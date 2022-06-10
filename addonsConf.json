@@ -86,9 +86,6 @@
   "vueAddon": {
     "type": "tool"
   },
-  "schoolRoutePlanning": {
-    "type": "tool"
-  },
   "streetSmart": {
     "type": "tool"
   },
@@ -140,10 +137,6 @@
   },
   "sturmflut": {
     "path":"gfiThemes/sturmflut",
-    "type": "gfiTheme"
-  },
-  "trafficCount": {
-    "path":"gfiThemes/trafficCount",
     "type": "gfiTheme"
   },
   "trinkwasser": {

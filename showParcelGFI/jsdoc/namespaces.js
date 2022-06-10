@@ -1,4 +1,0 @@
-/**
- * @namespace ShowParcelGFI
- * @memberof Addons
- */
