@@ -42,6 +42,7 @@
  */
 
 const state = {
+    type: "SdpAddon",
     active: false,
     id: "SdpAddon",
     // defaults for config.json parameters

@@ -1,4 +1,4 @@
-import LoaderOverlay from "../../../src/utils/loaderOverlay";
+import LoaderOverlay from "../../../src_3_0_0/app-store/js/loaderOverlay";
 import {WFS} from "ol/format.js";
 import {default as turfIntersect} from "@turf/intersect";
 import {polygon as turfPolygon} from "@turf/helpers";

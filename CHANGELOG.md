@@ -93,3 +93,4 @@ Addon `obliqueViewer` was renamed to `vcOblique`.
 ## v2.26.0 - 2022-10-05
 ### Added
 - The new addon [obliqueViewer](https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/obliqueViewer/) allows to configure oblique viewer in the Masterportal. Further details: [obliqueViewer documentation](https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/obliqueViewer/doc/config.json.md)
+### Fixed

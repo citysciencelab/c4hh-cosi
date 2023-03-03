@@ -1,4 +1,4 @@
-import {generateSimpleMutations} from "../../../src/app-store/utils/generators";
+import {generateSimpleMutations} from "../../../src_3_0_0/shared/js/utils/generators";
 import stateSdpAddon from "./stateSdpDownload";
 
 const mutations = {

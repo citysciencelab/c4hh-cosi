@@ -1,29 +1,4 @@
 {
-  "bauforum": "changeGUI/loader.js",
-  "formular": "view.js",
-  "showParcelGFI": "showParcelGFI.js",
-  "addLayerRemotely": {
-    "type": "javascript"
-  },
-  "gfiOnAddress": {
-    "type": "javascript"
-  },
-  "verkehrsfunctions": {
-    "type": "javascript"
-  },
-  "fileImportAddon": {
-    "type": "tool"
-  },
-  "cosiFileImport": {
-    "path": "cosi/cosiFileImport",
-    "type": "tool"
-  },
-  "boris": {
-    "type": "tool"
-  },
-  "populationRequest": {
-    "type": "tool"
-  },
   "sdpDownload": {
     "type": "tool"
   },

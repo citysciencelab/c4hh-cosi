@@ -1,15 +1,13 @@
 <script>
-import ToolTemplate from "../../../src/modules/tools/ToolTemplate.vue";
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import getters from "../store/gettersSdpDownload";
 import mutations from "../store/mutationsSdpDownload";
 import actions from "../store/actionsSdpDownload";
-import GraphicalSelect from "../../../src/share-components/graphicalSelect/components/GraphicalSelect.vue";
+import GraphicalSelect from "../../../src_3_0_0/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 
 export default {
     name: "SdpDownload",
     components: {
-        ToolTemplate,
         GraphicalSelect
     },
     data () {
@@ -61,7 +59,7 @@ export default {
      * @returns {void}
      */
     created () {
-        this.$on("close", this.close);
+       // this.$on("close", this.close);
     },
     /**
      * Put initialize functions here after mounting
@@ -71,8 +69,8 @@ export default {
         this.applyTranslationKey(this.name);
     },
     methods: {
-        ...mapMutations("Tools/SdpDownload", Object.keys(mutations)),
-        ...mapActions("Tools/SdpDownload", Object.keys(actions)),
+        ...mapMutations("Modules/SdpDownload", Object.keys(mutations)),
+        ...mapActions("Modules/SdpDownload", Object.keys(actions)),
         /**
          * Sets the focus to the first control
          * @returns {void}
@@ -123,16 +121,8 @@ export default {
 </script>
 
 <template lang="html">
-    <ToolTemplate
-        :title="$t(name)"
-        :icon="icon"
-        :active="active"
-        :render-to-window="renderToWindow"
-        :resizable-window="resizableWindow"
-        :initial-width="initialWidth"
-        :deactivate-gfi="deactivateGFI"
-    >
-        <template #toolBody>
+
+        <div>
             <form
                 id="sdp-download"
                 class="form-horizontal"
@@ -230,15 +220,13 @@ export default {
                     </button>
                 </div>
             </form>
-        </template>
-    </ToolTemplate>
+        </div>
 </template>
 
 <style lang="scss" scoped>
-    @import "~/css/mixins.scss";
 
 /*sdp download*/
-    #button-selectedDownload{
+  /* #button-selectedDownload{
         margin-top: 15px;
     }
     .btn, .btn-default, .btn-primary {
@@ -266,11 +254,11 @@ export default {
     .header {
         padding: 5px;
     }
-}
+}*/
 </style>
 
-<style lang="scss">
-@import "~variables";
+<style lang="scss" scoped>
+/* @import "~variables";
 
     #circle-overlay {
     position: absolute;
@@ -283,5 +271,5 @@ export default {
         background: rgba(51, 153, 204, 0.8);
         color: $white;
         padding: 4px 8px;
-    }
+    } */
 </style>
