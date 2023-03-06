@@ -1,5 +1,8 @@
 import LoaderOverlay from "../../../src_3_0_0/app-store/js/loaderOverlay";
 import {WFS} from "ol/format.js";
+import {rawLayerList} from "@masterportal/masterportalapi/src";
+import layerFactory from "../../../src_3_0_0/core/layers/js/layerFactory";
+import layerCollection from "../../../src_3_0_0/core/layers/js/layerCollection";
 import {default as turfIntersect} from "@turf/intersect";
 import {polygon as turfPolygon} from "@turf/helpers";
 import axios from "axios";
@@ -38,12 +41,23 @@ const actions = {
      * @param {Object} dispatch vuex element
      * @returns {void}
      */
-    toggleRasterLayer: function ({getters, dispatch}) {
+    toggleRasterLayer: function ({getters, dispatch, rootGetters}) {
         const layerId = getters.wmsRasterLayerId,
-            isActive = getters.active;
+            rasterLayerConfig = rawLayerList.getLayerWhere({id: layerId});
 
-        dispatch("addModelsByAttributesToModelList", layerId);
-        dispatch("setModelAttributesByIdToModelList", {layerId, isActive});
+
+        if (rasterLayerConfig && layerCollection.getLayerById(layerId) === undefined) {
+            console.log('---------');
+            const rasterLayer = layerFactory.createLayer(rasterLayerConfig);
+
+            layerCollection.addLayer(rasterLayer);
+
+            //dispatch("Maps/addLayer", rasterLayer.layer, {root: true});
+
+        }
+        else {
+            mapCollection.getMap("2D")?.removeLayer(layerCollection.getLayerById(layerId).layer);
+        }
     },
     /**
     * Loads the WFS raster with the params stored in property wfsRasterParams.

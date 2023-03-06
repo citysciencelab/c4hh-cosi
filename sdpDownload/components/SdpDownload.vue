@@ -20,7 +20,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Tools/SdpDownload", Object.keys(getters))
+        ...mapGetters("Modules/SdpDownload", Object.keys(getters))
     },
     watch: {
         /**
@@ -59,6 +59,8 @@ export default {
      * @returns {void}
      */
     created () {
+      /* this.$refs.graphicalSelection.setStatus(false);
+        this.$refs.graphicalSelection.resetView(); */
        // this.$on("close", this.close);
     },
     /**
@@ -67,6 +69,26 @@ export default {
      */
     mounted () {
         this.applyTranslationKey(this.name);
+        this.active = true;
+        this.$refs.graphicalSelection.createDrawInteraction();
+        this.toggleRasterLayer();
+        this.loadWfsRaster();
+        this.$refs.graphicalSelection.setStatus(true);
+        // this.$refs.graphicalSelection.resetGeographicSelection();
+    },
+    unmounted () {
+        this.setActive(false);
+        this.$refs.graphicalSelection.setStatus(false);
+        this.$refs.graphicalSelection.resetView();
+
+        // TODO replace trigger when Menu is migrated
+        // set the backbone model to active false for changing css class in menu (menu/desktop/tool/view.toggleIsActiveClass)
+        // else the menu-entry for this tool is always highlighted
+        /* const model = Radio.request("ModelList", "getModelByAttributes", {id: this.$store.state.Tools.SdpDownload.id});
+
+        if (model) {
+            model.set("isActive", false);
+        } */
     },
     methods: {
         ...mapMutations("Modules/SdpDownload", Object.keys(mutations)),
@@ -121,7 +143,6 @@ export default {
 </script>
 
 <template lang="html">
-
         <div>
             <form
                 id="sdp-download"

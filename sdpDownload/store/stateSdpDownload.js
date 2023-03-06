@@ -48,6 +48,7 @@ const state = {
     // defaults for config.json parameters
     name: "SDP Download",
     icon: "bi-download",
+    hasMouseMapInteractions: true,
     isVisibleInMenu: true,
     deactivateGFI: true,
     renderToSidebar: true,

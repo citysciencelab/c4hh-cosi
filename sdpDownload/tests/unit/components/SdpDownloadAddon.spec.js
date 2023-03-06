@@ -46,7 +46,7 @@ describe("SdpDownload.vue", () => {
                 selectedAreaGeoJson: {}
             }
         });
-        store.commit("Tools/SdpDownload/setActive", true);
+        store.commit("Modules/SdpDownload/setActive", true);
 
     });
 
