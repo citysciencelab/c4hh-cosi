@@ -25,7 +25,7 @@ export default {
     watch: {
         /**
          * Starts the action for processes and adds layers if the tool is activated (active === true)
-         * @param {Boolean} value value deciding whether the tool gets activated or deactivated
+         * @param {Boolean} value value deceiding whether the tool gets activated or deactivated
          * @returns {void}
          */
         active (value) {
@@ -33,12 +33,13 @@ export default {
                 this.$nextTick(() => {
                     this.toggleRasterLayer();
                     this.loadWfsRaster();
-                    this.$refs.graphicalSelection.setStatus(value);
+                    this.$refs.graphicalSelection.createDrawInteraction()
+                    //this.$refs.graphicalSelection.setStatus(value);
                     this.$refs.graphicalSelection.resetGeographicSelection();
                 });
                 this.setFocusToFirstControl();
             }
-            else {
+            if (!value) {
                 this.toggleRasterLayer();
                 this.$refs.graphicalSelection.setStatus(value);
                 this.$refs.graphicalSelection.resetView();
@@ -68,18 +69,20 @@ export default {
      * @returns {void}
      */
     mounted () {
-        this.applyTranslationKey(this.name);
-        this.active = true;
-        this.$refs.graphicalSelection.createDrawInteraction();
-        this.toggleRasterLayer();
+        this.setActive(true);
+        //this.$refs.graphicalSelection.createDrawInteraction();
         this.loadWfsRaster();
-        this.$refs.graphicalSelection.setStatus(true);
+        //this.$refs.graphicalSelection.setStatus(true);
         // this.$refs.graphicalSelection.resetGeographicSelection();
     },
-    unmounted () {
+    onBeforeUnmounted () {
         this.setActive(false);
+         this.$nextTick(() => {
+        this.toggleRasterLayer();
+        this.$refs.graphicalSelection.setActive(false);
         this.$refs.graphicalSelection.setStatus(false);
         this.$refs.graphicalSelection.resetView();
+         });
 
         // TODO replace trigger when Menu is migrated
         // set the backbone model to active false for changing css class in menu (menu/desktop/tool/view.toggleIsActiveClass)

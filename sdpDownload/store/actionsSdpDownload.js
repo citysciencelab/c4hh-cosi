@@ -16,9 +16,9 @@ const actions = {
      * @returns {void}
      */
     addModelsByAttributesToModelList: function (context, layerId) {
-        if (Radio.request("ModelList", "getModelsByAttributes", {id: layerId}).length === 0) {
+      /*   if (Radio.request("ModelList", "getModelsByAttributes", {id: layerId}).length === 0) {
             Radio.trigger("ModelList", "addModelsByAttributes", {id: layerId});
-        }
+        } */
     },
     /**
      * Sets the layer to the modellist
@@ -30,10 +30,10 @@ const actions = {
      * @returns {void}
      */
     setModelAttributesByIdToModelList: function (context, payload) {
-        Radio.trigger("ModelList", "setModelAttributesById", payload.layerId, {
+      /*   Radio.trigger("ModelList", "setModelAttributesById", payload.layerId, {
             isSelected: payload.isActive,
             isVisibleInMap: payload.isActive
-        });
+        }); */
     },
     /**
      * Shows or hides the raster layer
@@ -47,7 +47,6 @@ const actions = {
 
 
         if (rasterLayerConfig && layerCollection.getLayerById(layerId) === undefined) {
-            console.log('---------');
             const rasterLayer = layerFactory.createLayer(rasterLayerConfig);
 
             layerCollection.addLayer(rasterLayer);
@@ -55,7 +54,7 @@ const actions = {
             //dispatch("Maps/addLayer", rasterLayer.layer, {root: true});
 
         }
-        else {
+        if (!getters.active) {
             mapCollection.getMap("2D")?.removeLayer(layerCollection.getLayerById(layerId).layer);
         }
     },
@@ -118,14 +117,14 @@ const actions = {
      */
     calculateSelectedRasterNames: async function ({getters, dispatch, commit, rootState}) {
         const rasterLayerFeatures = getters.wfsRaster,
-            selectedAreaGeoJson = rootState.GraphicalSelect.selectedAreaGeoJson,
+            selectedAreaGeoJson = rootState.Modules.GraphicalSelect.selectedAreaGeoJson,
             rasterNames = [];
 
         if (selectedAreaGeoJson && selectedAreaGeoJson.coordinates) {
             const turfGeoSelection = turfPolygon([selectedAreaGeoJson.coordinates[0]]);
 
             rasterLayerFeatures.forEach(async feature => {
-                const featureGeojson = await dispatch("GraphicalSelect/featureToGeoJson", feature, {root: true}),
+                const featureGeojson = await dispatch("Modules/GraphicalSelect/featureToGeoJson", feature, {root: true}),
                     turfRaster = turfPolygon([featureGeojson.coordinates[0]]);
 
                 if (turfIntersect(turfGeoSelection, turfRaster)) {
@@ -254,8 +253,8 @@ const actions = {
      * @param {Object} commit vuex element
      * @returns {void}
      */
-    doRequest: function ({getters, dispatch, commit}, params) {
-        const url = Radio.request("RestReader", "getServiceById", getters.compressDataId).get("url"),
+    doRequest: function ({getters, dispatch, commit, rootGetters}, params) {
+        const url = rootGetters.restServiceById(getters.compressDataId).url,
             dataZip = axios.create();
 
         let alertingFailedToDownload = {},
@@ -263,13 +262,13 @@ const actions = {
 
         // function before the request is sent
         dataZip.interceptors.request.use(function (request) {
-            LoaderOverlay.show(15000);
+            LoaderOverlay.fade(15000);
             return request;
         });
 
         // function before the response is handled
         dataZip.interceptors.response.use(function (response) {
-            LoaderOverlay.hide();
+           // LoaderOverlay.hide();
             return response;
         });
 
