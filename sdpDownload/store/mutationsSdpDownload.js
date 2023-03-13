@@ -18,7 +18,7 @@ const mutations = {
      */
     applyTranslationKey: (state, payload) => {
         if (payload && payload.indexOf("translate#") > -1) {
-            state.name = payload.substr("translate#".length);
+            state.name = payload.substring("translate#".length);
         }
     },
     /**

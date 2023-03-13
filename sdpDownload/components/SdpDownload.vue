@@ -1,13 +1,14 @@
 <script>
+// todo
+// Layout + Spinner + css ref graphicalselect
 import {mapGetters, mapMutations, mapActions} from "vuex";
-import getters from "../store/gettersSdpDownload";
-import mutations from "../store/mutationsSdpDownload";
-import actions from "../store/actionsSdpDownload";
+import FlatButton from "../../../src_3_0_0/shared/modules/buttons/components/FlatButton.vue";
 import GraphicalSelect from "../../../src_3_0_0/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 
 export default {
     name: "SdpDownload",
     components: {
+        FlatButton,
         GraphicalSelect
     },
     data () {
@@ -20,49 +21,18 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/SdpDownload", Object.keys(getters))
-    },
-    watch: {
-        /**
-         * Starts the action for processes and adds layers if the tool is activated (active === true)
-         * @param {Boolean} value value deceiding whether the tool gets activated or deactivated
-         * @returns {void}
-         */
-        active (value) {
-            if (value) {
-                this.$nextTick(() => {
-                    this.toggleRasterLayer();
-                    this.loadWfsRaster();
-                    this.$refs.graphicalSelection.createDrawInteraction()
-                    //this.$refs.graphicalSelection.setStatus(value);
-                    this.$refs.graphicalSelection.resetGeographicSelection();
-                });
-                this.setFocusToFirstControl();
-            }
-            if (!value) {
-                this.toggleRasterLayer();
-                this.$refs.graphicalSelection.setStatus(value);
-                this.$refs.graphicalSelection.resetView();
-            }
-        },
-        /**
-         * Sets the graphicalSelection active or not
-         * @param {Boolean} value value deciding whether the graphicalSelection gets activated or deactivated
-         * @returns {void}
-         */
-        graphicalSelectStatus (value) {
-            this.$refs.graphicalSelection.setStatus(value);
-            this.$refs.graphicalSelection.resetView(value);
-        }
-    },
-    /**
-     * Initialize the closing of the tool window after created
-     * @returns {void}
-     */
-    created () {
-      /* this.$refs.graphicalSelection.setStatus(false);
-        this.$refs.graphicalSelection.resetView(); */
-       // this.$on("close", this.close);
+        ...mapGetters("Modules/SdpDownload", [
+            "formats",
+            "selectedFormat",
+            "selectFormat",
+            "howToChooseTiles",
+            "downloadDataPackage",
+            "specialDownloads",
+            "neuwerkDataPackage",
+            "scharhoernDataPackage",
+            "tileOverview310",
+            "tileOverview320"
+        ])
     },
     /**
      * Put initialize functions here after mounting
@@ -70,32 +40,29 @@ export default {
      */
     mounted () {
         this.setActive(true);
-        //this.$refs.graphicalSelection.createDrawInteraction();
         this.loadWfsRaster();
-        //this.$refs.graphicalSelection.setStatus(true);
-        // this.$refs.graphicalSelection.resetGeographicSelection();
-    },
-    onBeforeUnmounted () {
-        this.setActive(false);
-         this.$nextTick(() => {
         this.toggleRasterLayer();
-        this.$refs.graphicalSelection.setActive(false);
-        this.$refs.graphicalSelection.setStatus(false);
-        this.$refs.graphicalSelection.resetView();
-         });
-
-        // TODO replace trigger when Menu is migrated
-        // set the backbone model to active false for changing css class in menu (menu/desktop/tool/view.toggleIsActiveClass)
-        // else the menu-entry for this tool is always highlighted
-        /* const model = Radio.request("ModelList", "getModelByAttributes", {id: this.$store.state.Tools.SdpDownload.id});
-
-        if (model) {
-            model.set("isActive", false);
-        } */
+        this.$refs.graphicalSelection.createDrawInteraction();
+        this.setFocusToFirstControl();
+    },
+    beforeUnmount () {
+        this.setActive(false);
+        this.toggleRasterLayer();
+        this.clearGraphicalSelect();
     },
     methods: {
-        ...mapMutations("Modules/SdpDownload", Object.keys(mutations)),
-        ...mapActions("Modules/SdpDownload", Object.keys(actions)),
+        ...mapMutations("Modules/SdpDownload", [
+            "setActive",
+            "setSelectedFormat",
+            "setType"
+        ]),
+        ...mapActions("Modules/SdpDownload", [
+            "requestCompressedData",
+            "requestCompressRasterOverviewData",
+            "requestCompressIslandData",
+            "loadWfsRaster",
+            "toggleRasterLayer"
+        ]),
         /**
          * Sets the focus to the first control
          * @returns {void}
@@ -122,139 +89,130 @@ export default {
             }
             return this.$t(key, options);
         },
-
         /**
-         * Closes this tool window by setting active to false
+         * Removes drawn objects and interactions from graphicalSelection
          * @returns {void}
          */
-        close () {
-            this.setActive(false);
+        clearGraphicalSelect () {
             this.$refs.graphicalSelection.setStatus(false);
             this.$refs.graphicalSelection.resetView();
-
-            // TODO replace trigger when Menu is migrated
-            // set the backbone model to active false for changing css class in menu (menu/desktop/tool/view.toggleIsActiveClass)
-            // else the menu-entry for this tool is always highlighted
-            const model = Radio.request("ModelList", "getModelByAttributes", {id: this.$store.state.Tools.SdpDownload.id});
-
-            if (model) {
-                model.set("isActive", false);
-            }
         }
     }
 };
 </script>
 
 <template lang="html">
-        <div>
-            <form
-                id="sdp-download"
-                class="form-horizontal"
-            >
-                <div class="form-group form-group-sm">
-                    <div class="row">
-                        <label
-                            for="formatSelection"
-                            class="col-sm-5 col-form-label"
+    <div>
+        <form
+            id="sdp-download"
+            class="form-horizontal"
+        >
+            <div class="form-group form-group-sm">
+                <div class="row">
+                    <label
+                        for="formatSelection"
+                        class="col-sm-5 col-form-label"
+                    >
+                        {{ translate(selectFormat) }}
+                    </label>
+                    <div class="col-sm-7 ">
+                        <select
+                            id="formatSelection"
+                            ref="formatSelection"
+                            name="formatSelection"
+                            class="form-control formatselect"
+                            @change="setSelectedFormat($event.target.value)"
                         >
-                            {{ translate(selectFormat) }}
-                        </label>
-                        <div class="col-sm-7 ">
-                            <select
-                                id="formatSelection"
-                                ref="formatSelection"
-                                name="formatSelection"
-                                class="form-control formatselect"
-                                @change="setSelectedFormat($event.target.value)"
+                            <option
+                                v-for="(format,index) in formats"
+                                :key="index"
+                                :value="format.id"
+                                data-bs-toggle="tooltip"
+                                :title="format.label"
                             >
-                                <option
-                                    v-for="(format,index) in formats"
-                                    :key="index"
-                                    :value="format.id"
-                                    data-bs-toggle="tooltip"
-                                    :title="format.label"
-                                >
-                                    {{ translate(`additional:modules.tools.sdpdownload.${format.fileId}Label`) }}
-                                </option>
-                            </select>
-                        </div>
+                                {{ translate(`additional:modules.tools.sdpdownload.${format.fileId}Label`) }}
+                            </option>
+                        </select>
                     </div>
                 </div>
-                <div class="form-group col-12">
-                    <div
-                        class="form-group form-group-sm"
-                    >
-                        <GraphicalSelect
-                            ref="graphicalSelection"
-                            :label="howToChooseTiles"
-                        />
-                    </div>
+            </div>
+            <div class="form-group col-12">
+                <div
+                    class="form-group form-group-sm"
+                >
+                    <GraphicalSelect
+                        ref="graphicalSelection"
+                        :label="howToChooseTiles"
+                    />
                 </div>
-                <div class="form-group col-12 limiter">
-                    <button
-                        id="button-selectedDownload"
-                        type="button"
-                        class="btn btn-primary btn-sm btn-block center-block w-100"
-                        @click="requestCompressedData"
-                    >
-                        {{ translate(downloadDataPackage) }}
-                    </button>
-                </div>
-                <div class="form-group col-12">
-                    <span>{{ translate(specialDownloads) }}</span>
-                </div>
-                <div class="form-group col-12">
-                    <button
-                        id="button-neuwerk"
-                        type="button"
-                        class="w-100 btn btn-sm btn-outline-default btn-block center-block"
-                        @click="requestCompressIslandData('Neuwerk')"
-                    >
-                        {{ translate(neuwerkDataPackage) }}
-                    </button>
-                </div>
-                <div class="form-group col-12">
-                    <button
-                        id="button-scharhoern"
-                        type="button"
-                        class="w-100 btn btn-sm btn-outline-default btn-block center-block"
-                        @click="requestCompressIslandData('Scharhoern')"
-                    >
-                        {{ $t(scharhoernDataPackage) }}
-                    </button>
-                </div>
-                <div class="form-group col-12">
-                    <button
-                        id="button-310"
-                        type="button"
-                        class="w-100 btn btn-sm btn-outline-default btn-block center-block"
-                        @click="requestCompressRasterOverviewData('LS310')"
-                    >
-                        {{ translate(tileOverview310) }}
-                    </button>
-                </div>
-                <div class="form-group col-12">
-                    <button
-                        id="button-320"
-                        type="button"
-                        class="w-100 btn btn-sm btn-outline-default btn-block center-block"
-                        @click="requestCompressRasterOverviewData('LS320')"
-                    >
-                        {{ translate(tileOverview320) }}
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <FlatButton
+                    id="flatButton-selectedDownload"
+                    aria-label="translate(downloadDataPackage)"
+                    type="button"
+                    :text="translate(downloadDataPackage)"
+                    :icon="sendIcon"
+                    :interaction="() => requestCompressedData ()"
+                />
+            </div>
+            <div class="form-group col-12">
+                <span>{{ translate(specialDownloads) }}</span>
+            </div>
+            <div class="form-group col-12">
+                <button
+                    id="button-neuwerk"
+                    type="button"
+                    class="w-100 btn btn-sm btn-outline-default btn-block center-block"
+                    @click="requestCompressIslandData('Neuwerk')"
+                >
+                    {{ translate(neuwerkDataPackage) }}
+                </button>
+            </div>
+            <div class="form-group col-12">
+                <button
+                    id="button-scharhoern"
+                    type="button"
+                    class="w-100 btn btn-sm btn-outline-default btn-block center-block"
+                    @click="requestCompressIslandData('Scharhoern')"
+                >
+                    {{ $t(scharhoernDataPackage) }}
+                </button>
+            </div>
+            <div class="form-group col-12">
+                <button
+                    id="button-310"
+                    type="button"
+                    class="w-100 btn btn-sm btn-outline-default btn-block center-block"
+                    @click="requestCompressRasterOverviewData('LS310')"
+                >
+                    {{ translate(tileOverview310) }}
+                </button>
+            </div>
+            <div class="form-group col-12">
+                <button
+                    id="button-320"
+                    type="button"
+                    class="w-100 btn btn-sm btn-outline-default btn-block center-block"
+                    @click="requestCompressRasterOverviewData('LS320')"
+                >
+                    {{ translate(tileOverview320) }}
+                </button>
+            </div>
+        </form>
+    </div>
 </template>
 
 <style lang="scss" scoped>
+  @import "~variables";
+  @import "~mixins";
 
 /*sdp download*/
-  /* #button-selectedDownload{
+    #button-selectedDownload{
         margin-top: 15px;
     }
-    .btn, .btn-default, .btn-primary {
-        white-space:initial;
+    .btn[id*='button-'] {
+        color:$dark_grey;
         &:focus {
             @include primary_action_focus;
         }
@@ -274,26 +232,21 @@ export default {
         border-bottom: 1px solid rgb(229,229,229);
         padding-bottom: 20px;
     }
-@media (min-width: 768px) {
-    .header {
-        padding: 5px;
-    }
-}*/
 </style>
 
-<style lang="scss" scoped>
-/* @import "~variables";
+<style lang="scss">
+ @import "~variables";
 
     #circle-overlay {
-    position: absolute;
-    background: rgba(51, 153, 204, 0.8);
-    color: $white;
-    padding: 4px 8px;
+        position: absolute;
+        background: rgba(51, 153, 204, 0.8);
+        color: $white;
+        padding: 4px 8px;
     }
     #tooltip-overlay {
         position: absolute;
         background: rgba(51, 153, 204, 0.8);
         color: $white;
         padding: 4px 8px;
-    } */
+    }
 </style>

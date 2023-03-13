@@ -5,11 +5,6 @@
  * @property {Boolean} id= SdpAddon internal used id
  * @property {String} name= SDP Download module name, // must be here although it is in the config.json, else it is lost
  * @property {String} icon= icon name string that represents the tool icon // must be here although it is in the config.json, else it is lost
- * @property {Boolean} isVisibleInMenu= true show the tool entry in the tool menu list
- * @property {Boolean} deactivateGFI= true avoid show DK5-Info if user clicks into Map
- * @property {Boolean} renderToSidebar= true show this tool in sidebar
- * @property {Boolean} renderToWindow= false not show this tool in window
- * @property {Number} initialWidth Size of the sidebar when opening.
  * @property {String} wmsRasterLayerId= "4707" id of the Layer utm_dk5_1km (WMS Uebersicht Kachelbezeichnungen)
  * @property {String[]} formats= [] provided formats of data to download
  * @property {String} selectedFormat= "NAS" is the preselected format
@@ -49,12 +44,6 @@ const state = {
     name: "SDP Download",
     icon: "bi-download",
     hasMouseMapInteractions: true,
-    isVisibleInMenu: true,
-    deactivateGFI: true,
-    renderToSidebar: true,
-    renderToWindow: false,
-    resizableWindow: true,
-    initialWidth: 500,
     wmsRasterLayerId: "4707",
     formats: [
         {id: "NAS", label: "additional:modules.tools.sdpdownload.nasLabel", isSelected: true, desc: "additional:modules.tools.sdpdownload.nasDescription", fileId: "nas"},

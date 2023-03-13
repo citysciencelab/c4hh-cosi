@@ -9,53 +9,20 @@ import axios from "axios";
 
 const actions = {
     /**
-     * Adds the layer to the modellist
-     * @param {Object} context of this component
-     * @param {String} layerId id of the layer
-     * @fires Core.ModelList#RadioTriggerModelListAddModelsByAttributes
-     * @returns {void}
-     */
-    addModelsByAttributesToModelList: function (context, layerId) {
-      /*   if (Radio.request("ModelList", "getModelsByAttributes", {id: layerId}).length === 0) {
-            Radio.trigger("ModelList", "addModelsByAttributes", {id: layerId});
-        } */
-    },
-    /**
-     * Sets the layer to the modellist
-     * @param {Object} context vuex element
-     * @param {Object} payload vuex element
-     * @param {Boolean} payload.isActive true if the layer is selected and is visible in map
-     * @param {String} payload.layerId id of the layer
-     * @fires  Core.ModelList#RadioTriggerModelListSetModelAttributesById
-     * @returns {void}
-     */
-    setModelAttributesByIdToModelList: function (context, payload) {
-      /*   Radio.trigger("ModelList", "setModelAttributesById", payload.layerId, {
-            isSelected: payload.isActive,
-            isVisibleInMap: payload.isActive
-        }); */
-    },
-    /**
      * Shows or hides the raster layer
      * @param {Object} getters vuex element
-     * @param {Object} dispatch vuex element
      * @returns {void}
-     */
-    toggleRasterLayer: function ({getters, dispatch, rootGetters}) {
+    */
+    toggleRasterLayer: function ({getters}) {
         const layerId = getters.wmsRasterLayerId,
-            rasterLayerConfig = rawLayerList.getLayerWhere({id: layerId});
+            rasterLayerConfig = rawLayerList.getLayerWhere({id: layerId}),
+            rasterLayer = layerFactory.createLayer(rasterLayerConfig);
 
-
-        if (rasterLayerConfig && layerCollection.getLayerById(layerId) === undefined) {
-            const rasterLayer = layerFactory.createLayer(rasterLayerConfig);
-
-            layerCollection.addLayer(rasterLayer);
-
-            //dispatch("Maps/addLayer", rasterLayer.layer, {root: true});
-
-        }
         if (!getters.active) {
-            mapCollection.getMap("2D")?.removeLayer(layerCollection.getLayerById(layerId).layer);
+            layerCollection.removeLayerById(layerId);
+        }
+        else if (rasterLayerConfig && layerCollection.getLayerById(layerId) === undefined) {
+            layerCollection.addLayer(rasterLayer);
         }
     },
     /**
@@ -87,7 +54,7 @@ const actions = {
             })
             .catch(error => {
                 alertingFailedToDownload = {
-                    "category": i18next.t(getters.error),
+                    "category": "error",
                     "content": i18next.t(getters.downloadError),
                     "displayClass": "error"
                 };
@@ -100,7 +67,7 @@ const actions = {
      * @param {Object} commit vuex element
      * @param {Object} data of the wfs response (XML)
      * @returns {void}
-     */
+    */
     readFeatures: function ({commit}, data) {
         const format = new WFS(),
             features = format.readFeatures(data);
@@ -114,7 +81,7 @@ const actions = {
      * @param {Object} dispatch vuex element
      * @param {Object} rootState vuex element
      * @returns {void}
-     */
+    */
     calculateSelectedRasterNames: async function ({getters, dispatch, commit, rootState}) {
         const rasterLayerFeatures = getters.wfsRaster,
             selectedAreaGeoJson = rootState.Modules.GraphicalSelect.selectedAreaGeoJson,
@@ -142,7 +109,7 @@ const actions = {
      * @param {Object} payload.feature to get the name of the tile
      * @param {Object} payload.rasterNames array to fill with unique names
      * @returns {void}
-     */
+    */
     addFeaturenameToRasternames: function (context, payload) {
         if (payload.feature && payload.rasterNames) {
             const intersectedRasterName = payload.feature.getProperties().kachel,
@@ -158,7 +125,7 @@ const actions = {
      * @param {Object} getters vuex element
      * @param {Object} dispatch vuex element
      * @returns {void}
-     */
+    */
     requestCompressedData: async function ({getters, dispatch}) {
         const params = {};
 
@@ -197,7 +164,7 @@ const actions = {
 
         if (selectedRasterNames.length > getters.selectedRasterLimit) {
             alertingTilesAmount = {
-                "category": i18next.t(getters.info),
+                "category": "info",
                 "content": i18next.t(getters.tooManyTilesSelected, {tilesCount: selectedRasterNames.length, maxTiles: getters.selectedRasterLimit}),
                 "displayClass": "info"
             };
@@ -207,7 +174,7 @@ const actions = {
         }
         else if (selectedRasterNames.length === 0) {
             alertingNoTiles = {
-                "category": i18next.t(getters.info),
+                "category": "info",
                 "content": "<strong>" + getters.pleaseSelectTiles + "</strong>",
                 "displayClass": "info"
             };
