@@ -2,7 +2,6 @@
  * User type definition
  * @typedef {Object} VueAddonState
  * @property {Boolean} active= false state of the tool
- * @property {Boolean} id= SdpAddon internal used id
  * @property {String} name= SDP Download module name, // must be here although it is in the config.json, else it is lost
  * @property {String} icon= icon name string that represents the tool icon // must be here although it is in the config.json, else it is lost
  * @property {String} wmsRasterLayerId= "4707" id of the Layer utm_dk5_1km (WMS Uebersicht Kachelbezeichnungen)
