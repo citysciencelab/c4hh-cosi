@@ -55,8 +55,7 @@ const actions = {
             .catch(error => {
                 alertingFailedToDownload = {
                     "category": "error",
-                    "content": i18next.t(getters.downloadError),
-                    "displayClass": "error"
+                    "content": i18next.t(getters.downloadError)
                 };
                 dispatch("Alerting/addSingleAlert", alertingFailedToDownload, {root: true});
                 console.error(error.response);
@@ -165,8 +164,7 @@ const actions = {
         if (selectedRasterNames.length > getters.selectedRasterLimit) {
             alertingTilesAmount = {
                 "category": "info",
-                "content": i18next.t(getters.tooManyTilesSelected, {tilesCount: selectedRasterNames.length, maxTiles: getters.selectedRasterLimit}),
-                "displayClass": "info"
+                "content": i18next.t(getters.tooManyTilesSelected, {tilesCount: selectedRasterNames.length, maxTiles: getters.selectedRasterLimit})
             };
             dispatch("Alerting/addSingleAlert", alertingTilesAmount, {root: true});
             LoaderOverlay.hide();
@@ -174,9 +172,8 @@ const actions = {
         }
         else if (selectedRasterNames.length === 0) {
             alertingNoTiles = {
-                "category": "info",
-                "content": "<strong>" + getters.pleaseSelectTiles + "</strong>",
-                "displayClass": "info"
+                "category": "error",
+                "content": "<strong>" + i18next.t(getters.pleaseSelectTiles) + "</strong>"
             };
             dispatch("Alerting/addSingleAlert", alertingNoTiles, {root: true});
             return false;
@@ -235,7 +232,7 @@ const actions = {
 
         // function before the response is handled
         dataZip.interceptors.response.use(function (response) {
-           // LoaderOverlay.hide();
+         // LoaderOverlay.hide();
             return response;
         });
 
@@ -247,9 +244,8 @@ const actions = {
                 commit("setGraphicalSelectStatus", true);
                 if (resp.status !== 200) {
                     alertingFailedToDownload = {
-                        "category": i18next.t(getters.error),
-                        "content": "<strong>" + i18next.t(getters.failedToDownload) + "</strong> <br> <small>" + i18next.t(getters.details) + " " + resp.data + "</small>",
-                        "displayClass": "error"
+                        "category": "error",
+                        "content": "<strong>" + i18next.t(getters.failedToDownload) + "</strong> <br> <small>" + i18next.t(getters.details) + " " + resp.data + "</small>"
                     };
                     dispatch("Alerting/addSingleAlert", alertingFailedToDownload, {root: true});
                 }
@@ -274,9 +270,8 @@ const actions = {
             })
             .catch(() => {
                 alertingServiceNotresponding = {
-                    "category": i18next.t(getters.error),
-                    "content": "<strong>" + i18next.t(getters.failedToDownload) + "</strong> <br> <small>" + i18next.t(getters.details) + " " + i18next.t(getters.serviceNotResponding) + "</small>",
-                    "displayClass": "error"
+                    "category": "error",
+                    "content": "<strong>" + i18next.t(getters.failedToDownload) + "</strong> <br> <small>" + i18next.t(getters.details) + " " + i18next.t(getters.serviceNotResponding) + "</small>"
                 };
                 commit("setGraphicalSelectStatus", false);
                 dispatch("Alerting/addSingleAlert", alertingServiceNotresponding, {root: true});

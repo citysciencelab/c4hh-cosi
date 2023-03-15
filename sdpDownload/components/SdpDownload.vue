@@ -1,6 +1,6 @@
 <script>
 // todo
-// Layout + Spinner + css ref graphicalselect
+// Spinner
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import FlatButton from "../../../src_3_0_0/shared/modules/buttons/components/FlatButton.vue";
 import GraphicalSelect from "../../../src_3_0_0/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
@@ -107,34 +107,28 @@ export default {
             id="sdp-download"
             class="form-horizontal"
         >
-            <div class="form-group form-group-sm">
-                <div class="row">
-                    <label
-                        for="formatSelection"
-                        class="col-sm-5 col-form-label"
+            <div class="form-floating mb-3">
+                <select
+                    id="formatSelection"
+                    ref="formatSelection"
+                    name="formatSelection"
+                    aria-label="$t(selectFormat)"
+                    class="form-select"
+                    @change="setSelectedFormat($event.target.value)"
+                >
+                    <option
+                        v-for="(format,index) in formats"
+                        :key="index"
+                        :value="format.id"
+                        data-bs-toggle="tooltip"
+                        :title="format.label"
                     >
-                        {{ translate(selectFormat) }}
-                    </label>
-                    <div class="col-sm-7 ">
-                        <select
-                            id="formatSelection"
-                            ref="formatSelection"
-                            name="formatSelection"
-                            class="form-control formatselect"
-                            @change="setSelectedFormat($event.target.value)"
-                        >
-                            <option
-                                v-for="(format,index) in formats"
-                                :key="index"
-                                :value="format.id"
-                                data-bs-toggle="tooltip"
-                                :title="format.label"
-                            >
-                                {{ translate(`additional:modules.tools.sdpdownload.${format.fileId}Label`) }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
+                        {{ translate(`additional:modules.tools.sdpdownload.${format.fileId}Label`) }}
+                    </option>
+                </select>
+                <label for="printLayout">
+                    {{ $t(selectFormat) }}
+                </label>
             </div>
             <div class="form-group col-12">
                 <div
@@ -146,7 +140,7 @@ export default {
                     />
                 </div>
             </div>
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center mt-3">
                 <FlatButton
                     id="flatButton-selectedDownload"
                     aria-label="translate(downloadDataPackage)"
@@ -157,6 +151,7 @@ export default {
                 />
             </div>
             <div class="form-group col-12">
+                <hr class="mt-1">
                 <span>{{ translate(specialDownloads) }}</span>
             </div>
             <div class="form-group col-12">
@@ -234,6 +229,7 @@ export default {
     }
 </style>
 
+// Only works unscoped
 <style lang="scss">
  @import "~variables";
 
