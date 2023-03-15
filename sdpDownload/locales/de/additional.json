@@ -3,7 +3,7 @@
         "tools": {
             "sdpdownload": {
                 "name": "SDP Download",
-                "selectFormat": "Wählen Sie das Format aus:",
+                "selectFormat": "Welches Format möchten Sie?",
                 "howToChooseTiles": "Wie möchten Sie die Kacheln auswählen?",
                 "downloadDataPackage": "Datenpaket herunterladen",
                 "specialDownloads": "Spezielle Downloads:",

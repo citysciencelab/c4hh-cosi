@@ -1,6 +1,4 @@
 <script>
-// todo
-// Spinner
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import FlatButton from "../../../src_3_0_0/shared/modules/buttons/components/FlatButton.vue";
 import GraphicalSelect from "../../../src_3_0_0/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
@@ -23,6 +21,8 @@ export default {
     computed: {
         ...mapGetters("Modules/SdpDownload", [
             "formats",
+            "icon",
+            "transactionProcessing",
             "selectedFormat",
             "selectFormat",
             "howToChooseTiles",
@@ -146,7 +146,8 @@ export default {
                     aria-label="translate(downloadDataPackage)"
                     type="button"
                     :text="translate(downloadDataPackage)"
-                    :icon="sendIcon"
+                    :icon="icon"
+                    :spinner-trigger="transactionProcessing"
                     :interaction="() => requestCompressedData ()"
                 />
             </div>

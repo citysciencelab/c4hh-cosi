@@ -224,6 +224,7 @@ const actions = {
         let alertingFailedToDownload = {},
             alertingServiceNotresponding = {};
 
+        commit("setTransactionProcessing", true);
         // function before the request is sent
         dataZip.interceptors.request.use(function (request) {
             LoaderOverlay.fade(15000);
@@ -232,7 +233,7 @@ const actions = {
 
         // function before the response is handled
         dataZip.interceptors.response.use(function (response) {
-         // LoaderOverlay.hide();
+            commit("setTransactionProcessing", false);
             return response;
         });
 

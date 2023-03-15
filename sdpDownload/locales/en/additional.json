@@ -3,7 +3,7 @@
         "tools": {
             "sdpdownload": {
                 "name": "SDP Download",
-                "selectFormat": "Select the format:",
+                "selectFormat": "Which format do you like?",
                 "howToChooseTiles": "How would you like to choose the tiles?",
                 "downloadDataPackage": "Download data package",
                 "specialDownloads:": "Special downloads",

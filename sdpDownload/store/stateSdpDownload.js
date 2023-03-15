@@ -19,6 +19,7 @@
  * @property {Boolean} graphicalSelectStatus= {} status for graphical selection
  * @property {Object} selectedRasterLimit= 9 limit og raster images for download
  * @property {String[]} rasterNames=[] stores the names of the tiles in the raster
+ * @property {Boolean} transactionProcessing Flag if a download is currently active
  * @property {String} selectFormat= "additional:modules.tools.sdpdownload.selectFormat" contains the translated text
  * @property {String} howToChooseTiles= "additional:modules.tools.sdpdownload.howToChooseTiles" contains the translated text
  * @property {String} downloadDataPackage= "additional:modules.tools.sdpdownload.downloadDataPackage" contains the translated text
@@ -63,6 +64,7 @@ const state = {
     graphicalSelectStatus: true,
     selectedRasterLimit: 9,
     rasterNames: [],
+    transactionProcessing: false,
     selectFormat: "additional:modules.tools.sdpdownload.selectFormat",
     howToChooseTiles: "additional:modules.tools.sdpdownload.howToChooseTiles",
     downloadDataPackage: "additional:modules.tools.sdpdownload.downloadDataPackage",
