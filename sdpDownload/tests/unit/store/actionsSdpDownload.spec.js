@@ -1,6 +1,7 @@
 import {expect} from "chai";
 import actions from "../../../store/actionsSdpDownload";
 import importedState from "../../../store/stateSdpDownload";
+import layerCollection from "../../../../../src_3_0_0/core/layers/js/layerCollection";
 import axios from "axios";
 import sinon from "sinon";
 
@@ -24,32 +25,15 @@ describe("addons/sdpdownload/store/actionsSdpDownload", () => {
     afterEach(sinon.restore);
 
 
-    it("setModelAttributesByIdToModelList calls Backbone ModelList.setModelAttributesById", () => {
-        const radioTrigger = sinon.spy(Radio, "trigger"),
-            payload = {layerId: "4707", isActive: true};
+    it("toggleRasterLayer dispatch removeLayerById if active is false", () => {
+        getters = {wmsRasterLayerId: importedState.wmsRasterLayerId, active: false};
 
-
-        actions.setModelAttributesByIdToModelList(context, payload);
-
-        expect(radioTrigger.calledOnceWithExactly("ModelList", "setModelAttributesById", payload.layerId, {
-            isSelected: payload.isActive,
-            isVisibleInMap: payload.isActive
-        })).to.be.true;
-
-    });
-    it("toggleRasterLayer dispatch addModelsByAttributesToModelList, setModelsByAttributesToModelList", () => {
-        getters = {wmsRasterLayerId: importedState.wmsRasterLayerId, active: true};
+        // dispatches actions
+        const stubAddLayer = sinon.stub(layerCollection, "removeLayerById");
 
         actions.toggleRasterLayer({getters, dispatch});
 
-        // dispatches actions
-        expect(dispatch.calledTwice).to.be.true;
-        expect(dispatch.firstCall.args).to.eql(["addModelsByAttributesToModelList", importedState.wmsRasterLayerId]);
-        expect(dispatch.secondCall.args).to.eql(["setModelAttributesByIdToModelList", {layerId: importedState.wmsRasterLayerId, isActive: true}]);
-        expect(typeof dispatch.firstCall.args[1]).to.eql("string");
-        expect(typeof dispatch.secondCall.args[1]).to.eql("object");
-        expect(typeof dispatch.secondCall.args[1].layerId).to.eql("string");
-        expect(typeof dispatch.secondCall.args[1].isActive).to.eql("boolean");
+        expect(stubAddLayer.calledOnce).to.be.true;
     });
     it("loadWfsRaster dispatch addModelsByAttributesToModelList, setModelsByAttributesToModelList", () => {
         // how to handle axios and the parameters?
@@ -90,7 +74,7 @@ describe("addons/sdpdownload/store/actionsSdpDownload", () => {
         const rasterNames = [];
 
         getters = {wfsRaster: importedState.wfsRaster};
-        rootState = {GraphicalSelect: {selectedAreaGeoJson: undefined}};
+        rootState = {Modules: {GraphicalSelect: {selectedAreaGeoJson: undefined}}};
 
         actions.calculateSelectedRasterNames({getters, dispatch, commit, rootState});
 

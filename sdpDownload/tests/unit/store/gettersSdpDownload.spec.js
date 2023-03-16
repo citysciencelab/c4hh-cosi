@@ -17,20 +17,11 @@ describe("addons/SdpDownload/store/gettersSdpDownload", function () {
         it("returns the icon default value from state", function () {
             expect(stateSdpDownload.icon).to.be.equal("bi-download");
         });
-        it("returns the renderToWindow default value from state", function () {
-            expect(stateSdpDownload.renderToWindow).to.be.false;
+        it("returns the hasMouseMapInteractions default value from state", function () {
+            expect(stateSdpDownload.hasMouseMapInteractions).to.be.true;
         });
-        it("returns the resizableWindow default value from state", function () {
-            expect(stateSdpDownload.resizableWindow).to.be.true;
-        });
-        it("returns the isVisibleInMenu default value from state", function () {
-            expect(stateSdpDownload.isVisibleInMenu).to.be.true;
-        });
-        it("returns the deactivateGFI default value from state", function () {
-            expect(stateSdpDownload.deactivateGFI).to.be.true;
-        });
-        it("returns the renderToSidebar default value from state", function () {
-            expect(stateSdpDownload.renderToSidebar).to.be.true;
+        it("returns the transactionProcessing default value from state", function () {
+            expect(stateSdpDownload.transactionProcessing).to.be.false;
         });
         it("returns the wmsRasterLayerId default value from state", function () {
             expect(stateSdpDownload.wmsRasterLayerId).to.be.equal("4707");
