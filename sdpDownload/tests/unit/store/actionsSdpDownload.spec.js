@@ -108,7 +108,6 @@ describe("addons/sdpdownload/store/actionsSdpDownload", () => {
 
         actions.requestCompressIslandData({getters, dispatch}, islandName);
 
-        // dispatches actions
         expect(dispatch.called).to.be.true;
         expect(dispatch.calledOnceWithExactly("doRequest", params)).to.be.true;
         expect(typeof dispatch.args[0][1]).to.equal("object");

@@ -180,4 +180,18 @@ describe("SdpDownload.vue", () => {
 
         spy.restore();
     });
+    it.skip("clearGraphicalSelect execute setStatus,resetView", async () => {
+        const wrapper = await mount(SDPComponent, {
+                global: {
+                    plugins: [store]
+                }
+            }),
+            mockedsetStatus = sinon.stub(wrapper.vm.$refs.graphicalSelection, "setStatus"),
+            mockedresetView = sinon.stub(wrapper.vm.$refs.graphicalSelection, "resetView");
+
+        await SDPComponent.methods.clearGraphicalSelect();
+
+        expect(mockedsetStatus.calledOnce).to.be.true;
+        expect(mockedresetView.calledOnce).to.be.true;
+    });
 });

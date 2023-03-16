@@ -1,9 +1,11 @@
 /**
  * User type definition
- * @typedef {Object} VueAddonState
+ * @typedef {Object} SdpDownloadState
+ * @property {String} type Type of the SdpDownload component.
  * @property {Boolean} active= false state of the tool
  * @property {String} name= SDP Download module name, // must be here although it is in the config.json, else it is lost
  * @property {String} icon= icon name string that represents the tool icon // must be here although it is in the config.json, else it is lost
+ * @property {Boolean} hasMouseMapInteractions If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
  * @property {String} wmsRasterLayerId= "4707" id of the Layer utm_dk5_1km (WMS Uebersicht Kachelbezeichnungen)
  * @property {String[]} formats= [] provided formats of data to download
  * @property {String} selectedFormat= "NAS" is the preselected format
@@ -20,26 +22,26 @@
  * @property {Object} selectedRasterLimit= 9 limit og raster images for download
  * @property {String[]} rasterNames=[] stores the names of the tiles in the raster
  * @property {Boolean} transactionProcessing Flag if a download is currently active
- * @property {String} selectFormat= "additional:modules.tools.sdpdownload.selectFormat" contains the translated text
- * @property {String} howToChooseTiles= "additional:modules.tools.sdpdownload.howToChooseTiles" contains the translated text
- * @property {String} downloadDataPackage= "additional:modules.tools.sdpdownload.downloadDataPackage" contains the translated text
- * @property {String} specialDownloads= "additional:modules.tools.sdpdownload.specialDownloads" contains the translated text
- * @property {String} neuwerkDataPackage= "additional:modules.tools.sdpdownload.neuwerkDataPackage" contains the translated text
- * @property {String} scharhoernDataPackage= "additional:modules.tools.sdpdownload.scharhoernDataPackage" contains the translated text
- * @property {String} tileOverview310= "additional:modules.tools.sdpdownload.tileOverview310" contains the translated text
- * @property {String} tileOverview320= "additional:modules.tools.sdpdownload.tileOverview320" contains the translated text
- * @property {String} pleaseSelectTiles= "additional:modules.tools.sdpdownload.pleaseSelectTiles" contains the translated text
- * @property {String} failedToDownload= "additional:modules.tools.sdpdownload.failedToDownload" contains the translated text
- * @property {String} details= "additional:modules.tools.sdpdownload.details" contains the translated text
- * @property {String} error= "additional:modules.tools.sdpdownload.alerts.error" contains the translated text
- * @property {String} info= "additional:modules.tools.sdpdownload.alerts.info" contains the translated text
- * @property {String} tooManyTilesSelected= "additional:modules.tools.sdpdownload.tooManyTilesSelected" contains the translated text
+ * @property {String} selectFormat= additional:modules.tools.sdpdownload.selectFormat" contains the translated text
+ * @property {String} howToChooseTiles= additional:modules.tools.sdpdownload.howToChooseTiles" contains the translated text
+ * @property {String} downloadDataPackage= additional:modules.tools.sdpdownload.downloadDataPackage" contains the translated text
+ * @property {String} specialDownloads= additional:modules.tools.sdpdownload.specialDownloads" contains the translated text
+ * @property {String} neuwerkDataPackage= additional:modules.tools.sdpdownload.neuwerkDataPackage" contains the translated text
+ * @property {String} scharhoernDataPackage= additional:modules.tools.sdpdownload.scharhoernDataPackage" contains the translated text
+ * @property {String} tileOverview310= additional:modules.tools.sdpdownload.tileOverview310" contains the translated text
+ * @property {String} tileOverview320= additional:modules.tools.sdpdownload.tileOverview320" contains the translated text
+ * @property {String} pleaseSelectTiles= additional:modules.tools.sdpdownload.pleaseSelectTiles" contains the translated text
+ * @property {String} failedToDownload= additional:modules.tools.sdpdownload.failedToDownload" contains the translated text
+ * @property {String} details= additional:modules.tools.sdpdownload.details" contains the translated text
+ * @property {String} serviceNotResponding= additional:modules.tools.sdpdownload.serviceNotResponding
+ * @property {String} error= additional:modules.tools.sdpdownload.alerts.error" contains the translated text
+ * @property {String} info= additional:modules.tools.sdpdownload.alerts.info" contains the translated text
+ * @property {String} tooManyTilesSelected= additional:modules.tools.sdpdownload.tooManyTilesSelected" contains the translated text
  */
 
 const state = {
     type: "SdpAddon",
     active: false,
-    id: "SdpAddon",
     // defaults for config.json parameters
     name: "SDP Download",
     icon: "bi-download",

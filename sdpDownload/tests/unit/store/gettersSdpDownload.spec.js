@@ -6,8 +6,8 @@ describe("addons/SdpDownload/store/gettersSdpDownload", function () {
     it("returns the active from state", function () {
         expect(stateSdpDownload.active).to.be.false;
     });
-    it("returns the id from state", function () {
-        expect(stateSdpDownload.id).to.be.equal("SdpAddon");
+    it("returns the type from state", function () {
+        expect(stateSdpDownload.type).to.be.equal("SdpAddon");
     });
 
     describe("testing default values", function () {

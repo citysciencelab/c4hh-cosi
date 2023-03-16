@@ -234,13 +234,13 @@ export default {
 <style lang="scss">
  @import "~variables";
 
-    #circle-overlay {
+    #sdp-circle-overlay {
         position: absolute;
         background: rgba(51, 153, 204, 0.8);
         color: $white;
         padding: 4px 8px;
     }
-    #tooltip-overlay {
+    #sdp-tooltip-overlay {
         position: absolute;
         background: rgba(51, 153, 204, 0.8);
         color: $white;
