@@ -58,7 +58,7 @@ describe("SdpDownload.vue", () => {
     });
 
     it("should find form in component", () => {
-        const wrapper = mount(SDPComponent, {
+        const wrapper = shallowMount(SDPComponent, {
             global: {
                 plugins: [store]
             }
