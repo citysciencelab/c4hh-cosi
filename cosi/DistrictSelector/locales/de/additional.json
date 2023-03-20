@@ -1,0 +1,22 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "districtSelector": {
+                    "title": "Gebiet auswählen",
+                    "dropdownLabel": "Bitte wählen Sie einen Bezugsrahmen aus",
+                    "districtLevel": "Bezugsrahmen",
+                    "multiDropdownLabel": "Gebiete",
+                    "inputLabel": "Puffer[m] (optional)",
+                    "additionalLayer": "Hilfsebenen einblenden",
+                    "description": "Klicken Sie in der Karte auf ein oder mehrere Gebiete, um Ihr Planungsgebiet zu bestimmen. Alternativ können Sie die Gebiete über die Auswahlliste festlegen. Anschließend bestätigen Sie Ihre Auswahl mit einem Klick auf den Button \"Auswahl bestätigen\".",
+                    "buttonConfirm": "Auswahl bestätigen",
+                    "buttonReset": "Auswahl zurücksetzen",
+                    "help": "Vor Beginn der Analyse/Planung können Sie hier ein Planungsgebiet auswählen. Die empirischen Daten werden für diese Gebiete geladen. Alternativ können Sie über das Werkzeug <strong>&quot;Vergleichbare Gebiete ermitteln&quot;</strong> Gebiete nach bestimmten Parametern auswählen. Mit dem <strong>Puffer</strong> können Sie wählen in welchem Radius um das gewählte Gebiet ausgewählte Einrichtungen angezeigt werden. Die Analysefunktionen werden davon nicht beeinflusst.",
+                    "warning": "<strong>Sie haben noch keine Gebiete ausgewählt. Es werden keine Datensätze geladen.</strong> Sie können trotzdem Fachdaten-Ebenen für die gesamte Stadt anzeigen lassen und Gebiete nach Parametern ermitteln.",
+                    "additionalInfoLayersHelp": "Mithilfe der Checkbox können Sie zusätzliche Layer zur Orientierung einblenden. Die Layer können ebenfalls über den Themenbaum ein- und ausgeschaltet werden."
+                }
+            }
+        }
+    }
+}

@@ -1,31 +1,47 @@
 <script>
 // Documentation in ./doc/ReportTemplates.md
 import Tool from "../../../../src/modules/tools/ToolTemplate.vue";
+<<<<<<< HEAD
 import ToolInfo from "../../components/ToolInfo.vue";
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 import {getComponent} from "../../../../src/utils/getComponent";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersReportTemplates";
 import mutations from "../store/mutationsReportTemplates";
 import tableify from "tableify"; // generate html tables from js objects
+<<<<<<< HEAD
 import promisedEvent from "../utils/promisedEvent";
 import validateToolSettings from "../utils/validateToolSettings";
 import {getModelByAttributes} from "../../utils/radioBridge.js";
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 
 export default {
     name: "ReportTemplates",
     components: {
+<<<<<<< HEAD
         Tool,
         ToolInfo
+=======
+        Tool
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     },
     data () {
         return {
             uploadedTemplate: null, // file input field for report templates. This variable is watched and used to replace `templateItems` store variable
             supportedExportFormats: ["HTML", "PDF", "Importierbares Template (json)"],
             selectedExportFormat: "HTML",
+<<<<<<< HEAD
             uiModes: {
                 startingTemplateSelected: false
             },
             exportLoading: false // true if currently applying a template and exporting
+=======
+            ui_currentTab: 0, // vuetify tab content based on v-model
+            ui_tab: null,
+            ui_items: ["Importieren", "Bearbeiten", "Anwenden", "Exportieren"]
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
         };
     },
     computed: {
@@ -33,8 +49,13 @@ export default {
         ...mapGetters("Tools/ReportTemplates", Object.keys(getters)),
         ...mapGetters("Tools/ToolBridge", ["currentSettings"]),
         ...mapGetters("Maps", {getMapView: "getView"}),
+<<<<<<< HEAD
         ...mapGetters("Tools/SelectionManager", ["lastSelectionWithCurrentDataLayers"]),
         ...mapGetters("Tools/DistrictSelector", ["selectedDistrictNames"])
+=======
+        ...mapGetters("Tools/SelectionManager", ["activeSelection", "selections", "lastSelectionWithCurrentDataLayers"]),
+        ...mapGetters("Tools/FeaturesList", ["activeVectorLayerList", {facilitiesMapping: "mapping"}])
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 
     },
     watch: {
@@ -51,7 +72,10 @@ export default {
             // 4. use the reader on the file
 
             if (!file) {
+<<<<<<< HEAD
                 this.uiModes.startingTemplateSelected = false;
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                 return;
             }
             // 1. create a file reader object
@@ -97,6 +121,7 @@ export default {
             };
             // 4. use the reader on the file
             reader.readAsText(file); // read file (and inherently run callback which replaces the templateItems array)
+<<<<<<< HEAD
             this.uiModes.startingTemplateSelected = true;
         },
         editingTool (newValue, oldValue) {
@@ -146,6 +171,8 @@ export default {
                     model.set("isActive", false);
                 }
             }
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
         }
     },
     created () {
@@ -155,12 +182,20 @@ export default {
         // ...
     },
     methods: {
+<<<<<<< HEAD
         ...mapActions("Tools/ReportTemplates", ["startEditingToolSettings", "finishEditingToolSettings", "abortEditingToolSettings", "returnToReportTemplatesInterface"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapMutations("Tools/ReportTemplates", Object.keys(mutations)),
         ...mapActions("Tools/ToolBridge", ["runTool"]),
         ...mapActions("Maps", ["zoomToExtent"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
+=======
+        ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
+        ...mapMutations("Tools/ReportTemplates", Object.keys(mutations)),
+        // ...mapActions("Tools/ReportTemplates", Object.keys(actions)),
+        ...mapActions("Tools/ToolBridge", ["runTool"]),
+        ...mapActions("Maps", ["zoomToExtent"]),
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
         ...mapActions("Tools/ExportPDF", ["reportTemplateToPDF"]),
         ...mapMutations("Tools/SelectionManager", ["addSelection", "setActiveSelection", "setAcceptSelection"]),
         // store settings from selected addon in the template
@@ -168,6 +203,7 @@ export default {
             // get settings via ToolBridge currentSettings() method
             const toolSettings = this.currentSettings(this.templateItems[templateItemsIndex].tool);
 
+<<<<<<< HEAD
             // update array
             this.templateItems[templateItemsIndex].settings = toolSettings; // update settings
             this.templateItems[templateItemsIndex].hasSettings = true;
@@ -270,6 +306,18 @@ export default {
          */
         updateToolOutput (templateItemsIndex) {
 
+=======
+            this.addSingleAlert("test");
+            // update array
+            this.templateItems[templateItemsIndex].settings = toolSettings; // update settings
+            this.templateItems[templateItemsIndex].hasSettings = true; // now handled as UI checkbox
+            this.clearTemplateItemOutput(templateItemsIndex); // delete any previous results that no longer match the new settings
+
+
+        },
+        // run a different addon based on templateItem, store results
+        updateToolOutput (templateItemsIndex) {
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
             // check if tool settings are stored
             if (!this.templateItems[templateItemsIndex].hasSettings) {
                 this.addSingleAlert({
@@ -277,6 +325,7 @@ export default {
                     category: "Fehler",
                     displayClass: "error"
                 });
+<<<<<<< HEAD
                 // since updateToolOutput failed, directly return a rejected promise
                 return Promise.reject(new Error("No toolBridge settings available for template item " + templateItemsIndex));
             }
@@ -300,21 +349,37 @@ export default {
             };
 
 
+=======
+                return null; // if no tool settings, stop here
+            }
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
             // calls toolBridge to run the selected tool with the given settings
             // outputCallback then saves the results to this.templateItems
             this.runTool({
                 toolName: this.templateItems[templateItemsIndex].tool, // the selected tool
                 settings: this.templateItems[templateItemsIndex].settings, // the settings stored previously via the `updateToolSeetings()` method
+<<<<<<< HEAD
                 outputCallback: outputCallback
             });
             return promisedEvent.call(this,
                 "reportTemplates-received-output-" + templateItemsIndex,
                 15000);
 
+=======
+                outputCallback: (output) => { // in the end, store result in `this.templateItems` and  display them.
+                    const itemID = templateItemsIndex; // copy the item id into the function namespace
+
+                    this.$store.commit("Tools/ReportTemplates/templateItemOutput", {output, itemID});
+
+                }
+            });
+            return null;
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 
         },
 
         exportTemplate () {
+<<<<<<< HEAD
             this.exportLoading = true;
             if (this.selectedExportFormat === "Importierbares Template (json)") {
                 this.exportTemplateJSON();
@@ -334,6 +399,20 @@ export default {
         exportTemplateJSON () {
             this.downloadObjectAsJson(this.templateItems, "template");
 
+=======
+            if (this.selectedExportFormat === "Importierbares Template (json)") {
+                this.downloadObjectAsJson(this.templateItems, "template");
+            }
+            if (this.selectedExportFormat === "HTML") {
+                this.exportTemplateToHTML();
+            }
+            else if (this.selectedExportFormat === "PDF") {
+                this.exportTemplateToPdF();
+            }
+        },
+        exportTemplateToPdF () {
+            this.reportTemplateToPDF(this.templateItems); // using ExportPDF addon
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
         },
         exportTemplateToHTML () {
 
@@ -355,18 +434,31 @@ export default {
                     .replace(/'/g, "&#039;");
             }
             // manually assemble an html document.
+<<<<<<< HEAD
             const tips = "<span style='color:orange;'>Weiterverarbeitung in Word: <ul><li>Neues Word Dokument öffnen</li><li>In Word Querformat einstellen</li><li>Inhalt dieser seite markieren (Strg+A) und in Word kopieren</li><li>Alles markieren und Schriftgröße verkleinern</li><li>Zeilenumbrüche in Kopfzeilen von Tabellen einfügen</li><li>Sollten Tabellen nach wie vor zu breit sein, Anzahl der Spalten bzw. ausgewählten Gebiete begrenzen</li><li>Spaltenbreite anpassen</li></ul></span>",
 
                 exportedHtml = tips + this.templateItems.map((item) => {
+=======
+            // Hopefully to be deprecated - placeholder until exportPDF addons comes through
+            const exportedHtml = this.templateItems.map((item) => {
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 
                     // for each chapter...
                     // set defaults
                     let resulthtml = "",
                         sourceInfo = "Quelleninformation fehlt.";// defaults
+<<<<<<< HEAD
 
                     // make table or image html..
                     if (item.output.type === "table") {
                         resulthtml = "<br>" + tableify(item.output.result); // tableify converts an js object to a (string) html table
+=======
+                    const tips = "<span style='color:orange;'>Weiterverarbeitung in Word: <ul><li>Neues Word Dokument öffnen</li><li>In Word Querformat einstellen</li><li>Inhalt dieser seite markieren (Strg+A) und in Word kopieren</li><li>Alles markieren und Schriftgröße verkleinern</li><li>Zeilenumbrüche in Kopfzeilen von Tabellen einfügen</li><li>Sollten Tabellen nach wie vor zu breit sein, Anzahl der Spalten bzw. ausgewählten Gebiete begrenzen</li><li>Spaltenbreite anpassen</li></ul></span>";
+
+                    // make table or image html..
+                    if (item.output.type === "table") {
+                        resulthtml = tips + "<br>" + tableify(item.output.result); // tableify converts an js object to a (string) html table
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                     }
                     if (item.output.type === "image") {
                         resulthtml = "<img src='" + item.output.result + "'>";
@@ -417,6 +509,7 @@ export default {
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
         },
+<<<<<<< HEAD
         emptyTemplate () {
             this.setTemplateItems([]);
             this.uploadedTemplate = null;
@@ -437,6 +530,20 @@ export default {
         },
         clearTemplateItemDataSelection (index) {
             this.templateItems[index].dataSelection = {};
+=======
+        addEmptyTemplateItem () { // "+" button to add new chapters to the template
+            const newID = 1 + Math.max(...this.templateItems.map(o => o.id)); // create an ID one larger than the highest id in array
+
+            this.templateItems.push({title: "", description: "", tool: "Dashboard", settings: {}, hasSettings: false, output: {}, hasOutput: false, dataSelection: {}, hasDataSelection: false, id: newID});
+
+        },
+        deleteTemplateItem (id) { // id is the value for key "id" in the templateItem (stable & unique), not the array index (unstable)
+            this.$store.state.Tools.ReportTemplates.templateItems = this.templateItems.filter(x => x.id !== id);
+        },
+        clearTemplateItemDataSelection (index) {
+            this.templateItems[index].dataSelection = {};
+            this.templateItems[index].hasDataSelection = false;
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 
         },
         clearTemplateItemSettings (index) {
@@ -446,21 +553,33 @@ export default {
         },
         clearTemplateItemOutput (index) {
             this.templateItems[index].output = {};
+<<<<<<< HEAD
+=======
+            this.templateItems[index].hasOutput = false;
+
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
         },
 
         // copy data selection from SelectionManager
         copyCurrentDataSelection (index) {
 
             this.templateItems[index].dataSelection = this.lastSelectionWithCurrentDataLayers;
+<<<<<<< HEAD
+=======
+            this.templateItems[index].hasDataSelection = true;
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 
 
         },
         // add stored selection to  SelectionManager
+<<<<<<< HEAD
         /**
          *
          * @param {Object} dataSelection the data selection as retreived from selectionManager
          * @return {Promise} a promise that resolves when data is loaded, or gets rejected after a timeout
          */
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
         setCurrentDataSelection (dataSelection) {
             if (Object.keys(dataSelection).length === 0) {
                 this.addSingleAlert({
@@ -468,6 +587,7 @@ export default {
                     category: "Fehler",
                     displayClass: "error"
                 });
+<<<<<<< HEAD
                 return Promise.resolve();
             }
             this.setAcceptSelection(null); // make sure watcher is triggered in next line
@@ -492,6 +612,78 @@ export default {
             newSelection.storedLayers = dataSelection.storedLayers;
             // apply it
             return this.setCurrentDataSelection(newSelection);
+=======
+                return null;
+            }
+            this.setAcceptSelection(null); // make sure watcher is triggered in next line
+            this.setAcceptSelection(dataSelection); // commit to selectionManager
+            return null;
+
+        },
+        /**
+         * either delete or copy data selection depending on which way the check box was toggled
+         * @param {integer} index the array item index of the templateItem
+         * @return {void}
+         */
+        hasDataToggle (index) {
+            // copy data selection if turned on:
+            if (this.templateItems[index].hasDataSelection) {
+                this.copyCurrentDataSelection(index);
+            }
+            // otherwise delete data selection
+            if (!this.templateItems[index].hasDataSelection) {
+                this.clearTemplateItemDataSelection(index);
+            }
+        },
+        /**
+         * either delete or copy tool settings depending on which way the check box was toggled
+         * @param {integer} index the array item index of the templateItem
+         * @return {void}
+         */
+        hasSettingsToggle (index) {
+            // copy data selection if turned on:
+            if (this.templateItems[index].hasSettings) {
+                this.updateToolSettings(index);
+            }
+            // otherwise delete data selection
+            if (!this.templateItems[index].hasSettings) {
+                this.clearTemplateItemSettings(index);
+            }
+        },
+        /**
+         * either delete or copy tool settings depending on which way the check box was toggled
+         * @param {integer} index the array item index of the templateItem
+         * @return {void}
+         */
+        hasOutputToggle (index) {
+            // copy data selection if turned on:
+            if (this.templateItems[index].hasOutput) {
+                this.updateToolOutput(index);
+            }
+            // otherwise delete data selection
+            if (!this.templateItems[index].hasOutput) {
+                this.clearTemplateItemOutput(index);
+            }
+        },
+        /**
+         * apply data selection and track which one is selected
+         * @param {integer} index the array item index of the templateItem
+         * @return {void}
+         */
+        dataSelectionAppliedToggle (index) {
+            // if the dataselection is turned on...
+            if (this.templateItems[index].dataSelectionApplied) {
+                // set dataSelectionApplied to false for all templateItems except the selected one
+                for (let i = 0; i < this.templateItems.length; i++) {
+                    if (i !== index) {
+                        this.templateItems[i].dataSelectionApplied = false;
+                    }
+                }
+                // apply data selection
+                this.setCurrentDataSelection(this.templateItems[index].dataSelection);
+            }
+            // if dataselection is turned of, nothing happens. Data selection is a one way street - we don't "unselect" data.
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 
         },
 
@@ -511,17 +703,27 @@ export default {
 
             // must be an array
             if (!Array.isArray(reportTemplate)) {
+<<<<<<< HEAD
                 console.warn("reportTemplate JSON is not an array");
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                 return false;
             }
 
             // each item must have the required keys (if not, return false)
+<<<<<<< HEAD
             const requiredKeys = ["title", "description", "tool", "settings", "hasSettings", "output", "dataSelection", "dataSelectionApplied", "id"];
+=======
+            const requiredKeys = ["title", "description", "tool", "settings", "hasSettings", "output", "hasOutput", "dataSelection", "hasDataSelection", "dataSelectionApplied", "id"];
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 
             for (const i in reportTemplate) {
                 for (const j in requiredKeys) {
                     if (!(requiredKeys[j] in reportTemplate[i])) {
+<<<<<<< HEAD
                         console.warn("reportTemplate JSON array item " + i + " does not contain key " + requiredKeys[j]);
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                         return false;
                     }
 
@@ -531,6 +733,7 @@ export default {
             return true;
 
         },
+<<<<<<< HEAD
         /**
          * Open a tool's interface
          * @param {string} toolName name of the tool that should be opened
@@ -543,6 +746,8 @@ export default {
                 this.setActive(false);
             }
         },
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
         close () {
             this.setActive(false);
             const model = getComponent(this.id);
@@ -566,6 +771,7 @@ export default {
         :deactivate-gfi="deactivateGFI"
     >
         <template #toolBody>
+<<<<<<< HEAD
             <v-app id="reporttemplates">
                 <ToolInfo
                     :url="readmeUrl"
@@ -586,10 +792,37 @@ export default {
                                 <!-- Sie können entweder ein bestehendes Report Template hochladen, oder ein neues Template erstellen. -->
                             </v-row>
                             <v-row class="">
+=======
+            <v-app
+                id="ReportTemplates-wrapper"
+                absolute
+            >
+                <v-tabs
+                    v-model="ui_tab"
+                    fixed-tabs
+                >
+                    <v-tabs-slider color="amber darken-3" />
+                    <v-tab
+                        v-for="(item, index) in ui_items"
+                        :key="item"
+                        :class="{active: ui_currentTab === index}"
+                        @click="ui_currentTab = index"
+                    >
+                        {{ item }}
+                    </v-tab>
+                </v-tabs>
+                <v-tabs-items v-model="ui_tab">
+                    <v-card flat>
+                        <!-- tab: import -->
+                        <div v-show="ui_currentTab === 0">
+                            <v-container class="main_container">
+                                <br><br>
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                                 <v-file-input
                                     v-model="uploadedTemplate"
                                     accept="application/JSON"
                                     label="Datei wählen.."
+<<<<<<< HEAD
                                     solo-filled
                                     dense
                                 />
@@ -790,6 +1023,215 @@ export default {
                         </v-col>
                     </v-row>
                 </v-container>
+=======
+                                    dense
+                                />
+                            </v-container>
+                        </div>
+
+                        <!-- tab: edit -->
+                        <div v-show="ui_currentTab === 1">
+                            <v-divider />
+                            <v-container class="main_container">
+                                <v-row>
+                                    <v-col cols="12">
+                                        <!-- one v-card per chapter in the template -->
+                                        <v-card
+                                            v-for="(templateItem,index) in templateItems"
+                                            :key="index"
+                                            class="mt-5 mb-8"
+                                            outlined
+                                            tile
+                                        >
+                                            <v-container>
+                                                <!-- delete item button -->
+                                                <v-row>
+                                                    <v-col
+                                                        cols="12"
+                                                        align="right"
+                                                    >
+                                                        #{{ index+1 }}
+                                                        <v-icon
+                                                            small
+                                                            @click="deleteTemplateItem(templateItem.id)"
+                                                        >
+                                                            mdi-trash-can
+                                                        </v-icon>
+                                                    </v-col>
+                                                </v-row>
+                                                <!-- title -->
+                                                <v-row>
+                                                    <v-col cols="12">
+                                                        <v-text-field
+                                                            v-model="templateItem.title"
+                                                            class="text-xl-h4 textfieldtitle"
+                                                            label="Titel"
+                                                            filled
+                                                        />
+                                                    </v-col>
+                                                </v-row>
+                                                <!-- description -->
+                                                <v-row>
+                                                    <v-col cols="12">
+                                                        <br><br>
+                                                        <v-textarea
+                                                            v-model="templateItem.description"
+                                                            label="Beschreibung"
+                                                            class=""
+                                                        />
+                                                        <br><br>
+                                                    </v-col>
+                                                </v-row>
+                                                <!-- tool selection -->
+                                                <v-row>
+                                                    <v-col cols="12">
+                                                        <v-select
+                                                            v-model="templateItem.tool"
+                                                            label="Tool wählen"
+                                                            :items="supportedTools"
+                                                            @change="getSelectionAndSettings(index)"
+                                                        />
+                                                    </v-col>
+                                                </v-row>
+                                                <!-- get data selection -->
+
+                                                <v-row class="mb-2">
+                                                    <v-switch
+                                                        v-model="templateItem.hasDataSelection"
+                                                        label="Datenauswahl"
+                                                        @change="hasDataToggle(index)"
+                                                    />
+                                                    <v-switch
+                                                        v-model="templateItem.hasSettings"
+                                                        label="Tool Einstellungen"
+                                                        @change="hasSettingsToggle(index)"
+                                                    />
+                                                </v-row>
+                                            </v-container>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+                                <v-row class="mb-2">
+                                    <v-col
+                                        cols="12"
+                                        align="right"
+                                    >
+                                        <v-icon
+                                            @click="addEmptyTemplateItem"
+                                        >
+                                            mdi-note-plus
+                                        </v-icon>
+                                        <v-row />
+                                    </v-col>
+                                </v-row>
+                            </v-container>
+                        </div>
+                        <!-- tab: apply -->
+
+                        <div v-show="ui_currentTab === 2">
+                            <v-container class="main_container">
+                                <v-card
+                                    v-for="(templateItem,index) in templateItems"
+                                    :key="index"
+                                    class="mt-5 mb-8 p-6"
+                                    outlined
+                                    tile
+                                >
+                                    <v-container>
+                                        <v-row> <v-col><h1>{{ templateItem.title }}</h1></v-col></v-row>
+                                        <v-row><v-col>{{ templateItem.description }}</v-col></v-row>
+                                        <v-row v-if="templateItem.hasDataSelection">
+                                            <v-col>
+                                                <!-- <v-switch
+                                                    v-model="templateItem.dataSelectionApplied"
+                                                    :disabled="!templateItem.hasDataSelection"
+                                                    label="Datenauswahl Anwendung"
+                                                    @change="dataSelectionAppliedToggle(index)"
+                                                /><br><br> -->
+
+                                                <!-- set data selection -->
+                                                <v-row class="mb-2">
+                                                    <v-btn
+                                                        dense
+                                                        :disabled="!templateItem.hasDataSelection"
+                                                        @click="setCurrentDataSelection(templateItem.dataSelection)"
+                                                    >
+                                                        <!-- <v-icon>
+                                                            mdi-map-marker-right
+                                                        </v-icon> -->
+                                                        Datenauswahl anwenden
+                                                    </v-btn><br><br>
+                                                </v-row>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row v-if="templateItem.hasSettings">
+                                            <!-- run tool -->
+                                            <v-row class="mb-2">
+                                                <v-switch
+                                                    v-model="templateItem.hasOutput"
+                                                    :disabled="!templateItem.hasSettings"
+                                                    label="Ergebnisse"
+                                                    @change="hasOutputToggle(index)"
+                                                /><br><br>
+                                            </v-row>
+                                        </v-row>
+                                        <!-- display raw settings -->
+                                        <!-- <v-row>
+                                    <v-col cols="12">
+                                        Einstellungen:
+                                        <div
+                                            class="limitSize rawData"
+                                            v-html="JSON.stringify(templateItem.settings,undefined,2)"
+                                        /><br>
+                                    </v-col>
+                                </v-row> -->
+                                        <!-- display results -->
+                                        <v-row class="mb-2">
+                                            <div
+                                                class="limitSize"
+                                            >
+                                                <!-- result might be a table, might be an image -->
+                                                <div v-if="templateItem.output.type==='table'">
+                                                    <div v-html="templateItem.output.result" />
+                                                </div>
+                                                <div v-if="templateItem.output.type==='image'">
+                                                    <img
+                                                        alt="template analysis result image"
+                                                        :src="templateItem.output.result"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </v-row>
+                                    </v-container>
+                                </v-card>
+                            </v-container>
+                        </div>
+                        <!-- tab: export -->
+
+                        <div v-show="ui_currentTab === 3">
+                            <v-container class="main_container">
+                                <v-row>
+                                    <v-select
+                                        v-model="selectedExportFormat"
+                                        label="Export Format"
+                                        :items="supportedExportFormats"
+                                    />
+                                </v-row>
+                                <v-row class="mb-2">
+                                    <v-btn
+                                        color="grey lighten-1"
+                                        @click="exportTemplate()"
+                                    >
+                                        Exportieren
+                                    </v-btn>
+                                </v-row>
+                                <br>
+                                <v-row><v-divider /></v-row>
+                            </v-container>
+                        </div>
+                    </v-card>
+                </v-tabs-items>
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
             </v-app>
         </template>
     </Tool>
@@ -799,7 +1241,11 @@ export default {
 
 #reportTemplates{
     overflow-y: auto;
+<<<<<<< HEAD
     width:500px;
+=======
+    height:100%;
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 }
     .textfieldtitle {
         font-size: 2em !important;

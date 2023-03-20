@@ -113,7 +113,10 @@ watch: {
                         result: YOUR_ANALYIS_RESULTS,
                         type: "geoJSON", // whats the format of your result
                         request: newRequest // the request as received
+<<<<<<< HEAD
                         success:true
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                     }
                 );
             };
@@ -197,7 +200,10 @@ watch: {
                         result: this.analysisResults, // change to where results are stored
                         type: "geoJSON", // see toolBridge docs for supported output types
                         request: newRequest // we need to give back the original request as well, leave this as is.
+<<<<<<< HEAD
                         success: true // true if analysis successful
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                     }
                 );
             };

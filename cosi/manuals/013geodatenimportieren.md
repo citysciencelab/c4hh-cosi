@@ -1,7 +1,11 @@
 
 ## Geodaten Importieren
 ___
+<<<<<<< HEAD
 Mit diesem Werkzeug können Sie eigene Datensätze in Form von GeoJSONs hochladen und als Themenlayer einfügen, der anschließend visualisiert werden kann und dem alle weiteren Analysefunktionen von CoSI zur Verfügung stehen.   
+=======
+Mit diesem Werkzeug können Sie eigene Datensätze in Form von GeoJSONs hochladen und als Themenlayer einfügen, der anschließnend visualisiert werden kann und dem alle weiteren Analysefunktionen von CoSI zur Verfügung stehen.   
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 
 ![Abbildung 1: Dateien importieren](./013a_geodatenimport.PNG)  
 *Abb. a: Dateien importieren.*   
@@ -57,10 +61,30 @@ Sobald Ihre Datei hier hochgeladen wurde, erscheint ein neues Fenster mit Funkti
    - **8.1** Mit einem Klick auf diesen Button öffnet sich ein Auswahlfeld, mit Hilfe dessen Sie ein Attribut zur weißen Liste des Filters hinzufügen können.
 
 #### Numerische Werte
+<<<<<<< HEAD
 ![Abbildung 6: Geodarten Importieren, Numerische Werte festlegen](./013f_geodatenimport.PNG)  
 *Abb. f: Geodarten Importieren, Numerische Werte festlegen*  
 - Mit Hilfe des Werkzeugs [Versorgungsanalyse](./006versorgungsanalyse.md) können Sie unterschiedlichste Zahlwerte gegeneinander verrechnen. In diesem Bereich bestimmen Sie Attribute, die numerische Werte enthalten, die für die Versorgungsanalyse bereitgestellt werden sollen. Dies können alle sinnvoll quantitativ messbaren Werte sein, wie beispielswiese "Budget", "Einwohnerzahl", "Fläche" oder "Besuche pro Woche" etc.  
+=======
+<<<<<<< HEAD:cosi/manuals/013geodatenimportieren.md
+![Abbildung 6: Geodarten Importieren, Numerische Werte festlegen](013f_geodatenimport.PNG)  
+*Abb.f: Geodarten Importieren, Numerische Werte festlegen*  
+- Mit Hilfe des Werkzeugs [Versorgungsanalyse](006versorgungsanalyse.md) können Sie unterschiedlichste Zahlwerte gegeneinander verrechnen. In diesem Bereich bestimmen Sie Attribute, die numerische Werte enthalten, die für die Versorgungsanalyse bereitgestellt werden sollen. Dies können alle sinnvoll quantitativ messbaren Werte sein, wie beispielswiese "Budget", "Einwohnerzahl", "Fläche" oder "Besuche pro Woche" etc.  
+=======
+![Abbildung 6: Geodarten Importieren, Numerische Werte festlegen](https://user-images.githubusercontent.com/43250699/142932809-d77c6760-bff3-4576-b9fa-1bcca88ef816.jpg)  
+*Abbildung 6: Geodarten Importieren, Numerische Werte festlegen*  
+<<<<<<< HEAD
+- Mit Hilfe des Werkzeugs [Versorgungsanalyse](./versorgungsanalyse.md) können Sie unterschiedlichste Zahlwerte gegeneinander verrechnen. In diesem Bereich bestimmen Sie Attribute, die numerische Werte enthalten, die für die Versorgungsanalyse bereitgestellt werden sollen. Dies können alle sinnvoll quantitativ messbaren Werte sein, wie beispielswiese "Budget", "Einwohnerzahl", "Fläche" oder "Besuche pro Woche" etc.  
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/geodatenimportieren.md
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 
    - **9.1** Für die bessere Visualisierung in einer späteren Tabelle können Sie hier dem numerischen Attribut einen sinnvollen Namen geben, sollte es nicht sinnvoll benannt sein. So könnten Sie beispielsweise "budget_21" in "Verfügbare Mittel 2021" umbenennen.
    - **9.2** Hier sehen Sie die ID des Attributs und dahinter in Klammern einen Beispielwert aus dem ersten Eintrag.
    - **9.3** Mit dieser Checkbox fügen Sie das Attribut zu den numerischen Werten hinzu. 
+=======
+- Mit Hilfe des Werkzeugs [Versorgungsanalyse](#markdown-header-versorgungsanalyse) können Sie unterschiedlichste Zahlwerte gegeneinander verrechnen. In diesem Bereich bestimmen Sie Attribute, die numerische Werte enthalten, die für die Versorgungsanalyse bereitgestellt werden sollen. Dies können alle sinnvoll quantitativ messbaren Werte sein, wie beispielswiese "Budget", "Einwohnerzahl", "Fläche" oder "Besuche pro Woche" etc.  
+
+   - **9.1** Für die bessere Visualisierung in einer späteren Tabelle, können Sie hier dem numerischen Wert einen sinnvollen Namen geben, sollte das Attribut nicht sinnvoll benannt sein. So könnten Sie beispielsweise "budget_21" in "Verfügbare Mittel 2021" umbenennen.
+   - **9.2** Hier sehen Sie die ID des Attributs und dahinter in Klammern einen Beispielwert aus dem ersten Eintrag.
+   - **9.3** Mit dieser Checkbox fügen Sie das Attribut zu den numerischen Werten hinzu. 
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)

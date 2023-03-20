@@ -51,11 +51,19 @@ const state = {
             scaleLabels: ["Anteil", "Alterskohorten"],
             labels: [
                 "Bevölkerung unter 6 Jahren",
+<<<<<<< HEAD
                 "Bevölkerung 6 bis 9 Jahren",
                 "Bevölkerung 10 bis 14 Jahren",
                 "Bevölkerung 15 bis 20 Jahren",
                 "Bevölkerung 21 bis 44 Jahren",
                 "Bevölkerung 45 bis 64 Jahren",
+=======
+                "Bevölkerung 6 bis unter 10 Jahren",
+                "Bevölkerung 10 bis unter 15 Jahren",
+                "Bevölkerung 15 bis unter 21 Jahren",
+                "Bevölkerung 21 bis unter 45 Jahren",
+                "Bevölkerung 45 bis unter 65 Jahren",
+>>>>>>> b8366341 (add new addons_3_0_0 structure-add missing addons)
                 "Bevölkerung ab 65 Jahren"
             ],
             type: "BarChart"

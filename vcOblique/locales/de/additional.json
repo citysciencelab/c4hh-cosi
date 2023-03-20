@@ -1,0 +1,17 @@
+{
+    "menu": {
+        "tools":{
+          "vcOblique": "Schrägluftbilder"
+        }
+    },
+    "modules": {
+        "tools": {
+          "vcOblique": {
+            "title": "Schrägluftbilder",
+            "frameworkUndefined": "Schrägluftbilder",
+            "frameworkUndefinedMessage": "Es ist ein Fehler bei der Anzeige der Schrägluftbilder aufgetreten. Starten Sie die Anwendung bitte erneut. Sollte der Fehler weiterhin auftreten melden Sie ihn bitte über Kontakt.",
+            "sameOrigin": "Die eingebundene Website kann nicht angezeigt werden. Bitte stellen Sie sicher, dass sich die eingebundene Website auf dem selben Server wie das aufgerufene Portal befindet."
+          }
+        }
+    }
+}

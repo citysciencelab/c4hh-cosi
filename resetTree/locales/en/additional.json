@@ -1,0 +1,9 @@
+{
+    "modules": {
+        "tools": {
+            "resetTree": {
+                "title": "Reset tree"
+            }
+        }
+    }
+}

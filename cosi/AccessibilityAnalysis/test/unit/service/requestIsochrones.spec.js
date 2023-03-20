@@ -1,7 +1,11 @@
 import {
     expect
 } from "chai";
+<<<<<<< HEAD
 import requestIsochrones from "../../../utils/requestIsochrones";
+=======
+import requestIsochrones from "../../../service/requestIsochrones";
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 import axios from "axios";
 
 describe("requestIsochrones", () => {

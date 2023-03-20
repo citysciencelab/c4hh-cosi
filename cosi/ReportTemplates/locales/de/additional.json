@@ -3,8 +3,12 @@
         "tools": {
             "cosi": {
                 "reportTemplates": {
+<<<<<<< HEAD
                     "title": "Report Template",
                     "chooseTemplate": "Template wählen"
+=======
+                    "title": "Report Template"
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                 }
             }
         }

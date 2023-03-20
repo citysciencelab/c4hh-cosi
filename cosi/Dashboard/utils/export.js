@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {replaceValues} from "../../utils/modifyObject.js";
 import renameKeys from "../../../../src/utils/renameKeys.js";
 import {getValue} from "./tableCells";
@@ -5,6 +6,7 @@ import {getValue} from "./tableCells";
 const valuesMap = {
         absolute: "absolut",
         relative: "relativ"
+<<<<<<< HEAD
     },
     keysToIgnore = ["id", "calculation"];
 
@@ -29,11 +31,16 @@ export function prepareTableExport (data, districtNames, timestamp, keyMap, dist
     }
 
     const exportData = data.map(item => {
+<<<<<<< HEAD
         const _item = replaceValues(renameKeys(keyMap, item), valuesMap);
 
         keysToIgnore.forEach(keyToIgnore => {
             delete _item[keyToIgnore];
         });
+=======
+        const _item = replaceValues(renameKeys(item, keyMap), valuesMap);
+
+>>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
         for (const col in _item) {
             if (typeof _item[col] === "object") {
                 _item[col] = getValue(item, {value: col}, timestamp, districts, timestampPrefix);
@@ -75,6 +82,7 @@ export function prepareTableExportWithTimeline (data, districtNames, timestamps,
     const
         ctimestamps = timestamps.slice().reverse(),
         exportData = data.reduce((items, item) => {
+<<<<<<< HEAD
             const _item = replaceValues(renameKeys(keyMap, item), valuesMap),
                 categoryRows = ctimestamps.map(timestamp => {
                     const el = {..._item};
@@ -83,6 +91,12 @@ export function prepareTableExportWithTimeline (data, districtNames, timestamps,
                         delete el[keyToIgnore];
                     });
 
+=======
+            const _item = replaceValues(renameKeys(item, keyMap), valuesMap),
+                categoryRows = ctimestamps.map(timestamp => {
+                    const el = {..._item};
+
+>>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
                     for (const col in el) {
                         if (typeof _item[col] === "object") {
                             el[col] = getValue(item, {value: col}, timestamp, districts, timestampPrefix);

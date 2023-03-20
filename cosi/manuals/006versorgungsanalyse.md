@@ -1,7 +1,11 @@
 
 ## Dienste/ Versorgungsanalyse
 ___
+<<<<<<< HEAD
 Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet werden. Die Datensätze können entweder regionalstatistische Daten oder Einrichtungsdaten aus dem Menü "Themen/ Fachdaten" sein. Damit die Versorgungsanalyse verwendet werden kann, müssen mindestens zwei Datensätze geladen worden sein. Die "Versorgungsanalyse" finden sie im Bereich "Analyse".
+=======
+Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet werden. Die Datensätze können entweder regionalstatistische Daten oder Einrichtungsdaten aus dem Menü "Themen/ Fachdaten" sein. Damit die Versorgungsanalyse verwendet werden kann, müssen mindestens zwei Datensätze geladen worden sein.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 
 
 ![Abbildung 1: Versorgungsanalyse, Einstellungen](./006a_versorgungsanalyse.PNG)

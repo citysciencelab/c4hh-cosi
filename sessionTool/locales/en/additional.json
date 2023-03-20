@@ -1,0 +1,14 @@
+{
+  "modules": {
+      "tools": {  
+            "sessionTool": {
+                "title": "SessionTool",
+                "uploadHeader": "Load Session",
+                "buttonTextUpload": "Upload",
+                "buttonTextDownload": "Download",
+                "downloadHeader": "Save Session",
+                "errorOnLoad": "An error occurred during upload!"
+            }
+        }
+    }
+}

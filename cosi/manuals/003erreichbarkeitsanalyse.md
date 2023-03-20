@@ -1,6 +1,10 @@
 
 ### Erreichbarkeitsanalyse
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 Die "Erreichbarkeitsanalyse" erreichen Sie über den Bereich "Analyse". 
 Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:  
 1. [Ab einem Referenzpunkt](#erreichbarkeit-ab-einem-Referenzpunkt)
@@ -9,6 +13,14 @@ Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:
 4. [Entlang einer Route](#erreichbarkeit-entlang-einer-route)
 
 Der Modus der Analyse kann im Dropdown Menü ausgewählt werden.
+=======
+Eine Erreichbarkeitsanalyse kann auf zwei Arten durchgeführt werden:  
+1. [Ab einem Referenzpunkt](#markdown-header-erreichbarkeit-ab-einem-Referenzpunkt)  
+2. [Im Planungsgebiet](#markdown-header-erreichbarkeit-im-gebiet) 
+3. [Entlang einer Route](#markdown-header-erreichbarkeit-entlang-einer-route)
+
+Der Modus der Analyse kann im Dropdown Menü ausgewÃ¤hlt werden.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 
 **Wichtige Informationen:**
 Dieses Werkzeug wurde realisiert unter Verwendung von OpenRouteService, einem Dienst, der von der *Heidelberg Institute for Geoinformation Technology* entwickelt wird. Der verwendete Dienst wird vom *Bundesamt für Kartografie und Geodäsie (BKG)* bereitgestellt und betrieben.
@@ -56,13 +68,26 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 
 *Für **Tageszeit**, **Verkehrsfluss berücksichtigen**, und **Von Flächenaußengrenzen berechnen** siehe im folgenden "Erreichbarkeit im Gebiet"*
 
+<<<<<<< HEAD
 #### Erreichbarkeit ab einer ausgewählten Einrichtung
 
 Diese Analyse wird genauso hergestellt, wie ab einem Referenzpunkt. Nur wird hier statt einem Referenzpunkt auf der Karte eine Einrichtung auf der Karte angeklickt.
 
 #### Erreichbarkeit im Gebiet
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (im Beispiel Krankenhäuser) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
+=======
+Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (z.B. Kindergärten) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann angegeben werden in Zeit oder in Metern. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
+=======
+
+#### Erreichbarkeit im Gebiet
+Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (z.B. Kindergärten) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann angegeben werden in Zeit oder in Metern. Die Erreichbarkeit ist abhÃ¤ngig von dem festgelegten Verkehrsmittel.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/erreichbarkeitsanalyse.md
 
 ![Erreichbarkeit ausgewählter Einrichtungen im Gebiet](./003b_erreichbarkeitabeinrichtung.png)
 
@@ -73,7 +98,11 @@ Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungs
 2. **Thema auswählen**
    > Damit dieses Modul verwendet werden kann muss mindestens ein Thema aktiv sein.
 3. **Verkehrsmittel festlegen**
+<<<<<<< HEAD
    > Das Verkehrsmittel wird ausgewählt aus einer Liste. Folgende Verkehrsmittel stehen aktuell zur Verfügung: Auto, Rad, Gehen, Rollstuhl.
+=======
+   > Das Verkehrsmittel wird ausgewählt aus einer Liste. Folgende Verkehrsmittel stehen aktuell zur Verfügung: Auto, Rad, Gehen, Rollstuhl / Kinderwagen.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 4. **Maßeinheit der Entfernung festlegen**
    > Festlegen, ob die Entfernung in Minuten oder in Metern angegeben wird.
 5. **Entfernung**
@@ -112,6 +141,18 @@ Das Modul kann ohne vorherige Gebietsauswahl verwendet werden.
 7. **Legende und Isochronen**
    > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen das um die Route herum erreichbare Gebiet abhängig von den zuvor eingegebenen Parametern.
 8. **Ergebnisverzeichnis**
+<<<<<<< HEAD
    > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das [Ergebnisverzeichnis](./020ergebnisverzeichnis) verwaltet werden.
+=======
+<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
+   > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](/cosi/manuals/020ergebnisverzeichnis) verwaltet werden.
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
    
 <div style="page-break-after: always;"></div>
+=======
+<<<<<<< HEAD
+   > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](./pagination.md) verwaltet werden.
+=======
+   > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](./pagination.md) verwaltet werden.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/erreichbarkeitsanalyse.md

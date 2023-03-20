@@ -2,19 +2,45 @@
 ___
 Als erster Arbeitsschritt in CoSI muss grundsätzlich eine Gebietsauswahl für das zu betrachtende Planungsgebiet getroffen werden.  Die Gebietsauswahl können sie entweder im Bezugsrahmen der Bezirke, der Stadtteile oder der statistischen Gebiete treffen. 
 
+<<<<<<< HEAD
 Wenn Sie Ihre Gebietsauswahl später ändern möchten, könnten Sie dies unter Gebiete auswählen tun.
+=======
+<<<<<<< HEAD
+Wenn Sie Ihren Bezugsrahmen ändern möchten, könnten Sie dies unter "Gebiete auswählen" tun.
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 
 ![Abbildung 1: Gebietsauswahl](./018a_gebietsauswahl.png)
 
 
+<<<<<<< HEAD
 *Abb. a: Das Werkzeug Gebiet auswählen.*  
+=======
+<<<<<<< HEAD:cosi/manuals/018gebietsauswahl.md
+*Abb.: Das Werkzeug "Gebiet auswählen".*  
+=======
+=======
+![Abbildung 1: Gebietsauswahl](https://user-images.githubusercontent.com/43250699/142933538-fd2e1dbc-8bef-444a-bc7f-66d0066a457e.png)
+
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+*Abbildung 1: Das Werkzeug "Gebiet auswählen"*  
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/gebietsauswahl.md
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 
 1. **Bezugsrahmen wählen**
    > Über ein Dropdown Menü können **Bezirke**, **Stadtteile** oder **Statistische Gebiete** ausgewählt werden – dies legt die Verwaltungseinheit fest, für die die statistischen Daten angezeigt und Auswertungen erstellt werden sollen. Alle Funktionen sind auf den jeweiligen Gebietsebenen verfügbar. Die Zahl der verfügbaren Indikatoren kann jedoch variieren. Der Bezugsrahmen bestimmt auch die zu ladenden übergeordneten Referenzgebiete: Stadtteile für stat. Gebiete, Bezirke für Stadtteile.
 2. **Gebiete aus- und abwählen**
     - Die einzelnen Verwaltungseinheiten (statistisches Gebiet oder Stadtteil) anklicken (nochmaliges Klicken deaktiviert die Auswahl wieder), die Grenzen werden blau markiert. 
+<<<<<<< HEAD
     - Auf dem Stift rechts neben Auswahl zurücksetzen klicken. Es wird ein Zeichentool aktiviert; damit können Nutzer:innen ein Rechteck über das Auswahlgebiet ziehen um dieses auszuwählen.
+=======
+<<<<<<< HEAD
+    - Auf dem Stift rechts neben "Auswahl zurücksetzen" klicken. Es wird ein Zeichentool aktiviert; damit können Nutzer:innen ein Rechteck über das Auswahlgebiet ziehen um dieses auszuwählen.
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
     - Beide vorher beschriebenen Möglichkeiten sind auch miteinander kombinierbar, wobei die Reihenfolge unerheblich ist. Die Nutzer:innen können also zuerst einzelne Verwaltungseinheiten auswählen und dann das Zeichentool aktivieren, um damit weitere Verwaltungseinheiten hinzuzuschalten oder auch andersherum vorgehen.
+=======
+    - Auf dem Stift rechts neben "Auswahl zurücksetzen" klicken. Es wird ein Zeichentool aktiviert; damit kann der Nutzende ein Rechteck über das Auswahlgebiet ziehen um dieses auszuwählen.
+    - Beide vorher beschriebenen Möglichkeiten sind auch miteinander kombinierbar, wobei die Reihenfolge unerheblich ist. Die Nutzenden können also zuerst einzelne Verwaltungseinheiten auswählen und dann das Zeichentool aktivieren, um damit weitere Verwaltungseinheiten dazu zuschalten oder auch andersherum vorgehen.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 3. **Puffer festlegen**
    > Es kann ein Pufferradius in Metern festgelegt werden. Für den werden ausgewählte Fachdaten um das Planungsgebiet herum angezeig. Dies berücksichtigt die Tatsache, dass das Einzugsgebiet von einer Einrichtung nicht unbedingt übereinstimmt mit den Gebietsgrenzen der Verwaltungseinheit innerhalb derer sich die Einrichtung befindet. Die Analysefunktionen werden davon nicht beeinflusst.
 4. **Auswahl bestätigen**
@@ -38,4 +64,12 @@ Für solche Fälle gelten folgende Hinweise:
 
    - Es werden keine Datensätze geladen, d.h. eine Anzeige der regionalstatistischen Daten ist nicht möglich. Auch werden keine regionalstatistischen Daten im Dashboard angezeigt.
    - Beim Zuschalten von Themen aus den Fachdaten könnte der Ladevorgang länger dauern.
+<<<<<<< HEAD
    - Möglicherweise funktioniert die [Erreichbarkeitsanalyse](./003erreichbarkeitsanalyse.md) für eine sehr große Zahl von Einrichtungen nicht zuverlässig.
+=======
+<<<<<<< HEAD
+   - Möglicherweise funktioniert die [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) für eine sehr große Zahl von Einrichtungen nicht zuverlässig.
+=======
+   - Möglicherweise funktioniert die [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) für eine sehr große Zahl von Einrichtungen nicht zuverlässig.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)

@@ -21,6 +21,7 @@ export default {
     id: "reportTemplates",
     name: "Report Templates",
     onlyDesktop: true,
+<<<<<<< HEAD
     renderToWindow: true,
     resizableWindow: true,
     title: "Report Templates",
@@ -32,5 +33,17 @@ export default {
     readmeUrl: {
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/024reporttool.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/024reporttool.md"
+=======
+    renderToWindow: false,
+    resizableWindow: false,
+    title: "Report Templates",
+    supportedTools: ["AccessibilityAnalysis", "Dashboard"], // to support additional tools, you need to hook them up to the toolBridge. Then simply add them in this array.
+    templateItems: [ // the current template. It is always an array, each item a chapter with this general structure (see ../docs/ for details)
+        {title: "Titel...", description: "Beschreibung...", tool: "Wählen!", settings: {}, hasSettings: false, output: {}, hasOutput: false, dataSelection: {}, hasDataSelection: false, dataSelectionApplied: false, id: 0}
+    ],
+    readmeUrl: {
+        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/fileimport.md",
+        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/geodatenimportieren.md"
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     }
 };

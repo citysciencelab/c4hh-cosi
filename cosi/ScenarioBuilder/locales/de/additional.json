@@ -1,0 +1,91 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "scenarioBuilder": {
+                    "title": "Einrichtungen anlegen",
+                    "configureFeature": "Einrichtung konfigurieren",
+                    "toolMenu": "Werkzeuge",
+                    "help": "Lorem Ipsum dolor sit amet",
+                    "layerSelector": "Thema auswählen",
+                    "pickReference": "Referenzeinrichtung wählen",
+                    "chooseLocation": "Ort wählen",
+                    "resetLocation": "Zurücksetzen",
+                    "createFeature": "Anlegen",
+                    "helpCreateFeature": "Neue Einrichtung erstellen",
+                    "resetFeature": "Werte Zurücksetzen",
+                    "helpResetFeature": "Die konfigurieren Werte der Einrichtung zurücksetzen",
+                    "warningNoData": "Es wurden bisher keine Themendaten geladen. Bitte wählen Sie mindestens ein Analysethema aus dem Themenbaum.",
+                    "required": "Erforderlich",
+                    "requiredFieldMissing": "Eines oder mehrere erforderliche Felder wurden nicht ausgefüllt.",
+                    "essentialFieldHeader": "Erforderliche Spalten",
+                    "optionalFieldHeader": "Optionale Spalten",
+                    "geomFieldHeader": "Geometrie / Ort",
+                    "optionalField": "Diese Spalte hat keinen Einfluss auf die Darstellung oder andere Analysefunktionen",
+                    "essentialField": "Dieses Feld ist wichtig für die Darstellung bzw. Suche",
+                    "defineFeature": "Neue Einrichtung definieren",
+                    "undo": "Schritt zurück",
+                    "pick": "Polygon in der Karte wählen",
+                    "editFeature": "Simulierte Einrichtung löschen?"
+                },
+                "moveFeatures": {
+                    "title": "Einrichtungen verschieben",
+                    "toggleOnlySimulated": "Nur Simulierte",
+                    "toggleOnlySimulatedTooltip": "Verriegelt: Nur simulierte Einrichtungen können bearbeitet werden",
+                    "toggleOnlySimulatedOffTooltip": "Offen: Alle Einrichtungen des Themas können bearbeitet werden",
+                    "onlySimulatedWarning": "Achtung: Sie können jetzt auch echte Einrichtungen verschieben. Ihre Änderungen sind nur temporär und werden nach der Sitzung nicht gespeichert.",
+                    "resetFeatureLocations": "Verschobene Einrichtungen Zurücksetzen",
+                    "help": "Einrichtung zum Verschieben auswählen. Der Cursor zeigt an, wenn eine Einrichtung durchs Ziehen verschoben werden kann."
+                },
+                "scenarioManager": {
+                    "title": "Szenariomanager",
+                    "createNewTitle": "Neues Szenario anlegen",
+                    "createNewSubmit": "Anlegen",
+                    "dublicateName": "Bitte wählen Sie einen anderen Namen",
+                    "scenarioName": "Name des Szenarios",
+                    "deleteScenario": "Szenario löschen",
+                    "deleteScenarioWarning": "Möchten Sie das aktive Szenario wirklich löschen? Alle Inhalte gehen verloren.",
+                    "noScenarios": "Bislang sind keine Szenarien vorhanden",
+                    "selectScenarios": "Szenario auswählen",
+                    "exportScenario": "Szenario exportieren (GeoJSON)",
+                    "exportNeighborhoods": "Wohnquartiere exportieren (GeoJSON)",
+                    "exportSimulatedFeatures": "Simulierte Einrichtungen exportieren (GeoJSON)",
+                    "restoreAllFeatures": "Alle wiederherstellen",
+                    "helpRestoreAllFeatures": "Alle erstellten Features wiederherstellen",
+                    "pruneAllFeatures": "Szenario leeren",
+                    "helpPruneAllFeatures": "Alle erstellten Features und löschen manipulierten Daten zurücksetzen.",
+                    "pruneNeighborhoods": "Wohnungsbauquartiere löschen",
+                    "helpPruneNeighborhoods": "Alle Wohnungsbauquartiere dieses Szenarios löschen",
+                    "pruneSimulatedFeatures": "Einrichtungen löschen",
+                    "helpPruneSimulatedFeatures": "Alle simulierten Einrichtungen dieses Szenarios löschen",
+                    "pruneAllFeaturesWarning": "Wollen Sie wirklich alle Daten in diesem Szenario löschen?",
+                    "pruneNeighborhoodsWarning": "Wollen Sie wirklich alle erstellten Wohnquartiere in diesem Szenario löschen?",
+                    "pruneSimulatedFeaturesWarning": "Wollen Sie wirklich alle erstellten Einrichtungen in diesem Szenario löschen?",
+                    "noActiveScenario": "Bitte wählen Sie ein Szenario oder legen Sie ein neues an."
+                },
+                "dataTypes": {
+                    "decimal": "Zahl",
+                    "long": "Zahl",
+                    "double": "Zahl",
+                    "float": "Zahl",
+                    "integer": "Zahl",
+                    "string": "Text",
+                    "date": "Datum",
+                    "boolean": "Ja/Nein",
+                    "geometry": "Geometrie",
+                    "object": "-"
+                },
+                "featureEditor": {
+                    "editFeature": "Einrichtung bearbeiten",
+                    "layer": "Fachdatenlayer",
+                    "update": "Änderungen speichern",
+                    "noScenarioWarning": "Bitte erstellen Sie erst ein Szenario um Einrichtungen bearbeiten zu können.",
+                    "reset": "Zurücksetzen",
+                    "confirmDelete": "Möchten Sie die ausgewählte Einrichtung wirklich löschen?",
+                    "confirmReset": "Möchten Sie die ausgewählte Einrichtung wirklich auf ihren Ursprungszustand zurücksetzen?"
+                }
+            }
+        }
+    }
+}
+

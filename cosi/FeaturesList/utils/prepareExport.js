@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import {replaceValues} from "../../utils/modifyObject.js";
 import renameKeys from "../../../../src/utils/renameKeys.js";
+=======
+import {renameKeys, replaceValues} from "../../utils/modifyObject.js";
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
 
 const keyMap = {
         name: "Einrichtung",
@@ -40,7 +44,11 @@ export function prepareTableExport (data) {
         console.error("prepareTableExport: data must be an array");
         return null;
     }
+<<<<<<< HEAD
     const exportData = data.map(item => replaceValues(renameKeys(keyMap, item), valuesMap, true, false));
+=======
+    const exportData = data.map(item => replaceValues(renameKeys(item, keyMap), valuesMap, true, false));
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
 
     return exportData;
 }
@@ -68,7 +76,11 @@ export function prepareDetailsExport (data, filterProps) {
                 return filterProps[item.layerId].includes(prop[0]);
             });
 
+<<<<<<< HEAD
         return replaceValues(renameKeys(keyMap, {...Object.fromEntries(properties), ...item}), valuesMap, true, false);
+=======
+        return replaceValues(renameKeys({...item, ...Object.fromEntries(properties)}, keyMap), valuesMap, true, false);
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
     });
 
     return exportData;

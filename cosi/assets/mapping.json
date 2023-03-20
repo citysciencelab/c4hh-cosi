@@ -1164,7 +1164,11 @@
     "valueType": "absolute"
   },
   {
+<<<<<<< HEAD
     "category": "wohn_avg_wohnflaeche_in_qm_pro_einw",
+=======
+    "category": "wohn_avg_wohnungsgroesse_in_qm_pro_einw",
+>>>>>>> aa211666 (add new addons_3_0_0 structure-add missing addons)
     "value": "Durchschnittsgröße der Wohnungen in qm pro Einwohner",
     "group": "Wohnen",
     "stat_gebiet": "31231",

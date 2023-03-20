@@ -27,7 +27,12 @@ export default {
     receivedResults: [], // when tools are finished running a request, they commit the results here; a watcher on this variable calls the callback given in the request.
     supportedTools: ["AccessibilityAnalysis", "Dashboard"],
     readmeUrl: {
+<<<<<<< HEAD
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/013fileimport.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/013geodatenimportieren.md"
+=======
+        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/fileimport.md",
+        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/geodatenimportieren.md"
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     }
 };

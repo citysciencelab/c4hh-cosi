@@ -207,6 +207,10 @@ export default {
                 const canvasPNG = canvas.$refs.canvas.toDataURL("image/png");
 
                 zip.file("cosi_chart_" + i + ".png", canvasPNG);
+<<<<<<< HEAD
+=======
+                // this.downloadFile(canvasPNG);
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
             });
 
             zip.generateAsync({type: "blob"})
@@ -437,6 +441,7 @@ export default {
                             </div>
                             <div class="graph_footer">
                                 <template v-if="datasets.length > 0">
+<<<<<<< HEAD
                                     <v-app>
                                         <v-divider />
                                         <AnalysisPagination
@@ -456,6 +461,27 @@ export default {
                                             @downloadAll="() => downloadAll()"
                                         />
                                     </v-app>
+=======
+                                    <AnalysisPagination
+                                        :sets="datasets"
+                                        :active-set="activeGraph"
+                                        :downloads="['PNG']"
+                                        :titles="{
+                                            downloads: [$t('additional:modules.tools.cosi.chartGenerator.downloadChart')],
+                                            downloadAll: $t('additional:modules.tools.cosi.chartGenerator.downloadAll'),
+                                            remove: $t('additional:modules.tools.cosi.chartGenerator.removeChart'),
+                                            removeAll: $t('additional:modules.tools.cosi.chartGenerator.deleteAll'),
+                                            next: $t('additional:modules.tools.cosi.chartGenerator.nextChart'),
+                                            prev: $t('additional:modules.tools.cosi.chartGenerator.prevChart'),
+                                        }"
+                                        @setActiveSet="(n) => selectGraph(n)"
+                                        @setPrevNext="(n) => graphPrevNext(n)"
+                                        @removeSingle="(n) => removeGraph(n)"
+                                        @removeAll="() => removeAll()"
+                                        @downloadPNG="(n) => downloadGraph()"
+                                        @downloadAll="() => downloadAll()"
+                                    />
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
                                 </template>
                             </div>
                         </div>
@@ -584,6 +610,13 @@ export default {
                                 }
                             }
 
+<<<<<<< HEAD
+=======
+                            .current_graph {
+                                //min-height:400px;
+                            }
+
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
                             .graph_sub {
                                 position:absolute;
                                 top:0;
@@ -617,6 +650,7 @@ export default {
                             }
                         }
                     }
+<<<<<<< HEAD
                     // .graph_footer {
                     //     width:100%;
                     //     display:flex;
@@ -625,6 +659,16 @@ export default {
                     //     margin:5px auto;
                     //     padding-top: 10px;
                     // }
+=======
+                    .graph_footer {
+                        width:100%;
+                        display:flex;
+                        flex-flow:row wrap;
+                        justify-content:flex-end;
+                        margin:5px auto;
+                        padding-top: 10px;
+                    }
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
                 }
 
                 &.active {

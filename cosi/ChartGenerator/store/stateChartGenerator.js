@@ -24,8 +24,17 @@ const state = {
     datasets: [],
     chartConfigs: [],
     readmeUrl: {
+<<<<<<< HEAD
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/008chartgenerator_en.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/008graphenvisualisierung.md"
+=======
+        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/chartgenerator_en.md",
+<<<<<<< HEAD
+        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/graphenvisualisierung.md"
+=======
+        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/chartgenerator.md"
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     }
 };
 

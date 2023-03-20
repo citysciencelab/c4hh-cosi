@@ -1,5 +1,9 @@
 
+<<<<<<< HEAD
 ### Sitzung Speichern und Laden
+=======
+<<<<<<< HEAD
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 
 ![Abbildung 1: Sitzung Speichern](./014_sitzungspeichern.PNG)
 *Abb. a: Sitzung speichern / laden*
@@ -14,6 +18,15 @@ Mit dem Dienst **Sitzung speichern/laden** können die folgend aufgelisteten Inf
 Die Funktion ist unter "Dienste", "Sitzung speichern/laden" zu finden.
 
 
+=======
+Mit dem Dienst **Sitzung speichern/laden** können aktuelle diverse Informationen der aktuellen Arbeitssitzung abgespeichert werden um diese zu einem späteren Zeitpunkt wieder öffnen und weiterbearbeiten zu können. Dies umfasst
+
+- Die ausgewählte Verwaltungsebene und ausgewählte Gebiete
+- Aktive Fachdatenthemen 
+- Mit den [Simulationswerkzeugen](./simulation.md) erstellte Szenarien
+- Ergebnisse und Konfigurationen der Werkzeuge [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Versorgungsanalyse](./versorgungsanalyse.md)
+
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 1. **Schnell speichern**
    > Aktuelle Sitzung im Browser (z.B. Edge, Firefox) speichern. Diese können beim Start von CoSI über den Button **Letzte Laden** wieder geladen werden. Wenn Browserverlauf oder Cache geleert werden, geht dieser Speicherstand verloren! Es kann immer nur eine Sitzung vorgehalten werden.
 2. **Letzte laden**

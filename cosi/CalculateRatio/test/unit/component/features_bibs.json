@@ -1,0 +1,44 @@
+{
+  "type": "FeatureCollection",
+  "features": [{
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [576481.087, 5939999.315, 0]
+    },
+    "properties": {
+      "bezeichnung": "Bücherhalle Rahlstedt",
+      "adresse": "Amtsstraße 3a",
+      "ort": "22143 Hamburg",
+      "telefon": "+49 (40) 67 70 46 0",
+      "link": "https://www.buecherhallen.de/rahlstedt.html",
+      "homepage": "https://www.buecherhallen.de",
+      "e_mail": "rahlstedt@buecherhallen.de",
+      "profil": "Dem Wohnort-Charakter des Stadtteils entsprechend, besuchen vor allem Familien die Bücherhalle Rahlstedt. Die Versorgung von Kindern und Schülern mit entsprechenden Medien und Informationen bildet einen Schwerpunkt der Arbeit.",
+      "angebote": "WLAN, Fotokopierer, MS-Office 2010, Datenbanken; Gruppenräume, Arbeitsmöglichkeiten, Spieleecken; Veranstaltungen für Kinder, Jugendliche und Erwachsene; Netzwerkpartner im Stadtteil; außerschulischer Bildungspartner; Dialog in Deutsch®; barrierefrei, Parkplätze.",
+      "medienanzahl": "Rund 38.000 Medien",
+      "medienarten": "Bücher (Romane, Sachbücher, Fachliteratur, Reiseführer, Kinderbücher, Jugendliteratur); Hörbücher, Musik-CDs (Jazz, Pop, Rock, Klassik); Filme als DVD und Blu-ray (Kinderfilme, Serien, Blockbuster, Arthouse); Konsolenspiele, Gesellschaftsspiele; Zeitungen (überregional, international); Zeitschriften (Publikumszeitschriften, Fachmagazine, Sport, Hobby); digitale Medien (E-Books, Streamingdienste, Datenbanken)"
+    },
+    "id": "DE.HH.UP_OEFFENTLICHE_BIBS_12"
+  }, {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [574175.88, 5940208.758, 0]
+    },
+    "properties": {
+      "bezeichnung": "Bücherhalle Farmsen",
+      "adresse": "Rahlstedter Weg 10",
+      "ort": "22159 Hamburg",
+      "telefon": "+49 (40) 64 32 08 3",
+      "link": "https://www.buecherhallen.de/farmsen.html",
+      "homepage": "https://www.buecherhallen.de",
+      "e_mail": "farmsen@buecherhallen.de",
+      "profil": "Die Bücherhalle Farmsen ist eine Bibliothek für alle Generationen in Farmsen und Berne.\n",
+      "angebote": "WLAN, Fotokopierer, MS-Office 2010, Datenbanken;  Gruppenräume,  Arbeitsmöglichkeiten, Spieleecke; Bilderbuchkino, Bastelnachmittage, Familiensamstage; digitale Sprechstunde; individuelle Beratung, Klassenführungen; außerschulischer Bildungspartner; Dialog in Deutsch®; barrierefrei, Parkplätze.",
+      "medienanzahl": "Rund 35.500 Medien",
+      "medienarten": "Bücher (Romane, Sachbücher, Reiseführer, Kinderbücher, Jugendliteratur); Hörbücher; Musik-CDs; Filme und Serien als DVD und Blu-ray; Tageszeitungen; Zeitschriften; Tiptoi, Ting und Booki; Gesellschaftsspiele; Konsolenspiele; digitale Medien (E-Books, Streamingdienste, Datenbanken)"
+    },
+    "id": "DE.HH.UP_OEFFENTLICHE_BIBS_31"
+  }]
+}

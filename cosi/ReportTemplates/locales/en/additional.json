@@ -1,0 +1,11 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "reportTemplates": {
+                    "title": "Report Template"
+                }
+            }
+        }
+    }
+}

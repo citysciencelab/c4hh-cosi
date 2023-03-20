@@ -40,10 +40,16 @@ const state = {
     disabledFeatureItems: [],
     distanceScoreEnabled: true,
     readmeUrl: {
+<<<<<<< HEAD
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/017featureslist.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/017einrichtungsuebersicht.md"
     },
     show: true
+=======
+        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/featureslist.md",
+        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/einrichtungsuebersicht.md"
+    }
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 };
 
 export default state;

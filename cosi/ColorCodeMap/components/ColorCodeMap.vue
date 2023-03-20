@@ -10,7 +10,10 @@ import groupMapping from "../../utils/groupMapping";
 import mapping from "../../assets/mapping.json";
 import ChartDataset from "../../ChartGenerator/classes/ChartDataset";
 import {mapDistrictNames} from "../../DistrictSelector/utils/prepareDistrictLevels";
+<<<<<<< HEAD
 import {convertColor} from "../../../../src/utils/convertColor";
+=======
+>>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
 
 export default {
     name: "ColorCodeMap",
@@ -247,11 +250,19 @@ export default {
                         if (this.originalStyling === null) {
                             this.originalStyling = getStyling;
                         }
+<<<<<<< HEAD
                         const styleArray = [],
                             match_props = matchResults.get(this.yearSelector + this.selectedYear),
                             convertedColor = convertColor(this.colorScale.scale(match_props), "rgb");
 
                         getStyling.fill = match_props !== undefined ? new Fill({color: [...convertedColor, 0.75]}) : new Fill({color: "rgba(0, 0, 0, 0.75)"});
+=======
+
+                        const styleArray = [],
+                            match_props = matchResults.get(this.yearSelector + this.selectedYear);
+
+                        getStyling.fill = match_props !== undefined ? new Fill({color: utils.getRgbArray(this.colorScale.scale(match_props), 0.75)}) : new Fill({color: "rgba(0, 0, 0, 0.75)"});
+>>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
                         getStyling.zIndex = 1;
                         getStyling.text = new Text({
                             font: "16px Calibri,sans-serif",
@@ -352,9 +363,13 @@ export default {
                     if (this.originalStyling === null) {
                         this.originalStyling = getStyling;
                     }
+<<<<<<< HEAD
                     const convertedColor = convertColor(this.colorScale.scale(matchResults.data), "rgb");
 
                     getStyling.fill = new Fill({color: [...convertedColor, 0.75]});
+=======
+                    getStyling.fill = new Fill({color: utils.getRgbArray(this.colorScale.scale(matchResults.data), 0.75)});
+>>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
                     getStyling.zIndex = 1;
                     getStyling.text = new Text({
                         font: "16px Calibri,sans-serif",
@@ -669,7 +684,11 @@ export default {
 
     .addon_container {
         position:fixed;
+<<<<<<< HEAD
         z-index:100;
+=======
+        z-index:5000;
+>>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
         left:10px;
         bottom:30px;
         width:460px;

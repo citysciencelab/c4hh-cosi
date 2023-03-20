@@ -1,0 +1,16 @@
+{
+  "modules": {
+    "tools": {
+      "oktagon": {
+        "fetchFailed": "Die Adressabfrage konnte nicht durchgeführt werden.",
+        "fetchFailedMessage": "Details: Ein benötigter Dienst antwortet nicht.",
+        "wrongDistrictName": "Der parametrisierte Aufruf des Portals ist leider fehlgeschlagen!",
+        "wrongDistrictNameMessage": "Folgender Bezirk konnte nicht gefunden werden: ",
+        "wrongAddressParameter": "Der parametrisierte Aufruf des Portals ist leider fehlgeschlagen!",
+        "wrongAddressParameterMessage": "Es konnte keine Adresse gefunden werde. Bitte prüfen Sie die Eingabeparameter.",
+        "send": "Senden",
+        "cancel": "Abbrechen"
+      }
+    }
+  }
+}

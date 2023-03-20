@@ -145,11 +145,16 @@ export default {
     <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
     <div
         class="feature-icon"
+<<<<<<< HEAD
         role="button"
         tabindex="0"
         :title="getTitle(item)"
         @click="zoomToFeature"
         @keydown.enter="zoomToFeature"
+=======
+        :title="getTitle(item)"
+        @click="zoomToFeature"
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
     >
         <InlineSvg
             v-if="getSvgSrc()"

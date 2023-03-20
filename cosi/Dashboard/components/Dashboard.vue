@@ -8,7 +8,10 @@ import actions from "../store/actionsDashboard";
 import {getTimestamps} from "../../utils/timeline";
 import beautifyKey from "../../../../src/utils/beautifyKey";
 import TableRowMenu from "./TableRowMenu.vue";
+<<<<<<< HEAD
 import EditForReportTemplate from "../../components/EditForReportTemplate.vue";
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
 import {
     addCalculation,
     addDivideSelectedCalculations,
@@ -39,8 +42,12 @@ export default {
         ToolInfo,
         TableRowMenu,
         DashboardToolbar,
+<<<<<<< HEAD
         TableCell,
         EditForReportTemplate
+=======
+        TableCell
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     },
     data () {
         return {
@@ -812,11 +819,14 @@ export default {
                         :url="readmeUrl"
                         :locale="currentLocale"
                     />
+<<<<<<< HEAD
                     <EditForReportTemplate
                         :report-template-mode="reportTemplateMode"
                         tool-name="Dashboard"
                         instructions="Wählen sie mindestens ein Gebiet in der Gebietsauswahl aus. Stellen Sie dann hier ein, welche Themen und Daten übernommen werden sollen. Drücken Sie dann auf übernehmen, um die Einstellungen in das Report Template zu übernehmen."
                     />
+=======
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
                     <v-container fluid>
                         <DashboardToolbar
                             :stats-feature-filter="statsFeatureFilter"

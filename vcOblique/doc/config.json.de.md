@@ -62,7 +62,11 @@ Mobil wird das iFrame im window angezeigt.
 |name|ja|String|Schrägluftbilder|Der Titel des Werkzeuges bzw. der Eintrag in der Werkzeugliste|false|
 |icon|ja|String|bi-camera-fill|Das zu verwendende Icon.|false|
 |styleId|nein|String|"obliqueViewer"|StyleId aus der style.json, um den Mapmarker in der Karte zu stylen, wenn Schrägluftbilder geöffnet ist.|true|
+<<<<<<< HEAD
 |dataYear|nein|String|""|Das Jahr der zugrundeliegenden Daten.|false|
+=======
+
+>>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
 
 
 
@@ -72,8 +76,12 @@ Mobil wird das iFrame im window angezeigt.
 #!json
     "vcOblique": {
     "name": "translate#additional:modules.tools.vcOblique.title",
+<<<<<<< HEAD
     "icon": "bi-image",
     "dataYear":"2020"
+=======
+    "icon": "bi-image"
+>>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
     }
 ```
 

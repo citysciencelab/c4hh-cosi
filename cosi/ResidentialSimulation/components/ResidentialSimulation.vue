@@ -118,8 +118,12 @@ export default {
             selectedFeatures: "selectedFeatures",
             selectedAdminFeatures: "selectedAdminFeatures",
             selectedDistricts: "selectedDistricts",
+<<<<<<< HEAD
             selectedDistrictLevel: "selectedDistrictLevel",
             mapping: "mapping"
+=======
+            selectedDistrictLevel: "selectedDistrictLevel"
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
         }),
         geomField () {
             return {
@@ -249,8 +253,12 @@ export default {
                     stats,
                     "Bevölkerung insgesamt",
                     this.timelinePrefix,
+<<<<<<< HEAD
                     this.groupsList,
                     this.mapping
+=======
+                    this.groupsList
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
                 );
 
             if (baseStats) {

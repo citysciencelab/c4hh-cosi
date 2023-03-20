@@ -4,7 +4,10 @@
             "cosi": {
                 "accessibilityAnalysis": {
                     "title": "Erreichbarkeitsanalyse",
+<<<<<<< HEAD
                     "description": "Zeigt ein Gebiet auf der Karte an, welches von einem ausgewählten Punkt, entlang einer Route oder ab einer Einrichtung innerhalb einer festgelegten Entfernung erreichbar ist. Die Entfernung kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit wird abhängig vom Verkehrsmittel berechnet.",
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                     "dropdownInfo": "Bitte wählen Sie den Modus, in dem Sie arbeiten möchten",
                     "mode": {
                       "point": "Erreichbarkeit ab einem Referenzpunkt",
@@ -13,10 +16,15 @@
                       "path": "Erreichbarkeit entlang einer Route"
                     },
                     "pointOfReference": "Referenzpunkt: Klicken Sie auf die Karte",
+<<<<<<< HEAD
                     "setByFeature": "Klicken Sie auf eine Einrichtung",
                     "setByFeatureOutline": "Von Flächenaußengrenzen ermitteln",
                     "setByFeatureInfo": "Verwendet die Eckpunkte von Polygonen für die Berechnung. Achtung: Kann bei extrem komplexen Flächen zu Fehlern führen.",
                     "addMultiplePoints": "Weitere Punkte hinzufügen ein-/ausschalten",
+=======
+                    "setByFeature": "Von Flächenaußengrenzen ermitteln",
+                    "setByFeatureInfo": "Verwendet die Eckpunkte von Polygonen für die Berechnung. Achtung: Kann bei extrem komplexen Flächen zu Fehlern führen.",
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                     "topic": "Thema",
                     "directions": "Berechnete Routen",
                     "transportType": "Verkehrsmittel",

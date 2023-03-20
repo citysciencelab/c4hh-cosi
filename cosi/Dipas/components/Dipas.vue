@@ -125,6 +125,7 @@ export default {
          * @returns {void}
          */
         async initialize () {
+<<<<<<< HEAD
             const fetch = await this.fetchProjects();
             let features = [];
 
@@ -135,6 +136,10 @@ export default {
             }
 
             features = new GeoJSON().readFeatures(fetch);
+=======
+            const fetch = await this.fetchProjects(),
+                features = new GeoJSON().readFeatures(fetch);
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 
             this.selectedStyling = "category";
             this.projectsFeatureCollection = this.transformFeatures(features);
@@ -167,8 +172,13 @@ export default {
                 this.$set(this.projectsActive, id, {layer: false, contributions: false, heatmap: false});
                 this.$set(this.contributions, id, {index: i, colors: {}, rainbowColors: {}, features: [], loading: false});
                 for (const [catIndex, category] of Object.values(feature.get("standardCategories")).entries()) {
+<<<<<<< HEAD
                     this.contributions[id].colors[category.name] = colorScale(catIndex);
                     this.contributions[id].rainbowColors[category.name] = rainbowColorScale(catIndex);
+=======
+                    this.contributions[id].colors[category] = colorScale(catIndex);
+                    this.contributions[id].rainbowColors[category] = rainbowColorScale(catIndex);
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
                 }
             }
         },
@@ -760,12 +770,21 @@ export default {
                                     </div>
                                     <v-chip
                                         v-for="category in feature.get('standardCategories')"
+<<<<<<< HEAD
                                         :key="feature.get('id') + category.id"
                                         class="ma-1 category"
                                         :color="handleColor(feature.get('id'), category.name)"
                                         small
                                     >
                                         {{ category.name }}
+=======
+                                        :key="feature.get('id') + category"
+                                        class="ma-1 category"
+                                        :color="handleColor(feature.get('id'), category)"
+                                        small
+                                    >
+                                        {{ category }}
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
                                     </v-chip>
                                     <v-list-item>
                                         <v-list-item-action>
