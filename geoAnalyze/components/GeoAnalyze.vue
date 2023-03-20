@@ -53,7 +53,7 @@ export default {
     watch: {
         active (newValue) {
             if (newValue) {
-                this.addLayer(this.layer);
+                this.addLayerToMap(this.layer);
                 this.addInteractions();
                 this.activateInteraction(this.selectedOption);
             }
@@ -73,8 +73,8 @@ export default {
     },
     methods: {
         ...mapMutations("Tools/GeoAnalyze", Object.keys(mutations)),
-        ...mapMutations("Maps", ["removeLayerFromMap"]),
-        ...mapActions("Maps", ["addLayer", "addInteraction", "removeInteraction"]),
+        ...mapMutations("Maps", ["addLayerToMap", "removeLayerFromMap"]),
+        ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
 
         /**

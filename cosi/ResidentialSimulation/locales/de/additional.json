@@ -1,0 +1,67 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "residentialSimulation": {
+                    "title": "Wohnungsbauquartiere anlegen",
+                    "subTitle": "Quartier anlegen",
+                    "help": "Lorem Ipsum",
+                    "geom": "Geometrie",
+                    "noGeomWarning": "Bitte erst Geometrie festlegen!",
+                    "helpDrawGeom": "Polygon zeichnen oder auswählen",
+                    "units": "Wohneinheiten",
+                    "helpUnits": "Anzahl der Wohneinheiten festlegen",
+                    "unitUnits": "Einheiten",
+                    "bgf": "Bruttogeschossfläche (BGF)",
+                    "helpBgf": "Bruttogeschossfläche (BGF) in m² festlegen",
+                    "gfz": "Geschossflächenzahl (GFZ)",
+                    "helpGfz": "Geschossflächenzahl (GFZ) anteilig an der BGF festlegen",
+                    "unitGfz": "GFZ",
+                    "livingSpace": "Wohnfläche pro Person",
+                    "helpLivingSpace": "Wohnfläche pro Person festlegen",
+                    "unitLivingSpace": "m² / EW",
+                    "populationDensity": "Bevölkerungsdichte",
+                    "helpPopulationDensity": "Bevölkerungsdichte in EW/km² festlegen",
+                    "unitPopulationDensity": "EW / km²",
+                    "livingSpaceRatio": "Verhältnis Wohnfläche / BGF",
+                    "helpLivingSpaceRatio": "Verhältnis Wohnfläche / BGF als Dezimalwert (z.B. 0.8) festlegen",
+                    "unitLivingSpaceRatio": "WF / BGF",
+                    "householdSize": "Ø Haushaltsgröße",
+                    "helpHouseholdSize": " Durchschnittliche Haushaltsgröße festlegen",
+                    "unitHouseholdSize": "Personen",
+                    "visualizeDemographics": "Bevölkerungsverteilung",
+                    "createFeature": "Anlegen",
+                    "createFeatureHelp": "Wohnquartier anlegen - Statistische Daten werden dem umliegenden Gebiet zugerechnet",
+                    "resetFeature": "Zurücksetzen",
+                    "editFeature": "Wohnquartier bearbeiten",
+                    "dateOfCompletion": "Jahr der Fertigstellung",
+                    "valueError": "Die Operation würde folgende ungültige Werte zu Folge haben:",
+                    "bounds": "Grenzwerte:"
+                },
+                "referencePicker": {
+                    "reference": "Referenzgebiet",
+                    "titleReference": "Referenzgebiet auswählen (optional)",
+                    "pickReference": "Gebiet auswählen",
+                    "helpPickReference": "Statistische Daten aus einem Referenzgebiet extrapolieren",
+                    "errorPickReference": "Statistische Daten des Referenzgebiets konnten nicht geladen werden. Bitte versuchen Sie es erneut oder laden Sie die Anwendung neu.",
+                    "noReference": "Ohne Referenzgebiet werden die Daten des umliegenden Gebietes herangezogen."
+                },
+                "statisticsTable": {
+                    "statsCategory": "Kategorie",
+                    "statsValue": "Wert",
+                    "statsType": "Typ",
+                    "editStatsTable": "Statistische Daten bearbeiten",
+                    "editStatsField": "Wert bearbeiten",
+                    "editStatsInfo": "Bitte beachten Sie, dass nach der Veränderung eines Wertes keine Sicherheit mehr besteht, dass relative und absolute Werte zueinander passen oder Abhängigkeiten zwischen Werten realistisch abgebildet werden.",
+                    "isNotNumber": "Muss eine Zahl sein"
+                },
+                "neighborhoodEditor": {
+                    "invalidDate": "Bitte geben Sie ein Datum im Format YYYY-MM ein",
+                    "updateStats": "Änderungen speichern",
+                    "changeName": "Name ändern",
+                    "confirmDelete": "Möchten Sie das ausgewählte Quartier wirklich löschen?"
+                }
+            }
+        }
+    }
+}

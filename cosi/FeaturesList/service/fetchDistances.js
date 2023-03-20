@@ -23,7 +23,11 @@ async function fetchMatrix (sources, destinations, profile, serviceId, fallbackI
         const originalRequest = error.config,
             bkg_url = getServiceUrl(serviceId);
 
+<<<<<<< HEAD
         if (!(error.response?.status === 200) && originalRequest.url.indexOf(bkg_url) === 0 && !originalRequest._retry) {
+=======
+        if (originalRequest.url.indexOf(bkg_url) === 0 && error.response.status !== 200 && !originalRequest._retry) {
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
             originalRequest._retry = true;
             const uri = originalRequest.url.replace(bkg_url, getServiceUrl(fallbackId));
 

@@ -1,13 +1,20 @@
 import Vuex from "vuex";
+<<<<<<< HEAD
 import {shallowMount, createLocalVue, config} from "@vue/test-utils";
 import {expect} from "chai";
 import DataTableTheme from "../../../components/DataTable.vue";
 import sinon from "sinon";
+=======
+import {shallowMount, createLocalVue} from "@vue/test-utils";
+import {expect} from "chai";
+import DataTableTheme from "../../../components/DataTable.vue";
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
 
 const localVue = createLocalVue();
 
 localVue.use(Vuex);
 
+<<<<<<< HEAD
 config.mocks.$t = key => key;
 
 describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTable.vue", () => {
@@ -32,6 +39,16 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
                     entnahme_datum: "Entnahme Datum",
                     ohg_in_meter: "OHG in Meter"
                 };
+=======
+describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTable.vue", () => {
+    let wrapper;
+
+    const featureData = {
+            getTheme: () => "DataTable",
+            getTitle: () => "DataTable",
+            getAttributesToShow: () => {
+                return {};
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
             },
             getMimeType: () => "text/xml",
             getFeatures: () => {
@@ -77,6 +94,7 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
                 }];
             }
         },
+<<<<<<< HEAD
         store = new Vuex.Store({
             namespaces: true,
             modules: {
@@ -85,22 +103,42 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
                     getters: {
                         currentLocale: () => "de-DE"
                     }
+=======
+
+        mockGetters = {
+            gfiFeatures: () => featureData
+        },
+
+        store = new Vuex.Store({
+            namespaces: true,
+            modules: {
+                Map: {
+                    namespaced: true,
+                    getters: mockGetters
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
                 }
             }
         });
 
     beforeEach(() => {
+<<<<<<< HEAD
         spyRunSorting = sinon.spy(DataTableTheme.methods, "runSorting");
         spyResetAll = sinon.spy(DataTableTheme.methods, "resetAll");
         wrapper = shallowMount(DataTableTheme, {
             localVue,
             store,
+=======
+        wrapper = shallowMount(DataTableTheme, {
+            store,
+            localVue,
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
             propsData: {
                 feature: featureData
             }
         });
     });
 
+<<<<<<< HEAD
     afterEach(() => {
         sinon.restore();
     });
@@ -676,6 +714,34 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
                 expect(wrapper.vm.dropdownSelected).to.deep.equal({});
                 expect(wrapper.vm.rows).to.deep.equal(originRows);
                 expect(wrapper.vm.columns).to.deep.equal(originColumns);
+=======
+    it("It should exist a container for a data table", () => {
+        expect(wrapper.find("#table-data-container").exists()).to.be.true;
+    });
+
+    it("Check the displayed table head", () => {
+        const theads = wrapper.findAll("#table-data-container table th");
+
+        expect(theads.exists()).to.be.true;
+
+        wrapper.vm.refinedData.head.forEach((singleCaption, index) => {
+            expect(theads.at(index).text()).to.equal(singleCaption);
+        });
+    });
+
+    it("Check the displayed table data", () => {
+        const trs = wrapper.findAll("#table-data-container table tr");
+
+        expect(trs.exists()).to.be.true;
+
+        trs.wrappers.forEach((tr, indexTr) => {
+            const tds = tr.findAll("td");
+
+            expect(tds.exists()).to.be.true;
+
+            tds.wrappers.forEach((td, indexTd) => {
+                expect(td.text()).to.equal(Object.values(wrapper.vm.refinedData.rows[indexTr])[indexTd]);
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
             });
         });
     });

@@ -31,9 +31,13 @@ const mutations = {
         }
         else {
             state.activeSelection = payload;
+<<<<<<< HEAD
 
         }
 
+=======
+        }
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     },
     /**
      * @param {object} state of this component

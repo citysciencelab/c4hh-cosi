@@ -3,6 +3,7 @@ import MappingJson from "../../assets/mapping.json";
 
 /**
  * @todo ONLY PROTOTYPE!!!! refactor
+<<<<<<< HEAD
  * @param {String} districtName - the district to process data for
  * @param {String} districtLevel - the districtLevel to operate on
  * @param {module:ol/Feature[]} statsFeatures - the features holding statistical data
@@ -17,6 +18,20 @@ export default function processStats (districtName, districtLevel, statsFeatures
         stats = statsFeatures.map(feature => feature.getProperties()),
         latestYear = timelinePrefix + getLastAvailableYear(statsFeatures, timelinePrefix),
         populationStats = groupsList?.length > 0 ? mapping.filter(mappingObj => groupsList.includes(mappingObj.group)) : mapping,
+=======
+ * @param {String} districtName -
+ * @param {String} districtLevel -
+ * @param {module:ol/Feature[]} statsFeatures -
+ * @param {String} basePopulationProp -
+ * @param {String} timelinePrefix -
+ * @param {String} groupsList -
+ * @returns {Object} - the base stats for the picked reference district
+ */
+export default function processStats (districtName, districtLevel, statsFeatures, basePopulationProp, timelinePrefix, groupsList) {
+    const stats = statsFeatures.map(feature => feature.getProperties()),
+        latestYear = timelinePrefix + getLastAvailableYear(statsFeatures, timelinePrefix),
+        populationStats = groupsList.length > 0 ? MappingJson.filter(mappingObj => groupsList.includes(mappingObj.group)) : MappingJson,
+>>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
         basePopulationFeature = statsFeatures.find(feature => feature.get("kategorie") === basePopulationProp),
         basePopulation = parseFloat(basePopulationFeature.get(latestYear)),
         baseStats = {

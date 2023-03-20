@@ -129,18 +129,9 @@ describe("Dipas.vue", () => {
                         "owner": "Bezirksamt Harburg",
                         "publisher": "",
                         "standardCategories": {
-                            "3": {
-                                "name": "Sonstiges",
-                                "id": "3"
-                            },
-                            "1": {
-                                "name": "Wunschstandort",
-                                "id": "1"
-                            },
-                            "2": {
-                                "name": "CLEVER Projekt",
-                                "id": "2"
-                            }
+                            "3": "Sonstiges",
+                            "1": "Wunschstandort",
+                            "2": "CLEVER Projekt"
                         },
                         "projectContributionType": [],
                         "referenceSystem": "4326",

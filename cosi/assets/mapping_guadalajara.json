@@ -1,0 +1,82 @@
+[
+  {
+    "category": "POBTOT",
+    "value": "Population total",
+    "group": "Population",
+    "CVEGEO": "mex_14_ageb",
+    "CVE_MUN": "mex_14_mun",
+    "CVE_ENT": "mex_14_ent",
+    "valueType": "absolute",
+    "ltf": true
+  },
+  {
+    "category": "P_0A2",
+    "value": "Population 0-2",
+    "group": "Population",
+    "CVEGEO": "mex_14_ageb",
+    "CVE_MUN": "mex_14_mun",
+    "CVE_ENT": "mex_14_ent",
+    "valueType": "absolute",
+    "ltf": true
+  },
+  {
+    "category": "P_18YMAS",
+    "value": "Population 18+",
+    "group": "Population",
+    "CVEGEO": "mex_14_ageb",
+    "CVE_MUN": "mex_14_mun",
+    "CVE_ENT": "mex_14_ent",
+    "valueType": "absolute",
+    "ltf": true
+  },
+  {
+    "category": "P_3A5",
+    "value": "Population 3-5",
+    "group": "Population",
+    "CVEGEO": "mex_14_ageb",
+    "CVE_MUN": "mex_14_mun",
+    "CVE_ENT": "mex_14_ent",
+    "valueType": "absolute",
+    "ltf": true
+  },
+  {
+    "category": "P_6A11",
+    "value": "Population 6-11",
+    "group": "Population",
+    "CVEGEO": "mex_14_ageb",
+    "CVE_MUN": "mex_14_mun",
+    "CVE_ENT": "mex_14_ent",
+    "valueType": "absolute",
+    "ltf": true
+  },
+  {
+    "category": "P_12A14",
+    "value": "Population 12-14",
+    "group": "Population",
+    "CVEGEO": "mex_14_ageb",
+    "CVE_MUN": "mex_14_mun",
+    "CVE_ENT": "mex_14_ent",
+    "valueType": "absolute",
+    "ltf": true
+  },
+  {
+    "category": "P_15A17",
+    "value": "Population 15-17",
+    "group": "Population",
+    "CVEGEO": "mex_14_ageb",
+    "CVE_MUN": "mex_14_mun",
+    "CVE_ENT": "mex_14_ent",
+    "valueType": "absolute",
+    "ltf": true
+  },
+  {
+    "category": "POB15_64",
+    "value": "Population 15-64",
+    "group": "Population",
+    "CVEGEO": "mex_14_ageb",
+    "CVE_MUN": "mex_14_mun",
+    "CVE_ENT": "mex_14_ent",
+    "valueType": "absolute",
+    "ltf": true
+  }
+]

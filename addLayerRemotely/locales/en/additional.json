@@ -1,0 +1,7 @@
+{
+  "modules": {
+      "addGeoJsonRemotely": {
+        "folderName": "Externally loaded Feature"
+      }
+  }
+}

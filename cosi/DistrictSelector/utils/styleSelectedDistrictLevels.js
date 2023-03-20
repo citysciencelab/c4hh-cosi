@@ -108,9 +108,6 @@ export function styleSelectedDistrictLevels (districtLevels, selectedLevelId, ac
                     stroke: getSelectedStrokeStyle(baseStyle, activeStyleValues)
                 });
 
-            level.layer.getSource().getFeatures().forEach(feature => {
-                feature.setStyle();
-            });
             level.layer.setStyle(() => selectedStyle);
         }
         else {

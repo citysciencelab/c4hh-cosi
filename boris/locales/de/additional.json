@@ -1,0 +1,111 @@
+{
+    "modules": {
+        "tools": {
+            "boris": {
+                "name": "Bodenrichtwert-Informationen",
+                "labelSelectYear": "Die Abfrage erfolgt für den Bodenrichtwertstichtag",
+                "ariaLabelSelectYear": "Datum",
+                "toggleStripesLayer": "Blockrandstreifen darstellen",
+                "toggleStripesLayerInfo": "Bisher wurden die Bodenrichtwertzonen als Blockrandstreifen dargestellt. Jetzt sehen Sie initial flächendeckende Bodenrichtwertzonen. Hier können Sie die Anzeige der Blockrandstreifen einschalten.",
+                "SelectAreaInMap": "Bitte klicken Sie nun auf den gewünschten BRW in der Karte.",
+                "labelSelectUse": "Gewählte Nutzung:",
+                "ariaLabelSelectUse": "Nutzungsarten",
+                "selectOption": "Bitte wählen",
+                "referenceNumber": "Bodenrichtwert-Nr.",
+                "detailInformation": {
+                    "title": "Detailinformationen",
+                    "state": "Entwicklungszustand",
+                    "condition": "Beitragsrechtlicher Zustand",
+                    "developmentAddition": "Sanierungs- oder Entwicklungszusatz",
+                    "typeOfUse": "Art der Nutzung",
+                    "landUse": "Gebäudestellung",
+                    "numberOfFloor": "Wertrelevante Geschossflächenzahl (WGFZ)",
+                    "landArea": "Grundstücksfläche in m²",
+                    "propertyDepth": "Grundstückstiefe in m",
+                    "moreFeatures": "Weitere Merkmale"
+                },
+                "locationDescription": {
+                    "title": "Lagebeschreibung",
+                    "codeCity": "PLZ, Gemeinde",
+                    "district":"Bezirk",
+                    "cityDistrict": "Stadtteil",
+                    "statisticalArea": "SGE (Stat. Gebietseinheit)",
+                    "buildingBlock": "Baublock",
+                    "address": "Adresse",
+                    "furtherLocation": "Weitere Lagebezeichnung",
+                    "redevelopmentArea": "Sanierungsgebiet"
+                },
+                "landCalculation": {
+                    "title": "Umrechnung auf individuelles Grundstück",
+                    "subtitle": "Daten des Zielgrundstücks, auf das der Bodenrichtwert umgerechnet wird:",
+                    "buildingDesigns": "Gebäudestellung",
+                    "ariaLabelBuildingDesigns": "Bauweisen",
+                    "buildingDesignsInfo": "Wählen Sie die Bauweise Ihres Gebäudes aus der Liste aus: <strong>Einzelhäuser </strong> sind freistehende Häuser, die nicht an die Grundstücksgrenze, Nutzungsgrenze oder andere Häuser angebaut sind. Lediglich zu einer Seite darf der Raum zwischen Haus und Grundstücksgrenze mit Nebengebäuden, z. B. Garagen zugebaut sein. <strong> Ein Doppelhaus </strong>ist eine Kombination zweier Häuser, die beide einseitig auf eine gemeinsame seitliche Grundstücksgrenze oder Nutzungsgrenze (bei Wohnungs-/Teileigentum) gebaut sind. Zur Vermeidung von Missverständnissen werden die einzelnen Häuser als <strong>halbe Doppelhäuser oder Doppelhaushälften</strong> bezeichnet. <strong>Ein Endreihenhaus</strong> ist einseitig bzw. ein <strong>Mittelreihenhaus</strong> ist beidseitig auf die seitlichen Grundstücks- bzw. Nutzungsgrenzen gebaut, so dass sich Zeilen von mindestens drei Häusern und bis zu 50 Meter Länge ergeben. <strong>Die geschlossenen Bauweise</strong> kennzeichnet Gebäude, die zu allen Seiten keinen Grenzabstand aufweisen und vollständig umbaut sind. <strong>Die abweichende Bauweise</strong> bezeichnet alle sonstigen Gebäudestellungen, die nicht in den zuvor genannten Kategorien aufgehen. Beispielsweise gehören hierzu Gartenhofhäuser, die zusammen mit Nachbarhäusern, Nebengebäuden und geschosshohen Mauern einen Garten in einem Gartenhof umschließen.",
+                    "positionToStreet": "Lage zur Straße",
+                    "positionToStreetInfo": "Wählen Sie die Stellung und damit auch die Zuwegung Ihres Grundstücks zur Straße aus der Liste aus: Während bei <strong>Frontlage</strong> das Grundstück unmittelbar an genau eine Straße heranreicht, ist bei einer <strong>Ecklage</strong> eine unmittelbare Anbindung an mindestens zwei Straßen gegeben. Ein <strong>Pfeifenstielgrundstück</strong> ist eine schmale, pfeifenstielartige Zuwegung zu einem Grundstück, das nicht direkt an der Straße gelegen ist. Der Pfeifenstiel steht normalerweise im Alleineigentum des Pfeifenkopf-Grundstücks. Es ist jedoch auch möglich, dass ein Pfeifenstiel bis zu vier rückwärtige Grundstücke erschließt. <strong>Die Hinterlage</strong> bezeichnet ein rückwärtiges Grundstück, welches sich nicht im Eigentum des Grundstücks befindet, sondern über ein grundbuchliches Wegerecht oder als Baulast gesichert ist.",
+                    "numberOfFloor": "Wertrelevante Geschossflächenzahl (WGFZ):",
+                    "numberOfFloorInfo":"Die <strong>wertrelevante Geschossflächenzahl (WGFZ)</strong> wird über das Verhältnis der Geschossflächen zur Grundstücksfläche definiert. Geben Sie hier die WGFZ Ihres Grundstücks ein.",
+                    "landArea": "Grundstücksfläche in m²:",
+                    "landAreaInfo": "Geben Sie für die <strong>Grundstücksfläche</strong> die Grundfläche Ihres Grundstücks laut Angabe im Liegenschaftskataster ein.",
+                    "calculatedLandValue": "Ihr umgerechneter Bodenrichtwert: ",
+                    "calculatedLandValueInfo": "Der <strong>umgerechnete Bodenrichtwert</strong> ist der durchschnittliche Bodenwert pro m² Grundstücksfläche im selektierten Gebiet bezogen auf Ihre individuellen und wertbeeinflussenden Angaben."
+                },
+                "floorValues": {
+                    "title": "Schichtwerte",
+                    "subTitle": "Durchschnittliche Bodenwerte der Geschossfläche einer bestimmten Nutzung:",
+                    "wgfz": "Anteilige WGFZ:",
+                    "usage": "Nutzung",
+                    "floorValue": "Schichtwert",
+                    "valueLanduse": "Normierter Bodenrichtwert für ",
+                    "commercial": "Geschäftshäuser",
+                    "apartment": "Mehrfamilienhäuser",
+                    "office": "Bürohäuser",
+                    "third": "3. Obergeschoss oder höher",
+                    "second": "2. Obergeschoss",
+                    "first": "1. Obergeschoss",
+                    "ground": "Erdgeschoss",
+                    "noValue": "Kein Wert vorhanden"
+                },
+                "landValue": "Bodenrichtwert",
+                "print": "Drucken",
+                "printScale":"Der Druckmaßstab orientiert sich an dem derzeit ausgewählten Maßstab",
+                "printExport":"Als PDF exportieren",
+                "alertMessage" :{
+                    "noData": "Datenabfrage fehlgeschlagen. Dies kann ein temporäres Problem sein. Bitte versuchen Sie es erneut.",
+                    "noBrw": "An dieser ausgewählten Stelle ist kein BRW vorhanden."
+                },
+                "config": {
+                    "placeholder": "Suche nach Adresse/Bodenrichtwertnummer",
+                    "menuName": "Hintergrundkarten",
+                    "parcelSearchName": "Flurstückssuche",
+                    "toolsName": "Werkzeuge",
+                    "legendName": "Legende",
+                    "measureName": "Strecke / Fläche messen",
+                    "infoName": "Informationen",
+                    "contactName": "Kontakt",
+                    "staticLinks": {
+                        "manual":"Bedienungsanleitung für BORIS.HH",
+                        "conditions": "Nutzungsbedingungen",
+                        "privacy": "Datenschutzerklärung",
+                        "imprint": "Impressum",
+                        "committee": "Gutachterausschuss Hamburg",
+                        "explanation": "BRW-Erläuterungen",
+                        "overview": "BRW Übersicht (Landwirtschaft)",
+                        "glossary": "Glossar",
+                        "borisGer": "BORIS-D"
+                    },
+                    "backgroundLayerName": "ALKIS farbig",
+                    "historicalMap2020": "Hist. Karte Jahrgang 2020",
+                    "historicalMap2015": "Hist. Karte Jahrgang 2015",
+                    "historicalMap2010": "Hist. Karte Jahrgang 2010",
+                    "historicalMap2005": "Hist. Karte Jahrgang 2005",
+                    "historicalMap1990-2000": "Hist. Karte Jahrgang 1990-2000",
+                    "historicalMap1980-1990": "Hist. Karte Jahrgang 1980-1990",
+                    "historicalMap1970-1980": "Hist. Karte Jahrgang 1970-1980",
+                    "historicalMap1960-1970": "Hist. Karte Jahrgang 1960-1970",
+                    "historicalMap1950-1960": "Hist. Karte Jahrgang 1950-1960"
+                } 
+            }
+        }
+    }
+}

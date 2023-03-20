@@ -1,12 +1,19 @@
 
 ___
+<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
 
 # Simulation
 ### Werkzeuge des Simulationsmenüs
 ___
 ## Einrichtungen anlegen
 
+=======
+<<<<<<< HEAD
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/einrichtungenanlegen.md
 Sobald sie unter "Simulation" "Einrichtungen anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden. Bei der Funktion "Wohnungsbauquartiere anlegen" befindet sich der Szenario Manager an derselben Stelle.
+=======
+Sobald sie "Einrichtungen anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden. Bei der Funktion "Wohnungsbauquartiere anlegen" befindet sich der Szenario Manager an derselben Stelle.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 
 #### Szenario Manager
 ![Abbildung 1: Szenario Manager](./009a_einrichtungenanlegen.PNG) 
@@ -47,6 +54,7 @@ Szenarios.
    > Entfernt vorhandene Geometrie.
 7. **Erforderliche Spalten**
    > Notwendige Bedingung zur Erstellung einer simulierten Einrichtung.
+<<<<<<< HEAD
    7.1 **Kapitelbezeichnung**
       > Art der ausgewählten Einrichtung.
    7.2 **Name**
@@ -59,7 +67,24 @@ Szenarios.
       > Setzt das Szenario zurück.
 
 #### Schrittweises Vorgehen
+<<<<<<< HEAD
 Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden Schritt für Schritt erläutert, wie eine neue Einrichtung erfolgreich angelegt werden kann.
+=======
+Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden Schritt für Schritt erläutert, wie erfolgreich eine neue Einrichtung angelegt werden kann.
+=======
+8. **Kapitelbezeichnung**
+9. **Name**
+10. **Optionale Spalten**
+   > Können bei Bedarf ergänzt werden.
+11. **Anlegen**
+   > Erstellt die simulierte Einrichtung
+12. **Zurücksetzen**
+   > Setzt das Szenario zurück.
+
+#### Schrittweises Vorgehen
+Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden einmal Schritt für Schritt erläutert, wie man erfolgreich selbst eine neue Einrichtung anlegt.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 
 1. #### **Schritt 1:** Neues Szenario erstellen
 2. #### **Schritt 2:** Name für Szenario festlegen
@@ -67,6 +92,7 @@ Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden Schritt für Schr
    1. Kopieren sie eine Einrichtung mit dem Pipetten-Symbol, indem Sie zuerst die Pipette anklicken und dann die zu kopierende Einrichtung in der Karte anwählen. Sie können Einrichtungen auch vollständig manuell anlegen, indem Sie die dazu erforderlichen Spalten selbst ausfüllen. 
    2. Positionieren Sie die Einrichtung auf der Karte, indem Sie zunächst den "Ort wählen" Stift im Feld *Geometrie/ Ort* anklicken und dann einen Punkt auf der Karte anwählen. Alternativ können Sie die geometrischen Werte in das Feld Geometrie/Ort eintragen. 
    3. *Erforderliche Spalten* werden durch das Kopieren einer Einrichtung per Pipette übernommen. Diese Spalten können jedoch manuell ergänzt oder verändert werden. 
+<<<<<<< HEAD
    4. *Optionale Spalten* werden automatisch durch das Kopieren einer Einrichtung übertragen, können aber auch manuell ergänzt oder ausgefüllt werden .
 4. #### **Schritt 4:** Einrichtung anlegen
    > Schließen Sie die Erstellung ab, indem Sie den blauen Button "Neue Einrichtung Erstellen" klicken. Die neue Einrichtung erscheint als Icon in der Karte. Neue Einrichtungen werden durch ein farbiges Sternchen gekennzeichnet. 
@@ -76,3 +102,14 @@ Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden Schritt für Schr
    *"Achtung: Sie können jetzt auch echte Einrichtungen verschieben. Ihre Änderungen sind nur temporär und werden nach der Sitzung nicht gespeichert."*  
 
 Alle Analysen, die innerhalb eines Szenarios durchgeführt werden, berücksichtigen die Parameter der simulierten Einrichtungen.
+=======
+   4. *Optionale Spalten* werden automatisch durch das Kopieren einer Einrichtung übertragen können aber auch manuell ergänzt oder ausgefüllt werden .
+4. #### **Schritt 4:** Einrichtung anlegen
+   > Schließen sie die Erstellung ab, indem Sie den blauen Button "Neue Einrichtung Erstellen" klicken. Die neue Einrichtung erscheint als Icon in der Karte. Neue Einrichtungen werden durch ein farbiges Sternchen gekennzeichnet. 
+5. #### **Schritt 5:** Einrichtung bewegen
+   1. Zum Verschieben von Einrichtungen klicken sie das Bewegen-Symbol. Nun klicken sie die Einrichtung, die Sie bewegen möchten. Ist diese angeklickt, vergrößert sich das Symbol und zeigt damit an, dass die Einrichtung nun beweglich ist. Ziehen sie die Einrichtung mit gedrückter linker Maustaste an den gewünschten Platz. 
+   2. Möchten sie bestehende Einrichtungen aus dem Datensatz auf der Karte verschieben, dann lösen Sie durch einen Klick auf das Schloss die Sperre. Es erscheint eine Warnung:   
+   *"Achtung: Sie können jetzt auch echte Einrichtungen verschieben. Ihre Änderungen sind nur temporär und werden nach der Sitzung nicht gespeichert."*  
+
+Alle Analysen, die innerhalb eines Szenarios durchgeführt werden, berücksichtigen die Parameter der simulierten Einrichtungen.
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)

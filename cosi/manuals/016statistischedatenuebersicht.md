@@ -4,6 +4,7 @@ ___
 ___
 
 ### Statistische Datenübersicht
+<<<<<<< HEAD
 
 In der statistischen Datenübersicht können tabellarisch Informationen zu den statistischen Daten der ausgewählten Gebiete (**Statistische Datenübersicht**) angezeigt, ausgewertet und exportiert werden.
 
@@ -20,7 +21,22 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 1. **Gruppen ein-/ausklappen**
    > Thematische Gruppen (vgl. [Regionalstatistische Daten](./019kartenvisualisierung.md)) über das **+** ein- und ausklappen.
 2. **Aktionen**
+<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
    > - [Dreistrich-Menü](#dreistrich-menü) aufklappen
+=======
+   > - s. [Bürger-Menü](#markdown-header-burgermenü)
+=======
+![Abbildung 27: Statistische Datenübersicht](../utils/assets/screenshots/statdashboard.png)
+*Abbildung 27: Statistische Datenübersicht*
+
+In der statistischen Datenübersicht können tabellarisch Informationen zu den statistischen Daten der ausgewählten Gebiete ([Statistische Datenübersicht](#markdown-header-statistische-datenübersicht)) angezeigt, ausgewertet und exportiert werden.
+
+1. **Gruppen ein-/ausklappen**
+   > Thematische Gruppen (vgl. [Regionalstatistische Daten](./kartenvisualisierung.md)) über das **+** ein- und ausklappen.
+2. **Aktionen**
+   > - s. [Burger-Menü](#markdown-header-burgermenü)
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/statistischedatenuebersicht.md
    > - Visualisierung ein- / ausschalten: Schaltet die Visualisierung des ausgewählten Indikators zum aktuell gewählten Jahr in der Karte ein/aus
    > - Jahre ein- / ausklappen: Klappt die Tabellenzeile auf um alle Jahre der Zeitreihe darzustellen.
 3. **Jahr auswählen**
@@ -41,13 +57,33 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 10. **Themenfilter**
       > Über den Filter können beliebige Indikatoren (sortiert nach Gruppen) für die Darstellung und den Export ausgewählt werden. Die Liste kann im Freitext durchsucht werden.
 11. **Tabelle exportieren**
+<<<<<<< HEAD
       > Die aktuelle Auswahl (Spalten, Zeilen, Jahre) als XLSX für Excel exportieren. Über das Auswahlfeld *alle Jahre exportieren* kann die gesamte Zeitreihe für die ausgewählten Spalten und Zeilen exportiert werden. Ist keine Spalte oder Zeile ausgewählt werden alle verwendet.
 12. **Kartenvisualisierung**
       > Die Darstellung in der Karte entspricht der des Kontrollfeldes [Kartenanalyse regionalstatistischer Daten](./kartenvisualisierung.md).
 
+<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
 #### Dreistrich Menü
+<<<<<<< HEAD
 ![Abbildung 28: Statistische Datenübersicht - Dreistrich-menü](./016c_statdashboard_burgermenu.PNG)
 *Abb. c: Statistische Datenübersicht - Dreistrich-Menü.*
+=======
+![Abbildung 28: Statistische Datenübersicht - Dreistrich-menü](016c_statdashboard_burgermenu.PNG)
+*Abb.: Statistische Datenübersicht - Dreistrich-Menü.*
+=======
+#### Dreipunkt Menü
+![Abbildung 28: Statistische Datenübersicht - Burgermenu](../utils/assets/screenshots/statdashboard_burgermenu.PNG)
+=======
+      > Die aktuelle Auswahl (Spalten, Zeilen, Jahre) als XLSX für Excel exportieren. Über aus Auswahlfeld *alle Jahre exportieren* kann die gesamte Zeitreihe für die ausgewählten Spalten und Zeilen exportiert werden. Ist keine Spalte oder Zeile ausgewählt werden alle verwendet.
+12. **Kartenvisualisierung**
+      > Die Darstellung in der Karte entspricht der des Kontrollfeldes [Kartenanalyse regionalstatistischer Daten](./kartenvisualisierung.md).
+
+#### Burgermenü
+![Abbildung 28: Statistische Datenübersicht - Burgermenü](../utils/assets/screenshots/statdashboard_burgermenu.png)
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+*Abbildung 28: Statistische Datenübersicht*
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/statistischedatenuebersicht.md
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 
 1. **Visualisierung ein-/ausschalten**
    > Thematische Gruppen

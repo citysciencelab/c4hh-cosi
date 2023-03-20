@@ -1,0 +1,16 @@
+{
+  "modules": {
+    "tools": {
+      "oktagon": {
+        "fetchFailed": "Address query could not be performed",
+        "fetchFailedMessage": "details: a required service is not responding",
+        "wrongDistrictName": "Sorry, the parameterized call to the portal failed!",
+        "wrongDistrictNameMessage": "The following district could not be found: ",
+        "wrongAddressParameter": "The parameterized call of the portal has unfortunately failed!",
+        "wrongAddressParameterMessage": "No address could be found. Please check the input parameters.",
+        "send": "Send",
+        "cancel": "Cancel"
+      }
+    }
+  }
+}

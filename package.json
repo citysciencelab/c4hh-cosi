@@ -12,7 +12,7 @@
     "versionMinor": "npm version minor && npm run versionLatest && git push --tags -f",
     "versionMajor": "npm version major && npm run versionLatest && git push --tags -f",
     "versionLatest": "git tag latest -f",
-    "postinstall": "cd cosi && npm install --legacy-peer-deps && cd .. && cd quickResponseCode && npm install && cd .. && cd sdpDownload && npm install && cd .. && cd valuationPrint && npm install && cd .. && cd vcOblique && npm install",
+    "postinstall": "cd cosi && npm install --legacy-peer-deps && cd .. && cd quickResponseCode && npm install && cd .. && cd sdpDownload && npm install && cd .. && cd valuationPrint && npm install && cd .. && cd vcOblique && npm install && cd .. && cd addons_3_0_0 && cd sdpDownload && npm install",
     "prePushHook": "cd .. && npm run prePushHook",
     "prepare": "husky install"
   },

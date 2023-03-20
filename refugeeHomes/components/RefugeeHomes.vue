@@ -253,8 +253,11 @@ export default {
                 >
                     <li
                         class="nav-item"
+<<<<<<< HEAD
                         role="button"
                         tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                         @click="existingLocationActive=true"
                         @keydown="existingLocationActive=true"
                     >
@@ -267,8 +270,11 @@ export default {
                     </li>
                     <li
                         class="nav-item"
+<<<<<<< HEAD
                         role="button"
                         tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                         @click="existingLocationActive=false"
                         @keydown="existingLocationActive=false"
                     >

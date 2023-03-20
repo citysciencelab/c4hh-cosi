@@ -1,0 +1,14 @@
+{
+  "name": "oblique-viewer",
+  "version": "1.0.0",
+  "description": "Schrägluftbilder",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "iframe-resizer": "^4.3.0"
+  }
+}

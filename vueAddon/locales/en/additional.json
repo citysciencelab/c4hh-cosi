@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "tools": {
+            "vueAddon": {
+                "title": "My VueAddon",
+                "content": "I am a Vue Addon"
+            }
+        }
+    }
+}

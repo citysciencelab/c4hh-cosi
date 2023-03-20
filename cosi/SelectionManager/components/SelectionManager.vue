@@ -41,7 +41,11 @@ export default {
         ...mapGetters("Tools/SelectionManager", Object.keys(getters)),
         ...mapGetters("Language", ["currentLocale"]),
         ...mapGetters("Tools/ColorCodeMap", ["upperEdge"]),
+<<<<<<< HEAD
         ...mapGetters("Tools/DistrictSelector", ["name", "selectedDistrictLevel", "selectedFeatures", "label", "keyOfAttrName", "keyOfAttrNameStats", "loadend", "metadataUrls", "boundingGeometry", "bufferValue"]),
+=======
+        ...mapGetters("Tools/DistrictSelector", ["name", "selectedDistrictLevel", "selectedFeatures", "label", "keyOfAttrName", "keyOfAttrNameStats", "loadend", "metadataUrls", "boundingGeometry"]),
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
         ...mapGetters("Maps", ["getVisibleLayerList"]),
         ...mapGetters("Tools/FeaturesList", ["activeVectorLayerList", {facilitiesMapping: "mapping"}]),
         dashboardOpen () {
@@ -184,7 +188,11 @@ export default {
             const vectorSource = new VectorSource({
                     features: this.selections[index].selection
                 }),
+<<<<<<< HEAD
                 style = this.openAddon ? new Style({fill: new Fill({color: "rgba(214, 96, 93, 0.35)"}), stroke: new Stroke({color: "#D6605D", width: 1})}) : new Style({fill: new Fill({color: "rgba(255, 255, 255, 0)"}), stroke: new Stroke({color: "#A8404E", width: 3})}),
+=======
+                style = this.openAddon ? new Style({fill: new Fill({color: "rgba(214, 96, 93, 0.35)"}), stroke: new Stroke({color: "#D6605D", width: 1})}) : new Style({stroke: new Stroke({color: "#A8404E", width: 3})}),
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
                 layer = new VectorLayer({
                     name: "selection_manager",
                     source: vectorSource,
@@ -203,7 +211,11 @@ export default {
             layer.setZIndex(9999);
             this.map.addLayer(layer);
 
+<<<<<<< HEAD
             setBBoxToGeom.call(this, getBoundingGeometry(this.selections[index].selection, this.bufferValue));
+=======
+            setBBoxToGeom.call(this, getBoundingGeometry(this.selections[index].selection, 0));
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
         },
         /**
              * @description Creates VectorLayer for the chosen selection if there is a buffer value and overwrites standard selection.
@@ -238,7 +250,11 @@ export default {
             layer.setZIndex(9999);
             this.map.addLayer(layer);
 
+<<<<<<< HEAD
             setBBoxToGeom.call(this, getBoundingGeometry(this.selections[index].bufferedSelection, this.bufferValue));
+=======
+            setBBoxToGeom.call(this, getBoundingGeometry(this.selections[index].bufferedSelection));
+>>>>>>> 15043dd8 (add new addons_3_0_0 structure-add missing addons)
         },
         /**
              * @description Creates VectorLayer for the chosen selection on hover in the selection menu.

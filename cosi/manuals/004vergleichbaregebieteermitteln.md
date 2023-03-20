@@ -1,8 +1,11 @@
 
 ## Vergleichbare Gebiete ermitteln
 ___
+<<<<<<< HEAD
 Über den Bereich der "Analyse" gelangen Sie zu "Vergleichbare Gebiete ermitteln".
 
+=======
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 Das Werkzeug erlaubt die Ermittlung aller Gebiete (Stadtteile oder statistische Gebiete), in denen die ausgewählten Parameter vorherrschen, bzw. solcher, die dem gewählten Referenzgebiet in diesen Parametern ähneln.
 Wählen Sie unter Filter die gewünschten Parameter für den Vergleich, sowie ein Referenzgebiet (optional).  
 
@@ -36,5 +39,12 @@ Wählen Sie unter Filter die gewünschten Parameter für den Vergleich, sowie ei
    > Eine Liste aller Gebiete, auf die die gewählten Kriterien zutreffen, wird im Fenster angezeigt. Ein Klick auf ein Gebiet legt den Kartenausschnitt auf dieses fest.
 6. **Als Gebietsauswahl setzen**
    > Über *Ergebnis als Gebietsauswahl* setzen kann die aktuelle Gebietsauswahl für weitere Analysen auf die Ergebnis-Gebiete gesetzt werden.
+<<<<<<< HEAD
   
+<<<<<<< HEAD:cosi/manuals/004vergleichbaregebieteermitteln.md
 <div style="page-break-after: always;"></div>
+=======
+=======
+  
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/vergleichbaregebieteermitteln.md

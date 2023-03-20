@@ -1,0 +1,11 @@
+{
+    "modules": {
+        "tools": {
+            "verkehrsfunctions": {
+                "bicycleHeaderSuffix": "Number of bicycles",
+                "carsHeaderSuffix": "Number of cars",
+                "trucksHeaderSuffix": "Number of trucks"
+            }
+        }
+    }
+}

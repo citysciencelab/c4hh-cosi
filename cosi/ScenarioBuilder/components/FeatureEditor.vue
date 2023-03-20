@@ -37,8 +37,13 @@ export default {
             text: ""
         },
         subReadMeUrl: {
+<<<<<<< HEAD
             "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/010einrichtungenbearbeiten.md",
             "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/010featureeditor.md"
+=======
+            "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/einrichtungenbearbeiten.md",
+            "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/featureeditor.md"
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
         }
     }),
     computed: {

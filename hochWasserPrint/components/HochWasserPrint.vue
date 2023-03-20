@@ -79,7 +79,12 @@ export default {
         }
 
         this.$on("close", this.close);
-        this.setServiceId(this.printServiceId);
+
+        if (this.mapfishServiceId) {
+            console.warn("Print Tool: The parameter 'mapfishServiceId' is deprecated in the next major release! Please use printServiceId instead.");
+        }
+
+        this.setServiceId(this.mapfishServiceId && this.mapfishServiceId !== "" ? this.mapfishServiceId : this.printServiceId);
 
         Backbone.Events.listenTo(Radio.channel("ModelList"), {
             "updatedSelectedLayerList": () => {

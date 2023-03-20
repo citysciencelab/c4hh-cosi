@@ -1,0 +1,8 @@
+{
+  "name": "QuickResponseCodeOverlay",
+  "version": "2.0.0",
+  "description": "A tool to generate QR-Codes pinned to a location on the map",
+  "dependencies": {
+    "qrcode": "^1.5.1"
+  }
+}

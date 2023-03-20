@@ -1,6 +1,7 @@
 
 ### Einrichtungen bearbeiten
 
+<<<<<<< HEAD
 Haben Sie ein aktives Szenario können Sie sowohl selbst angelegte als auch bereits in den Daten vorhandene Einrichtungen bearbeiten. Sollten Sie kein Szenario angelegt haben und Sie klicken eine Einrichtung an, wird folgendes Popup angezeigt:
 
 ![Abbildung 1: Bitte erstellen Sie ein Szenario](./010a_einrichtungenbearbeiten.PNG)
@@ -17,7 +18,34 @@ Wählen Sie hier den Button **BEARBEITEN** an. Daraufhin wird sich das folgende 
 
 ![Abbildung 3: Einrichtung-Bearbeiten-Fenster](./010c_einrichtungenbearbeiten.PNG)
 
+<<<<<<< HEAD
 *Abb. c: Fenster für das bearbeiten der Einrichtung.*
+=======
+<<<<<<< HEAD:cosi/manuals/010einrichtungenbearbeiten.md
+*Abb.c: Fenster für das bearbeiten der Einrichtung.*
+=======
+*Abbildung 3: Einrichtung bearbeiten.*
+=======
+Sie können sowohl selbst angelegte als auch bereits in den Daten vorhandene Einrichtungen bearbeiten, sobald Sie ein aktives Szenario haben. Sollten Sie kein Szenario angelegt haben und Sie klicken eine Einrichtung an, wird folgendes Popup angezeigt:
+
+![Abbildung 1: Bitte erstellen Sie ein Szenario](https://user-images.githubusercontent.com/43250699/159273029-a17ce734-e7ed-4374-9cf4-433d44f26508.JPG)
+
+*Abbildung 1: Bitte erstellen Sie ein Szenario*
+
+Ein Szenario können Sie wie im [Szenario Manager](./einrichtungenanlegen.md) beschrieben anlegen. Sobald Sie ein Szenario erfolgreich erstellt haben, wenn Sie eine Einrichtung anklicken, folgender Popup am unteren Bildschirmrand: 
+
+![Abbildung 2: Einrichtung bearbeiten](https://user-images.githubusercontent.com/43250699/159273504-35b08fa1-2206-4ef4-a850-670f0e03a381.JPG)
+
+*Abbildung 2: Einrichtung bearbeiten*
+
+Wählen Sie hier den Button **BEARBEITEN** an, daraufhin wird sich das folgende Fenster öffnen:
+
+![Abbildung 3: Einrichtung-Bearbeiten-Fenster](https://user-images.githubusercontent.com/43250699/159273975-1e1f2960-1af4-4e49-a03a-5657060b322f.png)
+
+*Abbildung 3: Einrichtung bearbeiten*
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/einrichtungenbearbeiten.md
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 
 1. **Eingaben sperren**
    > Mit Hilfe dieses Buttons sperren Sie die Input-Felder des Fensters, so dass Sie nicht mehr bearbeitet werden können. Die Input-Felder sind standardmäßig gesperrt, so dass Sie diesen Button aktivieren müssen, ehe Sie eine vorhandene Einrichtung bearbeiten können. 
@@ -37,7 +65,15 @@ Wählen Sie hier den Button **BEARBEITEN** an. Daraufhin wird sich das folgende 
 *Abb. d: Clusterauswahl.*
 
 1. **Das angewählte Cluster (3)**
+<<<<<<< HEAD
    > Die Darstellung von Einrichtungen wird auf der Karte gebündelt, wenn Einrichtungen so dicht beeinander liegen, dass sie, wenn diese in der aktuellen Zoomstufe nicht separiert werden können. 
+=======
+<<<<<<< HEAD
+   > Die Darstellung von Einrichtungen wird auf der Karte gebündelt, wenn zu viele Einrichtungen an einem Ort sind, wenn diese in der aktuellen Zoomstufe nicht dargestellt werden können. 
+=======
+   > Die Darstellung von Einrichtungen wird auf der Karte gebündelt, wenn zu viele Einrichtungen an einem Ort sind, so dass sie in der aktuellen Zoomstufe nicht dargestellt werden können. 
+>>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 2. **Auswahl**
    > Alle im Cluster gebundenen Einrichtungen werden angezeigt, sobald Sie auf das Cluster klicken. Sie können dann in diesem Fenster eine Einrichtung auswählen, woraufhin sich das Fenster aus *Abbildung 3* öffnet.
 

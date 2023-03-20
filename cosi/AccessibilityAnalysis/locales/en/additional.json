@@ -4,7 +4,10 @@
             "cosi": {
                 "accessibilityAnalysis": {
                     "title": "Accessibility Analysis",
+<<<<<<< HEAD
                     "description": "Displays an area on the map that can be reached from a selected point, along a route or from a facility within a specified distance. The distance can be specified in time or in meters. The accessibility is calculated depending on the means of transport.",
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                     "dropdownInfo": "Please choose the mode you want to work with:",
                     "mode": {
                       "point": "Accessibility from a reference point",
@@ -14,9 +17,13 @@
                     },
                     "pointOfReference": "Point of reference: click on the map",
                     "setByFeature": "Select facilities as location (use perimeter of polygons)",
+<<<<<<< HEAD
                     "setByFeatureOutline": "Use perimeter of polygons",
                     "setByFeatureInfo": "Uses the vertices of polygons for the calculation. Caution: Can lead to errors with extremely complex surfaces.",
                     "addMultiplePoints": "Add multiple points for analysis (on/off)",
+=======
+                    "setByFeatureInfo": "Uses the vertices of polygons for the calculation. Caution: Can lead to errors with extremely complex surfaces.",
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                     "topic": "Topic",
                     "directions": "Calculated directions",
                     "transportType": "Type of transportation",

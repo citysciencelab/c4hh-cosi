@@ -30,7 +30,7 @@ import exportXlsx from "../../utils/exportXlsx";
 import DashboardToolbar from "./DashboardToolbar.vue";
 import ToolInfo from "../../components/ToolInfo.vue";
 import TableCell from "./TableCell.vue";
-import isObject from "../../../../src/utils/isObject";
+
 
 export default {
     name: "Dashboard",
@@ -135,9 +135,6 @@ export default {
         valueColumns () {
             return [...this.districtColumns, ...this.aggregateColumns];
         },
-        minimizedCols () {
-            return this.districtColumns.filter(col => col.minimized === true);
-        },
         selectedColumns () {
             const selectedCols = this.valueColumns.filter(col => col.selected);
 
@@ -163,23 +160,6 @@ export default {
          */
         hasMappingOrientationValue () {
             return this.mapping.some(obj => typeof obj.orientationValue !== "undefined");
-        },
-
-        /**
-         * The mapped key from value
-         * @returns {Object} the key map object
-         */
-        keyMap () {
-            return {
-                category: "Kategorie",
-                group: "Gruppe",
-                valueType: "Datentyp",
-                timestamp: "Jahr",
-                hamburg_gesamt: "Hamburg gesamt",
-                total: "Gesamt",
-                average: "Durchschnitt",
-                orientationValue: this.getColumnHeader("orientationValue")
-            };
         }
     },
 
@@ -204,33 +184,34 @@ export default {
             /** 0. Check if request is valid */
             const requestSettingsValid = ("statsFeatureFilter" in newRequest.settings) & ("calculations" in newRequest.settings),
                 /**
-                 * 1. update the interface based on the settings received from toolBridge
-                 * @param {Object} request the toolBridge request {id:..., settings:{...}}
-                 * @returns {void} (run for side effects only, passes along the request)
-                 */
+             * 1. update the interface based on the settings received from toolBridge
+             * @param {Object} request the toolBridge request {id:..., settings:{...}}
+             * @returns {void} (run for side effects only, passes along the request)
+             */
                 updateInterface = (request) => {
                     this.$store.commit("Tools/Dashboard/setStatsFeatureFilter", request.settings.statsFeatureFilter); // not sure why simple this.
                     this.overwriteAllCalculations(request.settings.calculations);
                 },
 
                 /**
-                 * 2. run the specific analysis of this addon
-                 * @returns {Object} the value of the function that runs the analysis.
-                 */
+                * 2. run the specific analysis of this addon
+                * @returns {Object} the value of the function that runs the analysis.
+                */
                 runTool = () => {
-                    // copied & modified this from exportTable() method
+                // copied & modified this from exportTable() method
                     if (this.currentItems.length < 1) { // if dashboard was never opened, currentItems is not yet copied from items, so we do it here just in case.
                         this.currentItems = this.items;
                     }
                     this.calculateAll(); // make sure the table is updated
                     this.generateTable(); // make sure the table is updated
-                    const items = this.selectedItems.length > 0 ? this.selectedItems : this.items.filter(item => this.filterTable(item.category)), // if no rows in the table are selected, act as if all rows are selected
-                        preparedItems = this.ignoreColumnsByExport && this.minimizedCols.length ? this.getPreparedItems(items) : items;
+                    const items = this.selectedItems.length > 0 ?
+                        this.selectedItems :
+                        this.items.filter(item => this.filterTable(item.category)); // if no rows in the table are selected, act as if all rows are selected
 
                     // this.currentItems = items;
                     let data = this.exportTimeline
-                        ? this.prepareTableExportWithTimeline(preparedItems, this.selectedDistrictNames, this.timestamps, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped)
-                        : this.prepareTableExport(preparedItems, this.selectedDistrictNames, this.selectedYear, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped);
+                        ? this.prepareTableExportWithTimeline(items, this.selectedDistrictNames, this.timestamps, this.timestampPrefix)
+                        : this.prepareTableExport(items, this.selectedDistrictNames, this.selectedYear, this.timestampPrefix);
 
                     data = JSON.parse(JSON.stringify(data)); // cleans the object to pure JSON (rather than array of getters and setters)
                     // eslint-disable-next-line no-unused-vars
@@ -242,10 +223,10 @@ export default {
                     return data;
                 },
                 /**
-                 * 3. hand the results back to toolBridge, in the form of: {request: ..., type: ..., result: ...}
-                 * @param {Object} data the data table
-                 * @returns {Object} null (runs for side effects only)
-                 */
+                * 3. hand the results back to toolBridge, in the form of: {request: ..., type: ..., result: ...}
+                * @param {Object} data the data table
+                * @returns {Object} null (runs for side effects only)
+                */
                 returnResults = (data) => {
                     return this.$store.commit("Tools/ToolBridge/setReceivedResults", // this is where toolBridge expects requested results to arrive
                         {
@@ -286,7 +267,6 @@ export default {
         ...mapMutations("Tools/ColorCodeMap", ["setSelectedYear"]),
         ...mapActions("Tools/ChartGenerator", ["channelGraphData"]),
         ...mapActions("Tools/DistrictSelector", ["updateDistricts"]),
-        ...mapActions("Alerting", ["addSingleAlert"]),
 
         /**
          * Returns the labels of the selected districts.
@@ -537,26 +517,6 @@ export default {
         },
 
         /**
-         * Returns the items that are not minimized
-         * @param {Object[]}  items to be prepared
-         * @returns {Object[]} prepared items
-         */
-        getPreparedItems (items) {
-            if (!Array.isArray(items) || items.length === 0) {
-                return [];
-            }
-            const clonedItems = JSON.parse(JSON.stringify(items));
-
-            clonedItems.forEach(item => {
-                this.minimizedCols.forEach(minCol => {
-                    delete item[minCol.value];
-                });
-            });
-
-            return clonedItems;
-        },
-
-        /**
          * Export the table as XLSX.
          * Either the simple view for the selected or all years.
          * @param {Boolean} exportTimeline - Whether to include all years.
@@ -565,65 +525,14 @@ export default {
          * @returns {void}
          */
         exportTable (exportTimeline = false) {
-            let exportedData = null,
-                iniHeader = null,
-                fixedHeaderStart = null,
-                fixedHeaderEnd = null,
-                header = null;
             const items = this.selectedItems.length > 0 ? this.selectedItems : this.currentItems,
-                preparedItems = this.ignoreColumnsByExport && this.minimizedCols.length ? this.getPreparedItems(items) : items,
                 prefix = this.prefixExportFilename,
-                rawData = exportTimeline
-                    ? this.prepareTableExportWithTimeline(preparedItems, this.selectedDistrictNames, this.timestamps, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped)
-                    : this.prepareTableExport(preparedItems, this.selectedDistrictNames, this.selectedYear, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped),
+                data = exportTimeline
+                    ? this.prepareTableExportWithTimeline(items, this.selectedDistrictNames, this.timestamps, this.timestampPrefix)
+                    : this.prepareTableExport(items, this.selectedDistrictNames, this.selectedYear, this.timestampPrefix),
                 filename = composeFilename(this.$t("additional:modules.tools.cosi.dashboard.exportFilename", {prefix}));
 
-            try {
-                exportedData = this.sanitizeData(JSON.parse(JSON.stringify(rawData)), [...this.excludedPropsForExport, ...this.unselectedColumnLabels]);
-                iniHeader = this.exportGrouped ?
-                    Object.keys(Object.values(exportedData)[0][0]) : Object.keys(exportedData[0]);
-            }
-            catch (error) {
-                this.addSingleAlert({
-                    content: this.$t("additional:modules.tools.cosi.dashboard.tableDataParsingError"),
-                    class: "Info",
-                    displayClass: "info"
-                });
-                return;
-            }
-
-            fixedHeaderStart = iniHeader.includes("Gruppe") ? ["Kategorie", "Gruppe", "Datentyp"] : ["Kategorie", "Datentyp"];
-            fixedHeaderEnd = iniHeader.includes(this.getColumnHeader("orientationValue")) ? [this.getColumnHeader("orientationValue"), "Gesamt", "Durchschnitt", "Jahr"] : ["Gesamt", "Durchschnitt", "Jahr"];
-            header = fixedHeaderStart.concat(iniHeader.filter((value) => {
-                return !fixedHeaderStart.includes(value) && !fixedHeaderEnd.includes(value);
-            }), fixedHeaderEnd);
-
-            exportXlsx(header, exportedData, filename);
-        },
-
-        /**
-         * @description Sanitizes the export data. Removes excluded columns.
-         * @param {Object[]} json - the array of objects
-         * @param {String[]} exclude - the list of keys to exclude
-         * @returns {Object[]} the sanitized data
-         */
-        sanitizeData (json, exclude) {
-            if (!exclude) {
-                return json;
-            }
-            if (isObject(json)) {
-                Object.values(json).forEach(objectsToSanitize => {
-                    this.sanitizeData(objectsToSanitize, exclude);
-                });
-                return json;
-            }
-            json.forEach(column => {
-                exclude.forEach(key => {
-                    delete column[key];
-                });
-            });
-
-            return json;
+            exportXlsx(data, filename, {exclude: [...this.excludedPropsForExport, ...this.unselectedColumnLabels]});
         },
 
         addCalculation,
@@ -709,10 +618,11 @@ export default {
             return this.statsFeatureFilter.map(t => typeof t === "string" ? t : t.value).includes(value);
         },
         /** make sure all objects in array include all the same keys
-         * @param {*} arr array of objects
-         * @param {*} missingValues what to set the missing values to
-         * @returns {array} same array but each item has the same keys
-         */
+       *
+        * @param {*} arr array of objects
+        * @param {*} missingValues what to set the missing values to
+        * @returns {array} same array but each item has the same keys
+        */
         fillMissingKeys (arr, missingValues = "NA") {
             // Create an object with all the keys in it
             // This will return one object containing all keys the items
@@ -745,7 +655,7 @@ export default {
 
             if (hasMappingOrientationValue && !hasOrientationColumn) {
                 this.aggregateColumns.splice(0, 0, {
-                    text: this.getColumnHeader("orientationValue"),
+                    text: "Orientierungswert",
                     value: "orientationValue",
                     align: "end",
                     sortable: false,
@@ -1118,93 +1028,95 @@ export default {
     }
 
 
-    .dashboard-table {
+.dashboard-table {
+    height: 100%;
+    .v-data-table__wrapper {
+        overflow-x: auto;
+        overflow-y: auto;
         height: 100%;
-        .v-data-table__wrapper {
-            overflow-x: auto;
-            overflow-y: auto;
-            height: 100%;
-        }
+    }
 
-        thead {
-            .district-header {
-                position: relative;
-                margin-top: 10px;
-                .move-col {
-                    position: absolute;
-                    top: -10px;
-                    font-size: 16px;
-                    &.left {
-                        left: 0px;
-                    }
-                    &.right {
-                        left: 10px;
-                    }
-                    &.minimize {
-                        right: 0px;
-                    }
-                }
-            }
-            .v-input {
-                font-size: unset;
-                label {
-                    font-size: 12px;
-                    font-weight: 700;
-                    i {
-                        font-size: 20px;
-                    }
-                }
-            }
-        }
-
-        th.minimized {
-            width: 20px;
-            max-width:20px;
-
-            .v-input {
-                display: none;
-            }
+    thead {
+        .district-header {
+            position: relative;
+            margin-top: 10px;
             .move-col {
+                position: absolute;
+                top: -10px;
+                font-size: 16px;
                 &.left {
-                    display: none;
+                    left: 0px;
                 }
                 &.right {
-                    display: none;
+                    left: 10px;
                 }
                 &.minimize {
-                    left: -10px;
-                    right: unset;
+                    right: 0px;
                 }
             }
         }
-
-        td {
-            vertical-align: top;
-
-            div.text-end {
-                text-align: right;
-            }
-            ul.timeline {
-                list-style: none;
-                li {
-                    text-align: right;
+        .v-input {
+            font-size: unset;
+            label {
+                font-size: 12px;
+                font-weight: 700;
+                i {
+                    font-size: 20px;
                 }
-            }
-            .timestamp {
-                color: $brightblue;
-            }
-            .no-wrap {
-                white-space: nowrap;
-            }
-            .modified {
-                color: $brightred;
-            }
-            .minimized {
-                // overflow: hidden;
-                // width: 20px;
-                display: none;
             }
         }
     }
+
+    th.minimized {
+        width: 20px;
+        max-width:20px;
+
+        .v-input {
+            display: none;
+        }
+        .move-col {
+            &.left {
+                display: none;
+            }
+            &.right {
+                display: none;
+            }
+            &.minimize {
+                left: -10px;
+                right: unset;
+            }
+        }
+    }
+
+    td {
+        vertical-align: top;
+
+        div.text-end {
+            text-align: right;
+        }
+        ul.timeline {
+            list-style: none;
+            li {
+                text-align: right;
+            }
+        }
+        .timestamp {
+            color: $brightblue;
+        }
+        .no-wrap {
+            white-space: nowrap;
+        }
+        .modified {
+            color: $brightred;
+        }
+        .minimized {
+            // overflow: hidden;
+            // width: 20px;
+            display: none;
+        }
+    }
+}
 }
 </style>
+
+

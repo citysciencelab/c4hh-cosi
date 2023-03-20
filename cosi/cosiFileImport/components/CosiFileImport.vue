@@ -408,7 +408,10 @@ export default {
                     <!-- eslint-disable-next-line vuejs-accessibility/mouse-events-have-key-events -->
                     <div
                         class="drop-area"
+<<<<<<< HEAD
                         role="presentation"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                         @drop.prevent="onDrop"
                         @dragover.prevent
                         @dragenter.prevent="onDZDragenter"
@@ -503,8 +506,11 @@ export default {
                                     <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
                                     <div
                                         class="feat_wrapper active style"
+<<<<<<< HEAD
                                         role="button"
                                         tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                         @click="e => e.target.classList.toggle('active')"
                                     >
                                         <h3>{{ $t("additional:modules.tools.cosiFileImport.styling") }}</h3>
@@ -551,8 +557,11 @@ export default {
                                                         />
                                                         <div
                                                             class="info_icon"
+<<<<<<< HEAD
                                                             role="button"
                                                             tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                                             @click="showInfo($t('additional:modules.tools.cosiFileImport.autoStyleTooltip'))"
                                                             @keyup="showInfo($t('additional:modules.tools.cosiFileImport.autoStyleTooltip'))"
                                                         >
@@ -604,8 +613,11 @@ export default {
                                                     />
                                                     <div
                                                         class="info_icon"
+<<<<<<< HEAD
                                                         role="button"
                                                         tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                                         @click="showInfo($t('additional:modules.tools.cosiFileImport.rainbowTooltip'))"
                                                         @keyup="showInfo($t('additional:modules.tools.cosiFileImport.rainbowTooltip'))"
                                                     >
@@ -661,8 +673,11 @@ export default {
                                     </div>
                                     <div
                                         class="feat_wrapper facility"
+<<<<<<< HEAD
                                         role="button"
                                         tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                         @click="e => e.target.classList.toggle('active')"
                                         @keyup="e => e.target.classList.toggle('active')"
                                     >
@@ -693,8 +708,11 @@ export default {
                                                 </v-select>
                                                 <div
                                                     class="info_icon"
+<<<<<<< HEAD
                                                     role="button"
                                                     tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                                     @click="showInfo($t('additional:modules.tools.cosiFileImport.namensfeldTooltip'))"
                                                     @keyup="showInfo($t('additional:modules.tools.cosiFileImport.namensfeldTooltip'))"
                                                 >
@@ -725,8 +743,11 @@ export default {
                                                 </v-select>
                                                 <div
                                                     class="info_icon"
+<<<<<<< HEAD
                                                     role="button"
                                                     tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                                     @click="showInfo($t('additional:modules.tools.cosiFileImport.typenfeldTooltip'))"
                                                     @keyup="showInfo($t('additional:modules.tools.cosiFileImport.typenfeldTooltip'))"
                                                 >
@@ -737,8 +758,11 @@ export default {
                                         <div
                                             v-if="noAddress"
                                             class="address"
+<<<<<<< HEAD
                                             role="button"
                                             tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                             @click="e => e.target.classList.toggle('active')"
                                             @keyup="e => e.target.classList.toggle('active')"
                                         >
@@ -802,8 +826,11 @@ export default {
                                     </div>
                                     <div
                                         class="feat_wrapper filterdata filter"
+<<<<<<< HEAD
                                         role="button"
                                         tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                         @click="e => e.target.classList.toggle('active')"
                                         @keyup="e => e.target.classList.toggle('active')"
                                     >
@@ -851,8 +878,11 @@ export default {
                                     </div>
                                     <div
                                         class="feat_wrapper prenum"
+<<<<<<< HEAD
                                         role="button"
                                         tabindex="0"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                         @click="e => e.target.classList.toggle('active')"
                                         @keyup="e => e.target.classList.toggle('active')"
                                     >

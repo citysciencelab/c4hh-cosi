@@ -142,7 +142,10 @@ export default {
                     <!-- eslint-disable-next-line vuejs-accessibility/mouse-events-have-key-events -->
                     <div
                         class="drop-area"
+<<<<<<< HEAD
                         role="presentation"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                         @drop.prevent="onDrop"
                         @dragover.prevent
                         @dragenter.prevent="onDZDragenter"

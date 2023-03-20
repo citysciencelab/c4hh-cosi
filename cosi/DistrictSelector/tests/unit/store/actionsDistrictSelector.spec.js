@@ -32,8 +32,7 @@ describe("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
             },
             districts: [{
                 statFeatures: [],
-                getName: () => "Mordor",
-                getReferencDistrictName: () => "Mordor"
+                getName: () => "Mordor"
             }],
             getStatFeatures: () => Promise.resolve(xmlDoc)
         };

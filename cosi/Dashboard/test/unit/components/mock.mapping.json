@@ -1,0 +1,35 @@
+[
+    {
+        "category": "bev_insgesamt",
+        "value": "Bevölkerung insgesamt",
+        "group": "Bevölkerung",
+        "statgebiet": "15563",
+        "stadtteil": "19034",
+        "bezirk": "18970",
+        "valueType": "absolute"
+      },
+      {
+        "category": "arb_arbeitslose_ingesamt_anz",
+        "value": "Arbeitslose insgesamt",
+        "group": "Arbeitslose",
+        "statgebiet": "15975",
+        "stadtteil": "19023",
+        "bezirk": "18960",
+        "valueType": "absolute"
+      },
+      {
+        "category": "arb_arbeitslose_ingesamt_proz",
+        "value": "Anteil der Arbeitslosen",
+        "group": "Arbeitslose",
+        "statgebiet": "15976",
+        "stadtteil": "19024",
+        "bezirk": "18961",
+        "valueType": "relative",
+        "calculation": {
+          "operation": "divide",
+          "category_A": "Arbeitslose insgesamt",
+          "category_B": "Bevölkerung insgesamt",
+          "modifier": 100
+        }
+      }
+]

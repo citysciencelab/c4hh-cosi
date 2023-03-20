@@ -94,7 +94,10 @@ export default {
             >
                 <span
                     class="bootstrap-icon"
+<<<<<<< HEAD
                     role="button"
+=======
+>>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                     tabindex="0"
                     title="Maximieren"
                     @click="resetQrDataUrl"

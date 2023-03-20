@@ -24,12 +24,20 @@ const state = {
     resizableWindow: true,
     excludedPropsForExport: ["visualized", "expanded", "years", "groupIndex"],
     readmeUrl: {
+<<<<<<< HEAD
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/016statistischedatenuebersicht.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/016statistischedatenuebersicht.md"
     },
     statsFeatureFilter: [],
     calculations: [],
     reportTemplateMode: null,
+=======
+        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/dashboard_en.md",
+        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/dashboard.md"
+    },
+    statsFeatureFilter: [],
+    calculations: [],
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     // these two variables are required to make this addon compatible with the toolBridge addon (for details see toolBridge documentation)
     toolBridgeIn: {settings: {}, type: "", outputCallback: null}, // accepts settings from toolBridge - must have a *watcher*
     toolBridgeOut: {}, // pass current settings to toolBridge - must have a *getter*,

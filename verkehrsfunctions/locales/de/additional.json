@@ -1,0 +1,11 @@
+{
+    "modules": {
+        "tools": {
+            "verkehrsfunctions": {
+                "bicycleHeaderSuffix": "Anzahl Fahrräder",
+                "carsHeaderSuffix": "Anzahl Kfz",
+                "trucksHeaderSuffix": "Anzahl SV"
+            }
+        }
+    }
+}

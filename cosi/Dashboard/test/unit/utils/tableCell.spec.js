@@ -5,24 +5,33 @@ import {
     isValueCalculated
 } from "../../../utils/tableCells.js";
 import {expect} from "chai/index";
-import selectedDistrictLevel from "../components/mock.districtLevel.js";
 
 describe("Dashboard/utils/tableCells", () => {
     const item = {
             "39003": {
-                "jahr_2020": "2266",
+                "undefined2020": "2266",
                 "isModified": 2020
-            }
+            },
+            "49004": {
+                "undefined2020": "10"
+            },
+            "category": "one"
         },
         itemTwo = {
-            "Wolkenkuckucksheim": {
-                "jahr_2012": "150"
+            "49004": {
+                "undefined2020": "150"
+            },
+            "category": "two"
+        },
+        itemThree = {
+            "49004": {
+                "undefined2012": "150"
             },
             "valueType": "relative",
             "calculation": {
                 "operation": "divide",
-                "category_A": "Arbeitslose insgesamt",
-                "category_B": "Bevölkerung insgesamt",
+                "category_A": "one",
+                "category_B": "two",
                 "modifier": 100
             }
         },
@@ -46,11 +55,11 @@ describe("Dashboard/utils/tableCells", () => {
         });
 
         it("should return the parsed value", () => {
-            expect(getValue.call({currentLocale: "de-DE"}, item, header, timestamp)).to.be.equal(2266);
+            expect(getValue.call({currentLocale: "de-DE"}, item, header, timestamp)).to.be.equal("2.266");
         });
 
         it("should return the calculated value", () => {
-            expect(getValue(itemTwo, {value: "Wolkenkuckucksheim"}, timestamp, selectedDistrictLevel.districts)).to.be.equal(16.32);
+            expect(getValue(itemThree, {value: "49004"}, timestamp, [item, itemTwo, itemThree])).to.be.equal("6,67");
         });
     });
 

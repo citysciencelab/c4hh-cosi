@@ -47,8 +47,13 @@ const state = {
     mappingPath: undefined,
     mappingInit: MappingJson,
     readmeUrl: {
+<<<<<<< HEAD
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/018districtselector.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/018gebietsauswahl.md"
+=======
+        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/districtselector.md",
+        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/gebietsauswahl.md"
+>>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     },
     remoteMetadata: {}, // after data is loaded, we also pull metadata remotely and store it here.
     toolToOpen: undefined,

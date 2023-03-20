@@ -1,0 +1,27 @@
+[
+    {
+        "name": "adresse_strasse_hausnr",
+        "minOccurs": "0",
+        "type": "string"
+    },
+    {
+        "name": "anzahl_schueler",
+        "minOccurs": "0",
+        "type": "integer"
+    },
+    {
+        "name": "kapitelbezeichnung",
+        "minOccurs": "0",
+        "type": "string"
+    },
+    {
+        "name": "schulname",
+        "minOccurs": "0",
+        "type": "string"
+    },
+    {
+        "name": "the_geom",
+        "minOccurs": "0",
+        "type": "gml:PointPropertyType"
+    }
+]

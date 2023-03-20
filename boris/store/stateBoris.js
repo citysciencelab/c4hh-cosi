@@ -73,7 +73,7 @@ const state = {
         "F Frontlage", "E Ecklage", "P Pfeifenstielgrundstück",
         "H Hinterlage (in 2. Reihe durch Wegerecht erschlossen)"
     ],
-    selectedBuildDesign: "",
+    selectedBuildDesign: "eh Einzelhaus (freistehend)",
     selectedPositionToStreet: "F Frontlage",
     wpsId: "1001",
     fmwProcess: "BRWConvert.fmw"

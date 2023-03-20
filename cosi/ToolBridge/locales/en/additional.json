@@ -1,0 +1,11 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "toolBridge": {
+                    "title": "Virtual User"
+                }
+            }
+        }
+    }
+}

@@ -424,10 +424,10 @@ const actions = {
             "zEntwicklungszustand": feature.get("entwicklungszustand"), // Mandatory attribute for WPS
             "zBeitragszustand": feature.get("beitragszustand"), // Mandatory attribute for WPS
             "zNutzung": feature.get("nutzung_kombiniert"), // Mandatory attribute for WPS
-            "zBauweise": state.selectedBuildDesign !== "" ? state.selectedBuildDesign : null,
+            "zBauweise": feature.get("anbauart") !== "" ? feature.get("anbauart") : null,
             "zGeschossfl_zahl": feature.get("geschossfl_zahl") !== "" ? feature.get("geschossfl_zahl") : null,
             "zGrdstk_flaeche": feature.get("grdstk_flaeche") !== "" ? feature.get("grdstk_flaeche") : null,
-            "zStrassenLage": feature.get("nutzung_kombiniert") === "EFH Ein- und Zweifamilienhäuser" ? state.selectedPositionToStreet : null
+            "zStrassenLage": feature.get("nutzung_kombiniert") === "EFH Ein- und Zweifamilienhäuser" ? "F Frontlage" : null
         });
 
         commit("setSelectedBrwFeature", feature);
@@ -440,7 +440,7 @@ const actions = {
      * @returns {void}
      */
     sendWpsConvertRequest ({dispatch, state}) {
-        const data = helpers.convert({brw: state.selectedBrwFeature});
+        const data = helpers.convert({brw: state.selectedBrwFeature, wpsTimeout: state.wpsTimeout});
 
         WPS.wpsRequest(state.wpsId, state.fmwProcess, data, (response, status) => dispatch("handleConvertResponse", {response, status}));
     },

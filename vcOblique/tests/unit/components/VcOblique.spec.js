@@ -33,6 +33,15 @@ describe("ADDONS: addons/vcOblique/components/VcOblique.vue", () => {
     let store, wrapper, setObliqueViewOrig, initObliqueViewOrig, setRenderToWindowOrig, initResetObliqueViewer, setObliqueViewerURLOrig;
 
     beforeEach(() => {
+<<<<<<< HEAD
+=======
+        global.MutationObserver = {
+            constructor: () => sinon.stub(),
+            disconnect: () => sinon.stub(),
+            observe: () => sinon.stub()
+        };
+
+>>>>>>> cbf2be88 (add new addons_3_0_0 structure-add missing addons)
         setObliqueViewOrig = VcOblique.actions.setObliqueView;
         VcOblique.actions.setObliqueView = sinon.stub();
         initObliqueViewOrig = VcOblique.actions.initObliqueView;
