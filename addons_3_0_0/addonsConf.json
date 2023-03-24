@@ -2,5 +2,8 @@
   "sdpDownload": {
     "type": "tool",
     "path": "sdpDownload"
+  },
+  "populationRequest": {
+    "type": "tool"
   }
 }
