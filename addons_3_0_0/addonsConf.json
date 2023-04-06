@@ -16,5 +16,41 @@
   "vcOblique": {
     "type": "tool",
     "path": "vcOblique"
+  },
+  "trinkwasser": {
+    "path":"gfiThemes/trinkwasser",
+    "type": "gfiTheme"
+  },
+  "sturmflut": {
+    "path":"gfiThemes/sturmflut",
+    "type": "gfiTheme"
+  },
+  "dataTable": {
+    "path":"gfiThemes/dataTable",
+    "type": "gfiTheme"
+  },
+  "bildungsatlas": {
+    "path":"gfiThemes/bildungsatlas",
+    "type": "gfiTheme"
+  },
+  "dipas": {
+    "path":"gfiThemes/dipas",
+    "type": "gfiTheme"
+  },
+  "dipasCockpit": {
+    "path":"gfiThemes/dipasCockpit",
+    "type": "gfiTheme"
+  },
+  "solaratlas": {
+    "path":"gfiThemes/solaratlas",
+    "type": "gfiTheme"
+  },
+  "verkehrsstaerken": {
+    "path":"gfiThemes/verkehrsstaerken",
+    "type": "gfiTheme"
+  },
+  "trafficCount": {
+    "path":"gfiThemes/trafficCount",
+    "type": "gfiTheme"
   }
 }
