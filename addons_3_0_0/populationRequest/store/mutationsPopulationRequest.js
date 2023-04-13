@@ -8,7 +8,13 @@ const mutations = {
      * {setKey:   (state, payload) => *   state[key] = payload * }
      * will be returned.
      */
-    ...generateSimpleMutations(statePopulationRequest)
+    ...generateSimpleMutations(statePopulationRequest),
+
+    setRasterActive(state, payload) {
+        console.log("setRasterActive:" + payload);
+        state.rasterActive = payload;
+        this.$refs.rasterCheckBox.checked = payload;
+    }
 };
 
 export default mutations;

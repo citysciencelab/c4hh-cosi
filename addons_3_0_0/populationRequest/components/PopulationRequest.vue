@@ -79,10 +79,6 @@ export default {
         }
     },
     mounted () {
-        if (this.$refs.graphicalSelection) {
-            this.$refs.graphicalSelection.resetGeographicSelection();
-        }
-
         this.$nextTick(() => {
             const interaction = this.$refs.graphicalSelection.drawInteraction;
 
@@ -367,7 +363,9 @@ export default {
 
                 // if the Map has too large Scale give notification and undo the activation
                 if (scale > 100000) {
+                    console.log("should invoke");
                     this.setRasterActive(false);
+                    this.$refs.rasterCheckBox.checked = false;
 
                     this.addSingleAlert({
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForRaster"),
@@ -382,7 +380,9 @@ export default {
 
             if (value) {
                 if (!this.checkIsModelLoaded(layerId, value)) {
+                    console.log("should invoke");
                     this.setRasterActive(false);
+                    this.$refs.rasterCheckBox.checked = false;
                 }
             }
         },
@@ -553,7 +553,7 @@ export default {
                                 :aria="translate('additional:modules.tools.populationRequest.select.showRasterLayer')"
                                 :interaction="($event) => triggerRaster($event.target.checked)"
                                 :label="translate('additional:modules.tools.populationRequest.select.showRasterLayer')"
-                                :checked="this.rasterActive"
+                                :checked="rasterActive"
                             />
                         </div>
                     </div>
@@ -567,7 +567,7 @@ export default {
                                 :aria="translate('additional:modules.tools.populationRequest.select.showAlkisAdresses')"
                                 :interaction="($event) => triggerAlkisAdresses($event.target.checked)"
                                 :label="translate('additional:modules.tools.populationRequest.select.showAlkisAdresses')"
-                                :checked="this.alkisAdressesActive"
+                                :checked="alkisAdressesActive"
                             />
                         </div>
                     </div>
