@@ -1,0 +1,99 @@
+import {createStore} from "vuex";
+import {expect} from "chai";
+import sinon from "sinon";
+import {config, shallowMount} from "@vue/test-utils";
+import ObliqueViewerComponent from "../../../components/VcOblique.vue";
+import VcOblique from "../../../store/indexVcOblique";
+
+config.global.mocks.$t = key => key;
+
+describe("ADDONS: addons/vcOblique/components/VcOblique.vue", () => {
+    const mockConfigJson = {
+            Portalconfig: {
+                menu: {
+                    tools: {
+                        children: {
+                            vcOblique: {
+                                "name": "translate#additional:modules.tools.obliqueViewer.title",
+                                "icon": "bi-image",
+                                "styleId": "obliqueViewer"
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    let store, wrapper, setObliqueViewOrig, initObliqueViewOrig, setRenderToWindowOrig, initResetObliqueViewer, setObliqueViewerURLOrig;
+
+    beforeEach(() => {
+        global.MutationObserver = {
+            constructor: () => sinon.stub(),
+            disconnect: () => sinon.stub(),
+            observe: () => sinon.stub()
+        };
+
+        setObliqueViewOrig = VcOblique.actions.setObliqueView;
+        VcOblique.actions.setObliqueView = sinon.stub();
+        initObliqueViewOrig = VcOblique.actions.initObliqueView;
+        VcOblique.actions.initObliqueView = sinon.stub();
+        initResetObliqueViewer = VcOblique.actions.resetObliqueViewer;
+        VcOblique.actions.resetObliqueViewer = sinon.stub();
+        setObliqueViewerURLOrig = VcOblique.actions.setObliqueViewerURL;
+        VcOblique.actions.setObliqueViewerURL = sinon.stub();
+
+        store = createStore({
+            namespaces: true,
+            modules: {
+                Modules: {
+                    namespaced: true,
+                    modules: {
+                        VcOblique
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    getters: {
+                        clickCoordinate: () => [100, 200],
+                        initialCenter: () => [565874, 5934140]
+                    }
+                }
+            },
+            state: {
+                configJson: mockConfigJson
+            },
+            getters: {
+                mobile: () => false
+            }
+        });
+
+        store.commit("Modules/VcOblique/setActive", true);
+        wrapper = shallowMount(ObliqueViewerComponent, {
+            global: {
+                plugins: [store]
+            },
+            directives: {
+                resize() { /* stub */ }
+              }
+        });
+    });
+    afterEach(function () {
+        sinon.restore();
+        VcOblique.actions.setObliqueView = setObliqueViewOrig;
+        VcOblique.actions.initObliqueView = initObliqueViewOrig;
+        VcOblique.actions.resetObliqueViewer = initResetObliqueViewer;
+        VcOblique.actions.setObliqueViewerURL = setObliqueViewerURLOrig;
+    });
+    describe("VcOblique.vue watcher", () => {
+        it("test watch on clickCoordinate should call action setObliqueView", async () => {
+            expect(wrapper.find("#obliqueIframe").exists()).to.be.true;
+            wrapper.vm.$options.watch.clickCoordinate.handler.call(wrapper.vm, [10, 20]);
+            expect(VcOblique.actions.setObliqueView.calledOnce).to.be.true;
+        });
+        it("test watch on active should call action setObliqueView", async () => {
+            expect(wrapper.find("#obliqueIframe").exists()).to.be.true;
+            await wrapper.vm.$options.watch.active.call(wrapper.vm, true);
+            expect(VcOblique.actions.initObliqueView.calledOnce).to.be.true;
+            expect(VcOblique.actions.resetObliqueViewer.calledOnce).to.be.false;
+        });
+    });
+});

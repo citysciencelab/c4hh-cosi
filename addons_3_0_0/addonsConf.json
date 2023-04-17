@@ -8,5 +8,9 @@
   },
   "streetSmart": {
     "type": "tool"
+  },
+  "vcOblique": {
+    "type": "tool",
+    "path": "vcOblique"
   }
 }
