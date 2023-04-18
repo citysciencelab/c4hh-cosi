@@ -7,6 +7,7 @@
  * @property {String[]} supportedDevices list of devices supported
  * @property {String[]} supportedMapModes list of map modes supported
  * @property {String} description description of tool (config-param)
+ * @property {String} showDescription should the description be shown (config-param)
  * @property {String} icon icon next to title (config-param)
  * @property {Boolean} isVisibleInMenu if true, tool is selectable in menu (config-param)
  * @property {Boolean} rasterActive is the rasterLayer active
@@ -27,8 +28,8 @@ const state = {
     // defaults for config.json parameters
     name: "additional:modules.tools.populationRequest.title",
     icon: "bi-person-bounding-box",
-    rasterActive: false,
-    alkisAdressesActive: false,
+    rasterActive: undefined,
+    alkisAdressesActive: undefined,
     populationReqServiceId: "2",
     wpsId: "1001",
     fmwProcess: "einwohner_ermitteln.fmw",

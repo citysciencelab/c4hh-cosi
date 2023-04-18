@@ -10,10 +10,24 @@ const mutations = {
      */
     ...generateSimpleMutations(statePopulationRequest),
 
+    /**
+     * Sets the rasterLayer active setting.
+     * @param {Object} state The state
+     * @param {Boolean} payload The value to set
+     * @returns {void}
+     */
     setRasterActive(state, payload) {
-        console.log("setRasterActive:" + payload);
         state.rasterActive = payload;
-        this.$refs.rasterCheckBox.checked = payload;
+    },
+
+    /**
+     * Sets the alkisAdresses active setting.
+     * @param {Object} state The state
+     * @param {Boolean} payload The value to set
+     * @returns {void}
+     */
+    setAlkisAdressesActive(state, payload) {
+        state.alkisAdressesActive = payload;
     }
 };
 

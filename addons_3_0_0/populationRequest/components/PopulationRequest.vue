@@ -52,6 +52,22 @@ export default {
             return this.uiStyle !== "SIMPLE" && this.uiStyle !== "TABLE";
         },
         /**
+         * Indicates whether the rasterLayer is active.
+         * @returns {Boolean} Is active.
+         */
+        isRasterActive() {
+            // console.log("isRasterActive:" + this.rasterActive);
+            return this.rasterActive;
+        },
+        /**
+         * Indicates whether the alkisAdressesLayer is active.
+         * @returns {Boolean} Is active.
+         */
+        isAlkisAdressesActive() {
+            // console.log("isAlkisAdressesActive:" + this.alkisAdressesActive);
+            return this.alkisAdressesActive;
+        },
+        /**
          * returns if the Hint and Linktext should be shown
          * @returns {Boolean} shall Text be shown
          */
@@ -363,9 +379,7 @@ export default {
 
                 // if the Map has too large Scale give notification and undo the activation
                 if (scale > 100000) {
-                    console.log("should invoke");
                     this.setRasterActive(false);
-                    this.$refs.rasterCheckBox.checked = false;
 
                     this.addSingleAlert({
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForRaster"),
@@ -380,9 +394,7 @@ export default {
 
             if (value) {
                 if (!this.checkIsModelLoaded(layerId, value)) {
-                    console.log("should invoke");
                     this.setRasterActive(false);
-                    this.$refs.rasterCheckBox.checked = false;
                 }
             }
         },
@@ -392,8 +404,7 @@ export default {
          * @returns {void}
          */
         triggerAlkisAdresses (value) {
-            const alkisAdressesCheckBox = this.$refs.alkisAdressesCheckBox,
-                layerId = this.alkisAdressLayerId;
+            const layerId = this.alkisAdressLayerId;
 
             this.setAlkisAdressesActive(value);
 
@@ -403,12 +414,13 @@ export default {
                 // if the Map has too large Scale give notification and undo the activation
                 if (scale > 10000) {
                     this.setAlkisAdressesActive(false);
-
+                    
                     this.addSingleAlert({
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForAlkisAdresses"),
                         category: this.translate("additional:modules.tools.populationRequest.errors.errorCategory"),
                         title: this.translate("additional:modules.tools.populationRequest.errors.errorTitle")
                     });
+                    value = false;
                 }
             }
 
@@ -553,7 +565,7 @@ export default {
                                 :aria="translate('additional:modules.tools.populationRequest.select.showRasterLayer')"
                                 :interaction="($event) => triggerRaster($event.target.checked)"
                                 :label="translate('additional:modules.tools.populationRequest.select.showRasterLayer')"
-                                :checked="rasterActive"
+                                :checked="isRasterActive"
                             />
                         </div>
                     </div>
@@ -567,7 +579,7 @@ export default {
                                 :aria="translate('additional:modules.tools.populationRequest.select.showAlkisAdresses')"
                                 :interaction="($event) => triggerAlkisAdresses($event.target.checked)"
                                 :label="translate('additional:modules.tools.populationRequest.select.showAlkisAdresses')"
-                                :checked="alkisAdressesActive"
+                                :checked="isAlkisAdressesActive"
                             />
                         </div>
                     </div>
