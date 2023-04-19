@@ -42,6 +42,9 @@ export default {
             "fmwProcess",
             "geometry"
         ]),
+        ...mapGetters("Modules/GraphicalSelect", [
+            "selectedAreaGeoJson"
+        ]),
         ...mapGetters(["uiStyle", "restServiceById"]),
         /**
          * Indicates whether the ui style is default.
@@ -55,7 +58,6 @@ export default {
          * @returns {Boolean} Is active.
          */
         isRasterActive() {
-            // console.log("isRasterActive:" + this.rasterActive);
             return this.rasterActive;
         },
         /**
@@ -63,7 +65,6 @@ export default {
          * @returns {Boolean} Is active.
          */
         isAlkisAdressesActive() {
-            // console.log("isAlkisAdressesActive:" + this.alkisAdressesActive);
             return this.alkisAdressesActive;
         },
         /**
@@ -89,23 +90,11 @@ export default {
         }
     },
     watch: {
-        geometry (newValue) {
+        selectedAreaGeoJson (newValue) {
             this.makeRequest(newValue);
         }
     },
     mounted () {
-        this.$nextTick(() => {
-            const interaction = this.$refs.graphicalSelection.drawInteraction;
-
-            if (typeof interaction === "object") {
-                interaction.on("drawend", async (evt) => {
-                    const geoJson = await this.featureToGeoJson(evt.feature);
-
-                    this.setGeometry(geoJson);
-                });
-            }
-        });
-
         const service = this.restServiceById(this.populationReqServiceId);
 
         if (service === undefined) {
@@ -159,10 +148,8 @@ export default {
     methods: {
         ...mapMutations("Modules/PopulationRequest", [
             "setAlkisAdressesActive",
-            "setRasterActive",
-            "setGeometry"
+            "setRasterActive"
         ]),
-        ...mapActions("Modules/GraphicalSelect", ["featureToGeoJson"]),
         ...mapActions(["addLayerToLayerConfig", "replaceByIdInLayerConfig"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
 
