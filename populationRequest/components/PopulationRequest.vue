@@ -692,7 +692,6 @@ import GraphicalSelect from "../../../src/share-components/graphicalSelect/compo
 import ToggleCheckbox from "../../../src/share-components/toggleCheckbox/components/ToggleCheckbox.vue";
 import thousandsSeparator from "../../../src/utils/thousandsSeparator";
 import WPS from "../../../src/api/wps";
-import LoaderOverlay from "../../../src/utils/loaderOverlay";
 
 export default {
     name: "PopulationRequest",
