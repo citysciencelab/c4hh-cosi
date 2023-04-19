@@ -23,7 +23,7 @@ describe("ADDONS: addons/vcOblique/components/VcOblique.vue", () => {
                 }
             }
         };
-    let store, wrapper, setObliqueViewOrig, initObliqueViewOrig, setRenderToWindowOrig, initResetObliqueViewer, setObliqueViewerURLOrig;
+    let store, wrapper, obliqueViewOrig, initObliqueViewOrig, setRenderToWindowOrig, initResetObliqueViewer, createObliqueViewerURLOrig;
 
     beforeEach(() => {
         global.MutationObserver = {
@@ -32,14 +32,14 @@ describe("ADDONS: addons/vcOblique/components/VcOblique.vue", () => {
             observe: () => sinon.stub()
         };
 
-        setObliqueViewOrig = VcOblique.actions.setObliqueView;
-        VcOblique.actions.setObliqueView = sinon.stub();
+        obliqueViewOrig = VcOblique.actions.obliqueView;
+        VcOblique.actions.obliqueView = sinon.stub();
         initObliqueViewOrig = VcOblique.actions.initObliqueView;
         VcOblique.actions.initObliqueView = sinon.stub();
         initResetObliqueViewer = VcOblique.actions.resetObliqueViewer;
         VcOblique.actions.resetObliqueViewer = sinon.stub();
-        setObliqueViewerURLOrig = VcOblique.actions.setObliqueViewerURL;
-        VcOblique.actions.setObliqueViewerURL = sinon.stub();
+        createObliqueViewerURLOrig = VcOblique.actions.createObliqueViewerURL;
+        VcOblique.actions.createObliqueViewerURL = sinon.stub();
 
         store = createStore({
             namespaces: true,
@@ -78,22 +78,16 @@ describe("ADDONS: addons/vcOblique/components/VcOblique.vue", () => {
     });
     afterEach(function () {
         sinon.restore();
-        VcOblique.actions.setObliqueView = setObliqueViewOrig;
+        VcOblique.actions.obliqueView = obliqueViewOrig;
         VcOblique.actions.initObliqueView = initObliqueViewOrig;
         VcOblique.actions.resetObliqueViewer = initResetObliqueViewer;
-        VcOblique.actions.setObliqueViewerURL = setObliqueViewerURLOrig;
+        VcOblique.actions.createObliqueViewerURL = createObliqueViewerURLOrig;
     });
     describe("VcOblique.vue watcher", () => {
-        it("test watch on clickCoordinate should call action setObliqueView", async () => {
+        it("test watch on clickCoordinate should call action obliqueView", async () => {
             expect(wrapper.find("#obliqueIframe").exists()).to.be.true;
             wrapper.vm.$options.watch.clickCoordinate.handler.call(wrapper.vm, [10, 20]);
-            expect(VcOblique.actions.setObliqueView.calledOnce).to.be.true;
-        });
-        it("test watch on active should call action setObliqueView", async () => {
-            expect(wrapper.find("#obliqueIframe").exists()).to.be.true;
-            await wrapper.vm.$options.watch.active.call(wrapper.vm, true);
-            expect(VcOblique.actions.initObliqueView.calledOnce).to.be.true;
-            expect(VcOblique.actions.resetObliqueViewer.calledOnce).to.be.false;
+            expect(VcOblique.actions.obliqueView.calledOnce).to.be.true;
         });
     });
 });

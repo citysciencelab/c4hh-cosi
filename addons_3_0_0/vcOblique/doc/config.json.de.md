@@ -1,4 +1,4 @@
-# Portalconfig.menu.tools.children
+# Portalconfig.menu.modules.children
 
 Liste aller konfigurierbaren Werkzeuge. Jedes Werkzeug erbt von **[tool](#markdown-header-portalconfigmenutool)** und kann/muss somit auch die dort angegebenen attribute konfiguiert bekommen.
 
@@ -8,7 +8,7 @@ Liste aller konfigurierbaren Werkzeuge. Jedes Werkzeug erbt von **[tool](#markdo
 
 
 
-## Portalconfig.menu.tools.children.vcOblique
+## Portalconfig.menu.modules.children.vcOblique
 
 Werkzeug zum einbinden der Schrägluftbildanwendung von vcs in der Sidebar.
 Die Schrägluftbildanwendung muss auf dem gleichen Server liegen, damit sie im iFrame eingebunden werden kann.

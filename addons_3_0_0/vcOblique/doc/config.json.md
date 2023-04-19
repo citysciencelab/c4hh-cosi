@@ -1,4 +1,4 @@
-# Portalconfig.menu.tools.children
+# Portalconfig.menu.modules.children
 
 List of all configurable tools. Each tool inherits from **[tool](#markdown-header-portalconfigmenutool)** and thus can/must also have the attributes specified there configured.
 
@@ -8,7 +8,7 @@ List of all configurable tools. Each tool inherits from **[tool](#markdown-heade
 
 
 
-## Portalconfig.menu.tools.children.vcOblique
+## Portalconfig.menu.modules.children.vcOblique
 
 Tool to include the oblique aerial view application from vcs in the sidebar.
 The oblique aerial view application must be on the same server to be included in the iFrame.

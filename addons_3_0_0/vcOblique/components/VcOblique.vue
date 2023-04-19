@@ -26,18 +26,10 @@ export default {
         ...mapGetters("Maps", ["clickCoordinate", "initialCenter"])
     },
     watch: {
-        active (value) {
-            if (value) {
-                this.$nextTick(() => {
-                    this.setObliqueViewerURL(this.initialCenter);
-                    this.initObliqueView();
-                });
-            }
-        },
         clickCoordinate: {
             handler(value) {
                 if (this.active === true) {
-                    this.setObliqueView(value);
+                    this.obliqueView(value);
                 }
             },
             deep: true
@@ -49,6 +41,10 @@ export default {
      */
     mounted () {
         this.setActive(true);
+        this.$nextTick(() => {
+            this.createObliqueViewerURL(this.initialCenter);
+            this.initObliqueView();
+        });
     },
     beforeUnmount () {
         this.setActive(false);
@@ -60,8 +56,8 @@ export default {
             "initObliqueView",
             "resetObliqueViewer",
             "rotatePointMarkerIn3D",
-            "setObliqueView",
-            "setObliqueViewerURL"])
+            "obliqueView",
+            "createObliqueViewerURL"])
     }
 };
 
