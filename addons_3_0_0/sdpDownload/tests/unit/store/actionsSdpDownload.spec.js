@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import actions from "../../../store/actionsSdpDownload";
 import importedState from "../../../store/stateSdpDownload";
-import layerCollection from "../../../../../src_3_0_0/core/layers/js/layerCollection";
+import layerCollection from "../../../../../../src_3_0_0/core/layers/js/layerCollection";
 import axios from "axios";
 import sinon from "sinon";
 
