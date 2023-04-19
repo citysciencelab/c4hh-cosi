@@ -4,7 +4,6 @@ import GraphicalSelect from "../../../../src_3_0_0/shared/modules/graphicalSelec
 import SwitchInput from "../../../../src_3_0_0/shared/modules/checkboxes/components/SwitchInput.vue";
 import thousandsSeparator from "../../../../src_3_0_0/shared/js/utils/thousandsSeparator";
 import WPS from "../../../../src_3_0_0/shared/js/api/wps";
-import LoaderOverlay from "../../../../src_3_0_0/shared/js/utils/loaderOverlay";
 import {treeSubjectsKey} from "../../../../src_3_0_0/shared/js/utils/constants";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 
@@ -180,7 +179,6 @@ export default {
             this.sourceFHH = "nein";
             this.sourceMRH = "nein";
             this.searcharea = 0;
-            LoaderOverlay.show();
 
             const service = this.restServiceById(this.wpsId);
 
@@ -222,8 +220,6 @@ export default {
             else {
                 this.resetView();
             }
-
-            LoaderOverlay.hide();
         },
         /**
          * Displays Errortext if the WPS returns an Error
@@ -334,13 +330,13 @@ export default {
             return true;
         },
         /**
-         * sets selected and visibility to ModelList via Radio.trigger
+         * sets visibility to layerList
          * @param {String} layerId id of the layer to be toggled
          * @param {Boolean} value true | false
          * @fires Core#RadioTriggerModelListSetModelAttributesById
          * @returns {void}
          */
-        setModelAttributesByIdToModelList: async function (layerId, value) {
+        setLayerVisibility: async function (layerId, value) {
             const rawLayer = rawLayerList.getLayerWhere({id: layerId});
 
             if (rawLayer) {
@@ -383,14 +379,12 @@ export default {
 
                     this.addSingleAlert({
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForRaster"),
-                        category: this.translate("additional:modules.tools.populationRequest.errors.errorCategory"),
-                        title: this.translate("additional:modules.tools.populationRequest.errors.errorTitle")
+                        category: "info"
                     });
-                    value = false;
                 }
             }
 
-            this.setModelAttributesByIdToModelList(layerId, value);
+            this.setLayerVisibility(layerId, value);
 
             if (value) {
                 if (!this.checkIsModelLoaded(layerId, value)) {
@@ -417,14 +411,12 @@ export default {
                     
                     this.addSingleAlert({
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForAlkisAdresses"),
-                        category: this.translate("additional:modules.tools.populationRequest.errors.errorCategory"),
-                        title: this.translate("additional:modules.tools.populationRequest.errors.errorTitle")
+                        category: "info"
                     });
-                    value = false;
                 }
             }
 
-            this.setModelAttributesByIdToModelList(layerId, value);
+            this.setLayerVisibility(layerId, value);
 
             if (value) {
                 if (!this.checkIsModelLoaded(layerId, value)) {

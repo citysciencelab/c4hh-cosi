@@ -94,7 +94,7 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
         expect(wrapper.find("div.checkbox").exists()).to.be.true;
     });
 
-    it.skip("should call toggleRasterLayer if Raster Checkbox is changed", async () => {
+    it.skip("should call triggerRaster if Raster Checkbox is changed", async () => {
         const spyRaster = sinon.spy(Component.methods, "triggerRaster"),
             wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
             rasterComponent = wrapper.findComponent({ref: "rasterCheckBox"});
@@ -105,7 +105,7 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
         spyRaster.restore();
     });
 
-    it.skip("should call toggleAlkisAdresses if alkisAdresses Checkbox is changed", async () => {
+    it.skip("should call triggerAlkisAdresses if alkisAdresses Checkbox is changed", async () => {
         const spyAlkisAdresses = sinon.spy(Component.methods, "triggerAlkisAdresses"),
             wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
             alkisAdressesComponent = wrapper.findComponent({ref: "alkisAdressesCheckBox"});
