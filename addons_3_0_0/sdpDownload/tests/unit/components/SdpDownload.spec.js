@@ -8,7 +8,7 @@ import {expect} from "chai";
 
 config.global.mocks.$t = key => key;
 
-describe("SdpDownload.vue", () => {
+describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 
     const mockConfigJson = {
         Portalconfig: {

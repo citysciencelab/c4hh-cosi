@@ -2,7 +2,7 @@ import {expect} from "chai";
 import stateSdpDownload from "../../../store/stateSdpDownload";
 
 
-describe("addons/SdpDownload/store/gettersSdpDownload", function () {
+describe("addons/sdpDownload/store/gettersSdpDownload", function () {
     it("returns the active from state", function () {
         expect(stateSdpDownload.active).to.be.false;
     });
