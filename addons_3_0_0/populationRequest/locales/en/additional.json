@@ -27,7 +27,6 @@
                 },
                 "errors": {
                     "errorTitle": "Error",
-                    "errorCategory": "Error",
                     "requestException": "Request failed. ",
                     "layerIdCantBeLoaded": "Layer with ID: {{layerId}} couldn't be loaded, since it's not available in the portal!",
                     "reduceScaleForRaster": "The Raster Layer can only be displayed from 1: 100.000.",

@@ -216,7 +216,7 @@ export default {
         handleWPSError: function (response) {
             this.addSingleAlert({
                 content: this.translate("additional:modules.tools.populationRequest.errors.requestException") + JSON.stringify(response.ergebnis),
-                category: this.translate("additional:modules.tools.populationRequest.errors.errorCategory"),
+                category: "error",
                 title: this.translate("additional:modules.tools.populationRequest.errors.errorTitle")
             });
         },
@@ -266,7 +266,7 @@ export default {
             catch (e) {
                 this.addSingleAlert({
                     content: this.translate("additional:modules.tools.populationRequest.errors.requestException") + JSON.stringify(response),
-                    category: this.translate("additional:modules.tools.populationRequest.errors.errorCategory"),
+                    category: "error",
                     title: this.translate("additional:modules.tools.populationRequest.errors.errorTitle")
                 });
                 this.resetView();
@@ -368,6 +368,7 @@ export default {
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForRaster"),
                         category: "info"
                     });
+                    value = false;
                 }
             }
 
@@ -400,6 +401,7 @@ export default {
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForAlkisAdresses"),
                         category: "info"
                     });
+                    value = false;
                 }
             }
 

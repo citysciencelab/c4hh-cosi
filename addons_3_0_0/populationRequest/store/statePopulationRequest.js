@@ -22,7 +22,7 @@ const state = {
     type: "populationRequest",
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D"],
-    description: "Einwohnerabfrage",
+    description: "Einwohnerabfrage über Geometrie-Auswahl in der Karte",
     showDescription: true,
     // defaults for config.json parameters
     name: "additional:modules.tools.populationRequest.title",

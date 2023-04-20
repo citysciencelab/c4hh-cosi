@@ -27,7 +27,6 @@
                 },
                 "errors": {
                     "errorTitle": "Fehler",
-                    "errorCategory": "Fehler",
                     "requestException": "Datenabfrage fehlgeschlagen. ",
                     "layerIdCantBeLoaded": "Der Layer mit der ID: {{layerId}} konnte nicht geladen werden, da dieser im Portal nicht zur Verfügung steht!",
                     "reduceScaleForRaster": "Das Raster Layer kann erst ab 1: 100.000 eingeblendet werden.",
