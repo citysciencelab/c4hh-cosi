@@ -1,0 +1,17 @@
+{
+    "menu": {
+        "tools":{
+            "streetsmart": "360° panorama"
+        }
+    },
+    "modules": {
+        "tools": {
+            "vueAddon": {
+                "title": "360° panorama",
+                "noData": "No panorama data available for this position. Marker is set back to last position.",
+                "createViewFailed": "Failed to create streetsmart view.",
+                "createViewFailedMoreInfo": "The panorama view cannot be displayed. You can find details about this in the developer console."
+            }
+        }
+    }
+}
