@@ -1,9 +1,12 @@
 {
+  "populationRequest": {
+    "type": "tool"
+  },
   "sdpDownload": {
     "type": "tool",
     "path": "sdpDownload"
   },
-  "populationRequest": {
+  "streetSmart": {
     "type": "tool"
   }
 }
