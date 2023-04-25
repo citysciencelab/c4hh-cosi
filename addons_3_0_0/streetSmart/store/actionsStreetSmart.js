@@ -144,9 +144,10 @@ const actions = {
                         if (result && result[0]) {
                             commit("setLastCoordinates", coordinates);
 
-                            result[0].setOrientation({yaw: 0});
-                            result[0].toggle3DCursor(state.toggle3DCursor);
-                            result[0].toggleAddressesVisible(state.toggleAddressesVisible);
+                            const viewers = StreetSmartApi.getViewers();
+
+                            viewers[0].toggle3DCursor(state.toggle3DCursor);
+                            viewers[0].toggleAddressesVisible(state.toggleAddressesVisible);
                         }
                         else {
                             dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.streetsmart.noData"), {root: true});
