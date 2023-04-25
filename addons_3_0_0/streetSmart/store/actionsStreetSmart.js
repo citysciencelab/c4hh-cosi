@@ -115,7 +115,7 @@ const actions = {
      * @param {Object} param.commit the commit
      * @param {Object} param.dispatch the dispatch
      * @param {Object} evt contains coordinates
-     * @see {@link https://www.cyclomedia.com/de/api-dokumentation }
+     * @see {@link https://www.cyclomedia.com/de/api-dokumentation}
      * @returns {void}
      */
     setPosition ({state, commit, dispatch}, evt) {
@@ -144,10 +144,9 @@ const actions = {
                         if (result && result[0]) {
                             commit("setLastCoordinates", coordinates);
 
-                            const viewers = StreetSmartApi.getViewers();
-
-                            viewers[0].toggle3DCursor(state.toggle3DCursor);
-                            viewers[0].toggleAddressesVisible(state.toggleAddressesVisible);
+                            result[0].setOrientation({yaw: 0});
+                            result[0].toggle3DCursor(state.toggle3DCursor);
+                            result[0].toggleAddressesVisible(state.toggleAddressesVisible);
                         }
                         else {
                             dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.streetsmart.noData"), {root: true});
