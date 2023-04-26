@@ -182,7 +182,7 @@ const actions = {
     },
 
     /**
-     * Rotates the mapMarker and remembers the last yaw.
+     * Rotates the mapMarker and remembers the last yaw/rotation.
      * @param {Object} param.commit the commit
      * @param {Object} param.dispatch the dispatch
      * @param {Object} evt to get rotation from
