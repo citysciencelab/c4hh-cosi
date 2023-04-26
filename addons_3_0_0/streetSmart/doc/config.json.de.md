@@ -29,7 +29,7 @@ Das Modul umfasst
 **Beispiel**
 ```
 #!json
-"streetSmart": {
+{
     "type": "streetSmart",
     "icon": "bi-camera-fill",
     "name": "additional:menu.tools.streetsmart",

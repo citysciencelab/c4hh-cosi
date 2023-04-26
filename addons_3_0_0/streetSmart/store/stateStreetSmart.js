@@ -13,7 +13,7 @@
  * @property {String} type type of the viewer component
  *
  * @property {Number[]} lastCoordinates the last clicked coordinates
- * @property {Number} lastYaw the last recorded yaw
+ * @property {Number} lastYaw the last recorded yaw/rotation
  * @property {Boolean} packagesLoaded represents if packages are loaded.
  * @property {Boolean} timeTravelVisible enables timeTravel in panoramaViewer
  * @property {Boolean} toggle3DCursor toggles the visibility of the 3D cursor in the PanoramaViewer
