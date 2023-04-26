@@ -25,6 +25,7 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
         mockGraphicalSelectGetters = {
             circleOverlay: sinon.stub(),
             tooltipOverlay: sinon.stub(),
+            selectedAreaGeoJson: sinon.stub(),
             geographicValues: () => geographicValues,
             selectionElements: () => selectionElements
         },
@@ -50,20 +51,26 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
                     namespaced: true,
                     modules: {
                         namespaced: true,
-                        PopulationRequest: Module
+                        PopulationRequest: Module,
+                        GraphicalSelect: {
+                            namespaced: true,
+                            getters: mockGraphicalSelectGetters,
+                            actions: mockGraphicalSelectActions,
+                            mutations: mockGraphicalSelectMutations
+                        }
                     }
                 },
                 Maps: {
                     namespaced: true,
                     mutations: mockMapMutations,
                     actions: mockMapActions
-                },
-                GraphicalSelect: {
-                    namespaced: true,
-                    getters: mockGraphicalSelectGetters,
-                    actions: mockGraphicalSelectActions,
-                    mutations: mockGraphicalSelectMutations
                 }
+                // GraphicalSelect: {
+                //     namespaced: true,
+                //     getters: mockGraphicalSelectGetters,
+                //     actions: mockGraphicalSelectActions,
+                //     mutations: mockGraphicalSelectMutations
+                // }
             },
             getters: {
                 isDefaultStyle: () => true,
