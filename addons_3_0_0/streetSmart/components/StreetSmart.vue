@@ -45,7 +45,7 @@ export default {
         ]),
 
         /**
-         * Set packages are loaded and initilaize api.
+         * Set packages are loaded and initialize api.
          * @returns {void}
          */
         apiLoadFinished () {

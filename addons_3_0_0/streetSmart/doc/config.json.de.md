@@ -1,18 +1,8 @@
-# Portalconfig.menu.tools.children
+## Portalconfig.menu.sections.streetSmart
 
-Liste aller konfigurierbaren Werkzeuge. Jedes Werkzeug erbt von **[tool](#markdown-header-portalconfigmenutool)** und kann/muss somit auch die dort angegebenen attribute konfiguiert bekommen.
+Modul zur Darstellung einer 360° Panorama Ansicht von [cyclomedia streetsmart](https://www.cyclomedia.com/de/street-smart) in der sidebar.
 
-|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
-|----|-------------|---|-------|------------|------|
-|streetSmart|nein|**[streetSmart](#markdown-header-portalconfigmenutoolschildrenstreetSmart)**||Werkzeug zur Darstellung einer 360° Panorama Ansicht.|false|
-
-
-
-## Portalconfig.menu.tools.children.streetSmart
-
-Werkzeug zur Darstellung einer 360° Panorama Ansicht von [cyclomedia streetsmart](https://www.cyclomedia.com/de/street-smart) in der sidebar.
-
-Das Werkzeug umfasst
+Das Modul umfasst
 
 * eine Panorama Ansicht die Luftbilder und Punktwolken anzeigt
 * das Panorama lässt sich auch im Vollbildmodus anzeigen
@@ -26,11 +16,12 @@ Das Werkzeug umfasst
 
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
-|name|ja|String|360° Panorama|Der Titel des Werkzeuges bzw. der Eintrag in der Werkzeugliste|false|
-|icon|ja|String|bi-camera-fill|Das zu verwendende Icon.|false|
-|streetsmartAPIVersion|nein|String|22.2|Die Version der streetsmartApi.|true|
+|type|ja|String|"streetSmart"|Der Typ zur Identifizierung des Modules.|false|
+|icon|nein|String|"bi-camera-fill"|Das zu verwendende Icon.|false|
+|name|nein|String|"360° Panorama"|Der Titel des Moduls bzw. der Eintrag im Menü|false|
 |reactVersion|nein|String|16.13.0|Die Version von React, kompatibel zur Version der streetsmartAPI.|true|
-|styleId|nein|String|"defaultMapMarkerPoint"|StyleId, um den Mapmarker in der Karte zu stylen, wenn streetsmart geöffnet ist.|true|
+|streetsmartAPIVersion|nein|String|22.2|Die Version der streetsmartApi.|true|
+|styleId|nein|String|"defaultMapMarkerPoint"|StyleId, um den Mapmarker in der Karte zu stylen, wenn streetsmart geöffnet ist.|false|
 |timeTravelVisible|nein|Boolean|false|Schaltet Zeitauswahl in der Panoramaansicht ein.|false|
 |toggle3DCursor|nein|Boolean|false|Schaltet die Sichtbarkeit des 3D-Cursors in der Panoramaansicht ein.|false|
 |toggleAddressesVisible|nein|Boolean|false|Schaltet die Sichtbarkeit von Adressen ein.|false|
@@ -39,15 +30,12 @@ Das Werkzeug umfasst
 ```
 #!json
 "streetSmart": {
-    "name": "additional:menu.tools.streetsmart",
+    "type": "streetSmart",
     "icon": "bi-camera-fill",
-    "streetsmartAPIVersion": "22.2",
-    "reactVersion": "16.13.0"
-    },
+    "name": "additional:menu.tools.streetsmart",
+    "reactVersion": "16.13.0",
+    "streetsmartAPIVersion": "22.2"
+},
 ```
 
 ***
-
-
-
-

@@ -1,18 +1,8 @@
-# Portalconfig.menu.tools.children
+## Portalconfig.menu.sections.streetSmart
 
-List of all configurable tools. Each tool inherits from **[tool](#markdown-header-portalconfigmenutool)** and can/must therefore also have the attributes specified there configured.
+Module to display a 360° panoramic view of [cyclomedia streetsmart](https://www.cyclomedia.com/de/street-smart) in the sidebar.
 
-|Name|Mandatory|Type|Default|Description|Expert|
-|----|-------------|---|-------|------------|------|
-|streetSmart|no|**[streetSmart](#markdown-header-portalconfigmenutoolschildrenstreetsmart)**||Tool for displaying a 360° panoramic view.|true|
-
-
-
-## Portalconfig.menu.tools.children.streetSmart
-
-Tool to display a 360° panoramic view of [cyclomedia streetsmart](https://www.cyclomedia.com/de/street-smart) in the sidebar.
-
-The tool includes
+The module includes
 
 * a panorama view that displays aerial images and point clouds
 * the panorama can also be displayed in full screen mode
@@ -26,11 +16,12 @@ The tool includes
 
 |Name|Mandatory|Type|Default|Description|Expert|
 |----|-------------|---|-------|------------|------|
-|name|yes|String|360° panorama|The title of the tool or the entry in the tool list.|false|
-|icon|yes|String|bi-camera-fill|The icon to use.|false|
-|streetsmartAPIVersion|no|String|22.2|The version of streetsmartApi.|true|
+|type|yes|String|"streetSmart"|The type used to identify the module.|false|
+|icon|no|String|"bi-camera-fill"|The icon to use.|false|
+|name|no|String|"360° panorama"|The title of the module or the entry in the menu.|false|
 |reactVersion|no|String|16.13.0|The version of React compatible with the version of streetsmartAPI.|true|
-|styleId|no|String|"defaultMapMarkerPoint"|StyleId to replace the mapmarker in the map when streetsmart is open.|true|
+|streetsmartAPIVersion|no|String|22.2|The version of streetsmartApi.|true|
+|styleId|no|String|"defaultMapMarkerPoint"|StyleId to replace the mapmarker in the map when streetsmart is open.|false|
 |timeTravelVisible|no|Boolean|false|Enables timeTravel in panoramaViewer.|false|
 |toggle3DCursor|no|Boolean|false|Toggles the visibility of the 3D cursor in the PanoramaViewer.|false|
 |toggleAddressesVisible|no|Boolean|false|Toggles the visibility of addresses.|false|
@@ -39,12 +30,12 @@ The tool includes
 ```
 #!json
 "streetSmart": {
-    "name": "additional:menu.tools.streetsmart",
+    "type": "streetSmart",
     "icon": "bi-camera-fill",
-    "streetsmartAPIVersion": "22.2",
-    "reactVersion": "16.13.0"
-    },
+    "name": "additional:menu.tools.streetsmart",
+    "reactVersion": "16.13.0",
+    "streetsmartAPIVersion": "22.2"
+},
 ```
 
 ***
-
