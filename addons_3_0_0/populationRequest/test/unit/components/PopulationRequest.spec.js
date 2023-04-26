@@ -99,7 +99,7 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
             wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
             rasterComponent = wrapper.findComponent({ref: "rasterCheckBox"});
 
-        await rasterComponent.trigger('click');
+        await rasterComponent.trigger("click");
         expect(spyRaster.calledOnce).to.be.true;
 
         spyRaster.restore();

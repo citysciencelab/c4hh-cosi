@@ -16,7 +16,7 @@ const mutations = {
      * @param {Boolean} payload The value to set
      * @returns {void}
      */
-    setRasterActive(state, payload) {
+    setRasterActive (state, payload) {
         state.rasterActive = payload;
     },
 
@@ -26,7 +26,7 @@ const mutations = {
      * @param {Boolean} payload The value to set
      * @returns {void}
      */
-    setAlkisAdressesActive(state, payload) {
+    setAlkisAdressesActive (state, payload) {
         state.alkisAdressesActive = payload;
     }
 };

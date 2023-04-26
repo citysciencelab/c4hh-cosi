@@ -57,14 +57,14 @@ export default {
          * Indicates whether the rasterLayer is active.
          * @returns {Boolean} Is active.
          */
-        isRasterActive() {
+        isRasterActive () {
             return this.rasterActive;
         },
         /**
          * Indicates whether the alkisAdressesLayer is active.
          * @returns {Boolean} Is active.
          */
-        isAlkisAdressesActive() {
+        isAlkisAdressesActive () {
             return this.alkisAdressesActive;
         },
         /**
@@ -124,7 +124,7 @@ export default {
                     layerConfigs: [{
                         id: this.alkisAdressLayerId,
                         layer: {
-                            visibility: false,
+                            visibility: false
                         }
                     }]
                 });
@@ -138,7 +138,7 @@ export default {
                     layerConfigs: [{
                         id: this.rasterLayerId,
                         layer: {
-                            visibility: false,
+                            visibility: false
                         }
                     }]
                 });
@@ -336,7 +336,7 @@ export default {
                             layerConfigs: [{
                                 id: layerId,
                                 layer: {
-                                    visibility: value,
+                                    visibility: value
                                 }
                             }]
                         });
@@ -354,10 +354,11 @@ export default {
          */
         triggerRaster (value) {
             const layerId = this.rasterLayerId;
+            let trigger = value;
 
-            this.setRasterActive(value);
+            this.setRasterActive(trigger);
 
-            if (value) {
+            if (trigger) {
                 const scale = this.$store.state.Maps.scale;
 
                 // if the Map has too large Scale give notification and undo the activation
@@ -368,14 +369,14 @@ export default {
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForRaster"),
                         category: "info"
                     });
-                    value = false;
+                    trigger = false;
                 }
             }
 
-            this.setLayerVisibility(layerId, value);
+            this.setLayerVisibility(layerId, trigger);
 
-            if (value) {
-                if (!this.checkIsModelLoaded(layerId, value)) {
+            if (trigger) {
+                if (!this.checkIsModelLoaded(layerId, trigger)) {
                     this.setRasterActive(false);
                 }
             }
@@ -387,28 +388,29 @@ export default {
          */
         triggerAlkisAdresses (value) {
             const layerId = this.alkisAdressLayerId;
+            let trigger = value;
 
-            this.setAlkisAdressesActive(value);
+            this.setAlkisAdressesActive(trigger);
 
-            if (value) {
+            if (trigger) {
                 const scale = this.$store.state.Maps.scale;
 
                 // if the Map has too large Scale give notification and undo the activation
                 if (scale > 10000) {
                     this.setAlkisAdressesActive(false);
-                    
+
                     this.addSingleAlert({
                         content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForAlkisAdresses"),
                         category: "info"
                     });
-                    value = false;
+                    trigger = false;
                 }
             }
 
-            this.setLayerVisibility(layerId, value);
+            this.setLayerVisibility(layerId, trigger);
 
-            if (value) {
-                if (!this.checkIsModelLoaded(layerId, value)) {
+            if (trigger) {
+                if (!this.checkIsModelLoaded(layerId, trigger)) {
                     this.setAlkisAdressesActive(false);
                 }
             }
