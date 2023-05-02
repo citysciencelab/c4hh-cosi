@@ -1,5 +1,6 @@
 import {createStore} from "vuex";
 import {config, shallowMount, mount} from "@vue/test-utils";
+import Map from "ol/Map.js";
 import SDPComponent from "../../../components/SdpDownload.vue";
 import GraphicalSelect from "../../../../../../src_3_0_0/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import SdpDownload from "../../../store/index.js";
@@ -54,7 +55,6 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
         sinon.stub(SDPComponent, "mounted");
         sinon.stub(GraphicalSelect, "mounted");
         store.commit("Modules/SdpDownload/setActive", true);
-
     });
 
     it("should find form in component", () => {
@@ -68,7 +68,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 
     });
 
-    it.skip("renders the SDPAddon", () => {
+    it("renders the SDPAddon", () => {
         const wrapper = shallowMount(SDPComponent, {
             global: {
                 plugins: [store]
@@ -78,7 +78,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
         expect(wrapper.find("#sdp-download").exists()).to.be.true;
 
     });
-    it.skip("SDPAddon contains correct amount (4 formats) of available options in format select", () => {
+    it("SDPAddon contains correct amount (4 formats) of available options in format select", () => {
         const wrapper = shallowMount(SDPComponent, {
             global: {
                 plugins: [store]
@@ -88,7 +88,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
         expect(wrapper.findAll("select#formatSelection > option").length).to.be.equal(4);
 
     });
-    it.skip("SDPAddon contains div for graphical selection", () => {
+    it("SDPAddon contains div for graphical selection", () => {
         const wrapper = shallowMount(SDPComponent, {
             global: {
                 plugins: [store]
@@ -98,7 +98,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
         expect(wrapper.find(".form-group").exists()).to.be.true;
 
     });
-    it.skip("flatbutton for download exists and has interaction", () => {
+    it("flatbutton for download exists and has interaction", () => {
         const wrapper = shallowMount(SDPComponent, {
                 global: {
                     plugins: [store]
@@ -110,7 +110,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
         expect(button.html().includes("interaction=\"[Function]\"")).to.be.true;
 
     });
-    it.skip("should call download function if Neuwerk format button is clicked", async () => {
+    it("should call download function if Neuwerk format button is clicked", async () => {
         const spyDownload = sinon.stub(SDPComponent.methods, "requestCompressIslandData"),
             wrapper = shallowMount(SDPComponent, {
                 global: {
@@ -124,7 +124,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 
         spyDownload.restore();
     });
-    it.skip("should call download function if Scharhoern format button is clicked", async () => {
+    it("should call download function if Scharhoern format button is clicked", async () => {
         const spyDownload = sinon.stub(SDPComponent.methods, "requestCompressIslandData"),
             wrapper = shallowMount(SDPComponent, {
                 global: {
@@ -138,7 +138,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 
         spyDownload.restore();
     });
-    it.skip("should call download function if tile overview 310 format button is clicked", async () => {
+    it("should call download function if tile overview 310 format button is clicked", async () => {
         const spyDownload = sinon.stub(SDPComponent.methods, "requestCompressRasterOverviewData"),
             wrapper = shallowMount(SDPComponent, {
                 global: {
@@ -152,7 +152,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 
         spyDownload.restore();
     });
-    it.skip("should call download function if tile overview 320 format button is clicked", async () => {
+    it("should call download function if tile overview 320 format button is clicked", async () => {
         const spyDownload = sinon.stub(SDPComponent.methods, "requestCompressRasterOverviewData"),
             wrapper = shallowMount(SDPComponent, {
                 global: {
@@ -166,7 +166,7 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 
         spyDownload.restore();
     });
-    it.skip("should call setSelectedFormat function if select is changed", async () => {
+    it("should call setSelectedFormat function if select is changed", async () => {
         const spy = sinon.spy(SDPComponent.methods, "setSelectedFormat"),
             wrapper = shallowMount(SDPComponent, {
                 global: {
@@ -180,16 +180,24 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 
         spy.restore();
     });
-    it.skip("clearGraphicalSelect execute setStatus,resetView", async () => {
-        const wrapper = await mount(SDPComponent, {
+    it("clearGraphicalSelect execute setStatus,resetView", () => {
+        const map = new Map({
+                id: "ol",
+                mode: "2D"
+            }),
+            wrapper = mount(SDPComponent, {
                 global: {
                     plugins: [store]
                 }
             }),
-            mockedsetStatus = sinon.stub(wrapper.vm.$refs.graphicalSelection, "setStatus"),
-            mockedresetView = sinon.stub(wrapper.vm.$refs.graphicalSelection, "resetView");
+            mockedsetStatus = sinon.spy(wrapper.vm.$refs.graphicalSelection, "setStatus"),
+            mockedresetView = sinon.spy(wrapper.vm.$refs.graphicalSelection, "resetView");
 
-        await SDPComponent.methods.clearGraphicalSelect();
+        mapCollection.clear();
+        mapCollection.addMap(map, "2D");
+
+
+        wrapper.vm.clearGraphicalSelect();
 
         expect(mockedsetStatus.calledOnce).to.be.true;
         expect(mockedresetView.calledOnce).to.be.true;

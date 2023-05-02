@@ -2,6 +2,7 @@ import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
+import {nextTick} from "vue";
 
 import Component from "../../../components/PopulationRequest.vue";
 import GraphicalSelectComponent from "../../../../../../src_3_0_0/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
@@ -101,26 +102,30 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
         expect(wrapper.find("div.checkbox").exists()).to.be.true;
     });
 
-    it.skip("should call triggerRaster if Raster Checkbox is changed", async () => {
+    it("should call triggerRaster if Raster Checkbox is changed", () => {
         const spyRaster = sinon.spy(Component.methods, "triggerRaster"),
-            wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
+            wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"GraphicalSelect": GraphicalSelectComponent}}),
             rasterComponent = wrapper.findComponent({ref: "rasterCheckBox"});
 
-        await rasterComponent.trigger("click");
-        expect(spyRaster.calledOnce).to.be.true;
+        rasterComponent.trigger("click");
 
-        spyRaster.restore();
+        nextTick(() => {
+            expect(spyRaster.calledOnce).to.be.true;
+        });
+
     });
 
-    it.skip("should call triggerAlkisAdresses if alkisAdresses Checkbox is changed", async () => {
+    it("should call triggerAlkisAdresses if alkisAdresses Checkbox is changed", () => {
         const spyAlkisAdresses = sinon.spy(Component.methods, "triggerAlkisAdresses"),
             wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
             alkisAdressesComponent = wrapper.findComponent({ref: "alkisAdressesCheckBox"});
 
-        await alkisAdressesComponent.vm.$emit("change");
-        expect(spyAlkisAdresses.calledOnce).to.be.true;
+        alkisAdressesComponent.vm.$emit("change");
 
-        spyAlkisAdresses.restore();
+        nextTick(() => {
+            expect(spyAlkisAdresses.calledOnce).to.be.true;
+        });
+
     });
 
     describe("chooseUnitAndThousandsSeparator", function () {
