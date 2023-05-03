@@ -9,21 +9,21 @@ config.global.mocks.$t = key => key;
 
 describe("ADDONS: addons/vcOblique/components/VcOblique.vue", () => {
     const mockConfigJson = {
-            Portalconfig: {
-                menu: {
-                    tools: {
-                        children: {
-                            vcOblique: {
-                                "name": "translate#additional:modules.tools.obliqueViewer.title",
-                                "icon": "bi-image",
-                                "styleId": "obliqueViewer"
-                            }
+        Portalconfig: {
+            menu: {
+                tools: {
+                    children: {
+                        vcOblique: {
+                            "name": "translate#additional:modules.tools.obliqueViewer.title",
+                            "icon": "bi-image",
+                            "styleId": "obliqueViewer"
                         }
                     }
                 }
             }
-        };
-    let store, wrapper, obliqueViewOrig, initObliqueViewOrig, setRenderToWindowOrig, initResetObliqueViewer, createObliqueViewerURLOrig;
+        }
+    };
+    let store, wrapper, obliqueViewOrig, initObliqueViewOrig, initResetObliqueViewer, createObliqueViewerURLOrig;
 
     beforeEach(() => {
         global.MutationObserver = {
@@ -72,8 +72,8 @@ describe("ADDONS: addons/vcOblique/components/VcOblique.vue", () => {
                 plugins: [store]
             },
             directives: {
-                resize() { /* stub */ }
-              }
+                resize () { /* stub */ }
+            }
         });
     });
     afterEach(function () {

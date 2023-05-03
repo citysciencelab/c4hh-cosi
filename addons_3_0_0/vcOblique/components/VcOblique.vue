@@ -27,7 +27,7 @@ export default {
     },
     watch: {
         clickCoordinate: {
-            handler(value) {
+            handler (value) {
                 if (this.active === true) {
                     this.obliqueView(value);
                 }
@@ -55,7 +55,6 @@ export default {
         ...mapActions("Modules/VcOblique", [
             "initObliqueView",
             "resetObliqueViewer",
-            "rotatePointMarkerIn3D",
             "obliqueView",
             "createObliqueViewerURL"])
     }

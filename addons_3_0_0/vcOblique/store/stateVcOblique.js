@@ -12,7 +12,6 @@
  * @property {String} defaultMapMarkerStyleId contains the default styleId of the mapMarker
  * @property {String} heading contains the heading of the oblique viewer
  * @property {String} serviceId contains the id of the oblique viewer from the rest-services.json
- * @property {Number[]} clickCartesianCoordinate Current cartesian 2D coordinate.
  * */
 
 const state = {
@@ -26,8 +25,7 @@ const state = {
     lastCoordinates: "",
     defaultMapMarkerStyleId: "",
     heading: 0,
-    serviceId: "oblique",
-    clickCartesianCoordinate: ""
+    serviceId: "oblique"
 };
 
 export default state;

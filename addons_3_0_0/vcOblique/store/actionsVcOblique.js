@@ -27,7 +27,7 @@ const actions = {
                     mapElements = iframe.contentWindow.document.getElementsByClassName("mapElement vcm-map-top");
 
 
-                commit("setClickCartesianCoordinate", pixelCoordinate);
+                commit("Maps/setClickPixel", pixelCoordinate, {root: true});
 
                 if (map) {
                     map.olMap.on("moveend", () => {
@@ -44,15 +44,11 @@ const actions = {
 
                     map.imageChanged.addEventListener(async () => {
                         const viewPoint = await map.getViewPoint(),
-                            heading = viewPoint.heading;
+                            heading = viewPoint.heading,
+                            coordinates = rootGetters["Maps/clickCoordinate"] ? rootGetters["Maps/clickCoordinate"] : rootGetters["Maps/initialCenter"];
 
                         if (heading !== getters.heading) {
-                            dispatch("Maps/rotatePointMarker", {angle: heading}, {root: true});
-                            if (rootGetters["Maps/mode"] === "3D") {
-                                setTimeout(() => {
-                                    dispatch("rotatePointMarkerIn3D", getters.heading);
-                                }, 0.1);
-                            }
+                            dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
                         }
                         commit("setHeading", heading);
                     });
@@ -96,7 +92,7 @@ const actions = {
     * @param {Object} param.getters the getters
     * @returns {void}
     */
-    resetObliqueViewer ({commit, dispatch, getters}) {
+    resetObliqueViewer ({dispatch, getters}) {
         mapMarker.getMapmarkerLayerById("marker_point_layer").set("styleId", getters.defaultMapMarkerStyleId);
         dispatch("Maps/removePointMarker", null, {root: true});
     },
@@ -108,33 +104,28 @@ const actions = {
     * @param {Object} param.dispatch the dispatch
     * @param {Object} param.getters the getters
     * @param {Object} param.rootGetters the rootGetters
-    * @param {Array} coordinate the click/center coordinate
+    * @param {Array} coordinates the click/center coordinate
     * @returns {void}
     */
-    async obliqueView ({commit, dispatch, getters, rootGetters}, coordinate = []) {
+    async obliqueView ({commit, dispatch, getters}, coordinates = []) {
         const vcs = document.getElementById("obliqueIframe")?.contentWindow?.vcs,
             framework = vcs?.vcm?.Framework?.getInstance(),
             map = framework?.getActiveMap();
         let viewPoint = {};
 
-        if (framework && coordinate && Array.isArray(coordinate) && coordinate.length > 1) {
-            commit("setLastCoordinates", coordinate);
+        if (framework && coordinates && Array.isArray(coordinates) && coordinates.length > 1) {
+            commit("setLastCoordinates", coordinates);
             if (vcs?.vcm?.util) {
                 viewPoint = new vcs.vcm.util.ViewPoint({
-                    groundPosition: crs.transform(mapCollection.getMapView("2D").getProjection().getCode(), "EPSG:4326", coordinate),
+                    groundPosition: crs.transform(mapCollection.getMapView("2D").getProjection().getCode(), "EPSG:4326", coordinates),
                     heading: getters.heading,
                     distance: map.getViewPointSync().distance
                 });
             }
 
             await framework?.getActiveMap().gotoViewPoint(viewPoint);
-            dispatch("Maps/rotatePointMarker", {angle: getters.heading, coordinate}, {root: true});
-
-            if (rootGetters["Maps/mode"] === "3D") {
-                setTimeout(() => {
-                    dispatch("rotatePointMarkerIn3D", getters.heading);
-                }, 0.1);
-            }
+            commit("Maps/setClickCoordinate", coordinates, {root: true});
+            dispatch("Maps/placingPointMarker", {rotation: getters.heading, coordinates}, {root: true});
         }
         else {
             dispatch("Alerting/addSingleAlert",
@@ -216,61 +207,7 @@ const actions = {
         });
 
         commit("setObliqueViewerURL", changedUrl + "?groundPosition=" + startCoordinates);
-    },
-
-    /**
-     * Rotates the point marker in 3D.
-     * @param {Object} param.rootGetters the rootGetters
-     * @param {Number} angle angle in degrees to rotate
-     * @returns {void}
-     */
-    rotatePointMarkerIn3D ({getters}, angle) {
-        const clickCartesianCoordinate = getters.clickCartesianCoordinate,
-            mapWidth = mapCollection.getMap("3D").getOlMap().getSize()[0],
-            mapHeight = mapCollection.getMap("3D").getOlMap().getSize()[1];
-        let pixelOffset;
-
-        mapCollection.getMap("3D").getCesiumScene().drillPick({x: clickCartesianCoordinate[0], y: clickCartesianCoordinate[1]}, 10, mapWidth, mapHeight).forEach((primitiveObject) => {
-            if (primitiveObject?.primitive?.olLayer?.get("id") === "marker_point_layer") {
-                switch (angle) {
-                    case 0: {
-                        pixelOffset = {
-                            x: ((primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[0] * primitiveObject.primitive.scale) - (((primitiveObject.primitive.width - primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[0]) * primitiveObject.primitive.scale))) / 2,
-                            y: -((primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[1] * primitiveObject.primitive.scale) - (((primitiveObject.primitive.height - primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[1]) * primitiveObject.primitive.scale))) / 2
-                        };
-                        break;
-                    }
-                    case 90: {
-                        pixelOffset = {
-                            x: ((primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[1] * primitiveObject.primitive.scale) - (((primitiveObject.primitive.height - primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[1]) * primitiveObject.primitive.scale))) / 2,
-                            y: ((primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[0] * primitiveObject.primitive.scale) - (((primitiveObject.primitive.width - primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[0]) * primitiveObject.primitive.scale))) / 2
-                        };
-                        break;
-                    }
-                    case 180: {
-                        pixelOffset = {
-                            x: ((primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[0] * primitiveObject.primitive.scale) - (((primitiveObject.primitive.width - primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[0]) * primitiveObject.primitive.scale))) / 2,
-                            y: ((primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[1] * primitiveObject.primitive.scale) - (((primitiveObject.primitive.height - primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[1]) * primitiveObject.primitive.scale))) / 2
-                        };
-                        break;
-                    }
-                    case 270: {
-                        pixelOffset = {
-                            x: -((primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[1] * primitiveObject.primitive.scale) - (((primitiveObject.primitive.height - primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[1]) * primitiveObject.primitive.scale))) / 2,
-                            y: ((primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[0] * primitiveObject.primitive.scale) - (((primitiveObject.primitive.width - primitiveObject.primitive.olFeature.getStyle().getImage().getAnchor()[0]) * primitiveObject.primitive.scale))) / 2
-                        };
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
-                primitiveObject.primitive.pixelOffset = pixelOffset;
-                primitiveObject.primitive.rotation = -angle * Math.PI / 180;
-            }
-        });
     }
-
 };
 
 export default actions;
