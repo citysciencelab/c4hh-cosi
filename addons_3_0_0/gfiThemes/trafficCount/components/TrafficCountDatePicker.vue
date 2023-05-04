@@ -61,6 +61,7 @@ export default {
             default: ""
         }
     },
+    emits: ["change"],
     data () {
         return {
             selectedDates: [],
@@ -201,8 +202,8 @@ export default {
         <TrafficCountDatePickerInput
             :input-dates="inputDates"
             :delimiter="inputDelimiter"
-            @toggleCalendar="toggleCalendar"
-            @clearInput="clearSelectedDates"
+            @toggle-calendar="toggleCalendar"
+            @clear-input="clearSelectedDates"
         />
         <TrafficCountDatePickerWeek
             v-if="isCalendarVisible"
@@ -210,7 +211,7 @@ export default {
             :selected-dates="selectedDates"
             :min-date="minDate"
             :max-date="maxDate"
-            @toggleSelectedDate="toggleSelectedDate"
+            @toggle-selected-date="toggleSelectedDate"
         >
             <template #currentSwitch="{momentDate}">
                 <slot

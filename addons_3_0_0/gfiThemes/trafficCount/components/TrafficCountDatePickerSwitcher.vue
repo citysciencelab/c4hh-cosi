@@ -13,6 +13,7 @@ export default {
             required: true
         }
     },
+    emits: ["yearDown", "yearUp", "monthDown", "monthUp"],
     computed: {
         currentSwitchMoment () {
             return dayjs(this.currentSwitch, this.currentSwitchFormat);

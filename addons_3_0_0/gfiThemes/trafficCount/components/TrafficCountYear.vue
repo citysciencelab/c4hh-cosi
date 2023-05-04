@@ -48,6 +48,10 @@ export default {
         checkGurlittInsel: {
             type: Boolean,
             required: true
+        },
+        activeTab: {
+            type: Boolean,
+            required: true
         }
     },
     data () {
@@ -256,7 +260,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div v-if="activeTab">
         <div
             id="yearDateSelector"
             class="dateSelector"
@@ -287,6 +291,7 @@ export default {
                 :render-label-legend="renderLabelLegend"
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
+                :active-tab="activeTab"
             />
         </div>
         <TrafficCountCheckbox

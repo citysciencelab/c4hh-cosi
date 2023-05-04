@@ -11,6 +11,7 @@ import "vue-datepicker-next/index.css";
 import {addMissingDataDay} from "../utils/addMissingData.js";
 import {getPublicHoliday} from "../../../../../src_3_0_0/shared/js/utils/calendar.js";
 import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi";
+import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -45,6 +46,10 @@ export default {
             required: true
         },
         checkGurlittInsel: {
+            type: Boolean,
+            required: true
+        },
+        activeTab: {
             type: Boolean,
             required: true
         }
@@ -130,6 +135,11 @@ export default {
             tableDay: "tableDay"
         };
     },
+    computed: {
+        ...mapGetters("Modules/GfiThemes/TrafficCount", [
+            "activeTabId"
+        ])
+    },
     watch: {
         reset () {
             this.initializeDates();
@@ -139,12 +149,20 @@ export default {
                 this.dayDatepickerValueChanged(value);
             },
             deep: true
+        },
+        activeTab () {
+            if (this.activeTab) {
+                this.setActiveTabId("day");
+            }
         }
     },
     mounted () {
         this.initializeDates();
     },
     methods: {
+        ...mapMutations("Modules/GfiThemes/TrafficCount", [
+            "setActiveTabId"
+        ]),
         /**
          * Initializes the calendar / resets the date.
          * @returns {void}
@@ -238,20 +256,20 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div v-if="activeTab">
         <div
             id="dayDateSelector"
             class="dateSelector"
         >
             <DatePicker
-                v-model="dates"
+                v-model:value="dates"
                 aria-label="Datum"
                 placeholder="Datum"
                 type="date"
                 format="DD.MM.YYYY"
                 :multiple="true"
                 :show-week-number="true"
-                :disabled-date="isDateDisabled"
+                :disabled="isDateDisabled"
                 title-format="DD.MM.YYYY"
                 :lang="$t('common:libraries.vue2-datepicker.lang', {returnObjects: true})"
             />
@@ -271,6 +289,7 @@ export default {
                 :render-label-legend="renderLabelLegend"
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
+                :active-tab="activeTab"
             />
         </div>
         <TrafficCountCheckbox

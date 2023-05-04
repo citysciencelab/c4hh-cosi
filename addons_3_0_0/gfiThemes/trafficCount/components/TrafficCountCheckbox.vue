@@ -49,6 +49,7 @@ export default {
          * @returns {Void}  -
          */
         toggleTableDiagram: function (evt) {
+            debugger;
             if (evt && evt.target) {
                 const checked = evt.target.checked,
                     toggledElementId = evt.target.value;
@@ -70,8 +71,7 @@ export default {
         <input
             :id="checkboxId"
             v-model="isChecked"
-            :modelValue="tableDiagramId"
-            update:modelValue="toggleTableDiagram"
+            :value="tableDiagramId"
             type="checkbox"
             class="form-check-input"
             @click="toggleTableDiagram"

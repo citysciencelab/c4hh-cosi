@@ -24,6 +24,10 @@ export default {
         holidays: {
             type: Array,
             required: true
+        },
+        activeTab: {
+            type: Boolean,
+            required: true
         }
     },
     data () {
@@ -358,6 +362,7 @@ export default {
 
 <template>
     <div
+        v-if="activeTab"
         id="infos"
         class="infos"
     >

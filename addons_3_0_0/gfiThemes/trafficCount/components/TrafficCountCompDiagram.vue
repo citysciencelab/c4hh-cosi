@@ -1,5 +1,6 @@
 <script>
 import ChartJs from "chart.js/auto";
+import {mapGetters} from "vuex";
 
 export default {
     name: "TrafficCountCompDiagram",
@@ -100,6 +101,11 @@ export default {
         renderPointSize: {
             type: Function,
             required: true
+        },
+        activeTab: {
+            type: Boolean,
+            default: true,
+            required: false
         }
     },
     data () {
@@ -123,22 +129,34 @@ export default {
             chart: null
         };
     },
+    computed: {
+        ...mapGetters("Modules/GfiThemes/TrafficCount", [
+            "activeTabId"
+        ])
+    },
     watch: {
         apiData: {
             handler (newData, oldValue) {
                 if (!oldValue.length) {
-                    this.chartData = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+                    this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
                     this.createChart(this.chartData, this.ctx);
                 }
                 else if (Array.isArray(newData) && newData.length) {
-                    this.chart.data = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-                    this.chart.update(this.updateAnimation);
+                    // debugger;
+                    // this.chart.data = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+                    // this.chart.update(this.updateAnimation);
                 }
                 else {
                     this.chart.destroy();
                 }
             },
             deep: true
+        },
+        activeTabId (active) {
+            console.log("active Tab in diagram", active);
+            if (!active) {
+                this.destroyChart();
+            }
         }
     },
     mounted () {
@@ -154,13 +172,14 @@ export default {
         // };
 
         this.createChart(this.chartData, this.ctx);
+        console.log(this.$store);
     },
     methods: {
         /**
          * Creating the diagram from chart js
          * @param {Object[]} data parsed for chartjs format
          * @param {html} ctx the canvas container for diagram
-         * @returns {Void}  -
+         * @returns {Void} -
          */
         createChart (data, ctx) {
             this.chart = new ChartJs(ctx, this.getChartJsConfig(data, {
@@ -179,6 +198,17 @@ export default {
                 descriptionXAxis: this.descriptionXAxis,
                 descriptionYAxis: this.descriptionYAxis
             }));
+        },
+        /**
+         * Destroys the current chart if exists.
+         * @returns {void}
+         */
+        destroyChart () {
+            console.log("destroy");
+            if (this.chart instanceof ChartJs) {
+                this.chart.destroy();
+                this.chart = null;
+            }
         },
         /**
          * creates the datasets for chartjs
@@ -235,7 +265,7 @@ export default {
                     datasets.push(holidayData);
                 }
             });
-
+            this.chartData = {labels: labelsXAxis, datasets};
             return {labels: labelsXAxis, datasets};
         },
         /**
@@ -268,79 +298,81 @@ export default {
                 type: "line",
                 data,
                 options: {
-                    title: {
-                        display: false
-                    },
                     elements: {
                         line: {
                             tension: 0
                         }
                     },
-                    legend: {
-                        display: true,
-                        onClick: (e) => e.stopPropagation(),
-                        labels: {
-                            usePointStyle: true,
-                            generateLabels: chart => {
-                                const chartData = chart.data,
-                                    legends = Array.isArray(chartData.datasets) ? chartData.datasets.map((dataset, i) => {
-                                        return {
-                                            text: dataset.label,
-                                            backgroundColor: dataset.backgroundColor,
-                                            borderColor: dataset.borderColor,
-                                            borderWidth: dataset.borderWidth,
-                                            pointStyle: dataset.pointStyle,
-                                            pointRadius: dataset.pointRadius,
-                                            pointHoverRadius: dataset.pointHoverRadius,
-                                            strokeStyle: dataset.borderColor,
-                                            fillStyle: dataset.borderColor,
-                                            spanGaps: dataset.spanGaps,
-                                            hidden: !chart.isDatasetVisible(i),
-                                            datasetIndex: i
-                                        };
-                                    }, this) : [];
-
-                                return legends;
-                            },
-                            fontSize: options.fontSizeLegend,
-                            fontColorLegend: options.fontColorLegend
+                    plugins: {
+                        title: {
+                            display: false
                         },
-                        align: "start"
-                    },
-                    tooltips: {
-                        bodyFontColor: options.colorTooltipFont,
-                        backgroundColor: options.colorTooltipBack,
-                        yAlign: "bottom",
-                        titleAlign: "center",
-                        bodyAlign: "center",
-                        custom: (tooltip) => {
-                            if (!tooltip) {
-                                return;
-                            }
-                            // disable displaying the color box;
-                            tooltip.displayColors = false;
-                        },
-                        callbacks: {
-                            // use label callback to return the desired label
-                            label: (tooltipItem, chartJsData) => {
-                                if (
-                                    typeof chartJsData === "object"
-                                    && Array.isArray(chartJsData.datasets)
-                                    && typeof chartJsData.datasets[tooltipItem.datasetIndex] === "object"
-                                    && Array.isArray(chartJsData.datasets[tooltipItem.datasetIndex].datetimes)
-                                    && chartJsData.datasets[tooltipItem.datasetIndex].datetimes[tooltipItem.index]
-                                ) {
-                                    tooltipItem.datetime = chartJsData.datasets[tooltipItem.datasetIndex].datetimes[tooltipItem.index];
-                                }
-                                else if (typeof tooltipItem === "object") {
-                                    tooltipItem.datetime = tooltipItem.label;
-                                }
+                        legend: {
+                            display: true,
+                            onClick: (e) => e.stopPropagation(),
+                            labels: {
+                                usePointStyle: true,
+                                generateLabels: chart => {
+                                    const chartData = chart.data,
+                                        legends = Array.isArray(chartData.datasets) ? chartData.datasets.map((dataset, i) => {
+                                            return {
+                                                text: dataset.label,
+                                                backgroundColor: dataset.backgroundColor,
+                                                borderColor: dataset.borderColor,
+                                                borderWidth: dataset.borderWidth,
+                                                pointStyle: dataset.pointStyle,
+                                                pointRadius: dataset.pointRadius,
+                                                pointHoverRadius: dataset.pointHoverRadius,
+                                                strokeStyle: dataset.borderColor,
+                                                fillStyle: dataset.borderColor,
+                                                spanGaps: dataset.spanGaps,
+                                                hidden: !chart.isDatasetVisible(i),
+                                                datasetIndex: i
+                                            };
+                                        }, this) : [];
 
-                                return options.setTooltipValue(tooltipItem);
+                                    return legends;
+                                },
+                                fontSize: options.fontSizeLegend,
+                                fontColorLegend: options.fontColorLegend
                             },
-                            // remove title
-                            title: () => {
-                                return false;
+                            align: "start"
+                        },
+                        tooltip: {
+                            bodyFontColor: options.colorTooltipFont,
+                            backgroundColor: options.colorTooltipBack,
+                            yAlign: "bottom",
+                            titleAlign: "center",
+                            bodyAlign: "center",
+                            external: (tooltip) => {
+                                if (!tooltip) {
+                                    return;
+                                }
+                                // disable displaying the color box;
+                                tooltip.displayColors = false;
+                            },
+                            callbacks: {
+                                // use label callback to return the desired label
+                                label: (tooltipItem, chartJsData) => {
+                                    if (
+                                        typeof chartJsData === "object"
+                                        && Array.isArray(chartJsData.datasets)
+                                        && typeof chartJsData.datasets[tooltipItem.datasetIndex] === "object"
+                                        && Array.isArray(chartJsData.datasets[tooltipItem.datasetIndex].datetimes)
+                                        && chartJsData.datasets[tooltipItem.datasetIndex].datetimes[tooltipItem.index]
+                                    ) {
+                                        tooltipItem.datetime = chartJsData.datasets[tooltipItem.datasetIndex].datetimes[tooltipItem.index];
+                                    }
+                                    else if (typeof tooltipItem === "object") {
+                                        tooltipItem.datetime = tooltipItem.label;
+                                    }
+
+                                    return options.setTooltipValue(tooltipItem);
+                                },
+                                // remove title
+                                title: () => {
+                                    return false;
+                                }
                             }
                         }
                     },
@@ -359,52 +391,53 @@ export default {
                         }
                     },
                     scales: {
-                        xAxes: [{
+                        x: {
                             display: true,
+                            beginAtZero: true,
                             ticks: {
                                 fontSize: options.fontSizeGraph,
                                 fontColor: options.fontColorGraph,
-                                beginAtZero: true,
                                 autoSkip: true,
                                 maxTicksLimit: options.xAxisTicks,
                                 callback: (xValue) => {
                                     return options.renderLabelXAxis(xValue);
                                 }
                             },
-                            gridLines: {
+                            grid: {
                                 color: options.gridLinesColor,
                                 display: true,
-                                drawBorder: true,
+                                border: {
+                                    display: true
+                                },
                                 drawOnChartArea: false
                             },
-                            scaleLabel: {
+                            title: {
                                 display: Boolean(options.descriptionXAxis),
-                                labelString: options.descriptionXAxis
+                                text: options.descriptionXAxis
                             }
-                        }],
-                        yAxes: [{
+                        },
+                        y: {
                             display: true,
+                            beginAtZero: true,
                             ticks: {
-                                beginAtZero: true,
                                 fontSize: options.fontSizeGraph,
                                 fontColor: options.fontColorGraph,
                                 maxTicksLimit: options.yAxisTicks,
                                 callback: (yValue) => {
                                     return options.renderLabelYAxis(yValue);
-                                },
-                                stepSize: 1
+                                }
                             },
-                            gridLines: {
+                            grid: {
                                 color: options.gridLinesColor,
                                 display: true,
                                 drawBorder: true,
                                 drawOnChartArea: false
                             },
-                            scaleLabel: {
+                            title: {
                                 display: Boolean(options.descriptionYAxis),
-                                labelString: options.descriptionYAxis
+                                text: options.descriptionYAxis
                             }
-                        }]
+                        }
                     }
                 }
             };

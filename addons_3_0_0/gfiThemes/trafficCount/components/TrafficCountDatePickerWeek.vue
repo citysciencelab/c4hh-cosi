@@ -31,6 +31,7 @@ export default {
             default: ""
         }
     },
+    emits: ["toggleSelectedDate"],
     data () {
         return {
             currentSwitch: dayjs().format("YYYY-MM")
@@ -95,10 +96,10 @@ export default {
             :current-switch="currentSwitch"
             :show-month-selector="true"
             current-switch-format="YYYY-MM"
-            @yearDown="yearDown"
-            @yearUp="yearUp"
-            @monthDown="monthDown"
-            @monthUp="monthUp"
+            @year-down="yearDown"
+            @year-up="yearUp"
+            @month-down="monthDown"
+            @month-up="monthUp"
         >
             <template #currentSwitch="{momentDate}">
                 <slot
@@ -113,7 +114,7 @@ export default {
             :show-week-number="showWeekNumber"
             :max-date="maxDate"
             :min-date="minDate"
-            @onClick="toggleSelectedDate"
+            @on-click="toggleSelectedDate"
         >
             <template #weekdayName="{weekdayName}">
                 <slot

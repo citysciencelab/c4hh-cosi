@@ -44,6 +44,10 @@ export default {
         holidays: {
             type: Array,
             required: true
+        },
+        activeTab: {
+            type: Boolean,
+            required: true
         }
     },
     data () {
@@ -276,7 +280,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div v-if="activeTab">
         <div
             id="weekDateSelector"
             class="dateSelector"
@@ -321,6 +325,7 @@ export default {
                 :render-label-legend="renderLabelLegend"
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
+                :active-tab="activeTab"
             />
         </div>
         <TrafficCountCheckbox

@@ -33,6 +33,10 @@ export default {
             type: [String, Boolean],
             required: false,
             default: false
+        },
+        activeTab: {
+            type: Boolean,
+            required: true
         }
     },
     data () {
@@ -280,7 +284,7 @@ export default {
 </script>
 
 <template>
-    <div v-if="typeof downloadUrl === 'string'">
+    <div v-if="typeof downloadUrl === 'string' && activeTab">
         <ExportButtonCSV
             :url="downloadUrl"
             :filename="downloadFilename"

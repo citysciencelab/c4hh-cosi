@@ -408,6 +408,7 @@ export default {
          * @returns {void} -
          */
         resetTab: function () {
+            debugger;
             if (this.currentTabId === "day") {
                 this.dayCheckReset = !this.dayCheckReset;
             }
@@ -501,6 +502,7 @@ export default {
                     :thing-id="propThingId"
                     :holidays="holidays"
                     :means-of-transport="propMeansOfTransport"
+                    :active-tab="currentTabId === 'infos'"
                 />
                 <TrafficCountDay
                     id="day"
@@ -512,6 +514,7 @@ export default {
                     :reset="dayCheckReset"
                     :holidays="holidays"
                     :check-gurlitt-insel="checkGurlittInsel"
+                    :active-tab="currentTabId === 'day'"
                 />
                 <TrafficCountWeek
                     id="week"
@@ -522,6 +525,7 @@ export default {
                     :means-of-transport="propMeansOfTransport"
                     :reset="weekCheckReset"
                     :holidays="holidays"
+                    :active-tab="currentTabId === 'week'"
                 />
                 <TrafficCountYear
                     id="year"
@@ -533,6 +537,7 @@ export default {
                     :reset="yearCheckReset"
                     :holidays="holidays"
                     :check-gurlitt-insel="checkGurlittInsel"
+                    :active-tab="currentTabId === 'year'"
                 />
                 <TrafficCountDownloads
                     id="downloads"
@@ -544,6 +549,7 @@ export default {
                     :means-of-transport="propMeansOfTransport"
                     :download-url="downloadUrl"
                     :download-filename="downloadFilename"
+                    :active-tab="currentTabId === 'downloads'"
                 />
             </div>
         </div>
@@ -553,7 +559,7 @@ export default {
             :api="api"
             :thing-id="propThingId"
             :means-of-transport="propMeansOfTransport"
-            @resetTab="resetTab"
+            @reset-tab="resetTab"
         />
     </div>
 </template>

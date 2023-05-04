@@ -14,6 +14,7 @@ export default {
             default: ","
         }
     },
+    emits: ["clearInput", "toggleCalendar"],
     data () {
         return {
             showCalendarIcon: true

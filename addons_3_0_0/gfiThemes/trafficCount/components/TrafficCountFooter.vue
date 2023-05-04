@@ -21,6 +21,7 @@ export default {
             required: true
         }
     },
+    emits: ["resetTab"],
     data () {
         return {
             customStyle: {},

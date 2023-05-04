@@ -41,6 +41,7 @@ export default {
             default: ""
         }
     },
+    emits: ["onClick"],
     data () {
         return {
             currentDates: []

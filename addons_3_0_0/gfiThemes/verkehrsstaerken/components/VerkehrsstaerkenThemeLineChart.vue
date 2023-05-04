@@ -81,11 +81,13 @@ export default {
                 data: this.createChartData(this.dataset, this.category),
                 options: {
                     responsive: true,
-                    legend: this.createChartLegend(),
-                    tooltips: this.createChartTooltip(),
                     scales: this.createChartScales(),
                     defaultFontFamily: this.defaultFontFamily,
-                    defaultFontColor: this.defaultFontColor
+                    defaultFontColor: this.defaultFontColor,
+                    plugins: {
+                        legend: this.createChartLegend(),
+                        tooltip: this.createChartTooltip()
+                    }
                 },
                 plugins: [{
                     beforeInit: chart => {
@@ -260,7 +262,7 @@ export default {
          */
         createChartScales: function () {
             return {
-                xAxes: [{
+                xAxes: {
                     scaleLabel: {
                         display: true,
                         labelString: this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.year")
@@ -270,19 +272,19 @@ export default {
                         max: this.dataset[this.dataset.length - 1].year
                     },
                     gridLines: this.createGridLines()
-                }],
-                yAxes: [{
+                },
+                yAxes: {
+                    beginAtZero: true,
                     scaleLabel: {
                         display: true,
                         labelString: this.createDatasetLabel(this.category)
                     },
                     ticks: {
-                        beginAtZero: true,
                         precision: 0,
                         callback: value => thousandsSeparator(value)
                     },
                     gridLines: this.createGridLines()
-                }]
+                }
             };
         },
 
