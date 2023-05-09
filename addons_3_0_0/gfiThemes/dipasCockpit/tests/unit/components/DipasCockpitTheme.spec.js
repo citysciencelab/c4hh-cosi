@@ -1,8 +1,8 @@
-import {shallowMount, createLocalVue} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
 import DipasCockpitTheme from "../../../components/DipasCockpitTheme.vue";
 
-const localVue = createLocalVue();
+config.global.mocks.$t = key => key;
 
 describe("addons/dipasCockpit/components/DipasCockpitTheme.vue", () => {
     let wrapper;
@@ -36,7 +36,6 @@ describe("addons/dipasCockpit/components/DipasCockpitTheme.vue", () => {
                     }
                 }
             },
-            localVue,
             mocks: {
                 $t: (msg) => msg
             }

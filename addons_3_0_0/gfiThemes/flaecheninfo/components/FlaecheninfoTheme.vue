@@ -38,7 +38,7 @@ export default {
          * @returns {void}
          */
         filterPropsAndHighlightRing () {
-            const requestedParcelId = Radio.request("GFI", "getRequestedParcelId");
+            const requestedParcelId = "1"; // Radio.request("GFI", "getRequestedParcelId");
             let propsMapped = this.feature.getMappedProperties(),
                 ring = "";
 

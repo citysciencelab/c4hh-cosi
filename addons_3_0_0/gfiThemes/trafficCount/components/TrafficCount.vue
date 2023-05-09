@@ -408,7 +408,6 @@ export default {
          * @returns {void} -
          */
         resetTab: function () {
-            debugger;
             if (this.currentTabId === "day") {
                 this.dayCheckReset = !this.dayCheckReset;
             }

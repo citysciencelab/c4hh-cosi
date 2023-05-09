@@ -1,8 +1,6 @@
-import {createStore} from "vuex";
-import {shallowMount, createLocalVue} from "@vue/test-utils";
+import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import TrinkwasserTheme from "../../../components/TrinkwasserTheme.vue";
-import {mock} from "sinon";
 
 config.global.mocks.$t = key => key;
 
@@ -11,7 +9,6 @@ describe("addons/trinkwasser/components/TrinkwasserTheme.vue", () => {
 
     beforeEach(() => {
         wrapper = shallowMount(TrinkwasserTheme, {
-            localVue,
             propsData: {
                 feature: {
                     getTheme: () => "Trinkwasser",

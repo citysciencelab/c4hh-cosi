@@ -1,13 +1,8 @@
-import Vuex from "vuex";
-import {shallowMount, createLocalVue, config} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
 import BildungsatlasTheme from "../../../components/BildungsatlasTheme.vue";
 
-const localVue = createLocalVue();
-
-localVue.use(Vuex);
-
-config.mocks.$t = key => key;
+config.global.mocks.$t = key => key;
 
 describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
     let wrapper;
@@ -31,8 +26,7 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                         };
                     }
                 }
-            },
-            localVue
+            }
         });
     });
     describe("created", () => {
@@ -101,8 +95,7 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                             };
                         }
                     }
-                },
-                localVue
+                }
             });
 
             expect(singleTestWrapper.findComponent({name: "BildungsatlasThemeBalkendiagramm"}).exists()).to.be.true;
@@ -123,8 +116,7 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                             };
                         }
                     }
-                },
-                localVue
+                }
             });
 
             expect(singleTestWrapper.findComponent({name: "BildungsatlasThemeSchulentlassene"}).exists()).to.be.true;
@@ -145,8 +137,7 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                             };
                         }
                     }
-                },
-                localVue
+                }
             });
 
             expect(singleTestWrapper.findComponent({name: "BildungsatlasThemeOKJA"}).exists()).to.be.true;
@@ -167,8 +158,7 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                             };
                         }
                     }
-                },
-                localVue
+                }
             });
 
             expect(singleTestWrapper.findComponent({name: "BildungsatlasThemeFluechtlinge"}).exists()).to.be.true;
@@ -189,8 +179,7 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                             };
                         }
                     }
-                },
-                localVue
+                }
             });
 
             expect(singleTestWrapper.findComponent({name: "BildungsatlasThemeBalkendiagrammWanderungen"}).exists()).to.be.true;
@@ -211,8 +200,7 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                             };
                         }
                     }
-                },
-                localVue
+                }
             });
 
             expect(singleTestWrapper.findComponent({name: "BildungsatlasThemeSchulenWohnort"}).exists()).to.be.true;
@@ -233,8 +221,7 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                             };
                         }
                     }
-                },
-                localVue
+                }
             });
 
             expect(singleTestWrapper.findComponent({name: "BildungsatlasThemeSchulenEinzugsgebiete"}).exists()).to.be.true;

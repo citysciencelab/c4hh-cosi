@@ -153,7 +153,7 @@ export default {
             deep: true
         },
         activeTabId (active) {
-            console.log("active Tab in diagram", active);
+            // console.log("active Tab in diagram", active);
             if (!active) {
                 this.destroyChart();
             }
@@ -172,7 +172,7 @@ export default {
         // };
 
         this.createChart(this.chartData, this.ctx);
-        console.log(this.$store);
+        // console.log(this.$store);
     },
     methods: {
         /**
@@ -204,7 +204,7 @@ export default {
          * @returns {void}
          */
         destroyChart () {
-            console.log("destroy");
+            // console.log("destroy");
             if (this.chart instanceof ChartJs) {
                 this.chart.destroy();
                 this.chart = null;

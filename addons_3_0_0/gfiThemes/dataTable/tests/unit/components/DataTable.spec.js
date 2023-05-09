@@ -1,11 +1,9 @@
-import Vuex from "vuex";
-import {shallowMount, createLocalVue} from "@vue/test-utils";
+import {createStore} from "vuex";
+import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
 import DataTableTheme from "../../../components/DataTable.vue";
 
-const localVue = createLocalVue();
-
-localVue.use(Vuex);
+config.global.mocks.$t = key => key;
 
 describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTable.vue", () => {
     let wrapper;
@@ -65,7 +63,7 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
             gfiFeatures: () => featureData
         },
 
-        store = new Vuex.Store({
+        store = createStore({
             namespaces: true,
             modules: {
                 Map: {
@@ -78,7 +76,6 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
     beforeEach(() => {
         wrapper = shallowMount(DataTableTheme, {
             store,
-            localVue,
             propsData: {
                 feature: featureData
             }
@@ -90,9 +87,7 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
     });
 
     it("Check the displayed table head", () => {
-        const theads = wrapper.findAll("#table-data-container table th");
-
-        expect(theads.exists()).to.be.true;
+        const theads = wrapper.findAll("#table-data-container table thead th");
 
         wrapper.vm.refinedData.head.forEach((singleCaption, index) => {
             expect(theads.at(index).text()).to.equal(singleCaption);
@@ -100,16 +95,14 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
     });
 
     it("Check the displayed table data", () => {
-        const trs = wrapper.findAll("#table-data-container table tr");
+        const trs = wrapper.findAllComponents("#table-data-container table tbody tr");
 
-        expect(trs.exists()).to.be.true;
-
-        trs.wrappers.forEach((tr, indexTr) => {
-            const tds = tr.findAll("td");
+        trs.forEach((tr, indexTr) => {
+            const tds = tr.wrapper.findAllComponents("td");
 
             expect(tds.exists()).to.be.true;
 
-            tds.wrappers.forEach((td, indexTd) => {
+            tds.forEach((td, indexTd) => {
                 expect(td.text()).to.equal(Object.values(wrapper.vm.refinedData.rows[indexTr])[indexTd]);
             });
         });

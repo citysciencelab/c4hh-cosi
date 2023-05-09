@@ -32,8 +32,11 @@ export default {
         };
     },
     watch: {
-        dataset () {
-            this.drawChart();
+        dataset: {
+            handler () {
+                this.drawChart();
+            },
+            deep: true
         }
     },
     mounted () {

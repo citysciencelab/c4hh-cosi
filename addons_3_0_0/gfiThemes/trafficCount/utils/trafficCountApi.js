@@ -3,8 +3,10 @@ import {SensorThingsMqtt} from "./../../../../../src_3_0_0/shared/js/api/sensorT
 import {getPublicHoliday} from "./../../../../../src_3_0_0/shared/js/utils/calendar.js";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
+import weekOfYear from "dayjs/plugin/weekOfYear";
 
 dayjs.extend(isoWeek);
+dayjs.extend(weekOfYear);
 
 // change language from day.js to german
 require("dayjs/locale/de.js");

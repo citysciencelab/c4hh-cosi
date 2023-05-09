@@ -1,8 +1,8 @@
-import {shallowMount, createLocalVue} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
 import SturmflutTheme from "../../../components/SturmflutTheme.vue";
 
-const localVue = createLocalVue();
+config.global.mocks.$t = key => key;
 
 describe("addons/sturmflut/components/SturmflutTheme.vue", () => {
     let wrapper;
@@ -24,7 +24,6 @@ describe("addons/sturmflut/components/SturmflutTheme.vue", () => {
                     }
                 }
             },
-            localVue,
             mocks: {
                 $t: (msg) => msg
             }
@@ -60,7 +59,6 @@ describe("addons/sturmflut/components/SturmflutTheme.vue", () => {
                     }
                 }
             },
-            localVue,
             mocks: {
                 $t: (msg) => msg
             }
@@ -97,7 +95,6 @@ describe("addons/sturmflut/components/SturmflutTheme.vue", () => {
                     }
                 }
             },
-            localVue,
             mocks: {
                 $t: (msg) => msg
             }

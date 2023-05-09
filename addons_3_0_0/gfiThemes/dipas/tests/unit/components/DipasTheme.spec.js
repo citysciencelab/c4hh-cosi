@@ -1,13 +1,9 @@
-import Vuex from "vuex";
-import {shallowMount, createLocalVue, config} from "@vue/test-utils";
+import {createStore} from "vuex";
+import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
 import DipasTheme from "../../../components/DipasTheme.vue";
 
-const localVue = createLocalVue();
-
-localVue.use(Vuex);
-
-config.mocks.$t = key => key;
+config.global.mocks.$t = key => key;
 
 describe("addons/dipas/components/DipasTheme.vue", () => {
     const iconPath = "https://geoportal-hamburg.de/lgv-beteiligung/icons/einzelmarker_dunkel.png",
@@ -15,7 +11,6 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
             "name": "dipas",
             "params": {
                 "gfiIconPath": iconPath
-
             }
         },
         getters = {
@@ -34,7 +29,7 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
      * @returns {void}
      */
     function createWrapper (isTable) {
-        store = new Vuex.Store({
+        store = createStore({
             namespaces: true,
             modules: {
                 DipasTheme
@@ -42,8 +37,9 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
             getters: isTable ? gettersTable : getters
         });
         wrapper = shallowMount(DipasTheme, {
-            store,
-            localVue,
+            global: {
+                plugins: [store]
+            },
             propsData: {
                 feature: {
                     getTheme: () => theme,

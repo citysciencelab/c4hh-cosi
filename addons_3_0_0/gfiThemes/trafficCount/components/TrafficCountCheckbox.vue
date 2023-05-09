@@ -49,7 +49,6 @@ export default {
          * @returns {Void}  -
          */
         toggleTableDiagram: function (evt) {
-            debugger;
             if (evt && evt.target) {
                 const checked = evt.target.checked,
                     toggledElementId = evt.target.value;

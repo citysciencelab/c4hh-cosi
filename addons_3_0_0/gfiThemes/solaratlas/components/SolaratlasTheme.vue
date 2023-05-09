@@ -12,7 +12,9 @@ export default {
 
 <template>
     <div class="solaratlas">
-        <h6 class="font-bold">{{ $t("additional:modules.tools.gfi.themes.solaratlas.solarPotential", {ardfull: feature.getMappedProperties().adrfull}) }}</h6>
+        <h6 class="font-bold">
+            {{ $t("additional:modules.tools.gfi.themes.solaratlas.solarPotential", {ardfull: feature.getMappedProperties().adrfull}) }}
+        </h6>
         <p
             v-if="feature.getMappedProperties().area_pv_m2 > 0"
             v-html="$t('additional:modules.tools.gfi.themes.solaratlas.buildingSuitable', {

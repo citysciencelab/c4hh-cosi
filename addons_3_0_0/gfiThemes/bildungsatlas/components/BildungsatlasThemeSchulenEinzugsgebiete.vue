@@ -141,7 +141,7 @@ export default {
     mounted () {
         this.refreshGfi();
     },
-    beforeDestroy: function () {
+    beforeUnmount: function () {
         this.reset(null);
     },
     methods: {

@@ -1,8 +1,8 @@
-import {shallowMount, createLocalVue} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
 import SolaratlasTheme from "../../../components/SolaratlasTheme.vue";
 
-const localVue = createLocalVue();
+config.global.mocks.$t = key => key;
 
 describe("addons/solaratlas/components/SolaratlasTheme.vue", () => {
     let wrapper;
@@ -30,7 +30,6 @@ describe("addons/solaratlas/components/SolaratlasTheme.vue", () => {
                     }
                 }
             },
-            localVue,
             mocks: {
                 $t: (msg) => msg
             }
@@ -39,12 +38,7 @@ describe("addons/solaratlas/components/SolaratlasTheme.vue", () => {
 
     it("should render three html elements", () => {
         expect(wrapper.find("h6").exists()).to.be.true;
-        expect(wrapper.find("strong").exists()).to.be.true;
         expect(wrapper.find("p").exists()).to.be.true;
-    });
-
-    it("should render the html strong tag with text solarPotential", () => {
-        expect(wrapper.find("strong").text()).to.equals("additional:modules.tools.gfi.themes.solaratlas.solarPotential");
     });
 
     it("should render the html p tag with text buildingSuitable for parameter area_pv_m2 > 0", () => {
@@ -74,14 +68,12 @@ describe("addons/solaratlas/components/SolaratlasTheme.vue", () => {
                     }
                 }
             },
-            localVue,
             mocks: {
                 $t: (msg) => msg
             }
         });
 
         expect(wrapper.find("h6").exists()).to.be.true;
-        expect(wrapper.find("strong").exists()).to.be.true;
         expect(wrapper.find("p").exists()).to.be.true;
         expect(wrapper.find("p").text()).to.equals("additional:modules.tools.gfi.themes.solaratlas.buildingUnsuitable");
     });

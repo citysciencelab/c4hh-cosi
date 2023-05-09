@@ -2,8 +2,10 @@ import {expect} from "chai";
 import {TrafficCountApi} from "../../../utils/trafficCountApi";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
+import weekOfYear from "dayjs/plugin/weekOfYear";
 
 dayjs.extend(isoWeek);
+dayjs.extend(weekOfYear);
 
 // change language from day.js to german
 require("dayjs/locale/de.js");

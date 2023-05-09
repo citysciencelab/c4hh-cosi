@@ -1,13 +1,9 @@
-import Vuex from "vuex";
-import {config, shallowMount, createLocalVue} from "@vue/test-utils";
+import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import VerkehrsstaerkenThemeTable from "../../../components/VerkehrsstaerkenThemeTable.vue";
 
-const localVue = createLocalVue();
+config.global.mocks.$t = key => key;
 
-config.mocks.$t = key => key;
-
-localVue.use(Vuex);
 describe("src/modules/tools/gfi/components/themes/verkehrsstaerken/components/VerkehrsstaerkenThemeTable.vue", () => {
 
     const years = [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018],
@@ -21,8 +17,7 @@ describe("src/modules/tools/gfi/components/themes/verkehrsstaerken/components/Ve
                 rowNames: rowNames,
                 years: years,
                 dataset: dataset
-            },
-            localVue
+            }
         });
     });
 
