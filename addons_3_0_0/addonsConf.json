@@ -17,20 +17,12 @@
     "type": "tool",
     "path": "vcOblique"
   },
-  "trinkwasser": {
-    "path":"gfiThemes/trinkwasser",
-    "type": "gfiTheme"
-  },
-  "sturmflut": {
-    "path":"gfiThemes/sturmflut",
+  "bildungsatlas": {
+    "path":"gfiThemes/bildungsatlas",
     "type": "gfiTheme"
   },
   "dataTable": {
     "path":"gfiThemes/dataTable",
-    "type": "gfiTheme"
-  },
-  "bildungsatlas": {
-    "path":"gfiThemes/bildungsatlas",
     "type": "gfiTheme"
   },
   "dipas": {
@@ -41,16 +33,32 @@
     "path":"gfiThemes/dipasCockpit",
     "type": "gfiTheme"
   },
+  "flaecheninfo": {
+    "path":"gfiThemes/flaecheninfo",
+    "type": "gfiTheme"
+  },
+  "schulinfo": {
+    "path":"gfiThemes/schulinfo",
+    "type": "gfiTheme"
+  },
   "solaratlas": {
     "path":"gfiThemes/solaratlas",
     "type": "gfiTheme"
   },
-  "verkehrsstaerken": {
-    "path":"gfiThemes/verkehrsstaerken",
+  "sturmflut": {
+    "path":"gfiThemes/sturmflut",
     "type": "gfiTheme"
   },
   "trafficCount": {
     "path":"gfiThemes/trafficCount",
+    "type": "gfiTheme"
+  },
+  "trinkwasser": {
+    "path":"gfiThemes/trinkwasser",
+    "type": "gfiTheme"
+  },
+  "verkehrsstaerken": {
+    "path":"gfiThemes/verkehrsstaerken",
     "type": "gfiTheme"
   }
 }
