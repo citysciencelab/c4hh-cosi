@@ -44,12 +44,9 @@ async function onmessage (self, event) {
         else if (event.data.type === "getFilterPoly") {
             self.postMessage({type, result: getFilterPoly()});
         }
-<<<<<<< HEAD
         else if (event.data.type === "register") {
             registerProjections(event.data.projections);
         }
-=======
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
     }
     catch (error) {
         if (axios.isCancel(error)) {

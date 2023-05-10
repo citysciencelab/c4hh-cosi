@@ -79,11 +79,8 @@ export default {
         </div>
         <a
             class="dipas-cockpit-proceedingLink"
-<<<<<<< HEAD
             role="button"
             tabindex="0"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
             @click="onClick(attributes.link)"
             @keyup.enter="onClick(attributes.link)"
         >
@@ -102,11 +99,8 @@ export default {
                 v-for="document in attributes.documentation"
                 :key="document.name"
                 class="dipas-cockpit-document"
-<<<<<<< HEAD
                 role="button"
                 tabindex="0"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                 @click="onClick(document.url)"
                 @keyup.enter="onClick(document.url)"
             >
@@ -246,3 +240,5 @@ export default {
 }
 
 </style>
+=======
+>>>>>>> d95d456b (BG-3814 deleted old file content)

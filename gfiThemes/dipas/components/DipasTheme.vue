@@ -1,6 +1,3 @@
-<script>
-import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList";
-import {mapGetters} from "vuex";
 
 export default {
     name: "DipasTheme",

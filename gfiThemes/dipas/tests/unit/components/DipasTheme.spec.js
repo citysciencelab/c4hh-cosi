@@ -1,7 +1,3 @@
-import Vuex from "vuex";
-import {shallowMount, createLocalVue, config} from "@vue/test-utils";
-import {expect} from "chai";
-import DipasTheme from "../../../components/DipasTheme.vue";
 
 const localVue = createLocalVue();
 
