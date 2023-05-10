@@ -31,11 +31,11 @@ export default {
             scaleGridLinesColor: "rgba(0, 0, 0, 1)"
         };
     },
-  computed: {
-    hasHGVsPerWeek: function () {
-      return this.dataset.filter(data => Object.prototype.hasOwnProperty.call(data, "Schwerverkehrsanteil am DTVw")).length > 0;
-    }
-  },
+    computed: {
+        hasHGVsPerWeek: function () {
+        return this.dataset.filter(data => Object.prototype.hasOwnProperty.call(data, "Schwerverkehrsanteil am DTVw")).length > 0;
+        }
+    },
     watch: {
         dataset () {
             this.drawChart();
@@ -139,7 +139,7 @@ export default {
                     });
             }
 
-            return chartData;
+          return chartData;
         },
 
         /**
@@ -386,3 +386,5 @@ export default {
     }
 }
 </style>
+=======
+>>>>>>> d50ea40d (BG-3814 deleted old file content)

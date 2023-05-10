@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <script>
 
 import {mapGetters} from "vuex";
@@ -618,3 +619,5 @@ export default {
     }
 }
 </style>
+=======
+>>>>>>> f9f3a31b (BG-3814 deleted old file content)
