@@ -35,21 +35,21 @@ describe.skip("src/modules/tools/gfi/components/themes/verkehrsstaerken/componen
 
         expect(btns.length).to.equal(3);
         expect(wrapper.find("#verkehrsstaerken-btn-group").exists()).to.be.true;
-        expect(btns.at(0).text()).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.DTV");
-        expect(btns.at(1).text()).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.DTVw");
-        expect(btns.at(2).text()).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek");
+        expect(btns[0].text()).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.DTV");
+        expect(btns[1].text()).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.DTVw");
+        expect(btns[2].text()).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek");
     });
 
     it("click on button should change category", async () => {
         const buttons = wrapper.findAll("button");
 
-        await buttons.at(0).trigger("click");
+        await buttons[0].trigger("click");
         expect(wrapper.vm.category).to.equals("DTV");
 
-        await buttons.at(1).trigger("click");
+        await buttons[1].trigger("click");
         expect(wrapper.vm.category).to.equals("DTVw");
 
-        await buttons.at(2).trigger("click");
+        await buttons[2].trigger("click");
         expect(wrapper.vm.category).to.equals("Schwerverkehrsanteil am DTVw");
     });
 

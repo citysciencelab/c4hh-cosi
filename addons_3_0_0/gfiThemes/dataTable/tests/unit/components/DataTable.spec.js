@@ -75,8 +75,10 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
 
     beforeEach(() => {
         wrapper = shallowMount(DataTableTheme, {
-            store,
-            propsData: {
+            global: {
+                plugins: [store]
+            },
+            props: {
                 feature: featureData
             }
         });
@@ -90,7 +92,7 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
         const theads = wrapper.findAll("#table-data-container table thead th");
 
         wrapper.vm.refinedData.head.forEach((singleCaption, index) => {
-            expect(theads.at(index).text()).to.equal(singleCaption);
+            expect(theads[index].text()).to.equal(singleCaption);
         });
     });
 

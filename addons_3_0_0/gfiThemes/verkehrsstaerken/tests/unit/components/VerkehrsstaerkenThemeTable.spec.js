@@ -13,7 +13,7 @@ describe("src/modules/tools/gfi/components/themes/verkehrsstaerken/components/Ve
 
     beforeEach(() => {
         wrapper = shallowMount(VerkehrsstaerkenThemeTable, {
-            propsData: {
+            props: {
                 rowNames: rowNames,
                 years: years,
                 dataset: dataset

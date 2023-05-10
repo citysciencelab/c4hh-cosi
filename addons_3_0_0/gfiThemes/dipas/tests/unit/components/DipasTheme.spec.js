@@ -40,7 +40,7 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
             global: {
                 plugins: [store]
             },
-            propsData: {
+            props: {
                 feature: {
                     getTheme: () => theme,
                     getTitle: () => "Dipas Title",
@@ -63,16 +63,16 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
         it("uiStyle table, should place the values", () => {
             createWrapper(true);
             wrapper.vm.$nextTick();
-            expect(wrapper.findAll(".dipas-gfi-thema").at(0).element.textContent.trim()).to.equal("Value Kategorie");
-            expect(wrapper.findAll(".dipas-gfi-name").at(0).element.textContent.trim()).to.equal("Value name");
-            expect(wrapper.findAll(".dipas-gfi-description").at(0).element.textContent.trim()).to.equal("Value description");
+            expect(wrapper.findAll(".dipas-gfi-thema")[0].element.textContent.trim()).to.equal("Value Kategorie");
+            expect(wrapper.findAll(".dipas-gfi-name")[0].element.textContent.trim()).to.equal("Value name");
+            expect(wrapper.findAll(".dipas-gfi-description")[0].element.textContent.trim()).to.equal("Value description");
             expect(wrapper.findAll("a").length).to.equal(0);
         });
         it("uiStyle NOT table, should place the values", () => {
             createWrapper(false);
-            expect(wrapper.findAll(".dipas-gfi-thema").at(0).element.textContent.trim()).to.equal("Value Kategorie");
-            expect(wrapper.findAll(".dipas-gfi-name").at(0).element.textContent.trim()).to.equal("Value name");
-            expect(wrapper.findAll(".dipas-gfi-description").at(0).element.textContent.trim()).to.equal("Value description");
+            expect(wrapper.findAll(".dipas-gfi-thema")[0].element.textContent.trim()).to.equal("Value Kategorie");
+            expect(wrapper.findAll(".dipas-gfi-name")[0].element.textContent.trim()).to.equal("Value name");
+            expect(wrapper.findAll(".dipas-gfi-description")[0].element.textContent.trim()).to.equal("Value description");
             expect(wrapper.findAll("a").length).to.equal(2);
         });
     });

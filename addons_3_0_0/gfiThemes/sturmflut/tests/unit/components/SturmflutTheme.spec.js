@@ -9,7 +9,7 @@ describe("addons/sturmflut/components/SturmflutTheme.vue", () => {
 
     it("should render all possible html elements", () => {
         wrapper = shallowMount(SturmflutTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getMappedProperties: function () {
                         return {
@@ -48,7 +48,7 @@ describe("addons/sturmflut/components/SturmflutTheme.vue", () => {
 
     it("should render only description, no image and audio", () => {
         wrapper = shallowMount(SturmflutTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getMappedProperties: function () {
                         return {
@@ -81,7 +81,7 @@ describe("addons/sturmflut/components/SturmflutTheme.vue", () => {
 
     it("should render only description and image, no audio", () => {
         wrapper = shallowMount(SturmflutTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getMappedProperties: function () {
                         return {

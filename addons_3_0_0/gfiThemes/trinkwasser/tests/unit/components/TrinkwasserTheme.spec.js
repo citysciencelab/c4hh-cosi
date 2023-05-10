@@ -9,7 +9,7 @@ describe("addons/trinkwasser/components/TrinkwasserTheme.vue", () => {
 
     beforeEach(() => {
         wrapper = shallowMount(TrinkwasserTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getTheme: () => "Trinkwasser",
                     getTitle: () => "Trinkwasser",
@@ -115,22 +115,22 @@ describe("addons/trinkwasser/components/TrinkwasserTheme.vue", () => {
 
     describe("template", () => {
         it("should place the title into the thead of each inner table", () => {
-            expect(wrapper.findAll(".innerTable").at(0).find("thead").find("th").element.textContent.trim()).to.equal("Untersuchungsergebnisse");
-            expect(wrapper.findAll(".innerTable").at(1).find("thead").find("th").element.textContent.trim()).to.equal("Mikrobiologische Parameter");
-            expect(wrapper.findAll(".innerTable").at(2).find("thead").find("th").element.textContent.trim()).to.equal("Chemische Parameter");
+            expect(wrapper.findAll(".innerTable")[0].find("thead").find("th").element.textContent.trim()).to.equal("Untersuchungsergebnisse");
+            expect(wrapper.findAll(".innerTable")[1].find("thead").find("th").element.textContent.trim()).to.equal("Mikrobiologische Parameter");
+            expect(wrapper.findAll(".innerTable")[2].find("thead").find("th").element.textContent.trim()).to.equal("Chemische Parameter");
         });
         it("should place the keys and values into the tbody of each inner table", () => {
-            expect(wrapper.findAll(".firstCol").at(0).element.textContent.trim()).to.equal("Entnahmedatum");
-            expect(wrapper.findAll(".firstCol").at(1).element.textContent.trim()).to.equal("Coliforme Bakterien");
-            expect(wrapper.findAll(".firstCol").at(2).element.textContent.trim()).to.equal("Escherichia coli");
-            expect(wrapper.findAll(".firstCol").at(3).element.textContent.trim()).to.equal("Others1");
-            expect(wrapper.findAll(".firstCol").at(4).element.textContent.trim()).to.equal("Others2");
+            expect(wrapper.findAll(".firstCol")[0].element.textContent.trim()).to.equal("Entnahmedatum");
+            expect(wrapper.findAll(".firstCol")[1].element.textContent.trim()).to.equal("Coliforme Bakterien");
+            expect(wrapper.findAll(".firstCol")[2].element.textContent.trim()).to.equal("Escherichia coli");
+            expect(wrapper.findAll(".firstCol")[3].element.textContent.trim()).to.equal("Others1");
+            expect(wrapper.findAll(".firstCol")[4].element.textContent.trim()).to.equal("Others2");
 
-            expect(wrapper.findAll(".secCol").at(0).element.textContent.trim()).to.equal("Value Entnahmedatum");
-            expect(wrapper.findAll(".secCol").at(1).element.textContent.trim()).to.equal("Value Coliforme Bakterien");
-            expect(wrapper.findAll(".secCol").at(2).element.textContent.trim()).to.equal("Value Escherichia coli");
-            expect(wrapper.findAll(".secCol").at(3).element.textContent.trim()).to.equal("Value Others1");
-            expect(wrapper.findAll(".secCol").at(4).element.textContent.trim()).to.equal("Value Others2");
+            expect(wrapper.findAll(".secCol")[0].element.textContent.trim()).to.equal("Value Entnahmedatum");
+            expect(wrapper.findAll(".secCol")[1].element.textContent.trim()).to.equal("Value Coliforme Bakterien");
+            expect(wrapper.findAll(".secCol")[2].element.textContent.trim()).to.equal("Value Escherichia coli");
+            expect(wrapper.findAll(".secCol")[3].element.textContent.trim()).to.equal("Value Others1");
+            expect(wrapper.findAll(".secCol")[4].element.textContent.trim()).to.equal("Value Others2");
         });
     });
 });

@@ -9,7 +9,7 @@ describe("addons/solaratlas/components/SolaratlasTheme.vue", () => {
 
     beforeEach(() => {
         wrapper = shallowMount(SolaratlasTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getMappedProperties: function () {
                         return {
@@ -47,7 +47,7 @@ describe("addons/solaratlas/components/SolaratlasTheme.vue", () => {
 
     it("should render the html p tag with text buildingUnsuitable for parameter area_pv_m2 === 0.0", () => {
         wrapper = shallowMount(SolaratlasTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getMappedProperties: function () {
                         return {

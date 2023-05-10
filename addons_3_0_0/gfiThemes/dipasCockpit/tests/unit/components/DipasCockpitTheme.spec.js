@@ -9,7 +9,7 @@ describe("addons/dipasCockpit/components/DipasCockpitTheme.vue", () => {
 
     beforeEach(() => {
         wrapper = shallowMount(DipasCockpitTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getMappedProperties: function () {
                         return {

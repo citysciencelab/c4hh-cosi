@@ -19,8 +19,25 @@ describe.skip("addons/flaecheninfo/components/FlaecheninfoTheme.vue", () => {
         sinon.stub(FlaecheninfoTheme.methods, "createReport").callsFake(function () {
             report = true;
         });
+        const store = createStore({
+            namespaced: true,
+            modules: {
+                MapMarker: {
+                    namespaced: true,
+                    actions: {
+                        removePolygonMarker: sinon.stub(),
+                        placingPolygonMarker: sinon.stub()
+                    },
+                    getters: {
+                        zoomLevel: sinon.stub(),
+                        markerPolygon: sinon.stub()
+                    }
+                }
+            }
+        });
+
         wrapper = shallowMount(FlaecheninfoTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getProperties: () => props,
                     getMappedProperties: () => mappedProps
@@ -29,22 +46,9 @@ describe.skip("addons/flaecheninfo/components/FlaecheninfoTheme.vue", () => {
             computed: {
                 gfiFeatures: () => sinon.stub
             },
-            store: createStore({
-                namespaced: true,
-                modules: {
-                    MapMarker: {
-                        namespaced: true,
-                        actions: {
-                            removePolygonMarker: sinon.stub(),
-                            placingPolygonMarker: sinon.stub()
-                        },
-                        getters: {
-                            zoomLevel: sinon.stub(),
-                            markerPolygon: sinon.stub()
-                        }
-                    }
-                }
-            })
+            global: {
+                plugins: [store]
+            }
         });
     });
 
@@ -59,19 +63,19 @@ describe.skip("addons/flaecheninfo/components/FlaecheninfoTheme.vue", () => {
 
     it("should contain gfi attributes", async () => {
         await wrapper.vm.$nextTick();
-        expect(wrapper.findAll("td").at(0).text()).to.equal("Flurstück");
-        expect(wrapper.findAll("td").at(1).text()).to.equal("aValue");
-        expect(wrapper.findAll("td").at(2).text()).to.equal("Gemarkung");
-        expect(wrapper.findAll("td").at(3).text()).to.equal("bValue");
-        expect(wrapper.findAll("td").at(4).text()).to.equal("Fläche_qm");
-        expect(wrapper.findAll("td").at(5).text()).to.equal("10");
+        expect(wrapper.findAll("td")[0].text()).to.equal("Flurstück");
+        expect(wrapper.findAll("td")[1].text()).to.equal("aValue");
+        expect(wrapper.findAll("td")[2].text()).to.equal("Gemarkung");
+        expect(wrapper.findAll("td")[3].text()).to.equal("bValue");
+        expect(wrapper.findAll("td")[4].text()).to.equal("Fläche_qm");
+        expect(wrapper.findAll("td")[5].text()).to.equal("10");
     });
 
     it("should contain button that triggers report", async () => {
         let button = null;
 
         expect(report).to.be.false;
-        button = wrapper.findAll("button").at(0);
+        button = wrapper.findAll("button")[0];
         expect(button.exists()).to.be.true;
         button.trigger("click");
         await wrapper.vm.$nextTick();

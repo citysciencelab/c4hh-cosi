@@ -12,7 +12,7 @@ describe("src/modules/tools/gfi/components/themes/verkehrsstaerken/components/Ve
 
     beforeEach(() => {
         wrapper = shallowMount(VerkehrsstaerkenTheme, {
-            propsData: {
+            props: {
                 feature: {
                     getMappedProperties: () => mappedProps
                 }
@@ -28,10 +28,10 @@ describe("src/modules/tools/gfi/components/themes/verkehrsstaerken/components/Ve
     });
 
     it("should show tabs", async () => {
-        expect(wrapper.findAll("ul").at(0).exists()).to.be.true;
+        expect(wrapper.findAll("ul")[0].exists()).to.be.true;
         expect(wrapper.findAll("li").length).to.equal(2);
-        expect(wrapper.findAll("li").at(0).text()).to.equal("additional:modules.tools.gfi.themes.verkehrsstaerken.table");
-        expect(wrapper.findAll("li").at(1).text()).to.equal("additional:modules.tools.gfi.themes.verkehrsstaerken.diagram");
+        expect(wrapper.findAll("li")[0].text()).to.equal("additional:modules.tools.gfi.themes.verkehrsstaerken.table");
+        expect(wrapper.findAll("li")[1].text()).to.equal("additional:modules.tools.gfi.themes.verkehrsstaerken.diagram");
         expect(wrapper.find(".tab-content").exists()).to.be.true;
     });
 
@@ -40,7 +40,7 @@ describe("src/modules/tools/gfi/components/themes/verkehrsstaerken/components/Ve
     });
 
     it("change tabs should change className", async () => {
-        const tab = wrapper.findAll("a").at(1);
+        const tab = wrapper.findAll("a")[1];
 
         expect(wrapper.find("#verkehrsstaerken-table-tab").attributes().class).to.contain("active");
 
