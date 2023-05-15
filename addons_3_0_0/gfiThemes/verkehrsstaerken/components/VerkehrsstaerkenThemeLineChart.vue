@@ -97,6 +97,15 @@ export default {
                         chart.legend.afterFit = function () {
                             this.height += 10;
                         };
+                    },
+                    tooltip: {
+                        external: (tooltip) => {
+                            if (!tooltip) {
+                                return;
+                            }
+                            // disable displaying the color box;
+                            tooltip.displayColors = false;
+                        }
                     }
                 }]
             });
@@ -244,13 +253,6 @@ export default {
                 yAlign: "bottom",
                 titleAlign: "center",
                 bodyAlign: "center",
-                custom: (tooltip) => {
-                    if (!tooltip) {
-                        return;
-                    }
-                    // disable displaying the color box;
-                    tooltip.displayColors = false;
-                },
                 callbacks: {
                     label: (tooltipItem) => thousandsSeparator(tooltipItem.value),
                     title: () => false
@@ -265,22 +267,20 @@ export default {
          */
         createChartScales: function () {
             return {
-                xAxes: {
-                    scaleLabel: {
+                x: {
+                    title: {
                         display: true,
-                        labelString: this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.year")
+                        text: this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.year")
                     },
-                    ticks: {
-                        min: this.dataset[0].year,
-                        max: this.dataset[this.dataset.length - 1].year
-                    },
+                    min: this.dataset[0].year,
+                    max: this.dataset[this.dataset.length - 1].year,
                     gridLines: this.createGridLines()
                 },
-                yAxes: {
+                y: {
                     beginAtZero: true,
-                    scaleLabel: {
+                    title: {
                         display: true,
-                        labelString: this.createDatasetLabel(this.category)
+                        text: this.createDatasetLabel(this.category)
                     },
                     ticks: {
                         precision: 0,
