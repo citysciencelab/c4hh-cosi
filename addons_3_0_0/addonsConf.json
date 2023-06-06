@@ -1,4 +1,8 @@
 {
+  "exampleSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/exampleSearch"
+  },
   "populationRequest": {
     "type": "tool"
   },

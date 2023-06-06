@@ -1,0 +1,44 @@
+import {expect} from "chai";
+import SearchInterface from "../../../../../../../src_3_0_0/modules/searchBar/searchInterfaces/searchInterface";
+import searchInterfaceExampleSearch from "../../../js/searchInterfaceExampleSearch.js";
+
+describe("ADDONS: addons_3_0_0/searchInterfaces/exampleSearch/searchInterfaceExampleSearch.js", () => {
+    let SearchInterface1 = null;
+
+    before(() => {
+        SearchInterface1 = new searchInterfaceExampleSearch();
+    });
+
+    afterEach(() => {
+        SearchInterface1.clearSearchResults();
+    });
+
+    describe("prototype", () => {
+        it("searchInterfaceExampleSearch should has the prototype SearchInterface", () => {
+            expect(SearchInterface1).to.be.an.instanceof(SearchInterface);
+        });
+    });
+
+    describe("createPossibleActions", () => {
+        it("should create possible events from search result", () => {
+            const searchResult = {
+                name: "Result Name1",
+                category: "example",
+                coordinates: [566601.20, 5928101.43]
+            };
+
+            expect(SearchInterface1.createPossibleActions(searchResult)).to.deep.equals(
+                {
+                    setMarker: {
+                        closeResults: true,
+                        coordinates: [566601.20, 5928101.43]
+                    },
+                    zoomToFeature: {
+                        closeResults: true,
+                        coordinates: [566601.20, 5928101.43]
+                    }
+                }
+            );
+        });
+    });
+});
