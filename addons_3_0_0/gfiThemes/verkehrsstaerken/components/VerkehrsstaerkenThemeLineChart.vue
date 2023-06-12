@@ -79,14 +79,15 @@ export default {
                 this.chart.destroy();
             }
 
+            Chart.defaults.font.family = this.defaultFontFamily;
+            Chart.defaults.color = this.defaultFontColor;
+
             this.chart = new Chart(ctx, {
                 type: this.chartType,
                 data: this.createChartData(this.dataset, this.category),
                 options: {
                     responsive: true,
                     scales: this.createChartScales(),
-                    defaultFontFamily: this.defaultFontFamily,
-                    defaultFontColor: this.defaultFontColor,
                     plugins: {
                         legend: this.createChartLegend(),
                         tooltip: this.createChartTooltip()
@@ -97,15 +98,6 @@ export default {
                         chart.legend.afterFit = function () {
                             this.height += 10;
                         };
-                    },
-                    tooltip: {
-                        external: (tooltip) => {
-                            if (!tooltip) {
-                                return;
-                            }
-                            // disable displaying the color box;
-                            tooltip.displayColors = false;
-                        }
                     }
                 }]
             });
@@ -125,7 +117,7 @@ export default {
                 datasets: [{
                     borderColor: this.chartColorCircle,
                     fill: false,
-                    lineTension: 0,
+                    tension: 0,
                     label: this.createDatasetLabel(category),
                     data: preparedDataset.data,
                     pointBorderColor: preparedDataset.color,
@@ -248,13 +240,14 @@ export default {
          */
         createChartTooltip: function () {
             return {
-                bodyFontColor: this.toolTipBodyFontColor,
                 backgroundColor: this.toolTipBackgroundColor,
+                bodyColor: this.toolTipBodyFontColor,
+                displayColors: false,
                 yAlign: "bottom",
                 titleAlign: "center",
                 bodyAlign: "center",
                 callbacks: {
-                    label: (tooltipItem) => thousandsSeparator(tooltipItem.value),
+                    label: (tooltipItem) => thousandsSeparator(tooltipItem.raw),
                     title: () => false
                 }
             };
