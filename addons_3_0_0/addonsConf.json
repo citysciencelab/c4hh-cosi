@@ -33,10 +33,6 @@
     "path":"gfiThemes/dipasCockpit",
     "type": "gfiTheme"
   },
-  "flaecheninfo": {
-    "path":"gfiThemes/flaecheninfo",
-    "type": "gfiTheme"
-  },
   "schulinfo": {
     "path":"gfiThemes/schulinfo",
     "type": "gfiTheme"

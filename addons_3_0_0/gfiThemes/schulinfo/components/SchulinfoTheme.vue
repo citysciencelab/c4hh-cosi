@@ -3,13 +3,13 @@ import ThemeConfig from "../themeConfig.json";
 import {isWebLink} from "../../../../../src_3_0_0/shared/js/utils/urlHelper.js";
 import {isPhoneNumber, getPhoneNumberAsWebLink} from "../../../../../src_3_0_0/shared/js/utils/isPhoneNumber.js";
 import {isEmailAddress} from "../../../../../src_3_0_0/shared/js/utils/isEmailAddress.js";
-import CompareFeatureIcon from "../../../../../src/modules/tools/gfi/components/favoriteIcons/components/CompareFeatureIcon.vue";
+// import CompareFeatureIcon from "../../../../../src_3_0_0/modules/getFeatureInfo/components/favoriteIcons/components/CompareFeatureIcon.vue";
 // import TargetSchoolIcon from "./favoriteIcons/TargetSchoolIcon.vue";
 
 export default {
     name: "SchulinfoTheme",
     components: {
-        CompareFeatureIcon
+        // CompareFeatureIcon
         // TargetSchoolIcon
     },
     props: {
