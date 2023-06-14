@@ -45,10 +45,6 @@
     "path":"gfiThemes/sturmflut",
     "type": "gfiTheme"
   },
-  "trafficCount": {
-    "path":"gfiThemes/trafficCount",
-    "type": "gfiTheme"
-  },
   "trinkwasser": {
     "path":"gfiThemes/trinkwasser",
     "type": "gfiTheme"
