@@ -152,7 +152,7 @@ const actions = {
                 startCoordinates = transformedCoordinates[0] + ", " + transformedCoordinates[1];
 
             if (document.location.hostname === "localhost") {
-                commit("setObliqueViewerURL", document.location.origin + "/" + rootGetters.getRestConfigById(getters.serviceId).url.split("//")[1].replaceAll(".", "_") + "?groundPosition=" + startCoordinates);
+                commit("setObliqueViewerURL", document.location.origin + "/" + rootGetters.restServiceById(getters.serviceId).url.split("//")[1].replaceAll(".", "_") + "?groundPosition=" + startCoordinates);
             }
             else {
                 dispatch("obliqueViewerURLWithSameHostname", startCoordinates);
@@ -172,10 +172,10 @@ const actions = {
      * @returns {void}
      */
     obliqueViewerURLWithSameHostname ({commit, dispatch, getters, rootGetters}, startCoordinates) {
-        const urlParts = rootGetters.getRestConfigById(getters.serviceId).url.split("https://")[1].split("/");
+        const urlParts = rootGetters.restServiceById(getters.serviceId).url.split("https://")[1].split("/");
 
         if (document.location.hostname === urlParts[0]) {
-            commit("setObliqueViewerURL", rootGetters.getRestConfigById(getters.serviceId).url + "?groundPosition=" + startCoordinates);
+            commit("setObliqueViewerURL", rootGetters.restServiceById(getters.serviceId).url + "?groundPosition=" + startCoordinates);
         }
         else if (document.location.hostname.startsWith("www.") && document.location.hostname.split("www.")[1] === urlParts[0]) {
             dispatch("obliqueViewerURLWithReplacedHostname", {urlParts, startCoordinates});

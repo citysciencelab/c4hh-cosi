@@ -58,7 +58,7 @@ describe("ADDONS: addons/vcOblique/store/actionsVcOblique", () => {
         dispatch = sinon.spy();
         getters = sinon.spy();
         rootGetters = {
-            getRestConfigById: () => {
+            restServiceById: () => {
                 return {
                     url: "https://this.could.be.your.url/examplePortal"
                 };
