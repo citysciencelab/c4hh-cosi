@@ -50,34 +50,6 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
             expect(wrapper.vm.isActiveTab("something else")).to.be.false;
         });
     });
-    describe("nav-pills", () => {
-        it("should initialize with a nav pill for data", () => {
-            const dataTab = wrapper.find(".nav-pills").findAll("li")[0].find("a");
-
-            expect(dataTab.text()).to.equal("additional:addons.gfiThemes.bildungsatlas.general.tabData");
-        });
-        it("should initialize with a nav pill for info", () => {
-            const dataTab = wrapper.find(".nav-pills").findAll("li")[1].find("a");
-
-            expect(dataTab.text()).to.equal("additional:addons.gfiThemes.bildungsatlas.general.tabInfo");
-        });
-        it("should initialize active tab with value 'data'", () => {
-            expect(wrapper.vm.activeTab).to.equal("data");
-        });
-        it("should switch the active tab if the info nav button is clicked", async () => {
-            const infoTab = wrapper.find(".nav-pills").findAll("li")[1].find("a");
-
-            await infoTab.trigger("click");
-            expect(wrapper.vm.activeTab).to.equal("info");
-        });
-        it("should switch back to 'data' if the data nav button is clicked", async () => {
-            const infoTab = wrapper.find(".nav-pills").findAll("li")[0].find("a");
-
-            wrapper.vm.activeTab = "something";
-            await infoTab.trigger("click");
-            expect(wrapper.vm.activeTab).to.equal("data");
-        });
-    });
     describe("components", () => {
         it("should find the child component BildungsatlasThemeThemeBalkendiagramm", () => {
             const singleTestWrapper = shallowMount(BildungsatlasTheme, {

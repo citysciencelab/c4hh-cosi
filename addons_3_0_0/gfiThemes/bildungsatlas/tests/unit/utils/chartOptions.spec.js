@@ -41,7 +41,7 @@ describe("addons/gfiThemes/bildungsatlas/utils/chartOptions.js", () => {
         it("should return ChartJS options specified with this test", () => {
             const expected = {
                     scales: {
-                        yAxes: [{
+                        y: [{
                             ticks: {
                                 optionA: 1,
                                 optionB: 2
@@ -64,13 +64,13 @@ describe("addons/gfiThemes/bildungsatlas/utils/chartOptions.js", () => {
         it("should use default values for ChartJS options", () => {
             const expected = {
                 scales: {
-                    yAxes: [{
+                    y: {
+                        suggestedMin: 0,
+                        suggestedMax: 100,
                         ticks: {
-                            suggestedMin: 0,
-                            suggestedMax: 100,
                             stepSize: 20
                         }
-                    }]
+                    }
                 }
             };
 
@@ -79,13 +79,13 @@ describe("addons/gfiThemes/bildungsatlas/utils/chartOptions.js", () => {
         it("should return ChartJS options with specific parameters", () => {
             const expected = {
                     scales: {
-                        yAxes: [{
+                        y: {
+                            suggestedMin: 1,
+                            suggestedMax: 2,
                             ticks: {
-                                suggestedMin: 1,
-                                suggestedMax: 2,
                                 stepSize: 3
                             }
-                        }]
+                        }
                     }
                 },
                 chartOptions = {
