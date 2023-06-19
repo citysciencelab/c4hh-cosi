@@ -525,7 +525,10 @@ export default {
                     :key="idx"
                     :value="lngkey"
                 >
-                    <h6 v-if="translationExists('additional:addons.gfiThemes.bildungsatlas.balkendiagramm.info.' + lngkey + '.title')">
+                    <h6
+                        v-if="translationExists('additional:addons.gfiThemes.bildungsatlas.balkendiagramm.info.' + lngkey + '.title')"
+                        class="font-bold"
+                    >
                         {{ $t('additional:addons.gfiThemes.bildungsatlas.balkendiagramm.info.' + lngkey + '.title') }}
                     </h6>
                     <p v-if="translationExists('additional:addons.gfiThemes.bildungsatlas.balkendiagramm.info.' + lngkey + '.text')">

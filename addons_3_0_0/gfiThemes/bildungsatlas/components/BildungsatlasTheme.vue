@@ -7,6 +7,7 @@ import BildungsatlasThemeOKJA from "./BildungsatlasThemeOKJA.vue";
 import BildungsatlasThemeSchulentlassene from "./BildungsatlasThemeSchulentlassene.vue";
 import BildungsatlasThemeSchulenWohnort from "./BildungsatlasThemeSchulenWohnort.vue";
 import BildungsatlasThemeSchulenEinzugsgebiete from "./BildungsatlasThemeSchulenEinzugsgebiete.vue";
+import NavTab from "../../../../../src_3_0_0/shared/modules/tabs/components/NavTab.vue";
 
 export default {
     name: "BildungsatlasTheme",
@@ -17,7 +18,8 @@ export default {
         BildungsatlasThemeOKJA,
         BildungsatlasThemeSchulentlassene,
         BildungsatlasThemeSchulenWohnort,
-        BildungsatlasThemeSchulenEinzugsgebiete
+        BildungsatlasThemeSchulenEinzugsgebiete,
+        NavTab
     },
     props: {
         /**
@@ -137,21 +139,25 @@ export default {
 
 <template>
     <div class="gfi-bildungsatlas">
-        <ul class="nav nav-pills">
-            <li :class="{ active: isActiveTab('data'), 'nav-item': true }">
-                <a
-                    class="nav-link"
-                    href="#data"
-                    @click.prevent="setActiveTab('data')"
-                >{{ $t("additional:addons.gfiThemes.bildungsatlas.general.tabData") }}</a>
-            </li>
-            <li :class="{ active: isActiveTab('info'), 'nav-item': true }">
-                <a
-                    class="nav-link"
-                    href="#info"
-                    @click.prevent="setActiveTab('info')"
-                >{{ $t("additional:addons.gfiThemes.bildungsatlas.general.tabInfo") }}</a>
-            </li>
+        <ul
+            id="bildungsatlas-tabs"
+            class="nav nav-tabs nav-justified"
+            role="tablist"
+        >
+            <NavTab
+                :id="'data-tab'"
+                :active="true"
+                :target="'#data'"
+                :label="'additional:addons.gfiThemes.bildungsatlas.general.tabData'"
+                :interaction="() => setActiveTab('data')"
+            />
+            <NavTab
+                :id="'info-tab'"
+                :active="false"
+                :target="'#info'"
+                :label="'additional:addons.gfiThemes.bildungsatlas.general.tabInfo'"
+                :interaction="() => setActiveTab('info')"
+            />
         </ul>
         <div
             v-if="subTheme !== ''"
@@ -168,14 +174,12 @@ export default {
                 :translate="translate"
                 :parse-translation-in-html="parseTranslationInHtml"
             />
-            <div class="gfi-bildungsatlas-footer">
-                {{ $t("additional:addons.gfiThemes.bildungsatlas.general.hint") }}
-            </div>
         </div>
     </div>
 </template>
 
 <style lang="scss">
+@import "~variables";
 .portal-title a img[alt*="Bildungsatlas"] {
     width: 80px;
 }
@@ -183,7 +187,7 @@ export default {
 .gfi-bildungsatlas-current-content {
     .gfi-data {
         & > * {
-            margin-top: 15px;
+            margin-top: 1rem;
         }
 
         .rba_header {
@@ -195,7 +199,7 @@ export default {
         }
 
         .rba_table {
-            padding-top: 7px;
+            padding-top: .5rem;
             border-top: 1px solid #ddd;
 
             table {
@@ -212,7 +216,7 @@ export default {
         }
 
         .rba_chart {
-            padding-top: 15px;
+            padding-top: 1rem;
             border-top: 1px solid #ddd;
 
             .rba_chart_title {
@@ -221,18 +225,15 @@ export default {
         }
 
         .rba_footer {
-            padding-top: 15px;
+            padding-top: 1rem;
             border-top: 1px solid #ddd;
         }
     }
 
     .gfi-info {
-        h6 {
-            font-weight: bold;
-        }
-
         p {
-            margin-bottom: 10px;
+            margin-bottom: 1rem;
+            font-size: $font-size-base;
         }
     }
 }

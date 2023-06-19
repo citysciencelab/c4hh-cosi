@@ -396,7 +396,7 @@ export default {
             v-if="isActiveTab('info')"
             class="gfi-info"
         >
-            <h6>
+            <h6 class="font-bold">
                 {{ translate("additional:addons.gfiThemes.bildungsatlas.okja.info.title") }}
             </h6>
             <p>

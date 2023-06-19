@@ -507,7 +507,7 @@ export default {
             class="gfi-info"
         >
             <div v-if="susType === 'anteil_sus_abi'">
-                <h6>
+                <h6 class="font-bold">
                     {{ translate("additional:addons.gfiThemes.bildungsatlas.schulentlassene.info.titleAbi") }}
                 </h6>
                 <p>
@@ -515,7 +515,7 @@ export default {
                 </p>
             </div>
             <div v-else>
-                <h6>
+                <h6 class="font-bold">
                     {{ translate("additional:addons.gfiThemes.bildungsatlas.schulentlassene.info.titleOsa") }}
                 </h6>
                 <p>
@@ -523,13 +523,13 @@ export default {
                 </p>
             </div>
             <div>
-                <h6>
+                <h6 class="font-bold">
                     {{ translate("additional:addons.gfiThemes.bildungsatlas.schulentlassene.info.titleA") }}
                 </h6>
                 <p>
                     {{ translate("additional:addons.gfiThemes.bildungsatlas.schulentlassene.info.textA") }}
                 </p>
-                <h6>
+                <h6 class="font-bold">
                     {{ translate("additional:addons.gfiThemes.bildungsatlas.schulentlassene.info.titleB") }}
                 </h6>
                 <p>

@@ -31,7 +31,7 @@ function getChartOptions (propertyName, chartOptions) {
     }
     return {
         scales: {
-            yAxes: [{
+            y: [{
                 ticks: chartOptions[propertyName]
             }]
         }
@@ -60,13 +60,13 @@ function getChartOptionsForPercentage (propertyName, chartOptions) {
     }
     return {
         scales: {
-            yAxes: [{
+            y: {
+                suggestedMin: typeof options[propertyName].suggestedMin === "number" ? options[propertyName].suggestedMin : 0,
+                suggestedMax: typeof options[propertyName].suggestedMax === "number" ? options[propertyName].suggestedMax : 100,
                 ticks: {
-                    suggestedMin: typeof options[propertyName].suggestedMin === "number" ? options[propertyName].suggestedMin : 0,
-                    suggestedMax: typeof options[propertyName].suggestedMax === "number" ? options[propertyName].suggestedMax : 100,
                     stepSize: typeof options[propertyName].stepSize === "number" ? options[propertyName].stepSize : 20
                 }
-            }]
+            }
         }
     };
 }
