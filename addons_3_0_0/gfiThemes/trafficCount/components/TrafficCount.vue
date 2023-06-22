@@ -10,6 +10,7 @@ import TrafficCountYear from "./TrafficCountYear.vue";
 import TrafficCountFooter from "./TrafficCountFooter.vue";
 import TrafficCountDownloads from "./TrafficCountDownloads.vue";
 import convertHttpLinkToSSL from "../../../../../src_3_0_0/shared/js/utils/convertHttpLinkToSSL";
+import NavTab from "../../../../../src_3_0_0/shared/modules/tabs/components/NavTab.vue";
 
 export default {
     name: "TrafficCount",
@@ -19,7 +20,8 @@ export default {
         TrafficCountWeek,
         TrafficCountYear,
         TrafficCountFooter,
-        TrafficCountDownloads
+        TrafficCountDownloads,
+        NavTab
     },
     props: {
         feature: {
@@ -294,12 +296,12 @@ export default {
         },
         /**
          * set the current tab id after clicking.
-         * @param {Object[]} evt the target of current click event
+         * @param {String} id the id of current tab
          * @returns {Void} -
          */
-        setCurrentTabId: function (evt) {
-            if (evt && evt.target && evt.target.hash) {
-                this.currentTabId = evt.target.hash.substring(1);
+        setCurrentTabId: function (id) {
+            if (id) {
+                this.currentTabId = id;
             }
         },
 
@@ -437,62 +439,45 @@ export default {
                 tabindex="0"
                 @click="setCurrentTabId"
                 @keydown.enter="setCurrentTabId"
+                id="traffic-count-tabs"
+                class="nav nav-tabs nav-justified"
+                role="tablist"
             >
-                <li
-                    value="infos"
-                    class="nav-item"
-                >
-                    <a
-                        class="nav-link"
-                        :class="{ active: isActiveTab('infos'), 'nav-link': true }"
-                        data-toggle="tab"
-                        href="#infos"
-                    >{{ infoLabel }}</a>
-                </li>
-                <li
-                    value="day"
-                    class="nav-item"
-                >
-                    <a
-                        class="nav-link"
-                        :class="{ active: isActiveTab('day'), 'nav-link': true }"
-                        data-toggle="tab"
-                        href="#day"
-                    >{{ dayLabel }}</a>
-                </li>
-                <li
-                    value="week"
-                    class="nav-item"
-                >
-                    <a
-                        class="nav-link"
-                        :class="{ active: isActiveTab('week'), 'nav-link': true }"
-                        data-toggle="tab"
-                        href="#week"
-                    >{{ weekLabel }}</a>
-                </li>
-                <li
-                    value="year"
-                    class="nav-item"
-                >
-                    <a
-                        class="nav-link"
-                        :class="{ active: isActiveTab('year'), 'nav-link': true }"
-                        data-toggle="tab"
-                        href="#year"
-                    >{{ yearLabel }}</a>
-                </li>
-                <li
-                    value="downloads"
-                    class="nav-item"
-                >
-                    <a
-                        class="nav-link"
-                        :class="{ active: isActiveTab('downloads'), 'nav-link': true }"
-                        data-toggle="tab"
-                        href="#downloads"
-                    >{{ downloadsLabel }}</a>
-                </li>
+                <NavTab
+                    :id="'infos-tab'"
+                    :active="true"
+                    :target="'#infos'"
+                    :label="infoLabel"
+                    :interaction="() => setCurrentTabId('info')"
+                />
+                <NavTab
+                    :id="'day-tab'"
+                    :active="false"
+                    :target="'#day'"
+                    :label="dayLabel"
+                    :interaction="() => setCurrentTabId('day')"
+                />
+                <NavTab
+                    :id="'week-tab'"
+                    :active="false"
+                    :target="'#week'"
+                    :label="weekLabel"
+                    :interaction="() => setCurrentTabId('week')"
+                />
+                <NavTab
+                    :id="'year-tab'"
+                    :active="false"
+                    :target="'#year'"
+                    :label="yearLabel"
+                    :interaction="() => setCurrentTabId('year')"
+                />
+                <NavTab
+                    :id="'downloads-tab'"
+                    :active="false"
+                    :target="'#downloads'"
+                    :label="downloadsLabel"
+                    :interaction="() => setCurrentTabId('downloads')"
+                />
             </ul>
             <div class="tab-content">
                 <TrafficCountInfo

@@ -101,11 +101,6 @@ export default {
         renderPointSize: {
             type: Function,
             required: true
-        },
-        activeTab: {
-            type: Boolean,
-            default: true,
-            required: false
         }
     },
     data () {
@@ -130,7 +125,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/GfiThemes/TrafficCount", [
+        ...mapGetters("Modules/TrafficCount", [
             "activeTabId"
         ])
     },
@@ -142,9 +137,11 @@ export default {
                     this.createChart(this.chartData, this.ctx);
                 }
                 else if (Array.isArray(newData) && newData.length) {
-                    // debugger;
-                    // this.chart.data = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-                    // this.chart.update(this.updateAnimation);
+                    debugger;
+                    document.querySelectorAll(".graph");
+                    console.log(this.chart);
+                    this.chart.data = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+                    this.chart.update(this.updateAnimation);
                 }
                 else {
                     this.chart.destroy();
@@ -153,10 +150,9 @@ export default {
             deep: true
         },
         activeTabId (active) {
-            // console.log("active Tab in diagram", active);
-            if (!active) {
-                this.destroyChart();
-            }
+            debugger;
+            console.log("active Tab in diagram: ", active);
+            this.destroyChart();
         }
     },
     mounted () {
@@ -172,7 +168,6 @@ export default {
         // };
 
         this.createChart(this.chartData, this.ctx);
-        // console.log(this.$store);
     },
     methods: {
         /**
@@ -204,7 +199,7 @@ export default {
          * @returns {void}
          */
         destroyChart () {
-            // console.log("destroy");
+            console.log("destroy");
             if (this.chart instanceof ChartJs) {
                 this.chart.destroy();
                 this.chart = null;
@@ -400,7 +395,7 @@ export default {
                                 autoSkip: true,
                                 maxTicksLimit: options.xAxisTicks,
                                 callback: (xValue) => {
-                                    return options.renderLabelXAxis(xValue);
+                                    return options.renderLabelXAxis(data.labels[xValue]);
                                 }
                             },
                             grid: {

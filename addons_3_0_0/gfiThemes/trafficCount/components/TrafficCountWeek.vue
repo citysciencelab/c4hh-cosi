@@ -11,6 +11,7 @@ import {addMissingDataWeek} from "../utils/addMissingData.js";
 import {getPublicHoliday} from "../../../../../src_3_0_0/shared/js/utils/calendar.js";
 import TrafficCountDatePicker from "./TrafficCountDatePicker.vue";
 import isObject from "../../../../../src_3_0_0/shared/js/utils/isObject";
+import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -140,6 +141,9 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("Modules/TrafficCount", [
+            "activeTabId"
+        ]),
         calendarweek: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.calendarweek");
         }
@@ -155,6 +159,11 @@ export default {
                 }
             },
             deep: true
+        },
+        activeTab () {
+            if (this.activeTab && this.activeTabId !== "week") {
+                this.setActiveTabId("week");
+            }
         }
     },
     created () {
@@ -164,6 +173,9 @@ export default {
         this.minDate = dayjs().subtract(1, "year").startOf("year").format("YYYY-MM-DD");
     },
     methods: {
+        ...mapMutations("Modules/TrafficCount", [
+            "setActiveTabId"
+        ]),
         /**
          * Initializes the calendar / resets the date.
          * @returns {void}

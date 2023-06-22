@@ -11,6 +11,7 @@ import DatePicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 import {addMissingDataYear} from "../utils/addMissingData.js";
 import {hasHolidayInWeek} from "../../../../../src_3_0_0/shared/js/utils/calendar.js";
+import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(advancedFormat);
 dayjs.extend(isSameOrAfter);
@@ -141,6 +142,11 @@ export default {
             tableYear: "tableYear"
         };
     },
+    computed: {
+        ...mapGetters("Modules/TrafficCount", [
+            "activeTabId"
+        ])
+    },
     watch: {
         reset () {
             this.initializeDates();
@@ -150,12 +156,20 @@ export default {
                 this.yearDatepickerValueChanged(value);
             },
             deep: true
+        },
+        activeTab () {
+            if (this.activeTab && this.activeTabId !== "year") {
+                this.setActiveTabId("year");
+            }
         }
     },
     mounted () {
         this.initializeDates();
     },
     methods: {
+        ...mapMutations("Modules/TrafficCount", [
+            "setActiveTabId"
+        ]),
         /**
          * Initializes the calendar / resets the date.
          * @returns {void}

@@ -136,7 +136,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/GfiThemes/TrafficCount", [
+        ...mapGetters("Modules/TrafficCount", [
             "activeTabId"
         ])
     },
@@ -151,7 +151,7 @@ export default {
             deep: true
         },
         activeTab () {
-            if (this.activeTab) {
+            if (this.activeTab && this.activeTabId !== "day") {
                 this.setActiveTabId("day");
             }
         }
@@ -160,7 +160,7 @@ export default {
         this.initializeDates();
     },
     methods: {
-        ...mapMutations("Modules/GfiThemes/TrafficCount", [
+        ...mapMutations("Modules/TrafficCount", [
             "setActiveTabId"
         ]),
         /**
@@ -231,6 +231,7 @@ export default {
          * @returns {Boolean} true if disabled, false if enabled.
          */
         isDateDisabled (date, currentDates) {
+            debugger;
             if (!(date instanceof Date)) {
                 return true;
             }
@@ -269,7 +270,6 @@ export default {
                 format="DD.MM.YYYY"
                 :multiple="true"
                 :show-week-number="true"
-                :disabled="isDateDisabled"
                 title-format="DD.MM.YYYY"
                 :lang="$t('common:libraries.vue2-datepicker.lang', {returnObjects: true})"
             />

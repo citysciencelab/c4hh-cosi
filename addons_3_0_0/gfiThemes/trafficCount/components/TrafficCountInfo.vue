@@ -2,7 +2,7 @@
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import thousandsSeparator from "../../../../../src_3_0_0/shared/js/utils/thousandsSeparator";
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(advancedFormat);
 
@@ -53,6 +53,9 @@ export default {
     },
     computed: {
         ...mapGetters("Language", ["currentLocale"]),
+        ...mapGetters("Modules/TrafficCount", [
+            "activeTabId"
+        ]),
 
         period: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.period");
@@ -117,12 +120,20 @@ export default {
                 }
             },
             immediate: true
+        },
+        activeTab () {
+            if (this.activeTab && this.activeTabId !== "info") {
+                this.setActiveTabId("info");
+            }
         }
     },
     mounted: function () {
         this.setupTabInfo(this.api, this.thingId, this.meansOfTransport);
     },
     methods: {
+        ...mapMutations("Modules/TrafficCount", [
+            "setActiveTabId"
+        ]),
         /**
          * setup of the info tab
          * @param {Object} api instance of TrafficCountApi
