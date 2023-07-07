@@ -1,4 +1,3 @@
-import LoaderOverlay from "../../../../src_3_0_0/app-store/js/loaderOverlay";
 import {WFS} from "ol/format.js";
 import {rawLayerList} from "@masterportal/masterportalapi/src";
 import layerFactory from "../../../../src_3_0_0/core/layers/js/layerFactory";
@@ -167,7 +166,7 @@ const actions = {
                 "content": i18next.t(getters.tooManyTilesSelected, {tilesCount: selectedRasterNames.length, maxTiles: getters.selectedRasterLimit})
             };
             dispatch("Alerting/addSingleAlert", alertingTilesAmount, {root: true});
-            LoaderOverlay.hide();
+
             return false;
         }
         else if (selectedRasterNames.length === 0) {
@@ -227,7 +226,6 @@ const actions = {
         commit("setTransactionProcessing", true);
         // function before the request is sent
         dataZip.interceptors.request.use(function (request) {
-            LoaderOverlay.fade(15000);
             return request;
         });
 
