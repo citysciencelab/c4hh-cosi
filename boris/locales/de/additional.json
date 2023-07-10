@@ -94,7 +94,7 @@
                         "glossary": "Glossar",
                         "borisGer": "BORIS-D"
                     },
-                    "backgroundLayerName": "ALKIS farbig",
+                    "baselayerName": "ALKIS farbig",
                     "historicalMap2020": "Hist. Karte Jahrgang 2020",
                     "historicalMap2015": "Hist. Karte Jahrgang 2015",
                     "historicalMap2010": "Hist. Karte Jahrgang 2010",
