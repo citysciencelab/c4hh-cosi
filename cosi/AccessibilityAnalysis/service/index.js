@@ -132,10 +132,7 @@ const id = "AccessibilityAnalysisService",
             if (worker === undefined) {
                 // worker.terminate();
                 worker = workerFactory();
-<<<<<<< HEAD
                 worker.postMessage({type: "register", projections: rootGetters.namedProjections});
-=======
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
                 worker.onerror = e => {
                     console.error(e);
                 };

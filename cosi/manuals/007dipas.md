@@ -4,6 +4,7 @@
 Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](./017einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](./006versorgungsanalyse.md), [Erreichbarkeitsanalyse](./003erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](./004vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](./005filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
 =======
 <<<<<<< HEAD:cosi/manuals/007dipas.md
+<<<<<<< HEAD:cosi/manuals/007dipas.md
 Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](017einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](006versorgungsanalyse.md), [Erreichbarkeitsanalyse](003erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](004vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](005filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
 =======
 <<<<<<< HEAD
@@ -12,7 +13,13 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
 Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](./einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](./versorgungsanalyse.md), [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](./vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](./filter.pdf) gefiltert werden.
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/dipas.de.md
+<<<<<<< HEAD
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
+=======
+=======
+Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](./einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](./versorgungsanalyse.md), [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](./vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](./filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
+>>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/dipas.de.md
+>>>>>>> 0650b0a5 (resolve rebase conflicts)
 
 
 ![Abbildung 1: DIPAS](./007a_dipas.PNG)
@@ -28,24 +35,31 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
    > Die Legende zeigt an, welche Farbe den Eintragstypen in der Visualisierung jeweils zugeordnet wird.
 =======
 <<<<<<< HEAD:cosi/manuals/007dipas.md
+<<<<<<< HEAD:cosi/manuals/007dipas.md
    > Das Icon in dem Indikator zeigt zum einen die Farbe an, in dem der jeweilige Datensatz visualisiert wird. Zum anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/dipas.de.md
    > Das Icon in dem Indikator zeigt zum einen die Farbe an, in dem der jeweilige Datensatz visualisiert wird. Zum Anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/dipas.de.md
 3. **Legende**
    > Die Legende zeigt an, welche Farbe den Eintragstypen in der Visualisierung zugeordnet wird.
+<<<<<<< HEAD
 =======
    > Das Icon in dem Indikator zeigt zum einen die Farbe an, in dem der jeweilige Datensatz visualiert wird. Zum Anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
 3. **Legende**
    > Die Legende zeigt an, welche Farbe den Eintragstypen in der Visualierung zugeordnet wird.
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 0650b0a5 (resolve rebase conflicts)
 4. **Verfahren in der Karte anzeigen**
    > Zeigt das Verfahrensgebiet als Polygon in der Karte in der jeweiligen Farbe des Verfahrens.
    - **4.1 Auf der Karte anzeigen**
       > Die Kartenansicht fokussiert auf das jeweilige Verfahrensgebiet.
 5. **Einzelne Beiträge in der Karte anzeigen**
+<<<<<<< HEAD:cosi/manuals/007dipas.md
 <<<<<<< HEAD:cosi/manuals/007dipas.md
    > Zeigt alle Einzelbeiträge des Verfahrens in der Karte. Das Styling der Beiträge kann unter *7. Styling der Beiträge* festgelegt werden.
 =======
@@ -53,15 +67,13 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
    > Zeigt alle Einzelbeiträge des Verfahrens in der Karte. Das Styling der Beiträge kann unter (s. 5) festgelegt werden.
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/dipas.de.md
 6. **Heatmap in der Karte anzeigen** 
+=======
+   > Zeigt alle Einzelbeiträge des Verfahrens in der Karte. Das Styling der Beiträge kann unter (s. 5) festgelegt werden.
+6. **Heatmap in der Karte anzeigen**
+>>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/dipas.de.md
    > Zeigt eine Heatmap der Beiträge in der Karte. Das Gewicht eines Punktes richtet sich dabei nach der Gesamtzahl der Bewertungen des Beitrags, also der Stärke der Resonanz auf ihn.
 7. **Styling der Beiträge wählen**
    * *Die Inhalte können nach verschiedenen Schwerpunkten dargestellt werden:*
-=======
-   > Zeigt alle Einzelbeiträge des Verfahrens in der Karte. Das Styling der Beiträge kann unten (s. 5) festgelegt werden.
-6. **Heatmap in der Karte anzeigen** 
-   > Zeigt eine Heatmap der Beiträge in der Karte. Das Gewicht eines Punktes richtet sich dabei nach der Gesamtzahl der Bewertungen des Beitrags, also der Stärke der Resonanz auf ihn.
-7. **Styling der Beiträge wählen**
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
    > - nach Projekt: Alle Beiträge werden gleichmäßig in der Projektfarbe dargestellt.
    > - nach Kategorien im Projektfarbraum: Jede Kategorie wird in einer Schattierung der Projektfarbe dargestellt.
    > - nach Kategorien im Regenbogenspektrum: Jeder Kategorie wird eine zufällige Farbe zugewiesen.
@@ -71,8 +83,8 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
 9. **Automatisches Update**
    > Wenn diese Checkbox aktiviert ist, werden die DIPAS Daten ggf. live aktualisiert.
 10. **Beiträge in der Karte**
-<<<<<<< HEAD
       > Alle Beiträge werden mit Ihrer ID (einer fortlaufenden Nummer) in der Karte dargestellt.
+<<<<<<< HEAD:cosi/manuals/007dipas.md
 <<<<<<< HEAD:cosi/manuals/007dipas.md
 <div style="page-break-after: always;"></div>
 =======
@@ -80,3 +92,5 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
       > Alle Beiträge werden mit ihrer ID (einer fortlaufenden Nummer) in der Karte dargestellt.
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/dipas.de.md
+=======
+>>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/dipas.de.md

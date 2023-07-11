@@ -4,14 +4,25 @@ ___
 ___
 
 ### Statistische Datenübersicht
-<<<<<<< HEAD
 
 In der statistischen Datenübersicht können tabellarisch Informationen zu den statistischen Daten der ausgewählten Gebiete (**Statistische Datenübersicht**) angezeigt, ausgewertet und exportiert werden.
 
+<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
   > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus. 
   
+<<<<<<< HEAD
 ![Abbildung 27: Statistische Datenübersicht](./016a_statistischedatenuebersicht.png)
 *Abb. a: Statistische Datenübersicht 1*
+=======
+![Abbildung 27: Statistische Datenübersicht](016a_statistischedatenuebersicht.png)
+*Abb.: Statistische Datenübersicht 1*
+=======
+  > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus.
+
+![Abbildung 27: Statistische Datenübersicht](https://github.com/AlexandraKanapki/cosi/blob/COSI-handbuch/cosi/manuals/statistische%20datenu%CC%88bersciht1.png?raw=true)
+*Abbildung 27: Statistische Datenübersichtm 1*
+>>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/statistischedatenuebersicht.md
+>>>>>>> 0650b0a5 (resolve rebase conflicts)
 
 ![Abbildung 29: Statistische Datenübersicht](./016b_statistischedatenuebersicht.png)
 *Abb. b: Statistische Datenübersicht 2*
@@ -25,6 +36,7 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
    > - [Dreistrich-Menü](#dreistrich-menü) aufklappen
 =======
    > - s. [Bürger-Menü](#markdown-header-burgermenü)
+<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
 =======
 ![Abbildung 27: Statistische Datenübersicht](../utils/assets/screenshots/statdashboard.png)
 *Abbildung 27: Statistische Datenübersicht*
@@ -37,6 +49,8 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
    > - s. [Burger-Menü](#markdown-header-burgermenü)
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/statistischedatenuebersicht.md
+=======
+>>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/statistischedatenuebersicht.md
    > - Visualisierung ein- / ausschalten: Schaltet die Visualisierung des ausgewählten Indikators zum aktuell gewählten Jahr in der Karte ein/aus
    > - Jahre ein- / ausklappen: Klappt die Tabellenzeile auf um alle Jahre der Zeitreihe darzustellen.
 3. **Jahr auswählen**
@@ -57,7 +71,6 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 10. **Themenfilter**
       > Über den Filter können beliebige Indikatoren (sortiert nach Gruppen) für die Darstellung und den Export ausgewählt werden. Die Liste kann im Freitext durchsucht werden.
 11. **Tabelle exportieren**
-<<<<<<< HEAD
       > Die aktuelle Auswahl (Spalten, Zeilen, Jahre) als XLSX für Excel exportieren. Über das Auswahlfeld *alle Jahre exportieren* kann die gesamte Zeitreihe für die ausgewählten Spalten und Zeilen exportiert werden. Ist keine Spalte oder Zeile ausgewählt werden alle verwendet.
 12. **Kartenvisualisierung**
       > Die Darstellung in der Karte entspricht der des Kontrollfeldes [Kartenanalyse regionalstatistischer Daten](./kartenvisualisierung.md).
@@ -73,14 +86,6 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 =======
 #### Dreipunkt Menü
 ![Abbildung 28: Statistische Datenübersicht - Burgermenu](../utils/assets/screenshots/statdashboard_burgermenu.PNG)
-=======
-      > Die aktuelle Auswahl (Spalten, Zeilen, Jahre) als XLSX für Excel exportieren. Über aus Auswahlfeld *alle Jahre exportieren* kann die gesamte Zeitreihe für die ausgewählten Spalten und Zeilen exportiert werden. Ist keine Spalte oder Zeile ausgewählt werden alle verwendet.
-12. **Kartenvisualisierung**
-      > Die Darstellung in der Karte entspricht der des Kontrollfeldes [Kartenanalyse regionalstatistischer Daten](./kartenvisualisierung.md).
-
-#### Burgermenü
-![Abbildung 28: Statistische Datenübersicht - Burgermenü](../utils/assets/screenshots/statdashboard_burgermenu.png)
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 *Abbildung 28: Statistische Datenübersicht*
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/statistischedatenuebersicht.md
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)

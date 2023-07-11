@@ -1,10 +1,6 @@
 /**
  * User type definition
-<<<<<<< HEAD
  * @typedef {object} selectionmanagerState
-=======
- * @typedef {object} ColorCodeMapState
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
  * @property {boolean} active if true, VueAddon will rendered
  * @property {string} id id of the VueAddon component
  * @property {string} name displayed as title (config-param)
@@ -30,16 +26,20 @@ const state = {
     acceptSelection: null, // other tools can commit to this variable. Then, a new selection is added and set as active.
     readmeUrl: {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/022selectionmanager.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/022auswahlmanager.md",
         "en": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/022selectionmanager.md",
         "de": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/022auswahlmanager.md"
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 023f8398 (resolve rebase conflicts)
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/selectionmanager.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/auswahlmanager.md",
         "en": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/selectionmanager.md",
         "de": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/auswahlmanager.md"
+<<<<<<< HEAD
 =======
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/colorcodemap.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/kartenvisualisierung.md",
@@ -47,6 +47,8 @@ const state = {
         "de": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/kartenvisualisierung.md"
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 023f8398 (resolve rebase conflicts)
     }
 };
 

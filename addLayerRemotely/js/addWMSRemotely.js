@@ -23,11 +23,7 @@ export default function importLayers (url, layersToLoad, folderName, zoomTo) {
     Radio.trigger("Util", "showLoader");
     axios({
         timeout: 40000,
-<<<<<<< HEAD
         url: `${url}${url.includes("?") ? "&" : "?"}request=GetCapabilities&service=WMS`
-=======
-        url: url + "?request=GetCapabilities&service=WMS"
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
     })
         .then(response => response.data)
         .then((data) => {

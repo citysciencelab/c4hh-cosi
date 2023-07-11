@@ -29,12 +29,14 @@ const state = {
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/008graphenvisualisierung.md"
 =======
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/chartgenerator_en.md",
-<<<<<<< HEAD
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/graphenvisualisierung.md"
+<<<<<<< HEAD
 =======
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/chartgenerator.md"
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 023f8398 (resolve rebase conflicts)
     }
 };
 
