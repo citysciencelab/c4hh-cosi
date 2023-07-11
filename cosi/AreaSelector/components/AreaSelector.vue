@@ -71,10 +71,7 @@ export default {
 
             this.addNewSelection({selection: [new Feature(geom)], source: this.$t("additional:modules.tools.cosi.areaSelector.title"), id: this.$t("additional:modules.tools.cosi.areaSelector.title") + " #" + new Feature(geom).ol_uid});
             setBBoxToGeom.call(this, geom || this.boundingGeometry);
-<<<<<<< HEAD
             this.setFilterGeometry(this, geom || this.boundingGeometry);
-=======
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
         }
     },
 
@@ -88,10 +85,7 @@ export default {
             setPopulationRequestGeometry: "setGeometry",
             setPopulationRequestActive: "setActive"
         }),
-<<<<<<< HEAD
         ...mapMutations("Tools/Filter", ["setFilterGeometry"]),
-=======
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
         ...mapActions("Maps", ["addNewLayerIfNotExists"]),
         ...mapActions("Tools/SelectionManager", ["addNewSelection"]),
 
