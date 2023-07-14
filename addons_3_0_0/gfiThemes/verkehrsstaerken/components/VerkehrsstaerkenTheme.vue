@@ -22,14 +22,19 @@ export default {
     data () {
         return {
             activeTab: "table",
-            downloadLink: "https://daten-hamburg.de/transport_verkehr/verkehrsstaerken/DTV_DTVw_Download.xlsx",
             years: [],
             rowNames: [],
             dataset: []
         };
     },
     computed: {
-        ...mapGetters("Modules/Language", ["currentLocale"])
+        ...mapGetters("Modules/Language", ["currentLocale"]),
+        gfiParams: function () {
+            return this.feature.getTheme()?.params;
+        },
+        downloadLink: function () {
+            return this.gfiParams?.downloadLink ? this.gfiParams.downloadLink : "https://daten-hamburg.de/transport_verkehr/verkehrsstaerken/DTV_DTVw_Download.xlsx";
+        }
     },
     watch: {
         // When the gfi window switched with arrow, the connection will be refreshed
