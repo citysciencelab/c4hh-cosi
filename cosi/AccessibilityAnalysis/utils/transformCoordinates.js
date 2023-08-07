@@ -2,11 +2,7 @@ import * as Proj from "ol/proj.js";
 
 /**
  * Transform each coordinate from one crs to another.
-<<<<<<< HEAD
  * @param {ol/coordindate[]} coordindates - An array of coordinates.
-=======
- * @param {ol/coordindates[]} coordindates - An array of coordinates.
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
  * @param {String} source - The current projection as crs identifier string.
  * @param {String} [destination="EPSG:4326"] - The desired projection as crs identifier string.
  * @returns {ol/coordindates[]|Boolean} The transformed coordinates or false if an error has occurred.
@@ -27,7 +23,6 @@ function transformCoordinates (coordindates, source, destination = "EPSG:4326") 
     });
 }
 
-<<<<<<< HEAD
 /**
  * Transform one coordinate from one crs to another.
  * @param {ol/coordindate} coordinate - An array of coordinates.
@@ -52,8 +47,4 @@ function transformCoordinate (coordinate, source, destination = "EPSG:4326") {
 module.exports = {
     transformCoordinates,
     transformCoordinate
-=======
-module.exports = {
-    transformCoordinates
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 };

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 **FeaturesList**
-=======
-**DistrictSelector**
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 
 Eine Übersicht der Features die auf der Karte zu sehen sind.
 

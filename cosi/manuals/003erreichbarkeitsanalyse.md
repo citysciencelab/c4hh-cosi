@@ -2,6 +2,7 @@
 ### Erreichbarkeitsanalyse
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 <<<<<<< HEAD
@@ -15,9 +16,13 @@ Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:
 =======
 Die "Erreichbarkeitsanalyse" erreichen Sie über den Bereich "Analyse".
 Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:
+=======
+Die "Erreichbarkeitsanalyse" erreichen Sie über den Bereich "Analyse". 
+Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:  
+>>>>>>> e41bd580 (update cosi folder)
 1. [Ab einem Referenzpunkt](#markdown-header-erreichbarkeit-ab-einem-Referenzpunkt)
 2. Ab einer ausgewählten Einrichtung
-3. [Im Planungsgebiet](#markdown-header-erreichbarkeit-im-gebiet)
+3. [Im Planungsgebiet](#markdown-header-erreichbarkeit-im-gebiet) 
 4. [Entlang einer Route](#markdown-header-erreichbarkeit-entlang-einer-route)
 >>>>>>> 896ab88b (resolve rebase conflicts)
 
@@ -26,8 +31,8 @@ Der Modus der Analyse kann im Dropdown Menü ausgewählt werden.
 **Wichtige Informationen:**
 Dieses Werkzeug wurde realisiert unter Verwendung von OpenRouteService, einem Dienst, der von der *Heidelberg Institute for Geoinformation Technology* entwickelt wird. Der verwendete Dienst wird vom *Bundesamt für Kartografie und Geodäsie (BKG)* bereitgestellt und betrieben.
 Die Verwendung ist gedeckt durch die Creative Commons Lizenz CC BY 4.0.
-Weitere Informationen finden Sie unter:
-https://heigit.org/de/ortsbasierte-dienste-und-navigation/
+Weitere Informationen finden Sie unter:  
+https://heigit.org/de/ortsbasierte-dienste-und-navigation/  
 https://openrouteservice.org/services/
 
 Die Vollständige Dokumentation des OpenRouteService inkl. aller Annahmen über Modalitätsprofile und Routenparameter finden Sie unter:
@@ -36,10 +41,10 @@ https://giscience.github.io/openrouteservice/documentation/Documentation.html
 Die Annahmen über einzelne Straßen und Wege können i.d.R. über die [OpenStreetMap](https://www.openstreetmap.org/#map=14/53.5492/9.9901) direkt ausgelesen oder in dringlichen Fällen beim BKG angefragt werden.
 
 #### Erreichbarkeit ab einem Referenzpunkt
-Zeigt ein Gebiet an, welches von einem ausgewählten Punkt auf der Karte innerhalb einer festgelegten Entfernung erreichbar ist. Die Entfernung kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit wird abhängig vom Verkehrsmittel berechnet. Die Polygone werden automatisch angepasst, wenn das Verkehrsmittel oder andere Parameter geändert werden.
-
+Zeigt ein Gebiet an, welches von einem ausgewählten Punkt auf der Karte innerhalb einer festgelegten Entfernung erreichbar ist. Die Entfernung kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit wird abhängig vom Verkehrsmittel berechnet. Die Polygone werden automatisch angepasst, wenn das Verkehrsmittel oder andere Parameter geändert werden.  
+  
 Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
-
+  
 
 
 ![Erreichbarkeit ab einem Referenzpunkt](./003a_erreichbarkeitreferenzpunkt.png)
@@ -53,13 +58,17 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
   
 =======
 *Abbildung 1: Erreichbarkeit ab einem Referenzpunkt*
+<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
 
 >>>>>>> 149927fa (resolve rebase conflicts):cosi/manuals/erreichbarkeitsanalyse.md
+=======
+  
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/erreichbarkeitsanalyse.md
 1. **Auswahl des Modus**
    > Art der Einrichtungsanalyse. Ab einem Referenzpunkt, entlang einer Route oder Erreichbarkeit der gewählten Einrichtungen im Gebiet.
 2. **Referenzpunkt setzen**
    > Durch Klicken auf der Karte wird der Punkt gesetzt, von dem aus berechnet wird.
-3. **Verkehrsmittel festlegen**
+3. **Verkehrsmittel festlegen** 
    > Das Verkehrsmittel wird ausgewählt aus einer Liste. Folgende Verkehrsmittel stehen aktuell zur Verfügung: Auto, Rad, Gehen, Rollstuhl / Kinderwagen.
 4. **Maßeinheit der Entfernung festlegen**
    > Festlegen, ob die Entfernung in Minuten oder in Metern angegeben wird
@@ -118,18 +127,22 @@ Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungs
 6. **Tageszeit**
    > Wenn Sie als Verkehrsmittel "Auto" ausgewählt haben, können Sie hier die Tageszeit auswählen, zu der Sie die Erreichbarkeit planen wollen. Die Funktion ist nur verfügbar, wenn "Verkehrsfluss berücksichtigen" aktiv ist. Dieser *Reisezeitindex* beschreibt die Veränderung der Reisezeiten zu verschiedenen Tageszeiten gegenüber einem normierten freien Verkehrsfluss (d.h. ein Reisezeitindex von 1,3 entspricht einer Verlängerung der Reisezeiten um 30% bzw. einer entsprechenden Verkürzung der zurückgelegten Strecke). Die Daten wurden von der Firma INRIX erhoben und beziehen sich, aggregiert für das gesamte Stadtgebiet für die Straßenklassen 2, 3 und 4 (Bundesstraßen, Kreisstraßen, Gemeindestraßen), auf das Jahr 2020. **Der Reisezeitindex bezieht sich ausschließlich auf den Kfz-Verkehr.**
 7. **Verkehrsfluss berücksichtigen**
-   > Wählen Sie aus, ob Sie den Verkehrsfluss berücksichtigen wollen oder nicht.
+   > Wählen Sie aus, ob Sie den Verkehrsfluss berücksichtigen wollen oder nicht. 
 8. **Von Flächenaußengrenzen ermitteln**
    > Wenn Sie einen Datensatz ausgewählt haben, wie bspw. "Grünflächen" oder ähnliches, dann wird die Erreichbarkeitsanalyse von der Außengrenze dieser Fläche durchgeführt.
 9. **Berechnen**
-10. **Ergebnis ausblenden**
+10. **Ergebnis ausblenden** 
 11. **Legende & Isochronen**
     > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen die vom den Einrichtungen aus erreichbaren Gebiete abhängig von den zuvor eingegebenen Parametern. Ist "Verkehrsfluss berücksichtigen" ausgewählt, wird das theoretische Maximum bei freier Fahrt als gestrichelte Linie angezeigt.
 12. **Ergebnisverzeichnis**
    > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das [Ergebnisverzeichnis](./020ergebnisverzeichnis) verwaltet werden.
 
    ### Erreichbarkeit entlang einer Route
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
+>>>>>>> e41bd580 (update cosi folder)
 Wenn Sie im Routing-Tool eine Route erstellt haben, können Sie die Erreichbarkeit in einem bestimmten Umkreis um die Route herum berechnen lassen.
 <<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
   
@@ -140,6 +153,10 @@ Das Modul kann ohne vorherige Gebietsauswahl verwendet werden.
 ![Erreichbarkeit entlang einer Route](003c_erreichbarkeitroute.png)
 =======
 
+=======
+Wenn Sie im Routing-Tool eine Route erstellt haben, können Sie die Erreichbarkeit in einem bestimmten Umkreis um die Route herum berechnen lassen. 
+  
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/erreichbarkeitsanalyse.md
 Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 ![Abbildung 3: Erreichbarkeit entlang einer Route](https://user-images.githubusercontent.com/43250699/159470252-067117b3-b8a3-481d-b007-113e7a0477c8.png)
 >>>>>>> 149927fa (resolve rebase conflicts):cosi/manuals/erreichbarkeitsanalyse.md
@@ -155,7 +172,7 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 4. **Entfernung**
    > Entfernung in Metern angeben.
 5. **Berechnen**
-6. **Ergebnis ausblenden**
+6. **Ergebnis ausblenden** 
 7. **Legende und Isochronen**
    > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen das um die Route herum erreichbare Gebiet abhängig von den zuvor eingegebenen Parametern.
 8. **Ergebnisverzeichnis**

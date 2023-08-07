@@ -24,10 +24,6 @@ const state = {
     resizableWindow: false,
     isVisibleInMenu: true,
     deactivateGFI: true,
-<<<<<<< HEAD
-=======
-    rawGeoJson: null,
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
     isochroneFeatures: [],
     isochroneColors: undefined,
     mode: "point",
@@ -54,7 +50,6 @@ const state = {
     reportTemplateMode: null, // is tool open to edit a report template? null if not, integer with chapter index if yes
     // these two variables are required to make this addon compatible with the toolBridge addon (for details see toolBridge documentation)
     toolBridgeIn: {settings: {}, type: "", outputCallback: null}, // accepts settings from toolBridge - must have a *watcher*
-<<<<<<< HEAD
     toolBridgeOut: {}, // pass current settings to toolBridge - must have a *getter
     progress: 0,
     batchSize: 50,
@@ -63,9 +58,6 @@ const state = {
     filterFeatureType: "landesgrenze",
     serviceId: "bkg_ors",
     fallbackServiceId: "csl_ors"
-=======
-    toolBridgeOut: {}// pass current settings to toolBridge - must have a *getter
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 };
 
 export default state;

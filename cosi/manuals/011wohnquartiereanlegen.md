@@ -1,5 +1,13 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
 
 ## Wohnungsbauquartiere anlegen 
+=======
+## Wohnungsbauquartiere anlegen
+>>>>>>> 0650b0a5 (resolve rebase conflicts)
+=======
+## Wohnungsbauquartiere anlegen 
+>>>>>>> e41bd580 (update cosi folder)
 
 Durch das Erstellen eines Wohnbauquartiers können Sie Wohnungsbauszenarien durchspielen. Die erstellten Wohnungsbauquartiere stehen Ihnen für weitere Analysefunktionen zur Verfügung. Die Szenarien können exportiert und gespeichert werden.
 
@@ -15,6 +23,7 @@ Sobald Sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet si
 *Abb. b: Wohnungsbauquartiere anlegen*
 =======
 <<<<<<< HEAD:cosi/manuals/011wohnquartiereanlegen.md
+<<<<<<< HEAD:cosi/manuals/011wohnquartiereanlegen.md
 Sobald Sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden (s. Abbidlung 009a "Szenario Manager").
 
 ![Abbildung a: Wohnungsbauquartiere anlegen](011a_wohnquartiere.PNG)
@@ -23,13 +32,11 @@ Sobald Sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet si
 *Abb.b: Wohnungsbauquartiere anlegen*
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/wohnquartiereanlegen.md
 Sobald sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden (s. Abbidlung "Szenario Manager").
 
 ![Abbildung: 2: Wohnungsbauquartiere anlegen](https://github.com/AlexandraKanapki/cosi/blob/COSI-handbuch/cosi/manuals/wohnquatier1.png?raw=true)
-=======
-Sobald sie "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden. (s. [Szenario Manager](#markdown-header-szenario-manager))
-
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 ![Abbildung: 1: Wohnungsbauquartiere anlegen](https://user-images.githubusercontent.com/43250699/143025884-f86a5897-3757-4b35-9d6d-1e4969d8175d.png)  
 *Abbildung 1: Wohnungsbauquartiere anlegen*
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/wohnquartiereanlegen.md
@@ -99,8 +106,4 @@ Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden einmal Schritt f�
 2. **Schritt 2:** Zeichnen Sie mit dem Zeichenstiftwerkzeug den Wohnblock an der gewünschten Fläche ein oder wählen Sie ein Polygon auf dem Kartenlayer aus. 
 3. **Schritt 3:** Parameter für das erstellte Quartier können per Schieberegler angepasst werden.
 4. **Schritt 4:** Wählen Sie ein Referenzgebiet für die Simulation der Zusammensetzung des Gebiets aus. 
-<<<<<<< HEAD
 5. **Schritt 5:** Klicken Sie auf "Anlegen". Das Neue Wohnbauquartier erscheint nun als hervorgehobenes Polygon mit Angaben zur Fläche und Einwohnerzahl auf der Karte.  
-=======
-5. **Schritt 5:** Klicken Sie auf "Anlegen". Das Neue Wohnbauquartier erscheint nun als hervorgehobenes Polygon mit Angaben zur Fläche und Einwohnerzahl auf der Karte.  
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)

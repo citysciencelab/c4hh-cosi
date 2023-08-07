@@ -17,13 +17,8 @@ import {
 import Vuetify from "vuetify";
 import Vue from "vue";
 import Tool from "../../../../../../src/modules/tools/ToolTemplate.vue";
-<<<<<<< HEAD
 import {Worker} from "../../../utils/isochronesWorker";
 import GeoJSON from "ol/format/GeoJSON";
-=======
-import {Worker} from "../../../service/isochronesWorker";
-import {readFeatures} from "../../../components/util";
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 
 global.Worker = Worker;
 
@@ -126,20 +121,16 @@ describe("AccessibilityAnalysis.vue", () => {
                                 isFeatureDisabled: () => sinon.stub().returns(false),
                                 isFeatureActive: () => sinon.stub().returns(true),
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 activeVectorLayerList: sinon.stub().returns(layersMock),
                                 progress: () => sinon.stub()
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> f04ac67c (update cosi folder)
                                 activeVectorLayerList: () => sinon.stub(),
                                 progress: () => sinon.stub()
                             },
-=======
-                                activeVectorLayerList: () => sinon.stub()
-                            }
-                        },
-                        AccessibilityAnalysisService: {
-                            namespaced: true,
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
                             actions: {
                                 // eslint-disable-next-line no-unused-vars
                                 async getIsochrones ({getters, commit}, params) {
@@ -147,12 +138,15 @@ describe("AccessibilityAnalysis.vue", () => {
                                     return createIsochronesStub();
                                 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                             },
                             getters: {
                                 progress: () => sinon.stub()
 >>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> f04ac67c (update cosi folder)
                             }
                         },
                         ScenarioBuilder: {
@@ -301,11 +295,7 @@ describe("AccessibilityAnalysis.vue", () => {
             createIsochronesStub.throws(error);
         }
         else {
-<<<<<<< HEAD
             createIsochronesStub.returns(new GeoJSON().readFeatures(data));
-=======
-            createIsochronesStub.returns(readFeatures(data));
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
         }
 
         await component.vm.$nextTick();
@@ -334,8 +324,11 @@ describe("AccessibilityAnalysis.vue", () => {
     });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> f04ac67c (update cosi folder)
     // it("trigger button with wrong input", async () => {
     //     const wrapper = await mount(undefined, {error: {response: {data: {error: {code: 3002}}}}});
 
@@ -354,26 +347,6 @@ describe("AccessibilityAnalysis.vue", () => {
     //             displayClass: "error"
     //         });
     // });
-=======
-    it("trigger button with wrong input", async () => {
-        const wrapper = await mount(undefined, {error: {response: {data: {error: {code: 3002}}}}});
-
-        wrapper.vm.setCoordinate("10.155828082155567, b");
-        wrapper.vm.setTransportType("Auto");
-        wrapper.vm.setScaleUnit("time");
-        wrapper.vm.setDistance(10);
-
-        await wrapper.vm.createIsochrones();
-
-        sinon.assert.callCount(addSingleAlertStub, 1);
-        expect(addSingleAlertStub.firstCall.args[1]).to.eql(
-            {
-                content: "<strong>additional:modules.tools.cosi.accessibilityAnalysis.showErrorInvalidInput</strong>",
-                category: "Fehler",
-                displayClass: "error"
-            });
-    });
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
     it("trigger button with user input and point selected", async () => {

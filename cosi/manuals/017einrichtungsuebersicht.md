@@ -1,6 +1,7 @@
 ### Einrichtungsübersicht
-<<<<<<< HEAD
    > Um zur Einrichtungsübersicht zu gelangen, muss zunächst ein beliebiger Stadtteil oder Bezirk ausgewählt werden. Als nächtes unter dem Bereich Themen die gewünschten Themen oder Fachdaten auswählen (z.B. Bildung und Wissenschaft). Im Dashboard unter Einrichtungsübersicht können Sie dann mit der Analyse Ihrer Einrichtung beginnen.
+<<<<<<< HEAD:cosi/manuals/017einrichtungsuebersicht.md
+<<<<<<< HEAD:cosi/manuals/017einrichtungsuebersicht.md
    
 <<<<<<< HEAD
 ![Abbildung 1: Einrichtungsübersicht](./017a_einrichtungsuebersicht.PNG)
@@ -12,6 +13,12 @@
 =======
 =======
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
+=======
+
+>>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/einrichtungsuebersicht.md
+=======
+   
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungsuebersicht.md
 ![Abbildung 1: Einrichtungsübersicht](https://user-images.githubusercontent.com/43250699/159693060-ce1ffbeb-e9f6-4525-8896-13f341138246.png)
 *Abbildung 1: Einrichtungsübersicht*
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/einrichtungsuebersicht.md
@@ -25,24 +32,27 @@
    ![Abbildung 2: Fachdaten zur Auswertung auf der Karte](./017b_einrichtungsuebersicht.PNG)
 *Abb. b: Weitere Fachdaten auf der Karte.*
 3. **Einrichtung fokussieren**
-<<<<<<< HEAD
    > Durch einen Klick auf das Symbol der Einrichtung zoomt die Karte zu den gewählten Einrichtungen. Die Einrichtungen werden dann in der Karte visuell hervorgehoben.
 4. **Einrichtung ein-/ausblenden**
 <<<<<<< HEAD
    > Einrichtungen können in der Karte ein- und ausgeschaltet werden indem auf das "Augen"-Symbol neben dem Richtungssymbol geklickt wird. Ausgeschaltete Einrichtungen werden auch bei allen anderen CoSI-Funktionen nicht berücksichtigt.
 =======
    > Einrichtungen können in der Karte ein- und ausgeschaltet werden. Indem auf das "Augen"-Symbol neben dem Richtungssymbol geklickt wird. Ausgeschaltete Einrichtungen werden bei allen anderen CoSI-Funktionen nicht berücksichtigt.
+<<<<<<< HEAD
 =======
    > Durch einen Klick auf das Symbol zoomt die Karte zu der betreffenden Einrichtungen. Die Einrichtung wird in der Karte visuell hervorgehoben.
 4. **Einrichtung ein-/ausblenden**
    > Einrichtungen können in der Karte ein- und ausgeschaltet werden. Ausgeschaltete Einrichtungen werden bei allen anderen CoSI-Funktionen nicht berücksichtigt.
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 0650b0a5 (resolve rebase conflicts)
 5. **Einrichtungsattribute**
    > - Einrichtungsname, Adresse, Layer, Typ und Thema werden dem Datensatz direkt entnommen
    > - Die Gebietszuweisung wird dynamisch für die aktuelle Verwaltungsebene generiert
    > - Symbole zeigen an, wenn eine Einrichtung simuliert oder modifiziert wurde.
 6. **Einträge sortieren**
+<<<<<<< HEAD
 <<<<<<< HEAD
    > Alle Spalten können durch mehrmaliges Klicken auf die Kopfzeile neben dem Namen (z.B. Einrichtung) auf- und absteigend sortiert werden (alphabetisch oder nach Wert). Dabei kann für max. 2 Spalten erfolgen (z.B. 1. nach Typ und 2. nach numerischem Wert).
 =======
@@ -52,25 +62,21 @@
    > Alle Spalten können, durch mehrmaliges Klicken auf die Kopfzeile, auf- und absteigend sortiert werden (alphabetisch oder nach Wert). Dabei kann für max. 2 Spalten erfolgen (z.B. 1. nach Typ und 2. nach numerischem Wert).
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
+=======
+   > Alle Spalten können, durch mehrmaliges Klicken auf die Kopfzeile, neben dem Namen (z.B. Einrichtung) auf- und absteigend sortiert werden (alphabetisch oder nach Wert). Dabei kann für max. 2 Spalten erfolgen (z.B. 1. nach Typ und 2. nach numerischem Wert).
+>>>>>>> 0650b0a5 (resolve rebase conflicts)
 7. **Numerische Attribute**
    > Alle Attribute einer Einrichtung, die Zahlwerte abbilden (welche auch für die [Versorgungsanalyse](./006versorgungsanalyse.md) verwendet werden können werden in einer eigenen Spalte dargestellt. Die Farbe des Balkens richtet sich dabei nach dem Dezil des Wertes in der Liste aller Einrichtungen. Die Länge des Balkens ist proportional zum Höchstwert.
 8. **Durchschnittliche Anbindung (in m)**
    > Die Anbindungsspalte zeigt die durchschnittliche Laufdistanz (in m) zu den jeweils nächstgelegenen Einrichtungen der ausgewählten Typen. Durch einen Klick auf den Wert kann die entsprechende Aufschlüsselung geöffnet werden (s. 12.).
 9.  **Such- und Filterfunktionen**
-<<<<<<< HEAD
       > Hier können Sie die Liste nach Themen filtern oder im Freitext die Einrichtungen durchsuchen.
-=======
-      > Hier können Sie die Liste nach Themen filtern oder im Freitext die Einrichtungen durchsuchen..
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 10. **Einrichtungsdiagramme erstellen**
       > Erzeugt für alle verfügbaren Datenspalten ein Balkendiagramm, in dem die Werte der jeweiligen Einrichtungen und ihre Verteilung über die ausgewählten Gebiete.
       - **10.1 Layer zusammenziehen**
          > Wenn Sie diese Checkbox aktivieren, werden bei "Einrichtungsdiagramme erstellen"  Einrichtungen unterschiedlichen Typs zusammengezogen, wenn sie identische Attribute haben. *Beispiel: Wenn Sie Supermärkte und Drogerien ausgewählt haben, teilen sich beide das Attribut "Verkaufsfläche in m² und werden dementsprechend im Graphen zusammen dargestellt".*
-<<<<<<< HEAD
       - **10.2 Graphenvisualisierung als PNG oder Zip**
          > Die Graphenvisualisierung kann als PNG oder Zip heruntergeladen werden. Die entsprechenden Buttons befinden sich unterhalb der Graphenvisualisierung.
-=======
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 11. **Tabelle exportieren**
       > Die ausgewählten Einträge als XLSX für Excel exportieren. Über das Auswahlfeld *Detailansicht exportieren* können alle bzw. in der Detailansicht ausgewählte Attribute eines Einrichtungstyps exportiert werden. Ist keine Auswahl getroffen, werden alle Einrichtungen exportiert.
 12. **Standortbewertung: Themenauswahl**
@@ -80,8 +86,4 @@
 14. **Standortvisualisierung für alle ausgewählten**
       > Erstellt ein Balkendiagramm mit der Aufschlüsselung für alle ausgewählten Einrichtungen. Wenn Sie mehr als zwei Fachdatensätze für die Auswertung (s. 12) ausgewählt haben, dann wird ein Radardiagramm generiert. Wenn Sie keine Einrichtungen ausgewählt haben, werden *alle* verfügbaren Einrichtungen in das Diagramm mit einbezogen.
 15. **Histogramm**
-<<<<<<< HEAD
       > Erzeugt ein Histogramm, dass die Verteilung der ausgewählten Einrichtungen abbildet.
-=======
-      > Erzeugt ein Histogramm, dass die Verteilung der ausgewählten Einrichtungen abbildet.
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)

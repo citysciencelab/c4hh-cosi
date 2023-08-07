@@ -934,6 +934,9 @@ export default {
                         border-bottom:1px solid #aaa;
                     }
 
+                    li.grouplevel {
+                    }
+
                     ul.selections {
                         li.selectionlevel {
                             display:flex;

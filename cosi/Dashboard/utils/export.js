@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {replaceValues} from "../../utils/modifyObject.js";
 import renameKeys from "../../../../src/utils/renameKeys.js";
 import {getValue} from "./tableCells";
@@ -32,6 +33,7 @@ export function prepareTableExport (data, districtNames, timestamp, keyMap, dist
 
     const exportData = data.map(item => {
 <<<<<<< HEAD
+<<<<<<< HEAD
         const _item = replaceValues(renameKeys(keyMap, item), valuesMap);
 
         keysToIgnore.forEach(keyToIgnore => {
@@ -39,6 +41,9 @@ export function prepareTableExport (data, districtNames, timestamp, keyMap, dist
         });
 =======
         const _item = replaceValues(renameKeys(item, keyMap), valuesMap);
+=======
+        const _item = replaceValues(renameKeys(keyMap, item), valuesMap);
+>>>>>>> 82fe22e5 (update cosi folder)
 
 >>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
         for (const col in _item) {
@@ -83,6 +88,7 @@ export function prepareTableExportWithTimeline (data, districtNames, timestamps,
         ctimestamps = timestamps.slice().reverse(),
         exportData = data.reduce((items, item) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
             const _item = replaceValues(renameKeys(keyMap, item), valuesMap),
                 categoryRows = ctimestamps.map(timestamp => {
                     const el = {..._item};
@@ -93,6 +99,9 @@ export function prepareTableExportWithTimeline (data, districtNames, timestamps,
 
 =======
             const _item = replaceValues(renameKeys(item, keyMap), valuesMap),
+=======
+            const _item = replaceValues(renameKeys(keyMap, item), valuesMap),
+>>>>>>> 82fe22e5 (update cosi folder)
                 categoryRows = ctimestamps.map(timestamp => {
                     const el = {..._item};
 
