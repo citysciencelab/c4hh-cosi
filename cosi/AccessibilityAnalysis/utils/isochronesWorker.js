@@ -1,41 +1,24 @@
-import {WMSCapabilities} from "ol/format.js";
-import {intersects} from "ol/extent";
-import crsModule from "@masterportal/masterportalapi/src/crs";
+import {createIsochrones, getFilterPoly, setFilterPoly} from "./createIsochrones";
+import "regenerator-runtime/runtime";
 import axios from "axios";
-import store from "../../../src/app-store";
+import {registerProjections} from "../../utils/registerProjections.js";
+import GeoJSON from "ol/format/GeoJSON";
 
 /**
- * Adds a WMS through the remote interface
- * Note: Only works with treeType Custom
- *
- * @param {String} url Url of the WMS
- * @param {Array} layersToLoad Array of Objects containing the name, title, style, layerOn information of the layers to be added from the WMS capabilities
- * @param {String} folderName Name of the folder in the layer tree
- * @param {Boolean} zoomTo Parameter to indicate whether the layer is turned on
+ * @param {*} self self
+ * @param {*} event event
  * @returns {void}
  */
-export default function importLayers (url, layersToLoad, folderName, zoomTo) {
+async function onmessage (self, event) {
+    const type = event.data.type;
 
-    if (url.includes("http:")) {
-        console.error("https required");
-        return;
-    }
-    Radio.trigger("Util", "showLoader");
-    axios({
-        timeout: 40000,
-        url: `${url}${url.includes("?") ? "&" : "?"}request=GetCapabilities&service=WMS`
-    })
-        .then(response => response.data)
-        .then((data) => {
-            Radio.trigger("Util", "hideLoader");
-            try {
-                const parser = new WMSCapabilities(),
-                    capability = parser.read(data),
-                    version = capability?.version,
-                    checkVersion = isVersionEnabled(version),
-                    currentExtent = Radio.request("Parser", "getPortalConfig")?.mapView?.extent,
-                    projection = store.getters["Maps/projection"].code_;
+    try {
+        if (event.data.type === "createIsochrones") {
+            const features = await createIsochrones(event.data, (p) => {
+                self.postMessage({type, "progress": p});
+            });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
             self.postMessage({type: event.data.type, result: new GeoJSON().writeFeatures(features)});
         }
@@ -222,49 +205,82 @@ function getIfInExtent (capability, currentExtent, projection) {
         if (!minCoords.length && !maxCoords.length) {
             minCoords = crsModule.transformCoord(definedExtents[0].crs, projection, [definedExtents[0].extent[0], definedExtents[0].extent[1]]);
             maxCoords = crsModule.transformCoord(definedExtents[0].crs, projection, [definedExtents[0].extent[2], definedExtents[0].extent[3]]);
+=======
+            self.postMessage({type: event.data.type, result: new GeoJSON().writeFeatures(features)});
+>>>>>>> 5a6c901e (update cosi folder)
         }
-
-        layerExtent = [minCoords[0], minCoords[1], maxCoords[0], maxCoords[1]];
-
-        // If there is no extent defined or the extent is not right defined, it will import the external wms layer(s).
-        if (!Array.isArray(currentExtent) || currentExtent.length !== 4) {
-            return layerExtent;
+        else if (event.data.type === "init") {
+            setFilterPoly(event.data.coords);
+            self.postMessage({type, result: "ok"});
         }
+        else if (event.data.type === "getFilterPoly") {
+            self.postMessage({type, result: getFilterPoly()});
+        }
+        else if (event.data.type === "register") {
+            registerProjections(event.data.projections);
+        }
+    }
+    catch (error) {
+        if (axios.isCancel(error)) {
+            self.postMessage({type, request_canceled: true});
+        }
+        else {
+            self.postMessage({type, error});
+        }
+    }
+}
 
-        return intersects(currentExtent, layerExtent) ? layerExtent : false;
+self.addEventListener("message", function (e) {
+    onmessage(self, e);
+});
+
+/**
+ * use this (for testing) if Workers are not available in the active enviroment
+ **/
+export class Worker {
+
+    // eslint-disable-next-line require-jsdoc
+    constructor () {
+        this.listeners = [];
     }
 
-    return true;
+    // eslint-disable-next-line require-jsdoc
+    async postMessage (args) {
+        await onmessage({
+            postMessage: (data) => {
+                if (data.error) {
+                    this.onerror(data);
+                }
+                if (this.onmessage) {
+                    this.onmessage({data});
+                }
+                for (const l of this.listeners) {
+                    l({data});
+                }
+            }
+        }, {data: args});
+    }
+
+    // eslint-disable-next-line require-jsdoc
+    terminate () {
+        this.status = "terminated";
+    }
+
+    // eslint-disable-next-line require-jsdoc
+    addEventListener (type, l) {
+        if (type === "message") {
+            this.listeners.push(l);
+        }
+    }
+
+    // eslint-disable-next-line require-jsdoc
+    removeEventListener (type, l) {
+        if (type === "message") {
+            const index = this.listeners.indexOf(l);
+
+            if (index > -1) {
+                this.listeners.splice(index, 1);
+            }
+        }
+    }
 }
-
-/**
- * Getter for reversed data of old wms version
- * @param {Object} data the response of the imported wms layer
- * @returns {xml} reversedData - The reversed data of the response of the imported wms layer
- */
-function getReversedData (data) {
-    let reversedData = new XMLSerializer().serializeToString(data);
-
-    reversedData = reversedData.replace(/<SRS>/g, "<CRS>").replace(/<\/SRS>/g, "</CRS>").replace(/SRS=/g, "CRS=");
-    reversedData = new DOMParser().parseFromString(reversedData, "text/xml");
-
-    return reversedData;
-}
-
-/**
- * Getter for parsed title without space and slash and colon
- * It will be used as id later in template
- * @param {String} title - the title of current layer
- * @returns {String} parsedTitle - The parsed title
- */
-function getParsedTitle (title) {
-    return String(title).replace(/\s+/g, "-").replace(/\//g, "-").replace(/:/g, "-").replace(/\(/g, "-").replace(/\)/g, "-");
-}
-
-export {
-    parseLayer,
-    isVersionEnabled,
-    getIfInExtent,
-    getReversedData,
-    getParsedTitle
-};

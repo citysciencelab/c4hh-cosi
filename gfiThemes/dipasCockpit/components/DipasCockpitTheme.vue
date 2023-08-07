@@ -240,5 +240,3 @@ export default {
 }
 
 </style>
-=======
->>>>>>> d95d456b (BG-3814 deleted old file content)

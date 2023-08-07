@@ -1,15 +1,8 @@
 import {expect} from "chai";
-<<<<<<< HEAD
 import {transformCoordinates, transformCoordinate} from "../../../utils/transformCoordinates";
 import sinon from "sinon";
 
 describe("Accessibility/utils/transformCoordinates", () => {
-=======
-import {transformCoordinates} from "../../../utils/transformCoordinates";
-import sinon from "sinon";
-
-describe("utils/features/transform", () => {
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
     const coordinates = [[567365.4714596295, 5939001.647575631], [565224.7537994956, 5938496.534138625], [567461.6848501588, 5937991.420701618]],
         transCoordinates = [[10.017877366728525, 53.595515231189246], [9.985431302078034, 53.59124641953129], [10.01911238545045, 53.58642383664248]];
 
@@ -22,11 +15,7 @@ describe("utils/features/transform", () => {
         sinon.restore();
     });
 
-<<<<<<< HEAD
     describe("transformCoordinates", () => {
-=======
-    describe("transformFeatures", () => {
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
         it("should return false if the given param is an object", () => {
             expect(transformCoordinates({})).to.be.false;
         });
@@ -122,7 +111,6 @@ describe("utils/features/transform", () => {
             expect(transformCoordinates(coordinates, "EPSG:25832", "EPSG:4326")).to.deep.equal(transCoordinates);
         });
     });
-<<<<<<< HEAD
 
     describe("transformCoordinate", () => {
         it("should return false if the given param is an object", () => {
@@ -220,6 +208,4 @@ describe("utils/features/transform", () => {
             expect(transformCoordinate(coordinates[0], "EPSG:25832", "EPSG:4326")).to.deep.equal(transCoordinates[0]);
         });
     });
-=======
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 });

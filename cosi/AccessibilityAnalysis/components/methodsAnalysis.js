@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-import * as Proj from "ol/proj.js";
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 import * as Extent from "ol/extent";
 import GeometryCollection from "ol/geom/GeometryCollection";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom";
@@ -11,11 +7,7 @@ import {
     featureCollection as turfFeatureCollection
 } from "@turf/helpers";
 import {default as turfBuffer} from "@turf/buffer";
-<<<<<<< HEAD
 import GeoJSON from "ol/format/GeoJSON";
-=======
-import {readFeatures} from "../components/util.js";
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 import {transformFeatures} from "../../utils/features/transform";
 import {getModelByAttributes} from "../../utils/radioBridge.js";
 import {getRecordById} from "../../../../src/api/csw/getRecordById";
@@ -23,10 +15,10 @@ import {filterAllFeatures} from "../../utils/layer/filterAllFeatures";
 import {styleIsochroneFeatures} from "../utils/styleIsochroneFeatures.js";
 import {simplify} from "../../utils/geometry/simplify";
 import {getFlatCoordinates} from "../../utils/geometry/getFlatCoordinates";
-<<<<<<< HEAD
 import {transformCoordinate} from "../utils/transformCoordinates";
 import {getDistances, getSteps} from "../utils/getDistances";
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 =======
@@ -38,6 +30,8 @@ export const methodConfig = {
 };
 >>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> f04ac67c (update cosi folder)
 export default {
     /**
      * create isochrones features
@@ -65,20 +59,19 @@ export default {
             }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
             console.error(err);
 >>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> f04ac67c (update cosi folder)
 
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
             try {
                 const code = (err.error || err).response.data.error.code;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
                 if (code === 3002 || code === 3099) {
                     this.showErrorInvalidInput();
                 }
@@ -103,6 +96,7 @@ export default {
         const allActiveFeatures = filterAllFeatures(this.selectedFacilityLayer, this.isFeatureActive),
             coordinates = this.getCoordinates(allActiveFeatures, this.setByFeature),
 <<<<<<< HEAD
+<<<<<<< HEAD
             {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this._useTravelTimeIndex, this.time);
 =======
 <<<<<<< HEAD
@@ -111,6 +105,9 @@ export default {
             {distance, maxDistance, minDistance, steps} = this.getDistances();
 >>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
+=======
+            {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this.useTravelTimeIndex, this.time);
+>>>>>>> f04ac67c (update cosi folder)
 
         if (
             coordinates !== null &&
@@ -126,10 +123,6 @@ export default {
                 scaleUnit: this.scaleUnit,
                 distance,
                 maxDistance,
-<<<<<<< HEAD
-=======
-                minDistance,
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
                 baseUrl: this.baseUrl
             });
 
@@ -150,6 +143,7 @@ export default {
     createIsochronesPoint: async function () {
         const
 <<<<<<< HEAD
+<<<<<<< HEAD
             {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this._useTravelTimeIndex, this.time);
 =======
 <<<<<<< HEAD
@@ -158,6 +152,9 @@ export default {
             {distance, maxDistance, minDistance, steps} = this.getDistances();
 >>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
+=======
+            {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this.useTravelTimeIndex, this.time);
+>>>>>>> f04ac67c (update cosi folder)
 
         if (
             this.coordinate.length > 0 &&
@@ -171,21 +168,11 @@ export default {
                 scaleUnit: this.scaleUnit,
                 distance,
                 maxDistance,
-<<<<<<< HEAD
-=======
-                minDistance,
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
                 baseUrl: this.baseUrl
             });
 
             this.setSteps(steps);
-<<<<<<< HEAD
             this.setIsochroneFeatures(features);
-=======
-            this.setRawGeoJson(await this.featureToGeoJson(features[0]));
-            this.setIsochroneFeatures(features);
-            this.showRequestButton = true;
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
             this.cleanup();
         }
         else {
@@ -196,13 +183,7 @@ export default {
         this.mapLayer.getSource().clear();
 
         if (newFeatures.length === 0) {
-<<<<<<< HEAD
             setBBoxToGeom.call(this, this.areaSelectorGeom || this.boundingGeometry);
-=======
-            if (this.mode !== "region") {
-                setBBoxToGeom.call(this, this.areaSelectorGeom || this.boundingGeometry);
-            }
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
             return;
         }
 
@@ -212,25 +193,6 @@ export default {
             this.setIsochroneAsBbox();
         }
     },
-<<<<<<< HEAD
-=======
-    /**
-     * add coordinate after user click
-     * @param {event} clickCoordinate - The coordinate of the click event on the map.
-     * @returns {void}
-     */
-    setCoordinateFromClick: function (clickCoordinate) {
-        this.setCoordinate(transformCoordinates([clickCoordinate], this.projectionCode));
-        this.setSetBySearch(false);
-    },
-
-    setCoordinateFromFeature: function (feature) {
-        const simplifiedGeom = simplify(feature.getGeometry()),
-            coordiantes = getFlatCoordinates(simplifiedGeom);
-
-        this.setCoordinate(transformCoordinates(coordiantes, this.projectionCode));
-    },
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
 
     createBufferFromDirections: function () {
         let bufferFeatures;
@@ -239,7 +201,6 @@ export default {
             distance = parseFloat(this.distance) / 1000,
             steps = [distance, distance * 2 / 3, distance / 3],
             coords = this.selectedDirections?.lineString
-<<<<<<< HEAD
                 .map(pt => transformCoordinate(pt, this.projectionCode, "EPSG:4326")),
             lineString = turfLineString(coords),
             buffer = turfFeatureCollection(steps.map(dist => {
@@ -247,13 +208,6 @@ export default {
             }));
 
         bufferFeatures = new GeoJSON().readFeatures(buffer);
-=======
-                .map(pt => Proj.transform(pt, this.projectionCode, "EPSG:4326")),
-            lineString = turfLineString(coords),
-            buffer = turfFeatureCollection(steps.map(dist => turfBuffer(lineString, dist)));
-
-        bufferFeatures = readFeatures(JSON.stringify(buffer));
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
         bufferFeatures = transformFeatures(bufferFeatures, "EPSG:4326", this.projectionCode);
         bufferFeatures.forEach((feature, i) => {
             feature.set("featureType", featureType);
@@ -262,12 +216,7 @@ export default {
             feature.set("unit", this.scaleUnit);
         });
 
-<<<<<<< HEAD
         this.setSteps(getSteps(parseFloat(this.distance)));
-=======
-        this.setSteps([distance * 1000 / 3, distance * 2000 / 3, distance * 1000].map((n) => Number.isInteger(n) ? n.toLocaleString("de-DE") : n.toFixed(2)));
-        this.setRawGeoJson(buffer);
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
         this.setIsochroneFeatures(bufferFeatures);
     },
 
@@ -279,11 +228,7 @@ export default {
         const coord = getSearchResultsCoordinates();
 
         if (coord) {
-<<<<<<< HEAD
             this.setCoordinate([transformCoordinate(coord, this.projectionCode, "EPSG:4326")]);
-=======
-            this.setCoordinate([Proj.transform(coord, this.projectionCode, "EPSG:4326")]);
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
             this.setClickCoordinate(coord);
             this.setSetBySearch(true);
         }
@@ -327,10 +272,7 @@ export default {
 
         setBBoxToGeom.call(this, geometryCollection);
     },
-<<<<<<< HEAD
 
-=======
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
     /**
     * resets facility layers' bbox
     * @returns {void}
@@ -343,13 +285,7 @@ export default {
      * @returns {void}
      */
     clear: function () {
-<<<<<<< HEAD
         this.setSteps([0, 0, 0]);
-=======
-        this.showRequestButton = false;
-        this.setSteps([0, 0, 0]);
-        this.setRawGeoJson(null);
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
         this.setIsochroneFeatures([]);
     },
 
@@ -369,43 +305,11 @@ export default {
         else {
             this.renderIsochrones(this._isochroneFeatures);
             if (this.mode === "point") {
-<<<<<<< HEAD
                 this.placingPointMarker(transformCoordinate(this.coordinate[0], "EPSG:4326", this.projectionCode));
-=======
-                this.placingPointMarker(
-                    Proj.transform(this.coordinate[0], "EPSG:4326", this.projectionCode)
-                );
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
             }
         }
     },
 
-<<<<<<< HEAD
-=======
-    /**
-     * gets the distance weighted by travel time index
-     * @returns {{distance: Number, maxDistance: Number, minDistance: Number, steps: String[]}} distance with penalty and legend
-     */
-    getDistances: function () {
-        const
-            hasPenalty = this.useTravelTimeIndex && this.scaleUnit === "time" && this.transportType === "driving-car",
-            penalty = this.travelTimeIndex[this.time] / Math.min(...Object.values(this.travelTimeIndex)),
-            rawDistance = parseFloat(this.distance);
-        let
-            distance = rawDistance,
-            maxDistance, minDistance,
-            steps = [rawDistance / 3, rawDistance * 2 / 3, rawDistance].map(n => Number.isInteger(n) ? n.toLocaleString("de-DE") : n.toFixed(2));
-
-        if (hasPenalty) {
-            distance = rawDistance / penalty;
-            maxDistance = rawDistance;
-            minDistance = rawDistance / (Math.max(...Object.values(this.travelTimeIndex)) / Math.min(...Object.values(this.travelTimeIndex)));
-            steps = [...steps, "max"];
-        }
-
-        return {distance, maxDistance, minDistance, steps};
-    },
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
     // pull meta data for the dataset used for the analysis
     getMetadataSelectedData: async function () {
         // first find out what layer we are working with
@@ -434,11 +338,7 @@ export default {
                     }
                     return [...res, Extent.getCenter(geometry.getExtent())];
 
-<<<<<<< HEAD
                 }, []).map(coord => transformCoordinate(coord, this.projectionCode, "EPSG:4326"));
-=======
-                }, []).map(coord => Proj.transform(coord, this.projectionCode, "EPSG:4326"));
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
         }
         return null;
     }

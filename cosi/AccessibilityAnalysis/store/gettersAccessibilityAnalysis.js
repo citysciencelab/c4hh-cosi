@@ -5,10 +5,11 @@ import stateAccessibilityAnalysis from "./stateAccessibilityAnalysis";
 =======
 import vueAddonState from "./stateAccessibilityAnalysis";
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
-import {getServiceUrl} from "../../utils/radioBridge.js";
 =======
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
+>>>>>>> f04ac67c (update cosi folder)
+import {getServiceUrl} from "../../utils/radioBridge.js";
 
 const getters = {
     ...generateSimpleGetters(stateAccessibilityAnalysis),
@@ -28,12 +29,9 @@ const getters = {
             setByFeature: state.setByFeature,
             steps: state.steps
         };
-<<<<<<< HEAD
     },
     baseUrl: s => serviceId => {
         return getServiceUrl(serviceId || s.fallbackServiceId) + "/v2/";
-=======
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
     }
 };
 

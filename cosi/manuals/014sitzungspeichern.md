@@ -7,11 +7,15 @@
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 =======
 <<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
+<<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
 ### Sitzung Speichern / Laden 
 ![Abbildung 1: Sitzung Speichern](014_sitzungspeichern.PNG)
 *Abb.: Sitzung speichern / laden*
 =======
 ### Sitzung Speichern / Laden
+=======
+### Sitzung Speichern / Laden 
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/sitzungspeichern.md
 ![Abbildung 1: Sitzung Speichern](../utils/assets/screenshots/sitzungspeichern.png)
 *Abbildung 1: Sitzung speichern / laden*
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/sitzungspeichern.md
@@ -25,6 +29,7 @@ Mit dem Dienst **Sitzung speichern/laden** können die folgend aufgelisteten Inf
 
 - Die ausgewählte Verwaltungsebene und ausgewählte Gebiete
 <<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
+<<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
 - Aktive Fachdatenthemen 
 <<<<<<< HEAD
 - Mit den [Simulationswerkzeugen](./009einrichtungenanlegen.md) erstellte Szenarien 
@@ -35,6 +40,10 @@ Mit dem Dienst **Sitzung speichern/laden** können die folgend aufgelisteten Inf
 =======
 - Aktive Fachdatenthemen
 - Mit den [Simulationswerkzeugen](./einrichtungenanlegen.md) erstellte Szenarien
+=======
+- Aktive Fachdatenthemen 
+- Mit den [Simulationswerkzeugen](./einrichtungenanlegen.md) erstellte Szenarien 
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/sitzungspeichern.md
 - Ergebnisse und Konfigurationen der Werkzeuge [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Versorgungsanalyse](./versorgungsanalyse.md)
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/sitzungspeichern.md
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
@@ -49,8 +58,8 @@ Die Funktion ist unter "Dienste", "Sitzung speichern/laden" zu finden.
 3. **Letzte löschen**
    > Letzte Sitzung aus dem Cache löschen
 4. **Speichern unter**
-   > Eine Sitzung benennen und als Datei auf dem Rechner speichern und über den Button **Datei laden** wieder laden. Diese können jederzeit wieder geladen oder mit anderen CoSI Nutzer:innen geteilt werden.
-
+   > Eine Sitzung benennen und als Datei auf dem Rechner speichern und über den Button **Datei laden** wieder laden. Diese können jederzeit wieder geladen oder mit anderen CoSI Nutzer:innen geteilt werden. 
+   
    *Expertentipp: Die Sitzungen können mit jedem Texteditor geöffnet und als JSON-Datei bearbeitet werden.*
 5. **Datei laden**
    > Sitzung aus lokaler Datei öffnen

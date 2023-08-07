@@ -43,13 +43,10 @@ const mutations = {
      */
     setMetadata: (state, payload) => {
         state.metaData = payload;
-<<<<<<< HEAD
     },
 
     setProgress: (moduleState, payload) => {
         moduleState.progress = payload;
-=======
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
     }
 };
 

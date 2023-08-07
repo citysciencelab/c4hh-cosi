@@ -48,8 +48,13 @@ const state = {
 =======
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/featureslist.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/einrichtungsuebersicht.md"
+<<<<<<< HEAD
     }
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
+=======
+    },
+    show: true
+>>>>>>> 3502056a (update cosi folder)
 };
 
 export default state;

@@ -11,11 +11,18 @@ Haben Sie ein aktives Szenario können Sie sowohl selbst angelegte als auch bere
 Ein Szenario können Sie wie im [Szenario Manager](./009einrichtungenanlegen.md) beschrieben anlegen. Ist ein Szenario angelegt und Sie wählen per Mausklick eine Einrichtung an, erscheint folgendes Popup am unteren Bildschirmrand: 
 =======
 <<<<<<< HEAD:cosi/manuals/010einrichtungenbearbeiten.md
+<<<<<<< HEAD:cosi/manuals/010einrichtungenbearbeiten.md
 Ein Szenario können Sie wie im [Szenario Manager](009einrichtungenanlegen.md) beschrieben anlegen. Ist ein Szenario angelegt und Sie wählen per Mausklick eine Einrichtung an, erscheint folgendes Popup am unteren Bildschirmrand: 
 =======
 Ein Szenario können Sie wie im [Szenario Manager](./einrichtungenanlegen.md) beschrieben anlegen. Ist ein Szenario angelegt und Sie wählen per Mausklick eine Einrichtung an, erscheint folgendes Popup am unteren Bildschirmrand:
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/einrichtungenbearbeiten.md
+<<<<<<< HEAD
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
+=======
+=======
+Ein Szenario können Sie wie im [Szenario Manager](./einrichtungenanlegen.md) beschrieben anlegen. Ist ein Szenario angelegt und Sie wählen per Mausklick eine Einrichtung an, erscheint folgendes Popup am unteren Bildschirmrand: 
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungenbearbeiten.md
+>>>>>>> e41bd580 (update cosi folder)
 
 ![Abbildung 2: Einrichtung bearbeiten](./010b_einrichtungenbearbeiten.PNG)
 
@@ -61,7 +68,7 @@ Wählen Sie hier den Button **BEARBEITEN** an, daraufhin wird sich das folgende 
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
 
 1. **Eingaben sperren**
-   > Mit Hilfe dieses Buttons sperren Sie die Input-Felder des Fensters, so dass Sie nicht mehr bearbeitet werden können. Die Input-Felder sind standardmäßig gesperrt, so dass Sie diesen Button aktivieren müssen, ehe Sie eine vorhandene Einrichtung bearbeiten können.
+   > Mit Hilfe dieses Buttons sperren Sie die Input-Felder des Fensters, so dass Sie nicht mehr bearbeitet werden können. Die Input-Felder sind standardmäßig gesperrt, so dass Sie diesen Button aktivieren müssen, ehe Sie eine vorhandene Einrichtung bearbeiten können. 
 2. **Inputfelder**
    > Die verfügbaren Inputfelder für den Datensatz der ausgewählten Einrichtung. Die Inputfelder weichen je nach Einrichtung ab (Krankenhaus, Sportstätte, Schule etc.).
 3. **Änderungen speichern**
@@ -80,6 +87,7 @@ Wählen Sie hier den Button **BEARBEITEN** an, daraufhin wird sich das folgende 
 1. **Das angewählte Cluster (3)**
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
    > Die Darstellung von Einrichtungen wird auf der Karte gebündelt, wenn Einrichtungen so dicht beeinander liegen, dass sie, wenn diese in der aktuellen Zoomstufe nicht separiert werden können. 
 =======
 <<<<<<< HEAD
@@ -91,6 +99,9 @@ Wählen Sie hier den Button **BEARBEITEN** an, daraufhin wird sich das folgende 
 =======
    > Die Darstellung von Einrichtungen wird auf der Karte gebündelt, wenn zu viele Einrichtungen an einem Ort sind, wenn diese in der aktuellen Zoomstufe nicht dargestellt werden können.
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
+=======
+   > Die Darstellung von Einrichtungen wird auf der Karte gebündelt, wenn zu viele Einrichtungen an einem Ort sind, wenn diese in der aktuellen Zoomstufe nicht dargestellt werden können. 
+>>>>>>> e41bd580 (update cosi folder)
 2. **Auswahl**
    > Alle im Cluster gebundenen Einrichtungen werden angezeigt, sobald Sie auf das Cluster klicken. Sie können dann in diesem Fenster eine Einrichtung auswählen, woraufhin sich das Fenster aus *Abbildung 3* öffnet.
 

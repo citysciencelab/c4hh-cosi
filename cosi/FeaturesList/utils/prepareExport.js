@@ -1,9 +1,14 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {replaceValues} from "../../utils/modifyObject.js";
 import renameKeys from "../../../../src/utils/renameKeys.js";
 =======
 import {renameKeys, replaceValues} from "../../utils/modifyObject.js";
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
+=======
+import {replaceValues} from "../../utils/modifyObject.js";
+import renameKeys from "../../../../src/utils/renameKeys.js";
+>>>>>>> f04ac67c (update cosi folder)
 
 const keyMap = {
         name: "Einrichtung",
@@ -45,10 +50,14 @@ export function prepareTableExport (data) {
         return null;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     const exportData = data.map(item => replaceValues(renameKeys(keyMap, item), valuesMap, true, false));
 =======
     const exportData = data.map(item => replaceValues(renameKeys(item, keyMap), valuesMap, true, false));
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
+=======
+    const exportData = data.map(item => replaceValues(renameKeys(keyMap, item), valuesMap, true, false));
+>>>>>>> f04ac67c (update cosi folder)
 
     return exportData;
 }
@@ -77,10 +86,14 @@ export function prepareDetailsExport (data, filterProps) {
             });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         return replaceValues(renameKeys(keyMap, {...Object.fromEntries(properties), ...item}), valuesMap, true, false);
 =======
         return replaceValues(renameKeys({...item, ...Object.fromEntries(properties)}, keyMap), valuesMap, true, false);
 >>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
+=======
+        return replaceValues(renameKeys({...Object.fromEntries(properties), ...item}, keyMap), valuesMap, true, false);
+>>>>>>> f04ac67c (update cosi folder)
     });
 
     return exportData;

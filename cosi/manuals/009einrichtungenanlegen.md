@@ -22,13 +22,21 @@ Sobald sie unter "Simulation" "Einrichtungen anlegen" auswählen, öffnet sich e
 *Abb. a: Szenario Manager*  
 =======
 <<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
+<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
 ![Abbildung 1: Szenario Manager](009a_einrichtungenanlegen.PNG) 
 *Abb.a: Szenario Manager*  
 =======
 ![Abbildung 1: Szenario Manager](https://user-images.githubusercontent.com/43250699/143022435-622e8032-e0da-4b5e-bd0c-9e33aa07de2c.png)
 *Abbildung 1: Szenario Manager*
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/einrichtungenanlegen.md
+<<<<<<< HEAD
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
+=======
+=======
+![Abbildung 1: Szenario Manager](https://user-images.githubusercontent.com/43250699/143022435-622e8032-e0da-4b5e-bd0c-9e33aa07de2c.png) 
+*Abbildung 1: Szenario Manager*  
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungenanlegen.md
+>>>>>>> e41bd580 (update cosi folder)
 
 1. **Szenario Dropdown**
    > Zeigt bisher erstellte Szenarien an.
@@ -38,17 +46,20 @@ Szenarios.
 3. **Szenario exportieren**
    > Stellt einen Download des Szenarios zur Verfügung
 4. **Szenario Löschen**
-   > Löscht das ausgewählte Szenario.
+   > Löscht das ausgewählte Szenario. 
 5. **Szenario leeren**
-   > Löscht alle Veränderungen im Szenario.
+   > Löscht alle Veränderungen im Szenario. 
 6. **Thema auswählen**
-   > Dropdownmenü erlaubt die Auswahl aus den aktivierten Fachthemen.
+   > Dropdownmenü erlaubt die Auswahl aus den aktivierten Fachthemen.  
+  
+ *Sie **müssen** ein Thema aus den geladenen Fachdaten wählen. Sind keine Fachdaten ausgewählt, ist kein Szenario möglich. Wählen Sie mindestens ein Analysethema aus dem Themenbaum.*  
 
 <<<<<<< HEAD
 ![Abbildung 2: Einrichtungen anlegen](./009b_einrichtungenanlegen.PNG)  
 
 *Abb. b: Einrichtungen anlegen*  
 =======
+<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
 <<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
 ![Abbildung 2: Einrichtungen anlegen](009b_einrichtungenanlegen.PNG)  
 *Abb.b: Einrichtungen anlegen*  
@@ -65,13 +76,20 @@ Szenarios.
 1. **Einrichtung kopieren**
    > Erlaubt den Upload eines gespeicherten Szenarios.
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/einrichtungenanlegen.md
+=======
+![Abbildung 2: Einrichtungen anlegen](https://user-images.githubusercontent.com/43250699/143023574-324b2275-eea7-4926-bf3d-07c2f21124e1.png)  
+*Abbildung 2: Einrichtungen anlegen*  
+
+1. **Einrichtung kopieren**
+   > Erlaubt den Upload eines gespeicherten Szenarios. 
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungenanlegen.md
 2. **Verschieben der Einrichtung**
    > Erlaubt das Bewegen von Einrichtungen durch verschieben auf der Karte
-3. **Sichern/ Öffnen**
+3. **Sichern/ Öffnen** 
    > Ermöglicht geöffnet das Verschieben vorhandener Einrichtungen.
-4. **Rückgängig**
+4. **Rückgängig** 
    > Stellt den vorherigen Zustand wieder her.
-5. **Geometrie**
+5. **Geometrie** 
    > Überträgt die Geometrie eines Punktes durch Klick auf der Karte.
 6. **Löschen**
    > Entfernt vorhandene Geometrie.
@@ -115,6 +133,7 @@ Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden einmal Schritt f�
 2. #### **Schritt 2:** Name für Szenario festlegen
 3. #### **Schritt 3:** Einrichtung definieren
 <<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
+<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
    1. Kopieren sie eine Einrichtung mit dem Pipetten-Symbol, indem Sie zuerst die Pipette anklicken und dann die zu kopierende Einrichtung in der Karte anwählen. Sie können Einrichtungen auch vollständig manuell anlegen, indem Sie die dazu erforderlichen Spalten selbst ausfüllen. 
    2. Positionieren Sie die Einrichtung auf der Karte, indem Sie zunächst den "Ort wählen" Stift im Feld *Geometrie/ Ort* anklicken und dann einen Punkt auf der Karte anwählen. Alternativ können Sie die geometrischen Werte in das Feld Geometrie/Ort eintragen. 
    3. *Erforderliche Spalten* werden durch das Kopieren einer Einrichtung per Pipette übernommen. Diese Spalten können jedoch manuell ergänzt oder verändert werden. 
@@ -130,13 +149,24 @@ Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden einmal Schritt f�
    1. Kopieren sie eine Einrichtung mit dem Pipetten-Symbol, indem sie zuerst die Pipette anklicken und dann die zu kopierende Einrichtung in der Karte anwählen. Sie können Einrichtungen auch vollständig manuell anlegen, indem Sie die dazu erforderlichen Spalten selbst ausfüllen.
    2. Positionieren sie die Einrichtung auf der Karte, indem sie zunächst den "Ort wählen" Stift im Feld *Geometrie/ Ort* anklicken und dann einen Punkt auf der Karte anwählen. Alternativ können Sie die geometrischen Werte in das Feld Geometrie/Ort eintragen.
    3. *Erforderliche Spalten* werden durch das Kopieren einer Einrichtung per Pipette übernommen. Diese Spalten können jedoch manuell ergänzt oder verändert werden.
+=======
+   1. Kopieren sie eine Einrichtung mit dem Pipetten-Symbol, indem sie zuerst die Pipette anklicken und dann die zu kopierende Einrichtung in der Karte anwählen. Sie können Einrichtungen auch vollständig manuell anlegen, indem Sie die dazu erforderlichen Spalten selbst ausfüllen. 
+   2. Positionieren sie die Einrichtung auf der Karte, indem sie zunächst den "Ort wählen" Stift im Feld *Geometrie/ Ort* anklicken und dann einen Punkt auf der Karte anwählen. Alternativ können Sie die geometrischen Werte in das Feld Geometrie/Ort eintragen. 
+   3. *Erforderliche Spalten* werden durch das Kopieren einer Einrichtung per Pipette übernommen. Diese Spalten können jedoch manuell ergänzt oder verändert werden. 
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungenanlegen.md
    4. *Optionale Spalten* werden automatisch durch das Kopieren einer Einrichtung übertragen, können aber auch manuell ergänzt oder ausgefüllt werden .
 4. #### **Schritt 4:** Einrichtung anlegen
-   > Schließen sie die Erstellung ab, indem Sie den blauen Button "Neue Einrichtung Erstellen" klicken. Die neue Einrichtung erscheint als Icon in der Karte. Neue Einrichtungen werden durch ein farbiges Sternchen gekennzeichnet.
+   > Schließen sie die Erstellung ab, indem Sie den blauen Button "Neue Einrichtung Erstellen" klicken. Die neue Einrichtung erscheint als Icon in der Karte. Neue Einrichtungen werden durch ein farbiges Sternchen gekennzeichnet. 
 5. #### **Schritt 5:** Einrichtung bewegen
+<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
    1. Zum Verschieben von Einrichtungen klicken Sie das Bewegen-Symbol. Nun klicken sie die Einrichtung, die Sie bewegen möchten. Ist diese aktiviert, vergrößert sich das Symbol und zeigt damit an, dass die Einrichtung nun beweglich ist. Ziehen sie die Einrichtung mit gedrückter linker Maustaste an den gewünschten Platz.
    2. Möchten sie bestehende Einrichtungen aus dem Datensatz auf der Karte verschieben, dann lösen Sie durch einen Klick auf das Schloss die Sperre. Es erscheint eine Warnung:
    *"Achtung: Sie können jetzt auch echte Einrichtungen verschieben. Ihre Änderungen sind nur temporär und werden nach der Sitzung nicht gespeichert."*
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/einrichtungenanlegen.md
+=======
+   1. Zum Verschieben von Einrichtungen klicken Sie das Bewegen-Symbol. Nun klicken sie die Einrichtung, die Sie bewegen möchten. Ist diese aktiviert, vergrößert sich das Symbol und zeigt damit an, dass die Einrichtung nun beweglich ist. Ziehen sie die Einrichtung mit gedrückter linker Maustaste an den gewünschten Platz. 
+   2. Möchten sie bestehende Einrichtungen aus dem Datensatz auf der Karte verschieben, dann lösen Sie durch einen Klick auf das Schloss die Sperre. Es erscheint eine Warnung:   
+   *"Achtung: Sie können jetzt auch echte Einrichtungen verschieben. Ihre Änderungen sind nur temporär und werden nach der Sitzung nicht gespeichert."*  
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungenanlegen.md
 
 Alle Analysen, die innerhalb eines Szenarios durchgeführt werden, berücksichtigen die Parameter der simulierten Einrichtungen.

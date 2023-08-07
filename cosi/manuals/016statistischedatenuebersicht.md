@@ -8,6 +8,7 @@ ___
 In der statistischen Datenübersicht können tabellarisch Informationen zu den statistischen Daten der ausgewählten Gebiete (**Statistische Datenübersicht**) angezeigt, ausgewertet und exportiert werden.
 
 <<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
+<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
   > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus. 
   
 <<<<<<< HEAD
@@ -19,6 +20,10 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 =======
   > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus.
 
+=======
+  > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus. 
+  
+>>>>>>> 3502056a (update cosi folder):cosi/manuals/statistischedatenuebersicht.md
 ![Abbildung 27: Statistische Datenübersicht](https://github.com/AlexandraKanapki/cosi/blob/COSI-handbuch/cosi/manuals/statistische%20datenu%CC%88bersciht1.png?raw=true)
 *Abbildung 27: Statistische Datenübersichtm 1*
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/statistischedatenuebersicht.md
