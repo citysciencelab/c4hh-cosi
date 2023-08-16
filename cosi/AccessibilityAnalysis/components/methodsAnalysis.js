@@ -18,7 +18,7 @@ import {getFlatCoordinates} from "../../utils/geometry/getFlatCoordinates";
 import {transformCoordinate} from "../utils/transformCoordinates";
 import {getDistances, getSteps} from "../utils/getDistances";
 
-<<<<<<< HEAD
+
 <<<<<<< HEAD
 
 =======

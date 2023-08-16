@@ -2,13 +2,8 @@ import {featuresToGeoJsonCollection, featureToGeoJson} from "../../utils/feature
 import {downloadJsonToFile} from "../../utils/download";
 import store from "../../../../src/app-store";
 import {generateColorScale} from "../../utils/colorScale.js";
-<<<<<<< HEAD
 import {Fill, Stroke, Style, Text} from "ol/style.js";
 import {convertColor} from "../../../../src/utils/convertColor";
-=======
-import utils from "../../utils";
-import {Fill, Stroke, Style, Text} from "ol/style.js";
->>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
 
 /**
  * Gets the map's CRS from the app-store
@@ -44,14 +39,9 @@ export function exportAsGeoJson (index) {
     // match the result and add it to the resp. geoJSON
     for (const feature of featureCollection.features) {
         const result = this.dataSets[index].results.find(res => res.scope === feature.properties[getKeyOfAttrName()]),
-<<<<<<< HEAD
             convertedColor = convertColor(colorScale.scale(result.coverage), "rgb"),
             style = new Style({
                 fill: new Fill({color: [...convertedColor, 0.75]}),
-=======
-            style = new Style({
-                fill: new Fill({color: utils.getRgbArray(colorScale.scale(result.coverage), 0.75)}),
->>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
                 zIndex: 1,
                 text: new Text({
                     font: "16px Calibri,sans-serif",
