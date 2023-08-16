@@ -433,6 +433,8 @@ export default {
         <div>
             <ul
                 class="nav nav-pills"
+                role="button"
+                tabindex="0"
                 @click="setCurrentTabId"
                 @keydown.enter="setCurrentTabId"
             >

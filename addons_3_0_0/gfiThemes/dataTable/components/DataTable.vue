@@ -8,12 +8,14 @@ import isObject from "../../../../../src_3_0_0/shared/js/utils/isObject";
 import Multiselect from "vue-multiselect";
 import localeCompare from "../../../../../src_3_0_0/shared/js/utils/localeCompare";
 import {getCenter as getCenterOfExtent} from "ol/extent";
+import IconButton from "../../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
 
 export default {
     name: "DataTable",
     components: {
         ExportButtonCSV,
-        Multiselect
+        Multiselect,
+        IconButton
     },
     props: {
         feature: {
@@ -381,12 +383,13 @@ export default {
                         </Multiselect>
                     </span>
                     <span v-else>{{ col.name }}</span>
-                    <span
+                    <IconButton
                         v-if="isSortable"
-                        class="bootstrap-icon"
-                        :class="getIconClassByOrder(col.order) + ' sort'"
-                        @click="runSorting(col)"
-                        @keypress="runSorting(col)"
+                        :aria="$t('common:modules.gfiThemes.dataTable.sort')"
+                        :class-array="['btn-sort']"
+                        :class="'bootstrap-icon ' + getIconClassByOrder(col.order) + ' sort'"
+                        :icon="'bootstrap-icon ' + getIconClassByOrder(col.order) + ' sort'"
+                        :interaction="() => runSorting(col)"
                     />
                 </th>
             </thead>
@@ -443,6 +446,14 @@ export default {
 
 <style lang="scss">
 @import "~variables";
+
+.btn-sort > i {
+    font-size: 1rem;
+}
+
+.btn-sort:focus i {
+    opacity: 1 !important;
+}
 
 #table-data-container {
     margin:6px 15px 0 12px;
