@@ -137,9 +137,7 @@ export default {
                     this.createChart(this.chartData, this.ctx);
                 }
                 else if (Array.isArray(newData) && newData.length) {
-                    debugger;
                     document.querySelectorAll(".graph");
-                    console.log(this.chart);
                     this.chart.data = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
                     this.chart.update(this.updateAnimation);
                 }
@@ -149,9 +147,7 @@ export default {
             },
             deep: true
         },
-        activeTabId (active) {
-            debugger;
-            console.log("active Tab in diagram: ", active);
+        activeTabId () {
             this.destroyChart();
         }
     },
@@ -199,7 +195,6 @@ export default {
          * @returns {void}
          */
         destroyChart () {
-            console.log("destroy");
             if (this.chart instanceof ChartJs) {
                 this.chart.destroy();
                 this.chart = null;

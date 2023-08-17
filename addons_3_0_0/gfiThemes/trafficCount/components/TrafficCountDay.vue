@@ -231,7 +231,6 @@ export default {
          * @returns {Boolean} true if disabled, false if enabled.
          */
         isDateDisabled (date, currentDates) {
-            debugger;
             if (!(date instanceof Date)) {
                 return true;
             }
