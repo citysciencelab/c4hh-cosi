@@ -386,8 +386,7 @@ export default {
                     <IconButton
                         v-if="isSortable"
                         :aria="$t('common:modules.gfiThemes.dataTable.sort')"
-                        :class-array="['btn-sort']"
-                        :class="'bootstrap-icon ' + getIconClassByOrder(col.order) + ' sort'"
+                        class="btn-sort"
                         :icon="'bootstrap-icon ' + getIconClassByOrder(col.order) + ' sort'"
                         :interaction="() => runSorting(col)"
                     />

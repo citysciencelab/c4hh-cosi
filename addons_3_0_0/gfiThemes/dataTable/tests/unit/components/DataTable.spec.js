@@ -165,8 +165,8 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
             expect(wrapper.find(".download").exists()).to.be.false;
         });
 
-        it("should find two bootstrap icons if isSortable is true", () => {
-            const icons = wrapper.findAll(".bootstrap-icon, .bi-arrow-down-up, .origin-order");
+        it.only("should find two bootstrap icons if isSortable is true", () => {
+            const icons = wrapper.findAll(".btn-sort");
 
             expect(icons.length).to.be.equal(2);
         });
