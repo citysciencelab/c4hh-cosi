@@ -165,7 +165,7 @@ describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTabl
             expect(wrapper.find(".download").exists()).to.be.false;
         });
 
-        it.only("should find two bootstrap icons if isSortable is true", () => {
+        it("should find two bootstrap icons if isSortable is true", () => {
             const icons = wrapper.findAll(".btn-sort");
 
             expect(icons.length).to.be.equal(2);
