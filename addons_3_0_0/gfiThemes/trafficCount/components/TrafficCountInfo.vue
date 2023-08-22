@@ -374,8 +374,8 @@ export default {
 <template>
     <div
         v-if="activeTab"
-        id="infos"
-        class="infos"
+        id="info"
+        class="info"
     >
         <div
             id="trafficcount-info-table"
@@ -490,13 +490,23 @@ export default {
 
 <style lang="scss" scoped>
     #trafficcount-info-table {
-        margin: .5rem 0 0 0;
+        margin: 6px 0 0 0;
         table {
             margin: 0;
+            tbody {
+                tr:first-child {
+                    td {
+                        text-align: left;
+                    }
+                }
+            }
             td,
             th {
                 text-align: right;
             }
+             td:first-child{
+                 text-align: left;
+             }
         }
-}
+    }
 </style>

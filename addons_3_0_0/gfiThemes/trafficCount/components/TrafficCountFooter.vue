@@ -67,7 +67,7 @@ export default {
         },
 
         currentTabId: function (newVal) {
-            if (newVal !== "infos" && newVal !== "downloads") {
+            if (newVal !== "info" && newVal !== "downloads") {
                 this.fixIndicationPosition();
             }
         }
@@ -133,28 +133,28 @@ export default {
 <template>
     <div>
         <div
-            v-if="currentTabId !== 'infos' && currentTabId !== 'downloads' "
+            v-if="currentTabId !== 'info' && currentTabId !== 'downloads' "
             class="tableIndication"
             :style="customStyle"
         >
             * {{ tableIndication }}
         </div>
         <div
-            v-if="currentTabId !== 'infos' && currentTabId !== 'downloads' && meansOfTransport === 'Anzahl_Kfz'"
+            v-if="currentTabId !== 'info' && currentTabId !== 'downloads' && meansOfTransport === 'Anzahl_Kfz'"
             class="trucksStatusIndication"
             :style="customStyle"
         >
             {{ $t("additional:modules.tools.gfi.themes.trafficCount.trucksStatus") }}
         </div>
         <div
-            v-if="currentTabId !== 'infos' && currentTabId !== 'downloads'"
+            v-if="currentTabId !== 'info' && currentTabId !== 'downloads'"
             class="indication"
             :style="customStyle"
         >
             {{ indication }}
         </div>
         <div
-            v-if="currentTabId !== 'infos' && currentTabId !== 'downloads'"
+            v-if="currentTabId !== 'info' && currentTabId !== 'downloads'"
             class="reset-container"
         >
             <button
@@ -212,7 +212,7 @@ export default {
         .text-right {
             text-align: right;
         }
-        &:not(.infos) {
+        &:not(.info) {
             min-width: 280px;
             width: 50%;
             float: right;

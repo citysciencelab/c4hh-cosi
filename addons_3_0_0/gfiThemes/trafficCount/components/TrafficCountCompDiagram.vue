@@ -137,7 +137,6 @@ export default {
                     this.createChart(this.chartData, this.ctx);
                 }
                 else if (Array.isArray(newData) && newData.length) {
-                    document.querySelectorAll(".graph");
                     this.chart.data = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
                     this.chart.update(this.updateAnimation);
                 }
@@ -155,14 +154,6 @@ export default {
         this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
         this.ctx = this.$el.getElementsByTagName("canvas")[0].getContext("2d");
 
-        /**
-         * @see afterFit https://www.chartjs.org/docs/latest/axes/?h=afterfit
-         * @returns {Void}  -
-         */
-        // ChartJs.Legend.prototype.afterFit = function () {
-        //     this.height = this.height + 10;
-        // };
-
         this.createChart(this.chartData, this.ctx);
     },
     methods: {
@@ -174,8 +165,8 @@ export default {
          */
         createChart (data, ctx) {
             this.chart = new ChartJs(ctx, this.getChartJsConfig(data, {
-                colorTooltipFont: this.colorTooltipFont,
-                colorTooltipBack: this.colorTooltipBack,
+                titleColor: this.colorTooltipFont,
+                backgroundColor: this.colorTooltipBack,
                 setTooltipValue: this.setTooltipValue,
                 fontSizeGraph: this.fontSizeGraph,
                 fontSizeLegend: this.fontSizeLegend,
@@ -329,7 +320,7 @@ export default {
                             align: "start"
                         },
                         tooltip: {
-                            bodyFontColor: options.colorTooltipFont,
+                            bodyColor: options.colorTooltipFont,
                             backgroundColor: options.colorTooltipBack,
                             yAlign: "bottom",
                             titleAlign: "center",

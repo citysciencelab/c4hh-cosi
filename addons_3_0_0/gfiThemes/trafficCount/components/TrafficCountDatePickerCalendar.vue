@@ -221,7 +221,7 @@ export default {
                 cursor: not-allowed;
             }
             &.selected {
-                color: $white;
+                color: $black;
                 background-color: $light_blue;
             }
             &.weekNumber {

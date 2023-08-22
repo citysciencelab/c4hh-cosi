@@ -38,7 +38,7 @@ export default {
             type: "",
             meansOfTransport: "",
             direction: "",
-            currentTabId: "infos",
+            currentTabId: "info",
             keyInfo: "info",
             keyDay: "day",
             keyWeek: "week",
@@ -285,11 +285,11 @@ export default {
         },
 
         /**
-         * set the default infos tab active when switch the language by triggering the click event
+         * set the default infs tab active when switch the language by triggering the click event
          * @returns {Void} -
          */
         setActiveDefaultTab: function () {
-            this.$el.querySelector("li[value='infos'] a").click();
+            this.$el.querySelector("#info-tab").click();
         },
         isActiveTab (tabId) {
             return this.currentTabId === tabId;
@@ -434,19 +434,15 @@ export default {
         </div>
         <div>
             <ul
-                class="nav nav-pills"
-                role="button"
-                tabindex="0"
-                @click="setCurrentTabId"
-                @keydown.enter="setCurrentTabId"
                 id="traffic-count-tabs"
                 class="nav nav-tabs nav-justified"
                 role="tablist"
+                tabindex="0"
             >
                 <NavTab
-                    :id="'infos-tab'"
+                    :id="'info-tab'"
                     :active="true"
-                    :target="'#infos'"
+                    :target="'#info'"
                     :label="infoLabel"
                     :interaction="() => setCurrentTabId('info')"
                 />
@@ -481,14 +477,14 @@ export default {
             </ul>
             <div class="tab-content">
                 <TrafficCountInfo
-                    id="infos"
+                    id="info"
                     :key="keyInfo"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'infos' }"
+                    :class="{ 'tab-pane': true, 'active': currentTabId === 'info' }"
                     :api="api"
                     :thing-id="propThingId"
                     :holidays="holidays"
                     :means-of-transport="propMeansOfTransport"
-                    :active-tab="currentTabId === 'infos'"
+                    :active-tab="currentTabId === 'info'"
                 />
                 <TrafficCountDay
                     id="day"
