@@ -2,6 +2,7 @@
 import dayjs from "dayjs";
 import {getPublicHoliday, hasHolidayInWeek} from "../../../../../src_3_0_0/shared/js/utils/calendar.js";
 import ExportButtonCSV from "../../../../../src_3_0_0/shared/modules/buttons/components/ExportButtonCSV.vue";
+import {mapGetters, mapMutations} from "vuex";
 
 export default {
     name: "TrafficCountDownloads",
@@ -50,6 +51,10 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("Modules/TrafficCount", [
+            "activeTabId"
+        ]),
+
         downloadHandlerMin: function () {
             return this.getDownloadHandler(this.minInterval, this.meansOfTransport);
         },
@@ -66,7 +71,17 @@ export default {
             return this.getDownloadHandler(this.weekInterval, this.meansOfTransport);
         }
     },
+    watch: {
+        activeTab () {
+            if (this.activeTab && this.activeTabId !== "downloads") {
+                this.setActiveTabId("downloads");
+            }
+        }
+    },
     methods: {
+        ...mapMutations("Modules/TrafficCount", [
+            "setActiveTabId"
+        ]),
         /**
          * Gets the download handler with different interval and meansOfTransport
          * @param {String} interval the interval to get different type of data
