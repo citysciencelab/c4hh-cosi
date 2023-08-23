@@ -30,11 +30,9 @@ describe("ADDONS: addons_3_0_0/searchInterfaces/exampleSearch/searchInterfaceExa
             expect(SearchInterface1.createPossibleActions(searchResult)).to.deep.equals(
                 {
                     setMarker: {
-                        closeResults: true,
                         coordinates: [566601.20, 5928101.43]
                     },
-                    zoomToFeature: {
-                        closeResults: true,
+                    zoomToResult: {
                         coordinates: [566601.20, 5928101.43]
                     }
                 }

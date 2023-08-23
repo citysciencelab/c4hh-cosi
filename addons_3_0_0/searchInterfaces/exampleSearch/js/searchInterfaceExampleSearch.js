@@ -4,20 +4,23 @@ import SearchInterface from "../../../../../src_3_0_0/modules/searchBar/searchIn
  * The example search interface as addon.
  * @constructs
  * @extends SearchInterface
+ * @param {String} [hitTemplate="default"] The template for rendering the hits.
  * @param {Object} [resultEvents] Actions that are executed when an interaction, such as hover or click, is performed with a result list item.
  * @param {String[]} [resultEvents.onClick=["setMarker", "zoomToFeature"]] Actions that are fired when clicking on a result list item.
  * @param {String[]} [resultEvents.onHover=["setMarker"]] Actions that are fired when hovering on a result list item.
  * @param {String} [searchInterfaceId="exampleSearch"] The id of the service interface.
  * @returns {void}
  */
-export default function SearchInterfaceExampleSearch ({resultEvents, searchInterfaceId} = {}) {
+export default function SearchInterfaceExampleSearch ({hitTemplate, resultEvents, searchInterfaceId} = {}) {
     SearchInterface.call(this,
         "client",
         searchInterfaceId || "exampleSearch",
         resultEvents || {
-            onClick: ["setMarker", "zoomToFeature"],
+            onClick: ["setMarker", "zoomToResult"],
             onHover: ["setMarker"]
-        });
+        },
+        hitTemplate
+    );
 }
 
 SearchInterfaceExampleSearch.prototype = Object.create(SearchInterface.prototype);
@@ -54,12 +57,10 @@ SearchInterfaceExampleSearch.prototype.search = async function (searchInput) {
 SearchInterfaceExampleSearch.prototype.createPossibleActions = function (searchResult) {
     return {
         setMarker: {
-            coordinates: searchResult.coordinates,
-            closeResults: true
+            coordinates: searchResult.coordinates
         },
-        zoomToFeature: {
-            coordinates: searchResult.coordinates,
-            closeResults: true
+        zoomToResult: {
+            coordinates: searchResult.coordinates
         }
     };
 };
