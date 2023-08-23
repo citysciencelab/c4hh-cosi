@@ -458,11 +458,8 @@ export default {
         <div>
             <ul
                 class="nav nav-pills"
-<<<<<<< HEAD
                 role="button"
                 tabindex="0"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                 @click="setCurrentTabId"
                 @keydown.enter="setCurrentTabId"
             >

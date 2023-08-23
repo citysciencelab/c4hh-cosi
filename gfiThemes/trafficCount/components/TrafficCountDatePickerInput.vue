@@ -57,11 +57,8 @@ export default {
 <template>
     <div
         class="input-wrapper"
-<<<<<<< HEAD
         role="button"
         tabindex="0"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
         @mouseover="setShowCalendarIcon(false)"
         @focus="setShowCalendarIcon(false)"
         @mouseleave="setShowCalendarIcon(true)"
@@ -76,11 +73,8 @@ export default {
         <i :class="['bi bi-calendar4 calendar', showCalendarIcon ? 'show': '']" />
         <i
             :class="['bi bi-x', !showCalendarIcon ? 'show': '']"
-<<<<<<< HEAD
             role="button"
             tabindex="0"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
             @click="clearInput"
             @keypress.enter="clearInput"
         />
