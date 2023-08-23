@@ -140,7 +140,6 @@ export default {
                 link.href = this.fileDownloadUrl;
                 link.click();
             }
-<<<<<<< HEAD
         },
         selectedLayerName () {
             this.setBuildingDesigns(this.buildingDesigns);
@@ -312,10 +311,7 @@ export default {
                     </label>
                     <span
                         class="bootstrap-icon bi-question-circle-fill"
-<<<<<<< HEAD
                         role="button"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                         tabindex="0"
                         @click="toggleInfoText('1')"
                         @keydown.enter="toggleInfoText('1')"
@@ -495,10 +491,7 @@ export default {
                                 <span>{{ $t('additional:modules.tools.boris.landCalculation.calculatedLandValue') }}</span>
                                 <span
                                     class="bootstrap-icon bi-question-circle-fill"
-<<<<<<< HEAD
                                     role="button"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                     tabindex="0"
                                     @click="toggleInfoText('6')"
                                     @keydown.enter="toggleInfoText('6')"

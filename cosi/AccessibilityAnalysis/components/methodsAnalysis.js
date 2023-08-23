@@ -19,19 +19,6 @@ import {transformCoordinate} from "../utils/transformCoordinates";
 import {getDistances, getSteps} from "../utils/getDistances";
 
 
-<<<<<<< HEAD
-
-=======
-=======
-import {transformCoordinates} from "../utils/transformCoordinates";
-
-export const methodConfig = {
-    store: null
-};
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> f04ac67c (update cosi folder)
 export default {
     /**
      * create isochrones features
@@ -58,17 +45,6 @@ export default {
                 return;
             }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-            console.error(err);
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> f04ac67c (update cosi folder)
-
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
             try {
                 const code = (err.error || err).response.data.error.code;
 
@@ -95,19 +71,7 @@ export default {
     createIsochronesRegion: async function () {
         const allActiveFeatures = filterAllFeatures(this.selectedFacilityLayer, this.isFeatureActive),
             coordinates = this.getCoordinates(allActiveFeatures, this.setByFeature),
-<<<<<<< HEAD
-<<<<<<< HEAD
             {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this._useTravelTimeIndex, this.time);
-=======
-<<<<<<< HEAD
-            {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this.useTravelTimeIndex, this.time);
-=======
-            {distance, maxDistance, minDistance, steps} = this.getDistances();
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
-=======
-            {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this.useTravelTimeIndex, this.time);
->>>>>>> f04ac67c (update cosi folder)
 
         if (
             coordinates !== null &&
@@ -142,19 +106,7 @@ export default {
      */
     createIsochronesPoint: async function () {
         const
-<<<<<<< HEAD
-<<<<<<< HEAD
             {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this._useTravelTimeIndex, this.time);
-=======
-<<<<<<< HEAD
-            {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this.useTravelTimeIndex, this.time);
-=======
-            {distance, maxDistance, minDistance, steps} = this.getDistances();
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
-=======
-            {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this.useTravelTimeIndex, this.time);
->>>>>>> f04ac67c (update cosi folder)
 
         if (
             this.coordinate.length > 0 &&

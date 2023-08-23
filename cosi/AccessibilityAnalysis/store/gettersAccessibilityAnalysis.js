@@ -1,14 +1,6 @@
 
 import {generateSimpleGetters} from "../../../../src/app-store/utils/generators";
-<<<<<<< HEAD
 import stateAccessibilityAnalysis from "./stateAccessibilityAnalysis";
-=======
-import vueAddonState from "./stateAccessibilityAnalysis";
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> f04ac67c (update cosi folder)
 import {getServiceUrl} from "../../utils/radioBridge.js";
 
 const getters = {

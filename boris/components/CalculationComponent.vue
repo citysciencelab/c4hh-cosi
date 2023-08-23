@@ -64,10 +64,7 @@ export default {
                 <span> {{ title }}</span>
                 <span
                     class="bootstrap-icon bi-question-circle-fill"
-<<<<<<< HEAD
                     role="button"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                     tabindex="0"
                     @click="toggleInfoText(textId)"
                     @keydown.enter="toggleInfoText(textId)"
@@ -105,10 +102,7 @@ export default {
                 <span>{{ title }}</span>
                 <span
                     class="bootstrap-icon bi-question-circle-fill"
-<<<<<<< HEAD
                     role="button"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                     tabindex="0"
                     @click="toggleInfoText(textId)"
                     @keydown.enter="toggleInfoText(textId)"
