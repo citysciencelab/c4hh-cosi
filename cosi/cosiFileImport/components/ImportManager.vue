@@ -165,16 +165,11 @@ export default {
     <div class="import_manager">
         <div class="list">
             <ul id="layerList">
-<<<<<<< HEAD
-=======
-                <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                 <li
                     v-for="(layer, i) in importedLayers"
                     :key="layer.id"
                     class="draggable"
                     :class="{active: setLayer === i}"
-<<<<<<< HEAD
                     role="button"
                     tabindex="0"
                     @click="setLayer = i"
@@ -184,12 +179,6 @@ export default {
                         class="handle"
                         role="button"
                         tabindex="0"
-=======
-                    @click="setLayer = i"
-                >
-                    <div
-                        class="handle"
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                         @mousedown.left="mouseDownHandler($event)"
                     >
                         <template v-if="layer.type === 'Polygon'">

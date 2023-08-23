@@ -76,7 +76,7 @@
                 },
                 "config": {
                     "placeholder": "Search by address/Ground reference number",
-                    "menuName": "Baselayers",
+                    "menuName": "Background maps",
                     "parcelSearchName": "Parcel search",
                     "toolsName": "Tools",
                     "legendName": "Legend",
@@ -94,7 +94,7 @@
                         "glossary": "Glossary",
                         "borisGer": "BORIS-GER"
                     },
-                    "baselayerName": "ALKIS colored",
+                    "backgroundLayerName": "ALKIS colored",
                     "historicalMap2020": "Historical map year 2020",
                     "historicalMap2015": "Historical map year 2015",
                     "historicalMap2010": "Historical map year 2010",
