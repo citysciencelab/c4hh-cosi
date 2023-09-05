@@ -22,3 +22,5 @@ Grundsätzlich bietet diese Funktion die Möglichkeit an, durch Aufziehen eines 
 - Bei der Nutzung innerhalb des Kontexts der Erreichbarkeitsanalyse muss das Gebiet nicht händisch festgelegt werden, sondern es wird als Gebiet das errechnete Einzugsgebiet übernommen.
 >>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/einwohnerabfrage.md
+
+<div style="page-break-after: always;"></div>

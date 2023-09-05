@@ -23,13 +23,8 @@ const state = {
     pollingInterval: 120000,
     baseUrl: "https://beteiligung.hamburg/drupal/dipas-pds/projects",
     readmeUrl: {
-<<<<<<< HEAD
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/007dipas.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/007dipas.md"
-=======
-        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/dipas.en.md",
-        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/dipas.de.md"
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     }
 };
 

@@ -8,6 +8,7 @@ Haben Sie ein aktives Szenario können Sie sowohl selbst angelegte als auch bere
 *Abb. a: Bitte erstellen Sie ein Szenario.*
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Ein Szenario können Sie wie im [Szenario Manager](./009einrichtungenanlegen.md) beschrieben anlegen. Ist ein Szenario angelegt und Sie wählen per Mausklick eine Einrichtung an, erscheint folgendes Popup am unteren Bildschirmrand: 
 =======
 <<<<<<< HEAD:cosi/manuals/010einrichtungenbearbeiten.md
@@ -23,6 +24,9 @@ Ein Szenario können Sie wie im [Szenario Manager](./einrichtungenanlegen.md) be
 Ein Szenario können Sie wie im [Szenario Manager](./einrichtungenanlegen.md) beschrieben anlegen. Ist ein Szenario angelegt und Sie wählen per Mausklick eine Einrichtung an, erscheint folgendes Popup am unteren Bildschirmrand: 
 >>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungenbearbeiten.md
 >>>>>>> e41bd580 (update cosi folder)
+=======
+Ein Szenario können Sie wie im [Szenario Manager](009einrichtungenanlegen.md) beschrieben anlegen. Ist ein Szenario angelegt und Sie wählen per Mausklick eine Einrichtung an, erscheint folgendes Popup am unteren Bildschirmrand: 
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 
 ![Abbildung 2: Einrichtung bearbeiten](./010b_einrichtungenbearbeiten.PNG)
 
@@ -32,6 +36,7 @@ Wählen Sie hier den Button **BEARBEITEN** an. Daraufhin wird sich das folgende 
 
 ![Abbildung 3: Einrichtung-Bearbeiten-Fenster](./010c_einrichtungenbearbeiten.PNG)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 *Abb. c: Fenster für das bearbeiten der Einrichtung.*
 =======
@@ -66,6 +71,9 @@ Wählen Sie hier den Button **BEARBEITEN** an, daraufhin wird sich das folgende 
 =======
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/einrichtungenbearbeiten.md
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
+=======
+*Abb.c: Fenster für das bearbeiten der Einrichtung.*
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 
 1. **Eingaben sperren**
    > Mit Hilfe dieses Buttons sperren Sie die Input-Felder des Fensters, so dass Sie nicht mehr bearbeitet werden können. Die Input-Felder sind standardmäßig gesperrt, so dass Sie diesen Button aktivieren müssen, ehe Sie eine vorhandene Einrichtung bearbeiten können. 

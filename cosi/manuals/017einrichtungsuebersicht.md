@@ -1,8 +1,7 @@
 ### Einrichtungsübersicht
    > Um zur Einrichtungsübersicht zu gelangen, muss zunächst ein beliebiger Stadtteil oder Bezirk ausgewählt werden. Als nächtes unter dem Bereich Themen die gewünschten Themen oder Fachdaten auswählen (z.B. Bildung und Wissenschaft). Im Dashboard unter Einrichtungsübersicht können Sie dann mit der Analyse Ihrer Einrichtung beginnen.
-<<<<<<< HEAD:cosi/manuals/017einrichtungsuebersicht.md
-<<<<<<< HEAD:cosi/manuals/017einrichtungsuebersicht.md
    
+<<<<<<< HEAD
 <<<<<<< HEAD
 ![Abbildung 1: Einrichtungsübersicht](./017a_einrichtungsuebersicht.PNG)
 *Abb. a: Einrichtungsübersicht.*
@@ -23,6 +22,10 @@
 *Abbildung 1: Einrichtungsübersicht*
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/einrichtungsuebersicht.md
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
+=======
+![Abbildung 1: Einrichtungsübersicht](017a_einrichtungsuebersicht.PNG)
+*Abb.: Einrichtungsübersicht.*
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 
 1. **Detailansicht ein-/ausklappen**
    > Über den Pfeil können *alle* Attribute einer Einrichtung aufgeklappt werden. Die einzelnen Zeilen der Detailansicht können für den weiteren Export ausgewählt werden.

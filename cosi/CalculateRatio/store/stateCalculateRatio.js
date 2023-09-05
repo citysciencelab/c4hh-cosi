@@ -39,13 +39,8 @@ const state = {
     dataSets: [],
     activeSet: 0,
     readmeUrl: {
-<<<<<<< HEAD
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/006calculateratio.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/006versorgungsanalyse.md"
-=======
-        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/calculateratio.md",
-        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/versorgungsanalyse.md"
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
     }
 };
 

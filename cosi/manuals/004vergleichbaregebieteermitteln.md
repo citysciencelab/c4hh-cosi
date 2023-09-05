@@ -41,7 +41,6 @@ Wählen Sie unter Filter die gewünschten Parameter für den Vergleich, sowie ei
    > Über *Ergebnis als Gebietsauswahl* setzen kann die aktuelle Gebietsauswahl für weitere Analysen auf die Ergebnis-Gebiete gesetzt werden.
 <<<<<<< HEAD
   
-<<<<<<< HEAD:cosi/manuals/004vergleichbaregebieteermitteln.md
 <div style="page-break-after: always;"></div>
 =======
 =======

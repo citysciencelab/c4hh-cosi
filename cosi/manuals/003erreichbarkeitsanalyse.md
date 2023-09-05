@@ -50,20 +50,15 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 ![Erreichbarkeit ab einem Referenzpunkt](./003a_erreichbarkeitreferenzpunkt.png)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 *Abb. a: Erreichbarkeit ab einem Referenzpunkt.*
 =======
 <<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 *Abb.003a: Erreichbarkeit ab einem Referenzpunkt.*
 >>>>>>> 896ab88b (resolve rebase conflicts)
   
-=======
-*Abbildung 1: Erreichbarkeit ab einem Referenzpunkt*
-<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
-
->>>>>>> 149927fa (resolve rebase conflicts):cosi/manuals/erreichbarkeitsanalyse.md
-=======
-  
->>>>>>> 3502056a (update cosi folder):cosi/manuals/erreichbarkeitsanalyse.md
 1. **Auswahl des Modus**
    > Art der Einrichtungsanalyse. Ab einem Referenzpunkt, entlang einer Route oder Erreichbarkeit der gewählten Einrichtungen im Gebiet.
 2. **Referenzpunkt setzen**
@@ -93,22 +88,14 @@ Diese Analyse wird genauso hergestellt, wie ab einem Referenzpunkt. Nur wird hie
 
 #### Erreichbarkeit im Gebiet
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 <<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (im Beispiel Krankenhäuser) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
-=======
-Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (z.B. Kindergärten) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann angegeben werden in Zeit oder in Metern. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
-<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
-=======
-
-#### Erreichbarkeit im Gebiet
-Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (z.B. Kindergärten) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann angegeben werden in Zeit oder in Metern. Die Erreichbarkeit ist abhÃ¤ngig von dem festgelegten Verkehrsmittel.
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/erreichbarkeitsanalyse.md
-=======
->>>>>>> 149927fa (resolve rebase conflicts):cosi/manuals/erreichbarkeitsanalyse.md
 
 ![Erreichbarkeit ausgewählter Einrichtungen im Gebiet](./003b_erreichbarkeitabeinrichtung.png)
 
@@ -139,18 +126,21 @@ Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungs
 
    ### Erreichbarkeit entlang einer Route
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 <<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
 >>>>>>> e41bd580 (update cosi folder)
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 Wenn Sie im Routing-Tool eine Route erstellt haben, können Sie die Erreichbarkeit in einem bestimmten Umkreis um die Route herum berechnen lassen.
-<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
   
 Das Modul kann ohne vorherige Gebietsauswahl verwendet werden.
 <<<<<<< HEAD
 ![Erreichbarkeit entlang einer Route](./003c_erreichbarkeitroute.png)
 =======
 ![Erreichbarkeit entlang einer Route](003c_erreichbarkeitroute.png)
+<<<<<<< HEAD
 =======
 
 =======
@@ -161,6 +151,8 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 ![Abbildung 3: Erreichbarkeit entlang einer Route](https://user-images.githubusercontent.com/43250699/159470252-067117b3-b8a3-481d-b007-113e7a0477c8.png)
 >>>>>>> 149927fa (resolve rebase conflicts):cosi/manuals/erreichbarkeitsanalyse.md
 >>>>>>> 896ab88b (resolve rebase conflicts)
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 
 *Abb. c: Erreichbarkeit entlang einer Route.*
 1. **Auswahl des Modus**
@@ -177,21 +169,14 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
    > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen das um die Route herum erreichbare Gebiet abhängig von den zuvor eingegebenen Parametern.
 8. **Ergebnisverzeichnis**
 <<<<<<< HEAD
+<<<<<<< HEAD
    > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das [Ergebnisverzeichnis](./020ergebnisverzeichnis) verwaltet werden.
 =======
 <<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
 <<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
    > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](/cosi/manuals/020ergebnisverzeichnis) verwaltet werden.
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
    
 <div style="page-break-after: always;"></div>
-=======
-<<<<<<< HEAD
-   > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](./pagination.md) verwaltet werden.
-=======
-   > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](./pagination.md) verwaltet werden.
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/erreichbarkeitsanalyse.md
-=======
-   > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](./pagination.md) verwaltet werden.
->>>>>>> 149927fa (resolve rebase conflicts):cosi/manuals/erreichbarkeitsanalyse.md
