@@ -1,5 +1,6 @@
 ### Vorlagen
 <<<<<<< HEAD
+<<<<<<< HEAD
 ![Abbildung 1: Vorlagen](./015a_vorlagen.png)
 =======
 <<<<<<< HEAD:cosi/manuals/015vorlagen.md
@@ -19,6 +20,9 @@
 ![Abbildung 1: Vorlagen](https://github.com/AlexandraKanapki/cosi/blob/COSI-handbuch/cosi/manuals/Vorlagen1.png?raw=true)
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/vorlagen.md
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
+=======
+![Abbildung 1: Vorlagen](015a_vorlagen.png)
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 
 *Abb. a: Vorlagen Übersicht.*
 
@@ -47,16 +51,4 @@
 4. **Vorlage laden**
    > Die ausgewählte Vorlage laden.
 
-<<<<<<< HEAD:cosi/manuals/015vorlagen.md
 
-=======
-![Abbildung 1: Vorlagen](https://github.com/AlexandraKanapki/cosi/blob/COSI-handbuch/cosi/manuals/Vorlagen2.png?raw=true)
-<<<<<<< HEAD:cosi/manuals/015vorlagen.md
-=======
-   > Wenn kein Bezugrahmen/Gebiete definiert sind, können diese händisch im Vorfeld oder nach dem Laden ausgewählt werden. Die Inhalte werden dann für die aktive Gebietsauswahl geladen.
-4. **Vorlage laden**
-   > Die ausgewählte Vorlage laden.
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/vorlagen.md
-=======
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/vorlagen.md

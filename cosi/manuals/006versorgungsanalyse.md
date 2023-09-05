@@ -33,6 +33,7 @@ Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet
    > Das [Ergebnisverzeichnis](./020ergebnisverzeichnis.md) verwaltet alle von Ihnen erstellten Analysen und bietet bestimmte standardisierte Funktionen wie Downloads und ähnliches an.
 2. **Daten als Chart visualisieren**
 <<<<<<< HEAD
+<<<<<<< HEAD
    > Die Daten werden zur [Graphenvisualisierung](./008graphenvisualisierung.md) geladen und dort als Graphen dargestellt.
 3. **Auf der Karte visualisieren**  
    > Die Daten werden mit Hilfe der [Kartenvisualisierung](./019kartenvisualisierung.md) auf der Karte visualisiert und je nach Wert in unterschiedlichen Farben dargestellt.
@@ -41,14 +42,11 @@ Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet
    
 =======
 <<<<<<< HEAD:cosi/manuals/006versorgungsanalyse.md
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
    > Die Daten werden zur [Graphenvisualisierung](008graphenvisualisierung.md) geladen und dort als Graphen dargestellt.
 3. **Auf der Karte visualisieren**  
    > Die Daten werden mit Hilfe der [Kartenvisualisierung](019kartenvisualisierung.md) auf der Karte visualisiert und je nach Wert in unterschiedlichen Farben dargestellt.
-=======
-   > Die Daten werden zum [Chartgenerator](./chartgenerator.md) geladen und dort als Graphen visualisiert.
-3. **Auf der Karte visualisieren**  
-   > Die Daten werden mit Hilfe der [Kartenvisualisierung](./kartenvisualisierung.md) auf der Karte visualisiert und je nach Wert in unterschiedlichen Farben dargestellt.
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/versorgungsanalyse.md
 4. **Tabellenspalte für erweiterte Funktionen auswählen**
    > Hier können Sie Tabellenspalten auswählen die für die erweiterten Funktionen "Als Chart visualisieren" (3) und "Auf der Karte visualisieren" (4) herangezogen werden soll.
 <<<<<<< HEAD
@@ -58,17 +56,8 @@ Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet
    
 >>>>>>> e41bd580 (update cosi folder)
 5. **Jahr auswählen**
-<<<<<<< HEAD:cosi/manuals/006versorgungsanalyse.md
    > Hier können Sie das Jahr auswählen, für das die entsprechenden Daten geladen werden.
 6. **Ergebnistabelle**  
-=======
-   > Hier können Sie das Jahr auswählen, für das die entsprechenden Daten geladen worden sind.
-<<<<<<< HEAD:cosi/manuals/006versorgungsanalyse.md
-6. **Ergebnistabelle**
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/versorgungsanalyse.md
-=======
-6. **Ergebnistabelle**  
->>>>>>> 3502056a (update cosi folder):cosi/manuals/versorgungsanalyse.md
       - **Gebiet:** Die ausgewählten Gebiete, für die die Ergebnisse berechnet wurden. Hier finden sich auch die Indikatoren für die Zeilen "Gesamt" und "Durchschnitt".
       - **Auswahlfeld (1):**  
          Der Wert für den in Auswahlfeld (1) gewählten Datensatz.
@@ -79,20 +68,15 @@ Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet
       - **Bedarfsdeckung:**  
          Die Versorgungsabdeckung in Prozent, d.h. das Verhältnis zwischen der aus Auswahlfeld (1) ermittelten Kapazität und Auswahlfeld (2) im Gebiet. Wurde kein Faktor F ausgewählt, zeigt die Spalte das direkte Verhältnis beider Felder in Prozent an.
 <<<<<<< HEAD
+<<<<<<< HEAD
 
    6.1 **Ergebnisverzeichnis der Ergebnistabelle:**
          
       >Wenn in Ihrer Ergebnistabelle mehr als 10 Ergebnisse angezeigt werden, können Sie hier entsprechend die Daten durchschalten.
 =======
 <<<<<<< HEAD:cosi/manuals/006versorgungsanalyse.md
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
       - **6.1 Ergebnisverzeichnis der Ergebnistabelle**
-=======
-      - **6.1 Pagination der Ergebnistabelle**
-<<<<<<< HEAD:cosi/manuals/006versorgungsanalyse.md
-
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/versorgungsanalyse.md
-=======
-      
->>>>>>> 3502056a (update cosi folder):cosi/manuals/versorgungsanalyse.md
          Wenn in Ihrer Ergebnistabelle mehr als 10 Ergebnisse angezeigt werden, können Sie hier entsprechend die Daten durchschalten.
 >>>>>>> 0650b0a5 (resolve rebase conflicts)

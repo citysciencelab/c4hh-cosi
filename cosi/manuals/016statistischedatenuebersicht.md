@@ -7,8 +7,6 @@ ___
 
 In der statistischen Datenübersicht können tabellarisch Informationen zu den statistischen Daten der ausgewählten Gebiete (**Statistische Datenübersicht**) angezeigt, ausgewertet und exportiert werden.
 
-<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
-<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
   > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus. 
   
 <<<<<<< HEAD
@@ -17,6 +15,7 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 =======
 ![Abbildung 27: Statistische Datenübersicht](016a_statistischedatenuebersicht.png)
 *Abb.: Statistische Datenübersicht 1*
+<<<<<<< HEAD
 =======
   > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus.
 
@@ -28,6 +27,8 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 *Abbildung 27: Statistische Datenübersichtm 1*
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/statistischedatenuebersicht.md
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 
 ![Abbildung 29: Statistische Datenübersicht](./016b_statistischedatenuebersicht.png)
 *Abb. b: Statistische Datenübersicht 2*
@@ -37,25 +38,7 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 1. **Gruppen ein-/ausklappen**
    > Thematische Gruppen (vgl. [Regionalstatistische Daten](./019kartenvisualisierung.md)) über das **+** ein- und ausklappen.
 2. **Aktionen**
-<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
    > - [Dreistrich-Menü](#dreistrich-menü) aufklappen
-=======
-   > - s. [Bürger-Menü](#markdown-header-burgermenü)
-<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
-=======
-![Abbildung 27: Statistische Datenübersicht](../utils/assets/screenshots/statdashboard.png)
-*Abbildung 27: Statistische Datenübersicht*
-
-In der statistischen Datenübersicht können tabellarisch Informationen zu den statistischen Daten der ausgewählten Gebiete ([Statistische Datenübersicht](#markdown-header-statistische-datenübersicht)) angezeigt, ausgewertet und exportiert werden.
-
-1. **Gruppen ein-/ausklappen**
-   > Thematische Gruppen (vgl. [Regionalstatistische Daten](./kartenvisualisierung.md)) über das **+** ein- und ausklappen.
-2. **Aktionen**
-   > - s. [Burger-Menü](#markdown-header-burgermenü)
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/statistischedatenuebersicht.md
-=======
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/statistischedatenuebersicht.md
    > - Visualisierung ein- / ausschalten: Schaltet die Visualisierung des ausgewählten Indikators zum aktuell gewählten Jahr in der Karte ein/aus
    > - Jahre ein- / ausklappen: Klappt die Tabellenzeile auf um alle Jahre der Zeitreihe darzustellen.
 3. **Jahr auswählen**
@@ -80,7 +63,6 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 12. **Kartenvisualisierung**
       > Die Darstellung in der Karte entspricht der des Kontrollfeldes [Kartenanalyse regionalstatistischer Daten](./kartenvisualisierung.md).
 
-<<<<<<< HEAD:cosi/manuals/016statistischedatenuebersicht.md
 #### Dreistrich Menü
 <<<<<<< HEAD
 ![Abbildung 28: Statistische Datenübersicht - Dreistrich-menü](./016c_statdashboard_burgermenu.PNG)
@@ -88,12 +70,15 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 =======
 ![Abbildung 28: Statistische Datenübersicht - Dreistrich-menü](016c_statdashboard_burgermenu.PNG)
 *Abb.: Statistische Datenübersicht - Dreistrich-Menü.*
+<<<<<<< HEAD
 =======
 #### Dreipunkt Menü
 ![Abbildung 28: Statistische Datenübersicht - Burgermenu](../utils/assets/screenshots/statdashboard_burgermenu.PNG)
 *Abbildung 28: Statistische Datenübersicht*
 >>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/statistischedatenuebersicht.md
 >>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 
 1. **Visualisierung ein-/ausschalten**
    > Thematische Gruppen

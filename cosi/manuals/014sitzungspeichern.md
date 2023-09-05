@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 ### Sitzung Speichern und Laden
@@ -8,17 +9,11 @@
 =======
 <<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
 <<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 ### Sitzung Speichern / Laden 
 ![Abbildung 1: Sitzung Speichern](014_sitzungspeichern.PNG)
 *Abb.: Sitzung speichern / laden*
-=======
-### Sitzung Speichern / Laden
-=======
-### Sitzung Speichern / Laden 
->>>>>>> 3502056a (update cosi folder):cosi/manuals/sitzungspeichern.md
-![Abbildung 1: Sitzung Speichern](../utils/assets/screenshots/sitzungspeichern.png)
-*Abbildung 1: Sitzung speichern / laden*
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/sitzungspeichern.md
 
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
 
@@ -28,8 +23,6 @@
 Mit dem Dienst **Sitzung speichern/laden** können die folgend aufgelisteten Informationen der aktuellen Arbeitssitzung abgespeichert werden, um diese zu einem späteren Zeitpunkt wieder öffnen und weiterbearbeiten zu können:
 
 - Die ausgewählte Verwaltungsebene und ausgewählte Gebiete
-<<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
-<<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
 - Aktive Fachdatenthemen 
 <<<<<<< HEAD
 - Mit den [Simulationswerkzeugen](./009einrichtungenanlegen.md) erstellte Szenarien 
@@ -37,6 +30,7 @@ Mit dem Dienst **Sitzung speichern/laden** können die folgend aufgelisteten Inf
 =======
 - Mit den [Simulationswerkzeugen](009einrichtungenanlegen.md) erstellte Szenarien 
 - Ergebnisse und Konfigurationen der Werkzeuge [Erreichbarkeitsanalyse](003erreichbarkeitsanalyse.md) und [Versorgungsanalyse](006versorgungsanalyse.md)
+<<<<<<< HEAD
 =======
 - Aktive Fachdatenthemen
 - Mit den [Simulationswerkzeugen](./einrichtungenanlegen.md) erstellte Szenarien
@@ -47,6 +41,8 @@ Mit dem Dienst **Sitzung speichern/laden** können die folgend aufgelisteten Inf
 - Ergebnisse und Konfigurationen der Werkzeuge [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Versorgungsanalyse](./versorgungsanalyse.md)
 >>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/sitzungspeichern.md
 >>>>>>> 0650b0a5 (resolve rebase conflicts)
+=======
+>>>>>>> 63cc74d8 (rm cosi conflicts)
 
 Die Funktion ist unter "Dienste", "Sitzung speichern/laden" zu finden.
 
