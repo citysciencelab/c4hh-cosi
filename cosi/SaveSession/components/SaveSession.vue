@@ -7,13 +7,8 @@ import mutations from "../store/mutationsSaveSession";
 import actions from "../store/actionsSaveSession";
 import {downloadJsonToFile} from "../../utils/download";
 import {Point, Polygon, MultiPoint, MultiPolygon} from "ol/geom";
-<<<<<<< HEAD
 import {serializeState} from "../utils/serializeState.js";
 import parseState from "../utils/parseState";
-=======
-import serializeState from "./serializeState";
-import parseState from "./parseState";
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
 import ToolInfo from "../../components/ToolInfo.vue";
 import openDB from "../utils/indexedDb";
 import {addModelsByAttributes, getModelByAttributes} from "../../utils/radioBridge.js";
@@ -32,16 +27,10 @@ export default {
                 // The order matters for loading
                 Maps: [
                     "layerIds",
-<<<<<<< HEAD
                     "loadedLayers",
                     // "view"
                     "center",
                     "zoom"
-=======
-                    // "view"
-                    "center",
-                    "zoomLevel"
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
                 ],
                 Tools: {
                     ChartGenerator: [
@@ -194,17 +183,12 @@ export default {
         this.checkLastSession();
     },
     methods: {
-<<<<<<< HEAD
         ...mapActions("Maps", ["addNewLayerIfNotExists", "registerListener", "unregisterListener"]),
-=======
-        ...mapActions("Maps", ["addNewLayerIfNotExists"]),
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         ...mapMutations("Tools/SaveSession", Object.keys(mutations)),
         ...mapActions("Tools/SaveSession", Object.keys(actions)),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapActions("Tools/DistrictSelector", ["setDistrictsByName"]),
         ...parseState,
-<<<<<<< HEAD
         downloadJsonToFile,
         /**
          * Saving the data
@@ -213,49 +197,31 @@ export default {
         save () {
             this.saveDialog = false;
             this.state = serializeState(this.storePaths, this.$store, this.deepFeatures);
-=======
-        ...serializeState,
-        downloadJsonToFile,
-
-        save () {
-            this.saveDialog = false;
-            this.serializeState();
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
 
             this.session.state = JSON.stringify(this.state);
             this.session.meta.created = new Date().toLocaleString();
             this.session.meta.date = new Date();
         },
-<<<<<<< HEAD
         /**
          * Saving the data in local storage
          * @returns {void}
          */
-=======
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         quickSave () {
             this.save();
             this.storeToLocalStorage();
         },
-<<<<<<< HEAD
         /**
          * Saving the data in extra file
          * @returns {void}
          */
-=======
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         saveAs () {
             this.save();
             this.downloadJsonToFile(this.session, this.session.meta.title + ".json");
         },
-<<<<<<< HEAD
         /**
          * Clearing the data in local storage
          * @returns {void}
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         clear () {
             if (this.db) {
                 const
@@ -271,14 +237,10 @@ export default {
             }
             this.localStorage.removeItem("cosi-state");
         },
-<<<<<<< HEAD
         /**
          * Saving the data in local storage
          * @returns {void}
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         storeToLocalStorage () {
             if (this.db) {
                 const
@@ -288,11 +250,7 @@ export default {
                 request.onerror = (err) => {
                     console.error(err);
                     this.addSingleAlert({
-<<<<<<< HEAD
                         content: this.$t("additional:modules.tools.cosi.saveSession.saveToLocalStorageError"),
-=======
-                        content: "Die Sitzung konnte nicht gespeichert werden. Die Fehlermeldung finden Sie, indem Sie die Taste F12 drücken. Wenden Sie sich bitte damit an Ihren Administrator.",
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
                         category: "Error",
                         displayClass: "error"
                     });
@@ -310,26 +268,18 @@ export default {
                 this.latestDate = this.session.meta?.created;
             }
         },
-<<<<<<< HEAD
         /**
          * Loading the last session
          * @returns {void}
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         loadLastSession () {
             this.loadFromLocalStorage();
             this.loadDialog = false;
         },
-<<<<<<< HEAD
         /**
          * Checking the last session
          * @returns {void}
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         checkLastSession () {
             let
                 lastSession = this.db ? undefined : JSON.parse(this.localStorage.getItem("cosi-state"));
@@ -350,14 +300,10 @@ export default {
                 }
             };
         },
-<<<<<<< HEAD
         /**
          * Loading the session from local storage
          * @returns {void}
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         async loadFromLocalStorage () {
             try {
                 const session = new Promise((res, rej) => {
@@ -383,37 +329,25 @@ export default {
             catch (e) {
                 console.error(e);
                 this.addSingleAlert({
-<<<<<<< HEAD
                     content: this.$t("additional:modules.tools.cosi.saveSession.loadFromLocalStorageError"),
-=======
-                    content: "Die letzte Sitzung konnte nicht geladen werden. Die Fehlermeldung finden Sie, indem Sie die Taste F12 drücken. Wenden Sie sich bitte damit an Ihren Administrator.",
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
                     category: "Error",
                     displayClass: "error"
                 });
             }
         },
-<<<<<<< HEAD
         /**
          * Loading the data from file
          * @returns {void}
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         loadFromFile () {
             this.$refs["file-prompt"].click();
             this.loadDialog = false;
         },
-<<<<<<< HEAD
         /**
          * Loading the data from file
          * @param {Object[]} evt The target of current change event.
          * @returns {void}
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         handleFile (evt) {
             const file = evt.target.files[0],
                 reader = new FileReader();
@@ -437,7 +371,6 @@ export default {
             };
             reader.readAsText(file);
         },
-<<<<<<< HEAD
         /**
          * Loading function
          * @param {Object} session The saved session
@@ -445,12 +378,6 @@ export default {
          */
         load (session) {
             const state = session.state || session; // fallback for old saves
-=======
-
-        load (session) {
-            const
-                state = session.state || session; // fallback for old saves
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
 
             this.session.meta.title = session.meta?.title || this.session.meta.title;
             this.setActive(false);
@@ -461,15 +388,11 @@ export default {
                 displayClass: "success"
             });
         },
-<<<<<<< HEAD
         /**
          * Getting the saved layers from id
          * @param {String} layerId The layer Id
          * @returns {module:ol/Layer} the layer
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         getTopicsLayer (layerId) {
             let layer = this.getLayerById({layerId: layerId});
 
@@ -508,20 +431,15 @@ export default {
             this.saveDialog = false;
             this[this.saveMode]();
         },
-<<<<<<< HEAD
         /**
          * Enable auto save regularly
          * @returns {void}
          */
-=======
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         enableAutoSave () {
             this.autoSaveInterval = setInterval(() => {
                 this.quickSave();
             }, 600000);
         },
-<<<<<<< HEAD
         /**
          * Disable auto save
          * @returns {void}
@@ -535,13 +453,6 @@ export default {
          * @param {String} attr - the attribute
          * @returns {void}
          */
-=======
-
-        disableAutoSave () {
-            clearInterval(this.autoSaveInterval);
-        },
-
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
         hasDeepFeatures (key, attr) {
             const tool = Object.keys(this.deepFeatures).find(id => key.includes(id));
 
@@ -573,21 +484,12 @@ export default {
                     />
                     <v-container class="flex btn-grid">
                         <v-card-title secondary-title>
-<<<<<<< HEAD
                             {{ $t('additional:modules.tools.cosi.saveSession.quickSave') }}
                         </v-card-title>
                         <div
                             class="mb-2"
                             v-html="$t('additional:modules.tools.cosi.saveSession.quickSaveDescription')"
                         />
-=======
-                            Schnelles Speichern
-                        </v-card-title>
-                        <div class="mb-2">
-                            Sitzungen im Browser (z.B. Edge, Firefox) speichern. Diese können beim Start von CoSI über den Button 'Letzte Laden' wieder geladen werden. <br>
-                            Wenn Browserverlauf oder Cache geleert werden, geht dieser Speicherstand verloren! Es kann immer nur eine Sitzung vorgehalten werden.
-                        </div>
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
                         <v-row class="flex">
                             <v-col
                                 cols="6"
@@ -659,20 +561,12 @@ export default {
                         </v-row>
                         <v-divider />
                         <v-card-title secondary-title>
-<<<<<<< HEAD
                             {{ $t('additional:modules.tools.cosi.saveSession.localSave') }}
                         </v-card-title>
                         <div
                             class="mb-2"
                             v-html="$t('additional:modules.tools.cosi.saveSession.localSaveDescription')"
                         />
-=======
-                            Lokales Speichern
-                        </v-card-title>
-                        <div class="mb-2">
-                            Sitzungen als Datei auf dem Rechner speichern und über den Button 'Datei laden' wieder laden. Diese können jederzeit wieder geladen oder mit anderen CoSI Nutzer:innen geteilt werden.
-                        </div>
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
                         <v-row class="flex">
                             <v-col
                                 cols="6"
@@ -728,11 +622,7 @@ export default {
                             dense
                         >
                             <small>
-<<<<<<< HEAD
                                 {{ $t('additional:modules.tools.cosi.saveSession.sessionHint') }}
-=======
-                                Bitte beachten Sie, dass nicht alle Daten und Aktionen gespeichert werden können. Grundsätzlich bezieht sich das Speichern auf die Gebiets- und Themenauswahl, Analyse- und Simulationsergebnisse. Welche Daten gespeichert werden können entnehmen Sie bitte der Anleitung.
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
                             </small>
                         </v-row>
                     </v-container>
