@@ -331,12 +331,12 @@ export default {
             return true;
         },
         /**
-         * Sets visibility to layer with given id. 
+         * Sets visibility to layer with given id.
          * @param {String} layerId id of the layer to be toggled
          * @param {Boolean} value true | false value for visibility
          * @returns {void}
          */
-         setLayerVisibility: function (layerId, value) {
+        setLayerVisibility: function (layerId, value) {
             const layer = layerCollection.getLayerById(layerId);
 
             if (!layer) {
