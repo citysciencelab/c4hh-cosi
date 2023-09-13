@@ -6,6 +6,7 @@ import thousandsSeparator from "../../../../src_3_0_0/shared/js/utils/thousandsS
 import WPS from "../../../../src_3_0_0/shared/js/api/wps";
 import {treeSubjectsKey} from "../../../../src_3_0_0/shared/js/utils/constants";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import layerCollection from "../../../../src_3_0_0/core/layers/js/layerCollection";
 
 export default {
     name: "PopulationRequest",
@@ -45,7 +46,7 @@ export default {
         ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
         ]),
-        ...mapGetters(["uiStyle", "restServiceById"]),
+        ...mapGetters(["uiStyle", "restServiceById", "visibleLayerConfigs", "layerConfigById"]),
         /**
          * Indicates whether the ui style is default.
          * @returns {Boolean} Is the uiStyle default.
@@ -92,6 +93,23 @@ export default {
     watch: {
         selectedAreaGeoJson (newValue) {
             this.makeRequest(newValue);
+        },
+        visibleLayerConfigs: {
+            handler (newLayerConfigs, oldLayerConfigs) {
+                if (newLayerConfigs?.find(conf => conf.id === this.rasterLayerId)) {
+                    this.setRasterActive(true);
+                }
+                else if (oldLayerConfigs?.find(conf => conf.id === this.rasterLayerId)) {
+                    this.setRasterActive(false);
+                }
+                if (newLayerConfigs?.find(conf => conf.id === this.alkisAdressLayerId)) {
+                    this.setAlkisAdressesActive(true);
+                }
+                else if (oldLayerConfigs?.find(conf => conf.id === this.alkisAdressLayerId)) {
+                    this.setAlkisAdressesActive(false);
+                }
+            },
+            deep: true
         }
     },
     mounted () {
@@ -156,8 +174,6 @@ export default {
         /**
          * Resets internal data and triggers the wps request "einwohner_ermitteln.fmw" for the selected area.
          * @param  {Object} geoJson GeoJSON to get selected area from
-         * @fires Addons.populationRequest#handleResponse
-         * @fires Core#TriggerWPSRequest
          * @returns {void}
          */
         makeRequest: function (geoJson) {
@@ -179,8 +195,7 @@ export default {
             }
         },
         /**
-         * Resets the GraphicalSelect
-         * @fires Snippets.GraphicalSelect#resetView
+         * Resets the GraphicalSelect.
          * @returns {void}
          */
         resetView: function () {
@@ -301,7 +316,6 @@ export default {
          * If it is not loaded, a corresponding error message is displayed
          * @param {String} layerId id of the layer to be toggled
          * @param {Boolean} value the new value
-         * @fires Core#RadioRequestModelListGetModelByAttributes
          * @returns {void}
          */
         checkIsModelLoaded: function (layerId, value) {
@@ -317,34 +331,43 @@ export default {
             return true;
         },
         /**
-         * sets visibility to layerList
+         * Sets visibility to layer with given id. 
          * @param {String} layerId id of the layer to be toggled
-         * @param {Boolean} value true | false
-         * @fires Core#RadioTriggerModelListSetModelAttributesById
+         * @param {Boolean} value true | false value for visibility
          * @returns {void}
          */
-        setLayerVisibility: async function (layerId, value) {
-            const rawLayer = rawLayerList.getLayerWhere({id: layerId});
+         setLayerVisibility: function (layerId, value) {
+            const layer = layerCollection.getLayerById(layerId);
 
-            if (rawLayer) {
-                rawLayer.visibility = value;
+            if (!layer) {
+                let config = this.layerConfigById(layerId),
+                    parentKey;
 
-                await this.addLayerToLayerConfig({layerConfig: rawLayer, parentKey: treeSubjectsKey}).then((addedLayer) => {
-                    if (!addedLayer) {
-                        // layer already in Config and needs changed visibility setting
-                        this.replaceByIdInLayerConfig({
-                            layerConfigs: [{
-                                id: layerId,
-                                layer: {
-                                    visibility: value
-                                }
-                            }]
-                        });
-                    }
-                });
+                if (!config) {
+                    config = rawLayerList.getLayerWhere({id: layerId});
+                    parentKey = treeSubjectsKey;
+                }
+                else {
+                    parentKey = config.parentId;
+                }
+                if (config) {
+                    config.visibility = value;
+                    config.type = "layer";
+                    this.addLayerToLayerConfig({layerConfig: config, parentKey});
+                }
+                else {
+                    console.warn("LayerId: " + layerId + " not found");
+                }
             }
             else {
-                console.warn("LayerId: " + layerId + " not found");
+                this.replaceByIdInLayerConfig({
+                    layerConfigs: [{
+                        id: layerId,
+                        layer: {
+                            visibility: value
+                        }
+                    }]
+                });
             }
         },
         /**
