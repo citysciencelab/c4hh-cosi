@@ -46,7 +46,7 @@ export default {
         ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
         ]),
-        ...mapGetters(["uiStyle", "restServiceById", "visibleLayerConfigs", "layerConfigById"]),
+        ...mapGetters(["uiStyle", "restServiceById", "visibleLayerConfigs", "layerConfigById", "determineZIndex"]),
         /**
          * Indicates whether the ui style is default.
          * @returns {Boolean} Is the uiStyle default.
@@ -360,11 +360,18 @@ export default {
                 }
             }
             else {
+                let zIndex = layer.zIndex;
+
+                if (!layer.showInLayerTree) {
+                    zIndex = this.determineZIndex(layerId);
+                }
                 this.replaceByIdInLayerConfig({
                     layerConfigs: [{
                         id: layerId,
                         layer: {
-                            visibility: value
+                            visibility: value,
+                            showInLayerTree: true,
+                            zIndex: zIndex
                         }
                     }]
                 });

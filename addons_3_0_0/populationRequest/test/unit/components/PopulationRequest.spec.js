@@ -84,7 +84,8 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
                 uiStyle: () => true,
                 restServiceById: () => () => true,
                 visibleLayerConfigs: sinon.stub(),
-                layerConfigById: () => sinon.stub().returns(layerConfigById)
+                layerConfigById: () => sinon.stub().returns(layerConfigById),
+                determineZIndex: () => sinon.stub().returns(2)
             },
             actions: {
                 addLayerToLayerConfig: spyAddLayerToLayerConfig,
