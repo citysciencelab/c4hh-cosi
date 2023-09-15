@@ -33,6 +33,7 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
         layerConfigById;
 
     beforeEach(() => {
+        console.warn = sinon.stub();
         layerConfigById = false;
         spyAddLayerToLayerConfig = sinon.spy();
         spyReplaceByIdInLayerConfig = sinon.spy();
@@ -76,6 +77,9 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
                         addInteraction: sinon.stub(),
                         registerListener: sinon.stub(),
                         addLayerOnTop: sinon.stub()
+                    },
+                    getters: {
+                        scale: sinon.stub()
                     }
                 }
             },
@@ -122,7 +126,7 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
     it("should call triggerRaster if Raster Checkbox is changed", () => {
         const spyRaster = sinon.spy(Component.methods, "triggerRaster"),
             wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"GraphicalSelect": GraphicalSelectComponent}}),
-            rasterComponent = wrapper.findComponent({ref: "rasterCheckBox"});
+            rasterComponent = wrapper.find("#rasterCheckBox");
 
         rasterComponent.trigger("click");
 
@@ -135,9 +139,9 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
     it("should call triggerAlkisAdresses if alkisAdresses Checkbox is changed", () => {
         const spyAlkisAdresses = sinon.spy(Component.methods, "triggerAlkisAdresses"),
             wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
-            alkisAdressesComponent = wrapper.findComponent({ref: "alkisAdressesCheckBox"});
+            alkisAdressesComponent = wrapper.find("#alkisAdressesCheckBox");
 
-        alkisAdressesComponent.vm.$emit("change");
+        alkisAdressesComponent.trigger("click");
 
         nextTick(() => {
             expect(spyAlkisAdresses.calledOnce).to.be.true;

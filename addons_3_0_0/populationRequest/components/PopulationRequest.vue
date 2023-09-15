@@ -46,6 +46,7 @@ export default {
         ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
         ]),
+        ...mapGetters("Maps", ["scale"]),
         ...mapGetters(["uiStyle", "restServiceById", "visibleLayerConfigs", "layerConfigById", "determineZIndex"]),
         /**
          * Indicates whether the ui style is default.
@@ -53,20 +54,6 @@ export default {
          */
         isDefaultStyle () {
             return this.uiStyle !== "SIMPLE" && this.uiStyle !== "TABLE";
-        },
-        /**
-         * Indicates whether the rasterLayer is active.
-         * @returns {Boolean} Is active.
-         */
-        isRasterActive () {
-            return this.rasterActive;
-        },
-        /**
-         * Indicates whether the alkisAdressesLayer is active.
-         * @returns {Boolean} Is active.
-         */
-        isAlkisAdressesActive () {
-            return this.alkisAdressesActive;
         },
         /**
          * returns if the Hint and Linktext should be shown
@@ -116,10 +103,16 @@ export default {
         const service = this.restServiceById(this.populationReqServiceId);
 
         if (service === undefined) {
-            console.warn("Rest Service with the ID " + this.populationReqServiceId + " is not configured in rest-services.json!");
+            console.error("PopulationRequest - Rest Service with the ID " + this.populationReqServiceId + " is not configured in rest-services.json!");
         }
         else {
             this.metaDataLink = service.url;
+        }
+        if (!rawLayerList.getLayerWhere({id: this.alkisAdressLayerId})) {
+            console.warn("PopulationRequest - Layer ALKIS Adresses with id ", this.alkisAdressLayerId, " is not avilable. Check your services.json!");
+        }
+        if (!rawLayerList.getLayerWhere({id: this.rasterLayerId})) {
+            console.warn("PopulationRequest - Layer raster with id ", this.alkisAdressLayerId, " is not avilable. Check your services.json!");
         }
     },
     unmounted () {
@@ -312,25 +305,6 @@ export default {
             return result;
         },
         /**
-         * checks whether the model has been loaded.
-         * If it is not loaded, a corresponding error message is displayed
-         * @param {String} layerId id of the layer to be toggled
-         * @param {Boolean} value the new value
-         * @returns {void}
-         */
-        checkIsModelLoaded: function (layerId, value) {
-            const layerModel = rawLayerList.getLayerWhere({id: layerId});
-
-            if (layerModel === undefined || layerModel.length === 0) {
-                if (value) {
-                    console.warn("Didn't find Layer '" + layerId + "'");
-                    return false;
-                }
-            }
-
-            return true;
-        },
-        /**
          * Sets visibility to layer with given id.
          * @param {String} layerId id of the layer to be toggled
          * @param {Boolean} value true | false value for visibility
@@ -383,33 +357,8 @@ export default {
          * @returns {void}
          */
         triggerRaster (value) {
-            const layerId = this.rasterLayerId;
-            let trigger = value;
-
-            this.setRasterActive(trigger);
-
-            if (trigger) {
-                const scale = this.$store.state.Maps.scale;
-
-                // if the Map has too large Scale give notification and undo the activation
-                if (scale > 100000) {
-                    this.setRasterActive(false);
-
-                    this.addSingleAlert({
-                        content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForRaster"),
-                        category: "info"
-                    });
-                    trigger = false;
-                }
-            }
-
-            this.setLayerVisibility(layerId, trigger);
-
-            if (trigger) {
-                if (!this.checkIsModelLoaded(layerId, trigger)) {
-                    this.setRasterActive(false);
-                }
-            }
+            this.setRasterActive(value);
+            this.setLayerVisibility(this.rasterLayerId, value);
         },
         /**
          * Sets the state regarding the alkisAdresses Layer
@@ -417,33 +366,27 @@ export default {
          * @returns {void}
          */
         triggerAlkisAdresses (value) {
-            const layerId = this.alkisAdressLayerId;
-            let trigger = value;
+            this.setAlkisAdressesActive(value);
+            this.setLayerVisibility(this.alkisAdressLayerId, value);
+        },
 
-            this.setAlkisAdressesActive(trigger);
-
-            if (trigger) {
-                const scale = this.$store.state.Maps.scale;
-
-                // if the Map has too large Scale give notification and undo the activation
-                if (scale > 10000) {
-                    this.setAlkisAdressesActive(false);
-
-                    this.addSingleAlert({
-                        content: this.translate("additional:modules.tools.populationRequest.errors.reduceScaleForAlkisAdresses"),
-                        category: "info"
-                    });
-                    trigger = false;
+        /**
+         * Returns true, if layer is in scale.
+         * @param {String} id of the layer to check
+         * @returns {Boolean}  true, if layer is in scale
+         */
+        isInScale (id) {
+            if (id === this.alkisAdressLayerId) {
+                if (this.scale > 10000) {
+                    return true;
                 }
             }
-
-            this.setLayerVisibility(layerId, trigger);
-
-            if (trigger) {
-                if (!this.checkIsModelLoaded(layerId, trigger)) {
-                    this.setAlkisAdressesActive(false);
+            else if (id === this.rasterLayerId) {
+                if (this.scale > 100000) {
+                    return true;
                 }
             }
+            return false;
         },
         /**
          * translates the given key, checkes if the key exists and throws a console warning if not
@@ -573,12 +516,12 @@ export default {
                     <div class="form-inline">
                         <div class="form-check form-switch mb-3 d-flex align-items-center">
                             <SwitchInput
-                                :id="'rasterCheckBoxPopRE'"
-                                ref="rasterCheckBox"
+                                :id="'rasterCheckBox'"
                                 :aria="translate('additional:modules.tools.populationRequest.select.showRasterLayer')"
                                 :interaction="($event) => triggerRaster($event.target.checked)"
                                 :label="translate('additional:modules.tools.populationRequest.select.showRasterLayer')"
-                                :checked="isRasterActive"
+                                :checked="rasterActive"
+                                :disabled="isInScale(rasterLayerId)"
                             />
                         </div>
                     </div>
@@ -587,12 +530,12 @@ export default {
                     <div class="form-inline">
                         <div class="form-check form-switch mb-3 d-flex align-items-center">
                             <SwitchInput
-                                :id="'alkisAdressesCheckBoxPopRe'"
-                                ref="alkisAdressesCheckBox"
+                                :id="'alkisAdressesCheckBox'"
                                 :aria="translate('additional:modules.tools.populationRequest.select.showAlkisAdresses')"
                                 :interaction="($event) => triggerAlkisAdresses($event.target.checked)"
                                 :label="translate('additional:modules.tools.populationRequest.select.showAlkisAdresses')"
-                                :checked="isAlkisAdressesActive"
+                                :checked="alkisAdressesActive"
+                                :disabled="isInScale(alkisAdressLayerId)"
                             />
                         </div>
                     </div>

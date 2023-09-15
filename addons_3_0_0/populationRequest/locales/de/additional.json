@@ -28,9 +28,7 @@
                 "errors": {
                     "errorTitle": "Fehler",
                     "requestException": "Datenabfrage fehlgeschlagen. ",
-                    "layerIdCantBeLoaded": "Der Layer mit der ID: {{layerId}} konnte nicht geladen werden, da dieser im Portal nicht zur Verfügung steht!",
-                    "reduceScaleForRaster": "Das Raster Layer kann erst ab 1: 100.000 eingeblendet werden.",
-                    "reduceScaleForAlkisAdresses": "Das ALKIS Adressen Layer kann erst ab 1: 10.000 eingeblendet werden."
+                    "layerIdCantBeLoaded": "Der Layer mit der ID: {{layerId}} konnte nicht geladen werden, da dieser im Portal nicht zur Verfügung steht!"
                 }
             }
         }
