@@ -328,6 +328,17 @@ export default {
             }
             this.rows = this.originRows;
             this.columns = this.getColumns(this.feature.getAttributesToShow());
+        },
+        /**
+         * Gets the css z-index for the column header.
+         * The left column should always have a higher z-index than the right column.
+         * @param {Number} idx - The of the column.
+         * @return {Object} The style object.
+         */
+        getZIndex (idx) {
+            return {
+                "z-index": this.columns.length - idx
+            };
         }
     }
 };
@@ -352,7 +363,8 @@ export default {
                     v-for="col in columns"
                     :key="col.index"
                     class="filter-select-box-container"
-                    :class="typeof showCount !== 'undefined' ? 'more-sticky' : ''"
+                    :class="[typeof showCount !== 'undefined' ? 'more-sticky' : '']"
+                    :style="getZIndex(col.index)"
                 >
                     <span
                         v-if="isFilterable"
@@ -379,7 +391,7 @@ export default {
                                 <span
                                     class="multiselect__single"
                                 >{{ col.name }}</span>
-                            </template>d
+                            </template>
                         </Multiselect>
                     </span>
                     <span v-else>{{ col.name }}</span>
@@ -424,7 +436,7 @@ export default {
                 :filename="fileName"
                 :data="rowsWithAdditionalData"
                 :use-semicolon="true"
-                :title="$t('modules.tools.filter.download.labelBtn')"
+                :title="$t('common:modules.filter.download.labelBtn')"
             />
         </div>
         <div
@@ -437,7 +449,7 @@ export default {
                 @click="resetAll"
                 @keypress="resetAll"
             >
-                {{ $t('additional:addons.gfiThemes.dataTable.reset') }}
+                {{ $t('common:modules.filter.snippetTags.resetAll') }}
             </button>
         </div>
     </div>
@@ -445,7 +457,6 @@ export default {
 
 <style lang="scss">
 @import "~variables";
-
 .btn-sort > i {
     font-size: 1rem;
 }
@@ -457,11 +468,7 @@ export default {
 #table-data-container {
     margin:6px 15px 0 12px;
     min-height: 350px;
-
-    &.enable-download {
-        margin:6px 15px 60px 12px;
-    }
-
+    overflow: scroll;
     .sort {
         position: absolute;
         right: 10px;
@@ -512,13 +519,16 @@ export default {
         bottom: 22px;
         float: right;
         margin-left: 20px;
+        margin-top: 20px;
     }
     .reset-all {
         position: sticky;
         bottom: 22px;
         float: right;
+        margin-top: 20px;
     }
     .filter-select-box-container {
+        width: 15rem;
         .multiselect {
             margin:0;
             padding: 0;
