@@ -1,7 +1,7 @@
 {
   "modules": {
     "vcOblique": {
-      "description": "Sehe dir Schrägluftbilder zu einer Position in der Karte an",
+      "description": "Sieh dir Schrägluftbilder zu einer Position in der Karte an",
       "frameworkUndefined": "Schrägluftbilder",
       "frameworkUndefinedMessage": "Es ist ein Fehler bei der Anzeige der Schrägluftbilder aufgetreten. Starten Sie die Anwendung bitte erneut. Sollte der Fehler weiterhin auftreten melden Sie ihn bitte über Kontakt.",
       "name": "Schrägluftbilder",

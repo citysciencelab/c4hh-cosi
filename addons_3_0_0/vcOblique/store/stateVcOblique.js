@@ -6,6 +6,7 @@
  * @property {Boolean} active if true, viewer will rendered
  * @property {String} name displayed as title (config-param)
  * @property {String} icon icon next to title (config-param)
+ * @property {String} description description of tool (config-param)
  * @property {Boolean} hasMouseMapInteractions If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
  * @property {String} styleId style.json id to style the mapMarker (config-param)
  * @property {String} obliqueViewerURL contains the url to the oblique viewer
