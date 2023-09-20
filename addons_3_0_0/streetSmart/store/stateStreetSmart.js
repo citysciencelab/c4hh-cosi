@@ -1,7 +1,7 @@
 /**
  * User type definition
  * @typedef {Object} StreetSmartState
- * @property {String} description The description that should be shown in the button in the menu.
+ * @property {String} description description of tool (config-param)
  * @property {Boolean} hasMouseMapInteractions If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
  * @property {String} icon icon next to title (config-param)
  * @property {String} name displayed as title (config-param)
