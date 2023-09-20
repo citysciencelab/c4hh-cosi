@@ -468,7 +468,6 @@ export default {
 #table-data-container {
     margin:6px 15px 0 12px;
     min-height: 350px;
-    overflow: scroll;
     .sort {
         position: absolute;
         right: 10px;
