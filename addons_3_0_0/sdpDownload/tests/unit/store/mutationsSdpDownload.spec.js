@@ -9,12 +9,12 @@ describe("addons/sdpDownload/store/mutationsSdpDownload", function () {
     describe("testing setting of mutations with payload", function () {
         it("removes 'translate#' from name if present", function () {
             const state = {
-                    name: "translate#additional:modules.tools.sdpdownload.name"
+                    name: "translate#additional:modules.sdpDownload.name"
                 },
-                payload = "translate#additional:modules.tools.sdpdownload.name";
+                payload = "translate#additional:modules.sdpDownload.name";
 
             applyTranslationKey(state, payload);
-            expect(state.name).to.equal("additional:modules.tools.sdpdownload.name");
+            expect(state.name).to.equal("additional:modules.sdpDownload.name");
         });
         it("does nothing, if name not starts with 'translate#'", function () {
             const name = "dies ist ein VueAddon",

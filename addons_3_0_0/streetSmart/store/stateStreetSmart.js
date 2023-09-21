@@ -1,6 +1,7 @@
 /**
  * User type definition
  * @typedef {Object} StreetSmartState
+ * @property {String} description The description that should be shown in the button in the menu.
  * @property {Boolean} hasMouseMapInteractions If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
  * @property {String} icon icon next to title (config-param)
  * @property {String} name displayed as title (config-param)
@@ -21,9 +22,10 @@
  */
 
 const state = {
+    description: "additional:modules.streetsmart.description",
     hasMouseMapInteractions: true,
     icon: "bi-camera-fill",
-    name: "additional:menu.tools.streetsmart",
+    name: "additional:modules.streetsmart.name",
     reactVersion: "16.13.0",
     serviceId: "streetsmart",
     streetsmartAPIVersion: "22.2",

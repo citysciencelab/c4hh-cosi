@@ -66,7 +66,7 @@ Mobile the iFrame is displayed in the window.
 ```
 #!json
     "vcOblique": {
-    "name": "translate#additional:modules.tools.vcOblique.title",
+    "name": "additional:modules.vcOblique.title",
     "icon": "bi-image"
     }
 ```

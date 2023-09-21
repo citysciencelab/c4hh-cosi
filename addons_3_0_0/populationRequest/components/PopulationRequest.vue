@@ -223,9 +223,9 @@ export default {
          */
         handleWPSError: function (response) {
             this.addSingleAlert({
-                content: this.translate("additional:modules.tools.populationRequest.errors.requestException") + JSON.stringify(response.ergebnis),
+                content: this.translate("additional:modules.populationRequest.errors.requestException") + JSON.stringify(response.ergebnis),
                 category: "error",
-                title: this.translate("additional:modules.tools.populationRequest.errors.errorTitle")
+                title: this.translate("additional:modules.populationRequest.errors.errorTitle")
             });
         },
         /**
@@ -273,9 +273,9 @@ export default {
             }
             catch (e) {
                 this.addSingleAlert({
-                    content: this.translate("additional:modules.tools.populationRequest.errors.requestException") + JSON.stringify(response),
+                    content: this.translate("additional:modules.populationRequest.errors.requestException") + JSON.stringify(response),
                     category: "error",
-                    title: this.translate("additional:modules.tools.populationRequest.errors.errorTitle")
+                    title: this.translate("additional:modules.populationRequest.errors.errorTitle")
                 });
                 this.resetView();
                 (console.error || console.warn).call(console, e.stack || e);
@@ -412,13 +412,13 @@ export default {
     >
         <form class="form-horizontal">
             <div class="mb-3">
-                {{ translate("additional:modules.tools.populationRequest.select.info") }}
+                {{ translate("additional:modules.populationRequest.select.info") }}
             </div>
             <div class="graphicalSelectionContainer row">
                 <div class="dropdown">
                     <GraphicalSelect
                         ref="graphicalSelection"
-                        :label="'additional:modules.tools.populationRequest.select.action'"
+                        :label="'additional:modules.populationRequest.select.action'"
                     />
                 </div>
             </div>
@@ -428,13 +428,13 @@ export default {
                     class="result"
                 >
                     <div class="heading additional-text">
-                        {{ translate("additional:modules.tools.populationRequest.result.confidentialityHint") }}:
+                        {{ translate("additional:modules.populationRequest.result.confidentialityHint") }}:
                     </div>
                     <table class="table">
                         <tr
                             v-if="sourceFHH !== 'nein'"
                         >
-                            <td>{{ translate("additional:modules.tools.populationRequest.result.populationFHH") }}:</td>
+                            <td>{{ translate("additional:modules.populationRequest.result.populationFHH") }}:</td>
                             <td
                                 class="inhabitantsFHH"
                             >
@@ -444,7 +444,7 @@ export default {
                         <tr
                             v-if="sourceMRH !== 'nein'"
                         >
-                            <td>{{ translate("additional:modules.tools.populationRequest.result.populationMRH") }}:</td>
+                            <td>{{ translate("additional:modules.populationRequest.result.populationMRH") }}:</td>
                             <td
                                 class="inhabitantsMRH"
                             >
@@ -454,7 +454,7 @@ export default {
                         <tr
                             v-if="searchArea"
                         >
-                            <td>{{ translate("additional:modules.tools.populationRequest.result.areaSize") }}:</td>
+                            <td>{{ translate("additional:modules.populationRequest.result.areaSize") }}:</td>
                             <td
                                 class="searchArea"
                             >
@@ -467,14 +467,14 @@ export default {
                         class="inhabitantsFHHAddText"
                     >
                         <div class="hinweis additional-text">
-                            <span>{{ translate("additional:modules.tools.populationRequest.result.hint") }}:</span>&nbsp;{{ translate("additional:modules.tools.populationRequest.result.confidentialityHintSmallValues") }}
+                            <span>{{ translate("additional:modules.populationRequest.result.hint") }}:</span>&nbsp;{{ translate("additional:modules.populationRequest.result.confidentialityHintSmallValues") }}
                         </div>
                         <div>
                             <a
                                 target="_blank"
                                 :href="`${metaDataLink}${fhhId}`"
                             >
-                                {{ translate("additional:modules.tools.populationRequest.result.dataSourceFHHLinktext") }}
+                                {{ translate("additional:modules.populationRequest.result.dataSourceFHHLinktext") }}
                             </a>
                         </div>
                     </div>
@@ -486,21 +486,21 @@ export default {
                             class="hinweis additional-text"
                         >
                             <div>
-                                <span>{{ translate("additional:modules.tools.populationRequest.result.hint") }}:</span>
+                                <span>{{ translate("additional:modules.populationRequest.result.hint") }}:</span>
                                 <span
                                     v-if="showMRHSourceAreaOutsideHint"
                                 >
-                                    {{ translate("additional:modules.tools.populationRequest.result.sourceAreaOutside") }}
+                                    {{ translate("additional:modules.populationRequest.result.sourceAreaOutside") }}
                                 </span>
                             </div>
-                            <span>{{ translate("additional:modules.tools.populationRequest.result.dataSourceMRHKey") }}:</span>&nbsp;{{ translate("additional:modules.tools.populationRequest.result.dataSourceMRHValue") }}
+                            <span>{{ translate("additional:modules.populationRequest.result.dataSourceMRHKey") }}:</span>&nbsp;{{ translate("additional:modules.populationRequest.result.dataSourceMRHValue") }}
                         </div>
                         <div>
                             <a
                                 target="_blank"
                                 :href="`${metaDataLink}${mrhId}`"
                             >
-                                {{ translate("additional:modules.tools.populationRequest.result.dataSourceMRHLinktext") }}
+                                {{ translate("additional:modules.populationRequest.result.dataSourceMRHLinktext") }}
                             </a>
                         </div>
                     </div>
@@ -517,9 +517,9 @@ export default {
                         <div class="form-check form-switch mb-3 d-flex align-items-center">
                             <SwitchInput
                                 :id="'rasterCheckBox'"
-                                :aria="translate('additional:modules.tools.populationRequest.select.showRasterLayer')"
+                                :aria="translate('additional:modules.populationRequest.select.showRasterLayer')"
                                 :interaction="($event) => triggerRaster($event.target.checked)"
-                                :label="translate('additional:modules.tools.populationRequest.select.showRasterLayer')"
+                                :label="translate('additional:modules.populationRequest.select.showRasterLayer')"
                                 :checked="rasterActive"
                                 :disabled="isInScale(rasterLayerId)"
                             />
@@ -531,9 +531,9 @@ export default {
                         <div class="form-check form-switch mb-3 d-flex align-items-center">
                             <SwitchInput
                                 :id="'alkisAdressesCheckBox'"
-                                :aria="translate('additional:modules.tools.populationRequest.select.showAlkisAdresses')"
+                                :aria="translate('additional:modules.populationRequest.select.showAlkisAdresses')"
                                 :interaction="($event) => triggerAlkisAdresses($event.target.checked)"
-                                :label="translate('additional:modules.tools.populationRequest.select.showAlkisAdresses')"
+                                :label="translate('additional:modules.populationRequest.select.showAlkisAdresses')"
                                 :checked="alkisAdressesActive"
                                 :disabled="isInScale(alkisAdressLayerId)"
                             />

@@ -58,7 +58,7 @@ const actions = {
 
             if (typeof StreetSmartApi === "undefined") {
                 console.warn("Cannot start Streetsmart-View. StreetSmartApi is not available.");
-                dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.streetsmart.createViewFailedMoreInfo"), {root: true});
+                dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.streetsmart.createViewFailedMoreInfo"), {root: true});
             }
             else {
                 StreetSmartApi.init(options)
@@ -67,13 +67,13 @@ const actions = {
                     })
                     .catch(reason => {
                         console.warn("Failed to create component(s) through API: " + reason);
-                        dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.streetsmart.createViewFailedMoreInfo"), {root: true});
+                        dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.streetsmart.createViewFailedMoreInfo"), {root: true});
                     });
             }
         }
         else {
             console.warn("Cannot start Streetsmart-View. No service in rest-services found for serviceId ", state.serviceId);
-            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.streetsmart.createViewFailedMoreInfo"), {root: true});
+            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.streetsmart.createViewFailedMoreInfo"), {root: true});
         }
     },
 
@@ -150,18 +150,18 @@ const actions = {
                             viewers[0].toggleAddressesVisible(state.toggleAddressesVisible);
                         }
                         else {
-                            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.streetsmart.noData"), {root: true});
+                            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.streetsmart.noData"), {root: true});
                             dispatch("Maps/placingPointMarker", {coordinates: state.lastCoordinates}, {root: true});
                         }
                     })
                     .catch(reason => {
                         console.warn("Error opening panorama viewer: " + reason);
-                        dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.streetsmart.createViewFailed"), {root: true});
+                        dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.streetsmart.createViewFailed"), {root: true});
                     });
             }
             catch (e) {
                 console.error("Create streetSmart view failed: ", e);
-                dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.streetsmart.createViewFailed"), {root: true});
+                dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.streetsmart.createViewFailed"), {root: true});
             }
         }
     },

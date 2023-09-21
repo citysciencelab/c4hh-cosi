@@ -175,7 +175,7 @@ describe("ADDONS: addons/vcOblique/store/actionsVcOblique", () => {
 
             expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("Alerting/addSingleAlert");
-            expect(dispatch.firstCall.args[1]).to.equal("modules.tools.vcOblique.sameOrigin");
+            expect(dispatch.firstCall.args[1]).to.equal("modules.vcOblique.sameOrigin");
         });
     });
 

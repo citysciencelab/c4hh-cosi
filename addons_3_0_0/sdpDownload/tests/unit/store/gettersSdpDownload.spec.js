@@ -12,7 +12,7 @@ describe("addons/sdpDownload/store/gettersSdpDownload", function () {
 
     describe("testing default values", function () {
         it("returns the name default value from state", function () {
-            expect(stateSdpDownload.name).to.be.equal("SDP Download");
+            expect(stateSdpDownload.name).to.be.equal("additional:modules.sdpDownload.name");
         });
         it("returns the icon default value from state", function () {
             expect(stateSdpDownload.icon).to.be.equal("bi-download");
@@ -28,10 +28,10 @@ describe("addons/sdpDownload/store/gettersSdpDownload", function () {
         });
         it("returns the formats default value from state", function () {
             expect(stateSdpDownload.formats).to.be.eql([
-                {id: "NAS", label: "additional:modules.tools.sdpdownload.nasLabel", isSelected: true, desc: "additional:modules.tools.sdpdownload.nasDescription", fileId: "nas"},
-                {id: "DWG_310", label: "additional:modules.tools.sdpdownload.dwg310Label", isSelected: false, desc: "additional:modules.tools.sdpdownload.dwg310Description", fileId: "dwg310"},
-                {id: "DWG_320", label: "additional:modules.tools.sdpdownload.dwg320Label", isSelected: false, desc: "additional:modules.tools.sdpdownload.dwg320Description", fileId: "dwg320"},
-                {id: "JPG", label: "additional:modules.tools.sdpdownload.jpgLabel", isSelected: false, desc: "additional:modules.tools.sdpdownload.jpgDescription", fileId: "jpg"}]);
+                {id: "NAS", label: "additional:modules.sdpDownload.nasLabel", isSelected: true, desc: "additional:modules.sdpDownload.nasDescription", fileId: "nas"},
+                {id: "DWG_310", label: "additional:modules.sdpDownload.dwg310Label", isSelected: false, desc: "additional:modules.sdpDownload.dwg310Description", fileId: "dwg310"},
+                {id: "DWG_320", label: "additional:modules.sdpDownload.dwg320Label", isSelected: false, desc: "additional:modules.sdpDownload.dwg320Description", fileId: "dwg320"},
+                {id: "JPG", label: "additional:modules.sdpDownload.jpgLabel", isSelected: false, desc: "additional:modules.sdpDownload.jpgDescription", fileId: "jpg"}]);
         });
         it("returns the selectedFormat default value from state", function () {
             expect(stateSdpDownload.selectedFormat).to.be.equal("NAS");

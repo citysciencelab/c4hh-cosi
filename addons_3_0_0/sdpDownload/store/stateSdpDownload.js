@@ -3,6 +3,7 @@
  * @typedef {Object} SdpDownloadState
  * @property {String} type Type of the SdpDownload component.
  * @property {Boolean} active= false state of the tool
+ * @property {String} description The description that should be shown in the button in the menu.
  * @property {String} name= SDP Download module name, // must be here although it is in the config.json, else it is lost
  * @property {String} icon= icon name string that represents the tool icon // must be here although it is in the config.json, else it is lost
  * @property {Boolean} hasMouseMapInteractions If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
@@ -22,36 +23,37 @@
  * @property {Object} selectedRasterLimit= 9 limit og raster images for download
  * @property {String[]} rasterNames=[] stores the names of the tiles in the raster
  * @property {Boolean} transactionProcessing Flag if a download is currently active
- * @property {String} selectFormat= additional:modules.tools.sdpdownload.selectFormat" contains the translated text
- * @property {String} howToChooseTiles= additional:modules.tools.sdpdownload.howToChooseTiles" contains the translated text
- * @property {String} downloadDataPackage= additional:modules.tools.sdpdownload.downloadDataPackage" contains the translated text
- * @property {String} specialDownloads= additional:modules.tools.sdpdownload.specialDownloads" contains the translated text
- * @property {String} neuwerkDataPackage= additional:modules.tools.sdpdownload.neuwerkDataPackage" contains the translated text
- * @property {String} scharhoernDataPackage= additional:modules.tools.sdpdownload.scharhoernDataPackage" contains the translated text
- * @property {String} tileOverview310= additional:modules.tools.sdpdownload.tileOverview310" contains the translated text
- * @property {String} tileOverview320= additional:modules.tools.sdpdownload.tileOverview320" contains the translated text
- * @property {String} pleaseSelectTiles= additional:modules.tools.sdpdownload.pleaseSelectTiles" contains the translated text
- * @property {String} failedToDownload= additional:modules.tools.sdpdownload.failedToDownload" contains the translated text
- * @property {String} details= additional:modules.tools.sdpdownload.details" contains the translated text
- * @property {String} serviceNotResponding= additional:modules.tools.sdpdownload.serviceNotResponding
- * @property {String} error= additional:modules.tools.sdpdownload.alerts.error" contains the translated text
- * @property {String} info= additional:modules.tools.sdpdownload.alerts.info" contains the translated text
- * @property {String} tooManyTilesSelected= additional:modules.tools.sdpdownload.tooManyTilesSelected" contains the translated text
+ * @property {String} selectFormat= additional:modules.sdpDownload.selectFormat" contains the translated text
+ * @property {String} howToChooseTiles= additional:modules.sdpDownload.howToChooseTiles" contains the translated text
+ * @property {String} downloadDataPackage= additional:modules.sdpDownload.downloadDataPackage" contains the translated text
+ * @property {String} specialDownloads= additional:modules.sdpDownload.specialDownloads" contains the translated text
+ * @property {String} neuwerkDataPackage= additional:modules.sdpDownload.neuwerkDataPackage" contains the translated text
+ * @property {String} scharhoernDataPackage= additional:modules.sdpDownload.scharhoernDataPackage" contains the translated text
+ * @property {String} tileOverview310= additional:modules.sdpDownload.tileOverview310" contains the translated text
+ * @property {String} tileOverview320= additional:modules.sdpDownload.tileOverview320" contains the translated text
+ * @property {String} pleaseSelectTiles= additional:modules.sdpDownload.pleaseSelectTiles" contains the translated text
+ * @property {String} failedToDownload= additional:modules.sdpDownload.failedToDownload" contains the translated text
+ * @property {String} details= additional:modules.sdpDownload.details" contains the translated text
+ * @property {String} serviceNotResponding= additional:modules.sdpDownload.serviceNotResponding
+ * @property {String} error= additional:modules.sdpDownload.alerts.error" contains the translated text
+ * @property {String} info= additional:modules.sdpDownload.alerts.info" contains the translated text
+ * @property {String} tooManyTilesSelected= additional:modules.sdpDownload.tooManyTilesSelected" contains the translated text
  */
 
 const state = {
     type: "SdpAddon",
     active: false,
     // defaults for config.json parameters
-    name: "SDP Download",
+    description: "additional:modules.sdpDownload.description",
+    name: "additional:modules.sdpDownload.name",
     icon: "bi-download",
     hasMouseMapInteractions: true,
     wmsRasterLayerId: "4707",
     formats: [
-        {id: "NAS", label: "additional:modules.tools.sdpdownload.nasLabel", isSelected: true, desc: "additional:modules.tools.sdpdownload.nasDescription", fileId: "nas"},
-        {id: "DWG_310", label: "additional:modules.tools.sdpdownload.dwg310Label", isSelected: false, desc: "additional:modules.tools.sdpdownload.dwg310Description", fileId: "dwg310"},
-        {id: "DWG_320", label: "additional:modules.tools.sdpdownload.dwg320Label", isSelected: false, desc: "additional:modules.tools.sdpdownload.dwg320Description", fileId: "dwg320"},
-        {id: "JPG", label: "additional:modules.tools.sdpdownload.jpgLabel", isSelected: false, desc: "additional:modules.tools.sdpdownload.jpgDescription", fileId: "jpg"}],
+        {id: "NAS", label: "additional:modules.sdpDownload.nasLabel", isSelected: true, desc: "additional:modules.sdpDownload.nasDescription", fileId: "nas"},
+        {id: "DWG_310", label: "additional:modules.sdpDownload.dwg310Label", isSelected: false, desc: "additional:modules.sdpDownload.dwg310Description", fileId: "dwg310"},
+        {id: "DWG_320", label: "additional:modules.sdpDownload.dwg320Label", isSelected: false, desc: "additional:modules.sdpDownload.dwg320Description", fileId: "dwg320"},
+        {id: "JPG", label: "additional:modules.sdpDownload.jpgLabel", isSelected: false, desc: "additional:modules.sdpDownload.jpgDescription", fileId: "jpg"}],
     selectedFormat: "NAS", // is preselected
     compressDataId: "compressData_nodejs",
     wfsRasterParams: {
@@ -67,21 +69,21 @@ const state = {
     selectedRasterLimit: 9,
     rasterNames: [],
     transactionProcessing: false,
-    selectFormat: "additional:modules.tools.sdpdownload.selectFormat",
-    howToChooseTiles: "additional:modules.tools.sdpdownload.howToChooseTiles",
-    downloadDataPackage: "additional:modules.tools.sdpdownload.downloadDataPackage",
-    specialDownloads: "additional:modules.tools.sdpdownload.specialDownloads",
-    neuwerkDataPackage: "additional:modules.tools.sdpdownload.neuwerkDataPackage",
-    scharhoernDataPackage: "additional:modules.tools.sdpdownload.scharhoernDataPackage",
-    tileOverview310: "additional:modules.tools.sdpdownload.tileOverview310",
-    tileOverview320: "additional:modules.tools.sdpdownload.tileOverview320",
-    pleaseSelectTiles: "additional:modules.tools.sdpdownload.pleaseSelectTiles",
-    failedToDownload: "additional:modules.tools.sdpdownload.failedToDownload",
-    details: "additional:modules.tools.sdpdownload.details",
-    serviceNotResponding: "additional:modules.tools.sdpdownload.serviceNotResponding",
-    error: "additional:modules.tools.sdpdownload.alerts.error",
-    info: "additional:modules.tools.sdpdownload.alerts.info",
-    tooManyTilesSelected: "additional:modules.tools.sdpdownload.tooManyTilesSelected"
+    selectFormat: "additional:modules.sdpDownload.selectFormat",
+    howToChooseTiles: "additional:modules.sdpDownload.howToChooseTiles",
+    downloadDataPackage: "additional:modules.sdpDownload.downloadDataPackage",
+    specialDownloads: "additional:modules.sdpDownload.specialDownloads",
+    neuwerkDataPackage: "additional:modules.sdpDownload.neuwerkDataPackage",
+    scharhoernDataPackage: "additional:modules.sdpDownload.scharhoernDataPackage",
+    tileOverview310: "additional:modules.sdpDownload.tileOverview310",
+    tileOverview320: "additional:modules.sdpDownload.tileOverview320",
+    pleaseSelectTiles: "additional:modules.sdpDownload.pleaseSelectTiles",
+    failedToDownload: "additional:modules.sdpDownload.failedToDownload",
+    details: "additional:modules.sdpDownload.details",
+    serviceNotResponding: "additional:modules.sdpDownload.serviceNotResponding",
+    error: "additional:modules.sdpDownload.alerts.error",
+    info: "additional:modules.sdpDownload.alerts.info",
+    tooManyTilesSelected: "additional:modules.sdpDownload.tooManyTilesSelected"
 };
 
 export default state;

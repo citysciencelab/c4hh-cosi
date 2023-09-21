@@ -123,7 +123,7 @@ export default {
                         data-bs-toggle="tooltip"
                         :title="format.label"
                     >
-                        {{ translate(`additional:modules.tools.sdpdownload.${format.fileId}Label`) }}
+                        {{ translate(`additional:modules.sdpDownload.${format.fileId}Label`) }}
                     </option>
                 </select>
                 <label for="printLayout">

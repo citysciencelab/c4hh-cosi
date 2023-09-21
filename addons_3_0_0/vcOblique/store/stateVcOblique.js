@@ -1,6 +1,7 @@
 /**
  * User type definition
  * @typedef {Object} vcObliqueState
+ * @property {String} description The description that should be shown in the button in the menu.
  * @property {String} type Type of the viewer component
  * @property {Boolean} active if true, viewer will rendered
  * @property {String} name displayed as title (config-param)
@@ -15,9 +16,10 @@
  * */
 
 const state = {
+    description: "additional:modules.vcOblique.description",
     type: "vcOblique",
     active: false,
-    name: "additional:menu.tools.vcOblique",
+    name: "additional:modules.vcOblique.name",
     icon: "bi-image",
     hasMouseMapInteractions: true,
     styleId: "",
