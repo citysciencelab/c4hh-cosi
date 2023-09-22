@@ -1,7 +1,6 @@
 import {expect} from "chai";
 import actions from "../../../store/actionsSdpDownload";
 import importedState from "../../../store/stateSdpDownload";
-import layerCollection from "../../../../../../src_3_0_0/core/layers/js/layerCollection";
 import axios from "axios";
 import sinon from "sinon";
 
@@ -25,15 +24,23 @@ describe("addons/sdpDownload/store/actionsSdpDownload", () => {
     afterEach(sinon.restore);
 
 
-    it("toggleRasterLayer dispatch removeLayerById if active is false", () => {
-        getters = {wmsRasterLayerId: importedState.wmsRasterLayerId, active: false};
+    it("toggleRasterLayer dispatch add layer, if active is true", () => {
+        getters = {wmsRasterLayerId: importedState.wmsRasterLayerId, active: true};
 
-        // dispatches actions
-        const stubAddLayer = sinon.stub(layerCollection, "removeLayerById");
+        actions.toggleRasterLayer({dispatch, getters});
 
-        actions.toggleRasterLayer({getters, dispatch});
-
-        expect(stubAddLayer.calledOnce).to.be.true;
+        expect(dispatch.calledOnce).to.be.true;
+        expect(dispatch.firstCall.args[0]).to.equals("replaceByIdInLayerConfig");
+        expect(dispatch.firstCall.args[1]).to.deep.equals({
+            layerConfigs: [{
+                id: "4707",
+                layer: {
+                    id: "4707",
+                    showInLayerTree: true,
+                    visibility: true
+                }
+            }]
+        });
     });
     it("loadWfsRaster dispatch addModelsByAttributesToModelList, setModelsByAttributesToModelList", () => {
         // how to handle axios and the parameters?

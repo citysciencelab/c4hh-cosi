@@ -1,29 +1,30 @@
 import {WFS} from "ol/format.js";
-import {rawLayerList} from "@masterportal/masterportalapi/src";
-import layerFactory from "../../../../src_3_0_0/core/layers/js/layerFactory";
-import layerCollection from "../../../../src_3_0_0/core/layers/js/layerCollection";
 import {default as turfIntersect} from "@turf/intersect";
 import {polygon as turfPolygon} from "@turf/helpers";
 import axios from "axios";
 
-const actions = {
+export default {
     /**
      * Shows or hides the raster layer
-     * @param {Object} getters vuex element
+     * @param {Object} param.dispatch the dispatch
+     * @param {Object} param.getters the getters
      * @returns {void}
     */
-    toggleRasterLayer: function ({getters}) {
-        const layerId = getters.wmsRasterLayerId,
-            rasterLayerConfig = rawLayerList.getLayerWhere({id: layerId}),
-            rasterLayer = layerFactory.createLayer(rasterLayerConfig);
+    toggleRasterLayer ({dispatch, getters}) {
+        const layerId = getters.wmsRasterLayerId;
 
-        if (!getters.active) {
-            layerCollection.removeLayerById(layerId);
-        }
-        else if (rasterLayerConfig && layerCollection.getLayerById(layerId) === undefined) {
-            layerCollection.addLayer(rasterLayer);
-        }
+        dispatch("replaceByIdInLayerConfig", {
+            layerConfigs: [{
+                id: layerId,
+                layer: {
+                    id: layerId,
+                    showInLayerTree: getters.active,
+                    visibility: getters.active
+                }
+            }]
+        }, {root: true});
     },
+
     /**
     * Loads the WFS raster with the params stored in property wfsRasterParams.
     * On success the features are read.
@@ -31,7 +32,7 @@ const actions = {
     * @param {Object} dispatch vuex element
     * @returns {void}
     */
-    loadWfsRaster: function ({getters, dispatch}) {
+    loadWfsRaster ({getters, dispatch}) {
         const params = getters.wfsRasterParams,
             urlParams = {
                 "Service": params.service,
@@ -60,18 +61,20 @@ const actions = {
                 console.error(error.response);
             });
     },
+
     /**
      * Reads all features in the given data and stores it in the property wfsRaster
      * @param {Object} commit vuex element
      * @param {Object} data of the wfs response (XML)
      * @returns {void}
     */
-    readFeatures: function ({commit}, data) {
+    readFeatures ({commit}, data) {
         const format = new WFS(),
             features = format.readFeatures(data);
 
         commit("setWfsRaster", features);
     },
+
     /**
      * Calculates the intersection of the graphical selection with the raster. The names of the intersected raster squares are then commited to the state.
      * @see {@link https://turfjs.org/docs/#intersect}
@@ -80,7 +83,7 @@ const actions = {
      * @param {Object} rootState vuex element
      * @returns {void}
     */
-    calculateSelectedRasterNames: async function ({getters, dispatch, commit, rootState}) {
+    async calculateSelectedRasterNames ({getters, dispatch, commit, rootState}) {
         const rasterLayerFeatures = getters.wfsRaster,
             selectedAreaGeoJson = rootState.Modules.GraphicalSelect.selectedAreaGeoJson,
             rasterNames = [];
@@ -100,6 +103,7 @@ const actions = {
         commit("setRasterNames", rasterNames);
 
     },
+
     /**
      * Adds the name of the features tile to the given list of rasterNames.
      * @param {Object} context vuex element
@@ -108,7 +112,7 @@ const actions = {
      * @param {Object} payload.rasterNames array to fill with unique names
      * @returns {void}
     */
-    addFeaturenameToRasternames: function (context, payload) {
+    addFeaturenameToRasternames (context, payload) {
         if (payload.feature && payload.rasterNames) {
             const intersectedRasterName = payload.feature.getProperties().kachel,
                 result = payload.rasterNames.find(rasterName => rasterName === intersectedRasterName);
@@ -118,13 +122,14 @@ const actions = {
             }
         }
     },
+
     /**
      * Collects the params to request the WMS for "Kacheln" and triggers the request.
      * @param {Object} getters vuex element
      * @param {Object} dispatch vuex element
      * @returns {void}
     */
-    requestCompressedData: async function ({getters, dispatch}) {
+    async requestCompressedData ({getters, dispatch}) {
         const params = {};
 
         dispatch("calculateSelectedRasterNames").then(() =>dispatch("checkRasterNamesAmount").then(response => {
@@ -146,6 +151,7 @@ const actions = {
             }
         }));
     },
+
     /**
      * Checks the models "rasterNames":
      * If there are more than the number of state.selectedRasterLimit tiles selected, the user is warned to reduce the selection.
@@ -154,7 +160,7 @@ const actions = {
      * @param {Object} dispatch vuex element
      * @returns {Booelan} true if check is okay to request server
      */
-    checkRasterNamesAmount: function ({getters, dispatch}) {
+    checkRasterNamesAmount ({getters, dispatch}) {
         const selectedRasterNames = getters.rasterNames;
 
         let alertingTilesAmount = {},
@@ -179,6 +185,7 @@ const actions = {
         }
         return true;
     },
+
     /**
      * Collects the params to request the WMS for island data.Params have to look like: "insel=Neuwerk&type=JPG"
      * @param {Object} getters vuex element
@@ -186,7 +193,7 @@ const actions = {
      * @param {Object} dispatch vuex element
      * @returns {void}
      */
-    requestCompressIslandData: function ({getters, dispatch}, islandName) {
+    requestCompressIslandData ({getters, dispatch}, islandName) {
         const params = {
             "downloadName": "zip_" + getters.selectedFormat + "_" + islandName + ".zip",
             "query": "insel=" + islandName + "&type=" + getters.selectedFormat
@@ -194,13 +201,14 @@ const actions = {
 
         dispatch("doRequest", params);
     },
+
     /**
      * Collects the params to load an overview.
      * @param {Object} dispatch vuex element
      * @param {String} format the LS state
      * @returns {void}
      */
-    requestCompressRasterOverviewData: function ({dispatch}, format) {
+    requestCompressRasterOverviewData ({dispatch}, format) {
         const params = {
             "downloadName": "U__Kachel_Uebersichten_UTM_Kachel_1KM_" + format + ".dwg",
             "query": "system=utm&type=" + format
@@ -208,6 +216,7 @@ const actions = {
 
         dispatch("doRequest", params);
     },
+
     /**
      * Requests the rest-service and loads the data e.g. dwg, xml,jpg as zip-file down.
      * @param {Object} getters vuex element
@@ -216,7 +225,7 @@ const actions = {
      * @param {Object} commit vuex element
      * @returns {void}
      */
-    doRequest: function ({getters, dispatch, commit, rootGetters}, params) {
+    doRequest ({getters, dispatch, commit, rootGetters}, params) {
         const url = rootGetters.restServiceById(getters.compressDataId).url,
             dataZip = axios.create();
 
@@ -277,6 +286,3 @@ const actions = {
             });
     }
 };
-
-export default actions;
-
