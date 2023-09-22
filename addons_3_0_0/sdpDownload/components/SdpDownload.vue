@@ -12,9 +12,9 @@ export default {
     data () {
         return {
             options_value: {
-                "Box": this.translate("common:snippets.graphicalSelect.selectBySquare"),
-                "Circle": this.translate("common:snippets.graphicalSelect.selectByCircle"),
-                "Polygon": this.translate("common:snippets.graphicalSelect.selectByPolygon")
+                "Box": this.translate("common:shared.modules.graphicalSelect.selectBySquare"),
+                "Circle": this.translate("common:shared.modules.graphicalSelect.selectByCircle"),
+                "Polygon": this.translate("common:shared.modules.graphicalSelect.selectByPolygon")
             }
         };
     },
