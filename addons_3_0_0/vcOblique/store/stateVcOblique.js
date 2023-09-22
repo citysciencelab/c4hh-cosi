@@ -18,7 +18,7 @@ const state = {
     type: "vcOblique",
     active: false,
     name: "additional:menu.tools.vcOblique",
-    icon: "bi-camera-fill",
+    icon: "bi-image",
     hasMouseMapInteractions: true,
     styleId: "",
     obliqueViewerURL: "",
