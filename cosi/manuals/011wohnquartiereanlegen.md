@@ -1,18 +1,8 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 ## Wohnungsbauquartiere anlegen 
-=======
-## Wohnungsbauquartiere anlegen
->>>>>>> 0650b0a5 (resolve rebase conflicts)
-=======
-## Wohnungsbauquartiere anlegen 
->>>>>>> e41bd580 (update cosi folder)
 
 Durch das Erstellen eines Wohnbauquartiers können Sie Wohnungsbauszenarien durchspielen. Die erstellten Wohnungsbauquartiere stehen Ihnen für weitere Analysefunktionen zur Verfügung. Die Szenarien können exportiert und gespeichert werden.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 Sobald Sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden (s. Abbildung a "Szenario Manager").
 
 ![Abbildung a: Wohnungsbauquartiere anlegen](./011a_wohnquartiere.PNG)
@@ -22,31 +12,6 @@ Sobald Sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet si
 ![Abbildung b: Wohnungsbauquartiere anlegen](./011b_wohnquartiere.PNG)  
 
 *Abb. b: Wohnungsbauquartiere anlegen*
-=======
-<<<<<<< HEAD:cosi/manuals/011wohnquartiereanlegen.md
-<<<<<<< HEAD:cosi/manuals/011wohnquartiereanlegen.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
-Sobald Sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden (s. Abbidlung 009a "Szenario Manager").
-
-![Abbildung a: Wohnungsbauquartiere anlegen](011a_wohnquartiere.PNG)
-*Abb.a: Wohnungsbauquartiere anlegen*
-![Abbildung b: Wohnungsbauquartiere anlegen](011b_wohnquartiere.PNG)  
-*Abb.b: Wohnungsbauquartiere anlegen*
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/wohnquartiereanlegen.md
-Sobald sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden (s. Abbidlung "Szenario Manager").
-
-![Abbildung: 2: Wohnungsbauquartiere anlegen](https://github.com/AlexandraKanapki/cosi/blob/COSI-handbuch/cosi/manuals/wohnquatier1.png?raw=true)
-![Abbildung: 1: Wohnungsbauquartiere anlegen](https://user-images.githubusercontent.com/43250699/143025884-f86a5897-3757-4b35-9d6d-1e4969d8175d.png)  
-*Abbildung 1: Wohnungsbauquartiere anlegen*
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/wohnquartiereanlegen.md
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
 
 1. **Geometrie**
    > Mithilfe des Stiftes kann ein Polygon in der Karte gezeichnet werden. 

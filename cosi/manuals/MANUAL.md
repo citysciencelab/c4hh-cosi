@@ -41,38 +41,7 @@ ___
 
 
 ### Stand
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 09/23
-=======
-08/23
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-### Projektteam
-___
-
-Daniel Schulz, HafenCity Universität Hamburg  
-Sebastian Duden, LGV Hamburg  
-Johanna Fischer, HafenCity Universität Hamburg   
-Nicola Stradtmann, HafenCity Universität Hamburg  
-Bertram Hillmann, a3rtgm GbR  
-Jannes Süpke, Senatskanzlei Hamburg, ITD  
-Peter Duensing, Senatskanzlei Hamburg, ITD    
-Hendrik Landgrebe, BA Hamburg-Nord  
-Gabriela Gabbert, BA Hamburg-Nord  
-Prof. Dr. Gesa Ziemer, HafenCity Universität Hamburg  
-Ogeigha Koroyin, HiTec e.V. (ehem.)  
-Dennis Rupnow, HiTec e.V. (ehem.)   
-Christian Bähnisch, HiTec e.V. (ehem.)   
-Yuxiang Zhang, HafenCity Universität Hamburg (ehem.)   
-Antje Widmayer, BA Hamburg-Nord (ehem.)   
-
-
-### Stand
-03/23/2022
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 ### Keywords
 GIS, Dashboard, Data Driven Urban Planning, Social Infrastructure, Urban Data Platform, Data Visualization, Planning Support Tools, Demand Driven Decision Making  
@@ -86,14 +55,6 @@ ___
 Bei der Planung städtischer und sozialer Infrastruktur sind Entscheidungsprozesse in der öffentlichen Verwaltung häufig durch langwierige Verfahren und eine fragmentierte Datengrundlage charakterisiert. D.h. Bedarfe werden teilweise  spät erkannt, oder die Konkretisierung der Planung verzögert sich durch das aufwendige Beschaffen von strukturierten Informationen.\
 Das vorliegende Handbuch beschreibt das *Cockpit Städtische Infrastrukturen* für Hamburg als digitales Analyse- und Planungswerkzeug, welches mithilfe eines leicht zugänglichen User-Interface statistische und georeferenzierte Daten bündelt, visualisiert und integriert, um Planungsbedarfe zu identifizieren und Planungsprozesse zu beschleunigen.  
   
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 Dazu wurden die durch die *Urban Data Platform* der Stadt Hamburg aufgebauten Datenbankstrukturen und die Funktionalität des Masterportals genutzt, um eine kartenbasierte Webapplikation zu etablieren, welche den Quartiersplanenden der Stadt eine Reihe von Analysefunktionen zur Verfügung stellt, um auf der Verwaltungsebene der statistischen Gebiete soziodemographische Zusammenhänge zu identifizieren, Trends zu erkennen sowie Verhältnisse zwischen dem existierenden Infrastrukturangebot und den relevanten Zielgruppen zu ermitteln. Das Werkzeug soll im Folgenden helfen, Standorte und Potentiale für die Entwicklung von Infrastruktur zu finden. Die Ergebnisse dieser Analysen können direkt aus CoSI heraus visualisiert und als Entscheidungs- und Diskussionsgrundlage verwendet werden. Der Workflow folgt dabei einer dreistufigen Logik von der *Visualisierung* von Daten, über die *Analyse*, also der kontextuellen Verknüpfung von Information, bis zur *Simulation* von Maßnahmen und Ableitung ihrer  Auswirkungen.  
   
 Um die technischen und inhaltlichen Anforderungen des Initialisierungs-Projekts aufzustellen, wurden im Vorfeld ab Sommer 2018 eine Reihe von Stakeholder- und Userstory-Workshops mit den Mitgliedern der Hamburger Verwaltung auf verschiedenen Ebenen durchgeführt. 
@@ -139,20 +100,9 @@ ___
     - [Gebietsauswahl](#markdown-header-gebietsauswahl)
     - [Kartenanalyse regionalstatistischer Daten](#markdown-header-kartenanalyse-regionalstatistischer-daten)
     - [Ergebnisverzeichnis](#markdown-header-ergebnisverzeichnis)
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
     - [Manuelle Flächenauswahl](#markdown-header-manuelleflaechenauswahl)
     - [Auswahlmanager](#markdown-header-auswahlmanager)
     - [Flächen stylen](#markdown-header-flaechen-stylen)
-=======
-<<<<<<< HEAD
-    - [Routing](#markdown-header-ergebnisverzeichnis)
-=======
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-    - [Routing](#markdown-header-ergebnisverzeichnis)
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 <div style="page-break-after: always;"></div>
 
@@ -160,15 +110,7 @@ ___
 ## Datenmodell und Infrastruktur
 ___
   
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 CoSI ermöglicht ganz ähnlich wie der FHH-Atlas die Anzeige verschiedener Fachdaten unterschiedlicher Behörden und Ämter in der Karte, wie z.B. dem digitalen Grünplan (BUKEA) oder den Öffentlichen Schulen (BSB).
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-CoSI ermöglicht ganz ähnlich wie der FHH-Atlas auch die Anzeige verschiedener Fachdaten unterschiedlicher Behörden und Ämter in der Karte, wie z.B. dem digitalen Grünplan (BUKEA) oder den Öffentlichen Schulen (BSB).
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 ![Vgl_FHH_Atlas](./001a_Vgl_FHH_Atlas.png)
 
@@ -218,23 +160,7 @@ Diese Datensätze beinhalten Zeitreihen, welche je nach Datensatz von ca. 2012 a
 ### Fachdaten
 CoSI bietet ganz ähnlich wie der FHH-Atlas Fachdatensätze in einem Themenbaum an. Während der FHH-Atlas grundsätzlich alle auf der Urban Data Platform verfügbaren und innerhalb der FHH freigegebenen Datensätze anzeigt, wird für CoSI in Abstimmung mit der Nutzendengruppe AG CoSI eine Auswahl getroffen. Dies dient der Übersicht und ermöglicht den Test und ggf. die Anpassung der Analysefunktionen an die angebotenen Daten.
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 Die Fachdatensätze, welche derzeit in CoSI eingebunden sind oder zukünftig noch eingebunden werden, werden als Geodienste von unterschiedlichsten Dateneignern (dies sind vor allem Behörden und Bezirksämter, aber prinzipiell sind auch Vereine oder Privatunternehmen denkbar.) bereitgestellt und in CoSI, wie im FHH-Atlas, über die URL des jeweiligen Dienstes abgerufen. Viele der Datensätze in ihrer aufbereiteten Form sind aus den Verhandlungs- und Koordinationsprozessen des Urban Data Hub hervorgegangen, über den sich die Behörden und Datenhalter der FHH auf gemeinsame Standards und regelmäßige Veröffentlichungen verständigen.
-=======
-=======
-   - Verkehr
-
-Diese Datensätze beinhalten Zeitreihen, welche (je nach Datensatz) von ca. 2012 an erfasst sind und jährlich erweitert werden.
-
-*Hinweis: Aus datenschutzrechtlichen Gründen werden bereits vom Datenbereitsteller solche Datensätze herausgefiltert, welche bei sensiblen Daten auf einzelne Individuen zurückverfolgbar wären. Diese Datensätze sind mit "–" oder mit "Keine Daten" ausgewiesen.*
-
-### Fachdaten
-Die Fachdatensätze, welche derzeit in CoSI eingebunden sind oder noch eingebunden werden können, werden als Geodienste von unterschiedlichsten Dateneignern (v.a. Behörden, aber prinzipiell auch Privatunternehmen, Echtzeitsensoren, etc.) bereitgestellt und in CoSI, wie im FHH-Atlas, über die URL des jeweiligen Dienstes abgerufen. Viele der Datensätze in ihrer aufbereiteten Form sind aus den Verhandlungs- und Koordinationsprozessen des Urban Data Hub hervorgegangen, über den sich die Behörden und Datenhalter der FHH auf gemeinsame Standards und regelmäßige Veröffentlichungen verständigen.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 ### Prognosedaten
 Die Prognosedaten enthalten die prognostizierte jährliche Bevölkerungsentwicklung in den Stadtteilen Hamburgs nach vier Altersgruppen und Geschlecht bis zum Jahr 2035. Stichtag ist jeweils der 31.12.
@@ -242,16 +168,6 @@ Die Prognosedaten enthalten die prognostizierte jährliche Bevölkerungsentwickl
 Aus Gründen der statistischen Geheimhaltung der zugrunde liegenden Ausgangsdaten werden die vier kleinsten Stadtteile Hamburgs nur in Kombination mit einem größeren angrenzenden Stadtteil ausgewiesen.
 
 Die Einzeldaten sind jeweils auf volle fünf gerundet.
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-=======
-Alle Daten unterliegen der Fünferrundung, d.h. sie sind durch die Zahl Fünf teilbar.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 Die Daten werden auf unregelmäßiger Basis vom Statistikamt Nord herausgegeben.
 
 ### Analyse
@@ -279,21 +195,7 @@ CoSI bietet verschiedene Module (nachfolgend oft auch als "Werkzeuge" oder "Tool
 
 ![Das CoSI Nutzer-Interface](./001d_user_interface.PNG)
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 *Abb. d: Das CoSI User-Interface.*
-=======
-*Abb.: Das CoSI User-Interface.*
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-CoSI bietet verschiedene Module (nachfolgend oft auch als "Werkzeuge" oder "Tools" bezeichnet" an, die bestimmte Funktionen zur Erstellung, Verwaltung und Analyse von Daten bereitstellen. Nachfolgend finden Sie die Übersicht über alle im UI zur Verfügung stehenden Funktionen:
-
-![Abbildung 1: Das CoSI Nutzer-Interface](https://user-images.githubusercontent.com/43250699/142911085-50a9fe73-0171-47d0-b2f9-527593ae42ed.jpg)
-
-*Abbildung 1: Das CoSI Nutzer-Interface*
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 1. **Themenbau/ Layer** (s. Themen)
 2. **Analyse**
@@ -329,52 +231,18 @@ CoSI bietet verschiedene Module (nachfolgend oft auch als "Werkzeuge" oder "Tool
 8. **Legende** (s. Legende)
 9. **Suchleiste**
 10. **Werkzeugfenster**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Aktive Werkzeuge werden in verschiebbaren Fenstern angezeigt.
-=======
-<<<<<<< HEAD
-   	> Aktive Werkzeuge werden in verschiebbaren Fenstern angezeigt.
-=======
-   > Aktive Werkzeuge werden in verschiebbaren Fenstern angezeigt.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-   	> Aktive Werkzeuge werden in verschiebbaren Fenstern angezeigt.
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 11. **Hereinzoomen**
 12. **Herauszoomen**
 13. **Vollbildansicht aktivieren/ deaktivieren**
 14. **Zurück zur Startansicht**
 15. **[Kartenanalyse regionalstatistischer Daten](./019kartenvisualisierung)**
 16. **Tooltip** (sog. Mousehover)
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-   > Zeigt das Gebiet und andere Elemente wie Tooltipps unter dem Mauszeiger an. Kann unter "Dienste" via "Mousehover ein-/ausschalten" deaktiviert werden.
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-   	> Zeigt das Gebiet und andere Elemente wie Tooltipps unter dem Mauszeiger an. Kann unter "Dienste" via "Mousehover ein-/ausschalten" deaktiviert werden.
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-18. **Ausgewählte Gebiete**
-   > Ausgewählte Gebiete werden dargestellt mit einer blauen Umrandung.
-19. **Sidebar**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-   > Das Dashboard und der Filter werden in einer Sidebar angezeigt. Die Sidebar kann in ihrer Breite angepasst werden. (s. Dashboard)
-=======
-   	> Das Dashboard und der Filter werden in einer Sidebar angezeigt. Die Sidebar kann in ihrer Breite angepasst werden. (s. Dashboard)
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
    > Zeigt das Gebiet und andere Elemente wie Tooltipps unter dem Mauszeiger an. Kann unter "Dienste" via "Mousehover ein-/ausschalten" deaktiviert werden.
 18. **Ausgewählte Gebiete**
    > Ausgewählte Gebiete werden dargestellt mit einer blauen Umrandung.
 19. **Sidebar**
    > Das Dashboard und der Filter werden in einer Sidebar angezeigt. Die Sidebar kann in ihrer Breite angepasst werden. (s. Dashboard)
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 <div style="page-break-after: always;"></div>
 
@@ -386,19 +254,7 @@ Der Themenbaum ist gegliedert in Hintergrundkarten, einen Katalog an Fachdaten u
 
 ![Der Themenbaum](./001e_Themenbaum.PNG)
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 *Abb. e: Der Themenbaum.*
-=======
-<<<<<<< HEAD
-*Abb.: Der Themenbaum.*
-=======
-*Abbildung 2: Der Themenbaum*
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-*Abb.: Der Themenbaum.*
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 Öffnen Sie mit dem Plus die Übersicht der Themenkategorie oder minimieren sie die Ansicht wieder mit dem Minus.
 
@@ -406,15 +262,7 @@ Der Themenbaum ist gegliedert in Hintergrundkarten, einen Katalog an Fachdaten u
    > Layer wie "Stadtkarte Hamburg", die als Standard automatisch aktiv sind, können auch deaktiviert werden. Die Hintergrundkarten orientieren sich am FHH Portal. Achtung beim An- und Ausschalten der Karten. Kartenlayer können andere Layer überlagern. Ihre Anzeige ist daher abhängig von der Reihenfolge der Aktivierung. Die Anordnung kann in "Ausgewählten Themen" noch nachträglich verändert und angepasst werden.
 2. **Fachdaten**  
 	 - **Analyse/Simulation**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
       > Die aufbereiteten Layer für CoSI-spezifische Werkzeuge (bereitgestellt als WFS, s. Glossar). Die einzelnen Datenlayer sind in Kategorien eingeteilt, die regelmäßig angepasst bzw. aktualisiert werden.
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-         > Die aufbereiteten Layer für CoSI-spezifische Werkzeuge (bereitgestellt als WFS, s. Glossar). Die einzelnen Datenlayer sind in Kategorien eingeteilt, die regelmäßig angepasst bzw. aktualisiert werden.
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 	 - **Darstellung**
       > Daten zur reinen "Anzeige" in der Karte, v.a. entnommen aus dem FHH Atlas (bereitgestellt als WMS).
 3. **Ausgewählte Themen**  
@@ -427,24 +275,8 @@ Der Themenbaum ist gegliedert in Hintergrundkarten, einen Katalog an Fachdaten u
    > Diese Funktion fixiert den Themenbaum, so dass er auch bei Interaktionen mit der Karte angezeigt bleibt.
    
    **Ausgewählte Themen**  
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
       ![Abbildung 3: Ausgewählte Themen](./001f_ausgewaehltethemen.PNG)
       *Abb.f: Ausgewählte Themen.*  
-=======
-      ![Abbildung 3: Ausgewählte Themen](https://user-images.githubusercontent.com/43250699/142911886-03547719-aab0-4f80-a3e3-cfdca1267eb7.png)  
-      *Abb.: Ausgewählte Themen.*  
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-      > Die aufbereiteten Layer für CoSI-spezifische Werkzeuge (bereitgestellt als WFS, s. Glossar). Die einzelnen Datenlayer sind in Kategorien eingeteilt, die regelmäßig angepasst bzw. aktualisiert werden.
-	 - **Darstellung**
-      > Daten zur reinen "Anzeige" in der Karte, v.a. entnommen aus dem FHH Atlas (bereitgestellt als WMS).
-3. **Ausgewählte Themen**  
-      ![Abbildung 3: Ausgewählte Themen](https://user-images.githubusercontent.com/43250699/142911886-03547719-aab0-4f80-a3e3-cfdca1267eb7.png)  
-      *Abbildung 3: Ausgewählte Themen*  
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
       - **3.1 Informationen und Legenden**
       - **3.2 Einstellungen**  
          Über das Zahnrad öffnen sich Einstellungen für Transparenz und Ebene verschieben.
@@ -471,27 +303,6 @@ ___
 ___
 Über "Analyse" gelangen Sie zu "Einwohneranzahl abfragen".
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-![Screenshot_81](https://github.com/nihalh01/cosi/assets/140716054/5c047dc2-d686-4b55-8ab3-fa885cecebb8)
-
-*Abb.: Manuelle Flächenauswahl*
-
-1. **Polygon zeichnen**
-   > Klicken Sie auf diesen Button, um ein neues Polygon auf der Karte zu zeichnen.
-2. **Eingabe löschen**
-   > Löscht die bestehende Flächenauswahl und zeigt alle Fachdaten wieder an.
-3. **Einwohnerabfrage**
-   > Für die aktuelle Flächenauswahl eine [Einwohnerabfrage](#markdown-header-einwohnerabfrage) durchführen.
-
-<div style="page-break-after: always;"></div>
-
-### Einwohnerabfrage
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 Grundsätzlich bietet diese Funktion die Möglichkeit an, durch Aufziehen eines Rechtecks oder Kreises bzw. durch Einzeichnen einer Fläche die adressgenaue Einwohneranzahl zu bestimmen. Dieses Werkzeug stammt ursprünglich aus dem Masterportal und wurde u.a. in dem Modul "Erreichbarkeitsanalyse" integriert.
 
 - Beim direkten Aufruf unter dem Reiter "Analyse" muss das Gebiet, über das man die Abfrage durchführen möchte, händisch festgelegt werden (via Rechteck oder Kreis ziehen bzw. via Zeichnen einer Fläche). 
@@ -510,42 +321,16 @@ Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:
 Der Modus der Analyse kann im Dropdown Menü ausgewählt werden.
 
 **Wichtige Informationen:**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 Dieses Werkzeug wurde realisiert unter Verwendung von OpenRouteService, einem Dienst, der von der *Heidelberg Institute for Geoinformation Technology* entwickelt wird. Der verwendete Dienst wird vom *Bundesamt für Kartografie und Geodäsie (BKG)* bereitgestellt und betrieben.
 Die Verwendung ist gedeckt durch die Creative Commons Lizenz CC BY 4.0.
-=======
-<<<<<<< HEAD
-> Dieses Werkzeug wurde realisiert unter Verwendung von OpenRouteService, einem Dienst, der von der *Heidelberg Institute for Geoinformation Technology* entwickelt wird. Der verwendete Dienst wird vom *Bundesamt für Kartografie und Geodäsie (BKG)* bereitgestellt und betrieben.Die Verwendung ist gedeckt durch die Creative Commons Lizenz CC BY 4.0. 
-=======
-Dieses Werkzeug wurde realisiert unter Verwendung von OpenRouteService, einem Dienst, der von der *Heidelberg Institute for Geoinformation Technology* entwickelt wird. Der verwendete Dienst wird vom *Bundesamt für Kartografie und Geodäsie (BKG)* bereitgestellt und betrieben.
-Die Verwendung ist gedeckt durch die Creative Commons Lizenz CC BY 4.0.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-> Dieses Werkzeug wurde realisiert unter Verwendung von OpenRouteService, einem Dienst, der von der *Heidelberg Institute for Geoinformation Technology* entwickelt wird. Der verwendete Dienst wird vom *Bundesamt für Kartografie und Geodäsie (BKG)* bereitgestellt und betrieben.Die Verwendung ist gedeckt durch die Creative Commons Lizenz CC BY 4.0. 
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 Weitere Informationen finden Sie unter:  
 https://heigit.org/de/ortsbasierte-dienste-und-navigation/  
 https://openrouteservice.org/services/
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 Die Vollständige Dokumentation des OpenRouteService inkl. aller Annahmen über Modalitätsprofile und Routenparameter finden Sie unter:
 https://giscience.github.io/openrouteservice/documentation/Documentation.html
 
 Die Annahmen über einzelne Straßen und Wege können i.d.R. über die [OpenStreetMap](https://www.openstreetmap.org/#map=14/53.5492/9.9901) direkt ausgelesen oder in dringlichen Fällen beim BKG angefragt werden.
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-> Die Vollständige Dokumentation des OpenRouteService inkl. aller Annahmen über Modalitätsprofile und Routenparameter finden Sie unter:
-https://giscience.github.io/openrouteservice/documentation/Documentation.html
-
-> Die Annahmen über einzelne Straßen und Wege können i.d.R. über die [OpenStreetMap](https://www.openstreetmap.org/#map=14/53.5492/9.9901) direkt ausgelesen oder in dringlichen Fällen beim BKG angefragt werden.
-
-<div style="page-break-after: always;"></div>
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 #### Erreichbarkeit ab einem Referenzpunkt
 Zeigt ein Gebiet an, welches von einem ausgewählten Punkt auf der Karte innerhalb einer festgelegten Entfernung erreichbar ist. Die Entfernung kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit wird abhängig vom Verkehrsmittel berechnet. Die Polygone werden automatisch angepasst, wenn das Verkehrsmittel oder andere Parameter geändert werden.  
@@ -586,18 +371,6 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 Diese Analyse wird genauso hergestellt, wie ab einem Referenzpunkt. Nur wird hier statt einem Referenzpunkt auf der Karte eine Einrichtung auf der Karte angeklickt.
 
 #### Erreichbarkeit im Gebiet
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-<<<<<<< HEAD
-Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (im Beispiel Krankenhäuser) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann angegeben werden in Zeit oder in Metern. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
-=======
-Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (z.B. Kindergärten) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann angegeben werden in Zeit oder in Metern. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (im Beispiel Krankenhäuser) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann angegeben werden in Zeit oder in Metern. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (im Beispiel Krankenhäuser) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
 
@@ -624,19 +397,7 @@ Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungs
 9. **Berechnen**
 10. **Ergebnis ausblenden** 
 11. **Legende & Isochronen**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
     > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen die vom den Einrichtungen aus erreichbaren Gebiete abhängig von den zuvor eingegebenen Parametern. Ist "Verkehrsfluss berücksichtigen" ausgewählt, wird das theoretische Maximum bei freier Fahrt als gestrichelte Linie angezeigt.
-=======
-<<<<<<< HEAD
-    > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen die von den Einrichtungen aus erreichbaren Gebiete abhängig von den zuvor eingegebenen Parametern. Ist "Verkehrsfluss berücksichtigen" ausgewählt, wird das theoretische Maximum bei freier Fahrt als gestrichelte Linie angezeigt.
-=======
-    > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen die vom den Einrichtungen aus erreichbaren Gebiete abhängig von den zuvor eingegebenen Parametern. Ist "Verkehrsfluss berücksichtigen" ausgewählt, wird das theoretische Maximum bei freier Fahrt als gestrichelte Linie angezeigt.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-    > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen die von den Einrichtungen aus erreichbaren Gebiete abhängig von den zuvor eingegebenen Parametern. Ist "Verkehrsfluss berücksichtigen" ausgewählt, wird das theoretische Maximum bei freier Fahrt als gestrichelte Linie angezeigt.
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 12. **Ergebnisverzeichnis**
    > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das [Ergebnisverzeichnis](./020ergebnisverzeichnis) verwaltet werden.
 
@@ -647,19 +408,7 @@ Wenn Sie im Routing-Tool eine Route erstellt haben, können Sie die Erreichbarke
 Das Modul kann ohne vorherige Gebietsauswahl verwendet werden.
 ![Erreichbarkeit entlang einer Route](./003c_erreichbarkeitroute.png)
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 *Abb. c: Erreichbarkeit entlang einer Route.*
-=======
-=======
-Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-![Abbildung 7: Erreichbarkeit entlang einer Route](https://user-images.githubusercontent.com/43250699/159470252-067117b3-b8a3-481d-b007-113e7a0477c8.png)
-
-*Abbildung 7: Erreichbarkeit entlang einer Route*
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 1. **Auswahl des Modus**
    > Art der Einrichtungsanalyse. Ab einem Referenzpunkt, entlang einer Route oder Erreichbarkeit der gewählten Einrichtungen im Gebiet. Beachten Sie, dass Sie die Erreichbarkeit entlang einer Route nur auswählen können, wenn Sie im Vorfeld im Routing-Tool eine Route angelegt haben.
 2. **Route auswählen**
@@ -680,20 +429,8 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 ___
 Über den Bereich der "Analyse" gelangen Sie zu "Vergleichbare Gebiete ermitteln".
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 Das Werkzeug erlaubt die Ermittlung aller Gebiete (Stadtteile oder statistische Gebiete), in denen die ausgewählten Parameter vorherrschen, bzw. solcher, die dem gewählten Referenzgebiet in diesen Parametern ähneln.
 Wählen Sie unter Filter die gewünschten Parameter für den Vergleich, sowie ein Referenzgebiet (optional).  
-=======
-### Vergleichbare Gebiete ermitteln
-Das Werkzeug erlaubt die Ermittlung aller Gebiete (Stadtteile oder statistische Gebiete), in denen die ausgewählten Parameter vorherrschen, bzw. solcher, die dem gewählten Referenzgebiet in diesen Parametern ähneln. Wählen Sie unter Filter die gewünschten Parameter für den Vergleich, sowie ein Referenzgebiet (optional).  
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-Das Werkzeug erlaubt die Ermittlung aller Gebiete (Stadtteile oder statistische Gebiete), in denen die ausgewählten Parameter vorherrschen, bzw. solcher, die dem gewählten Referenzgebiet in diesen Parametern ähneln.
-Wählen sie unter Filter die gewünschten Parameter für den Vergleich, sowie ein Referenzgebiet (optional).  
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 ![Vergleichbare Gebiete ermitteln](./004a_vergleichbaregebiete_ermitteln.PNG)
  
@@ -714,15 +451,7 @@ Wählen sie unter Filter die gewünschten Parameter für den Vergleich, sowie ei
 *Abb. b: Vergleichbare Gebiete ermitteln, Ergebnisse.*  
 
 1. **Ergebnisverzeichnis**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Das [Ergebnisverzeichnis](./ergebnisverzeichnis.md) verwaltet die unterschiedlichen Analysen. Es erscheint, sobald Sie eine zweite Analyse erstellt haben.
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-   > Das [Ergebnisverzeichnis](#markdown-header-ergebnisverzeichnis) verwaltet die unterschiedlichen Datensätze. Sie erscheint, sobald Sie einen zweiten Datensatz erstellt haben.
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 2. **Parametereinstellungen (Jahr)**
    > Wählen Sie die Grundlage für das entsprechende Jahr aus.  
 3. **Parametereinstellungen (Attribute)**
@@ -741,53 +470,22 @@ Die aktiven, ausgewählten Themen können durch Klick auf den Reiter "Filter" na
 
 Um Ihre gewünschten Fachdaten zu filtern, gehen Sie zunächst auf "Analyse" und dann auf "Filter".
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 ![Abbildung 1: Filter](./005_filter.PNG)
 
 *Abb. a: Filter.*  
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-![Screenshot_91](https://github.com/nihalh01/cosi/assets/140716054/1cdeb603-b12f-45c9-9c99-f59694837a11)
-
-
-*Abbildung 10: Filter*  
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 1. **Ein Thema im Filter wählen**
    > Angezeigt werden die ausgewählten Themen wie im Themenbaum. Themen können jederzeit hinzugefügt werden. Dazu Themenbaum im Filter aufklappen und Thema auswählen.
 2. **Filteroptionen:**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
     - es können mehrere Filteroptionen gewählt werden. Abhängig sind diese von den Inhalten der Datensätze. Kennzeichnung der Auswahl erfolgt durch die Anzeige als dunkelblauer Tag. 
     - Schieberegler (von / bis): es kann z.B. eine gewünschte Jahreszahl/Flächengröße eingegeben werden.
-=======
-    - es können mehrere Filteroptionen gewählt werden. Kennzeichnung der Auswahl erfolgt automatisch durch Haken. 
-    - Schieberegler (von / bis): es kann z.B. eine gewünschte Schülerzahl eingegeben werden.
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-    - Schieberegler (von / bis): es kann z.B. eine gewünschte Flächengröße eingegeben werden.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 3. **Ergebnis wird sofort mit Wahl der Filteroption angezeigt:**
     - Ergebnis wird in der Karte durch Symbol oder Flächenfarbe angezeigt.
     - Im Ergebnisfeld der Suche werden Namen der Gebiete / Einrichtungen angezeigt. Durch Anklicken der Namen wird die Auswahl in der Karte markiert. 
 4. **Filter löschen:** 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Einzelne Themen werden durch Anklicken des "X" gelöscht. Die gesamte Auswahl im Thema wird durch Anklicken des Buttons "Zurücksetzen” entfernt.
    > Einzelne Filtervariablen können über das "x" and den dunkelblauen Tags wieder ausgeschaltet werden.
    
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-   > Einzelne Auswahl durch Anklicken des roten "X" oder gesamte Auswahl löschen durch Anklicken des Buttons "Zurücksetzen”.
-
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 <div style="page-break-after: always;"></div>
 
 
@@ -810,32 +508,12 @@ Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet
    > Bei Einrichtungsdatensätzen können Sie einen *Faktor (F)* angeben, der bestimmt, wie viele Einheiten der ausgewählten Einrichtung für den Referenzdatensatz benötigt werden. Wollen Sie beispielsweise die Anzahl der öffentlichen Schulen gegen die Anzahl der Bevölkerung unter 18 Jahren rechnen und geben einen Faktor von 0,001 an, würde das bedeuten, dass eine Schule pro 1000 Mitglieder der Referenzgruppe benötigt wird. Ist ein *Faktor (F)* angegeben, werden die Spalten "Kapazität" und "Bedarf" in der Berechnungstabelle mit angegeben.
 5. **Parameter auswählen** 
    > Manche Einrichtungsdatensätze haben andere Parameter, als nur ihre Anzahl in den ausgewählten Gebieten. So kann man bei öffentlichen Schulen beispielsweise den Datensatz "Schülerzahl" abfragen oder bei Krankenhäusern die Anzahl der stationären Plätze. Nicht jeder Einrichtungsdatensatz bietet zusätzliche Parameter.
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 6. **Berechnung pro x der Datengrundlage**
    > Bestimmen Sie mit dieser Größe eine Einheit (x) der Datengrundlage für die die Versorgung berechnet werden soll.
 7. **Auswahl vertauschen**
    > Mit einem Klick auf diesen Button können Sie Ihre Auswahl von Feld (1) und (2) vertauschen.
 8. **Die gesamte Auswahl zurücksetzen**
 9. **Berechnen**
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-6. **Auswahl vertauschen**
-   > Mit einem Klick auf diesen Button können Sie Ihre Auswahl von Feld (1) und (2) vertauschen.
-7. **Die gesamte Auswahl zurücksetzen**
-8. **Berechnen**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-7. **Auswahl vertauschen**
-   > Mit einem Klick auf diesen Button können Sie Ihre Auswahl von Feld (1) und (2) vertauschen.
-8. **Die gesamte Auswahl zurücksetzen**
-9. **Berechnen**
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 ![Abbildung 2: Versorgungsanalyse, Ergebnisse](./006b_versorgungsanalyse.PNG)
 
@@ -862,15 +540,6 @@ Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet
          Hier wurde der Wert des Auswahlfeldes (1) durch den Wert des Auswahlfeldes (2) geteilt.
       - **Bedarfsdeckung:**  
          Die Versorgungsabdeckung in Prozent, d.h. das Verhältnis zwischen der aus Auswahlfeld (1) ermittelten Kapazität und Auswahlfeld (2) im Gebiet. Wurde kein Faktor F ausgewählt, zeigt die Spalte das direkte Verhältnis beider Felder in Prozent an.
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-      - **6.1 Ergebnisverzeichnis der Ergebnistabelle**      
-         Wenn in Ihrer Ergebnistabelle mehr als 10 Ergebnisse angezeigt werden, können Sie hier entsprechend die Daten durchschalten.
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
    6.1 **Ergebnisverzeichnis der Ergebnistabelle:**
          
@@ -879,17 +548,6 @@ Mit diesem Werkzeug kann das Verhältnis zweier Datensätze zueinander berechnet
 ### DIPAS
 Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](./017einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](./006versorgungsanalyse.md), [Erreichbarkeitsanalyse](./003erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](./004vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](./005filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-<<<<<<< HEAD
-=======
-
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-![Abbildung 13: DIPAS](https://user-images.githubusercontent.com/43250699/159553679-c957f150-298f-476a-83ea-73ee854f5f61.png)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 ![Abbildung 1: DIPAS](./007a_dipas.PNG)
 
@@ -898,19 +556,7 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
 1. **Beteiligungsverfahren auswählen**
    > Für jedes Verfahren aus der DIPAS-Datenbank wird automatisch eine Registerkarte angelegt, welche durch Anklicken aufgeklappt werden kann. Ein aufgeklapptes Verfahren zeigt dessen Beschreibungstext und die Kontrollfelder für die Visualisierung. Jedem Verfahren wid dabei eine zufällige Farbe zugewiesen.
 2. **Indikator**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Das Icon in dem Indikator zeigt zum einen die Farbe an, in der der jeweilige Datensatz visualisiert wird. Zum anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
-=======
-<<<<<<< HEAD
-   > Das Icon in dem Indikator zeigt zum einen die Farbe an, in dem der jeweilige Datensatz visualiert wird. Zum anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
-=======
-   > Das Icon in dem Indikator zeigt zum einen die Farbe an, in dem der jeweilige Datensatz visualiert wird. Zum Anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-   > Das Icon in dem Indikator zeigt zum einen die Farbe an, in dem der jeweilige Datensatz visualiert wird. Zum anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 3. **Legende**
    > Die Legende zeigt an, welche Farbe den Eintragstypen in der Visualisierung jeweils zugeordnet wird.
 4. **Verfahren in der Karte anzeigen**
@@ -918,19 +564,7 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
    - **4.1 Auf der Karte anzeigen**
       > Die Kartenansicht fokussiert auf das jeweilige Verfahrensgebiet.
 5. **Einzelne Beiträge in der Karte anzeigen**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Zeigt alle Einzelbeiträge des Verfahrens in der Karte. Das Styling der Beiträge kann unter *7. Styling der Beiträge* festgelegt werden.
-=======
-<<<<<<< HEAD
-   > Zeigt alle Einzelbeiträge des Verfahrens in der Karte. Das Styling der Beiträge kann unten (s. 7) festgelegt werden.
-=======
-   > Zeigt alle Einzelbeiträge des Verfahrens in der Karte. Das Styling der Beiträge kann unten (s. 5) festgelegt werden.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-   > Zeigt alle Einzelbeiträge des Verfahrens in der Karte. Das Styling der Beiträge kann unten (s. 7) festgelegt werden.
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 6. **Heatmap in der Karte anzeigen** 
    > Zeigt eine Heatmap der Beiträge in der Karte. Das Gewicht eines Punktes richtet sich dabei nach der Gesamtzahl der Bewertungen des Beitrags, also der Stärke der Resonanz auf ihn.
 7. **Styling der Beiträge wählen**
@@ -946,12 +580,7 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
 10. **Beiträge in der Karte**
       > Alle Beiträge werden mit Ihrer ID (einer fortlaufenden Nummer) in der Karte dargestellt.
 <div style="page-break-after: always;"></div>
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 ## Graphenvisualisierung
-=======
-
-### Graphenvisualierung
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 ___
 Das Graphenvisualisierungswerkzeug erstellt Graphen aus Datensätzen und verwaltet diese. Darüber hinaus ermöglicht es Ihnen den Export dieser Graphen als PNG.
 
@@ -959,34 +588,8 @@ Das Graphenvisualisierungswerkzeug erstellt Graphen aus Datensätzen und verwalt
    
    > **Hinweis**: Wenn Sie die Graphenvisualisierung direkt aus dem Analyse Menü öffnen, bitte unten in der Kartenvisualisierung auf das Graph Symbol klicken. 
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 ![Abbildung 1: Graphenvisualisierung](./008_graphenvisualisierung.png)  
 *Abb. a: Graphenvisualisierung.*
-=======
-> **Hinweis:** Wenn Sie die Graphenvisualisierung direkt aus dem Analyse Menü öffnen, bitte unten in der Kartenvisualisierung auf das Graph Symbol klicken.
-
-![Screenshot_75](https://github.com/nihalh01/cosi/assets/140716054/fff6f46d-22c6-4316-aa9c-c6dccc799e31)
-
-*Abbildung_14.1: Graphenvisualisierung*
-
-	Sie finden dieses Symbol auch im gesamten CoSI wie z.B.
-	Dashboard –> Einrichtungsübersicht
-	Dashboard –> Statistische Datenübersicht –> wählen Sie hier eine Kategorie & klicken 3 Punkte Menü –> Diagramme
-
-![Abbildung 14: Graphenvisualisierung](https://user-images.githubusercontent.com/43250699/157070471-84b8aca7-44f9-47cb-9de2-2284a43062f4.png)  
-*Abbildung_14.2: Graphenvisualisierung aktuell*
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-### Datenvisualierung
-___
-Das Datenvisualisierungswerkzeug erstellt Graphen aus Datensätzen und verwaltet diese. Darüberhinaus ermöglicht es Ihnen den Export dieser Graphen als PNG.
-
-![Abbildung 14: Datenvisualisierung](https://user-images.githubusercontent.com/43250699/157070471-84b8aca7-44f9-47cb-9de2-2284a43062f4.png)  
-*Abbildung 14: Datenvisualisierung*
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 1. **Diagrammtyp auswählen**
    > Häufig werden gleich unterschiedliche Graphen erstellt. Hier können Sie zwischen den verfügbaren Diagrammen für den ausgewählten Datensatz umschalten.
@@ -998,17 +601,7 @@ Das Datenvisualisierungswerkzeug erstellt Graphen aus Datensätzen und verwaltet
 4. **Y-Achse stapeln**
     > Die Werte der Datensätze werden aufsummiert und farblich abgetrennt dargestellt.
 5. **Ergebnisverzeichnis**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Das [Ergebnisverzeichnis](./020ergebnisverzeichnis.md) verwaltet die unterschiedlichen erstellten Graphen und erlaubt, sie als Bild oder gesammelt als zip-Datei herunterzuladen.
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-   > Das [Ergebnisverzeichnis](#markdown-header-ergebnisverzeichnis) verwaltet die unterschiedlichen erstellten Graphen und erlaubt, sie als Bild oder gesamelt als ZIP herunterzuladen.
-
-<div style="page-break-after: always;"></div>
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 ___
 
@@ -1027,22 +620,8 @@ Sobald sie unter "Simulation" "Einrichtungen anlegen" auswählen, öffnet sich e
 1. **Szenario Dropdown**
    > Zeigt bisher erstellte Szenarien an.
 2. **Neues Szenario anlegen**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Öffnet die Maske zur Erstellung eines weiteren
 Szenarios.
-=======
-   > Öffnet die Maske zur Erstellung eines weiteren Szenarios.
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-1. **Scenario Dropdown**
-   > Zeigt bisher erstellte Szenarien an.
-2. **Neues Szenario anlegen**
-   > Öffnet die Maske zur Erstellung eines weiteren
-Szenarios.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 3. **Szenario exportieren**
    > Stellt einen Download des Szenarios zur Verfügung
 4. **Szenario Löschen**
@@ -1059,19 +638,7 @@ Szenarios.
 *Abb. b: Einrichtungen anlegen*  
 
 1. **Einrichtung kopieren**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Erlaubt das Kopieren einer vorhandenen Einrichtung. 
-=======
-<<<<<<< HEAD
-   > Erlaubt das Kopieren einer vorhandenen Einrichtung 
-=======
-   > Erlaubt den Upload eines gespeicherten Szenarios. 
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-   > Erlaubt das Kopieren einer vorhandenen Einrichtung 
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 2. **Verschieben der Einrichtung**
    > Erlaubt das Bewegen von Einrichtungen durch verschieben auf der Karte
 3. **Sichern/ Öffnen** 
@@ -1110,26 +677,7 @@ Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden Schritt für Schr
 5. #### **Schritt 5:** Einrichtung bewegen
    1. Zum Verschieben von Einrichtungen klicken Sie das Bewegen-Symbol. Nun klicken sie die Einrichtung, die Sie bewegen möchten. Ist diese aktiviert, vergrößert sich das Symbol und zeigt damit an, dass die Einrichtung nun beweglich ist. Ziehen sie die Einrichtung mit gedrückter linker Maustaste an den gewünschten Platz. 
    2. Möchten Sie bestehende Einrichtungen aus dem Datensatz auf der Karte verschieben, dann lösen Sie durch einen Klick auf das Schloss die Sperre. Es erscheint eine Warnung:   
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    *"Achtung: Sie können jetzt auch echte Einrichtungen verschieben. Ihre Änderungen sind nur temporär und werden nach der Sitzung nicht gespeichert."*  
-=======
-   > *"Achtung: Sie können jetzt auch echte Einrichtungen verschieben. Ihre Änderungen sind nur temporär und werden nach der Sitzung nicht gespeichert."*  
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-   1. Kopieren sie eine Einrichtung mit dem Pipetten-Symbol, indem sie zuerst die Pipette anklicken und dann die zu kopierende Einrichtung in der Karte anwählen. Sie können Einrichtungen auch vollständig manuell anlegen, indem Sie die dazu erforderlichen Spalten selbst ausfüllen. 
-   2. Positionieren sie die Einrichtung auf der Karte, indem sie zunächst den "Ort wählen" Stift im Feld *Geometrie/ Ort* anklicken und dann einen Punkt auf der Karte anwählen. Alternativ können Sie die geometrischen Werte in das Feld Geometrie/Ort eintragen. 
-   3. *Erforderliche Spalten* werden durch das Kopieren einer Einrichtung per Pipette übernommen. Diese Spalten können jedoch manuell ergänzt oder verändert werden. 
-   4. *Optionale Spalten* werden automatisch durch das Kopieren einer Einrichtung übertragen können aber auch manuell ergänzt oder ausgefüllt werden .
-4. #### **Schritt 4:** Einrichtung anlegen
-   > Schließen sie die Erstellung ab, indem Sie den blauen Button "Neue Einrichtung Erstellen" klicken. Die neue Einrichtung erscheint als Icon in der Karte. Neue Einrichtungen werden durch ein farbiges Sternchen gekennzeichnet. 
-5. #### **Schritt 5:** Einrichtung bewegen
-   1. Zum Verschieben von Einrichtungen klicken sie das Bewegen-Symbol. Nun klicken sie die Einrichtung, die Sie bewegen möchten. Ist diese angeklickt, vergrößert sich das Symbol und zeigt damit an, dass die Einrichtung nun beweglich ist. Ziehen sie die Einrichtung mit gedrückter linker Maustaste an den gewünschten Platz. 
-   2. Möchten sie bestehende Einrichtungen aus dem Datensatz auf der Karte verschieben, dann lösen Sie durch einen Klick auf das Schloss die Sperre. Es erscheint eine Warnung:   
-   *"Achtung: Sie können jetzt auch echte Einrichtungen verschieben. Ihre Änderungen sind nur temporär und werden nach der Sitzung nicht gespeichert."*  
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 Alle Analysen, die innerhalb eines Szenarios durchgeführt werden, berücksichtigen die Parameter der simulierten Einrichtungen.
 
@@ -1154,19 +702,7 @@ Wählen Sie hier den Button **BEARBEITEN** an. Daraufhin wird sich das folgende 
 *Abb. c: Fenster für das bearbeiten der Einrichtung.*
 
 1. **Eingaben sperren**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Mit Hilfe dieses Buttons sperren Sie die Input-Felder des Fensters, so dass Sie nicht mehr bearbeitet werden können. Die Input-Felder sind standardmäßig gesperrt, so dass Sie diesen Button aktivieren müssen, ehe Sie eine vorhandene Einrichtung bearbeiten können. 
-=======
-<<<<<<< HEAD
-   > Mit Hilfe dieses Buttons sperren Sie die Input-Felder des Fensters, so dass sie nicht mehr bearbeitet werden können. Die Input-Felder sind standardmäßig gesperrt, so dass Sie diesen Button aktivieren müssen, ehe Sie eine vorhandene Einrichtung bearbeiten können. 
-=======
-   > Mit Hilfe dieses Buttons sperren Sie die Input-Felder des Fensters, so dass Sie nicht mehr bearbeitet werden können. Die Input-Felder sind standardmäßig gesperrt, so dass Sie diesen Button aktivieren müssen, ehe Sie eine vorhandene Einrichtung bearbeiten können. 
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-   > Mit Hilfe dieses Buttons sperren Sie die Input-Felder des Fensters, so dass sie nicht mehr bearbeitet werden können. Die Input-Felder sind standardmäßig gesperrt, so dass Sie diesen Button aktivieren müssen, ehe Sie eine vorhandene Einrichtung bearbeiten können. 
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 2. **Inputfelder**
    > Die verfügbaren Inputfelder für den Datensatz der ausgewählten Einrichtung. Die Inputfelder weichen je nach Einrichtung ab (Krankenhaus, Sportstätte, Schule etc.).
 3. **Änderungen speichern**
@@ -1176,19 +712,7 @@ Wählen Sie hier den Button **BEARBEITEN** an. Daraufhin wird sich das folgende 
 5. **Abbrechen**
    > Verwerfen Sie Ihre ungespeicherten Änderungen und schließen Sie dieses Fenster.
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 **Hinweis:** Wenn auf der Karte Cluster von Einrichtungen angezeigt werden, weil in der aktuellen Zoomstufe nicht alle Einrichtungen dargestellt werden können, öffnet sich bei einem Klick auf das Clustersymbol folgendes Fenster:
-=======
-<<<<<<< HEAD
-   > **Hinweis:** Wenn auf der Karte Cluster von Einrichtungen angezeigt werden, weil in der aktuellen Zoomstufe nicht alle Einrichtungen dargestellt werden können, öffnet sich bei einem Klick auf das Clustersymbol folgendes Fenster:
-=======
-**Hinweis:** Wenn auf der Karte Cluster von Einrichtungen angezeigt werden, weil in der aktuellen Zoomstufe nicht alle Einrichtungen dargestellt werden können, öffnet sich bei einem Klick auf das Clustersymbol folgendes Fenster:
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-   > **Hinweis:** Wenn auf der Karte Cluster von Einrichtungen angezeigt werden, weil in der aktuellen Zoomstufe nicht alle Einrichtungen dargestellt werden können, öffnet sich bei einem Klick auf das Clustersymbol folgendes Fenster:
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 ![Abbildung 4: Clusterauswahl](./010d_einrichtungenbearbeiten.PNG)
 
@@ -1204,19 +728,7 @@ Wählen Sie hier den Button **BEARBEITEN** an. Daraufhin wird sich das folgende 
 
 Durch das Erstellen eines Wohnbauquartiers können Sie Wohnungsbauszenarien durchspielen. Die erstellten Wohnungsbauquartiere stehen Ihnen für weitere Analysefunktionen zur Verfügung. Die Szenarien können exportiert und gespeichert werden.
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 Sobald Sie über "Simulation" "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden (s. Abbildung a "Szenario Manager").
-=======
-Sobald Sie "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden. (s. [Szenario Manager](#markdown-header-szenario-manager))
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-Durch das Erstellen eines Wohnbauquartiers können sie Wohnungsbauszenarien durchspielen. Die erstellten Wohnungsbauquartiere stehen Ihnen für weitere Analysefunktionen zur Verfügung. Die Szenarien können exportiert und gespeichert werden.
-
-Sobald sie "Wohnungsquartiere anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden. (s. [Szenario Manager](#markdown-header-szenario-manager))
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 ![Abbildung a: Wohnungsbauquartiere anlegen](./011a_wohnquartiere.PNG)
 
@@ -1295,77 +807,31 @@ ___
 ## Dienste
 ### Werkzeuge des Dienstemenüs
 ___
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 ![Abbildung 22: Dienste](./012a_dienste.PNG)
 
 *Abb. a: Dropdown Dienste.*
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-
-![Screenshot_96](https://github.com/nihalh01/cosi/assets/140716054/354408a0-b2d4-4464-be52-aebbd803c8d7)
-
-*Abbildung 22 - Dienste*
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 1. **Zeichnen/ Schreiben**
 2. **Karte drucken**
    > Den aktuellen Kartenausschnitt inkl. aktiver Layer drucken.
 3. **Mousehover ein-/ ausschalten**
    > Den Tooltip, der am Mauszeiger in der Karte eingeblendet wird (de-)aktivieren
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 4. **[Geodaten Importieren](./013geodatenimportieren.md)**
 5. **WMS hinzufügen**
-=======
-4. **[Geodaten Importieren](#markdown-header-geodaten-importieren)**
-5. **Report Template**
-6. **WMS hinzufügen**
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
    > Beliebige andere Kartendienste können aus dem FHH-Atlas oder anderen Quellen über die Webadresse (URL) des Dienstes eingebunden werden. Die URLs entnehmen Sie z.B. dem Metadatenkatalog der FHH oder dem Geoportal unter dem Info-Button im Themenbaum (s. Themenbaum).
 6. **[Sitzung speichen / laden](./014sitzungspeichern.md)**
    > Die aktuelle Sitzung mit aktiven Daten, gewählten Gebieten und Filtern speichern. Sitzungen können im Browser gespeichert werden. Diese können beim Programmstart wieder aus dem Verlauf geladen werden.
    Wenn Browserverlauf oder Cache geleert werden, geht dieser Speicherstand verloren! Es kann immer nur eine Sitzung parallel vorgehalten werden.   
    Sitzungen als Datei auf dem Rechner speichern. Diese können jederzeit wieder geladen oder mit anderen CoSI Nutzer:innen geteilt werden.
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 7. **[Vorlagen](./015vorlagen.md)**
-=======
-8. **[Vorlagen](#markdown-header-vorlagen)**
-9. **ExportPdf**
-10. **Virtueller Nutzer**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-5. **WMS hinzufügen**
-   > Beliebige andere Kartendienste können aus dem FHH-Atlas oder anderen Quellen über die Webadresse (URL) des Dienstes eingebunden werden. Die URLs entnehmen Sie z.B. dem Metadatenkatalog der FHH oder dem Geoportal unter dem Info-Button im Themenbaum (s. Themenbaum).
-6. **[Sitzung speichen / laden](#markdown-header-sitzung-speichern)**
-   > Die aktuelle Sitzung mit aktiven Daten, gewählten Gebieten und Filtern speichern. Sitzungen können im Browser gespeichert werden. Diese können beim Programmstart wieder aus dem Verlauf geladen werden.
-   Wenn Browserverlauf oder Cache geleert werden, geht dieser Speicherstand verloren! Es kann immer nur eine Sitzung parallel vorgehalten werden.   
-   Sitzungen als Datei auf dem Rechner speichern. Diese können jederzeit wieder geladen oder mit anderen CoSI Nutzer:innen geteilt werden.
-7. **[Vorlagen](#markdown-header-vorlagen)**
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
    >*Hinweis: Manuell hinzugefügte Kartendienste (WMS) und erstellte Berechnungen bleiben nicht erhalten. Das Speichern aller Arbeitsergebnisse ist Teil des aktuell laufenden Weiterentwicklungsprojekts.*
 
 <div style="page-break-after: always;"></div>
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 ## Geodaten Importieren
 ___
 Mit diesem Werkzeug können Sie eigene Datensätze in Form von GeoJSONs hochladen und als Themenlayer einfügen, der anschließend visualisiert werden kann und dem alle weiteren Analysefunktionen von CoSI zur Verfügung stehen.   
-=======
-### Geodaten Importieren
-Mit diesem Werkzeug können Sie eigene Datensätze in Form von GeoJSON hochladen und als Themenlayer einfügen, der anschließnend visualisiert werden kann und dem alle weiteren Analysefunktionen von CoSI zur Verfügung stehen.   
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-Mit diesem Werkzeug können Sie eigene Datensätze in Form von GeoJSONs hochladen und als Themenlayer einfügen, der anschließnend visualisiert werden kann und dem alle weiteren Analysefunktionen von CoSI zur Verfügung stehen.   
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 ![Abbildung 1: Dateien importieren](./013a_geodatenimport.PNG)  
 *Abb. a: Dateien importieren.*   
@@ -1398,23 +864,8 @@ Sobald Ihre Datei hier hochgeladen wurde, erscheint ein neues Fenster mit Funkti
 ![Abbildung 3: Geodaten Importieren, Layerstyling](./013c_geodatenimport.PNG)  
 *Abb. c: Geodaten Importieren, Layerstyling*  
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 - **6.1** Ein Icon auswählen, mit dem die jeweiligen Punkte visualisiert werden sollen. (Diese Option steht nicht zur Verfügung, wenn es sich bei denen von Ihnen hochgeladenen Geodaten um Polygone handelt).
 - **6.2** Mit dieser Checkbox legen Sie fest, ob alle Entitäten des Datensatzes mit derselben Farbe dargestellt oder basierend auf einer ihrer Attribute farblich angepasst werden sollen. Aktivieren Sie diese Checkbox, bestimmen Sie das gewünschte Attribut bitte wie in 6.2.1 beschrieben.
-=======
-<<<<<<< HEAD
-- **6.1** Ein Icon auswählen, mit dem die jeweiligen Punkte visualisiert werden sollen. (Diese Option steht nicht zur Verfügung, wenn es sich bei den von Ihnen hochgeladenen Geodaten um Polygone handelt).
-- **6.2** Mit dieser Checkbox legen Sie fest, ob alle Entitäten des Datensatzes mit derselben Farbe dargestellt werden sollen oder basierend auf einem ihrer Attribute farblich angepasst werden sollen. Aktivieren Sie diese Checkbox, bestimmen Sie das gewünschte Attribut bitte wie in 6.2.1 beschrieben.
-=======
-- **6.1** Ein Icon auswählen, mit dem die jeweiligen Punkte visualisiert werden sollen. (Diese Option steht nicht zur Verfügung, wenn es sich bei denen von Ihnen hochgeladenen Geodaten um Polygone handelt).
-- **6.2** Mit dieser Checkbox legen Sie fest, ob alle Entitäten des Datensatzes mit derselben Farbe dargestellt werden sollen oder basierend auf einer ihrer Attribute farblich angepasst werden sollen. Aktivieren Sie diese Checkbox, bestimmen Sie das gewünschte Attribut bitte wie in 6.2.1 beschrieben.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-- **6.1** Ein Icon auswählen, mit dem die jeweiligen Punkte visualisiert werden sollen. (Diese Option steht nicht zur Verfügung, wenn es sich bei den von Ihnen hochgeladenen Geodaten um Polygone handelt).
-- **6.2** Mit dieser Checkbox legen Sie fest, ob alle Entitäten des Datensatzes mit derselben Farbe dargestellt werden sollen oder basierend auf einem ihrer Attribute farblich angepasst werden sollen. Aktivieren Sie diese Checkbox, bestimmen Sie das gewünschte Attribut bitte wie in 6.2.1 beschrieben.
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
    - **6.2.1** Haben Sie die Checkbox "Farbe nach Attributen" aktiviert, erscheint dieses Auswahlfeld, in dem alle Attribute der Einträge Ihres Datensatzes aufgelistet werden. Bestimmen Sie hier bitte das Attribut, anhand dessen die Farben generiert werden sollen.
    - **6.2.2** Sobald Sie in 6.2.1 ein Attribut ausgewählt haben, erscheint diese Checkbox, sofern es sich nicht um ein Attribut mit numerischen Werten handelt. Hier haben Sie die Option, Ihre Daten nicht auf Basis einer ausgewählten Farbe zu visualisieren, sondern gleichmäßig verteilt über ein Regenbogenfarbspektrum. Dies kann zur besseren Unterscheidung einzelner Punkte hilfreich sein. 
 - **6.3** Haben Sie weder "Farbe nach Attributen" ausgewählt bzw. bei "Farbe nach Attributen" nicht die Checkbox "Regenbogenfarbspektrum" aktiviert, können Sie hier eine Farbe bestimmen, auf deren Basis die Daten visualisiert werden. Ein Klick auf das farbige Viereck der Textbox öffnet das Farbauswahlfeld.
@@ -1449,19 +900,7 @@ Sobald Ihre Datei hier hochgeladen wurde, erscheint ein neues Fenster mit Funkti
 ![Abbildung 1: Sitzung Speichern](./014_sitzungspeichern.PNG)
 *Abb. a: Sitzung speichern / laden*
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 Mit dem Dienst **Sitzung speichern/laden** können die folgend aufgelisteten Informationen der aktuellen Arbeitssitzung abgespeichert werden, um diese zu einem späteren Zeitpunkt wieder öffnen und weiterbearbeiten zu können:
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-![Screenshot_102](https://github.com/nihalh01/cosi/assets/140716054/fccee60e-5482-42d9-a703-e5075ec5c28c)
-
-*Abbildung 29: Sitzung speichern / laden*
-
-Mit dem Dienst **Sitzung speichern/laden** können aktuelle diverse Informationen der aktuellen Arbeitssitzung abgespeichert werden um diese zu einem späteren Zeitpunkt wieder öffnen und weiterbearbeiten zu können. Dies umfasst
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 - Die ausgewählte Verwaltungsebene und ausgewählte Gebiete
 - Aktive Fachdatenthemen 
@@ -1486,23 +925,9 @@ Die Funktion ist unter "Dienste", "Sitzung speichern/laden" zu finden.
 6. **Automatisches Speichern (10min)**
    > Wenn aktiv wird die aktuelle Sitzung im Modus **Schnell speichern** alle 10min im Hintergrund gespeichert und kann über **Letzte laden** wiederhergestellt werden.
 ### Vorlagen
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 ![Abbildung 1: Vorlagen](./015a_vorlagen.png)
 
 *Abb. a: Vorlagen Übersicht.*
-=======
-<<<<<<< HEAD
-
-![Screenshot_105](https://github.com/nihalh01/cosi/assets/140716054/ab4d95f3-e3e0-49b5-8430-3faebe4b27f6)
-=======
-![Abbildung 30: Vorlagen](../cosi/utils/assets/screenshots/vorlagen.png)
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-
-![Screenshot_105](https://github.com/nihalh01/cosi/assets/140716054/ab4d95f3-e3e0-49b5-8430-3faebe4b27f6)
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 ![Abbildung 1: Vorlagen](./015b_vorlagen.png)
 *Abb. b: Vorlagen aufgeklappte Ansicht.*
@@ -1529,17 +954,6 @@ Die Funktion ist unter "Dienste", "Sitzung speichern/laden" zu finden.
 4. **Vorlage laden**
    > Die ausgewählte Vorlage laden.
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-![Screenshot_109](https://github.com/nihalh01/cosi/assets/140716054/1694d425-5e6a-4e1f-916b-7f41b236d3c8)
-
-
-<div style="page-break-after: always;"></div>
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 ___
 
@@ -1559,17 +973,6 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 *Abb. b: Statistische Datenübersicht 2*
 
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-*Abbildung 31: Statistische Datenübersicht 2*
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-![Abbildung 31: Statistische Datenübersicht](../cosi/utils/assets/screenshots/statdashboard.png)
-*Abbildung 31: Statistische Datenübersicht*
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 1. **Gruppen ein-/ausklappen**
    > Thematische Gruppen (vgl. [Regionalstatistische Daten](./019kartenvisualisierung.md)) über das **+** ein- und ausklappen.
@@ -1599,16 +1002,9 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 12. **Kartenvisualisierung**
       > Die Darstellung in der Karte entspricht der des Kontrollfeldes [Kartenanalyse regionalstatistischer Daten](./kartenvisualisierung.md).
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 #### Dreistrich Menü
 ![Abbildung 28: Statistische Datenübersicht - Dreistrich-menü](./016c_statdashboard_burgermenu.PNG)
 *Abb. c: Statistische Datenübersicht - Dreistrich-Menü.*
-=======
-#### Burgermenü
-![Abbildung 32: Statistische Datenübersicht - Burgermenü](https://user-images.githubusercontent.com/43250699/159326829-900bffff-6db2-4055-9219-7be46ffb1dea.png)
-
-*Abbildung 32: Statistische Datenübersicht - Burgermenü*
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 
 1. **Visualisierung ein-/ausschalten**
    > Thematische Gruppen
@@ -1622,7 +1018,6 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
    > Selektiert das Thema als **Feld B** für Berechnungen und Korrelation (siehe 7, 8, 9, 10, 12).
 6. **Auswahl aufheben**
    > Setzt die Felder **A** und **B** zurück
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 7. **Addieren**
    > Addiert die Werte für **A** und **B** für jede Gebietsspalte und fügt das Ergebnis der Tabelle an. Der neue Datensatz kann ebenfalls in der Karte visualisiert und in anderen Werkzeugen verwendet werden.
 8. **Subtrahieren**
@@ -1635,34 +1030,6 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
       > Erzeugt Diagramme für den ausgewählten Indikator im [Graphenvisualisierung](./008graphenvisualisierung.md) (analog zu [Kartenanalyse regionalstatistischer Daten](./019kartenvisualisierung.md)). Visualisiert alle ausgewählten Spalten (s. [Statistische Datenübersicht](./016statistischedatenuebersicht.md)).
 12. **Korrelations- / Streuungsdiagramm**
       > Visualisiert ein Streuungsdiagramm für die Felder **A** (Y-Achse) über **B** (X-Achse) per [Graphenvisualisierung](./008graphenvisualisierung.md), berechnet die Korrelation (Pearson) zwischen den Datensätzen und zeichet eine Regressionsgerade.
-=======
-
-![Abbildung 33: Statistische Datenübersicht - Burgermenü](https://user-images.githubusercontent.com/43250699/159326748-5207418c-9e01-4e8d-8727-ea61b42bfd45.png)
-
-*Abbildung 33: Statistische Datenübersicht - Burgermenü*
-
-1. **Grundlegende Mathematische Funktionen**
-   > Verrechnet die Werte für **A** und **B** für jede Gebietsspalte und fügt das Ergebnis der Tabelle an. Die durchzuführende Operation wird in Klammern hinter dem Menüpunkt angezeigt, bspw. (A + B).
-2. **Ausgewählte Aufsummieren**
-   > Addiert die Werte aller ausgewählten Spalten auf. Das Ergebnis der Berechnung finden Sie ganz unten im Dashboard unter "Berechnungen".
-3. **Ausgewählte Dividieren**
-   > Alle ausgewählten Zeilen werden durch den als **B** gesetzten Wert geteilt. Die Ergebnisse finden Sie ganz unten im Dashboard unter "Berechnungen".
-
-![Abbildung 34: Statistische Datenübersicht - Burgermenü](https://user-images.githubusercontent.com/43250699/159326761-e49c2e5c-b25b-4897-9d9b-681cdaef5c96.png)
-
-*Abbildung 34: Statistische Datenübersicht - Burgermenü*
-
-1. **Diagramme erzeugen**
-      > Erzeugt Diagramme für den ausgewählten Indikator in der [Datenvisualisierung](#markdown-header-datenvisualisierung) (analog zu [Kartenanalyse regionalstatistischer Daten](#markdown-header-kartenanalyse-regionalstatistischer-daten)).
-2. **Diagramme für ausgewählte Zeilen**
-      > Erzeugt Diagramme, die die Werte aller ausgewählten Zeilen abbilden im [Datenvisualisierung](#markdown-header-datenvisualisierung) (analog zu [Kartenanalyse regionalstatistischer Daten](#markdown-header-kartenanalyse-regionalstatistischer-daten)).
-3. **Korrelations- / Streuungsdiagramm**
-      > Visualisiert ein Streuungsdiagramm für die Felder **A** (Y-Achse) über **B** (X-Achse) im [Datenvisualisierung](#markdown-header-datenvisualisierung) und berechnet die Korrelation (Pearson) zwischen den Datensätzen und zeichet eine Regressionsgerade.
-
-
-<div style="page-break-after: always;"></div>
-
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 ### Einrichtungsübersicht
    > Um zur Einrichtungsübersicht zu gelangen, muss zunächst ein beliebiger Stadtteil oder Bezirk ausgewählt werden. Als nächtes unter dem Bereich Themen die gewünschten Themen oder Fachdaten auswählen (z.B. Bildung und Wissenschaft). Im Dashboard unter Einrichtungsübersicht können Sie dann mit der Analyse Ihrer Einrichtung beginnen.
    
@@ -1677,19 +1044,7 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
    ![Abbildung 2: Fachdaten zur Auswertung auf der Karte](./017b_einrichtungsuebersicht.PNG)
 *Abb. b: Weitere Fachdaten auf der Karte.*
 3. **Einrichtung fokussieren**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Durch einen Klick auf das Symbol der Einrichtung zoomt die Karte zu den gewählten Einrichtungen. Die Einrichtungen werden dann in der Karte visuell hervorgehoben.
-=======
-<<<<<<< HEAD
-   > Durch einen Klick auf das Symbol zoomt die Karte zu der betreffenden Einrichtung. Die Einrichtung wird in der Karte visuell hervorgehoben.
-=======
-   > Durch einen Klick auf das Symbol zoomt die Karte zu der betreffenden Einrichtungen. Die Einrichtung wird in der Karte visuell hervorgehoben.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-   > Durch einen Klick auf das Symbol zoomt die Karte zu der betreffenden Einrichtung. Die Einrichtung wird in der Karte visuell hervorgehoben.
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 4. **Einrichtung ein-/ausblenden**
    > Einrichtungen können in der Karte ein- und ausgeschaltet werden indem auf das "Augen"-Symbol neben dem Richtungssymbol geklickt wird. Ausgeschaltete Einrichtungen werden auch bei allen anderen CoSI-Funktionen nicht berücksichtigt.
 5. **Einrichtungsattribute**
@@ -1707,23 +1062,9 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 10. **Einrichtungsdiagramme erstellen**
       > Erzeugt für alle verfügbaren Datenspalten ein Balkendiagramm, in dem die Werte der jeweiligen Einrichtungen und ihre Verteilung über die ausgewählten Gebiete.
       - **10.1 Layer zusammenziehen**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
          > Wenn Sie diese Checkbox aktivieren, werden bei "Einrichtungsdiagramme erstellen"  Einrichtungen unterschiedlichen Typs zusammengezogen, wenn sie identische Attribute haben. *Beispiel: Wenn Sie Supermärkte und Drogerien ausgewählt haben, teilen sich beide das Attribut "Verkaufsfläche in m² und werden dementsprechend im Graphen zusammen dargestellt".*
       - **10.2 Graphenvisualisierung als PNG oder Zip**
          > Die Graphenvisualisierung kann als PNG oder Zip heruntergeladen werden. Die entsprechenden Buttons befinden sich unterhalb der Graphenvisualisierung.
-=======
-         > Wenn Sie diese Checkbox aktivieren, werden bei "Einrichtungsdiagramme erstellen"  Einrichtungen unterschiedlichen Typs zusammengezogen, wenn sie identische Attribute haben. *Beispiel: Wenn Sie Supermärkte und Drogerien ausgewählt haben, teilen sich beide das Attribut "Verkaufsfläche in m²" und werden dementsprechend im Graphen zusammen dargestellt*
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-      > Hier können Sie die Liste nach Themen filtern oder im Freitext die Einrichtungen durchsuchen..
-10. **Einrichtungsdiagramme erstellen**
-      > Erzeugt für alle verfügbaren Datenspalten ein Balkendiagramm, in dem die Werte der jeweiligen Einrichtungen und ihre Verteilung über die ausgewählten Gebiete.
-      - **10.1 Layer zusammenziehen**
-         > Wenn Sie diese Checkbox aktivieren, werden bei "Einrichtungsdiagramme erstellen"  Einrichtungen unterschiedlichen Typs zusammengezogen, wenn sie identische Attribute haben. *Beispiel: Wenn Sie Supermärkte und Drogerien ausgewählt haben, teilen sich beide das Attribut "Verkaufsfläche in m² und werden dementsprechend im Graphen zusammen dargestellt".*
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 11. **Tabelle exportieren**
       > Die ausgewählten Einträge als XLSX für Excel exportieren. Über das Auswahlfeld *Detailansicht exportieren* können alle bzw. in der Detailansicht ausgewählte Attribute eines Einrichtungstyps exportiert werden. Ist keine Auswahl getroffen, werden alle Einrichtungen exportiert.
 12. **Standortbewertung: Themenauswahl**
@@ -1733,20 +1074,8 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 14. **Standortvisualisierung für alle ausgewählten**
       > Erstellt ein Balkendiagramm mit der Aufschlüsselung für alle ausgewählten Einrichtungen. Wenn Sie mehr als zwei Fachdatensätze für die Auswertung (s. 12) ausgewählt haben, dann wird ein Radardiagramm generiert. Wenn Sie keine Einrichtungen ausgewählt haben, werden *alle* verfügbaren Einrichtungen in das Diagramm mit einbezogen.
 15. **Histogramm**
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
       > Erzeugt ein Histogramm, dass die Verteilung der ausgewählten Einrichtungen abbildet.
 ## Gebietsauswahl
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
-      > Erzeugt ein Histogramm, das die Verteilung der ausgewählten Einrichtungen abbildet.
-
-<div style="page-break-after: always;"></div>
-
-### Gebietsauswahl
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
 ___
 Als erster Arbeitsschritt in CoSI muss grundsätzlich eine Gebietsauswahl für das zu betrachtende Planungsgebiet getroffen werden.  Die Gebietsauswahl können sie entweder im Bezugsrahmen der Bezirke, der Stadtteile oder der statistischen Gebiete treffen. 
 
@@ -1780,19 +1109,7 @@ Das festgelegte Planungsgebiet kann jederzeit angepasst werden:
    - Das Gebiet kann *verkleinert* werden: per Klick können markierte Verwaltungseinheiten wieder abgewählt werden.
    - Das Gebiet kann komplett zurückgesetzt werden: per Klick auf "Auswahl zurücksetzen".
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 Es muss nicht in jedem Nutzungskontext immer ein Planungsgebiet als erstes festgelegt werden; bestimmte Analysetools wie z.B. die [Erreichbarkeitsanalyse](./003erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete](./004vergleichbaregebieteermitteln.md) können verwendet werden ohne dass vorher ein Gebiet festgelegt wird.  
-=======
-<<<<<<< HEAD
-Es muss nicht in jedem Nutzungskontext immer ein Planungsgebiet als erstes festgelegt werden; bestimmte Analysetools wie z.B. die [Erreichbarkeitsanalyse](#markdown-header-erreichbarkeitsanalyse) und [Vergleichbare Gebiete](#markdown-header-vergleichbare-gebiete) können verwendet werden, ohne dass vorher ein Gebiet festgelegt wird.  
-=======
-Es muss nicht in jedem Nutzungskontext immer ein Planungsgebiet als erstes festgelegt werden; bestimmte Analysetools wie z.B. die [Erreichbarkeitsanalyse](#markdown-header-erreichbarkeitsanalyse) und [Vergleichbare Gebiete](#markdown-header-vergleichbare-gebiete) können verwendet werden ohne dass vorher ein Gebiet festgelegt wird.  
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-Es muss nicht in jedem Nutzungskontext immer ein Planungsgebiet als erstes festgelegt werden; bestimmte Analysetools wie z.B. die [Erreichbarkeitsanalyse](#markdown-header-erreichbarkeitsanalyse) und [Vergleichbare Gebiete](#markdown-header-vergleichbare-gebiete) können verwendet werden, ohne dass vorher ein Gebiet festgelegt wird.  
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 Für solche Fälle gelten folgende Hinweise:  
 
@@ -1817,19 +1134,7 @@ Das Werkzeug kann die ausgewählten Datensätze auf der Karte visualisieren und 
 3.	**Vor/ Zurück**  
    > Mit den Vor- und Zurückbuttons können die regionalstatistischen Datensätze fließend durchgeschaltet werden.
 4.	**Jahresauswahl**  
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
    > Hier können Sie das Jahr auswählen für den der regionalstatistische Datensatz visualisiert wird. Standardmäßig ist das aktuellste, verfügbare Jahr ausgewählt.
-=======
-<<<<<<< HEAD
-   > Hier können Sie das Jahr auswählen, für den der regionalstatistische Datensatz visualisiert wird. Standardmäßig ist das aktuellste verfügbare Jahr ausgewählt.
-=======
-   > Hier können Sie das Jahr auswählen, für den der regionalstatistische Datensatz visualisiert wird. Standardmäßig ist das aktuellste, verfügbare Jahr ausgewählt.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-   > Hier können Sie das Jahr auswählen, für den der regionalstatistische Datensatz visualisiert wird. Standardmäßig ist das aktuellste verfügbare Jahr ausgewählt.
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 5.	**Referenzjahr auswählen**  
    > Hier können Sie ein Vergleichsjahr auswählen. Die prozentuale Differenz zum ersten, ausgewählten Jahr wird dann ebenfalls auf der Karte eingeblendet.
 6.	**Auswahlfeld für die verfügbaren regionalstatistischen Datensätze**     
@@ -1846,21 +1151,8 @@ Das Werkzeug kann die ausgewählten Datensätze auf der Karte visualisieren und 
    > Über den Button können Sie die Namen der ausgewählten Gebiete auf der Karte ein- und wieder ausblenden.
 12. **Hilfsbutton**  
 ### Ergebnisverzeichnis
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 Das Ergebnisverzeichnis unterstützt in einigen Werkzeugen die Verwaltung mehrerer Datensätze. Die zugrunde liegenden Funktionen sind aber standardisiert und werden im Folgenden näher erläutert. 
   
-=======
-<<<<<<< HEAD
-Die Ergebnisverzeichnis unterstützt in einigen Werkzeugen die Verwaltung mehrerer Datensätze. Die zugrunde liegenden Funktionen sind aber standardisiert und werden im Folgenden näher erläutert.   
-=======
-Die Ergebnisverzeichnis unterstützt in einigen Werkzeugen die Verwaltung mehrerer Datensätze, die ihr zugrunde liegenden Funktionen sind aber standardisiert und werden im Folgenden näher erläutert. 
-  
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
-Die Ergebnisverzeichnis unterstützt in einigen Werkzeugen die Verwaltung mehrerer Datensätze. Die zugrunde liegenden Funktionen sind aber standardisiert und werden im Folgenden näher erläutert.   
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md
 
 
 ![Ergebnisverzeichnis des Werkzeugs "Vergleichbare Gebiete ermitteln"](./020a_ergebnisverzeichnis.png)
@@ -2079,7 +1371,6 @@ Jedes Kapitel des Templates wird als grauer Kasten dargestellt.
 1. Wiederholen Sie den Vorgang für alle Kapitel, die Sie hinzufügen oder bearbeiten wollen.
 
 
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
 ### Template Speichern
 
 Um ein Template zu speichern, damit Sie es später anwenden oder mit anderen teilen können, drücken Sie auf "Template Speichern". Dabei wird eine Datei mit der Endung ".json" heruntergeladen. Diese Datei können Sie dann später wieder hochladen, um das Template zu bearbeiten oder anzuwenden (s.o.). ![Template speichern](./reporttemplates_speichern.png)
@@ -2196,12 +1487,3 @@ Das Modul kann ohne vorherige Gebietsauswahl verwendet werden.
    > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen das um die Route herum erreichbare Gebiet abhängig von den zuvor eingegebenen Parametern.
 8. **Ergebnisverzeichnis**
    > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](./ergebnisverzeichnis.md) verwaltet werden.
-=======
-![routing_16.png](https://geodienste.hamburg.de/lgv-config/img/routing_16.png)
-<<<<<<< HEAD:cosi/manuals/MANUAL.md
-=======
-   > Mit diesem Button entfernen Sie alle Datensätze und setzen das Werkzeug zurück.
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons):cosi/MANUAL.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts):cosi/MANUAL.md

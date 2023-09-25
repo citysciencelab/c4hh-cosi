@@ -1,30 +1,12 @@
 
 ### Erreichbarkeitsanalyse
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
 Die "Erreichbarkeitsanalyse" erreichen Sie über den Bereich "Analyse". 
 Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:  
 1. [Ab einem Referenzpunkt](#erreichbarkeit-ab-einem-Referenzpunkt)
 2. Ab einer ausgewählten Einrichtung
 3. [Im Planungsgebiet](#erreichbarkeit-im-gebiet) 
 4. [Entlang einer Route](#erreichbarkeit-entlang-einer-route)
-=======
-Die "Erreichbarkeitsanalyse" erreichen Sie über den Bereich "Analyse".
-Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:
-=======
-Die "Erreichbarkeitsanalyse" erreichen Sie über den Bereich "Analyse". 
-Eine Erreichbarkeitsanalyse kann auf drei Arten durchgeführt werden:  
->>>>>>> e41bd580 (update cosi folder)
-1. [Ab einem Referenzpunkt](#markdown-header-erreichbarkeit-ab-einem-Referenzpunkt)
-2. Ab einer ausgewählten Einrichtung
-3. [Im Planungsgebiet](#markdown-header-erreichbarkeit-im-gebiet) 
-4. [Entlang einer Route](#markdown-header-erreichbarkeit-entlang-einer-route)
->>>>>>> 896ab88b (resolve rebase conflicts)
 
 Der Modus der Analyse kann im Dropdown Menü ausgewählt werden.
 
@@ -49,15 +31,7 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 
 ![Erreichbarkeit ab einem Referenzpunkt](./003a_erreichbarkeitreferenzpunkt.png)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 *Abb. a: Erreichbarkeit ab einem Referenzpunkt.*
-=======
-<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
-*Abb.003a: Erreichbarkeit ab einem Referenzpunkt.*
->>>>>>> 896ab88b (resolve rebase conflicts)
   
 1. **Auswahl des Modus**
    > Art der Einrichtungsanalyse. Ab einem Referenzpunkt, entlang einer Route oder Erreichbarkeit der gewählten Einrichtungen im Gebiet.
@@ -87,14 +61,7 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 Diese Analyse wird genauso hergestellt, wie ab einem Referenzpunkt. Nur wird hier statt einem Referenzpunkt auf der Karte eine Einrichtung auf der Karte angeklickt.
 
 #### Erreichbarkeit im Gebiet
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
 Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungsart (im Beispiel Krankenhäuser) in dem festgelegten Einzugsbereich (Planungsgebiet). Der Einzugsbereich ist die Entfernung von der jeweiligen Einrichtung und kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit ist abhängig von dem festgelegten Verkehrsmittel.
 
 ![Erreichbarkeit ausgewählter Einrichtungen im Gebiet](./003b_erreichbarkeitabeinrichtung.png)
@@ -125,34 +92,11 @@ Zeigt die Abdeckung und Erreichbarkeit von einer zuvor festgelegten Einrichtungs
    > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das [Ergebnisverzeichnis](./020ergebnisverzeichnis) verwaltet werden.
 
    ### Erreichbarkeit entlang einer Route
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
->>>>>>> e41bd580 (update cosi folder)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
 Wenn Sie im Routing-Tool eine Route erstellt haben, können Sie die Erreichbarkeit in einem bestimmten Umkreis um die Route herum berechnen lassen.
   
 Das Modul kann ohne vorherige Gebietsauswahl verwendet werden.
-<<<<<<< HEAD
 ![Erreichbarkeit entlang einer Route](./003c_erreichbarkeitroute.png)
-=======
-![Erreichbarkeit entlang einer Route](003c_erreichbarkeitroute.png)
-<<<<<<< HEAD
-=======
-
-=======
-Wenn Sie im Routing-Tool eine Route erstellt haben, können Sie die Erreichbarkeit in einem bestimmten Umkreis um die Route herum berechnen lassen. 
-  
->>>>>>> 3502056a (update cosi folder):cosi/manuals/erreichbarkeitsanalyse.md
-Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
-![Abbildung 3: Erreichbarkeit entlang einer Route](https://user-images.githubusercontent.com/43250699/159470252-067117b3-b8a3-481d-b007-113e7a0477c8.png)
->>>>>>> 149927fa (resolve rebase conflicts):cosi/manuals/erreichbarkeitsanalyse.md
->>>>>>> 896ab88b (resolve rebase conflicts)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
 
 *Abb. c: Erreichbarkeit entlang einer Route.*
 1. **Auswahl des Modus**
@@ -168,15 +112,6 @@ Das Modul kann verwendet werden, ohne vorherige Gebietsauswahl.
 7. **Legende und Isochronen**
    > Eine Legende wird eingeblendet. Sie wird dynamisch für die Anfrage generiert und zeigt drei gleichmäßig verteilte Entfernungswerte. Höchstwert ist der zuvor eingegebene Wert für die Entfernung. Die Isochronen (Polygone) in der Karte sind entsprechend der Legende eingefärbt. Sie zeigen das um die Route herum erreichbare Gebiet abhängig von den zuvor eingegebenen Parametern.
 8. **Ergebnisverzeichnis**
-<<<<<<< HEAD
-<<<<<<< HEAD
    > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das [Ergebnisverzeichnis](./020ergebnisverzeichnis) verwaltet werden.
-=======
-<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
-<<<<<<< HEAD:cosi/manuals/003erreichbarkeitsanalyse.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
-   > Sie können mehrere Erreichbarkeitsanalysen erstellen, die über das sog. [Ergebnisverzeichnis](/cosi/manuals/020ergebnisverzeichnis) verwaltet werden.
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
    
 <div style="page-break-after: always;"></div>

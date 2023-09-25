@@ -1,31 +1,8 @@
 ### Einrichtungsübersicht
    > Um zur Einrichtungsübersicht zu gelangen, muss zunächst ein beliebiger Stadtteil oder Bezirk ausgewählt werden. Als nächtes unter dem Bereich Themen die gewünschten Themen oder Fachdaten auswählen (z.B. Bildung und Wissenschaft). Im Dashboard unter Einrichtungsübersicht können Sie dann mit der Analyse Ihrer Einrichtung beginnen.
    
-<<<<<<< HEAD
-<<<<<<< HEAD
 ![Abbildung 1: Einrichtungsübersicht](./017a_einrichtungsuebersicht.PNG)
 *Abb. a: Einrichtungsübersicht.*
-=======
-<<<<<<< HEAD:cosi/manuals/017einrichtungsuebersicht.md
-![Abbildung 1: Einrichtungsübersicht](017a_einrichtungsuebersicht.PNG)
-*Abb.: Einrichtungsübersicht.*
-=======
-=======
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
-=======
-
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/einrichtungsuebersicht.md
-=======
-   
->>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungsuebersicht.md
-![Abbildung 1: Einrichtungsübersicht](https://user-images.githubusercontent.com/43250699/159693060-ce1ffbeb-e9f6-4525-8896-13f341138246.png)
-*Abbildung 1: Einrichtungsübersicht*
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/einrichtungsuebersicht.md
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
-![Abbildung 1: Einrichtungsübersicht](017a_einrichtungsuebersicht.PNG)
-*Abb.: Einrichtungsübersicht.*
->>>>>>> 63cc74d8 (rm cosi conflicts)
 
 1. **Detailansicht ein-/ausklappen**
    > Über den Pfeil können *alle* Attribute einer Einrichtung aufgeklappt werden. Die einzelnen Zeilen der Detailansicht können für den weiteren Export ausgewählt werden.
@@ -37,37 +14,13 @@
 3. **Einrichtung fokussieren**
    > Durch einen Klick auf das Symbol der Einrichtung zoomt die Karte zu den gewählten Einrichtungen. Die Einrichtungen werden dann in der Karte visuell hervorgehoben.
 4. **Einrichtung ein-/ausblenden**
-<<<<<<< HEAD
    > Einrichtungen können in der Karte ein- und ausgeschaltet werden indem auf das "Augen"-Symbol neben dem Richtungssymbol geklickt wird. Ausgeschaltete Einrichtungen werden auch bei allen anderen CoSI-Funktionen nicht berücksichtigt.
-=======
-   > Einrichtungen können in der Karte ein- und ausgeschaltet werden. Indem auf das "Augen"-Symbol neben dem Richtungssymbol geklickt wird. Ausgeschaltete Einrichtungen werden bei allen anderen CoSI-Funktionen nicht berücksichtigt.
-<<<<<<< HEAD
-=======
-   > Durch einen Klick auf das Symbol zoomt die Karte zu der betreffenden Einrichtungen. Die Einrichtung wird in der Karte visuell hervorgehoben.
-4. **Einrichtung ein-/ausblenden**
-   > Einrichtungen können in der Karte ein- und ausgeschaltet werden. Ausgeschaltete Einrichtungen werden bei allen anderen CoSI-Funktionen nicht berücksichtigt.
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 0650b0a5 (resolve rebase conflicts)
 5. **Einrichtungsattribute**
    > - Einrichtungsname, Adresse, Layer, Typ und Thema werden dem Datensatz direkt entnommen
    > - Die Gebietszuweisung wird dynamisch für die aktuelle Verwaltungsebene generiert
    > - Symbole zeigen an, wenn eine Einrichtung simuliert oder modifiziert wurde.
 6. **Einträge sortieren**
-<<<<<<< HEAD
-<<<<<<< HEAD
    > Alle Spalten können durch mehrmaliges Klicken auf die Kopfzeile neben dem Namen (z.B. Einrichtung) auf- und absteigend sortiert werden (alphabetisch oder nach Wert). Dabei kann für max. 2 Spalten erfolgen (z.B. 1. nach Typ und 2. nach numerischem Wert).
-=======
-<<<<<<< HEAD
-   > Alle Spalten können, durch mehrmaliges Klicken auf die Kopfzeile, neben dem Namen (z.B. Einrichtung) auf- und absteigend sortiert werden (alphabetisch oder nach Wert). Dabei kann für max. 2 Spalten erfolgen (z.B. 1. nach Typ und 2. nach numerischem Wert).
-=======
-   > Alle Spalten können, durch mehrmaliges Klicken auf die Kopfzeile, auf- und absteigend sortiert werden (alphabetisch oder nach Wert). Dabei kann für max. 2 Spalten erfolgen (z.B. 1. nach Typ und 2. nach numerischem Wert).
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
-   > Alle Spalten können, durch mehrmaliges Klicken auf die Kopfzeile, neben dem Namen (z.B. Einrichtung) auf- und absteigend sortiert werden (alphabetisch oder nach Wert). Dabei kann für max. 2 Spalten erfolgen (z.B. 1. nach Typ und 2. nach numerischem Wert).
->>>>>>> 0650b0a5 (resolve rebase conflicts)
 7. **Numerische Attribute**
    > Alle Attribute einer Einrichtung, die Zahlwerte abbilden (welche auch für die [Versorgungsanalyse](./006versorgungsanalyse.md) verwendet werden können werden in einer eigenen Spalte dargestellt. Die Farbe des Balkens richtet sich dabei nach dem Dezil des Wertes in der Liste aller Einrichtungen. Die Länge des Balkens ist proportional zum Höchstwert.
 8. **Durchschnittliche Anbindung (in m)**

@@ -1,21 +1,5 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-<<<<<<< HEAD
 ### Sitzung Speichern und Laden
-=======
-<<<<<<< HEAD
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
-<<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
-<<<<<<< HEAD:cosi/manuals/014sitzungspeichern.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
-### Sitzung Speichern / Laden 
-![Abbildung 1: Sitzung Speichern](014_sitzungspeichern.PNG)
-*Abb.: Sitzung speichern / laden*
-
->>>>>>> 0650b0a5 (resolve rebase conflicts)
 
 ![Abbildung 1: Sitzung Speichern](./014_sitzungspeichern.PNG)
 *Abb. a: Sitzung speichern / laden*
@@ -24,25 +8,8 @@ Mit dem Dienst **Sitzung speichern/laden** können die folgend aufgelisteten Inf
 
 - Die ausgewählte Verwaltungsebene und ausgewählte Gebiete
 - Aktive Fachdatenthemen 
-<<<<<<< HEAD
 - Mit den [Simulationswerkzeugen](./009einrichtungenanlegen.md) erstellte Szenarien 
 - Ergebnisse und Konfigurationen der Werkzeuge [Erreichbarkeitsanalyse](./003erreichbarkeitsanalyse.md) und [Versorgungsanalyse](./006versorgungsanalyse.md)
-=======
-- Mit den [Simulationswerkzeugen](009einrichtungenanlegen.md) erstellte Szenarien 
-- Ergebnisse und Konfigurationen der Werkzeuge [Erreichbarkeitsanalyse](003erreichbarkeitsanalyse.md) und [Versorgungsanalyse](006versorgungsanalyse.md)
-<<<<<<< HEAD
-=======
-- Aktive Fachdatenthemen
-- Mit den [Simulationswerkzeugen](./einrichtungenanlegen.md) erstellte Szenarien
-=======
-- Aktive Fachdatenthemen 
-- Mit den [Simulationswerkzeugen](./einrichtungenanlegen.md) erstellte Szenarien 
->>>>>>> 3502056a (update cosi folder):cosi/manuals/sitzungspeichern.md
-- Ergebnisse und Konfigurationen der Werkzeuge [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Versorgungsanalyse](./versorgungsanalyse.md)
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/sitzungspeichern.md
->>>>>>> 0650b0a5 (resolve rebase conflicts)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
 
 Die Funktion ist unter "Dienste", "Sitzung speichern/laden" zu finden.
 
