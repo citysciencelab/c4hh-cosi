@@ -47,7 +47,6 @@ const state = {
     description: "additional:modules.sdpDownload.description",
     name: "additional:modules.sdpDownload.name",
     icon: "bi-download",
-    description: "additional:modules.tools.sdpdownload.description",
     hasMouseMapInteractions: true,
     wmsRasterLayerId: "4707",
     formats: [
