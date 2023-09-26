@@ -1,7 +1,7 @@
 {
   "modules": {
     "sdpDownload": {
-      "description": "Lade ein Standarddatenpaket herunter",
+      "description": "Lade Daten kachelweise aus dem Standarddatenpaket herunter",
       "name": "SDP Download",
       "selectFormat": "Welches Format möchten Sie?",
       "howToChooseTiles": "Wie möchten Sie die Kacheln auswählen?",

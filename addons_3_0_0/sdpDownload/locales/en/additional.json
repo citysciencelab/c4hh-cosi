@@ -1,7 +1,7 @@
 {
   "modules": {
     "sdpDownload": {
-      "description": "Download a default data package",
+      "description": "Download data tile by tile from the default data package",
       "name": "SDP Download",
       "selectFormat": "Which format do you like?",
       "howToChooseTiles": "How would you like to choose the tiles?",
