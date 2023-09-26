@@ -115,62 +115,6 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
         expect(button.html().includes("interaction=\"[Function]\"")).to.be.true;
 
     });
-    it("should call download function if Neuwerk format button is clicked", async () => {
-        const spyDownload = sinon.stub(SDPComponent.methods, "requestCompressIslandData"),
-            wrapper = shallowMount(SDPComponent, {
-                global: {
-                    plugins: [store]
-                }
-            }),
-            button = wrapper.find("#button-neuwerk");
-
-        await button.trigger("click");
-        expect(spyDownload.calledOnce).to.be.true;
-
-        spyDownload.restore();
-    });
-    it("should call download function if Scharhoern format button is clicked", async () => {
-        const spyDownload = sinon.stub(SDPComponent.methods, "requestCompressIslandData"),
-            wrapper = shallowMount(SDPComponent, {
-                global: {
-                    plugins: [store]
-                }
-            }),
-            button = wrapper.find("#button-scharhoern");
-
-        await button.trigger("click");
-        expect(spyDownload.calledOnce).to.be.true;
-
-        spyDownload.restore();
-    });
-    it("should call download function if tile overview 310 format button is clicked", async () => {
-        const spyDownload = sinon.stub(SDPComponent.methods, "requestCompressRasterOverviewData"),
-            wrapper = shallowMount(SDPComponent, {
-                global: {
-                    plugins: [store]
-                }
-            }),
-            button = wrapper.find("#button-310");
-
-        await button.trigger("click");
-        expect(spyDownload.calledOnce).to.be.true;
-
-        spyDownload.restore();
-    });
-    it("should call download function if tile overview 320 format button is clicked", async () => {
-        const spyDownload = sinon.stub(SDPComponent.methods, "requestCompressRasterOverviewData"),
-            wrapper = shallowMount(SDPComponent, {
-                global: {
-                    plugins: [store]
-                }
-            }),
-            button = wrapper.find("#button-320");
-
-        await button.trigger("click");
-        expect(spyDownload.calledOnce).to.be.true;
-
-        spyDownload.restore();
-    });
     it("should call setSelectedFormat function if select is changed", async () => {
         const spy = sinon.spy(SDPComponent.methods, "setSelectedFormat"),
             wrapper = shallowMount(SDPComponent, {

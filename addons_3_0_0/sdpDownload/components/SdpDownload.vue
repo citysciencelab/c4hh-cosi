@@ -143,8 +143,6 @@ export default {
             <div class="d-flex justify-content-center mt-3">
                 <FlatButton
                     id="flatButton-selectedDownload"
-                    aria-label="translate(downloadDataPackage)"
-                    type="button"
                     :text="translate(downloadDataPackage)"
                     :icon="icon"
                     :spinner-trigger="transactionProcessing"
@@ -153,47 +151,39 @@ export default {
             </div>
             <div class="form-group col-12">
                 <hr class="mt-1">
-                <span>{{ translate(specialDownloads) }}</span>
+                <span>{{ $t(specialDownloads) }}</span>
             </div>
-            <div class="form-group col-12">
-                <button
+            <div class="d-flex justify-content-center mt-3">
+                <FlatButton
                     id="button-neuwerk"
-                    type="button"
-                    class="w-100 btn btn-sm btn-outline-default btn-block center-block"
-                    @click="requestCompressIslandData('Neuwerk')"
-                >
-                    {{ translate(neuwerkDataPackage) }}
-                </button>
+                    :text="$t(neuwerkDataPackage)"
+                    :icon="icon"
+                    :interaction="() => requestCompressIslandData('Neuwerk')"
+                />
             </div>
-            <div class="form-group col-12">
-                <button
+            <div class="d-flex justify-content-center">
+                <FlatButton
                     id="button-scharhoern"
-                    type="button"
-                    class="w-100 btn btn-sm btn-outline-default btn-block center-block"
-                    @click="requestCompressIslandData('Scharhoern')"
-                >
-                    {{ $t(scharhoernDataPackage) }}
-                </button>
+                    :text="$t(scharhoernDataPackage)"
+                    :icon="icon"
+                    :interaction="() => requestCompressIslandData('Scharhoern')"
+                />
             </div>
-            <div class="form-group col-12">
-                <button
+            <div class="d-flex justify-content-center">
+                <FlatButton
                     id="button-310"
-                    type="button"
-                    class="w-100 btn btn-sm btn-outline-default btn-block center-block"
-                    @click="requestCompressRasterOverviewData('LS310')"
-                >
-                    {{ translate(tileOverview310) }}
-                </button>
+                    :text="$t(tileOverview310)"
+                    :icon="icon"
+                    :interaction="() => requestCompressRasterOverviewData('LS310')"
+                />
             </div>
-            <div class="form-group col-12">
-                <button
+            <div class="d-flex justify-content-center">
+                <FlatButton
                     id="button-320"
-                    type="button"
-                    class="w-100 btn btn-sm btn-outline-default btn-block center-block"
-                    @click="requestCompressRasterOverviewData('LS320')"
-                >
-                    {{ translate(tileOverview320) }}
-                </button>
+                    :text="$t(tileOverview320)"
+                    :icon="icon"
+                    :interaction="() => requestCompressRasterOverviewData('LS320')"
+                />
             </div>
         </form>
     </div>
@@ -207,27 +197,7 @@ export default {
     #button-selectedDownload{
         margin-top: 15px;
     }
-    .btn[id*='button-'] {
-        color:$dark_grey;
-        &:focus {
-            @include primary_action_focus;
-        }
-        &:hover {
-            @include primary_action_hover;
-        }
-    }
-    .formatselect{
-        width: 100%;
-        height: 30px;
-        margin-right: 15px;
-        padding: 5px 5px;
-        font-size: 12px;
-        cursor: pointer;
-    }
-    .limiter{
-        border-bottom: 1px solid rgb(229,229,229);
-        padding-bottom: 20px;
-    }
+
 </style>
 
 // Only works unscoped
