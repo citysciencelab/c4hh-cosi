@@ -4,9 +4,7 @@ import GraphicalSelect from "../../../../src_3_0_0/shared/modules/graphicalSelec
 import SwitchInput from "../../../../src_3_0_0/shared/modules/checkboxes/components/SwitchInput.vue";
 import thousandsSeparator from "../../../../src_3_0_0/shared/js/utils/thousandsSeparator";
 import WPS from "../../../../src_3_0_0/shared/js/api/wps";
-import {treeSubjectsKey} from "../../../../src_3_0_0/shared/js/utils/constants";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
-import layerCollection from "../../../../src_3_0_0/core/layers/js/layerCollection";
 
 export default {
     name: "PopulationRequest",
@@ -161,7 +159,7 @@ export default {
             "setAlkisAdressesActive",
             "setRasterActive"
         ]),
-        ...mapActions(["addLayerToLayerConfig", "replaceByIdInLayerConfig"]),
+        ...mapActions(["addLayerToLayerConfig", "replaceByIdInLayerConfig", "addOrReplaceLayer"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
 
         /**
@@ -305,60 +303,13 @@ export default {
             return result;
         },
         /**
-         * Sets visibility to layer with given id.
-         * @param {String} layerId id of the layer to be toggled
-         * @param {Boolean} value true | false value for visibility
-         * @returns {void}
-         */
-        setLayerVisibility: function (layerId, value) {
-            const layer = layerCollection.getLayerById(layerId);
-
-            if (!layer) {
-                let config = this.layerConfigById(layerId),
-                    parentKey;
-
-                if (!config) {
-                    config = rawLayerList.getLayerWhere({id: layerId});
-                    parentKey = treeSubjectsKey;
-                }
-                else {
-                    parentKey = config.parentId;
-                }
-                if (config) {
-                    config.visibility = value;
-                    config.type = "layer";
-                    this.addLayerToLayerConfig({layerConfig: config, parentKey});
-                }
-                else {
-                    console.warn("LayerId: " + layerId + " not found");
-                }
-            }
-            else {
-                let zIndex = layer.zIndex;
-
-                if (!layer.showInLayerTree) {
-                    zIndex = this.determineZIndex(layerId);
-                }
-                this.replaceByIdInLayerConfig({
-                    layerConfigs: [{
-                        id: layerId,
-                        layer: {
-                            visibility: value,
-                            showInLayerTree: true,
-                            zIndex: zIndex
-                        }
-                    }]
-                });
-            }
-        },
-        /**
          * Sets the state regarding the RasterLayer
          * @param {Boolean} value flag if Raster is to be set
          * @returns {void}
          */
         triggerRaster (value) {
             this.setRasterActive(value);
-            this.setLayerVisibility(this.rasterLayerId, value);
+            this.addOrReplaceLayer({layerId: this.rasterLayerId, visibility: value});
         },
         /**
          * Sets the state regarding the alkisAdresses Layer
@@ -367,7 +318,7 @@ export default {
          */
         triggerAlkisAdresses (value) {
             this.setAlkisAdressesActive(value);
-            this.setLayerVisibility(this.alkisAdressLayerId, value);
+            this.addOrReplaceLayer({layerId: this.alkisAdressLayerId, visibility: value});
         },
 
         /**

@@ -4,8 +4,6 @@ import {expect} from "chai";
 import sinon from "sinon";
 import {nextTick} from "vue";
 
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
-import layerCollection from "../../../../../../src_3_0_0/core/layers/js/layerCollection";
 import Component from "../../../components/PopulationRequest.vue";
 import GraphicalSelectComponent from "../../../../../../src_3_0_0/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import SwitchInputComponent from "../../../../../../src_3_0_0/shared/modules/checkboxes/components/SwitchInput.vue";
@@ -170,76 +168,6 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
         });
         it("should return correctly formatted number with unit when value > 10000000 &&  maxlength === 1", function () {
             expect(Component.methods.chooseUnitAndThousandsSeparator(99999999.999, 1)).to.equal("100,0 km²");
-        });
-    });
-
-    describe("method setLayerVisibility", () => {
-        let layerInCollection = false;
-
-        beforeEach(() => {
-            sinon.stub(layerCollection, "getLayerById").returns(layerInCollection);
-            sinon.stub(rawLayerList, "getLayerWhere").callsFake(function () {
-                return {
-                    id: rasterLayerId
-                };
-            });
-        });
-        it("layer not in layerCollection will be set visible", () => {
-            const wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}});
-
-            wrapper.vm.setLayerVisibility(rasterLayerId, true);
-            nextTick(() => {
-                expect(spyAddLayerToLayerConfig.calledOnce).to.be.true;
-                expect(spyAddLayerToLayerConfig.firstCall.args[0]).to.be.deep.equals({
-                    layerConfig: {
-                        id: rasterLayerId
-                    },
-                    parentKey: "Fachdaten"
-                });
-                expect(spyReplaceByIdInLayerConfig.notCalled).to.be.true;
-            });
-        });
-
-        it("layer in layerCollection will be set visible", () => {
-            layerInCollection = true;
-            const wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}});
-
-            wrapper.vm.setLayerVisibility(rasterLayerId, true);
-            nextTick(() => {
-                expect(spyAddLayerToLayerConfig.notCalled).to.be.true;
-                expect(spyReplaceByIdInLayerConfig.calledOnce).to.be.true;
-                expect(spyReplaceByIdInLayerConfig.firstCall.args[0]).to.be.deep.equals({
-                    layerConfigs: [
-                        {
-                            id: rasterLayerId,
-                            layer: {
-                                visibility: true
-                            }
-                        }
-                    ]
-                });
-            });
-        });
-
-        it("layer in layerCollection will be set not visible", () => {
-            layerInCollection = true;
-            const wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}});
-
-            wrapper.vm.setLayerVisibility(rasterLayerId, false);
-            nextTick(() => {
-                expect(spyAddLayerToLayerConfig.notCalled).to.be.true;
-                expect(spyReplaceByIdInLayerConfig.calledOnce).to.be.true;
-                expect(spyReplaceByIdInLayerConfig.firstCall.args[0]).to.be.deep.equals({
-                    layerConfigs: [
-                        {
-                            id: rasterLayerId,
-                            layer: {
-                                visibility: false
-                            }
-                        }
-                    ]
-                });
-            });
         });
     });
 
