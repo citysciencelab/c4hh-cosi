@@ -15,8 +15,7 @@ export default {
                 "Box": this.translate("common:shared.modules.graphicalSelect.selectBySquare"),
                 "Circle": this.translate("common:shared.modules.graphicalSelect.selectByCircle"),
                 "Polygon": this.translate("common:shared.modules.graphicalSelect.selectByPolygon")
-            },
-            rasterSelected: false
+            }
         };
     },
     computed: {
@@ -26,7 +25,6 @@ export default {
             "howToChooseTiles",
             "icon",
             "neuwerkDataPackage",
-            "rasterNames",
             "scharhoernDataPackage",
             "selectedFormat",
             "selectFormat",
@@ -35,19 +33,6 @@ export default {
             "tileOverview320",
             "transactionProcessing"
         ])
-    },
-    watch: {
-        rasterNames: {
-            handler () {
-                if (this.rasterNames.lenght > 0) {
-                    this.rasterSelected = true;
-                }
-                else {
-                    this.rasterSelected = false;
-                }
-            },
-            deep: true
-        }
     },
     /**
      * Put initialize functions here after mounting
@@ -161,7 +146,6 @@ export default {
                     :text="translate(downloadDataPackage)"
                     :icon="icon"
                     :interaction="() => requestCompressedData ()"
-                    :disabled="!rasterSelected"
                 />
             </div>
             <div class="form-group col-12">
