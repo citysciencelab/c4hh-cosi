@@ -15,24 +15,39 @@ export default {
                 "Box": this.translate("common:shared.modules.graphicalSelect.selectBySquare"),
                 "Circle": this.translate("common:shared.modules.graphicalSelect.selectByCircle"),
                 "Polygon": this.translate("common:shared.modules.graphicalSelect.selectByPolygon")
-            }
+            },
+            rasterSelected: false
         };
     },
     computed: {
         ...mapGetters("Modules/SdpDownload", [
+            "downloadDataPackage",
             "formats",
+            "howToChooseTiles",
             "icon",
-            "transactionProcessing",
+            "neuwerkDataPackage",
+            "rasterNames",
+            "scharhoernDataPackage",
             "selectedFormat",
             "selectFormat",
-            "howToChooseTiles",
-            "downloadDataPackage",
             "specialDownloads",
-            "neuwerkDataPackage",
-            "scharhoernDataPackage",
             "tileOverview310",
-            "tileOverview320"
+            "tileOverview320",
+            "transactionProcessing"
         ])
+    },
+    watch: {
+        rasterNames: {
+            handler () {
+                if (this.rasterNames.lenght > 0) {
+                    this.rasterSelected = true;
+                }
+                else {
+                    this.rasterSelected = false;
+                }
+            },
+            deep: true
+        }
     },
     /**
      * Put initialize functions here after mounting
@@ -145,8 +160,8 @@ export default {
                     id="flatButton-selectedDownload"
                     :text="translate(downloadDataPackage)"
                     :icon="icon"
-                    :spinner-trigger="transactionProcessing"
                     :interaction="() => requestCompressedData ()"
+                    :disabled="!rasterSelected"
                 />
             </div>
             <div class="form-group col-12">
