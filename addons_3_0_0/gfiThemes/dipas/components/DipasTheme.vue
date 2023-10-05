@@ -98,12 +98,12 @@ export default {
     <div class="dipas-gfi-content">
         <div class="dipas-gfi-icon">
             <img
-                :src="calculateIconPath(feature.getMappedProperties().Kategorie)"
+                :src="calculateIconPath(feature.getMappedProperties().Thema)"
                 alt="Icon"
             >
         </div>
         <div class="dipas-gfi-thema">
-            {{ feature.getMappedProperties().Kategorie }}
+            {{ feature.getMappedProperties().Thema }}
         </div>
         <div
             v-if="!isTableStyle() && feature.getMappedProperties().link"

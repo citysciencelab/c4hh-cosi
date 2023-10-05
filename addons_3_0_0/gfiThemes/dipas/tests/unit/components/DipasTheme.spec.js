@@ -47,11 +47,11 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
                     getMimeType: () => "text/xml",
                     getMappedProperties () {
                         return {
-                            "Kategorie": "Value Kategorie",
-                            "link": "/drupal/de/node/5",
-                            "name": "Value name",
-                            "description": "Value description",
-                            "nid": "5"
+                            Thema: "Value Kategorie",
+                            link: "/drupal/de/node/5",
+                            name: "Value name",
+                            description: "Value description",
+                            nid: "5"
                         };
                     }
                 }
