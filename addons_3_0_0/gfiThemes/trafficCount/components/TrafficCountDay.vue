@@ -269,8 +269,9 @@ export default {
                 format="DD.MM.YYYY"
                 :multiple="true"
                 :show-week-number="true"
+                :disabled-date="isDateDisabled"
                 title-format="DD.MM.YYYY"
-                :lang="$t('common:libraries.vue2-datepicker.lang', {returnObjects: true})"
+                :lang="$t('common:libraries.vue-datepicker-next.lang', {returnObjects: true})"
             />
         </div>
         <TrafficCountCheckbox

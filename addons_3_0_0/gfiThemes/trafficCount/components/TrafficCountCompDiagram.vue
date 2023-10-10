@@ -1,6 +1,7 @@
 <script>
 import ChartJs from "chart.js/auto";
 import {mapGetters} from "vuex";
+import {shallowRef} from "vue";
 
 export default {
     name: "TrafficCountCompDiagram",
@@ -133,7 +134,8 @@ export default {
         apiData: {
             handler (newData, oldValue) {
                 if (!oldValue.length) {
-                    this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+                    this.destroyChart();
+                    this.chartData = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
                     this.createChart(this.chartData, this.ctx);
                 }
                 else if (Array.isArray(newData) && newData.length) {
@@ -141,7 +143,7 @@ export default {
                     this.chart.update(this.updateAnimation);
                 }
                 else {
-                    this.chart.destroy();
+                    this.destroyChart();
                 }
             },
             deep: true
@@ -152,7 +154,7 @@ export default {
     },
     mounted () {
         this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-        this.ctx = this.$el.getElementsByTagName("canvas")[0].getContext("2d");
+        this.ctx = this.$refs[`trafficCountChart_${this.activeTabId}`];
 
         this.createChart(this.chartData, this.ctx);
     },
@@ -164,7 +166,7 @@ export default {
          * @returns {Void} -
          */
         createChart (data, ctx) {
-            this.chart = new ChartJs(ctx, this.getChartJsConfig(data, {
+            this.chart = shallowRef(new ChartJs(ctx, this.getChartJsConfig(data, {
                 titleColor: this.colorTooltipFont,
                 backgroundColor: this.colorTooltipBack,
                 setTooltipValue: this.setTooltipValue,
@@ -179,7 +181,7 @@ export default {
                 renderLabelYAxis: this.renderLabelYAxis,
                 descriptionXAxis: this.descriptionXAxis,
                 descriptionYAxis: this.descriptionYAxis
-            }));
+            })));
         },
         /**
          * Destroys the current chart if exists.
@@ -246,7 +248,7 @@ export default {
                     datasets.push(holidayData);
                 }
             });
-            this.chartData = {labels: labelsXAxis, datasets};
+
             return {labels: labelsXAxis, datasets};
         },
         /**
@@ -429,7 +431,10 @@ export default {
 
 <template>
     <div class="graph">
-        <canvas />
+        <canvas
+            :id="`trafficCountChart_${activeTabId}`"
+            :ref="`trafficCountChart_${activeTabId}`"
+        />
     </div>
 </template>
 

@@ -280,7 +280,7 @@ export default {
             class="dateSelector"
         >
             <DatePicker
-                v-model="dates"
+                v-model:value="dates"
                 aria-label="Datum"
                 placeholder="Datum"
                 type="year"
@@ -288,7 +288,7 @@ export default {
                 :multiple="true"
                 :disabled-date="isDateDisabled"
                 title-format="YYYY"
-                :lang="$t('common:libraries.vue2-datepicker.lang', {returnObjects: true})"
+                :lang="$t('common:libraries.vue-datepicker-next.lang', {returnObjects: true})"
             />
         </div>
         <TrafficCountCheckbox
