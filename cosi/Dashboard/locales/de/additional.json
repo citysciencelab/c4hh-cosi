@@ -12,11 +12,7 @@
                     "search": "Tabelle durchsuchen",
                     "exportTable": "Tabelle exportieren",
                     "exportTableTimeline": "alle Jahre exportieren",
-<<<<<<< HEAD
                     "exportFilename": "{{prefix}}_Dashboard-Tabelle",
-=======
-                    "exportFilename": "CoSI_Dashboard-Tabelle",
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
                     "modifiedTooltip": "Dieses Datum wurde durch Simulationsfunktionen verändert.",
                     "moveColLeft": "Spalte nach links verschieben",
                     "moveColRight": "Spalte nach rechts verschieben",

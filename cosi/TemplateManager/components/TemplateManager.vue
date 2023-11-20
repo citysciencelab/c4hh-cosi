@@ -6,10 +6,10 @@ import getters from "../store/gettersTemplateManager";
 import mutations from "../store/mutationsTemplateManager";
 import actions from "../store/actionsTemplateManager";
 import ToolInfo from "../../components/ToolInfo.vue";
-<<<<<<< HEAD
 import TemplateManagerImport from "./TemplateManagerImport.vue";
 import axios from "axios";
 import mapping from "../../assets/mapping.json";
+<<<<<<< HEAD
 <<<<<<< HEAD
 import {getItemsByAttributes, addModelsByAttributes, getModelByAttributes} from "../../utils/radioBridge";
 import Multiselect from "vue-multiselect";
@@ -18,22 +18,26 @@ import Multiselect from "vue-multiselect";
 import axios from "axios";
 >>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 3851ff37 (update cosi)
 
 export default {
     name: "TemplateManager",
     components: {
         Tool,
-<<<<<<< HEAD
         ToolInfo,
 <<<<<<< HEAD
         TemplateManagerImport,
         Multiselect
 =======
         TemplateManagerImport
+<<<<<<< HEAD
 =======
         ToolInfo
 >>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
 >>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 3851ff37 (update cosi)
     },
     data () {
         return {
@@ -112,10 +116,7 @@ export default {
     methods: {
         ...mapMutations("Tools/TemplateManager", Object.keys(mutations)),
         ...mapActions("Tools/TemplateManager", Object.keys(actions)),
-<<<<<<< HEAD
         ...mapMutations("Tools/DistrictSelector", ["setMapping"]),
-=======
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
         ...mapActions("Tools/SaveSession", ["loadSessionData"]),
 
         /**
@@ -179,7 +180,6 @@ export default {
         },
 
         loadFromTemplate (template, index) {
-<<<<<<< HEAD
             template.meta.isActive = true;
 
             const _template = this.applyFilters(template, this.filters[index]),
@@ -230,20 +230,6 @@ export default {
             else if (typeof this.toolToOpen === "string") {
                 this.$store.dispatch("Tools/setToolActive", {id: this.toolToOpen, active: true});
             }
-=======
-            const _template = this.applyFilters(template, index);
-
-            this.loadSessionData(_template);
-            this.setActive(false);
-        },
-
-        showTemplateInfo (template) {
-            this.addSingleAlert({
-                content: template.meta?.info,
-                category: "Info",
-                displayClass: "info"
-            });
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
         },
 
         /**
@@ -294,7 +280,10 @@ export default {
 =======
             return template.state.Tools?.Dashboard?.calculations || [];
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
+=======
+>>>>>>> 3851ff37 (update cosi)
         },
 
         /**
@@ -365,8 +354,6 @@ export default {
         getOrientationValueByStatistic (orientationValues, stat) {
             return orientationValues.find(orientation => orientation.statisticName === stat)?.value || "-";
 
-=======
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
         }
     }
 };
@@ -388,9 +375,12 @@ export default {
             #toolBody
         >
 <<<<<<< HEAD
+<<<<<<< HEAD
             <div
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 3851ff37 (update cosi)
             <v-app
 >>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
                 id="template-manager"
@@ -579,22 +569,6 @@ export default {
                             class="float-end"
                             @addTemplate="addTemplate"
                         />
-=======
-            <v-app class="clamp-40vw">
-                <v-container>
-                    <ToolInfo
-                        :url="readmeUrl"
-                        :locale="currentLocale"
-                    />
-                    <div class="mb-2">
-                        {{ $t("additional:modules.tools.cosi.templateManager.infoLoadFromTemplates") }}
-                    </div>
-                    <v-divider />
-                    <div>
-                        <span class="text-subtitle-2">
-                            {{ $t("additional:modules.tools.cosi.templateManager.loadFromTemplate") }}
-                        </span>
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
                     </div>
                     <v-list dense>
                         <v-list-group
@@ -616,10 +590,6 @@ export default {
                                 <v-list-item-content class="no-flex">
                                     <v-row>
                                         <v-simple-table
-<<<<<<< HEAD
-=======
-                                            class="info-table"
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
                                             dense
                                         >
                                             <template #default>
@@ -724,7 +694,6 @@ export default {
                                     </v-row>
                                     <v-divider />
                                     <v-row justify="end">
-<<<<<<< HEAD
                                         <v-col>
                                             <button
                                                 class="btn btn-outline lh-1 fs-5 mb-3"
@@ -732,34 +701,13 @@ export default {
                                             >
                                                 <i class="bi bi-upload pe-2" />{{ $t("additional:modules.tools.cosi.templateManager.loadFromTemplate") }}
                                             </button>
-=======
-                                        <v-col class="right-text">
-                                            <v-btn
-                                                id="load"
-                                                dense
-                                                small
-                                                tile
-                                                color="grey lighten-1"
-                                                :title="$t('additional:modules.tools.cosi.saveSession.infoLoadFromTemplates')"
-                                                @click="loadFromTemplate(template, i)"
-                                            >
-                                                <v-icon left>
-                                                    mdi-open-in-app
-                                                </v-icon>
-                                                {{ $t('additional:modules.tools.cosi.saveSession.loadFromTemplate') }}
-                                            </v-btn>
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
                                         </v-col>
                                     </v-row>
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-group>
                     </v-list>
-<<<<<<< HEAD
                 </div>
-=======
-                </v-container>
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
             </v-app>
 >>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
         </template>
@@ -767,7 +715,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-<<<<<<< HEAD
     @import "~variables";
 
     #template-manager {
@@ -839,16 +786,6 @@ export default {
        }
     }
 
-=======
-    @import "../../utils/variables.scss";
-
-    .hidden {
-        display: hidden;
-    }
-    .template-info-button {
-        margin-right: 20px;
-    }
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
     .info-table {
         max-width: 640px;
     }
