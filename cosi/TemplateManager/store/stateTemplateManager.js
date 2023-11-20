@@ -33,6 +33,6 @@ const state = {
     toolToOpen: undefined,
     useImport: false,
     useTemplatesForMapping: false
-}
+};
 
 export default state;

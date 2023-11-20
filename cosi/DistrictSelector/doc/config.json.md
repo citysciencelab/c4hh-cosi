@@ -1,12 +1,12 @@
 **DistrictSelector**
 
-Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwaltungsebene (z.B.: Statistisches Gebiet) ausgewÃ¤hlt. FÃ¼r das gewÃ¤hlte Gebiet werden die entsprechenden regionalstatistischen Daten geladen.
+Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwaltungsebene (z.B.: Statistisches Gebiet) ausgewählt. Für das gewählte Gebiet werden die entsprechenden regionalstatistischen Daten geladen.
 
 |Name|Verpflichtend| Typ|Default|Beschreibung|
 |----|-------------|----|-------|------------|
-|name|nein|String|Gebiet auswÃ¤hlen|Name des Werkzeuges im Menu.|
+|name|nein|String|Gebiet auswählen|Name des Werkzeuges im Menu.|
 |icon|nein|String|bi-image|CSS Klasse des Glyphicons, das vor dem Toolnamen im Menu angezeigt wird.|
-|districtLevels|ja|Object[]| |Beinhaltet die nÃ¶tigen Informationen der einzelnen Verwaltungsebenen (siehe Beispiel).|
+|districtLevels|ja|Object[]| |Beinhaltet die nötigen Informationen der einzelnen Verwaltungsebenen (siehe Beispiel).|
 |districtLevels[i].layerId|ja|String| |Die Layer id zum jeweiligen Verwaltungslayer.|
 |districtLevels[i].label|ja|String| |Die/der Bezeichnung/ Name für die Verwaltungsebene.|
 |districtLevels[i].keyOfAttrName|ja|String| |Der Key für das Attribut in dem der Name der Verwaltungeinheit steht.|
@@ -14,10 +14,10 @@ Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwal
 |districtLevels[i].stats|ja|Object| |Definiert die Layer-Id für die regionalstatistischen Daten, die jeweiligen Metadaten URLs und den Key des Attributes "Name" für die statistischen Daten.|
 |districtLevels[i].stats.keyOfAttrName|ja|String[]| |Die Keys für die Attribute in dem die Namen für die statistischen Daten stehen.|
 |districtLevels[i].stats.metadataUrls|nein|String[]| |Die URLs der Metadaten der statistischen Daten.|
-|districtLevels[i].activeStyle|nein|Object| |Benutzerdefinierte Styles fÃ¼r die jeweils ausgewÃ¤hlte Verwaltungsebene. Entspricht der Hierarchie des OpenLayers Style Definition|
+|districtLevels[i].activeStyle|nein|Object| |Benutzerdefinierte Styles für die jeweils ausgewählte Verwaltungsebene. Entspricht der Hierarchie des OpenLayers Style Definition|
 |districtLevels[i].districtNamesMap|nein|Object| |Benutzerdefiniertes dictionary zum bereitstellen von synonymen Gebietsnamen|
-|additionalInfoLayers|nein|Object| |ZusÃ¤tzliche Info Layer die beim Nutzen des Tools angezeigt werden kÃ¶nnen. Der Key ist der angezeigte Bezeichner, der Value die Liste an Layer IDs|
-|toolToOpen|nein|String| |Das Werkzeug, das nach dem SchlieÃŸen des DistrictSelector geÃ¶ffnet wird.|
+|additionalInfoLayers|nein|Object| |Zusätzliche Info Layer die beim Nutzen des Tools angezeigt werden können. Der Key ist der angezeigte Bezeichner, der Value die Liste an Layer IDs|
+|toolToOpen|nein|String| |Das Werkzeug, das nach dem Schließen des DistrictSelector geöffnet wird.|
 |enableBuffer|nein|Boolean|true|Legt fest, ob der Puffer als InputFeld angezeigt wird.|
 
 **Beispiel**
@@ -68,7 +68,7 @@ Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwal
     }
   ],
   "additionalInfoLayers": {
-    "SozialrÃ¤ume": ["20179"],
+    "Sozialräume": ["20179"],
     "RISE": ["4411", "13895", "17040", "18712", "4413", "4409", "18713", "4412", "4410", "18714", "10767"]
 }
 ```
