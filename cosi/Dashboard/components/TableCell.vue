@@ -32,13 +32,10 @@ export default {
         tooltipOffset: {
             type: Number,
             default: 0
-<<<<<<< HEAD
         },
         items: {
             type: Array,
             required: true
-=======
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
         }
     },
     computed: {

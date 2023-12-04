@@ -25,7 +25,6 @@ export default {
         Tool,
 <<<<<<< HEAD
         ToolInfo,
-<<<<<<< HEAD
         TemplateManagerImport,
         Multiselect
 =======
@@ -289,7 +288,6 @@ export default {
         },
 
         getCalculations (template) {
-<<<<<<< HEAD
             return template?.state?.Tools?.Dashboard?.calculations || [];
 =======
             return template.state.Tools?.Dashboard?.calculations || [];
@@ -401,7 +399,6 @@ export default {
                     :locale="currentLocale"
                     :summary="$t('additional:modules.tools.cosi.templateManager.infoLoadFromTemplates')"
                 />
-<<<<<<< HEAD
                 <TemplateManagerImport
                     v-if="useImport"
                     @addTemplate="addTemplate"
@@ -787,7 +784,6 @@ export default {
             background-color: $light_blue;
             color: $white;
        }
-<<<<<<< HEAD
     }
 </style>
 
@@ -832,11 +828,6 @@ export default {
         .multiselect__option--selected {
             font-family: $font_family_accent
         }
-=======
-
-       th {
-            font-family: $font_family_accent;
-       }
     }
 
 =======
