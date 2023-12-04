@@ -4,8 +4,6 @@
             "cosi": {
                 "templateManager": {
                     "title": "Templates",
-<<<<<<< HEAD
-<<<<<<< HEAD
                     "importTemplate": "Import Template",
                     "loadFromTemplate": "Load Template",
                     "infoLoadFromTemplates": "Load basic thematic configurations for specific types of analyses. You can find the data which will be loaded in the templates' overview. Some templates include the selection of areas, some require you to select areas yourself in beforehand.",
@@ -29,30 +27,6 @@
                       "wrongFileFormat": "The file is not in the correct format.",
                       "attErr": " {{attribute}} node does not exist."
                     }
-=======
-=======
-                    "importTemplate": "Import Template",
->>>>>>> 3851ff37 (update cosi)
-                    "loadFromTemplate": "Load templates",
-                    "infoLoadFromTemplates": "Load basic thematic configurations for specific types of analyses. You can find the data which will be loaded in the templates' overview. Some templates include the selection of areas, some require you to select areas yourself in beforehand.",
-                    "noInfo": "No description available.",
-                    "created": "Created",
-                    "info": "Description",
-                    "layers": "Topics",
-                    "districtLevel": "District Level",
-                    "selectedDistricts": "Selected Districts",
-                    "activeTool": "Active Tool",
-<<<<<<< HEAD
-                    "categories": "Statistical Data"
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
-=======
-                    "categories": "Statistical Data",
-                    "errors": {
-                      "default": "File could not be loaded",
-                      "invalid": "File could not be readed",
-                      "wrongFileFormat": "The file is not in the correct format."
-                    }
->>>>>>> 3851ff37 (update cosi)
                 }
             }
         }
