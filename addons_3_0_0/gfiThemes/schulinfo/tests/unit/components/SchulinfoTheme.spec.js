@@ -61,12 +61,14 @@ describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
 
     it("should assign feature properties", () => {
         const prop = {
-                "adresse_strasse_hausnr": "Exampleweg",
-                "kantine_vorh": "true"
+                adresse_strasse_hausnr: "Exampleweg",
+                kantine_vorh: "true",
+                schwerpunktschule: false
             },
             attrToShow = {
                 adresse_strasse_hausnr: "Adresse",
-                kantine_vorh: "Kantine vorhanden"
+                kantine_vorh: "Kantine vorhanden",
+                schwerpunktschule: "Test"
             },
             feature = {
                 getLayerId: () =>sinon.stub(),
@@ -79,11 +81,17 @@ describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
         expect(result.length).to.equal(2);
         expect(result[0].name).equals("Grundsätzliche Informationen");
         expect(result[0].isSelected).to.be.true;
-        expect(result[0].attributes).to.deep.equal([
-            {
-                attributeName: attrToShow.adresse_strasse_hausnr,
-                attributeValue: [prop.adresse_strasse_hausnr]
-            }]
+        expect(result[0].attributes).to.deep.equal(
+            [
+                {
+                    attributeName: attrToShow.schwerpunktschule,
+                    attributeValue: ["additional:modules.tools.gfi.themes.schulinfo.no"]
+                },
+                {
+                    attributeName: attrToShow.adresse_strasse_hausnr,
+                    attributeValue: [prop.adresse_strasse_hausnr]
+                }
+            ]
         );
         expect(result[1].name).equals("Mittagsversorgung");
         expect(result[1].isSelected).to.be.undefined;

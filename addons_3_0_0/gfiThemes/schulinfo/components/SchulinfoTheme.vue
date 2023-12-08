@@ -88,7 +88,7 @@ export default {
                     if (value !== undefined) {
                         filteredAttributes.push({
                             attributeName: feature.getAttributesToShow()[attribute],
-                            attributeValue: this.beautifyAttribute(value)
+                            attributeValue: this.beautifyAttribute(String(value))
                         });
                     }
                 });
