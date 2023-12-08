@@ -85,7 +85,7 @@ describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
             [
                 {
                     attributeName: attrToShow.schwerpunktschule,
-                    attributeValue: ["additional:modules.tools.gfi.themes.schulinfo.no"]
+                    attributeValue: ["additional:modules.getFeatureInfo.themes.schulinfo.no"]
                 },
                 {
                     attributeName: attrToShow.adresse_strasse_hausnr,
@@ -98,7 +98,7 @@ describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
         expect(result[1].attributes).to.deep.equal([
             {
                 attributeName: attrToShow.kantine_vorh,
-                attributeValue: ["additional:modules.tools.gfi.themes.schulinfo.yes"]
+                attributeValue: ["additional:modules.getFeatureInfo.themes.schulinfo.yes"]
             }]
         );
     });
@@ -124,7 +124,7 @@ describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
         expect(wrapper.findAll("tr").length).equals(1);
         expect(wrapper.findAll("td").length).equals(2);
         expect(wrapper.findAll("td")[0].text()).equals("");
-        expect(wrapper.findAll("td")[1].text()).equals("additional:modules.tools.gfi.themes.schulinfo.yes");
+        expect(wrapper.findAll("td")[1].text()).equals("additional:modules.getFeatureInfo.themes.schulinfo.yes");
     });
 
     it("should set the selected category to true and all other to false", () => {
@@ -144,7 +144,7 @@ describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
     });
 
     it("should render the table for the first topic", () => {
-        const resultValues = ["Exampleweg", "99999 Neverland", "example Bezirk", "example@schulmail.com", "+49 40 123456789", "https://example.de", "additional:modules.tools.gfi.themes.schulinfo.yes"],
+        const resultValues = ["Exampleweg", "99999 Neverland", "example Bezirk", "example@schulmail.com", "+49 40 123456789", "https://example.de", "additional:modules.getFeatureInfo.themes.schulinfo.yes"],
             tdText = wrapper.findAll("td").map(td => td.text());
 
         expect(wrapper.vm.selectedPropertyAttributes.length).equals(7);

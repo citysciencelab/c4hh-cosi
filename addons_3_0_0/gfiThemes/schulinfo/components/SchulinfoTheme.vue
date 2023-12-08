@@ -113,10 +113,10 @@ export default {
                 return attributeValue.split("|");
             }
             if (attributeValue === "true" || attributeValue === "ja") {
-                return [this.$t("additional:modules.tools.gfi.themes.schulinfo.yes")];
+                return [this.$t("additional:modules.getFeatureInfo.themes.schulinfo.yes")];
             }
             if (attributeValue === "false" || attributeValue === "nein") {
-                return [this.$t("additional:modules.tools.gfi.themes.schulinfo.no")];
+                return [this.$t("additional:modules.getFeatureInfo.themes.schulinfo.no")];
             }
             return [attributeValue];
         },

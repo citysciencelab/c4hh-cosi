@@ -1,17 +1,15 @@
 {
-    "modules": {
-        "tools": {
-            "gfi": {
-                "themes":{
-                    "schulinfo": {
-                        "no": "Nein",
-                        "yes": "Ja",
-                        "favoriteicons": {
-                          "adoptedTargetSchool": "Schule als Ziel übernehmen"
-                        }
-                      }
-                }
-            }
+  "modules": {
+    "getFeatureInfo": {
+      "themes": {
+        "schulinfo": {
+          "no": "Nein",
+          "yes": "Ja",
+          "favoriteicons": {
+            "adoptedTargetSchool": "Schule als Ziel übernehmen"
+          }
         }
+      }
     }
+  }
 }
