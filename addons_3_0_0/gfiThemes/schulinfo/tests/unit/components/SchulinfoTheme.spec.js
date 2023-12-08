@@ -6,7 +6,7 @@ import ThemeConfig from "../../../themeConfig.json";
 
 config.global.mocks.$t = key => key;
 
-describe.skip("addons/schulinfo/components/SchulinfoTheme.vue", () => {
+describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
     const properties = {
         "abschluss": "Allgemeine Hochschulreife|erster allgemeinbildender Schulabschluss|Erweiterter erster allgemeinbildender Schulabschluss|mittlerer Schulabschluss|schulischer Teil der Fachhochschulreife",
         "adresse_ort": "99999 Neverland",
@@ -54,7 +54,7 @@ describe.skip("addons/schulinfo/components/SchulinfoTheme.vue", () => {
         const topics = ThemeConfig.themen.map(topic => topic.name);
 
         expect(wrapper.findAll("button").length).to.equal(7);
-        wrapper.findAll("button").wrappers.forEach(button => {
+        wrapper.findAll("button").forEach(button => {
             expect(topics.includes(button.text())).to.be.true;
         });
     });
@@ -103,8 +103,8 @@ describe.skip("addons/schulinfo/components/SchulinfoTheme.vue", () => {
         expect(wrapper.vm.selectedPropertyAttributes.length).equals(1);
         expect(wrapper.findAll("tr").length).equals(1);
         expect(wrapper.findAll("td").length).equals(2);
-        expect(wrapper.findAll("td").wrappers[0].text()).equals("");
-        expect(wrapper.findAll("td").wrappers[1].text()).equals("Humans and their environment (bilingual);In diesem bilingualen Profil");
+        expect(wrapper.findAll("td")[0].text()).equals("");
+        expect(wrapper.findAll("td")[1].text()).equals("Humans and their environment (bilingual);In diesem bilingualen Profil");
     });
 
     it("should switch the active tab to Mittagsversorgung, if the button is clicked", async () => {
@@ -115,8 +115,8 @@ describe.skip("addons/schulinfo/components/SchulinfoTheme.vue", () => {
         expect(wrapper.vm.selectedPropertyAttributes.length).equals(1);
         expect(wrapper.findAll("tr").length).equals(1);
         expect(wrapper.findAll("td").length).equals(2);
-        expect(wrapper.findAll("td").wrappers[0].text()).equals("");
-        expect(wrapper.findAll("td").wrappers[1].text()).equals("additional:modules.tools.gfi.themes.schulinfo.yes");
+        expect(wrapper.findAll("td")[0].text()).equals("");
+        expect(wrapper.findAll("td")[1].text()).equals("additional:modules.tools.gfi.themes.schulinfo.yes");
     });
 
     it("should set the selected category to true and all other to false", () => {
@@ -137,7 +137,7 @@ describe.skip("addons/schulinfo/components/SchulinfoTheme.vue", () => {
 
     it("should render the table for the first topic", () => {
         const resultValues = ["Exampleweg", "99999 Neverland", "example Bezirk", "example@schulmail.com", "+49 40 123456789", "https://example.de", "additional:modules.tools.gfi.themes.schulinfo.yes"],
-            tdText = wrapper.findAll("td").wrappers.map(td => td.text());
+            tdText = wrapper.findAll("td").map(td => td.text());
 
         expect(wrapper.vm.selectedPropertyAttributes.length).equals(7);
         expect(wrapper.findAll("tr").length).equals(7);
@@ -149,7 +149,7 @@ describe.skip("addons/schulinfo/components/SchulinfoTheme.vue", () => {
     });
 
     it("should render all properties as phone number if the property starts with '+[xx]' (x = any Number)", () => {
-        wrapper.findAll("a[href^=tel]").wrappers.forEach(a => {
+        wrapper.findAll("a[href^=tel]").forEach(a => {
             expect(a.attributes("href")).to.have.string("tel:");
         });
     });
