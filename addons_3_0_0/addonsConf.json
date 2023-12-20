@@ -3,6 +3,10 @@
     "type": "searchInterface",
     "path": "searchInterfaces/exampleSearch"
   },
+  "gfiOnAddressGaz": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/gfiOnAddressGaz"
+  },
   "populationRequest": {
     "type": "tool"
   },
