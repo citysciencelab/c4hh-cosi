@@ -60,5 +60,8 @@
   "parcelinfo": {
     "path":"gfiThemes/parcelinfo",
     "type": "gfiTheme"
+  },
+  "valuationPrint": {
+    "type": "tool"
   }
 }

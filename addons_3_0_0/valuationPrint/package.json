@@ -1,0 +1,15 @@
+{
+  "name": "valuation-print",
+  "version": "1.0.0",
+  "description": "Wertermittlung",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "@turf/buffer": "^6.5.0",
+    "@turf/union": "^6.5.0"
+  }
+}

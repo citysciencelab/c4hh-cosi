@@ -1,0 +1,33 @@
+{
+  "modules": {
+    "valuationPrint": {
+      "title": "Wertermittlung",
+      "removeButton": "Entfernen",
+      "startButton": "Starten",
+      "parcel": "Flurstück:",
+      "district": "Gemarkung:",
+      "messageListTitle": "Statusverlauf",
+      "parcelListTitle": "Ausgewählte Flurstücke",
+      "urlListTitle": "Download-Links",
+      "pdfInTheMaking": "PDF wird erstellt.",
+      "pleaseWait": "Bitte warten ...",
+      "pdfError": "Fehler beim Erzeugen der PDF.",
+      "pdfSuccess": "PDF wurde erstellt.",
+      "report": "WANDA Bericht",
+      "imageInTheMaking": "{{imageName}} wird erstellt.",
+      "imageSuccess": "{{imageName}} wurde erstellt.",
+      "imageError": "Fehler beim Erzeugen vom {{imageName}}.",
+      "downloadAll": "Alle Herunterladen",
+      "cancel": "Abbrechen",
+      "number": "Geschäfszeichen:",
+      "address": "Adresse:",
+      "modalTitle": "Anlagen zum A1 Karten Anlagenverzeichnis",
+      "specificationReport": "A1 Karten Anlagenverzeichnis",
+      "placeholder": "Bitte auswählen",
+      "formError": {
+        "missingDocumentName": "Bitte Dokumentnamen eingeben.",
+        "missingAddress": "Bitte eine Adresse auswählen oder eingeben."
+      }
+    }
+  }
+}
