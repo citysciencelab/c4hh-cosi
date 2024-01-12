@@ -45,6 +45,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         },
         store = createStore({
             modules: {
+                namespaces: true,
                 Maps: {
                     namespaced: true,
                     actions: mockMapActions,
@@ -62,7 +63,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             }
         }),
         factory = {
-            getShallowMount: (values = {}, isActive = false) => {
+            getShallowMount: (values = {}, isLayerConfigured = true) => {
                 return shallowMount(ValuationPrint, {
                     global: {
                         plugins: [store],
@@ -76,18 +77,18 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         };
                     },
                     computed: {
-                        active: () => isActive,
                         name: () => "Hallo",
                         icon: () => "small",
                         renderToWindow: () => false,
-                        resizableWindow: () => false
+                        resizableWindow: () => false,
+                        layerConfigById: () => () => isLayerConfigured
                     },
                     slots: {
                         footer: "<div>Footer</div>"
                     }
                 });
             },
-            getMount: (values = {}, isActive = false) => {
+            getMount: (values = {}, isLayerConfigured = true) => {
                 return mount(ValuationPrint, {
                     global: {
                         plugins: [store]
@@ -98,11 +99,11 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         };
                     },
                     computed: {
-                        active: () => isActive,
                         name: () => "Hallo",
                         icon: () => "small",
                         renderToWindow: () => false,
-                        resizableWindow: () => false
+                        resizableWindow: () => false,
+                        layerConfigById: () => () => isLayerConfigured
                     }
                 });
             }
@@ -133,7 +134,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should find one list per feature", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.select.getFeatures().push(features[1]);
@@ -143,7 +144,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should render the feature properties correctly", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             await wrapper.vm.$forceUpdate();
@@ -155,7 +156,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should find one remove button per feature", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.select.getFeatures().push(features[1]);
@@ -167,7 +168,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should find one start button per feature and one for the merged feature", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.select.getFeatures().push(features[1]);
@@ -177,7 +178,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should find one start buttons if only one feature is available", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             await wrapper.vm.$forceUpdate();
@@ -186,7 +187,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should not add an error class to the list entry if no error is added", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.addMessage("message", false);
@@ -195,7 +196,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             expect(wrapper.find(".messageListError").exists()).to.be.false;
         });
         it("should add an error class to the list entry if an error is added", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.addMessage("message", true);
@@ -205,14 +206,14 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should not show any message if no message is added", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             expect(wrapper.find(".messageListError").exists()).to.be.false;
             expect(wrapper.find(".messageListEntry").exists()).to.be.false;
         });
 
         it("should add an url to the list entry if an url is added", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             wrapper.vm.addUrl({url: "url", name: "name"});
             await wrapper.vm.$forceUpdate();
@@ -221,14 +222,14 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should not show any url if no url is added", async () => {
-            const wrapper = factory.getShallowMount({}, true);
+            const wrapper = factory.getShallowMount({});
 
             expect(wrapper.find(".urlListEntry").exists()).to.be.false;
         });
 
         describe("modal", () => {
             it("should render", () => {
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 wrapper.vm.showModal = true;
                 expect(wrapper.findAllComponents(ModalItem).length).to.be.equals(1);
@@ -239,7 +240,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
     describe("User Interactions", () => {
         it("should call 'removeFeature' if user click the remove button", async () => {
             const spyRemoveFeature = sinon.spy(ValuationPrint.methods, "removeFeature"),
-                wrapper = factory.getShallowMount({}, true);
+                wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.select.getFeatures().push(features[1]);
@@ -253,7 +254,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
         it("should call 'getAddress' if user click the start button in list", async () => {
             const spyGetAddress = sinon.stub(ValuationPrint.methods, "getAddress"),
-                wrapper = factory.getShallowMount({}, true);
+                wrapper = factory.getShallowMount({});
 
             await wrapper.setData({selectedFeatures: [features[0]]});
             await wrapper.findAll(".valuation-print button").forEach(button => {
@@ -269,7 +270,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
         it("should call 'setParcelData' if user click the start button in print modal", async () => {
             const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
-                wrapper = factory.getMount({}, true);
+                wrapper = factory.getMount({});
 
             wrapper.vm.showModal = true;
             wrapper.findAllComponents(ModalItem).at(0).findAll(".confirm-print").forEach(button => {
@@ -285,7 +286,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
         it("should call 'showPrintModal' if user click the cancel button in print modal", async () => {
             const spyShowPrintModal = sinon.spy(ValuationPrint.methods, "showPrintModal"),
-                wrapper = factory.getMount({}, true);
+                wrapper = factory.getMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.select.getFeatures().push(features[1]);
@@ -322,6 +323,17 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             });
         });
 
+        describe("Created", () => {
+            it("should call setSelectInteraction if the component is created", () => {
+                const spySetSelectInteraction = sinon.spy(ValuationPrint.methods, "setSelectInteraction");
+
+                factory.getShallowMount({});
+
+                expect(spySetSelectInteraction.calledOnce).to.be.true;
+
+                spySetSelectInteraction.restore();
+            });
+        });
     });
 
     describe("Methods", () => {
@@ -354,7 +366,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
         describe("removeFeature", () => {
             it("should remove a feature from the select interaction", () => {
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 wrapper.vm.select.getFeatures().push(features[0]);
                 wrapper.vm.select.getFeatures().push(features[1]);
@@ -363,7 +375,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                 expect(wrapper.vm.select.getFeatures().getArray()).to.be.lengthOf(1);
             });
             it("should only remove data from type ol/Feature", () => {
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 wrapper.vm.select.getFeatures().push(features[0]);
                 wrapper.vm.select.getFeatures().push(features[1]);
@@ -381,7 +393,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         describe("setParcelData", () => {
             it("should set the parcelData object", () => {
                 sinon.stub(ValuationPrint.methods, "formValidation").returns(true);
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 wrapper.vm.setParcelData([features[0]]);
 
@@ -389,7 +401,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                 sinon.restore();
             });
             it("should not set the parcelData object", () => {
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 wrapper.vm.setParcelData(122);
                 wrapper.vm.setParcelData({});
@@ -402,7 +414,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             });
             it("should reset the message list", () => {
                 sinon.stub(ValuationPrint.methods, "formValidation").returns(true);
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 wrapper.vm.addMessage("message");
                 wrapper.vm.setParcelData([features[0]]);
@@ -414,7 +426,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
         describe("setSelectInteraction", () => {
             it("should set openlayers select interaction", () => {
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 expect(wrapper.vm.select).to.be.exists;
                 expect(wrapper.vm.select instanceof Select).to.be.true;
@@ -432,18 +444,18 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
         describe("addMessage", () => {
             it("should initialize with an empty message list", () => {
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 expect(wrapper.vm.messageList).to.be.an("array").that.is.empty;
             });
             it("should add a message to the messageList", () => {
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 wrapper.vm.addMessage("message");
                 expect(wrapper.vm.messageList).to.deep.equal([{message: "message", isError: false}]);
             });
             it("should add a message flaged as error to the messageList", () => {
-                const wrapper = factory.getShallowMount({}, true);
+                const wrapper = factory.getShallowMount({});
 
                 wrapper.vm.addMessage("message", true);
                 expect(wrapper.vm.messageList).to.deep.equal([{message: "message", isError: true}]);

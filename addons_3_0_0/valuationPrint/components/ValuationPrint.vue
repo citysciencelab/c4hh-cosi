@@ -18,6 +18,8 @@ import dayjs from "dayjs";
 import {upperFirst} from "../../../../src_3_0_0/shared/js/utils/changeCase";
 import {collectFeatures} from "../js/collectFeatures";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import layerCollection from "../../../../src_3_0_0/core/layers/js/layerCollection";
+import layerFactory from "../../../../src_3_0_0/core/layers/js/layerFactory";
 
 export default {
     name: "ValuationPrint",
@@ -46,8 +48,8 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/ValuationPrint", Object.keys(getters)),
-        ...mapGetters("Maps", ["projection"]),
-        ...mapGetters(["restServiceById"])
+        ...mapGetters("Maps", ["projection", "getResolutionByScale"]),
+        ...mapGetters(["restServiceById", "layerConfigById"])
     },
     watch: {
         /**
@@ -144,16 +146,42 @@ export default {
         this.setConfig();
         this.setSelectInteraction();
     },
+
     mounted () {
+        if (!this.layerConfigById(this.parcelLayerId)) {
+            this.createParcelLayer(this.parcelLayerId);
+        }
+
         this.select.setActive(true);
         this.select.getFeatures().on("change:length", (evt) => {
             this.selectedFeatures = [...evt.target.getArray()];
         });
     },
+    unmounted () {
+        if (!this.layerConfigById(this.parcelLayerId)) {
+            layerCollection.removeLayerById(this.parcelLayerId);
+        }
+    },
+
     methods: {
         ...mapMutations("Modules/ValuationPrint", Object.keys(mutations)),
         ...mapActions("Maps", ["addInteraction"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
+
+        /**
+         * Creates and adds parcel layer if it is not configured.
+         * For performance reasons a max resolution is set to the layer.
+         * @param {String} layerId - The id for the parcel layer.
+         * @param {Number} scale - The scale for the max resolution of the layer.
+         * @returns {void}
+         */
+        createParcelLayer (layerId, scale = 2500) {
+            const layer = layerFactory.createLayer(rawLayerList.getLayerWhere({id: layerId})),
+                resoByMaxScale = this.getResolutionByScale(scale, "max");
+
+            layer.getLayer().setMaxResolution(resoByMaxScale + (resoByMaxScale / 100));
+            layerCollection.addLayer(layer);
+        },
 
         /**
          * Removes the passed feature from the collection where the select interaction will place the selected features.
