@@ -5,6 +5,7 @@ import {intersects, within} from "ol/format/filter";
 import Point from "ol/geom/Point";
 import {WFS} from "ol/format";
 import isObject from "../../../../src_3_0_0/shared/js/utils/isObject";
+import getOAFFeature from "../../../../src_3_0_0/shared/js/api/oaf/getOAFFeature";
 
 /**
  * Creates a feature with the given coordinate or requests features via a service.
@@ -20,43 +21,60 @@ import isObject from "../../../../src_3_0_0/shared/js/utils/isObject";
  * @param {String} [config.geometryName] - The geometry name of the feature. Only used if no coordinate is specified.
  * @param {String[]} [config.propertyName] - Attributes that are requested. Only used if no coordinate is specified.
  * @param {Number} [config.radius] - A optional radius to set a buffer around the parcel geometry.
- * @param {String} mapProjection - The EPSG-Code of the current map projection.
+ * @param {Object} projection - An Object with the map projection and the OAF CRS URI aswell.
+ * @param {String} projection.mapProjection - The EPSG-Code of the current map projection.
+ * @param {String} projection.oafCRSURI - The OAF CRS URI - only needed for oaf services.
  * @param {Object} [service] - The service to use for the request. Only used if no coordinate is specified.
  * @param {Function} onsuccess - Is called on success.
  * @param {Function} onerror - Is called on error.
  * @returns {void}
  */
-export function collectFeatures (parcel, config, mapProjection, service, onsuccess, onerror) {
+export async function collectFeatures (parcel, config, {mapProjection, oafCRSURI}, service, onsuccess, onerror) {
     if (config.coordinate) {
         const feature = createFeatureByCoordinate(config.coordinate);
 
         onsuccess([feature]);
+        return;
     }
-    else if (config.filter === "equalTo") {
+    if (config.filter === "equalTo") {
         onsuccess(parcel.featureList);
+        return;
     }
-    else {
-        const payload = {
-            featureNS: service.featureNS,
-            featureTypes: [service.featureType],
-            filter: getFilter(parcel.geometry, config.geometryName, config.filter, config.radius),
-            srsName: mapProjection,
-            propertyNames: getPropertyNames(config.propertyName, config.geometryName, config.precompiler)
-        };
+    if (service.typ === "OAF") {
+        const filter = getOAFGeometryFilter(parcel.geometry, config.geometryName, config.filter, config.radius);
 
-        wfsGetFeaturePOST(service.url, payload, onerror).then(response => {
-            if (response) {
-                const parserWFS = new WFS(),
-                    features = parserWFS.readFeatures(response);
-
-                onsuccess(features);
-            }
-        }).catch(error => {
-            if (typeof onerror === "function") {
+        getOAFFeature.getOAFFeatureGet(service.url, service.collection, 10000, filter, oafCRSURI)
+            .then(plainOAFFeatures => {
+                if (Array.isArray(plainOAFFeatures)) {
+                    onsuccess(getOAFFeature.readAllOAFToGeoJSON(plainOAFFeatures, {
+                        featureProjection: mapProjection
+                    }));
+                }
+            }).catch(error => {
                 onerror(error);
-            }
-        });
+            });
+        return;
     }
+    const payload = {
+        featureNS: service.featureNS,
+        featureTypes: [service.featureType],
+        filter: getFilter(parcel.geometry, config.geometryName, config.filter, config.radius),
+        srsName: mapProjection,
+        propertyNames: getPropertyNames(config.propertyName, config.geometryName, config.precompiler)
+    };
+
+    wfsGetFeaturePOST(service.url, payload, onerror).then(response => {
+        if (response) {
+            const parserWFS = new WFS(),
+                features = parserWFS.readFeatures(response);
+
+            onsuccess(features);
+        }
+    }).catch(error => {
+        if (typeof onerror === "function") {
+            onerror(error);
+        }
+    });
 }
 
 /**
@@ -89,6 +107,33 @@ export function getFilter (geometry, geometryName, filterType, radius) {
         return intersects(geometryName, usedGeometry);
     }
     return within(geometryName, usedGeometry);
+}
+
+/**
+ * Gets an oaf geometry filter.
+ * @param {ol/geom/Geometry} geometry - The Geometry.
+ * @param {String} geometryName - The geometry-valued property.
+ * @param {String} filterType - Possible types are intersects | within.
+ * @param {Number|undefined} radius - The radius for the buffer.
+ * @returns {String|undefined} a string which represents the oaf geometry filter.
+ */
+export function getOAFGeometryFilter (geometry, geometryName, filterType, radius) {
+    if (!filterType) {
+        return undefined;
+    }
+
+    const usedGeometry = radius ? bufferGeometry(geometry, radius) : geometry,
+        flattenCoordinates = Array.isArray(usedGeometry?.flatCoordinates) && usedGeometry?.flatCoordinates[2] === 0 ? usedGeometry.flatCoordinates.filter((coordinate, index) => (index + 1) % 3) : usedGeometry.flatCoordinates,
+        result = [],
+        operation = filterType === "intersects" ? "S_INTERSECTS" : "S_WITHIN";
+
+    for (let i = 0; i < flattenCoordinates.length; i += 2) {
+        const chunk = flattenCoordinates.slice(i, i + 2);
+
+        result.push(chunk.join(" "));
+    }
+
+    return `${operation}(${geometryName}, POLYGON((${result.join(", ")})))`;
 }
 
 /**

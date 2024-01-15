@@ -74,7 +74,7 @@ export default {
                 return;
             }
 
-            createKnowledgeBase(parcel, this.config.services, this.projection.getCode(), message => {
+            createKnowledgeBase(parcel, this.config.services, {mapProjection: this.projection.getCode(), oafCRSURI: this.oafCRSURI}, message => {
                 this.setShowDownloadAll(false);
                 this.addMessage(message, false);
             }, knowledgeBase => {
@@ -355,7 +355,7 @@ export default {
          * @param {ol/Feature[]} featureList - the selected feature(s) for the print window
          * @returns {void}
          */
-        getAddress (val, featureList) {
+        async getAddress (val, featureList) {
             const feature = featureList.length > 1 ? unionFeatures(featureList) : featureList[0],
                 config = this.config?.services?.hh_wfs_dog;
 
@@ -363,12 +363,12 @@ export default {
                 this.setParcelData(featureList);
                 return;
             }
-            collectFeatures(
+            await collectFeatures(
                 {
                     geometry: feature.getGeometry()
                 },
                 config,
-                this.projection.getCode(),
+                {mapProjection: this.projection.getCode(), oafCRSURI: this.oafCRSURI},
                 rawLayerList.getLayerWhere({id: config?.layerId}),
                 features => {
                     const addr = [];

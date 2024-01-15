@@ -12,6 +12,7 @@ Tool to support the valuation of land on the basis of parcels.
 |showParcelSearch|no|Boolean|false|If true, WfsSearch is rendered, otherwise the valuation.|false|
 |isModalRequired|no|Boolean|true|Whether or not a modal is displayed asking for reference number and specific address before starting report generation.|false|
 |reportPath|no|String|"config.valuation.json"|File name/path for configuration of the report.|false|
+|oafCRSURI|no|Boolean|false|The CRS URI for the OAF service requests. If any OAF service is configured this parameter must be set to a valid CRS.|false|
 
 
 **Example**
@@ -25,7 +26,8 @@ Tool to support the valuation of land on the basis of parcels.
         "multiSelectParcels": true,
         "showParcelSearch": true,
         "isModalRequired": false,
-        "reportPath": "config.valuation.json"
+        "reportPath": "config.valuation.json",
+        "oafCRSURI": "http://www.opengis.net/def/crs/EPSG/0/25832"
     },
 ```
 

@@ -13,7 +13,9 @@ import sumNumbers from "./precompiler.sumNumbers.js";
  * @param {ol/Feature} parcel.feature - The ol feature of the parcel.
  * @param {ol/geom/Polygon} parcelData.geometry - The geometry of the parcel.
  * @param {Object} services - The services config for the valuation.
- * @param {String} mapProjection - The EPSG-Code of the current map projection.
+ * @param {Object} projection - An Object with the map projection and the OAF CRS URI aswell.
+ * @param {String} projection.mapProjection - The EPSG-Code of the current map projection.
+ * @param {String} projection.oafCRSURI - The OAF CRS URI - only needed for oaf services.
  * @param {Function} onstart - A function that is called when the knowledge base creation starts.
  * @param {Function} onfinish - A function that is called when the knowledge base is created.
  * @param {Function} onUserError - Error function.
@@ -22,9 +24,10 @@ import sumNumbers from "./precompiler.sumNumbers.js";
  * @param {Number} [idx=0] - The index.
  * @returns {void}
  */
-export function createKnowledgeBase (parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase = {}, idx = 0) {
+export function createKnowledgeBase (parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase = {}, idx = 0) {
     const prefix = Object.keys(services)[idx],
-        config = services[prefix];
+        config = services[prefix],
+        layer = rawLayerList.getLayerWhere({id: config?.layerId});
 
     if (typeof config === "undefined") {
         onfinish(knowledgeBase);
@@ -35,7 +38,7 @@ export function createKnowledgeBase (parcelData, services, mapProjection, onstar
         onstart(config?.onstart);
     }
 
-    collectFeatures(parcelData, config, mapProjection, rawLayerList.getLayerWhere({id: config.layerId}), features => {
+    collectFeatures(parcelData, config, {mapProjection, oafCRSURI}, layer, features => {
         if (features.length === 0) {
             if (config?.precompiler?.type === "assignAttributes") {
                 knowledgeBase[prefix] = undefined;
@@ -45,7 +48,7 @@ export function createKnowledgeBase (parcelData, services, mapProjection, onstar
                     knowledgeBase[prefix + "." + attributeKey] = undefined;
                 });
             }
-            createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+            createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
         }
         else if (config?.precompiler?.type === "allFeaturesByDuration") {
             allFeaturesByDuration(
@@ -60,12 +63,12 @@ export function createKnowledgeBase (parcelData, services, mapProjection, onstar
                     Object.entries(attributes).forEach(([attributeKey, attributeValue]) => {
                         knowledgeBase[prefix + "." + attributeKey] = attributeValue;
                     });
-                    createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+                    createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
                 }, error => {
                     onDevError(error);
                     onUserError(config.onerror);
                     addKnowledgeBaseError(knowledgeBase, error, prefix, Array.isArray(config.propertyName) ? config.propertyName.concat(config.precompiler.key) : [config.precompiler.key]);
-                    createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+                    createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
                 }
             );
         }
@@ -74,12 +77,12 @@ export function createKnowledgeBase (parcelData, services, mapProjection, onstar
                 Object.entries(attributes).forEach(([attributeKey, attributeValue]) => {
                     knowledgeBase[prefix + "." + attributeKey] = attributeValue;
                 });
-                createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+                createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
             }, error => {
                 onDevError(error);
                 onUserError(config.onerror);
                 addKnowledgeBaseError(knowledgeBase, error, prefix, Array.isArray(config.propertyName) ? config.propertyName.concat(config.precompiler.key) : [config.precompiler.key]);
-                createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+                createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
             });
         }
         else if (config?.precompiler?.type === "nextFeatureByDistance") {
@@ -87,12 +90,12 @@ export function createKnowledgeBase (parcelData, services, mapProjection, onstar
                 Object.entries(attributes).forEach(([attributeKey, attributeValue]) => {
                     knowledgeBase[prefix + "." + attributeKey] = attributeValue;
                 });
-                createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+                createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
             }, error => {
                 onDevError(error);
                 onUserError(config.onerror);
                 addKnowledgeBaseError(knowledgeBase, error, prefix, Array.isArray(config.propertyName) ? config.propertyName.concat(config.precompiler.key) : [config.precompiler.key]);
-                createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+                createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
             });
         }
         else if (config?.precompiler?.type === "sumNumbers") {
@@ -100,36 +103,39 @@ export function createKnowledgeBase (parcelData, services, mapProjection, onstar
                 Object.entries(attributes).forEach(([attributeKey, attributeValue]) => {
                     knowledgeBase[prefix + "." + attributeKey] = attributeValue;
                 });
-                createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+                createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
             }, error=> {
                 onDevError(error);
                 onUserError(config.onerror);
                 addKnowledgeBaseError(knowledgeBase, error, prefix, Array.isArray(config.propertyName) ? config.propertyName.concat(config.precompiler.key) : [config.precompiler.key]);
-                createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+                createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
             });
         }
         else if (config?.precompiler?.type === "assignAttributes") {
             const attributes = [];
 
             features.forEach(feature => {
-                attributes.push(Object.assign(feature.getProperties(), config.precompiler.attributes));
+                const properties = Object.fromEntries(Object.entries(feature.getProperties()).filter(
+                    ([propertyKey]) => config.propertyName.includes(propertyKey)));
+
+                attributes.push(Object.assign(properties, config.precompiler.attributes));
             });
             knowledgeBase[prefix] = attributes;
-            createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+            createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
         }
         else {
-            const attributes = createAttributesByFeatures(features, config.propertyName);
+            const attributes = createAttributesByFeatures(features, config.propertyName, layer.typ, parcelData?.feature);
 
             Object.entries(attributes).forEach(([attributeKey, attributeValue]) => {
                 knowledgeBase[prefix + "." + attributeKey] = attributeValue;
             });
-            createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+            createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
         }
     }, error => {
         onDevError(error);
         onUserError(config?.onerror);
         addKnowledgeBaseError(knowledgeBase, error, prefix, config?.propertyName);
-        createKnowledgeBase(parcelData, services, mapProjection, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
+        createKnowledgeBase(parcelData, services, {mapProjection, oafCRSURI}, onstart, onfinish, onUserError, onDevError, knowledgeBase, idx + 1);
     });
 }
 

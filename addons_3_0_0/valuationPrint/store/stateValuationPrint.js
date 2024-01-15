@@ -13,6 +13,7 @@
  * @property {Boolean} showStatusProgress -If set to false, status progress ("Statusverlauf") is never renderend.
  * @property {Boolean} multiSelectParcels - If true, user can have more than one parcel selected at a time.
  * @property {Boolean} showParcelSearch - If true, WfsSearch is rendered.
+ * @property {Boolean} oafCRSURI - The URI for the oaf services. Needs to be set with a valid crs URI.
  * @property {String} reportPath - File name for configuration of the report.
  * @property {Object} selectedFeatures - The Selected Features.
  * @property {Object} messageList - List of messages for status progress.
@@ -27,6 +28,7 @@ const state = {
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D"],
     parcelLayerId: "",
+    oafCRSURI: undefined,
     // defaults for config.json parameters
     name: "additional:modules.valuationPrint.title",
     icon: "bi-bar-chart-line-fill",

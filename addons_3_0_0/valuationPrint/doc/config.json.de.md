@@ -12,6 +12,7 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
 |showParcelSearch|nein|Boolean|false|Wenn true, wird die Flurstückssuche angezeigt, ansonsten die Wertermittlung.|false|
 |isModalRequired|nein|Boolean|true|Ob vor dem Starten der Berichtserzeugung durch ein Modal Angaben zu Geschäftszeichen, Adresse etc. abgefragt werden sollen.|false|
 |reportPath|nein|String|"config.valuation.json"|Dateiname/Pfad zur Konfiguration des Berichts.|false|
+|oafCRSURI|no|Boolean|false|Die CRS-URL Definition für die OAF Serviceanfragen. Dieser Parameter muss mit einer validen CRS-URL gefüllt werden, sobald ein OAF Service konfiguriert ist.|false|
 
 
 **Beispiel**
@@ -25,7 +26,8 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
         "multiSelectParcels": true,
         "showParcelSearch": true,
         "isModalRequired": false,
-        "reportPath": "config.valuation.json"
+        "reportPath": "config.valuation.json",
+        "oafCRSURI": "http://www.opengis.net/def/crs/EPSG/0/25832"
     },
 ```
 
