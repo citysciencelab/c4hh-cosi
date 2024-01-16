@@ -253,6 +253,14 @@ export default {
             });
 
             this.select.on("change:active", this.styleSelectedFeatures);
+            this.select.on("select", event => {
+                if (this.multiSelectParcels === false) {
+                    if (this.selectedFeatures.length > 1) {
+                        this.select.getFeatures().clear();
+                        this.select.getFeatures().push(event.selected[0]);
+                    }
+                }
+            });
             this.addInteraction(this.select);
         },
         /**
@@ -654,7 +662,7 @@ export default {
                 <hr>
             </div>
             <div
-                v-if="messageList.length > 0"
+                v-if="messageList.length > 0 && showStatusProgress"
                 class="accordion accordion-flush mt-3"
             >
                 <div class="accordion-item">

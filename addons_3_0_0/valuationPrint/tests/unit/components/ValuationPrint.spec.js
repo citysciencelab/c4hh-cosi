@@ -64,7 +64,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             }
         }),
         factory = {
-            getShallowMount: (values = {}, isLayerConfigured = true) => {
+            getShallowMount: (values = {}, isLayerConfigured = true, isStatusProgressVisible = true) => {
                 return shallowMount(ValuationPrint, {
                     global: {
                         plugins: [store],
@@ -82,6 +82,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         icon: () => "small",
                         renderToWindow: () => false,
                         resizableWindow: () => false,
+                        showStatusProgress: () => isStatusProgressVisible,
                         layerConfigById: () => () => isLayerConfigured
                     },
                     slots: {
@@ -89,7 +90,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                     }
                 });
             },
-            getMount: (values = {}, isLayerConfigured = true) => {
+            getMount: (values = {}, isLayerConfigured = true, isStatusProgressVisible = true) => {
                 return mount(ValuationPrint, {
                     global: {
                         plugins: [store]
@@ -104,6 +105,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         icon: () => "small",
                         renderToWindow: () => false,
                         resizableWindow: () => false,
+                        showStatusProgress: () => isStatusProgressVisible,
                         layerConfigById: () => () => isLayerConfigured
                     }
                 });
@@ -185,7 +187,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             expect(wrapper.find(".messageListError").exists()).to.be.false;
         });
-        it("should add an error class to the list entry if an error is added", async () => {
+        it("should add an error class to the list entry if an error is added and status progress is configured to be shown", async () => {
             const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
@@ -224,6 +226,46 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                 wrapper.vm.showModal = true;
                 expect(wrapper.findAllComponents(ModalItem).length).to.be.equals(1);
             });
+        });
+
+        describe("configuration of status progress", () => {
+            it("should render status progress if configured to be shown", async () => {
+                const wrapper = factory.getShallowMount({}, true, true);
+
+                wrapper.vm.addMessage("message");
+                await wrapper.vm.$forceUpdate();
+
+                expect(wrapper.find(".messageListEntry").exists()).to.be.true;
+            });
+
+            it("should not render status progress if configured not to be shown", async () => {
+                const wrapper = factory.getShallowMount({}, true, false);
+
+                wrapper.vm.addMessage("message");
+                await wrapper.vm.$forceUpdate();
+
+                expect(wrapper.find(".messageListEntry").exists()).to.be.false;
+            });
+        });
+    });
+
+    describe("User Interactions", () => {
+        it("should have only one selected layer if user has clicked on two and multiSelect is configured to be false", async () => {
+            const wrapper = factory.getMount({}, true);
+
+            wrapper.vm.multiSelectParcels = false;
+            wrapper.vm.select.getFeatures().push(features[0]);
+            wrapper.vm.select.dispatchEvent({
+                type: "select",
+                selected: [features[0]]
+            });
+            wrapper.vm.select.getFeatures().push(features[1]);
+            wrapper.vm.select.dispatchEvent({
+                type: "select",
+                selected: [features[1]]
+            });
+
+            expect(wrapper.vm.selectedFeatures).to.have.lengthOf(1);
         });
     });
 
