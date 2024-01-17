@@ -20,11 +20,15 @@ import {collectFeatures} from "../js/collectFeatures";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 import layerCollection from "../../../../src_3_0_0/core/layers/js/layerCollection";
 import layerFactory from "../../../../src_3_0_0/core/layers/js/layerFactory";
+import IconButton from "../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
+import FlatButton from "../../../../src_3_0_0/shared/modules/buttons/components/FlatButton.vue";
 
 export default {
     name: "ValuationPrint",
     components: {
-        ModalItem
+        ModalItem,
+        IconButton,
+        FlatButton
     },
     data () {
         return {
@@ -43,7 +47,8 @@ export default {
             },
             specificAddress: "",
             documentNumber: "",
-            autofill: false
+            autofill: false,
+            parcelModule: "wanda"
         };
     },
     computed: {
@@ -561,230 +566,281 @@ export default {
     >
         <div>
             <div
-                v-if="true"
-                class="card"
+                v-if="parcelModule === 'wanda'"
+                class="parcel-report"
             >
-                <div class="card-header">
+                <h6 class="selected-parcels">
                     {{ $t('additional:modules.valuationPrint.parcelListTitle') }}
-                </div>
-                <div class="card-body">
-                    <div class="card-text">
+                </h6>
+                <div class="parcels">
+                    <div class="parcels-text">
                         <div
                             v-for="feature in selectedFeatures"
                             :key="feature.get('flstnrzae')"
                         >
-                            <ul class="list-inline">
-                                <li class="list-inline-item">
-                                    {{ $t('additional:modules.valuationPrint.parcel') }}
-                                </li>
-                                <li class="list-inline-item">
-                                    {{ feature.get("flstnrzae") }}
-                                </li>
-                                <li class="list-inline-item">
-                                    {{ $t('additional:modules.valuationPrint.district') }}
-                                </li>
-                                <li class="list-inline-item">
-                                    {{ feature.get("gemarkung") }}
+                            <ul class="list-group">
+                                <li class="list-group-item container">
+                                    <div
+                                        class="row justify-content-start"
+                                    >
+                                        <input
+                                            class="form-check-input col col-md-1 align-self-center"
+                                            type="checkbox"
+                                            value=""
+                                            aria-label="..."
+                                        >
+                                        <div class="parcel col col-md-5 text-center">
+                                            <div class="parcel-label">
+                                                {{ $t('additional:modules.valuationPrint.parcel') }}
+                                            </div>
+                                            <div class="list-item">
+                                                {{ feature.get("flstnrzae") }}
+                                            </div>
+                                        </div>
+                                        <div class="parcel col col-md-5 text-center">
+                                            <div class="parcel-label">
+                                                {{ $t('additional:modules.valuationPrint.district') }}
+                                            </div>
+                                            <div class="list-item">
+                                                {{ feature.get("gemarkung") }}
+                                            </div>
+                                        </div>
+                                        <IconButton
+                                            :aria="$t('additional:modules.valuationPrint.removeButton')"
+                                            :icon="'bi-trash'"
+                                            :interaction="() => removeFeature(feature)"
+                                            class="remove btn-sm col col-md-1"
+                                        />
+                                    </div>
                                 </li>
                             </ul>
-                            <div>
-                                <button
-                                    type="button"
-                                    class="confirm btn btn-primary btn-sm start-button"
-                                    @click="getAddress(true, [feature])"
-                                >
-                                    {{ $t('additional:modules.valuationPrint.startButton') }}
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-primary btn-sm"
-                                    @click="removeFeature(feature)"
-                                >
-                                    {{ $t('additional:modules.valuationPrint.removeButton') }}
-                                </button>
-                            </div>
                             <hr v-if="selectedFeatures.length > 1">
                         </div>
-                        <template v-if="selectedFeatures.length > 1">
-                            <button
-                                type="button"
-                                class="btn btn-primary btn-sm start-button"
-                                @click="getAddress(true, select.getFeatures().getArray())"
-                            >
-                                {{ $t('additional:modules.valuationPrint.startButton') }}
-                            </button>
+                        <template v-if="selectedFeatures.length > 0">
+                            <div class="d-flex justify-content-center pt-3">
+                                <FlatButton
+                                    id="start-valuation-print"
+                                    aria-label="$t('additional:modules.valuationPrint.startButton')"
+                                    type="button"
+                                    :text="$t('additional:modules.valuationPrint.startButton')"
+                                    :interaction="() => getAddress(true, select.getFeatures().getArray())"
+                                    icon="bi-play"
+                                />
+                            </div>
                         </template>
                     </div>
                 </div>
             </div>
             <div
-                v-if="messageList.length > 0"
-                class="card mt-3"
+                v-if="parcelModule === 'fis'"
+                class="parcel-report"
             >
-                <div class="card-header">
-                    {{ $t('additional:modules.valuationPrint.messageListTitle') }}
+                <h6 class="generate-report pt-3">
+                    {{ $t('additional:modules.valuationPrint.generateReport') }}
+                </h6>
+                <p class="infotext">
+                    {{ $t('additional:modules.valuationPrint.infoGenerateReport') }}
+                </p>
+                <div class="d-flex justify-content-center pt-3">
+                    <FlatButton
+                        id="start-fis"
+                        aria-label="$t('additional:modules.valuationPrint.startButton')"
+                        type="button"
+                        :text="$t('additional:modules.valuationPrint.startButton')"
+                        :interaction="() => getAddress(true, select.getFeatures().getArray())"
+                        icon="bi-play"
+                    />
                 </div>
-                <div class="card-body">
-                    <div class="card-text">
-                        <div
-                            v-for="(messageObj, idx) in messageList"
-                            :key="idx + '_' + messageObj.message"
-                            :class="messageObj.isError ? 'messageListError' : 'messageListEntry'"
+                <hr>
+            </div>
+            <div
+                v-if="messageList.length > 0"
+                class="accordion accordion-flush mt-3"
+            >
+                <div class="accordion-item">
+                    <h6 class="accordion-header message-list">
+                        <button
+                            class="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseMessage"
+                            aria-expanded="true"
+                            aria-controls="collapseMessage"
                         >
-                            {{ messageObj.message }}
+                            {{ $t('additional:modules.valuationPrint.messageListTitle') }}
+                        </button>
+                    </h6>
+                    <div
+                        id="collapseMessage"
+                        class="accordion-collapse collapse show"
+                        data-bs-parent="#accordionMessage"
+                    >
+                        <div class="accordion-body">
+                            <div
+                                v-for="(messageObj, idx) in messageList"
+                                :key="idx + '_' + messageObj.message"
+                                :class="messageObj.isError ? 'messageListError' : 'messageListEntry'"
+                            >
+                                {{ messageObj.message }}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div
                 v-if="urlList.length > 0"
-                class="card mt-3"
+                class="mt-3"
             >
-                <div class="card-header">
+                <hr>
+                <h6 class="download-header">
                     {{ $t('additional:modules.valuationPrint.urlListTitle') }}
-                </div>
+                </h6>
                 <div class="card-body">
-                    <p class="card-text">
-                        <ul class="list-unstyled">
-                            <li
-                                v-for="(url, idx) in urlList"
-                                :key="idx + '_' + url.name"
-                                class="urlListEntry"
-                            >
-                                <a
-                                    :href="url.link"
-                                    target="_blank"
-                                >{{ url.name }}</a>
-                            </li>
-                            <li v-if="showDownloadAll">
-                                <button
-                                    type="button"
-                                    class="btn btn-primary btn-sm"
-                                    @click="openUrls(urlList)"
-                                    @keydown="openUrls(urlList)"
-                                >
-                                    {{ $t('additional:modules.valuationPrint.downloadAll') }}
-                                </button>
-                            </li>
-                        </ul>
-                    </p>
+                    <ul class="list-unstyled">
+                        <li
+                            v-for="(url, idx) in urlList"
+                            :key="idx + '_' + url.name"
+                            class="urlListEntry"
+                        >
+                            <a
+                                :href="url.link"
+                                target="_blank"
+                            >{{ url.name }}</a>
+                        </li>
+                        <div class="d-flex justify-content-center pt-3">
+                            <FlatButton
+                                v-if="showDownloadAll"
+                                id="download-all"
+                                aria-label="$t('additional:modules.valuationPrint.downloadAll')"
+                                type="button"
+                                :text="$t('additional:modules.valuationPrint.downloadAll')"
+                                :icon="'bi-download'"
+                                :interaction="() => openUrls(urlList)"
+                            />
+                        </div>
+                    </ul>
                 </div>
             </div>
-        </div>
-        <ModalItem
-            :icon="icon"
-            :show-modal="showModal"
-            modal-inner-wrapper-style="min-width: 400px;"
-            modal-content-container-style="padding: 0.5rem"
-            @modal-hid="showPrintModal(false, [])"
-        >
-            <template #header>
-                <h5 class="px-2 mt-2">
-                    {{ $t('additional:modules.valuationPrint.modalTitle') }}
-                </h5>
-            </template>
-            <template #default>
-                <div class="border-bottom border-top def-font">
-                    <div class="my-3">
-                        <label
-                            for="number"
-                            class="form-label"
-                        >{{ $t('additional:modules.valuationPrint.number') }}</label>
-                        <input
-                            id="number"
-                            v-model="documentNumber"
-                            :aria-label="$t('additional:modules.valuationPrint.number')"
-                            type="text"
-                            placeholder="xx.xxxx - xxx"
-                            :class="`form-control ${errors.documentNumber ? 'is-invalid' : ''}`"
-                        >
-                        <div
-                            v-if="errors.documentNumber"
-                            class="invalid-feedback"
-                        >
-                            {{ $t('additional:modules.valuationPrint.formError.missingDocumentName') }}
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label
-                            for="address-list"
-                            class="form-label"
-                        >{{ $t('additional:modules.valuationPrint.address') }}</label>
-                        <input
-                            id="address-list"
-                            ref="addressInput"
-                            :class="`form-control ${errors.address ? 'is-invalid' : ''}`"
-                            list="addresslistOptions"
-                            :placeholder="!autofill ? $t('additional:modules.valuationPrint.placeholder') : ''"
-                            @change="setSpecificAddress"
-                        >
-                        <datalist id="addresslistOptions">
-                            <option
-                                v-for="address in addressList"
-                                :key="address"
-                                :value="address"
-                            >
-                                {{ address }}
-                            </option>
-                        </datalist>
-                        <div
-                            v-if="errors.address"
-                            class="invalid-feedback"
-                        >
-                            {{ $t('additional:modules.valuationPrint.formError.missingAddress') }}
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check">
+            <ModalItem
+                :icon="icon"
+                :show-modal="showModal"
+                modal-inner-wrapper-style="min-width: 400px;"
+                modal-content-container-style="padding: 0.5rem"
+                @modal-hid="showPrintModal(false, [])"
+            >
+                <template #header>
+                    <h5 class="px-2 mt-2">
+                        {{ $t('additional:modules.valuationPrint.modalTitle') }}
+                    </h5>
+                </template>
+                <template #default>
+                    <div class="border-bottom border-top def-font">
+                        <div class="my-3">
                             <label
-                                v-for="type in printType"
-                                :key="type"
+                                for="number"
+                                class="form-label"
+                            >{{ $t('additional:modules.valuationPrint.number') }}</label>
+                            <input
+                                id="number"
+                                v-model="documentNumber"
+                                :aria-label="$t('additional:modules.valuationPrint.number')"
+                                type="text"
+                                placeholder="xx.xxxx - xxx"
+                                :class="`form-control ${errors.documentNumber ? 'is-invalid' : ''}`"
                             >
-                                {{ type }}
-                                <input
-                                    :id="type"
-                                    v-model="chosenType"
-                                    class="form-check-input"
-                                    type="radio"
-                                    name="printType"
-                                    :value="type"
+                            <div
+                                v-if="errors.documentNumber"
+                                class="invalid-feedback"
+                            >
+                                {{ $t('additional:modules.valuationPrint.formError.missingDocumentName') }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label
+                                for="address-list"
+                                class="form-label"
+                            >{{ $t('additional:modules.valuationPrint.address') }}</label>
+                            <input
+                                id="address-list"
+                                ref="addressInput"
+                                :class="`form-control ${errors.address ? 'is-invalid' : ''}`"
+                                list="addresslistOptions"
+                                :placeholder="!autofill ? $t('additional:modules.valuationPrint.placeholder') : ''"
+                                @change="setSpecificAddress"
+                            >
+                            <datalist id="addresslistOptions">
+                                <option
+                                    v-for="address in addressList"
+                                    :key="address"
+                                    :value="address"
                                 >
-                            </label>
+                                    {{ address }}
+                                </option>
+                            </datalist>
+                            <div
+                                v-if="errors.address"
+                                class="invalid-feedback"
+                            >
+                                {{ $t('additional:modules.valuationPrint.formError.missingAddress') }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <label
+                                    v-for="type in printType"
+                                    :key="type"
+                                >
+                                    {{ type }}
+                                    <input
+                                        :id="type"
+                                        v-model="chosenType"
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="printType"
+                                        :value="type"
+                                    >
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </template>
-            <template #footer>
-                <div class="p-2">
-                    <button
-                        type="button"
-                        class="btn btn-primary confirm-print"
-                        tabindex="0"
-                        @click.prevent="setParcelData(printedFeature)"
-                        @keydown.prevent="setParcelData(printedFeature)"
-                    >
-                        {{ $t('additional:modules.valuationPrint.startButton') }}
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        tabindex="0"
-                        @click="showPrintModal(false, [])"
-                        @keydown="showPrintModal(false, [])"
-                    >
-                        {{ $t('additional:modules.valuationPrint.cancel') }}
-                    </button>
-                </div>
-            </template>
-        </ModalItem>
+                </template>
+                <template #footer>
+                    <div class="p-2">
+                        <button
+                            type="button"
+                            class="btn btn-primary confirm-print"
+                            tabindex="0"
+                            @click.prevent="setParcelData(printedFeature)"
+                            @keydown.prevent="setParcelData(printedFeature)"
+                        >
+                            {{ $t('additional:modules.valuationPrint.startButton') }}
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            tabindex="0"
+                            @click="showPrintModal(false, [])"
+                            @keydown="showPrintModal(false, [])"
+                        >
+                            {{ $t('additional:modules.valuationPrint.cancel') }}
+                        </button>
+                    </div>
+                </template>
+            </ModalItem>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 @import "/src_3_0_0/assets/css/mixins.scss";
+@import "~variables";
 
 h5 {
     font-family: "MasterPortalFont Bold", "Arial Narrow", Arial, sans-serif;
+}
+.selected-parcels, .accordion-button, .download-header, .generate-report {
+    font-family: "MasterPortalFont Bold";
+    font-size: 14px;
 }
 
 .def-font {
@@ -801,13 +857,31 @@ button {
 .messageListError {
     color: $danger;
 }
-
-.card-body {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 13px;
+.accordion-button {
+    font-size: 13px;
 }
 
+.parcels {
+    padding: 13px;
+    .parcel-label {
+        font-size: 12px;
+    }
+    .list-item {
+        font-family: "MasterPortalFont Bold";
+    }
+    ul {
+        list-style-type: none;
+    }
+}
+
+.list-group {
+    .list-group-item {
+        border: none;
+    }
+    .form-check-input {
+        appearance: checkbox;
+    }
+}
 .list-inline, .list-unstyled {
     margin-bottom: 0;
 }

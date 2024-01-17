@@ -7,6 +7,7 @@ import sinon from "sinon";
 import ValuationPrint from "../../../components/ValuationPrint.vue";
 import {createStore} from "vuex";
 import ModalItem from "../../../../../../src_3_0_0/shared/modules/modals/components/ModalItem.vue";
+import IconButton from "../../../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
 
 config.global.mocks.$t = key => key;
 
@@ -140,7 +141,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             wrapper.vm.select.getFeatures().push(features[1]);
             await wrapper.vm.$forceUpdate();
 
-            expect(wrapper.findAll(".list-inline")).to.be.lengthOf(2);
+            expect(wrapper.findAll(".list-group-item")).to.be.lengthOf(2);
         });
 
         it("should render the feature properties correctly", async () => {
@@ -149,10 +150,10 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             wrapper.vm.select.getFeatures().push(features[0]);
             await wrapper.vm.$forceUpdate();
 
-            expect(wrapper.findAll(".list-inline-item").at(0).text()).to.be.equal("additional:modules.valuationPrint.parcel");
-            expect(wrapper.findAll(".list-inline-item").at(1).text()).to.be.equal("12345");
-            expect(wrapper.findAll(".list-inline-item").at(2).text()).to.be.equal("additional:modules.valuationPrint.district");
-            expect(wrapper.findAll(".list-inline-item").at(3).text()).to.be.equal("ueberall");
+            expect(wrapper.findAll(".parcel-label").at(0).text()).to.be.equal("additional:modules.valuationPrint.parcel");
+            expect(wrapper.findAll(".list-item").at(0).text()).to.be.equal("12345");
+            expect(wrapper.findAll(".parcel-label").at(1).text()).to.be.equal("additional:modules.valuationPrint.district");
+            expect(wrapper.findAll(".list-item").at(1).text()).to.be.equal("ueberall");
         });
 
         it("should find one remove button per feature", async () => {
@@ -162,28 +163,17 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             wrapper.vm.select.getFeatures().push(features[1]);
             await wrapper.vm.$forceUpdate();
 
-            expect(wrapper.findAll("button").filter(button => {
-                return button.text() === "additional:modules.valuationPrint.removeButton";
-            })).to.be.lengthOf(2);
+            expect(wrapper.findAllComponents(IconButton).length).to.be.equals(2);
         });
 
-        it("should find one start button per feature and one for the merged feature", async () => {
-            const wrapper = factory.getShallowMount({});
+        it("should find one start button", async () => {
+            const wrapper = factory.getShallowMount({}, true);
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.select.getFeatures().push(features[1]);
             await wrapper.vm.$forceUpdate();
 
-            expect(wrapper.findAll(".start-button").length).to.be.equals(3);
-        });
-
-        it("should find one start buttons if only one feature is available", async () => {
-            const wrapper = factory.getShallowMount({});
-
-            wrapper.vm.select.getFeatures().push(features[0]);
-            await wrapper.vm.$forceUpdate();
-
-            expect(wrapper.findAll(".start-button").length).to.be.equals(1);
+            expect(wrapper.findAll("#start-valuation-print").length).to.be.equals(1);
         });
 
         it("should not add an error class to the list entry if no error is added", async () => {
@@ -240,12 +230,12 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
     describe("User Interactions", () => {
         it("should call 'removeFeature' if user click the remove button", async () => {
             const spyRemoveFeature = sinon.spy(ValuationPrint.methods, "removeFeature"),
-                wrapper = factory.getShallowMount({});
+                wrapper = factory.getMount({}, true);
 
             wrapper.vm.select.getFeatures().push(features[0]);
             wrapper.vm.select.getFeatures().push(features[1]);
             await wrapper.vm.$forceUpdate();
-            await wrapper.findAll("button").at(1).trigger("click");
+            await wrapper.findAll(".remove").at(0).trigger("click");
 
             expect(spyRemoveFeature.calledOnce).to.be.true;
 
@@ -254,14 +244,11 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
         it("should call 'getAddress' if user click the start button in list", async () => {
             const spyGetAddress = sinon.stub(ValuationPrint.methods, "getAddress"),
-                wrapper = factory.getShallowMount({});
+                wrapper = factory.getMount({}, true);
 
+            wrapper.vm.parcelModule = "wanda";
             await wrapper.setData({selectedFeatures: [features[0]]});
-            await wrapper.findAll(".valuation-print button").forEach(button => {
-                if (button.text() === "additional:modules.valuationPrint.startButton") {
-                    button.trigger("click");
-                }
-            });
+            await wrapper.find("#start-valuation-print").trigger("click");
 
             expect(spyGetAddress.calledOnce).to.be.true;
 
