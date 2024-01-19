@@ -22,13 +22,16 @@ import layerCollection from "../../../../src_3_0_0/core/layers/js/layerCollectio
 import layerFactory from "../../../../src_3_0_0/core/layers/js/layerFactory";
 import IconButton from "../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
 import FlatButton from "../../../../src_3_0_0/shared/modules/buttons/components/FlatButton.vue";
+import WfsSearch from "../../../../src_3_0_0/modules/wfsSearch/components/WfsSearch.vue";
+
 
 export default {
     name: "ValuationPrint",
     components: {
         ModalItem,
         IconButton,
-        FlatButton
+        FlatButton,
+        WfsSearch
     },
     data () {
         return {
@@ -206,7 +209,7 @@ export default {
          * @returns {void}
          */
         setConfig () {
-            axios.get("config.valuation.json", {
+            axios.get(this.reportPath, {
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -574,7 +577,7 @@ export default {
     >
         <div>
             <div
-                v-if="parcelModule === 'wanda'"
+                v-if="!showParcelSearch"
                 class="parcel-report"
             >
                 <h6 class="selected-parcels">
@@ -640,9 +643,10 @@ export default {
                 </div>
             </div>
             <div
-                v-if="parcelModule === 'fis'"
-                class="parcel-report"
+                v-else
             >
+                <WfsSearch :show-reset-button="false" />
+                <hr>
                 <h6 class="generate-report pt-3">
                     {{ $t('additional:modules.valuationPrint.generateReport') }}
                 </h6>

@@ -9,6 +9,8 @@ Tool to support the valuation of land on the basis of parcels.
 |parcelLayerId|yes|String|""|Layer-Id of the parcels, whose data are required for this tool.|false|
 |showStatusProgress|no|Boolean|true|Whether or not status progress is shown.|false|
 |multiSelectParcels|no|Boolean|false|If true, user can have more than one parcel selected at a time.|false|
+|showParcelSearch|no|Boolean|false|If true, WfsSearch is rendered, otherwise the valuation.|false|
+|reportPath|no|String|"config.valuation.json"|File name/path for configuration of the report.|false|
 
 
 **Example**
@@ -19,7 +21,9 @@ Tool to support the valuation of land on the basis of parcels.
         "icon": "bi-bar-chart-line-fill",
         "parcelLayerId": "6076",
         "showStatusProgress": false,
-        "multiSelectParcels": true
+        "multiSelectParcels": true,
+        "showParcelSearch": true,
+        "reportPath": "config.valuation.json"
     },
 ```
 

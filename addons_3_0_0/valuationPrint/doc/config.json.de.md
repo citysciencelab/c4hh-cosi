@@ -9,6 +9,8 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
 |parcelLayerId|ja|String|""|Layer-Id der Flurstücke, deren Daten erforderlich für dieses Tool sind.|false|
 |showStatusProgress|nein|Boolean|true|Ob der Statusverlauf angezeigt werden soll.|false|
 |multiSelectParcels|nein|Boolean|false|Ob der User mehrere Flurstücke gleichzeitig ausgewählt haben kann.|false|
+|showParcelSearch|nein|Boolean|false|Wenn true, wird die Flurstückssuche angezeigt, ansonsten die Wertermittlung.|false|
+|reportPath|nein|String|"config.valuation.json"|Dateiname/Pfad zur Konfiguration des Berichts.|false|
 
 
 **Beispiel**
@@ -19,7 +21,9 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
         "icon": "bi-bar-chart-line-fill",
         "parcelLayerId": "6076",
         "showStatusProgress": false,
-        "multiSelectParcels": true
+        "multiSelectParcels": true,
+        "showParcelSearch": true,
+        "reportPath": "config.valuation.json"
     },
 ```
 

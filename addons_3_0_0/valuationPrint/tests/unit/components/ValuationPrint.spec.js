@@ -8,6 +8,7 @@ import ValuationPrint from "../../../components/ValuationPrint.vue";
 import {createStore} from "vuex";
 import ModalItem from "../../../../../../src_3_0_0/shared/modules/modals/components/ModalItem.vue";
 import IconButton from "../../../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
+import WfsSearch from "../../../../../../src_3_0_0/modules/wfsSearch/components/WfsSearch.vue";
 
 config.global.mocks.$t = key => key;
 
@@ -64,7 +65,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             }
         }),
         factory = {
-            getShallowMount: (values = {}, isLayerConfigured = true, isStatusProgressVisible = true) => {
+            getShallowMount: (values = {}, isLayerConfigured = true, isStatusProgressVisible = true, isParcelSearch = false) => {
                 return shallowMount(ValuationPrint, {
                     global: {
                         plugins: [store],
@@ -83,14 +84,16 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         renderToWindow: () => false,
                         resizableWindow: () => false,
                         showStatusProgress: () => isStatusProgressVisible,
-                        layerConfigById: () => () => isLayerConfigured
+                        layerConfigById: () => () => isLayerConfigured,
+                        showParcelSearch: () => isParcelSearch,
+                        reportPath: () => "config.valuation.json"
                     },
                     slots: {
                         footer: "<div>Footer</div>"
                     }
                 });
             },
-            getMount: (values = {}, isLayerConfigured = true, isStatusProgressVisible = true) => {
+            getMount: (values = {}, isLayerConfigured = true, isStatusProgressVisible = true, isParcelSearch = false) => {
                 return mount(ValuationPrint, {
                     global: {
                         plugins: [store]
@@ -106,7 +109,9 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         renderToWindow: () => false,
                         resizableWindow: () => false,
                         showStatusProgress: () => isStatusProgressVisible,
-                        layerConfigById: () => () => isLayerConfigured
+                        layerConfigById: () => () => isLayerConfigured,
+                        valuationReport: () => isParcelSearch,
+                        reportPath: () => "config.valuation.json"
                     }
                 });
             }
@@ -217,6 +222,16 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             const wrapper = factory.getShallowMount({});
 
             expect(wrapper.find(".urlListEntry").exists()).to.be.false;
+        });
+        it("should render parcel report if showParcelSearch is false", async () => {
+            const wrapper = factory.getShallowMount({}, true, true, false);
+
+            expect(wrapper.find(".parcel-report").exists()).to.be.true;
+        });
+        it("should render WfsSearch if showParcelSearch is true", async () => {
+            const wrapper = factory.getShallowMount({}, true, true, true);
+
+            expect(wrapper.findComponent(WfsSearch).exists()).to.be.true;
         });
 
         describe("modal", () => {

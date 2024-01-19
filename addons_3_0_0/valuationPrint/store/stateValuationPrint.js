@@ -12,6 +12,8 @@
  * @property {Boolean} deactivateGFI - Flag if tool should deactivate gfi.
  * @property {Boolean} showStatusProgress -If set to false, status progress ("Statusverlauf") is never renderend.
  * @property {Boolean} multiSelectParcels - If true, user can have more than one parcel selected at a time.
+ * @property {Boolean} showParcelSearch - If true, WfsSearch is rendered.
+ * @property {Boolean} reportPath - File name for configuration of the report.
  */
 const state = {
     id: "valuationPrint",
@@ -28,7 +30,9 @@ const state = {
     isVisibleInMenu: true,
     deactivateGFI: false,
     showStatusProgress: true,
-    multiSelectParcels: false
+    multiSelectParcels: false,
+    showParcelSearch: false,
+    reportPath: "config.valuation.json"
 };
 
 export default state;

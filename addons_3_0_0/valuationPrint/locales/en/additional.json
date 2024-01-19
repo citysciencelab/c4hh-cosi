@@ -1,7 +1,7 @@
 {
   "modules": {
     "valuationPrint": {
-      "title": "Valuation",
+      "title": "Parcel report",
       "removeButton": "Remove",
       "startButton": "Start",
       "parcel": "Parcel:",

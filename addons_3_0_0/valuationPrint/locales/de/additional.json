@@ -1,7 +1,7 @@
 {
   "modules": {
     "valuationPrint": {
-      "title": "Wertermittlung",
+      "title": "Flurstücksreport",
       "removeButton": "Entfernen",
       "startButton": "Starten",
       "parcel": "Flurstück:",
