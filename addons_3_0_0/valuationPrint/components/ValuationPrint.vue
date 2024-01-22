@@ -198,7 +198,9 @@ export default {
          */
         removeFeature (feature) {
             if (feature instanceof Feature) {
-                this.select.getFeatures().remove(feature);
+                const i = this.selectedFeatures.findIndex(f => f.get("flstnrzae") === feature.get("flstnrzae"));
+
+                this.select.getFeatures().removeAt(i);
             }
         },
 
@@ -258,7 +260,7 @@ export default {
             this.select.on("change:active", this.styleSelectedFeatures);
             this.select.on("select", event => {
                 if (this.multiSelectParcels === false) {
-                    if (this.selectedFeatures.length > 1) {
+                    if (this.select.getFeatures().getLength() > 1) {
                         this.select.getFeatures().clear();
                         this.select.getFeatures().push(event.selected[0]);
                     }
