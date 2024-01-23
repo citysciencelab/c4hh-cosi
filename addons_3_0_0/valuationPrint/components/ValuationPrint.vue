@@ -156,7 +156,7 @@ export default {
     },
 
     mounted () {
-        if (!this.layerConfigById(this.parcelLayerId)) {
+        if (!layerCollection.getLayerById(this.parcelLayerId)) {
             this.createParcelLayer(this.parcelLayerId);
         }
 
@@ -166,9 +166,7 @@ export default {
         });
     },
     unmounted () {
-        if (!this.layerConfigById(this.parcelLayerId)) {
-            layerCollection.removeLayerById(this.parcelLayerId);
-        }
+        layerCollection.removeLayerById(this.parcelLayerId);
     },
 
     methods: {
