@@ -85,7 +85,11 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         resizableWindow: () => false,
                         showStatusProgress: () => isStatusProgressVisible,
                         showParcelSearch: () => isParcelSearch,
-                        reportPath: () => "config.valuation.json"
+                        reportPath: () => "config.valuation.json",
+                        selectedFeatures: () => [],
+                        messageList: () => [],
+                        urlList: () => [],
+                        showDownloadAll: () => false
                     },
                     slots: {
                         footer: "<div>Footer</div>"
@@ -109,7 +113,11 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         resizableWindow: () => false,
                         showStatusProgress: () => isStatusProgressVisible,
                         showParcelSearch: () => isParcelSearch,
-                        reportPath: () => "config.valuation.json"
+                        reportPath: () => "config.valuation.json",
+                        selectedFeatures: () => [],
+                        messageList: () => [],
+                        urlList: () => [],
+                        showDownloadAll: () => false
                     }
                 });
             }
@@ -144,8 +152,9 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         it("should find one list per feature", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.select.getFeatures().push(features[0]);
-            wrapper.vm.select.getFeatures().push(features[1]);
+            wrapper.vm.selectedFeatures.push(features[0]);
+            wrapper.vm.selectedFeatures.push(features[1]);
+
             await wrapper.vm.$forceUpdate();
 
             expect(wrapper.findAll(".list-group-item")).to.be.lengthOf(2);
@@ -154,7 +163,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         it("should render the feature properties correctly", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.select.getFeatures().push(features[0]);
+            wrapper.vm.selectedFeatures.push(features[0]);
             await wrapper.vm.$forceUpdate();
 
             expect(wrapper.findAll(".parcel-label").at(0).text()).to.be.equal("additional:modules.valuationPrint.parcel");
@@ -166,8 +175,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         it("should find one remove button per feature", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.select.getFeatures().push(features[0]);
-            wrapper.vm.select.getFeatures().push(features[1]);
+            wrapper.vm.selectedFeatures.push(features[0]);
+            wrapper.vm.selectedFeatures.push(features[1]);
             await wrapper.vm.$forceUpdate();
 
             expect(wrapper.findAllComponents(IconButton).length).to.be.equals(2);
@@ -176,8 +185,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         it("should find one start button", async () => {
             const wrapper = factory.getShallowMount({}, true);
 
-            wrapper.vm.select.getFeatures().push(features[0]);
-            wrapper.vm.select.getFeatures().push(features[1]);
+            wrapper.vm.selectedFeatures.push(features[0]);
+            wrapper.vm.selectedFeatures.push(features[1]);
             await wrapper.vm.$forceUpdate();
 
             expect(wrapper.findAll("#start-valuation-print").length).to.be.equals(1);
@@ -279,15 +288,15 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                     selected: [features[1]]
                 });
 
-                expect(wrapper.vm.selectedFeatures).to.have.lengthOf(1);
+                expect(wrapper.vm.select.getFeatures().getArray()).to.have.lengthOf(1);
             });
 
             it("should call 'removeFeature' if user click the remove button", async () => {
                 const spyRemoveFeature = sinon.spy(ValuationPrint.methods, "removeFeature"),
                     wrapper = factory.getMount({}, true);
 
-                wrapper.vm.select.getFeatures().push(features[0]);
-                wrapper.vm.select.getFeatures().push(features[1]);
+                wrapper.vm.selectedFeatures.push(features[0]);
+                wrapper.vm.selectedFeatures.push(features[1]);
                 await wrapper.vm.$forceUpdate();
                 await wrapper.findAll(".remove").at(0).trigger("click");
 
@@ -298,11 +307,12 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             it("should call 'getAddress' if user click the start button in list", async () => {
                 const spyGetAddress = sinon.stub(ValuationPrint.methods, "getAddress"),
-                    wrapper = factory.getMount({}, true);
+                    wrapper = factory.getMount({}, true, false);
 
-                wrapper.vm.parcelModule = "wanda";
-                await wrapper.setData({selectedFeatures: [features[0]]});
+                wrapper.vm.selectedFeatures.push(features[0]);
+                await wrapper.vm.$forceUpdate();
                 await wrapper.find("#start-valuation-print").trigger("click");
+                await wrapper.vm.$forceUpdate();
 
                 expect(spyGetAddress.calledOnce).to.be.true;
 
@@ -330,7 +340,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                     wrapper = factory.getMount({});
 
                 wrapper.vm.isModalRequired = false;
-                await wrapper.setData({selectedFeatures: [features[0]]});
+                wrapper.vm.selectedFeatures.push(features[0]);
+                await wrapper.vm.$forceUpdate();
                 wrapper.findComponent("#start-valuation-print").trigger("click");
 
                 expect(spySetParcelData.calledOnce).to.be.true;
@@ -419,14 +430,14 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             });
 
             describe("removeFeature", () => {
-                it("should remove a feature from the select interaction", () => {
+                it("should remove a feature from the select interaction", async () => {
                     const wrapper = factory.getShallowMount({});
 
-                    wrapper.vm.select.getFeatures().push(features[0]);
-                    wrapper.vm.select.getFeatures().push(features[1]);
-                    wrapper.vm.removeFeature(features[0]);
+                    wrapper.vm.setSelectedFeatures(features[0]);
 
-                    expect(wrapper.vm.select.getFeatures().getArray()).to.be.lengthOf(1);
+                    wrapper.vm.removeFeature(features[0]);
+                    await wrapper.vm.$forceUpdate();
+                    expect(wrapper.vm.selectedFeatures).to.be.lengthOf(0);
                 });
                 it("should only remove data from type ol/Feature", () => {
                     const wrapper = factory.getShallowMount({});
@@ -470,9 +481,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                     sinon.stub(ValuationPrint.methods, "formValidation").returns(true);
                     const wrapper = factory.getShallowMount({});
 
-                    wrapper.vm.addMessage("message");
+                    wrapper.vm.setMessageList({message: "message", isError: false});
                     wrapper.vm.setParcelData([features[0]]);
-
                     expect(wrapper.vm.messageList).to.be.an("array").that.is.empty;
                     sinon.restore();
                 });

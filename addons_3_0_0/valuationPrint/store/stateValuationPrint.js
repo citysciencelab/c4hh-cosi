@@ -13,7 +13,11 @@
  * @property {Boolean} showStatusProgress -If set to false, status progress ("Statusverlauf") is never renderend.
  * @property {Boolean} multiSelectParcels - If true, user can have more than one parcel selected at a time.
  * @property {Boolean} showParcelSearch - If true, WfsSearch is rendered.
- * @property {Boolean} reportPath - File name for configuration of the report.
+ * @property {String} reportPath - File name for configuration of the report.
+ * @property {Object} selectedFeatures - The Selected Features.
+ * @property {Object} messageList - List of messages for status progress.
+ * @property {Object} urlList - List of urls for downloding pdf and images.
+ * @property {Boolean} showDownloadAll - True, if the url list was generated.
  */
 const state = {
     id: "valuationPrint",
@@ -33,7 +37,11 @@ const state = {
     multiSelectParcels: false,
     showParcelSearch: false,
     isModalRequired: true,
-    reportPath: "config.valuation.json"
+    reportPath: "config.valuation.json",
+    selectedFeatures: [],
+    messageList: [],
+    urlList: [],
+    showDownloadAll: false
 };
 
 export default state;

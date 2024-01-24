@@ -35,13 +35,9 @@ export default {
     },
     data () {
         return {
-            selectedFeatures: [],
             parcelData: null,
-            messageList: [],
             printedFeature: [],
-            urlList: [],
             addressList: [],
-            showDownloadAll: false,
             showModal: false,
             chosenType: "Gutachten",
             errors: {
@@ -50,8 +46,7 @@ export default {
             },
             specificAddress: "",
             documentNumber: "",
-            autofill: false,
-            parcelModule: "wanda"
+            autofill: false
         };
     },
     computed: {
@@ -80,7 +75,7 @@ export default {
             }
 
             createKnowledgeBase(parcel, this.config.services, this.projection.getCode(), message => {
-                this.showDownloadAll = false;
+                this.setShowDownloadAll(false);
                 this.addMessage(message, false);
             }, knowledgeBase => {
                 const mapfishDialog = createMapfishDialog(
@@ -151,27 +146,28 @@ export default {
         this.fileprefix = "";
         this.printType = ["Gutachten", "Wertbeurteilung"];
 
+        if (!layerCollection.getLayerById(this.parcelLayerId)) {
+            this.createParcelLayer(this.parcelLayerId);
+        }
+
         this.setConfig();
         this.setSelectInteraction();
     },
 
     mounted () {
-        if (!layerCollection.getLayerById(this.parcelLayerId)) {
-            this.createParcelLayer(this.parcelLayerId);
-        }
-
         this.select.setActive(true);
         this.select.getFeatures().on("change:length", (evt) => {
-            this.selectedFeatures = [...evt.target.getArray()];
+            this.setSelectedFeatures([...evt.target.getArray()]);
         });
     },
     unmounted () {
         layerCollection.removeLayerById(this.parcelLayerId);
+        this.removeInteraction(this.select);
     },
 
     methods: {
         ...mapMutations("Modules/ValuationPrint", Object.keys(mutations)),
-        ...mapActions("Maps", ["addInteraction"]),
+        ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
 
         /**
@@ -199,6 +195,7 @@ export default {
                 const i = this.selectedFeatures.findIndex(f => f.get("flstnrzae") === feature.get("flstnrzae"));
 
                 this.select.getFeatures().removeAt(i);
+                this.setSelectedFeatures(this.select.getFeatures().getArray());
             }
         },
 
@@ -255,6 +252,8 @@ export default {
                 removeCondition: singleClick
             });
 
+            this.addFeaturesToSelectInteraction(this.select);
+
             this.select.on("change:active", this.styleSelectedFeatures);
             this.select.on("select", event => {
                 if (this.multiSelectParcels === false) {
@@ -265,6 +264,30 @@ export default {
                 }
             });
             this.addInteraction(this.select);
+        },
+        /**
+         * Adds features, loaded from the store to the select interaction.
+         * @param {Object} select - the select interaction
+         * @returns {void}
+         */
+        addFeaturesToSelectInteraction (select) {
+            if (this.selectedFeatures.length > 0) {
+                const layerSource = layerCollection.getLayerById(this.parcelLayerId).getLayerSource();
+
+                layerSource.once("featuresloadend", () => {
+                    this.selectedFeatures.forEach(selected => {
+                        const feat = layerSource.getFeatureById(selected.getId());
+
+                        if (feat !== null) {
+                            select.getFeatures().push(feat);
+                        }
+                        else {
+                            layerSource.addFeature(selected);
+                            select.getFeatures().push(selected);
+                        }
+                    });
+                });
+            }
         },
         /**
          * Shows the print modal and saves the feature for print window
@@ -308,8 +331,8 @@ export default {
             const feature = featureList.length > 1 ? unionFeatures(featureList) : featureList[0],
                 extent = feature.getGeometry().getExtent();
 
-            this.messageList = [];
-            this.urlList = [];
+            this.setMessageList([]);
+            this.setUrlList([]);
             this.parcelData = {
                 center: getCenterOfExtent(extent),
                 extent,
@@ -416,7 +439,7 @@ export default {
                         this.startImageProcess(idx + 1);
                         return;
                     }
-                    this.showDownloadAll = true;
+                    this.setShowDownloadAll(true);
                 });
             }, 0);
         },
@@ -641,7 +664,7 @@ export default {
                                     aria-label="$t('additional:modules.valuationPrint.startButton')"
                                     type="button"
                                     :text="$t('additional:modules.valuationPrint.startButton')"
-                                    :interaction="() => getAddress(true, select.getFeatures().getArray())"
+                                    :interaction="() => getAddress(true, selectedFeatures)"
                                     icon="bi-play"
                                 />
                             </div>
@@ -666,7 +689,7 @@ export default {
                         aria-label="$t('additional:modules.valuationPrint.startButton')"
                         type="button"
                         :text="$t('additional:modules.valuationPrint.startButton')"
-                        :interaction="() => getAddress(true, select.getFeatures().getArray())"
+                        :interaction="() => getAddress(true, selectedFeatures)"
                         icon="bi-play"
                     />
                 </div>
