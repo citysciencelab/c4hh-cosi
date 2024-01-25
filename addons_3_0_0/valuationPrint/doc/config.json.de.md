@@ -10,6 +10,7 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
 |showStatusProgress|nein|Boolean|true|Ob der Statusverlauf angezeigt werden soll.|false|
 |multiSelectParcels|nein|Boolean|false|Ob der User mehrere Flurstücke gleichzeitig ausgewählt haben kann.|false|
 |showParcelSearch|nein|Boolean|false|Wenn true, wird die Flurstückssuche angezeigt, ansonsten die Wertermittlung.|false|
+|isModalRequired|nein|Boolean|true|Ob vor dem Starten der Berichtserzeugung durch ein Modal Angaben zu Geschäftszeichen, Adresse etc. abgefragt werden sollen.|false|
 |reportPath|nein|String|"config.valuation.json"|Dateiname/Pfad zur Konfiguration des Berichts.|false|
 
 
@@ -23,6 +24,7 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
         "showStatusProgress": false,
         "multiSelectParcels": true,
         "showParcelSearch": true,
+        "isModalRequired": false,
         "reportPath": "config.valuation.json"
     },
 ```

@@ -325,6 +325,19 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                 spySetParcelData.restore();
             });
 
+            it("should call 'setParcelData' if user click the start button in parcel list and modal is configured to not be required", async () => {
+                const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
+                    wrapper = factory.getMount({});
+
+                wrapper.vm.isModalRequired = false;
+                await wrapper.setData({selectedFeatures: [features[0]]});
+                wrapper.findComponent("#start-valuation-print").trigger("click");
+
+                expect(spySetParcelData.calledOnce).to.be.true;
+
+                spySetParcelData.restore();
+            });
+
             it("should call 'showPrintModal' if user click the cancel button in print modal", async () => {
                 const spyShowPrintModal = sinon.spy(ValuationPrint.methods, "showPrintModal"),
                     wrapper = factory.getMount({});

@@ -32,6 +32,7 @@ const state = {
     showStatusProgress: true,
     multiSelectParcels: false,
     showParcelSearch: false,
+    isModalRequired: true,
     reportPath: "config.valuation.json"
 };
 

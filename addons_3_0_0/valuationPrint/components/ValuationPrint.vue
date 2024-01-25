@@ -296,8 +296,10 @@ export default {
          * @returns {void}
          */
         setParcelData (featureList) {
-            if (!this.formValidation()) {
-                return;
+            if (this.isModalRequired) {
+                if (!this.formValidation()) {
+                    return;
+                }
             }
             if (!Array.isArray(featureList) || !featureList.length) {
                 console.error(`startValuation: ${featureList} has to be a non empty array`);
@@ -328,6 +330,11 @@ export default {
             const feature = featureList.length > 1 ? unionFeatures(featureList) : featureList[0],
                 config = this.config?.services?.hh_wfs_dog;
 
+            if (this.isModalRequired === false) {
+                this.printedFeature = featureList;
+                this.setParcelData(this.printedFeature);
+                return;
+            }
             collectFeatures(
                 {
                     geometry: feature.getGeometry()
