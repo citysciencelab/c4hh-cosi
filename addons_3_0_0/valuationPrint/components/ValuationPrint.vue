@@ -691,6 +691,7 @@ export default {
                         :text="$t('additional:modules.valuationPrint.startButton')"
                         :interaction="() => getAddress(true, selectedFeatures)"
                         icon="bi-play"
+                        :disabled="!selectedFeatures.length"
                     />
                 </div>
                 <hr>
