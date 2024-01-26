@@ -35,6 +35,15 @@ export default {
     },
     data () {
         return {
+            isPdfAppIdConfigured: false,
+            pdfAppId: "",
+            isPdfSpecificationAppIdConfigured: false,
+            pdfSpecificationAppId: "",
+            isInProcessOfCreatingReport: false,
+            numberOfServicesConfigured: 0,
+            numberOfImagesConfigured: 0,
+            numberOfProgressSteps: 0,
+            progressCounter: 0,
             parcelData: null,
             addressList: [],
             showModal: false,
@@ -90,9 +99,14 @@ export default {
                 return;
             }
 
+            this.progressCounter = 0;
             createKnowledgeBase(parcel, this.config.services, {mapProjection: this.projection.getCode(), oafCRSURI: this.oafCRSURI}, message => {
                 this.setShowDownloadAll(false);
                 this.addMessage(message, false);
+                this.isInProcessOfCreatingReport = true;
+                if (this.progressCounter < this.numberOfServicesConfigured) {
+                    this.progressCounter++;
+                }
             }, knowledgeBase => {
                 const mapfishDialog = createMapfishDialog(
                     parcel,
@@ -103,6 +117,10 @@ export default {
                     this.getFilenameOfPDF(this.fileprefix, dayjs().format("YYYY-MM-DD"))
                 );
 
+                if (!this.isPdfAppIdConfigured) {
+                    this.startSpecificationProcess();
+                    return;
+                }
                 setTimeout(() => {
                     startPrintProcess(this.printUrl, "pdf", this.pdfAppId, mapfishDialog, (url, payload) => {
                         this.addMessage(this.$t("additional:modules.valuationPrint.pdfInTheMaking"));
@@ -119,6 +137,7 @@ export default {
                     url => {
                         this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
                         this.addUrl(url, this.$t("additional:modules.valuationPrint.report"));
+                        this.progressCounter++;
                         this.startSpecificationProcess();
                     });
                 }, 0);
@@ -156,7 +175,6 @@ export default {
         this.config = null;
         this.select = null;
         this.printUrl = "";
-        this.pdfAppId = "";
         this.imageAppId = "";
         this.defaultValue = "";
         this.fileprefix = "";
@@ -281,11 +299,19 @@ export default {
                 .then(response => {
                     this.config = response.data;
                     this.printUrl = this.restServiceById(response.data.settings.printServiceId).url;
-                    this.pdfAppId = response.data.settings.pdfAppId;
+                    this.isPdfAppIdConfigured = typeof response.data.settings?.pdfAppId === "string";
+                    this.pdfAppId = response.data.settings?.pdfAppId;
+                    this.isPdfSpecificationAppIdConfigured = typeof response.data.settings?.pdfSpecificationAppId === "string";
+                    this.pdfSpecificationAppId = response.data.settings?.pdfSpecificationAppId;
+                    this.numberOfImagesConfigured = response.data?.images?.length || 0;
+                    this.numberOfServicesConfigured = Object.keys(response.data.services).length;
                     this.imageAppId = response.data.settings.imageAppId;
-                    this.pdfSpecificationAppId = response.data.settings.pdfSpecificationAppId;
                     this.defaultValue = response.data.settings.defaultValue;
                     this.fileprefix = response.data.settings.fileprefix;
+                    this.numberOfProgressSteps = this.numberOfServicesConfigured
+                        + (this.isPdfAppIdConfigured ? 1 : 0)
+                        + (this.isPdfSpecificationAppIdConfigured ? 1 : 0)
+                        + this.numberOfImagesConfigured;
                 })
                 .catch(() => {
                     const message = "Could not load the config file config.valuation.json";
@@ -416,8 +442,9 @@ export default {
             const feature = featureList.length > 1 ? unionFeatures(featureList) : featureList[0],
                 config = this.config?.services?.hh_wfs_dog;
 
-            if (this.isModalRequired === false) {
-                this.setParcelData(featureList);
+            if (!this.isModalRequired) {
+                this.printedFeature = featureList;
+                this.setParcelData(this.printedFeature);
                 return;
             }
             await collectFeatures(
@@ -470,6 +497,14 @@ export default {
          * @returns {void}
          */
         startImageProcess (idx = 0) {
+            if (this.numberOfImagesConfigured === 0) {
+                this.progressCounter = this.numberOfProgressSteps;
+                setTimeout(() => {
+                    this.isInProcessOfCreatingReport = false;
+                }, 2000);
+                this.setShowDownloadAll(true);
+                return;
+            }
             const imageName = Object.keys(this.config.images[idx])[0],
                 mapfishDialog = createMapfishDialog(
                     this.parcelData,
@@ -499,12 +534,17 @@ export default {
                     }
                 },
                 (url) => {
+                    this.progressCounter++;
                     this.addMessage(this.$t("additional:modules.valuationPrint.imageSuccess", {imageName: upperFirst(imageName)}), false);
                     this.addUrl(url, upperFirst(imageName));
                     if (this.config.images[idx + 1]) {
                         this.startImageProcess(idx + 1);
                         return;
                     }
+                    this.progressCounter = this.numberOfProgressSteps;
+                    setTimeout(() => {
+                        this.isInProcessOfCreatingReport = false;
+                    }, 2000);
                     this.setShowDownloadAll(true);
                 });
             }, 0);
@@ -515,6 +555,10 @@ export default {
          * @returns {void}
          */
         startSpecificationProcess () {
+            if (!this.isPdfSpecificationAppIdConfigured) {
+                this.startImageProcess();
+                return;
+            }
             if (this.specificAddress === "" && this.addressList.length === 1) {
                 this.specificAddress = this.addressList[0];
             }
@@ -553,6 +597,7 @@ export default {
                 (url) => {
                     this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
                     this.addUrl(url, this.$t("additional:modules.valuationPrint.modalTitle"));
+                    this.progressCounter++;
                     this.startImageProcess();
                 });
             }, 0);
@@ -759,7 +804,10 @@ export default {
                         {{ selectedFeatures[0].get("flstnrzae") }}
                     </span>
                 </p>
-                <div class="d-flex justify-content-center pt-3">
+                <div
+                    v-if="!isInProcessOfCreatingReport"
+                    class="d-flex justify-content-center pt-3"
+                >
                     <FlatButton
                         id="start-fis"
                         aria-label="$t('additional:modules.valuationPrint.startButton')"
@@ -770,10 +818,24 @@ export default {
                         :disabled="!selectedFeatures.length"
                     />
                 </div>
+                <div
+                    v-if="isInProcessOfCreatingReport && !showStatusLog"
+                >
+                    <div v-if="messageList.length > 0">
+                        {{ messageList[0].message }}
+                    </div>
+                    <label>
+                        <progress
+                            max="100"
+                            :value="progressCounter / numberOfProgressSteps * 100"
+                        />
+                        {{ Math.round(progressCounter / numberOfProgressSteps * 100) }} %
+                    </label>
+                </div>
                 <hr>
             </div>
             <div
-                v-if="messageList.length > 0 && showStatusProgress"
+                v-if="messageList.length > 0 && showStatusLog"
                 class="accordion accordion-flush mt-3"
             >
                 <div class="accordion-item">

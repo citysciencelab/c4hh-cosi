@@ -87,7 +87,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             }
         }),
         factory = {
-            getShallowMount: (values = {}, isStatusProgressVisible = true, isParcelSearch = false) => {
+            getShallowMount: (values = {}, isStatusLogVisible = true, isParcelSearch = false) => {
                 return shallowMount(ValuationPrint, {
                     global: {
                         plugins: [store],
@@ -109,7 +109,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         icon: () => "small",
                         renderToWindow: () => false,
                         resizableWindow: () => false,
-                        showStatusProgress: () => isStatusProgressVisible,
+                        showStatusLog: () => isStatusLogVisible,
                         showParcelSearch: () => isParcelSearch,
                         reportPath: () => "config.valuation.json",
                         urlList: () => [],
@@ -120,7 +120,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                     }
                 });
             },
-            getMount: (values = {}, isStatusProgressVisible = true, isParcelSearch = false) => {
+            getMount: (values = {}, isStatusLogVisible = true, isParcelSearch = false) => {
                 return mount(ValuationPrint, {
                     global: {
                         plugins: [store]
@@ -139,7 +139,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         icon: () => "small",
                         renderToWindow: () => false,
                         resizableWindow: () => false,
-                        showStatusProgress: () => isStatusProgressVisible,
+                        showStatusLog: () => isStatusLogVisible,
                         showParcelSearch: () => isParcelSearch,
                         reportPath: () => "config.valuation.json",
                         urlList: () => [],
@@ -232,7 +232,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             expect(wrapper.find(".messageListError").exists()).to.be.false;
         });
-        it("should add an error class to the list entry if an error is added and status progress is configured to be shown", async () => {
+        it("should add an error class to the list entry if an error is added and status log is configured to be shown", async () => {
             const wrapper = factory.getShallowMount({});
 
             wrapper.vm.select.getFeatures().push(features[0]);
@@ -292,6 +292,20 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             expect(wrapper.findComponent(WfsSearch).exists()).to.be.true;
         });
+        it("should render progress bar if isInProcessOfCreatingReport and status log is configured not to be shown", async () => {
+            const wrapper = factory.getShallowMount({}, false, true);
+
+            wrapper.vm.isInProcessOfCreatingReport = true;
+            await wrapper.vm.$forceUpdate();
+            expect(wrapper.find("progress").exists()).to.be.true;
+        });
+        it("should not render progress bar if status log is configured to be shown even if isInProcessOfCreatingReport", async () => {
+            const wrapper = factory.getShallowMount({}, true, true);
+
+            wrapper.vm.isInProcessOfCreatingReport = true;
+            await wrapper.vm.$forceUpdate();
+            expect(wrapper.find("progress").exists()).to.be.false;
+        });
     });
 
     describe("modal", () => {
@@ -303,8 +317,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
     });
 
-    describe("configuration of status progress", () => {
-        it("should render status progress if configured to be shown", async () => {
+    describe("configuration of status log", () => {
+        it("should render status log if configured to be shown", async () => {
             const wrapper = factory.getShallowMount({}, true);
 
             wrapper.vm.addMessage("message");
@@ -313,7 +327,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             expect(wrapper.find(".messageListEntry").exists()).to.be.true;
         });
 
-        it("should not render status progress if configured not to be shown", async () => {
+        it("should not render status log if configured not to be shown", async () => {
             const wrapper = factory.getShallowMount({}, false);
 
             wrapper.vm.addMessage("message");

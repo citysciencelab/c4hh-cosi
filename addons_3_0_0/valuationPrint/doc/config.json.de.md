@@ -7,7 +7,7 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
 |name|ja|String|Wertermittlung|Der Titel des Werkzeuges bzw. der Eintrag in der Werkzeugliste|false|
 |icon|ja|String|bi-bar-chart-line-fill|Das zu verwendende Icon.|false|
 |parcelLayerId|ja|String|""|Layer-Id der Flurstücke, deren Daten erforderlich für dieses Tool sind.|false|
-|showStatusProgress|nein|Boolean|true|Ob der Statusverlauf angezeigt werden soll.|false|
+|showStatusLog|nein|Boolean|true|Ob anstelle der Progress Bar die accordion-Komponente mit den einzelnen Status-Meldungen angezeigt werden soll.|false|
 |multiSelectParcels|nein|Boolean|false|Ob der User mehrere Flurstücke gleichzeitig ausgewählt haben kann.|false|
 |showParcelSearch|nein|Boolean|false|Wenn true, wird die Flurstückssuche angezeigt, ansonsten die Wertermittlung.|false|
 |isModalRequired|nein|Boolean|true|Ob vor dem Starten der Berichtserzeugung durch ein Modal Angaben zu Geschäftszeichen, Adresse etc. abgefragt werden sollen.|false|
@@ -22,7 +22,7 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
         "name": "Wertermittlung",
         "icon": "bi-bar-chart-line-fill",
         "parcelLayerId": "6076",
-        "showStatusProgress": false,
+        "showStatusLog": false,
         "multiSelectParcels": true,
         "showParcelSearch": true,
         "isModalRequired": false,

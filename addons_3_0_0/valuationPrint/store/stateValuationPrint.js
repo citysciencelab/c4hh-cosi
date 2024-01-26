@@ -10,7 +10,7 @@
  * @property {Boolean} resizableWindow - If true, window is resizable.
  * @property {Boolean} isVisibleInMenu - If true, tool is selectable in menu.
  * @property {Boolean} deactivateGFI - Flag if tool should deactivate gfi.
- * @property {Boolean} showStatusProgress -If set to false, status progress ("Statusverlauf") is never renderend.
+ * @property {Boolean} showStatusLog -If set to false, status log ("Statusverlauf") is never renderend.
  * @property {Boolean} multiSelectParcels - If true, user can have more than one parcel selected at a time.
  * @property {Boolean} showParcelSearch - If true, WfsSearch is rendered.
  * @property {Boolean} oafCRSURI - The URI for the oaf services. Needs to be set with a valid crs URI.
@@ -36,7 +36,7 @@ const state = {
     resizableWindow: true,
     isVisibleInMenu: true,
     deactivateGFI: false,
-    showStatusProgress: true,
+    showStatusLog: true,
     multiSelectParcels: false,
     showParcelSearch: false,
     isModalRequired: true,
