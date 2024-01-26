@@ -150,6 +150,10 @@ export default {
             this.createParcelLayer(this.parcelLayerId);
         }
 
+        if (this.showParcelSearch) {
+            this.setMultiSelectParcels(false);
+        }
+
         this.setConfig();
         this.setSelectInteraction();
     },
