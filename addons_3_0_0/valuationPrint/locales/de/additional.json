@@ -29,7 +29,8 @@
       "formError": {
         "missingDocumentName": "Bitte Dokumentnamen eingeben.",
         "missingAddress": "Bitte eine Adresse auswählen oder eingeben."
-      }
+      },
+      "select": "Aus-/abwählen"
     }
   }
 }

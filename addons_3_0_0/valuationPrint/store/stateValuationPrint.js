@@ -18,6 +18,7 @@
  * @property {Object} messageList - List of messages for status progress.
  * @property {Object} urlList - List of urls for downloding pdf and images.
  * @property {Boolean} showDownloadAll - True, if the url list was generated.
+ * @property {Object[]} printedFeature - the printed features
  */
 const state = {
     id: "valuationPrint",
@@ -41,7 +42,8 @@ const state = {
     selectedFeatures: [],
     messageList: [],
     urlList: [],
-    showDownloadAll: false
+    showDownloadAll: false,
+    printedFeature: []
 };
 
 export default state;

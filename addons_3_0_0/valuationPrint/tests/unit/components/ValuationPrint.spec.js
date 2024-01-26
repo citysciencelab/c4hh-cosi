@@ -89,7 +89,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         selectedFeatures: () => [],
                         messageList: () => [],
                         urlList: () => [],
-                        showDownloadAll: () => false
+                        showDownloadAll: () => false,
+                        printedFeature: () => []
                     },
                     slots: {
                         footer: "<div>Footer</div>"
@@ -117,7 +118,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         selectedFeatures: () => [],
                         messageList: () => [],
                         urlList: () => [],
-                        showDownloadAll: () => false
+                        showDownloadAll: () => false,
+                        printedFeature: () => []
                     }
                 });
             }
@@ -310,6 +312,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                     wrapper = factory.getMount({}, true, false);
 
                 wrapper.vm.selectedFeatures.push(features[0]);
+                wrapper.vm.printedFeature.push(features[0]);
                 await wrapper.vm.$forceUpdate();
                 await wrapper.find("#start-valuation-print").trigger("click");
                 await wrapper.vm.$forceUpdate();
@@ -341,6 +344,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
                 wrapper.vm.isModalRequired = false;
                 wrapper.vm.selectedFeatures.push(features[0]);
+                wrapper.vm.printedFeature.push(features[0]);
                 await wrapper.vm.$forceUpdate();
                 wrapper.findComponent("#start-valuation-print").trigger("click");
 

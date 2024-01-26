@@ -29,7 +29,8 @@
       "formError": {
         "missingDocumentName": "Please insert the dokument name.",
         "missingAddress": "Please select or insert an address."
-      }
+      },
+      "select": "(de)select"
     }
   }
 }

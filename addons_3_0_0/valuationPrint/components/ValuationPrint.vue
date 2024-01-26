@@ -23,7 +23,7 @@ import layerFactory from "../../../../src_3_0_0/core/layers/js/layerFactory";
 import IconButton from "../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
 import FlatButton from "../../../../src_3_0_0/shared/modules/buttons/components/FlatButton.vue";
 import WfsSearch from "../../../../src_3_0_0/modules/wfsSearch/components/WfsSearch.vue";
-
+import {uniqueId} from "../../../../src_3_0_0/shared/js/utils/uniqueId.js";
 
 export default {
     name: "ValuationPrint",
@@ -36,7 +36,6 @@ export default {
     data () {
         return {
             parcelData: null,
-            printedFeature: [],
             addressList: [],
             showModal: false,
             chosenType: "Gutachten",
@@ -46,7 +45,8 @@ export default {
             },
             specificAddress: "",
             documentNumber: "",
-            autofill: false
+            autofill: false,
+            optionListName: ""
         };
     },
     computed: {
@@ -162,6 +162,9 @@ export default {
         this.select.setActive(true);
         this.select.getFeatures().on("change:length", (evt) => {
             this.setSelectedFeatures([...evt.target.getArray()]);
+            if (this.showParcelSearch) {
+                this.setPrintedFeature(this.selectedFeatures);
+            }
         });
     },
     unmounted () {
@@ -200,6 +203,7 @@ export default {
 
                 this.select.getFeatures().removeAt(i);
                 this.setSelectedFeatures(this.select.getFeatures().getArray());
+                this.setPrintedFeature(this.printedFeature.filter(fea => fea.get("flstnrzae") !== feature.get("flstnrzae")));
             }
         },
 
@@ -296,12 +300,10 @@ export default {
         /**
          * Shows the print modal and saves the feature for print window
          * @param {Boolean} val - true or false to decide if open or close the print window
-         * @param {ol/Feature[]} featureList - the selected feature(s) for the print window
          * @returns {void}
          */
-        showPrintModal (val, featureList) {
+        showPrintModal (val) {
             this.showModal = val;
-            this.printedFeature = featureList;
 
             if (this.showModal && Array.isArray(this.addressList)) {
                 if (this.addressList.length === 1) {
@@ -358,8 +360,7 @@ export default {
                 config = this.config?.services?.hh_wfs_dog;
 
             if (this.isModalRequired === false) {
-                this.printedFeature = featureList;
-                this.setParcelData(this.printedFeature);
+                this.setParcelData(featureList);
                 return;
             }
             collectFeatures(
@@ -387,6 +388,7 @@ export default {
                         }
                         addr.push(address);
                     });
+
                     this.addressList = addr.sort((a, b) => {
                         if (a < b) {
                             return -1;
@@ -396,6 +398,9 @@ export default {
                         }
                         return 0;
                     });
+
+                    this.optionListName = uniqueId("addresslistOptions");
+
                     this.showPrintModal(val, featureList);
                 },
                 error => console.warn(error)
@@ -599,6 +604,21 @@ export default {
                 }
             }
             return isValid;
+        },
+
+        /**
+         * Edit the printed features
+         * @param {Event} evt input checkbox event
+         * @param {ol/Feature} feature - the current features
+         * @returns {void}
+         */
+        editPrintedFeature (evt, feature) {
+            if (evt?.target?.checked) {
+                this.setPrintedFeature([].concat(this.printedFeature, feature));
+            }
+            else {
+                this.setPrintedFeature(this.printedFeature.filter(fea => fea.get("flstnrzae") !== feature.get("flstnrzae")));
+            }
         }
     }
 };
@@ -631,8 +651,10 @@ export default {
                                         <input
                                             class="form-check-input col col-md-1 align-self-center"
                                             type="checkbox"
+                                            :checked="printedFeature.filter(fea => fea.get('flstnrzae') === feature.get('flstnrzae')).length"
                                             value=""
-                                            aria-label="..."
+                                            aria-label="$t('additional:modules.valuationPrint.select')"
+                                            @change="editPrintedFeature($event, feature)"
                                         >
                                         <div class="parcel col col-md-5 text-center">
                                             <div class="parcel-label">
@@ -668,8 +690,9 @@ export default {
                                     aria-label="$t('additional:modules.valuationPrint.startButton')"
                                     type="button"
                                     :text="$t('additional:modules.valuationPrint.startButton')"
-                                    :interaction="() => getAddress(true, selectedFeatures)"
+                                    :interaction="() => getAddress(true, printedFeature)"
                                     icon="bi-play"
+                                    :disabled="!printedFeature.length"
                                 />
                             </div>
                         </template>
@@ -693,7 +716,7 @@ export default {
                         aria-label="$t('additional:modules.valuationPrint.startButton')"
                         type="button"
                         :text="$t('additional:modules.valuationPrint.startButton')"
-                        :interaction="() => getAddress(true, selectedFeatures)"
+                        :interaction="() => getAddress(true, printedFeature)"
                         icon="bi-play"
                         :disabled="!selectedFeatures.length"
                     />
@@ -811,11 +834,11 @@ export default {
                                 id="address-list"
                                 ref="addressInput"
                                 :class="`form-control ${errors.address ? 'is-invalid' : ''}`"
-                                list="addresslistOptions"
+                                :list="optionListName"
                                 :placeholder="!autofill ? $t('additional:modules.valuationPrint.placeholder') : ''"
                                 @change="setSpecificAddress"
                             >
-                            <datalist id="addresslistOptions">
+                            <datalist :id="optionListName">
                                 <option
                                     v-for="address in addressList"
                                     :key="address"
@@ -927,6 +950,7 @@ button {
     }
     .form-check-input {
         appearance: checkbox;
+        cursor: pointer;
     }
 }
 .list-inline, .list-unstyled {
