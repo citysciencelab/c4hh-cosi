@@ -52,9 +52,25 @@ export default {
     computed: {
         ...mapGetters("Modules/ValuationPrint", Object.keys(getters)),
         ...mapGetters("Maps", ["projection", "getResolutionByScale"]),
-        ...mapGetters(["restServiceById", "layerConfigById"])
+        ...mapGetters(["restServiceById", "layerConfigById"]),
+        ...mapGetters("Modules/WfsSearch", {
+            parcelSearchFeature: "results"
+        })
     },
     watch: {
+        /**
+         * If the parcel search is configured, this watcher is required to handle the result of the search.
+         * @params {ol/Feature[]} features - The result of the parcel search.
+         * @returns {void}
+         */
+        parcelSearchFeature: {
+            deep: true,
+            handler (features) {
+                if (features?.length) {
+                    this.handleParcelSearch(features[0]);
+                }
+            }
+        },
         /**
          * Starts process for the valuation.
          * @param {Object} parcel - The parcel data.
@@ -184,7 +200,7 @@ export default {
          * @param {Number} scale - The scale for the max resolution of the layer.
          * @returns {void}
          */
-        createParcelLayer (layerId, scale = 2500) {
+        createParcelLayer (layerId, scale = 5000) {
             const layer = layerFactory.createLayer(rawLayerList.getLayerWhere({id: layerId})),
                 resoByMaxScale = this.getResolutionByScale(scale, "max");
 
@@ -205,6 +221,49 @@ export default {
                 this.setSelectedFeatures(this.select.getFeatures().getArray());
                 this.setPrintedFeature(this.printedFeature.filter(fea => fea.get("flstnrzae") !== feature.get("flstnrzae")));
             }
+        },
+
+        /**
+         * Handles the result of the parcel search and add the related feature to the collection of the select interaction.
+         * The layer that is used in the parcel search is different from this one.
+         * The refresh is necessary because the feature searched for may not yet be loaded.
+         * @param {ol/Feature} feature - The feature from the parcel search.
+         * @returns {void}
+         */
+        handleParcelSearch (feature) {
+            const landmark = feature.get("gemarkungsname"),
+                parcelNumber = feature.get("flurstuecksnummer"),
+                layerSource = layerCollection.getLayerById(this.parcelLayerId).getLayerSource();
+
+            layerSource.refresh();
+            layerSource.once("featuresloadend", () => {
+                const parcelFeature = this.getParcelByAttributes(layerSource.getFeatures(), landmark, parcelNumber);
+
+                this.clearAndAddFeature(parcelFeature);
+            });
+        },
+
+        /**
+         * Finds a parcel by the given landmark and parcel number.
+         * @param {ol/Feature[]} features - The list of features to search in.
+         * @param {String} landmark - The landmark searched for.
+         * @param {String} parcelNumber - The parcel number searched for.
+         * @returns {ol/Feature|undefined} The found feature.
+         */
+        getParcelByAttributes (features, landmark, parcelNumber) {
+            return features.find(feature => {
+                return feature.get("gemarkung") === landmark && feature.get("flstnrzae") === parcelNumber;
+            });
+        },
+
+        /**
+         * Removes all features from the collection and adds the given one.
+         * @param {ol/Feature} feature - The feature to add.
+         * @returns {void}
+         */
+        clearAndAddFeature (feature) {
+            this.select.getFeatures().clear();
+            this.select.getFeatures().push(feature);
         },
 
         /**
@@ -262,12 +321,10 @@ export default {
 
             this.addFeaturesToSelectInteraction(this.select);
 
-            this.select.on("change:active", this.styleSelectedFeatures);
             this.select.on("select", event => {
                 if (this.multiSelectParcels === false) {
                     if (this.select.getFeatures().getLength() > 1) {
-                        this.select.getFeatures().clear();
-                        this.select.getFeatures().push(event.selected[0]);
+                        this.clearAndAddFeature(event.selected[0]);
                     }
                 }
             });
@@ -500,29 +557,6 @@ export default {
                 });
             }, 0);
         },
-        /**
-         * Sets the style of the selected features depending on the activity of the select interaction.
-         * If the interaction is active, all existing featurers are styled using the select interaction style.
-         * If it is not, the layer style is used.
-         * @param {ol/Object.ObjectEvent} evt - OpenLayers Object Event.
-         * @param {String} evt.key - The name of the property whose value is changing.
-         * @param {ol/interaction/Select} evt.target - The event target. In this case the select interaction.
-         * @returns {void}
-         */
-        styleSelectedFeatures ({key, target}) {
-            const features = target.getFeatures();
-
-            if (target.get(key)) {
-                features.forEach(feature => {
-                    feature.setStyle(target.getStyle());
-                });
-            }
-            else {
-                features.forEach(feature => {
-                    feature.setStyle(false);
-                });
-            }
-        },
 
         /**
          * Adds a new message to the GUI log.
@@ -660,7 +694,7 @@ export default {
                                             <div class="parcel-label">
                                                 {{ $t('additional:modules.valuationPrint.parcel') }}
                                             </div>
-                                            <div class="list-item">
+                                            <div class="font-bold">
                                                 {{ feature.get("flstnrzae") }}
                                             </div>
                                         </div>
@@ -668,7 +702,7 @@ export default {
                                             <div class="parcel-label">
                                                 {{ $t('additional:modules.valuationPrint.district') }}
                                             </div>
-                                            <div class="list-item">
+                                            <div class="font-bold">
                                                 {{ feature.get("gemarkung") }}
                                             </div>
                                         </div>
@@ -709,6 +743,21 @@ export default {
                 </h6>
                 <p class="infotext">
                     {{ $t('additional:modules.valuationPrint.infoGenerateReport') }}
+                </p>
+                <br>
+                <p v-if="selectedFeatures.length === 1">
+                    <span class="parcel-label">
+                        {{ $t('additional:modules.valuationPrint.district') }}
+                    </span>
+                    <span class="font-bold">
+                        {{ selectedFeatures[0].get("gemarkung") }}
+                    </span><br>
+                    <span class="parcel-label">
+                        {{ $t('additional:modules.valuationPrint.parcel') }}
+                    </span>
+                    <span class="font-bold">
+                        {{ selectedFeatures[0].get("flstnrzae") }}
+                    </span>
                 </p>
                 <div class="d-flex justify-content-center pt-3">
                     <FlatButton
@@ -942,6 +991,10 @@ h5 {
     font-size: 14px;
 }
 
+.font-bold {
+    font-family: "MasterPortalFont Bold";
+}
+
 .def-font {
     font-size: 16px;
     .form-check-label {
@@ -964,9 +1017,6 @@ button {
     padding: 13px;
     .parcel-label {
         font-size: 12px;
-    }
-    .list-item {
-        font-family: "MasterPortalFont Bold";
     }
     ul {
         list-style-type: none;

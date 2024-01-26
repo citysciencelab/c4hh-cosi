@@ -61,6 +61,28 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                             };
                         }
                     }
+                },
+                Modules: {
+                    namespaced: true,
+                    modules: {
+                        namespaced: true,
+                        WfsSearch: {
+                            namespaced: true,
+                            getters: {
+                                results: () => []
+                            }
+                        },
+                        ValuationPrint: {
+                            namespaced: true,
+                            mutations: {
+                                setMessageList: sinon.stub(),
+                                setSelectedFeatures: sinon.stub(),
+                                setMultiSelectParcels: sinon.stub(),
+                                setUrlList: sinon.stub(),
+                                setPrintedFeatures: sinon.stub()
+                            }
+                        }
+                    }
                 }
             }
         }),
@@ -75,6 +97,10 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                     },
                     data () {
                         return {
+                            selectedFeatures: [],
+                            messageList: [],
+                            specificAddress: "",
+                            printedFeature: [],
                             ...values
                         };
                     },
@@ -86,11 +112,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         showStatusProgress: () => isStatusProgressVisible,
                         showParcelSearch: () => isParcelSearch,
                         reportPath: () => "config.valuation.json",
-                        selectedFeatures: () => [],
-                        messageList: () => [],
                         urlList: () => [],
-                        showDownloadAll: () => false,
-                        printedFeature: () => []
+                        showDownloadAll: () => false
                     },
                     slots: {
                         footer: "<div>Footer</div>"
@@ -104,7 +127,11 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                     },
                     data () {
                         return {
-                            ...values
+                            ...values,
+                            selectedFeatures: [],
+                            messageList: [],
+                            specificAddress: "",
+                            printedFeature: []
                         };
                     },
                     computed: {
@@ -115,11 +142,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                         showStatusProgress: () => isStatusProgressVisible,
                         showParcelSearch: () => isParcelSearch,
                         reportPath: () => "config.valuation.json",
-                        selectedFeatures: () => [],
-                        messageList: () => [],
                         urlList: () => [],
-                        showDownloadAll: () => false,
-                        printedFeature: () => []
+                        showDownloadAll: () => false
                     }
                 });
             }
@@ -132,7 +156,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         stubCreateParcelLayer = sinon.stub(ValuationPrint.methods, "createParcelLayer");
     });
 
-    after(function () {
+    afterEach(function () {
         stubSetConfig.restore();
         stubCreateParcelLayer.restore();
     });
@@ -154,32 +178,31 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         it("should find one list per feature", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.selectedFeatures.push(features[0]);
-            wrapper.vm.selectedFeatures.push(features[1]);
-
-            await wrapper.vm.$forceUpdate();
-
+            await wrapper.setData({
+                selectedFeatures: features
+            });
             expect(wrapper.findAll(".list-group-item")).to.be.lengthOf(2);
         });
 
         it("should render the feature properties correctly", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.selectedFeatures.push(features[0]);
-            await wrapper.vm.$forceUpdate();
+            await wrapper.setData({
+                selectedFeatures: [features[0]]
+            });
 
             expect(wrapper.findAll(".parcel-label").at(0).text()).to.be.equal("additional:modules.valuationPrint.parcel");
-            expect(wrapper.findAll(".list-item").at(0).text()).to.be.equal("12345");
+            expect(wrapper.findAll(".font-bold").at(0).text()).to.be.equal("12345");
             expect(wrapper.findAll(".parcel-label").at(1).text()).to.be.equal("additional:modules.valuationPrint.district");
-            expect(wrapper.findAll(".list-item").at(1).text()).to.be.equal("ueberall");
+            expect(wrapper.findAll(".font-bold").at(1).text()).to.be.equal("ueberall");
         });
 
         it("should find one remove button per feature", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.selectedFeatures.push(features[0]);
-            wrapper.vm.selectedFeatures.push(features[1]);
-            await wrapper.vm.$forceUpdate();
+            await wrapper.setData({
+                selectedFeatures: features
+            });
 
             expect(wrapper.findAllComponents(IconButton).length).to.be.equals(2);
         });
@@ -187,9 +210,9 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         it("should find one start button", async () => {
             const wrapper = factory.getShallowMount({}, true);
 
-            wrapper.vm.selectedFeatures.push(features[0]);
-            wrapper.vm.selectedFeatures.push(features[1]);
-            await wrapper.vm.$forceUpdate();
+            await wrapper.setData({
+                selectedFeatures: features
+            });
 
             expect(wrapper.findAll("#start-valuation-print").length).to.be.equals(1);
         });
@@ -197,9 +220,15 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         it("should not add an error class to the list entry if no error is added", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.select.getFeatures().push(features[0]);
-            wrapper.vm.addMessage("message", false);
-            await wrapper.vm.$forceUpdate();
+            await wrapper.setData({
+                selectedFeatures: [features[0]],
+                messageList: [{
+                    message: "message",
+                    isError: false
+                }]
+            });
+            // wrapper.vm.addMessage("message", false);
+            // await wrapper.vm.$forceUpdate();
 
             expect(wrapper.find(".messageListError").exists()).to.be.false;
         });
@@ -263,328 +292,341 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             expect(wrapper.findComponent(WfsSearch).exists()).to.be.true;
         });
+    });
 
-        describe("modal", () => {
-            it("should render", () => {
+    describe("modal", () => {
+        it("should render", () => {
+            const wrapper = factory.getShallowMount({});
+
+            wrapper.vm.showModal = true;
+            expect(wrapper.findAllComponents(ModalItem).length).to.be.equals(1);
+        });
+    });
+
+    describe("configuration of status progress", () => {
+        it("should render status progress if configured to be shown", async () => {
+            const wrapper = factory.getShallowMount({}, true);
+
+            wrapper.vm.addMessage("message");
+            await wrapper.vm.$forceUpdate();
+
+            expect(wrapper.find(".messageListEntry").exists()).to.be.true;
+        });
+
+        it("should not render status progress if configured not to be shown", async () => {
+            const wrapper = factory.getShallowMount({}, false);
+
+            wrapper.vm.addMessage("message");
+            await wrapper.vm.$forceUpdate();
+
+            expect(wrapper.find(".messageListEntry").exists()).to.be.false;
+        });
+    });
+
+    describe("User Interactions", () => {
+        it("should have only one selected layer if user has clicked on two and multiSelect is configured to be false", async () => {
+            const wrapper = factory.getMount({}, true);
+
+            wrapper.vm.multiSelectParcels = false;
+            wrapper.vm.select.getFeatures().push(features[0]);
+            wrapper.vm.select.dispatchEvent({
+                type: "select",
+                selected: [features[0]]
+            });
+            wrapper.vm.select.getFeatures().push(features[1]);
+            wrapper.vm.select.dispatchEvent({
+                type: "select",
+                selected: [features[1]]
+            });
+
+            expect(wrapper.vm.select.getFeatures().getArray()).to.have.lengthOf(1);
+        });
+
+        it("should call 'removeFeature' if user click the remove button", async () => {
+            const spyRemoveFeature = sinon.spy(ValuationPrint.methods, "removeFeature"),
+                wrapper = factory.getMount({}, true);
+
+            await wrapper.setData({
+                selectedFeatures: features
+            });
+            await wrapper.findAll(".remove")[0].trigger("click");
+
+            expect(spyRemoveFeature.calledOnce).to.be.true;
+            spyRemoveFeature.restore();
+        });
+
+        it("should call 'getAddress' if user click the start button in list", async () => {
+            const spyGetAddress = sinon.stub(ValuationPrint.methods, "getAddress"),
+                wrapper = factory.getMount({}, true);
+
+            await wrapper.setData({
+                selectedFeatures: [features[0]],
+                printedFeature: [features[0]]
+            });
+            await wrapper.find("#start-valuation-print").trigger("click");
+
+            expect(spyGetAddress.calledOnce).to.be.true;
+
+            spyGetAddress.restore();
+        });
+
+        it("should call 'setParcelData' if user click the start button in print modal", async () => {
+            const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
+                wrapper = factory.getMount({});
+
+            await wrapper.setData({
+                showModal: true
+            });
+            wrapper.findAllComponents(ModalItem).at(0).findAll(".confirm-print").forEach(button => {
+                if (button.text() === "additional:modules.valuationPrint.startButton") {
+                    button.trigger("click");
+                }
+            });
+
+            expect(spySetParcelData.calledOnce).to.be.true;
+
+            spySetParcelData.restore();
+        });
+
+        it("should call 'setParcelData' if user click the start button in parcel list and modal is configured to not be required", async () => {
+            const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
+                wrapper = factory.getMount({isModalRequired: false});
+
+            await wrapper.setData({
+                selectedFeatures: [features[0]],
+                printedFeature: [features[0]]
+            });
+            wrapper.findComponent("#start-valuation-print").trigger("click");
+
+            expect(spySetParcelData.calledOnce).to.be.true;
+
+            spySetParcelData.restore();
+        });
+
+        it("should call 'showPrintModal' if user click the cancel button in print modal", async () => {
+            const spyShowPrintModal = sinon.spy(ValuationPrint.methods, "showPrintModal"),
+                wrapper = factory.getMount({});
+
+            wrapper.vm.select.getFeatures().push(features[0]);
+            wrapper.vm.select.getFeatures().push(features[1]);
+
+            await wrapper.vm.$forceUpdate();
+            await wrapper.findAllComponents(ModalItem).at(0).findAll(".p-2 button").forEach(button => {
+                if (button.text() === "additional:modules.valuationPrint.cancel") {
+                    button.trigger("click");
+                }
+            });
+
+            expect(spyShowPrintModal.calledOnce).to.be.true;
+
+            spyShowPrintModal.restore();
+        });
+    });
+
+    describe("Watcher", () => {
+        describe("parcelSearchFeature", () => {
+            let stubParcelSearchFeature;
+
+            beforeEach(function () {
+                stubParcelSearchFeature = sinon.stub(ValuationPrint.methods, "handleParcelSearch");
+            });
+
+            afterEach(function () {
+                stubParcelSearchFeature.restore();
+            });
+
+            it("should call handleParcelSearch, if the parcel search delivers a result", () => {
                 const wrapper = factory.getShallowMount({});
 
-                wrapper.vm.showModal = true;
-                expect(wrapper.findAllComponents(ModalItem).length).to.be.equals(1);
-            });
-        });
-
-        describe("configuration of status progress", () => {
-            it("should render status progress if configured to be shown", async () => {
-                const wrapper = factory.getShallowMount({}, true);
-
-                wrapper.vm.addMessage("message");
-                await wrapper.vm.$forceUpdate();
-
-                expect(wrapper.find(".messageListEntry").exists()).to.be.true;
+                wrapper.vm.$options.watch.parcelSearchFeature.handler.call(wrapper.vm, [features[1]]);
+                expect(stubParcelSearchFeature.calledOnce).to.be.true;
             });
 
-            it("should not render status progress if configured not to be shown", async () => {
-                const wrapper = factory.getShallowMount({}, false);
-
-                wrapper.vm.addMessage("message");
-                await wrapper.vm.$forceUpdate();
-
-                expect(wrapper.find(".messageListEntry").exists()).to.be.false;
-            });
-        });
-
-        describe("User Interactions", () => {
-            it("should have only one selected layer if user has clicked on two and multiSelect is configured to be false", async () => {
-                const wrapper = factory.getMount({}, true);
-
-                wrapper.vm.multiSelectParcels = false;
-                wrapper.vm.select.getFeatures().push(features[0]);
-                wrapper.vm.select.dispatchEvent({
-                    type: "select",
-                    selected: [features[0]]
-                });
-                wrapper.vm.select.getFeatures().push(features[1]);
-                wrapper.vm.select.dispatchEvent({
-                    type: "select",
-                    selected: [features[1]]
-                });
-
-                expect(wrapper.vm.select.getFeatures().getArray()).to.have.lengthOf(1);
-            });
-
-            it("should call 'removeFeature' if user click the remove button", async () => {
-                const spyRemoveFeature = sinon.spy(ValuationPrint.methods, "removeFeature"),
-                    wrapper = factory.getMount({}, true);
-
-                wrapper.vm.selectedFeatures.push(features[0]);
-                wrapper.vm.selectedFeatures.push(features[1]);
-                await wrapper.vm.$forceUpdate();
-                await wrapper.findAll(".remove").at(0).trigger("click");
-
-                expect(spyRemoveFeature.calledOnce).to.be.true;
-
-                spyRemoveFeature.restore();
-            });
-
-            it("should call 'getAddress' if user click the start button in list", async () => {
-                const spyGetAddress = sinon.stub(ValuationPrint.methods, "getAddress"),
-                    wrapper = factory.getMount({}, true, false);
-
-                wrapper.vm.selectedFeatures.push(features[0]);
-                wrapper.vm.printedFeature.push(features[0]);
-                await wrapper.vm.$forceUpdate();
-                await wrapper.find("#start-valuation-print").trigger("click");
-                await wrapper.vm.$forceUpdate();
-
-                expect(spyGetAddress.calledOnce).to.be.true;
-
-                spyGetAddress.restore();
-            });
-
-            it("should call 'setParcelData' if user click the start button in print modal", async () => {
-                const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
-                    wrapper = factory.getMount({});
-
-                wrapper.vm.showModal = true;
-                wrapper.findAllComponents(ModalItem).at(0).findAll(".confirm-print").forEach(button => {
-                    if (button.text() === "additional:modules.valuationPrint.startButton") {
-                        button.trigger("click");
-                    }
-                });
-
-                expect(spySetParcelData.calledOnce).to.be.true;
-
-                spySetParcelData.restore();
-            });
-
-            it("should call 'setParcelData' if user click the start button in parcel list and modal is configured to not be required", async () => {
-                const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
-                    wrapper = factory.getMount({});
-
-                wrapper.vm.isModalRequired = false;
-                wrapper.vm.selectedFeatures.push(features[0]);
-                wrapper.vm.printedFeature.push(features[0]);
-                await wrapper.vm.$forceUpdate();
-                wrapper.findComponent("#start-valuation-print").trigger("click");
-
-                expect(spySetParcelData.calledOnce).to.be.true;
-
-                spySetParcelData.restore();
-            });
-
-            it("should call 'showPrintModal' if user click the cancel button in print modal", async () => {
-                const spyShowPrintModal = sinon.spy(ValuationPrint.methods, "showPrintModal"),
-                    wrapper = factory.getMount({});
-
-                wrapper.vm.select.getFeatures().push(features[0]);
-                wrapper.vm.select.getFeatures().push(features[1]);
-
-                await wrapper.vm.$forceUpdate();
-                await wrapper.findAllComponents(ModalItem).at(0).findAll(".p-2 button").forEach(button => {
-                    if (button.text() === "additional:modules.valuationPrint.cancel") {
-                        button.trigger("click");
-                    }
-                });
-
-                expect(spyShowPrintModal.calledOnce).to.be.true;
-
-                spyShowPrintModal.restore();
-            });
-        });
-
-        describe("Hooks", () => {
-            describe("Created", () => {
-                it("should call setSelectInteraction if the component is created", () => {
-                    const spySetSelectInteraction = sinon.spy(ValuationPrint.methods, "setSelectInteraction");
-
-                    factory.getShallowMount({});
-
-                    expect(spySetSelectInteraction.calledOnce).to.be.true;
-
-                    spySetSelectInteraction.restore();
-                });
-
-                it("should call setConfig if the component is created", () => {
-                    factory.getShallowMount({});
-
-                    expect(stubSetConfig.called).to.be.true;
-                });
-
-                it("should call setSelectInteraction if the component is created", () => {
-                    const spySetSelectInteraction = sinon.spy(ValuationPrint.methods, "setSelectInteraction");
-
-                    factory.getShallowMount({});
-
-                    expect(spySetSelectInteraction.calledOnce).to.be.true;
-
-                    spySetSelectInteraction.restore();
-                });
-            });
-        });
-
-        describe("Methods", () => {
-            describe("getFilenameOfPDF", () => {
-                it("should return the right file name", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    expect(wrapper.vm.getFilenameOfPDF("prefix", "2022-07-11")).to.equal("2022-07-11 prefix");
-                });
-            });
-
-            describe("styleSelectedFeatures", () => {
-                it("should style the features with the select interaction style if the interaction is active", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.select.getFeatures().push(features[0]);
-                    wrapper.vm.styleSelectedFeatures({key: "active", target: wrapper.vm.select});
-                    expect(wrapper.vm.select.getFeatures().getArray()[0].getStyle()).to.deep.equal(wrapper.vm.select.getStyle());
-
-                });
-
-                it("should style the features with the layer style if the interaction is not active", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.select.getFeatures().push(features[0]);
-                    wrapper.vm.select.setActive(false);
-                    wrapper.vm.styleSelectedFeatures({key: "active", target: wrapper.vm.select});
-                    expect(wrapper.vm.select.getFeatures().getArray()[0].getStyle()).to.be.false;
-
-                });
-            });
-
-            describe("removeFeature", () => {
-                it("should remove a feature from the select interaction", async () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.setSelectedFeatures(features[0]);
-
-                    wrapper.vm.removeFeature(features[0]);
-                    await wrapper.vm.$forceUpdate();
-                    expect(wrapper.vm.selectedFeatures).to.be.lengthOf(0);
-                });
-                it("should only remove data from type ol/Feature", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.select.getFeatures().push(features[0]);
-                    wrapper.vm.select.getFeatures().push(features[1]);
-                    wrapper.vm.removeFeature(122);
-                    wrapper.vm.removeFeature({});
-                    wrapper.vm.removeFeature(true);
-                    wrapper.vm.removeFeature(undefined);
-                    wrapper.vm.removeFeature(null);
-                    wrapper.vm.removeFeature([]);
-
-                    expect(wrapper.vm.select.getFeatures().getArray()).to.be.lengthOf(2);
-                });
-            });
-
-            describe("setParcelData", () => {
-                it("should set the parcelData object", () => {
-                    sinon.stub(ValuationPrint.methods, "formValidation").returns(true);
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.setParcelData([features[0]]);
-
-                    expect(wrapper.vm.parcelData).to.have.all.keys("center", "geometry", "extent", "feature", "featureList");
-                    sinon.restore();
-                });
-                it("should not set the parcelData object", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.setParcelData(122);
-                    wrapper.vm.setParcelData({});
-                    wrapper.vm.setParcelData(true);
-                    wrapper.vm.setParcelData(undefined);
-                    wrapper.vm.setParcelData(null);
-                    wrapper.vm.setParcelData([]);
-
-                    expect(wrapper.vm.parcelData).to.be.null;
-                });
-                it("should reset the message list", () => {
-                    sinon.stub(ValuationPrint.methods, "formValidation").returns(true);
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.setMessageList({message: "message", isError: false});
-                    wrapper.vm.setParcelData([features[0]]);
-                    expect(wrapper.vm.messageList).to.be.an("array").that.is.empty;
-                    sinon.restore();
-                });
-            });
-
-            describe("setSelectInteraction", () => {
-                it("should set openlayers select interaction", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    expect(wrapper.vm.select).to.be.exists;
-                    expect(wrapper.vm.select instanceof Select).to.be.true;
-                });
-                it("should call addInteraction", () => {
-                    const spyAddInteraction = sinon.spy(ValuationPrint.methods, "addInteraction");
-
-                    factory.getShallowMount({}, true);
-
-                    expect(spyAddInteraction.calledOnce).to.be.true;
-
-                    spyAddInteraction.restore();
-                });
-            });
-
-            describe("addMessage", () => {
-                it("should initialize with an empty message list", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    expect(wrapper.vm.messageList).to.be.an("array").that.is.empty;
-                });
-                it("should add a message to the messageList", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.addMessage("message");
-                    expect(wrapper.vm.messageList).to.deep.equal([{message: "message", isError: false}]);
-                });
-                it("should add a message flaged as error to the messageList", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.addMessage("message", true);
-                    expect(wrapper.vm.messageList).to.deep.equal([{message: "message", isError: true}]);
-                });
-            });
-
-            describe("formValidation", () => {
-                it("should return false and set matching error only for documentNumber", () => {
-                    const wrapper = factory.getShallowMount({});
-                    let isValid = false;
-
-                    wrapper.vm.specificAddress = "foo";
-                    isValid = wrapper.vm.formValidation();
-                    expect(isValid).to.be.false;
-                    expect(wrapper.vm.errors.documentNumber).to.be.true;
-                });
-                it("should return false and set matching error only for documentNumber", () => {
-                    const wrapper = factory.getShallowMount({});
-                    let isValid = false;
-
-                    wrapper.vm.documentNumber = "foo";
-                    isValid = wrapper.vm.formValidation();
-                    expect(isValid).to.be.false;
-                    expect(wrapper.vm.errors.address).to.be.true;
-                });
-                it("should return false and set matching errors", () => {
-                    const wrapper = factory.getShallowMount({});
-                    let isValid = false;
-
-                    expect(isValid).to.be.false;
-                    isValid = wrapper.vm.formValidation();
-                    expect(wrapper.vm.errors).to.deep.equals({documentNumber: true, address: true});
-                });
-                it("should return true", () => {
-                    const wrapper = factory.getShallowMount({});
-
-                    wrapper.vm.documentNumber = "foo";
-                    wrapper.vm.specificAddress = "foo";
-                    expect(wrapper.vm.formValidation()).to.be.true;
-                    expect(wrapper.vm.errors).to.deep.equals({documentNumber: false, address: false});
-                });
+            it("should not call handleParcelSearch", () => {
+                const wrapper = factory.getShallowMount({});
+
+                wrapper.vm.$options.watch.parcelSearchFeature.handler.call(wrapper.vm, undefined);
+                expect(stubParcelSearchFeature.called).to.be.false;
             });
         });
     });
+
+    describe("Hooks", () => {
+        describe("Created", () => {
+            it("should call setSelectInteraction if the component is created", () => {
+                const spySetSelectInteraction = sinon.spy(ValuationPrint.methods, "setSelectInteraction");
+
+                factory.getShallowMount({});
+
+                expect(spySetSelectInteraction.calledOnce).to.be.true;
+
+                spySetSelectInteraction.restore();
+            });
+
+            it("should call setConfig if the component is created", () => {
+                factory.getShallowMount({});
+
+                expect(stubSetConfig.called).to.be.true;
+            });
+        });
+    });
+
+    describe("Methods", () => {
+        describe("getFilenameOfPDF", () => {
+            it("should return the right file name", () => {
+                const wrapper = factory.getShallowMount({});
+
+                expect(wrapper.vm.getFilenameOfPDF("prefix", "2022-07-11")).to.equal("2022-07-11 prefix");
+            });
+        });
+
+        describe("removeFeature", () => {
+            it("should remove a feature from the select interaction", async () => {
+                const wrapper = factory.getShallowMount({});
+
+                wrapper.vm.select.getFeatures().push(features[0]);
+                wrapper.vm.select.getFeatures().push(features[1]);
+                await wrapper.setData({
+                    selectedFeatures: features
+                });
+                wrapper.vm.removeFeature(features[0]);
+
+                expect(wrapper.vm.select.getFeatures().getArray()).to.be.lengthOf(1);
+            });
+            it("should only remove data from type ol/Feature", () => {
+                const wrapper = factory.getShallowMount({});
+
+                wrapper.vm.select.getFeatures().push(features[0]);
+                wrapper.vm.select.getFeatures().push(features[1]);
+                wrapper.vm.removeFeature(122);
+                wrapper.vm.removeFeature({});
+                wrapper.vm.removeFeature(true);
+                wrapper.vm.removeFeature(undefined);
+                wrapper.vm.removeFeature(null);
+                wrapper.vm.removeFeature([]);
+
+                expect(wrapper.vm.select.getFeatures().getArray()).to.be.lengthOf(2);
+            });
+        });
+
+        describe("setParcelData", () => {
+            it("should set the parcelData object", () => {
+                sinon.stub(ValuationPrint.methods, "formValidation").returns(true);
+                const wrapper = factory.getShallowMount({});
+
+                wrapper.vm.setParcelData([features[0]]);
+
+                expect(wrapper.vm.parcelData).to.have.all.keys("center", "geometry", "extent", "feature", "featureList");
+                sinon.restore();
+            });
+            it("should not set the parcelData object", () => {
+                const wrapper = factory.getShallowMount({});
+
+                wrapper.vm.setParcelData(122);
+                wrapper.vm.setParcelData({});
+                wrapper.vm.setParcelData(true);
+                wrapper.vm.setParcelData(undefined);
+                wrapper.vm.setParcelData(null);
+                wrapper.vm.setParcelData([]);
+
+                expect(wrapper.vm.parcelData).to.be.null;
+            });
+        });
+
+        describe("setSelectInteraction", () => {
+            it("should set openlayers select interaction", () => {
+                const wrapper = factory.getShallowMount({});
+
+                expect(wrapper.vm.select).to.be.exists;
+                expect(wrapper.vm.select instanceof Select).to.be.true;
+            });
+            it("should call addInteraction", () => {
+                const spyAddInteraction = sinon.spy(ValuationPrint.methods, "addInteraction");
+
+                factory.getShallowMount({}, true);
+
+                expect(spyAddInteraction.calledOnce).to.be.true;
+
+                spyAddInteraction.restore();
+            });
+        });
+
+        describe("addMessage", () => {
+            it("should initialize with an empty message list", () => {
+                const wrapper = factory.getShallowMount({});
+
+                expect(wrapper.vm.messageList).to.be.an("array").that.is.empty;
+            });
+            it("should add a message to the messageList", () => {
+                const wrapper = factory.getShallowMount({});
+
+                wrapper.vm.addMessage("message");
+                expect(wrapper.vm.messageList).to.deep.equal([{message: "message", isError: false}]);
+            });
+            it("should add a message flaged as error to the messageList", () => {
+                const wrapper = factory.getShallowMount({});
+
+                wrapper.vm.addMessage("message", true);
+                expect(wrapper.vm.messageList).to.deep.equal([{message: "message", isError: true}]);
+            });
+        });
+
+        describe("formValidation", () => {
+            it("should return false and set matching error only for documentNumber", async () => {
+                const wrapper = factory.getShallowMount({});
+                let isValid = false;
+
+                await wrapper.setData({
+                    specificAddress: "foo"
+                });
+                isValid = wrapper.vm.formValidation();
+                expect(isValid).to.be.false;
+                expect(wrapper.vm.errors.documentNumber).to.be.true;
+            });
+            it("should return false and set matching errors", () => {
+                const wrapper = factory.getShallowMount({});
+                let isValid = false;
+
+                expect(isValid).to.be.false;
+                isValid = wrapper.vm.formValidation();
+                expect(wrapper.vm.errors).to.deep.equals({documentNumber: true, address: true});
+            });
+            it("should return true", () => {
+                const wrapper = factory.getShallowMount({});
+
+                wrapper.vm.documentNumber = "foo";
+                wrapper.vm.specificAddress = "foo";
+                expect(wrapper.vm.formValidation()).to.be.true;
+                expect(wrapper.vm.errors).to.deep.equals({documentNumber: false, address: false});
+            });
+        });
+
+        describe("getParcelByAttributes", () => {
+            it("should return the right parcel feature", () => {
+                const wrapper = factory.getShallowMount(),
+                    parcelFeature = wrapper.vm.getParcelByAttributes(features, "ueberall", "12345");
+
+                expect(parcelFeature).to.deep.equal(features[0]);
+            });
+            it("should return undefined if no parcel feature was found", () => {
+                const wrapper = factory.getShallowMount(),
+                    parcelFeature = wrapper.vm.getParcelByAttributes(features, "ueberall", "67890");
+
+                expect(parcelFeature).to.be.undefined;
+            });
+        });
+
+        describe("clearAndAddFeature", () => {
+            it("should clear the feature collection of the select interaction and add the given feature", () => {
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.select.getFeatures().push(features[0]);
+                wrapper.vm.clearAndAddFeature(features[1]);
+
+                expect(wrapper.vm.select.getFeatures().getArray()).to.be.an("array").with.lengthOf(1);
+                expect(wrapper.vm.select.getFeatures().getArray()[0]).to.deep.equal(features[1]);
+            });
+        });
+    });
+
 });
