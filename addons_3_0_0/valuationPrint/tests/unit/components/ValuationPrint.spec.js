@@ -232,6 +232,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             expect(wrapper.find(".messageListError").exists()).to.be.false;
         });
+
         it("should add an error class to the list entry if an error is added and status log is configured to be shown", async () => {
             const wrapper = factory.getShallowMount({});
 
@@ -265,6 +266,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             expect(wrapper.find(".urlListEntry").exists()).to.be.false;
         });
+
         it("should render pdf icon if only one url in url list is present", async () => {
             const wrapper = factory.getShallowMount({});
 
@@ -273,6 +275,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             expect(wrapper.findAll(".pdf-icon").length).to.be.equals(1);
         });
+
         it("should not render pdf icon if more than one url are present", async () => {
             const wrapper = factory.getShallowMount({});
 
@@ -282,16 +285,19 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             expect(wrapper.find(".pdf-icon").exists()).to.be.false;
         });
+
         it("should render parcel report if showParcelSearch is false", async () => {
             const wrapper = factory.getShallowMount({}, true, false);
 
             expect(wrapper.find(".parcel-report").exists()).to.be.true;
         });
+
         it("should render WfsSearch if showParcelSearch is true", async () => {
             const wrapper = factory.getShallowMount({}, true, true);
 
             expect(wrapper.findComponent(WfsSearch).exists()).to.be.true;
         });
+
         it("should render progress bar if isInProcessOfCreatingReport and status log is configured not to be shown", async () => {
             const wrapper = factory.getShallowMount({}, false, true);
 
@@ -299,12 +305,28 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             await wrapper.vm.$forceUpdate();
             expect(wrapper.find("progress").exists()).to.be.true;
         });
+
         it("should not render progress bar if status log is configured to be shown even if isInProcessOfCreatingReport", async () => {
             const wrapper = factory.getShallowMount({}, true, true);
 
             wrapper.vm.isInProcessOfCreatingReport = true;
             await wrapper.vm.$forceUpdate();
             expect(wrapper.find("progress").exists()).to.be.false;
+        });
+
+        it("should not find 'all-select' if there are features selected", async () => {
+            const wrapper = factory.getMount({});
+
+            expect(wrapper.find(".all-select").exists()).to.be.false;
+        });
+
+        it("should find 'all-select' if there are features selected", async () => {
+            const wrapper = factory.getMount({});
+
+            wrapper.vm.selectedFeatures.push(features[0]);
+            wrapper.vm.selectedFeatures.push(features[1]);
+            await wrapper.vm.$forceUpdate();
+            expect(wrapper.find(".all-select").exists()).to.be.true;
         });
     });
 
@@ -434,6 +456,16 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             expect(spyShowPrintModal.calledOnce).to.be.true;
 
             spyShowPrintModal.restore();
+        });
+
+        it("should select all the parcels in options", async () => {
+            const wrapper = factory.getMount({});
+
+            wrapper.vm.selectedFeatures.push(features[0]);
+            wrapper.vm.selectedFeatures.push(features[1]);
+            await wrapper.vm.$forceUpdate();
+            await wrapper.find("#select-all").setChecked();
+            expect(wrapper.vm.isAllSelected).to.be.true;
         });
     });
 

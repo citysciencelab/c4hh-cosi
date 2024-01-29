@@ -55,7 +55,8 @@ export default {
             specificAddress: "",
             documentNumber: "",
             autofill: false,
-            optionListName: ""
+            optionListName: "",
+            isAllSelected: false
         };
     },
     computed: {
@@ -169,6 +170,39 @@ export default {
             else {
                 this.autofill = false;
             }
+        },
+        /**
+         * Updates the printed features dynamically according to the selected features
+         * @param {ol/Feature[]} features - The selected features
+         * @returns {void}
+         */
+        selectedFeatures (features) {
+            if (features.length) {
+                this.setPrintedFeature(this.printedFeature.filter(pf => features.find(sf => sf.get("flstnrzae") === pf.get("flstnrzae"))));
+
+                if (this.printedFeature.length !== features.length) {
+                    this.isAllSelected = false;
+                }
+                else {
+                    this.isAllSelected = true;
+                }
+            }
+            else {
+                this.setPrintedFeature([]);
+            }
+        },
+        /**
+         * If the input checkbox is checked, all options will be checked
+         * @param {Boolean} val true if input is checked
+         * @returns {void}
+         */
+        isAllSelected (val) {
+            if (val) {
+                this.setPrintedFeature(this.selectedFeatures);
+            }
+            else if (this.printedFeature.length === this.selectedFeatures.length) {
+                this.setPrintedFeature([]);
+            }
         }
     },
     created () {
@@ -200,6 +234,9 @@ export default {
                 this.setPrintedFeature(this.selectedFeatures);
             }
         });
+        if (this.printedFeature.length && this.selectedFeatures.length === this.printedFeature.length) {
+            this.isAllSelected = true;
+        }
     },
     unmounted () {
         layerCollection.removeLayerById(this.parcelLayerId);
@@ -237,7 +274,6 @@ export default {
 
                 this.select.getFeatures().removeAt(i);
                 this.setSelectedFeatures(this.select.getFeatures().getArray());
-                this.setPrintedFeature(this.printedFeature.filter(fea => fea.get("flstnrzae") !== feature.get("flstnrzae")));
             }
         },
 
@@ -694,9 +730,13 @@ export default {
         editPrintedFeature (evt, feature) {
             if (evt?.target?.checked) {
                 this.setPrintedFeature([].concat(this.printedFeature, feature));
+                if (this.printedFeature.length === this.selectedFeatures.length) {
+                    this.isAllSelected = true;
+                }
             }
             else {
                 this.setPrintedFeature(this.printedFeature.filter(fea => fea.get("flstnrzae") !== feature.get("flstnrzae")));
+                this.isAllSelected = false;
             }
         }
     }
@@ -717,6 +757,26 @@ export default {
                     {{ $t('additional:modules.valuationPrint.parcelListTitle') }}
                 </h6>
                 <div class="parcels">
+                    <div
+                        v-if="selectedFeatures.length"
+                        class="all-select"
+                    >
+                        <label for="select-all">
+                            <input
+                                id="select-all"
+                                v-model="isAllSelected"
+                                class="form-check-input col col-md-1 align-self-center"
+                                type="checkbox"
+                                name="select-all"
+                            >
+                            <span v-if="!isAllSelected">
+                                {{ $t('additional:modules.valuationPrint.selectAll') }}
+                            </span>
+                            <span v-else>
+                                {{ $t('additional:modules.valuationPrint.deselectAll') }}
+                            </span>
+                        </label>
+                    </div>
                     <div class="parcels-text">
                         <div
                             v-for="feature in selectedFeatures"
@@ -1076,7 +1136,19 @@ button {
 }
 
 .parcels {
-    padding: 13px;
+    padding: 13px 0;
+    .all-select {
+        margin-bottom: 10px;
+        padding: 0 4px;
+        label {
+            cursor: pointer;
+            input {
+                margin-right: 10px;
+                appearance: checkbox;
+                cursor: pointer;
+            }
+        }
+    }
     .parcel-label {
         font-size: 12px;
     }

@@ -32,7 +32,9 @@
         "missingDocumentName": "Please insert the dokument name.",
         "missingAddress": "Please select or insert an address."
       },
-      "select": "(de)select"
+      "select": "(De)select",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all"
     }
   }
 }
