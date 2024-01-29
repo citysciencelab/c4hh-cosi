@@ -220,19 +220,38 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             expect(wrapper.find(".messageListEntry").exists()).to.be.false;
         });
 
-        it("should add an url to the list entry if an url is added", async () => {
+        it("should add two urls to the list entry if two urls are added", async () => {
             const wrapper = factory.getShallowMount({});
 
             wrapper.vm.addUrl({url: "url", name: "name"});
+            wrapper.vm.addUrl({url: "url2", name: "name2"});
+
             await wrapper.vm.$forceUpdate();
 
-            expect(wrapper.find(".urlListEntry").exists()).to.be.true;
+            expect(wrapper.findAll(".urlListEntry").length).to.be.equals(2);
         });
 
         it("should not show any url if no url is added", async () => {
             const wrapper = factory.getShallowMount({});
 
             expect(wrapper.find(".urlListEntry").exists()).to.be.false;
+        });
+        it("should render pdf icon if only one url in url list is present", async () => {
+            const wrapper = factory.getShallowMount({});
+
+            wrapper.vm.addUrl({url: "url", name: "name"});
+            await wrapper.vm.$forceUpdate();
+
+            expect(wrapper.findAll(".pdf-icon").length).to.be.equals(1);
+        });
+        it("should not render pdf icon if more than one url are present", async () => {
+            const wrapper = factory.getShallowMount({});
+
+            wrapper.vm.addUrl({url: "url", name: "name"});
+            wrapper.vm.addUrl({url: "url2", name: "name2"});
+            await wrapper.vm.$forceUpdate();
+
+            expect(wrapper.find(".pdf-icon").exists()).to.be.false;
         });
         it("should render parcel report if showParcelSearch is false", async () => {
             const wrapper = factory.getShallowMount({}, true, false);
