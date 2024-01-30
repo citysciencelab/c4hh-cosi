@@ -303,7 +303,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             wrapper.vm.isInProcessOfCreatingReport = true;
             await wrapper.vm.$forceUpdate();
-            expect(wrapper.find("progress").exists()).to.be.true;
+            expect(wrapper.find(".progress").exists()).to.be.true;
         });
 
         it("should not render progress bar if status log is configured to be shown even if isInProcessOfCreatingReport", async () => {

@@ -65,7 +65,10 @@ export default {
         ...mapGetters(["restServiceById", "layerConfigById"]),
         ...mapGetters("Modules/WfsSearch", {
             parcelSearchFeature: "results"
-        })
+        }),
+        percentage () {
+            return Math.round(this.progressCounter / this.numberOfProgressSteps * 100);
+        }
     },
     watch: {
         /**
@@ -880,17 +883,23 @@ export default {
                 </div>
                 <div
                     v-if="isInProcessOfCreatingReport && !showStatusLog"
+                    class="pt-3"
                 >
                     <div v-if="messageList.length > 0">
                         {{ messageList[0].message }}
                     </div>
-                    <label>
-                        <progress
-                            max="100"
-                            :value="progressCounter / numberOfProgressSteps * 100"
-                        />
-                        {{ Math.round(progressCounter / numberOfProgressSteps * 100) }} %
-                    </label>
+                    <div class="progress">
+                        <div
+                            class="progress-bar bg-secondary"
+                            role="progressbar"
+                            :style="`width: ${percentage}%`"
+                            :aria-valuenow="percentage"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                        >
+                            <span class="progress-percentage">{{ percentage > 2 ? `${percentage} %` : '' }}</span>
+                        </div>
+                    </div>
                 </div>
                 <hr>
             </div>
@@ -927,12 +936,12 @@ export default {
                         </div>
                     </div>
                 </div>
+                <hr>
             </div>
             <div
                 v-if="urlList.length > 1"
                 class="mt-3"
             >
-                <hr>
                 <h6 class="download-header">
                     {{ $t('additional:modules.valuationPrint.urlListTitle') }}
                 </h6>
@@ -966,7 +975,6 @@ export default {
                 v-if="urlList.length === 1"
                 class="mt-3"
             >
-                <hr>
                 <h6 class="download-header">
                     {{ $t('additional:modules.valuationPrint.urlTitleForOneReport') }}
                 </h6>
@@ -1186,5 +1194,19 @@ button {
             top: -3px;
         }
     }
+}
+.progress {
+    background-color: $light_grey;
+    color: white;
+    text-align: center;
+    border-radius: 10px;
+    height: 16px;
+    font-size: 10px;
+}
+.progress-bar {
+    border-radius: 10px;
+}
+.progress-percentage {
+    white-space: nowrap;
 }
 </style>
