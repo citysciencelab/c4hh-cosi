@@ -881,30 +881,29 @@ export default {
                         :disabled="!selectedFeatures.length"
                     />
                 </div>
-                <div
-                    v-if="isInProcessOfCreatingReport && !showStatusLog"
-                    class="pt-3"
-                >
-                    <div v-if="messageList.length > 0">
-                        {{ messageList[0].message }}
-                    </div>
-                    <div class="progress">
-                        <div
-                            class="progress-bar bg-secondary"
-                            role="progressbar"
-                            :style="`width: ${percentage}%`"
-                            :aria-valuenow="percentage"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                        >
-                            <span class="progress-percentage">{{ percentage > 2 ? `${percentage} %` : '' }}</span>
-                        </div>
-                    </div>
-                </div>
-                <hr>
             </div>
             <div
-                v-if="messageList.length > 0 && showStatusLog"
+                v-if="isInProcessOfCreatingReport && !showStatusLog"
+                class="pt-3"
+            >
+                <div v-if="messageList.length > 0">
+                    {{ messageList[0].message }}
+                </div>
+                <div class="progress">
+                    <div
+                        class="progress-bar bg-secondary"
+                        role="progressbar"
+                        :style="`width: ${percentage}%`"
+                        :aria-valuenow="percentage"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    >
+                        <span class="progress-percentage">{{ percentage > 2 ? `${percentage} %` : '' }}</span>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-else-if="messageList.length > 0 && showStatusLog"
                 class="accordion accordion-flush mt-3"
             >
                 <div class="accordion-item">
@@ -936,8 +935,8 @@ export default {
                         </div>
                     </div>
                 </div>
-                <hr>
             </div>
+            <hr v-if="selectedFeatures.length > 0">
             <div
                 v-if="urlList.length > 1"
                 class="mt-3"
