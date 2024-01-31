@@ -325,6 +325,8 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             wrapper.vm.selectedFeatures.push(features[0]);
             wrapper.vm.selectedFeatures.push(features[1]);
+            wrapper.vm.multiSelectParcels = true;
+
             await wrapper.vm.$forceUpdate();
             expect(wrapper.find(".all-select").exists()).to.be.true;
         });
@@ -463,6 +465,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
 
             wrapper.vm.selectedFeatures.push(features[0]);
             wrapper.vm.selectedFeatures.push(features[1]);
+            wrapper.vm.multiSelectParcels = true;
             await wrapper.vm.$forceUpdate();
             await wrapper.find("#select-all").setChecked();
             expect(wrapper.vm.isAllSelected).to.be.true;

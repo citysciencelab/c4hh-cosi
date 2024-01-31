@@ -33,8 +33,8 @@
         "missingAddress": "Please select or insert an address."
       },
       "select": "(De)select",
-      "selectAll": "Select all",
-      "deselectAll": "Deselect all"
+      "selectAll": "Select all for report",
+      "deselectAll": "Deselect all for report"
     }
   }
 }

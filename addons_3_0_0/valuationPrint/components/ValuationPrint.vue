@@ -56,7 +56,8 @@ export default {
             documentNumber: "",
             autofill: false,
             optionListName: "",
-            isAllSelected: false
+            isAllSelected: false,
+            isfirstFeaturesLoaded: false
         };
     },
     computed: {
@@ -177,11 +178,21 @@ export default {
         /**
          * Updates the printed features dynamically according to the selected features
          * @param {ol/Feature[]} features - The selected features
+         * @param {ol/Feature[]} oldFeatures - The old selected features
          * @returns {void}
          */
-        selectedFeatures (features) {
+        selectedFeatures (features, oldFeatures) {
             if (features.length) {
-                this.setPrintedFeature(this.printedFeature.filter(pf => features.find(sf => sf.get("flstnrzae") === pf.get("flstnrzae"))));
+                if (this.isfirstFeaturesLoaded) {
+                    this.setPrintedFeature(this.printedFeature.filter(pf => features.find(sf => sf.get("flstnrzae") === pf.get("flstnrzae"))));
+                    this.isfirstFeaturesLoaded = false;
+                }
+                else if (oldFeatures.length > features.length) {
+                    this.setPrintedFeature(this.printedFeature.filter(pf => features.find(sf => sf.get("flstnrzae") === pf.get("flstnrzae"))));
+                }
+                else {
+                    this.setPrintedFeature([].concat(this.printedFeature, features[features.length - 1]));
+                }
 
                 if (this.printedFeature.length !== features.length) {
                     this.isAllSelected = false;
@@ -230,6 +241,9 @@ export default {
     },
 
     mounted () {
+        if (this.selectedFeatures.length) {
+            this.isfirstFeaturesLoaded = true;
+        }
         this.select.setActive(true);
         this.select.getFeatures().on("change:length", (evt) => {
             this.setSelectedFeatures([...evt.target.getArray()]);
@@ -761,7 +775,7 @@ export default {
                 </h6>
                 <div class="parcels">
                     <div
-                        v-if="selectedFeatures.length"
+                        v-if="selectedFeatures.length && multiSelectParcels"
                         class="all-select"
                     >
                         <label for="select-all">
