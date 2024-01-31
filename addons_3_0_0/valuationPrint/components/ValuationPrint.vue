@@ -938,7 +938,35 @@ export default {
             </div>
             <hr v-if="selectedFeatures.length > 0">
             <div
-                v-if="urlList.length > 1"
+                v-if="showParcelSearch && urlList.length === 1"
+                class="mt-3"
+            >
+                <h6 class="download-header">
+                    {{ $t('additional:modules.valuationPrint.urlTitleForOneReport') }}
+                </h6>
+                <div class="container">
+                    <div class="row">
+                        <i class="bi bi-filetype-pdf pdf-icon col col-md-12 text-center" />
+                        <a
+                            :href="urlList[0].link"
+                            class="col col-md-12  text-center lh-1"
+                            target="_blank"
+                        >{{ urlList[0].name }}</a>
+                        <div class="d-flex justify-content-center pt-2 pb-3">
+                            <FlatButton
+                                id="download-report"
+                                aria-label="$t('additional:modules.valuationPrint.download')"
+                                type="button"
+                                :text="$t('additional:modules.valuationPrint.download')"
+                                :icon="'bi-download'"
+                                :interaction="() => openUrls(urlList[0])"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-else-if="urlList.length > 0"
                 class="mt-3"
             >
                 <h6 class="download-header">
@@ -968,34 +996,6 @@ export default {
                             />
                         </div>
                     </ul>
-                </div>
-            </div>
-            <div
-                v-if="urlList.length === 1"
-                class="mt-3"
-            >
-                <h6 class="download-header">
-                    {{ $t('additional:modules.valuationPrint.urlTitleForOneReport') }}
-                </h6>
-                <div class="container">
-                    <div class="row">
-                        <i class="bi bi-filetype-pdf pdf-icon col col-md-12 text-center" />
-                        <a
-                            :href="urlList[0].link"
-                            class="col col-md-12  text-center lh-1"
-                            target="_blank"
-                        >{{ urlList[0].name }}</a>
-                        <div class="d-flex justify-content-center pt-2 pb-3">
-                            <FlatButton
-                                id="download-report"
-                                aria-label="$t('additional:modules.valuationPrint.download')"
-                                type="button"
-                                :text="$t('additional:modules.valuationPrint.download')"
-                                :icon="'bi-download'"
-                                :interaction="() => openUrls(urlList[0])"
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
             <ModalItem

@@ -268,7 +268,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
         });
 
         it("should render pdf icon if only one url in url list is present", async () => {
-            const wrapper = factory.getShallowMount({});
+            const wrapper = factory.getShallowMount({}, true, true);
 
             wrapper.vm.addUrl({url: "url", name: "name"});
             await wrapper.vm.$forceUpdate();
