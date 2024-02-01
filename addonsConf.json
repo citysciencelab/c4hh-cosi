@@ -98,8 +98,8 @@
     "path":"gfiThemes/dipasCockpit",
     "type": "gfiTheme"
   },
-  "flaecheninfo": {
-    "path":"gfiThemes/flaecheninfo",
+  "parcelinfo": {
+    "path":"gfiThemes/parcelinfo",
     "type": "gfiTheme"
   },
   "schulinfo": {
