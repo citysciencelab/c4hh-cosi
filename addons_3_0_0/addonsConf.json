@@ -57,10 +57,6 @@
     "path":"gfiThemes/verkehrsstaerken",
     "type": "gfiTheme"
   },
-  "parcelinfo": {
-    "path":"gfiThemes/parcelinfo",
-    "type": "gfiTheme"
-  },
   "valuationPrint": {
     "type": "tool"
   }
