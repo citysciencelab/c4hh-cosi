@@ -496,7 +496,7 @@ export default {
                 config = this.config?.services?.hh_wfs_dog;
 
             if (!this.isModalRequired) {
-                this.printedFeature = featureList;
+                this.setPrintedFeature(featureList);
                 this.setParcelData(this.printedFeature);
                 return;
             }
