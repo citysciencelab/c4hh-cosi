@@ -973,7 +973,7 @@ export default {
                                 type="button"
                                 :text="$t('additional:modules.valuationPrint.download')"
                                 :icon="'bi-download'"
-                                :interaction="() => openUrls(urlList[0])"
+                                :interaction="() => openUrls(urlList)"
                             />
                         </div>
                     </div>
