@@ -234,7 +234,7 @@ export default {
         this.printType = ["Gutachten", "Wertbeurteilung"];
 
         if (!layerCollection.getLayerById(this.parcelLayerId)) {
-            this.createParcelLayer(this.parcelLayerId);
+            this.createParcelLayer(this.parcelLayerId, this.parcelLayerZoomLevel);
         }
 
         if (this.showParcelSearch) {
@@ -272,16 +272,15 @@ export default {
 
         /**
          * Creates and adds parcel layer if it is not configured.
-         * For performance reasons a max resolution is set to the layer.
+         * For performance reasons a (configurable) min zoom is set to the layer.
          * @param {String} layerId - The id for the parcel layer.
-         * @param {Number} scale - The scale for the max resolution of the layer.
+         * @param {Number} minZoomLevel - minimum zoom level at which the layer is shown
          * @returns {void}
          */
-        createParcelLayer (layerId, scale = 5000) {
-            const layer = layerFactory.createLayer(rawLayerList.getLayerWhere({id: layerId})),
-                resoByMaxScale = this.getResolutionByScale(scale, "max");
+        createParcelLayer (layerId, minZoomLevel = 7) {
+            const layer = layerFactory.createLayer(rawLayerList.getLayerWhere({id: layerId}));
 
-            layer.getLayer().setMaxResolution(resoByMaxScale + (resoByMaxScale / 100));
+            layer.getLayer().setMinZoom(minZoomLevel);
             layerCollection.addLayer(layer);
         },
 
@@ -868,6 +867,7 @@ export default {
                 <WfsSearch
                     :show-reset-button="false"
                     :reset-parcel-search="resetParcelSearch"
+                    :zoom-level-prop="parcelLayerZoomLevel + 1"
                 />
                 <hr>
                 <h5 class="pt-3">

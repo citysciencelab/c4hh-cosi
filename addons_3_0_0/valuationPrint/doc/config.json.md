@@ -7,6 +7,7 @@ Tool to support the valuation of land on the basis of parcels.
 |name|yes|String|Wertermittlung|The title of the tool or the entry in the tool list.|false|
 |icon|yes|String|bi-bar-chart-line-fill|The icon to use.|false|
 |parcelLayerId|yes|String|""|Layer-Id of the parcels, whose data are required for this tool.|false|
+|parcelLayerZoomLevel|no|Number|7|Minimum zoom level at which the parcel layer is visible. Tunable for performance reasons.|false|
 |showStatusLog|no|Boolean|true|If accordion compononent logging every single status update is shown instead of progress bar.|false|
 |multiSelectParcels|no|Boolean|false|If true, user can have more than one parcel selected at a time.|false|
 |showParcelSearch|no|Boolean|false|If true, WfsSearch is rendered, otherwise the valuation.|false|
@@ -22,6 +23,7 @@ Tool to support the valuation of land on the basis of parcels.
         "name": "Wertermittlung",
         "icon": "bi-bar-chart-line-fill",
         "parcelLayerId": "6076",
+        "parcelLayerZoomLevel": 8,
         "showStatusLog": false,
         "multiSelectParcels": true,
         "showParcelSearch": true,

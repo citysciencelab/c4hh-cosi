@@ -7,6 +7,7 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
 |name|ja|String|Wertermittlung|Der Titel des Werkzeuges bzw. der Eintrag in der Werkzeugliste|false|
 |icon|ja|String|bi-bar-chart-line-fill|Das zu verwendende Icon.|false|
 |parcelLayerId|ja|String|""|Layer-Id der Flurstücke, deren Daten erforderlich für dieses Tool sind.|false|
+|parcelLayerZoomLevel|nein|Number|7|Zoom Level, ab dem der Flurstücks-Layer sichtbar ist. Konfigurierbar aus Peformance-Gründen.|false|
 |showStatusLog|nein|Boolean|true|Ob anstelle der Progress Bar die accordion-Komponente mit den einzelnen Status-Meldungen angezeigt werden soll.|false|
 |multiSelectParcels|nein|Boolean|false|Ob der User mehrere Flurstücke gleichzeitig ausgewählt haben kann.|false|
 |showParcelSearch|nein|Boolean|false|Wenn true, wird die Flurstückssuche angezeigt, ansonsten die Wertermittlung.|false|
@@ -22,6 +23,7 @@ Werkzeug zur Unterstützung der Wertermittlung von Grundstücken auf Basis von F
         "name": "Wertermittlung",
         "icon": "bi-bar-chart-line-fill",
         "parcelLayerId": "6076",
+        "parcelLayerZoomLevel": 8,
         "showStatusLog": false,
         "multiSelectParcels": true,
         "showParcelSearch": true,
