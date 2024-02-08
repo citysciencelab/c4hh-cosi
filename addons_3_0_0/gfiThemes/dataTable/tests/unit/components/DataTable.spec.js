@@ -85,10 +85,15 @@ describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue",
                     namespaced: true,
                     getters: mockGetters
                 },
-                Language: {
+                Modules: {
                     namespaced: true,
-                    getters: {
-                        currentLocale: () => "de-DE"
+                    modules: {
+                        Language: {
+                            namespaced: true,
+                            getters: {
+                                currentLocale: () => "de-DE"
+                            }
+                        }
                     }
                 }
             }

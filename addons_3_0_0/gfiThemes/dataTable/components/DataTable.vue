@@ -33,7 +33,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Language", ["currentLocale"]),
+        ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Maps", ["projection"]),
         ...mapGetters("Modules/GetFeatureInfo", Object.keys(getters)),
         /**
