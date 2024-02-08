@@ -57,7 +57,8 @@ export default {
             autofill: false,
             optionListName: "",
             isAllSelected: false,
-            isfirstFeaturesLoaded: false
+            isfirstFeaturesLoaded: false,
+            resetParcelSearch: false
         };
     },
     computed: {
@@ -105,7 +106,10 @@ export default {
             }
 
             this.progressCounter = 0;
-            createKnowledgeBase(parcel, this.config.services, {mapProjection: this.projection.getCode(), oafCRSURI: this.oafCRSURI}, message => {
+            createKnowledgeBase(parcel, this.config.services, {
+                mapProjection: this.projection.getCode(),
+                oafCRSURI: this.oafCRSURI
+            }, message => {
                 this.setShowDownloadAll(false);
                 this.addMessage(message, false);
                 this.isInProcessOfCreatingReport = true;
@@ -203,6 +207,7 @@ export default {
             }
             else {
                 this.setPrintedFeature([]);
+                this.resetParcelSearch = true;
             }
         },
         /**
@@ -310,7 +315,7 @@ export default {
             layerSource.once("featuresloadend", () => {
                 const parcelFeature = this.getParcelByAttributes(layerSource.getFeatures(), landmark, parcelNumber);
 
-                this.clearAndAddFeature(parcelFeature);
+                this.clearAndAddFeature(parcelFeature, true);
             });
         },
 
@@ -330,11 +335,13 @@ export default {
         /**
          * Removes all features from the collection and adds the given one.
          * @param {ol/Feature} feature - The feature to add.
+         * @param {Boolean} onSearch - true if it is from wfs search
          * @returns {void}
          */
-        clearAndAddFeature (feature) {
+        clearAndAddFeature (feature, onSearch = false) {
             this.select.getFeatures().clear();
             this.select.getFeatures().push(feature);
+            this.resetParcelSearch = !onSearch;
         },
 
         /**
@@ -571,7 +578,7 @@ export default {
             mapfishDialog.attributes.map = mapfishDialog.attributes[imageName + ".map"];
             delete mapfishDialog.attributes[imageName + ".map"];
 
-            setTimeout(()=> {
+            setTimeout(() => {
                 startPrintProcess(this.printUrl, "png", this.imageAppId, mapfishDialog, (url, payload) => {
                     this.addMessage(this.$t("additional:modules.valuationPrint.imageInTheMaking", {imageName: upperFirst(imageName)}), false);
                     return axios.post(url, payload);
@@ -634,7 +641,7 @@ export default {
                 mapfishDialog.attributes[key] = value;
             });
 
-            setTimeout(()=> {
+            setTimeout(() => {
                 startPrintProcess(this.printUrl, "pdf", this.pdfSpecificationAppId, mapfishDialog, (url, payload) => {
                     this.addMessage(this.$t("additional:modules.valuationPrint.pdfInTheMaking"));
                     return axios.post(url, payload);
@@ -858,7 +865,10 @@ export default {
             <div
                 v-else
             >
-                <WfsSearch :show-reset-button="false" />
+                <WfsSearch
+                    :show-reset-button="false"
+                    :reset-parcel-search="resetParcelSearch"
+                />
                 <hr>
                 <h5 class="pt-3">
                     {{ $t('additional:modules.valuationPrint.generateReport') }}
@@ -1139,6 +1149,7 @@ export default {
 
 .def-font {
     font-size: 16px;
+
     .form-check-label {
         padding-top: 3px;
     }
@@ -1152,17 +1163,21 @@ p {
 .messageListError {
     color: $danger;
 }
+
 .accordion-button {
     font-size: 13px;
 }
 
 .parcels {
     padding: 13px 0;
+
     .all-select {
         margin-bottom: 10px;
         padding: 0 4px;
+
         label {
             cursor: pointer;
+
             input {
                 margin-right: 10px;
                 appearance: checkbox;
@@ -1170,9 +1185,11 @@ p {
             }
         }
     }
+
     .parcel-label {
         font-size: 12px;
     }
+
     ul {
         list-style-type: none;
     }
@@ -1182,11 +1199,13 @@ p {
     .list-group-item {
         border: none;
     }
+
     .form-check-input {
         appearance: checkbox;
         cursor: pointer;
     }
 }
+
 .list-inline, .list-unstyled {
     margin-bottom: 0;
 }
@@ -1201,6 +1220,7 @@ p {
         cursor: pointer;
         position: relative;
         margin-top: 5px;
+
         input {
             position: absolute;
             left: 0;
@@ -1208,6 +1228,7 @@ p {
         }
     }
 }
+
 .progress {
     background-color: $light_grey;
     color: white;
@@ -1216,9 +1237,11 @@ p {
     height: 16px;
     font-size: 12px;
 }
+
 .progress-bar {
     border-radius: 10px;
 }
+
 .progress-percentage {
     white-space: nowrap;
 }
