@@ -147,6 +147,9 @@ export default {
                         this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
                         this.addUrl(url, this.$t("additional:modules.valuationPrint.report"));
                         this.progressCounter++;
+                        if (this.numberOfImagesConfigured === 0) {
+                            this.scrollToDownloadSection();
+                        }
                         this.startSpecificationProcess();
                     });
                 }, 0);
@@ -605,6 +608,7 @@ export default {
                         this.isInProcessOfCreatingReport = false;
                     }, 2000);
                     this.setShowDownloadAll(true);
+                    this.scrollToDownloadSection();
                 });
             }, 0);
         },
@@ -761,6 +765,18 @@ export default {
                 this.setPrintedFeature(this.printedFeature.filter(fea => fea.get("flstnrzae") !== feature.get("flstnrzae")));
                 this.isAllSelected = false;
             }
+        },
+
+        /**
+         * Scrolls to download section after a certain amount of time.
+         * @returns {void}
+         */
+        scrollToDownloadSection () {
+            setTimeout(() => {
+                if (this.$refs.downloadSection) {
+                    this.$refs.downloadSection.scrollIntoView({behavior: "smooth"});
+                }
+            }, 500);
         }
     }
 };
@@ -965,6 +981,7 @@ export default {
             <hr v-if="selectedFeatures.length > 0">
             <div
                 v-if="showParcelSearch && urlList.length === 1"
+                ref="downloadSection"
                 class="mt-3"
             >
                 <h5>
@@ -978,7 +995,9 @@ export default {
                             class="col col-md-12  text-center lh-1"
                             target="_blank"
                         >{{ urlList[0].name }}</a>
-                        <div class="d-flex justify-content-center pt-2 pb-3">
+                        <div
+                            class="d-flex justify-content-center pt-2 pb-3"
+                        >
                             <FlatButton
                                 id="download-report"
                                 aria-label="$t('additional:modules.valuationPrint.download')"
@@ -993,6 +1012,7 @@ export default {
             </div>
             <div
                 v-else-if="urlList.length > 0"
+                ref="downloadSection"
                 class="mt-3"
             >
                 <h5>
