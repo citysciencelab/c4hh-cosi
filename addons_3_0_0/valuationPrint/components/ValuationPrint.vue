@@ -860,23 +860,25 @@ export default {
             >
                 <WfsSearch :show-reset-button="false" />
                 <hr>
-                <h6 class="generate-report pt-3">
+                <h5 class="pt-3">
                     {{ $t('additional:modules.valuationPrint.generateReport') }}
-                </h6>
-                <p class="infotext">
+                </h5>
+                <p>
                     {{ $t('additional:modules.valuationPrint.infoGenerateReport') }}
                 </p>
                 <br>
                 <p v-if="selectedFeatures.length === 1">
-                    <span class="parcel-label">
+                    <span>
                         {{ $t('additional:modules.valuationPrint.district') }}
                     </span>
+                    &NonBreakingSpace;
                     <span class="font-bold">
                         {{ selectedFeatures[0].get("gemarkung") }}
                     </span><br>
-                    <span class="parcel-label">
+                    <span>
                         {{ $t('additional:modules.valuationPrint.parcel') }}
                     </span>
+                    &NonBreakingSpace;
                     <span class="font-bold">
                         {{ selectedFeatures[0].get("flstnrzae") }}
                     </span>
@@ -955,9 +957,9 @@ export default {
                 v-if="showParcelSearch && urlList.length === 1"
                 class="mt-3"
             >
-                <h6 class="download-header">
+                <h5>
                     {{ $t('additional:modules.valuationPrint.urlTitleForOneReport') }}
-                </h6>
+                </h5>
                 <div class="container">
                     <div class="row">
                         <i class="bi bi-filetype-pdf pdf-icon col col-md-12 text-center" />
@@ -983,9 +985,9 @@ export default {
                 v-else-if="urlList.length > 0"
                 class="mt-3"
             >
-                <h6 class="download-header">
+                <h5>
                     {{ $t('additional:modules.valuationPrint.urlListTitle') }}
-                </h6>
+                </h5>
                 <div class="card-body">
                     <ul class="list-unstyled">
                         <li
@@ -1126,10 +1128,7 @@ export default {
 @import "/src_3_0_0/assets/css/mixins.scss";
 @import "~variables";
 
-h5 {
-    font-family: "MasterPortalFont Bold", "Arial Narrow", Arial, sans-serif;
-}
-.selected-parcels, .accordion-button, .download-header, .generate-report {
+.selected-parcels, .accordion-button {
     font-family: "MasterPortalFont Bold";
     font-size: 14px;
 }
@@ -1145,8 +1144,9 @@ h5 {
     }
 }
 
-button {
-    font-size: 13px;
+p {
+    font-size: 1rem;
+    color: #222;
 }
 
 .messageListError {
@@ -1214,7 +1214,7 @@ button {
     text-align: center;
     border-radius: 10px;
     height: 16px;
-    font-size: 10px;
+    font-size: 12px;
 }
 .progress-bar {
     border-radius: 10px;

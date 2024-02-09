@@ -9,7 +9,7 @@
       "messageListTitle": "Process",
       "parcelListTitle": "Selected Parcels",
       "generateReport": "Generate report",
-      "infoGenerateReport": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "infoGenerateReport": "By clicking on Start, you can generate a PDF report for the selected parcel. The process may take a few minutes. You can then access the generated files in the download section below.",
       "urlListTitle": "Download-Links",
       "urlTitleForOneReport": "Download report",
       "pdfInTheMaking": "PDF is in progress.",

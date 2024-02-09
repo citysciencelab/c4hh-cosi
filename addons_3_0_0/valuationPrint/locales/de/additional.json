@@ -1,7 +1,7 @@
 {
   "modules": {
     "valuationPrint": {
-      "title": "Flurstücksreport",
+      "title": "Flurstücksbericht",
       "removeButton": "Entfernen",
       "startButton": "Starten",
       "parcel": "Flurstück:",
@@ -9,7 +9,7 @@
       "messageListTitle": "Statusverlauf",
       "parcelListTitle": "Ausgewählte Flurstücke",
       "generateReport": "Bericht generieren",
-      "infoGenerateReport": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "infoGenerateReport": "Durch Klick auf Starten können Sie zum ausgewählten Flurstück einen PDF-Bericht erzeugen lassen. Der Vorgang kann einige Minuten in Anspruch nehmen. Anschließend werden Ihnen im unteren Bereich die erzeugten Dateien zum Download zur Verfügung gestellt.",
       "urlListTitle": "Download-Links",
       "urlTitleForOneReport": "Bericht herunterladen",
       "pdfInTheMaking": "PDF wird erstellt.",
