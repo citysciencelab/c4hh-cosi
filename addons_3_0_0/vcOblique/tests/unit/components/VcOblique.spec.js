@@ -7,7 +7,7 @@ import VcOblique from "../../../store/indexVcOblique";
 
 config.global.mocks.$t = key => key;
 
-describe("ADDONS: addons/vcOblique/components/VcOblique.vue", () => {
+describe("addons_3_0_0/vcOblique/components/VcOblique.vue", () => {
     const mockConfigJson = {
         Portalconfig: {
             menu: {

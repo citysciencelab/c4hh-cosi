@@ -4,7 +4,7 @@ import Polygon from "ol/geom/Polygon";
 import sinon from "sinon";
 import {unionFeatures} from "../../../js/unionFeatures.js";
 
-describe("addons/valuationPrint/js/unionFeatures.js", () => {
+describe("addons_3_0_0/valuationPrint/js/unionFeatures.js", () => {
     const features = [
         new Feature({
             geometry: new Polygon([[
@@ -42,11 +42,12 @@ describe("addons/valuationPrint/js/unionFeatures.js", () => {
     ];
 
     beforeEach(function () {
-        sinon.spy(console, "error");
+        const error = sinon.spy();
+
+        sinon.stub(console, "error").callsFake(error);
     });
 
     afterEach(function () {
-        console.error.restore();
         sinon.restore();
     });
 

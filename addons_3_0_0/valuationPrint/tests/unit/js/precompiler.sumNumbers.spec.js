@@ -2,7 +2,7 @@ import {expect} from "chai";
 import Feature from "ol/Feature";
 import sumNumbers from "../../../js/precompiler.sumNumbers.js";
 
-describe("addons/valuationPrint/js/precompiler.sumNumbers.js", () => {
+describe("addons_3_0_0/valuationPrint/js/precompiler.sumNumbers.js", () => {
     describe("sumNumbers", () => {
         it("should return an empty object if the wrong feature is given", () => {
             let outputResult = false;

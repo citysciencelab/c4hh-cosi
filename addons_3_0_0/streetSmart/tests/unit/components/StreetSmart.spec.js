@@ -7,7 +7,7 @@ import {nextTick} from "vue";
 
 config.global.mocks.$t = key => key;
 
-describe("ADDONS: addons/streetSmart/components/StreetSmart.vue", () => {
+describe("addons_3_0_0/streetSmart/components/StreetSmart.vue", () => {
     let destroyApiSpy,
         initApiSpy,
         packagesLoaded,

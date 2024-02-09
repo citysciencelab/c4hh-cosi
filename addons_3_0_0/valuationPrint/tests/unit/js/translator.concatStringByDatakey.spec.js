@@ -14,7 +14,7 @@ import {
     formatValueNumber
 } from "../../../js/translator.concatStringByDatakey.js";
 
-describe("addons/valuationPrint/js/translator.concatStringByDatakey.js", () => {
+describe("addons_3_0_0/valuationPrint/js/translator.concatStringByDatakey.js", () => {
     afterEach(sinon.restore);
 
     describe("formatValueNumber", () => {

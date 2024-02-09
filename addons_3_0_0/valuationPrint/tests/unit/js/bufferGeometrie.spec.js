@@ -3,7 +3,7 @@ import Polygon from "ol/geom/Polygon";
 import sinon from "sinon";
 import {bufferGeometry} from "../../../js/bufferGeometry.js";
 
-describe("addons/valuationPrint/js/bufferGeometrie.js", () => {
+describe("addons_3_0_0/valuationPrint/js/bufferGeometrie.js", () => {
     const polygon = new Polygon([[
         [9.98119979890, 53.56442623621],
         [9.98122568840, 53.56442208667],
@@ -18,11 +18,11 @@ describe("addons/valuationPrint/js/bufferGeometrie.js", () => {
         [9.98119979890, 53.56442623621]]]);
 
     beforeEach(function () {
-        sinon.spy(console, "error");
+        sinon.stub(console, "warn").callsFake(sinon.spy());
+        sinon.stub(console, "error").callsFake(sinon.spy());
     });
 
     afterEach(function () {
-        console.error.restore();
         sinon.restore();
     });
 

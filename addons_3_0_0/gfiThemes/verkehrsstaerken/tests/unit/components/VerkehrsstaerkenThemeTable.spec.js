@@ -4,7 +4,7 @@ import VerkehrsstaerkenThemeTable from "../../../components/VerkehrsstaerkenThem
 
 config.global.mocks.$t = key => key;
 
-describe("src/modules/tools/gfi/components/themes/verkehrsstaerken/components/VerkehrsstaerkenThemeTable.vue", () => {
+describe("addons_3_0_0/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThemeTable.vue", () => {
 
     const years = [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018],
         rowNames = ["DTV", "DTVw", "Schwerverkehrsanteil am DTVw", "Baustelleneinfluss"],

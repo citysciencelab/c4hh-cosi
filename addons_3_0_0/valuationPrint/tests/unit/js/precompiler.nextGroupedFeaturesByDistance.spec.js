@@ -9,7 +9,7 @@ import {
     concatGroupAttributes
 } from "../../../js/precompiler.nextGroupedFeaturesByDistance.js";
 
-describe("addons/valuationPrint/js/precompiler.nextGroupedFeaturesByDistance.js", () => {
+describe("addons_3_0_0/valuationPrint/js/precompiler.nextGroupedFeaturesByDistance.js", () => {
     describe("concatGroupAttributes", () => {
         it("should return an empty object if anything but an object is given", () => {
             expect(concatGroupAttributes(undefined)).to.be.an("object").that.is.empty;

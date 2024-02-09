@@ -4,7 +4,7 @@ import SolaratlasTheme from "../../../components/SolaratlasTheme.vue";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/solaratlas/components/SolaratlasTheme.vue", () => {
+describe("addons_3_0_0/solaratlas/components/SolaratlasTheme.vue", () => {
     let wrapper;
 
     beforeEach(() => {

@@ -12,7 +12,7 @@ import WfsSearch from "../../../../../../src_3_0_0/modules/wfsSearch/components/
 
 config.global.mocks.$t = key => key;
 
-describe("addons/valuation/components/ValuationPrint.vue", () => {
+describe("addons_3_0_0/valuationPrint/components/ValuationPrint.vue", () => {
     const features = [
             new Feature({
                 flstnrzae: "12345",
@@ -79,7 +79,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
                                 setSelectedFeatures: sinon.stub(),
                                 setMultiSelectParcels: sinon.stub(),
                                 setUrlList: sinon.stub(),
-                                setPrintedFeatures: sinon.stub()
+                                setPrintedFeature: sinon.stub()
                             }
                         }
                     }
@@ -149,16 +149,17 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             }
         };
 
-    let stubSetConfig, stubCreateParcelLayer;
+    let stubSetConfig;
 
     beforeEach(function () {
+        sinon.stub(console, "warn").callsFake(sinon.spy());
+        sinon.stub(console, "error").callsFake(sinon.spy());
         stubSetConfig = sinon.stub(ValuationPrint.methods, "setConfig");
-        stubCreateParcelLayer = sinon.stub(ValuationPrint.methods, "createParcelLayer");
+        sinon.stub(ValuationPrint.methods, "createParcelLayer");
     });
 
     afterEach(function () {
-        stubSetConfig.restore();
-        stubCreateParcelLayer.restore();
+        sinon.restore();
     });
 
     describe("Component DOM", () => {
@@ -481,7 +482,7 @@ describe("addons/valuation/components/ValuationPrint.vue", () => {
             });
 
             afterEach(function () {
-                stubParcelSearchFeature.restore();
+                sinon.restore();
             });
 
             it("should call handleParcelSearch, if the parcel search delivers a result", () => {

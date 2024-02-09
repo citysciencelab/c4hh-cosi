@@ -3,7 +3,7 @@ import sinon from "sinon";
 import actions from "../../../store/actionsStreetSmart";
 import state from "../../../store/stateStreetSmart";
 
-describe("ADDONS: addons/streetSmart/store/actionsStreetSmart", () => {
+describe("addons_3_0_0/streetSmart/store/actionsStreetSmart", () => {
     const toggle3DCursorSpy = sinon.spy(),
         toggleAddressesVisibleSpy = sinon.spy();
     let commit, dispatch, rootGetters, getters, rootState;

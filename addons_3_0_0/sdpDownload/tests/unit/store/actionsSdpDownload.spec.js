@@ -5,7 +5,7 @@ import axios from "axios";
 import sinon from "sinon";
 
 
-describe("addons/sdpDownload/store/actionsSdpDownload", () => {
+describe("addons_3_0_0/sdpDownload/store/actionsSdpDownload", () => {
     let commit, dispatch, context, getters, rootState;
 
     before(() => {

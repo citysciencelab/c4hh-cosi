@@ -7,7 +7,7 @@ import {
 } from "../../../js/createVectorLayer";
 import store from "../../../../../../src_3_0_0/app-store/";
 
-describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
+describe("addons_3_0_0/valuationPrint/js/translator.getFixedMap.js", () => {
 
     beforeEach(() => {
         store.getters = {

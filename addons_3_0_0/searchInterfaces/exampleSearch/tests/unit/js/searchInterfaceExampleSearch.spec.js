@@ -2,7 +2,7 @@ import {expect} from "chai";
 import SearchInterface from "../../../../../../../src_3_0_0/modules/searchBar/searchInterfaces/searchInterface";
 import searchInterfaceExampleSearch from "../../../js/searchInterfaceExampleSearch.js";
 
-describe("ADDONS: addons_3_0_0/searchInterfaces/exampleSearch/searchInterfaceExampleSearch.js", () => {
+describe("addons_3_0_0/searchInterfaces/exampleSearch/searchInterfaceExampleSearch.js", () => {
     let SearchInterface1 = null;
 
     before(() => {

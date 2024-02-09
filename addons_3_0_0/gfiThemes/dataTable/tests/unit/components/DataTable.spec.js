@@ -6,7 +6,7 @@ import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
-describe("/src/modules/tools/gfi/components/themes/dataTable/components/DataTable.vue", () => {
+describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue", () => {
     let wrapper,
         spyRunSorting,
         spyResetAll;

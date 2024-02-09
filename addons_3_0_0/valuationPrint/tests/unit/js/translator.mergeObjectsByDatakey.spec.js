@@ -2,13 +2,14 @@ import {expect} from "chai";
 import sinon from "sinon";
 import {mergeObjectsByDatakey} from "../../../js/translator.mergeObjectsByDatakey";
 
-describe("addons/valuationPrint/js/translator.mergeObjectsByDatakey.js", () => {
+describe("addons_3_0_0/valuationPrint/js/translator.mergeObjectsByDatakey.js", () => {
     beforeEach(function () {
-        sinon.spy(console, "error");
+        const error = sinon.spy();
+
+        sinon.stub(console, "error").callsFake(error);
     });
 
     afterEach(function () {
-        console.error.restore();
         sinon.restore();
     });
 

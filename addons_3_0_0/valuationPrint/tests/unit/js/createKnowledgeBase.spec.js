@@ -4,7 +4,7 @@ import Polygon from "ol/geom/Polygon";
 import sinon from "sinon";
 import {createAttributesByFeatures, addKnowledgeBaseError, createKnowledgeBase} from "../../../js/createKnowledgeBase.js";
 
-describe("addons/valuationPrint/js/createKnowledgeBase.js", () => {
+describe("addons_3_0_0/valuationPrint/js/createKnowledgeBase.js", () => {
     const features = [
         new Feature({
             flstnrzae: "12345",

@@ -5,7 +5,7 @@ import DipasTheme from "../../../components/DipasTheme.vue";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/dipas/components/DipasTheme.vue", () => {
+describe("addons_3_0_0/dipas/components/DipasTheme.vue", () => {
     const iconPath = "https://geoportal-hamburg.de/lgv-beteiligung/icons/einzelmarker_dunkel.png",
         theme = {
             "name": "dipas",

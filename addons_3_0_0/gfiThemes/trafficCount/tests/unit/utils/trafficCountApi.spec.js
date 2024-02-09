@@ -11,7 +11,7 @@ dayjs.extend(weekOfYear);
 require("dayjs/locale/de.js");
 dayjs.locale("de");
 
-describe("addons/trafficCount/utils/trafficCountApi.js", () => {
+describe("addons_3_0_0/trafficCount/utils/trafficCountApi.js", () => {
     describe("TrafficCountApi.constructor", () => {
         describe("SensorThingsHttp", () => {
             it("should take the given dummy instead of creating a new instance of SensorThingsHttp", () => {

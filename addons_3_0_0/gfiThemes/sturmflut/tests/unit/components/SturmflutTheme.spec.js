@@ -4,7 +4,7 @@ import SturmflutTheme from "../../../components/SturmflutTheme.vue";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/sturmflut/components/SturmflutTheme.vue", () => {
+describe("addons_3_0_0/sturmflut/components/SturmflutTheme.vue", () => {
     let wrapper;
 
     it("should render all possible html elements", () => {

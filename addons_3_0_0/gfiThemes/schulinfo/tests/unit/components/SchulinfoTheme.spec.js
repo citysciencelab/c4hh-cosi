@@ -6,7 +6,7 @@ import ThemeConfig from "../../../themeConfig.json";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
+describe("addons_3_0_0/schulinfo/components/SchulinfoTheme.vue", () => {
     const properties = {
         "abschluss": "Allgemeine Hochschulreife|erster allgemeinbildender Schulabschluss|Erweiterter erster allgemeinbildender Schulabschluss|mittlerer Schulabschluss|schulischer Teil der Fachhochschulreife",
         "adresse_ort": "99999 Neverland",

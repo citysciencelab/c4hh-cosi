@@ -4,7 +4,7 @@ import DipasCockpitTheme from "../../../components/DipasCockpitTheme.vue";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/dipasCockpit/components/DipasCockpitTheme.vue", () => {
+describe("addons_3_0_0/dipasCockpit/components/DipasCockpitTheme.vue", () => {
     let wrapper;
 
     beforeEach(() => {

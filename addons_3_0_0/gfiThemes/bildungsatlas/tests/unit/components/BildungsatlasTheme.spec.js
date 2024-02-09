@@ -1,13 +1,17 @@
 import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
+import sinon from "sinon";
 import BildungsatlasTheme from "../../../components/BildungsatlasTheme.vue";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
+describe("addons_3_0_0/bildungsatlas/components/BildungsatlasTheme.vue", () => {
     let wrapper;
 
     beforeEach(() => {
+        const error = sinon.spy();
+
+        sinon.stub(console, "error").callsFake(error);
         wrapper = shallowMount(BildungsatlasTheme, {
             props: {
                 feature: {
@@ -28,6 +32,9 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
                 }
             }
         });
+    });
+    afterEach(() => {
+        sinon.restore();
     });
     describe("created", () => {
         it("should set the internal value of subTheme to the value found in the feature", () => {

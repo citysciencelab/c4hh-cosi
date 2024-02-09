@@ -5,7 +5,7 @@ import sinon from "sinon";
 import {createFeatureByCoordinate, collectFeatures, getFilter, getPropertyNames, getOAFGeometryFilter} from "../../../js/collectFeatures.js";
 import getFeature from "../../../../../../src_3_0_0/shared/js/api/oaf/getOAFFeature.js";
 
-describe("addons/valuationPrint/js/collectFeatures.js", () => {
+describe("addons_3_0_0/valuationPrint/js/collectFeatures.js", () => {
     const feature = new Feature({
         geometry: new Polygon([[
             [563599.939, 5936263.688, 0],
@@ -42,6 +42,15 @@ describe("addons/valuationPrint/js/collectFeatures.js", () => {
             [563614.001, 5936249.392, 0],
             [563613.561, 5936249.803, 0],
             [563599.939, 5936263.688, 0]]])
+    });
+
+    beforeEach(function () {
+        sinon.stub(console, "warn").callsFake(sinon.spy());
+        sinon.stub(console, "error").callsFake(sinon.spy());
+    });
+
+    afterEach(function () {
+        sinon.restore();
     });
 
     describe("createFeatureByCoordinate", () => {
@@ -177,15 +186,6 @@ describe("addons/valuationPrint/js/collectFeatures.js", () => {
     });
 
     describe("getPropertyNames", () => {
-        beforeEach(function () {
-            sinon.spy(console, "error");
-        });
-
-        afterEach(function () {
-            console.error.restore();
-            sinon.restore();
-        });
-
         it("should return undefined if the given parameter is undefined", () => {
             expect(getPropertyNames(undefined)).to.be.undefined;
         });

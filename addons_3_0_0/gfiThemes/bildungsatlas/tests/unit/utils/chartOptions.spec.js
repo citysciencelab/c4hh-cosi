@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import {isChartOptions, getChartOptions, getChartOptionsForPercentage} from "../../../utils/chartOptions.js";
 
-describe("addons/gfiThemes/bildungsatlas/utils/chartOptions.js", () => {
+describe("addons_3_0_0/gfiThemes/bildungsatlas/utils/chartOptions.js", () => {
     describe("isChartOptions", () => {
         it("should return false if anything but a string is given as propertyName", () => {
             expect(isChartOptions(undefined)).to.be.false;

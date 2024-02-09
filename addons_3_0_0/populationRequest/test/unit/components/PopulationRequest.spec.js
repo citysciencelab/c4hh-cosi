@@ -11,7 +11,7 @@ import PopulationRequest from "../../../store/indexPopulationRequest";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue", () => {
+describe("addons_3_0_0/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue", () => {
     const geographicValues = ["Box", "Circle", "Polygon"],
         selectionElements = ["Dropdown"],
         mockGraphicalSelectGetters = {
@@ -31,7 +31,11 @@ describe("addons/addons_3_0_0/PopulationRequest/components/PopulationRequest.vue
         layerConfigById;
 
     beforeEach(() => {
-        console.warn = sinon.stub();
+        const warnSpy = sinon.spy(),
+            errorSpy = sinon.spy();
+
+        sinon.stub(console, "warn").callsFake(warnSpy);
+        sinon.stub(console, "error").callsFake(errorSpy);
         layerConfigById = false;
         spyAddLayerToLayerConfig = sinon.spy();
         spyReplaceByIdInLayerConfig = sinon.spy();

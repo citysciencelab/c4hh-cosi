@@ -5,7 +5,7 @@ import VerkehrsstaerkenTheme from "../../../components/VerkehrsstaerkenTheme.vue
 
 config.global.mocks.$t = key => key;
 
-describe("src/modules/tools/gfi/components/themes/verkehrsstaerken/components/VerkehrsstaerkenTheme.vue", () => {
+describe("addons_3_0_0/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenTheme.vue", () => {
 
     const mappedProps = {"Zählstelle": "2693", "Bezeichnung": "Beim Schlump NO Schäferkampsallee T179", "Art": "Kurzpegel", "DTV 2008": "17000", "DTVw 2008": "19000", "Schwerverkehrsanteil am DTVw 2008": "5 %", "DTV 2009": "17000", "DTVw 2009": "19000", "Schwerverkehrsanteil am DTVw 2009": "6 %", "DTV 2010": "17000", "DTVw 2010": "18000", "Schwerverkehrsanteil am DTVw 2010": "6 %", "DTV 2011": "17000", "DTVw 2011": "19000", "Schwerverkehrsanteil am DTVw 2011": "5 %", "DTV 2012": "16000", "DTVw 2012": "18000", "Schwerverkehrsanteil am DTVw 2012": "5 %", "DTV 2013": "16000", "DTVw 2013": "18000", "Schwerverkehrsanteil am DTVw 2013": "5 %", "DTV 2014": "16000", "DTVw 2014": "18000", "Schwerverkehrsanteil am DTVw 2014": "5 %", "DTV 2015": "16000", "DTVw 2015": "18000", "Schwerverkehrsanteil am DTVw 2015": "5 %", "DTV 2016": "18000", "DTVw 2016": "20000", "Schwerverkehrsanteil am DTVw 2016": "6 %", "Baustelleneinfluss 2016": "*", "DTV 2017": "16000", "DTVw 2017": "18000", "Schwerverkehrsanteil am DTVw 2017": "5 %", "DTV 2018": "16000", "DTVw 2018": "17000", "Schwerverkehrsanteil am DTVw 2018": "5 %"};
     let wrapper;

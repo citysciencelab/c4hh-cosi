@@ -4,7 +4,7 @@ import TrinkwasserTheme from "../../../components/TrinkwasserTheme.vue";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/trinkwasser/components/TrinkwasserTheme.vue", () => {
+describe("addons_3_0_0/trinkwasser/components/TrinkwasserTheme.vue", () => {
     let wrapper;
 
     beforeEach(() => {

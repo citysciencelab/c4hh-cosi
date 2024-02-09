@@ -7,7 +7,7 @@ import {
 } from "../../../js/translator.getWalkerMap";
 import store from "../../../../../../src_3_0_0/app-store/";
 
-describe("addons/valuationPrint/js/translator.getWalkerMap.js", () => {
+describe("addons_3_0_0/valuationPrint/js/translator.getWalkerMap.js", () => {
     const feature = new Feature({
         geometry: new MultiPolygon([[
             [

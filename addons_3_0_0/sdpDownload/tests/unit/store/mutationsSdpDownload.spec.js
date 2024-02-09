@@ -4,7 +4,7 @@ import mutations from "../../../store/mutationsSdpDownload";
 
 const {applyTranslationKey} = mutations;
 
-describe("addons/sdpDownload/store/mutationsSdpDownload", function () {
+describe("addons_3_0_0/sdpDownload/store/mutationsSdpDownload", function () {
 
     describe("testing setting of mutations with payload", function () {
         it("removes 'translate#' from name if present", function () {

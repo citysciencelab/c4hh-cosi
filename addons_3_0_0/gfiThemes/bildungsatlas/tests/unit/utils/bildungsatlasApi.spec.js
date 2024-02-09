@@ -2,7 +2,7 @@ import {expect} from "chai";
 import {BildungsatlasApi} from "../../../utils/bildungsatlasApi.js";
 import Feature from "ol/Feature.js";
 
-describe("addons/gfiThemes/bildungsatlas/utils/bildungsatlasApi.js", () => {
+describe("addons_3_0_0/gfiThemes/bildungsatlas/utils/bildungsatlasApi.js", () => {
     describe("BildungsatlasApi.constructor", () => {
         it("should assign wfsUrls and featureTypes as parameters as they are", () => {
             const api = new BildungsatlasApi("configUrl", "wfsUrls", "featureTypes", "mockWfsCall", true);

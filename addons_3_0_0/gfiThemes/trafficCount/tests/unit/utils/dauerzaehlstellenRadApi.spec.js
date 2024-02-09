@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 require("dayjs/locale/de.js");
 dayjs.locale("de");
 
-describe("addons/trafficCount/utils/dauerzaehlstellenRadApi.js", () => {
+describe("addons_3_0_0/trafficCount/utils/dauerzaehlstellenRadApi.js", () => {
     let dummyApi = null;
 
     beforeEach(() => {
