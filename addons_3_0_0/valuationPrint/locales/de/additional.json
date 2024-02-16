@@ -17,6 +17,7 @@
       "pdfError": "Fehler beim Erzeugen der PDF.",
       "pdfSuccess": "PDF wurde erstellt.",
       "report": "WANDA Bericht",
+      "parcelReport": "Flurstücksbericht",
       "imageInTheMaking": "{{imageName}} wird erstellt.",
       "imageSuccess": "{{imageName}} wurde erstellt.",
       "imageError": "Fehler beim Erzeugen vom {{imageName}}.",

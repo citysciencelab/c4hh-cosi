@@ -17,6 +17,7 @@
       "pdfError": "PDF failed ...",
       "pdfSuccess": "PDF is ready.",
       "report": "Report",
+      "parcelReport": "Parcel report",
       "imageInTheMaking": "{{imageName}} is in progress.",
       "imageSuccess": "{{imageName}} is ready.",
       "imageError": "{{imageName}} failed.",

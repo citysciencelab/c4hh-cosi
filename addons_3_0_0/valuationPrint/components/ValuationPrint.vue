@@ -145,7 +145,7 @@ export default {
                     },
                     url => {
                         this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
-                        this.addUrl(url, this.$t("additional:modules.valuationPrint.report"));
+                        this.addUrl(url, this.fileprefix);
                         this.progressCounter++;
                         if (this.numberOfImagesConfigured === 0) {
                             this.scrollToDownloadSection();
@@ -369,7 +369,7 @@ export default {
                     this.numberOfServicesConfigured = Object.keys(response.data.services).length;
                     this.imageAppId = response.data.settings.imageAppId;
                     this.defaultValue = response.data.settings.defaultValue;
-                    this.fileprefix = response.data.settings.fileprefix;
+                    this.fileprefix = this.$t(response.data.settings.fileprefix);
                     this.numberOfProgressSteps = this.numberOfServicesConfigured
                         + (this.isPdfAppIdConfigured ? 1 : 0)
                         + (this.isPdfSpecificationAppIdConfigured ? 1 : 0)
