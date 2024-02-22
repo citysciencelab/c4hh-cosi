@@ -188,30 +188,33 @@ export default {
          * @param {ol/Feature[]} oldFeatures - The old selected features
          * @returns {void}
          */
-        selectedFeatures (features, oldFeatures) {
-            if (features.length) {
-                if (this.isfirstFeaturesLoaded) {
-                    this.setPrintedFeature(this.printedFeature.filter(pf => features.find(sf => sf.get("flstnrzae") === pf.get("flstnrzae"))));
-                    this.isfirstFeaturesLoaded = false;
-                }
-                else if (oldFeatures.length > features.length) {
-                    this.setPrintedFeature(this.printedFeature.filter(pf => features.find(sf => sf.get("flstnrzae") === pf.get("flstnrzae"))));
-                }
-                else {
-                    this.setPrintedFeature([].concat(this.printedFeature, features[features.length - 1]));
-                }
+        selectedFeatures: {
+            handler  (features, oldFeatures) {
+                if (features.length) {
+                    if (this.isfirstFeaturesLoaded) {
+                        this.setPrintedFeature(this.printedFeature.filter(pf => features.find(sf => sf.get("flstnrzae") === pf.get("flstnrzae"))));
+                        this.isfirstFeaturesLoaded = false;
+                    }
+                    else if (oldFeatures.length > features.length) {
+                        this.setPrintedFeature(this.printedFeature.filter(pf => features.find(sf => sf.get("flstnrzae") === pf.get("flstnrzae"))));
+                    }
+                    else {
+                        this.setPrintedFeature([].concat(this.printedFeature, features[features.length - 1]));
+                    }
 
-                if (this.printedFeature.length !== features.length) {
-                    this.isAllSelected = false;
+                    if (this.printedFeature.length !== features.length) {
+                        this.isAllSelected = false;
+                    }
+                    else {
+                        this.isAllSelected = true;
+                    }
                 }
                 else {
-                    this.isAllSelected = true;
+                    this.setPrintedFeature([]);
+                    this.resetParcelSearch = true;
                 }
-            }
-            else {
-                this.setPrintedFeature([]);
-                this.resetParcelSearch = true;
-            }
+            },
+            deep: true
         },
         /**
          * If the input checkbox is checked, all options will be checked
