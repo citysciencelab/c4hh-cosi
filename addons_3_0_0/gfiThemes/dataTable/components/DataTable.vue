@@ -25,8 +25,8 @@ export default {
     },
     data () {
         return {
-            columns: this.getColumns(this.feature.getAttributesToShow()),
-            rows: this.feature.getFeatures().map(singleFeature => singleFeature.getMappedProperties()),
+            columns: [],
+            rows: [],
             dropdownSelected: {},
             filterObject: {},
             originFilteredRows: undefined
@@ -118,6 +118,13 @@ export default {
                 }
             },
             deep: true
+        },
+        feature: {
+            handler (newVal) {
+                this.rows = newVal.getFeatures().map(singleFeature => singleFeature.getMappedProperties());
+                this.columns = this.getColumns(newVal.getAttributesToShow());
+            },
+            immediate: true
         }
     },
     created () {
