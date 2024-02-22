@@ -360,7 +360,7 @@ export default {
             v-if="typeof showCount !== 'undefined'"
             class="count"
         >
-            <b>{{ $t(showCount) }}</b> {{ rows.length }}
+            <span>{{ $t(showCount) }}</span> {{ rows.length }}
         </div>
         <table
             class="table table-hover"
@@ -494,6 +494,9 @@ export default {
         position: sticky;
         top: 0px;
         background-color: #ffffff;
+        span {
+            font-family: "MasterPortalFont Bold";
+        }
     }
 
     table {
@@ -505,6 +508,7 @@ export default {
             top: 0px;
             background: $white;
             vertical-align: top;
+            font-family: "MasterPortalFont Bold";
             &.more-sticky {
                 top: 37px;
             }
