@@ -20,6 +20,7 @@
  * @property {Object} messageList - List of messages for status progress.
  * @property {Object} urlList - List of urls for downloding pdf and images.
  * @property {Boolean} showDownloadAll - True, if the url list was generated.
+ * @property {Boolean} sendLegends - If true, legends for wms layers are sent together with report request.
  * @property {Object[]} printedFeature - the printed features
  */
 const state = {
@@ -47,6 +48,7 @@ const state = {
     messageList: [],
     urlList: [],
     showDownloadAll: false,
+    sendLegends: false,
     printedFeature: []
 };
 

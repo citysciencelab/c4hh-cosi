@@ -1,3 +1,4 @@
+import {rawLayerList} from "@masterportal/masterportalapi";
 import {concatStringByDatakey} from "./translator.concatStringByDatakey";
 import {getFixedMap} from "./translator.getFixedMap";
 import {getProportionMap} from "./translator.getProportionMap";
@@ -16,10 +17,13 @@ import {mergeObjectsByDatakey} from "./translator.mergeObjectsByDatakey";
  * @param {String} defaultValue - Used when nothing is present or nothing was found.
  * @param {String} mapProjection - The EPSG-Code of the current map projection.
  * @param {String} outputFilename - The output filename of the pdf (without extension).
+ * @param {Boolean} sendLegends - If dialog should contain legends.
  * @returns {Object} The mapfish dialog.
  */
-export function createMapfishDialog (parcel, knowledgeBase, transformer, defaultValue, mapProjection, outputFilename) {
+export function createMapfishDialog (parcel, knowledgeBase, transformer, defaultValue, mapProjection, outputFilename,
+    sendLegends) {
     const mapfishDialog = {},
+        legendLayerIds = new Set(),
         defaultDelimitor = ", ";
 
     Object.entries(transformer).forEach(([prefix, obj]) => {
@@ -29,6 +33,7 @@ export function createMapfishDialog (parcel, knowledgeBase, transformer, default
             }
             else if (transformerConfig.type === "mapProportion") {
                 mapfishDialog[prefix + "." + postfix] = getProportionMap(parcel?.feature, parcel?.extent, mapProjection, transformerConfig.style, transformerConfig.proportion, transformerConfig.layerIds, transformerConfig.dpi);
+                transformerConfig.layerIds?.forEach?.(id => legendLayerIds.add(id));
             }
             else if (transformerConfig.type === "mapFixed") {
                 mapfishDialog[prefix + "." + postfix] = getFixedMap(parcel?.center, mapProjection, transformerConfig.style, transformerConfig.bbox, transformerConfig.layerIds, transformerConfig.dpi);
@@ -67,9 +72,51 @@ export function createMapfishDialog (parcel, knowledgeBase, transformer, default
         });
     });
 
+    if (sendLegends) {
+        mapfishDialog.legend = createLegendObject(legendLayerIds);
+    }
+
     return {
         layout: "A4 Hochformat",
         attributes: mapfishDialog,
         outputFilename
     };
+}
+
+/**
+ * Creates the legend object for the mapfish dialog.
+ * @param {Set} setOflegendLayerIds - The ids of the layers to be included in the legend.
+ * @returns {Object} - The "legend" object for mapfish print request payload.
+ */
+export function createLegendObject (setOflegendLayerIds) {
+    const legendObject = {
+        layers: []
+    };
+
+    setOflegendLayerIds?.forEach?.(layerId => {
+        const layer = rawLayerList.getLayerWhere({id: layerId});
+
+        if (layer?.legendURL?.endsWith?.(".pdf") || layer?.typ !== "WMS") {
+            return;
+        }
+
+        legendObject.layers.push(
+            {
+                layerName: layer.name,
+                values: [
+                    {
+                        color: "",
+                        geometryType: "",
+                        legendType: "wmsGetLegendGraphic",
+                        imageUrl: layer.url
+                            + "?SERVICE=WMS&VERSION="
+                            + layer.version
+                            + "&REQUEST=GetLegendGraphic&FORMAT=image%2Fpng&LAYER="
+                            + layer.layers
+                    }
+                ]
+            }
+        );
+    });
+    return legendObject;
 }

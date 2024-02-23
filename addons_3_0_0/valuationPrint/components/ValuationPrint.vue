@@ -123,7 +123,8 @@ export default {
                     this.config.transformer,
                     this.defaultValue,
                     this.projection.getCode(),
-                    this.getFilenameOfPDF(this.fileprefix, dayjs().format("YYYY-MM-DD"))
+                    this.getFilenameOfPDF(this.fileprefix, dayjs().format("YYYY-MM-DD")),
+                    this.sendLegends
                 );
 
                 if (!this.isPdfAppIdConfigured) {
