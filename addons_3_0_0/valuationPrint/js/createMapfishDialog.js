@@ -33,7 +33,10 @@ export function createMapfishDialog (parcel, knowledgeBase, transformer, default
             }
             else if (transformerConfig.type === "mapProportion") {
                 mapfishDialog[prefix + "." + postfix] = getProportionMap(parcel?.feature, parcel?.extent, mapProjection, transformerConfig.style, transformerConfig.proportion, transformerConfig.layerIds, transformerConfig.dpi);
-                transformerConfig.layerIds?.forEach?.(id => legendLayerIds.add(id));
+
+                if (transformerConfig.legend === true) {
+                    transformerConfig.layerIds?.forEach?.(id => legendLayerIds.add(id));
+                }
             }
             else if (transformerConfig.type === "mapFixed") {
                 mapfishDialog[prefix + "." + postfix] = getFixedMap(parcel?.center, mapProjection, transformerConfig.style, transformerConfig.bbox, transformerConfig.layerIds, transformerConfig.dpi);
@@ -109,14 +112,18 @@ export function createLegendObject (setOflegendLayerIds) {
                         geometryType: "",
                         legendType: "wmsGetLegendGraphic",
                         imageUrl: layer.url
-                            + "?SERVICE=WMS&VERSION="
+                            + "?language=ger&"
+                            + "version="
                             + layer.version
-                            + "&REQUEST=GetLegendGraphic&FORMAT=image%2Fpng&LAYER="
+                            + "&service=WMS&"
+                            + "&request=GetLegendGraphic&sld_version=1.1.0&layer="
                             + layer.layers
+                            + "&format=image/png"
                     }
                 ]
             }
         );
     });
+
     return legendObject;
 }
