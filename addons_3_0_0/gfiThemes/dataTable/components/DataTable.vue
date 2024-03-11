@@ -3,19 +3,19 @@
 import {mapGetters} from "vuex";
 import getters from "../../../../../src_3_0_0/modules/getFeatureInfo/store/gettersGetFeatureInfo";
 import {isWebLink} from "../../../../../src_3_0_0/shared/js/utils/urlHelper.js";
-import ExportButtonCSV from "../../../../../src_3_0_0/shared/modules/buttons/components/ExportButtonCSV.vue";
 import isObject from "../../../../../src_3_0_0/shared/js/utils/isObject";
 import Multiselect from "vue-multiselect";
 import localeCompare from "../../../../../src_3_0_0/shared/js/utils/localeCompare";
 import {getCenter as getCenterOfExtent} from "ol/extent";
 import IconButton from "../../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
+import TableComponent from "../../../../../src_3_0_0/shared/modules/table/components/TableComponent.vue";
 
 export default {
     name: "DataTable",
     components: {
-        ExportButtonCSV,
         Multiselect,
-        IconButton
+        IconButton,
+        TableComponent
     },
     props: {
         feature: {
@@ -36,6 +36,7 @@ export default {
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Maps", ["projection"]),
         ...mapGetters("Modules/GetFeatureInfo", Object.keys(getters)),
+
         /**
          * Gets the unsorted and unfiltered rows.
          * @returns {Object[]} The origin rows.
@@ -123,6 +124,10 @@ export default {
             handler (newVal) {
                 this.rows = newVal.getFeatures().map(singleFeature => singleFeature.getMappedProperties());
                 this.columns = this.getColumns(newVal.getAttributesToShow());
+                this.data = {
+                    headers: this.columns,
+                    items: this.rows
+                };
             },
             immediate: true
         }
@@ -356,12 +361,11 @@ export default {
         id="table-data-container"
         :class="enableDownload ? 'enable-download' : ''"
     >
-        <div
-            v-if="typeof showCount !== 'undefined'"
-            class="count"
-        >
-            <span>{{ $t(showCount) }}</span> {{ rows.length }}
-        </div>
+        <TableComponent
+            :data="data"
+            :sortable="true"
+            :hits="showCount"
+        />
         <table
             class="table table-hover"
         >
@@ -434,31 +438,6 @@ export default {
                 </tr>
             </tbody>
         </table>
-        <div
-            v-if="enableDownload"
-            class="download"
-        >
-            <ExportButtonCSV
-                :url="false"
-                :filename="fileName"
-                :data="rowsWithAdditionalData"
-                :use-semicolon="true"
-                :title="$t('common:modules.filter.download.labelBtn')"
-            />
-        </div>
-        <div
-            v-if="isFilterable || isSortable"
-            class="reset-all"
-        >
-            <button
-                type="button"
-                class="btn btn-primary reset"
-                @click="resetAll"
-                @keypress="resetAll"
-            >
-                {{ $t('common:modules.filter.snippetTags.resetAll') }}
-            </button>
-        </div>
     </div>
 </template>
 
@@ -488,42 +467,6 @@ export default {
         }
     }
 
-    .count {
-        padding-top: 25px;
-        padding-left: 6px;
-        position: sticky;
-        top: 0px;
-        background-color: #ffffff;
-        span {
-            font-family: "MasterPortalFont Bold";
-        }
-    }
-
-    table {
-        margin: 0;
-        table-layout: fixed;
-        th {
-            padding: 6px 15px 6px 6px;
-            position: sticky;
-            top: 0px;
-            background: $white;
-            vertical-align: top;
-            font-family: "MasterPortalFont Bold";
-            &.more-sticky {
-                top: 37px;
-            }
-            span {
-                cursor: pointer;
-                padding: 0;
-            }
-            .multiselect-dropdown {
-                padding: 0;
-            }
-        }
-        td{
-            padding: 6px;
-        }
-    }
     .download {
         position: sticky;
         bottom: 22px;

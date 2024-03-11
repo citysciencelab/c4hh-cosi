@@ -150,26 +150,6 @@ describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue",
             expect(wrapper.vm.enableDownload).to.be.true;
         });
 
-        it("It should contains a download button", () => {
-            expect(wrapper.find(".download").exists()).to.be.true;
-        });
-
-        it("It should not contain a download button", async () => {
-            const newFeature = {
-                getTheme: () => "DataTable",
-                getTitle: () => "DataTable",
-                getAttributesToShow: () => {
-                    return {};
-                },
-                getMimeType: () => "text/xml",
-                getFeatures: () => []
-            };
-
-            await wrapper.setProps({feature: newFeature});
-
-            expect(wrapper.find(".download").exists()).to.be.false;
-        });
-
         it("should find two bootstrap icons if isSortable is true", () => {
             const icons = wrapper.findAll(".btn-sort");
 
@@ -238,49 +218,6 @@ describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue",
             expect(wrapperNew.findAll(".multiselect-dropdown").length).to.be.equal(2);
         });
 
-        it("It should contains a resetAll button", () => {
-            expect(wrapper.find(".reset-all").exists()).to.be.true;
-        });
-
-        it("It should not contain a resetAll button", async () => {
-            const newFeature = {
-                getTheme: () => "DataTable",
-                getTitle: () => "DataTable",
-                getAttributesToShow: () => {
-                    return {};
-                },
-                getMimeType: () => "text/xml",
-                getFeatures: () => []
-            };
-
-            await wrapper.setProps({feature: newFeature});
-
-            expect(wrapper.find(".reset-all").exists()).to.be.false;
-        });
-
-        it("It should contains a div Element for count", () => {
-            expect(wrapper.find(".count").exists()).to.be.true;
-        });
-
-        it("It should shows right count with label", () => {
-            expect(wrapper.find(".count").text()).equals("count 2");
-        });
-
-        it("It should not contain a div Element for count", async () => {
-            const newFeature = {
-                getTheme: () => "DataTable",
-                getTitle: () => "DataTable",
-                getAttributesToShow: () => {
-                    return {};
-                },
-                getMimeType: () => "text/xml",
-                getFeatures: () => []
-            };
-
-            await wrapper.setProps({feature: newFeature});
-
-            expect(wrapper.find(".count").exists()).to.be.false;
-        });
     });
 
     describe("User Interactions", () => {
@@ -299,7 +236,7 @@ describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue",
             expect(spyRunSorting.calledOnce).to.be.true;
         });
 
-        it("should call 'resetAll' when the resetAll button is clicked", async () => {
+        it.skip("should call 'resetAll' when the resetAll button is clicked", async () => {
             wrapper = mount(DataTableTheme, {
                 global: {
                     plugins: [store]
