@@ -47,7 +47,7 @@ describe("addons_3_0_0/dipas/components/DipasTheme.vue", () => {
                     getMimeType: () => "text/xml",
                     getMappedProperties () {
                         return {
-                            Thema: "Value Kategorie",
+                            Kategorie: "Value Kategorie",
                             link: "/drupal/de/node/5",
                             name: "Value name",
                             description: "Value description",
@@ -176,7 +176,7 @@ describe("addons_3_0_0/dipas/components/DipasTheme.vue", () => {
             expect(ret).to.equal("/drupal/de/node/5");
         });
 
-        it("should show path to dipas frontend contribution when table = true", function () {
+        it("should show path to dipas frontend contribution when table = false", function () {
             Object.defineProperty(document, "referrer", {value: "https://localhost:9001/portalconfigs/dipas/#/projektinfo", configurable: true});
 
             createWrapper(false);
@@ -187,7 +187,7 @@ describe("addons_3_0_0/dipas/components/DipasTheme.vue", () => {
             expect(ret).to.equal(path);
         });
 
-        it("should show path to dipas frontend contribution when table = true and filter = visible", function () {
+        it("should show path to dipas frontend contribution when table = false and filter = visible", function () {
             Object.defineProperty(document, "referrer", {value: "https://localhost:9001/portalconfigs/dipas/#/projektinfo?filter=open&test=true", configurable: true});
 
             createWrapper(false);
