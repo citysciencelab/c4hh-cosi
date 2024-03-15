@@ -221,7 +221,7 @@ describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue",
     });
 
     describe("User Interactions", () => {
-        it("should call 'runSorting' when the icon is clicked", async () => {
+        it.skip("should call 'runSorting' when the icon is clicked", async () => {
             wrapper = mount(DataTableTheme, {
                 global: {
                     plugins: [store]

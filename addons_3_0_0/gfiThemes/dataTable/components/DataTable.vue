@@ -365,6 +365,7 @@ export default {
             :data="data"
             :sortable="true"
             :hits="showCount"
+            :downloadable="enableDownload"
         />
         <table
             class="table table-hover"
