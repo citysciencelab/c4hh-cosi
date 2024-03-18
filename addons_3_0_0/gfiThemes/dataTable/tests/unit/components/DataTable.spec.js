@@ -22,6 +22,7 @@ describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue",
                     }
                 };
             },
+            getBBox: () => [0, 0, 200, 500],
             getTitle: () => "DataTable",
             getAttributesToShow: () => {
                 return {
@@ -75,13 +76,18 @@ describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue",
         },
 
         mockGetters = {
+            projection: () => {
+                return {
+                    getCode: () => "12345"
+                };
+            },
             gfiFeatures: () => featureData
         },
 
         store = createStore({
             namespaces: true,
             modules: {
-                Map: {
+                Maps: {
                     namespaced: true,
                     getters: mockGetters
                 },
@@ -253,6 +259,15 @@ describe("addons_3_0_0/gfiThemes/components/dataTable/components/DataTable.vue",
     });
 
     describe("methods", () => {
+        describe("additionalColumns", () => {
+            it("should return expected values for EPSG, Rechtswert und Hochwert", () => {
+                expect(wrapper.vm.additionalColumns).to.deep.equal([
+                    {key: "EPSG", value: "12345"},
+                    {key: "Rechtswert", value: "100"},
+                    {key: "Hochwert", value: "250"}
+                ]);
+            });
+        });
         describe("getColumns", () => {
             it("should create the correct column objects", () => {
                 const columns = wrapper.vm.getColumns({key1: "Moin", key2: "Tschüss"}),

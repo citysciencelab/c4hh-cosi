@@ -6,7 +6,7 @@ import {isWebLink} from "../../../../../src_3_0_0/shared/js/utils/urlHelper.js";
 import isObject from "../../../../../src_3_0_0/shared/js/utils/isObject";
 import Multiselect from "vue-multiselect";
 import localeCompare from "../../../../../src_3_0_0/shared/js/utils/localeCompare";
-import {getCenter as getCenterOfExtent} from "ol/extent";
+import {getCenter} from "ol/extent";
 import IconButton from "../../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
 import TableComponent from "../../../../../src_3_0_0/shared/modules/table/components/TableComponent.vue";
 
@@ -27,6 +27,7 @@ export default {
         return {
             columns: [],
             rows: [],
+            data: {},
             dropdownSelected: {},
             filterObject: {},
             originFilteredRows: undefined
@@ -84,25 +85,20 @@ export default {
         sortingColumn: function () {
             return this.columns.find(column => column.order !== "origin");
         },
-        rowsWithAdditionalData () {
-            if (typeof this.feature?.getBBox !== "function" || !this.feature?.getBBox()) {
-                return this.rows;
+        /**
+         * Returns additional columns for epsg code, easting and northing.
+         * @returns {Object[]} Array of key-value-objects representing the column header and the value to be set for all items.
+         */
+        additionalColumns () {
+            const columns = [],
+                extent = this.feature?.getBBox?.();
+
+            if (extent) {
+                columns.push({key: "EPSG", value: this.projection.getCode()});
+                columns.push({key: "Rechtswert", value: getCenter(extent)[0].toString()});
+                columns.push({key: "Hochwert", value: getCenter(extent)[1].toString()});
             }
-            const result = JSON.parse(JSON.stringify(this.rows)),
-                extent = this.feature.getBBox(),
-                epsg = this.projection.getCode(),
-                coordinates = getCenterOfExtent(extent);
-
-            result.forEach(row => {
-                const obj = {
-                    EPSG: epsg,
-                    Rechtswert: coordinates[0],
-                    Hochwert: coordinates[1]
-                };
-
-                Object.assign(row, obj);
-            });
-            return result;
+            return columns;
         }
     },
     watch: {
@@ -366,6 +362,7 @@ export default {
             :sortable="true"
             :hits="showCount"
             :downloadable="enableDownload"
+            :additional-columns-for-download="additionalColumns"
         />
         <table
             class="table table-hover"
