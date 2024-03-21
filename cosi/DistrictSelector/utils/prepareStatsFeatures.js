@@ -70,9 +70,9 @@ export function createStatFeaturesFromLTF (ltfFeatures, districtLevel) {
             group: obj.group
         });
 
-        statFeature.set(districtLevel.stats.keyOfAttrName, ltfFeatures[0].get(districtLevel.stats.keyOfAttrName));
+        statFeature.set(districtLevel.stats.keyOfAttrName[0], ltfFeatures[0].get(districtLevel.stats.keyOfAttrName[0]));
         if (districtLevel.referenceLevel) {
-            statFeature.set(districtLevel.referenceLevel.stats.keyOfAttrName, ltfFeatures[0].get(districtLevel.referenceLevel.stats.keyOfAttrName));
+            statFeature.set(districtLevel.referenceLevel.stats.keyOfAttrName[0], ltfFeatures[0].get(districtLevel.referenceLevel.stats.keyOfAttrName[0]));
         }
         ltfFeatures.forEach(feature => {
             statFeature.set("jahr_" + feature.get("jahr"), feature.get(obj.category));

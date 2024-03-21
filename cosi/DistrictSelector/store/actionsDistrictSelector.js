@@ -37,7 +37,7 @@ const actions = {
                             featureTypes: [districtLevel.stats.layers[j].featureType],
                             srsName: rootGetters["Maps/projectionCode"],
                             propertyNames: districtLevel.propertyNameList[j],
-                            filter: equalTo(districtLevel.stats.keyOfAttrName, districtName)
+                            filter: equalTo(districtLevel.stats.keyOfAttrName[j], districtName)
                         }),
                         olFeatures = wfsFormat.readFeatures(statFeatures);
 
@@ -61,7 +61,7 @@ const actions = {
             const referenceLevel = districtLevel.referenceLevel,
                 // reference names of the districts
                 refNames = districts.map(district => {
-                    return district.statFeatures[0]?.get(districtLevel.referenceLevel.stats.keyOfAttrName);
+                    return mapDistrictNames(district.getReferencDistrictName(), districtLevel.referenceLevel);
                 }),
                 // reference districts
                 refDistricts = referenceLevel.districts.filter(district => {
