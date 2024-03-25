@@ -360,6 +360,7 @@ export default {
         <TableComponent
             :data="data"
             :sortable="true"
+            :filterable="true"
             :hits="showCount"
             :downloadable="enableDownload"
             :additional-columns-for-download="additionalColumns"
