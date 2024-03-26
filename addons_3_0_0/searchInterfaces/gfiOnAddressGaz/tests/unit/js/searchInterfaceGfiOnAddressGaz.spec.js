@@ -1,4 +1,6 @@
 import {expect} from "chai";
+import sinon from "sinon";
+import store from "../../../../../../../src_3_0_0/app-store";
 import SearchInterface from "../../../../../../../src_3_0_0/modules/searchBar/searchInterfaces/searchInterface.js";
 import SearchInterfaceGfiOnAddressGaz from "../../../js/searchInterfaceGfiOnAddressGaz.js";
 
@@ -6,6 +8,9 @@ describe("ADDONS: addons_3_0_0/searchInterfaces/exampleSearch/searchInterfaceGfi
     let searchInterface = null;
 
     before(() => {
+        store.getters = {
+            restServiceById: () => sinon.stub()
+        };
         searchInterface = new SearchInterfaceGfiOnAddressGaz();
     });
 
