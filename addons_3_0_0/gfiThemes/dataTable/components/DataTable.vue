@@ -4,17 +4,13 @@ import {mapGetters} from "vuex";
 import getters from "../../../../../src_3_0_0/modules/getFeatureInfo/store/gettersGetFeatureInfo";
 import {isWebLink} from "../../../../../src_3_0_0/shared/js/utils/urlHelper.js";
 import isObject from "../../../../../src_3_0_0/shared/js/utils/isObject";
-import Multiselect from "vue-multiselect";
 import localeCompare from "../../../../../src_3_0_0/shared/js/utils/localeCompare";
 import {getCenter} from "ol/extent";
-import IconButton from "../../../../../src_3_0_0/shared/modules/buttons/components/IconButton.vue";
 import TableComponent from "../../../../../src_3_0_0/shared/modules/table/components/TableComponent.vue";
 
 export default {
     name: "DataTable",
     components: {
-        Multiselect,
-        IconButton,
         TableComponent
     },
     props: {
@@ -52,6 +48,13 @@ export default {
          */
         enableDownload: function () {
             return this.feature?.getTheme()?.params?.enableDownload || false;
+        },
+        /**
+         * Returns the name for the download file.
+         * @returns {String} True if the download Buttion is enabled.
+         */
+        exportFileName: function () {
+            return this.feature?.getTheme()?.params?.exportFileName || false;
         },
 
         /**
@@ -355,7 +358,6 @@ export default {
 <template>
     <div
         id="table-data-container"
-        :class="enableDownload ? 'enable-download' : ''"
     >
         <TableComponent
             :data="data"
@@ -364,220 +366,14 @@ export default {
             :hits="showCount"
             :downloadable="enableDownload"
             :additional-columns-for-download="additionalColumns"
+            :export-file-name="exportFileName"
         />
-        <table
-            class="table table-hover"
-        >
-            <thead>
-                <th
-                    v-for="col in columns"
-                    :key="col.index"
-                    class="filter-select-box-container"
-                    :class="[typeof showCount !== 'undefined' ? 'more-sticky' : '']"
-                    :style="getZIndex(col.index)"
-                >
-                    <span
-                        v-if="isFilterable"
-                        class="multiselect-dropdown"
-                    >
-                        <Multiselect
-                            v-model="dropdownSelected[col.name]"
-                            :options="getUniqueValuesByColumnName(col.name, originRows)"
-                            :multiple="true"
-                            :show-labels="false"
-                            open-direction="auto"
-                            :close-on-select="true"
-                            :clear-on-select="false"
-                            :searchable="false"
-                            placeholder=""
-                            :taggable="true"
-                            class="multiselect-dropdown"
-                            @select="(selectedOption) => addFilter(selectedOption, col.name)"
-                            @remove="(removedOption) => removeFilter(removedOption, col.name)"
-                        >
-                            <template
-                                #selection
-                            >
-                                <span
-                                    class="multiselect__single"
-                                >{{ col.name }}</span>
-                            </template>
-                        </Multiselect>
-                    </span>
-                    <span v-else>{{ col.name }}</span>
-                    <IconButton
-                        v-if="isSortable"
-                        :aria="$t('common:modules.gfiThemes.dataTable.sort')"
-                        class="btn-sort"
-                        :icon="'bootstrap-icon ' + getIconClassByOrder(col.order) + ' sort'"
-                        :interaction="() => runSorting(col)"
-                    />
-                </th>
-            </thead>
-            <tbody v-if="rows.length > 0">
-                <tr
-                    v-for="(singleRow, index1) in rows"
-                    :key="index1"
-                >
-                    <td
-                        v-for="(col, index2) in columns"
-                        :key="index2"
-                    >
-                        <a
-                            v-if="isWebLink(singleRow[col.name])"
-                            :href="singleRow[col.name]"
-                            target="_blank"
-                        >
-                            {{ singleRow[col.name] ? singleRow[col.name] : '' }}
-                        </a>
-                        <span v-else>
-                            {{ singleRow[col.name] ? singleRow[col.name] : '' }}
-                        </span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </template>
 
 <style lang="scss">
 @import "~variables";
-.btn-sort > i {
-    font-size: 1rem;
-}
-
-.btn-sort:focus i {
-    opacity: 1 !important;
-}
-
 #table-data-container {
     margin:6px 15px 0 12px;
-    min-height: 350px;
-    .sort {
-        position: absolute;
-        right: 10px;
-        top: 18px;
-        z-index: 50;
     }
-    .origin-order {
-        opacity: 0.3;
-        &:hover {
-            opacity: 1;
-        }
-    }
-
-    .download {
-        position: sticky;
-        bottom: 22px;
-        float: right;
-        margin-left: 20px;
-        margin-top: 20px;
-    }
-    .reset-all {
-        position: sticky;
-        bottom: 22px;
-        float: right;
-        margin-top: 20px;
-    }
-    .filter-select-box-container {
-        width: 15rem;
-        .multiselect {
-            margin:0;
-            padding: 0;
-            .multiselect__single {
-                font-family: inherit;
-                font-size: $font-size-base;
-                margin:0;
-                padding: 0;
-            }
-            .filter-select-box-container {
-                .multiselect__input {
-                    font-family: inherit;
-                    font-size: $font-size-base;
-                }
-            }
-            .multiselect__tags {
-                border: none;
-                box-shadow: none;
-                padding: 8px 40px 0 0;
-            }
-            .multiselect__option {
-                display: block;
-                min-height: 16px;
-                line-height: 8px;
-                text-decoration: none;
-                text-transform: none;
-                vertical-align: middle;
-                position: relative;
-                cursor: pointer;
-                white-space: nowrap;
-                padding: 10px 12px;
-            }
-            .multiselect__option--selected {
-                background: $light_blue;
-                outline: none;
-                color: $white;
-            }
-            .option__image {
-                width: 22px;
-            }
-            .multiselect__option--highlight {
-                background: $light_blue;
-                outline: none;
-                color: $white;
-                &::after {
-                    content: attr(data-select);
-                    background: $light_blue;
-                    color: $white;
-                }
-            }
-            .multiselect__tag-icon {
-                &::after {
-                    content: "\D7";
-                    color: $light_grey;
-                    font-size: $font_size_big;
-                }
-                &:hover {
-                    background: $light_blue;
-                }
-                &:hover {
-                    background: $light_grey;
-                }
-                &:focus {
-                    background: $light_grey;
-                }
-            }
-            .multiselect__placeholder {
-                display: none;
-            }
-            .multiselect__select {
-                height: 34px;
-                line-height: 14px;
-                top: inherit;
-                &::before {
-                    top: 64%;
-                }
-            }
-            .multiselect__content-wrapper {
-                overflow-y: auto;
-                width: auto;
-                top: 54px;
-            }
-        }
-        .multiselect__select {
-            height: 34px;
-            line-height: 14px;
-            &::before {
-                top: 64%;
-            }
-        }
-        .multiselect--active {
-            color: $black;
-            background-color: $white;
-            border-color: $light_blue;
-            outline: 0;
-            box-shadow: unset;
-        }
-    }
-}
 </style>
