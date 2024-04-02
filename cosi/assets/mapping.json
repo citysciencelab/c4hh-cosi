@@ -1483,5 +1483,222 @@
     "stadtteil": "31241",
     "bezirk": "31269",
     "valueType": "absolute"
+  },
+  {
+    "category": "gl_1_wohnung",
+    "value": "1 Wohnung",
+    "group": "Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gl_2_wohnungen",
+    "value": "2 Wohnungen",
+    "group": "Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_3_6_wohnungen",
+    "value": "3 - 6 Wohnungen",
+    "group": "Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_7_12_wohnungen",
+    "value": "7 - 12 Wohnungen",
+    "group": "Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "ab_13_und_mehr_wohnungen",
+    "value": "13 und mehr Wohnungen",
+    "group": "Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "von_eigentuemer_bewohnt",
+    "value": "Von Eigentümer/-in bewohnt",
+    "group": "Art der Wohnungsnutzung",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zu_wohnzwecken_vermietet",
+    "value": "Zu Wohnzwecken vermietet (auch mietfrei)",
+    "group": "Art der Wohnungsnutzung",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "vor_1919",
+    "value": "Vor 1919",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1919_1948",
+    "value": "1919 - 1948",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1949_1978",
+    "value": "1949 - 1978",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1979_1986",
+    "value": "1979 - 1986",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1987_1990",
+    "value": "1987 - 1990",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1991_1995",
+    "value": "1991 - 1995",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1996_2000",
+    "value": "1996 - 2000",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_2001_2004",
+    "value": "2001 - 2004",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_2005_2008",
+    "value": "2005 - 2008",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "ab_2009_und_spaeter",
+    "value": "2009 und später",
+    "group": "Baujahr der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gemeinschaft_von_wohnungseigentuemern",
+    "value": "Gemeinschaft von Wohnungseigentümern/innen",
+    "group": "Eigentumsform der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "privatpersonen",
+    "value": "Privatperson/en",
+    "group": "Eigentumsform der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohnungsgenossenschaft",
+    "value": "Wohnungsgenossenschaft",
+    "group": "Eigentumsform der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "kommune_kommunales_wohnungsunternehmen",
+    "value": "Kommune oder kommunales Wohnungsunternehmen",
+    "group": "Eigentumsform der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "privatwirtschaftl_wohnungsunternehmen",
+    "value": "Privatwirtschaftliches Wohnungsunternehmen",
+    "group": "Eigentumsform der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anderes_privatwirtschaftl_unternehmen",
+    "value": "Anderes privatwirtschaftliches Unternehmen",
+    "group": "Eigentumsform der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bund_oder_land",
+    "value": "Bund oder Land",
+    "group": "Eigentumsform der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "organisation_ohne_erwerbszweck",
+    "value": "Organisation ohne Erwerbszweck (z.B. Kirche)",
+    "group": "Eigentumsform der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "fernheizung",
+    "value": "Fernheizung (Fernwärme)",
+    "group": "Heizungsart der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "etagenheizung",
+    "value": "Etagenheizung",
+    "group": "Heizungsart der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "blockheizung",
+    "value": "Blockheizung",
+    "group": "Heizungsart der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zentralheizung",
+    "value": "Zentralheizung",
+    "group": "Heizungsart der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "einzel_und_mehrraumoefen",
+    "value": "Einzel-/Mehrraumöfen (auch Nachtspeicherheizung)",
+    "group": "Heizungsart der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
+  },
+  {
+    "category": "keine_heizung_in_wohnung",
+    "value": "Keine Heizung im Gebäude oder in den Wohnungen",
+    "group": "Heizungsart der Gebäude",
+    "stat_gebiet": "31231",
+    "valueType": "absolute"
   }
 ]
