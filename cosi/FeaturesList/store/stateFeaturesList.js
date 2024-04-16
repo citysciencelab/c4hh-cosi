@@ -12,7 +12,7 @@
 const state = {
     active: false,
     deactivateGFI: false,
-    icon: "bi-apple",
+    icon: "bi-house-door",
     id: "featuresList",
     isVisibleInMenu: true,
     name: "Einrichtungsübersicht",
