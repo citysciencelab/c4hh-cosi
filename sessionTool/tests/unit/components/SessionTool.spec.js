@@ -154,6 +154,19 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
                 expect(stubClose.called).to.be.true;
                 sinon.restore();
             });
+            it("should handle 3d mode map differently", async () => {
+                sinon.stub(SessionTool.methods, "close");
+                let setObserverSpy = null;
+
+                wrapper = shallowMount(SessionTool, {store, localVue});
+                wrapper.vm.setObserver([{key: "foo", setter: "bar"}, {key: "Maps", setter: "bar"}]);
+                setObserverSpy = sinon.spy(wrapper.vm, "setObserver");
+                await wrapper.vm.$nextTick();
+                wrapper.vm.onFileLoad(JSON.stringify({state: {Maps: {mode: "3D"}, Modeler3D: "foo"}}));
+                await wrapper.vm.$nextTick();
+                expect(setObserverSpy.callCount).to.be.equal(2);
+                sinon.restore();
+            });
         });
     });
 });

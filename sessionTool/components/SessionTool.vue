@@ -11,6 +11,7 @@ import {register as registerMap} from "../observer/MapObserver";
 import {register as registerLayers} from "../observer/LayerObserver";
 import {register as registerFilter} from "../observer/FilterObserver";
 import {register as registerDraw} from "../observer/DrawObserver";
+import {register as registerModeler3D} from "../observer/Modeler3DObserver";
 
 export default {
     name: "SessionTool",
@@ -32,6 +33,7 @@ export default {
         registerLayers(this.$store);
         registerFilter(this.$store);
         registerDraw(this.$store);
+        registerModeler3D(this.$store);
     },
     methods: {
         ...mapMutations("Tools/SessionTool", Object.keys(mutations)),
@@ -64,7 +66,8 @@ export default {
          * @param {String} fileContent The file content as string.
          * @returns {void}
          */
-        onFileLoad (fileContent) {
+        async onFileLoad (fileContent) {
+            const originalObservers = [...this.observer];
             let json;
 
             try {
@@ -77,6 +80,15 @@ export default {
             if (!isObject(json?.state)) {
                 return;
             }
+            if (json.state.Maps?.mode === "3D" && Object.prototype.hasOwnProperty.call(json.state, "Modeler3D")) {
+                const mapObserver = this.observer.find(observer => observer.key === "Maps"),
+                    observersWithoutMap = this.observer.filter(observer => observer.key !== "Maps");
+
+                if (typeof mapObserver?.setter === "function") {
+                    await mapObserver.setter(json.state.Maps);
+                }
+                this.setObserver(observersWithoutMap);
+            }
             this.observer.forEach(({key, setter}) => {
                 if (typeof setter !== "function") {
                     return;
@@ -88,6 +100,7 @@ export default {
                     }
                 });
             });
+            this.setObserver(originalObservers);
             this.close();
         },
         /**

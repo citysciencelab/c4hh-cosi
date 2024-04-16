@@ -16,7 +16,8 @@ export function register (vueStore) {
 function getCurrentExtentOfMap () {
     return {
         center: store.getters["Maps/center"],
-        zoomLevel: store.getters["Maps/getView"].getZoom()
+        zoomLevel: store.getters["Maps/getView"].getZoom(),
+        mode: store.getters["Maps/mode"]
     };
 }
 
@@ -26,8 +27,20 @@ function getCurrentExtentOfMap () {
  * @returns {void}
  */
 function setExtentForMap (payload) {
-    if (payload?.center && payload?.zoomLevel) {
-        store.dispatch("Maps/setZoomLevel", payload.zoomLevel);
-        store.dispatch("Maps/setCenter", payload.center);
-    }
+    return new Promise((resolve) => {
+        if (payload?.center && payload?.zoomLevel) {
+            store.dispatch("Maps/setZoomLevel", payload.zoomLevel);
+            store.dispatch("Maps/setCenter", payload.center);
+            if (payload?.mode === "3D") {
+                if (store.getters["Maps/mode"] === "3D") {
+                    resolve();
+                    return;
+                }
+                store.dispatch("Maps/activateMap3D").then(resolve);
+            }
+            else {
+                store.dispatch("Maps/deactivateMap3D").then(resolve);
+            }
+        }
+    });
 }

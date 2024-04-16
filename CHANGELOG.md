@@ -7,6 +7,7 @@
 ### __Breaking Changes__
 
 ### Added
+- SessionTool: Adds the observer of Modeler3D to enable its states can be saved in sessions.
 
 ### Changed
 - The following package has been updated:
