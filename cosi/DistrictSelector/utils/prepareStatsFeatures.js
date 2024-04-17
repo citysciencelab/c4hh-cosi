@@ -1,4 +1,4 @@
-import store from "../../../../src/app-store";
+import mapping from "../../assets/mapping.json";
 import Feature from "ol/Feature";
 
 /**
@@ -62,8 +62,7 @@ export function prepareStatsFeatures (feature) {
  * @returns {module:ol/feature[]} The statistical features.
  */
 export function createStatFeaturesFromLTF (ltfFeatures, districtLevel) {
-    const statFeatureList = [],
-        mapping = store.getters["Tools/DistrictSelector/mapping"];
+    const statFeatureList = [];
 
 
     mapping.forEach(obj => {
@@ -92,8 +91,7 @@ export function createStatFeaturesFromLTF (ltfFeatures, districtLevel) {
  * @returns {void}
  */
 export function updateStatFeaturesFromLTF (ltfFeatures, statFeatures) {
-    const lftFeatureKeys = Object.keys(ltfFeatures[0].getProperties()),
-        mapping = store.getters["Tools/DistrictSelector/mapping"];
+    const lftFeatureKeys = Object.keys(ltfFeatures[0].getProperties());
 
 
     mapping.forEach((obj, i) => {
@@ -115,7 +113,6 @@ export function findMappingObjectByCategory (value) {
         console.error(`prepareStatFeatures.findMappingObjectByCategory: ${value} has to be defined and a string.`);
         return undefined;
     }
-    const mapping = store.getters["Tools/DistrictSelector/mapping"];
 
     return mapping.find(obj => {
         return obj.category === value;
