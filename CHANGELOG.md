@@ -9,6 +9,8 @@
 ### Added
 
 ### Changed
+- The version of node was updated to `^16.13.2 || ^18.16.0 || ^20.12.2`.
+- The version of npm was updated to `^8.1.2 || ^9.5.1 || ^10.5.0`
 
 ### Deprecated
 
