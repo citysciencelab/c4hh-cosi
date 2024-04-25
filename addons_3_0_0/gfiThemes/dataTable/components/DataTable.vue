@@ -363,6 +363,7 @@ export default {
             :data="data"
             :sortable="true"
             :filterable="true"
+            :enable-settings="true"
             :hits="showCount"
             :downloadable="enableDownload"
             :additional-columns-for-download="additionalColumns"
