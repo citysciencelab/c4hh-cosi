@@ -189,7 +189,7 @@ SearchInterfaceGfiOnAddressGaz.prototype.addCustomActionToStore = function () {
          * @param {Object} searchResult - The search result object.
          * @returns {void}
          */
-        newCustomAction (searchResult) {
+        async newCustomAction (searchResult) {
             const rawSearchResult = toRaw(searchResult),
                 properties = rawSearchResult.searchResult.properties,
                 searchInstanceConfig = toRaw(store.getters["Modules/SearchBar/searchInterfaces"]),
