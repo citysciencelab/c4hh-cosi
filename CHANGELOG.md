@@ -9,6 +9,9 @@
 ### Added
 
 ### Changed
+- The following package has been updated:
+    - devDependencies:
+        - husky: 8.0.3 to 9.0.11
 
 ### Deprecated
 
