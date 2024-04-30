@@ -3,23 +3,12 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
-
-### Added
-
+## v2.45.0 - 2024-04-30
 ### Changed
 - The version of node was updated to `^16.13.2 || ^18.16.0 || ^20.12.2`.
 - The version of npm was updated to `^8.1.2 || ^9.5.1 || ^10.5.0`
 
-### Deprecated
-
-### Removed
-
-### Fixed
-
 ---
-
 ## v2.43.0 - 2024-03-06
 
 ### Changed
