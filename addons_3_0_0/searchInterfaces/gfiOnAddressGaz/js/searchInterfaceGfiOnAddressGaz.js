@@ -48,7 +48,7 @@ export default function SearchInterfaceGfiOnAddressGaz ({serviceId, hitTemplate,
     this.searchStreets = searchStreets || false;
     setGazetteerUrl(store?.getters?.restServiceById(this.serviceId)?.url);
     setShowGeographicIdentifier(this.showGeographicIdentifier);
-    this.addCustomActionToStore();
+    // this.addCustomActionToStore();
 }
 
 SearchInterfaceGfiOnAddressGaz.prototype = Object.create(SearchInterface.prototype);
@@ -150,11 +150,27 @@ SearchInterfaceGfiOnAddressGaz.prototype.getTranslationByType = function (type) 
  * @returns {Object} The possible actions.
  */
 SearchInterfaceGfiOnAddressGaz.prototype.createPossibleActions = function (searchResult) {
-    const coords = [parseFloat(searchResult.geometry.coordinates[0]), parseFloat(searchResult.geometry.coordinates[1])];
+    const coords = [parseFloat(searchResult.geometry.coordinates[0]), parseFloat(searchResult.geometry.coordinates[1])],
+        rawSearchResult = toRaw(searchResult),
+        properties = rawSearchResult.properties,
+        searchInstance = toRaw(store.getters["Modules/SearchBar/searchInterfaces"]),
+        {attributesToShow, title} = searchInstance[0] || {},
+        feature = {getProperties: () => properties},
+        layer = {
+            get: (key) => {
+                const data = {
+                    name: title,
+                    gfiAttributes: attributesToShow
+                };
+
+                return data[key];
+            }
+        };
 
     return {
         openGetFeatureInfo: {
-            searchResult
+            feature: feature,
+            layer: layer
         },
         zoomToResult: {
             coordinates: coords
@@ -168,56 +184,3 @@ SearchInterfaceGfiOnAddressGaz.prototype.createPossibleActions = function (searc
         }
     };
 };
-
-/**
- * Adds a custom action to the Vuex store under SearchBar module.
- * This action transforms a search result into a GetFeatureInfo-compatible structure
- * and sets it in the GetFeatureInfo module of the store. Original openGetFeatureInfo action gets overwritten.
- * @function addCustomActionToStore
- * @memberof SearchInterfaceGfiOnAddressGaz.prototype
- * @returns {void}
- */
-SearchInterfaceGfiOnAddressGaz.prototype.addCustomActionToStore = function () {
-    /**
-     * New action to be added to the store.
-     * @type {Object}
-     */
-    const newAction = {
-        /**
-         * Custom action handling the transformation of a search result
-         * and setting it in the GetFeatureInfo module.
-         * @param {Object} searchResult - The search result object.
-         * @returns {void}
-         */
-        async newCustomAction (searchResult) {
-            const rawSearchResult = toRaw(searchResult),
-                properties = rawSearchResult.searchResult.properties,
-                searchInstanceConfig = toRaw(store.getters["Modules/SearchBar/searchInterfaces"]),
-                attributesToShowFromConfig = searchInstanceConfig[0].attributesToShow,
-                titleFromConfig = searchInstanceConfig[0].title,
-                gfiFeature = {
-                    getTitle: () => titleFromConfig,
-                    getTheme: () => "defaultTheme",
-                    getAttributesToShow: () => attributesToShowFromConfig,
-                    getProperties: () => properties,
-                    getFeatures: () => null,
-                    getOlFeature: () => null,
-                    getId: () => "",
-                    getGfiUrl: () => null,
-                    getMimeType: () => null,
-                    getLayerId: () => "",
-                    getDocument: () => document,
-                    getBBox: () => null
-                };
-
-            store.commit("Modules/GetFeatureInfo/setGfiFeatures", [gfiFeature], {root: true});
-        }
-    };
-
-    // Assigning the new custom action to the store under SearchBar module.
-    store._actions["Modules/SearchBar/openGetFeatureInfo"] = [
-        newAction.newCustomAction
-    ];
-};
-
-
