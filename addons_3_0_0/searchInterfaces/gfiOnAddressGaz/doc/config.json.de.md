@@ -41,3 +41,4 @@ Konfiguration des Gazetteer Suchdienstes als Addon zur Darstellung der Ergebniss
         "postleitzahl": "Postleitzahl"
     }
 }
+```

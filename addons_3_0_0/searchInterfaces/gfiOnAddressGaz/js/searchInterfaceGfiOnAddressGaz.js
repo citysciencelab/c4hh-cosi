@@ -48,7 +48,6 @@ export default function SearchInterfaceGfiOnAddressGaz ({serviceId, hitTemplate,
     this.searchStreets = searchStreets || false;
     setGazetteerUrl(store?.getters?.restServiceById(this.serviceId)?.url);
     setShowGeographicIdentifier(this.showGeographicIdentifier);
-    // this.addCustomActionToStore();
 }
 
 SearchInterfaceGfiOnAddressGaz.prototype = Object.create(SearchInterface.prototype);

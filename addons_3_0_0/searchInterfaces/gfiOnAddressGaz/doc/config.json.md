@@ -41,3 +41,4 @@ Configuration of the Gazetteer search service as an addon for displaying results
         "postleitzahl": "Postal code"
     }
 }
+```

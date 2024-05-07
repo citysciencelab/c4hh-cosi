@@ -27,16 +27,32 @@ describe("ADDONS: addons_3_0_0/searchInterfaces/exampleSearch/searchInterfaceGfi
     describe("createPossibleActions", () => {
         it("should create possible events from search result", () => {
             const searchResult = {
-                name: "Result Name1",
-                geometry: {
-                    coordinates: [566601.20, 5928101.43]
-                }
-            };
+                    name: "Result Name1",
+                    geometry: {
+                        coordinates: [566601.20, 5928101.43]
+                    },
+                    properties: {
+                        ObjectType: "Street"
+                    },
+                    gfiAttributes: {}
+                },
+                feature = {getProperties: () => searchResult.properties},
+                layer = {
+                    get: (key) => {
+                        const data = {
+                            name: searchResult.name,
+                            gfiAttributes: searchResult.gfiAttributes
+                        };
+
+                        return data[key];
+                    }
+                };
 
             expect(searchInterface.createPossibleActions(searchResult)).to.deep.equal(
                 {
                     openGetFeatureInfo: {
-                        searchResult
+                        feature: feature,
+                        layer: layer
                     },
                     zoomToResult: {
                         coordinates: [566601.20, 5928101.43]
