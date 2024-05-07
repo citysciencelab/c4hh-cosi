@@ -1,4 +1,4 @@
-import {convertColor} from "../../src_3_0_0/shared/js/utils/convertColor";
+import {convertColor} from "../../src/utils/convertColor";
 import dayjs from "dayjs";
 
 /**

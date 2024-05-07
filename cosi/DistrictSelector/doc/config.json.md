@@ -12,7 +12,7 @@ Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwal
 |districtLevels[i].keyOfAttrName|ja|String| |Der Key für das Attribut in dem der Name der Verwaltungeinheit steht.|
 |districtLevels[i].duplicateDistrictNames|nein|String[]| |Namen von Gebieten, die Konflikte auslösen. Eimsbüttel zum Beispiel gibt es als Stadtteil und als Bezirk. Die Namen sind bei der höheren Verwaltungsebene anzugeben.|
 |districtLevels[i].stats|ja|Object| |Definiert die Layer-Id für die regionalstatistischen Daten, die jeweiligen Metadaten URLs und den Key des Attributes "Name" für die statistischen Daten.|
-|districtLevels[i].stats.keyOfAttrName|ja|String| |Key des Attributes "Name" für die statistischen Daten.|
+|districtLevels[i].stats.keyOfAttrName|ja|String[]| |Die Keys für die Attribute in dem die Namen für die statistischen Daten stehen.|
 |districtLevels[i].stats.metadataUrls|nein|String[]| |Die URLs der Metadaten der statistischen Daten.|
 |districtLevels[i].activeStyle|nein|Object| |Benutzerdefinierte Styles für die jeweils ausgewählte Verwaltungsebene. Entspricht der Hierarchie des OpenLayers Style Definition|
 |districtLevels[i].districtNamesMap|nein|Object| |Benutzerdefiniertes dictionary zum bereitstellen von synonymen Gebietsnamen|
@@ -33,8 +33,8 @@ Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwal
       "label": "Statistische Gebiete",
       "keyOfAttrName": "statgebiet",
       "stats": {
-        "keyOfAttrName": "stat_gebiet",
-        "layerIds": ["112233"],
+        "keyOfAttrName": ["stat_gebiet", "statistisches_gebiet"],
+        "layerIds": ["112233", "1234],
         "metadataUrls": ["http://hmdk.metaver.de/trefferanzeige?docuuid=99687398-CFFE-413E-B966-6B8629D335F5"]
       },
       "activeStyle": {
@@ -55,7 +55,7 @@ Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwal
       "label": "Stadtteile",
       "keyOfAttrName": "stadtteil_name",
       "stats": {
-        "keyOfAttrName": "stadtteil",
+        "keyOfAttrName": ["stadtteil"],
         "layerIds": ["22121"],
         "metadataUrls": ["http://hmdk.metaver.de/trefferanzeige?docuuid=F4062BD8-43C4-4C4F-AA45-253D84A3685E"]
       },

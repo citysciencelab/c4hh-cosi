@@ -64,15 +64,16 @@ export function prepareStatsFeatures (feature) {
 export function createStatFeaturesFromLTF (ltfFeatures, districtLevel) {
     const statFeatureList = [];
 
+
     mapping.forEach(obj => {
         const statFeature = new Feature({
             kategorie: obj.value,
             group: obj.group
         });
 
-        statFeature.set(districtLevel.stats.keyOfAttrName, ltfFeatures[0].get(districtLevel.stats.keyOfAttrName));
+        statFeature.set(districtLevel.stats.keyOfAttrName[0], ltfFeatures[0].get(districtLevel.stats.keyOfAttrName[0]));
         if (districtLevel.referenceLevel) {
-            statFeature.set(districtLevel.referenceLevel.stats.keyOfAttrName, ltfFeatures[0].get(districtLevel.referenceLevel.stats.keyOfAttrName));
+            statFeature.set(districtLevel.referenceLevel.stats.keyOfAttrName[0], ltfFeatures[0].get(districtLevel.referenceLevel.stats.keyOfAttrName[0]));
         }
         ltfFeatures.forEach(feature => {
             statFeature.set("jahr_" + feature.get("jahr"), feature.get(obj.category));
@@ -91,6 +92,7 @@ export function createStatFeaturesFromLTF (ltfFeatures, districtLevel) {
  */
 export function updateStatFeaturesFromLTF (ltfFeatures, statFeatures) {
     const lftFeatureKeys = Object.keys(ltfFeatures[0].getProperties());
+
 
     mapping.forEach((obj, i) => {
         if (lftFeatureKeys.includes(obj.category)) {
@@ -111,6 +113,7 @@ export function findMappingObjectByCategory (value) {
         console.error(`prepareStatFeatures.findMappingObjectByCategory: ${value} has to be defined and a string.`);
         return undefined;
     }
+
     return mapping.find(obj => {
         return obj.category === value;
     });
