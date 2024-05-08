@@ -1,6 +1,6 @@
 <script>
 import {mapGetters} from "vuex";
-import {optimizeValueRootedInComplexType} from "../../../../utils/complexType.js";
+import {optimizeValueRootedInComplexType} from "../utils/complexType.js";
 
 export default {
     name: "BildungsatlasThemeSchulenEinzugsgebiete",

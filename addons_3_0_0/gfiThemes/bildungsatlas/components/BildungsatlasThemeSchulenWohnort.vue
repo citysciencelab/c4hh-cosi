@@ -2,7 +2,7 @@
 import {mapGetters} from "vuex";
 import thousandsSeparator from "../../../../../src_3_0_0/shared/js/utils/thousandsSeparator.js";
 import mouseOverCotentLivingLocation from "../utils/mouseOverContent.js";
-import {optimizeValueRootedInComplexType} from "../../../../utils/complexType.js";
+import {optimizeValueRootedInComplexType} from "../utils/complexType.js";
 
 export default {
     name: "BildungsatlasThemeSchulenWohnort",

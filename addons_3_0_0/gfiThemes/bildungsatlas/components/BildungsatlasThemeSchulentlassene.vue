@@ -15,7 +15,7 @@ import {
     sortComplexType,
     isComplexType,
     hasComplexTypeValues
-} from "../../../../utils/complexType.js";
+} from "../utils/complexType.js";
 
 export default {
     name: "BildungsatlasThemeSchulentlassene",

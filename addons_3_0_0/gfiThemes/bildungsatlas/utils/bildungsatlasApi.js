@@ -2,7 +2,7 @@ import {WFS} from "ol/format.js";
 import Feature from "ol/Feature.js";
 import axios from "axios";
 import hash from "object-hash";
-import {isComplexType} from "../../../../utils/complexType.js";
+import {isComplexType} from "../utils/complexType.js";
 
 /**
  * a complex type is an object to represent a wfs array

@@ -11,7 +11,7 @@ import {
     sortComplexType,
     isComplexType,
     hasComplexTypeValues
-} from "../../../../utils/complexType.js";
+} from "../utils/complexType.js";
 
 /**
  * a complex type is an object to represent a wfs array
