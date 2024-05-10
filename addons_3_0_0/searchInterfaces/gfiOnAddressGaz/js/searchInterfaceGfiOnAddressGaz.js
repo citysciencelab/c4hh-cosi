@@ -153,7 +153,8 @@ SearchInterfaceGfiOnAddressGaz.prototype.createPossibleActions = function (searc
         rawSearchResult = toRaw(searchResult),
         properties = rawSearchResult.properties,
         searchInstance = toRaw(store.getters["Modules/SearchBar/searchInterfaces"]),
-        {attributesToShow, title} = searchInstance[0] || {},
+        firstInstance = Array.isArray(searchInstance) ? searchInstance[0] : {},
+        {attributesToShow, title} = firstInstance,
         feature = {getProperties: () => properties},
         layer = {
             get: (key) => {

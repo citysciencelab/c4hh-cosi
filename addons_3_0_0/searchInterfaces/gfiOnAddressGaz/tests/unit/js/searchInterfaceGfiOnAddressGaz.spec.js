@@ -25,47 +25,49 @@ describe("ADDONS: addons_3_0_0/searchInterfaces/exampleSearch/searchInterfaceGfi
     });
 
     describe("createPossibleActions", () => {
-        it("should create possible events from search result", () => {
+        it("should create possible actions from search result", () => {
+            // Arrange
             const searchResult = {
                     name: "Result Name1",
                     geometry: {
                         coordinates: [566601.20, 5928101.43]
                     },
                     properties: {
-                        ObjectType: "Street"
-                    },
-                    gfiAttributes: {}
+                        attribute1: "value1",
+                        attribute2: "value2",
+                        attribute3: "value3"
+                    }
                 },
-                feature = {getProperties: () => searchResult.properties},
-                layer = {
-                    get: (key) => {
-                        const data = {
-                            name: searchResult.name,
-                            gfiAttributes: searchResult.gfiAttributes
-                        };
-
-                        return data[key];
+                searchInterfaces = [
+                    {
+                        attributesToShow: ["attribute1", "attribute2", "attribute3"],
+                        title: "Search Interface 1"
                     }
-                };
-
-            expect(searchInterface.createPossibleActions(searchResult)).to.deep.equal(
-                {
-                    openGetFeatureInfo: {
-                        feature: feature,
-                        layer: layer
-                    },
-                    zoomToResult: {
-                        coordinates: [566601.20, 5928101.43]
-                    },
-                    setMarker: {
-                        coordinates: [566601.20, 5928101.43]
-                    },
-                    startRouting: {
-                        coordinates: [566601.20, 5928101.43],
-                        name: "Result Name1"
+                ],
+                mockStore = {
+                    getters: {
+                        "Modules/SearchBar/searchInterfaces": searchInterfaces
                     }
-                }
-            );
+                },
+                newSearchInterface = new SearchInterfaceGfiOnAddressGaz(mockStore),
+                // Act
+                actions = newSearchInterface.createPossibleActions(searchResult);
+
+            // Assert
+            expect(actions).to.have.property("openGetFeatureInfo");
+            expect(actions.openGetFeatureInfo).to.have.property("feature");
+            expect(actions.openGetFeatureInfo).to.have.property("layer");
+            expect(actions.openGetFeatureInfo.feature.getProperties()).to.deep.equal(searchResult.properties);
+            expect(actions).to.have.property("zoomToResult");
+            expect(actions.zoomToResult).to.have.property("coordinates");
+            expect(actions).to.have.property("setMarker");
+            expect(actions.setMarker).to.have.property("coordinates");
+            expect(actions.setMarker.coordinates).to.deep.equal(searchResult.geometry.coordinates);
+            expect(actions).to.have.property("startRouting");
+            expect(actions.startRouting).to.have.property("coordinates");
+            expect(actions.startRouting).to.have.property("name");
+            expect(actions.startRouting.coordinates).to.deep.equal(searchResult.geometry.coordinates);
+            expect(actions.startRouting.name).to.equal(searchResult.name);
         });
     });
 });
