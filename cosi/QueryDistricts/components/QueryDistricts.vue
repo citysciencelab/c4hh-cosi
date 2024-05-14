@@ -114,6 +114,7 @@ export default {
             this.selectedDistrict = this.dataSets[newValue].inputs.selectedDistrict;
             this.resultTableHeaders = this.dataSets[newValue].inputs.resultTableHeaders;
             this.selectedLayer = this.dataSets[newValue].inputs.selectedLayer;
+
             const newModels = [];
 
             for (const m of this.layerFilterModels) {
@@ -378,7 +379,7 @@ export default {
 
             if (this.selectedDistrict) {
                 const selector = this.keyOfAttrNameStats,
-                    feature = features.find(f => f[selector] === this.selectedDistrictLevel.districtNamesMap[this.selectedDistrict] || this.selectedDistrict);
+                    feature = features.find(f => f[selector] === this.selectedDistrictLevel.districtNamesMap[this.selectedDistrict] || f[selector] === this.selectedDistrict);
 
                 if (feature) {
                     const value = Number(Number(parseFloat(feature[model.field])).toFixed(3));
