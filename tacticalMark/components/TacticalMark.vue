@@ -598,965 +598,682 @@ export default {
                     <div class="tm-container">
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Dammbalken"
+                                ref="gefahr_akut"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Dammbalken.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Dammbalken.jpg');"
+                                @click="setIcon('gefahr_akut.jpg');"
+                                @keydown.enter="setIcon('gefahr_akut.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        alt="Dammbalken"
-                                        :src="$t(getIconPath('Vorlage_Dammbalken_16.jpg'))"
+                                        alt="Gefahr akut"
+                                        :src="$t(getIconPath('gefahr_akut_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Dammbalken
+                                        Gefahr akut
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Deich"
+                                ref="gefahr_atomare_stoffe"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Deich.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Deich.jpg');"
+                                @click="setIcon('gefahr_atomare_stoffe.jpg');"
+                                @keydown.enter="setIcon('gefahr_atomare_stoffe.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        alt="Deich"
-                                        :src="$t(getIconPath('Vorlage_Deich_16.jpg'))"
+                                        alt="Gefahr atomare Stoffe"
+                                        :src="$t(getIconPath('gefahr_atomare_stoffe_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Deich
+                                        Gefahr atomare Stoffe
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Zug_DB"
+                                ref="gefahr_biologische_stoffe"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Zug_DB.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Zug_DB.jpg');"
+                                @click="setIcon('gefahr_biologische_stoffe.jpg');"
+                                @keydown.enter="setIcon('gefahr_biologische_stoffe.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Zug_DB_16.jpg'))"
-                                        alt="Zug DB"
+                                        alt="Gefahr biologische Stoffe"
+                                        :src="$t(getIconPath('gefahr_biologische_stoffe_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Zug-DB
+                                        Gefahr biologische Stoffe
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Dammbalken_ueberflutet_defekt"
+                                ref="gefahr_chemische_stoffe"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Dammbalken_ueberflutet_defekt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Dammbalken_ueberflutet_defekt.jpg');"
+                                @click="setIcon('gefahr_chemische_stoffe.jpg');"
+                                @keydown.enter="setIcon('gefahr_chemische_stoffe.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Dammbalken_ueberflutet_defekt_16.jpg'))"
-                                        alt="Dammbalken überflutet"
+                                        alt="Gefahr chemische Stoffe"
+                                        :src="$t(getIconPath('gefahr_chemische_stoffe_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Dammbalken überflutet
+                                        Gefahr chemische Stoffe
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Deich_normal"
+                                ref="gefahr_deichlinie"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Deich_normal.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Deich_normal.jpg');"
+                                @click="setIcon('gefahr_deichlinie.jpg');"
+                                @keydown.enter="setIcon('gefahr_deichlinie.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Deich_normal_16.jpg'))"
-                                        alt="Deich normal"
+                                        alt="Gefahr Deichlinie"
+                                        :src="$t(getIconPath('gefahr_deichlinie_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Deich normal
+                                        Gefahr Deichlinie
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Zug_DB_Schaden"
+                                ref="gefahr_durch_wassereinbruch"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Zug_DB_Schaden.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Zug_DB_Schaden.jpg');"
+                                @click="setIcon('gefahr_durch_wassereinbruch.jpg');"
+                                @keydown.enter="setIcon('gefahr_durch_wassereinbruch.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Zug_DB_Schaden_16.jpg'))"
-                                        alt="Zug DB Schaden"
+                                        alt="Gefahr durch Wassereinbruch"
+                                        :src="$t(getIconPath('gefahr_durch_wassereinbruch_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Zug-DB Schaden
+                                        Gefahr durch Wassereinbruch
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Drehtor"
+                                ref="gefahr_elektrizitaet"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Drehtor.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Drehtor.jpg');"
+                                @click="setIcon('gefahr_elektrizitaet.jpg');"
+                                @keydown.enter="setIcon('gefahr_elektrizitaet.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Drehtor_16.jpg'))"
-                                        alt="Drehtor"
+                                        alt="Gefahr Elektrizität"
+                                        :src="$t(getIconPath('gefahr_elektrizitaet_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Drehtor
+                                        Gefahr Elektrizität
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Deichbruch"
+                                ref="gefahr_explosion"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Deichbruch.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Deichbruch.jpg');"
+                                @click="setIcon('gefahr_explosion.jpg');"
+                                @keydown.enter="setIcon('gefahr_explosion.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Deichbruch_16.jpg'))"
-                                        alt="Deichbruch"
+                                        alt="Gefahr Explosion"
+                                        :src="$t(getIconPath('gefahr_explosion_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Deichbruch
+                                        Gefahr Explosion
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Zugunglueck"
+                                ref="gefahr_explosionsfaehige_kampfmittel"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Zugunglueck.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Zugunglueck.jpg');"
+                                @click="setIcon('gefahr_explosionsfaehige_kampfmittel.jpg');"
+                                @keydown.enter="setIcon('gefahr_explosionsfaehige_kampfmittel.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Zugunglueck_16.jpg'))"
-                                        alt="Zugunglück"
+                                        alt="Gefahr explosionsfähige Kampfmittel"
+                                        :src="$t(getIconPath('gefahr_explosionsfaehige_kampfmittel_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Zugunglück
+                                        Gefahr explosionsf. Kampfmittel
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Drehtor_ueberflutet_defekt"
+                                ref="gefahr_gefaehrliche_stoffe"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Drehtor_ueberflutet_defekt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Drehtor_ueberflutet_defekt.jpg');"
+                                @click="setIcon('gefahr_gefaehrliche_stoffe.jpg');"
+                                @keydown.enter="setIcon('gefahr_gefaehrliche_stoffe.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Drehtor_ueberflutet_defekt_16.jpg'))"
-                                        alt="Drehtor überflutet/defekt"
+                                        alt="Gefahr gefährliche Stoffe"
+                                        :src="$t(getIconPath('gefahr_gefaehrtliche_stoffe_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Drehtor überflutet/defekt
+                                        Gefahr gefährliche Stoffe
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Deichwart"
+                                ref="Gefahr Öl"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Deichwart.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Deichwart.jpg');"
+                                @click="setIcon('Gefahr Öl.jpg');"
+                                @keydown.enter="setIcon('Gefahr Öl.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Deichwart_16.jpg'))"
-                                        alt="Deichwart"
+                                        alt="Gefahr Öl"
+                                        :src="$t(getIconPath('gefahr_oel_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Deichwart
+                                        Gefahr Öl
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_E_Lok_DB"
+                                ref="Gefahr vermutet"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_E_Lok_DB.jpg');"
-                                @keydown.enter="setIcon('Vorlage_E_Lok_DB.jpg');"
+                                @click="setIcon('Gefahr vermutet.jpg');"
+                                @keydown.enter="setIcon('Gefahr vermutet.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_E_Lok_DB_16.jpg'))"
-                                        alt="E-Lok DB"
+                                        alt="Gefahr vermutet"
+                                        :src="$t(getIconPath('gefahr_vermutet_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        E-Lok DB
+                                        Gefahr vermutet
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Schleusen"
+                                ref="person"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Schleusen.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Schleusen.jpg');"
+                                @click="setIcon('person.jpg');"
+                                @keydown.enter="setIcon('person.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Schleusen_16.jpg'))"
-                                        alt="Schleusen"
+                                        alt="Person"
+                                        :src="$t(getIconPath('person_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Schleusen
+                                        Person
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Produktionsbetrieb_firma"
+                                ref="person_gerettet"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Produktionsbetrieb_firma.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Produktionsbetrieb_firma.jpg');"
+                                @click="setIcon('person_gerettet.jpg');"
+                                @keydown.enter="setIcon('person_gerettet.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Produktionsbetrieb_firma_16.jpg'))"
-                                        alt="Produktionsfirma"
+                                        alt="Person gerettet"
+                                        :src="$t(getIconPath('person_gerettet_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Produktionsfirma
+                                        Person gerettet
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_E_Lok_DB_Schaden"
+                                ref="person_tot"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_E_Lok_DB_Schaden.jpg');"
-                                @keydown.enter="setIcon('Vorlage_E_Lok_DB_Schaden.jpg');"
+                                @click="setIcon('person_tot.jpg');"
+                                @keydown.enter="setIcon('person_tot.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_E_Lok_DB_Schaden_16.jpg'))"
-                                        alt="E-Lok DB Schaden"
+                                        alt="Person tot"
+                                        :src="$t(getIconPath('person_tot_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        E-Lok DB Schaden
+                                        Person tot
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Schleusen_ueberflutet_defekt"
+                                ref="person_transportiert"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Schleusen_ueberflutet_defekt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Schleusen_ueberflutet_defekt.jpg');"
+                                @click="setIcon('person_transportiert.jpg');"
+                                @keydown.enter="setIcon('person_transportiert.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Schleusen_ueberflutet_defekt_16.jpg'))"
-                                        alt="Schleusen überflutet/defekt"
+                                        alt="Person transportiert"
+                                        :src="$t(getIconPath('person_transportiert_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Schleusen überflutet/defekt
+                                        Person transportiert
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Produktionsbetrieb_firma_problem"
+                                ref="person_verletzt"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Produktionsbetrieb_firma_problem.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Produktionsbetrieb_firma_problem.jpg');"
+                                @click="setIcon('person_verletzt.jpg');"
+                                @keydown.enter="setIcon('person_verletzt.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Produktionsbetrieb_firma_problem_16.jpg'))"
-                                        alt="Produktionfirma Problem"
+                                        alt="Person verletzt"
+                                        :src="$t(getIconPath('person_verletzt_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Produktionsfirma Problem
+                                        Person verletzt
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Pfeil_oben"
+                                ref="person_vermisst"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Pfeil_oben.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pfeil_oben.jpg');"
+                                @click="setIcon('person_vermisst.jpg');"
+                                @keydown.enter="setIcon('person_vermisst.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Pfeil_oben_16.jpg'))"
-                                        alt="Pfeil oben"
+                                        alt="Person vermisst"
+                                        :src="$t(getIconPath('person_vermisst_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Pfeil oben
+                                        Person vermisst
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Schiebetor"
+                                ref="person_verschuettet"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Schiebetor.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Schiebetor.jpg');"
+                                @click="setIcon('person_verschuettet.jpg');"
+                                @keydown.enter="setIcon('person_verschuettet.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Schiebetor_16.jpg'))"
-                                        alt="Schiebetor"
+                                        alt="Person verschuettet"
+                                        :src="$t(getIconPath('person_verschuettet_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Schiebetor
+                                        Person verschuettet
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Produktionsbetrieb_firma_problem_auslaufen"
+                                ref="person_zu_tranportieren"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Produktionsbetrieb_firma_problem_auslaufen.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Produktionsbetrieb_firma_problem_auslaufen.jpg');"
+                                @click="setIcon('person_zu_tranportieren.jpg');"
+                                @keydown.enter="setIcon('person_zu_tranportieren.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Produktionsbetrieb_firma_problem_auslaufen_16.jpg'))"
-                                        alt="Produktionsfirma auslaufen"
+                                        alt="Person zu transportieren"
+                                        :src="$t(getIconPath('person_zu_tranportieren_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Produktionsfirma auslaufen
+                                        Person zu transportieren
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Pfeil_oben_rechts"
+                                ref="schaden_beschaedigt"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Pfeil_oben_rechts.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pfeil_oben_rechts.jpg');"
+                                @click="setIcon('schaden_beschaedigt.jpg');"
+                                @keydown.enter="setIcon('schaden_beschaedigt.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Pfeil_oben_rechts_16.jpg'))"
-                                        alt="Pfeil oben rechts"
+                                        alt="Schaden beschädigt"
+                                        :src="$t(getIconPath('schaden_beschaedigt_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Pfeil oben rechts
+                                        Schaden beschädigt
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Schiebetor_uebeflutet_defekt"
+                                ref="schaden_blockiert"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Schiebetor_uebeflutet_defekt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Schiebetor_uebeflutet_defekt.jpg');"
+                                @click="setIcon('schaden_blockiert.jpg');"
+                                @keydown.enter="setIcon('schaden_blockiert.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Schiebetor_uebeflutet_defekt_16.jpg'))"
-                                        alt="Schiebetor überflutet/defekt"
+                                        alt="Schaden blockiert"
+                                        :src="$t(getIconPath('schaden_blockiert_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Schiebetor überflutet/defekt
+                                        Schaden blockiert
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Produktionsbetrieb_firma_explosion_brand"
+                                ref="schaden_oelverschmutzung_auf_gewaesser"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Produktionsbetrieb_firma_explosion_brand.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Produktionsbetrieb_firma_explosion_brand.jpg');"
+                                @click="setIcon('schaden_oelverschmutzung_auf_gewaesser.jpg');"
+                                @keydown.enter="setIcon('schaden_oelverschmutzung_auf_gewaesser.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Produktionsbetrieb_firma_explosion_brand_16.jpg'))"
-                                        alt="Produktionsfirma Explosion"
+                                        alt="Schaden Ölverschmutzung a. Gewässer"
+                                        :src="$t(getIconPath('schaden_oelverschmutzung_auf_gewaesser_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Produktionsfirma Explosion
+                                        Schaden Ölverschm. a. Gewässer
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Pfeil_rechts"
+                                ref="schaden_teilblockiert"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Pfeil_rechts.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pfeil_rechts.jpg');"
+                                @click="setIcon('schaden_teilblockiert.jpg');"
+                                @keydown.enter="setIcon('schaden_teilblockiert.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Pfeil_rechts_16.jpg'))"
-                                        alt="Pfeil rechts"
+                                        alt="Schaden teilblockiert"
+                                        :src="$t(getIconPath('schaden_teilblockiert_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Pfeil rechts
+                                        Schaden teilblockiert
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_sandsackwall"
+                                ref="schaden_teilzerstoert"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_sandsackwall.jpg');"
-                                @keydown.enter="setIcon('Vorlage_sandsackwall.jpg');"
+                                @click="setIcon('schaden_teilzerstoert.jpg');"
+                                @keydown.enter="setIcon('schaden_teilzerstoert.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_sandsackwall_16.jpg'))"
-                                        alt="Sandsackwall"
+                                        alt="Schaden teilzerstört"
+                                        :src="$t(getIconPath('schaden_teilzerstoert_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sandsackwall
+                                        Schaden teilzerstört
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_LKW_Tank"
+                                ref="schaden_total_zerstoert"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_LKW_Tank.jpg');"
-                                @keydown.enter="setIcon('Vorlage_LKW_Tank.jpg');"
+                                @click="setIcon('schaden_total_zerstoert.jpg');"
+                                @keydown.enter="setIcon('schaden_total_zerstoert.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_LKW_Tank_16.jpg'))"
-                                        alt="LKW Tank"
+                                        alt="Schaden total zerstört"
+                                        :src="$t(getIconPath('schaden_total_zerstoert_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        LKW Tank
+                                        Schaden total zerstört
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Pfeil_unten_rechts"
+                                ref="schaden_ueberschwemmtes_gebiet"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Pfeil_unten_rechts.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pfeil_unten_rechts.jpg');"
+                                @click="setIcon('schaden_ueberschwemmtes_gebiet.jpg');"
+                                @keydown.enter="setIcon('schaden_ueberschwemmtes_gebiet.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Pfeil_unten_rechts_16.jpg'))"
-                                        alt="Pfeil unten rechts"
+                                        alt="Schaden überschwemmtes Gebiet"
+                                        :src="$t(getIconPath('schaden_ueberschwemmtes_gebiet_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Pfeil unten rechts
+                                        Schaden überschw. Gebiet
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_sandsackwall_ueberflutet_defekt"
+                                ref="schaden_vollbrand"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_sandsackwall_ueberflutet_defekt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_sandsackwall_ueberflutet_defekt.jpg');"
+                                @click="setIcon('schaden_vollbrand.jpg');"
+                                @keydown.enter="setIcon('schaden_vollbrand.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_sandsackwall_ueberflutet_defekt_16.jpg'))"
-                                        alt="Sandsackwall überflutet/defekt"
+                                        alt="Schaden vollbrand"
+                                        :src="$t(getIconPath('schaden_vollbrand_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sandsackwall überflutet/defekt
+                                        Schaden vollbrand
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_LKW_Tank_Auslaufen"
+                                ref="tier"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_LKW_Tank_Auslaufen.jpg');"
-                                @keydown.enter="setIcon('Vorlage_LKW_Tank_Auslaufen.jpg');"
+                                @click="setIcon('tier.jpg');"
+                                @keydown.enter="setIcon('tier.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_LKW_Tank_Auslaufen_16.jpg'))"
-                                        alt="LKW Tank auslaufen"
+                                        alt="Tier"
+                                        :src="$t(getIconPath('tier_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        LKW Tank auslaufen
+                                        Tier
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Pfeil_unten"
+                                ref="tier_tot"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Pfeil_unten.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pfeil_unten.jpg');"
+                                @click="setIcon('tier_tot.jpg');"
+                                @keydown.enter="setIcon('tier_tot.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Pfeil_unten_16.jpg'))"
-                                        alt="Pfeil unten"
+                                        alt="Tier tot"
+                                        :src="$t(getIconPath('tier_tot_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Pfeil unten
+                                        Tier tot
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Klapptor"
+                                ref="tier_verletzt"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Klapptor.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Klapptor.jpg');"
+                                @click="setIcon('tier_verletzt.jpg');"
+                                @keydown.enter="setIcon('tier_verletzt.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Klapptor_16.jpg'))"
-                                        alt="Klapptor"
+                                        alt="Tier verletzt"
+                                        :src="$t(getIconPath('tier_verletzt_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Klapptor
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Wasser"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Wasser.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Wasser.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Wasser_16.jpg'))"
-                                        alt="Wasser"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Wasser
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Pfeil_unten_links"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Pfeil_unten_links.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pfeil_unten_links.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Pfeil_unten_links_16.jpg'))"
-                                        alt="Pfeil unten links"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Pfeil unten links
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Klapptor_ueberflutet_defekt"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Klapptor_ueberflutet_defekt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Klapptor_ueberflutet_defekt.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Klapptor_ueberflutet_defekt_16.jpg'))"
-                                        alt="Klapptor überflutet/defekt"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Klapptor überflutet/defekt
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Haus"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Haus.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Haus.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Haus_16.jpg'))"
-                                        alt="Haus"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Haus
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Pfeil_links"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Pfeil_links.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pfeil_links.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Pfeil_links_16.jpg'))"
-                                        alt="Pfeil links"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Pfeil links
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Kraftwerk"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Kraftwerk.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kraftwerk.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Kraftwerk_16.jpg'))"
-                                        alt="Kraftwerk"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Kraftwerk
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_container"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_container.jpg');"
-                                @keydown.enter="setIcon('Vorlage_container.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_container_16.jpg'))"
-                                        alt="Container"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Container
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Pfeil_oben_links"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Pfeil_oben_links.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pfeil_oben_links.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Pfeil_oben_links_16.jpg'))"
-                                        alt="Pfeil oben links"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Pfeil oben links
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Kraftwerk_gefahr"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Kraftwerk_gefahr.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kraftwerk_gefahr.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Kraftwerk_gefahr_16.jpg'))"
-                                        alt="Kraftwerk Gefahr"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Kraftwerk Gefahr
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_bombe"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_bombe.jpg');"
-                                @keydown.enter="setIcon('Vorlage_bombe.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_bombe_16.jpg'))"
-                                        alt="Bombe"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Bombe
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_viereck"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_viereck.jpg');"
-                                @keydown.enter="setIcon('Vorlage_viereck.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_viereck_16.jpg'))"
-                                        alt="Viereck"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Viereck
+                                        Tier verletzt
                                     </span>
                                 </div>
                             </div>
@@ -1568,1195 +1285,1033 @@ export default {
                     <div class="tm-container">
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Mannschaft"
+                                ref="einheit_bundespolizei"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Mannschaft.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Mannschaft.jpg');"
+                                @click="setIcon('einheit_bundespolizei.jpg');"
+                                @keydown.enter="setIcon('einheit_bundespolizei.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Mannschaft_16.jpg'))"
-                                        alt="Mannschaft"
+                                        alt="Einheit Bundespolizei"
+                                        :src="$t(getIconPath('einheit_bundespolizei_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Mannschaft
+                                        Einheit Bundespolizei
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Notunterkunft_Kapazitaet"
+                                ref="einheit_bundeswehr"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Notunterkunft_Kapazitaet.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Notunterkunft_Kapazitaet.jpg');"
+                                @click="setIcon('einheit_bundeswehr.jpg');"
+                                @keydown.enter="setIcon('einheit_bundeswehr.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Notunterkunft_Kapazitaet_16.jpg'))"
-                                        alt="Notunterkunft Kapazität"
+                                        alt="Einheit Bundeswehr"
+                                        :src="$t(getIconPath('einheit_bundeswehr_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Notunterkunft Kapazität
+                                        Einheit Bundeswehr
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_sandsacklager"
+                                ref="einheit_feuerwehr"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_sandsacklager.jpg');"
-                                @keydown.enter="setIcon('Vorlage_sandsacklager.jpg');"
+                                @click="setIcon('einheit_feuerwehr.jpg');"
+                                @keydown.enter="setIcon('einheit_feuerwehr.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_sandsacklager_16.jpg'))"
-                                        alt="Sandsacklager"
+                                        alt="Einheit Feuerwehr"
+                                        :src="$t(getIconPath('einheit_feuerwehr_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sandsacklager
+                                        Einheit Feuerwehr
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Kran_Bergepanzer"
+                                ref="einheit_fuehrung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Kran_Bergepanzer.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kran_Bergepanzer.jpg');"
+                                @click="setIcon('einheit_fuehrung.jpg');"
+                                @keydown.enter="setIcon('einheit_fuehrung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Kran_Bergepanzer_16.jpg'))"
-                                        alt="Kran/Bergepanzer"
+                                        alt="Einheit Führung"
+                                        :src="$t(getIconPath('einheit_fuehrung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Kran/Bergepanzer
+                                        Einheit Führung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Mannschaft_F"
+                                ref="einheit_hilfsorganisation"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Mannschaft_F.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Mannschaft_F.jpg');"
+                                @click="setIcon('einheit_hilfsorganisation.jpg');"
+                                @keydown.enter="setIcon('einheit_hilfsorganisation.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Mannschaft_F_16.jpg'))"
-                                        alt="Mannschaft F"
+                                        alt="Einheit Hilfsorganisation"
+                                        :src="$t(getIconPath('einheit_hilfsorganisation_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Mannschaft FF
+                                        Einheit Hilfsorganisation
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Notunterkunft_Kapazitaet_aktiviert"
+                                ref="einheit_landespolizei"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Notunterkunft_Kapazitaet_aktiviert.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Notunterkunft_Kapazitaet_aktiviert.jpg');"
+                                @click="setIcon('einheit_landespolizei.jpg');"
+                                @keydown.enter="setIcon('einheit_landespolizei.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Notunterkunft_Kapazitaet_aktiviert_16.jpg'))"
-                                        alt="Notunterkunft Kapazität aktiviert"
+                                        alt="Einheit Landespolizei"
+                                        :src="$t(getIconPath('einheit_landespolizei_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Notunterkunft Kapazität aktiviert
+                                        Einheit Landespolizei
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Sandsacklager_aktiviert"
+                                ref="einheit_thw"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Sandsacklager_aktiviert.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Sandsacklager_aktiviert.jpg');"
+                                @click="setIcon('einheit_thw.jpg');"
+                                @keydown.enter="setIcon('einheit_thw.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Sandsacklager_aktiviert_16.jpg'))"
-                                        alt="Sandsacklager aktiviert"
+                                        alt="Einheit THW"
+                                        :src="$t(getIconPath('einheit_thw_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sandsacklager aktiviert
+                                        Einheit THW
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Kran_Bergepanzer_Raeumschild"
+                                ref="einheit_zoll"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Kran_Bergepanzer_Raeumschild.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kran_Bergepanzer_Raeumschild.jpg');"
+                                @click="setIcon('einheit_zoll.jpg');"
+                                @keydown.enter="setIcon('einheit_zoll.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Kran_Bergepanzer_Raeumschild_16.jpg'))"
-                                        alt="Kran/Bergepanzer/Räumschild"
+                                        alt="Einheit Zoll"
+                                        :src="$t(getIconPath('einheit_zoll_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Kran/Bergepanzer/Räumschild
+                                        Einheit Zoll
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Mannschaft_Pol"
+                                ref="fachaufgabe_aerztliche_versorgung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Mannschaft_Pol.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Mannschaft_Pol.jpg');"
+                                @click="setIcon('fachaufgabe_aerztliche_versorgung.jpg');"
+                                @keydown.enter="setIcon('fachaufgabe_aerztliche_versorgung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Mannschaft_Pol_16.jpg'))"
-                                        alt="Mannschaft Pol"
+                                        alt="Fachaufgabe ärztl. Versorgung"
+                                        :src="$t(getIconPath('fachaufgabe_aerztliche_versorgung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Mannschaft Pol
+                                        Fachaufgabe ärztl. Versorgung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Notunterkunft_Kapazitaet_ok"
+                                ref="fachaufgabe_betreuung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Notunterkunft_Kapazitaet_ok.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Notunterkunft_Kapazitaet_ok.jpg');"
+                                @click="setIcon('fachaufgabe_betreuung.jpg');"
+                                @keydown.enter="setIcon('fachaufgabe_betreuung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Notunterkunft_Kapazitaet_ok_16.jpg'))"
-                                        alt="Notunterkunft Kapazität ok"
+                                        alt="Fachaufgabe Betreuung"
+                                        :src="$t(getIconPath('fachaufgabe_betreuung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Notunterkunft Kapazität ok
+                                        Fachaufgabe Betreuung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Sandsacklager_ok"
+                                ref="fachaufgabe_psnv"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Sandsacklager_ok.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Sandsacklager_ok.jpg');"
+                                @click="setIcon('fachaufgabe_psnv.jpg');"
+                                @keydown.enter="setIcon('fachaufgabe_psnv.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Sandsacklager_ok_16.jpg'))"
-                                        alt="Sandsacklager ok"
+                                        alt="Fachaufgabe PSNV"
+                                        :src="$t(getIconPath('fachaufgabe_psnv_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sandsacklager ok
+                                        Fachaufgabe PSNV
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Kran_Panzer"
+                                ref="fachaufgabe_sanitaetswesen"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Kran_Panzer.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kran_Panzer.jpg');"
+                                @click="setIcon('fachaufgabe_sanitaetswesen.jpg');"
+                                @keydown.enter="setIcon('fachaufgabe_sanitaetswesen.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Kran_Panzer_16.jpg'))"
-                                        alt="Kran/Panzer"
+                                        alt="Fachaufgabe Sanitätswesen"
+                                        :src="$t(getIconPath('fachaufgabe_sanitaetswesen_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Kran/Panzer
+                                        Fachaufgabe Sanitätswesen
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Mannschaft_SAN"
+                                ref="fachaufgabe_unterbringung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Mannschaft_SAN.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Mannschaft_SAN.jpg');"
+                                @click="setIcon('fachaufgabe_unterbringung.jpg');"
+                                @keydown.enter="setIcon('fachaufgabe_unterbringung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Mannschaft_SAN_16.jpg'))"
-                                        alt="Mannschaft San"
+                                        alt="Fachaufgabe Unterbringung"
+                                        :src="$t(getIconPath('fachaufgabe_unterbringung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Mannschaft San
+                                        Fachaufgabe Unterbringung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Notunterkunft_besetzt_defekt"
+                                ref="fachaufgabe_warnung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Notunterkunft_besetzt_defekt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Notunterkunft_besetzt_defekt.jpg');"
+                                @click="setIcon('fachaufgabe_warnung.jpg');"
+                                @keydown.enter="setIcon('fachaufgabe_warnung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Notunterkunft_besetzt_defekt_16.jpg'))"
-                                        alt="Notunterkunft besetzt/defekt"
+                                        alt="Fachaufgabe Warnung"
+                                        :src="$t(getIconPath('fachaufgabe_warnung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Notunterkunft besetzt/defekt
+                                        Fachaufgabe Warnung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Sandsacklager_leer"
+                                ref="fuehrung_fuehrungsstelle"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Sandsacklager_leer.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Sandsacklager_leer.jpg');"
+                                @click="setIcon('fuehrung_fuehrungsstelle.jpg');"
+                                @keydown.enter="setIcon('fuehrung_fuehrungsstelle.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Sandsacklager_leer_16.jpg'))"
-                                        alt="Sandsacklager leer"
+                                        alt="Führung Führungsstelle"
+                                        :src="$t(getIconPath('fuehrung_fuehrungsstelle_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sandsacklager leer
+                                        Führung Führungsstelle
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Kran_BW"
+                                ref="fuehrung_meldekopf_bereistellungsraum"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Kran_BW.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kran_BW.jpg');"
+                                @click="setIcon('fuehrung_meldekopf_bereistellungsraum.jpg');"
+                                @keydown.enter="setIcon('fuehrung_meldekopf_bereistellungsraum.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Kran_BW_16.jpg'))"
-                                        alt="Kran BW"
+                                        alt="Führung Meldekopf Bereitstellungsraum"
+                                        :src="$t(getIconPath('fuehrung_meldekopf_bereistellungsraum_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Kran BW
+                                        Führung Meldekopf Bereitst.
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Mannschaft_THW"
+                                ref="fuehrung_stab"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Mannschaft_THW.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Mannschaft_THW.jpg');"
+                                @click="setIcon('fuehrung_stab.jpg');"
+                                @keydown.enter="setIcon('fuehrung_stab.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Mannschaft_THW_16.jpg'))"
-                                        alt="Mannschaft THW"
+                                        alt="Führung Stab"
+                                        :src="$t(getIconPath('fuehrung_stab_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Mannschaft THW
+                                        Führung Stab
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Fluchtburg"
+                                ref="logistik"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Fluchtburg.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Fluchtburg.jpg');"
+                                @click="setIcon('logistik.jpg');"
+                                @keydown.enter="setIcon('logistik.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Fluchtburg_16.jpg'))"
-                                        alt="Fluchtburg"
+                                        alt="Logistik"
+                                        :src="$t(getIconPath('logistik_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Fluchtburg
+                                        Logistik
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Sand_Lagerflaeche"
+                                ref="logistik_betriebsstoffe"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Sand_Lagerflaeche.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Sand_Lagerflaeche.jpg');"
+                                @click="setIcon('logistik_betriebsstoffe.jpg');"
+                                @keydown.enter="setIcon('logistik_betriebsstoffe.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Sand_Lagerflaeche_16.jpg'))"
-                                        alt="Sand Lagerfläche"
+                                        alt="Logistik Betriebsstoffe"
+                                        :src="$t(getIconPath('logistik_betriebsstoffe_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sand Lagerfläche
+                                        Logistik Betriebsstoffe
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Kran_Feuerwehr"
+                                ref="logistik_brauchwasser"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Kran_Feuerwehr.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kran_Feuerwehr.jpg');"
+                                @click="setIcon('logistik_brauchwasser.jpg');"
+                                @keydown.enter="setIcon('logistik_brauchwasser.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Kran_Feuerwehr_16.jpg'))"
-                                        alt="Kran Feuerwehr"
+                                        alt="Logistik Brauchwasser"
+                                        :src="$t(getIconPath('logistik_brauchwasser_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Kran FF
+                                        Logistik Brauchwasser
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Pol"
+                                ref="logistik_elektrizitaet"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Pol.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Pol.jpg');"
+                                @click="setIcon('logistik_elektrizitaet.jpg');"
+                                @keydown.enter="setIcon('logistik_elektrizitaet.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Pol_16.jpg'))"
-                                        alt="Pol"
+                                        alt="Logistik Elektrizität"
+                                        :src="$t(getIconPath('logistik_elektrizitaet_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Polizei
+                                        Logistik Elektrizität
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Fluchtburg_aktiviert"
+                                ref="logistik_instandsetzung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Fluchtburg_aktiviert.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Fluchtburg_aktiviert.jpg');"
+                                @click="setIcon('logistik_instandsetzung.jpg');"
+                                @keydown.enter="setIcon('logistik_instandsetzung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Fluchtburg_aktiviert_16.jpg'))"
-                                        alt="Fluchtburg aktiviert"
+                                        alt="Logistik Instandsetzung"
+                                        :src="$t(getIconPath('logistik_instandsetzung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Fluchtburg aktiviert
+                                        Logistik Instandsetzung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Sand_Lagerflaeche_aktiviert"
+                                ref="logistik_trinkwasser"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Sand_Lagerflaeche_aktiviert.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Sand_Lagerflaeche_aktiviert.jpg');"
+                                @click="setIcon('logistik_trinkwasser.jpg');"
+                                @keydown.enter="setIcon('logistik_trinkwasser.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Sand_Lagerflaeche_aktiviert_16.jpg'))"
-                                        alt="Sand Lagerfläche aktiviert"
+                                        alt="Logistik Trinkwasser"
+                                        :src="$t(getIconPath('logistik_trinkwasser_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sand Lagerfläche aktiviert
+                                        Logistik Trinkwasser
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Kran_THW"
+                                ref="logistik_verpflegung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Kran_THW.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kran_THW.jpg');"
+                                @click="setIcon('logistik_verpflegung.jpg');"
+                                @keydown.enter="setIcon('logistik_verpflegung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Kran_THW_16.jpg'))"
-                                        alt="Kran THW"
+                                        alt="Logistik Verpflegung"
+                                        :src="$t(getIconPath('logistik_verpflegung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Kran THW
+                                        Logistik Verpflegung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_THW"
+                                ref="maßnahme_beleuchtung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_THW.jpg');"
-                                @keydown.enter="setIcon('Vorlage_THW.jpg');"
+                                @click="setIcon('maßnahme_beleuchtung.jpg');"
+                                @keydown.enter="setIcon('maßnahme_beleuchtung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_THW_16.jpg'))"
-                                        alt="THW"
+                                        alt="Maßnahme Beleuchtung"
+                                        :src="$t(getIconPath('maßnahme_beleuchtung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        THW
+                                        Maßnahme Beleuchtung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Fluchtburg_aktiv_ok"
+                                ref="maßnahme_beraeumen"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Fluchtburg_aktiv_ok.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Fluchtburg_aktiv_ok.jpg');"
+                                @click="setIcon('maßnahme_beraeumen.jpg');"
+                                @keydown.enter="setIcon('maßnahme_beraeumen.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Fluchtburg_aktiv_ok_16.jpg'))"
-                                        alt="Fluchtburg aktiv/ok"
+                                        alt="Maßnahme beräumen"
+                                        :src="$t(getIconPath('maßnahme_beraeumen_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Fluchtburg aktiv/ok
+                                        Maßnahme beräumen
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Kran_sonstige"
+                                ref="maßnahme_brueckenbau"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Kran_sonstige.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Kran_sonstige.jpg');"
+                                @click="setIcon('maßnahme_brueckenbau.jpg');"
+                                @keydown.enter="setIcon('maßnahme_brueckenbau.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Kran_sonstige_16.jpg'))"
-                                        alt="Kran sonstige"
+                                        alt="Maßnahme Brückenbau"
+                                        :src="$t(getIconPath('maßnahme_brueckenbau_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Kran sonstige
+                                        Maßnahme Brückenbau
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_feuerwehr"
+                                ref="maßnahme_deichverteidungung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_feuerwehr.jpg');"
-                                @keydown.enter="setIcon('Vorlage_feuerwehr.jpg');"
+                                @click="setIcon('maßnahme_deichverteidungung.jpg');"
+                                @keydown.enter="setIcon('maßnahme_deichverteidungung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_feuerwehr_16.jpg'))"
-                                        alt="Feuerwehr"
+                                        alt="Maßnahme Deichverteidigung"
+                                        :src="$t(getIconPath('maßnahme_deichverteidungung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Feuerwehr
+                                        Maßnahme Deichverteidigung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Fluchtburg_besetzt"
+                                ref="maßnahme_dekontamination"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Fluchtburg_besetzt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Fluchtburg_besetzt.jpg');"
+                                @click="setIcon('maßnahme_dekontamination.jpg');"
+                                @keydown.enter="setIcon('maßnahme_dekontamination.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Fluchtburg_besetzt_16.jpg'))"
-                                        alt="Fluchtburg besetzt"
+                                        alt="Maßnahme Dekontamination"
+                                        :src="$t(getIconPath('maßnahme_dekontamination_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Fluchtburg besetzt
+                                        Maßnahme Dekontamination
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Sand_Lagerflaeche_leer_defekt"
+                                ref="maßnahme_erkunden"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Sand_Lagerflaeche_leer_defekt.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Sand_Lagerflaeche_leer_defekt.jpg');"
+                                @click="setIcon('maßnahme_erkunden.jpg');"
+                                @keydown.enter="setIcon('maßnahme_erkunden.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Sand_Lagerflaeche_leer_defekt_16.jpg'))"
-                                        alt="Sand Lagerfläche leer/defekt"
+                                        alt="Maßnahme erkunden"
+                                        :src="$t(getIconPath('maßnahme_erkunden_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Sand Lagerfläche leer/defekt
+                                        Maßnahme erkunden
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_TLF"
+                                ref="maßnahme_fahren_auf_wasser"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_TLF.jpg');"
-                                @keydown.enter="setIcon('Vorlage_TLF.jpg');"
+                                @click="setIcon('maßnahme_fahren_auf_wasser.jpg');"
+                                @keydown.enter="setIcon('maßnahme_fahren_auf_wasser.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_TLF_16.jpg'))"
-                                        alt="TLF"
+                                        alt="Maßnahme fahren auf Wasser"
+                                        :src="$t(getIconPath('maßnahme_fahren_ auf_wasser_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        TLF
+                                        Maßnahme fahren auf Wasser
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="feuerwehr_rtw"
+                                ref="maßnahme_instandsetzung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('feuerwehr_rtw.jpg');"
-                                @keydown.enter="setIcon('feuerwehr_rtw.jpg');"
+                                @click="setIcon('maßnahme_instandsetzung.jpg');"
+                                @keydown.enter="setIcon('maßnahme_instandsetzung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('feuerwehr_rtw_16.jpg'))"
-                                        alt="Feuerwehr RTW"
+                                        alt="Maßnahme Instandsetzung"
+                                        :src="$t(getIconPath('maßnahme_instandsetzung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Feuerwehr RTW
+                                        Maßnahme Instandsetzung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Fluchtburg_Kapazitaet"
+                                ref="maßnahme_lenzen"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Fluchtburg_Kapazitaet.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Fluchtburg_Kapazitaet.jpg');"
+                                @click="setIcon('maßnahme_lenzen.jpg');"
+                                @keydown.enter="setIcon('maßnahme_lenzen.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Fluchtburg_Kapazitaet_16.jpg'))"
-                                        alt="Fluchtburg Kapazität"
+                                        alt="Maßnahme lenzen"
+                                        :src="$t(getIconPath('maßnahme_lenzen_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Fluchtburg Kapazität
+                                        Maßnahme lenzen
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_HWS_Material"
+                                ref="maßnahme_lotsen"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_HWS_Material.jpg');"
-                                @keydown.enter="setIcon('Vorlage_HWS_Material.jpg');"
+                                @click="setIcon('maßnahme_lotsen.jpg');"
+                                @keydown.enter="setIcon('maßnahme_lotsen.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_HWS_Material_16.jpg'))"
-                                        alt="HWS Material"
+                                        alt="Maßnahme lotsen"
+                                        :src="$t(getIconPath('maßnahme_lotsen_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        HWS Material
+                                        Maßnahme lotsen
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Drehleiter"
+                                ref="maßnahme_sandsackfuellen"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Drehleiter.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Drehleiter.jpg');"
+                                @click="setIcon('maßnahme_sandsackfuellen.jpg');"
+                                @keydown.enter="setIcon('maßnahme_sandsackfuellen.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Drehleiter_16.jpg'))"
-                                        alt="Drehleiter"
+                                        alt="Maßnahme sandsackfüllen"
+                                        :src="$t(getIconPath('maßnahme_sandsackfuellen_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Drehleiter
+                                        Maßnahme sandsackfüllen
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="feuerwehr_nef"
+                                ref="maßnahme_sandsackverbau"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('feuerwehr_nef.jpg');"
-                                @keydown.enter="setIcon('feuerwehr_nef.jpg');"
+                                @click="setIcon('maßnahme_sandsackverbau.jpg');"
+                                @keydown.enter="setIcon('maßnahme_sandsackverbau.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('feuerwehr_nef_16.jpg'))"
-                                        alt="Feuerwehr NEF"
+                                        alt="Maßnahme verbau"
+                                        :src="$t(getIconPath('maßnahme_sandsackverbau_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Feuerwehr NEF
+                                        Maßnahme verbau
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Bereitstellungsraum_Ort"
+                                ref="maßnahme_sprengen"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Bereitstellungsraum_Ort.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Bereitstellungsraum_Ort.jpg');"
+                                @click="setIcon('maßnahme_sprengen.jpg');"
+                                @keydown.enter="setIcon('maßnahme_sprengen.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Bereitstellungsraum_Ort_16.jpg'))"
-                                        alt="Bereitstellungsraum Ort"
+                                        alt="Maßnahme sprengen"
+                                        :src="$t(getIconPath('maßnahme_sprengen_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Bereitstellungsraum Ort
+                                        Maßnahme sprengen
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_TEL_DV1"
+                                ref="maßnahme_suchen_mit_rettungshunden"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_TEL_DV1.jpg');"
-                                @keydown.enter="setIcon('Vorlage_TEL_DV1.jpg');"
+                                @click="setIcon('maßnahme_suchen_mit_rettungshunden.jpg');"
+                                @keydown.enter="setIcon('maßnahme_suchen_mit_rettungshunden.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_TEL_DV1_16.jpg'))"
-                                        alt="TEL DV1"
+                                        alt="Maßnahme suchen mit Rettungshunden"
+                                        :src="$t(getIconPath('maßnahme_suchen_ mit_rettungshunden_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        TEL DV1
+                                        Maßnahme suchen m. Rettungsh.
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Bagger_Tieflader"
+                                ref="maßnahme_transportieren"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Bagger_Tieflader.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Bagger_Tieflader.jpg');"
+                                @click="setIcon('maßnahme_transportieren.jpg');"
+                                @keydown.enter="setIcon('maßnahme_transportieren.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Bagger_Tieflader_16.jpg'))"
-                                        alt="Bagger/Tieflader"
+                                        alt="Maßnahme transportieren"
+                                        :src="$t(getIconPath('maßnahme_transportieren_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Bagger/Tieflader
+                                        Maßnahme transportieren
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="feuerwehr_umwelt"
+                                ref="maßnahme_wasserrettung"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('feuerwehr_umwelt.jpg');"
-                                @keydown.enter="setIcon('feuerwehr_umwelt.jpg');"
+                                @click="setIcon('maßnahme_wasserrettung.jpg');"
+                                @keydown.enter="setIcon('maßnahme_wasserrettung.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('feuerwehr_umwelt_16.jpg'))"
-                                        alt="Feuerwehr Umwelt"
+                                        alt="Maßnahme Wasserrettung"
+                                        :src="$t(getIconPath('maßnahme_wasserrettung_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Feuerwehr Umwelt
+                                        Maßnahme Wasserrettung
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Bereitstellungsraum_Ort_arbeitet"
+                                ref="stelle_behandlungsplatz"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Bereitstellungsraum_Ort_arbeitet.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Bereitstellungsraum_Ort_arbeitet.jpg');"
+                                @click="setIcon('stelle_behandlungsplatz.jpg');"
+                                @keydown.enter="setIcon('stelle_behandlungsplatz.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Bereitstellungsraum_Ort_arbeitet_16.jpg'))"
-                                        alt="Bereitstellungsraum Ort arbeitet"
+                                        alt="Stelle Behandlungsplatzt"
+                                        :src="$t(getIconPath('stelle_behandlungsplatz_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Bereitstellungsraum Ort arbeitet
+                                        Stelle Behandlungsplatzt
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_TEL_DV2"
+                                ref="stelle_bereistellungsraum"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_TEL_DV2.jpg');"
-                                @keydown.enter="setIcon('Vorlage_TEL_DV2.jpg');"
+                                @click="setIcon('stelle_bereistellungsraum.jpg');"
+                                @keydown.enter="setIcon('stelle_bereistellungsraum.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_TEL_DV2_16.jpg'))"
-                                        alt="TEL DV2"
+                                        alt="Stelle Bereitstellungsraum"
+                                        :src="$t(getIconPath('stelle_bereistellungsraum_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        TEL DV2
+                                        Stelle Bereitstellungsraum
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Radlader"
+                                ref="stelle_betreuungsstelle"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Radlader.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Radlader.jpg');"
+                                @click="setIcon('stelle_betreuungsstelle.jpg');"
+                                @keydown.enter="setIcon('stelle_betreuungsstelle.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Radlader_16.jpg'))"
-                                        alt="Radlader"
+                                        alt="Stelle Betreuungsstelle"
+                                        :src="$t(getIconPath('stelle_betreuungsstelle_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Radlader
+                                        Stelle Betreuungsstelle
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_LKW"
+                                ref="stelle_patiententransportmittel"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_LKW.jpg');"
-                                @keydown.enter="setIcon('Vorlage_LKW.jpg');"
+                                @click="setIcon('stelle_patiententransportmittel.jpg');"
+                                @keydown.enter="setIcon('stelle_patiententransportmittel.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_LKW_16.jpg'))"
-                                        alt="LKW"
+                                        alt="Stelle Transportmittel"
+                                        :src="$t(getIconPath('stelle_patiententransportmittel_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        LKW
+                                        Stelle Transportmittel
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_Bereitstellungsraum_Ort_aktiv"
+                                ref="stelle_sammelplatz_fuer_betroffene"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Bereitstellungsraum_Ort_aktiv.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Bereitstellungsraum_Ort_aktiv.jpg');"
+                                @click="setIcon('stelle_sammelplatz_fuer_betroffene.jpg');"
+                                @keydown.enter="setIcon('stelle_sammelplatz_fuer_betroffene.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Bereitstellungsraum_Ort_aktiv_16.jpg'))"
-                                        alt="Bereitstellungsraum Ort aktiv"
+                                        alt="Stelle Sammelplatz für Betroffene"
+                                        :src="$t(getIconPath('stelle_sammelplatz_fuer_betroffene_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Bereitstellungsraum Ort aktiv
+                                        Stelle Sammelpl. f. Betroffene
                                     </span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="tm-item">
                             <div
-                                ref="Vorlage_TEL_DV3"
+                                ref="stelle_sammelstelle"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_TEL_DV3.jpg');"
-                                @keydown.enter="setIcon('Vorlage_TEL_DV3.jpg');"
+                                @click="setIcon('stelle_sammelstelle.jpg');"
+                                @keydown.enter="setIcon('stelle_sammelstelle.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_TEL_DV3_16.jpg'))"
-                                        alt="TEL DV3"
+                                        alt="Stelle Sammelstelle"
+                                        :src="$t(getIconPath('stelle_sammelstelle_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        TEL DV3
+                                        Stelle Sammelstelle
                                     </span>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="tm-item">
+                        </div><div class="tm-item">
                             <div
-                                ref="Vorlage_Transporthubschrauber_BW"
+                                ref="stelle_unterkunft"
                                 class="tm-btn"
                                 role="button"
                                 tabindex="0"
-                                @click="setIcon('Vorlage_Transporthubschrauber_BW.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Transporthubschrauber_BW.jpg');"
+                                @click="setIcon('stelle_unterkunft.jpg');"
+                                @keydown.enter="setIcon('stelle_unterkunft.jpg');"
                             >
                                 <div class="tm-btn-img pull-left">
                                     <img
-                                        :src="$t(getIconPath('Vorlage_Transporthubschrauber_BW_16.jpg'))"
-                                        alt="Transporthubschrauber BW"
+                                        alt="Stelle Unterkunft"
+                                        :src="$t(getIconPath('stelle_unterkunft_small.jpg'))"
                                     >
                                 </div>
                                 <div class="tm-btn-txt">
                                     <span>
-                                        Transporthubschrauber BW
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_LKW_Kippeinrichtung"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_LKW_Kippeinrichtung.jpg');"
-                                @keydown.enter="setIcon('Vorlage_LKW_Kippeinrichtung.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_LKW_Kippeinrichtung_16.jpg'))"
-                                        alt="LKW Kippeinrichtung"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        LKW Kippeinrichtung
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_Bereitstellungsraum_Ort_inaktiv"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_Bereitstellungsraum_Ort_inaktiv.jpg');"
-                                @keydown.enter="setIcon('Vorlage_Bereitstellungsraum_Ort_inaktiv.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_Bereitstellungsraum_Ort_inaktiv_16.jpg'))"
-                                        alt="Bereitstellungsraum Ort inaktiv"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        Bereitstellungsraum Ort inaktiv
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_TEL_DV4"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_TEL_DV4.jpg');"
-                                @keydown.enter="setIcon('Vorlage_TEL_DV4.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_TEL_DV4_16.jpg'))"
-                                        alt="TEL DV4"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        TEL DV4
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_RTH"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_RTH.jpg');"
-                                @keydown.enter="setIcon('Vorlage_RTH.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_RTH_16.jpg'))"
-                                        alt="RTH"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        RTH
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tm-item">
-                            <div
-                                ref="Vorlage_LKW_Stadtreinigung"
-                                class="tm-btn"
-                                role="button"
-                                tabindex="0"
-                                @click="setIcon('Vorlage_LKW_Stadtreinigung.jpg');"
-                                @keydown.enter="setIcon('Vorlage_LKW_Stadtreinigung.jpg');"
-                            >
-                                <div class="tm-btn-img pull-left">
-                                    <img
-                                        :src="$t(getIconPath('Vorlage_LKW_Stadtreinigung_16.jpg'))"
-                                        alt="LKW Stadtreinigung"
-                                    >
-                                </div>
-                                <div class="tm-btn-txt">
-                                    <span>
-                                        LKW Stadtreinigung
+                                        Stelle Unterkunft
                                     </span>
                                 </div>
                             </div>
@@ -2949,7 +2504,7 @@ export default {
                 cursor: pointer;
                 text-align: center;
                 border: 1px solid #cdcdcd;
-                width: 206px;
+                width: 215px;
                 &:hover {
                     background-color: $white;
                     color: $black;
