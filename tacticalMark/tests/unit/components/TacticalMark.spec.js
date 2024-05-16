@@ -138,7 +138,7 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
         store.commit("Tools/TacticalMark/setActive", true);
 
-        expect(wrapper.findComponent({ref: "Vorlage_Dammbalken"}).exists()).to.be.true;
+        expect(wrapper.findComponent({ref: "gefahr_akut"}).exists()).to.be.true;
     });
 
     it("check if buttons, images and texts exists in dmg container", () => {
