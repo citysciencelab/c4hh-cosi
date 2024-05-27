@@ -29,7 +29,6 @@
                     "yes": "Ja",
                     "no": "Nein",
                     "success": "Sitzung erfolgreich gespeichert!",
-<<<<<<< HEAD
                     "settingsChanged": "Ihre Einstellungen wurden geändert",
                     "saveToLocalStorageError": "Die Sitzung konnte nicht gespeichert werden. Die Fehlermeldung finden Sie, indem Sie die Taste F12 drücken. Wenden Sie sich bitte damit an Ihren Administrator.",
                     "loadFromLocalStorageError": "Die letzte Sitzung konnte nicht geladen werden. Die Fehlermeldung finden Sie, indem Sie die Taste F12 drücken. Wenden Sie sich bitte damit an Ihren Administrator.",
@@ -38,9 +37,6 @@
                     "localSave": "Lokales Speichern",
                     "localSaveDescription": "Sitzungen als Datei auf dem Rechner speichern und über den Button 'Datei laden' wieder laden. Diese können jederzeit wieder geladen oder mit anderen CoSI Nutzer:innen geteilt werden.",
                     "sessionHint": "Bitte beachten Sie, dass nicht alle Daten und Aktionen gespeichert werden können. Grundsätzlich bezieht sich das Speichern auf die Gebiets- und Themenauswahl, Analyse- und Simulationsergebnisse. Welche Daten gespeichert werden können entnehmen Sie bitte der Anleitung."
-=======
-                    "settingsChanged": "Ihre Einstellungen wurden geändert"
->>>>>>> 46944dd7 (add new addons_3_0_0 structure-add missing addons)
                 }
             }
         }

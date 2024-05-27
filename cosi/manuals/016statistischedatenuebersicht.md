@@ -9,26 +9,8 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
 
   > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus. 
   
-<<<<<<< HEAD
 ![Abbildung 27: Statistische Datenübersicht](./016a_statistischedatenuebersicht.png)
 *Abb. a: Statistische Datenübersicht 1*
-=======
-![Abbildung 27: Statistische Datenübersicht](016a_statistischedatenuebersicht.png)
-*Abb.: Statistische Datenübersicht 1*
-<<<<<<< HEAD
-=======
-  > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus.
-
-=======
-  > Um zur statistischen Datenübersicht zu gelangen, wählen Sie im Dashboard den Punkt "statistische Datenübersicht" aus. 
-  
->>>>>>> 3502056a (update cosi folder):cosi/manuals/statistischedatenuebersicht.md
-![Abbildung 27: Statistische Datenübersicht](https://github.com/AlexandraKanapki/cosi/blob/COSI-handbuch/cosi/manuals/statistische%20datenu%CC%88bersciht1.png?raw=true)
-*Abbildung 27: Statistische Datenübersichtm 1*
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/statistischedatenuebersicht.md
->>>>>>> 0650b0a5 (resolve rebase conflicts)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
 
 ![Abbildung 29: Statistische Datenübersicht](./016b_statistischedatenuebersicht.png)
 *Abb. b: Statistische Datenübersicht 2*
@@ -64,21 +46,8 @@ In der statistischen Datenübersicht können tabellarisch Informationen zu den s
       > Die Darstellung in der Karte entspricht der des Kontrollfeldes [Kartenanalyse regionalstatistischer Daten](./kartenvisualisierung.md).
 
 #### Dreistrich Menü
-<<<<<<< HEAD
 ![Abbildung 28: Statistische Datenübersicht - Dreistrich-menü](./016c_statdashboard_burgermenu.PNG)
 *Abb. c: Statistische Datenübersicht - Dreistrich-Menü.*
-=======
-![Abbildung 28: Statistische Datenübersicht - Dreistrich-menü](016c_statdashboard_burgermenu.PNG)
-*Abb.: Statistische Datenübersicht - Dreistrich-Menü.*
-<<<<<<< HEAD
-=======
-#### Dreipunkt Menü
-![Abbildung 28: Statistische Datenübersicht - Burgermenu](../utils/assets/screenshots/statdashboard_burgermenu.PNG)
-*Abbildung 28: Statistische Datenübersicht*
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/statistischedatenuebersicht.md
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
 
 1. **Visualisierung ein-/ausschalten**
    > Thematische Gruppen

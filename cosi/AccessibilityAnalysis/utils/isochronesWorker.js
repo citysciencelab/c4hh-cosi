@@ -1,25 +1,8 @@
-<<<<<<< HEAD:cosi/AccessibilityAnalysis/utils/isochronesWorker.js
-=======
-<<<<<<< HEAD
-import {writeFeatures} from "../components/util.js";
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons):cosi/AccessibilityAnalysis/service/isochronesWorker.js
 import {createIsochrones, getFilterPoly, setFilterPoly} from "./createIsochrones";
 import "regenerator-runtime/runtime";
 import axios from "axios";
 import {registerProjections} from "../../utils/registerProjections.js";
-<<<<<<< HEAD:cosi/AccessibilityAnalysis/utils/isochronesWorker.js
 import GeoJSON from "ol/format/GeoJSON";
-=======
-=======
-import {writeFeatures, registerProjections} from "../components/util.js";
-import {createIsochrones, getFilterPoly, setFilterPoly} from "./createIsochrones";
-import "regenerator-runtime/runtime";
-import axios from "axios";
-
-
-registerProjections();
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons):cosi/AccessibilityAnalysis/service/isochronesWorker.js
 
 /**
  * @param {*} self self

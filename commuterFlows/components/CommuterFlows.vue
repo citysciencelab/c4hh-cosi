@@ -675,10 +675,7 @@ export default {
                         <div class="col-6 col-sm-6 tooltipWrapper">
                             <div
                                 class="form-check form-check-inline"
-<<<<<<< HEAD
                                 role="presentation"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                 @mouseover="tooltipOutActive = true"
                                 @focusin="tooltipOutActive = true"
                                 @mouseout="tooltipOutActive = false"
@@ -709,10 +706,7 @@ export default {
                         <div class="col-6 col-sm-6 tooltipWrapper">
                             <div
                                 class="form-check form-check-inline"
-<<<<<<< HEAD
                                 role="presentation"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
                                 @mouseover="tooltipInActive = true"
                                 @focusin="tooltipInActive = true"
                                 @mouseout="tooltipInActive = false"

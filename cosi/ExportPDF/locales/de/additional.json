@@ -4,11 +4,7 @@
             "cosi": {
                 "exportPDF": {
                     "captions": {
-<<<<<<< HEAD
                         "title": "Als PDF exportieren"
-=======
-                    "title": "Als PDF exportieren"
->>>>>>> cbf2be88 (add new addons_3_0_0 structure-add missing addons)
                     }
                 }
             }

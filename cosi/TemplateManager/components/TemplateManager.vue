@@ -6,33 +6,19 @@ import getters from "../store/gettersTemplateManager";
 import mutations from "../store/mutationsTemplateManager";
 import actions from "../store/actionsTemplateManager";
 import ToolInfo from "../../components/ToolInfo.vue";
-<<<<<<< HEAD
 import TemplateManagerImport from "./TemplateManagerImport.vue";
 import axios from "axios";
 import mapping from "../../assets/mapping.json";
-<<<<<<< HEAD
 import {getItemsByAttributes, addModelsByAttributes, getModelByAttributes} from "../../utils/radioBridge";
 import Multiselect from "vue-multiselect";
-=======
-=======
-import axios from "axios";
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
 
 export default {
     name: "TemplateManager",
     components: {
         Tool,
-<<<<<<< HEAD
         ToolInfo,
         TemplateManagerImport,
         Multiselect
-=======
-        TemplateManagerImport
-=======
-        ToolInfo
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
     },
     data () {
         return {
@@ -111,10 +97,7 @@ export default {
     methods: {
         ...mapMutations("Tools/TemplateManager", Object.keys(mutations)),
         ...mapActions("Tools/TemplateManager", Object.keys(actions)),
-<<<<<<< HEAD
         ...mapMutations("Tools/DistrictSelector", ["setMapping"]),
-=======
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
         ...mapActions("Tools/SaveSession", ["loadSessionData"]),
 
         /**
@@ -178,7 +161,6 @@ export default {
         },
 
         loadFromTemplate (template, index) {
-<<<<<<< HEAD
             template.meta.isActive = true;
 
             const _template = this.applyFilters(template, this.filters[index]),
@@ -229,20 +211,6 @@ export default {
             else if (typeof this.toolToOpen === "string") {
                 this.$store.dispatch("Tools/setToolActive", {id: this.toolToOpen, active: true});
             }
-=======
-            const _template = this.applyFilters(template, index);
-
-            this.loadSessionData(_template);
-            this.setActive(false);
-        },
-
-        showTemplateInfo (template) {
-            this.addSingleAlert({
-                content: template.meta?.info,
-                category: "Info",
-                displayClass: "info"
-            });
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
         },
 
         /**
@@ -289,10 +257,6 @@ export default {
 
         getCalculations (template) {
             return template?.state?.Tools?.Dashboard?.calculations || [];
-=======
-            return template.state.Tools?.Dashboard?.calculations || [];
-<<<<<<< HEAD
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
         },
 
         /**
@@ -363,8 +327,6 @@ export default {
         getOrientationValueByStatistic (orientationValues, stat) {
             return orientationValues.find(orientation => orientation.statisticName === stat)?.value || "-";
 
-=======
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
         }
     }
 };
@@ -385,12 +347,7 @@ export default {
             v-if="active"
             #toolBody
         >
-<<<<<<< HEAD
             <div
-=======
-<<<<<<< HEAD
-            <v-app
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
                 id="template-manager"
                 class="container"
             >
@@ -565,206 +522,11 @@ export default {
                     <i class="bi bi-file-earmark-plus pe-2" />{{ $t("additional:modules.tools.cosi.templateManager.loadFromTemplate") }}
                 </button>
             </div>
-=======
-                <div>
-                    <div class="mb-3">
-                        <span class="text-subtitle-2">
-                            {{ $t("additional:modules.tools.cosi.templateManager.loadFromTemplate") }}
-                        </span>
-                        <TemplateManagerImport
-                            v-if="useImport"
-                            class="float-end"
-                            @addTemplate="addTemplate"
-                        />
-=======
-            <v-app class="clamp-40vw">
-                <v-container>
-                    <ToolInfo
-                        :url="readmeUrl"
-                        :locale="currentLocale"
-                    />
-                    <div class="mb-2">
-                        {{ $t("additional:modules.tools.cosi.templateManager.infoLoadFromTemplates") }}
-                    </div>
-                    <v-divider />
-                    <div>
-                        <span class="text-subtitle-2">
-                            {{ $t("additional:modules.tools.cosi.templateManager.loadFromTemplate") }}
-                        </span>
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
-                    </div>
-                    <v-list dense>
-                        <v-list-group
-                            v-for="(template, i) in templates"
-                            :key="i"
-                            color="primary"
-                            :prepend-icon="template.meta.icon"
-                            no-action
-                        >
-                            <template #activator>
-                                <v-list-item-content>
-                                    <v-list-item-title>
-                                        {{ template.meta.title }}
-                                    </v-list-item-title>
-                                </v-list-item-content>
-                            </template>
-
-                            <v-list-item class="template">
-                                <v-list-item-content class="no-flex">
-                                    <v-row>
-                                        <v-simple-table
-<<<<<<< HEAD
-=======
-                                            class="info-table"
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
-                                            dense
-                                        >
-                                            <template #default>
-                                                <tbody>
-                                                    <tr>
-                                                        <th v-text="$t('additional:modules.tools.cosi.templateManager.created')" />
-                                                        <td v-text="template.meta.created" />
-                                                    </tr>
-                                                    <tr>
-                                                        <th v-text="$t('additional:modules.tools.cosi.templateManager.info')" />
-                                                        <td v-html="template.meta.info || $t('additional:modules.tools.cosi.templateManager.noInfo')" />
-                                                    </tr>
-                                                    <tr>
-                                                        <th v-text="$t('additional:modules.tools.cosi.templateManager.layers')" />
-                                                        <td>
-                                                            <v-chip
-                                                                v-for="layerMap in getActiveLayerList(template)"
-                                                                :key="template.meta.title + layerMap.id"
-                                                                class="ma-1"
-                                                                small
-                                                            >
-                                                                {{ layerMap.id }}
-                                                                <v-checkbox
-                                                                    v-model="filters[i].activeLayerList[layerMap.layerId]"
-                                                                    small
-                                                                />
-                                                            </v-chip>
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-if="getActiveDistrictLevel(template)">
-                                                        <th>
-                                                            {{ $t("additional:modules.tools.cosi.templateManager.districtLevel") }}
-                                                        </th>
-                                                        <td>
-                                                            {{ getActiveDistrictLevel(template) }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-if="getSelectedDistricts(template).length > 0">
-                                                        <th>
-                                                            {{ $t("additional:modules.tools.cosi.templateManager.selectedDistricts") }}
-                                                        </th>
-                                                        <td>
-                                                            <v-chip
-                                                                v-for="districtName in getSelectedDistricts(template)"
-                                                                :key="template.meta.title + districtName"
-                                                                class="ma-1"
-                                                                small
-                                                            >
-                                                                {{ districtName }}
-                                                                <v-checkbox
-                                                                    v-model="filters[i].selectedDistrictNames[districtName]"
-                                                                    small
-                                                                />
-                                                            </v-chip>
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-if="getStatsCategories(template).length > 0">
-                                                        <th v-text="$t('additional:modules.tools.cosi.templateManager.categories')" />
-                                                        <td>
-                                                            <v-chip
-                                                                v-for="category in getStatsCategories(template)"
-                                                                :key="template.meta.title + category"
-                                                                class="ma-1"
-                                                                small
-                                                            >
-                                                                {{ category }}
-                                                                <v-checkbox
-                                                                    v-model="filters[i].statsCategories[category]"
-                                                                    small
-                                                                />
-                                                            </v-chip>
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-if="getCalculations(template).length > 0">
-                                                        <th v-text="$t('additional:modules.tools.cosi.templateManager.calculations')" />
-                                                        <td>
-                                                            <v-chip
-                                                                v-for="(calculation, j) in getCalculations(template)"
-                                                                :key="template.meta.title + 'calculation' + j"
-                                                                class="ma-1"
-                                                                small
-                                                            >
-                                                                {{ calculation.id }}
-                                                                <v-checkbox
-                                                                    v-model="filters[i].calculations[calculation.id]"
-                                                                    small
-                                                                />
-                                                            </v-chip>
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-if="getActiveTool(template)">
-                                                        <th>
-                                                            {{ $t("additional:modules.tools.cosi.templateManager.activeTool") }}
-                                                        </th>
-                                                        <td>
-                                                            {{ getActiveTool(template) }}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </template>
-                                        </v-simple-table>
-                                    </v-row>
-                                    <v-divider />
-                                    <v-row justify="end">
-<<<<<<< HEAD
-                                        <v-col>
-                                            <button
-                                                class="btn btn-outline lh-1 fs-5 mb-3"
-                                                @click="loadFromTemplate(template, i)"
-                                            >
-                                                <i class="bi bi-upload pe-2" />{{ $t("additional:modules.tools.cosi.templateManager.loadFromTemplate") }}
-                                            </button>
-=======
-                                        <v-col class="right-text">
-                                            <v-btn
-                                                id="load"
-                                                dense
-                                                small
-                                                tile
-                                                color="grey lighten-1"
-                                                :title="$t('additional:modules.tools.cosi.saveSession.infoLoadFromTemplates')"
-                                                @click="loadFromTemplate(template, i)"
-                                            >
-                                                <v-icon left>
-                                                    mdi-open-in-app
-                                                </v-icon>
-                                                {{ $t('additional:modules.tools.cosi.saveSession.loadFromTemplate') }}
-                                            </v-btn>
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
-                                        </v-col>
-                                    </v-row>
-                                </v-list-item-content>
-                            </v-list-item>
-                        </v-list-group>
-                    </v-list>
-<<<<<<< HEAD
-                </div>
-=======
-                </v-container>
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
-            </v-app>
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
         </template>
     </Tool>
 </template>
 
 <style lang="scss" scoped>
-<<<<<<< HEAD
     @import "~variables";
 
     #template-manager {
@@ -828,26 +590,5 @@ export default {
         .multiselect__option--selected {
             font-family: $font_family_accent
         }
-    }
-
-=======
-    @import "../../utils/variables.scss";
-
-    .hidden {
-        display: hidden;
-    }
-    .template-info-button {
-        margin-right: 20px;
-    }
->>>>>>> 53f86fb2 (add new addons_3_0_0 structure-add missing addons)
-    .info-table {
-        max-width: 640px;
-    }
-    .clamp-40vw .v-list-group--no-action >.v-list-group__items >.v-list-item.template {
-        padding-left: 0;
-    }
-    .no-flex {
-        display: block;
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
     }
 </style>

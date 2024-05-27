@@ -4,7 +4,6 @@
             "cosi": {
                 "templateManager": {
                     "title": "Vorlagen",
-<<<<<<< HEAD
                     "importTemplate": "Vorlage importieren",
                     "loadFromTemplate": "Vorlage laden",
                     "infoLoadFromTemplates": "Laden Sie eine thematische Basis-Konfiguration für fachspezifische Analysen. Welche Inhalte durch die Vorlage geladen werden entnehmen Sie der Vorlagenübersicht. Manche Vorlagen beinhalten eine Gebietsauswahl, bei anderen können Sie das Gebiet zuvor selbst auswählen.",
@@ -30,19 +29,6 @@
                       "isLoaded": "ist bereits geladen.",
                       "attErr": " {{attribute}} Tag existiert nicht."
                     }
-=======
-                    "loadFromTemplate": "Vorlage laden",
-                    "infoLoadFromTemplates": "Laden Sie eine thematische Basis-Konfiguration für fachspezifische Analysen. Welche Inhalte durch die Vorlage geladen werden entnehmen Sie der Vorlagenübersicht. Manche Vorlagen beinhalten eine Gebietsauswahl, bei anderen können Sie das Gebiet zuvor selbst auswählen.",
-                    "noInfo": "Keine Beschreibung verfügbar",
-                    "created": "Erstellt",
-                    "info": "Beschreibung",
-                    "layers": "Themen",
-                    "districtLevel": "Bezugsrahmen",
-                    "selectedDistricts": "Ausgewählte Gebiete",
-                    "activeTool": "Aktive Werkzeuge",
-                    "categories": "Statistische Daten",
-                    "calculations": "Berechnungen"
->>>>>>> 7437b27c (add new addons_3_0_0 structure-add missing addons)
                 }
             }
         }

@@ -1,11 +1,6 @@
 import requestIsochrones from "./requestIsochrones";
 import {transformFeatures} from "../../utils/features/transform";
-<<<<<<< HEAD
 import {multiPolygon as turfMultiPolygon, polygon as turfPolygon} from "@turf/helpers";
-=======
-import {transformCoordinate} from "./transformCoordinates";
-import {polygon as turfPolygon} from "@turf/helpers";
->>>>>>> cbf2be88 (add new addons_3_0_0 structure-add missing addons)
 import {default as turfUnion} from "@turf/union";
 import {default as turfBooleanPointInPolygon} from "@turf/boolean-point-in-polygon";
 import axios from "axios";
@@ -142,20 +137,7 @@ async function createIsochronesPoints (args) {
         coordinatesList = [],
         groupedFeaturesList = [],
         filteredCoordinates = filterPoly === undefined ? args.coordinates :
-<<<<<<< HEAD
-<<<<<<< HEAD
             args.coordinates.filter(c => turfBooleanPointInPolygon(c, filterPoly));
-=======
-<<<<<<< HEAD:cosi/AccessibilityAnalysis/utils/createIsochrones.js
-            args.coordinates.filter(c => turfBooleanPointInPolygon(transformCoordinate(c, "EPSG:4326", args.projectionCode), filterPoly));
-=======
-            args.coordinates.filter(c => turfBooleanPointInPolygon(
-                Proj.transform(c, "EPSG:4326", args.projectionCode), filterPoly));
->>>>>>> 39389637 (add new addons_3_0_0 structure-add missing addons):cosi/AccessibilityAnalysis/service/createIsochrones.js
->>>>>>> cbf2be88 (add new addons_3_0_0 structure-add missing addons)
-=======
-            args.coordinates.filter(c => turfBooleanPointInPolygon(transformCoordinate(c, "EPSG:4326", args.projectionCode), filterPoly));
->>>>>>> 5a6c901e (update cosi folder)
 
     for (let i = 0; i < filteredCoordinates.length; i += args.batchSize) {
         const arrayItem = filteredCoordinates.slice(i, i + args.batchSize);

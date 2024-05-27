@@ -44,10 +44,7 @@ export default {
         v-if="componentExists(id)"
         class="bootstrap-icon"
         :title="$t('additional:modules.tools.gfi.themes.schulinfo.favoriteicons.adoptedTargetSchool')"
-<<<<<<< HEAD
         role="button"
-=======
->>>>>>> cd4746c6 (add new addons_3_0_0 structure-add missing addons)
         tabindex="0"
         @click="takeRoute"
         @keydown.enter="takeRoute"

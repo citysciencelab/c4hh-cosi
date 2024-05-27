@@ -1,19 +1,18 @@
-
 # Portalconfig.menu.tools.children
 
 Liste aller konfigurierbaren Werkzeuge. Jedes Werkzeug erbt von **[tool](#markdown-header-portalconfigmenutool)** und kann/muss somit auch die dort angegebenen attribute konfiguiert bekommen.
 
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
-|vcOblique|nein|**[obliqueViewer](#markdown-header-portalconfigmenutoolschildrenvcOblique)**||Werkzeug zum einbinden der Schrägluftbildanwendung von vcs.|false|
+|vcOblique|nein|**[obliqueViewer](#markdown-header-portalconfigmenutoolschildrenvcOblique)**||Werkzeug zum einbinden der SchrÃ¤gluftbildanwendung von vcs.|false|
 
 
 
 ## Portalconfig.menu.tools.children.vcOblique
 
-Werkzeug zum einbinden der Schrägluftbildanwendung von vcs in der Sidebar.
-Die Schrägluftbildanwendung muss auf dem gleichen Server liegen, damit sie im iFrame eingebunden werden kann.
-Der Pfad zur Schrägluftbildanwendung wird in der rest-services.json angegeben.
+Werkzeug zum einbinden der SchrÃ¤gluftbildanwendung von vcs in der Sidebar.
+Die SchrÃ¤gluftbildanwendung muss auf dem gleichen Server liegen, damit sie im iFrame eingebunden werden kann.
+Der Pfad zur SchrÃ¤gluftbildanwendung wird in der rest-services.json angegeben.
 **Beispiel**
 ```
 #!json
@@ -24,7 +23,7 @@ Der Pfad zur Schrägluftbildanwendung wird in der rest-services.json angegeben.
     "typ": "url"
   }
 ```
-Der mapMarker kann über die styleId in der config.json konfiguriert werden und muss dafür in der style.json definiert sein.
+Der mapMarker kann Ã¼ber die styleId in der config.json konfiguriert werden und muss dafÃ¼r in der style.json definiert sein.
 **Beispiel**
 ```
 #!json
@@ -59,14 +58,10 @@ Mobil wird das iFrame im window angezeigt.
 
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
-|name|ja|String|Schrägluftbilder|Der Titel des Werkzeuges bzw. der Eintrag in der Werkzeugliste|false|
+|name|ja|String|SchrÃ¤gluftbilder|Der Titel des Werkzeuges bzw. der Eintrag in der Werkzeugliste|false|
 |icon|ja|String|bi-camera-fill|Das zu verwendende Icon.|false|
-|styleId|nein|String|"obliqueViewer"|StyleId aus der style.json, um den Mapmarker in der Karte zu stylen, wenn Schrägluftbilder geöffnet ist.|true|
-<<<<<<< HEAD
+|styleId|nein|String|"obliqueViewer"|StyleId aus der style.json, um den Mapmarker in der Karte zu stylen, wenn SchrÃ¤gluftbilder geÃ¶ffnet ist.|true|
 |dataYear|nein|String|""|Das Jahr der zugrundeliegenden Daten.|false|
-=======
-
->>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
 
 
 
@@ -76,12 +71,8 @@ Mobil wird das iFrame im window angezeigt.
 #!json
     "vcOblique": {
     "name": "translate#additional:modules.tools.vcOblique.title",
-<<<<<<< HEAD
     "icon": "bi-image",
     "dataYear":"2020"
-=======
-    "icon": "bi-image"
->>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
     }
 ```
 
@@ -89,6 +80,3 @@ Mobil wird das iFrame im window angezeigt.
 
 
 
-
-=======
->>>>>>> 08d4e5d6 (remove vcOblique content from addons)

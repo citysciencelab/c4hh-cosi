@@ -9,32 +9,9 @@ ___
 Sobald sie unter "Simulation" "Einrichtungen anlegen" auswählen, öffnet sich ein Fenster, in dessen oberem Bereich Sie den Szenario Manager finden. Bei der Funktion "Wohnungsbauquartiere anlegen" befindet sich der Szenario Manager an derselben Stelle.
 
 #### Szenario Manager
-<<<<<<< HEAD
-<<<<<<< HEAD
 ![Abbildung 1: Szenario Manager](./009a_einrichtungenanlegen.PNG) 
 
 *Abb. a: Szenario Manager*  
-=======
-<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
-<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
-![Abbildung 1: Szenario Manager](009a_einrichtungenanlegen.PNG) 
-*Abb.a: Szenario Manager*  
-=======
-![Abbildung 1: Szenario Manager](https://user-images.githubusercontent.com/43250699/143022435-622e8032-e0da-4b5e-bd0c-9e33aa07de2c.png)
-*Abbildung 1: Szenario Manager*
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/einrichtungenanlegen.md
-<<<<<<< HEAD
->>>>>>> 0650b0a5 (resolve rebase conflicts)
-=======
-=======
-![Abbildung 1: Szenario Manager](https://user-images.githubusercontent.com/43250699/143022435-622e8032-e0da-4b5e-bd0c-9e33aa07de2c.png) 
-*Abbildung 1: Szenario Manager*  
->>>>>>> 3502056a (update cosi folder):cosi/manuals/einrichtungenanlegen.md
->>>>>>> e41bd580 (update cosi folder)
-=======
-![Abbildung 1: Szenario Manager](009a_einrichtungenanlegen.PNG) 
-*Abb.a: Szenario Manager*  
->>>>>>> 63cc74d8 (rm cosi conflicts)
 
 1. **Szenario Dropdown**
    > Zeigt bisher erstellte Szenarien an.
@@ -52,19 +29,9 @@ Szenarios.
   
  *Sie **müssen** ein Thema aus den geladenen Fachdaten wählen. Sind keine Fachdaten ausgewählt, ist kein Szenario möglich. Wählen Sie mindestens ein Analysethema aus dem Themenbaum.*  
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ![Abbildung 2: Einrichtungen anlegen](./009b_einrichtungenanlegen.PNG)  
 
 *Abb. b: Einrichtungen anlegen*  
-=======
-<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
-<<<<<<< HEAD:cosi/manuals/009einrichtungenanlegen.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
-![Abbildung 2: Einrichtungen anlegen](009b_einrichtungenanlegen.PNG)  
-*Abb.b: Einrichtungen anlegen*  
->>>>>>> 0650b0a5 (resolve rebase conflicts)
 
 1. **Einrichtung kopieren**
    > Erlaubt das Kopieren einer vorhandenen Einrichtung. 
@@ -92,27 +59,7 @@ Szenarios.
       > Setzt das Szenario zurück.
 
 #### Schrittweises Vorgehen
-<<<<<<< HEAD
 Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden Schritt für Schritt erläutert, wie eine neue Einrichtung erfolgreich angelegt werden kann.
-=======
-Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden Schritt für Schritt erläutert, wie erfolgreich eine neue Einrichtung angelegt werden kann.
-<<<<<<< HEAD
-=======
-8. **Kapitelbezeichnung**
-9. **Name**
-10. **Optionale Spalten**
-   > Können bei Bedarf ergänzt werden.
-11. **Anlegen**
-   > Erstellt die simulierte Einrichtung
-12. **Zurücksetzen**
-   > Setzt das Szenario zurück.
-
-#### Schrittweises Vorgehen
-Zur besseren Verständlichkeit des Werkzeugs wird im Folgenden einmal Schritt für Schritt erläutert, wie man erfolgreich selbst eine neue Einrichtung anlegt.
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 0650b0a5 (resolve rebase conflicts)
 
 1. #### **Schritt 1:** Neues Szenario erstellen
 2. #### **Schritt 2:** Name für Szenario festlegen

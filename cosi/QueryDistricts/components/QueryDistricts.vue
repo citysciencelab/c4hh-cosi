@@ -7,10 +7,6 @@ import mutations from "../store/mutationsQueryDistricts";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 import compareFeatures from "./compareFeatures.js";
 import LayerFilter from "./LayerFilter.vue";
-<<<<<<< HEAD
-=======
-import Info from "text-loader!./info.html";
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
 import {Fill, Stroke, Style} from "ol/style.js";
 import {getAllFeaturesByLayerId as _getAllFeatures} from "../../utils/features/getAllFeaturesByLayerId";
 import exportXlsx from "../../utils/exportXlsx";
@@ -186,16 +182,6 @@ export default {
         },
 
         setLayerOptions: function () {
-<<<<<<< HEAD
-=======
-            const urls = this.selectedDistrictLevel.stats.baseUrl,
-                layers = [];
-
-            urls.forEach(url => {
-                layers.push(...this.getLayerList().filter(layer=> layer.url === url));
-            });
-
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
             this.allLayerOptions = [];
 
             // facility data first
@@ -211,11 +197,7 @@ export default {
 
             // statistical data second
             for (const m of this.mapping) {
-<<<<<<< HEAD
                 const layer = this.selectedDistrictLevel.stats.layers.find(l=>l.id && l.id === m[this.keyOfAttrNameStats]);
-=======
-                const layer = layers.find(l=>l.id && l.id === m[this.keyOfAttrNameStats]);
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
 
                 if (layer) {
                     this.allLayerOptions.push({
@@ -557,18 +539,6 @@ export default {
             this.updateAvailableLayerOptions();
         },
 
-<<<<<<< HEAD
-=======
-        showHelp: function () {
-            this.cleanup();
-            this.addSingleAlert({
-                category: "Info",
-                content: Info,
-                displayClass: "info"
-            });
-        },
-
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
         close () {
             this.setActive(false);
 
@@ -697,19 +667,6 @@ export default {
             exportXlsx(undefined, [headers, [], ...filters, ...data], filename, {exclude: this.excludedPropsForExport}, "aoa_to_sheet");
         },
         // pagination functions
-<<<<<<< HEAD
-=======
-        /**
-         * @description Selects the next or the previous supply analysis in the Tool Window.
-         * @param {Integer} value +1 or -1.
-         * @returns {Void} Function returns nothing.
-         */
-        setPrevNext (value) {
-            const l = this.dataSets.length;
-
-            this.setActiveSet((((this.activeSet + value) % l) + l) % l); // modulo with negative handling
-        },
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
         downloadAll () {
             this.dataSets.forEach((set, index) => {
                 this.exportTable(index);
@@ -814,10 +771,7 @@ export default {
                     >
                         {{ $t('additional:modules.tools.cosi.queryDistricts.resetSelection') }}
                     </v-btn>
-<<<<<<< HEAD
                     <v-divider />
-=======
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
                     <AnalysisPagination
                         v-if="dataSets.length > 0 || layerFilterModels.length > 0"
                         :sets="dataSets"
@@ -831,18 +785,9 @@ export default {
                             downloads: [$t('additional:modules.tools.cosi.queryDistricts.exportTable')],
                             downloadAll: $t('additional:modules.tools.cosi.queryDistricts.paginationDownloadAll'),
                             remove: $t('additional:modules.tools.cosi.queryDistricts.paginationRemove'),
-<<<<<<< HEAD
                             removeAll: $t('additional:modules.tools.cosi.queryDistricts.paginationRemoveAll')
                         }"
                         @setActiveSet="(n) => setActiveSet(n)"
-=======
-                            removeAll: $t('additional:modules.tools.cosi.queryDistricts.paginationRemoveAll'),
-                            next: $t('additional:modules.tools.cosi.queryDistricts.paginationNext'),
-                            prev: $t('additional:modules.tools.cosi.queryDistricts.paginationPrev'),
-                        }"
-                        @setActiveSet="(n) => setActiveSet(n)"
-                        @setPrevNext="(n) => setPrevNext(n)"
->>>>>>> 170e67aa (add new addons_3_0_0 structure-add missing addons)
                         @removeSingle="(n) => removeSet(n)"
                         @addSet="addSet"
                         @removeAll="removeAll"

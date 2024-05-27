@@ -1,4 +1,3 @@
-
 <script>
 import Vue from "vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
@@ -31,12 +30,8 @@ export default {
             "name",
             "obliqueViewerURL",
             "renderToWindow",
-<<<<<<< HEAD
             "resizableWindow",
             "dataYear"
-=======
-            "resizableWindow"
->>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
         ]),
         ...mapGetters("Maps", ["clickCoordinate", "initialCenter"]),
         ...mapGetters({
@@ -82,7 +77,6 @@ export default {
             if (model) {
                 model.set("isActive", false);
             }
-<<<<<<< HEAD
         },
         /**
          * translates the given key, checkes if the key exists and throws a console warning if not
@@ -96,8 +90,6 @@ export default {
             }
 
             return this.$t(key, options);
-=======
->>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
         }
     }
 };
@@ -106,11 +98,7 @@ export default {
 
 <template lang="html">
     <ToolTemplate
-<<<<<<< HEAD
         :title="`${translate(name)} ${dataYear}`"
-=======
-        :title="$t(name)"
->>>>>>> 108ebd74 (add new addons_3_0_0 structure-add missing addons)
         :icon="icon"
         :active="active"
         :render-to-window="renderToWindow"
@@ -144,5 +132,3 @@ export default {
 }
 </style>
 
-=======
->>>>>>> 08d4e5d6 (remove vcOblique content from addons)

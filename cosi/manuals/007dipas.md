@@ -1,29 +1,7 @@
 
 ### DIPAS
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](./017einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](./006versorgungsanalyse.md), [Erreichbarkeitsanalyse](./003erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](./004vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](./005filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
-=======
-<<<<<<< HEAD:cosi/manuals/007dipas.md
-<<<<<<< HEAD:cosi/manuals/007dipas.md
-Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](017einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](006versorgungsanalyse.md), [Erreichbarkeitsanalyse](003erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](004vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](005filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
-=======
-<<<<<<< HEAD
-Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](./einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](./versorgungsanalyse.md), [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](./vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](./filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
-=======
-Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](./einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](./versorgungsanalyse.md), [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](./vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](./filter.pdf) gefiltert werden.
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> a3a39d38 (add new addons_3_0_0 structure-add missing addons):cosi/manuals/dipas.de.md
-<<<<<<< HEAD
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
-=======
-Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](./einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](./versorgungsanalyse.md), [Erreichbarkeitsanalyse](./erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](./vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](./filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
->>>>>>> 023f8398 (resolve rebase conflicts):cosi/manuals/dipas.de.md
->>>>>>> 0650b0a5 (resolve rebase conflicts)
-=======
-Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert, nach verschiedenen Kriterien dargestellt und für alle CoSI-Werkzeuge verfügbar gemacht werden. D.h. alle Beiträge können in der [Einrichtungsübersicht](017einrichtungsuebersicht.md) angezeigt, für [Versorgungsanalyse](006versorgungsanalyse.md), [Erreichbarkeitsanalyse](003erreichbarkeitsanalyse.md) und [Vergleichbare Gebiete Ermitteln](004vergleichbaregebieteermitteln.md) verwendet und mit dem [Filter](005filter.md) gefiltert werden. Über "Analyse" erreichen Sie "Dipas".
->>>>>>> 63cc74d8 (rm cosi conflicts)
 
 
 ![Abbildung 1: DIPAS](./007a_dipas.PNG)
@@ -33,28 +11,9 @@ Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in d
 1. **Beteiligungsverfahren auswählen**
    > Für jedes Verfahren aus der DIPAS-Datenbank wird automatisch eine Registerkarte angelegt, welche durch Anklicken aufgeklappt werden kann. Ein aufgeklapptes Verfahren zeigt dessen Beschreibungstext und die Kontrollfelder für die Visualisierung. Jedem Verfahren wid dabei eine zufällige Farbe zugewiesen.
 2. **Indikator**
-<<<<<<< HEAD
-<<<<<<< HEAD
    > Das Icon in dem Indikator zeigt zum einen die Farbe an, in der der jeweilige Datensatz visualisiert wird. Zum anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
 3. **Legende**
    > Die Legende zeigt an, welche Farbe den Eintragstypen in der Visualisierung jeweils zugeordnet wird.
-=======
-<<<<<<< HEAD:cosi/manuals/007dipas.md
-<<<<<<< HEAD:cosi/manuals/007dipas.md
-=======
->>>>>>> 63cc74d8 (rm cosi conflicts)
-   > Das Icon in dem Indikator zeigt zum einen die Farbe an, in dem der jeweilige Datensatz visualisiert wird. Zum anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
-3. **Legende**
-   > Die Legende zeigt an, welche Farbe den Eintragstypen in der Visualisierung zugeordnet wird.
-<<<<<<< HEAD
-=======
-   > Das Icon in dem Indikator zeigt zum einen die Farbe an, in dem der jeweilige Datensatz visualiert wird. Zum Anderen zeigt es, ob der Datensatz gerade auf der Karte angezeigt wird.
-3. **Legende**
-   > Die Legende zeigt an, welche Farbe den Eintragstypen in der Visualierung zugeordnet wird.
->>>>>>> dd718441 (add new addons_3_0_0 structure-add missing addons)
->>>>>>> 5d874e4b (add new addons_3_0_0 structure-add missing addons)
-=======
->>>>>>> 0650b0a5 (resolve rebase conflicts)
 4. **Verfahren in der Karte anzeigen**
    > Zeigt das Verfahrensgebiet als Polygon in der Karte in der jeweiligen Farbe des Verfahrens.
    - **4.1 Auf der Karte anzeigen**
