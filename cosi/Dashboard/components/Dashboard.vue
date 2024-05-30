@@ -770,18 +770,17 @@ export default {
         },
 
         /**
-         *  This function collapses the results of dashboard to make it look more clean
+         * Collapses all the accordion group after loading.
+         * @returns {void}
          */
-
         collapseAllGroups () {
-            // The second half of the solution is not clear to me but found that it is one way to achieve
-            // const groupStates = this.$refs["dashboard-table"]?.$vnode.componentInstance.openCache;
+            const groupStates = this.$refs["dashboard-table"]?.$vnode?.componentInstance?.openCache;
 
-            // if (groupStates) {
-            //     for (const e in groupStates) {
-            //         groupStates[e] = false;
-            //     }
-            // }
+            if (groupStates) {
+                for (const e in groupStates) {
+                    groupStates[e] = false;
+                }
+            }
         }
 
     }
