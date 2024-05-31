@@ -63,5 +63,8 @@
   },
   "valuationPrint": {
     "type": "tool"
+  },
+  "commuterFlows": {
+    "type": "tool"
   }
 }

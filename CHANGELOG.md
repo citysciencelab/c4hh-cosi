@@ -9,6 +9,7 @@
 ### Added
 
 ### Changed
+- CommuterFlows: Now available for Masterportal 3.0
 
 ### Deprecated
 
