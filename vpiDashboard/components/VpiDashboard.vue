@@ -168,8 +168,8 @@ export default {
             val ? LoaderOverlay.show() : LoaderOverlay.hide();
         },
         /**
-         * activates the WhatALocation-Locations when the tool is activated
-         * and deactivates the layer (and the mobile cell grid layer) when the tool is deactivated.
+         * activates the WhatALocation-Locations and the mobile cell grid layer when the tool is activated
+         * and deactivates both layers when the tool is deactivated.
          * @param {boolean} val isToolActive
          * @returns {void}
          */
@@ -182,6 +182,8 @@ export default {
             if (!visibleLayers.includes(vpiLayer)) {
                 model.toggleIsVisibleInMap();
             }
+
+            this.gridLayerIsVisible = true;
 
             if (!val) {
                 model.setIsSettingVisible(false);

@@ -3,7 +3,7 @@
     "tools": {
       "vpidashboard": {
         "name": "VPI Dashboard",
-        "toggleGridLayer": "Mobilfunkzellengitter anzeigen/ausblenden",
+        "toggleGridLayer": "Gitterraster anzeigen/ausblenden",
         "tabitems": {
           "activities": "Aktivitäten",
           "gender": "Geschlecht",

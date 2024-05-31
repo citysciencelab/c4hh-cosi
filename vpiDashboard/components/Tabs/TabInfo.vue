@@ -38,16 +38,31 @@ export default {
 
             <div>
                 <p>
-                    Eine spezieller Funktionsbereich des Fachportals ist ein Daten-Dashboard zur Analyse der Besucherfrequenzen in der Hamburger Innenstadt. Das Dashboard wird im Fachportal über den Reiter "VPI-Dashboard" aufgerufen. Mit dem VPI-Dashboard können Aufenthalts-Frequenzdaten aus 20 Mobilfunkzellen in den Stadtteilen Hamburg-Neustadt, Hamburg-Altstadt und HafenCity analysiert werden
+                    Ein zentraler Funktionsbereich des Fachportals Innenstadt ist ein Daten-Dashboard zur Analyse der Besucherfrequenzen in der Hamburger Innenstadt. Das Dashboard wird im Hauptmenü des Fachportals über den Reiter VPI aufgerufen.
                 </p>
                 <p>
-                    Analysierbar sind Besucherzahlen, Besuchertypen, Altersgruppen und die Verweildauer. Auch der Vergleich mehrerer Standorte und Zeiträume ist möglich. Jeder rote Punkt auf der Karte repräsentiert Daten aus einer Funkzelle. Die Daten sind also nicht adressscharf, sondern auf die Zelle bezogen. Das Zellenraster wird in der Karte mit den Standorten angezeigt.
+                    Mit dem VPI-Dashboard können Aufenthalts-Frequenzdaten aus 20 Gitterzellen
+                    <sup id="fnref:1">
+                        <a
+                            href="#fn:1"
+                            rel="footnote"
+                        >
+                            1
+                        </a>
+                    </sup>
+                    in den Stadtteilen Hamburg-Neustadt, Hamburg-Altstadt und HafenCity analysiert werden.
+                </p>
+                <p>
+                    Über das Dashboard sind Besucherzahlen, Besuchertypen, Altersgruppen und die Verweildauer für die Flächen in den Gitterzellen analysierbar. Auch der Vergleich mehrerer Standorte und Zeiträume ist möglich. Jeder rote Punkt auf der Karte repräsentiert Daten aus einer Gitterzelle. Die Daten sind also nicht adressscharf, sondern auf die Zelle bezogen. Das Gitter wird in der Karte mit den Standorten angezeigt.
                 </p>
                 <p>
                     Für die Frequenzdaten werden Telekommunikationsdaten (Signaldaten) der Telefónica Deutschland GmbH & Co. OHG genutzt die durch den Datendienstleister WHATALOCATION bereitgestellt und über eine Datenschnittstelle in das Fachportal eingebunden sind. Telefónica anonymisiert und aggregiert die Daten in einem mit dem Bundesbeauftragten für Datenschutz und Informationsfreiheit abgestimmten Verfahren und rechnet sie auf die Gesamtbevölkerung hoch.
                 </p>
                 <p>
-                    Die so für jede Mobilfunkzelle errechneten Daten ermöglichen eine flächendeckende Betrachtung des Personenaufkommens in der gesamten Innenstadt. Die Daten zu Besucherzahlen werden mit einem Zeitverzug von ca. 5 Tagen ab dem aktuellen Datum bereitgestellt, die Daten zu Besuchertypen, Altersgruppen und Verweildauer mit einem Zeitverzug von ca. 5 Monaten.
+                    Die so für jede Gitterzelle errechneten Daten ermöglichen eine flächendeckende Betrachtung des Personenaufkommens in der gesamten Innenstadt. Die Daten zu Besucherzahlen werden mit einem Zeitverzug von ca. 5 Tagen ab dem aktuellen Datum bereitgestellt, die Daten zu Besuchertypen, Altersgruppen und Verweildauer mit einem Zeitverzug von max. 2 Monaten.
+                </p>
+                <p>
+                    Aufgrund technischer Störungen beim Netzbetreiber, z.B. temporäre Ausfälle im Mobilfunknetz etwa durch Bauarbeiten oder Defekt von Sendemasten kann es bei der Datenbereitstellung zu zeitlichen Verzögerungen kommen. In seltenen Fällen können Datenlücken nicht nachträglich geschlossen werden, so dass für einzelne Tage keine Frequenzdaten angezeigt werden.
                 </p>
             </div>
         </div>
@@ -57,23 +72,28 @@ export default {
 
             <div class="listBlock">
                 <p>
-                    Beim Öffnen des VPI-Dashboards ist zunächst der Standort Jungfernstieg vorausgewählt sowie die Werte für den 01. Januar des jeweiligen Jahres. Der Standort kann sowohl durch Klick auf einen anderen Standort in der Karte als auch durch Eingabe eines anderen Standorts im Adressfeld des Dashboards geändert werden. Das Datum ist in den Kacheln für Jahr, Monat und Wochentag über Pfeiltasten änderbar.
+                    Beim Öffnen des VPI-Dashboards werden zunächst die Aktivitäten für den Standort Alstertor sowie die Werte für den 01. Januar des jeweiligen Jahres vorausgewählt angezeigt.
                 </p>
-                <h3>Beschreibung der Funktionen zur Datenanalyse</h3>
+                <p>
+                    Der Standort kann sowohl durch Klick auf einen anderen Standort (roter Punkt) in der Karte als auch durch Dropdown oder Eingabe eines anderen Standorts im Adressfeld des Dashboards geändert werden.
+                </p>
+                <p>
+                    Das Datum ist in den Kacheln für Jahr, Monat und Wochentag über Pfeiltasten änderbar.
+                </p>
                 <strong class="listHeader">Reiter: Aktivitäten</strong>
 
                 <p>
-                    Die Analysekategorie „Aktivitäten“ ermöglicht die Aufschlüsselung von Registrierungsvorgängen von Mobilfunkgeräten in Mobilfunkzellen. Ein Mobilfunkgerät wird dabei mit einer Person gleichgesetzt. Wie oben dargestellt sind die abgeleiteten Besucherzahlen Näherungswerte, u.a. da nicht alle Personen Mobilfunkgeräte mit sich führen.
+                    Die Analysekategorie „Aktivitäten“ ermöglicht die Aufschlüsselung von Signalisierungsdaten von Mobilfunkgeräten in Mobilfunkzellen. Ein Mobilfunkgerät wird dabei mit einer Person gleichgesetzt. Wie oben dargestellt sind die abgeleiteten Besucherzahlen Näherungswerte, u.a. da nicht alle Personen Mobilfunkgeräte mit sich führen.
                 </p>
                 <p class="paragraph_underline">
                     Datenkacheln:
                 </p>
                 <p>
-                    Die drei Datenkacheln zeigen die Aktivitäten für einen Standort a) pro Jahr, b) pro Monat sowie c) pro durchschnittlichen Wochentag im ausgewählten Monat.
+                    Die drei Datenkacheln zeigen die Aktivitäten für einen Standort pro Jahr, pro Monat sowie pro durchschnittlichen Wochentag im ausgewählten Monat.
                 </p>
                 <ul>
                     <li>
-                        Auswählbar sind Daten für die Jahre 2019 bis 2023.
+                        Auswählbar sind Daten für die Jahre 2019 bis 2024.
                     </li>
                     <li>
                         Die Werte ändern sich entsprechend der Änderung des Datums.
@@ -93,20 +113,23 @@ export default {
                     Datendiagramm:
                 </p>
                 <p>
-                    Im Diagramm unter den Datenkacheln werden die Daten zum jeweils ausgewählten Merkmal grafisch dargestellt. In der Darstellung ist ein Wechsel zwischen Balken- und Liniendiagramm möglich.
+                    Im Diagramm unter den Datenkacheln werden die Daten zum jeweils ausgewählten Merkmal grafisch dargestellt. Über die Schaltflächen unterhalb des Diagramms ist ein Wechsel zwischen Balken- und Liniendiagramm möglich.
                 </p>
                 <p>
-                    Über das Dropdown-Menü „Datengrundlage für Grafik auswählen“ können weitere Daten geladen werden, die dann in der Grafik visualisiert werden.
+                    Über das Dropdown-Menü „Datengrundlage für Grafik auswählen“ können weitere Daten geladen werden, die dann in der Grafik visualisiert werden:
                 </p>
                 <p>
                     Die Auswahlmöglichkeiten sind:
                 </p>
                 <ul>
                     <li>
-                        Anzahl der monatlichen Besucher im Jahr X (2019 bis 2023):
+                        Anzahl der monatlichen Besucher im Jahr X (2019 bis 2024):
                         <ul>
                             <li>
-                                zeigt die Anzahl an Aktivitäten je Monat für das ausgewählte Jahr an. Die Auswahl des Jahres erfolgt über Kachel a).
+                                zeigt die Anzahl an Aktivitäten je Monat für das ausgewählte Jahr an.
+                            </li>
+                            <li>
+                                Die Auswahl des Jahres erfolgt über die Kachel
                             </li>
                         </ul>
                     </li>
@@ -130,7 +153,10 @@ export default {
                         Besucher eines bestimmten Tages (stündlich):
                         <ul>
                             <li>
-                                zeigt die Aktivitäten an einem bestimmten Tag in stundenweiser Auflösung an. Der Tag ist über die Kalenderfunktion frei auswählbar.
+                                zeigt die Aktivitäten an einem bestimmten Tag in stundenweiser Auflösung an.
+                            </li>
+                            <li>
+                                Der Tag ist über die Kalenderfunktion frei auswählbar.
                             </li>
                         </ul>
                     </li>
@@ -138,7 +164,10 @@ export default {
                         Besucher einer bestimmten Zeitspanne (täglich):
                         <ul>
                             <li>
-                                zeigt die Aktivitäten an einem Standort über einen bestimmten Zeitraum an. Der Zeitraum kann über die Kalenderfunktion ausgewählt werden.
+                                zeigt die Aktivitäten an einem Standort über einen bestimmten Zeitraum an.
+                            </li>
+                            <li>
+                                Der Zeitraum kann über die Kalenderfunktion ausgewählt werden.
                             </li>
                         </ul>
                     </li>
@@ -149,7 +178,7 @@ export default {
                 <strong class="listHeader">Reiter: Besuchertypen</strong>
 
                 <p>
-                    Die Analysekategorie „Besuchertypen“ zeigt die Mengenverhältnisse unterschiedlicher Besuchertypen an einem ausgewählten Standort. Die Besuchertypen werden von Telefonica durch eine anonymisierte Analyse der Mobilitätsmuster der in der Funkzelle im ausgewählten Zeitraum registrierten Besucher ermittelt. Aus den Mobilitätsmustern werden Besuchertypen abgeleitet.
+                    Die Analysekategorie „Besuchertypen“ zeigt die Mengenverhältnisse unterschiedlicher Besuchertypen an einem ausgewählten Standort. Die Besuchertypen werden von Telefónica durch eine anonymisierte Analyse der Mobilitätsmuster der in der Funkzelle im ausgewählten Zeitraum registrierten Besucher ermittelt. Aus den Mobilitätsmustern werden Besuchertypen abgeleitet.
                 </p>
                 <p>
                     Besuchertypen:
@@ -162,17 +191,17 @@ export default {
                         Pendler = Person lebt nicht in Hamburg, kommt aber regelmäßig von außerhalb in die Mobilfunkzelle
                     </li>
                     <li>
-                        Tagestouristen = Person hält sich nicht regelmäßig und sonst nur kurzfristig und ohne Übernachtung in der Mobilfunkzelle auf
+                        Tagestourist = Person hält sich nicht regelmäßig und sonst nur kurzfristig und ohne Übernachtung in der Mobilfunkzelle auf
                     </li>
                     <li>
-                        Übernachtungstouristen = Person hält sich mit Übernachtung für einen oder mehrere Tage in der Mobilfunkzelle auf
+                        Übernachtungstourist = Person hält sich mit Übernachtung für einen oder mehrere Tage in der Mobilfunkzelle auf
                     </li>
                 </ul>
                 <p>
-                    Die Datenseite der Analysekategorie besteht aus drei Datenkacheln und einem Stapeldiagramm.
+                    Die Analysekategorie besteht aus drei Datenkacheln und einem Stapeldiagramm.
                 </p>
                 <p>
-                    In den drei Datenkacheln wird für die jeweils ausgewählte Funkzelle a) die Hamburger:innen im wöchentlichen Durchschnitt, b) die Pendler:innen im wöchentlichen Durchschnitt und c) die Tages und Übernachtungstouristen im wöchentlichen Durchschnitt angezeigt.
+                    In den drei Datenkacheln wird für die jeweils ausgewählte Funkzelle die Hamburger:innen im wöchentlichen Durchschnitt, die Pendler:innen im wöchentlichen Durchschnitt und die Tages und Übernachtungstouristen im wöchentlichen Durchschnitt angezeigt.
                 </p>
                 <p>
                     Mit den Pfeiltasten über der mittleren Kachel lässt sich die Ansicht jahresweise verändern.
@@ -186,7 +215,7 @@ export default {
                 <strong class="listHeader">Reiter: Altersgruppe</strong>
 
                 <p>
-                    In der Analysekategorie „Altersgruppen“ werden Personen, die sich in einer Funkzelle aufgehalten haben nach Altersgruppen aufgeschlüsselt. Die Informationen zum Alter stammen aus den Mobilfunkverträgen der Personen. Diese werden anonymisiert zu Altersklassen aggregiert. Die Daten werden tagesweise erhoben; jedes Mobilfunkgerät und somit jede Person, die sich in einer Mobilfunkzelle aufhält, wird einmal täglich erfasst. Aus Datenschutzgründen werden die tageweisen erhobenen Daten von Telefonica als wöchentlicher Durchschnitt pro Monat ausgegeben. Die Altersgruppen werden in sechs Kohorten unterschieden.
+                    In der Analysekategorie „Altersgruppen“ werden Personen, die sich in einer Funkzelle aufgehalten haben nach Altersgruppen aufgeschlüsselt. Die Informationen zum Alter stammen aus den Mobilfunkverträgen der Personen. Diese werden anonymisiert zu Altersklassen aggregiert. Die Daten werden tagesweise erhoben; jedes Mobilfunkgerät und somit jede Person, die sich in einer Mobilfunkzelle aufhält, wird einmal täglich erfasst. Aus Datenschutzgründen werden die tageweise erhobenen Daten von Telefónica als wöchentlicher Durchschnitt pro Monat ausgegeben. Die Altersgruppen werden in sechs Kohorten unterschieden.
                 </p>
                 <p>
                     Altersgruppen:
@@ -232,7 +261,7 @@ export default {
                 <strong class="listHeader">Reiter: Verweildauer</strong>
 
                 <p>
-                    Die Analysekategorie „Verweildauer“ gibt an, wie lange sich Personen (Geräte) in einer Mobilfunkzelle aufgehalten haben. Die Verweildauer wird aus dem Zeitpunkt des Eintreffens eines Geräts in einer Mobilfunkzelle und dem Zeitpunkt des Verlassens der Mobilfunkzelle errechnet. Jedes Mobilfunkgerät, das sich in einer Mobilfunkzelle anmeldet, wird einmal täglich erfasst. Die Verweildauer wird in vier Intervallen unterschieden.
+                    Die Analysekategorie „Verweildauer“ gibt an, wie lange sich Personen (Geräte) in einer Mobilfunkzelle aufgehalten haben. Die Verweildauer wird aus dem Zeitpunkt des Eintreffens eines Geräts in einer Mobilfunkzelle und dem Zeitpunkt des Verlassens der Mobilfunkzelle errechnet. Jedes Mobilfunkgerät, dass sich in einer Mobilfunkzelle anmeldet, wird einmal täglich erfasst. Die Verweildauer wird in vier Intervallen unterschieden.
                 </p>
                 <p>
                     Verweildauern:
@@ -269,7 +298,7 @@ export default {
                 <strong class="listHeader">Reiter: Standorte Vergleichen</strong>
 
                 <p>
-                    Die Funktion ermöglicht den Vergleich bestimmter Merkmale für <span class="paragraph_underline">zwei Standorte</span>.
+                    Die Funktion ermöglicht den Vergleich bestimmter Merkmale für zwei Standorte.
                 </p>
                 <ul>
                     <li>
@@ -283,7 +312,7 @@ export default {
                     Um den Standort (A) zu ändern, muss der Haken im Kästchen „Deaktivieren …“ entfernt werden, sonst kann nur Standort B über die Karte hinzugefügt werden. Ist der Haken nicht gesetzt, lassen sich auch Standorte für A über die Karte auswählen.
                 </p>
                 <p>
-                    Über das Drop-down Menü ist das Laden folgender Merkmale möglich:
+                    Über das Dropdown Menü ist das Laden folgender Merkmale möglich:
                 </p>
                 <p class="paragraph_underline">
                     Besucher einer bestimmten Zeitspanne (täglich):
@@ -294,6 +323,9 @@ export default {
                 <ul>
                     <li>
                         Der Zeitraum ist über die Kalenderfunktion auswählbar.
+                    </li>
+                    <li>
+                        X-Achse zeigt die Tage (Datum), y-Achse zeigt die Anzahl an Besuchern für Standort A und B
                     </li>
                     <li>
                         Analysierbare Daten sind ab ca. 5 Tagen vor dem jeweils aktuellen Daten verfügbar.
@@ -313,6 +345,9 @@ export default {
                         Das Datum ist über die Kalenderfunktion frei auswählbar.
                     </li>
                     <li>
+                        X-Achse zeigt die Stunden für ausgewähltes Datum, y-Achse zeigt die Anzahl an Besuchern für Standort A und B
+                    </li>
+                    <li>
                         Analysierbare Daten sind ab ca. 5 Tagen vor dem jeweils aktuellen Daten verfügbar.
                     </li>
                     <li>
@@ -327,7 +362,7 @@ export default {
                 </p>
                 <ul>
                     <li>
-                        Die Auswahl des Monats erfolgt über die Kalenderfunktion.
+                        Die Auswahl des Monats erfolgt über die Kalenderfunktion. Der erste des jeweiligen Monats ist auswählbar.
                     </li>
                     <li>
                         Die Zahlenwerte auf der Y-Achse geben den Besucherdurchschnitt pro Woche an.
@@ -350,7 +385,7 @@ export default {
                 </p>
                 <ul>
                     <li>
-                        Die Auswahl des Monats erfolgt über die Kalenderfunktion.
+                        Die Auswahl des Monats erfolgt über die Kalenderfunktion. Der erste des jeweiligen Monats ist auswählbar.
                     </li>
                     <li>
                         Die Zahlenwerte auf der Y-Achse geben den Besucherdurchschnitt pro Woche an.
@@ -373,7 +408,7 @@ export default {
                 </p>
                 <ul>
                     <li>
-                        Die Auswahl des Monats erfolgt über die Kalenderfunktion.
+                        Die Auswahl des Monats erfolgt über die Kalenderfunktion. Der erste des jeweiligen Monats ist auswählbar.
                     </li>
                     <li>
                         Die Zahlenwerte auf der Y-Achse geben den Besucherdurchschnitt pro Woche an.
@@ -393,10 +428,10 @@ export default {
                 <strong class="listHeader">Reiter: Zeitpunkte Vergleichen</strong>
 
                 <p>
-                    Die Funktion „Zeitpunkte Vergleichen“ ermöglicht den Vergleich spezifischer Merkmale <span class="paragraph_underline">eines Standortes</span> zu unterschiedlichen Zeitpunkten. Die Auswahl des Standorts erfolgt über die Karte oder über das Adressfeld.
+                    Die Funktion „Zeitpunkte Vergleichen“ ermöglicht den Vergleich spezifischer Merkmale eines Standortes zu unterschiedlichen Zeitpunkten. Die Auswahl des Standorts erfolgt über die Karte oder über das Adressfeld.
                 </p>
                 <p>
-                    Über die Filterfunktion lassen sich folgende Merkmale laden:
+                    Über das Dropdown Menü lassen sich folgende Merkmale laden:
                 </p>
                 <p class="paragraph_underline">
                     Besucher eines Standorts an zwei verschiedenen Tagen:
@@ -419,7 +454,7 @@ export default {
                     Besucher eines Standorts an zwei verschiedenen Tagen (stündlich):
                 </p>
                 <p>
-                    Angezeigt werden die Aktivitäten an einem Standort für zwei bestimmte Tage in stundenweiser Auflösung.
+                    Angezeigt werden die Aktivitäten an einem Standort für zwei ausgewählte Tage in stundenweiser Auflösung.
                 </p>
                 <ul>
                     <li>
@@ -436,7 +471,7 @@ export default {
                     Altersgruppe:
                 </p>
                 <p>
-                    Angezeigt wird die Verteilung der Altersgruppen an einem Standort in zwei Monaten im wöchentlichen Durchschnitt im Vergleich.
+                    Angezeigt wird die Verteilung der Altersgruppen an einem Standort für zwei Zeitpunkte. Vergleichen lassen sich die durchschnittlichen wöchentlichen Besucher je Altersgruppe pro Monat und ausgewähltem Jahr.
                 </p>
                 <ul>
                     <li>
@@ -446,7 +481,7 @@ export default {
                         Die Zahlenwerte auf der Y-Achse geben den Besucherdurchschnitt pro Woche an.
                     </li>
                     <li>
-                        Analysierbare Daten sind ab ca. 5 Monaten vor dem jeweils aktuellen Datum verfügbar.
+                        Analysierbare Daten werden mit einer zeitlichen Verzögerung ab ca. 5 Monaten bereitgestellt .
                     </li>
                     <li>
                         Die Merkmale der Altersgruppen sind identisch mit denen der Analysekategorie „Altersgruppe“.
@@ -459,11 +494,11 @@ export default {
                     Verweildauer:
                 </p>
                 <p>
-                    Angezeigt wird die Verweildauer von Besuchern eines Standorts in zwei Monaten im wöchentlichen Durchschnitt im Vergleich.
+                    Angezeigt wird die durchschnittliche wöchentliche Verweildauer der Besucher pro Monat und ausgewähltem Jahr an einem Standort für zwei unterschiedliche Zeitpunkte.
                 </p>
                 <ul>
                     <li>
-                        Die Auswahl der Monate erfolgt über die Kalenderfunktion.
+                        Die Auswahl der Monate erfolgt über die Kalenderfunktion. Der erste des jeweiligen Monats ist auswählbar.
                     </li>
                     <li>
                         Die Zahlenwerte auf der Y-Achse geben den Besucherdurchschnitt pro Woche an.
@@ -482,11 +517,11 @@ export default {
                     Besuchertypen:
                 </p>
                 <p>
-                    Angezeigt werden die Besuchertypen eines Standorts für in zwei Monaten im wöchentlichen Durchschnitt im Vergleich.
+                    Angezeigt werden die durchschnittlichen wöchentlichen Besucher eines Standortes pro Monat für zwei Zeitpunkte.
                 </p>
                 <ul>
                     <li>
-                        Die Auswahl der Monate erfolgt über die Kalenderfunktion.
+                        Die Auswahl der Monate erfolgt über die Kalenderfunktion. Der erste des jeweiligen Monats ist auswählbar.
                     </li>
                     <li>
                         Die Zahlenwerte auf der Y-Achse geben den Besucherdurchschnitt pro Woche an.
@@ -514,7 +549,7 @@ export default {
                     Als Datengrundlage dienen Signalisierungsdaten der Telefónica Deutschland GmbH & Co. OHG, welche anonymisiert über den Dienstleister WHATALOCATION über elektronische Schnittstellen im VPI-Dashboard bereitgestellt werden.
                 </p>
                 <p>
-                    WHATALOCATION ist ein in Deutschland ansässiges Unternehmen, welches die aufbereiteten und anonymisierten Signalisierungsdaten der Telefónica Deutschland GmbH & Co. OHG für eine Web-Applikation nutzt. Diese beinhaltet ein Dashboard mit der sich Analysen zu Aufenthalts- und Bewegungsverhalten durchführen lassen. Das Dashboard und die in der Web-Applikation definierten Merkmale bildeten die Grundlage für die Entwicklung des Fachportals Verborgene Potenziale Innenstadt.
+                    WHATALOCATION ist ein in Deutschland ansässiges Unternehmen, welches die aufbereiteten und anonymisierten Signalisierungsdaten der Telefónica Deutschland GmbH & Co. OHG für eine Web-Applikation nutzt. Diese beinhaltet ein Dashboard mit der sich Analysen zu Aufenthalts- und Bewegungsverhalten durchführen lassen. Das Dashboard und die in der WHATALOCATION Web-Applikation genutzten Merkmale bildeten die Grundlage für die Entwicklung des Fachportals Verborgene Potenziale Innenstadt.
                 </p>
                 <a
                     href="https://www.whatalocation.ai/"
@@ -522,6 +557,29 @@ export default {
                     rel="nofollow noopener"
                 >WHATALOCATION.ai</a>
             </div>
+        </div>
+        <div class="footnotes">
+            <hr>
+            <ol>
+                <li id="fn:1">
+                    <p>
+                        INSPIRE definiert europaweit einheitliche
+                        <a
+                            href="https://www.bkg.bund.de/SharedDocs/Produktinformationen/BKG/DE/P-2021/210111_GeoGitter.html"
+                            target="_blank"
+                        >
+                            Geographische Gitter
+                        </a>
+                        . Das im VPI Dashboard genutzte Gitter hat, in Abhängigkeit von der Netzverfügbarkeit der jeweiligen Betreiber quadratische Zellgrößen von 500 m bis 1 km.
+                        <a
+                            href="#fnref:1"
+                            rev="footnote"
+                        >
+                            ↩
+                        </a>
+                    </p>
+                </li>
+            </ol>
         </div>
     </div>
 </template>
@@ -544,7 +602,7 @@ export default {
     }
 
     H1,
-    h2, {
+    h2 {
         margin: 0 0 1.5rem 0;
         padding: 0 1rem 1rem 1rem;
         border-bottom: solid 1px var(--bs-gray-300);
