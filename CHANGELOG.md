@@ -3,8 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## v2.46.0 - 2024-06-05
 
 ### Added
 - SessionTool: Adds the observer of Modeler3D to enable its states can be saved in sessions.
@@ -13,12 +12,6 @@
 - The following package has been updated:
     - devDependencies:
         - husky: 8.0.3 to 9.0.11
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ---
 ## v2.45.0 - 2024-04-30
