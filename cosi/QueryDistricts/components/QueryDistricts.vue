@@ -636,7 +636,7 @@ export default {
             return [0, 0];
         },
 
-        exportTable: function (index) {
+        exportTable: function (index = 0) {
             const
                 date = new Date().toLocaleDateString("de-DE", {year: "numeric", month: "numeric", day: "numeric"}),
                 filename = `${this.$t("additional:modules.tools.cosi.queryDistricts.exportFilename")}_${date}`,
@@ -664,7 +664,7 @@ export default {
 
                 ]);
 
-            exportXlsx([headers, [], ...filters, ...data], filename, {exclude: this.excludedPropsForExport}, "aoa_to_sheet");
+            exportXlsx(undefined, [headers, [], ...filters, ...data], filename, {exclude: this.excludedPropsForExport}, "aoa_to_sheet");
         },
         // pagination functions
         downloadAll () {
