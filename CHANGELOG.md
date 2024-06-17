@@ -7,11 +7,13 @@
 ### __Breaking Changes__
 
 ### Added
+- A mechanism was added to define searchInterfaces for the searchBar as an addon for Masterportal 3.0.
 
 ### Changed
-- CommuterFlows: Now available for Masterportal 3.0
+- CommuterFlows, sdpDownload, populationRequest, streetsmart, vcOblique and different gfiThemes: Now available for Masterportal 3.0.
 
 ### Deprecated
+- The deprecated Backbone add-ons, defined by a string in addonsConf.json are no longer supported for Masterportal 3.0.
 
 ### Removed
 

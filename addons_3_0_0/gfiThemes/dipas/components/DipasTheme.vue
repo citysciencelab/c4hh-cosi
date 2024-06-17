@@ -40,20 +40,6 @@ export default {
 
             return iconPath;
         },
-        /**
-         * @deprecated with new vectorStyle module. Should be removed with version 3.0.
-         * Getting icon from old style format
-         * @param  {Array} valueStyle - the list of style values
-         * @returns {String} the path of the icons
-         */
-        fetchIconPathDeprecated (valueStyle) {
-            let finalIconPath = this.feature.getTheme()?.params?.gfiIconPath;
-
-            if (valueStyle && valueStyle.length > 0 && ("imageName" in valueStyle[0])) {
-                finalIconPath = valueStyle[0].imageName;
-            }
-            return finalIconPath;
-        },
 
         /**
          * Getting icon from new style format
