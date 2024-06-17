@@ -1,6 +1,7 @@
 {
   "modules": {
     "valuationPrint": {
+      "description": "Show valuation information",
       "title": "Parcel report",
       "removeButton": "Remove",
       "startButton": "Start",

@@ -2,6 +2,7 @@
     "modules": {
           "CommuterFlows": {
               "title": "Pendlerströme",
+              "description": "Visualisiere Pendlerströme",
               "select": "Bitte auswählen",
               "labelDistrict": "Landkreis/kreisfreie Stadt",
               "selectCity": "Stadt/Gemeinde auswählen",

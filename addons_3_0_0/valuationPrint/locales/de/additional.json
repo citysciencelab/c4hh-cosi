@@ -1,6 +1,7 @@
 {
   "modules": {
     "valuationPrint": {
+      "description": "Zeige Informationen zur Wertermittlung an",
       "title": "Flurstücksbericht",
       "removeButton": "Entfernen",
       "startButton": "Starten",

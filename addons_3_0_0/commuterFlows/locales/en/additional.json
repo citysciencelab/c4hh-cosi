@@ -2,6 +2,7 @@
     "modules": {
           "CommuterFlows": {
               "title": "Commuter flows",
+              "description": "Visualize commuter flows",
               "select": "Please select",
               "labelDistrict": "County/district",
               "selectCity": "Choose town/municipality",

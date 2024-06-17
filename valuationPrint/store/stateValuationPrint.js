@@ -1,6 +1,7 @@
 /**
  * User type definition
  * @typedef {Object} ValuationPrintState
+ * @property {String} description The description that should be shown in the button in the menu.
  * @property {Boolean} active - If true, ValuationPrint will rendered.
  * @property {String} id - Id of the ValuationPrint component.
  * @property {String} parcelLayerId - The id of the layer which data are the basis of this tool.
@@ -12,6 +13,7 @@
  * @property {Boolean} deactivateGFI - Flag if tool should deactivate gfi.
  */
 const state = {
+    description: "additional:modules.valuationPrint.description",
     active: false,
     id: "valuation",
     parcelLayerId: "",
