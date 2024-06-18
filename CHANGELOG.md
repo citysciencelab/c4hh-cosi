@@ -5,12 +5,18 @@
 
 ## Unreleased - in development
 ### __Breaking Changes__
+Under the headline `deprecated` you can find several changes of removed deprecated properties and tools.
+In certain circumstances this means that you have to update your portal files (index.html, config.js and config.json) according to the new changes in order to use your portal furthermore.
+For further information about the changes for version 3.0 visit the [Masterportal Docs and Changelog](https://bitbucket.org/geowerkstatt-hamburg/masterportal/src/dev_vue/).
 
 ### Added
 - A mechanism was added to define searchInterfaces for the searchBar as an addon for Masterportal 3.0.
+- gfiOnAdress was migrated to version 3.0.0 within searchInterfaces addon.
+- New gfi theme `flaecheninfo` in MP3.0
 
 ### Changed
-- CommuterFlows, sdpDownload, populationRequest, streetsmart, vcOblique and different gfiThemes: Now available for Masterportal 3.0.
+- CommuterFlows, sdpDownload, populationRequest, streetsmart, vcOblique, valuationPrint, searchInterfaces and different gfiThemes: Now available for Masterportal 3.0.
+- Adapt tests for Masterportal 3.0 structure.
 
 ### Deprecated
 - The deprecated Backbone add-ons, defined by a string in addonsConf.json are no longer supported for Masterportal 3.0.
