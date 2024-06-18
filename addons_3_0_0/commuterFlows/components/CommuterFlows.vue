@@ -57,7 +57,6 @@ export default {
          */
         lastDataset (newLastDataset) {
             if (Array.isArray(newLastDataset?.featureList) && Array.isArray(newLastDataset?.coordinate)) {
-                // eslint-disable-next-line vue/no-multiple-template-root
                 this.refreshCaptions();
                 this.refreshBeams();
                 this.refreshAnimation();
@@ -73,7 +72,6 @@ export default {
          * @returns {void}
          */
         currentDistrict (district) {
-            // eslint-disable-next-line vue/no-multiple-template-root
             this.currentCity = "";
             if (district) {
                 this.selectDistrict(district, this.isOutCommuter(), this.listChunk);

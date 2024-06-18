@@ -18,9 +18,7 @@ export default function SearchInterfaceExampleSearch ({hitTemplate, resultEvents
         resultEvents || {
             onClick: ["setMarker", "zoomToResult"],
             onHover: ["setMarker"]
-        },   
-          
-
+        },
         hitTemplate
     );
 }
