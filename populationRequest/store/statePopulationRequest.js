@@ -1,36 +1,34 @@
 /**
  * User type definition
- * @typedef {Object} populationRequestState
- * @property {Boolean} active if true, PopulationRequest will be rendered
- * @property {String} id id of the PopulationRequest component
- * @property {String} icon icon next to title (config-param)
- * @property {Boolean} renderToWindow if true, tool is rendered in a window, else in sidebar (config-param)
- * @property {Boolean} resizableWindow if true, window is resizable (config-param)
+ * @typedef {Object} state
+ * @property {Boolean} hasMouseMapInteractions Tool interacts with the map
+ * @property {String} type type of the PopulationRequest component
+ * @property {String[]} supportedDevices list of devices supported
+ * @property {String[]} supportedMapModes list of map modes supported
+ * @property {String} description The description that should be shown in the button in the menu.
+ * @property {String} name Displayed as title (config-param)
+* @property {String} icon icon next to title (config-param)
  * @property {Boolean} isVisibleInMenu if true, tool is selectable in menu (config-param)
- * @property {Boolean} deactivateGFI flag if tool should deactivate gfi (config-param)
  * @property {Boolean} rasterActive is the rasterLayer active
  * @property {Boolean} alkisAdressesActive is the alkisAdressesLayer active
  * @property {Number} populationReqServiceId id of the population Request
  * @property {String} wpsId The id of the used web processing service.
  * @property {String} fmwProcess FME process triggered via the WPS.
- * @property {GeoJSON|undefined} The area as GeoJSON object in which the inhabitants are requested.
  */
 const state = {
-    active: false,
-    id: "populationRequest",
+    hasMouseMapInteractions: true,
+    type: "populationRequest",
+    supportedDevices: ["Desktop", "Mobile", "Table"],
+    supportedMapModes: ["2D"],
     // defaults for config.json parameters
-    name: "translate#additional:modules.tools.populationRequest.title",
+    description: "additional:modules.populationRequest.description",
+    name: "additional:modules.populationRequest.name",
     icon: "bi-person-bounding-box",
-    renderToWindow: true,
-    resizableWindow: true,
-    isVisibleInMenu: true,
-    deactivateGFI: true,
-    rasterActive: false,
-    alkisAdressesActive: false,
-    populationReqServiceId: 2,
+    rasterActive: undefined,
+    alkisAdressesActive: undefined,
+    populationReqServiceId: "2",
     wpsId: "1001",
-    fmwProcess: "einwohner_ermitteln.fmw",
-    geometry: undefined
+    fmwProcess: "einwohner_ermitteln.fmw"
 };
 
 export default state;

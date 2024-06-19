@@ -1,6 +1,7 @@
 /**
  * User type definition
  * @typedef {Object} CommuterFlowsState
+ * @property {String} description The description that should be shown in the button in the menu.
  * @property {Boolean} active if true, CommuterFlows will rendered
  * @property {String} name displayed as title (config-param)
  * @property {String} icon icon next to title (config-param)
@@ -32,9 +33,10 @@
  * @property {Number[]} olAnimationPaces the pace for the animation: even idx for forwards speed in ms, odd idx for backwards speed in ms, leave a zero to jump forwards/backwards
  */
 const state = {
+    description: "additional:modules.CommuterFlows.description",
     active: false,
     id: "CommuterFlows",
-    name: "translate#additional:modules.tools.commuterFlows.title",
+    name: "additional:modules.CommuterFlows.title",
     icon: "bi-arrow-left-right",
     renderToWindow: true,
     resizableWindow: true,

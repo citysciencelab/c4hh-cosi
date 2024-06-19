@@ -1,4 +1,4 @@
-import {generateSimpleMutations} from "../../../src/app-store/utils/generators";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
 import state from "./stateVcOblique";
 
 const mutations = {

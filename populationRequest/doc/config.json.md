@@ -22,16 +22,14 @@ Einwohnerabfrage für Hamburg und die MRH (Metropolregion Hamburg).
 |----|-------------|---|-------|------------|------|
 |name|ja|String||Name des Werkzeuges im Menu.|false|
 |icon|nein|String||CSS Klasse des Bootstrap Icon, das vor dem Toolnamen im Menu angezeigt wird. |false|
-|onlyDesktop|nein|Boolean|false|Flag ob das Werkzeug nur im Desktop Modus sichtbar sein soll.|false|
-|populationReqServiceId|ja|String|"2"|In rest-services.[...].js konfigurierte Service-ID|false|
+|type|ja|String||ID des Addons: populationRequest|false|
+|populationReqServiceId|nein|String|"2"|In rest-services.[...].js konfigurierte Service-ID|false|
 
 **Beispiel Einwohnerabfrage**
 ```
 #!json
-"populationRequest": {
-    "name": "Einwohneranzahl abfragen",
-    "icon": "bi-wrench",
-    "onlyDesktop": false
+{
+    "type": "populationRequest"
 }
 ```
 

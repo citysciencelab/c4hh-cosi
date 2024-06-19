@@ -1,83 +1,25 @@
 {
+  "exampleSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/exampleSearch"
+  },
+  "gfiOnAddressGaz": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/gfiOnAddressGaz"
+  },
+  "populationRequest": {
+    "type": "tool"
+  },
   "sdpDownload": {
-    "type": "tool"
-  },
-  "tacticalMark": {
-    "type": "tool"
-  },
-  "ColorCodeMap": {
-    "path": "cosi/ColorCodeMap",
-    "type": "tool"
-  },
-  "CalculateRatio": {
-    "path": "cosi/CalculateRatio",
-    "type": "tool"
-  },
-  "ChartGenerator": {
-    "path": "cosi/ChartGenerator",
-    "type": "tool"
-  },
-  "DistrictSelector": {
-    "path":"cosi/DistrictSelector",
-    "type": "tool"
-  },
-  "Dashboard": {
-    "path":"cosi/Dashboard",
-    "type": "tool"
-  },
-  "FeaturesList": {
-    "path":"cosi/FeaturesList",
-    "type": "tool"
-  },
-  "PolygonStyler": {
-    "path":"cosi/PolygonStyler",
-    "type": "tool"
-  },
-  "ScenarioBuilder": {
-    "path": "cosi/ScenarioBuilder",
-    "type": "tool"
-  },
-  "SaveSession": {
-    "path": "cosi/SaveSession",
-    "type": "tool"
-  },
-  "SelectionManager": {
-    "path": "cosi/SelectionManager",
-    "type": "tool"
-  },
-  "TemplateManager": {
-    "path": "cosi/TemplateManager",
-    "type": "tool"
-  },
-  "resetTree": {
-    "type": "tool"
-  },
-  "geoAnalyze": {
-    "type": "tool"
-  },
-  "vueAddon": {
-    "type": "tool"
+    "type": "tool",
+    "path": "sdpDownload"
   },
   "streetSmart": {
     "type": "tool"
   },
-  "refugeeHomes": {
-    "type": "tool"
-  },
-  "hochWasserPrint": {
-    "type": "tool"
-  },
-  "valuationPrint": {
-    "type": "tool"
-  },
-  "sessionTool": {
-    "type": "tool"
-  },
-  "oktagonKartenportal": {
-    "type": "tool"
-  },
-  "quickResponseCode": {
-    "type": "tool"
+  "vcOblique": {
+    "type": "tool",
+    "path": "vcOblique"
   },
   "bildungsatlas": {
     "path":"gfiThemes/bildungsatlas",
@@ -107,6 +49,10 @@
     "path":"gfiThemes/sturmflut",
     "type": "gfiTheme"
   },
+  "trafficCount": {
+    "path":"gfiThemes/trafficCount",
+    "type": "gfiTheme"
+  },
   "trinkwasser": {
     "path":"gfiThemes/trinkwasser",
     "type": "gfiTheme"
@@ -115,68 +61,10 @@
     "path":"gfiThemes/verkehrsstaerken",
     "type": "gfiTheme"
   },
-  "wholeCity": {
-    "path":"gfiThemes/wholeCity",
-    "type": "gfiTheme"
-  },
-  "vpi": {
-       "path": "gfiThemes/vpi",
-       "type": "gfiTheme"
-  },
-  "AccessibilityAnalysis": {
-    "path": "cosi/AccessibilityAnalysis",
+  "valuationPrint": {
     "type": "tool"
   },
-  "DistanceScoreService": {
-    "path": "cosi/FeaturesList/service",
-    "type": "tool"
-  },
-  "QueryDistricts": {
-    "path": "cosi/QueryDistricts",
-    "type": "tool"
-  },
-  "ResidentialSimulation": {
-    "path": "cosi/ResidentialSimulation",
-    "type": "tool"
-  },
-  "Dipas": {
-    "path": "cosi/Dipas",
-    "type": "tool"
-  },
-  "AreaSelector": {
-    "path": "cosi/AreaSelector",
-    "type": "tool"
-  },
-  "ExportPDF": {
-    "path":"cosi/ExportPDF",
-    "type": "tool"
-    },
-  "vcOblique": {
-    "type": "tool"
-  },
-  "ToolBridge": {
-    "path": "cosi/ToolBridge",
-    "type": "tool"
-  },
-  "ReportTemplates": {
-    "path": "cosi/ReportTemplates",
-    "type": "tool"
-  },
-  "mietenspiegelFormular": {
-    "type": "tool"
-  },
-  "vpiDashboard": {
-    "type": "tool"
-  },
-  "TimeSeriesAnalyse": {
-    "path": "cosi/TimeSeriesAnalyse",
-    "type": "tool"
-  },
-  "wholeCityList": {
-    "type": "tool"
-  },
-  "TemplateAdmin": {
-    "path": "cosi/TemplateAdmin",
+  "commuterFlows": {
     "type": "tool"
   }
 }

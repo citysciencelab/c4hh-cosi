@@ -1,3 +1,6 @@
+<script>
+import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList";
+import {mapGetters} from "vuex";
 
 export default {
     name: "DipasTheme",
@@ -9,7 +12,13 @@ export default {
     },
     computed: {
         ...mapGetters(["uiStyle"]),
-        ...mapGetters("Tools/SaveSelection", ["layerVisibilities", "layerIds", "layerTransparencies"])
+        cssVars () {
+            return {
+                "--buttonColor": this.feature.getMappedProperties().ButtonBackgroundColor,
+                "--buttonFontColor": this.feature.getMappedProperties().ButtonTextColor,
+                "--buttonHoverColor": this.feature.getMappedProperties().ButtonBackgroundHoverColor
+            };
+        }
     },
     methods: {
         /**
@@ -30,20 +39,6 @@ export default {
             }
 
             return iconPath;
-        },
-        /**
-         * @deprecated with new vectorStyle module. Should be removed with version 3.0.
-         * Getting icon from old style format
-         * @param  {Array} valueStyle - the list of style values
-         * @returns {String} the path of the icons
-         */
-        fetchIconPathDeprecated (valueStyle) {
-            let finalIconPath = this.feature.getTheme()?.params?.gfiIconPath;
-
-            if (valueStyle && valueStyle.length > 0 && ("imageName" in valueStyle[0])) {
-                finalIconPath = valueStyle[0].imageName;
-            }
-            return finalIconPath;
         },
 
         /**
@@ -71,19 +66,12 @@ export default {
                 contributionLink = "";
 
             if (!this.isTableStyle()) {
-                const urlParams = "?Map/layerIds=" + this.layerIds +
-                    "&visibility=" + this.layerVisibilities +
-                    "&transparency=" + this.layerTransparencies +
-                    "&Map/center=[" + this.$store.state.Maps.center +
-                    "]&Map/zoomLevel=" + this.$store.state.Maps.zoom;
-
                 parentLocation = document.referrer.split("?")[0];
-                contributionLink = parentLocation.split("#")[0] + "#/contribution/" + nid + urlParams;
+                contributionLink = parentLocation.split("#")[0] + "#/contribution/" + nid;
             }
             else {
                 contributionLink = link;
             }
-
             return contributionLink;
         },
 
@@ -100,7 +88,10 @@ export default {
 
 
 <template>
-    <div class="dipas-gfi-content">
+    <div
+        class="dipas-gfi-content"
+        :style="cssVars"
+    >
         <div class="dipas-gfi-icon">
             <img
                 :src="calculateIconPath(feature.getMappedProperties().Kategorie)"
@@ -148,13 +139,13 @@ export default {
         font-family: $font_family_default;
         .dipas-gfi-thema {
             font-family: $font_family_default;
-            font-size: 14px;
+            font-size: $font-size-base;
             color: $dark_grey;
             text-transform: uppercase;
         }
         .dipas-gfi-name {
             font-family: $font_family_accent;
-            font-size: 18px;
+            font-size: $font-size-lg;
             color: $primary;
             padding-bottom: 16px;
 
@@ -164,7 +155,7 @@ export default {
         }
         .dipas-gfi-description {
             font-family: $font_family_default;
-            font-size: 14px;
+            font-size: $font-size-base;
             color: $dark_grey;
         }
 
@@ -175,16 +166,19 @@ export default {
         }
 
         a.dipas-gfi-more {
-            font-size: 12px;
+            font-size:  $font-size-sm;
             border-radius: 2px;
             margin-top: 20px;
             padding: 7px 8px 4px;
-            background-color: $light_red;
-            border-color: #800040;
-            color: $accent_contrast;
+            background-color: var(--buttonColor, #e10019);
+            color: var(--buttonFontColor, #ffffff);
             font-family: $font_family_accent;
             text-transform: uppercase;
             display: inline-block;
+
+            &:hover {
+                    background-color: var(--buttonHoverColor, #b4081b);
+                }
         }
 }
 

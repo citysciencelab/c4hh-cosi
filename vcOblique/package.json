@@ -1,6 +1,6 @@
 {
   "name": "oblique-viewer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Schrägluftbilder",
   "license": "MIT",
   "repository": {
@@ -9,6 +9,6 @@
   },
   "scripts": {},
   "dependencies": {
-    "iframe-resizer": "^4.3.0"
+    "iframe-resizer": "^4.3.7"
   }
 }

@@ -1,4 +1,4 @@
-import {generateSimpleMutations} from "../../../src/app-store/utils/generators";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
 import statePopulationRequest from "./statePopulationRequest";
 
 const mutations = {
@@ -8,7 +8,27 @@ const mutations = {
      * {setKey:   (state, payload) => *   state[key] = payload * }
      * will be returned.
      */
-    ...generateSimpleMutations(statePopulationRequest)
+    ...generateSimpleMutations(statePopulationRequest),
+
+    /**
+     * Sets the rasterLayer active setting.
+     * @param {Object} state The state
+     * @param {Boolean} payload The value to set
+     * @returns {void}
+     */
+    setRasterActive (state, payload) {
+        state.rasterActive = payload;
+    },
+
+    /**
+     * Sets the alkisAdresses active setting.
+     * @param {Object} state The state
+     * @param {Boolean} payload The value to set
+     * @returns {void}
+     */
+    setAlkisAdressesActive (state, payload) {
+        state.alkisAdressesActive = payload;
+    }
 };
 
 export default mutations;

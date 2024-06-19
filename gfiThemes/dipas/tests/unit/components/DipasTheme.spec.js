@@ -1,9 +1,9 @@
+import {createStore} from "vuex";
+import {shallowMount, config} from "@vue/test-utils";
+import {expect} from "chai";
+import DipasTheme from "../../../components/DipasTheme.vue";
 
-const localVue = createLocalVue();
-
-localVue.use(Vuex);
-
-config.mocks.$t = key => key;
+config.global.mocks.$t = key => key;
 
 describe("addons/dipas/components/DipasTheme.vue", () => {
     const iconPath = "https://geoportal-hamburg.de/lgv-beteiligung/icons/einzelmarker_dunkel.png",
@@ -11,7 +11,6 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
             "name": "dipas",
             "params": {
                 "gfiIconPath": iconPath
-
             }
         },
         getters = {
@@ -30,34 +29,29 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
      * @returns {void}
      */
     function createWrapper (isTable) {
-        store = new Vuex.Store({
+        store = createStore({
             namespaces: true,
             modules: {
                 DipasTheme
             },
-            getters: isTable ? gettersTable : getters,
-            state: {
-                Maps: {
-                    center: [12345, 6789],
-                    zoom: 3
-                }
-            }
+            getters: isTable ? gettersTable : getters
         });
         wrapper = shallowMount(DipasTheme, {
-            store,
-            localVue,
-            propsData: {
+            global: {
+                plugins: [store]
+            },
+            props: {
                 feature: {
                     getTheme: () => theme,
                     getTitle: () => "Dipas Title",
                     getMimeType: () => "text/xml",
                     getMappedProperties () {
                         return {
-                            "Kategorie": "Value Kategorie",
-                            "link": "/drupal/de/node/5",
-                            "name": "Value name",
-                            "description": "Value description",
-                            "nid": "5"
+                            Kategorie: "Value Kategorie",
+                            link: "/drupal/de/node/5",
+                            name: "Value name",
+                            description: "Value description",
+                            nid: "5"
                         };
                     }
                 }
@@ -69,45 +63,17 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
         it("uiStyle table, should place the values", () => {
             createWrapper(true);
             wrapper.vm.$nextTick();
-            expect(wrapper.findAll(".dipas-gfi-thema").at(0).element.textContent.trim()).to.equal("Value Kategorie");
-            expect(wrapper.findAll(".dipas-gfi-name").at(0).element.textContent.trim()).to.equal("Value name");
-            expect(wrapper.findAll(".dipas-gfi-description").at(0).element.textContent.trim()).to.equal("Value description");
+            expect(wrapper.findAll(".dipas-gfi-thema")[0].element.textContent.trim()).to.equal("Value Kategorie");
+            expect(wrapper.findAll(".dipas-gfi-name")[0].element.textContent.trim()).to.equal("Value name");
+            expect(wrapper.findAll(".dipas-gfi-description")[0].element.textContent.trim()).to.equal("Value description");
             expect(wrapper.findAll("a").length).to.equal(0);
         });
         it("uiStyle NOT table, should place the values", () => {
             createWrapper(false);
-            expect(wrapper.findAll(".dipas-gfi-thema").at(0).element.textContent.trim()).to.equal("Value Kategorie");
-            expect(wrapper.findAll(".dipas-gfi-name").at(0).element.textContent.trim()).to.equal("Value name");
-            expect(wrapper.findAll(".dipas-gfi-description").at(0).element.textContent.trim()).to.equal("Value description");
+            expect(wrapper.findAll(".dipas-gfi-thema")[0].element.textContent.trim()).to.equal("Value Kategorie");
+            expect(wrapper.findAll(".dipas-gfi-name")[0].element.textContent.trim()).to.equal("Value name");
+            expect(wrapper.findAll(".dipas-gfi-description")[0].element.textContent.trim()).to.equal("Value description");
             expect(wrapper.findAll("a").length).to.equal(2);
-        });
-    });
-
-    describe("method: fetchIconPathDeprecated -> iconPathOld should show the right name with path", function () {
-        it("should show the default name with path", function () {
-            valueStyle = [];
-            createWrapper(true);
-
-            const ret = wrapper.vm.fetchIconPathDeprecated(valueStyle);
-
-            expect(ret).to.equal(iconPath);
-        });
-
-        it("should show the parsed name with path", function () {
-            createWrapper(true);
-            valueStyle = [
-                {
-                    "styleFieldValue": "Wohnen",
-                    "color": "#E20613",
-                    "imageName": "https://geoportal-hamburg.de/lgv-beteiligung/icons/40px-wohnen.png",
-                    "imageScale": "0.5"
-                }
-            ];
-            const icon = "https://geoportal-hamburg.de/lgv-beteiligung/icons/40px-wohnen.png",
-
-                ret = wrapper.vm.fetchIconPathDeprecated(valueStyle);
-
-            expect(ret).to.equal(icon);
         });
     });
 
@@ -187,7 +153,7 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
 
             createWrapper(false);
 
-            const path = "https://localhost:9001/portalconfigs/dipas/#/contribution/5?Map/layerIds=undefined&visibility=undefined&transparency=undefined&Map/center=[12345,6789]&Map/zoomLevel=3",
+            const path = "https://localhost:9001/portalconfigs/dipas/#/contribution/5",
                 ret = wrapper.vm.modifyContributionLink(wrapper.vm.feature.getMappedProperties().link, wrapper.vm.feature.getMappedProperties().nid);
 
             expect(ret).to.equal(path);
@@ -198,7 +164,7 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
 
             createWrapper(false);
 
-            const path = "https://localhost:9001/portalconfigs/dipas/#/contribution/5?Map/layerIds=undefined&visibility=undefined&transparency=undefined&Map/center=[12345,6789]&Map/zoomLevel=3",
+            const path = "https://localhost:9001/portalconfigs/dipas/#/contribution/5",
                 ret = wrapper.vm.modifyContributionLink(wrapper.vm.feature.getMappedProperties().link, wrapper.vm.feature.getMappedProperties().nid);
 
             expect(ret).to.equal(path);

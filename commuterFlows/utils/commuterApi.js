@@ -1,7 +1,14 @@
 import {WFS} from "ol/format.js";
-import getProxyUrl from "../../../src/utils/getProxyUrl";
 import axios from "axios";
 import hash from "object-hash";
+
+/**
+ *
+ * @returns {Boolean} dasf
+ */
+function getProxyUrl () {
+    return false;
+}
 
 /**
  * CommuterApi is the api for the Tool "CommuterFlows"

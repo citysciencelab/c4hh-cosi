@@ -1,5 +1,5 @@
-import {generateSimpleMutations} from "../../../src/app-store/utils/generators";
-import stateGeoAnalyze from "./stateValuationPrint";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
+import stateValuationPrint from "./stateValuationPrint";
 
 const mutations = {
     /**
@@ -8,7 +8,7 @@ const mutations = {
      * {setKey:   (state, payload) => *   state[key] = payload * }
      * will be returned.
      */
-    ...generateSimpleMutations(stateGeoAnalyze)
+    ...generateSimpleMutations(stateValuationPrint)
 };
 
 export default mutations;

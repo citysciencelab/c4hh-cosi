@@ -3,9 +3,12 @@ import {extend as olExpandExtent} from "ol/extent.js";
 import VectorLayer from "ol/layer/Vector";
 import {Point} from "ol/geom.js";
 import Feature from "ol/Feature.js";
-import uniqueId from "../../../src/utils/uniqueId.js";
-import thousandsSeparator from "../../../src/utils/thousandsSeparator";
+import {uniqueId} from "../../../src/shared/js/utils/uniqueId.js";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
 import {CommuterAnimation} from "./commuterAnimation.js";
+import store from "../../../src/app-store/index.js";
+import layerCollection from "../../../src/core/layers/js/layerCollection.js";
+import layerFactory from "../../../src/core/layers/js/layerFactory";
 
 /**
  * CommuterOL is the OpenLayers api for the Tool "CommuterFlows"
@@ -102,15 +105,18 @@ export class CommuterOL {
     getOpenlayersConnectors () {
         return {
             createLayerIfNotExists: (labelname, onsuccess) => {
-                const promise = Radio.request("Map", "createLayerIfNotExists", labelname);
+                const layer = layerFactory.createLayer({
+                    id: labelname,
+                    name: labelname,
+                    visibility: true,
+                    type: "layer",
+                    showLayerInTree: false,
+                    typ: "VECTORBASE"
+                });
 
-                if (promise instanceof VectorLayer) {
-                    onsuccess(promise);
-                }
-                else if (promise instanceof Promise) {
-                    promise.then(layer => {
-                        onsuccess(layer);
-                    });
+                if (layer) {
+                    layerCollection.addLayer(layer);
+                    onsuccess(layer.layer);
                 }
             },
             getFeatures: layer => {
@@ -130,7 +136,7 @@ export class CommuterOL {
                 }
             },
             zoomToExtent: extent => {
-                Radio.trigger("Map", "zoomToExtent", {extent, options: this.options.zoomOptions});
+                store.dispatch("Maps/zoomToExtent", {extent: extent, options: {padding: [20, 20, 20, 20]}});
             },
             showLayer: layer => {
                 if (layer instanceof VectorLayer) {
@@ -143,7 +149,7 @@ export class CommuterOL {
                 }
             },
             render: () => {
-                Radio.trigger("Map", "render");
+                mapCollection.getMap("2D").render();
             },
             onPostRender: (layer, event) => {
                 if (layer instanceof VectorLayer && typeof event === "function") {

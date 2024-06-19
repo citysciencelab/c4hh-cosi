@@ -4,7 +4,7 @@ import actions from "../../../store/actionsVcOblique";
 import crs from "@masterportal/masterportalapi/src/crs";
 
 
-describe("ADDONS: addons/vcOblique/store/actionsVcOblique", () => {
+describe("addons/vcOblique/store/actionsVcOblique", () => {
     const namedProjections = [
         ["EPSG:31467", "+title=Bessel/Gauß-Krüger 3 +proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=3500000 +y_0=0 +ellps=bessel +datum=potsdam +units=m +no_defs"],
         ["EPSG:25832", "+title=ETRS89/UTM 32N +proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"],
@@ -26,6 +26,21 @@ describe("ADDONS: addons/vcOblique/store/actionsVcOblique", () => {
                         };
                     }
                 };
+            },
+            getLayers: () => {
+                return {
+                    getArray: () => {
+                        return [{
+                            get: (key) => {
+                                if (key === "id") {
+                                    return "marker_point_layer";
+                                }
+                                return {};
+                            },
+                            set: () => sinon.stub()
+                        }];
+                    }
+                };
             }
         };
 
@@ -43,7 +58,7 @@ describe("ADDONS: addons/vcOblique/store/actionsVcOblique", () => {
         dispatch = sinon.spy();
         getters = sinon.spy();
         rootGetters = {
-            getRestServiceById: () => {
+            restServiceById: () => {
                 return {
                     url: "https://this.could.be.your.url/examplePortal"
                 };
@@ -59,46 +74,44 @@ describe("ADDONS: addons/vcOblique/store/actionsVcOblique", () => {
             actions.resetObliqueViewer({commit, dispatch, getters});
 
             expect(dispatch.calledOnce).to.be.true;
-            expect(dispatch.args[0][0]).to.equal("MapMarker/removePointMarker");
-            expect(commit.calledOnce).to.be.true;
-            expect(commit.args[0][0]).to.equal("MapMarker/setPointStyleId");
+            expect(dispatch.args[0][0]).to.equal("Maps/removePointMarker");
         });
     });
-    describe("setObliqueView", () => {
-        it("setObliqueView shall do nothing, if coordinates are null", () => {
+    describe("obliqueView", () => {
+        it("obliqueView shall do nothing, if coordinates are null", () => {
             const centerCoordinate = null;
 
-            actions.setObliqueView({commit, dispatch, getters}, centerCoordinate);
+            actions.obliqueView({commit, dispatch, getters}, centerCoordinate);
 
             expect(commit.calledOnce).to.be.false;
             expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.args[0][0]).to.equal("Alerting/addSingleAlert");
 
         });
-        it("setObliqueView shall do nothing, if coordinates are undefined", () => {
+        it("obliqueView shall do nothing, if coordinates are undefined", () => {
             const centerCoordinate = undefined;
 
-            actions.setObliqueView({commit, dispatch, getters}, centerCoordinate);
+            actions.obliqueView({commit, dispatch, getters}, centerCoordinate);
 
             expect(commit.calledOnce).to.be.false;
             expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.args[0][0]).to.equal("Alerting/addSingleAlert");
 
         });
-        it("setObliqueView shall do nothing, if coordinates are no array", () => {
+        it("obliqueView shall do nothing, if coordinates are no array", () => {
             const centerCoordinate = "";
 
-            actions.setObliqueView({commit, dispatch, getters}, centerCoordinate);
+            actions.obliqueView({commit, dispatch, getters}, centerCoordinate);
 
             expect(commit.calledOnce).to.be.false;
             expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.args[0][0]).to.equal("Alerting/addSingleAlert");
 
         });
-        it("setObliqueView shall do nothing, if coordinates array length is smaller two", () => {
+        it("obliqueView shall do nothing, if coordinates array length is smaller two", () => {
             const centerCoordinate = [565874];
 
-            actions.setObliqueView({commit, dispatch, getters}, centerCoordinate);
+            actions.obliqueView({commit, dispatch, getters}, centerCoordinate);
 
             expect(commit.calledOnce).to.be.false;
             expect(dispatch.calledOnce).to.be.true;
@@ -106,72 +119,72 @@ describe("ADDONS: addons/vcOblique/store/actionsVcOblique", () => {
 
         });
     });
-    describe("setObliqueViewerURL", () => {
-        it("setObliqueViewerURL shall do nothing, if coordinates are null", () => {
+    describe("createObliqueViewerURL", () => {
+        it("createObliqueViewerURL shall do nothing, if coordinates are null", () => {
             const initialCenter = null;
 
-            actions.setObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
+            actions.createObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
 
             expect(commit.notCalled).to.be.true;
             expect(dispatch.notCalled).to.be.true;
 
         });
-        it("setObliqueViewerURL shall do nothing, if coordinates are undefined", () => {
+        it("createObliqueViewerURL shall do nothing, if coordinates are undefined", () => {
             const initialCenter = undefined;
 
-            actions.setObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
+            actions.createObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
 
             expect(commit.notCalled).to.be.true;
             expect(dispatch.notCalled).to.be.true;
 
         });
-        it("setObliqueViewerURL shall do nothing, if coordinates are no array", () => {
+        it("createObliqueViewerURL shall do nothing, if coordinates are no array", () => {
             const initialCenter = "";
 
-            actions.setObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
+            actions.createObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
 
             expect(commit.notCalled).to.be.true;
             expect(dispatch.notCalled).to.be.true;
 
         });
-        it("setObliqueViewerURL shall do nothing, if coordinates array length is smaller two", async () => {
+        it("createObliqueViewerURL shall do nothing, if coordinates array length is smaller two", async () => {
             const initialCenter = [565874];
 
-            actions.setObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
+            actions.createObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
 
             expect(commit.notCalled).to.be.true;
             expect(dispatch.notCalled).to.be.true;
 
         });
-        it("setObliqueViewerURL shall commit the oblique url", () => {
+        it("createObliqueViewerURL shall commit the oblique url", () => {
             const initialCenter = [565874, 5934140];
 
-            actions.setObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
+            actions.createObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
 
             expect(dispatch.calledOnce).to.be.true;
-            expect(dispatch.firstCall.args[0]).to.equal("setObliqueViewerURLWithSameHostname");
+            expect(dispatch.firstCall.args[0]).to.equal("obliqueViewerURLWithSameHostname");
             expect(dispatch.firstCall.args[1]).to.equal("9.99431966511419, 53.55201216725377");
         });
     });
 
-    describe("setObliqueViewerURLWithSameHostname", () => {
+    describe("obliqueViewerURLWithSameHostname", () => {
         it("should print an alerting if url hostnames are different", () => {
             const startCoordinates = "9.99431966511419, 53.55201216725377";
 
-            actions.setObliqueViewerURLWithSameHostname({commit, dispatch, getters, rootGetters}, startCoordinates);
+            actions.obliqueViewerURLWithSameHostname({commit, dispatch, getters, rootGetters}, startCoordinates);
 
             expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("Alerting/addSingleAlert");
-            expect(dispatch.firstCall.args[1]).to.equal("modules.tools.vcOblique.sameOrigin");
+            expect(dispatch.firstCall.args[1]).to.equal("modules.vcOblique.sameOrigin");
         });
     });
 
-    describe("setObliqueViewerURLWithReplacedHostname", () => {
+    describe("obliqueViewerURLWithReplacedHostname", () => {
         it("should replace the ", () => {
             const urlParts = ["geoportal-example.de", "examplePortal"],
                 startCoordinates = "9.99431966511419, 53.55201216725377";
 
-            actions.setObliqueViewerURLWithReplacedHostname({commit}, {urlParts, startCoordinates});
+            actions.obliqueViewerURLWithReplacedHostname({commit}, {urlParts, startCoordinates});
 
             expect(commit.calledOnce).to.be.true;
             expect(commit.firstCall.args[0]).to.equals("setObliqueViewerURL");

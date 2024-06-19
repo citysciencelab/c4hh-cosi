@@ -1,7 +1,0 @@
-{
-  "modules": {
-    "gfiOnAddress": {
-      "title": "Adressinformation zu: {{searchResultName}}"
-    }
-  }
-}

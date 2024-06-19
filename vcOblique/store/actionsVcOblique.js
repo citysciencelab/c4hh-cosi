@@ -1,5 +1,5 @@
 import crs from "@masterportal/masterportalapi/src/crs";
-import getProxyUrl from "../../../src/utils/getProxyUrl";
+import mapMarker from "../../../src/core/maps/js/mapMarker";
 
 const actions = {
     /**
@@ -27,7 +27,7 @@ const actions = {
                     mapElements = iframe.contentWindow.document.getElementsByClassName("mapElement vcm-map-top");
 
 
-                commit("Maps/setClickCartesianCoordinate", pixelCoordinate, {root: true});
+                commit("Maps/setClickPixel", pixelCoordinate, {root: true});
 
                 if (map) {
                     map.olMap.on("moveend", () => {
@@ -35,7 +35,7 @@ const actions = {
 
                         transformedCooridnates.every((coordinate, index) => {
                             if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
-                                dispatch("setObliqueView", transformedCooridnates);
+                                dispatch("obliqueView", transformedCooridnates);
                                 return false;
                             }
                             return true;
@@ -43,12 +43,14 @@ const actions = {
                     });
 
                     map.imageChanged.addEventListener(async () => {
-                        const viewPoint = await map.getViewPoint();
+                        const viewPoint = await map.getViewPoint(),
+                            heading = viewPoint.heading,
+                            coordinates = rootGetters["Maps/clickCoordinate"] ? rootGetters["Maps/clickCoordinate"] : rootGetters["Maps/initialCenter"];
 
-                        if (viewPoint.heading !== getters.heading) {
-                            dispatch("MapMarker/rotatePointMarker", viewPoint.heading, {root: true});
+                        if (heading !== getters.heading) {
+                            dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
                         }
-                        commit("setHeading", viewPoint.heading);
+                        commit("setHeading", heading);
                     });
                 }
 
@@ -59,12 +61,12 @@ const actions = {
                     for (const element of mapElements) {
                         element.style.top = 0;
                     }
-
-                    commit("setDefaultMapMarkerStyleId", rootGetters["MapMarker/pointStyleId"]);
+                    mapMarker.getMapmarkerLayerById("marker_point_layer").get("styleId");
+                    commit("setDefaultMapMarkerStyleId", mapMarker.getMapmarkerLayerById("marker_point_layer").get("styleId"));
                     if (getters.styleId) {
-                        commit("MapMarker/setPointStyleId", getters.styleId, {root: true});
+                        mapMarker.getMapmarkerLayerById("marker_point_layer").set("styleId", getters.styleId);
                     }
-                    dispatch("setObliqueView", rootGetters["Maps/center"]);
+                    dispatch("obliqueView", rootGetters["Maps/center"]);
                     observer.disconnect();
                 }
                 if (mapMenu) {
@@ -90,52 +92,52 @@ const actions = {
     * @param {Object} param.getters the getters
     * @returns {void}
     */
-    resetObliqueViewer ({commit, dispatch, getters}) {
-        commit("MapMarker/setPointStyleId", getters.defaultMapMarkerStyleId, {root: true});
-        dispatch("MapMarker/removePointMarker", null, {root: true});
+    resetObliqueViewer ({dispatch, getters}) {
+        mapMarker.getMapmarkerLayerById("marker_point_layer").set("styleId", getters.defaultMapMarkerStyleId);
+        dispatch("Maps/removePointMarker", null, {root: true});
     },
 
     /**
-    * SetObliqueView moves the map marker to the click position and centers the oblique aerial images at the point in the sidebar.
+    * ObliqueView moves the map marker to the click position and centers the oblique aerial images at the point in the sidebar.
     * @param {Object} param store context
     * @param {Object} param.commit the commit
     * @param {Object} param.dispatch the dispatch
     * @param {Object} param.getters the getters
-    * @param {Array} coordinate the click/center coordinate
+    * @param {Object} param.rootGetters the rootGetters
+    * @param {Array} coordinates the click/center coordinate
     * @returns {void}
     */
-    async setObliqueView ({commit, dispatch, getters}, coordinate = []) {
+    async obliqueView ({commit, dispatch, getters}, coordinates = []) {
         const vcs = document.getElementById("obliqueIframe")?.contentWindow?.vcs,
             framework = vcs?.vcm?.Framework?.getInstance(),
             map = framework?.getActiveMap();
         let viewPoint = {};
 
-        if (framework && coordinate && Array.isArray(coordinate) && coordinate.length > 1) {
-            commit("setLastCoordinates", coordinate);
+        if (framework && coordinates && Array.isArray(coordinates) && coordinates.length > 1) {
+            commit("setLastCoordinates", coordinates);
             if (vcs?.vcm?.util) {
                 viewPoint = new vcs.vcm.util.ViewPoint({
-                    groundPosition: crs.transform(mapCollection.getMapView("2D").getProjection().getCode(), "EPSG:4326", coordinate),
+                    groundPosition: crs.transform(mapCollection.getMapView("2D").getProjection().getCode(), "EPSG:4326", coordinates),
                     heading: getters.heading,
                     distance: map.getViewPointSync().distance
                 });
             }
 
             await framework?.getActiveMap().gotoViewPoint(viewPoint);
-
-            dispatch("MapMarker/placingPointMarker", coordinate, {root: true});
-            dispatch("MapMarker/rotatePointMarker", getters.heading, {root: true});
+            commit("Maps/setClickCoordinate", coordinates, {root: true});
+            dispatch("Maps/placingPointMarker", {rotation: getters.heading, coordinates}, {root: true});
         }
         else {
             dispatch("Alerting/addSingleAlert",
-                "<strong>" + i18next.t("additional:modules.tools.vcOblique.frameworkUndefined") + "</strong>"
+                "<strong>" + i18next.t("additional:modules.vcOblique.frameworkUndefined") + "</strong>"
                 + "<br>"
-                + "<small>" + i18next.t("additional:modules.tools.vcOblique.frameworkUndefinedMessage") + "</small>",
+                + "<small>" + i18next.t("additional:modules.vcOblique.frameworkUndefinedMessage") + "</small>",
                 {root: true}
             );
         }
     },
     /**
-    * SetObliqueViewerURL gets the initaialCenter coordinate and creates the URL for the Oblique Map.
+    * createObliqueViewerURL gets the initialCenter coordinate and creates the URL for the Oblique Map.
     * @param {Object} param store context
     * @param {Object} param.commit the commit
     * @param {Object} param.dispatch the dispatch
@@ -144,16 +146,16 @@ const actions = {
     * @param {Number[]} initialCenter the initial center coordinate
     * @returns {void}
     */
-    setObliqueViewerURL ({commit, dispatch, getters, rootGetters}, initialCenter) {
+    createObliqueViewerURL ({commit, dispatch, getters, rootGetters}, initialCenter) {
         if (initialCenter && Array.isArray(initialCenter) && initialCenter.length > 1) {
             const transformedCoordinates = crs.transform(mapCollection.getMapView("2D").getProjection().getCode(), "EPSG:4326", initialCenter),
                 startCoordinates = transformedCoordinates[0] + ", " + transformedCoordinates[1];
 
             if (document.location.hostname === "localhost") {
-                commit("setObliqueViewerURL", getProxyUrl(rootGetters.getRestServiceById(getters.serviceId).url) + "?groundPosition=" + startCoordinates);
+                commit("setObliqueViewerURL", document.location.origin + "/" + rootGetters.restServiceById(getters.serviceId).url.split("//")[1].replaceAll(".", "_") + "?groundPosition=" + startCoordinates);
             }
             else {
-                dispatch("setObliqueViewerURLWithSameHostname", startCoordinates);
+                dispatch("obliqueViewerURLWithSameHostname", startCoordinates);
             }
         }
     },
@@ -169,17 +171,17 @@ const actions = {
      * @param {String} startCoordinates The start coordinates
      * @returns {void}
      */
-    setObliqueViewerURLWithSameHostname ({commit, dispatch, getters, rootGetters}, startCoordinates) {
-        const urlParts = rootGetters.getRestServiceById(getters.serviceId).url.split("https://")[1].split("/");
+    obliqueViewerURLWithSameHostname ({commit, dispatch, getters, rootGetters}, startCoordinates) {
+        const urlParts = rootGetters.restServiceById(getters.serviceId).url.split("https://")[1].split("/");
 
         if (document.location.hostname === urlParts[0]) {
-            commit("setObliqueViewerURL", rootGetters.getRestServiceById(getters.serviceId).url + "?groundPosition=" + startCoordinates);
+            commit("setObliqueViewerURL", rootGetters.restServiceById(getters.serviceId).url + "?groundPosition=" + startCoordinates);
         }
         else if (document.location.hostname.startsWith("www.") && document.location.hostname.split("www.")[1] === urlParts[0]) {
-            dispatch("setObliqueViewerURLWithReplacedHostname", {urlParts, startCoordinates});
+            dispatch("obliqueViewerURLWithReplacedHostname", {urlParts, startCoordinates});
         }
         else {
-            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.vcOblique.sameOrigin"), {root: true});
+            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.vcOblique.sameOrigin"), {root: true});
         }
     },
 
@@ -192,7 +194,7 @@ const actions = {
      * @param {String} payload.startCoordinates The start coordinates
      * @returns {void}
      */
-    setObliqueViewerURLWithReplacedHostname ({commit}, {urlParts, startCoordinates}) {
+    obliqueViewerURLWithReplacedHostname ({commit}, {urlParts, startCoordinates}) {
         let changedUrl = "https:/";
 
         urlParts.forEach((part, index) => {
@@ -206,7 +208,6 @@ const actions = {
 
         commit("setObliqueViewerURL", changedUrl + "?groundPosition=" + startCoordinates);
     }
-
 };
 
 export default actions;

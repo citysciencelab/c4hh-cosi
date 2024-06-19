@@ -1,0 +1,15 @@
+{
+  "modules": {
+    "getFeatureInfo": {
+      "themes": {
+        "schulinfo": {
+          "no": "Nein",
+          "yes": "Ja",
+          "favoriteicons": {
+            "adoptedTargetSchool": "Schule als Ziel übernehmen"
+          }
+        }
+      }
+    }
+  }
+}

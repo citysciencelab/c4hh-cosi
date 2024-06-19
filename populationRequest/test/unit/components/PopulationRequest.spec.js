@@ -1,135 +1,154 @@
-import Vuex from "vuex";
-import {config, shallowMount, createLocalVue} from "@vue/test-utils";
+import {createStore} from "vuex";
+import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
+import {nextTick} from "vue";
 
 import Component from "../../../components/PopulationRequest.vue";
-import GraphicalSelectComponent from "../../../../../src/share-components/graphicalSelect/components/GraphicalSelect.vue";
-import ToggleCheckboxComponent from "../../../../../src/share-components/toggleCheckbox/components/ToggleCheckbox.vue";
-import Module from "../../../store/indexPopulationRequest";
+import GraphicalSelectComponent from "../../../../../src/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
+import SwitchInputComponent from "../../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
+import PopulationRequest from "../../../store/indexPopulationRequest";
 
-const localVue = createLocalVue();
-
-localVue.use(Vuex);
-config.mocks.$t = key => key;
+config.global.mocks.$t = key => key;
 
 describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
     const geographicValues = ["Box", "Circle", "Polygon"],
         selectionElements = ["Dropdown"],
-        mockMapMutations = {
-            addLayerToMap: sinon.stub(),
-            removeLayerFromMap: sinon.stub()
-        },
-        mockMapActions = {
-            addInteraction: sinon.stub(),
-            registerListener: sinon.stub(),
-            addLayerOnTop: sinon.stub()
-        },
         mockGraphicalSelectGetters = {
             circleOverlay: sinon.stub(),
             tooltipOverlay: sinon.stub(),
+            selectedAreaGeoJson: sinon.stub(),
             geographicValues: () => geographicValues,
             selectionElements: () => selectionElements
         },
-        mockGraphicalSelectActions = {
-            createDomOverlay: sinon.stub(),
-            toggleOverlay: sinon.stub(),
-            setDrawInteractionListener: sinon.stub(),
-            setDefaultSelection: sinon.stub()
-        },
-        mockGraphicalSelectMutations = {
-            setCurrentValue: sinon.stub(),
-            setDrawInteraction: sinon.stub(),
-            setDefaultSelection: sinon.stub()
-        };
-    let store;
+        alkisAdressLayerId = "9726",
+        rasterLayerId = "13023";
+    let store,
+        spyAddLayerToLayerConfig,
+        spyReplaceByIdInLayerConfig,
+        spySetRasterActive,
+        spySetAlkisAdressesActive,
+        layerConfigById;
 
     beforeEach(() => {
-        store = new Vuex.Store({
-            namespaced: true,
+        const warnSpy = sinon.spy(),
+            errorSpy = sinon.spy();
+
+        sinon.stub(console, "warn").callsFake(warnSpy);
+        sinon.stub(console, "error").callsFake(errorSpy);
+        layerConfigById = false;
+        spyAddLayerToLayerConfig = sinon.spy();
+        spyReplaceByIdInLayerConfig = sinon.spy();
+        spySetRasterActive = sinon.spy();
+        spySetAlkisAdressesActive = sinon.spy();
+        PopulationRequest.mutations.setRasterActive = spySetRasterActive;
+        PopulationRequest.mutations.setAlkisAdressesActive = spySetAlkisAdressesActive;
+        store = createStore({
+            namespaces: true,
             modules: {
-                Tools: {
+                Modules: {
                     namespaced: true,
                     modules: {
-                        PopulationRequest: Module
+                        namespaced: true,
+                        PopulationRequest: PopulationRequest,
+                        GraphicalSelect: {
+                            namespaced: true,
+                            getters: mockGraphicalSelectGetters,
+                            actions: {
+                                createDomOverlay: sinon.stub(),
+                                toggleOverlay: sinon.stub(),
+                                setDrawInteractionListener: sinon.stub(),
+                                setDefaultSelection: sinon.stub()
+                            },
+                            mutations: {
+                                setCurrentValue: sinon.stub(),
+                                setDrawInteraction: sinon.stub(),
+                                setDefaultSelection: sinon.stub(),
+                                resetGeographicSelection: sinon.stub()
+                            }
+                        }
                     }
                 },
                 Maps: {
                     namespaced: true,
-                    mutations: mockMapMutations,
-                    actions: mockMapActions
-                },
-                GraphicalSelect: {
-                    namespaced: true,
-                    getters: mockGraphicalSelectGetters,
-                    actions: mockGraphicalSelectActions,
-                    mutations: mockGraphicalSelectMutations
+                    mutations: {
+                        addLayerToMap: sinon.stub(),
+                        removeLayerFromMap: sinon.stub()
+                    },
+                    actions: {
+                        addInteraction: sinon.stub(),
+                        registerListener: sinon.stub(),
+                        addLayerOnTop: sinon.stub()
+                    },
+                    getters: {
+                        scale: sinon.stub()
+                    }
                 }
             },
             getters: {
                 isDefaultStyle: () => true,
-                uiStyle: () => true
+                uiStyle: () => true,
+                restServiceById: () => () => true,
+                visibleLayerConfigs: sinon.stub(),
+                layerConfigById: () => sinon.stub().returns(layerConfigById),
+                determineZIndex: () => sinon.stub().returns(2)
+            },
+            actions: {
+                addLayerToLayerConfig: spyAddLayerToLayerConfig,
+                replaceByIdInLayerConfig: spyReplaceByIdInLayerConfig
             }
         });
+    });
 
-        store.commit("Tools/PopulationRequest/setActive", true);
+    afterEach(() => {
+        sinon.restore();
     });
 
     it("should exist", async () => {
-        const wrapper = shallowMount(Component, {store, localVue});
+        const wrapper = shallowMount(Component, {global: {plugins: [store]}});
 
         expect(wrapper.exists()).to.be.true;
     });
 
-    it("should find Tool component", async () => {
-        const wrapper = shallowMount(Component, {store, localVue}),
-            toolWrapper = wrapper.findComponent({name: "ToolTemplate"});
+    it("should find GraphicalSelect component", async () => {
+        const wrapper = shallowMount(Component, {global: {plugins: [store]}}),
+            graphicalSelectWrapper = wrapper.findComponent({name: "GraphicalSelect"});
 
-        expect(toolWrapper.exists()).to.be.true;
-    });
-
-    it("should not render if active is false", () => {
-
-        const wrapper = shallowMount(Component, {store, localVue}),
-            divWrapper = wrapper.findComponent({name: "div.dropdown"});
-
-        expect(divWrapper.exists()).to.be.false;
-    });
-
-    it("should render if active is true", async () => {
-        const wrapper = shallowMount(Component, {store, localVue});
-
-        expect(wrapper.find("div.dropdown").exists()).to.be.true;
+        expect(graphicalSelectWrapper.exists()).to.be.true;
     });
 
     it("renders the PopulationRequest tool with the expected divs", async () => {
-        const wrapper = shallowMount(Component, {store, localVue});
+        const wrapper = shallowMount(Component, {global: {plugins: [store]}});
 
         expect(wrapper.find("div.dropdown").exists()).to.be.true;
         expect(wrapper.find("div.result").exists()).to.be.false;
         expect(wrapper.find("div.checkbox").exists()).to.be.true;
     });
 
-    it("should call toggleRasterLayer if Raster Checkbox is changed", async () => {
+    it("should call triggerRaster if Raster Checkbox is changed", () => {
         const spyRaster = sinon.spy(Component.methods, "triggerRaster"),
-            wrapper = shallowMount(Component, {store, localVue, stubs: {"ToggleCheckbox": ToggleCheckboxComponent, "GraphicalSelect": GraphicalSelectComponent}}),
-            rasterComponent = wrapper.findComponent({ref: "rasterCheckBox"});
+            wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"GraphicalSelect": GraphicalSelectComponent}}),
+            rasterComponent = wrapper.find("#rasterCheckBox");
 
-        await rasterComponent.vm.$emit("change");
-        expect(spyRaster.calledOnce).to.be.true;
+        rasterComponent.trigger("click");
 
-        spyRaster.restore();
+        nextTick(() => {
+            expect(spyRaster.calledOnce).to.be.true;
+        });
+
     });
 
-    it("should call toggleAlkisAdresses if alkisAdresses Checkbox is changed", async () => {
+    it("should call triggerAlkisAdresses if alkisAdresses Checkbox is changed", () => {
         const spyAlkisAdresses = sinon.spy(Component.methods, "triggerAlkisAdresses"),
-            wrapper = shallowMount(Component, {store, localVue, stubs: {"ToggleCheckbox": ToggleCheckboxComponent, "GraphicalSelect": GraphicalSelectComponent}}),
-            alkisAdressesComponent = wrapper.findComponent({ref: "alkisAdressesCheckBox"});
+            wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
+            alkisAdressesComponent = wrapper.find("#alkisAdressesCheckBox");
 
-        await alkisAdressesComponent.vm.$emit("change");
-        expect(spyAlkisAdresses.calledOnce).to.be.true;
+        alkisAdressesComponent.trigger("click");
 
-        spyAlkisAdresses.restore();
+        nextTick(() => {
+            expect(spyAlkisAdresses.calledOnce).to.be.true;
+        });
+
     });
 
     describe("chooseUnitAndThousandsSeparator", function () {
@@ -153,6 +172,85 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
         });
         it("should return correctly formatted number with unit when value > 10000000 &&  maxlength === 1", function () {
             expect(Component.methods.chooseUnitAndThousandsSeparator(99999999.999, 1)).to.equal("100,0 km²");
+        });
+    });
+
+    describe("watcher", () => {
+        it("visibleBaselayerConfigs shall set raster layer on", () => {
+            const newLayerConfigs = [{
+                    id: rasterLayerId
+                }],
+                oldLayerConfigs = [],
+
+                wrapper = shallowMount(Component, {
+                    global: {
+                        plugins: [store]
+                    },
+                    stubs: {
+                        "SwitchInput": SwitchInputComponent,
+                        "GraphicalSelect": GraphicalSelectComponent}
+                });
+
+            wrapper.vm.$options.watch.visibleLayerConfigs.handler.call(wrapper.vm, newLayerConfigs, oldLayerConfigs);
+            expect(spySetRasterActive.calledOnce).to.be.true;
+            expect(spySetRasterActive.firstCall.args[1]).to.be.true;
+        });
+        it("visibleBaselayerConfigs shall set alkis addresses layer on", () => {
+            const newLayerConfigs = [{
+                    id: alkisAdressLayerId
+                }],
+                oldLayerConfigs = [],
+
+                wrapper = shallowMount(Component, {
+                    global: {
+                        plugins: [store]
+                    },
+                    stubs: {
+                        "SwitchInput": SwitchInputComponent,
+                        "GraphicalSelect": GraphicalSelectComponent}
+                });
+
+            wrapper.vm.$options.watch.visibleLayerConfigs.handler.call(wrapper.vm, newLayerConfigs, oldLayerConfigs);
+            expect(spySetAlkisAdressesActive.calledOnce).to.be.true;
+            expect(spySetAlkisAdressesActive.firstCall.args[1]).to.be.true;
+        });
+        it("visibleBaselayerConfigs shall set raster layer off", () => {
+            const oldLayerConfigs = [{
+                    id: rasterLayerId
+                }],
+                newLayerConfigs = [],
+
+                wrapper = shallowMount(Component, {
+                    global: {
+                        plugins: [store]
+                    },
+                    stubs: {
+                        "SwitchInput": SwitchInputComponent,
+                        "GraphicalSelect": GraphicalSelectComponent}
+                });
+
+            wrapper.vm.$options.watch.visibleLayerConfigs.handler.call(wrapper.vm, newLayerConfigs, oldLayerConfigs);
+            expect(spySetRasterActive.calledOnce).to.be.true;
+            expect(spySetRasterActive.firstCall.args[1]).to.be.false;
+        });
+        it("visibleBaselayerConfigs shall set alkis address layer off", () => {
+            const oldLayerConfigs = [{
+                    id: alkisAdressLayerId
+                }],
+                newLayerConfigs = [],
+
+                wrapper = shallowMount(Component, {
+                    global: {
+                        plugins: [store]
+                    },
+                    stubs: {
+                        "SwitchInput": SwitchInputComponent,
+                        "GraphicalSelect": GraphicalSelectComponent}
+                });
+
+            wrapper.vm.$options.watch.visibleLayerConfigs.handler.call(wrapper.vm, newLayerConfigs, oldLayerConfigs);
+            expect(spySetAlkisAdressesActive.calledOnce).to.be.true;
+            expect(spySetAlkisAdressesActive.firstCall.args[1]).to.be.false;
         });
     });
 });

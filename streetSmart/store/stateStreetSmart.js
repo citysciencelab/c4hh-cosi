@@ -1,46 +1,45 @@
 /**
  * User type definition
  * @typedef {Object} StreetSmartState
- * @property {Boolean} active if true, viewer will rendered
- * @property {String} id id of the viewer component
- * @property {String} name displayed as title (config-param)
+ * @property {String} description description of tool (config-param)
+ * @property {Boolean} hasMouseMapInteractions If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
  * @property {String} icon icon next to title (config-param)
- * @property {Boolean} renderToWindow if true, tool is rendered in a window, else in sidebar (config-param)
- * @property {Boolean} resizableWindow if true, window is resizable (config-param)
- * @property {Boolean} isVisibleInMenu if true, tool is selectable in menu (config-param)
- * @property {Boolean} deactivateGFI flag if tool should deactivate gfi (config-param)
- * @property {Number} initialWidth initial width of the sidebar
+ * @property {String} name displayed as title (config-param)
+ * @property {String} reactVersion version of react to load
  * @property {String} serviceId id of the rest-service that provides the panorama pictures
  * @property {String} streetsmartAPIVersion version of the streetsmartAPI to load
+ * @property {String} styleId The styleId for the map marker.
+ * @property {String[]} supportedDevices Devices on which the module is displayed.
+ * @property {String[]} supportedMapModes Map mode in which this module can be used.
+ * @property {String} type type of the viewer component
+ *
+ * @property {Number[]} lastCoordinates the last clicked coordinates
+ * @property {Number} lastYaw the last recorded yaw/rotation
+ * @property {Boolean} packagesLoaded represents if packages are loaded.
  * @property {Boolean} timeTravelVisible enables timeTravel in panoramaViewer
  * @property {Boolean} toggle3DCursor toggles the visibility of the 3D cursor in the PanoramaViewer
  * @property {Boolean} toggleAddressesVisible toggles the visibility of addresses
- * @property {String} reactVersion version of react to load
- * @property {Array} lastCoordinates the last clicked coordinates
- * @property {Number} lastYaw the last recorded yaw
  */
 
 const state = {
-    active: false,
-    id: "streetsmart",
-    name: "additional:menu.tools.streetsmart",
+    description: "additional:modules.streetsmart.description",
+    hasMouseMapInteractions: true,
     icon: "bi-camera-fill",
-    renderToWindow: false,
-    resizableWindow: true,
-    isVisibleInMenu: true,
-    deactivateGFI: false,
-    initialWidth: 500,
+    name: "additional:modules.streetsmart.name",
+    reactVersion: "16.13.0",
     serviceId: "streetsmart",
     streetsmartAPIVersion: "22.2",
-    reactVersion: "16.12.0",
+    styleId: "defaultMapMarkerPoint",
+    supportedDevices: ["Desktop", "Mobile", "Table"],
+    supportedMapModes: ["2D", "3D"],
+    type: "streetSmart",
+
+    lastCoordinates: [],
+    lastYaw: 0,
+    packagesLoaded: false,
     timeTravelVisible: false,
     toggle3DCursor: false,
-    toggleAddressesVisible: false,
-    cycloLayerID: null,
-    styleId: "defaultMapMarkerPoint",
-    mapMarkerStyleId: "defaultMapMarkerPoint",
-    lastCoordinates: [],
-    lastYaw: 0
+    toggleAddressesVisible: false
 };
 
 export default state;

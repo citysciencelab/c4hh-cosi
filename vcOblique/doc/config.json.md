@@ -1,4 +1,4 @@
-# Portalconfig.menu.tools.children
+# Portalconfig.menu.modules.children
 
 List of all configurable tools. Each tool inherits from **[tool](#markdown-header-portalconfigmenutool)** and thus can/must also have the attributes specified there configured.
 
@@ -8,7 +8,7 @@ List of all configurable tools. Each tool inherits from **[tool](#markdown-heade
 
 
 
-## Portalconfig.menu.tools.children.vcOblique
+## Portalconfig.menu.modules.children.vcOblique
 
 Tool to include the oblique aerial view application from vcs in the sidebar.
 The oblique aerial view application must be on the same server to be included in the iFrame.
@@ -61,16 +61,15 @@ Mobile the iFrame is displayed in the window.
 |name|yes|String|Elevation|The title of the tool or the entry in the tool list|false|
 |icon|yes|string|bi-camera-fill|The icon to use.|false|
 |styleId|no|String|"obliqueViewer"|StyleId from the style.json to style the mapmarker in the map when obliqueviewer is open.|true|
-|dataYear|no|String|""|Year of the underlying data.|false|
 
 **Example**
 ```
 #!json
     "vcOblique": {
-    "name": "translate#additional:modules.tools.vcOblique.title",
-    "icon": "bi-image",
-    "dataYear":"2020"
+    "name": "additional:modules.vcOblique.title",
+    "icon": "bi-image"
     }
 ```
 
 ***
+

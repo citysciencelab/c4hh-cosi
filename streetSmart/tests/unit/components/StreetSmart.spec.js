@@ -1,49 +1,47 @@
-import Vuex from "vuex";
-import {config, shallowMount, createLocalVue} from "@vue/test-utils";
+import {createStore} from "vuex";
+import {config, shallowMount} from "@vue/test-utils";
 import StreetSmartComponent from "../../../components/StreetSmart.vue";
-import StreetSmart from "../../../store/indexStreetSmart";
 import {expect} from "chai";
 import sinon from "sinon";
+import {nextTick} from "vue";
 
-const localVue = createLocalVue();
+config.global.mocks.$t = key => key;
 
-localVue.use(Vuex);
-config.mocks.$t = key => key;
-
-describe("ADDONS: addons/streetSmart/components/StreetSmart.vue", () => {
-    const mockConfigJson = {
-        Portalconfig: {
-            menu: {
-                tools: {
-                    children: {
-                        streetSmart: {
-                            name: "translate#additional:menu.tools.streetsmart",
-                            glyphicon: "glyphicon-picture",
-                            streetsmartAPIVersion: "v22.2",
-                            reactVersion: "16.13.0"
-                        }
-                    }
-                }
-            }
-        }
-    };
-    let store, wrapper, destroyApiOrig, initApiOrig, setPositionOrig;
+describe("addons/streetSmart/components/StreetSmart.vue", () => {
+    let destroyApiSpy,
+        initApiSpy,
+        packagesLoaded,
+        setPositionSpy,
+        store,
+        wrapper;
 
     beforeEach(() => {
-        destroyApiOrig = StreetSmart.actions.destroyApi;
-        StreetSmart.actions.destroyApi = sinon.stub();
-        initApiOrig = StreetSmart.actions.initApi;
-        StreetSmart.actions.initApi = sinon.stub();
-        setPositionOrig = StreetSmart.actions.setPosition;
-        StreetSmart.actions.setPosition = sinon.stub();
+        packagesLoaded = true;
+        destroyApiSpy = sinon.spy();
+        initApiSpy = sinon.spy();
+        setPositionSpy = sinon.spy();
 
-        store = new Vuex.Store({
+        store = createStore({
             namespaces: true,
             modules: {
-                Tools: {
+                Modules: {
                     namespaced: true,
                     modules: {
-                        StreetSmart
+                        StreetSmart: {
+                            namespaced: true,
+                            getters: {
+                                packagesLoaded: () => packagesLoaded
+                            },
+                            mutations: {
+                                setPackagesLoaded: sinon.spy()
+                            },
+                            actions: {
+                                destroyApi: destroyApiSpy,
+                                loadPackages: sinon.spy(),
+                                initApi: initApiSpy,
+                                setPosition: setPositionSpy
+                            }
+                        }
                     }
                 },
                 Maps: {
@@ -51,80 +49,78 @@ describe("ADDONS: addons/streetSmart/components/StreetSmart.vue", () => {
                     getters: {
                         clickCoordinate: () => [100, 200]
                     }
-                },
-                MapMarker: {
-                    namespaced: true,
-                    getters: {
-                        markerPoint: () => sinon.spy()
-                    }
                 }
-            },
-            state: {
-                configJson: mockConfigJson
             }
         });
     });
-    afterEach(function () {
+
+    afterEach(() => {
         sinon.restore();
-        // set back to original functions, else next test actionsStreetSmart.spec.js fails
-        StreetSmart.actions.destroyApi = destroyApiOrig;
-        StreetSmart.actions.initApi = initApiOrig;
-        StreetSmart.actions.setPosition = setPositionOrig;
-        if (wrapper) {
-            wrapper.destroy();
-        }
     });
 
     it("renders the StreetSmart", () => {
-        store.state.Tools.StreetSmart.active = true;
-        wrapper = shallowMount(StreetSmartComponent, {store, localVue});
+        wrapper = shallowMount(StreetSmartComponent, {
+            global: {
+                plugins: [store]
+            }
+        });
 
-        expect(wrapper.find("#streetsmart").exists()).to.be.true;
+        expect(wrapper.find("#addons-street-smart").exists()).to.be.true;
     });
 
-    it("do not render the StreetSmart if not active", () => {
-        store.state.Tools.StreetSmart.active = false;
-        wrapper = shallowMount(StreetSmartComponent, {store, localVue});
+    it("should set to false destroyApi should be called", () => {
+        wrapper = shallowMount(StreetSmartComponent, {
+            global: {
+                plugins: [store]
+            }
+        });
 
-        expect(wrapper.find("#streetsmart").exists()).to.be.false;
+        wrapper.unmount();
+
+        nextTick(() => {
+            expect(wrapper.find("#street-smart").exists()).to.be.false;
+            expect(destroyApiSpy.calledOnce).to.be.true;
+        });
     });
 
-    it("if active is set to false destroyApi should be called", async () => {
-        store.state.Tools.StreetSmart.active = true;
-        wrapper = shallowMount(StreetSmartComponent, {store, localVue});
+    it("should set to true initApi should be called", () => {
+        wrapper = shallowMount(StreetSmartComponent, {
+            global: {
+                plugins: [store]
+            }
+        });
 
-        store.commit("Tools/StreetSmart/setActive", false);
-        await wrapper.vm.$nextTick();
-        expect(wrapper.find("#streetsmart").exists()).to.be.false;
-        expect(StreetSmart.actions.destroyApi.calledOnce).to.be.true;
-    });
-    it("if active is set to true initApi should be called", async () => {
-        store.state.Tools.StreetSmart.active = false;
-        wrapper = shallowMount(StreetSmartComponent, {store, localVue});
-
-        wrapper.vm.apiIsLoaded = true;
-        store.commit("Tools/StreetSmart/setActive", true);
-        await wrapper.vm.$nextTick();
-        expect(wrapper.find("#streetsmart").exists()).to.be.true;
-        expect(StreetSmart.actions.initApi.calledOnce).to.be.true;
+        nextTick(() => {
+            expect(wrapper.find("#street-smart").exists()).to.be.true;
+            expect(initApiSpy.calledOnce).to.be.true;
+        });
     });
     it("if active is set to true, but api loading has not finished: initApi should not be called", async () => {
-        store.state.Tools.StreetSmart.active = false;
-        wrapper = shallowMount(StreetSmartComponent, {store, localVue});
+        packagesLoaded = false;
 
-        wrapper.vm.apiIsLoaded = false;
-        store.commit("Tools/StreetSmart/setActive", true);
-        await wrapper.vm.$nextTick();
-        expect(wrapper.find("#streetsmart").exists()).to.be.true;
-        expect(StreetSmart.actions.initApi.notCalled).to.be.true;
+        wrapper = shallowMount(StreetSmartComponent, {
+            global: {
+                plugins: [store]
+            }
+        });
+
+        nextTick(() => {
+            expect(wrapper.find("#street-smart").exists()).to.be.true;
+            expect(initApiSpy.notCalled).to.be.true;
+        });
     });
 
-    it("test watch on clickCoordinate should call action setPosition", async () => {
-        store.state.Tools.StreetSmart.active = true;
-        wrapper = shallowMount(StreetSmartComponent, {store, localVue});
+    it("test watch on clickCoordinate should call action setPosition", () => {
+        wrapper = shallowMount(StreetSmartComponent, {
+            global: {
+                plugins: [store]
+            }
+        });
 
-        expect(wrapper.find("#streetsmart").exists()).to.be.true;
-        wrapper.vm.$options.watch.clickCoordinate.call(wrapper.vm, [10, 20]);
-        expect(StreetSmart.actions.setPosition.calledOnce).to.be.true;
+        nextTick(() => {
+            expect(wrapper.find("#street-smart").exists()).to.be.true;
+            wrapper.vm.$options.watch.clickCoordinate.call(wrapper.vm, [10, 20]);
+            expect(setPositionSpy.called).to.be.true;
+        });
     });
 });
