@@ -131,7 +131,7 @@ describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () =>
             expect(wrapper.vm.enableDownload).to.be.true;
         });
     });
-
+    // see https://lgv-hamburg.atlassian.net/browse/BG-5580
     describe("User Interactions", () => {
         it.skip("should call 'runSorting' when the icon is clicked", async () => {
             wrapper = mount(DataTableTheme, {
@@ -147,7 +147,7 @@ describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () =>
             await icon.trigger("click");
             expect(spyRunSorting.calledOnce).to.be.true;
         });
-
+        // see: https://lgv-hamburg.atlassian.net/browse/BG-5580
         it.skip("should call 'resetAll' when the resetAll button is clicked", async () => {
             wrapper = mount(DataTableTheme, {
                 global: {
