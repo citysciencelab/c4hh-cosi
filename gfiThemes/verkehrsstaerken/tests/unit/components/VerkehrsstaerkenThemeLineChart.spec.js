@@ -23,7 +23,6 @@ describe.skip("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThem
             }
         });
     });
-    
 
     it("should exist", () => {
         nextTick(() => {
