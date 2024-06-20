@@ -24,7 +24,6 @@ describe.skip("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThem
         });
     });
 
-
     it("should exist", () => {
         nextTick(() => {
             expect(wrapper.find("#verkehrsstaerken-line-chart").exists()).to.be.true;
