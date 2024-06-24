@@ -24,6 +24,7 @@ For further information about the changes for version 3.0.0 visit the [Masterpor
 ### Removed
 
 ### Fixed
+- The prePushHook works again
 
 
 ## v2.46.0 - 2024-06-05
