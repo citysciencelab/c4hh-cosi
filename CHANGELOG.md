@@ -3,7 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
+## 2024-06-27 v3.0.0
 ### __Breaking Changes__
 Under the headline `deprecated` you can find several changes of removed deprecated properties and tools.
 In certain circumstances this means that you have to update your portal files (index.html, config.js and config.json) according to the new changes in order to use your portal furthermore.
@@ -20,8 +20,6 @@ For further information about the changes for version 3.0.0 visit the [Masterpor
 
 ### Deprecated
 - The deprecated Backbone add-ons, defined by a string in addonsConf.json, are no longer supported in version 3.0.0.
-
-### Removed
 
 ### Fixed
 - The prePushHook works again
