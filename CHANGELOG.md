@@ -3,6 +3,21 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
+## Unreleased - in development
+### __Breaking Changes__
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+---
+
 ## 2024-06-27 v3.0.0
 ### __Breaking Changes__
 Under the headline `deprecated` you can find several changes of removed deprecated properties and tools.
