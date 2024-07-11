@@ -9,6 +9,7 @@
 ### Added
 
 ### Changed
+- Eslint: no-undef eslint rule is switched on and changes to not return warnings/errors are applied.
 
 ### Deprecated
 
