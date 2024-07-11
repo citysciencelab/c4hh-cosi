@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import mapCollection from "../../../src/core/maps/js/mapCollection";
 import loadPackage from "../js/loadPackage";
+
 const actions = {
     /**
      * Loads StreetSmartApi and react in the given versions. They are loaded by appending a script tag to head tag and not by package.json.
