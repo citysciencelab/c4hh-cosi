@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import mapCollection from "../../../src/core/maps/js/mapCollection";
 import loadPackage from "../js/loadPackage";
 
