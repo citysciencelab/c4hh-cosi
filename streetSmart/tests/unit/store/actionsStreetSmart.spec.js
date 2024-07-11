@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import {expect} from "chai";
 import sinon from "sinon";
 import actions from "../../../store/actionsStreetSmart";

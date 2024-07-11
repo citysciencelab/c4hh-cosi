@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable no-undef */
 import {mapGetters} from "vuex";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import mouseOverCotentLivingLocation from "../utils/mouseOverContent.js";

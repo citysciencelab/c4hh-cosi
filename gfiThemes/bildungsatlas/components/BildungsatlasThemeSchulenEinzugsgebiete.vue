@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable no-undef */
 import {mapGetters} from "vuex";
 import {optimizeValueRootedInComplexType} from "../utils/complexType.js";
 
