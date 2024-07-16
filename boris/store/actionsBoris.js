@@ -1,10 +1,10 @@
 import axios from "axios";
 import helpers from "../utils/helpers";
-import thousandsSeparator from "../../../src/utils/thousandsSeparator";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
 import {WFS, WMSGetFeatureInfo} from "ol/format.js";
-import {getLayerModelsByAttributes} from "../utils/RadioBridge";
-import WPS from "../../../src/api/wps";
-import mapCollection from "../../../src/core/maps/mapCollection";
+import layerCollection from "../../../src/core/layers/js/layerCollection";
+import WPS from "../../../src/shared/js/api/wps";
+import mapCollection from "../../../src/core/maps/js/mapCollection";
 
 const actions = {
     /**
@@ -13,11 +13,13 @@ const actions = {
      * @param {Object} initialize.commit the commit
      * @returns {void}
      */
-    initialize ({commit}) {
-        let layerList = getLayerModelsByAttributes({isNeverVisibleInTree: true});
-
+    initialize ({commit, rootGetters}) {
+        let layerList = rootGetters.layerConfigsByAttributes({isNeverVisibleInTree: true});
+        console.log("initialize: ", layerList);
+        // warum brauche ich layerCollection hier? wenn layerConfigByAttribute ja theoretisch auch funktioniert?
         if (layerList) {
             // parentId is being resettet to enable the handling of singleBaseLayer only for baseLayers (layer.js: function handleSingleBaseLayer)
+            // layerCollection.getLayerById(selectedSourceLayer.id);
             layerList.forEach(layer => layer.set("parentId", "noParent"));
             layerList = layerList.filter(function (layer) {
                 return layer.get("gfiAttributes") !== "ignore";

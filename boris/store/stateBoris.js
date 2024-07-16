@@ -39,9 +39,12 @@
 
 
 const state = {
+    supportedDevices: ["Desktop", "Mobile", "Table"],
+    supportedMapModes: ["2D"],
+    type: "borisComponent",
     active: false,
     id: "boris",
-    name: "common:menu.tools.boris",
+    name: "additional:modules.boris.name",
     icon: "bi-vinyl",
     renderToWindow: false,
     resizableWindow: true,

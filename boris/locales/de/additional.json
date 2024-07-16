@@ -1,6 +1,5 @@
 {
     "modules": {
-        "tools": {
             "boris": {
                 "name": "Bodenrichtwert-Informationen",
                 "labelSelectYear": "Die Abfrage erfolgt für den Bodenrichtwertstichtag",
@@ -104,8 +103,7 @@
                     "historicalMap1970-1980": "Hist. Karte Jahrgang 1970-1980",
                     "historicalMap1960-1970": "Hist. Karte Jahrgang 1960-1970",
                     "historicalMap1950-1960": "Hist. Karte Jahrgang 1950-1960"
-                } 
+                }
             }
         }
     }
-}

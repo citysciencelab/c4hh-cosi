@@ -1,33 +1,33 @@
 <script>
-import Tool from "../../../src/modules/tools/ToolTemplate.vue";
-import {mapGetters, mapActions, mapMutations} from "vuex";
+// import Tool from "../../../src/modules/tools/ToolTemplate.vue";
+import {mapGetters, mapActions, mapMutations, useStore} from "vuex";
 import mutations from "../store/mutationsBoris";
 import InformationComponent from "./InformationComponent.vue";
 import CalculationComponent from "./CalculationComponent.vue";
 import FloorComponent from "./FloorComponent.vue";
-import {preparePrint} from "../utils/preparePrint.js";
+// import {preparePrint} from "../utils/preparePrint.js";
 import axios from "axios";
-import {getLayerModelByAttributes} from "../utils/RadioBridge";
+import {onMounted} from "vue";
+// import {useLayerModels} from "@/composables/useLayerModels";
 
 
 export default {
     name: "BorisComponent",
     components: {
-        Tool,
         InformationComponent,
         CalculationComponent,
         FloorComponent
     },
     computed: {
-        ...mapGetters("Tools/BorisComponent", [
-            "active", "id", "icon", "renderToWindow", "resizableWindow", "initialWidth",
+        ...mapGetters("Modules/BorisComponent", [
+            "name", "type", "active", "id", "icon", "renderToWindow", "resizableWindow", "initialWidth",
             "initialWidthMobile", "keepOpen", "filteredLayerList", "isAreaLayer",
             "isStripesLayer", "textIds", "selectedPolygon", "selectedLayerName",
             "selectedLanduse", "selectedBrwFeature", "convertedBrw", "buttonValue",
             "buildingDesigns", "positionsToStreet", "isProcessFromParametricUrl",
             "paramUrlParams", "selectedBuildDesign", "selectedPositionToStreet"
         ]),
-        ...mapGetters("Tools/Print", [
+        ...mapGetters("Modules/Print", [
             "printFileReady", "fileDownloadUrl", "filename", "printStarted", "progressWidth"
         ]),
         /**
@@ -147,7 +147,7 @@ export default {
         }
     },
     created () {
-        this.$on("close", this.close);
+        // this.$on("close", this.close);
         this.initialize();
     },
     mounted () {
@@ -157,7 +157,7 @@ export default {
         });
     },
     methods: {
-        ...mapActions("Tools/BorisComponent", [
+        ...mapActions("Modules/BorisComponent", [
             "initialize",
             "switchLayer",
             "toggleStripesLayer",
@@ -173,8 +173,8 @@ export default {
             "registerListener",
             "unregisterListener"
         ]),
-        ...mapMutations("Tools/BorisComponent", Object.keys(mutations)),
-        preparePrint,
+        ...mapMutations("Modules/BorisComponent", Object.keys(mutations)),
+        // preparePrint,
         /**
          * Toggles info text if clicked on info icon
          * @param {String} id the textId to toggle the right info text for the intended element
@@ -256,312 +256,303 @@ export default {
 </script>
 
 <template lang="html">
-    <Tool
-        :title="$t('additional:modules.tools.boris.name')"
-        :icon="icon"
-        :active="active"
-        :render-to-window="renderToWindow"
-        :resizable-window="resizableWindow"
-        :initial-width="initialWidth"
-        :initial-width-mobile="initialWidthMobile"
-        :keep-open="keepOpen"
+    <div
+        id="tool-PopulationRequest"
+        class="population-request"
     >
-        <template #toolBody>
+        <div
+            id="boris"
+            class="content"
+        >
+            <div class="py-1">
+                <span>{{ $t("additional:modules.boris.labelSelectYear") }}</span>
+            </div>
+            <div>
+                <select
+                    id="brwLayerSelect"
+                    v-model="selectedLayerNameComputed"
+                    :aria-label="$t('additional:modules.boris.ariaLabelSelectYear')"
+                    class="form-select"
+                    @change="switchLayer($event.target.value)"
+                >
+                    <option
+                        v-for="(model, index) in getFilterListWithoutStripes"
+                        :key="index"
+                        :value="model.attributes.name"
+                    >
+                        {{ model.attributes.name }}
+                    </option>
+                </select>
+            </div>
             <div
-                v-if="active"
-                id="boris"
-                class="content"
+                v-if="isAreaLayer === true"
+                class="form-check pt-2"
             >
-                <div class="py-1">
-                    <span>{{ $t("additional:modules.tools.boris.labelSelectYear") }}</span>
-                </div>
-                <div>
-                    <select
-                        id="brwLayerSelect"
-                        v-model="selectedLayerNameComputed"
-                        :aria-label="$t('additional:modules.tools.boris.ariaLabelSelectYear')"
-                        class="form-select"
-                        @change="switchLayer($event.target.value)"
-                    >
-                        <option
-                            v-for="(model, index) in getFilterListWithoutStripes"
-                            :key="index"
-                            :value="model.attributes.name"
-                        >
-                            {{ model.attributes.name }}
-                        </option>
-                    </select>
-                </div>
-                <div
-                    v-if="isAreaLayer === true"
-                    class="form-check pt-2"
+                <input
+                    id="showStripes"
+                    class="form-check-input"
+                    type="checkbox"
+                    :value="isStripesLayer"
+                    @change="toggleStripesLayer(!isStripesLayer)"
                 >
-                    <input
-                        id="showStripes"
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="isStripesLayer"
-                        @change="toggleStripesLayer(!isStripesLayer)"
-                    >
-                    <label
-                        class="form-check-label"
-                        for="showStripes"
-                    >
-                        {{ $t("additional:modules.tools.boris.toggleStripesLayer") }}
-                    </label>
-                    <span
-                        class="bootstrap-icon bi-question-circle-fill"
-                        role="button"
-                        tabindex="0"
-                        @click="toggleInfoText('1')"
-                        @keydown.enter="toggleInfoText('1')"
-                    />
-                    <div v-if="Object.values(textIds).includes('1')">
-                        <div class="pt-2">
-                            <span>{{ $t("additional:modules.tools.boris.toggleStripesLayerInfo") }}</span>
-                        </div>
+                <label
+                    class="form-check-label"
+                    for="showStripes"
+                >
+                    {{ $t("additional:modules.boris.toggleStripesLayer") }}
+                </label>
+                <span
+                    class="bootstrap-icon bi-question-circle-fill"
+                    role="button"
+                    tabindex="0"
+                    @click="toggleInfoText('1')"
+                    @keydown.enter="toggleInfoText('1')"
+                />
+                <div v-if="Object.values(textIds).includes('1')">
+                    <div class="pt-2">
+                        <span>{{ $t("additional:modules.boris.toggleStripesLayerInfo") }}</span>
                     </div>
                 </div>
-                <div
-                    v-if="selectedPolygon === null && Object.keys(selectedBrwFeature).length === 0"
-                    class="pt-3"
+            </div>
+            <div
+                v-if="selectedPolygon === null && Object.keys(selectedBrwFeature).length === 0"
+                class="pt-3"
+            >
+                <span
+                    id="selectPolygonText"
                 >
-                    <span
-                        id="selectPolygonText"
+                    {{ $t("additional:modules.boris.SelectAreaInMap") }}
+                </span>
+            </div>
+            <div
+                v-else-if="selectedPolygon !== null"
+                class="pt-3"
+            >
+                <span>{{ $t("additional:modules.boris.labelSelectUse") }}</span>
+                <select
+                    id="landuseSelect"
+                    v-model="selectedLanduseComputed"
+                    :aria-label="$t('additional:modules.boris.ariaLabelSelectUse')"
+                    class="form-select mt-1"
+                >
+                    <option
+                        value=""
+                        disabled
+                        selected
                     >
-                        {{ $t("additional:modules.tools.boris.SelectAreaInMap") }}
-                    </span>
+                        {{ $t("additional:modules.boris.selectOption") }}
+                    </option>
+                    <option
+                        v-for="(landuse, index) in selectedPolygon.get('nutzungsart')"
+                        :key="index"
+                        :value="landuse.nutzungsart"
+                    >
+                        {{ landuse.nutzungsart }}
+                    </option>
+                </select>
+            </div>
+            <div
+                v-if="Object.keys(selectedBrwFeature).length !== 0"
+            >
+                <div class="pt-4 larger">
+                    {{ $t("additional:modules.boris.referenceNumber") }}: {{ selectedBrwFeature.get("richtwertnummer") }}
                 </div>
+                <hr>
                 <div
-                    v-else-if="selectedPolygon !== null"
-                    class="pt-3"
+                    class="d-flex mb-2"
                 >
-                    <span>{{ $t("additional:modules.tools.boris.labelSelectUse") }}</span>
-                    <select
-                        id="landuseSelect"
-                        v-model="selectedLanduseComputed"
-                        :aria-label="$t('additional:modules.tools.boris.ariaLabelSelectUse')"
-                        class="form-select mt-1"
-                    >
-                        <option
-                            value=""
-                            disabled
-                            selected
-                        >
-                            {{ $t("additional:modules.tools.boris.selectOption") }}
-                        </option>
-                        <option
-                            v-for="(landuse, index) in selectedPolygon.get('nutzungsart')"
-                            :key="index"
-                            :value="landuse.nutzungsart"
-                        >
-                            {{ landuse.nutzungsart }}
-                        </option>
-                    </select>
-                </div>
-                <div
-                    v-if="Object.keys(selectedBrwFeature).length !== 0"
-                >
-                    <div class="pt-4 larger">
-                        {{ $t("additional:modules.tools.boris.referenceNumber") }}: {{ selectedBrwFeature.get("richtwertnummer") }}
-                    </div>
-                    <hr>
-                    <div
-                        class="d-flex mb-2"
-                    >
-                        <button
-                            class="bi-info-circle-fill col me-1"
-                            :class="(buttonValue === 'info') ? 'btn btn-primary' : 'btn btn-default'"
-                            value="info"
-                            :title="$t('additional:modules.tools.boris.detailInformation.title')"
-                            @click="setButtonValue($event.target.value)"
-                        />
-                        <button
-                            class="bi-geo-alt-fill col me-1"
-                            :class="(buttonValue === 'lage') ? 'btn btn-primary' : 'btn btn-default'"
-                            value="lage"
-                            :title="$t('additional:modules.tools.boris.locationDescription.title')"
-                            @click="setButtonValue($event.target.value)"
-                        />
-                        <button
-                            class="bi-currency-euro col "
-                            :class="(buttonValue === 'euro') ? 'btn btn-primary' : 'btn btn-default'"
-                            value="euro"
-                            :title="$t('additional:modules.tools.boris.landCalculation.title')"
-                            @click="setButtonValue($event.target.value)"
-                        />
-                        <button
-                            v-if="selectedBrwFeature.get('schichtwert')"
-                            class="bi-list-ul col ms-1"
-                            :class="(buttonValue === 'liste') ? 'btn btn-primary' : 'btn btn-default'"
-                            value="liste"
-                            :title="$t('additional:modules.tools.boris.floorValues.title')"
-                            @click="setButtonValue($event.target.value)"
-                        />
-                    </div>
-                    <div v-if="buttonValue === 'info'">
-                        <InformationComponent
-                            :title="$t('additional:modules.tools.boris.detailInformation.title')"
-                            :selected-brw-feature="selectedBrwFeature"
-                            :button-value="buttonValue"
-                        />
-                    </div>
-                    <div v-if="buttonValue === 'lage'">
-                        <InformationComponent
-                            :title="$t('additional:modules.tools.boris.locationDescription.title')"
-                            :selected-brw-feature="selectedBrwFeature"
-                            :button-value="buttonValue"
-                        />
-                    </div>
-                    <div v-if="buttonValue === 'euro'">
-                        <h4 class="pb-2 mb-0">
-                            {{ $t('additional:modules.tools.boris.landCalculation.title') }}
-                        </h4>
-                        <h6 class="pb-2">
-                            {{ $t('additional:modules.tools.boris.landCalculation.subtitle') }}
-                        </h6>
-                        <dl>
-                            <div
-                                v-if="selectedBrwFeature.get('zBauweise')"
-                            >
-                                <CalculationComponent
-                                    :title="$t('additional:modules.tools.boris.landCalculation.buildingDesigns')"
-                                    :options="buildingDesigns"
-                                    :selected-brw-feature="selectedBrwFeature"
-                                    :text-ids="textIds"
-                                    :text-id="2"
-                                    :text="$t('additional:modules.tools.boris.landCalculation.buildingDesignsInfo')"
-                                    :toggle-info-text="toggleInfoText"
-                                    :handle-change="handleBuildingDesignOptionChange"
-                                    :subject="'zBauweise'"
-                                    :type="'select'"
-                                    :selected-option="selectedBuildDesign"
-                                />
-                            </div>
-                            <div
-                                v-if="selectedBrwFeature.get('zStrassenLage')"
-                            >
-                                <CalculationComponent
-                                    :title="$t('additional:modules.tools.boris.landCalculation.positionToStreet')"
-                                    :options="positionsToStreet"
-                                    :selected-brw-feature="selectedBrwFeature"
-                                    :text-ids="textIds"
-                                    :text-id="3"
-                                    :text="$t('additional:modules.tools.boris.landCalculation.positionToStreetInfo')"
-                                    :toggle-info-text="toggleInfoText"
-                                    :handle-change="handlePositionToStreetOptionChange"
-                                    :subject="'zStrassenLage'"
-                                    :type="'select'"
-                                    :selected-option="selectedPositionToStreet"
-                                />
-                            </div>
-                            <div
-                                v-if="selectedBrwFeature.get('zGeschossfl_zahl')"
-                            >
-                                <CalculationComponent
-                                    :title="$t('additional:modules.tools.boris.landCalculation.numberOfFloor')"
-                                    :options="[]"
-                                    :selected-brw-feature="selectedBrwFeature"
-                                    :text-ids="textIds"
-                                    :text-id="4"
-                                    :text="$t('additional:modules.tools.boris.landCalculation.numberOfFloorInfo')"
-                                    :toggle-info-text="toggleInfoText"
-                                    :handle-change="handleInputChange"
-                                    :subject="'zGeschossfl_zahl'"
-                                    :type="'input'"
-                                />
-                            </div>
-                            <div
-                                v-if="selectedBrwFeature.get('zGrdstk_flaeche')"
-                            >
-                                <CalculationComponent
-                                    :title="$t('additional:modules.tools.boris.landCalculation.landArea')"
-                                    :options="[]"
-                                    :selected-brw-feature="selectedBrwFeature"
-                                    :text-ids="textIds"
-                                    :text-id="5"
-                                    :text="$t('additional:modules.tools.boris.landCalculation.landAreaInfo')"
-                                    :toggle-info-text="toggleInfoText"
-                                    :handle-change="handleInputChange"
-                                    :subject="'zGrdstk_flaeche'"
-                                    :type="'input'"
-                                />
-                            </div>
-                            <dt>
-                                <span>{{ $t('additional:modules.tools.boris.landCalculation.calculatedLandValue') }}</span>
-                                <span
-                                    class="bootstrap-icon bi-question-circle-fill"
-                                    role="button"
-                                    tabindex="0"
-                                    @click="toggleInfoText('6')"
-                                    @keydown.enter="toggleInfoText('6')"
-                                />
-                            </dt>
-                            <dd
-                                v-if="selectedBrwFeature.get('convertedBrwDM') === ''"
-                            >
-                                {{ convertedBrw }} €/m²
-                                <div
-                                    v-if="Object.values(textIds).includes('6')"
-                                    class="help pt-2"
-                                >
-                                    <span v-html="$t('additional:modules.tools.boris.landCalculation.calculatedLandValueInfo')" />
-                                </div>
-                            </dd>
-                            <dd
-                                v-else
-                            >
-                                <div
-                                    class="d-flex justify-content-between"
-                                >
-                                    <span>{{ convertedBrw }} €/m²</span>
-                                    <span>{{ selectedBrwFeature.get("convertedBrwDM") }} DM/m²</span>
-                                </div>
-                                <div
-                                    v-if="Object.values(textIds).includes('6')"
-                                    class="help pt-2"
-                                >
-                                    <span v-html="$t('additional:modules.tools.boris.landCalculation.calculatedLandValueInfo')" />
-                                </div>
-                            </dd>
-                        </dl>
-                    </div>
-                    <div v-if="buttonValue === 'liste' && selectedBrwFeature.get('schichtwert')">
-                        <FloorComponent
-                            :title="$t('additional:modules.tools.boris.floorValues.title')"
-                            :feature="selectedBrwFeature.get('schichtwert')"
-                            :label="$t('additional:modules.tools.boris.floorValues.subTitle')"
-                            :landuse="selectedLanduseComputed"
-                        />
-                    </div>
                     <button
-                        class="btn btn-primary btn-infos"
-                        :title="$t('additional:modules.tools.boris.printExport')"
-                        @click="startPrint"
-                    >
-                        {{ $t("additional:modules.tools.boris.print") }}
-                    </button>
-                    <div class="mt-2">
-                        {{ $t("additional:modules.tools.boris.printScale") }}
-                    </div>
-                    <div
-                        v-if="printStarted"
-                        class="pt-2"
-                    >
-                        <div class="progress">
+                        class="bi-info-circle-fill col me-1"
+                        :class="(buttonValue === 'info') ? 'btn btn-primary' : 'btn btn-default'"
+                        value="info"
+                        :title="$t('additional:modules.boris.detailInformation.title')"
+                        @click="setButtonValue($event.target.value)"
+                    />
+                    <button
+                        class="bi-geo-alt-fill col me-1"
+                        :class="(buttonValue === 'lage') ? 'btn btn-primary' : 'btn btn-default'"
+                        value="lage"
+                        :title="$t('additional:modules.boris.locationDescription.title')"
+                        @click="setButtonValue($event.target.value)"
+                    />
+                    <button
+                        class="bi-currency-euro col "
+                        :class="(buttonValue === 'euro') ? 'btn btn-primary' : 'btn btn-default'"
+                        value="euro"
+                        :title="$t('additional:modules.boris.landCalculation.title')"
+                        @click="setButtonValue($event.target.value)"
+                    />
+                    <button
+                        v-if="selectedBrwFeature.get('schichtwert')"
+                        class="bi-list-ul col ms-1"
+                        :class="(buttonValue === 'liste') ? 'btn btn-primary' : 'btn btn-default'"
+                        value="liste"
+                        :title="$t('additional:modules.boris.floorValues.title')"
+                        @click="setButtonValue($event.target.value)"
+                    />
+                </div>
+                <div v-if="buttonValue === 'info'">
+                    <InformationComponent
+                        :title="$t('additional:modules.boris.detailInformation.title')"
+                        :selected-brw-feature="selectedBrwFeature"
+                        :button-value="buttonValue"
+                    />
+                </div>
+                <div v-if="buttonValue === 'lage'">
+                    <InformationComponent
+                        :title="$t('additional:modules.boris.locationDescription.title')"
+                        :selected-brw-feature="selectedBrwFeature"
+                        :button-value="buttonValue"
+                    />
+                </div>
+                <div v-if="buttonValue === 'euro'">
+                    <h4 class="pb-2 mb-0">
+                        {{ $t('additional:modules.boris.landCalculation.title') }}
+                    </h4>
+                    <h6 class="pb-2">
+                        {{ $t('additional:modules.boris.landCalculation.subtitle') }}
+                    </h6>
+                    <dl>
+                        <div
+                            v-if="selectedBrwFeature.get('zBauweise')"
+                        >
+                            <CalculationComponent
+                                :title="$t('additional:modules.boris.landCalculation.buildingDesigns')"
+                                :options="buildingDesigns"
+                                :selected-brw-feature="selectedBrwFeature"
+                                :text-ids="textIds"
+                                :text-id="2"
+                                :text="$t('additional:modules.boris.landCalculation.buildingDesignsInfo')"
+                                :toggle-info-text="toggleInfoText"
+                                :handle-change="handleBuildingDesignOptionChange"
+                                :subject="'zBauweise'"
+                                :type="'select'"
+                                :selected-option="selectedBuildDesign"
+                            />
+                        </div>
+                        <div
+                            v-if="selectedBrwFeature.get('zStrassenLage')"
+                        >
+                            <CalculationComponent
+                                :title="$t('additional:modules.boris.landCalculation.positionToStreet')"
+                                :options="positionsToStreet"
+                                :selected-brw-feature="selectedBrwFeature"
+                                :text-ids="textIds"
+                                :text-id="3"
+                                :text="$t('additional:modules.boris.landCalculation.positionToStreetInfo')"
+                                :toggle-info-text="toggleInfoText"
+                                :handle-change="handlePositionToStreetOptionChange"
+                                :subject="'zStrassenLage'"
+                                :type="'select'"
+                                :selected-option="selectedPositionToStreet"
+                            />
+                        </div>
+                        <div
+                            v-if="selectedBrwFeature.get('zGeschossfl_zahl')"
+                        >
+                            <CalculationComponent
+                                :title="$t('additional:modules.boris.landCalculation.numberOfFloor')"
+                                :options="[]"
+                                :selected-brw-feature="selectedBrwFeature"
+                                :text-ids="textIds"
+                                :text-id="4"
+                                :text="$t('additional:modules.boris.landCalculation.numberOfFloorInfo')"
+                                :toggle-info-text="toggleInfoText"
+                                :handle-change="handleInputChange"
+                                :subject="'zGeschossfl_zahl'"
+                                :type="'input'"
+                            />
+                        </div>
+                        <div
+                            v-if="selectedBrwFeature.get('zGrdstk_flaeche')"
+                        >
+                            <CalculationComponent
+                                :title="$t('additional:modules.boris.landCalculation.landArea')"
+                                :options="[]"
+                                :selected-brw-feature="selectedBrwFeature"
+                                :text-ids="textIds"
+                                :text-id="5"
+                                :text="$t('additional:modules.boris.landCalculation.landAreaInfo')"
+                                :toggle-info-text="toggleInfoText"
+                                :handle-change="handleInputChange"
+                                :subject="'zGrdstk_flaeche'"
+                                :type="'input'"
+                            />
+                        </div>
+                        <dt>
+                            <span>{{ $t('additional:modules.boris.landCalculation.calculatedLandValue') }}</span>
+                            <span
+                                class="bootstrap-icon bi-question-circle-fill"
+                                role="button"
+                                tabindex="0"
+                                @click="toggleInfoText('6')"
+                                @keydown.enter="toggleInfoText('6')"
+                            />
+                        </dt>
+                        <dd
+                            v-if="selectedBrwFeature.get('convertedBrwDM') === ''"
+                        >
+                            {{ convertedBrw }} €/m²
                             <div
-                                class="progress-bar"
-                                role="progressbar"
-                                :style="progressWidth"
+                                v-if="Object.values(textIds).includes('6')"
+                                class="help pt-2"
                             >
-                                <span class="visually-hidden">30% Complete</span>
+                                <span v-html="$t('additional:modules.boris.landCalculation.calculatedLandValueInfo')" />
                             </div>
+                        </dd>
+                        <dd
+                            v-else
+                        >
+                            <div
+                                class="d-flex justify-content-between"
+                            >
+                                <span>{{ convertedBrw }} €/m²</span>
+                                <span>{{ selectedBrwFeature.get("convertedBrwDM") }} DM/m²</span>
+                            </div>
+                            <div
+                                v-if="Object.values(textIds).includes('6')"
+                                class="help pt-2"
+                            >
+                                <span v-html="$t('additional:modules.boris.landCalculation.calculatedLandValueInfo')" />
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+                <div v-if="buttonValue === 'liste' && selectedBrwFeature.get('schichtwert')">
+                    <FloorComponent
+                        :title="$t('additional:modules.boris.floorValues.title')"
+                        :feature="selectedBrwFeature.get('schichtwert')"
+                        :label="$t('additional:modules.boris.floorValues.subTitle')"
+                        :landuse="selectedLanduseComputed"
+                    />
+                </div>
+                <button
+                    class="btn btn-primary btn-infos"
+                    :title="$t('additional:modules.boris.printExport')"
+                    @click="startPrint"
+                >
+                    {{ $t("additional:modules.tools.boris.print") }}
+                </button>
+                <div class="mt-2">
+                    {{ $t("additional:modules.boris.printScale") }}
+                </div>
+                <div
+                    v-if="printStarted"
+                    class="pt-2"
+                >
+                    <div class="progress">
+                        <div
+                            class="progress-bar"
+                            role="progressbar"
+                            :style="progressWidth"
+                        >
+                            <span class="visually-hidden">30% Complete</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </template>
-    </Tool>
+        </div>
+    </div>
 </template>
 
 

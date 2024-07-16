@@ -1,6 +1,5 @@
 {
     "modules": {
-        "tools": {
             "boris": {
                 "name": "Land Value Information",
                 "labelSelectYear": "The query is carried out for the standard land value date",
@@ -104,8 +103,7 @@
                     "historicalMap1970-1980": "Historical map year 1970-1980",
                     "historicalMap1960-1970": "Historical map year 1960-1970",
                     "historicalMap1950-1960": "Historical map year 1950-1960"
-                }  
+                }
             }
         }
     }
-}

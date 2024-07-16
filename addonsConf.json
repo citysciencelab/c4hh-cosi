@@ -29,6 +29,10 @@
     "path":"gfiThemes/bildungsatlas",
     "type": "gfiTheme"
   },
+  "borisComponent": {
+    "type": "tool",
+    "path": "boris"
+  },
   "dataTable": {
     "path":"gfiThemes/dataTable",
     "type": "gfiTheme"

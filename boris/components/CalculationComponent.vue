@@ -74,7 +74,7 @@ export default {
                 <select
                     :value="selectedOption"
                     class="form-select"
-                    :aria-label="$t('additional:modules.tools.boris.landCalculation.ariaLabelBuildingDesigns')"
+                    :aria-label="$t('additional:modules.boris.landCalculation.ariaLabelBuildingDesigns')"
                     @select="$emit('select', $event.target.value)"
                     @change="handleChange($event, subject)"
                 >

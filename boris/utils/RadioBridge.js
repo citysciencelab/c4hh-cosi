@@ -1,4 +1,4 @@
-import {Radio} from "backbone";
+// import {Radio} from "backbone";
 
 /**
  * Returns the layerModel with the given attributes.
@@ -7,7 +7,7 @@ import {Radio} from "backbone";
  * @returns {void}
  */
 export function getLayerModelsByAttributes (attribute) {
-    return Radio.request("ModelList", "getModelsByAttributes", attribute);
+    // return Radio.request("ModelList", "getModelsByAttributes", attribute);
 }
 /**
  * Returns the layerModel with the given attributes.
@@ -16,5 +16,5 @@ export function getLayerModelsByAttributes (attribute) {
  * @returns {void}
  */
 export function getLayerModelByAttributes ({id}) {
-    return Radio.request("ModelList", "getModelByAttributes", {id});
+    // return Radio.request("ModelList", "getModelByAttributes", {id});
 }

@@ -1,6 +1,6 @@
 import borisState from "../store/stateBoris";
 import store from "../../../src/app-store/index";
-import SpecModel from "../../../src/modules/tools/print/utils/buildSpec.js";
+import SpecModel from "../../../src/modules/print/js/buildSpec.js";
 
 /**
  * Helper Function to prepare the Pdf file from currently selected layer and its features on the comparison list.

@@ -38,23 +38,23 @@ export default {
                 :key="index"
             >
                 <h5 v-if="schichtwert.geschoss === '3. Obergeschoss oder höher'">
-                    {{ $t("additional:modules.tools.boris.floorValues.third") }}
+                    {{ $t("additional:modules.boris.floorValues.third") }}
                 </h5>
                 <h5 v-else-if="schichtwert.geschoss === '2. Obergeschoss'">
-                    {{ $t("additional:modules.tools.boris.floorValues.second") }}
+                    {{ $t("additional:modules.boris.floorValues.second") }}
                 </h5>
                 <h5 v-else-if="schichtwert.geschoss === '1. Obergeschoss'">
-                    {{ $t("additional:modules.tools.boris.floorValues.first") }}
+                    {{ $t("additional:modules.boris.floorValues.first") }}
                 </h5>
                 <h5 v-else>
-                    {{ $t("additional:modules.tools.boris.floorValues.ground") }}
+                    {{ $t("additional:modules.boris.floorValues.ground") }}
                 </h5>
                 <dl>
-                    <dt>{{ $t("additional:modules.tools.boris.floorValues.wgfz") }}</dt>
+                    <dt>{{ $t("additional:modules.boris.floorValues.wgfz") }}</dt>
                     <dd>{{ schichtwert.wgfz }}</dd>
-                    <dt>{{ $t("additional:modules.tools.boris.floorValues.usage") }}</dt>
+                    <dt>{{ $t("additional:modules.boris.floorValues.usage") }}</dt>
                     <dd>{{ schichtwert.nutzung }}</dd>
-                    <dt>{{ $t("additional:modules.tools.boris.floorValues.floorValue") }}</dt>
+                    <dt>{{ $t("additional:modulesW.boris.floorValues.floorValue") }}</dt>
                     <dd
                         v-if="schichtwert.schichtwertDM === ''"
                     >
@@ -74,17 +74,17 @@ export default {
         >
             <dl>
                 <dt v-if="landuse === 'GH Geschäftshäuser (mehrgeschossig, Wertanteil Erdgeschoss)'">
-                    {{ $t("additional:modules.tools.boris.floorValues.valueLanduse") }} {{ $t("additional:modules.tools.boris.floorValues.commercial") }}:
+                    {{ $t("additional:modules.boris.floorValues.valueLanduse") }} {{ $t("additional:modules.boris.floorValues.commercial") }}:
                 </dt>
                 <dt v-else-if="landuse === 'MFH Mehrfamilienhäuser'">
-                    {{ $t("additional:modules.tools.boris.floorValues.valueLanduse") }} {{ $t("additional:modules.tools.boris.floorValues.apartment") }}:
+                    {{ $t("additional:modules.boris.floorValues.valueLanduse") }} {{ $t("additional:modules.boris.floorValues.apartment") }}:
                 </dt>
                 <dt v-else>
-                    {{ $t("additional:modules.tools.boris.floorValues.valueLanduse") }} {{ $t("additional:modules.tools.boris.floorValues.office") }}:
+                    {{ $t("additional:modules.boris.floorValues.valueLanduse") }} {{ $t("additional:modules.boris.floorValues.office") }}:
                 </dt>
                 <dd v-if="Object.values(feature)[1] === undefined">
                     <span>
-                        {{ $t("additional:modules.tools.boris.floorValues.noValue") }}
+                        {{ $t("additional:modules.boris.floorValues.noValue") }}
                     </span>
                 </dd>
                 <dd v-else-if="Object.values(feature)[2] === ''">
