@@ -2,7 +2,7 @@ import axios from "axios";
 import helpers from "../utils/helpers";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
 import {WFS, WMSGetFeatureInfo} from "ol/format.js";
-import layerCollection from "../../../src/core/layers/js/layerCollection";
+// import layerCollection from "../../../src/core/layers/js/layerCollection";
 import WPS from "../../../src/shared/js/api/wps";
 import mapCollection from "../../../src/core/maps/js/mapCollection";
 
@@ -15,16 +15,15 @@ const actions = {
      */
     initialize ({commit, rootGetters}) {
         let layerList = rootGetters.layerConfigsByAttributes({isNeverVisibleInTree: true});
-        console.log("initialize: ", layerList);
-        // warum brauche ich layerCollection hier? wenn layerConfigByAttribute ja theoretisch auch funktioniert?
+
         if (layerList) {
             // parentId is being resettet to enable the handling of singleBaseLayer only for baseLayers (layer.js: function handleSingleBaseLayer)
             // layerCollection.getLayerById(selectedSourceLayer.id);
-            layerList.forEach(layer => layer.set("parentId", "noParent"));
+            // layerList.forEach(layer => layer.set("parentId", "noParent"));
             layerList = layerList.filter(function (layer) {
-                return layer.get("gfiAttributes") !== "ignore";
+                return layer.gfiAttributes !== "ignore";
             });
-            layerList = layerList.reverse();
+            // layerList = layerList.reverse();
             commit("setFilteredLayerList", layerList);
         }
     },
@@ -78,14 +77,17 @@ const actions = {
      */
     switchLayer ({rootGetters, state, dispatch, commit}, selectedLayerName) {
         const previousSelectedLayer = state.filteredLayerList.filter(function (layer) {
-                return layer.get("isSelected") === true;
+                //layer existiert aber hat keinen wert isSelected. gibt aber immer 1964 aus
+                console.log("switchLayer", state.filteredLayerList);
+                console.log("layer: ", layer);
+                return layer.visibility === true;
             }),
             currentYear = selectedLayerName.split(".")[2];
         let previousYear = null;
 
         previousSelectedLayer.forEach(layer => {
-            layer.set("isVisibleInMap", false);
-            layer.set("isSelected", false);
+            // layer.set("isVisibleInMap", false);
+            layer.visibility = false;
             previousYear = layer.get("name").split(".")[2];
         });
 
@@ -181,6 +183,7 @@ const actions = {
      */
     requestGFI ({rootGetters, state, dispatch}, {processFromParametricUrl, center}) {
         if (state.active) {
+            console.log("requestGFI",layer.get("isSelected"))
             const selectedLayer = state.filteredLayerList.find(layer => layer.get("isSelected") === true),
                 coordinates = processFromParametricUrl ? center : rootGetters["Maps/clickCoordinate"],
                 map = mapCollection.getMap("2D"),

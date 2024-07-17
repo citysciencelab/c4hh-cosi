@@ -1,15 +1,11 @@
 <script>
-// import Tool from "../../../src/modules/tools/ToolTemplate.vue";
-import {mapGetters, mapActions, mapMutations, useStore} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import mutations from "../store/mutationsBoris";
 import InformationComponent from "./InformationComponent.vue";
 import CalculationComponent from "./CalculationComponent.vue";
 import FloorComponent from "./FloorComponent.vue";
 // import {preparePrint} from "../utils/preparePrint.js";
 import axios from "axios";
-import {onMounted} from "vue";
-// import {useLayerModels} from "@/composables/useLayerModels";
-
 
 export default {
     name: "BorisComponent",
@@ -36,7 +32,7 @@ export default {
          */
         getFilterListWithoutStripes () {
             return this.filteredLayerList.filter(function (filteredLayer) {
-                return filteredLayer.attributes.name.indexOf("-stripes") === -1;
+                return filteredLayer.name.indexOf("-stripes") === -1;
             });
         },
         /**
@@ -278,9 +274,9 @@ export default {
                     <option
                         v-for="(model, index) in getFilterListWithoutStripes"
                         :key="index"
-                        :value="model.attributes.name"
+                        :value="model.name"
                     >
-                        {{ model.attributes.name }}
+                        {{ model.name }}
                     </option>
                 </select>
             </div>
