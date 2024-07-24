@@ -2,7 +2,7 @@
     "modules": {
             "boris": {
                 "name": "Land Value Information",
-                "labelSelectYear": "The query is carried out for the standard land value date",
+                "labelSelectYear": "Standard land value date:",
                 "ariaLabelSelectYear": "Date",
                 "toggleStripesLayer": "Display block boarder stripes",
                 "toggleStripesLayerInfo": "Previously, the standard land value zones were displayed as block boarder stripes. Now you see initial area-wide standard land value zones. Here you can switch to the display of the block edge stripes.",

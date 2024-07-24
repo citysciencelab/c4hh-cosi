@@ -2,7 +2,7 @@
     "modules": {
             "boris": {
                 "name": "Bodenrichtwert-Informationen",
-                "labelSelectYear": "Die Abfrage erfolgt für den Bodenrichtwertstichtag",
+                "labelSelectYear": "Bodenrichtwertstichtag:",
                 "ariaLabelSelectYear": "Datum",
                 "toggleStripesLayer": "Blockrandstreifen darstellen",
                 "toggleStripesLayerInfo": "Bisher wurden die Bodenrichtwertzonen als Blockrandstreifen dargestellt. Jetzt sehen Sie initial flächendeckende Bodenrichtwertzonen. Hier können Sie die Anzeige der Blockrandstreifen einschalten.",

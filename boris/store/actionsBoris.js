@@ -2,7 +2,7 @@ import axios from "axios";
 import helpers from "../utils/helpers";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
 import {WFS, WMSGetFeatureInfo} from "ol/format.js";
-// import layerCollection from "../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../src/core/layers/js/layerCollection";
 import WPS from "../../../src/shared/js/api/wps";
 import mapCollection from "../../../src/core/maps/js/mapCollection";
 
@@ -77,9 +77,6 @@ const actions = {
      */
     switchLayer ({rootGetters, state, dispatch, commit}, selectedLayerName) {
         const previousSelectedLayer = state.filteredLayerList.filter(function (layer) {
-                //layer existiert aber hat keinen wert isSelected. gibt aber immer 1964 aus
-                console.log("switchLayer", state.filteredLayerList);
-                console.log("layer: ", layer);
                 return layer.visibility === true;
             }),
             currentYear = selectedLayerName.split(".")[2];
@@ -88,7 +85,7 @@ const actions = {
         previousSelectedLayer.forEach(layer => {
             // layer.set("isVisibleInMap", false);
             layer.visibility = false;
-            previousYear = layer.get("name").split(".")[2];
+            previousYear = layer.name.split(".")[2];
         });
 
         dispatch("selectLayerByName", selectedLayerName);
@@ -113,7 +110,7 @@ const actions = {
             commit("setSelectedBrwFeature", {});
             commit("setTextIds", []);
         }
-        if (state.selectedLayer?.get("typ") !== "GROUP" && state.selectedLayer?.attributes.layers.indexOf("flaeche") > -1) {
+        if (state.selectedLayer?.typ !== "GROUP" && state.selectedLayer?.layers.indexOf("flaeche") > -1) {
             commit("setIsAreaLayer", true);
             dispatch("toggleStripesLayer", state.isStripesLayer);
         }
@@ -131,9 +128,9 @@ const actions = {
      * @returns {void}
      */
     toggleStripesLayer ({state, dispatch, commit}, value) {
-        const layerList = state.filteredLayerList.filter(layer => layer.get("isNeverVisibleInTree") === true),
-            selectedLayer = layerList.find(layer=> layer.get("isSelected") === true),
-            selectedLayerName = selectedLayer.attributes.name,
+        const layerList = state.filteredLayerList.filter(layer => layer.isNeverVisibleInTree === true),
+            selectedLayer = layerList.find(layer=> layer.visibility === true),
+            selectedLayerName = selectedLayer.name,
             layerName = selectedLayerName + "-stripes";
 
         commit("setIsStripesLayer", value);
@@ -142,11 +139,11 @@ const actions = {
             dispatch("selectLayerByName", layerName);
         }
         else {
-            const layer = layerList.find(aLayer => aLayer.get("name") === layerName);
+            const layer = layerList.find(aLayer => aLayer.name === layerName);
 
             if (layer) {
-                layer.set("isVisibleInMap", false);
-                layer.set("isSelected", false);
+                layer.visibility = false;
+                // layer.set("isSelected", false);
             }
         }
     },
@@ -158,17 +155,17 @@ const actions = {
      * @returns {void}
      */
     selectLayerByName ({state, commit}, selectedLayerName) {
-        const layerList = state.filteredLayerList.filter(layer => layer.get("isNeverVisibleInTree") === true),
+        const layerList = state.filteredLayerList.filter(layer => layer.isNeverVisibleInTree === true),
             selectedLayer = layerList.find((layer) => {
-                if (layer.get("name") === selectedLayerName) {
+                if (layer.name === selectedLayerName) {
                     return layer;
                 }
                 return undefined;
             });
 
         if (selectedLayer !== undefined) {
-            selectedLayer.set("isVisibleInMap", true);
-            selectedLayer.set("isSelected", true);
+            selectedLayer.visibility = true;
+            // selectedLayer.set("isSelected", true);
             commit("setSelectedLayer", selectedLayer);
         }
     },
@@ -182,37 +179,35 @@ const actions = {
      * @returns {void}
      */
     requestGFI ({rootGetters, state, dispatch}, {processFromParametricUrl, center}) {
-        if (state.active) {
-            console.log("requestGFI",layer.get("isSelected"))
-            const selectedLayer = state.filteredLayerList.find(layer => layer.get("isSelected") === true),
-                coordinates = processFromParametricUrl ? center : rootGetters["Maps/clickCoordinate"],
-                map = mapCollection.getMap("2D"),
-                mapView = map.getView();
-            let layerSource,
-                url = null;
+        const selectedLayer = state.filteredLayerList.find(layer => layer.visibility === true),
+            coordinates = processFromParametricUrl ? center : rootGetters["Maps/clickCoordinate"],
+            map = mapCollection.getMap("2D"),
+            mapView = map.getView();
+        let layerSource,
+            url = null;
+        //TODO: remove if clause maybe?
 
-            if (selectedLayer.get("typ") === "GROUP") {
-                const groupedLayers = selectedLayer.get("layerSource");
+        if (selectedLayer.typ === "GROUP") {
+            const groupedLayers = layerCollection.getLayerById(selectedLayer.id);
 
-                layerSource = groupedLayers[groupedLayers.length - 1].get("layer").getSource();
-            }
-            else {
-                layerSource = selectedLayer.get("layer").getSource();
-            }
-
-            url = layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());
-
-            axios.get(url)
-                .then((response) => {
-                    if (response.status === 200) {
-                        dispatch("handleGfiResponse", {response: response.data, coordinate: coordinates});
-                    }
-                })
-                .catch((error) => {
-                    console.error(error.response);
-                    dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.boris.alertMessage:noData"), {root: true});
-                });
+            layerSource = groupedLayers.layerSource[0].layerSource;
         }
+        else {
+            layerSource = selectedLayer.layerSource[0].layerSource;
+        }
+
+        url = layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());
+
+        axios.get(url)
+            .then((response) => {
+                if (response.status === 200) {
+                    dispatch("handleGfiResponse", {response: response.data, coordinate: coordinates});
+                }
+            })
+            .catch((error) => {
+                console.error(error.response);
+                dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.boris.alertMessage:noData"), {root: true});
+            });
     },
     /**
      * Handles wms get feature info response
@@ -242,7 +237,7 @@ const actions = {
             }
         }
         else {
-            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.boris.alertMessage:noBrw"), {root: true});
+            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.boris.alertMessage:noBrw"), {root: true});
             dispatch("MapMarker/removePolygonMarker", null, {root: true});
             dispatch("MapMarker/removePointMarker", null, {root: true});
             commit("setSelectedBrwFeature", {});
@@ -291,12 +286,12 @@ const actions = {
                 if (feature) {
                     feature.unset("geom_brw_grdstk");
                     feature.setGeometryName(geometryName);
-                    dispatch("MapMarker/placingPolygonMarker", feature, {root: true});
+                    dispatch("Maps/placingPolygonMarker", feature, {root: true});
                 }
             })
             .catch((error) => {
                 console.error(error.message);
-                dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.boris.alertMessage:noData"), {root: true});
+                dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.boris.alertMessage:noData"), {root: true});
             });
 
     },
@@ -311,7 +306,8 @@ const actions = {
      * @returns {void}
      */
     matchPolygonFeatureWithLanduse ({dispatch, commit}, {feature, selectedLanduse}) {
-        const landuseMatch = feature.get("nutzungsart").find((typeOfUse) => {
+        console.log("matchPolygonFeatureWithLanduse", feature.values_.nutzungsart);
+        const landuseMatch = feature.values_.nutzungsart.find((typeOfUse) => {
             return typeOfUse.nutzungsart === selectedLanduse;
         });
 
@@ -356,7 +352,7 @@ const actions = {
             }
         }).catch((error) => {
             console.error(error.response);
-            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.boris.alertMessage:noData"), {root: true});
+            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.boris.alertMessage:noData"), {root: true});
         });
     },
     /**
@@ -390,7 +386,7 @@ const actions = {
         }
         else {
             console.error("Data query failed");
-            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.boris.alertMessage:noData"), {root: true});
+            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.boris.alertMessage:noData"), {root: true});
         }
     },
     /**
@@ -418,7 +414,7 @@ const actions = {
     extendFeatureAttributes ({dispatch, commit, state}, {feature, date}) {
         const isDMTime = parseInt(feature.get("jahrgang"), 10) < 2002,
             sw = helpers.parseSW({feature});
-
+        console.log("feature", feature);
         feature.setProperties({
             "richtwert_dm": isDMTime ? thousandsSeparator(parseFloat(feature.get("richtwert_dm"), 10).toFixed(1)) : "",
             "richtwert_euro": thousandsSeparator(feature.get("richtwert_euro")),
@@ -489,7 +485,7 @@ const actions = {
             console.error("WPS-Query with status " + status + " aborted.");
         }
         if (showErrorMessage) {
-            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.boris.alertMessage:noData"), {root: true});
+            dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.boris.alertMessage:noData"), {root: true});
         }
     },
     /**

@@ -146,6 +146,12 @@ export default {
         // this.$on("close", this.close);
         this.initialize();
     },
+    unmounted () {
+        this.unregisterListener({
+            type: "click",
+            listener: this.requestGFI
+        });
+    },
     mounted () {
         this.$nextTick(() => {
             this.handleUrlParameters();
@@ -260,25 +266,25 @@ export default {
             id="boris"
             class="content"
         >
-            <div class="py-1">
-                <span>{{ $t("additional:modules.boris.labelSelectYear") }}</span>
-            </div>
-            <div>
-                <select
-                    id="brwLayerSelect"
-                    v-model="selectedLayerNameComputed"
-                    :aria-label="$t('additional:modules.boris.ariaLabelSelectYear')"
-                    class="form-select"
-                    @change="switchLayer($event.target.value)"
-                >
-                    <option
-                        v-for="(model, index) in getFilterListWithoutStripes"
-                        :key="index"
-                        :value="model.name"
+            <div class="dropdown">
+                <div class="form-floating mb-3">
+                    <select
+                        id="brwLayerSelect"
+                        v-model="selectedLayerNameComputed"
+                        :aria-label="$t('additional:modules.boris.ariaLabelSelectYear')"
+                        class="form-select"
+                        @change="switchLayer($event.target.value)"
                     >
-                        {{ model.name }}
-                    </option>
-                </select>
+                        <option
+                            v-for="(model, index) in getFilterListWithoutStripes"
+                            :key="index"
+                            :value="model.name"
+                        >
+                            {{ model.name }}
+                        </option>
+                    </select>
+                    <label for="brwLayerSelect">{{ $t("additional:modules.boris.labelSelectYear") }}</label>
+                </div>
             </div>
             <div
                 v-if="isAreaLayer === true"
@@ -322,33 +328,38 @@ export default {
             </div>
             <div
                 v-else-if="selectedPolygon !== null"
-                class="pt-3"
+                class="dropdown"
             >
-                <span>{{ $t("additional:modules.boris.labelSelectUse") }}</span>
-                <select
-                    id="landuseSelect"
-                    v-model="selectedLanduseComputed"
-                    :aria-label="$t('additional:modules.boris.ariaLabelSelectUse')"
-                    class="form-select mt-1"
+                <div
+                    class="form-floating mb-3"
                 >
-                    <option
-                        value=""
-                        disabled
-                        selected
+                    <select
+                        id="landuseSelect"
+                        v-model="selectedLanduseComputed"
+                        :aria-label="$t('additional:modules.boris.ariaLabelSelectUse')"
+                        class="form-select mt-1"
                     >
-                        {{ $t("additional:modules.boris.selectOption") }}
-                    </option>
-                    <option
-                        v-for="(landuse, index) in selectedPolygon.get('nutzungsart')"
-                        :key="index"
-                        :value="landuse.nutzungsart"
-                    >
-                        {{ landuse.nutzungsart }}
-                    </option>
-                </select>
+                        <option
+                            value=""
+                            disabled
+                            selected
+                        >
+                            {{ $t("additional:modules.boris.selectOption") }}
+                        </option>
+                        <option
+                            v-for="(landuse, index) in selectedPolygon.get('nutzungsart')"
+                            :key="index"
+                            :value="landuse.nutzungsart"
+                        >
+                            {{ landuse.nutzungsart }}
+                        </option>
+                    </select>
+                    <label for="landuseSelect">{{ $t("additional:modules.boris.labelSelectUse") }}</label>
+                </div>
             </div>
             <div
                 v-if="Object.keys(selectedBrwFeature).length !== 0"
+                class="pt-4Box"
             >
                 <div class="pt-4 larger">
                     {{ $t("additional:modules.boris.referenceNumber") }}: {{ selectedBrwFeature.get("richtwertnummer") }}
@@ -523,11 +534,11 @@ export default {
                     />
                 </div>
                 <button
-                    class="btn btn-primary btn-infos"
+                    class="btn btn-primary btn-infos print-button"
                     :title="$t('additional:modules.boris.printExport')"
                     @click="startPrint"
                 >
-                    {{ $t("additional:modules.tools.boris.print") }}
+                    {{ $t("additional:modules.boris.print") }}
                 </button>
                 <div class="mt-2">
                     {{ $t("additional:modules.boris.printScale") }}
@@ -554,6 +565,16 @@ export default {
 
 <style lang="scss" scoped>
 @import "~variables";
+
+.print-button {
+    align-self: center;
+    width: 10rem;
+    max-width: 80%;
+}
+.pt-4Box {
+    display: flex;
+    flex-direction: column;
+}
 .larger {
     font-size: $font_size_big;
     font-family: $font_family_accent;
