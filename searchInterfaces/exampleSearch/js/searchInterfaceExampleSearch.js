@@ -37,7 +37,7 @@ SearchInterfaceExampleSearch.prototype.search = async function (searchInput) {
             events: this.normalizeResultEvents(this.resultEvents, {coordinates: [566601.20, 5928101.43]}),
             category: "example",
             id: "exampleSearch_1",
-            icon: "bi-signpost-2-fill",
+            icon: "bi-signpost-2",
             name: "Example Search: " + searchInput
         }
     ]);

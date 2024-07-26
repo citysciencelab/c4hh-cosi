@@ -24,7 +24,7 @@
 const state = {
     description: "additional:modules.streetsmart.description",
     hasMouseMapInteractions: true,
-    icon: "bi-camera-fill",
+    icon: "bi-camera",
     name: "additional:modules.streetsmart.name",
     reactVersion: "16.13.0",
     serviceId: "streetsmart",

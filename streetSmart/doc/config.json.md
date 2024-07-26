@@ -17,7 +17,7 @@ The module includes
 |Name|Mandatory|Type|Default|Description|Expert|
 |----|-------------|---|-------|------------|------|
 |type|yes|String|"streetSmart"|The type used to identify the module.|false|
-|icon|no|String|"bi-camera-fill"|The icon to use.|false|
+|icon|no|String|"bi-camera"|The icon to use.|false|
 |name|no|String|"360° panorama"|The title of the module or the entry in the menu.|false|
 |reactVersion|no|String|16.13.0|The version of React compatible with the version of streetsmartAPI.|true|
 |streetsmartAPIVersion|no|String|22.2|The version of streetsmartApi.|true|
@@ -31,7 +31,7 @@ The module includes
 #!json
 {
     "type": "streetSmart",
-    "icon": "bi-camera-fill",
+    "icon": "bi-camera",
     "name": "additional:menu.tools.streetsmart",
     "reactVersion": "16.13.0",
     "streetsmartAPIVersion": "22.2"

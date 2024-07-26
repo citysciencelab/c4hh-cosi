@@ -59,7 +59,7 @@ Mobil wird das iFrame im window angezeigt.
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
 |name|ja|String|Schrägluftbilder|Der Titel des Werkzeuges bzw. der Eintrag in der Werkzeugliste|false|
-|icon|ja|String|bi-camera-fill|Das zu verwendende Icon.|false|
+|icon|ja|String|bi-camera|Das zu verwendende Icon.|false|
 |styleId|nein|String|"obliqueViewer"|StyleId aus der style.json, um den Mapmarker in der Karte zu stylen, wenn Schrägluftbilder geöffnet ist.|true|
 
 

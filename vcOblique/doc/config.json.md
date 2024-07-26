@@ -59,7 +59,7 @@ Mobile the iFrame is displayed in the window.
 |Name|Mandatory|Type|Default|Description|Expert|
 |----|-------------|---|-------|------------|------|
 |name|yes|String|Elevation|The title of the tool or the entry in the tool list|false|
-|icon|yes|string|bi-camera-fill|The icon to use.|false|
+|icon|yes|string|bi-camera|The icon to use.|false|
 |styleId|no|String|"obliqueViewer"|StyleId from the style.json to style the mapmarker in the map when obliqueviewer is open.|true|
 
 **Example**
