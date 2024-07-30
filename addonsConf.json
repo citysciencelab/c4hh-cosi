@@ -66,5 +66,8 @@
   },
   "commuterFlows": {
     "type": "tool"
+  },
+  "waterRiskCheck": {
+    "type": "tool"
   }
 }

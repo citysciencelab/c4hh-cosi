@@ -1,0 +1,8 @@
+{
+  "modules": {
+    "waterRiskCheck": {
+      "description": "Erhalte Informationen und Handlungsempfehlungen zu deiner Adresse",
+      "title": "Wasser-Risiko-Check"
+    }
+  }
+}

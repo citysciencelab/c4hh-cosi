@@ -1,0 +1,8 @@
+{
+  "modules": {
+    "waterRiskCheck": {
+      "description": "Get information and recommendations for your address",
+      "title": "Water risk check"
+    }
+  }
+}
