@@ -80,15 +80,15 @@ export default {
                     v-if="parseInt(selectedBrwFeature.get('jahrgang'), 10) >= 2002"
                 >
                     <dt>{{ $t("additional:modules.boris.landValue") }}:</dt>
-                    <dd>{{ selectedBrwFeature.get('richtwert_euro') }} €/m²</dd>
+                    <dd>{{ selectedBrwFeature.values_.richtwert_euro }} €/m²</dd>
                 </div>
                 <div
                     v-else
                 >
                     <dt>{{ $t("additional:modules.boris.landValue") }}:</dt>
                     <dd>
-                        <span>{{ selectedBrwFeature.get('richtwert_euro') }} €/m²</span>
-                        <span class="d-flex justify-content-end">{{ selectedBrwFeature.get('richtwert_dm') }} DM/m²</span>
+                        <span>{{ selectedBrwFeature.values_.richtwert_euro }} €/m²</span>
+                        <span class="d-flex justify-content-end">{{ selectedBrwFeature.values_.richtwert_dm }} DM/m²</span>
                     </dd>
                 </div>
             </dl>

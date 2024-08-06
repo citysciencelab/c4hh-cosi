@@ -1,7 +1,6 @@
 /**
  * User type definition
  * @typedef {Object} MapState
- * @property {Boolean} active - if true, Boris will be rendered
  * @property {String} id - id of Boris component
  * @property {String} name - displayed as the title
  * @property {String} icon - icon next to the title
@@ -42,7 +41,6 @@ const state = {
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D"],
     type: "borisComponent",
-    active: false,
     id: "boris",
     name: "additional:modules.boris.name",
     icon: "bi-vinyl",
@@ -54,6 +52,7 @@ const state = {
     isVisibleInMenu: true,
     deactivateGFI: false,
     filteredLayerList: [],
+    hasMouseMapInteractions: true,
     isAreaLayer: true,
     isStripesLayer: false,
     selectedLayer: null,

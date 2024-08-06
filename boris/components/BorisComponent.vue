@@ -4,7 +4,7 @@ import mutations from "../store/mutationsBoris";
 import InformationComponent from "./InformationComponent.vue";
 import CalculationComponent from "./CalculationComponent.vue";
 import FloorComponent from "./FloorComponent.vue";
-// import {preparePrint} from "../utils/preparePrint.js";
+import {preparePrint} from "../utils/preparePrint.js";
 import axios from "axios";
 
 export default {
@@ -16,7 +16,7 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/BorisComponent", [
-            "name", "type", "active", "id", "icon", "renderToWindow", "resizableWindow", "initialWidth",
+            "name", "type", "id", "icon", "renderToWindow", "resizableWindow", "initialWidth",
             "initialWidthMobile", "keepOpen", "filteredLayerList", "isAreaLayer",
             "isStripesLayer", "textIds", "selectedPolygon", "selectedLayerName",
             "selectedLanduse", "selectedBrwFeature", "convertedBrw", "buttonValue",
@@ -57,19 +57,6 @@ export default {
         }
     },
     watch: {
-        /**
-         * Whenever active changes to false, the map click listener is unregistered
-         * @param {boolean} value this.active
-         * @returns {void}
-         */
-        active (value) {
-            if (value === false) {
-                this.unregisterListener({type: "click", listener: this.requestGFI});
-            }
-            else {
-                this.registerListener({type: "click", listener: this.requestGFI});
-            }
-        },
         /**
          * Listens to the selectedPolygon for simulating landuse if parametric URL is being used
          * @returns {void}
@@ -130,9 +117,9 @@ export default {
          * @returns {void}
          */
         printFileReady () {
-            if (this.active && this.printFileReady && this.fileDownloadUrl) {
+            if (this.printFileReady && this.fileDownloadUrl) {
                 const link = document.createElement("a");
-
+                console.log("printFileReady");
                 link.href = this.fileDownloadUrl;
                 link.click();
             }
@@ -176,7 +163,7 @@ export default {
             "unregisterListener"
         ]),
         ...mapMutations("Modules/BorisComponent", Object.keys(mutations)),
-        // preparePrint,
+        preparePrint,
         /**
          * Toggles info text if clicked on info icon
          * @param {String} id the textId to toggle the right info text for the intended element
@@ -347,7 +334,7 @@ export default {
                             {{ $t("additional:modules.boris.selectOption") }}
                         </option>
                         <option
-                            v-for="(landuse, index) in selectedPolygon.get('nutzungsart')"
+                            v-for="(landuse, index) in selectedPolygon.values_.nutzungsart"
                             :key="index"
                             :value="landuse.nutzungsart"
                         >
@@ -362,7 +349,7 @@ export default {
                 class="pt-4Box"
             >
                 <div class="pt-4 larger">
-                    {{ $t("additional:modules.boris.referenceNumber") }}: {{ selectedBrwFeature.get("richtwertnummer") }}
+                    {{ $t("additional:modules.boris.referenceNumber") }}: {{ selectedBrwFeature.values_.richtwertnummer }}
                 </div>
                 <hr>
                 <div
@@ -390,7 +377,7 @@ export default {
                         @click="setButtonValue($event.target.value)"
                     />
                     <button
-                        v-if="selectedBrwFeature.get('schichtwert')"
+                        v-if="selectedBrwFeature.values_.schichtwert"
                         class="bi-list-ul col ms-1"
                         :class="(buttonValue === 'liste') ? 'btn btn-primary' : 'btn btn-default'"
                         value="liste"
@@ -421,7 +408,7 @@ export default {
                     </h6>
                     <dl>
                         <div
-                            v-if="selectedBrwFeature.get('zBauweise')"
+                            v-if="selectedBrwFeature.values_.zBauweise"
                         >
                             <CalculationComponent
                                 :title="$t('additional:modules.boris.landCalculation.buildingDesigns')"
@@ -438,7 +425,7 @@ export default {
                             />
                         </div>
                         <div
-                            v-if="selectedBrwFeature.get('zStrassenLage')"
+                            v-if="selectedBrwFeature.values_.zStrassenLage"
                         >
                             <CalculationComponent
                                 :title="$t('additional:modules.boris.landCalculation.positionToStreet')"
@@ -455,7 +442,7 @@ export default {
                             />
                         </div>
                         <div
-                            v-if="selectedBrwFeature.get('zGeschossfl_zahl')"
+                            v-if="selectedBrwFeature.values_.zGeschossfl_zahl"
                         >
                             <CalculationComponent
                                 :title="$t('additional:modules.boris.landCalculation.numberOfFloor')"
@@ -471,7 +458,7 @@ export default {
                             />
                         </div>
                         <div
-                            v-if="selectedBrwFeature.get('zGrdstk_flaeche')"
+                            v-if="selectedBrwFeature.values_.zGrdstk_flaeche"
                         >
                             <CalculationComponent
                                 :title="$t('additional:modules.boris.landCalculation.landArea')"
@@ -497,9 +484,9 @@ export default {
                             />
                         </dt>
                         <dd
-                            v-if="selectedBrwFeature.get('convertedBrwDM') === ''"
+                            v-if="selectedBrwFeature.values_.convertedBrwDM === ''"
                         >
-                            {{ convertedBrw }} €/m²
+                            {{ selectedBrwFeature.values_ }} €/m²
                             <div
                                 v-if="Object.values(textIds).includes('6')"
                                 class="help pt-2"
@@ -507,14 +494,15 @@ export default {
                                 <span v-html="$t('additional:modules.boris.landCalculation.calculatedLandValueInfo')" />
                             </div>
                         </dd>
+                        <!-- vielleicht streichen -->
                         <dd
                             v-else
                         >
                             <div
                                 class="d-flex justify-content-between"
                             >
-                                <span>{{ convertedBrw }} €/m²</span>
-                                <span>{{ selectedBrwFeature.get("convertedBrwDM") }} DM/m²</span>
+                                <span>{{ selectedBrwFeature.values_.convertedBrw }} €/m²</span>
+                                <span>{{ selectedBrwFeature.values_.convertedBrwDM }} DM/m²</span>
                             </div>
                             <div
                                 v-if="Object.values(textIds).includes('6')"
@@ -525,10 +513,10 @@ export default {
                         </dd>
                     </dl>
                 </div>
-                <div v-if="buttonValue === 'liste' && selectedBrwFeature.get('schichtwert')">
+                <div v-if="buttonValue === 'liste' && selectedBrwFeature.values_.schichtwert">
                     <FloorComponent
                         :title="$t('additional:modules.boris.floorValues.title')"
-                        :feature="selectedBrwFeature.get('schichtwert')"
+                        :feature="selectedBrwFeature.values_.schichtwert"
                         :label="$t('additional:modules.boris.floorValues.subTitle')"
                         :landuse="selectedLanduseComputed"
                     />
@@ -566,10 +554,21 @@ export default {
 <style lang="scss" scoped>
 @import "~variables";
 
+.form-check-label {
+    margin: 0 0.5rem;
+}
+.pt-2 {
+    // display: flex;
+    // flex-direction: row;
+    margin-bottom: 1.5rem;
+}
 .print-button {
+    margin-bottom: 1rem;
     align-self: center;
-    width: 10rem;
-    max-width: 80%;
+    width: fit-content;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
 }
 .pt-4Box {
     display: flex;
@@ -589,7 +588,7 @@ export default {
     word-wrap: break-word;
 }
 ::v-deep h4 {
-    font-size: 1rem;
+    font-size: 1.2rem;
     padding: 10px 0px;
 }
 </style>
