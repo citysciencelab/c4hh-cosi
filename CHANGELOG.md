@@ -3,6 +3,21 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
+## Unreleased - in development
+### __Breaking Changes__
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+---
+
 ## 2024-08-07 v3.1.0
 ### Changed
 - Eslint: no-undef eslint rule is switched on and changes to not return warnings/errors are applied.
