@@ -9,7 +9,7 @@
   },
   "scripts": {
     "versionHotfix": "npm version patch && npm run versionLatest && git push --tags -f",
-    "versionMinor": "npm version minor && npm run versionLatest && git push --tags -f",
+    "versionMinor": "npm version minor && git push --tags -f",
     "versionMajor": "npm version major && npm run versionLatest && git push --tags -f",
     "versionLatest": "git tag latest -f",
     "postinstall": "cd sdpDownload && npm install && cd .. && cd vcOblique && npm install && cd .. && cd valuationPrint && npm install",
