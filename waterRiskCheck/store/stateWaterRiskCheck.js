@@ -13,7 +13,8 @@ const state = {
     supportedMapModes: ["2D"],
     name: "additional:modules.waterRiskCheck.title",
     icon: "bi-water",
-    description: "additional:modules.waterRiskCheck.description"
+    description: "additional:modules.waterRiskCheck.description",
+    configuredQuestions: []
 };
 
 export default state;

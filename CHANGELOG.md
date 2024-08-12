@@ -7,6 +7,8 @@
 ### __Breaking Changes__
 
 ### Added
+- New tool WaterRiskCheck:
+    - Implemented form ui.
 
 ### Changed
 

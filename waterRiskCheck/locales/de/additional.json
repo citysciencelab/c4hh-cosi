@@ -2,7 +2,27 @@
   "modules": {
     "waterRiskCheck": {
       "description": "Erhalte Informationen und Handlungsempfehlungen zu deiner Adresse",
-      "title": "Wasser-Risiko-Check"
+      "title": "Wasser-Risiko-Check",
+      "generelExplenationText": "Mit dem Wegweiser Überflutungsvorsorge erhalten Sie Empfehlungen zur individuellen Gefahrenlage und Maßnahmenvorschläge für Ihr Grundstück. Der Wegweiser kombiniert unser Fachwissen, Wasser-Fachkarten und Ihre Antworten in einem kurzen Fragebogenzu einer individuellen Empfehlung. Sie erfahren in diesem Dokument außerdem, wie Sie sich im Notfall verhalten sollten. Der Wegweiser beginnt mit einer Eingabe Ihrer Adresse in das Suchfeld auf der linken Seite. Die konkrete Eingabe ermöglicht dabei eine genauere Auswertung der Fachkarten. Anschließend startet der kurze Fragebogen mit vier Fragen.",
+      "informationTextIconLabel": "Hinweis",
+      "informationText": "Der Fragebogen richtet sich ausschließlich an berechtigte Nutzer:innen. Sie sind berechtigt, wenn Sie wohnhaft an der eingegebenen Adresse sind oder Eigentümer:in des betrachteten Grundstückes sind. Mit \"Fragebogen starten\" bestätigen Sie, dass Sie für die angefragte Adresse berechtigt sind",
+      "formInformationText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+      "formStartButton": "Fragebogen starten",
+      "forwardPage": "weiter",
+      "backPage": "zurück",
+      "infoButton": "mehr Infos",
+      "closeInfoButton": "weniger Infos",
+      "finishButton": "Fertig",
+      "downloadURLFileTitle": "Überflutungsvorsorgenbericht.pdf",
+      "download": "Meinen Bericht anzeigen",
+      "themeProgressLabel": "Thema {{currentIdx}} von {{maxLength}}",
+      "downloadPageTitle": "Download der Ergebnisse",
+      "downloadInformationText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et",
+      "toolIconAltText": "Wegweiser Überflutungsvorsorge Logo",
+      "districtLabel": "Gemarkung:",
+      "parcelLabel": "Flurstück:",
+      "buildingCountLabel": "Anzahl der Gebäude:",
+      "addressLabel": "Adresse"
     }
   }
 }

@@ -1,16 +1,431 @@
 <script>
+import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
+import {mapGetters} from "vuex";
 
 export default {
     name: "WaterRiskCheck",
-    components: {},
+    components: {
+        FlatButton
+    },
     data () {
-        return {};
+        return {
+            formStarted: false,
+            formFinished: false,
+            questions: [],
+            currentQuestionIdx: 0,
+            downloadLink: "",
+            infoBoxOpen: false,
+            isCreatingPDF: false,
+            calculatedPercentage: 0,
+            address: "Neuenfelder Str. 19, 21109 Hamburg",
+            district: "Wilhelmsburg",
+            parcel: "13647",
+            numberOfBuildungs: 3
+        };
+    },
+    computed: {
+        ...mapGetters("Modules/WaterRiskCheck", ["configuredQuestions"])
+    },
+    watch: {
+        currentQuestionIdx (val) {
+            this.updateCalculatedPercentage(val);
+            if (this.infoBoxOpen) {
+                this.$refs.information.click();
+            }
+        }
+    },
+    mounted () {
+        this.questions = [...this.configuredQuestions];
+    },
+    methods: {
+        /**
+         * Starts the form.
+         * @returns {void}
+         */
+        startForm () {
+            this.formStarted = true;
+        },
+        /**
+         * Sets the selected answer to the question.
+         * @param {Number} questionId The question index.
+         * @param {String} selectedAnswer The selected answer.
+         */
+        selectAnswer (questionId, selectedAnswer) {
+            this.questions[questionId].selectedAnswer = selectedAnswer;
+        },
+        /**
+         * Goes back one page in the form.
+         * @returns {void}
+         */
+        previousPage () {
+            if (this.currentQuestionIdx <= 0) {
+                return;
+            }
+            this.currentQuestionIdx -= 1;
+        },
+        /**
+         * Goes forward one page in the form.
+         * @returns {void}
+         */
+        nextPage () {
+            if (this.currentQuestionIdx >= this.questions.length - 1) {
+                return;
+            }
+            this.currentQuestionIdx += 1;
+        },
+        /**
+         * Finishes the form.
+         * @returns {void}
+         */
+        finishForm () {
+            this.updateCalculatedPercentage("finish");
+            this.isCreatingPDF = true;
+            setTimeout(() => {
+                this.isCreatingPDF = false;
+                this.formStarted = false;
+                this.formFinished = true;
+            }, 2000);
+        },
+        /**
+         * Toggles the infoBoxOpen flag.
+         * @returns {void}
+         */
+        toggleInfoBox () {
+            this.infoBoxOpen = !this.infoBoxOpen;
+        },
+        /**
+         * Calculates the percentage of the progress bar.
+         * Use finish as parameter to create a last finishing step.
+         * @param {Number|String} pageIndex The page index or 'finish' if last page.
+         * @returns {void}
+         */
+        updateCalculatedPercentage (pageIndex) {
+            if (pageIndex === "finish") {
+                this.calculatedPercentage = 100;
+                return;
+            }
+            this.calculatedPercentage = Number(pageIndex / (this.questions.length - 1) * 100).toFixed(2);
+        }
     }
 };
 </script>
 
 <template lang="html">
-    <div>
-        Wasser-Risiko-Check / Water risk check
+    <div
+        id="tool-waterRiskCheck"
+        class="water-risk-check"
+    >
+        <div v-if="!formStarted && !formFinished">
+            <p>
+                {{ $t('additional:modules.waterRiskCheck.generelExplenationText') }}
+            </p>
+            <br>
+            <div class="container">
+                <div class="row">
+                    <div class="col-2 d-flex justify-content-center align-items-center">
+                        <i class="geo-icon bi-geo-alt-fill text-secondary" />
+                    </div>
+                    <div class="address-container col-10 d-flex flex-column justify-content-center align-items-start">
+                        <p class="current-address font-bold mb-2">
+                            {{ address }}
+                        </p>
+                        <div class="d-flex justify-content-center">
+                            <p>{{ $t("additional:modules.waterRiskCheck.districtLabel") }}</p>
+                            <p class="font-bold">
+                                {{ district }}
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <p>{{ $t("additional:modules.waterRiskCheck.parcelLabel") }}</p>
+                            <p class="font-bold">
+                                {{ parcel }}
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <p>{{ $t("additional:modules.waterRiskCheck.buildingCountLabel") }}</p>
+                            <p class="font-bold">
+                                {{ numberOfBuildungs }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-1 d-flex align-items-center">
+                        <i class="bi-info-circle" />
+                    </div>
+                    <div class="col-11 d-flex align-items-center">
+                        <p class="fs-5">
+                            {{ $t("additional:modules.waterRiskCheck.informationTextIconLabel") }}
+                        </p>
+                    </div>
+                </div>
+                <div class="row mb-3 mt-2">
+                    <p class="col offset-md-1">
+                        {{ $t("additional:modules.waterRiskCheck.informationText") }}
+                    </p>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <FlatButton
+                            id="start-form"
+                            :aria-label="$t('additional:modules.waterRiskCheck.formStartButton')"
+                            type="button"
+                            :text="$t('additional:modules.waterRiskCheck.formStartButton')"
+                            :interaction="startForm"
+                            icon="bi-play-circle"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-else-if="formStarted && !formFinished && questions.length">
+            <div class="container basic-infos">
+                <p class="row">
+                    {{ $t('additional:modules.waterRiskCheck.addressLabel') }}
+                </p>
+                <p class="row font-bold">
+                    {{ address }}
+                </p>
+                <p class="row mt-2">
+                    {{ $t('additional:modules.waterRiskCheck.formInformationText') }}
+                </p>
+            </div>
+            <div class="form-container container">
+                <div class="progress-section px-4 my-4 row">
+                    <div class="d-flex justify-content-center">
+                        {{ $t('additional:modules.waterRiskCheck.themeProgressLabel', {currentIdx: currentQuestionIdx + 1, maxLength: questions.length}) }}
+                    </div>
+                    <div class="progress p-0">
+                        <div
+                            class="progress-bar bg-secondary"
+                            role="progressbar"
+                            :style="`width: ${calculatedPercentage}%`"
+                            :aria-valuenow="calculatedPercentage"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                        />
+                    </div>
+                </div>
+                <div class="question-section row mt-4 mb-5">
+                    <div class="container d-flex flex-column">
+                        <div class="d-flex flex-column align-items-start justify-content-center">
+                            <p class="font-bold mb-2">
+                                {{ questions[currentQuestionIdx].title }}
+                            </p>
+                            <span class="mb-2">
+                                {{ questions[currentQuestionIdx].question }}
+                            </span>
+                            <button
+                                id="information"
+                                ref="information"
+                                type="button"
+                                class="btn btn-sm btn-secondary rounded-pill lh-1 me-2 mb-2"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseInfo"
+                                aria-expanded="false"
+                                aria-controls="collapseInfo"
+                                @click="toggleInfoBox"
+                            >
+                                <i
+                                    class="bi fs-6 pe-2"
+                                    :class="[infoBoxOpen ? 'bi-x-circle' : 'bi-info-circle']"
+                                />
+                                {{ infoBoxOpen ? $t('additional:modules.waterRiskCheck.closeInfoButton') : $t('additional:modules.waterRiskCheck.infoButton') }}
+                            </button>
+                            <div
+                                id="collapseInfo"
+                                class="collapse"
+                            >
+                                <div class="card card-body p-4 border border-primary rounded">
+                                    <h6 class="text-secondary font-bold">
+                                        {{ questions[currentQuestionIdx].title }}
+                                    </h6>
+                                    <div class="container p-0">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p>{{ questions[currentQuestionIdx].info.text }}</p>
+                                            </div>
+                                            <div class="col-6 d-flex justify-content-end align-items-start">
+                                                <img
+                                                    class="information-image"
+                                                    :src="questions[currentQuestionIdx].info.image"
+                                                    :alt="questions[currentQuestionIdx].info.alt"
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="answer-container d-flex flex-column align-items-center">
+                            <div
+                                v-for="answer in questions[currentQuestionIdx].answers"
+                                :key="answer"
+                                tabindex="0"
+                                role="button"
+                                class="answer d-flex justify-content-center mt-3 py-2 border position-relative"
+                                :class="[
+                                    questions[currentQuestionIdx].selectedAnswer === answer ? 'marked-answers' : '',
+                                    isCreatingPDF ? 'disabled-answer': ''
+                                ]"
+                                @click="selectAnswer(currentQuestionIdx, answer)"
+                                @keypress.enter="selectAnswer(currentQuestionIdx, answer)"
+                            >
+                                <i
+                                    v-if="questions[currentQuestionIdx].selectedAnswer === answer"
+                                    class="selected-answer-icon position-absolute bi bi-check-circle-fill fs-6 pe-2 text-secondary"
+                                />
+                                <div>
+                                    {{ answer }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mb-4">
+                <div class="d-flex flex-row justify-content-between">
+                    <FlatButton
+                        id="page-back"
+                        :aria-label="$t('additional:modules.waterRiskCheck.backPage')"
+                        type="button"
+                        :text="$t('additional:modules.waterRiskCheck.backPage')"
+                        :interaction="previousPage"
+                        :disabled="currentQuestionIdx <= 0 || isCreatingPDF"
+                        icon="bi-arrow-left-circle-fill"
+                    />
+                    <FlatButton
+                        v-if="currentQuestionIdx < questions.length -1"
+                        id="page-forward"
+                        :aria-label="$t('additional:modules.waterRiskCheck.forwardPage')"
+                        type="button"
+                        :text="$t('additional:modules.waterRiskCheck.forwardPage')"
+                        :interaction="nextPage"
+                        :disabled="questions[currentQuestionIdx].selectedAnswer === null"
+                        icon="bi-arrow-right-circle-fill"
+                    />
+                    <FlatButton
+                        v-else
+                        id="page-forward"
+                        :aria-label="$t('additional:modules.waterRiskCheck.finishButton')"
+                        type="button"
+                        :text="$t('additional:modules.waterRiskCheck.finishButton')"
+                        :interaction="finishForm"
+                        :disabled="questions[currentQuestionIdx].selectedAnswer === null || isCreatingPDF"
+                        :spinner-trigger="isCreatingPDF"
+                        icon="bi-arrow-right-circle-fill"
+                    />
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <div class="container">
+                <div class="d-flex flex-column mb-4">
+                    <p>
+                        {{ $t('additional:modules.waterRiskCheck.addressLabel') }}
+                    </p>
+                    <p class="font-bold">
+                        {{ address }}
+                    </p>
+                </div>
+                <div>
+                    <h5>{{ $t('additional:modules.waterRiskCheck.downloadPageTitle') }}</h5>
+                    <p>{{ $t('additional:modules.waterRiskCheck.downloadInformationText') }}</p>
+                    <div
+                        ref="downloadSection"
+                        class="mt-3"
+                    >
+                        <div class="container">
+                            <div class="row">
+                                <div
+                                    class="d-flex justify-content-center pt-2 pb-3"
+                                >
+                                    <FlatButton
+                                        id="download-report"
+                                        aria-label="$t('additional:modules.waterRiskCheck.download')"
+                                        type="button"
+                                        :text="$t('additional:modules.waterRiskCheck.download')"
+                                        :icon="'bi-download'"
+                                        :interaction="() => {}"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="d-flex justify-content-center pt-2">
+                                    <img
+                                        class="logo-image"
+                                        :src="'./assets/logo.png'"
+                                        :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
+
+<style lang="scss" scoped>
+    @import "~mixins";
+
+    #collapseHiddenButton {
+        display: none;
+    }
+    .answer {
+        width: 50%;
+        cursor: pointer;
+        border-radius: 20px;
+        border: 1px solid var(--form-check-input-border);
+    }
+    .disabled-answer {
+        pointer-events: none;
+        opacity: 50%;
+    }
+    .pdf-icon {
+        font-size: 50px;
+    }
+    .progress {
+        background-color: $light_grey;
+        color: white;
+        text-align: center;
+        border-radius: 10px;
+        height: 12px;
+        font-size: 12px;
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+        height: 100%;
+    }
+    .information-image {
+        width: 100%;
+        z-index: 10;
+    }
+    .information-image:hover {
+        transform: scale(3.5) translateX(-24%);
+        width: 75%;
+    }
+    .selected-answer-icon {
+        left: 15px;
+        top: 9px;
+    }
+    .answer:hover, .marked-answers{
+        background-color: $primary;
+        font-family: $font_family_accent;
+    }
+    .logo-image {
+        width: 135px;
+    }
+    .geo-icon {
+        font-size: 40px;
+    }
+    .address-container p {
+        margin-right: 5px;
+    }
+    .current-address {
+        font-size: 16px;
+    }
+</style>
