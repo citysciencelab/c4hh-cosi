@@ -222,10 +222,10 @@ const actions = {
         const feature = new WMSGetFeatureInfo().readFeature(response);
 
         if (feature !== null) {
-            if (parseInt(feature.values_.jahrgang, 10) > 2008) {
+            if (parseInt(feature.get("jahrgang"), 10) > 2008) {
                 // wie übersetze ich das???
                 feature.set("nutzungsart", JSON.parse(feature.get("nutzungsart")).nutzungen);
-                dispatch("getFeatureRequestById", {featureId: feature.getId(), featureYear: feature.values_.jahrgang});
+                dispatch("getFeatureRequestById", {featureId: feature.getId(), featureYear: feature.get("jahrgang")});
                 commit("setSelectedPolygon", feature);
                 dispatch("matchPolygonFeatureWithLanduse", {feature, selectedLanduse: state.selectedLanduse});
             }
@@ -307,12 +307,12 @@ const actions = {
      * @returns {void}
      */
     matchPolygonFeatureWithLanduse ({dispatch, commit}, {feature, selectedLanduse}) {
-        const landuseMatch = feature.values_.nutzungsart.find((typeOfUse) => {
+        const landuseMatch = feature.get("nutzungsart").find((typeOfUse) => {
             return typeOfUse.nutzungsart === selectedLanduse;
         });
 
         if (landuseMatch) {
-            dispatch("postFeatureRequestByBrwNumber", {brwNumber: landuseMatch.richtwertnummer, featureYear: feature.values_.jahrgang});
+            dispatch("postFeatureRequestByBrwNumber", {brwNumber: landuseMatch.richtwertnummer, featureYear: feature.get("jahrgang")});
         }
         else {
             commit("setSelectedLanduse", "");
@@ -412,23 +412,23 @@ const actions = {
      * @returns {void}
      */
     extendFeatureAttributes ({dispatch, commit, state}, {feature, date}) {
-        const isDMTime = parseInt(feature.values_.jahrgang, 10) < 2002,
+        const isDMTime = parseInt(feature.get("jahrgang"), 10) < 2002,
             sw = helpers.parseSW({feature});
 
         feature.setProperties({
-            "richtwert_dm": isDMTime ? thousandsSeparator(parseFloat(feature.values_.richtwert_dm, 10).toFixed(1)) : "",
-            "richtwert_euro": thousandsSeparator(feature.values_.richtwert_euro),
+            "richtwert_dm": isDMTime ? thousandsSeparator(parseFloat(feature.get("richtwert_dm"), 10).toFixed(1)) : "",
+            "richtwert_euro": thousandsSeparator(feature.get("richtwert_euro")),
             "schichtwert": sw,
             "stichtag": date,
             "convertedBrw": "", // Converted standard land value
             "convertedBrwDM": "",
-            "zEntwicklungszustand": feature.values_.zEntwicklungszustand, // Mandatory attribute for WPS
-            "zBeitragszustand": feature.values_.zBeitragszustand, // Mandatory attribute for WPS
-            "zNutzung": feature.values_.zNutzung, // Mandatory attribute for WPS
+            "zEntwicklungszustand": feature.get("entwicklungszustand"), // Mandatory attribute for WPS
+            "zBeitragszustand": feature.get("beitragszustand"), // Mandatory attribute for WPS
+            "zNutzung": feature.get("nutzung_kombiniert"), // Mandatory attribute for WPS
             "zBauweise": state.selectedBuildDesign !== "" ? state.selectedBuildDesign : null,
-            "zGeschossfl_zahl": feature.values_.zGeschossfl_zahl !== "" ? feature.values_.zGeschossfl_zahl : null,
-            "zGrdstk_flaeche": feature.values_.zGrdstk_flaeche !== "" ? feature.values_.zGrdstk_flaeche : null,
-            "zStrassenLage": feature.values_.nutzung_kombiniert === "EFH Ein- und Zweifamilienhäuser" ? state.selectedPositionToStreet : null
+            "zGeschossfl_zahl": feature.get("geschossfl_zahl") !== "" ? feature.get("geschossfl_zahl") : null,
+            "zGrdstk_flaeche": feature.get("grdstk_flaeche") !== "" ? feature.get("grdstk_flaeche") : null,
+            "zStrassenLage": feature.get("nutzung_kombiniert") === "EFH Ein- und Zweifamilienhäuser" ? state.selectedPositionToStreet : null
         });
 
         commit("setSelectedBrwFeature", feature);
@@ -440,10 +440,16 @@ const actions = {
      * Sends a request to convert the BRW
      * @returns {void}
      */
-    sendWpsConvertRequest ({dispatch, state}) {
-        const data = helpers.convert({brw: state.selectedBrwFeature});
+    sendWpsConvertRequest ({dispatch, state, rootGetters}) {
+        const data = helpers.convert({brw: state.selectedBrwFeature}),
+            url = rootGetters.restServiceById(state.wpsId);
 
-        WPS.wpsRequest(state.wpsId, state.fmwProcess, data, (response, status) => dispatch("handleConvertResponse", {response, status}));
+        if (url === undefined) {
+            console.warn("Rest Service with the ID " + this.wpsId + " is not configured in rest-services.json!");
+        }
+        else {
+            WPS.wpsRequest(state.wpsId, url.url, state.fmwProcess, data, (response, status) => dispatch("handleConvertResponse", {response, status}));
+        }
     },
     /**
      * Extracts and stores the converted BRW
@@ -460,6 +466,7 @@ const actions = {
             executeResponse = response.ExecuteResponse;
 
             if (executeResponse.ProcessOutputs) {
+
                 complexData = response.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData;
                 if (complexData.serviceResponse) {
                     showErrorMessage = true;
@@ -499,7 +506,7 @@ const actions = {
     updateSelectedBrwFeature ({state, commit}, {converted, brw}) {
         if (Object.keys(state.selectedBrwFeature).length !== 0) {
             const feature = state.selectedBrwFeature,
-                isDMTime = parseInt(feature.values_.jahrgang, 10) < 2002,
+                isDMTime = parseInt(feature.get("jahrgang"), 10) < 2002,
                 valueDm = isDMTime ? thousandsSeparator((parseFloat(brw, 10) * 1.95583).toFixed(1)) : "";
 
             switch (converted) {

@@ -2,7 +2,6 @@ import Vuex from "vuex";
 import {config, shallowMount, createLocalVue} from "@vue/test-utils";
 import BorisComponent from "../../../components/BorisComponent.vue";
 import Boris from "../../../store/indexBoris";
-import MapActions from "../../../../../src/core/maps/store/actions/actionsMapInteractions.js";
 import {expect} from "chai";
 import sinon from "sinon";
 

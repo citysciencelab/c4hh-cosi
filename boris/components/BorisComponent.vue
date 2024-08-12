@@ -119,7 +119,7 @@ export default {
         printFileReady () {
             if (this.printFileReady && this.fileDownloadUrl) {
                 const link = document.createElement("a");
-                console.log("printFileReady");
+
                 link.href = this.fileDownloadUrl;
                 link.click();
             }
@@ -334,7 +334,7 @@ export default {
                             {{ $t("additional:modules.boris.selectOption") }}
                         </option>
                         <option
-                            v-for="(landuse, index) in selectedPolygon.values_.nutzungsart"
+                            v-for="(landuse, index) in selectedPolygon.get('nutzungsart')"
                             :key="index"
                             :value="landuse.nutzungsart"
                         >
@@ -349,7 +349,7 @@ export default {
                 class="pt-4Box"
             >
                 <div class="pt-4 larger">
-                    {{ $t("additional:modules.boris.referenceNumber") }}: {{ selectedBrwFeature.values_.richtwertnummer }}
+                    {{ $t("additional:modules.boris.referenceNumber") }}: {{ selectedBrwFeature.get("richtwertnummer") }}
                 </div>
                 <hr>
                 <div
@@ -377,7 +377,7 @@ export default {
                         @click="setButtonValue($event.target.value)"
                     />
                     <button
-                        v-if="selectedBrwFeature.values_.schichtwert"
+                        v-if="selectedBrwFeature.get('schichtwert')"
                         class="bi-list-ul col ms-1"
                         :class="(buttonValue === 'liste') ? 'btn btn-primary' : 'btn btn-default'"
                         value="liste"
@@ -408,7 +408,7 @@ export default {
                     </h6>
                     <dl>
                         <div
-                            v-if="selectedBrwFeature.values_.zBauweise"
+                            v-if="selectedBrwFeature.get('zBauweise')"
                         >
                             <CalculationComponent
                                 :title="$t('additional:modules.boris.landCalculation.buildingDesigns')"
@@ -425,7 +425,7 @@ export default {
                             />
                         </div>
                         <div
-                            v-if="selectedBrwFeature.values_.zStrassenLage"
+                            v-if="selectedBrwFeature.get('zStrassenLage')"
                         >
                             <CalculationComponent
                                 :title="$t('additional:modules.boris.landCalculation.positionToStreet')"
@@ -442,7 +442,7 @@ export default {
                             />
                         </div>
                         <div
-                            v-if="selectedBrwFeature.values_.zGeschossfl_zahl"
+                            v-if="selectedBrwFeature.get('zGeschossfl_zahl')"
                         >
                             <CalculationComponent
                                 :title="$t('additional:modules.boris.landCalculation.numberOfFloor')"
@@ -455,10 +455,11 @@ export default {
                                 :handle-change="handleInputChange"
                                 :subject="'zGeschossfl_zahl'"
                                 :type="'input'"
+                                :value="'Input'"
                             />
                         </div>
                         <div
-                            v-if="selectedBrwFeature.values_.zGrdstk_flaeche"
+                            v-if="selectedBrwFeature.get('zGrdstk_flaeche')"
                         >
                             <CalculationComponent
                                 :title="$t('additional:modules.boris.landCalculation.landArea')"
@@ -484,9 +485,9 @@ export default {
                             />
                         </dt>
                         <dd
-                            v-if="selectedBrwFeature.values_.convertedBrwDM === ''"
+                            v-if="selectedBrwFeature.get('convertedBrwDM') === ''"
                         >
-                            {{ selectedBrwFeature.values_ }} €/m²
+                            {{ convertedBrw }} €/m²
                             <div
                                 v-if="Object.values(textIds).includes('6')"
                                 class="help pt-2"
@@ -494,15 +495,14 @@ export default {
                                 <span v-html="$t('additional:modules.boris.landCalculation.calculatedLandValueInfo')" />
                             </div>
                         </dd>
-                        <!-- vielleicht streichen -->
                         <dd
                             v-else
                         >
                             <div
                                 class="d-flex justify-content-between"
                             >
-                                <span>{{ selectedBrwFeature.values_.convertedBrw }} €/m²</span>
-                                <span>{{ selectedBrwFeature.values_.convertedBrwDM }} DM/m²</span>
+                                <span>{{ convertedBrw }} €/m²</span>
+                                <span>{{ selectedBrwFeature.get("convertedBrwDM") }} DM/m²</span>
                             </div>
                             <div
                                 v-if="Object.values(textIds).includes('6')"
@@ -513,10 +513,10 @@ export default {
                         </dd>
                     </dl>
                 </div>
-                <div v-if="buttonValue === 'liste' && selectedBrwFeature.values_.schichtwert">
+                <div v-if="buttonValue === 'liste' && selectedBrwFeature.get('schichtwert')">
                     <FloorComponent
                         :title="$t('additional:modules.boris.floorValues.title')"
-                        :feature="selectedBrwFeature.values_.schichtwert"
+                        :feature="selectedBrwFeature.get('schichtwert')"
                         :label="$t('additional:modules.boris.floorValues.subTitle')"
                         :landuse="selectedLanduseComputed"
                     />

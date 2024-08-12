@@ -17,7 +17,6 @@ const getters = {
      * @returns {String} returns the landuse of the selected feature
      */
     findLanduseByBrwId () {
-        console.log("selectedPolygon", selectedPolygon);
         if (state.selectedPolygon !== undefined) {
             const landuseList = state.selectedPolygon.get("nutzungsart"),
                 brwId = state.paramUrlParams.brwId,
@@ -45,7 +44,6 @@ const getters = {
         const selectedLayer = state.filteredLayerList.find(layer => layer.visibility === true);
 
         if (selectedLayer) {
-            console.log(selectedLayer);
             date = selectedLayer.name;
         }
         return date;

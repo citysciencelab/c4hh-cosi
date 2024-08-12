@@ -4,7 +4,7 @@ import sinon from "sinon";
 import actions from "../../../store/actionsBoris";
 import stateBoris from "../../../store/stateBoris";
 import axios from "axios";
-import mapCollection from "../../../../../src/core/maps/mapCollection.js";
+import mapCollection from "../../../../../src/core/maps/js/mapCollection";
 import rawSources from "../../resources/rawSources";
 
 import {addProjection} from "ol/proj.js";
@@ -329,7 +329,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
 
         it("show stripes layer", () => {
             const value = true,
-                layerName = state.filteredLayerList[0].get("name") + "-stripes";
+                layerName = state.filteredLayerList[0].name + "-stripes";
 
             actions.toggleStripesLayer({state, dispatch, commit}, value);
 
