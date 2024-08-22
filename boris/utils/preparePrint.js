@@ -130,6 +130,3 @@ export function printFloorValues (floorvalue) {
     }
     return false;
 }
-
-
-
