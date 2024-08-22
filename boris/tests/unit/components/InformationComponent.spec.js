@@ -1,7 +1,6 @@
-import Vuex from "vuex";
+import {createStore} from "vuex";
 import {config, shallowMount, mount} from "@vue/test-utils";
 import InformationComponent from "../../../components/InformationComponent.vue";
-import Boris from "../../../store/indexBoris";
 import {expect} from "chai";
 import sinon from "sinon";
 import VectorLayer from "ol/layer/Vector.js";
@@ -10,7 +9,7 @@ import VectorSource from "ol/source/Vector.js";
 
 config.global.mocks.$t = key => key;
 
-describe.skip("ADDONS: addons/boris/components/InformationComponent.vue", () => {
+describe("ADDONS: addons/boris/components/InformationComponent.vue", () => {
     const mockConfigJson = {
         Portalconfig: {
             menu: {
@@ -30,16 +29,35 @@ describe.skip("ADDONS: addons/boris/components/InformationComponent.vue", () => 
     let store, propsData, wrapper;
 
     beforeEach(() => {
-        store = new Vuex.Store({
+        store = createStore({
             namespaces: true,
             modules: {
-                Tools: {
+                Modules: {
                     namespaced: true,
                     modules: {
-                        Boris
+                        BorisComponent: {
+                            namespaced: true,
+                            actions: {
+                                initialize: () => sinon.stub()
+                            }
+                        },
+                        Print: {
+                            namespaced: true,
+                            getters: {printFileReady: () => sinon.stub(),
+                                fileDownloadUrl: () => sinon.stub(),
+                                filename: () => sinon.stub(),
+                                printStarted: () => sinon.stub(),
+                                progressWidth: () => sinon.stub()}
+                        }
                     }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {registerListener: () => sinon.stub(),
+                        unregisterListener: () => sinon.stub()}
                 }
             },
+            getters: {mobile: () => false},
             state: {
                 configJson: mockConfigJson
             }
@@ -57,15 +75,12 @@ describe.skip("ADDONS: addons/boris/components/InformationComponent.vue", () => 
             buttonValue: "info"
         };
         wrapper = shallowMount(InformationComponent, {
-            store,
+            global: {plugins: [store]},
             propsData: propsData
         });
     });
     afterEach(() => {
         sinon.restore();
-        // if (wrapper) {
-        //     wrapper.destroy();
-        // }
     });
 
     describe("Boris Information Component template", () => {
@@ -79,7 +94,7 @@ describe.skip("ADDONS: addons/boris/components/InformationComponent.vue", () => 
 
         it("renders position part", () => {
             wrapper = mount(InformationComponent, {
-                store,
+                global: {plugins: [store]},
                 propsData: {
                     ...propsData,
                     buttonValue: "lage"

@@ -18,12 +18,9 @@ const actions = {
 
         if (layerList) {
             // parentId is being resettet to enable the handling of singleBaseLayer only for baseLayers (layer.js: function handleSingleBaseLayer)
-            // layerCollection.getLayerById(selectedSourceLayer.id);
-            // layerList.forEach(layer => layer.set("parentId", "noParent"));
             layerList = layerList.filter(function (layer) {
                 return layer.gfiAttributes !== "ignore";
             });
-            // layerList = layerList.reverse();
             commit("setFilteredLayerList", layerList);
         }
     },
@@ -83,7 +80,6 @@ const actions = {
         let previousYear = null;
 
         previousSelectedLayer.forEach(layer => {
-            // layer.set("isVisibleInMap", false);
             layer.visibility = false;
             previousYear = layer.name.split(".")[2];
         });
@@ -143,7 +139,6 @@ const actions = {
 
             if (layer) {
                 layer.visibility = false;
-                // layer.set("isSelected", false);
             }
         }
     },
@@ -165,7 +160,6 @@ const actions = {
 
         if (selectedLayer !== undefined) {
             selectedLayer.visibility = true;
-            // selectedLayer.set("isSelected", true);
             commit("setSelectedLayer", selectedLayer);
         }
     },
@@ -214,7 +208,6 @@ const actions = {
 
         if (feature !== null) {
             if (parseInt(feature.get("jahrgang"), 10) > 2008) {
-                // wie übersetze ich das???
                 feature.set("nutzungsart", JSON.parse(feature.get("nutzungsart")).nutzungen);
                 dispatch("getFeatureRequestById", {featureId: feature.getId(), featureYear: feature.get("jahrgang")});
                 commit("setSelectedPolygon", feature);

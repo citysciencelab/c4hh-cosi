@@ -130,7 +130,6 @@ export default {
         }
     },
     created () {
-        // this.$on("close", this.close);
         this.initialize();
     },
     unmounted () {
@@ -546,8 +545,6 @@ export default {
     margin: 0 0.5rem;
 }
 .pt-2 {
-    // display: flex;
-    // flex-direction: row;
     margin-bottom: 1.5rem;
 }
 .print-button {

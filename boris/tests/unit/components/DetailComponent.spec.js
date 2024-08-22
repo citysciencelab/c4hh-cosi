@@ -1,14 +1,11 @@
-import Vuex from "vuex";
+import {createStore} from "vuex";
 import {shallowMount} from "@vue/test-utils";
 import DetailComponent from "../../../components/DetailComponent.vue";
-import Boris from "../../../store/indexBoris";
 import {expect} from "chai";
 import sinon from "sinon";
 
 
-// config.global.mocks.$t = key => key;
-
-describe.skip("ADDONS: addons/boris/components/DetailComponent.vue", () => {
+describe("ADDONS: addons/boris/components/DetailComponent.vue", () => {
     const mockConfigJson = {
         Portalconfig: {
             menu: {
@@ -16,9 +13,7 @@ describe.skip("ADDONS: addons/boris/components/DetailComponent.vue", () => {
                     children: {
                         boris: {
                             "name": "common:menu.tools.boris",
-                            "icon": "bi-vinyl",
-                            "active": true,
-                            "renderToWindow": false
+                            "icon": "bi-vinyl"
                         }
                     }
                 }
@@ -28,20 +23,40 @@ describe.skip("ADDONS: addons/boris/components/DetailComponent.vue", () => {
     let store, propsData, wrapper;
 
     beforeEach(() => {
-        store = new Vuex.Store({
+        store = createStore({
             namespaces: true,
             modules: {
-                Tools: {
+                Modules: {
                     namespaced: true,
                     modules: {
-                        Boris
+                        BorisComponent: {
+                            namespaced: true,
+                            actions: {
+                                initialize: () => sinon.stub()
+                            }
+                        },
+                        Print: {
+                            namespaced: true,
+                            getters: {printFileReady: () => sinon.stub(),
+                                fileDownloadUrl: () => sinon.stub(),
+                                filename: () => sinon.stub(),
+                                printStarted: () => sinon.stub(),
+                                progressWidth: () => sinon.stub()}
+                        }
                     }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {registerListener: () => sinon.stub(),
+                        unregisterListener: () => sinon.stub()}
                 }
             },
+            getters: {mobile: () => false},
             state: {
                 configJson: mockConfigJson
             }
         });
+
         propsData = {
             feature: {},
             keys: ["entwicklungszustand"],
@@ -51,9 +66,6 @@ describe.skip("ADDONS: addons/boris/components/DetailComponent.vue", () => {
     });
     afterEach(function () {
         sinon.restore();
-        // if (wrapper) {
-        //     wrapper.destroy();
-        // }
     });
 
     describe("Boris Detail Component template", () => {
@@ -65,7 +77,7 @@ describe.skip("ADDONS: addons/boris/components/DetailComponent.vue", () => {
 
         it("renders Detail Component", () => {
             wrapper = shallowMount(DetailComponent, {
-                store,
+                global: {plugins: [store]},
                 propsData: {...propsData, feature: {
                     get: (key) => {
                         return key;
@@ -76,7 +88,7 @@ describe.skip("ADDONS: addons/boris/components/DetailComponent.vue", () => {
         });
         it("does not render Detail Component if feature is empty", () => {
             wrapper = shallowMount(DetailComponent, {
-                store,
+                global: {plugins: [store]},
                 propsData: {...propsData, feature: {}}
             });
 
@@ -84,7 +96,7 @@ describe.skip("ADDONS: addons/boris/components/DetailComponent.vue", () => {
         });
         it("test method getValue", () => {
             wrapper = shallowMount(DetailComponent, {
-                store,
+                global: {plugins: [store]},
                 propsData: {
                     feature: {
                         values: data,

@@ -1,14 +1,13 @@
-import Vuex from "vuex";
+import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import FloorComponent from "../../../components/FloorComponent.vue";
-import Boris from "../../../store/indexBoris";
 import {expect} from "chai";
 import sinon from "sinon";
 
 
 config.global.mocks.$t = key => key;
 
-describe.skip("ADDONS: addons/boris/components/FloorComponent.vue", () => {
+describe("ADDONS: addons/boris/components/FloorComponent.vue", () => {
     const mockConfigJson = {
         Portalconfig: {
             menu: {
@@ -16,9 +15,7 @@ describe.skip("ADDONS: addons/boris/components/FloorComponent.vue", () => {
                     children: {
                         boris: {
                             "name": "common:menu.tools.boris",
-                            "icon": "bi-vinyl",
-                            "active": true,
-                            "renderToWindow": false
+                            "icon": "bi-vinyl"
                         }
                     }
                 }
@@ -28,16 +25,35 @@ describe.skip("ADDONS: addons/boris/components/FloorComponent.vue", () => {
     let store, propsData, wrapper;
 
     beforeEach(() => {
-        store = new Vuex.Store({
+        store = createStore({
             namespaces: true,
             modules: {
-                Tools: {
+                Modules: {
                     namespaced: true,
                     modules: {
-                        Boris
+                        BorisComponent: {
+                            namespaced: true,
+                            actions: {
+                                initialize: () => sinon.stub()
+                            }
+                        },
+                        Print: {
+                            namespaced: true,
+                            getters: {printFileReady: () => sinon.stub(),
+                                fileDownloadUrl: () => sinon.stub(),
+                                filename: () => sinon.stub(),
+                                printStarted: () => sinon.stub(),
+                                progressWidth: () => sinon.stub()}
+                        }
                     }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {registerListener: () => sinon.stub(),
+                        unregisterListener: () => sinon.stub()}
                 }
             },
+            getters: {mobile: () => false},
             state: {
                 configJson: mockConfigJson
             }
@@ -51,15 +67,12 @@ describe.skip("ADDONS: addons/boris/components/FloorComponent.vue", () => {
             landuse: "MFH Mehrfamilienhäuser"
         };
         wrapper = shallowMount(FloorComponent, {
-            store,
+            global: {plugins: [store]},
             propsData: propsData
         });
     });
     afterEach(function () {
         sinon.restore();
-        // if (wrapper) {
-        //     wrapper.destroy();
-        // }
     });
 
     describe("Boris floor component template", () => {
@@ -69,7 +82,7 @@ describe.skip("ADDONS: addons/boris/components/FloorComponent.vue", () => {
         });
         it("renders 'schichtwerte'", () => {
             wrapper = shallowMount(FloorComponent, {
-                store,
+                global: {plugins: [store]},
                 propsData: {...propsData, feature: {schichtwerte: {
                     schichtwert: "blaa"
                 }}}
@@ -81,7 +94,8 @@ describe.skip("ADDONS: addons/boris/components/FloorComponent.vue", () => {
             const feature = {key1: "euro"};
 
             wrapper = shallowMount(FloorComponent, {
-                store,
+                global: {plugins: [store]},
+
                 propsData: {...propsData, feature: feature
                 }
             });
