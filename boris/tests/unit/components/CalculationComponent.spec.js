@@ -1,27 +1,20 @@
-import Vuex from "vuex";
-import {config, shallowMount, createLocalVue} from "@vue/test-utils";
+import {createStore} from "vuex";
+import {config, shallowMount} from "@vue/test-utils";
 import CalculationComponent from "../../../components/CalculationComponent.vue";
-import Boris from "../../../store/indexBoris";
 import {expect} from "chai";
 import sinon from "sinon";
 
-const localVue = createLocalVue();
-
-localVue.use(Vuex);
-
-config.mocks.$t = key => key;
+config.global.mocks.$t = key => key;
 
 describe("ADDONS: addons/boris/components/CalculationComponent.vue", () => {
     const mockConfigJson = {
         Portalconfig: {
             menu: {
-                tools: {
+                modules: {
                     children: {
-                        boris: {
+                        borisComponent: {
                             "name": "common:menu.tools.boris",
-                            "icon": "bi-vinyl",
-                            "active": true,
-                            "renderToWindow": false
+                            "icon": "bi-vinyl"
                         }
                     }
                 }
@@ -31,16 +24,35 @@ describe("ADDONS: addons/boris/components/CalculationComponent.vue", () => {
     let store, propsData, wrapper;
 
     beforeEach(() => {
-        store = new Vuex.Store({
+        store = createStore({
             namespaces: true,
             modules: {
-                Tools: {
+                Modules: {
                     namespaced: true,
                     modules: {
-                        Boris
+                        BorisComponent: {
+                            namespaced: true,
+                            actions: {
+                                initialize: () => sinon.stub()
+                            }
+                        },
+                        Print: {
+                            namespaced: true,
+                            getters: {printFileReady: () => sinon.stub(),
+                                fileDownloadUrl: () => sinon.stub(),
+                                filename: () => sinon.stub(),
+                                printStarted: () => sinon.stub(),
+                                progressWidth: () => sinon.stub()}
+                        }
                     }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {registerListener: () => sinon.stub(),
+                        unregisterListener: () => sinon.stub()}
                 }
             },
+            getters: {mobile: () => false},
             state: {
                 configJson: mockConfigJson
             }
@@ -62,29 +74,25 @@ describe("ADDONS: addons/boris/components/CalculationComponent.vue", () => {
             subject: "Subject",
             type: "type"
         };
-        wrapper = shallowMount(CalculationComponent, {
-            store,
-            propsData: propsData,
-            localVue
-        });
+
     });
     afterEach(function () {
         sinon.restore();
-        if (wrapper) {
-            wrapper.destroy();
-        }
     });
 
     describe("Boris calculation component template", () => {
         it("renders Calculation Component", () => {
+            wrapper = shallowMount(CalculationComponent, {
+                global: {plugins: [store]},
+                propsData: propsData
+            });
             expect(wrapper.find("#calculation-component").exists()).to.be.true;
         });
 
         it("renders select type", () => {
             wrapper = shallowMount(CalculationComponent, {
-                store,
-                propsData: {...propsData, type: "select"},
-                localVue
+                global: {plugins: [store]},
+                propsData: {...propsData, type: "select"}
             });
             expect(wrapper.find(".select-part").exists()).to.be.true;
 
@@ -92,14 +100,17 @@ describe("ADDONS: addons/boris/components/CalculationComponent.vue", () => {
 
         it("renders input type", () => {
             wrapper = shallowMount(CalculationComponent, {
-                store,
-                propsData: {...propsData, type: "input"},
-                localVue
+                global: {plugins: [store]},
+                propsData: {...propsData, type: "input"}
             });
             expect(wrapper.find(".input-part").exists()).to.be.true;
         });
 
         it("triggers click", async () => {
+            wrapper = shallowMount(CalculationComponent, {
+                global: {plugins: [store]},
+                propsData: propsData
+            });
             const questionElement = wrapper.find(".bi-question-circle-fill");
 
             questionElement.trigger("click");

@@ -1,4 +1,3 @@
-import {Vector as VectorLayer} from "ol/layer";
 import {expect} from "chai";
 import sinon from "sinon";
 import actions from "../../../store/actionsBoris";
@@ -6,12 +5,29 @@ import stateBoris from "../../../store/stateBoris";
 import axios from "axios";
 import mapCollection from "../../../../../src/core/maps/js/mapCollection";
 import rawSources from "../../resources/rawSources";
+import layerCollection from "../../../../../src/core/layers/js/layerCollection";
 
 import {addProjection} from "ol/proj.js";
 import Projection from "ol/proj/Projection.js";
+// import Layer from "../../../../../src/core/layers/js/layer";
 
 
 describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
+    const layer1 = {
+            name: "Layer1",
+            id: "1",
+            gfiAttributes: "ignore"
+        },
+        layer2 = {
+            name: "Layer2",
+            id: "2",
+            gfiAttributes: ""
+        },
+        layer3 = {
+            name: "Layer3",
+            id: "3",
+            gfiAttributes: ""
+        };
     let commit,
         dispatch,
         getters,
@@ -21,6 +37,18 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         map = null,
         error;
 
+    // layer1.set("name", "Layer1");
+    //     layer1.set("id", "1");
+    //     layer1.set("gfiAttributes", "ignore");
+    //     layer1.set("isNeverVisibleInTree", "true");
+    //     layer2.set("name", "Layer2");
+    //     layer2.set("id", "2");
+    //     layer2.set("gfiAttributes", "");
+    //     layer2.set("isNeverVisibleInTree", "true");
+    //     layer3.set("name", "Layer3");
+    //     layer3.set("id", "3");
+    //     layer3.set("gfiAttributes", "");
+    //     layer3.set("isNeverVisibleInTree", "true");
     before(() => {
         const proj = new Projection({
             code: "EPSG:25832",
@@ -73,7 +101,8 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             }
         };
         rootGetters = {
-            "Maps/clickCoordinate": [0, 0]
+            "Maps/clickCoordinate": [0, 0],
+            layerConfigsByAttributes: ()=> [layer1, layer2, layer3]
         };
         state = {...stateBoris};
         error = sinon.spy();
@@ -82,59 +111,61 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         const attribute1 = {
                 "name": "31.12.2022",
                 "isNeverVisibleInTree": true,
-                "isSelected": true,
-                "isVisibleInMap": false,
+                visibility: true,
                 "typ": "WMS",
                 "layers": "v_brw_zonen_geom_flaeche_2022"
             },
             attribute2 = {
                 "name": "31.12.2020",
                 "isNeverVisibleInTree": true,
-                "isSelected": false,
-                "isVisibleInMap": false,
+                visibility: false,
                 "typ": "WMS",
                 "layers": "v_brw_zonen_geom_flaeche_2020"
             };
 
         state.filteredLayerList = [
-            {
-                "attributes": attribute1,
-                get: (key)=> {
-                    if (key === "layer") {
-                        return {getSource: () => {
-                            return {getFeatureInfoUrl: () =>{
-                                const url = "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5781983&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=508&J=91&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316";
+            attribute1,
+            attribute2
+            // {
+            //     "attributes": attribute1,
+            //     get: (key)=> {
+            //         if (key === "layer") {
+            //             return {getSource: () => {
+            //                 return {getFeatureInfoUrl: () =>{
+            //                     const url = "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5781983&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=508&J=91&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316";
 
-                                return url;
-                            }
-                            };
-                        }};
-                    }
-                    return attribute1[key];
-                },
-                set: (key, value) => {
-                    attribute1[key] = value;
-                }
-            },
-            {
-                "attributes": attribute2,
-                get: (key)=> {
-                    if (key === "layer") {
-                        return {getSource: () => {
-                            return {getFeatureInfoUrl: () =>{
-                                const url = "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5762993&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=476&J=55&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316";
+            //                     return url;
+            //                 }
+            //                 };
+            //             }};
+            //         }
+            //         return attribute1[key];
+            //     },
+            //     set: (key, value) => {
+            //         attribute1[key] = value;
+            //     },
+            //     visibility: true
+            // },
+            // {
+            //     "attributes": attribute2,
+            //     get: (key)=> {
+            //         if (key === "layer") {
+            //             return {getSource: () => {
+            //                 return {getFeatureInfoUrl: () =>{
+            //                     const url = "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5762993&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=476&J=55&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316";
 
-                                return url;
-                            }
-                            };
-                        }};
-                    }
-                    return attribute2[key];
-                },
-                set: (key, value) => {
-                    attribute2[key] = value;
-                }
-            }
+            //                     return url;
+            //                 }
+            //                 };
+            //             }};
+            //         }
+            //         return attribute2[key];
+            //     },
+            //     set: (key, value) => {
+            //         attribute2[key] = value;
+            //     },
+            //     visibility: true
+            // }
         ];
     });
 
@@ -144,38 +175,15 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
 
     describe("initialize", () => {
         it("initializes the layerlist ", () => {
-            const layer1 = new VectorLayer(),
-                layer2 = new VectorLayer(),
-                layer3 = new VectorLayer();
             let resultArray = [];
 
-            layer1.set("name", "Layer1");
-            layer1.set("id", "1");
-            layer1.set("gfiAttributes", "ignore");
-            layer1.set("isNeverVisibleInTree", "true");
-            layer2.set("name", "Layer2");
-            layer2.set("id", "2");
-            layer2.set("gfiAttributes", "");
-            layer2.set("isNeverVisibleInTree", "true");
-            layer3.set("name", "Layer3");
-            layer3.set("id", "3");
-            layer3.set("gfiAttributes", "");
-            layer3.set("isNeverVisibleInTree", "true");
-
-            sinon.stub(Radio, "request").callsFake(function (channel, topic) {
-                if (channel === "ModelList" && topic === "getModelsByAttributes") {
-                    return [layer1, layer2, layer3];
-                }
-                return null;
-            });
-
-            actions.initialize({commit, dispatch});
+            actions.initialize({commit, rootGetters});
             resultArray = commit.args[0][1];
 
             expect(commit.calledOnce).to.be.true;
             expect(commit.args[0][0]).to.equal("setFilteredLayerList");
-            expect(resultArray[1]).to.deep.equal(layer2);
-            expect(resultArray).to.deep.equal([layer3, layer2]);
+            expect(resultArray[1]).to.deep.equal(layer3);
+            expect(resultArray).to.deep.equal([layer2, layer3]);
         });
     });
     describe("handleUrlParameters", () => {
@@ -226,6 +234,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             state.selectedLayer = state.filteredLayerList.attribute1;
 
             actions.switchLayer({rootGetters, state, dispatch, commit}, selectedLayerName);
+
             expect(commit.callCount).to.equal(2);
             expect(commit.args[0][0]).to.equal("setSelectedLayerName");
             expect(commit.args[0][1]).to.equal(selectedLayerName);
@@ -364,13 +373,25 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
     });
     describe("requestGFI", () => {
         it("requests GFI", () => {
+            sinon.stub(layerCollection, "getLayerById").returns(
+                {
+                    layerSource: [{
+                        layerSource: {
+                            getFeatureInfoUrl: () =>{
+                                const url = "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5781983&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=508&J=91&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316";
+
+                                return url;
+                            }
+                        }
+                    }]
+                }
+            );
             state.active = true;
 
             const axiosStub = sinon.stub(axios, "get").returns(Promise.resolve({status: 200})),
-                url = state.filteredLayerList[0].get("layer").getSource().getFeatureInfoUrl(),
+                url = layerCollection.getLayerById().layerSource[0].layerSource.getFeatureInfoUrl(),
                 processFromParametricUrl = "",
                 center = "";
-                // console.log("*****URL*****", url)
 
             actions.requestGFI({rootGetters, state, dispatch}, {processFromParametricUrl, center});
             expect(axiosStub.calledWith(url)).to.be.true;
@@ -561,14 +582,6 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
 
             expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("Alerting/addSingleAlert");
-        });
-    });
-    describe("getDateByActiveLayerName", () => {
-        it("gets date by using the active layer name", () => {
-
-            const result = actions.getDateByActiveLayerName({state});
-
-            expect(result).to.equal("31.12.2022");
         });
     });
     describe("extendFeatureAttributes", () => {

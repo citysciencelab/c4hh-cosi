@@ -220,18 +220,6 @@ export default {
             }
         },
         /**
-         * Close this tool window by setting active to false
-         *  @return  {void}
-         */
-        close () {
-            this.setActive(false);
-            const layer = getLayerModelByAttributes({id: this.id});
-
-            if (layer) {
-                layer.set("isActive", false);
-            }
-        },
-        /**
          * start print process
          * @returns {Object} an axios.post request is returned
          */

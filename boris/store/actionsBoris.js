@@ -182,19 +182,10 @@ const actions = {
         const selectedLayer = state.filteredLayerList.find(layer => layer.visibility === true),
             coordinates = processFromParametricUrl ? center : rootGetters["Maps/clickCoordinate"],
             map = mapCollection.getMap("2D"),
-            mapView = map.getView();
-        let layerSource,
-            url = null;
-        //TODO: remove if clause maybe?
-
-        if (selectedLayer.typ === "GROUP") {
-            const groupedLayers = layerCollection.getLayerById(selectedLayer.id);
-
+            mapView = map.getView(),
+            groupedLayers = layerCollection.getLayerById(selectedLayer.id),
             layerSource = groupedLayers.layerSource[0].layerSource;
-        }
-        else {
-            layerSource = selectedLayer.layerSource[0].layerSource;
-        }
+        let url = null;
 
         url = layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());
 
@@ -388,20 +379,6 @@ const actions = {
             console.error("Data query failed");
             dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.boris.alertMessage:noData"), {root: true});
         }
-    },
-    /**
-     * Gets the date of the selected layer
-     * @param {Object} getDateByActiveLayerName.state the state
-     * @returns {String} layername which is used as date
-     */
-    getDateByActiveLayerName ({state}) {
-        let date = "";
-        const selectedLayer = state.filteredLayerList.find(layer => layer?.get("isSelected") === true);
-
-        if (selectedLayer) {
-            date = selectedLayer.get("name");
-        }
-        return date;
     },
     /**
      * Sets the extended feature attributes

@@ -74,8 +74,8 @@ export async function preparePrint (getResponse) {
 
     let printJob = {};
 
-    store.dispatch("Tools/Print/retrieveCapabilites", true, {root: true});
-    store.dispatch("Tools/Print/activatePrintStarted", true, {root: true});
+    store.dispatch("Modules/Print/retrieveCapabilites", true, {root: true});
+    store.dispatch("Modules/Print/activatePrintStarted", true, {root: true});
 
     spec.setAttributes(attributes);
     await spec.buildLayers(visibleLayerList);
@@ -87,7 +87,7 @@ export async function preparePrint (getResponse) {
         getResponse: getResponse
     };
 
-    store.dispatch("Tools/Print/createPrintJob", printJob, {root: true});
+    store.dispatch("Modules/Print/createPrintJob", printJob, {root: true});
 }
 
 /**
