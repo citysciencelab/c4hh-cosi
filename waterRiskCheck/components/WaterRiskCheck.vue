@@ -301,7 +301,7 @@ export default {
                         type="button"
                         :text="$t('additional:modules.waterRiskCheck.forwardPage')"
                         :interaction="nextPage"
-                        :disabled="questions[currentQuestionIdx].selectedAnswer === null"
+                        :disabled="typeof questions[currentQuestionIdx].selectedAnswer === 'undefined'"
                         icon="bi-arrow-right-circle-fill"
                     />
                     <FlatButton
@@ -311,7 +311,7 @@ export default {
                         type="button"
                         :text="$t('additional:modules.waterRiskCheck.finishButton')"
                         :interaction="finishForm"
-                        :disabled="questions[currentQuestionIdx].selectedAnswer === null || isCreatingPDF"
+                        :disabled="typeof questions[currentQuestionIdx].selectedAnswer === 'undefined' || isCreatingPDF"
                         :spinner-trigger="isCreatingPDF"
                         icon="bi-arrow-right-circle-fill"
                     />
