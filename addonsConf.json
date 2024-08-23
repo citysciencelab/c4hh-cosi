@@ -7,6 +7,10 @@
     "type": "searchInterface",
     "path": "searchInterfaces/gfiOnAddressGaz"
   },
+  "waterRiskCheckSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/waterRiskCheckSearch"
+  },
   "populationRequest": {
     "type": "tool"
   },

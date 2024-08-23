@@ -1,6 +1,12 @@
 <script>
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {mapGetters} from "vuex";
+import getOAFFeature from "../../../src/shared/js/api/oaf/getOAFFeature";
+import Point from "ol/geom/Point";
+import MultiPolygon from "ol/geom/MultiPolygon.js";
+import layerCollection from "../../../src/core/layers/js/layerCollection";
+import layerFactory from "../../../src/core/layers/js/layerFactory";
+import {Fill, Stroke, Style} from "ol/style.js";
 
 export default {
     name: "WaterRiskCheck",
@@ -17,16 +23,72 @@ export default {
             infoBoxOpen: false,
             isCreatingPDF: false,
             calculatedPercentage: 0,
-            address: "Neuenfelder Str. 19, 21109 Hamburg",
-            district: "Wilhelmsburg",
-            parcel: "13647",
-            numberOfBuildungs: 3
+            parcel: {},
+            buildings: [],
+            buildingsByAddress: [],
+            styleBuilding: {
+                stroke: {
+                    width: 3,
+                    color: "rgba(228, 26, 28)"
+                },
+                fill: {
+                    color: "rgba(255, 255, 255, 0)"
+                }
+            },
+            styleParcel: {
+                stroke: {
+                    width: 4,
+                    color: "rgba(55, 126, 184, 1)"
+                },
+                fill: {
+                    color: "rgba(255, 255, 255, 0)"
+                }
+            }
         };
     },
     computed: {
-        ...mapGetters("Modules/WaterRiskCheck", ["configuredQuestions"])
+        ...mapGetters("Modules/WaterRiskCheck", [
+            "address",
+            "addressCoordinates",
+            "configuredQuestions"
+        ]),
+
+        /**
+         * Gets the number of the parcel if the parcel is defined.
+         * @returns {String} The number.
+         */
+        parcelNumber () {
+            return this.parcel[0]?.properties?.flstnrzae || "";
+        },
+
+        /**
+         * Gets the name of the district if the parcel is defined.
+         * @returns {String} The name.
+         */
+        districtName () {
+            return this.parcel[0]?.properties?.gemarkung || "";
+        },
+
+        /**
+         * Gets the count of the buildings if there are buildings.
+         * @returns {Number|String} The count or an empty String.
+         */
+        countOfBuildings () {
+            if (this.buildings.length > 0) {
+                return this.buildings.filter(building => building?.properties?.gebnutzbez === "Gebaeude").length;
+            }
+            return "";
+        }
     },
     watch: {
+        /**
+         * Listen to the mutation "modules/WaterRiskCheck/setAddress".
+         * @returns {void}
+         */
+        address () {
+            this.walkTroughToFetchAndAdd();
+        },
+
         currentQuestionIdx (val) {
             this.updateCalculatedPercentage(val);
             if (this.infoBoxOpen) {
@@ -34,10 +96,101 @@ export default {
             }
         }
     },
+    created () {
+        this.createLayer();
+    },
     mounted () {
         this.questions = [...this.configuredQuestions];
     },
     methods: {
+        /**
+         * Creates a layer for the display of parcels and buildings on the map.
+         * @returns {void}
+         */
+        createLayer () {
+            if (typeof layerCollection.getLayerById("water-risk") !== "undefined") {
+                this.layer = layerCollection.getLayerById("water-risk");
+                return;
+            }
+            this.layer = layerFactory.createLayer({
+                typ: "VECTORBASE",
+                id: "water-risk",
+                name: "water-risk",
+                alwaysOnTop: true
+            });
+            this.setLayerStyle(this.layer, this.styleBuilding, this.styleParcel);
+            layerCollection.addLayer(this.layer);
+        },
+
+        /**
+         * Sets the layer style for building and parcel features.
+         * @param {Object} layer - The layer.
+         * @param {Object} styleBuilding - Contains the style rules for the buildings.
+         * @param {Object} styleParcel - Contains the style rules for the parcel.
+         * @returns {void}
+         */
+        setLayerStyle (layer, styleBuilding, styleParcel) {
+            const building = new Style({
+                    stroke: new Stroke(styleBuilding.stroke),
+                    fill: new Fill(styleBuilding.fill)
+                }),
+                parcel = new Style({
+                    stroke: new Stroke(styleParcel.stroke),
+                    fill: new Fill(styleParcel.fill)
+                });
+
+            layer.setStyle((feature) => {
+                if (feature.get("idflurst")) {
+                    return parcel;
+                }
+                else if (feature.get("gebnutzbez") === "Gebaeude") {
+                    return building;
+                }
+                return null;
+            });
+        },
+
+        /**
+         * Creates a point geometry from the address and
+         * fetches the parcel and the building for this address.
+         * All buildings that intersect the parcel are also fetched.
+         * Adds the parcel and all buildings to the layer.
+         * @returns {void}
+         */
+        async walkTroughToFetchAndAdd () {
+            const addressPoint = new Point(this.addressCoordinates),
+                parcelPolygon = new MultiPolygon([]);
+
+            this.layer.getLayerSource().clear();
+            this.parcel = await this.fetchFeatures(addressPoint, "Flurstueck");
+            this.buildingsByAddress = this.fetchFeatures(addressPoint, "GebaeudeBauwerk");
+            parcelPolygon.setCoordinates(this.parcel[0].geometry.coordinates);
+            this.buildings = await this.fetchFeatures(parcelPolygon, "GebaeudeBauwerk", false);
+        },
+
+        /**
+         * Fetches the features of the passed collection.
+         * @param {ol/geom/Geometry} geometry - The geometry to filter.
+         * @param {String} collection - The feature collection id.
+         * @returns {GeoJSON[]} The response.
+         */
+        async fetchFeatures (geometry, collection, flag = true) {
+            try {
+                const filter = getOAFFeature.getOAFGeometryFilter(geometry, "geometrie", "intersects"),
+                    geoJson = await getOAFFeature.getOAFFeatureGet("https://api.hamburg.de/datasets/v1/alkis_vereinfacht", collection, 100, filter, "http://www.opengis.net/def/crs/EPSG/0/25832", "http://www.opengis.net/def/crs/EPSG/0/25832"),
+                    features = getOAFFeature.readAllOAFToGeoJSON(geoJson);
+
+                if (flag) {
+                    this.layer.getLayerSource().addFeatures(features);
+                }
+                return geoJson;
+            }
+            catch (error) {
+                console.warn("An error has occurred when requesting the features", error);
+                return [];
+            }
+        },
+
         /**
          * Starts the form.
          * @returns {void}
@@ -132,19 +285,19 @@ export default {
                         <div class="d-flex justify-content-center">
                             <p>{{ $t("additional:modules.waterRiskCheck.districtLabel") }}</p>
                             <p class="font-bold">
-                                {{ district }}
+                                {{ districtName }}
                             </p>
                         </div>
                         <div class="d-flex justify-content-center">
                             <p>{{ $t("additional:modules.waterRiskCheck.parcelLabel") }}</p>
                             <p class="font-bold">
-                                {{ parcel }}
+                                {{ parcelNumber }}
                             </p>
                         </div>
                         <div class="d-flex justify-content-center">
                             <p>{{ $t("additional:modules.waterRiskCheck.buildingCountLabel") }}</p>
                             <p class="font-bold">
-                                {{ numberOfBuildungs }}
+                                {{ countOfBuildings }}
                             </p>
                         </div>
                     </div>

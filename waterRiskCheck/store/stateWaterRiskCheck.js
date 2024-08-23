@@ -14,7 +14,9 @@ const state = {
     name: "additional:modules.waterRiskCheck.title",
     icon: "bi-water",
     description: "additional:modules.waterRiskCheck.description",
-    configuredQuestions: []
+    configuredQuestions: [],
+    address: "",
+    addressCoordinates: undefined
 };
 
 export default state;
