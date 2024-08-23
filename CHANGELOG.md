@@ -66,6 +66,8 @@
     - Implemented form ui.
 
 ### Changed
+- Added Boris to version 3.x
+    - reworked ui and functionality
 
 ### Deprecated
 
