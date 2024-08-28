@@ -51,7 +51,10 @@ export default {
         ...mapGetters("Modules/WaterRiskCheck", [
             "address",
             "addressCoordinates",
-            "configuredQuestions"
+            "configuredQuestions",
+            "pdfPages",
+            "answersLogic",
+            "alwaysShow"
         ]),
 
         /**
@@ -79,6 +82,19 @@ export default {
                 return this.buildings.filter(building => building?.properties?.gebnutzbez === "Gebaeude").length;
             }
             return "";
+        },
+        /**
+         * Gets the names of all pages.
+         * @returns {void}
+         */
+        pageNamesFromQuestions () {
+            const names = this.alwaysShow[0];
+
+            this.pdfPages.forEach((name) => {
+                names[Object.keys(name)[0]] = false;
+            });
+
+            return names;
         }
     },
     watch: {
@@ -238,6 +254,7 @@ export default {
          */
         finishForm () {
             this.updateCalculatedPercentage("finish");
+            this.preparePDFPageNames();
             this.isCreatingPDF = true;
             setTimeout(() => {
                 this.isCreatingPDF = false;
@@ -264,7 +281,76 @@ export default {
                 return;
             }
             this.calculatedPercentage = Number(pageIndex / (this.questions.length - 1) * 100).toFixed(2);
+        },
+        /**
+         * Evaluates the answers.
+         * @param {Number} questionId The question index.
+         * @param {String} selectedAnswer The selected answer.
+         * @returns {void}
+         */
+        evaluatingAnswers (questionId, answer) {
+            this.answersLogic.forEach((question, idx) => {
+                if (idx === questionId) {
+                    Object.values(question).forEach((allAnswers) => {
+                        if (Object.keys(allAnswers).some(key => key === answer)) {
+                            this.setNameFromSelectedAnswer(allAnswers, answer);
+                        }
+                    });
+                }
+            });
+        },
+        /**
+         * Sets the name of the PDF page depending on the selected answer.
+         * @param {Object} answersFromQuestion The question index.
+         * @param {String} selectedAnswer The selected answer.
+         * @returns {void}
+         */
+        setNameFromSelectedAnswer (answersFromQuestion, selectedAnswer) {
+            const givenAnswers = Object.keys(this.pageNamesFromQuestions);
+
+            if (givenAnswers.length !== 0) {
+                givenAnswers.forEach((key) => {
+                    Object.values(answersFromQuestion).forEach((val, idx) => {
+                        if (key === val[idx] || val.includes(key)) {
+                            this.pageNamesFromQuestions[key] = false;
+                        }
+                    });
+                });
+            }
+            answersFromQuestion[selectedAnswer].forEach((page) => {
+                if (page !== undefined) {
+                    this.pageNamesFromQuestions[page] = true;
+                }
+            });
+        },
+        /**
+         * Prepare pdf pages depending on the questions and data evaluated.
+         * @returns {void}
+         */
+        preparePDFPageNames () {
+            const pages = [];
+
+            this.pdfPages.forEach((page) => {
+                Object.keys(page).forEach(val => {
+                    // TODO: Compare with data
+                    if (this.pageNamesFromQuestions[val] === page[val].question) {
+                        pages[val] = true;
+                    }
+                    else {
+                        pages[val] = false;
+                    }
+                });
+            });
+            // this.createJson(pages);
         }
+        /**
+        * @TODO
+        * @param {Array} pages
+        * @returns {void}
+        */
+        /* createJson (pages) {
+            console.log(pages);
+        }*/
     }
 };
 </script>
@@ -452,8 +538,8 @@ export default {
                                     questions[currentQuestionIdx].selectedAnswer === answer ? 'marked-answers' : '',
                                     isCreatingPDF ? 'disabled-answer': ''
                                 ]"
-                                @click="selectAnswer(currentQuestionIdx, answer)"
-                                @keypress.enter="selectAnswer(currentQuestionIdx, answer)"
+                                @click="selectAnswer(currentQuestionIdx, answer), evaluatingAnswers(currentQuestionIdx, answer)"
+                                @keypress.enter="selectAnswer(currentQuestionIdx, answer), evaluatingAnswers(currentQuestionIdx, answer)"
                             >
                                 <i
                                     v-if="questions[currentQuestionIdx].selectedAnswer === answer"

@@ -35,11 +35,17 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                 state: {
                                     address: "",
                                     configuredQuestions: [],
+                                    pdfPages: [],
+                                    answersLogic: [],
+                                    alwaysShow: [],
                                     ...initialState
                                 },
                                 getters: {
                                     address: (state) => state.address,
-                                    configuredQuestions: (state) => state.configuredQuestions
+                                    configuredQuestions: (state) => state.configuredQuestions,
+                                    answersLogic: (state) => state.answersLogic,
+                                    pdfPages: (state) => state.pdfPages,
+                                    alwaysShow: (state) => state.alwaysShow
                                 }
                             }
                         }
@@ -259,6 +265,109 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
 
             wrapper.vm.$options.watch.address.call(wrapper.vm, [true]);
             expect(stubWalkTroughToFetchAndAdd.calledOnce).to.be.true;
+        });
+    });
+
+    describe("methods", () => {
+        describe("setNameFromSelectedAnswer", () => {
+            it("should sets the page name depending on selected answer", async () => {
+                const store = factory.createVuexStore({answersLogic: () => []}),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    }),
+                    allAnswers = {Ja: ["First"], Nein: ["Second"], Vielleicht: ["Third"]},
+                    selected = "Ja",
+                    expected = {First: true, Second: false, Third: false};
+
+                await wrapper.setData({pageNamesFromQuestions: {
+                    First: false,
+                    Second: false,
+                    Third: false
+                }});
+
+                wrapper.vm.setNameFromSelectedAnswer(allAnswers, selected);
+                await wrapper.vm.$nextTick();
+                expect(wrapper.vm.pageNamesFromQuestions).to.deep.equal(expected);
+            });
+            it("should change the given answer if the current answer has been changed", async () => {
+                const store = factory.createVuexStore({answersLogic: () => []}),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    }),
+                    allAnswers = {Ja: ["First"], Nein: ["Second"], Vielleicht: ["Third"]},
+                    selected = "Nein",
+                    expected = {First: false, Second: true, Third: false};
+
+                await wrapper.setData({
+                    pageNamesFromQuestions: {
+                        First: true,
+                        Second: false,
+                        Third: false
+                    }
+                });
+
+                wrapper.vm.setNameFromSelectedAnswer(allAnswers, selected);
+                await wrapper.vm.$nextTick();
+                expect(wrapper.vm.pageNamesFromQuestions).to.deep.equal(expected);
+            });
+        });
+
+        describe("evaluatingAnswers", () => {
+            it("should evaluating the selected answers for each question", async () => {
+                const store = factory.createVuexStore({
+                        answersLogic: [
+                            {question: {Ja: ["First_0"], Nein: ["Second_0"], Vielleicht: ["Third_0"]}},
+                            {question: {Ja: ["First_1"], Nein: ["Second_1a", "Second_1b"], Vielleicht: []}}
+                        ]
+                    }),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    });
+
+                await wrapper.setData({
+                    pageNamesFromQuestions: {
+                        First_0: false,
+                        Second_0: false,
+                        Third_0: false,
+                        First_1: false,
+                        Second_1a: false,
+                        Second_1b: false
+                    }
+                });
+
+                wrapper.vm.evaluatingAnswers(0, "Ja");
+                expect(wrapper.vm.pageNamesFromQuestions).to.deep.equal({
+                    First_0: true,
+                    Second_0: false,
+                    Third_0: false,
+                    First_1: false,
+                    Second_1a: false,
+                    Second_1b: false});
+                wrapper.vm.evaluatingAnswers(1, "Nein");
+                expect(wrapper.vm.pageNamesFromQuestions).to.deep.equal({
+                    First_0: true,
+                    Second_0: false,
+                    Third_0: false,
+                    First_1: false,
+                    Second_1a: true,
+                    Second_1b: true
+                });
+                wrapper.vm.evaluatingAnswers(2, "Vielleicht");
+                expect(wrapper.vm.pageNamesFromQuestions).to.deep.equal({
+                    First_0: true,
+                    Second_0: false,
+                    Third_0: false,
+                    First_1: false,
+                    Second_1a: true,
+                    Second_1b: true
+                });
+            });
         });
     });
 });

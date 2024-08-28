@@ -16,7 +16,10 @@ const state = {
     description: "additional:modules.waterRiskCheck.description",
     configuredQuestions: [],
     address: "",
-    addressCoordinates: undefined
+    addressCoordinates: undefined,
+    pdfPages: [],
+    answersLogic: [],
+    alwaysShow: []
 };
 
 export default state;
