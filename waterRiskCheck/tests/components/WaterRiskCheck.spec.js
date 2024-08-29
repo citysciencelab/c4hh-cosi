@@ -8,6 +8,17 @@ import sinon from "sinon";
 import VectorLayer from "ol/layer/Vector.js";
 
 config.global.mocks.$t = key => key;
+/**
+ * mocks secondary menu
+ * @returns {void}
+ */
+function addSecondaryMenuElement () {
+    const app = document.createElement("div");
+
+    app.setAttribute("id", "mp-menu-secondaryMenu");
+    document.body.append(app);
+}
+
 
 describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
     const factory = {
@@ -39,6 +50,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
     };
 
     beforeEach(() => {
+        addSecondaryMenuElement();
         sinon.stub(layerCollection, "getLayerById").returns(
             {
                 getLayer: () => {
@@ -66,7 +78,9 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
             expect(wrapper.exists()).to.be.true;
         });
         it("should find a start button", () => {
-            const store = factory.createVuexStore(),
+            const store = factory.createVuexStore({
+                    address: "Test Address"
+                }),
                 wrapper = shallowMount(WaterRiskCheck, {
                     global: {
                         plugins: [store]

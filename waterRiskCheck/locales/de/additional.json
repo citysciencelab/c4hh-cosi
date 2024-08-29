@@ -22,7 +22,8 @@
       "districtLabel": "Gemarkung:",
       "parcelLabel": "Flurstück:",
       "buildingCountLabel": "Anzahl der Gebäude:",
-      "addressLabel": "Adresse"
+      "addressLabel": "Adresse",
+      "addressInput":"Bitte geben Sie Ihre Adresse links in die Suchleiste ein!"
     }
   }
 }

@@ -22,7 +22,8 @@
       "districtLabel": "District:",
       "parcelLabel": "Parcel:",
       "buildingCountLabel": "Number of buildings:",
-      "addressLabel": "Address"
+      "addressLabel": "Address",
+      "addressInput":"Please enter your address in the search bar on the left!"
     }
   }
 }

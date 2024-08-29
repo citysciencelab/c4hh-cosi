@@ -43,7 +43,8 @@ export default {
                 fill: {
                     color: "rgba(255, 255, 255, 0)"
                 }
-            }
+            },
+            sideMenuWidth: undefined
         };
     },
     computed: {
@@ -101,6 +102,11 @@ export default {
     },
     mounted () {
         this.questions = [...this.configuredQuestions];
+        this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
+        document.getElementById("mp-menu-secondaryMenu").style.width = "37vw";
+    },
+    unmounted () {
+        document.getElementById("mp-menu-secondaryMenu").style.width = this.sideMenuWidth;
     },
     methods: {
         /**
@@ -273,12 +279,21 @@ export default {
                 {{ $t('additional:modules.waterRiskCheck.generelExplenationText') }}
             </p>
             <br>
-            <div class="container">
-                <div class="row">
-                    <div class="col-2 d-flex justify-content-center align-items-center">
-                        <i class="geo-icon bi-geo-alt-fill text-secondary" />
+            <p
+                v-if="!address"
+                class="address-hint d-flex justify-content-center align-items-center my-3 text-md-center"
+            >
+                {{ $t("additional:modules.waterRiskCheck.addressInput") }}
+            </p>
+            <div
+                v-else
+                class="container mt-3"
+            >
+                <div class="row justify-content-center">
+                    <div class="col-1 p-0">
+                        <i class="geo-icon bi-geo-alt-fill text-secondary float-center me-1" />
                     </div>
-                    <div class="address-container col-10 d-flex flex-column justify-content-center align-items-start">
+                    <div class="address-container col-auto d-flex flex-column justify-content-center align-items-start m-0">
                         <p class="current-address font-bold mb-2">
                             {{ address }}
                         </p>
@@ -302,7 +317,7 @@ export default {
                         </div>
                     </div>
                 </div>
-                <hr>
+                <hr class="my-5">
                 <div class="row">
                     <div class="col-1 d-flex align-items-center">
                         <i class="bi-info-circle" />
@@ -319,7 +334,7 @@ export default {
                     </p>
                 </div>
                 <div class="row">
-                    <div class="col d-flex justify-content-center">
+                    <div class="col d-flex justify-content-center mt-3">
                         <FlatButton
                             id="start-form"
                             :aria-label="$t('additional:modules.waterRiskCheck.formStartButton')"
@@ -334,15 +349,28 @@ export default {
         </div>
         <div v-else-if="formStarted && !formFinished && questions.length">
             <div class="container basic-infos">
-                <p class="row">
-                    {{ $t('additional:modules.waterRiskCheck.addressLabel') }}
-                </p>
-                <p class="row font-bold">
-                    {{ address }}
-                </p>
-                <p class="row mt-2">
-                    {{ $t('additional:modules.waterRiskCheck.formInformationText') }}
-                </p>
+                <div class="info-header row">
+                    <div class="col-10">
+                        <p>
+                            {{ $t('additional:modules.waterRiskCheck.addressLabel') }}
+                        </p>
+                        <p class="basic-infos-address">
+                            {{ address }}
+                        </p>
+                    </div>
+                    <div
+                        class="col-2 pe-0"
+                    >
+                        <img
+                            class="header-logo float-end"
+                            :src="'./assets/logo.png'"
+                            :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                        >
+                    </div>
+                    <p class="row mt-2 mx-0 pe-0">
+                        {{ $t('additional:modules.waterRiskCheck.formInformationText') }}
+                    </p>
+                </div>
             </div>
             <div class="form-container container">
                 <div class="progress-section px-4 my-4 row">
@@ -391,13 +419,15 @@ export default {
                                 class="collapse"
                             >
                                 <div class="card card-body p-4 border border-primary rounded">
-                                    <h6 class="text-secondary font-bold">
-                                        {{ questions[currentQuestionIdx].title }}
-                                    </h6>
                                     <div class="container p-0">
                                         <div class="row">
                                             <div class="col-6">
-                                                <p>{{ questions[currentQuestionIdx].info.text }}</p>
+                                                <h6 class="text-secondary">
+                                                    {{ questions[currentQuestionIdx].title }}
+                                                </h6>
+                                                <p
+                                                    v-html="questions[currentQuestionIdx].info.text"
+                                                />
                                             </div>
                                             <div class="col-6 d-flex justify-content-end align-items-start">
                                                 <img
@@ -503,17 +533,19 @@ export default {
                                     />
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="d-flex justify-content-center pt-2">
-                                    <img
-                                        class="logo-image"
-                                        :src="'./assets/logo.png'"
-                                        :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
-                                    >
-                                </div>
-                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="!formStarted || formFinished">
+            <div class="row">
+                <div class="d-flex justify-content-center pt-2">
+                    <img
+                        class="logo-image img-fluid"
+                        :src="'./assets/logo.png'"
+                        :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                    >
                 </div>
             </div>
         </div>
@@ -580,5 +612,11 @@ export default {
     }
     .current-address {
         font-size: 16px;
+    }
+    .address-hint, .basic-infos-address, .text-secondary {
+        font-family: $font_family_accent;
+    }
+    .header-logo {
+        width: 80px;
     }
 </style>
