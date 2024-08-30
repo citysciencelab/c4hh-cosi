@@ -1,0 +1,16 @@
+{
+  "name": "water-risk-check",
+  "version": "1.0.0",
+  "description": "Überflutungsvorsorge",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "dependencies": {
+    "@turf/area": "^7.1.0",
+    "@turf/difference": "^7.1.0",
+    "@turf/helpers": "^7.1.0",
+    "@turf/intersect": "^7.1.0"
+  }
+}

@@ -236,6 +236,62 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
             });
             expect(wrapper.vm.countOfBuildings).to.be.equal(0);
         });
+        it("should return all buildings for 'buildingToUse", async () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            await wrapper.setData({
+                buildings: [{
+                    properties: {
+                        gebnutzbez: "Gebaeude"
+                    }
+                }]
+            });
+            expect(wrapper.vm.buildingsToUse).to.deep.equal(wrapper.vm.buildings);
+        });
+        it("should return one building for 'buildingToUse'", async () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            await wrapper.setData({
+                buildings: [{
+                    properties: {
+                        gebnutzbez: "Gebaeude"
+                    }
+                },
+                {
+                    properties: {
+                        gebnutzbez: "Berg"
+                    }
+                }]
+            });
+            expect(wrapper.vm.buildingsToUse).to.deep.equal([wrapper.vm.buildings[0]]);
+        });
+        it("should return an empty array for 'buildingToUse'", async () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            await wrapper.setData({
+                buildings: [{
+                    properties: {
+                        gebnutzbez: "Berg"
+                    }
+                }]
+            });
+            expect(wrapper.vm.buildingsToUse).to.deep.equal([]);
+        });
     });
 
     describe("Hook", () => {

@@ -7,6 +7,7 @@ import MultiPolygon from "ol/geom/MultiPolygon.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
 import {Fill, Stroke, Style} from "ol/style.js";
+import {intersect, getUnbuiltArea, calcArea} from "../js/spatialOperations";
 
 export default {
     name: "WaterRiskCheck",
@@ -44,7 +45,47 @@ export default {
                     color: "rgba(255, 255, 255, 0)"
                 }
             },
-            sideMenuWidth: undefined
+            sideMenuWidth: undefined,
+            data: {
+                infiltration: {
+                    url: "https://api.hamburg.de/datasets/v1/versickerung",
+                    collection: "versickerungspotential",
+                    geometryName: "geom",
+                    propertyToUse: "versickerungswahrscheinlichkeit",
+                    geoJsonFeatures: [],
+                    values: undefined
+                },
+                groundWaterMin: {
+                    url: "https://api.hamburg.de/datasets/v1/grundwasserflurabstand_min_2008",
+                    collection: "u12_f_gw_flurabstand_min",
+                    geometryName: "geom",
+                    propertyToUse: "klasse_in_m_unter_gok",
+                    geoJsonFeatures: [],
+                    values: undefined
+                },
+                hwrm_mittel: {
+                    url: "https://api.hamburg.de/datasets/v1/hwrm_2_zyklus",
+                    collection: "rwme_dehh_2hwrm_2019",
+                    geometryName: "geom",
+                    propertyToUse: "wassertiefe",
+                    geoJsonFeatures: [],
+                    values: undefined
+                },
+                hwrm_selten: {
+                    url: "https://api.hamburg.de/datasets/v1/hwrm_2_zyklus",
+                    collection: "rwlo_dehh_2hwrm_2019",
+                    geometryName: "geom",
+                    propertyToUse: "wassertiefe",
+                    geoJsonFeatures: [],
+                    values: undefined
+                },
+                uesg: {
+                    url: "https://api.hamburg.de/datasets/v1/uesg",
+                    collection: "ueberschwemmungsgebiete",
+                    geometryName: "geom",
+                    geoJsonFeatures: []
+                }
+            }
         };
     },
     computed: {
@@ -54,7 +95,8 @@ export default {
             "configuredQuestions",
             "pdfPages",
             "answersLogic",
-            "alwaysShow"
+            "alwaysShow",
+            "alkisBaseUrl"
         ]),
 
         /**
@@ -95,6 +137,14 @@ export default {
             });
 
             return names;
+        },
+
+        /**
+         * Gets all builindgs of the type 'gebaeude'.
+         * @returns {Object[]} The buildings.
+         */
+        buildingsToUse () {
+            return this.buildings.filter(building => building?.properties?.gebnutzbez === "Gebaeude");
         }
     },
     watch: {
@@ -165,7 +215,7 @@ export default {
                 if (feature.get("idflurst")) {
                     return parcel;
                 }
-                else if (feature.get("gebnutzbez") === "Gebaeude") {
+                if (feature.get("gebnutzbez") === "Gebaeude") {
                     return building;
                 }
                 return null;
@@ -181,28 +231,55 @@ export default {
          */
         async walkTroughToFetchAndAdd () {
             const addressPoint = new Point(this.addressCoordinates),
-                parcelPolygon = new MultiPolygon([]);
+                addressPointWGS8 = addressPoint.clone().transform("EPSG:25832", "EPSG:4326"),
+                parcelGeometry = new MultiPolygon([]);
 
             this.layer.getLayerSource().clear();
-            this.parcel = await this.fetchFeatures(addressPoint, "Flurstueck");
-            this.buildingsByAddress = this.fetchFeatures(addressPoint, "GebaeudeBauwerk");
-            parcelPolygon.setCoordinates(this.parcel[0].geometry.coordinates);
-            this.buildings = await this.fetchFeatures(parcelPolygon, "GebaeudeBauwerk", false);
+            this.parcel = await this.fetchFeatures(addressPointWGS8, "Flurstueck", this.alkisBaseUrl, "geometrie", true);
+            this.buildingsByAddress = this.fetchFeatures(addressPointWGS8, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie", true);
+            parcelGeometry.setCoordinates(this.parcel[0].geometry.coordinates);
+            this.buildings = await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie");
+            this.addDataByParcel(this.data, this.parcel[0], parcelGeometry);
+        },
+
+        /**
+         * Adds the passed spatial data for the parcel.
+         * @param {Object} data - The spatial data to add.
+         * @param {GeoJSON} parcelFeature - The feature of the parcel.
+         * @param {ol/Geometry} parcelGeometry - The geometry of the parcel.
+         * @returns {void}
+         */
+        async addDataByParcel (data, parcelFeature, parcelGeometry) {
+            const unbuiltArea = getUnbuiltArea(parcelFeature, this.buildingsToUse);
+
+            for (const key of Object.keys(data)) {
+                this.fetchFeatures(parcelGeometry, data[key].collection, data[key].url, data[key].geometryName)
+                    .then(geoJsonList => {
+                        data[key].geoJsonFeatures = intersect(geoJsonList, unbuiltArea);
+                        if (data[key].propertyToUse) {
+                            data[key].values = calcArea(data[key].geoJsonFeatures, unbuiltArea, data[key].propertyToUse);
+                        }
+                    });
+            }
         },
 
         /**
          * Fetches the features of the passed collection.
          * @param {ol/geom/Geometry} geometry - The geometry to filter.
          * @param {String} collection - The feature collection id.
+         * @param {Stirng} url - The base api url.
+         * @param {String} geom - The name of the geometry property.
+         * @param {Boolean} [flag=false] - Controls whether the features should be added to the layer.
          * @returns {GeoJSON[]} The response.
          */
-        async fetchFeatures (geometry, collection, flag = true) {
+        async fetchFeatures (geometry, collection, url, geom, flag = false) {
             try {
-                const filter = getOAFFeature.getOAFGeometryFilter(geometry, "geometrie", "intersects"),
-                    geoJson = await getOAFFeature.getOAFFeatureGet("https://api.hamburg.de/datasets/v1/alkis_vereinfacht", collection, 100, filter, "http://www.opengis.net/def/crs/EPSG/0/25832", "http://www.opengis.net/def/crs/EPSG/0/25832"),
-                    features = getOAFFeature.readAllOAFToGeoJSON(geoJson);
+                const filter = getOAFFeature.getOAFGeometryFilter(geometry, geom, "intersects"),
+                    geoJson = await getOAFFeature.getOAFFeatureGet(url, collection, 100, filter, "http://www.opengis.net/def/crs/OGC/1.3/CRS84", "http://www.opengis.net/def/crs/OGC/1.3/CRS84");
 
                 if (flag) {
+                    const features = getOAFFeature.readAllOAFToGeoJSON(geoJson, {dataProjection: "EPSG:4326", featureProjection: "EPSG:25832"});
+
                     this.layer.getLayerSource().addFeatures(features);
                 }
                 return geoJson;

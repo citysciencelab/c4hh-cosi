@@ -19,7 +19,8 @@ const state = {
     addressCoordinates: undefined,
     pdfPages: [],
     answersLogic: [],
-    alwaysShow: []
+    alwaysShow: [],
+    alkisBaseUrl: "https://api.hamburg.de/datasets/v1/alkis_vereinfacht"
 };
 
 export default state;
