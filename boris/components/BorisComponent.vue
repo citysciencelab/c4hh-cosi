@@ -4,7 +4,7 @@ import mutations from "../store/mutationsBoris";
 import InformationComponent from "./InformationComponent.vue";
 import CalculationComponent from "./CalculationComponent.vue";
 import FloorComponent from "./FloorComponent.vue";
-import {preparePrint} from "../utils/preparePrint.js";
+import {preparePrint} from "../js/preparePrint.js";
 import axios from "axios";
 
 export default {
@@ -16,15 +16,14 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/BorisComponent", [
-            "name", "type", "id", "icon", "renderToWindow", "resizableWindow", "initialWidth",
-            "initialWidthMobile", "keepOpen", "filteredLayerList", "isAreaLayer",
+            "name", "type", "id", "icon", "filteredLayerList", "isAreaLayer",
             "isStripesLayer", "textIds", "selectedPolygon", "selectedLayerName",
             "selectedLanduse", "selectedBrwFeature", "convertedBrw", "buttonValue",
             "buildingDesigns", "positionsToStreet", "isProcessFromParametricUrl",
             "paramUrlParams", "selectedBuildDesign", "selectedPositionToStreet"
         ]),
         ...mapGetters("Modules/Print", [
-            "printFileReady", "fileDownloadUrl", "filename", "printStarted", "progressWidth"
+            "printFileReady", "fileDownloadUrl", "printStarted", "progressWidth"
         ]),
         /**
          * Gets a list of layers without the stripes-layers
@@ -132,13 +131,11 @@ export default {
     created () {
         this.initialize();
     },
-    unmounted () {
+    mounted () {
         this.unregisterListener({
             type: "click",
             listener: this.requestGFI
         });
-    },
-    mounted () {
         this.$nextTick(() => {
             this.handleUrlParameters();
             this.registerListener({type: "click", listener: this.requestGFI});
@@ -151,7 +148,6 @@ export default {
             "toggleStripesLayer",
             "handleUrlParameters",
             "matchPolygonFeatureWithLanduse",
-            "getSelectedBuildingDesign",
             "updateSelectedBrwFeature",
             "simulateLanduseSelect",
             "sendWpsConvertRequest",
@@ -563,16 +559,16 @@ export default {
     font-size: $font_size_big;
     font-family: $font_family_accent;
 }
-::v-deep dt {
+:deep(.dt) {
     background-color: $secondary_table_style;
     font-family: $font_family_accent;
     padding: 8px;
 };
-::v-deep dd{
+:deep(.dd){
     padding: 8px;
     word-wrap: break-word;
 }
-::v-deep h4 {
+:deep(.h4) {
     font-size: 1.2rem;
     padding: 10px 0px;
 }

@@ -1,4 +1,4 @@
-import {createAddressString, createPostalCodeCityString, printFloorValues} from "../../../utils/preparePrint";
+import {createAddressString, createPostalCodeCityString, printFloorValues} from "../../../js/preparePrint";
 import {expect} from "chai";
 
 describe("boris preparePrint functions", () => {

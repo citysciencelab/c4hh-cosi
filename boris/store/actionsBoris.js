@@ -1,5 +1,5 @@
 import axios from "axios";
-import helpers from "../utils/helpers";
+import helpers from "../js/helpers";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
 import {WFS, WMSGetFeatureInfo} from "ol/format.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection";
@@ -130,15 +130,22 @@ const actions = {
             layerName = selectedLayerName + "-stripes";
 
         commit("setIsStripesLayer", value);
+        if (!selectedLayer) {
+            console.warn("No visible layer found in the list");
+            return;
+        }
 
         if (value) {
             dispatch("selectLayerByName", layerName);
         }
         else {
-            const layer = layerList.find(aLayer => aLayer.name === layerName);
+            const layer = layerList.find(aLayer => aLayer.name === selectedLayerName);
 
             if (layer) {
                 layer.visibility = false;
+            }
+            else {
+                console.warn(`Layer with name ${layerName} not found`);
             }
         }
     },

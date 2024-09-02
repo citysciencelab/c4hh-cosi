@@ -4,11 +4,6 @@
  * @property {String} id - id of Boris component
  * @property {String} name - displayed as the title
  * @property {String} icon - icon next to the title
- * @property {Boolean} renderToWindow - if true, tool is rendered in a window, else in sidebar (config-param)
- * @property {Boolean} resizableWindow - if true, window is resizable (config-param)
- * @property {Number} initialWidth: Initial width the sidebar when opening
- * @property {Number} initialWidthMobile: Initial mobile width of the sidebar when opening
- * @property {Boolean} keepOpen: attribute that enables keeping the BORIS component open while opening another tool
  * @property {Boolean} isVisibleInMenu - if true, tool is selectable in menu (config-param)
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * @property {Object} filteredLayerList - list of wms layers without the stripes layers
@@ -29,9 +24,7 @@
  * @property {Object} positionsToStreet - list of positions to streets that are options for the conversion to individual property
  * @property {String} selectedBuildingDesign - is the selected option of building designs
  * @property {String} selectedPositionToStreet - is the selected option of positions to street
- * @property {String} selectedOption - is the selected option of building designs or positions to street
  * @property {String} selectedBuildingDesign - is the selected option of building designs
- * @property {String} selectedPositionToStreet - is the selected option of positions to street
  * @property {String} wpsId - the id of the used web processing service
  * @property {String} fmwProcess - the FME process triggered via the WPS
  */
@@ -44,11 +37,6 @@ const state = {
     id: "boris",
     name: "additional:modules.boris.name",
     icon: "bi-vinyl",
-    renderToWindow: false,
-    resizableWindow: true,
-    initialWidth: 520,
-    initialWidthMobile: 240,
-    keepOpen: true,
     isVisibleInMenu: true,
     deactivateGFI: false,
     filteredLayerList: [],
