@@ -23,7 +23,9 @@
       "parcelLabel": "Flurstück:",
       "buildingCountLabel": "Anzahl der Gebäude:",
       "addressLabel": "Adresse",
-      "addressInput":"Bitte geben Sie Ihre Adresse links in die Suchleiste ein!"
+      "addressInput":"Bitte geben Sie Ihre Adresse links in die Suchleiste ein!",
+      "reset": "Der Fragebogen wird einschließlich aller Antworten zurückgesetzt. Sie können den Fragebogen mit einer anderen Adresse neu starten.",
+      "resetButton": "Fragebogen neu starten"
     }
   }
 }

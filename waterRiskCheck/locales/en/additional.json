@@ -23,7 +23,9 @@
       "parcelLabel": "Parcel:",
       "buildingCountLabel": "Number of buildings:",
       "addressLabel": "Address",
-      "addressInput":"Please enter your address in the search bar on the left!"
+      "addressInput":"Please enter your address in the search bar on the left!",
+      "reset": "The questionnaire will be reset including all answers. You can restart the questionnaire with a different address.",
+      "resetButton": "Restart questionnaire"
     }
   }
 }

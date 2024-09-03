@@ -38,10 +38,12 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                     pdfPages: [],
                                     answersLogic: [],
                                     alwaysShow: [],
+                                    addressCoordinates: undefined,
                                     ...initialState
                                 },
                                 getters: {
                                     address: (state) => state.address,
+                                    addressCoordinates: (state) => state.addressCoordinates,
                                     configuredQuestions: (state) => state.configuredQuestions,
                                     answersLogic: (state) => state.answersLogic,
                                     pdfPages: (state) => state.pdfPages,
@@ -133,6 +135,37 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
 
             await wrapper.vm.$nextTick();
             expect(wrapper.findAll(".progress-bar").at(0).attributes()).to.have.property("aria-valuenow", "20.00");
+        });
+        it("should find a reset icon button when the form is started", async () => {
+            const store = factory.createVuexStore({
+                    configuredQuestions: [{title: "foo", question: "bar", info: {}}]
+                }),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            wrapper.vm.formStarted = true;
+
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find("#reset-button").exists()).to.be.true;
+        });
+        it("should find a reset button when the form is finished", async () => {
+            const store = factory.createVuexStore({
+                    configuredQuestions: [{title: "foo", question: "bar", info: {}}]
+                }),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            wrapper.vm.formStarted = false;
+            wrapper.vm.formFinished = true;
+
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find("#reset").exists()).to.be.true;
         });
     });
 
@@ -321,6 +354,22 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
 
             wrapper.vm.$options.watch.address.call(wrapper.vm, [true]);
             expect(stubWalkTroughToFetchAndAdd.calledOnce).to.be.true;
+        });
+        it("should call resetAll, if the address was changed when form is started", () => {
+            const stubResetAll = sinon.stub(WaterRiskCheck.methods, "resetAll"),
+                store = factory.createVuexStore({
+                    address: "Test Address"
+                }),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            wrapper.vm.formStarted = true;
+
+            wrapper.vm.$options.watch.address.call(wrapper.vm, [true]);
+            expect(stubResetAll.calledOnce).to.be.true;
         });
     });
 

@@ -1,6 +1,7 @@
 <script>
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
-import {mapGetters} from "vuex";
+import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
+import {mapGetters, mapActions} from "vuex";
 import getOAFFeature from "../../../src/shared/js/api/oaf/getOAFFeature";
 import Point from "ol/geom/Point";
 import MultiPolygon from "ol/geom/MultiPolygon.js";
@@ -12,7 +13,8 @@ import {intersect, getUnbuiltArea, calcArea} from "../js/spatialOperations";
 export default {
     name: "WaterRiskCheck",
     components: {
-        FlatButton
+        FlatButton,
+        IconButton
     },
     data () {
         return {
@@ -153,6 +155,9 @@ export default {
          * @returns {void}
          */
         address () {
+            if (this.formStarted && this.address !== "") {
+                this.resetAll(false);
+            }
             this.walkTroughToFetchAndAdd();
         },
 
@@ -172,9 +177,13 @@ export default {
         document.getElementById("mp-menu-secondaryMenu").style.width = "37vw";
     },
     unmounted () {
+        this.resetAll();
         document.getElementById("mp-menu-secondaryMenu").style.width = this.sideMenuWidth;
     },
     methods: {
+        ...mapActions("Modules/WaterRiskCheck", [
+            "setAddress"
+        ]),
         /**
          * Creates a layer for the display of parcels and buildings on the map.
          * @returns {void}
@@ -230,6 +239,10 @@ export default {
          * @returns {void}
          */
         async walkTroughToFetchAndAdd () {
+            if (this.addressCoordinates === undefined) {
+                return;
+            }
+
             const addressPoint = new Point(this.addressCoordinates),
                 addressPointWGS8 = addressPoint.clone().transform("EPSG:25832", "EPSG:4326"),
                 parcelGeometry = new MultiPolygon([]);
@@ -358,6 +371,25 @@ export default {
                 return;
             }
             this.calculatedPercentage = Number(pageIndex / (this.questions.length - 1) * 100).toFixed(2);
+        },
+        /**
+         * Resets the address and selected answers.
+         * @param {Boolean} address True if the address is also to be reset. Default is true.
+         * @returns {void}
+         */
+        resetAll (address = true) {
+            this.formStarted = false;
+            this.formFinished = false;
+            this.currentQuestionIdx = 0;
+            this.questions.forEach(val => {
+                delete val.selectedAnswer;
+            });
+            if (address) {
+                this.layer.getLayerSource().clear();
+                this.parcel = {};
+                this.buildings = [];
+                this.setAddress("", undefined);
+            }
         },
         /**
          * Evaluates the answers.
@@ -513,7 +545,7 @@ export default {
         <div v-else-if="formStarted && !formFinished && questions.length">
             <div class="container basic-infos">
                 <div class="info-header row">
-                    <div class="col-10">
+                    <div class="col-md-auto">
                         <p>
                             {{ $t('additional:modules.waterRiskCheck.addressLabel') }}
                         </p>
@@ -521,8 +553,17 @@ export default {
                             {{ address }}
                         </p>
                     </div>
+                    <div class="col-md-1 p-0">
+                        <IconButton
+                            id="reset-button"
+                            :aria="$t('additional:modules.waterRiskCheck.reset')"
+                            :interaction="() => resetAll()"
+                            class="remove btn-light col col-md-1 p-0 fs-5"
+                            icon="bi bi-pencil-fill"
+                        />
+                    </div>
                     <div
-                        class="col-2 pe-0"
+                        class="col pe-0"
                     >
                         <img
                             class="header-logo float-end"
@@ -684,15 +725,28 @@ export default {
                         <div class="container">
                             <div class="row">
                                 <div
-                                    class="d-flex justify-content-center pt-2 pb-3"
+                                    class="d-flex justify-content-center pt-2 pb-1 mb-1"
                                 >
                                     <FlatButton
                                         id="download-report"
                                         aria-label="$t('additional:modules.waterRiskCheck.download')"
                                         type="button"
                                         :text="$t('additional:modules.waterRiskCheck.download')"
-                                        :icon="'bi-download'"
+                                        icon="bi-download"
+                                        class="mb-1"
                                         :interaction="() => {}"
+                                    />
+                                </div>
+                                <div
+                                    class="d-flex justify-content-center pt-1 pb-3"
+                                >
+                                    <FlatButton
+                                        id="reset"
+                                        aria-label="$t('additional:modules.waterRiskCheck.resetButton')"
+                                        type="button"
+                                        :text="$t('additional:modules.waterRiskCheck.resetButton')"
+                                        icon="bi bi-arrow-clockwise"
+                                        :interaction="() => resetAll()"
                                     />
                                 </div>
                             </div>
