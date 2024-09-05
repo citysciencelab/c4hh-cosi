@@ -101,6 +101,10 @@ export default {
             "alkisBaseUrl"
         ]),
 
+        ...mapGetters("Modules/SearchBar", [
+            "searchResults"
+        ]),
+
         /**
          * Gets the number of the parcel if the parcel is defined.
          * @returns {String} The number.
@@ -147,6 +151,18 @@ export default {
          */
         buildingsToUse () {
             return this.buildings.filter(building => building?.properties?.gebnutzbez === "Gebaeude");
+        },
+
+        /**
+         * Returns the Boolean value if the start button is to display.
+         * @returns {Boolean} true to show the start button.
+         */
+        enabledStart () {
+            if (Array.isArray(this.searchResults) && this.searchResults.length && this.address) {
+                return this.searchResults.some(result => result?.category === "Adresse" && result?.name === this.address);
+            }
+
+            return false;
         }
     },
     watch: {
@@ -476,7 +492,7 @@ export default {
             </p>
             <br>
             <p
-                v-if="!address"
+                v-if="!enabledStart"
                 class="address-hint d-flex justify-content-center align-items-center my-3 text-md-center"
             >
                 {{ $t("additional:modules.waterRiskCheck.addressInput") }}

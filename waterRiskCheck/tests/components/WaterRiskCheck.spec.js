@@ -49,6 +49,15 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                     pdfPages: (state) => state.pdfPages,
                                     alwaysShow: (state) => state.alwaysShow
                                 }
+                            },
+                            SearchBar: {
+                                namespaced: true,
+                                getters: {
+                                    searchResults: () => [{
+                                        category: "Adresse",
+                                        name: "Test Address 1"
+                                    }]
+                                }
                             }
                         }
                     }
@@ -85,7 +94,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
 
             expect(wrapper.exists()).to.be.true;
         });
-        it("should find a start button", () => {
+        it("should find not a start button", () => {
             const store = factory.createVuexStore({
                     address: "Test Address"
                 }),
@@ -94,6 +103,25 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                         plugins: [store]
                     }
                 });
+
+            expect(wrapper.find("#start-form").exists()).to.be.false;
+        });
+        it("should find a start button", async () => {
+            const store = factory.createVuexStore({
+                    address: "Test Address 1"
+                }),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            await wrapper.setData({buildings: {
+                properties: {
+                    gebnutzbez: "Gebaeude"
+                }
+            }
+            });
 
             expect(wrapper.find("#start-form").exists()).to.be.true;
         });
