@@ -8,7 +8,7 @@ import MultiPolygon from "ol/geom/MultiPolygon.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
 import {Fill, Stroke, Style} from "ol/style.js";
-import {intersect, getUnbuiltArea, calcArea} from "../js/spatialOperations";
+import {intersect, getUnbuiltArea, calcArea, buffer} from "../js/spatialOperations";
 
 export default {
     name: "WaterRiskCheck",
@@ -249,9 +249,10 @@ export default {
 
             this.layer.getLayerSource().clear();
             this.parcel = await this.fetchFeatures(addressPointWGS8, "Flurstueck", this.alkisBaseUrl, "geometrie", true);
-            this.buildingsByAddress = this.fetchFeatures(addressPointWGS8, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie", true);
+            this.buildingsByAddress = buffer(await this.fetchFeatures(addressPointWGS8, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie", true));
             parcelGeometry.setCoordinates(this.parcel[0].geometry.coordinates);
-            this.buildings = await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie");
+            this.buildings = buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"));
+
             this.addDataByParcel(this.data, this.parcel[0], parcelGeometry);
         },
 

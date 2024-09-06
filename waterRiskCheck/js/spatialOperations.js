@@ -2,6 +2,7 @@ import {intersect as turfIntersect} from "@turf/intersect";
 import {featureCollection as turfFeatureCollection} from "@turf/helpers";
 import {area as turfArea} from "@turf/area";
 import {difference as turfDifference} from "@turf/difference";
+import {buffer as turfBuffer} from "@turf/buffer";
 
 /**
  * Gets the unbuilt area of the given parcel.
@@ -67,8 +68,28 @@ function calcArea (features, feature, property) {
     return groupedFeatures;
 }
 
+/**
+ * Calculates a buffer for passed features.
+ * @param {GeoJSON[]} features - The features to buffer.
+ * @param {Number} [radius=1] - Distance in meters to draw the buffer.
+ * @returns {GeoJSON} The buffered features.
+ */
+function buffer (features, radius = 1) {
+    const bufferedFeatures = [];
+
+    if (typeof radius !== "number" || radius === 0) {
+        return features;
+    }
+
+    features.forEach(feature => {
+        bufferedFeatures.push(turfBuffer(feature, radius, {units: "meters"}));
+    });
+    return bufferedFeatures;
+}
+
 export {
     intersect,
     getUnbuiltArea,
-    calcArea
+    calcArea,
+    buffer
 };

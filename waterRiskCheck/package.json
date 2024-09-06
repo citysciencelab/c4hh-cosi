@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@turf/area": "^7.1.0",
+    "@turf/buffer": "^7.1.0",
     "@turf/difference": "^7.1.0",
     "@turf/helpers": "^7.1.0",
     "@turf/intersect": "^7.1.0"

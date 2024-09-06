@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {getUnbuiltArea} from "../../js/spatialOperations.js";
+import {getUnbuiltArea, buffer} from "../../js/spatialOperations.js";
 
 
 const buildingFeatures = [
@@ -7,38 +7,36 @@ const buildingFeatures = [
             "type": "Feature",
             "id": 316452,
             "geometry": {
-                "type": "MultiPolygon",
+                "type": "Polygon",
                 "coordinates": [
                     [
                         [
-                            [
-                                9.966927792685999,
-                                53.571173630336546
-                            ],
-                            [
-                                9.966815541847277,
-                                53.57122851620633
-                            ],
-                            [
-                                9.966637310502461,
-                                53.57109925737904
-                            ],
-                            [
-                                9.966740600840307,
-                                53.571048776759405
-                            ],
-                            [
-                                9.966812742315584,
-                                53.57110115655929
-                            ],
-                            [
-                                9.966821873923417,
-                                53.57109697481007
-                            ],
-                            [
-                                9.966927792685999,
-                                53.571173630336546
-                            ]
+                            9.966927792685999,
+                            53.571173630336546
+                        ],
+                        [
+                            9.966815541847277,
+                            53.57122851620633
+                        ],
+                        [
+                            9.966637310502461,
+                            53.57109925737904
+                        ],
+                        [
+                            9.966740600840307,
+                            53.571048776759405
+                        ],
+                        [
+                            9.966812742315584,
+                            53.57110115655929
+                        ],
+                        [
+                            9.966821873923417,
+                            53.57109697481007
+                        ],
+                        [
+                            9.966927792685999,
+                            53.571173630336546
                         ]
                     ]
                 ]
@@ -283,6 +281,26 @@ describe("addons/waterRiskCheck/js/spatialOperations.js", () => {
             const unbuiltArea = getUnbuiltArea(parcelFeature, buildingFeatures);
 
             expect(unbuiltArea).to.not.equal(parcelFeature);
+        });
+    });
+
+    describe("buffer", () => {
+        it("should return a different geometry", () => {
+            const bufferedFeatures = buffer(buildingFeatures, 2);
+
+            expect(bufferedFeatures[0].geometry.coordinates).to.not.equal(buildingFeatures[0].geometry.coordinates);
+        });
+
+        it("should return an empty array", () => {
+            const bufferedPolygon = buffer([], 5);
+
+            expect(bufferedPolygon).to.be.an("array").an.to.be.empty;
+        });
+
+        it("should return the passed geometry if radius is 0", () => {
+            const bufferedFeatures = buffer(buildingFeatures, 0);
+
+            expect(bufferedFeatures[0].geometry).to.deep.equal(buildingFeatures[0].geometry);
         });
     });
 });
