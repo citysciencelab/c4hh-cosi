@@ -590,5 +590,238 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                 }, "hwrm_mittel")).to.equal("1 - 2m");
             });
         });
+
+        describe("getLegends", () => {
+            it("Should return an empty array, if the given parameter is not an object", () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    });
+
+                expect(wrapper.vm.getLegends(undefined)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getLegends(null)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getLegends(1234)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getLegends(true)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getLegends(false)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getLegends([])).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getLegends("")).to.be.an("array").and.to.be.empty;
+            });
+            it("Should return an empty array, if the given parameter is an empty object", () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    });
+
+                expect(wrapper.vm.getLegends({})).to.be.an("array").and.to.be.empty;
+            });
+            it("Should return an correct array", () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    }),
+                    legends = {
+                        "strassenverkehr": {
+                            "legend_tag": {
+                                "type": "default",
+                                "content": "https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=strassenverkehr_tag_abend_nacht_2022"
+                            },
+                            "legend_nacht": {
+                                "type": "default",
+                                "content": "https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=strassenverkehr_nacht_2022"
+                            }
+                        },
+                        "starkregen": {
+                            "legend_fliesspfeile": {
+                                "type": "default",
+                                "content": "https://geodienste.hamburg.de/HH_WMS_Starkregenhinweiskarte?language=ger&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=fliesswege_und_pfeile&format=image/png&STYLE=default"
+                            },
+                            "legend_senktiefen": {
+                                "type": "default",
+                                "content": "https://geodienste.hamburg.de/HH_WMS_Starkregenhinweiskarte?language=ger&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=senkentiefen&format=image/png&STYLE=default"
+                            }
+                        }
+                    },
+                    expected = [];
+
+                expected["strassenverkehr.legend_tag"] = "https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=strassenverkehr_tag_abend_nacht_2022";
+                expected["strassenverkehr.legend_nacht"] = "https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=strassenverkehr_nacht_2022";
+                expected["starkregen.legend_fliesspfeile"] = "https://geodienste.hamburg.de/HH_WMS_Starkregenhinweiskarte?language=ger&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=fliesswege_und_pfeile&format=image/png&STYLE=default";
+                expected["starkregen.legend_senktiefen"] = "https://geodienste.hamburg.de/HH_WMS_Starkregenhinweiskarte?language=ger&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=senkentiefen&format=image/png&STYLE=default";
+
+                expect(wrapper.vm.getLegends(legends)).to.deep.equal(expected);
+            });
+        });
+
+        describe("getMapConf", () => {
+            it("Should return an empty array, if the given parameter is not an object", () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    });
+
+                expect(wrapper.vm.getMapConf(undefined)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(null)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(1234)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(true)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(false)).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getMapConf([])).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getMapConf("")).to.be.an("array").and.to.be.empty;
+            });
+            it("Should return an empty array, if the given parameter is an empty object", () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    });
+
+                expect(wrapper.vm.getMapConf({}, {})).to.be.an("array").and.to.be.empty;
+            });
+            it("Should return an correct array", () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    }),
+                    specification = {
+                        "cards": {
+                            "uebersichtskarte": {
+                                "type": "mapProportion",
+                                "proportion": 0.33,
+                                "style": {
+                                    "borderSize": 3,
+                                    "color": [
+                                        228,
+                                        26,
+                                        28,
+                                        1
+                                    ]
+                                },
+                                "layerIds": [
+                                    "1103",
+                                    "453"
+                                ]
+                            },
+                            "uebersichtskarte_fixed": {
+                                "type": "mapFixed",
+                                "style": {
+                                    "pointSize": 6,
+                                    "color": [
+                                        228,
+                                        26,
+                                        28,
+                                        1
+                                    ]
+                                },
+                                "bbox": [
+                                    10.023374939929553,
+                                    53.5356067536243,
+                                    10.023374939929553,
+                                    53.5356067536243
+                                ],
+                                "layerIds": [
+                                    "1886"
+                                ]
+                            },
+                            "uebersichtskarte_1": {
+                                "type": "mapProportion",
+                                "proportion": 0.33,
+                                "style": {
+                                    "borderSize": 3,
+                                    "color": [
+                                        228,
+                                        26,
+                                        28,
+                                        1
+                                    ]
+                                },
+                                "layerIds": [
+                                    "15603",
+                                    "15610",
+                                    "453"
+                                ]
+                            },
+                            "strassenverkehr_tag": {
+                                "type": "mapWalker",
+                                "style": {
+                                    "borderSize": 1,
+                                    "color": [
+                                        0,
+                                        0,
+                                        0,
+                                        1
+                                    ]
+                                },
+                                "scale": 10000,
+                                "layerIds": [
+                                    "95",
+                                    "453"
+                                ]
+                            },
+                            "strassenverkehr_nacht": {
+                                "type": "mapWalker",
+                                "style": {
+                                    "borderSize": 1,
+                                    "color": [
+                                        0,
+                                        0,
+                                        0,
+                                        1
+                                    ]
+                                },
+                                "scale": 10000,
+                                "layerIds": [
+                                    "96",
+                                    "453"
+                                ]
+                            }
+                        }
+                    },
+                    parcel = {
+                        "type": "Feature",
+                        "geometry":
+                            {
+                                "type": "Point",
+                                "coordinates": [10.023374939929553, 53.5356067536243]
+                            },
+                        "properties": {"EPSG": "25832"}
+                    },
+                    bbox = [
+                        10.023374939929553,
+                        53.5356067536243,
+                        10.023374939929553,
+                        53.5356067536243
+                    ],
+                    result = wrapper.vm.getMapConf(parcel, specification);
+
+                expect(result.uebersichtskarte).to.be.an("object").that.is.not.empty;
+                expect(result.uebersichtskarte.dpi).to.be.equal(200);
+                expect(result.uebersichtskarte.projection).to.be.equal("EPSG:25832");
+                expect(result.uebersichtskarte.bbox).to.deep.equal(bbox);
+                expect(result.uebersichtskarte_fixed).to.be.an("object").that.is.not.empty;
+                expect(result.uebersichtskarte_fixed.dpi).to.be.equal(200);
+                expect(result.uebersichtskarte_fixed.projection).to.be.equal("EPSG:25832");
+                expect(result.uebersichtskarte_fixed.bbox).to.deep.equal(bbox);
+                expect(result.uebersichtskarte_1).to.be.an("object").that.is.not.empty;
+                expect(result.uebersichtskarte_1.dpi).to.be.equal(200);
+                expect(result.uebersichtskarte_1.projection).to.be.equal("EPSG:25832");
+                expect(result.uebersichtskarte_1.bbox).to.deep.equal(bbox);
+                expect(result.strassenverkehr_tag).to.be.an("object").that.is.not.empty;
+                expect(result.strassenverkehr_tag.dpi).to.be.equal(200);
+                expect(result.strassenverkehr_tag.projection).to.be.equal("EPSG:25832");
+                expect(result.strassenverkehr_nacht).to.be.an("object").that.is.not.empty;
+                expect(result.strassenverkehr_nacht.dpi).to.be.equal(200);
+                expect(result.strassenverkehr_nacht.projection).to.be.equal("EPSG:25832");
+            });
+        });
     });
 });

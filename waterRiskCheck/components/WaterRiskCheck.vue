@@ -9,10 +9,14 @@ import layerCollection from "../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
 import {Fill, Stroke, Style} from "ol/style.js";
 import {intersect, getUnbuiltArea, calcArea, buffer, findPointInPolygonsByHighestValue} from "../js/spatialOperations";
-import axios from "axios";
-import isObject from "../../../src/shared/js/utils/isObject";
 import getWCSFeatures from "../js/getWCSFeatures.js";
-import {bbox} from "@turf/bbox";
+import isObject from "../../../src/shared/js/utils/isObject";
+import {getFixedMap} from "../../../addons/valuationPrint/js/translator.getFixedMap";
+import {getProportionMap} from "../../../addons/valuationPrint/js/translator.getProportionMap";
+import {getWalkerMap} from "../../../addons/valuationPrint/js/translator.getWalkerMap";
+import bbox from "@turf/bbox";
+import {GeoJSON} from "ol/format";
+import axios from "axios";
 
 export default {
     name: "WaterRiskCheck",
@@ -107,7 +111,9 @@ export default {
                 }
             },
             config: null,
+            select: null,
             printUrl: "",
+            pdfAppId: "",
             defaultValue: "",
             fileprefix: "",
             middleFloodDepth: "",
@@ -123,7 +129,7 @@ export default {
             "answersLogic",
             "alwaysShow",
             "alkisBaseUrl",
-            "settings"
+            "reportPath"
         ]),
         ...mapGetters(["restServiceById"]),
         ...mapGetters("Modules/SearchBar", [
@@ -280,19 +286,31 @@ export default {
                 return null;
             });
         },
+
         /**
          * Gets the config for the valuation and sets it.
          * In addition, the print url is set from the config.
+         * @param {Function} onsuccess - Is called when the config is set.
          * @returns {void}
          */
         setConfig () {
-            this.config = this.settings;
-            this.printUrl = this.restServiceById(this.config?.printServiceId).url;
-            this.isPdfAppIdConfigured = typeof this.config?.pdfAppId === "string";
-            this.pdfAppId = this.config?.pdfAppId;
-            this.defaultValue = this.config?.defaultValue;
-            this.fileprefix = this.$t(this.config?.fileprefix);
+            axios.get(this.reportPath, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => {
+                    this.config = response.data;
+                    this.printUrl = this.restServiceById(response.data.settings.printServiceId).url;
+                    this.pdfAppId = response.data.settings?.pdfAppId;
+                    this.defaultValue = response.data.settings.defaultValue;
+                    this.fileprefix = this.$t(response.data.settings.fileprefix);
+                })
+                .catch(() => {
+                    console.warn("Could not load the config file config.valuation.json");
+                });
         },
+
         /**
          * Creates a point geometry from the address and
          * fetches the parcel and the building for this address.
@@ -315,10 +333,78 @@ export default {
             parcelGeometry.setCoordinates(this.parcel[0].geometry.coordinates);
             this.buildings = buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"));
 
+            // @TODO Die zurückgelieferte Werte aus beiden Funktionen werden in CreateMapfishDialog verwendet.
+            this.getMapConf(this.parcel[0], this.config?.specification);
+            this.getLegends(this.config?.legends);
+
             this.addDataByParcel(this.data, this.parcel[0], parcelGeometry);
             // console.log(this.data);
         },
 
+        /**
+         * Returns an array of the legends for Mapfish
+         * @param {Object} legends - the legends from the config
+         * @return {Array} - the array of the legends for Mapfish
+         */
+        getLegends (legends) {
+            const legendArr = [];
+
+            if (!isObject(legends)) {
+                console.error("Wrong config for legends");
+                return [];
+            }
+            if (Object.keys(legends).length > 0) {
+                Object.keys(legends).forEach(tags => {
+                    Object.keys(legends[tags]).forEach(legend => {
+                        legendArr[tags + "." + legend] = legends[tags][legend].content;
+                    });
+                });
+            }
+
+            return legendArr;
+        },
+
+        /**
+         * Returns an array of map configuration for Mapfish
+         * @param {Object} parcel - the Parcel Object
+         * @param {Object} specification - The specification object from the config
+         * @return {Array} - The array of the map configurations in object
+         */
+        getMapConf (parcel, specification) {
+            const mapConfArr = [];
+
+            if (!isObject(parcel) || Object.keys(parcel).length === 0 || !isObject(specification) || !Object.prototype.hasOwnProperty.call(specification, "cards")) {
+                console.error("Wrong configuration or parcel data!");
+                return [];
+            }
+
+            try {
+                const
+                    cards = specification.cards,
+                    feature = new GeoJSON().readFeature(parcel),
+                    mapProjection = "EPSG:25832",
+                    extent = feature.getGeometry().getExtent();
+
+                if (Object.keys(cards).length > 0) {
+                    Object.keys(cards).forEach(card => {
+                        if (cards[card].type === "mapProportion") {
+                            mapConfArr[card] = getProportionMap(feature, extent, mapProjection, cards[card].style, cards[card].proportion, cards[card].layerIds, cards[card].dpi);
+                        }
+                        else if (cards[card].type === "mapWalker") {
+                            mapConfArr[card] = getWalkerMap(feature, bbox(parcel), mapProjection, cards[card].style, cards[card].scale, cards[card].layerIds, cards[card].dpi);
+                        }
+                        else if (cards[card].type === "mapFixed") {
+                            mapConfArr[card] = getFixedMap(bbox(parcel), mapProjection, cards[card].style, cards[card].bbox, cards[card].layerIds, cards[card].dpi);
+                        }
+                    });
+                }
+            }
+            catch (error) {
+                console.warn(error);
+            }
+
+            return mapConfArr;
+        },
         /**
          * Adds the passed spatial data for the parcel.
          * @param {Object} data - The spatial data to add.
@@ -554,25 +640,25 @@ export default {
             // this.createJson(pages);
         },
         /**
-        * @TODO
-        * @param {Array} pages
-        * @returns {void}
-        */
+         * @TODO
+         * @param {Array} pages
+         * @returns {void}
+         */
         /* createJson (pages) {
             console.log(pages);
         }*/
 
         /**
-        * Starts the print process. Creates a print job then asks for the status.
-        * @param {String} url - MapFish Print url.
-        * @param {String} format - The output format (e.g. pdf or png).
-        * @param {String} appId - The identifier of the print configurations.
-        * @param {Object} mapfishDialog - The POST body.
-        * @param {Function} onstart - Function that creates the print job.
-        * @param {Function} onerror - Is called when the status is "cancelled" or "error".
-        * @param {Function} onfinish - Is called when the status is "finished".
-        * @returns {void}
-        */
+         * Starts the print process. Creates a print job then asks for the status.
+         * @param {String} url - MapFish Print url.
+         * @param {String} format - The output format (e.g. pdf or png).
+         * @param {String} appId - The identifier of the print configurations.
+         * @param {Object} mapfishDialog - The POST body.
+         * @param {Function} onstart - Function that creates the print job.
+         * @param {Function} onerror - Is called when the status is "cancelled" or "error".
+         * @param {Function} onfinish - Is called when the status is "finished".
+         * @returns {void}
+         */
         startPrint (url, format, appId, mapfishDialog, onstart, onerror, onfinish) {
             onstart(url + appId + "/report." + format, mapfishDialog).then(response => {
                 this.fetchStatus(url, response.data.ref, onerror, onfinish);
@@ -581,13 +667,13 @@ export default {
             });
         },
         /**
-        * Queries the status for a print job and handles it.
-        * @param {String} url - MapFish Print url.
-        * @param {String} ref - A reference id that can be used to request the status for the print job or to download the finished report.
-        * @param {Function} onerror - Is called when the status is "cancelled" or "error".
-        * @param {Function} onfinish - Is called when the status is "finished".
-        * @returns {void}
-        */
+         * Queries the status for a print job and handles it.
+         * @param {String} url - MapFish Print url.
+         * @param {String} ref - A reference id that can be used to request the status for the print job or to download the finished report.
+         * @param {Function} onerror - Is called when the status is "cancelled" or "error".
+         * @param {Function} onfinish - Is called when the status is "finished".
+         * @returns {void}
+         */
         fetchStatus (url, ref, onerror, onfinish) {
             const statusUrl = url + "status/" + ref + ".json";
 
@@ -961,75 +1047,74 @@ export default {
 
 
 <style lang="scss" scoped>
-    @import "~mixins";
+@import "~mixins";
 
-    #collapseHiddenButton {
-        display: none;
-    }
-    .answer {
-        width: 50%;
-        cursor: pointer;
-        border-radius: 20px;
-        border: 1px solid var(--form-check-input-border);
-    }
-    .disabled-answer {
-        pointer-events: none;
-        opacity: 50%;
-    }
-    .pdf-icon {
-        font-size: 50px;
-    }
-    .progress {
-        background-color: $light_grey;
-        color: white;
-        text-align: center;
-        border-radius: 10px;
-        height: 12px;
-        font-size: 12px;
-    }
-
-    .progress-bar {
-        border-radius: 10px;
-        height: 100%;
-    }
-    .information-image {
-        width: 50%;
-        z-index: 20;
-    }
-    .information-image:hover {
-        transform: scale(1.5) translateX(-11%) translateY(+5%);
-        width: 75%;
-    }
-    .selected-answer-icon {
-        left: 15px;
-        top: 9px;
-    }
-    .answer:hover, .marked-answers{
-        background-color: $primary;
-        font-family: $font_family_accent;
-    }
-    .logo-image {
-        width: 200px;
-        image-rendering: crisp-edges;
-    }
-    .geo-icon {
-        font-size: 40px;
-    }
-    .address-container p {
-        margin-right: 5px;
-    }
-    .current-address {
-        font-family: $font_family_accent;
-        font-size: 17px;
-    }
-    .address-hint, .basic-infos-address, .text-secondary {
-        font-family: $font_family_accent;
-    }
-    .header-logo {
-        width: 80px;
-        image-rendering: crisp-edges;
-    }
-    .info-icon {
-        font-size: 18px;
-    }
+#collapseHiddenButton {
+    display: none;
+}
+.answer {
+    width: 50%;
+    cursor: pointer;
+    border-radius: 20px;
+    border: 1px solid var(--form-check-input-border);
+}
+.disabled-answer {
+    pointer-events: none;
+    opacity: 50%;
+}
+.pdf-icon {
+    font-size: 50px;
+}
+.progress {
+    background-color: $light_grey;
+    color: white;
+    text-align: center;
+    border-radius: 10px;
+    height: 12px;
+    font-size: 12px;
+}
+.progress-bar {
+    border-radius: 10px;
+    height: 100%;
+}
+.information-image {
+    width: 50%;
+    z-index: 20;
+}
+.information-image:hover {
+    transform: scale(1.5) translateX(-11%) translateY(+5%);
+    width: 75%;
+}
+.selected-answer-icon {
+    left: 15px;
+    top: 9px;
+}
+.answer:hover, .marked-answers{
+    background-color: $primary;
+    font-family: $font_family_accent;
+}
+.logo-image {
+    width: 200px;
+    image-rendering: crisp-edges;
+}
+.geo-icon {
+    font-size: 40px;
+}
+.address-container p {
+    margin-right: 5px;
+}
+.current-address {
+    font-family: $font_family_accent;
+    font-size: 17px;
+}
+.address-hint, .basic-infos-address, .text-secondary {
+    font-family: $font_family_accent;
+}
+.header-logo {
+    width: 80px;
+    image-rendering: crisp-edges;
+}
+.info-icon {
+    font-size: 18px;
+}
 </style>
