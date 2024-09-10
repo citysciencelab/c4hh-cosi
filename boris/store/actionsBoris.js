@@ -129,23 +129,23 @@ const actions = {
             selectedLayerName = selectedLayer.name,
             layerName = selectedLayerName + "-stripes";
 
-        commit("setIsStripesLayer", value);
         if (!selectedLayer) {
             console.warn("No visible layer found in the list");
             return;
         }
+        commit("setIsStripesLayer", value);
 
         if (value) {
             dispatch("selectLayerByName", layerName);
         }
         else {
-            const layer = layerList.find(aLayer => aLayer.name === selectedLayerName);
+            const layer = layerList.find(aLayer => aLayer.name === layerName);
 
             if (layer) {
                 layer.visibility = false;
             }
             else {
-                console.warn(`Layer with name ${layerName} not found`);
+                console.warn(`Layer with name ${selectedLayerName} not found`);
             }
         }
     },
