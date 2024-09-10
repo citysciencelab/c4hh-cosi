@@ -145,7 +145,7 @@ const actions = {
                 layer.visibility = false;
             }
             else {
-                console.warn(`Layer with name ${selectedLayerName} not found`);
+                console.warn(`Layer with name ${layerName} not found`);
             }
         }
     },
