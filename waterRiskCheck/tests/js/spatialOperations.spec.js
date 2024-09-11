@@ -1,6 +1,5 @@
 import {expect} from "chai";
-import {getUnbuiltArea, buffer} from "../../js/spatialOperations.js";
-
+import {getUnbuiltArea, buffer, findPointInPolygonsByHighestValue} from "../../js/spatialOperations.js";
 
 const buildingFeatures = [
         {
@@ -301,6 +300,16 @@ describe("addons/waterRiskCheck/js/spatialOperations.js", () => {
             const bufferedFeatures = buffer(buildingFeatures, 0);
 
             expect(bufferedFeatures[0].geometry).to.deep.equal(buildingFeatures[0].geometry);
+        });
+    });
+
+    describe("findPointInPolygonsByHighestValue", () => {
+        it("should return the first param if the first param is not an array", () => {
+            expect(findPointInPolygonsByHighestValue()).to.be.undefined;
+            expect(findPointInPolygonsByHighestValue(null)).to.be.null;
+        });
+        it("should return the first param if the second is not an array", () => {
+            expect(findPointInPolygonsByHighestValue([])).to.be.an("array").that.is.empty;
         });
     });
 });

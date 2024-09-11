@@ -3,6 +3,7 @@ import {featureCollection as turfFeatureCollection} from "@turf/helpers";
 import {area as turfArea} from "@turf/area";
 import {difference as turfDifference} from "@turf/difference";
 import {buffer as turfBuffer} from "@turf/buffer";
+import {pointsWithinPolygon} from "@turf/points-within-polygon";
 
 /**
  * Gets the unbuilt area of the given parcel.
@@ -87,9 +88,40 @@ function buffer (features, radius = 1) {
     return bufferedFeatures;
 }
 
+/**
+ * Finds the point from all points with the highest value in the given polygons and returns it.
+ * @param {Object[]} points The points as array.
+ * @param {Object[]} polygons The polygons to check if any point is within.
+ * @returns {Object|null} the found point or null.
+ */
+function findPointInPolygonsByHighestValue (points, polygons) {
+    if (!Array.isArray(points) || !Array.isArray(polygons)) {
+        return points;
+    }
+    const sortedPoints = points.sort((a, b) => b?.properties?.value - a?.properties?.value);
+    let result = null;
+
+    for (let i = 0; i < sortedPoints.length; i++) {
+        const point = sortedPoints[i];
+
+        for (let j = 0; j < polygons.length; j++) {
+            if (pointsWithinPolygon(sortedPoints[i], polygons[j]).features.length) {
+                result = point;
+                break;
+            }
+        }
+        if (result !== null) {
+            break;
+        }
+    }
+
+    return result;
+}
+
 export {
     intersect,
     getUnbuiltArea,
     calcArea,
-    buffer
+    buffer,
+    findPointInPolygonsByHighestValue
 };

@@ -8,9 +8,11 @@ import MultiPolygon from "ol/geom/MultiPolygon.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
 import {Fill, Stroke, Style} from "ol/style.js";
-import {intersect, getUnbuiltArea, calcArea, buffer} from "../js/spatialOperations";
+import {intersect, getUnbuiltArea, calcArea, buffer, findPointInPolygonsByHighestValue} from "../js/spatialOperations";
 import axios from "axios";
 import isObject from "../../../src/shared/js/utils/isObject";
+import getWCSFeatures from "../js/getWCSFeatures.js";
+import {bbox} from "@turf/bbox";
 
 export default {
     name: "WaterRiskCheck",
@@ -88,6 +90,20 @@ export default {
                     collection: "ueberschwemmungsgebiete",
                     geometryName: "geom",
                     geoJsonFeatures: []
+                },
+                sri07_wassertiefe: {
+                    type: "WCS",
+                    baseURL: "https://qs-geodienste.hamburg.de/wcs_starkregengefahrenkarte",
+                    coverageId: "sri07_wassertiefe",
+                    epsg: "EPSG:4326",
+                    value: undefined
+                },
+                sri12_wassertiefe: {
+                    type: "WCS",
+                    baseURL: "https://qs-geodienste.hamburg.de/wcs_starkregengefahrenkarte",
+                    coverageId: "sri12_wassertiefe",
+                    epsg: "EPSG:4326",
+                    value: undefined
                 }
             },
             config: null,
@@ -300,6 +316,7 @@ export default {
             this.buildings = buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"));
 
             this.addDataByParcel(this.data, this.parcel[0], parcelGeometry);
+            // console.log(this.data);
         },
 
         /**
@@ -313,13 +330,21 @@ export default {
             const unbuiltArea = getUnbuiltArea(parcelFeature, this.buildingsToUse);
 
             for (const key of Object.keys(data)) {
-                this.fetchFeatures(parcelGeometry, data[key].collection, data[key].url, data[key].geometryName)
-                    .then(geoJsonList => {
-                        data[key].geoJsonFeatures = intersect(geoJsonList, unbuiltArea);
-                        if (data[key].propertyToUse) {
-                            data[key].values = calcArea(data[key].geoJsonFeatures, unbuiltArea, data[key].propertyToUse);
-                        }
-                    });
+                if (data[key].type === "WCS") {
+                    this.getHeavyRainPointForPolygons(data[key].baseURL, data[key].coverageId, bbox(buffer([parcelFeature])[0]), data[key].epsg, this.buildingsToUse)
+                        .then(point => {
+                            data[key].value = point;
+                        }).catch(error => console.error(error));
+                }
+                else {
+                    this.fetchFeatures(parcelGeometry, data[key].collection, data[key].url, data[key].geometryName)
+                        .then(geoJsonList => {
+                            data[key].geoJsonFeatures = intersect(geoJsonList, unbuiltArea);
+                            if (data[key].propertyToUse) {
+                                data[key].values = calcArea(data[key].geoJsonFeatures, unbuiltArea, data[key].propertyToUse);
+                            }
+                        });
+                }
             }
         },
 
@@ -348,6 +373,23 @@ export default {
                 console.warn("An error has occurred when requesting the features", error);
                 return [];
             }
+        },
+
+        /**
+         * Gets the point with the highest score for heavy rain for given polygons.
+         * @param {String} baseUrl The base url to request the wcs points.
+         * @param {String} coverageId The coverage id to request.
+         * @param {Number[]} boundingBox The bounding box.
+         * @param {String} epsg The EPSG code.
+         * @param {Object[]} polygons The polygons.
+         * @returns {Object|null} the point with the highest found result.
+         */
+        async getHeavyRainPointForPolygons (baseUrl, coverageId, boundingBox, epsg, polygons) {
+            return new Promise((resolve, reject) => {
+                getWCSFeatures.getWCSPoints(baseUrl, coverageId, boundingBox, epsg).then(points => {
+                    resolve(findPointInPolygonsByHighestValue(points, polygons));
+                }).catch(error => reject(error));
+            });
         },
 
         /**
