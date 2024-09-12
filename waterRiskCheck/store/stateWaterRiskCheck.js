@@ -4,6 +4,10 @@
  * @property {String} id - Id of the WaterRiskCheck component.
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
+ * @property {Object} pdfPages - Defines which pdfs are displayed depending on questions and data.
+ * @property {Object} answersLogic - Defines which pdfs are displayed for which answer.
+ * @property {Object} alwaysShow - Pdfs that are always show regardless of questions and data.
+ * @property {Object} settings - Print configuration of the report.
  */
 const state = {
     id: "waterRiskCheck",
@@ -20,7 +24,8 @@ const state = {
     pdfPages: [],
     answersLogic: [],
     alwaysShow: [],
-    alkisBaseUrl: "https://api.hamburg.de/datasets/v1/alkis_vereinfacht"
+    alkisBaseUrl: "https://api.hamburg.de/datasets/v1/alkis_vereinfacht",
+    settings: {}
 };
 
 export default state;

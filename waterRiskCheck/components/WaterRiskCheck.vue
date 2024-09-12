@@ -9,6 +9,7 @@ import layerCollection from "../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
 import {Fill, Stroke, Style} from "ol/style.js";
 import {intersect, getUnbuiltArea, calcArea, buffer} from "../js/spatialOperations";
+import axios from "axios";
 
 export default {
     name: "WaterRiskCheck",
@@ -87,7 +88,11 @@ export default {
                     geometryName: "geom",
                     geoJsonFeatures: []
                 }
-            }
+            },
+            config: null,
+            printUrl: "",
+            defaultValue: "",
+            fileprefix: ""
         };
     },
     computed: {
@@ -98,9 +103,10 @@ export default {
             "pdfPages",
             "answersLogic",
             "alwaysShow",
-            "alkisBaseUrl"
+            "alkisBaseUrl",
+            "settings"
         ]),
-
+        ...mapGetters(["restServiceById"]),
         ...mapGetters("Modules/SearchBar", [
             "searchResults"
         ]),
@@ -191,6 +197,7 @@ export default {
         this.questions = [...this.configuredQuestions];
         this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
         document.getElementById("mp-menu-secondaryMenu").style.width = "37vw";
+        this.setConfig();
     },
     unmounted () {
         this.resetAll();
@@ -246,7 +253,19 @@ export default {
                 return null;
             });
         },
-
+        /**
+         * Gets the config for the valuation and sets it.
+         * In addition, the print url is set from the config.
+         * @returns {void}
+         */
+        setConfig () {
+            this.config = this.settings;
+            this.printUrl = this.restServiceById(this.config?.printServiceId).url;
+            this.isPdfAppIdConfigured = typeof this.config?.pdfAppId === "string";
+            this.pdfAppId = this.config?.pdfAppId;
+            this.defaultValue = this.config?.defaultValue;
+            this.fileprefix = this.$t(this.config?.fileprefix);
+        },
         /**
          * Creates a point geometry from the address and
          * fetches the parcel and the building for this address.
@@ -364,9 +383,21 @@ export default {
             this.preparePDFPageNames();
             this.isCreatingPDF = true;
             setTimeout(() => {
-                this.isCreatingPDF = false;
-                this.formStarted = false;
-                this.formFinished = true;
+                // TODO: create mapfishDialog
+                const mapfishDialog = {"uniqueIdList": [], "visibleLayerIds": ["19969"], "layout": "A4 Hochformat", "attributes": {"title": "Mein Titel", "map": {"dpi": 200, "projection": "EPSG:25832", "center": [565874, 5934140], "scale": 1000000, "layers": [{"baseURL": "https://geodienste.hamburg.de/HH_WMS_Cache_Stadtplan", "opacity": 1, "type": "tiledwms", "layers": ["stadtplan"], "imageFormat": "image/png", "customParams": {"TRANSPARENT": "true", "DPI": 200}, "tileSize": [512, 512]}]}, "metadata": true, "scale": "1:1000000", "showLegend": false, "legend": {}}, "outputFilename": "Ausdruck", "outputFormat": "pdf"};
+
+                this.startPrint(this.printUrl, "pdf", this.pdfAppId, mapfishDialog, (url, payload) => {
+                    return axios.post(url, payload);
+                },
+                error => {
+                    console.error(error);
+                },
+                url => {
+                    this.downloadLink = url;
+                    this.isCreatingPDF = false;
+                    this.formStarted = false;
+                    this.formFinished = true;
+                });
             }, 2000);
         },
         /**
@@ -468,7 +499,7 @@ export default {
                 });
             });
             // this.createJson(pages);
-        }
+        },
         /**
         * @TODO
         * @param {Array} pages
@@ -477,7 +508,66 @@ export default {
         /* createJson (pages) {
             console.log(pages);
         }*/
+
+        /**
+        * Starts the print process. Creates a print job then asks for the status.
+        * @param {String} url - MapFish Print url.
+        * @param {String} format - The output format (e.g. pdf or png).
+        * @param {String} appId - The identifier of the print configurations.
+        * @param {Object} mapfishDialog - The POST body.
+        * @param {Function} onstart - Function that creates the print job.
+        * @param {Function} onerror - Is called when the status is "cancelled" or "error".
+        * @param {Function} onfinish - Is called when the status is "finished".
+        * @returns {void}
+        */
+        startPrint (url, format, appId, mapfishDialog, onstart, onerror, onfinish) {
+            onstart(url + appId + "/report." + format, mapfishDialog).then(response => {
+                this.fetchStatus(url, response.data.ref, onerror, onfinish);
+            }).catch(error => {
+                onerror(error);
+            });
+        },
+        /**
+        * Queries the status for a print job and handles it.
+        * @param {String} url - MapFish Print url.
+        * @param {String} ref - A reference id that can be used to request the status for the print job or to download the finished report.
+        * @param {Function} onerror - Is called when the status is "cancelled" or "error".
+        * @param {Function} onfinish - Is called when the status is "finished".
+        * @returns {void}
+        */
+        fetchStatus (url, ref, onerror, onfinish) {
+            const statusUrl = url + "status/" + ref + ".json";
+
+            axios.get(statusUrl).then(response => {
+                if (response.data.status === "running" || response.data.status === "waiting") {
+                    setTimeout(() => {
+                        this.fetchStatus(url, ref, onerror, onfinish);
+                    }, 1000);
+                }
+                else if (response.data.status === "finished") {
+                    const downloadUrl = url + "report/" + ref;
+
+                    onfinish(downloadUrl);
+                }
+                else if (response.data.status === "cancelled") {
+                    onerror("cancelled");
+                }
+                else {
+                    onerror(response.data.error);
+                }
+            }).catch(error => {
+                onerror(error);
+            });
+        },
+        /**
+         * Opens the url in window for downloading
+         * @returns {void}
+         */
+        startDownload () {
+            window.open(this.downloadLink, "_blank");
+        }
     }
+
 };
 </script>
 
@@ -751,7 +841,7 @@ export default {
                                         :text="$t('additional:modules.waterRiskCheck.download')"
                                         icon="bi-download"
                                         class="mb-1"
-                                        :interaction="() => {}"
+                                        :interaction="() => startDownload()"
                                     />
                                 </div>
                                 <div

@@ -38,6 +38,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                     pdfPages: [],
                                     answersLogic: [],
                                     alwaysShow: [],
+                                    settings: {},
                                     addressCoordinates: undefined,
                                     ...initialState
                                 },
@@ -47,7 +48,8 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                     configuredQuestions: (state) => state.configuredQuestions,
                                     answersLogic: (state) => state.answersLogic,
                                     pdfPages: (state) => state.pdfPages,
-                                    alwaysShow: (state) => state.alwaysShow
+                                    alwaysShow: (state) => state.alwaysShow,
+                                    settings: (state) => state.settings
                                 }
                             },
                             SearchBar: {
@@ -61,13 +63,22 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                             }
                         }
                     }
+                },
+                getters: {
+                    restServiceById: () => {
+                        return {
+                            url: "https://this.could.be.your.url/examplePortal"
+                        };
+                    }
                 }
             });
         }
     };
+    let stubSetConfig;
 
     beforeEach(() => {
         addSecondaryMenuElement();
+        stubSetConfig = sinon.stub(WaterRiskCheck.methods, "setConfig");
         sinon.stub(layerCollection, "getLayerById").returns(
             {
                 getLayer: () => {
@@ -367,6 +378,17 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
             });
 
             expect(stubCreateLayer.calledOnce).to.be.true;
+        });
+        it("should call setConfig if the component is mounted", () => {
+            const store = factory.createVuexStore();
+
+            shallowMount(WaterRiskCheck, {
+                global: {
+                    plugins: [store]
+                }
+            });
+
+            expect(stubSetConfig.called).to.be.true;
         });
     });
 
