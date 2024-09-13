@@ -180,7 +180,7 @@ export default {
          * @returns {void}
          */
         address () {
-            if (this.formStarted && this.address !== "") {
+            if (this.formStarted && this.address !== "" || this.formFinished) {
                 this.resetAll(false);
             }
             this.walkTroughToFetchAndAdd();
@@ -642,7 +642,7 @@ export default {
                         <i class="geo-icon bi-geo-alt-fill text-secondary float-center me-1" />
                     </div>
                     <div class="address-container col-auto d-flex flex-column justify-content-center align-items-start m-0">
-                        <p class="current-address font-bold mb-2">
+                        <p class="current-address mb-2">
                             {{ address }}
                         </p>
                         <div class="d-flex justify-content-center">
@@ -667,7 +667,7 @@ export default {
                 </div>
                 <hr class="my-5">
                 <div class="row">
-                    <div class="col-1 d-flex align-items-center">
+                    <div class="info-icon col-1 d-flex align-items-center">
                         <i class="bi-info-circle" />
                     </div>
                     <div class="col-11 d-flex align-items-center">
@@ -720,13 +720,10 @@ export default {
                     >
                         <img
                             class="header-logo float-end"
-                            :src="'./assets/logo.png'"
+                            :src="'./assets/logo_without_text.png'"
                             :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
                         >
                     </div>
-                    <p class="row mt-2 mx-0 pe-0">
-                        {{ $t('additional:modules.waterRiskCheck.formInformationText') }}
-                    </p>
                 </div>
             </div>
             <div class="form-container container">
@@ -748,9 +745,9 @@ export default {
                 <div class="question-section row mt-4 mb-5">
                     <div class="container d-flex flex-column">
                         <div class="d-flex flex-column align-items-start justify-content-center">
-                            <p class="font-bold mb-2">
+                            <h5 class="text-secondary pt-3">
                                 {{ questions[currentQuestionIdx].title }}
-                            </p>
+                            </h5>
                             <span class="mb-2">
                                 {{ questions[currentQuestionIdx].question }}
                             </span>
@@ -758,7 +755,7 @@ export default {
                                 id="information"
                                 ref="information"
                                 type="button"
-                                class="btn btn-sm btn-secondary rounded-pill lh-1 me-2 mb-2"
+                                class="btn btn-sm btn-secondary rounded-pill lh-1 me-2 mb-2 mt-2"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#collapseInfo"
                                 aria-expanded="false"
@@ -778,20 +775,18 @@ export default {
                                 <div class="card card-body p-4 border border-primary rounded">
                                     <div class="container p-0">
                                         <div class="row">
-                                            <div class="col-6">
-                                                <h6 class="text-secondary">
+                                            <div class="col-12">
+                                                <h6 class="col-6 text-secondary">
                                                     {{ questions[currentQuestionIdx].title }}
                                                 </h6>
-                                                <p
-                                                    v-html="questions[currentQuestionIdx].info.text"
-                                                />
-                                            </div>
-                                            <div class="col-6 d-flex justify-content-end align-items-start">
                                                 <img
-                                                    class="information-image"
+                                                    class="information-image float-end img-fluid px-2 pb-2"
                                                     :src="questions[currentQuestionIdx].info.image"
                                                     :alt="questions[currentQuestionIdx].info.alt"
                                                 >
+                                                <p
+                                                    v-html="questions[currentQuestionIdx].info.text"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -910,7 +905,7 @@ export default {
         </div>
         <div v-if="!formStarted || formFinished">
             <div class="row">
-                <div class="d-flex justify-content-center pt-2">
+                <div class="d-flex justify-content-center pt-4">
                     <img
                         class="logo-image img-fluid"
                         :src="'./assets/logo.png'"
@@ -956,11 +951,11 @@ export default {
         height: 100%;
     }
     .information-image {
-        width: 100%;
-        z-index: 10;
+        width: 50%;
+        z-index: 20;
     }
     .information-image:hover {
-        transform: scale(3.5) translateX(-24%);
+        transform: scale(1.5) translateX(-11%) translateY(+5%);
         width: 75%;
     }
     .selected-answer-icon {
@@ -972,7 +967,8 @@ export default {
         font-family: $font_family_accent;
     }
     .logo-image {
-        width: 135px;
+        width: 200px;
+        image-rendering: crisp-edges;
     }
     .geo-icon {
         font-size: 40px;
@@ -981,12 +977,17 @@ export default {
         margin-right: 5px;
     }
     .current-address {
-        font-size: 16px;
+        font-family: $font_family_accent;
+        font-size: 17px;
     }
     .address-hint, .basic-infos-address, .text-secondary {
         font-family: $font_family_accent;
     }
     .header-logo {
         width: 80px;
+        image-rendering: crisp-edges;
+    }
+    .info-icon {
+        font-size: 18px;
     }
 </style>
