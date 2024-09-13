@@ -524,5 +524,71 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                 });
             });
         });
+
+        describe("getDeepFloodDepth", () => {
+            it("should return empty string if the parameter is wrong or in wrong type", () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    });
+
+                expect(wrapper.vm.getDeepFloodDepth(true)).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth("")).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth(0)).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth([])).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth({}, true)).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth({}, 0)).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth({}, [])).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth({}, {})).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth({}, "hwrm_mittel")).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth({"hwrm_mittel": 0}, {})).to.equal("");
+            });
+
+            it("should return empty string if there are no features found", async () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    });
+
+                expect(wrapper.vm.getDeepFloodDepth({"hwrm_mittel": {}})).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth({"hwrm_mittel": {"geoJsonFeatures": []}})).to.equal("");
+            });
+
+            it("should return the deepest depth", async () => {
+                const store = factory.createVuexStore(),
+                    wrapper = shallowMount(WaterRiskCheck, {
+                        global: {
+                            plugins: [store]
+                        }
+                    });
+
+                expect(wrapper.vm.getDeepFloodDepth({
+                    "hwrm_mittel": {
+                        "propertyToUse": "wassertiefe",
+                        "geoJsonFeatures": [
+                            {
+                                "properties": {
+                                    "wassertiefe": "0 - 0,5m"
+                                }
+                            },
+                            {
+                                "properties": {
+                                    "wassertiefe": "0,5 - 1m"
+                                }
+                            },
+                            {
+                                "properties": {
+                                    "wassertiefe": "1 - 2m"
+                                }
+                            }
+                        ]
+                    }
+                }, "hwrm_mittel")).to.equal("1 - 2m");
+            });
+        });
     });
 });

@@ -10,6 +10,7 @@ import layerFactory from "../../../src/core/layers/js/layerFactory";
 import {Fill, Stroke, Style} from "ol/style.js";
 import {intersect, getUnbuiltArea, calcArea, buffer} from "../js/spatialOperations";
 import axios from "axios";
+import isObject from "../../../src/shared/js/utils/isObject";
 
 export default {
     name: "WaterRiskCheck",
@@ -92,7 +93,9 @@ export default {
             config: null,
             printUrl: "",
             defaultValue: "",
-            fileprefix: ""
+            fileprefix: "",
+            middleFloodDepth: "",
+            seldomFloodDepth: ""
         };
     },
     computed: {
@@ -188,6 +191,14 @@ export default {
             if (this.infoBoxOpen) {
                 this.$refs.information.click();
             }
+        },
+
+        data: {
+            handler (val) {
+                this.middleFloodDepth = this.getDeepFloodDepth(val, "hwrm_mittel");
+                this.seldomFloodDepth = this.getDeepFloodDepth(val, "hwrm_selten");
+            },
+            deep: true
         }
     },
     created () {
@@ -565,6 +576,41 @@ export default {
          */
         startDownload () {
             window.open(this.downloadLink, "_blank");
+        },
+
+        /**
+         * Gets the deepest flood depth according to the flood type
+         * @param {Object} data - the required and generated data for buildings.
+         * @param {String} type - The flood type.
+         * @returns {String} the deepest depth.
+         */
+        getDeepFloodDepth (data, type) {
+            if (!isObject(data) || typeof type !== "string" || !Object.prototype.hasOwnProperty.call(data, type)) {
+                return "";
+            }
+
+            if (!Array.isArray(data[type].geoJsonFeatures) || !data[type].geoJsonFeatures.length) {
+                return "";
+            }
+
+            const features = data[type].geoJsonFeatures,
+                property = data[type].propertyToUse,
+                floodDepth = [];
+            let deepestFloodDepth = "";
+
+            if (Array.isArray(features)) {
+                features.forEach(feature => {
+                    if (feature?.properties[property] && !floodDepth.includes(feature?.properties[property])) {
+                        floodDepth.push(feature?.properties[property]);
+                    }
+                });
+            }
+
+            if (floodDepth.length) {
+                deepestFloodDepth = floodDepth.sort((a, b) => a.toString().localeCompare(b.toString(), undefined, {numeric: true})).slice(-1)[0];
+            }
+
+            return deepestFloodDepth;
         }
     }
 
