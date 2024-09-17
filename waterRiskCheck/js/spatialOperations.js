@@ -118,7 +118,7 @@ function findPointInPolygonsByHighestValue (points, polygons) {
     return result;
 }
 
-export {
+export default {
     intersect,
     getUnbuiltArea,
     calcArea,

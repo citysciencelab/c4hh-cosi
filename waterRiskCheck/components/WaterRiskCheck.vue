@@ -8,8 +8,8 @@ import MultiPolygon from "ol/geom/MultiPolygon.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
 import {Fill, Stroke, Style} from "ol/style.js";
-import {intersect, getUnbuiltArea, calcArea, buffer, findPointInPolygonsByHighestValue} from "../js/spatialOperations";
 import getWCSFeatures from "../js/getWCSFeatures.js";
+import spatialOperations from "../js/spatialOperations";
 import isObject from "../../../src/shared/js/utils/isObject";
 import {getFixedMap} from "../../../addons/valuationPrint/js/translator.getFixedMap";
 import {getProportionMap} from "../../../addons/valuationPrint/js/translator.getProportionMap";
@@ -34,7 +34,7 @@ export default {
             infoBoxOpen: false,
             isCreatingPDF: false,
             calculatedPercentage: 0,
-            parcel: {},
+            parcel: [],
             buildings: [],
             buildingsByAddress: [],
             styleBuilding: {
@@ -63,6 +63,7 @@ export default {
                     geometryName: "geom",
                     propertyToUse: "versickerungswahrscheinlichkeit",
                     geoJsonFeatures: [],
+                    geoJsonParcelFeatures: [],
                     values: undefined
                 },
                 groundWaterMin: {
@@ -71,6 +72,7 @@ export default {
                     geometryName: "geom",
                     propertyToUse: "klasse_in_m_unter_gok",
                     geoJsonFeatures: [],
+                    geoJsonParcelFeatures: [],
                     values: undefined
                 },
                 hwrm_mittel: {
@@ -79,6 +81,7 @@ export default {
                     geometryName: "geom",
                     propertyToUse: "wassertiefe",
                     geoJsonFeatures: [],
+                    geoJsonParcelFeatures: [],
                     values: undefined
                 },
                 hwrm_selten: {
@@ -87,13 +90,15 @@ export default {
                     geometryName: "geom",
                     propertyToUse: "wassertiefe",
                     geoJsonFeatures: [],
+                    geoJsonParcelFeatures: [],
                     values: undefined
                 },
                 uesg: {
                     url: "https://api.hamburg.de/datasets/v1/uesg",
                     collection: "ueberschwemmungsgebiete",
                     geometryName: "geom",
-                    geoJsonFeatures: []
+                    geoJsonFeatures: [],
+                    geoJsonParcelFeatures: []
                 },
                 sri07_wassertiefe: {
                     type: "WCS",
@@ -117,7 +122,8 @@ export default {
             defaultValue: "",
             fileprefix: "",
             middleFloodDepth: "",
-            seldomFloodDepth: ""
+            seldomFloodDepth: "",
+            mapfishAttributes: {}
         };
     },
     computed: {
@@ -174,6 +180,108 @@ export default {
             });
 
             return names;
+        },
+        /**
+         * Computes whether minimal ground water is within 4m under ground on the whole parcel.
+         * @returns {Boolean} True, if there is ground water within 4m according to the data, false if not.
+         */
+        groundWaterWithin4m () {
+            if (!this.parcel[0]) {
+                return false;
+            }
+            const groupedParcelFeatures =
+                spatialOperations.calcArea(this.data.groundWaterMin.geoJsonParcelFeatures ?? [], this.parcel[0], "klasse_in_m_unter_gok");
+
+            return groupedParcelFeatures?.["0,0 bis 1,0_area"] > 0
+                || groupedParcelFeatures?.["1,0 bis 2,0_area"] > 0
+                || groupedParcelFeatures?.["2,0 bis 3,0_area"] > 0
+                || groupedParcelFeatures?.["3,0 bis 4,0_area"] > 0;
+        },
+        /**
+         * Gets a table containing the infiltration classes and their values on the parcel.
+         * @returns {String[][]} An array with [classname, value] entries.
+         */
+        infiltrationTableParcel () {
+            const groupedParcelFeatures = this.parcel[0]
+                ? spatialOperations.calcArea(this.data.infiltration.geoJsonParcelFeatures ?? [], this.parcel[0], "versickerungswahrscheinlichkeit")
+                : undefined;
+
+            return [
+                ["möglich", groupedParcelFeatures?.möglich_percent ?? "0"],
+                ["wahrscheinlich", groupedParcelFeatures?.wahrscheinlich_percent ?? "0"],
+                ["eingeschränkt", groupedParcelFeatures?.eingeschränkt_percent ?? "0"],
+                ["unwahrscheinlich", groupedParcelFeatures?.unwahrscheinlich_percent ?? "0"]
+            ];
+        },
+        /**
+         * Gets a table containing the infiltration classes and their values on the unbuilt area.
+         * @returns {String[][]} An array with [classname, value] entries.
+         */
+        infiltrationTableUnbuilt () {
+            return [
+                ["möglich", this.data.infiltration.values?.möglich_percent ?? "0"],
+                ["wahrscheinlich", this.data.infiltration.values?.wahrscheinlich_percent ?? "0"],
+                ["eingeschränkt", this.data.infiltration.values?.eingeschränkt_percent ?? "0"],
+                ["unwahrscheinlich", this.data.infiltration.values?.unwahrscheinlich_percent ?? "0"]
+            ];
+        },
+        /**
+         * Computes whether infiltration is at least likely on the parcel
+         * @returns {Boolean} True if there is a non-zero value for möglich or wahrscheinlich in the corresponding table, false if not.
+         */
+        infiltrationLikelyParcel () {
+            return this.infiltrationTableParcel
+                .filter(row => row[0] === "möglich" || row[0] === "wahrscheinlich")
+                .some(row => row[1] !== "0");
+        },
+        /**
+         * Computes whether infiltration is at least likely on the unbuilt area
+         * @returns {Boolean} True if there is a non-zero value for möglich or wahrscheinlich in the corresponding table, false if not.
+         */
+        infiltrationLikelyUnbuilt () {
+            return this.infiltrationTableUnbuilt
+                .filter(row => row[0] === "möglich" || row[0] === "wahrscheinlich")
+                .some(row => row[1] !== "0");
+        },
+        /**
+         * Computes whether the parcel is in an ÜSG area
+         * @returns {Boolean} True if there are ÜSG features on the parcel, false if not.
+         */
+        isParcelInUesg () {
+            return this.data.uesg.geoJsonParcelFeatures.length > 0;
+        },
+        /**
+         * Computes whether there is flooding around the building in case of SRI 7 rain.
+         * @returns {Boolean} True if the water depth is greater than zero, false if not.
+         */
+        floodingInSri07 () {
+            return this.data.sri07_wassertiefe.value?.properties?.value > 0;
+        },
+        /**
+         * Computes whether there is flooding around the building in case of SRI 12 rain.
+         * @returns {Boolean} True if the water depth is greater than zero, false if not.
+         */
+        floodingInSri12 () {
+            return this.data.sri07_wassertiefe.value?.properties?.value > 0;
+        },
+        /**
+         * Gets the pages that depend on the data.
+         * @returns {Object} An object with page names as keys and true or false as values.
+         */
+        pageNamesFromData () {
+            return {
+                "K2": this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth,
+                "A2": this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth,
+                "K3": this.groundWaterWithin4m,
+                "A3_ja": this.groundWaterWithin4m,
+                "A3_wn": this.groundWaterWithin4m,
+                "A4_Neubau": this.infiltrationLikelyParcel,
+                "A4_Bestand": this.infiltrationLikelyUnbuilt,
+                "A1_SRI12_ja": this.floodingInSri12,
+                "A1_SRI12_nein": !this.floodingInSri12,
+                "A1_SRI7_ja": this.floodingInSri07 && !this.floodingInSri12,
+                "A1_SRI7_nein": !this.floodingInSri07
+            };
         },
 
         /**
@@ -329,16 +437,15 @@ export default {
 
             this.layer.getLayerSource().clear();
             this.parcel = await this.fetchFeatures(addressPointWGS8, "Flurstueck", this.alkisBaseUrl, "geometrie", true);
-            this.buildingsByAddress = buffer(await this.fetchFeatures(addressPointWGS8, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie", true));
+            this.buildingsByAddress = spatialOperations.buffer(await this.fetchFeatures(addressPointWGS8, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie", true));
             parcelGeometry.setCoordinates(this.parcel[0].geometry.coordinates);
-            this.buildings = buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"));
+            this.buildings = spatialOperations.buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"));
 
             // @TODO Die zurückgelieferte Werte aus beiden Funktionen werden in CreateMapfishDialog verwendet.
             this.getMapConf(this.parcel[0], this.config?.specification);
             this.getLegends(this.config?.legends);
 
             this.addDataByParcel(this.data, this.parcel[0], parcelGeometry);
-            // console.log(this.data);
         },
 
         /**
@@ -413,11 +520,11 @@ export default {
          * @returns {void}
          */
         async addDataByParcel (data, parcelFeature, parcelGeometry) {
-            const unbuiltArea = getUnbuiltArea(parcelFeature, this.buildingsToUse);
+            const unbuiltArea = spatialOperations.getUnbuiltArea(parcelFeature, this.buildingsToUse);
 
             for (const key of Object.keys(data)) {
                 if (data[key].type === "WCS") {
-                    this.getHeavyRainPointForPolygons(data[key].baseURL, data[key].coverageId, bbox(buffer([parcelFeature])[0]), data[key].epsg, this.buildingsToUse)
+                    this.getHeavyRainPointForPolygons(data[key].baseURL, data[key].coverageId, bbox(spatialOperations.buffer([parcelFeature])[0]), data[key].epsg, this.buildingsToUse)
                         .then(point => {
                             data[key].value = point;
                         }).catch(error => console.error(error));
@@ -425,9 +532,10 @@ export default {
                 else {
                     this.fetchFeatures(parcelGeometry, data[key].collection, data[key].url, data[key].geometryName)
                         .then(geoJsonList => {
-                            data[key].geoJsonFeatures = intersect(geoJsonList, unbuiltArea);
+                            data[key].geoJsonParcelFeatures = spatialOperations.intersect(geoJsonList, parcelFeature);
+                            data[key].geoJsonFeatures = spatialOperations.intersect(geoJsonList, unbuiltArea);
                             if (data[key].propertyToUse) {
-                                data[key].values = calcArea(data[key].geoJsonFeatures, unbuiltArea, data[key].propertyToUse);
+                                data[key].values = spatialOperations.calcArea(data[key].geoJsonFeatures, unbuiltArea, data[key].propertyToUse);
                             }
                         });
                 }
@@ -473,7 +581,7 @@ export default {
         async getHeavyRainPointForPolygons (baseUrl, coverageId, boundingBox, epsg, polygons) {
             return new Promise((resolve, reject) => {
                 getWCSFeatures.getWCSPoints(baseUrl, coverageId, boundingBox, epsg).then(points => {
-                    resolve(findPointInPolygonsByHighestValue(points, polygons));
+                    resolve(spatialOperations.findPointInPolygonsByHighestValue(points, polygons));
                 }).catch(error => reject(error));
             });
         },
@@ -524,6 +632,8 @@ export default {
             setTimeout(() => {
                 // TODO: create mapfishDialog
                 const mapfishDialog = {"uniqueIdList": [], "visibleLayerIds": ["19969"], "layout": "A4 Hochformat", "attributes": {"title": "Mein Titel", "map": {"dpi": 200, "projection": "EPSG:25832", "center": [565874, 5934140], "scale": 1000000, "layers": [{"baseURL": "https://geodienste.hamburg.de/HH_WMS_Cache_Stadtplan", "opacity": 1, "type": "tiledwms", "layers": ["stadtplan"], "imageFormat": "image/png", "customParams": {"TRANSPARENT": "true", "DPI": 200}, "tileSize": [512, 512]}]}, "metadata": true, "scale": "1:1000000", "showLegend": false, "legend": {}}, "outputFilename": "Ausdruck", "outputFormat": "pdf"};
+
+                Object.assign(mapfishDialog.attributes, this.mapfishAttributes);
 
                 this.startPrint(this.printUrl, "pdf", this.pdfAppId, mapfishDialog, (url, payload) => {
                     return axios.post(url, payload);
@@ -624,29 +734,37 @@ export default {
          * @returns {void}
          */
         preparePDFPageNames () {
-            const pages = [];
+            const pages = {};
 
             this.pdfPages.forEach((page) => {
                 Object.keys(page).forEach(val => {
-                    // TODO: Compare with data
-                    if (this.pageNamesFromQuestions[val] === page[val].question) {
-                        pages[val] = true;
-                    }
-                    else {
-                        pages[val] = false;
-                    }
+                    pages[val] = this.pageNamesFromQuestions[val] === page[val].question
+                        && (this.pageNamesFromData[val] || !page[val].data);
                 });
             });
-            // this.createJson(pages);
+            this.createJson(pages);
         },
         /**
-         * @TODO
-         * @param {Array} pages
-         * @returns {void}
-         */
-        /* createJson (pages) {
-            console.log(pages);
-        }*/
+        * @param {Array} pages
+        * @returns {void}
+        */
+        createJson (pages) {
+            if (typeof pages !== "object" || pages === null) {
+                return;
+            }
+
+            const attributes = {...pages};
+
+            attributes.adresse = this.address;
+            attributes.datum = new Date().toLocaleDateString();
+            attributes["K2.uesg"] = this.isParcelInUesg;
+            // Bei den folgenden Attributen kommt eine Fehlermeldung, dass sie noch nicht konfiguriert sind:
+            // attributes["K2.mittleres.gebaeude"] = [["Gebäude 1", this.middleFloodDepth]];
+            // attributes["K2.seltenes.gebaeude"] = [["Gebäude 1", this.seldomFloodDepth]];
+            // attributes["K4.tabelle"] = this.pageNamesFromQuestion?.A4_Bestand ? this.infiltrationTableUnbuilt : this.infiltrationTableParcel;
+
+            this.mapfishAttributes = attributes;
+        },
 
         /**
          * Starts the print process. Creates a print job then asks for the status.
@@ -717,11 +835,11 @@ export default {
                 return "";
             }
 
-            if (!Array.isArray(data[type].geoJsonFeatures) || !data[type].geoJsonFeatures.length) {
+            if (!Array.isArray(data[type].geoJsonParcelFeatures) || !data[type].geoJsonParcelFeatures.length) {
                 return "";
             }
 
-            const features = data[type].geoJsonFeatures,
+            const features = spatialOperations.intersect(data[type].geoJsonParcelFeatures, this.buildingsToUse[0]),
                 property = data[type].propertyToUse,
                 floodDepth = [];
             let deepestFloodDepth = "";

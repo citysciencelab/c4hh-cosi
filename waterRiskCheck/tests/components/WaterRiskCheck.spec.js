@@ -6,6 +6,7 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import sinon from "sinon";
 import VectorLayer from "ol/layer/Vector.js";
+import spatialOperations from "../../js/spatialOperations";
 
 config.global.mocks.$t = key => key;
 /**
@@ -364,6 +365,130 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
             });
             expect(wrapper.vm.buildingsToUse).to.deep.equal([]);
         });
+        it("should return false for 'groundWaterWithin4m' by default", () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    },
+                    data: () => {
+                        return {parcel: [true]};
+                    }
+                });
+
+            sinon.stub(spatialOperations, "calcArea").returns({});
+            expect(wrapper.vm.groundWaterWithin4m).to.be.false;
+        });
+        it("should return true for 'groundWaterWithin4m' if such features exist", () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    },
+                    data: () => {
+                        return {parcel: [true]};
+                    }
+                });
+
+            sinon.stub(spatialOperations, "calcArea").returns(
+                {"2,0 bis 3,0_area": "1"}
+            );
+            expect(wrapper.vm.groundWaterWithin4m).to.be.true;
+        });
+        it("should return table with zeros for 'infiltrationTableParcel' by default", () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            expect(wrapper.vm.infiltrationTableParcel).to.deep.equal(
+                [
+                    ["möglich", "0"],
+                    ["wahrscheinlich", "0"],
+                    ["eingeschränkt", "0"],
+                    ["unwahrscheinlich", "0"]
+                ]
+            );
+        });
+        it("should return table with correct values for 'infiltrationTableParcel'", () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    },
+                    data: () => {
+                        return {parcel: [true]};
+                    }
+                });
+
+            sinon.stub(spatialOperations, "calcArea").returns(
+                {
+                    "möglich_percent": "0,4",
+                    "wahrscheinlich_percent": "0,3",
+                    "eingeschränkt_percent": "0,2",
+                    "unwahrscheinlich_percent": "0,1"
+                }
+            );
+
+            expect(wrapper.vm.infiltrationTableParcel).to.deep.equal(
+                [
+                    ["möglich", "0,4"],
+                    ["wahrscheinlich", "0,3"],
+                    ["eingeschränkt", "0,2"],
+                    ["unwahrscheinlich", "0,1"]
+                ]
+            );
+        });
+        it("should return table with zeros for 'infiltrationTableUnbuilt' by default", () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            expect(wrapper.vm.infiltrationTableUnbuilt).to.deep.equal(
+                [
+                    ["möglich", "0"],
+                    ["wahrscheinlich", "0"],
+                    ["eingeschränkt", "0"],
+                    ["unwahrscheinlich", "0"]
+                ]
+            );
+        });
+        it("should return table with correct values for 'infiltrationTableUnbuilt'", () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    },
+                    data: () => {
+                        return {
+                            data: {
+                                infiltration: {
+                                    values: {
+                                        "möglich_percent": "0,4",
+                                        "wahrscheinlich_percent": "0,3",
+                                        "eingeschränkt_percent": "0,2",
+                                        "unwahrscheinlich_percent": "0,1"
+                                    }
+                                }
+                            }
+                        };
+                    }
+                });
+
+            expect(wrapper.vm.infiltrationTableUnbuilt).to.deep.equal(
+                [
+                    ["möglich", "0,4"],
+                    ["wahrscheinlich", "0,3"],
+                    ["eingeschränkt", "0,2"],
+                    ["unwahrscheinlich", "0,1"]
+                ]
+            );
+        });
     });
 
     describe("Hook", () => {
@@ -555,7 +680,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                     });
 
                 expect(wrapper.vm.getDeepFloodDepth({"hwrm_mittel": {}})).to.equal("");
-                expect(wrapper.vm.getDeepFloodDepth({"hwrm_mittel": {"geoJsonFeatures": []}})).to.equal("");
+                expect(wrapper.vm.getDeepFloodDepth({"hwrm_mittel": {"geoJsonParcelFeatures": []}})).to.equal("");
             });
 
             it("should return the deepest depth", async () => {
@@ -566,28 +691,34 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                         }
                     });
 
-                expect(wrapper.vm.getDeepFloodDepth({
-                    "hwrm_mittel": {
-                        "propertyToUse": "wassertiefe",
-                        "geoJsonFeatures": [
-                            {
-                                "properties": {
-                                    "wassertiefe": "0 - 0,5m"
-                                }
-                            },
-                            {
-                                "properties": {
-                                    "wassertiefe": "0,5 - 1m"
-                                }
-                            },
-                            {
-                                "properties": {
-                                    "wassertiefe": "1 - 2m"
-                                }
+                sinon.stub(spatialOperations, "intersect").returns(
+                    [
+                        {
+                            "properties": {
+                                "wassertiefe": "0 - 0,5m"
                             }
-                        ]
-                    }
-                }, "hwrm_mittel")).to.equal("1 - 2m");
+                        },
+                        {
+                            "properties": {
+                                "wassertiefe": "0,5 - 1m"
+                            }
+                        },
+                        {
+                            "properties": {
+                                "wassertiefe": "1 - 2m"
+                            }
+                        }
+                    ]
+                );
+                expect(wrapper.vm.getDeepFloodDepth(
+                    {
+                        "hwrm_mittel": {
+                            "propertyToUse": "wassertiefe",
+                            "geoJsonParcelFeatures": [null]
+                        }
+                    },
+                    "hwrm_mittel"
+                )).to.equal("1 - 2m");
             });
         });
 

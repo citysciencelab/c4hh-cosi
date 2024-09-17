@@ -1,5 +1,6 @@
 import {expect} from "chai";
-import {getUnbuiltArea, buffer, findPointInPolygonsByHighestValue} from "../../js/spatialOperations.js";
+import spatialOperations from "../../js/spatialOperations.js";
+
 
 const buildingFeatures = [
         {
@@ -272,12 +273,12 @@ const buildingFeatures = [
 describe("addons/waterRiskCheck/js/spatialOperations.js", () => {
     describe("getUnbuiltArea", () => {
         it("should return the passed parcelFeature", () => {
-            const unbuiltArea = getUnbuiltArea(parcelFeature, []);
+            const unbuiltArea = spatialOperations.getUnbuiltArea(parcelFeature, []);
 
             expect(unbuiltArea).to.deep.equal(parcelFeature);
         });
         it("should not return the passed parcelFeature", () => {
-            const unbuiltArea = getUnbuiltArea(parcelFeature, buildingFeatures);
+            const unbuiltArea = spatialOperations.getUnbuiltArea(parcelFeature, buildingFeatures);
 
             expect(unbuiltArea).to.not.equal(parcelFeature);
         });
@@ -285,19 +286,19 @@ describe("addons/waterRiskCheck/js/spatialOperations.js", () => {
 
     describe("buffer", () => {
         it("should return a different geometry", () => {
-            const bufferedFeatures = buffer(buildingFeatures, 2);
+            const bufferedFeatures = spatialOperations.buffer(buildingFeatures, 2);
 
             expect(bufferedFeatures[0].geometry.coordinates).to.not.equal(buildingFeatures[0].geometry.coordinates);
         });
 
         it("should return an empty array", () => {
-            const bufferedPolygon = buffer([], 5);
+            const bufferedPolygon = spatialOperations.buffer([], 5);
 
             expect(bufferedPolygon).to.be.an("array").an.to.be.empty;
         });
 
         it("should return the passed geometry if radius is 0", () => {
-            const bufferedFeatures = buffer(buildingFeatures, 0);
+            const bufferedFeatures = spatialOperations.buffer(buildingFeatures, 0);
 
             expect(bufferedFeatures[0].geometry).to.deep.equal(buildingFeatures[0].geometry);
         });
@@ -305,11 +306,11 @@ describe("addons/waterRiskCheck/js/spatialOperations.js", () => {
 
     describe("findPointInPolygonsByHighestValue", () => {
         it("should return the first param if the first param is not an array", () => {
-            expect(findPointInPolygonsByHighestValue()).to.be.undefined;
-            expect(findPointInPolygonsByHighestValue(null)).to.be.null;
+            expect(spatialOperations.findPointInPolygonsByHighestValue()).to.be.undefined;
+            expect(spatialOperations.findPointInPolygonsByHighestValue(null)).to.be.null;
         });
         it("should return the first param if the second is not an array", () => {
-            expect(findPointInPolygonsByHighestValue([])).to.be.an("array").that.is.empty;
+            expect(spatialOperations.findPointInPolygonsByHighestValue([])).to.be.an("array").that.is.empty;
         });
     });
 });
