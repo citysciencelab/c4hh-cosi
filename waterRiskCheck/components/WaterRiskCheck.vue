@@ -123,7 +123,7 @@ export default {
             fileprefix: "",
             middleFloodDepth: "",
             seldomFloodDepth: "",
-            mapfishAttributes: {}
+            mapfishData: {}
         };
     },
     computed: {
@@ -329,6 +329,10 @@ export default {
                 this.seldomFloodDepth = this.getDeepFloodDepth(val, "hwrm_selten");
             },
             deep: true
+        },
+
+        mapfishData (val) {
+            this.finishForm(val);
         }
     },
     created () {
@@ -441,67 +445,68 @@ export default {
             parcelGeometry.setCoordinates([spatialOperations.buffer(this.parcel, -1)[0].geometry.coordinates]);
             this.buildings = spatialOperations.buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"), 2);
 
-            // @TODO Die zurückgelieferte Werte aus beiden Funktionen werden in CreateMapfishDialog verwendet.
-            this.getMapConf(this.parcel[0], this.config?.specification);
-            this.getLegends(this.config?.legends);
-
             this.addDataByParcel(this.data, this.parcel[0], parcelGeometry);
         },
 
         /**
-         * Returns an array of the legends for Mapfish
-         * @param {Object} legends - the legends from the config
-         * @return {Array} - the array of the legends for Mapfish
+         * Returns the legends for Mapfish
+         * @param {Object} legends - The legends from the config
+         * @return {Object} - The legends for Mapfish
          */
         getLegends (legends) {
-            const legendArr = [];
+            const legendsObj = {};
 
             if (!isObject(legends)) {
                 console.error("Wrong config for legends");
-                return [];
+                return {};
             }
             if (Object.keys(legends).length > 0) {
                 Object.keys(legends).forEach(tags => {
-                    Object.keys(legends[tags]).forEach(legend => {
-                        legendArr[tags + "." + legend] = legends[tags][legend].content;
-                    });
+                    if (Array.isArray(Object.keys(legends[tags]))) {
+                        Object.keys(legends[tags]).forEach(legend => {
+                            legendsObj[tags + "_" + legend] = legends[tags][legend].content;
+                        });
+                    }
                 });
             }
 
-            return legendArr;
+            return legendsObj;
         },
 
         /**
-         * Returns an array of map configuration for Mapfish
+         * Returns the map configuration for Mapfish
          * @param {Object} parcel - the Parcel Object
          * @param {Object} specification - The specification object from the config
-         * @return {Array} - The array of the map configurations in object
+         * @return {Object} - The map configurations
          */
         getMapConf (parcel, specification) {
-            const mapConfArr = [];
+            const mapConf = {};
 
             if (!isObject(parcel) || Object.keys(parcel).length === 0 || !isObject(specification) || !Object.prototype.hasOwnProperty.call(specification, "cards")) {
                 console.error("Wrong configuration or parcel data!");
-                return [];
+                return {};
             }
 
             try {
                 const
                     cards = specification.cards,
-                    feature = new GeoJSON().readFeature(parcel),
                     mapProjection = "EPSG:25832",
+                    feature = new GeoJSON().readFeature(parcel, {
+                        dataProjection: "EPSG:4326",
+                        featureProjection: mapProjection
+                    }),
                     extent = feature.getGeometry().getExtent();
 
                 if (Object.keys(cards).length > 0) {
                     Object.keys(cards).forEach(card => {
                         if (cards[card].type === "mapProportion") {
-                            mapConfArr[card] = getProportionMap(feature, extent, mapProjection, cards[card].style, cards[card].proportion, cards[card].layerIds, cards[card].dpi);
+                            mapConf[card] = getProportionMap(feature, extent, mapProjection, cards[card].style, cards[card].proportion, cards[card].layerIds, cards[card].dpi);
                         }
                         else if (cards[card].type === "mapWalker") {
-                            mapConfArr[card] = getWalkerMap(feature, bbox(parcel), mapProjection, cards[card].style, cards[card].scale, cards[card].layerIds, cards[card].dpi);
+                            mapConf[card] = getWalkerMap(feature, bbox(parcel), mapProjection, cards[card].style, cards[card].scale, cards[card].layerIds, cards[card].dpi);
                         }
                         else if (cards[card].type === "mapFixed") {
-                            mapConfArr[card] = getFixedMap(bbox(parcel), mapProjection, cards[card].style, cards[card].bbox, cards[card].layerIds, cards[card].dpi);
+                            mapConf[card] = getFixedMap(bbox(parcel), mapProjection, cards[card].style, cards[card].bbox, cards[card].layerIds, cards[card].dpi);
                         }
                     });
                 }
@@ -510,7 +515,7 @@ export default {
                 console.warn(error);
             }
 
-            return mapConfArr;
+            return mapConf;
         },
         /**
          * Adds the passed spatial data for the parcel.
@@ -622,32 +627,85 @@ export default {
             this.currentQuestionIdx += 1;
         },
         /**
+         * Creates the mapfish dialog and sets mapfishData
+         * @return {void}
+         */
+        createMapfishDialog () {
+            const mapConf = this.getMapConf(this.parcel[0], this.config?.specification),
+                legends = this.getLegends(this.config?.legends),
+                pdfPageNames = this.preparePDFPageNames(this.pdfPages),
+                attributes = this.getAttributes(mapConf, legends, pdfPageNames);
+
+            this.mapfishData = {
+                "layout": "A4 Hochformat",
+                attributes,
+                "outputFilename": "Ausdruck",
+                "uniqueIdList": [],
+                "visibleLayerIds": ["19969"],
+                "outputFormat": "pdf"
+            };
+        },
+        /**
          * Finishes the form.
+         * @param {Object} mapfishDialog - The mapfish dialog
          * @returns {void}
          */
-        finishForm () {
+        finishForm (mapfishDialog) {
             this.updateCalculatedPercentage("finish");
-            this.preparePDFPageNames();
             this.isCreatingPDF = true;
             setTimeout(() => {
-                // TODO: create mapfishDialog
-                const mapfishDialog = {"uniqueIdList": [], "visibleLayerIds": ["19969"], "layout": "A4 Hochformat", "attributes": {"title": "Mein Titel", "map": {"dpi": 200, "projection": "EPSG:25832", "center": [565874, 5934140], "scale": 1000000, "layers": [{"baseURL": "https://geodienste.hamburg.de/HH_WMS_Cache_Stadtplan", "opacity": 1, "type": "tiledwms", "layers": ["stadtplan"], "imageFormat": "image/png", "customParams": {"TRANSPARENT": "true", "DPI": 200}, "tileSize": [512, 512]}]}, "metadata": true, "scale": "1:1000000", "showLegend": false, "legend": {}}, "outputFilename": "Ausdruck", "outputFormat": "pdf"};
-
-                Object.assign(mapfishDialog.attributes, this.mapfishAttributes);
-
-                this.startPrint(this.printUrl, "pdf", this.pdfAppId, mapfishDialog, (url, payload) => {
-                    return axios.post(url, payload);
-                },
-                error => {
-                    console.error(error);
-                },
-                url => {
-                    this.downloadLink = url;
-                    this.isCreatingPDF = false;
-                    this.formStarted = false;
-                    this.formFinished = true;
-                });
+                this.startPrint(this.printUrl, "pdf",
+                    this.pdfAppId,
+                    mapfishDialog,
+                    (url, payload) => {
+                        return axios.post(url, payload);
+                    },
+                    error => {
+                        console.error(error);
+                    },
+                    url => {
+                        this.downloadLink = url;
+                        this.isCreatingPDF = false;
+                        this.formStarted = false;
+                        this.formFinished = true;
+                    });
             }, 2000);
+        },
+        /**
+         * Returns the attributes needed for Mapfish dialog
+         * @param {Object} mapConf - The map configuration
+         * @param {Object} legends - The legends
+         * @param {Object} pdfPageNames - The names of the pages to be printed
+         * @return {Object} Attributes - The attribute for Mapfish dialog
+         */
+        getAttributes (mapConf, legends, pdfPageNames) {
+            if (!isObject(mapConf) || !isObject(legends) || !isObject(pdfPageNames)) {
+                return {};
+            }
+
+            const attributes = {
+                "adresse": this.address,
+                "datum": new Date().toLocaleDateString(),
+                "K1.legend": legends.starkregengefahrenkarte_karte,
+                "K1.außergewoehnliches.uebersichtskarte": mapConf.starkregengefahrenkarte_aussergewoehnlich,
+                "K1.extremes.uebersichtskarte": mapConf.starkregengefahrenkarte_extrem,
+                "K2.uesg": this.isParcelInUesg,
+                "K2.mittleres.gebaeude": {"geb1": this.middleFloodDepth},
+                "K2.mittleres.uebersichtskarte": mapConf.hochwasser_binnenhw_mittleres_ereignis,
+                "K2.seltenes.gebaeude": {"geb1": this.seldomFloodDepth},
+                "K2.seltenes.uebersichtskarte": mapConf.hochwasser_binnenhw_seltenes_ereignis,
+                "K2.legend": legends.hochwasser_binnenhw,
+                "K3.uebersichtskarte": mapConf.grundwasser_flurabstand_min,
+                "K3.gebaeude": {"geb1": "undefined"}, // @TODO Daten müssen gesetzt werden
+                "K3.legend": legends.grundwasser_flurabstand_min,
+                "K4.uebersichtskarte": mapConf.versickerungspotential,
+                "K4.legend": legends.versickerungspotential_karte,
+                "K4.tabelle": this.pageNamesFromQuestions?.A4_Bestand ? this.infiltrationTableUnbuilt : this.infiltrationTableParcel
+            };
+
+            Object.assign(attributes, pdfPageNames);
+
+            return attributes;
         },
         /**
          * Toggles the infoBoxOpen flag.
@@ -731,39 +789,28 @@ export default {
         },
         /**
          * Prepare pdf pages depending on the questions and data evaluated.
-         * @returns {void}
+         * @param {Object} pdfPages - pdf pages from the config
+         * @returns {Object[]} Returns a list of page name objects
          */
-        preparePDFPageNames () {
-            const pages = {};
+        preparePDFPageNames (pdfPages) {
+            const pageNames = {};
 
-            this.pdfPages.forEach((page) => {
+            pdfPages?.forEach((page) => {
                 Object.keys(page).forEach(val => {
-                    pages[val] = this.pageNamesFromQuestions[val] === page[val].question
+                    pageNames[val] = this.pageNamesFromQuestions[val] === page[val].question
                         && (this.pageNamesFromData[val] || !page[val].data);
                 });
             });
-            this.createJson(pages);
-        },
-        /**
-        * @param {Array} pages
-        * @returns {void}
-        */
-        createJson (pages) {
-            if (typeof pages !== "object" || pages === null) {
-                return;
+
+            if (Array.isArray(this.alwaysShow) && this.alwaysShow.length > 0) {
+                this.alwaysShow.forEach(page => {
+                    Object.keys(page).forEach(key => {
+                        pageNames[key] = true;
+                    });
+                });
             }
 
-            const attributes = {...pages};
-
-            attributes.adresse = this.address;
-            attributes.datum = new Date().toLocaleDateString();
-            attributes["K2.uesg"] = this.isParcelInUesg;
-            // Bei den folgenden Attributen kommt eine Fehlermeldung, dass sie noch nicht konfiguriert sind:
-            // attributes["K2.mittleres.gebaeude"] = [["Gebäude 1", this.middleFloodDepth]];
-            // attributes["K2.seltenes.gebaeude"] = [["Gebäude 1", this.seldomFloodDepth]];
-            // attributes["K4.tabelle"] = this.pageNamesFromQuestion?.A4_Bestand ? this.infiltrationTableUnbuilt : this.infiltrationTableParcel;
-
-            this.mapfishAttributes = attributes;
+            return pageNames;
         },
 
         /**
@@ -1091,7 +1138,7 @@ export default {
                         :aria-label="$t('additional:modules.waterRiskCheck.finishButton')"
                         type="button"
                         :text="$t('additional:modules.waterRiskCheck.finishButton')"
-                        :interaction="finishForm"
+                        :interaction="createMapfishDialog"
                         :disabled="typeof questions[currentQuestionIdx].selectedAnswer === 'undefined' || isCreatingPDF"
                         :spinner-trigger="isCreatingPDF"
                         icon="bi-arrow-right-circle-fill"

@@ -723,7 +723,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
         });
 
         describe("getLegends", () => {
-            it("Should return an empty array, if the given parameter is not an object", () => {
+            it("Should return an empty object, if the given parameter is not an object", () => {
                 const store = factory.createVuexStore(),
                     wrapper = shallowMount(WaterRiskCheck, {
                         global: {
@@ -731,15 +731,15 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                         }
                     });
 
-                expect(wrapper.vm.getLegends(undefined)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getLegends(null)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getLegends(1234)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getLegends(true)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getLegends(false)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getLegends([])).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getLegends("")).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getLegends(undefined)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getLegends(null)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getLegends(1234)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getLegends(true)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getLegends(false)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getLegends([])).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getLegends("")).to.be.an("object").and.to.be.empty;
             });
-            it("Should return an empty array, if the given parameter is an empty object", () => {
+            it("Should return an empty object, if the given parameter is an empty object", () => {
                 const store = factory.createVuexStore(),
                     wrapper = shallowMount(WaterRiskCheck, {
                         global: {
@@ -747,9 +747,9 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                         }
                     });
 
-                expect(wrapper.vm.getLegends({})).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getLegends({})).to.be.an("object").and.to.be.empty;
             });
-            it("Should return an correct array", () => {
+            it("Should return an correct object", () => {
                 const store = factory.createVuexStore(),
                     wrapper = shallowMount(WaterRiskCheck, {
                         global: {
@@ -778,19 +778,19 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                             }
                         }
                     },
-                    expected = [];
+                    expected = {};
 
-                expected["strassenverkehr.legend_tag"] = "https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=strassenverkehr_tag_abend_nacht_2022";
-                expected["strassenverkehr.legend_nacht"] = "https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=strassenverkehr_nacht_2022";
-                expected["starkregen.legend_fliesspfeile"] = "https://geodienste.hamburg.de/HH_WMS_Starkregenhinweiskarte?language=ger&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=fliesswege_und_pfeile&format=image/png&STYLE=default";
-                expected["starkregen.legend_senktiefen"] = "https://geodienste.hamburg.de/HH_WMS_Starkregenhinweiskarte?language=ger&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=senkentiefen&format=image/png&STYLE=default";
+                expected.strassenverkehr_legend_tag = "https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=strassenverkehr_tag_abend_nacht_2022";
+                expected.strassenverkehr_legend_nacht = "https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=strassenverkehr_nacht_2022";
+                expected.starkregen_legend_fliesspfeile = "https://geodienste.hamburg.de/HH_WMS_Starkregenhinweiskarte?language=ger&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=fliesswege_und_pfeile&format=image/png&STYLE=default";
+                expected.starkregen_legend_senktiefen = "https://geodienste.hamburg.de/HH_WMS_Starkregenhinweiskarte?language=ger&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=senkentiefen&format=image/png&STYLE=default";
 
                 expect(wrapper.vm.getLegends(legends)).to.deep.equal(expected);
             });
         });
 
         describe("getMapConf", () => {
-            it("Should return an empty array, if the given parameter is not an object", () => {
+            it("Should return an empty object, if the given parameter is not an object", () => {
                 const store = factory.createVuexStore(),
                     wrapper = shallowMount(WaterRiskCheck, {
                         global: {
@@ -798,15 +798,15 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                         }
                     });
 
-                expect(wrapper.vm.getMapConf(undefined)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getMapConf(null)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getMapConf(1234)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getMapConf(true)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getMapConf(false)).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getMapConf([])).to.be.an("array").and.to.be.empty;
-                expect(wrapper.vm.getMapConf("")).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(undefined)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(null)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(1234)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(true)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getMapConf(false)).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getMapConf([])).to.be.an("object").and.to.be.empty;
+                expect(wrapper.vm.getMapConf("")).to.be.an("object").and.to.be.empty;
             });
-            it("Should return an empty array, if the given parameter is an empty object", () => {
+            it("Should return an empty object, if the given parameter is an empty object", () => {
                 const store = factory.createVuexStore(),
                     wrapper = shallowMount(WaterRiskCheck, {
                         global: {
@@ -814,9 +814,9 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                         }
                     });
 
-                expect(wrapper.vm.getMapConf({}, {})).to.be.an("array").and.to.be.empty;
+                expect(wrapper.vm.getMapConf({}, {})).to.be.an("object").and.to.be.empty;
             });
-            it("Should return an correct array", () => {
+            it("Should return an correct object", () => {
                 const store = factory.createVuexStore(),
                     wrapper = shallowMount(WaterRiskCheck, {
                         global: {
@@ -854,10 +854,10 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                     ]
                                 },
                                 "bbox": [
-                                    10.023374939929553,
-                                    53.5356067536243,
-                                    10.023374939929553,
-                                    53.5356067536243
+                                    567825.083654769,
+                                    5932342.216619911,
+                                    567825.083654769,
+                                    5932342.216619911
                                 ],
                                 "layerIds": [
                                     "1886"
@@ -927,10 +927,10 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                         "properties": {"EPSG": "25832"}
                     },
                     bbox = [
-                        10.023374939929553,
-                        53.5356067536243,
-                        10.023374939929553,
-                        53.5356067536243
+                        567825.083654769,
+                        5932342.216619911,
+                        567825.083654769,
+                        5932342.216619911
                     ],
                     result = wrapper.vm.getMapConf(parcel, specification);
 
