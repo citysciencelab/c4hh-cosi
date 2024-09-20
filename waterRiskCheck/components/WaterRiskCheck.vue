@@ -1112,6 +1112,8 @@ export default {
                 <div>
                     <h5>{{ $t('additional:modules.waterRiskCheck.downloadPageTitle') }}</h5>
                     <p>{{ $t('additional:modules.waterRiskCheck.downloadInformationText') }}</p>
+                    <br>
+                    <p>{{ $t('additional:modules.waterRiskCheck.downloadInformationTextRestart') }}</p>
                     <div
                         ref="downloadSection"
                         class="mt-3"

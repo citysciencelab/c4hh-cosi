@@ -2,7 +2,7 @@
   "modules": {
     "waterRiskCheck": {
       "description": "Get information and recommendations for your address",
-      "title": "Water risk check",
+      "title": "Flood prevention guide",
       "generelExplenationText": "The flood prevention guide provides you with recommendations on the individual risk situation and suggested measures for your property. The guide combines our specialist knowledge, water maps and your answers in a short questionnaire to create a customized recommendation. This document also tells you what to do in an emergency. The guide begins by entering your address in the search field on the left-hand side. The specific entry enables a more precise evaluation of the specialist cards. The short questionnaire then starts with four questions.",
       "informationTextIconLabel": "Note",
       "informationText": "The questionnaire is aimed exclusively at authorized users. You are authorized if you live at the address entered or are the owner of the property in question. With \"Start questionnaire\" you confirm that you are authorized for the requested address.",
@@ -16,7 +16,8 @@
       "download": "View my report",
       "themeProgressLabel": "Topic {{currentIdx}} from {{maxLength}}",
       "downloadPageTitle": "Download of the results",
-      "downloadInformationText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et",
+      "downloadInformationText": "Click on the blue button to download your personal results as a PDF. A PDF reader program is required to view this file.",
+      "downloadInformationTextRestart": "If you would like to restart the questionnaire, please click on the button below.",
       "toolIconAltText": "Flood prevention guide logo",
       "districtLabel": "District:",
       "parcelLabel": "Parcel:",
