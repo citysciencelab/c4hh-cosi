@@ -438,8 +438,8 @@ export default {
             this.layer.getLayerSource().clear();
             this.parcel = await this.fetchFeatures(addressPointWGS8, "Flurstueck", this.alkisBaseUrl, "geometrie", true);
             this.buildingsByAddress = spatialOperations.buffer(await this.fetchFeatures(addressPointWGS8, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie", true));
-            parcelGeometry.setCoordinates(this.parcel[0].geometry.coordinates);
-            this.buildings = spatialOperations.buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"));
+            parcelGeometry.setCoordinates([spatialOperations.buffer(this.parcel, -1)[0].geometry.coordinates]);
+            this.buildings = spatialOperations.buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"), 2);
 
             // @TODO Die zurückgelieferte Werte aus beiden Funktionen werden in CreateMapfishDialog verwendet.
             this.getMapConf(this.parcel[0], this.config?.specification);
