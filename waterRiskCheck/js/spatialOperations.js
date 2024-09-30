@@ -64,7 +64,7 @@ function calcArea (features, feature, property) {
         groupedFeatures[key].forEach(groupedFeature => {
             groupedFeatures[key + "_area"] += turfArea(groupedFeature);
         });
-        groupedFeatures[key + "_percent"] = (groupedFeatures[key + "_area"] / totalArea * 100).toFixed(2);
+        groupedFeatures[key + "_percent"] = groupedFeatures[key + "_area"] / totalArea;
     });
     return groupedFeatures;
 }

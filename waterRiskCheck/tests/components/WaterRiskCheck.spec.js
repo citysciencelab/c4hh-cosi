@@ -395,7 +395,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
             );
             expect(wrapper.vm.groundWaterWithin4m).to.be.true;
         });
-        it("should return table with zeros for 'infiltrationTableParcel' by default", () => {
+        it("should return table with hyphens for 'infiltrationTableParcel' by default", () => {
             const store = factory.createVuexStore(),
                 wrapper = shallowMount(WaterRiskCheck, {
                     global: {
@@ -405,10 +405,10 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
 
             expect(wrapper.vm.infiltrationTableParcel).to.deep.equal(
                 [
-                    ["möglich", "0"],
-                    ["wahrscheinlich", "0"],
-                    ["eingeschränkt", "0"],
-                    ["unwahrscheinlich", "0"]
+                    ["möglich", "-"],
+                    ["wahrscheinlich", "-"],
+                    ["eingeschränkt", "-"],
+                    ["unwahrscheinlich", "-"]
                 ]
             );
         });
@@ -441,7 +441,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                 ]
             );
         });
-        it("should return table with zeros for 'infiltrationTableUnbuilt' by default", () => {
+        it("should return table with hyphens for 'infiltrationTableUnbuilt' by default", () => {
             const store = factory.createVuexStore(),
                 wrapper = shallowMount(WaterRiskCheck, {
                     global: {
@@ -451,10 +451,10 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
 
             expect(wrapper.vm.infiltrationTableUnbuilt).to.deep.equal(
                 [
-                    ["möglich", "0"],
-                    ["wahrscheinlich", "0"],
-                    ["eingeschränkt", "0"],
-                    ["unwahrscheinlich", "0"]
+                    ["möglich", "-"],
+                    ["wahrscheinlich", "-"],
+                    ["eingeschränkt", "-"],
+                    ["unwahrscheinlich", "-"]
                 ]
             );
         });
@@ -488,6 +488,31 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                     ["unwahrscheinlich", "0,1"]
                 ]
             );
+        });
+        it("should return correct minimum for minimalGroundWaterDistance", () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    },
+                    data: () => {
+                        return {
+                            parcel: [true],
+                            data: {
+                                groundWaterMin: {
+                                    propertyToUse: "wassertiefe",
+                                    geoJsonParcelFeatures: [
+                                        {properties: {wassertiefe: "2,0 bis 3,0"}},
+                                        {properties: {wassertiefe: "1,0 bis 2,0"}},
+                                        {properties: {wassertiefe: "3,0 bis 4,0"}}
+                                    ]
+                                }
+                            }
+                        };
+                    }
+                });
+
+            expect(wrapper.vm.minimalGroundWaterDistance).to.equal("1,0 bis 2,0");
         });
     });
 

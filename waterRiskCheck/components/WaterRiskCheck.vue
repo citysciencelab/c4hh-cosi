@@ -198,6 +198,18 @@ export default {
                 || groupedParcelFeatures?.["3,0 bis 4,0_area"] > 0;
         },
         /**
+         * Gets the minimum distance to groundwater over the entire parcel.
+         * @returns {String} The minimal distance or distance range as a string.
+         */
+        minimalGroundWaterDistance () {
+            if (!this.parcel[0]) {
+                return "";
+            }
+            return this.data.groundWaterMin.geoJsonParcelFeatures
+                .map(f => f?.properties?.[this.data.groundWaterMin.propertyToUse])
+                .sort((a, b) => a?.localeCompare(b, undefined, {numeric: true}))[0];
+        },
+        /**
          * Gets a table containing the infiltration classes and their values on the parcel.
          * @returns {String[][]} An array with [classname, value] entries.
          */
@@ -207,10 +219,10 @@ export default {
                 : undefined;
 
             return [
-                ["möglich", groupedParcelFeatures?.möglich_percent ?? "0"],
-                ["wahrscheinlich", groupedParcelFeatures?.wahrscheinlich_percent ?? "0"],
-                ["eingeschränkt", groupedParcelFeatures?.eingeschränkt_percent ?? "0"],
-                ["unwahrscheinlich", groupedParcelFeatures?.unwahrscheinlich_percent ?? "0"]
+                ["möglich", groupedParcelFeatures?.möglich_percent?.toLocaleString("de-DE", {style: "percent"}) ?? "-"],
+                ["wahrscheinlich", groupedParcelFeatures?.wahrscheinlich_percent?.toLocaleString("de-DE", {style: "percent"}) ?? "-"],
+                ["eingeschränkt", groupedParcelFeatures?.eingeschränkt_percent?.toLocaleString("de-DE", {style: "percent"}) ?? "-"],
+                ["unwahrscheinlich", groupedParcelFeatures?.unwahrscheinlich_percent?.toLocaleString("de-DE", {style: "percent"}) ?? "-"]
             ];
         },
         /**
@@ -219,11 +231,20 @@ export default {
          */
         infiltrationTableUnbuilt () {
             return [
-                ["möglich", this.data.infiltration.values?.möglich_percent ?? "0"],
-                ["wahrscheinlich", this.data.infiltration.values?.wahrscheinlich_percent ?? "0"],
-                ["eingeschränkt", this.data.infiltration.values?.eingeschränkt_percent ?? "0"],
-                ["unwahrscheinlich", this.data.infiltration.values?.unwahrscheinlich_percent ?? "0"]
+                ["möglich", this.data.infiltration.values?.möglich_percent?.toLocaleString("de-DE", {style: "percent"}) ?? "-"],
+                ["wahrscheinlich", this.data.infiltration.values?.wahrscheinlich_percent?.toLocaleString("de-DE", {style: "percent"}) ?? "-"],
+                ["eingeschränkt", this.data.infiltration.values?.eingeschränkt_percent?.toLocaleString("de-DE", {style: "percent"}) ?? "-"],
+                ["unwahrscheinlich", this.data.infiltration.values?.unwahrscheinlich_percent?.toLocaleString("de-DE", {style: "percent"}) ?? "-"]
             ];
+        },
+        /**
+        * Gets the infiltration values to be included in the report depending on the users' answer.
+        * @returns {Object} An object containing the values to use.
+         */
+        infiltrationValueToUse () {
+            return this.pageNamesFromQuestions?.A4_Bestand ?
+                Object.fromEntries(this.infiltrationTableUnbuilt) :
+                Object.fromEntries(this.infiltrationTableParcel);
         },
         /**
          * Computes whether infiltration is at least likely on the parcel
@@ -262,7 +283,23 @@ export default {
          * @returns {Boolean} True if the water depth is greater than zero, false if not.
          */
         floodingInSri12 () {
-            return this.data.sri07_wassertiefe.value?.properties?.value > 0;
+            return this.data.sri12_wassertiefe.value?.properties?.value > 0;
+        },
+        /**
+         * Gets the water depth around the building in case of flooding due to SRI 7 rain.
+         * @returns {String} Water depth formatted as string with cm or "n.v.".
+         */
+        floodingDepthInSri07 () {
+            return this.data.sri07_wassertiefe.value?.properties?.value
+                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "n.v.";
+        },
+        /**
+         * Gets the water depth around the building in case of flooding due to SRI 12 rain.
+         * @returns {String} Water depth formatted as string with cm or "n.v.".
+         */
+        floodingDepthInSri12 () {
+            return this.data.sri12_wassertiefe.value?.properties?.value
+                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "n.v.";
         },
         /**
          * Gets the pages that depend on the data.
@@ -688,19 +725,31 @@ export default {
                 "datum": new Date().toLocaleDateString(),
                 "K1.legend": legends.starkregengefahrenkarte_karte,
                 "K1.außergewoehnliches.uebersichtskarte": mapConf.starkregengefahrenkarte_aussergewoehnlich,
+                "K1.aussergewoehnliches.gebaeude": "Um das bzw. die Gebäude",
+                "K1.aussergewoehnliches.wassertiefe": this.floodingDepthInSri07,
+                "K1.extremes.gebaeude": "Um das bzw. die Gebäude",
+                "K1.extremes.wassertiefe": this.floodingDepthInSri12,
                 "K1.extremes.uebersichtskarte": mapConf.starkregengefahrenkarte_extrem,
                 "K2.uesg": this.isParcelInUesg,
-                "K2.mittleres.gebaeude": {"geb1": this.middleFloodDepth},
+                "K2.mittleres.gebaeude": "Gebäude (1)",
+                "K2.mittleres.wassertiefe": this.middleFloodDepth || "n.v.",
                 "K2.mittleres.uebersichtskarte": mapConf.hochwasser_binnenhw_mittleres_ereignis,
-                "K2.seltenes.gebaeude": {"geb1": this.seldomFloodDepth},
+                "K2.seltenes.gebaeude": "Gebäude (1)",
+                "K2.seltenes.wassertiefe": this.seldomFloodDepth || "n.v.",
                 "K2.seltenes.uebersichtskarte": mapConf.hochwasser_binnenhw_seltenes_ereignis,
                 "K2.legend": legends.hochwasser_binnenhw,
                 "K3.uebersichtskarte": mapConf.grundwasser_flurabstand_min,
-                "K3.gebaeude": {"geb1": "undefined"}, // @TODO Daten müssen gesetzt werden
+                "K3.minimaler_flurabstand": this.minimalGroundWaterDistance,
                 "K3.legend": legends.grundwasser_flurabstand_min,
                 "K4.uebersichtskarte": mapConf.versickerungspotential,
                 "K4.legend": legends.versickerungspotential_karte,
-                "K4.tabelle": this.pageNamesFromQuestions?.A4_Bestand ? this.infiltrationTableUnbuilt : this.infiltrationTableParcel
+                "K4.tabelle.werteart": this.pageNamesFromQuestions?.A4_Bestand ?
+                    "Anteil auf der unbebauten Fläche des Flurstücks" :
+                    "Anteil auf der Gesamtfläche des Flurstücks",
+                "K4.tabelle.möglich": this.infiltrationValueToUse.möglich,
+                "K4.tabelle.wahrscheinlich": this.infiltrationValueToUse.wahrscheinlich,
+                "K4.tabelle.eingeschränkt": this.infiltrationValueToUse.eingeschränkt,
+                "K4.tabelle.unwahrscheinlich": this.infiltrationValueToUse.unwahrscheinlich
             };
 
             Object.assign(attributes, pdfPageNames);
