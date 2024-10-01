@@ -13,6 +13,7 @@
 ### Deprecated
 
 ### Removed
+- Deleted the `namespaces` option, as it is not a valid configuration for `createStore`
 
 ### Fixed
 
