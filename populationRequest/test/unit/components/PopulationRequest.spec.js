@@ -44,7 +44,6 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
         PopulationRequest.mutations.setRasterActive = spySetRasterActive;
         PopulationRequest.mutations.setAlkisAdressesActive = spySetAlkisAdressesActive;
         store = createStore({
-            namespaces: true,
             modules: {
                 Modules: {
                     namespaced: true,

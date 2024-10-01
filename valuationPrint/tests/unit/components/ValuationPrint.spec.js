@@ -47,7 +47,6 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
         },
         store = createStore({
             modules: {
-                namespaces: true,
                 Maps: {
                     namespaced: true,
                     actions: mockMapActions,

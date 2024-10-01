@@ -30,7 +30,6 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 
     beforeEach(() => {
         store = createStore({
-            namespaces: true,
             modules: {
                 namespaced: true,
                 Modules: {

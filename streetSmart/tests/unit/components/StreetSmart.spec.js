@@ -22,7 +22,6 @@ describe("addons/streetSmart/components/StreetSmart.vue", () => {
         setPositionSpy = sinon.spy();
 
         store = createStore({
-            namespaces: true,
             modules: {
                 Modules: {
                     namespaced: true,

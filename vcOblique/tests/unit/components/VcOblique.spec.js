@@ -36,7 +36,6 @@ describe("addons/vcOblique/components/VcOblique.vue", () => {
         VcOblique.actions.createObliqueViewerURL = sinon.stub();
 
         store = createStore({
-            namespaces: true,
             modules: {
                 Modules: {
                     namespaced: true,

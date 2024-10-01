@@ -85,7 +85,6 @@ describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () =>
         },
 
         store = createStore({
-            namespaces: true,
             modules: {
                 Maps: {
                     namespaced: true,

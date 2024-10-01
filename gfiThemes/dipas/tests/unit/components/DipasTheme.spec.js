@@ -30,7 +30,6 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
      */
     function createWrapper (isTable) {
         store = createStore({
-            namespaces: true,
             modules: {
                 DipasTheme
             },
