@@ -17,6 +17,7 @@ import {getWalkerMap} from "../../../addons/valuationPrint/js/translator.getWalk
 import bbox from "@turf/bbox";
 import {GeoJSON} from "ol/format";
 import axios from "axios";
+import dayjs from "dayjs";
 
 export default {
     name: "WaterRiskCheck",
@@ -287,19 +288,19 @@ export default {
         },
         /**
          * Gets the water depth around the building in case of flooding due to SRI 7 rain.
-         * @returns {String} Water depth formatted as string with cm or "n.v.".
+         * @returns {String} Water depth formatted as string with cm or "-".
          */
         floodingDepthInSri07 () {
             return this.data.sri07_wassertiefe.value?.properties?.value
-                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "n.v.";
+                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "-";
         },
         /**
          * Gets the water depth around the building in case of flooding due to SRI 12 rain.
-         * @returns {String} Water depth formatted as string with cm or "n.v.".
+         * @returns {String} Water depth formatted as string with cm or "-".
          */
         floodingDepthInSri12 () {
             return this.data.sri12_wassertiefe.value?.properties?.value
-                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "n.v.";
+                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "-";
         },
         /**
          * Gets the pages that depend on the data.
@@ -722,7 +723,7 @@ export default {
 
             const attributes = {
                 "adresse": this.address,
-                "datum": new Date().toLocaleDateString(),
+                "datum": dayjs().format("DD.MM.YYYY"),
                 "K1.legend": legends.starkregengefahrenkarte_karte,
                 "K1.außergewoehnliches.uebersichtskarte": mapConf.starkregengefahrenkarte_aussergewoehnlich,
                 "K1.aussergewoehnliches.gebaeude": "Um das bzw. die Gebäude",
@@ -732,10 +733,10 @@ export default {
                 "K1.extremes.uebersichtskarte": mapConf.starkregengefahrenkarte_extrem,
                 "K2.uesg": this.isParcelInUesg,
                 "K2.mittleres.gebaeude": "Gebäude (1)",
-                "K2.mittleres.wassertiefe": this.middleFloodDepth || "n.v.",
+                "K2.mittleres.wassertiefe": this.middleFloodDepth || "-",
                 "K2.mittleres.uebersichtskarte": mapConf.hochwasser_binnenhw_mittleres_ereignis,
                 "K2.seltenes.gebaeude": "Gebäude (1)",
-                "K2.seltenes.wassertiefe": this.seldomFloodDepth || "n.v.",
+                "K2.seltenes.wassertiefe": this.seldomFloodDepth || "-",
                 "K2.seltenes.uebersichtskarte": mapConf.hochwasser_binnenhw_seltenes_ereignis,
                 "K2.legend": legends.hochwasser_binnenhw,
                 "K3.uebersichtskarte": mapConf.grundwasser_flurabstand_min,
