@@ -13,13 +13,15 @@ export default function getPrintedLayers (layerIds) {
     if (Array.isArray(layerIds) && layerIds.length) {
         layerIds.forEach(async layerId => {
             let layerObj = null,
-                layer = {};
+                layer = {},
+                id;
 
             if (isObject(layerId)) {
                 layerObj = Object.assign({
                     opacity: 1,
                     dpi: 200
                 }, layerId);
+                id = layerId.layerId;
             }
             else if (typeof layerId === "string") {
                 layerObj = {
@@ -27,12 +29,13 @@ export default function getPrintedLayers (layerIds) {
                     opacity: 1,
                     dpi: 200
                 };
+                id = layerId;
             }
             else {
                 return;
             }
 
-            layer = layerFactory.createLayer(rawLayerList.getLayerWhere({id: layerId}))?.layer;
+            layer = layerFactory.createLayer(rawLayerList.getLayerWhere({id: id}))?.layer;
 
             if (typeof layer !== "undefined") {
                 printedLayers.push({
