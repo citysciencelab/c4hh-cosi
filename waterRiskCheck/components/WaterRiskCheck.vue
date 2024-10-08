@@ -171,10 +171,10 @@ export default {
         },
         /**
          * Gets the names of all pages.
-         * @returns {void}
+         * @returns {Object[]} Array of key-value-objects representing the pages
          */
         pageNamesFromQuestions () {
-            const names = this.alwaysShow[0];
+            const names = [...this.alwaysShow];
 
             this.pdfPages.forEach((name) => {
                 names[Object.keys(name)[0]] = false;
