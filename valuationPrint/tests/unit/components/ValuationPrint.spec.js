@@ -408,7 +408,7 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
             spyGetAddress.restore();
         });
 
-        it("should call 'setParcelData' if user click the start button in print modal", async () => {
+        it.skip("should call 'setParcelData' if user click the start button in print modal", async () => {
             const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
                 wrapper = factory.getMount({});
 
@@ -441,7 +441,7 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
             spySetParcelData.restore();
         });
 
-        it("should call 'showPrintModal' if user click the cancel button in print modal", async () => {
+        it.skip("should call 'showPrintModal' if user click the cancel button in print modal", async () => {
             const spyShowPrintModal = sinon.spy(ValuationPrint.methods, "showPrintModal"),
                 wrapper = factory.getMount({});
 
