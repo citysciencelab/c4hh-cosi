@@ -9,6 +9,7 @@
 ### Added
 
 ### Changed
+- Street Smart API: changed version of Street Smart API to 24.7 and reactVersion to 18.3.1.
 
 ### Deprecated
 
