@@ -34,7 +34,7 @@ The module includes
     "icon": "bi-camera",
     "name": "additional:menu.tools.streetsmart",
     "reactVersion": "18.3.1",
-    "streetsmartAPIVersion": "24.7"
+    "streetsmartAPIVersion": "24.11"
 },
 ```
 
