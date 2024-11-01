@@ -1,6 +1,7 @@
 <script>
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
+import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import {mapGetters, mapActions} from "vuex";
 import getOAFFeature from "../../../src/shared/js/api/oaf/getOAFFeature";
 import Point from "ol/geom/Point";
@@ -23,10 +24,12 @@ export default {
     name: "WaterRiskCheck",
     components: {
         FlatButton,
-        IconButton
+        IconButton,
+        SpinnerItem
     },
     data () {
         return {
+            showSpinner: false,
             formStarted: false,
             formFinished: false,
             questions: [],
@@ -473,6 +476,7 @@ export default {
                 return;
             }
 
+            this.showSpinner = true;
             const addressPoint = new Point(this.addressCoordinates),
                 addressPointWGS8 = addressPoint.clone().transform("EPSG:25832", "EPSG:4326"),
                 parcelGeometry = new MultiPolygon([]);
@@ -483,7 +487,8 @@ export default {
             parcelGeometry.setCoordinates([spatialOperations.buffer(this.parcel, -1)[0].geometry.coordinates]);
             this.buildings = spatialOperations.buffer(await this.fetchFeatures(parcelGeometry, "GebaeudeBauwerk", this.alkisBaseUrl, "geometrie"), 2);
 
-            this.addDataByParcel(this.data, this.parcel[0], parcelGeometry);
+            await this.addDataByParcel(this.data, this.parcel[0], parcelGeometry);
+            this.showSpinner = false;
         },
 
         /**
@@ -563,26 +568,26 @@ export default {
          * @returns {void}
          */
         async addDataByParcel (data, parcelFeature, parcelGeometry) {
-            const unbuiltArea = spatialOperations.getUnbuiltArea(parcelFeature, this.buildingsToUse);
+            const unbuiltArea = spatialOperations.getUnbuiltArea(parcelFeature, this.buildingsToUse),
+                localData = {...data};
 
-            for (const key of Object.keys(data)) {
-                if (data[key].type === "WCS") {
-                    this.getHeavyRainPointForPolygons(data[key].baseURL, data[key].coverageId, bbox(spatialOperations.buffer([parcelFeature])[0]), data[key].epsg, this.buildingsToUse)
-                        .then(point => {
-                            data[key].value = point;
-                        }).catch(error => console.error(error));
+            for (const key of Object.keys(localData)) {
+                if (localData[key].type === "WCS") {
+                    const point = await this.getHeavyRainPointForPolygons(localData[key].baseURL, localData[key].coverageId, bbox(spatialOperations.buffer([parcelFeature])[0]), localData[key].epsg, this.buildingsToUse).catch(error => console.error(error));
+
+                    localData[key].value = point;
                 }
                 else {
-                    this.fetchFeatures(parcelGeometry, data[key].collection, data[key].url, data[key].geometryName)
-                        .then(geoJsonList => {
-                            data[key].geoJsonParcelFeatures = spatialOperations.intersect(geoJsonList, parcelFeature);
-                            data[key].geoJsonFeatures = spatialOperations.intersect(geoJsonList, unbuiltArea);
-                            if (data[key].propertyToUse) {
-                                data[key].values = spatialOperations.calcArea(data[key].geoJsonFeatures, unbuiltArea, data[key].propertyToUse);
-                            }
-                        });
+                    const geoJsonList = await this.fetchFeatures(parcelGeometry, localData[key].collection, localData[key].url, localData[key].geometryName);
+
+                    localData[key].geoJsonParcelFeatures = spatialOperations.intersect(geoJsonList, parcelFeature);
+                    localData[key].geoJsonFeatures = spatialOperations.intersect(geoJsonList, unbuiltArea);
+                    if (localData[key].propertyToUse) {
+                        localData[key].values = spatialOperations.calcArea(localData[key].geoJsonFeatures, unbuiltArea, localData[key].propertyToUse);
+                    }
                 }
             }
+            this.data = localData;
         },
 
         /**
@@ -963,8 +968,15 @@ export default {
 <template lang="html">
     <div
         id="tool-waterRiskCheck"
-        class="water-risk-check"
+        class="water-risk-check position-relative"
     >
+        <div v-if="showSpinner">
+            <div class="position-absolute w-100 h-100 transparentBG d-flex justify-content-center align-items-center">
+                <SpinnerItem
+                    custom-class="large-spinner"
+                />
+            </div>
+        </div>
         <div v-if="!formStarted && !formFinished">
             <p>
                 {{ $t('additional:modules.waterRiskCheck.generelExplenationText') }}
@@ -1333,5 +1345,13 @@ export default {
 }
 .info-icon {
     font-size: 18px;
+}
+.transparentBG {
+    background-color: #ffffffc2;
+    z-index: 1;
+}
+.large-spinner {
+    width: 4rem;
+    height: 4rem;
 }
 </style>
