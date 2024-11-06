@@ -3,19 +3,10 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
-
-### Added
-
-### Changed
-
-### Deprecated
+## 2024-11-06 v3.4.0
 
 ### Removed
 - Deleted the `namespaces` option, as it is not a valid configuration for `createStore`
-
-### Fixed
 
 ---
 
