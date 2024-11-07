@@ -408,24 +408,6 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
             spyGetAddress.restore();
         });
 
-        it.skip("should call 'setParcelData' if user click the start button in print modal", async () => {
-            const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
-                wrapper = factory.getMount({});
-
-            await wrapper.setData({
-                showModal: true
-            });
-            wrapper.findAllComponents(ModalItem).at(0).findAll(".confirm-print").forEach(button => {
-                if (button.text() === "additional:modules.valuationPrint.startButton") {
-                    button.trigger("click");
-                }
-            });
-
-            expect(spySetParcelData.calledOnce).to.be.true;
-
-            spySetParcelData.restore();
-        });
-
         it("should call 'setParcelData' if user click the start button in parcel list and modal is configured to not be required", async () => {
             const spySetParcelData = sinon.spy(ValuationPrint.methods, "setParcelData"),
                 wrapper = factory.getMount({isModalRequired: false});
@@ -439,25 +421,6 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
             expect(spySetParcelData.calledOnce).to.be.true;
 
             spySetParcelData.restore();
-        });
-
-        it.skip("should call 'showPrintModal' if user click the cancel button in print modal", async () => {
-            const spyShowPrintModal = sinon.spy(ValuationPrint.methods, "showPrintModal"),
-                wrapper = factory.getMount({});
-
-            wrapper.vm.select.getFeatures().push(features[0]);
-            wrapper.vm.select.getFeatures().push(features[1]);
-
-            await wrapper.vm.$forceUpdate();
-            await wrapper.findAllComponents(ModalItem).at(0).findAll(".p-2 button").forEach(button => {
-                if (button.text() === "additional:modules.valuationPrint.cancel") {
-                    button.trigger("click");
-                }
-            });
-
-            expect(spyShowPrintModal.calledOnce).to.be.true;
-
-            spyShowPrintModal.restore();
         });
 
         it("should select all the parcels in options", async () => {
