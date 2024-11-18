@@ -184,11 +184,19 @@ const actions = {
             coordinates = processFromParametricUrl ? center : rootGetters["Maps/clickCoordinate"],
             map = mapCollection.getMap("2D"),
             mapView = map.getView(),
-            groupedLayers = layerCollection.getLayerById(selectedLayer.id),
-            layerSource = groupedLayers.layerSource[0].layerSource;
+            groupedLayers = layerCollection.getLayerById(selectedLayer.id);
+
+        if (!selectedLayer) {
+            console.error("No visible layer found in filteredLayerList.");
+            return;
+        }
+        if (!groupedLayers || !groupedLayers.layerSource || groupedLayers.layerSource.length === 0 || !groupedLayers.layerSource[0].layerSource) {
+            console.error("Layer source not available or empty.");
+            return;
+        }
         let url = null;
 
-        url = layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());
+        url = groupedLayers.layerSource[0].layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());
 
         axios.get(url)
             .then((response) => {
