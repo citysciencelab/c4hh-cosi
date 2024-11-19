@@ -15,6 +15,7 @@
 ### Removed
 
 ### Fixed
+- gfiTeme dipas: pipe symbols, \n and \r in attribute description are respected as line break. 
 
 ---
 

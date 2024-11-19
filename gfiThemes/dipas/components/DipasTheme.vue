@@ -81,6 +81,19 @@ export default {
          */
         isTableStyle () {
             return this.uiStyle === "TABLE";
+        },
+        /**
+         * Splits description by pipes into an array.
+         * @param {Object} feature to get the properties from
+         * @returns{Array} description splittet by pipes
+         */
+        getDescriptions (feature) {
+            const description = feature.getMappedProperties().description;
+
+            if (description) {
+                return description.split("|");
+            }
+            return [];
         }
     }
 };
@@ -117,10 +130,12 @@ export default {
             {{ feature.getMappedProperties().name }}
         </div>
         <div
-            v-if="feature.getMappedProperties().description"
+            v-for="(value, i) in getDescriptions(feature)"
+            :key="i"
             class="dipas-gfi-description"
         >
-            {{ feature.getMappedProperties().description }}
+            {{ value }}
+            <br>
         </div>
         <a
             v-if="!isTableStyle() && feature.getMappedProperties().link"
@@ -146,7 +161,6 @@ export default {
         .dipas-gfi-name {
             font-family: $font_family_accent;
             font-size: $font-size-lg;
-            color: $primary;
             padding-bottom: 16px;
 
             a {
