@@ -28,7 +28,7 @@ const state = {
     name: "additional:modules.streetsmart.name",
     reactVersion: "18.3.1",
     serviceId: "streetsmart",
-    streetsmartAPIVersion: "23.15",
+    streetsmartAPIVersion: "24.13",
     styleId: "defaultMapMarkerPoint",
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D", "3D"],
