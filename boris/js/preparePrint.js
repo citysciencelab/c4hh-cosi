@@ -1,15 +1,14 @@
 import borisState from "../store/stateBoris";
 import store from "../../../src/app-store/index";
 import SpecModel from "../../../src/modules/print/js/buildSpec.js";
-import layerProvider from "../../../src/modules/print/js/getVisibleLayer.js";
 
 /**
  * Helper Function to prepare the Pdf file from currently selected layer and its features on the comparison list.
  * @param {function} getResponse function that will get axios response
  * @returns {void}
  */
-export async function preparePrint (state, getResponse) {
-    const visibleLayerList = layerProvider.getVisibleLayerList(true),
+export async function preparePrint (getResponse) {
+    const visibleLayerList = store.state.Modules.Print.visibleLayerList,
         scale = store.state.Maps.scale,
         feature = borisState.selectedBrwFeature,
         selectedOption = borisState.selectedOption,
