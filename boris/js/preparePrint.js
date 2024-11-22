@@ -9,7 +9,7 @@ import layerProvider from "../../../src/modules/print/js/getVisibleLayer.js";
  * @returns {void}
  */
 export async function preparePrint (state, getResponse) {
-    const visibleLayerList = layerProvider.getVisibleLayer(true),
+    const visibleLayerList = layerProvider.getVisibleLayerList(true),
         scale = store.state.Maps.scale,
         feature = borisState.selectedBrwFeature,
         selectedOption = borisState.selectedOption,
