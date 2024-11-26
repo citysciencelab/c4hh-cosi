@@ -8,8 +8,7 @@ import SpecModel from "../../../src/modules/print/js/buildSpec.js";
  * @returns {void}
  */
 export async function preparePrint (getResponse) {
-    const visibleLayerList = store.state.Modules.Print.visibleLayerList,
-        scale = store.state.Maps.scale,
+    const scale = store.state.Maps.scale,
         feature = borisState.selectedBrwFeature,
         selectedOption = borisState.selectedOption,
         defaultString = "",
@@ -76,7 +75,7 @@ export async function preparePrint (getResponse) {
     store.dispatch("Modules/Print/activatePrintStarted", true, {root: true});
 
     spec.setAttributes(attributes);
-    await spec.buildLayers(visibleLayerList);
+    await spec.buildLayers(store.state.Modules.Print.visibleLayerList);
 
     printJob = {
         payload: encodeURIComponent(JSON.stringify(spec.defaults)),

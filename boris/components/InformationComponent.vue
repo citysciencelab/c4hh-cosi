@@ -76,6 +76,7 @@ export default {
                     :keys="['bemerkung']"
                     :label="$t('additional:modules.boris.detailInformation.moreFeatures')"
                 />
+                <br>
                 <div
                     v-if="parseInt(selectedBrwFeature.get('jahrgang'), 10) >= 2002"
                 >

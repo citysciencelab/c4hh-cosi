@@ -36,6 +36,7 @@ export default {
         v-if="Object.keys(feature).length > 0 && feature.get(keys[0])"
         class="detail-component"
     >
+        <br>
         <dt class="label">
             {{ label }}:
         </dt>
