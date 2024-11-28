@@ -1,6 +1,7 @@
-import borisState from "../store/stateBoris";
+import borisState from "../store/stateBoris.js";
 import store from "../../../src/app-store/index";
 import SpecModel from "../../../src/modules/print/js/buildSpec.js";
+import layerProvider from "../../../src/modules/print/js/getVisibleLayer.js";
 
 /**
  * Helper Function to prepare the Pdf file from currently selected layer and its features on the comparison list.
@@ -8,6 +9,7 @@ import SpecModel from "../../../src/modules/print/js/buildSpec.js";
  * @returns {void}
  */
 export async function preparePrint (getResponse) {
+    layerProvider.getVisibleLayer(true);
     const scale = store.state.Maps.scale,
         feature = borisState.selectedBrwFeature,
         selectedOption = borisState.selectedOption,
