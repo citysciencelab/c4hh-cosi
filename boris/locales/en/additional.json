@@ -81,6 +81,7 @@
                     "legendName": "Legend",
                     "measureName": "Measure distance / area",
                     "infoName": "Technical Information",
+                    "aboutName": "About this Portal",
                     "contactName": "Contact",
                     "staticLinks": {
                         "manual":"Operating instructions for BORIS.HH",

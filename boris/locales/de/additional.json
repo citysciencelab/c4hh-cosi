@@ -81,6 +81,7 @@
                     "legendName": "Legende",
                     "measureName": "Strecke / Fläche messen",
                     "infoName": "Fachliche Informationen",
+                    "aboutName": "Über dieses Portal",
                     "contactName": "Kontakt",
                     "staticLinks": {
                         "manual":"Bedienungsanleitung für BORIS.HH",
