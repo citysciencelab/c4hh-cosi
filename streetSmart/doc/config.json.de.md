@@ -20,7 +20,7 @@ Das Modul umfasst
 |icon|nein|String|"bi-camera"|Das zu verwendende Icon.|false|
 |name|nein|String|"360° Panorama"|Der Titel des Moduls bzw. der Eintrag im Menü|false|
 |reactVersion|nein|String|18.3.1|Die Version von React, kompatibel zur Version der streetsmartAPI.|true|
-|streetsmartAPIVersion|nein|String|24.13|Die Version der streetsmartApi.|true|
+|streetsmartAPIVersion|nein|String|24.14|Die Version der streetsmartApi.|true|
 |styleId|nein|String|"defaultMapMarkerPoint"|StyleId, um den Mapmarker in der Karte zu stylen, wenn streetsmart geöffnet ist.|false|
 |timeTravelVisible|nein|Boolean|false|Schaltet Zeitauswahl in der Panoramaansicht ein.|false|
 |toggle3DCursor|nein|Boolean|false|Schaltet die Sichtbarkeit des 3D-Cursors in der Panoramaansicht ein.|false|
@@ -34,7 +34,7 @@ Das Modul umfasst
     "icon": "bi-camera",
     "name": "additional:menu.tools.streetsmart",
     "reactVersion": "18.3.1",
-    "streetsmartAPIVersion": "24.13"
+    "streetsmartAPIVersion": "24.14"
 },
 ```
 

@@ -9,7 +9,7 @@
 ### Added
 
 ### Changed
-- Street Smart API: changed version of Street Smart API to 24.13 and reactVersion to 18.3.1.
+- Street Smart API: changed version of Street Smart API to 24.14 and reactVersion to 18.3.1.
 - vcOblique: the year is now also displayed in the name  of the module
 
 ### Deprecated
