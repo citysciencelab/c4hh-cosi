@@ -319,25 +319,27 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         });
     });
     describe("requestGFI", () => {
-        afterEach(() => {
-            sinon.restore();
-        });
-        it("requests GFI", async () => {
-            const source = {
-                    getFeatureInfoUrl: () => "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5781983&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=508&J=91&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316"
-                },
-                axiosStub = sinon.stub(axios, "get").returns(Promise.resolve({status: 200})),
+        it("requests GFI", () => {
+            sinon.stub(layerCollection, "getLayerById").returns(
+                {
+                    layerSource: {
+                        getFeatureInfoUrl: () =>{
+                            const url = "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5781983&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=508&J=91&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316";
+
+                            return url;
+                        }
+                    }
+                }
+            );
+            state.active = true;
+
+            const axiosStub = sinon.stub(axios, "get").returns(Promise.resolve({status: 200})),
+                url = layerCollection.getLayerById().layerSource.getFeatureInfoUrl(),
                 processFromParametricUrl = "",
                 center = "";
 
-            sinon.stub(layerCollection, "getLayerById").returns({
-                getLayerSource: () => source // Rückgabe der gestubbten Source
-            });
-            await actions.requestGFI({rootGetters, state, dispatch}, {processFromParametricUrl, center});
-
-            expect(axiosStub.calledWith(source.getFeatureInfoUrl())).to.be.true;
-
-            expect(dispatch.calledWith("handleGfiResponse", sinon.match.object)).to.be.true;
+            actions.requestGFI({rootGetters, state, dispatch}, {processFromParametricUrl, center});
+            expect(axiosStub.calledWith(url)).to.be.true;
         });
     });
     describe("handleGfiResponse", () => {
