@@ -195,7 +195,12 @@ const actions = {
         }
         let url = null;
 
-        url = groupedLayers.layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());
+        if (Array.isArray(groupedLayers.layerSource)) {
+            url = groupedLayers.layerSource[0].layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());
+        }
+        else {
+            url = groupedLayers.layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());
+        }
 
         axios.get(url)
             .then((response) => {
