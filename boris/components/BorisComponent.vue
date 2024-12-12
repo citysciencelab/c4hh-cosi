@@ -129,6 +129,8 @@ export default {
         }
     },
     created () {
+        this.changeCurrentMouseMapInteractionsComponent({type: this.type, side: this.menuSide});
+        this.setDefaultComponent(this.id);
         this.initialize();
     },
     mounted () {
@@ -139,6 +141,12 @@ export default {
         this.$nextTick(() => {
             this.handleUrlParameters();
             this.registerListener({type: "click", listener: this.requestGFI});
+        });
+    },
+    unmounted () {
+        this.unregisterListener({
+            type: "click",
+            listener: this.requestGFI
         });
     },
     methods: {
@@ -153,11 +161,13 @@ export default {
             "sendWpsConvertRequest",
             "requestGFI"
         ]),
+        ...mapActions("Menu", ["changeCurrentMouseMapInteractionsComponent"]),
         ...mapActions("Maps", [
             "registerListener",
             "unregisterListener"
         ]),
         ...mapMutations("Modules/BorisComponent", Object.keys(mutations)),
+        ...mapMutations("Menu", ["setDefaultComponent"]),
         preparePrint,
         /**
          * Toggles info text if clicked on info icon
