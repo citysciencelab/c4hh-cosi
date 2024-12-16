@@ -7,6 +7,7 @@
 ### __Breaking Changes__
 
 ### Added
+- Re-enabled setting the latest tag. 
 
 ### Changed
 
