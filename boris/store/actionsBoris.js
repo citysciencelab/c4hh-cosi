@@ -17,7 +17,6 @@ const actions = {
         let layerList = rootGetters.layerConfigsByAttributes({isNeverVisibleInTree: true});
 
         if (layerList) {
-            // parentId is being resettet to enable the handling of singleBaseLayer only for baseLayers (layer.js: function handleSingleBaseLayer)
             layerList = layerList.filter(function (layer) {
                 return layer.gfiAttributes !== "ignore";
             });
