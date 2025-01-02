@@ -3,19 +3,11 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+
+## 2025-01-02 v3.6.0
 
 ### Added
-- Re-enabled setting the latest tag. 
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
+- Re-enabled setting the latest tag.
 
 ---
 
