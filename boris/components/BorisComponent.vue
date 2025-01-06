@@ -524,7 +524,7 @@ export default {
                         :landuse="selectedLanduseComputed"
                     />
                 </div>
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center justify-content-center">
                     <button
                         class="btn btn-primary btn-infos print-button"
                         :title="$t('additional:modules.boris.printExport')"
@@ -572,7 +572,6 @@ export default {
 }
 .print-button {
     margin-bottom: 0;
-    align-self: center;
     width: auto;
     padding: 0.5rem 1rem;
     line-height: 1;
