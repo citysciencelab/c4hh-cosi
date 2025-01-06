@@ -4,6 +4,7 @@ import mutations from "../store/mutationsBoris";
 import InformationComponent from "./InformationComponent.vue";
 import CalculationComponent from "./CalculationComponent.vue";
 import FloorComponent from "./FloorComponent.vue";
+import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import {preparePrint} from "../js/preparePrint.js";
 import axios from "axios";
 
@@ -12,7 +13,8 @@ export default {
     components: {
         InformationComponent,
         CalculationComponent,
-        FloorComponent
+        FloorComponent,
+        SpinnerItem
     },
     computed: {
         ...mapGetters("Modules/BorisComponent", [
@@ -33,6 +35,14 @@ export default {
             return this.filteredLayerList.filter(function (filteredLayer) {
                 return filteredLayer.name.indexOf("-stripes") === -1;
             });
+        },
+        /**
+         * Gets the print status
+         * @return {Boolean} isLoading to return true if print is started and not yet finished
+         */
+        isLoading () {
+            return this.printStarted && !this.printFileReady;
+
         },
         /**
          * Gets the selected option from "chosen landuse" which is set as selectedLanduse
@@ -514,13 +524,20 @@ export default {
                         :landuse="selectedLanduseComputed"
                     />
                 </div>
-                <button
-                    class="btn btn-primary btn-infos print-button"
-                    :title="$t('additional:modules.boris.printExport')"
-                    @click="startPrint"
-                >
-                    {{ $t("additional:modules.boris.print") }}
-                </button>
+                <div class="d-flex align-items-center">
+                    <button
+                        class="btn btn-primary btn-infos print-button"
+                        :title="$t('additional:modules.boris.printExport')"
+                        @click="startPrint"
+                    >
+                        {{ $t("additional:modules.boris.print") }}
+                    </button>
+                    <SpinnerItem
+                        v-if="isLoading"
+                        custom-class="spinner"
+                        class="ms-3"
+                    />
+                </div>
                 <div class="mt-2">
                     {{ $t("additional:modules.boris.printScale") }}
                 </div>
@@ -554,12 +571,13 @@ export default {
     margin-bottom: 1.5rem;
 }
 .print-button {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     align-self: center;
-    width: fit-content;
-    padding-left: 1rem;
-    padding-right: 1rem;
-
+    width: auto;
+    padding: 0.5rem 1rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 .pt-4Box {
     display: flex;
