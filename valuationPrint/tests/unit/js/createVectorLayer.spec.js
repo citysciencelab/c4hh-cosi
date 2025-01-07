@@ -19,7 +19,7 @@ describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
     afterEach(sinon.restore);
 
     describe("getPointStyle", () => {
-        it.skip("should return the default point style", () => {
+        it("should return the default point style", () => {
             expect(getPointStyle(undefined).image_.radius_).to.equal(4);
             expect(getPointStyle(undefined).image_.fill_.color_).to.deep.equal([228, 26, 28, 1]);
             expect(getPointStyle(undefined).image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
@@ -41,7 +41,7 @@ describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
             expect(getPointStyle("string").image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
         });
 
-        it.skip("should return the point style with configured and default style", () => {
+        it("should return the point style with configured and default style", () => {
             let style = {
                 "pointSize": 3
             };
@@ -64,7 +64,7 @@ describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
             expect(getPointStyle(style).image_.renderOptions_.strokeStyle).to.equal("rgba(226,26,28,1)");
         });
 
-        it.skip("should return the configured point style", () => {
+        it("should return the configured point style", () => {
             const style = {
                 "pointSize": 3,
                 "color": [
