@@ -2,12 +2,12 @@
     "modules": {
             "boris": {
                 "name": "Land Value Information",
-                "labelSelectYear": "Standard land value date:",
+                "labelSelectYear": "Standard land value date: ",
                 "ariaLabelSelectYear": "Date",
                 "toggleStripesLayer": "Display block boarder stripes",
                 "toggleStripesLayerInfo": "Previously, the standard land value zones were displayed as block boarder stripes. Now you see initial area-wide standard land value zones. Here you can switch to the display of the block edge stripes.",
                 "SelectAreaInMap": "Please click on the required BRW in the map",
-                "labelSelectUse": "Chosen Land Use:",
+                "labelSelectUse": "Chosen Land Use: ",
                 "ariaLabelSelectUse": "Land Use Types",
                 "selectOption": "Please select",
                 "referenceNumber": "Ground value no.",
@@ -26,7 +26,7 @@
                 "locationDescription": {
                     "title": "Location Description",
                     "codeCity": "Postal Code, Municipality",
-                    "district":"District",
+                    "district": "District",
                     "cityDistrict": "City District",
                     "statisticalArea": "Statistical Area",
                     "buildingBlock": "Building Block",
@@ -36,15 +36,15 @@
                 },
                 "landCalculation": {
                     "title": "Conversion to Individual Property",
-                    "subtitle": "Data of the target property to which the standard land value is converted:",
+                    "subtitle": "Data of the target property to which the standard land value is converted: ",
                     "buildingDesigns": "Building position",
                     "ariaLabelBuildingDesigns": "Construction Design",
                     "buildingDesignsInfo": "Select the construction method of your building from the list: <strong>Single Houses (Einzelhäuser) </strong> are detached houses, which aren't attached to the property line, usage limit or other houses. Only one side of the space between the house and the property line may be covered with outbuildings, e.g. garages. <strong> A semi-detached house (Doppelhaus) </strong>is a combination of two houses, both built on one side to a common side property line or use boundary (in the case of condominium/partial ownership). To avoid misunderstandings, the individual houses are called <strong>half duplexes (halbe Doppelhäuser) or semi-detached houses (Doppelhaushälften)</strong> bezeichnet. An <strong>end row house (Endreihenhaus)</strong> is built on one side or a <strong>middle row house (Mittelreihenhaus)</strong> is built on both sides of the side lot or use boundaries, resulting in rows of at least three houses and up to 50 meters in length. The <strong>closed construction method (geschlossenen Bauweise)</strong> characterizes buildings that do not have a boundary distance on all sides and are fully enclosed. The <strong>deviating construction method (abweichende Bauweise)</strong> refers to all other building positions that are not included in the previously mentioned categories. For example, these include garden courtyard houses that enclose a garden in a garden courtyard along with neighboring houses, outbuildings, and story-high walls.",
                     "positionToStreet": "Position to the street",
                     "positionToStreetInfo": "Select the position and thus also the access of your property to the street from the list: Whereas in the case of <strong>frontage (Frontlage)</strong>, the property directly adjoins exactly one street, in the case of a <strong>corner location (Ecklage)</strong>, there is a direct connection to at least two streets. A <strong>'pipe stem property' (Pfeifenstielgrundstück)</strong> is a narrow, pipe stem access road to a property, that is not located directly on the street. The 'pipe stem' is normally the sole property of the 'pipehead' property. However, it is also possible for a pipe stem to access up to four rear properties. <strong>The back lot (Hinterlage)</strong> refers to a rear lot, which is not owned by the owner of the property, but is secured by a land register right of way or as a building encumbrance.",
                     "numberOfFloor": "Value-relevant Number of Floors",
-                    "numberOfFloorInfo":"The <strong>value-relevant number of floors (wertrelevante Geschossflächenzahl - WGFZ)</strong> is defined by the ratio of the floor area to the plot area. Enter the WGFZ of your property here.",
-                    "landArea": "Land Area in m²",
+                    "numberOfFloorInfo": "The <strong>value-relevant number of floors (wertrelevante Geschossflächenzahl - WGFZ)</strong> is defined by the ratio of the floor area to the plot area. Enter the WGFZ of your property here.",
+                    "landArea": "Land Area in m²: ",
                     "landAreaInfo": "For the <strong>plot area (Grundstücksfläche)</strong>, enter the area of your plot as indicated in the real estate cadastre.",
                     "calculatedLandValue": "Your converted standard land value",
                     "calculatedLandValueInfo": "The <strong>converted standard land value</strong> is the average land value per porperty area in m² in the selected area related to your individual und value-influencing specifications."
@@ -67,8 +67,8 @@
                 },
                 "landValue": "Standard Land Value",
                 "print": "Print",
-                "printScale":"The print scale is based on currently selected",
-                "printExport":"Export as PDF",
+                "printScale": "The print scale is based on currently selected",
+                "printExport": "Export as PDF",
                 "alertMessage":{
                     "noData": "Data request failed. This may be a temporary problem. Please try again.",
                     "noBrw": "There is no land value at this clicked position"
@@ -84,7 +84,7 @@
                     "aboutName": "About this Portal",
                     "contactName": "Contact",
                     "staticLinks": {
-                        "manual":"Operating instructions for BORIS.HH",
+                        "manual": "Operating instructions for BORIS.HH",
                         "conditions": "Terms of use",
                         "privacy": "Privacy policy",
                         "imprint": "Imprint",
