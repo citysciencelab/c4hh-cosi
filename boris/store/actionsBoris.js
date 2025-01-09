@@ -31,11 +31,22 @@ const actions = {
      * @returns {void}
      * url parameter. "?brwId=01510241&brwlayername=31.12.2017&center=565774,5933956"
      */
-    handleUrlParameters ({rootState, dispatch, commit}) {
-        const brwId = rootState.urlParams?.brwId,
-            brwLayerName = rootState.urlParams?.brwLayerName,
-            center = rootState.urlParams && rootState.urlParams["Maps/center"],
+    async handleUrlParameters ({rootState, dispatch, commit}) {
+        const brwId = rootState.urlParams?.BRWID,
+            brwLayerName = rootState.urlParams?.BRWLAYERNAME,
             processFromParametricUrl = true;
+
+        let center;
+
+        // This check ensures that `center` is properly handled whether `rootState.urlParams.CENTER` is an array or a string.
+        if (rootState.urlParams && rootState.urlParams.CENTER) {
+            center = Array.isArray(rootState.urlParams.CENTER)
+                ? rootState.urlParams.CENTER.map(parseFloat)
+                : rootState.urlParams.CENTER.split(",").map(parseFloat);
+        }
+        else {
+            center = undefined;
+        }
 
         if (brwId && brwLayerName && center) {
             commit("setIsProcessFromParametricUrl", processFromParametricUrl);
@@ -44,7 +55,7 @@ const actions = {
                 brwLayerName: brwLayerName,
                 center: center});
 
-            dispatch("switchLayer", brwLayerName);
+            await dispatch("switchLayer", brwLayerName);
             commit("setSelectedLayerName", brwLayerName);
             dispatch("Maps/setCenter", center, {root: true});
             dispatch("requestGFI", {processFromParametricUrl, center});
@@ -136,15 +147,15 @@ const actions = {
 
         if (value) {
             dispatch("selectLayerByName", layerName);
+            if (!layerList.some(aLayer => aLayer.name === layerName)) {
+                console.warn(`Layer with name ${layerName} not found`);
+            }
         }
         else {
             const layer = layerList.find(aLayer => aLayer.name === layerName);
 
             if (layer) {
                 layer.visibility = false;
-            }
-            else {
-                console.warn(`Layer with name ${layerName} not found`);
             }
         }
     },

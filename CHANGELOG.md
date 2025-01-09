@@ -16,6 +16,7 @@
 ### Removed
 
 ### Fixed
+- Boris: Resolved issue with the parameterised URL call.
 
 ---
 

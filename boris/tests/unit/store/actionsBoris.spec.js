@@ -82,9 +82,9 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
                 mode: "2D"
             },
             urlParams: {
-                "brwId": "01510241",
-                "brwLayerName": "31.12.2017",
-                "Maps/center": "[565774, 5933956]"
+                "BRWID": "01510241",
+                "BRWLAYERNAME": "31.12.2017",
+                "CENTER": [565774, 5933956]
             }
         };
         rootGetters = {
@@ -134,30 +134,35 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         });
     });
     describe("handleUrlParameters", () => {
-        it("handles URL parameters", () => {
-            actions.handleUrlParameters({rootState, commit, dispatch});
-            expect(commit.calledThrice).to.be.true;
+        it("handles URL parameters", async () => {
+            dispatch.withArgs("switchLayer", rootState.urlParams.BRWLAYERNAME).resolves();
+            dispatch.withArgs("Maps/setCenter", rootState.urlParams["Maps/center"]).resolves();
+            dispatch.withArgs("requestGFI", {processFromParametricUrl: true, center: rootState.urlParams["Maps/center"]}).resolves();
+
+            await actions.handleUrlParameters({rootState, commit, dispatch});
+
+            expect(dispatch.calledThrice).to.be.true;
             expect(commit.firstCall.args[0]).to.equal("setIsProcessFromParametricUrl");
             expect(commit.firstCall.args[1]).to.equal(true);
             expect(commit.secondCall.args[0]).to.equal("setParamUrlParams");
-            expect(commit.secondCall.args[1].brwId).to.equal(rootState.urlParams.brwId);
-            expect(commit.secondCall.args[1].brwLayerName).to.equal(rootState.urlParams.brwLayerName);
-            expect(commit.secondCall.args[1].center).to.equal(rootState.urlParams["Maps/center"]);
+            expect(commit.secondCall.args[1].brwId).to.equal(rootState.urlParams.BRWID);
+            expect(commit.secondCall.args[1].brwLayerName).to.equal(rootState.urlParams.BRWLAYERNAME);
+            expect(commit.secondCall.args[1].center).to.deep.equal(rootState.urlParams.CENTER);
             expect(commit.thirdCall.args[0]).to.equal("setSelectedLayerName");
-            expect(commit.thirdCall.args[1]).to.equal(rootState.urlParams.brwLayerName);
+            expect(commit.thirdCall.args[1]).to.equal(rootState.urlParams.BRWLAYERNAME);
             expect(dispatch.calledThrice).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("switchLayer");
-            expect(dispatch.firstCall.args[1]).to.equal(rootState.urlParams.brwLayerName);
+            expect(dispatch.firstCall.args[1]).to.equal(rootState.urlParams.BRWLAYERNAME);
             expect(dispatch.secondCall.args[0]).to.equal("Maps/setCenter");
-            expect(dispatch.secondCall.args[1]).to.equal(rootState.urlParams["Maps/center"], {root: true});
+            expect(dispatch.secondCall.args[1]).to.deep.equal(rootState.urlParams.CENTER, {root: true});
             expect(dispatch.thirdCall.args[0]).to.equal("requestGFI");
             expect(dispatch.thirdCall.args[1].undefined).to.equal(undefined);
             expect(dispatch.thirdCall.args[1].processFromParametricUrl).to.equal(true);
-            expect(dispatch.thirdCall.args[1].center).to.equal(rootState.urlParams["Maps/center"]);
+            expect(dispatch.thirdCall.args[1].center).to.deep.equal(rootState.urlParams.CENTER);
         });
-        it("do not handle url parameters", () => {
+        it("do not handle url parameters", async () => {
             rootState.urlParams = {};
-            actions.handleUrlParameters({rootState, commit, dispatch});
+            await actions.handleUrlParameters({rootState, commit, dispatch});
             expect(commit.notCalled).to.be.true;
         });
     });
