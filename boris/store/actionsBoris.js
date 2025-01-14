@@ -157,6 +157,9 @@ const actions = {
             if (layer) {
                 layer.visibility = false;
             }
+            else {
+                console.warn(`There are no block stripes available for layer ${selectedLayerName}`);
+            }
         }
     },
     /**
