@@ -67,6 +67,15 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
                     namespaced: true,
                     actions: {registerListener: () => sinon.stub(),
                         unregisterListener: () => sinon.stub()}
+                },
+                Menu: {
+                    namespaced: true,
+                    actions: {
+                        changeCurrentMouseMapInteractionsComponent: sinon.stub()
+                    },
+                    mutations: {
+                        setDefaultComponent: sinon.stub()
+                    }
                 }
             },
             getters: {mobile: () => false},
