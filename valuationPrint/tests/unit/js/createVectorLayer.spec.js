@@ -24,19 +24,19 @@ describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
             expect(getPointStyle(undefined).image_.fill_.color_).to.deep.equal([228, 26, 28, 1]);
             expect(getPointStyle(undefined).image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
 
-            expect(getPointStyle(null).image_.radius_).to.equal(4);
+            expect(getPointStyle(null).image_.radius).to.equal(4);
             expect(getPointStyle(null).image_.fill_.color_).to.deep.equal([228, 26, 28, 1]);
             expect(getPointStyle(null).image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
 
-            expect(getPointStyle([]).image_.radius_).to.equal(4);
+            expect(getPointStyle([]).image_.radius).to.equal(4);
             expect(getPointStyle([]).image_.fill_.color_).to.deep.equal([228, 26, 28, 1]);
             expect(getPointStyle([]).image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
 
-            expect(getPointStyle(true).image_.radius_).to.equal(4);
+            expect(getPointStyle(true).image_.radius).to.equal(4);
             expect(getPointStyle(true).image_.fill_.color_).to.deep.equal([228, 26, 28, 1]);
             expect(getPointStyle(true).image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
 
-            expect(getPointStyle("string").image_.radius_).to.equal(4);
+            expect(getPointStyle("string").image_.radius).to.equal(4);
             expect(getPointStyle("string").image_.fill_.color_).to.deep.equal([228, 26, 28, 1]);
             expect(getPointStyle("string").image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
         });
@@ -46,7 +46,7 @@ describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
                 "pointSize": 3
             };
 
-            expect(getPointStyle(style).image_.radius_).to.equal(3);
+            expect(getPointStyle(style).image_.radius).to.equal(3);
             expect(getPointStyle(style).image_.fill_.color_).to.deep.equal([228, 26, 28, 1]);
             expect(getPointStyle(style).image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
 
@@ -59,7 +59,7 @@ describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
                 ]
             };
 
-            expect(getPointStyle(style).image_.radius_).to.equal(4);
+            expect(getPointStyle(style).image_.radius).to.equal(4);
             expect(getPointStyle(style).image_.fill_.color_).to.deep.equal([226, 26, 28, 1]);
             expect(getPointStyle(style).image_.renderOptions_.strokeStyle).to.equal("rgba(226,26,28,1)");
         });
@@ -75,7 +75,7 @@ describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
                 ]
             };
 
-            expect(getPointStyle(style).image_.radius_).to.equal(3);
+            expect(getPointStyle(style).image_.radius).to.equal(3);
             expect(getPointStyle(style).image_.fill_.color_).to.deep.equal([228, 26, 30, 1]);
             expect(getPointStyle(style).image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,30,1)");
         });
