@@ -20,7 +20,7 @@ describe("addons/valuationPrint/js/translator.getFixedMap.js", () => {
 
     describe("getPointStyle", () => {
         it("should return the default point style", () => {
-            expect(getPointStyle(undefined).image_.radius_).to.equal(4);
+            expect(getPointStyle(undefined).image_.radius).to.equal(4);
             expect(getPointStyle(undefined).image_.fill_.color_).to.deep.equal([228, 26, 28, 1]);
             expect(getPointStyle(undefined).image_.renderOptions_.strokeStyle).to.equal("rgba(228,26,28,1)");
 
