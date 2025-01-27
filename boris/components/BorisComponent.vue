@@ -359,30 +359,26 @@ export default {
                     class="d-flex mb-2"
                 >
                     <button
-                        class="bi-info-circle-fill col me-1"
-                        :class="(buttonValue === 'info') ? 'btn btn-primary' : 'btn btn-default'"
+                        class="bi-info-circle-fill col me-1 btn btn-component"
                         value="info"
                         :title="$t('additional:modules.boris.detailInformation.title')"
                         @click="setButtonValue($event.target.value)"
                     />
                     <button
-                        class="bi-geo-alt-fill col me-1"
-                        :class="(buttonValue === 'lage') ? 'btn btn-primary' : 'btn btn-default'"
+                        class="bi-geo-alt-fill col me-1 btn btn-component"
                         value="lage"
                         :title="$t('additional:modules.boris.locationDescription.title')"
                         @click="setButtonValue($event.target.value)"
                     />
                     <button
-                        class="bi-currency-euro col "
-                        :class="(buttonValue === 'euro') ? 'btn btn-primary' : 'btn btn-default'"
+                        class="bi-currency-euro col me-1 btn btn-component"
                         value="euro"
                         :title="$t('additional:modules.boris.landCalculation.title')"
                         @click="setButtonValue($event.target.value)"
                     />
                     <button
                         v-if="selectedBrwFeature.get('schichtwert')"
-                        class="bi-list-ul col ms-1"
-                        :class="(buttonValue === 'liste') ? 'btn btn-primary' : 'btn btn-default'"
+                        class="bi-list-ul col btn btn-component"
                         value="liste"
                         :title="$t('additional:modules.boris.floorValues.title')"
                         @click="setButtonValue($event.target.value)"
@@ -563,6 +559,37 @@ export default {
 
 <style lang="scss" scoped>
 @import "~variables";
+
+.btn-component {
+  --bs-btn-color: #001B3D;
+  --bs-btn-bg: #D6E3FF;
+  --bs-btn-border-radius: 16px;
+  --bs-btn-hover-color: #001B3D;
+  --bs-btn-hover-bg: #AFCBFF;
+  --bs-btn-border: none;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #001B3D;
+  --bs-btn-focus-color: #fff;
+  --bs-btn-focus-bg: #001B3D;
+  --bs-btn-transition: all 0.3s ease-in-out;
+  color: var(--bs-btn-color);
+  background-color: var(--bs-btn-bg);
+  border-radius: var(--bs-btn-border-radius);
+  border: var(--bs-btn-border);
+  transition: var(--bs-btn-transition);
+  box-sizing: border-box;
+}
+
+.btn-component:hover {
+  color: var(--bs-btn-hover-color);
+  background-color: var(--bs-btn-hover-bg);
+}
+
+.btn-component:focus,
+.btn-component:active {
+  color: var(--bs-btn-active-color);
+  background-color: var(--bs-btn-active-bg);
+}
 
 .form-check-label {
     margin: 0 0.5rem;
