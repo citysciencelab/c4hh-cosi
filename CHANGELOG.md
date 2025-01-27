@@ -9,6 +9,7 @@
 ### Added
 
 ### Changed
+- Boris: Design adjustments for the component buttons, including colors and hover effect. 
 
 ### Deprecated
 
