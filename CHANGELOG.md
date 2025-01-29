@@ -8,6 +8,7 @@
 ### __Breaking Changes__
 
 ### Added
+- Added 'addLayerRemotely' to version 3.x
 
 ### Changed
 - The following package has been updated:

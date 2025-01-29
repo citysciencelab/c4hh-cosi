@@ -1,0 +1,19 @@
+{
+  "modules": {
+      "addLayerRemotely": {
+        "geojson": {
+          "alertTitleSuccess": "Layer added successfully",
+          "alreadyAdded": "The layer of the given GeoJSON has already been added.",
+          "completeMessage": "The layer of the given GeoJSON was added to the topic tree and can be selected via <b>Add layer</b>!",
+          "errorTitle": "Layer could not be added",
+          "layerNotFound": "addLayerRemotely: The layer with the id {{layerId}} was not found to zoom to the features."
+        },
+        "wms": {
+          "alertTitleSuccess": "Layer added successfully",
+          "alreadyAdded": "The layers of the requested WMS have already been added.",
+          "completeMessage": "The layers of the requested WMS were added to the topic tree and can be selected via <b>Add layer</b>!",
+          "errorTitle": "Layer could not be added"
+        }
+      }
+  }
+}
