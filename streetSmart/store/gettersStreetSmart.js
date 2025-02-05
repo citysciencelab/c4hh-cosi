@@ -14,7 +14,7 @@ const getters = {
      * @returns {string} the current locale if supported or "de"
      */
     currentLocale (___, __, _, rootGetters) {
-        let locale = rootGetters["Language/currentLocale"];
+        let locale = rootGetters["Modules/Language/currentLocale"];
 
         if (locale === "en") {
             locale = "en-US";
