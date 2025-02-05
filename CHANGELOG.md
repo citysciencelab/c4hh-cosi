@@ -3,17 +3,9 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
-
-### Added
-
+## 2025-02-05 v3.7.0
 ### Changed
 - Added Boris to version 3.x
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - Boris: Resolved issue with the parameterised URL call.
