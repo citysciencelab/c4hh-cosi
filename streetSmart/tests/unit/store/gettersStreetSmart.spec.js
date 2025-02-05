@@ -7,7 +7,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
 
         it("returns the 'de' if currentLocale is 'de'", function () {
             const rootGetters = {
-                    "Language/currentLocale": "de"
+                    "Modules/Language/currentLocale": "de"
                 },
                 locale = getters.currentLocale({}, {}, {}, rootGetters);
 
@@ -15,7 +15,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
         });
         it("returns the 'en-US' if currentLocale is 'en'", function () {
             const rootGetters = {
-                    "Language/currentLocale": "en"
+                    "Modules/Language/currentLocale": "en"
                 },
                 locale = getters.currentLocale({}, {}, {}, rootGetters);
 
@@ -23,7 +23,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
         });
         it("returns the 'pt-BR' if currentLocale is 'pt'", function () {
             const rootGetters = {
-                    "Language/currentLocale": "pt"
+                    "Modules/Language/currentLocale": "pt"
                 },
                 locale = getters.currentLocale({}, {}, {}, rootGetters);
 
@@ -31,7 +31,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
         });
         it("returns the 'de' if currentLocale is 'es'", function () {
             const rootGetters = {
-                    "Language/currentLocale": "es"
+                    "Modules/Language/currentLocale": "es"
                 },
                 locale = getters.currentLocale({}, {}, {}, rootGetters);
 
@@ -39,7 +39,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
         });
         it("returns the 'de' if currentLocale is 'tr'", function () {
             const rootGetters = {
-                    "Language/currentLocale": "tr"
+                    "Modules/Language/currentLocale": "tr"
                 },
                 locale = getters.currentLocale({}, {}, {}, rootGetters);
 
@@ -47,7 +47,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
         });
         it("returns the 'de' if currentLocale is undefined", function () {
             const rootGetters = {
-                    "Language/currentLocale": undefined
+                    "Modules/Language/currentLocale": undefined
                 },
                 locale = getters.currentLocale({}, {}, {}, rootGetters);
 
@@ -55,7 +55,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
         });
         it("returns the 'de' if currentLocale is null", function () {
             const rootGetters = {
-                    "Language/currentLocale": null
+                    "Modules/Language/currentLocale": null
                 },
                 locale = getters.currentLocale({}, {}, {}, rootGetters);
 
