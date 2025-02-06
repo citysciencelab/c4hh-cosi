@@ -11,7 +11,7 @@ export default {
     computed: {
         ...mapGetters("Modules/StreetSmart", ["packagesLoaded"]),
         ...mapGetters("Maps", ["clickCoordinate"]),
-        ...mapGetters("Modules/Language", ["currentLocale"])
+        ...mapGetters("Modules/StreetSmart", ["currentLocale"])
     },
     watch: {
         clickCoordinate: {
@@ -24,10 +24,7 @@ export default {
         },
         currentLocale: {
             handler (currentLocale) {
-                if (this.language === "" && localStorage && localStorage.i18nextLng) {
-                    this.language = localStorage.i18nextLng;
-                }
-                else if (currentLocale !== this.language) {
+                if (currentLocale !== this.language) {
                     this.destroyApi();
                     this.initApi();
                     this.language = currentLocale;
@@ -38,9 +35,6 @@ export default {
     created () {
         if (!this.packagesLoaded) {
             this.loadPackages(this.apiLoadFinished);
-        }
-        if (localStorage && localStorage.i18nextLng) {
-            this.language = localStorage.i18nextLng;
         }
     },
     mounted () {
