@@ -16,6 +16,7 @@
 ### Removed
 
 ### Fixed
+- StreetSmart: Fixed language switch, now supporting english, german and portuguese
 
 ---
 
