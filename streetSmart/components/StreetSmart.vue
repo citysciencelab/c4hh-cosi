@@ -3,9 +3,15 @@ import {mapGetters, mapActions, mapMutations} from "vuex";
 
 export default {
     name: "StreetSmart",
+    data () {
+        return {
+            language: ""
+        };
+    },
     computed: {
         ...mapGetters("Modules/StreetSmart", ["packagesLoaded"]),
-        ...mapGetters("Maps", ["clickCoordinate"])
+        ...mapGetters("Maps", ["clickCoordinate"]),
+        ...mapGetters("Modules/Language", ["currentLocale"])
     },
     watch: {
         clickCoordinate: {
@@ -15,11 +21,26 @@ export default {
                 }
             },
             deep: true
+        },
+        currentLocale: {
+            handler (currentLocale) {
+                if (this.language === "" && localStorage && localStorage.i18nextLng) {
+                    this.language = localStorage.i18nextLng;
+                }
+                else if (currentLocale !== this.language) {
+                    this.destroyApi();
+                    this.initApi();
+                    this.language = currentLocale;
+                }
+            }
         }
     },
     created () {
         if (!this.packagesLoaded) {
             this.loadPackages(this.apiLoadFinished);
+        }
+        if (localStorage && localStorage.i18nextLng) {
+            this.language = localStorage.i18nextLng;
         }
     },
     mounted () {
