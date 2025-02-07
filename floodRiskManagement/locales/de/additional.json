@@ -1,0 +1,8 @@
+{
+  "modules": {
+    "floodRiskManagement": {
+      "description": "Menü Hochwassergefahrenkarten und Hochwasserrisikokarten",
+      "title": "Hochwasserrisikomanagement"
+    }
+  }
+}

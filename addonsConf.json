@@ -77,5 +77,8 @@
   },
   "waterRiskCheck": {
     "type": "tool"
+  },
+  "floodRiskManagement": {
+    "type": "tool"
   }
 }

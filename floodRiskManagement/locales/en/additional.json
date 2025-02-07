@@ -1,0 +1,8 @@
+{
+  "modules": {
+    "floodRiskManagement": {
+      "description": "Menu of flood hazard maps and flood risk maps",
+      "title": "Flood risk management"
+    }
+  }
+}
