@@ -1,11 +1,21 @@
 <script>
+import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerItem.vue";
+
 export default {
     name: "FloodRiskManagementCard",
+    components: {
+        SpinnerItem
+    },
     props: {
         icon: {
             type: [Boolean, String],
             required: false,
             default: false
+        },
+        selectedCard: {
+            type: String,
+            required: false,
+            default: ""
         },
         title: {
             type: String,
@@ -15,14 +25,27 @@ export default {
             type: [Boolean, String],
             required: false,
             default: false
-        },
-        selectedCard: {
-            type: String,
-            required: false,
-            default: ""
         }
     },
-    emits: ["setSelected"]
+    emits: ["setSelected"],
+    data () {
+        return {
+            showLoadSpinner: false
+        };
+    },
+    watch: {
+        /**
+         * Watcher for setting the loading spinner.
+         * @returns {void}
+         */
+        selectedCard () {
+            this.showLoadSpinner = true;
+
+            setTimeout(() => {
+                this.showLoadSpinner = false;
+            }, 1000);
+        }
+    }
 };
 </script>
 <template>
@@ -30,6 +53,12 @@ export default {
         class="card p-3 d-flex position-relative"
         :isActive="selectedCard === title"
     >
+        <div
+            v-if="showLoadSpinner && selectedCard === title"
+            class="loading"
+        >
+            <SpinnerItem />
+        </div>
         <div class="card-body align-middle">
             <div class="row">
                 <i
@@ -79,7 +108,19 @@ export default {
                 color: white;
             }
     }
-      .title-button {
+
+    .loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.3);
+        text-align: center;
+        align-content: center;
+    }
+
+    .title-button {
         box-shadow: none;
         text-align: left;
         &:enabled {
