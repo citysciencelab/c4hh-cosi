@@ -1,11 +1,10 @@
 import {expect} from "chai";
 import getters from "../../../store/gettersStreetSmart";
 
-
 describe("addons/StreetSmart/store/gettersStreetSmart", function () {
     describe("currentLocale", function () {
 
-        it("returns the 'de' if currentLocale is 'de'", function () {
+        it("returns 'de' if currentLocale is 'de'", function () {
             const rootGetters = {
                     "Modules/Language/currentLocale": "de"
                 },
@@ -13,7 +12,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
 
             expect(locale).to.be.eql("de");
         });
-        it("returns the 'en-US' if currentLocale is 'en'", function () {
+        it("returns 'en-US' if currentLocale is 'en'", function () {
             const rootGetters = {
                     "Modules/Language/currentLocale": "en"
                 },
@@ -21,7 +20,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
 
             expect(locale).to.be.eql("en-US");
         });
-        it("returns the 'pt-BR' if currentLocale is 'pt'", function () {
+        it("returns 'pt-BR' if currentLocale is 'pt'", function () {
             const rootGetters = {
                     "Modules/Language/currentLocale": "pt"
                 },
@@ -29,7 +28,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
 
             expect(locale).to.be.eql("pt-BR");
         });
-        it("returns the 'de' if currentLocale is 'es'", function () {
+        it("returns 'de' if currentLocale is 'es'", function () {
             const rootGetters = {
                     "Modules/Language/currentLocale": "es"
                 },
@@ -37,7 +36,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
 
             expect(locale).to.be.eql("de");
         });
-        it("returns the 'de' if currentLocale is 'tr'", function () {
+        it("returns 'de' if currentLocale is 'tr'", function () {
             const rootGetters = {
                     "Modules/Language/currentLocale": "tr"
                 },
@@ -45,7 +44,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
 
             expect(locale).to.be.eql("de");
         });
-        it("returns the 'de' if currentLocale is undefined", function () {
+        it("returns 'de' if currentLocale is undefined", function () {
             const rootGetters = {
                     "Modules/Language/currentLocale": undefined
                 },
@@ -53,9 +52,31 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
 
             expect(locale).to.be.eql("de");
         });
-        it("returns the 'de' if currentLocale is null", function () {
+        it("returns 'de' if currentLocale is null", function () {
             const rootGetters = {
                     "Modules/Language/currentLocale": null
+                },
+                locale = getters.currentLocale({}, {}, {}, rootGetters);
+
+            expect(locale).to.be.eql("de");
+        });
+        it("gets the locale from localstorage", async function () {
+            global.localStorage = {
+                "i18nextLng": "en"
+            };
+            const rootGetters = {
+                    "Modules/Language/currentLocale": ""
+                },
+                locale = getters.currentLocale({}, {}, {}, rootGetters);
+
+            expect(locale).to.be.eql("en-US");
+        });
+        it("defaults to de if the localStorage language is not available", async function () {
+            global.localStorage = {
+                "i18nextLng": "it"
+            };
+            const rootGetters = {
+                    "Modules/Language/currentLocale": ""
                 },
                 locale = getters.currentLocale({}, {}, {}, rootGetters);
 
