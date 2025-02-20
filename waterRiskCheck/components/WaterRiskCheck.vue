@@ -1,7 +1,6 @@
 <script>
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
-import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import {mapGetters, mapActions} from "vuex";
 import getOAFFeature from "../../../src/shared/js/api/oaf/getOAFFeature";
 import Point from "ol/geom/Point";
@@ -24,8 +23,7 @@ export default {
     name: "WaterRiskCheck",
     components: {
         FlatButton,
-        IconButton,
-        SpinnerItem
+        IconButton
     },
     data () {
         return {
@@ -970,13 +968,6 @@ export default {
         id="tool-waterRiskCheck"
         class="water-risk-check position-relative"
     >
-        <div v-if="showSpinner">
-            <div class="position-absolute w-100 h-100 transparentBG d-flex justify-content-center align-items-center">
-                <SpinnerItem
-                    custom-class="large-spinner"
-                />
-            </div>
-        </div>
         <div v-if="!formStarted && !formFinished">
             <p>
                 {{ $t('additional:modules.waterRiskCheck.generelExplenationText') }}
@@ -1040,11 +1031,13 @@ export default {
                     <div class="col d-flex justify-content-center mt-3">
                         <FlatButton
                             id="start-form"
-                            :aria-label="$t('additional:modules.waterRiskCheck.formStartButton')"
+                            icon="bi-play-circle"
                             type="button"
+                            :aria-label="$t('additional:modules.waterRiskCheck.formStartButton')"
+                            :disabled="showSpinner"
                             :text="$t('additional:modules.waterRiskCheck.formStartButton')"
                             :interaction="startForm"
-                            icon="bi-play-circle"
+                            :spinner-trigger="showSpinner"
                         />
                     </div>
                 </div>
