@@ -104,14 +104,14 @@ export default {
                 },
                 sri07_wassertiefe: {
                     type: "WCS",
-                    baseURL: "https://qs-geodienste.hamburg.de/wcs_starkregengefahrenkarte",
+                    baseURL: "https://geodienste.hamburg.de/wcs_starkregengefahrenkarte",
                     coverageId: "sri07_wassertiefe",
                     epsg: "EPSG:4326",
                     value: undefined
                 },
                 sri12_wassertiefe: {
                     type: "WCS",
-                    baseURL: "https://qs-geodienste.hamburg.de/wcs_starkregengefahrenkarte",
+                    baseURL: "https://geodienste.hamburg.de/wcs_starkregengefahrenkarte",
                     coverageId: "sri12_wassertiefe",
                     epsg: "EPSG:4326",
                     value: undefined
