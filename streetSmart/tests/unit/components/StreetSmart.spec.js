@@ -13,13 +13,15 @@ describe("addons/streetSmart/components/StreetSmart.vue", () => {
         packagesLoaded,
         setPositionSpy,
         store,
-        wrapper;
+        wrapper,
+        currentLocale;
 
     beforeEach(() => {
         packagesLoaded = true;
         destroyApiSpy = sinon.spy();
         initApiSpy = sinon.spy();
         setPositionSpy = sinon.spy();
+        currentLocale = sinon.spy();
 
         store = createStore({
             modules: {
@@ -29,7 +31,8 @@ describe("addons/streetSmart/components/StreetSmart.vue", () => {
                         StreetSmart: {
                             namespaced: true,
                             getters: {
-                                packagesLoaded: () => packagesLoaded
+                                packagesLoaded: () => packagesLoaded,
+                                currentLocale: () => currentLocale
                             },
                             mutations: {
                                 setPackagesLoaded: sinon.spy()
