@@ -1,6 +1,6 @@
 import {WFS} from "ol/format.js";
 import {default as turfIntersect} from "@turf/intersect";
-import {polygon as turfPolygon} from "@turf/helpers";
+import {polygon as turfPolygon, featureCollection as turfFeatureCollection} from "@turf/helpers";
 import axios from "axios";
 
 export default {
@@ -95,7 +95,7 @@ export default {
                 const featureGeojson = await dispatch("Modules/GraphicalSelect/featureToGeoJson", feature, {root: true}),
                     turfRaster = turfPolygon([featureGeojson.coordinates[0]]);
 
-                if (turfIntersect(turfGeoSelection, turfRaster)) {
+                if (turfIntersect(turfFeatureCollection([turfGeoSelection, turfRaster]))) {
                     await dispatch("addFeaturenameToRasternames", {feature: feature, rasterNames: rasterNames});
                 }
             });

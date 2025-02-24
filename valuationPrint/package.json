@@ -9,7 +9,7 @@
   },
   "scripts": {},
   "dependencies": {
-    "@turf/buffer": "^6.5.0",
-    "@turf/union": "^6.5.0"
+    "@turf/buffer": "^7.2.0",
+    "@turf/union": "^7.2.0"
   }
 }

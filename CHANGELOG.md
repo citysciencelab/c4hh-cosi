@@ -10,6 +10,26 @@
 ### Added
 
 ### Changed
+- The following package has been updated:
+    - devDependencies:
+        - husky: 9.0.11 to 9.1.7
+    - sdpDownload:
+        - dependencies:
+            - @turf/helpers: 6.5.0 to 7.2.0
+            - @turf/intersect: 6.5.0 to 7.2.0
+    - valuationPrint:
+        - dependencies:
+            - @turf/buffer: 6.5.0 to 7.2.0
+            - @turf/helpers: 6.5.0 to 7.2.0
+            - @turf/union: 6.5.0 to 7.2.0
+    - waterRiskCheck:
+        - dependencies:
+            - @turf/area: 7.1.0 to 7.2.0
+            - @turf/buffer: 7.1.0 to 7.2.0
+            - @turf/difference: 7.1.0 to 7.2.0
+            - @turf/helpers: 7.1.0 to 7.2.0
+            - @turf/intersect: 7.1.0 to 7.2.0
+            - @turf/points-within-polygon: 7.1.0 to 7.2.0
 
 ### Deprecated
 
