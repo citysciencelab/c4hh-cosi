@@ -23,9 +23,10 @@
       "parcelLabel": "Parcel:",
       "buildingCountLabel": "Number of buildings:",
       "addressLabel": "Address",
-      "addressInput":"Please enter your address in the search bar on the left!",
+      "addressInput":"To get started, please enter the address you are looking for in the search field on the left!",
       "reset": "The questionnaire will be reset including all answers. You can restart the questionnaire with a different address.",
-      "resetButton": "Restart questionnaire"
+      "resetButton": "Restart questionnaire",
+      "hamburgIconText": "Hamburg Klimaplanförderung Logo"
     }
   }
 }

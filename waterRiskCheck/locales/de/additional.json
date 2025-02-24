@@ -3,7 +3,7 @@
     "waterRiskCheck": {
       "description": "Erhalte Informationen und Handlungsempfehlungen zu deiner Adresse",
       "title": "Wegweiser Überflutungsvorsorge",
-      "generelExplenationText": "Mit dem Wegweiser Überflutungsvorsorge erhalten Sie Empfehlungen zur individuellen Gefahrenlage und Maßnahmenvorschläge für Ihr Grundstück. Der Wegweiser kombiniert unser Fachwissen, Wasser-Fachkarten und Ihre Antworten in einem kurzen Fragebogenzu einer individuellen Empfehlung. Sie erfahren in diesem Dokument außerdem, wie Sie sich im Notfall verhalten sollten. Der Wegweiser beginnt mit einer Eingabe Ihrer Adresse in das Suchfeld auf der linken Seite. Die konkrete Eingabe ermöglicht dabei eine genauere Auswertung der Fachkarten. Anschließend startet der kurze Fragebogen mit vier Fragen.",
+      "generelExplenationText": "Mit dem Wegweiser Überflutungsvorsorge erhalten Sie Empfehlungen zur individuellen Gefahrenlage und Maßnahmenvorschläge für Ihr Grundstück.<br><br>Der Wegweiser kombiniert unser Fachwissen, Wasser-Fachkarten und Ihre Antworten in einem kurzen Fragebogen zu einer individuellen Empfehlung. Sie erfahren in diesem Dokument außerdem, wie Sie sich im Notfall verhalten sollten.<br><br>Der Wegweiser beginnt mit einer Eingabe Ihrer Adresse in das Suchfeld auf der linken Seite. Die konkrete Eingabe ermöglicht dabei eine genauere Auswertung der Fachkarten. Anschließend startet der kurze Fragebogen mit vier Fragen.",
       "informationTextIconLabel": "Hinweis",
       "informationText": "Der Fragebogen richtet sich ausschließlich an berechtigte Nutzer:innen. Sie sind berechtigt, wenn Sie wohnhaft an der eingegebenen Adresse sind oder Eigentümer:in des betrachteten Grundstückes sind. Mit \"Fragebogen starten\" bestätigen Sie, dass Sie für die angefragte Adresse berechtigt sind",
       "formStartButton": "Fragebogen starten",
@@ -23,9 +23,10 @@
       "parcelLabel": "Flurstück:",
       "buildingCountLabel": "Anzahl der Gebäude:",
       "addressLabel": "Adresse",
-      "addressInput":"Bitte geben Sie Ihre Adresse links in die Suchleiste ein!",
+      "addressInput":"Um loszulegen, geben Sie bitte die zu suchende Adresse links in dem Suchfeld ein!",
       "reset": "Der Fragebogen wird einschließlich aller Antworten zurückgesetzt. Sie können den Fragebogen mit einer anderen Adresse neu starten.",
-      "resetButton": "Fragebogen neu starten"
+      "resetButton": "Fragebogen neu starten",
+      "hamburgIconText": "Hamburg Klimaplanförderung Logo"
     }
   }
 }

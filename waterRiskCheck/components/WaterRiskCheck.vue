@@ -969,23 +969,40 @@ export default {
         class="water-risk-check position-relative"
     >
         <div v-if="!formStarted && !formFinished">
-            <p>
-                {{ $t('additional:modules.waterRiskCheck.generelExplenationText') }}
-            </p>
-            <br>
-            <p
-                v-if="!enabledStart"
-                class="address-hint d-flex justify-content-center align-items-center my-3 text-md-center"
-            >
-                {{ $t("additional:modules.waterRiskCheck.addressInput") }}
-            </p>
             <div
-                v-else
+                v-if="!enabledStart"
+                class="container pb-3"
+            >
+                <div class="row justify-content-md-center">
+                    <div class="col col-11">
+                        <div class="row border border-2 border-secondary rounded-2 justify-content-md-center my-3">
+                            <div class="col col-2 col-md-2 d-flex flex-wrap align-items-center">
+                                <img
+                                    class="header-logo pe-3"
+                                    :src="'./assets/logo_without_text.png'"
+                                    :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                                >
+                            </div>
+                            <p
+                                class="col address-hint text-secondary my-3"
+                            >
+                                {{ $t("additional:modules.waterRiskCheck.addressInput") }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p
+                class="info-text ms-5"
+                v-html="$t('additional:modules.waterRiskCheck.generelExplenationText')"
+            />
+            <div
+                v-if="enabledStart"
                 class="container mt-3"
             >
-                <div class="row justify-content-center">
+                <div class="row justify-content-center pt-3">
                     <div class="col-1 p-0">
-                        <i class="geo-icon bi-geo-alt-fill text-secondary float-center me-1" />
+                        <i class="geo-icon bi-geo-alt-fill float-center me-1" />
                     </div>
                     <div class="address-container col-auto d-flex flex-column justify-content-center align-items-start m-0">
                         <p class="current-address mb-2">
@@ -1011,7 +1028,7 @@ export default {
                         </div>
                     </div>
                 </div>
-                <hr class="my-5">
+                <hr class="my-4">
                 <div class="row">
                     <div class="info-icon col-1 d-flex align-items-center">
                         <i class="bi-info-circle" />
@@ -1020,10 +1037,19 @@ export default {
                         <p class="fs-5">
                             {{ $t("additional:modules.waterRiskCheck.informationTextIconLabel") }}
                         </p>
+                        <div
+                            class="col pe-0"
+                        >
+                            <img
+                                class="header-logo float-end"
+                                :src="'./assets/logo_without_text.png'"
+                                :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                            >
+                        </div>
                     </div>
                 </div>
                 <div class="row mb-3 mt-2">
-                    <p class="col offset-md-1">
+                    <p class="hint-text col offset-md-1">
                         {{ $t("additional:modules.waterRiskCheck.informationText") }}
                     </p>
                 </div>
@@ -1212,10 +1238,27 @@ export default {
                     </p>
                 </div>
                 <div>
-                    <h5>{{ $t('additional:modules.waterRiskCheck.downloadPageTitle') }}</h5>
-                    <p>{{ $t('additional:modules.waterRiskCheck.downloadInformationText') }}</p>
+                    <div class="row mb-3">
+                        <h5 class="col col-md">
+                            {{ $t('additional:modules.waterRiskCheck.downloadPageTitle') }}
+                        </h5>
+                        <div
+                            class="col pe-4"
+                        >
+                            <img
+                                class="header-logo float-end"
+                                :src="'./assets/logo_without_text.png'"
+                                :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                            >
+                        </div>
+                    </div>
+                    <p class="download-text">
+                        {{ $t('additional:modules.waterRiskCheck.downloadInformationText') }}
+                    </p>
                     <br>
-                    <p>{{ $t('additional:modules.waterRiskCheck.downloadInformationTextRestart') }}</p>
+                    <p class="download-text">
+                        {{ $t('additional:modules.waterRiskCheck.downloadInformationTextRestart') }}
+                    </p>
                     <div
                         ref="downloadSection"
                         class="mt-3"
@@ -1257,9 +1300,9 @@ export default {
             <div class="row">
                 <div class="d-flex justify-content-center pt-4">
                     <img
-                        class="logo-image img-fluid"
-                        :src="'./assets/logo.png'"
-                        :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                        class="hamburg-logo img-fluid"
+                        :src="'./assets/Foerderlogo_LSK_neg_RGB.png'"
+                        :alt="$t('additional:modules.waterRiskCheck.hamburgIconAltText')"
                     >
                 </div>
             </div>
@@ -1273,6 +1316,9 @@ export default {
 
 #collapseHiddenButton {
     display: none;
+}
+#tool-waterRiskCheck {
+    height: 100vh;
 }
 .answer {
     width: 50%;
@@ -1307,6 +1353,12 @@ export default {
     transform: scale(1.5) translateX(-11%) translateY(+5%);
     width: 75%;
 }
+.info-text, .download-text {
+    font-size: $font-size-base;
+}
+.hint-text {
+    font-size: $font_size_sm;
+}
 .selected-answer-icon {
     left: 15px;
     top: 9px;
@@ -1320,6 +1372,7 @@ export default {
     image-rendering: crisp-edges;
 }
 .geo-icon {
+    color: $secondary;
     font-size: 40px;
 }
 .address-container p {
@@ -1331,6 +1384,7 @@ export default {
 }
 .address-hint, .basic-infos-address, .text-secondary {
     font-family: $font_family_accent;
+    font-size: $font_size_big;
 }
 .header-logo {
     width: 80px;
@@ -1347,4 +1401,8 @@ export default {
     width: 4rem;
     height: 4rem;
 }
+.hamburg-logo {
+    width: 200px;
+}
+
 </style>
