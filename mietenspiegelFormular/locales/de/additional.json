@@ -1,0 +1,25 @@
+{
+  "modules": {
+      "tools": {
+          "mietenspiegelFormular": {
+              "title": "Wohnlagen",
+              "errorMessages": {
+                "noDataFound": "Für diese Adresse wurden keine Daten gefunden.",
+                "noUrl": "Es konnte keine Abfrage an die Koordinaten geschickt werden."
+              },
+              "street": "Straße",
+              "cityDistrict": "Stadtteil",
+              "pleaseSelect": "Bitte wählen",
+              "editor": "Herausgeber:",
+              "collectionStatus": "Erhebungsstand:",
+              "notice": "Hinweise:",
+              "middle": "Mittelwert:",
+              "min": "Spanne Min.:",
+              "max": "Spanne Max.:",
+              "rentPriceTitle": "Nettokaltmiete ohne Heizung und ohne Betriebskosten (in EUR/m²)",
+              "noticeText": "Diese Tabelle lässt sich nur richtig anwenden, wenn die Erläuterungen in der Broschüre <a target=\"_blank\" href=\"{{link}}\">{{text}}</a> genau beachtet werden.",
+              "noData": "unzureichende Datenbasis."
+          }
+      }
+  }
+}

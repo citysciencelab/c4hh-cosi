@@ -11,6 +11,10 @@
     "type": "searchInterface",
     "path": "searchInterfaces/waterRiskCheckSearch"
   },
+  "mietenspiegelSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/mietenspiegelSearch"
+  },
   "populationRequest": {
     "type": "tool"
   },
@@ -79,6 +83,9 @@
     "type": "tool"
   },
   "floodRiskManagement": {
+    "type": "tool"
+  },
+  "mietenspiegelFormular": {
     "type": "tool"
   }
 }
