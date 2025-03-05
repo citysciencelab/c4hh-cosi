@@ -3,17 +3,9 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
-
-### Added
-
+## 2025-03-05 v3.8.0
 ### Changed
-- Boris: Design adjustments for the component buttons, including colors and hover effect. 
-
-### Deprecated
-
-### Removed
+- Boris: Design adjustments for the component buttons, including colors and hover effect.
 
 ### Fixed
 - StreetSmart: Fixed language switch, now supporting english, german and portuguese
