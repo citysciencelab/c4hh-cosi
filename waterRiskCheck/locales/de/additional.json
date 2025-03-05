@@ -26,7 +26,8 @@
       "addressInput":"Um loszulegen, geben Sie bitte die zu suchende Adresse links in dem Suchfeld ein!",
       "reset": "Der Fragebogen wird einschließlich aller Antworten zurückgesetzt. Sie können den Fragebogen mit einer anderen Adresse neu starten.",
       "resetButton": "Fragebogen neu starten",
-      "hamburgIconText": "Hamburg Klimaplanförderung Logo"
+      "hamburgIconText": "Hamburg Klimaplanförderung Logo",
+      "waitingLabel": "Bitte warten!"
     }
   }
 }

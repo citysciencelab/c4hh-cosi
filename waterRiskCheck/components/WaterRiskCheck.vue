@@ -125,7 +125,9 @@ export default {
             fileprefix: "",
             middleFloodDepth: "",
             seldomFloodDepth: "",
-            mapfishData: {}
+            mapfishData: {},
+            startBtnLabel: this.$t("additional:modules.waterRiskCheck.formStartButton"),
+            finishBtnLabel: this.$t("additional:modules.waterRiskCheck.finishButton")
         };
     },
     computed: {
@@ -353,6 +355,24 @@ export default {
                 this.resetAll(false);
             }
             this.walkTroughToFetchAndAdd();
+        },
+
+        isCreatingPDF () {
+            if (this.isCreatingPDF) {
+                this.finishBtnLabel = this.$t("additional:modules.waterRiskCheck.waitingLabel");
+            }
+            else {
+                this.finishBtnLabel = this.$t("additional:modules.waterRiskCheck.finishButton");
+            }
+        },
+
+        showSpinner () {
+            if (this.showSpinner) {
+                this.startBtnLabel = this.$t("additional:modules.waterRiskCheck.waitingLabel");
+            }
+            else {
+                this.startBtnLabel = this.$t("additional:modules.waterRiskCheck.formStartButton");
+            }
         },
 
         currentQuestionIdx (val) {
@@ -1059,9 +1079,9 @@ export default {
                             id="start-form"
                             icon="bi-play-circle"
                             type="button"
-                            :aria-label="$t('additional:modules.waterRiskCheck.formStartButton')"
+                            :aria-label="startBtnLabel"
                             :disabled="showSpinner"
-                            :text="$t('additional:modules.waterRiskCheck.formStartButton')"
+                            :text="startBtnLabel"
                             :interaction="startForm"
                             :spinner-trigger="showSpinner"
                         />
@@ -1216,9 +1236,9 @@ export default {
                     <FlatButton
                         v-else
                         id="page-forward"
-                        :aria-label="$t('additional:modules.waterRiskCheck.finishButton')"
+                        :aria-label="finishBtnLabel"
                         type="button"
-                        :text="$t('additional:modules.waterRiskCheck.finishButton')"
+                        :text="finishBtnLabel"
                         :interaction="createMapfishDialog"
                         :disabled="typeof questions[currentQuestionIdx].selectedAnswer === 'undefined' || isCreatingPDF"
                         :spinner-trigger="isCreatingPDF"
