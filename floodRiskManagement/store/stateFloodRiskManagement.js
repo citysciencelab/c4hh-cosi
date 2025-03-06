@@ -47,6 +47,7 @@
  * @property {String} printServiceId the id from the rest services json for the print app.
  * @property {String} printService the type of print service, mapfish and plotservice currently possible.
  * @property {Boolean} printStarted - true if the print process is started.
+ * @property {String} printUrl - the generated print url.
  * @property {Object} scaleAttribute - the scale attribute.
  * @property {Number[]} scaleList available scales of the specified print configuration.
  * @property {String} serviceUrl the service url.
@@ -185,6 +186,7 @@ const state = {
     printServiceId: "mapfish",
     printService: "mapfish",
     printStarted: false,
+    printUrl: "",
     scaleAttribute: null,
     scaleList: [],
     serviceUrl: "",

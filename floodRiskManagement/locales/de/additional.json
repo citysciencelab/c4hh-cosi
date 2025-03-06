@@ -4,7 +4,8 @@
       "alertMessage": "Die maximale Anzahl an parallel ausgeführten Ausdrucken ist überschritten.<br>Bitte versuchen Sie es erneut sobald die Erstellung anderer Ausdrucke abgeschlossen ist.",
       "button":{
         "applyLabel": "Einstellungen anwenden",
-        "printLabel": "Drucken"
+        "downloadLabel": "Herunterladen",
+        "printLabel": "Datei erstellen"
       },
       "cycle": ". Zyklus",
       "description": "Hochwassergefahrenkarten und Hochwasserrisikokarten drucken",

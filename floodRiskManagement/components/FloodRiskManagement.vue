@@ -42,6 +42,7 @@ export default {
             "printHwsId",
             "printLayerList",
             "printServiceId",
+            "printUrl",
             "selectedCycleName",
             "selectedEvent",
             "selectedFrequency",
@@ -171,8 +172,10 @@ export default {
         }
     },
     mounted () {
-        this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
-        document.getElementById("mp-menu-secondaryMenu").style.width = "33vw";
+        if (document.getElementById("mp-menu-secondaryMenu")) {
+            this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
+            document.getElementById("mp-menu-secondaryMenu").style.width = "33vw";
+        }
 
         if (this.selectedCycleName === "") {
             this.setSelectedCycleName(this.reversedCyclesKeys[0]);
@@ -212,6 +215,7 @@ export default {
             "setPrintHwsId",
             "setPrintLayerList",
             "setPrintStarted",
+            "setPrintUrl",
             "setSelectedCycleName",
             "setSelectedEvent",
             "setSelectedFrequency",
@@ -230,6 +234,19 @@ export default {
                     this.changeVisibility({layerId: id, value: active});
                 });
             }
+        },
+
+        /**
+         * Downloads the pdf file by the url
+         * @param {String} url - The print url.
+         * @returns {void}
+         */
+        download (url) {
+            if (typeof url !== "string" || url === "") {
+                return;
+            }
+            window.open(url, "_blank");
+            this.setPrintUrl("");
         },
 
         /**
@@ -452,12 +469,22 @@ export default {
                 </div>
                 <div class="print col-md-12 d-flex justify-content-center">
                     <FlatButton
+                        v-if="printUrl===''"
                         id="printBtn"
                         :aria-label="$t('additional:modules.floodRiskManagement.button.printLabel')"
                         :disabled="printDisabled"
                         :icon="'bi bi-printer'"
                         :interaction="() => print()"
                         :text="$t('additional:modules.floodRiskManagement.button.printLabel')"
+                    />
+                    <FlatButton
+                        v-else
+                        id="printBtn"
+                        :aria-label="$t('additional:modules.floodRiskManagement.button.downloadLabel')"
+                        :disabled="printDisabled"
+                        :icon="'bi bi-printer'"
+                        :interaction="() => download(printUrl)"
+                        :text="$t('additional:modules.floodRiskManagement.button.downloadLabel')"
                     />
                     <span
                         v-if="isPrinting"

@@ -195,7 +195,7 @@ export default {
             const index = response.downloadURL.lastIndexOf("/"),
                 fileId = response.downloadURL.substr(index);
 
-            window.open(state.serviceUrl + printFolderUrlPart + state.printAppId + "/report" + fileId);
+            commit("setPrintUrl", state.serviceUrl + printFolderUrlPart + state.printAppId + "/report" + fileId);
         }
         else {
             // The report is not ready yet. Check again in 2s.

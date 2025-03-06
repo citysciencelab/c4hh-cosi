@@ -4,7 +4,8 @@
       "alertMessage": "The maximum number of parallel printouts has been exceeded.<br>Please try again once the creation of other printouts is complete.",
       "button":{
         "applyLabel": "Apply settings",
-        "printLabel": "Print"
+        "downloadLabel": "Download",
+        "printLabel": "Create File"
       },
       "cycle": ". Cycle",
       "description": "Flood hazard maps and flood risk maps",

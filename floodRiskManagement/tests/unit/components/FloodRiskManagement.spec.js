@@ -358,6 +358,7 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
         store = createStore({
             namespaced: true,
             modules: {
+                namespaced: true,
                 Modules: {
                     namespaced: true,
                     modules: {
@@ -380,6 +381,7 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
                                 printHwsId: () => "gbm",
                                 printLayerList: () => [],
                                 printServiceId: () => "mapfish",
+                                printUrl: () => "http://",
                                 selectedCycleName: () => "",
                                 selectedEvent: () => "Küstenhochwasser",
                                 selectedFrequency: () => "extremes",
@@ -406,6 +408,9 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
                                 },
                                 setPrintLayerList: sinon.stub(),
                                 setPrintStarted: sinon.stub(),
+                                setPrintUrl (state, value) {
+                                    state.printUrl = value;
+                                },
                                 setSelectedCycleName: sinon.stub(),
                                 setSelectedEvent (state, value) {
                                     state.selectedEvent = value;
@@ -538,7 +543,7 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
                 }
             });
 
-            expect(wrapper.findAllComponents(FlatButton).at(1).attributes().id).to.equal("printBtn");
+            expect(wrapper.findAllComponents(FlatButton).at(1).attributes().text).to.equal("additional:modules.floodRiskManagement.button.downloadLabel");
         });
     });
 
