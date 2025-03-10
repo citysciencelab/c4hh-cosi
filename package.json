@@ -12,7 +12,7 @@
     "versionMinor": "npm version minor && npm run versionLatest && git tag -d lts && git push --tags -f --no-verify",
     "versionMajor": "npm version major && npm run versionLatest && git tag -d lts && git push --tags -f --no-verify",
     "versionLatest": "git tag latest -f",
-    "postinstall": "cd sdpDownload && npm install && cd .. && cd vcOblique && npm install && cd .. && cd valuationPrint && npm install && cd .. && cd waterRiskCheck && npm install && cd .. && cd simulationTool && npm install && cd .. && cd shared/js/mapfishUtils && npm install && cd ../../../",
+    "postinstall": "cd sdpDownload && npm install && cd .. && cd vcOblique && npm install && cd .. && cd valuationPrint && npm install && cd .. && cd waterRiskCheck && npm install && cd .. && cd simulationTool && npm install && cd .. && cd shared/js/mapfishUtils && npm install && cd ../../../ && cd vpiDashboard && npm install && cd ..",
     "prePushHook": "cd .. && npm run prePushHook",
     "prepare": "husky install"
   },

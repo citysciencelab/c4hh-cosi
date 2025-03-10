@@ -8,6 +8,7 @@
 
 ### Added
 - Added 'BIMFabrikHH' to version 3.x
+- Added 'vpiDashboard' to version 3.x
 
 ### Changed
 
@@ -25,7 +26,7 @@
 - Removed since version 3 not used state property `deactivateGFI` and `translate#` in language-keys.
 
 ### Fixed
-- Boris: Fixed that all Layers are shown in DropDown Menu, even if gfiAttributes are set to ignore. 
+- Boris: Fixed that all Layers are shown in DropDown Menu, even if gfiAttributes are set to ignore.
 
 ---
 
