@@ -53,10 +53,11 @@ export default {
     },
     data () {
         return {
-            tab: "week",
             apiData: [],
             dates: null,
+            key: "",
             showPreviousWeekUntilThisWeekday: 1,
+            tab: "week",
 
             // props for diagram
             setTooltipValue: (tooltipItem) => {
@@ -149,8 +150,9 @@ export default {
         }
     },
     watch: {
-        reset () {
+        reset (val) {
             this.initializeDates();
+            this.key = val ? "reset" : "noreset";
         },
         dates: {
             handler (value) {
@@ -298,6 +300,7 @@ export default {
             class="dateSelector"
         >
             <TrafficCountDatePicker
+                :key="key"
                 type="week"
                 input-delimiter=", "
                 :format="weekFormat"

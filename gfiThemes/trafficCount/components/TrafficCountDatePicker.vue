@@ -80,12 +80,7 @@ export default {
     mounted () {
         this.initialDates.forEach(date => {
             if (date.includes("KW")) {
-                if (dayjs().weekday() === 0) {
-                    this.toggleSelectedDate(dayjs(date, "gggg [KW] ww").subtract(7, "day"));
-                }
-                else {
-                    this.toggleSelectedDate(dayjs(date, "gggg [KW] ww"));
-                }
+                this.toggleSelectedDate(dayjs(date, "gggg [KW] ww"));
             }
             else {
                 this.toggleSelectedDate(dayjs(date, this.format));
