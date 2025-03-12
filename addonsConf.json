@@ -73,6 +73,9 @@
     "path":"gfiThemes/verkehrsstaerken",
     "type": "gfiTheme"
   },
+  "verkehrsfunctions": {
+    "type": "javascript"
+  },
   "valuationPrint": {
     "type": "tool"
   },
