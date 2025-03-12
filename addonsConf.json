@@ -90,5 +90,8 @@
   },
   "mietenspiegelFormular": {
     "type": "tool"
+  },
+  "sessionTool": {
+    "type": "tool"
   }
 }

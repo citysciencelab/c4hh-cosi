@@ -1,0 +1,13 @@
+{
+  "modules": {
+      "sessionTool": {
+          "title": "Sitzungstool",
+          "description": "Speichern oder laden Sie ihre zuvor gespeicherte Sitzung",
+          "uploadHeader": "Sitzung laden",
+          "buttonTextUpload": "Hochladen",
+          "buttonTextDownload": "Herunterladen",
+          "downloadHeader": "Sitzung speichern",
+          "errorOnLoad": "Beim hochladen ist ein Fehler aufgetreten!"
+      }
+  }
+}

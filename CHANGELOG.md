@@ -9,6 +9,7 @@
 
 ### Added
 - Added 'addLayerRemotely' to version 3.x
+- Added SessionTool to version 3.x
 
 ### Changed
 - The following package has been updated:
