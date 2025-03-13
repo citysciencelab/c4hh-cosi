@@ -319,9 +319,9 @@ export default {
                 "A4_Neubau": this.infiltrationLikelyParcel,
                 "A4_Bestand": this.infiltrationLikelyUnbuilt,
                 "A1_SRI12_ja": this.floodingInSri12 && !this.floodingInSri07,
-                "A1_SRI12_nein": !this.floodingInSri12,
+                "A1_SRI12_nein": this.floodingInSri12 && !this.floodingInSri07,
                 "A1_SRI7_ja": this.floodingInSri07,
-                "A1_SRI7_nein": !this.floodingInSri07
+                "A1_SRI7_nein": this.floodingInSri07
             };
         },
 
