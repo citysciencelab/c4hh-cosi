@@ -13,7 +13,7 @@ setTimeout(() => {
     if (typeof map !== "undefined") {
         map.on("pointermove", (evt) => {
             map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
-                if (layer.get("gfiTheme") === "trafficCount") {
+                if (layer && layer.get("gfiTheme") === "trafficCount") {
                     updateMouseHoverAttribute(feature);
                 }
             });
