@@ -11,13 +11,14 @@ import {Fill, Stroke, Style} from "ol/style.js";
 import getWCSFeatures from "../js/getWCSFeatures.js";
 import spatialOperations from "../js/spatialOperations";
 import isObject from "../../../src/shared/js/utils/isObject";
-import {getFixedMap} from "../../../addons/valuationPrint/js/translator.getFixedMap";
-import {getProportionMap} from "../../../addons/valuationPrint/js/translator.getProportionMap";
-import {getWalkerMap} from "../../../addons/valuationPrint/js/translator.getWalkerMap";
+import {getFixedMap} from "../../shared/js/mapfishUtils/translator.getFixedMap.js";
+import {getProportionMap} from "../../shared/js/mapfishUtils/translator.getProportionMap.js";
+import {getWalkerMap} from "../../shared/js/mapfishUtils/translator.getWalkerMap.js";
 import bbox from "@turf/bbox";
 import {GeoJSON} from "ol/format";
 import axios from "axios";
 import dayjs from "dayjs";
+import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
 
 export default {
     name: "WaterRiskCheck",
@@ -540,7 +541,7 @@ export default {
          * @param {Object} specification - The specification object from the config
          * @return {Object} - The map configurations
          */
-        getMapConf (parcel, specification) {
+        async getMapConf (parcel, specification) {
             const mapConf = {};
 
             if (!isObject(parcel) || Object.keys(parcel).length === 0 || !isObject(specification) || !Object.prototype.hasOwnProperty.call(specification, "cards")) {
@@ -551,6 +552,7 @@ export default {
             try {
                 const
                     cards = specification.cards,
+                    cardKeys = Object.keys(cards),
                     mapProjection = "EPSG:25832",
                     feature = new GeoJSON().readFeature(parcel, {
                         dataProjection: "EPSG:4326",
@@ -558,18 +560,16 @@ export default {
                     }),
                     extent = feature.getGeometry().getExtent();
 
-                if (Object.keys(cards).length > 0) {
-                    Object.keys(cards).forEach(card => {
+                if (cardKeys.length > 0) {
+                    for (const card of cardKeys) {
                         if (cards[card].type === "mapProportion") {
-                            mapConf[card] = getProportionMap(feature, extent, mapProjection, cards[card].style, cards[card].proportion, cards[card].layerIds, cards[card].dpi);
+                            mapConf[card] = await getProportionMap(feature, extent, mapProjection, cards[card].style, cards[card].proportion, cards[card].layerIds, cards[card].dpi);
+                        } else if (cards[card].type === "mapWalker") {
+                            mapConf[card] = await getWalkerMap(feature, bbox(parcel), mapProjection, cards[card].style, cards[card].scale, cards[card].layerIds, cards[card].dpi);
+                        } else if (cards[card].type === "mapFixed") {
+                            mapConf[card] = await getFixedMap(bbox(parcel), mapProjection, cards[card].style, cards[card].bbox, cards[card].layerIds, cards[card].dpi);
                         }
-                        else if (cards[card].type === "mapWalker") {
-                            mapConf[card] = getWalkerMap(feature, bbox(parcel), mapProjection, cards[card].style, cards[card].scale, cards[card].layerIds, cards[card].dpi);
-                        }
-                        else if (cards[card].type === "mapFixed") {
-                            mapConf[card] = getFixedMap(bbox(parcel), mapProjection, cards[card].style, cards[card].bbox, cards[card].layerIds, cards[card].dpi);
-                        }
-                    });
+                    }
                 }
             }
             catch (error) {
@@ -691,8 +691,8 @@ export default {
          * Creates the mapfish dialog and sets mapfishData
          * @return {void}
          */
-        createMapfishDialog () {
-            const mapConf = this.getMapConf(this.parcel[0], this.config?.specification),
+        async createMapfishDialog () {
+            const mapConf = await this.getMapConf(this.parcel[0], this.config?.specification),
                 legends = this.getLegends(this.config?.legends),
                 pdfPageNames = this.preparePDFPageNames(this.pdfPages),
                 attributes = this.getAttributes(mapConf, legends, pdfPageNames);
@@ -898,43 +898,7 @@ export default {
          * @returns {void}
          */
         startPrint (url, format, appId, mapfishDialog, onstart, onerror, onfinish) {
-            onstart(url + appId + "/report." + format, mapfishDialog).then(response => {
-                this.fetchStatus(url, response.data.ref, onerror, onfinish);
-            }).catch(error => {
-                onerror(error);
-            });
-        },
-        /**
-         * Queries the status for a print job and handles it.
-         * @param {String} url - MapFish Print url.
-         * @param {String} ref - A reference id that can be used to request the status for the print job or to download the finished report.
-         * @param {Function} onerror - Is called when the status is "cancelled" or "error".
-         * @param {Function} onfinish - Is called when the status is "finished".
-         * @returns {void}
-         */
-        fetchStatus (url, ref, onerror, onfinish) {
-            const statusUrl = url + "status/" + ref + ".json";
-
-            axios.get(statusUrl).then(response => {
-                if (response.data.status === "running" || response.data.status === "waiting") {
-                    setTimeout(() => {
-                        this.fetchStatus(url, ref, onerror, onfinish);
-                    }, 1000);
-                }
-                else if (response.data.status === "finished") {
-                    const downloadUrl = url + "report/" + ref;
-
-                    onfinish(downloadUrl);
-                }
-                else if (response.data.status === "cancelled") {
-                    onerror("cancelled");
-                }
-                else {
-                    onerror(response.data.error);
-                }
-            }).catch(error => {
-                onerror(error);
-            });
+            startPrintProcess(url, format, appId, mapfishDialog, onstart, undefined, onerror, onfinish)
         },
         /**
          * Opens the url in window for downloading

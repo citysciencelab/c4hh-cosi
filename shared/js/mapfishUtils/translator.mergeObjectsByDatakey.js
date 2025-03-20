@@ -1,4 +1,4 @@
-import isObject from "../../../src/shared/js/utils/isObject";
+import isObject from "../../../../src/shared/js/utils/isObject";
 import {formatValue} from "./translator.concatStringByDatakey";
 
 /**

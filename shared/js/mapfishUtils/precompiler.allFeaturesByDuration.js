@@ -1,8 +1,8 @@
-import {fetchRoutingOrsDirections} from "../../../src/modules/routing/js/directions/routing-ors-directions.js";
+import {fetchRoutingOrsDirections} from "../../../../src/modules/routing/js/directions/routing-ors-directions.js";
 import crs from "@masterportal/masterportalapi/src/crs";
 import {getCenter as getCenterOfExtent} from "ol/extent";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
-import isObject from "../../../src/shared/js/utils/isObject.js";
+import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
 
 /**
  * This function uses the routing tool to get real distance and duration for each given feature to the given coordinate.

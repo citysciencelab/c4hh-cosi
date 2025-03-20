@@ -1,13 +1,14 @@
-import isObject from "../../../src/shared/js/utils/isObject.js";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
-import layerFactory from "../../../src/core/layers/js/layerFactory.js";
+import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 
 /**
  * Gets the printed layers from layer Ids
  * @param {String[]} layerIds the layer id
+ * @param {Number} dpi the dpi of the layers object.
  * @returns {[ol/layer, opacity]} printedLayers the printed layer and its opacity in an Array list
  */
-export default function getPrintedLayers (layerIds) {
+export default function getPrintedLayers (layerIds, dpi) {
     const printedLayers = [];
 
     if (Array.isArray(layerIds) && layerIds.length) {
@@ -19,7 +20,7 @@ export default function getPrintedLayers (layerIds) {
             if (isObject(layerId)) {
                 layerObj = Object.assign({
                     opacity: 1,
-                    dpi: 200
+                    dpi
                 }, layerId);
                 id = layerId.layerId;
             }
@@ -27,7 +28,7 @@ export default function getPrintedLayers (layerIds) {
                 layerObj = {
                     layerId,
                     opacity: 1,
-                    dpi: 200
+                    dpi
                 };
                 id = layerId;
             }

@@ -13,7 +13,7 @@ import {getFeatureLayer} from "./createVectorLayer";
  * @param {Number} [dpi=200] the dpi for resolution
  * @returns {Object} The map configuration in object
  */
-function getWalkerMap (feature, center, projection, style, scale, layerIds, dpi = 200) {
+async function getWalkerMap (feature, center, projection, style, scale, layerIds, dpi = 200) {
     const mapConfig = {},
         defaultScale = 20000;
     let originLayers = [];
@@ -30,27 +30,25 @@ function getWalkerMap (feature, center, projection, style, scale, layerIds, dpi 
             opacity: 1,
             dpi
         });
-        originLayers = originLayers.concat(getPrintedLayers(layerIds));
+        originLayers = originLayers.concat(getPrintedLayers(layerIds, dpi));
     }
     else {
         const splitIndex = layerIds.indexOf("feature"),
             frontLayerIds = layerIds.slice(0, splitIndex),
             backLayerIds = layerIds.slice(splitIndex + 1 - layerIds.length);
 
-        originLayers = getPrintedLayers(frontLayerIds);
+        originLayers = getPrintedLayers(frontLayerIds, dpi);
         originLayers.push({
             layer: getFeatureLayer(style, feature),
             opacity: 1,
             dpi
         });
-        originLayers = originLayers.concat(getPrintedLayers(backLayerIds));
+        originLayers = originLayers.concat(getPrintedLayers(backLayerIds, dpi));
 
     }
 
 
-    buildLayers(originLayers).then(parsedLayers => {
-        mapConfig.layers = parsedLayers;
-    });
+    mapConfig.layers = await buildLayers(originLayers);
 
     return mapConfig;
 }

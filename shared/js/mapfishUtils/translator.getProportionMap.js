@@ -13,7 +13,7 @@ import {getFeatureLayer} from "./createVectorLayer";
  * @param {Number} [dpi=200] the dpi for resolution
  * @returns {Object} The map configuration in object
  */
-function getProportionMap (feature, extent, projection, style, proportion, layerIds, dpi = 200) {
+async function getProportionMap (feature, extent, projection, style, proportion, layerIds, dpi = 200) {
     const mapConfig = {},
         defaultBbox = [545114.80, 5914269.80, 591483.01, 5957132.28];
     let originLayers = [];
@@ -29,26 +29,24 @@ function getProportionMap (feature, extent, projection, style, proportion, layer
             opacity: 1,
             dpi
         });
-        originLayers = originLayers.concat(getPrintedLayers(layerIds));
+        originLayers = originLayers.concat(getPrintedLayers(layerIds, dpi));
     }
     else {
         const splitIndex = layerIds.indexOf("feature"),
             frontLayerIds = layerIds.slice(0, splitIndex),
             backLayerIds = layerIds.slice(splitIndex + 1 - layerIds.length);
 
-        originLayers = getPrintedLayers(frontLayerIds);
+        originLayers = getPrintedLayers(frontLayerIds, dpi);
         originLayers.push({
             layer: getFeatureLayer(style, feature),
             opacity: 1,
             dpi
         });
-        originLayers = originLayers.concat(getPrintedLayers(backLayerIds));
+        originLayers = originLayers.concat(getPrintedLayers(backLayerIds, dpi));
 
     }
 
-    buildLayers(originLayers).then(parsedLayers => {
-        mapConfig.layers = parsedLayers;
-    });
+    mapConfig.layers = await buildLayers(originLayers);
 
     return mapConfig;
 }

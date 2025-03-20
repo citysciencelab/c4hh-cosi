@@ -1,5 +1,5 @@
-import isObject from "../../../src/shared/js/utils/isObject.js";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
+import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 
 /**
  * Translator for generating a string with any number of knowledge base value.

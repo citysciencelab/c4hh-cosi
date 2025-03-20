@@ -49,7 +49,8 @@ const state = {
     urlList: [],
     showDownloadAll: false,
     sendLegends: false,
-    printedFeature: []
+    printedFeature: [],
+    templateName: "A4 Hochformat"
 };
 
 export default state;

@@ -20,26 +20,25 @@ import {mergeObjectsByDatakey} from "./translator.mergeObjectsByDatakey";
  * @param {Boolean} sendLegends - If dialog should contain legends.
  * @returns {Object} The mapfish dialog.
  */
-export function createMapfishDialog (parcel, knowledgeBase, transformer, defaultValue, mapProjection, outputFilename,
-    sendLegends) {
+export async function createMapfishDialog (parcel, knowledgeBase, transformer, defaultValue, mapProjection, layoutName, outputFilename, sendLegends) {
     const mapfishDialog = {},
         legendLayerIds = new Set(),
         defaultDelimitor = ", ";
 
-    Object.entries(transformer).forEach(([prefix, obj]) => {
-        Object.entries(obj).forEach(([postfix, transformerConfig]) => {
+    for (const [prefix, obj] of Object.entries(transformer)) {
+        for (const [postfix, transformerConfig] of Object.entries(obj)) {
             if (transformerConfig.type === "mapWalker") {
-                mapfishDialog[prefix + "." + postfix] = getWalkerMap(parcel?.feature, parcel?.center, mapProjection, transformerConfig.style, transformerConfig.scale, transformerConfig.layerIds, transformerConfig.dpi);
+                mapfishDialog[prefix + "." + postfix] = await getWalkerMap(parcel?.feature, parcel?.center, mapProjection, transformerConfig.style, transformerConfig.scale, transformerConfig.layerIds, transformerConfig.dpi);
             }
             else if (transformerConfig.type === "mapProportion") {
-                mapfishDialog[prefix + "." + postfix] = getProportionMap(parcel?.feature, parcel?.extent, mapProjection, transformerConfig.style, transformerConfig.proportion, transformerConfig.layerIds, transformerConfig.dpi);
+                mapfishDialog[prefix + "." + postfix] = await getProportionMap(parcel?.feature, parcel?.extent, mapProjection, transformerConfig.style, transformerConfig.proportion, transformerConfig.layerIds, transformerConfig.dpi);
 
                 if (transformerConfig.legend === true) {
                     transformerConfig.layerIds?.forEach?.(id => legendLayerIds.add(id));
                 }
             }
             else if (transformerConfig.type === "mapFixed") {
-                mapfishDialog[prefix + "." + postfix] = getFixedMap(parcel?.center, mapProjection, transformerConfig.style, transformerConfig.bbox, transformerConfig.layerIds, transformerConfig.dpi);
+                mapfishDialog[prefix + "." + postfix] = await getFixedMap(parcel?.center, mapProjection, transformerConfig.style, transformerConfig.bbox, transformerConfig.layerIds, transformerConfig.dpi);
             }
             else if (transformerConfig.type === "concat") {
                 const resultConcat = concatStringByDatakey(knowledgeBase, transformerConfig.datakey, transformerConfig.default, defaultValue, transformerConfig.delimitor ? transformerConfig.delimitor : defaultDelimitor, transformerConfig.options);
@@ -72,15 +71,15 @@ export function createMapfishDialog (parcel, knowledgeBase, transformer, default
             else {
                 mapfishDialog[prefix + "." + postfix] = transformerConfig.content;
             }
-        });
-    });
+        }
+    }
 
     if (sendLegends) {
         mapfishDialog.legend = createLegendObject(legendLayerIds);
     }
 
     return {
-        layout: "A4 Hochformat",
+        layout: layoutName,
         attributes: mapfishDialog,
         outputFilename
     };

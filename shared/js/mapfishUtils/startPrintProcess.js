@@ -32,7 +32,9 @@ export function startPrintProcess (url, format, appId, mapfishDialog, onstart, o
 function fetchStatus (url, ref, onwait, onerror, onfinish) {
     const statusUrl = url + "status/" + ref + ".json";
 
-    onwait();
+    if (typeof onwait === "function") {
+        onwait();
+    }
     axios.get(statusUrl).then(response => {
         if (response.data.status === "running" || response.data.status === "waiting") {
             setTimeout(() => {

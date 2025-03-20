@@ -1,5 +1,5 @@
 import nextFeatureByDistance from "./precompiler.nextFeatureByDistance.js";
-import isObject from "../../../src/shared/js/utils/isObject.js";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
 
 
 /**
