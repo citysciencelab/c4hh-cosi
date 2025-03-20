@@ -9,6 +9,7 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
+import layerProvider from "../js/getVisibleLayer";
 
 export default {
     name: "FloodRiskManagement",
@@ -146,13 +147,12 @@ export default {
         /**
          * Watcher for activating the layers.
          * @param {String[]} newVal - The selected layers list.
-         * @param {String[]} oldVal - The old selected layers list.
          * @returns {void}
          */
         selectedLayersId: {
-            handler (newVal, oldVal) {
-                this.activateLayer(oldVal, false);
-                this.activateLayer(newVal, true);
+            handler (newVal) {
+                this.deactivateLayer(layerProvider.getVisibleLayerList());
+                this.activateLayer(newVal);
 
                 this.$nextTick(() => {
                     const printLayers = [];
@@ -197,7 +197,7 @@ export default {
         document.getElementById("mp-menu-secondaryMenu").style.width = this.sideMenuWidth;
     },
     methods: {
-        ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
+        ...mapActions(["addOrReplaceLayer"]),
         ...mapActions("Modules/FloodRiskManagement", [
             "getOptimalResolution",
             "retrieveCapabilites",
@@ -205,6 +205,7 @@ export default {
             "togglePostrenderListener",
             "updateCanvasLayer"
         ]),
+        ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Modules/FloodRiskManagement", [
             "setAutoAdjustScale",
             "setCurrentScale",
@@ -223,15 +224,27 @@ export default {
         ]),
 
         /**
-         * (De)activates the layer according to the layer id and status
+         * Activates the layer according to the layer id.
          * @param {String[]} layerIds - The layer ids.
-         * @param {Boolean} active - true or false to activate or deactivate layers
          * @returns {void}
          */
-        activateLayer (layerIds, active) {
+        activateLayer (layerIds) {
             if (Array.isArray(layerIds) && layerIds.length) {
                 layerIds.forEach(id => {
-                    this.changeVisibility({layerId: id, value: active});
+                    this.addOrReplaceLayer({layerId: id, visibility: true});
+                });
+            }
+        },
+
+        /**
+         * Deactivates the layer according to the layer id.
+         * @param {ol/Layer[]} layers - The visible layers.
+         * @returns {void}
+         */
+        deactivateLayer (layers) {
+            if (Array.isArray(layers) && layers.length) {
+                layers.forEach(layer => {
+                    this.removeLayer({id: layer.get("id")});
                 });
             }
         },
