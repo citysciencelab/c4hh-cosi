@@ -2,10 +2,10 @@ import {expect} from "chai";
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
 import sinon from "sinon";
-import {createFeatureByCoordinate, collectFeatures, getFilter, getPropertyNames, getOAFGeometryFilter} from "../../../js/collectFeatures.js";
-import getFeature from "../../../../../src/shared/js/api/oaf/getOAFFeature.js";
+import {createFeatureByCoordinate, collectFeaturesByCoordinates as collectFeatures, getFilter, getPropertyNames} from "../../collectFeatures.js";
+import getFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 
-describe("addons/valuationPrint/js/collectFeatures.js", () => {
+describe("addons/shared/js/mapfishUtils/collectFeatures.js", () => {
     const feature = new Feature({
         geometry: new Polygon([[
             [563599.939, 5936263.688, 0],
@@ -84,63 +84,6 @@ describe("addons/valuationPrint/js/collectFeatures.js", () => {
             const filter = getFilter(feature.getGeometry(), "geom");
 
             expect(filter).to.be.undefined;
-        });
-    });
-
-    describe("getOAFGeometryFilter", () => {
-        it("should return undefined if no filter type is provided", () => {
-            expect(getOAFGeometryFilter(feature.getGeometry(), undefined)).to.be.undefined;
-        });
-
-        it("should return a within filter", () => {
-            const filter = getOAFGeometryFilter(feature.getGeometry(), "geom", "within");
-
-            expect(filter.startsWith("S_WITHIN")).to.be.true;
-        });
-        it("should return a intersects filter", () => {
-            const filter = getOAFGeometryFilter(feature.getGeometry(), "geom", "intersects");
-
-            expect(filter.startsWith("S_INTERSECTS")).to.be.true;
-        });
-        it("should return a filter with the coordinates fixed", () => {
-            const expected = [
-                "563599.939 5936263.688",
-                "563602.501 5936266.163",
-                "563608.446 5936271.905",
-                "563609.548 5936272.969",
-                "563617.959 5936281.094",
-                "563619.708 5936280.381",
-                "563628.979 5936276.605",
-                "563630.879 5936275.831",
-                "563634.164 5936274.492",
-                "563625.036 5936252.064",
-                "563624.785 5936251.517",
-                "563624.488 5936250.994",
-                "563624.147 5936250.498",
-                "563623.765 5936250.033",
-                "563623.344 5936249.603",
-                "563622.888 5936249.21",
-                "563622.4 5936248.858",
-                "563621.883 5936248.55",
-                "563621.342 5936248.287",
-                "563620.78 5936248.071",
-                "563620.202 5936247.904",
-                "563619.612 5936247.788",
-                "563619.013 5936247.723",
-                "563618.412 5936247.709",
-                "563617.811 5936247.747",
-                "563617.216 5936247.837",
-                "563616.631 5936247.977",
-                "563616.06 5936248.168",
-                "563615.508 5936248.406",
-                "563614.978 5936248.691",
-                "563614.474 5936249.021",
-                "563614.001 5936249.392",
-                "563613.561 5936249.803",
-                "563599.939 5936263.688"];
-
-            expect(getOAFGeometryFilter(feature.getGeometry(), "geom", "intersects")).to
-                .be.equal(`S_INTERSECTS(geom, POLYGON((${expected.join(", ")})))`);
         });
     });
 

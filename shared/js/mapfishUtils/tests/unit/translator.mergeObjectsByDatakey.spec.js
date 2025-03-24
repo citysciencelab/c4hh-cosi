@@ -1,8 +1,8 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import {mergeObjectsByDatakey} from "../../../js/translator.mergeObjectsByDatakey";
+import {mergeObjectsByDatakey} from "../../translator.mergeObjectsByDatakey";
 
-describe("addons/valuationPrint/js/translator.mergeObjectsByDatakey.js", () => {
+describe("addons/shared/js/mapfishUtils/translator.mergeObjectsByDatakey.js", () => {
     beforeEach(function () {
         const error = sinon.spy();
 

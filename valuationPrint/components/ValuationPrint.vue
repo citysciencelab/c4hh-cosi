@@ -10,13 +10,12 @@ import {singleClick} from "ol/events/condition";
 import ModalItem from "../../../src/shared/modules/modals/components/ModalItem.vue";
 import {unionFeatures} from "../js/unionFeatures";
 import {createKnowledgeBase} from "../../shared/js/mapfishUtils/createKnowledgeBase.js";
-import {createMapfishDialog} from "../../shared/js/mapfishUtils/createMapfishDialog.js";
 import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
 import axios from "axios";
 import isObject from "../../../src/shared/js/utils/isObject";
 import dayjs from "dayjs";
 import {upperFirst} from "../../../src/shared/js/utils/changeCase";
-import {collectFeatures} from "../js/collectFeatures";
+import {collectFeaturesByCoordinates as collectFeatures} from "../../shared/js/mapfishUtils/collectFeatures.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 import layerCollection from "../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
@@ -24,6 +23,7 @@ import IconButton from "../../../src/shared/modules/buttons/components/IconButto
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import WfsSearch from "../../../src/modules/wfsSearch/components/WfsSearch.vue";
 import {uniqueId} from "../../../src/shared/js/utils/uniqueId.js";
+import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog";
 
 export default {
     name: "ValuationPrint",
@@ -117,8 +117,7 @@ export default {
                     this.progressCounter++;
                 }
             }, knowledgeBase => {
-                createMapfishDialog(
-                    parcel,
+                const mapfishDialogInstance = new MapfishDialog(
                     knowledgeBase,
                     this.config.transformer,
                     this.defaultValue,
@@ -126,7 +125,9 @@ export default {
                     this.templateName,
                     this.getFilenameOfPDF(this.fileprefix, dayjs().format("YYYY-MM-DD")),
                     this.sendLegends
-                ).then(mapfishDialog => {
+                );
+
+                mapfishDialogInstance.create(parcel).then(mapfishDialog => {
                     if (!this.isPdfAppIdConfigured) {
                         this.startSpecificationProcess();
                         return;
@@ -570,16 +571,17 @@ export default {
                 this.setShowDownloadAll(true);
                 return;
             }
-            const imageName = Object.keys(this.config.images[idx])[0];
-            createMapfishDialog(
-                this.parcelData,
-                {},
-                this.config.images[idx],
-                this.defaultValue,
-                this.projection.getCode(),
-                this.templateName,
-                this.getFilenameOfPDF(imageName, dayjs().format("YYYY-MM-DD"))
-            ).then(mapfishDialog => {
+            const imageName = Object.keys(this.config.images[idx])[0],
+                mapfishDialogInstance = new MapfishDialog(
+                    {},
+                    this.config.images[idx],
+                    this.defaultValue,
+                    this.projection.getCode(),
+                    this.templateName,
+                    this.getFilenameOfPDF(imageName, dayjs().format("YYYY-MM-DD"))
+                );
+
+            mapfishDialogInstance.create(this.parcelData).then(mapfishDialog => {
                 mapfishDialog.attributes.map = mapfishDialog.attributes[imageName + ".map"];
                 delete mapfishDialog.attributes[imageName + ".map"];
 
@@ -612,7 +614,7 @@ export default {
                     this.setShowDownloadAll(true);
                     this.scrollToDownloadSection();
                 });
-            })
+            });
         },
 
         /**
@@ -627,45 +629,45 @@ export default {
             if (this.specificAddress === "" && this.addressList.length === 1) {
                 this.specificAddress = this.addressList[0];
             }
+            const mapfishDialogInstance = new MapfishDialog(
+                {},
+                this.config.specification,
+                this.defaultValue,
+                this.projection.getCode(),
+                this.templateName,
+                this.getFilenameOfPDF(this.$t("additional:modules.valuationPrint.specificationReport"), dayjs().format("YYYY-MM-DD"))
+            );
 
-            createMapfishDialog(
-                    this.parcelData,
-                    {},
-                    this.config.specification,
-                    this.defaultValue,
-                    this.projection.getCode(),
-                    this.templateName,
-                    this.getFilenameOfPDF(this.$t("additional:modules.valuationPrint.specificationReport"), dayjs().format("YYYY-MM-DD"))
-                ).then(mapfishDialog => {
-                    const replacedparcelData = {
-                        "angabenZumGrundstueck.geschaeftszeichen": this.documentNumber.trim(),
-                        "angabenZumGrundstueck.strasse": this.specificAddress.trim(),
-                        "angabenZumGrundstueck.art": this.chosenType.trim()
-                    };
+            mapfishDialogInstance.create(this.parcelData).then(mapfishDialog => {
+                const replacedparcelData = {
+                    "angabenZumGrundstueck.geschaeftszeichen": this.documentNumber.trim(),
+                    "angabenZumGrundstueck.strasse": this.specificAddress.trim(),
+                    "angabenZumGrundstueck.art": this.chosenType.trim()
+                };
 
-                    Object.entries(replacedparcelData).forEach(([key, value]) => {
-                        mapfishDialog.attributes[key] = value;
-                    });
-
-                    startPrintProcess(this.printUrl, "pdf", this.pdfSpecificationAppId, mapfishDialog, (url, payload) => {
-                            this.addMessage(this.$t("additional:modules.valuationPrint.pdfInTheMaking"));
-                            return axios.post(url, payload);
-                        },
-                        () => {
-                            this.addMessage(this.$t("additional:modules.valuationPrint.pleaseWait"));
-                        },
-                        error => {
-                            this.addMessage(this.$t("additional:modules.valuationPrint.pdfError"), true);
-                            console.error(error);
-                            this.startImageProcess();
-                        },
-                        (url) => {
-                            this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
-                            this.addUrl(url, this.$t("additional:modules.valuationPrint.modalTitle"));
-                            this.progressCounter++;
-                            this.startImageProcess();
-                        });
+                Object.entries(replacedparcelData).forEach(([key, value]) => {
+                    mapfishDialog.attributes[key] = value;
                 });
+
+                startPrintProcess(this.printUrl, "pdf", this.pdfSpecificationAppId, mapfishDialog, (url, payload) => {
+                    this.addMessage(this.$t("additional:modules.valuationPrint.pdfInTheMaking"));
+                    return axios.post(url, payload);
+                },
+                () => {
+                    this.addMessage(this.$t("additional:modules.valuationPrint.pleaseWait"));
+                },
+                error => {
+                    this.addMessage(this.$t("additional:modules.valuationPrint.pdfError"), true);
+                    console.error(error);
+                    this.startImageProcess();
+                },
+                (url) => {
+                    this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
+                    this.addUrl(url, this.$t("additional:modules.valuationPrint.modalTitle"));
+                    this.progressCounter++;
+                    this.startImageProcess();
+                });
+            });
         },
 
         /**

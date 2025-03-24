@@ -11,14 +11,12 @@ import {Fill, Stroke, Style} from "ol/style.js";
 import getWCSFeatures from "../js/getWCSFeatures.js";
 import spatialOperations from "../js/spatialOperations";
 import isObject from "../../../src/shared/js/utils/isObject";
-import {getFixedMap} from "../../shared/js/mapfishUtils/translator.getFixedMap.js";
-import {getProportionMap} from "../../shared/js/mapfishUtils/translator.getProportionMap.js";
-import {getWalkerMap} from "../../shared/js/mapfishUtils/translator.getWalkerMap.js";
 import bbox from "@turf/bbox";
 import {GeoJSON} from "ol/format";
 import axios from "axios";
 import dayjs from "dayjs";
 import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
+import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog";
 
 export default {
     name: "WaterRiskCheck",
@@ -562,12 +560,30 @@ export default {
 
                 if (cardKeys.length > 0) {
                     for (const card of cardKeys) {
+                        const mapfishDialogInstance = new MapfishDialog(
+                            null,
+                            {tmpAttr1: {tmpAttr2: cards[card]}},
+                            "",
+                            mapProjection,
+                            "A4 Hochformat",
+                            this.getFilenameOfPDF(this.fileprefix, dayjs().format("YYYY-MM-DD")),
+                            false
+                        );
+
                         if (cards[card].type === "mapProportion") {
-                            mapConf[card] = await getProportionMap(feature, extent, mapProjection, cards[card].style, cards[card].proportion, cards[card].layerIds, cards[card].dpi);
-                        } else if (cards[card].type === "mapWalker") {
-                            mapConf[card] = await getWalkerMap(feature, bbox(parcel), mapProjection, cards[card].style, cards[card].scale, cards[card].layerIds, cards[card].dpi);
-                        } else if (cards[card].type === "mapFixed") {
-                            mapConf[card] = await getFixedMap(bbox(parcel), mapProjection, cards[card].style, cards[card].bbox, cards[card].layerIds, cards[card].dpi);
+                            const mfDialog = await mapfishDialogInstance.create({extent, feature});
+
+                            mapConf[card] = mfDialog.attributes["tmpAttr1.tmpAttr2"];
+                        }
+                        else if (cards[card].type === "mapWalker") {
+                            const mfDialog = await mapfishDialogInstance.create(bbox(parcel));
+
+                            mapConf[card] = mfDialog.attributes["tmpAttr1.tmpAttr2"];
+                        }
+                        else if (cards[card].type === "mapFixed") {
+                            const mfDialog = await mapfishDialogInstance.create(bbox(parcel));
+
+                            mapConf[card] = mfDialog.attributes["tmpAttr1.tmpAttr2"];
                         }
                     }
                 }
@@ -578,6 +594,17 @@ export default {
 
             return mapConf;
         },
+
+        /**
+         * Returns the filename of the pdf with timestamp.
+         * @param {String} [fileprefix=""] The prefix to use for the filename.
+         * @param {String} [timestamp=""] A timestamp to use for better ui.
+         * @returns {String} The current filname.
+         */
+        getFilenameOfPDF (fileprefix = "", timestamp = "") {
+            return timestamp + " " + fileprefix;
+        },
+
         /**
          * Adds the passed spatial data for the parcel.
          * @param {Object} data - The spatial data to add.
@@ -898,7 +925,7 @@ export default {
          * @returns {void}
          */
         startPrint (url, format, appId, mapfishDialog, onstart, onerror, onfinish) {
-            startPrintProcess(url, format, appId, mapfishDialog, onstart, undefined, onerror, onfinish)
+            startPrintProcess(url, format, appId, mapfishDialog, onstart, undefined, onerror, onfinish);
         },
         /**
          * Opens the url in window for downloading

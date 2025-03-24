@@ -22,7 +22,7 @@ async function buildLayers (layerList, skipDefectLayerList = true) {
             }
             continue;
         }
-        const createdLayer =  await BuildSpec.buildLayerType(item.layer, currentResolution, item.dpi, true);
+        const createdLayer = await BuildSpec.buildLayerType(item.layer, currentResolution, item.dpi, true);
 
         if (typeof createdLayer !== "undefined") {
             createdLayer.opacity = item.opacity;

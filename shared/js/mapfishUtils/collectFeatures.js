@@ -5,6 +5,7 @@ import Point from "ol/geom/Point";
 import {WFS} from "ol/format";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
+import {bufferGeometry} from "./bufferGeometry";
 
 /**
  * Creates a feature with the given coordinate or requests features via a service.
@@ -28,7 +29,7 @@ import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
  * @param {Function} onerror - Is called on error.
  * @returns {void}
  */
-export async function collectFeaturesByCoordinates (parcel, {coordinate, filter, geometryName, propertyName, precompiler}, {mapProjection, oafCRSURI}, layer, onsuccess, onerror) {
+export async function collectFeaturesByCoordinates (parcel, {coordinate, filter, geometryName, propertyName, precompiler, radius}, {mapProjection, oafCRSURI}, layer, onsuccess, onerror) {
     if (coordinate) {
         const feature = createFeatureByCoordinate(coordinate);
 
@@ -40,7 +41,8 @@ export async function collectFeaturesByCoordinates (parcel, {coordinate, filter,
         return;
     }
     if (layer.typ === "OAF") {
-        const geometryFilter = getOAFFeature.getOAFGeometryFilter(parcel.geometry, geometryName, filter);
+        const usedGeometry = radius ? bufferGeometry(parcel.geometry, radius) : parcel.geometry,
+            geometryFilter = getOAFFeature.getOAFGeometryFilter(usedGeometry, geometryName, filter);
 
         getOAFFeature.getOAFFeatureGet(layer.url, layer.collection, 10000, geometryFilter, oafCRSURI)
             .then(plainOAFFeatures => {
@@ -57,7 +59,7 @@ export async function collectFeaturesByCoordinates (parcel, {coordinate, filter,
     const payload = {
         featureNS: layer.featureNS,
         featureTypes: [layer.featureType],
-        filter: getFilter(parcel.geometry, geometryName, filter),
+        filter: getFilter(parcel.geometry, geometryName, filter, radius),
         srsName: mapProjection,
         propertyNames: getPropertyNames(propertyName, geometryName, precompiler)
     };
@@ -93,18 +95,18 @@ export function createFeatureByCoordinate (coordinate) {
  * @param {ol/geom/Geometry} geometry - The Geometry.
  * @param {String} geometryName - The geometry-valued property.
  * @param {String} filterType - Possible types are intersects | within.
- * @param {Number|undefined} radius - The radius for the buffer.
  * @returns {Object} Represents a filter operater.
  */
-export function getFilter (geometry, geometryName, filterType) {
+export function getFilter (geometry, geometryName, filterType, radius) {
     if (!filterType) {
         return undefined;
     }
+    const usedGeometry = radius ? bufferGeometry(geometry, radius) : geometry;
 
     if (filterType === "intersects") {
-        return intersects(geometryName, geometry);
+        return intersects(geometryName, usedGeometry);
     }
-    return within(geometryName, geometry);
+    return within(geometryName, usedGeometry);
 }
 
 

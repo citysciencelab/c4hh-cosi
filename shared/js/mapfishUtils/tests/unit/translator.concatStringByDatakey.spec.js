@@ -12,7 +12,7 @@ import {
     mergeKnowledgeIntoDatakey,
     formatValue,
     formatValueNumber
-} from "../../../js/translator.concatStringByDatakey.js";
+} from "../../translator.concatStringByDatakey.js";
 
 describe("addons/valuationPrint/js/translator.concatStringByDatakey.js", () => {
     afterEach(sinon.restore);

@@ -2,9 +2,9 @@ import {expect} from "chai";
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
 import sinon from "sinon";
-import {createAttributesByFeatures, addKnowledgeBaseError, createKnowledgeBase} from "../../../js/createKnowledgeBase.js";
+import {createAttributesByFeatures, addKnowledgeBaseError, createKnowledgeBase} from "../../createKnowledgeBase.js";
 
-describe("addons/valuationPrint/js/createKnowledgeBase.js", () => {
+describe("addons/shared/js/mapfishUtils/createKnowledgeBase.js", () => {
     const features = [
         new Feature({
             flstnrzae: "12345",

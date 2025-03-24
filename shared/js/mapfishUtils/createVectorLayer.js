@@ -9,16 +9,16 @@ import {Circle as CircleStyle, Fill, Stroke, Style} from "ol/style";
  * @param {String} type - The type of the feature geometry.
  * @returns {ol/layer/Vector} The created vector layer with feature and style.
  */
-function getFeatureLayer (styleConfig, feature, type) {
-    const printedFeature = feature.clone();
+async function getFeatureLayer (styleConfig, feature, type) {
+    const printedFeature = await feature.clone(),
+        vectorSource = new VectorSource(),
+        vectorLayer = new VectorLayer();
 
-    printedFeature.setStyle(type === "point" ? getPointStyle(styleConfig) : getPolygonStyle(styleConfig));
+    await printedFeature.setStyle(type === "point" ? getPointStyle(styleConfig) : getPolygonStyle(styleConfig));
+    vectorLayer.setSource(vectorSource);
+    vectorSource.addFeature(printedFeature);
 
-    return new VectorLayer({
-        source: new VectorSource({
-            features: [printedFeature]
-        })
-    });
+    return vectorLayer;
 }
 
 /**
@@ -64,7 +64,7 @@ function getPolygonStyle (styleConfig) {
     });
 }
 
-export {
+export default {
     getFeatureLayer,
     getPointStyle,
     getPolygonStyle

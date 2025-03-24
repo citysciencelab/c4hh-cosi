@@ -21,7 +21,8 @@
  * @property {Object} urlList - List of urls for downloding pdf and images.
  * @property {Boolean} showDownloadAll - True, if the url list was generated.
  * @property {Boolean} sendLegends - If true, legends for wms layers are sent together with report request.
- * @property {Object[]} printedFeature - the printed features
+ * @property {Object[]} printedFeature - The printed features.
+ * @property {String} templateName - The name of the template.
  */
 const state = {
     id: "valuationPrint",

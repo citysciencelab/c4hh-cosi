@@ -1,9 +1,9 @@
 import {expect} from "chai";
 import Polygon from "ol/geom/Polygon";
 import sinon from "sinon";
-import {bufferGeometry} from "../../../js/bufferGeometry.js";
+import {bufferGeometry} from "../../bufferGeometry";
 
-describe("addons/valuationPrint/js/bufferGeometrie.js", () => {
+describe("addons/shared/js/mapfishUtils/bufferGeometrie.js", () => {
     const polygon = new Polygon([[
         [9.98119979890, 53.56442623621],
         [9.98122568840, 53.56442208667],
