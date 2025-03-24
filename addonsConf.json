@@ -93,5 +93,8 @@
   },
   "sessionTool": {
     "type": "tool"
+  },
+  "simulationTool": {
+    "type": "tool"
   }
 }

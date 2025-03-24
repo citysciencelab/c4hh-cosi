@@ -1,0 +1,131 @@
+<script>
+import {mapActions, mapMutations, mapGetters} from "vuex";
+
+export default {
+    name: "SideMenu",
+    computed: {
+        ...mapGetters("Modules/SimulationTool", [
+            "mode"
+        ]),
+        ...mapGetters("Modules/Login", [
+            "loggedIn"
+        ]),
+        ...mapGetters("Menu", [
+            "currentComponentName"
+        ])
+    },
+    mounted: async function () {
+        this.applyCustomLayout();
+    },
+    methods: {
+        ...mapMutations("Modules/SimulationTool", [
+            "setMode"
+        ]),
+        ...mapMutations("Menu", [
+            "setCurrentComponent",
+            "setCurrentComponentPropsName"
+        ]),
+        ...mapActions("Menu", [
+            "resetMenu"
+        ]),
+        closeSimulationTool () {
+            this.restoreDefaultLayout();
+            if (this.currentComponentName("secondaryMenu") !== "Simulationen") {
+                this.setCurrentComponentPropsName({side: "secondaryMenu", name: "Simulationen"});
+            }
+            this.resetMenu("secondaryMenu");
+        },
+        applyCustomLayout () {
+            const defaultNavigation = document.getElementById("mp-menu-navigation-secondaryMenu"),
+                menuBody = document.getElementById("mp-body-secondaryMenu");
+
+            menuBody.style.padding = "0";
+            defaultNavigation.style.display = "none";
+        },
+        restoreDefaultLayout () {
+            const defaultNavigation = document.getElementById("mp-menu-navigation-secondaryMenu"),
+                menuBody = document.getElementById("mp-body-secondaryMenu");
+
+            menuBody.style.padding = "0 1.5rem 1.5rem 1.5rem";
+            defaultNavigation.style.display = "block";
+        }
+    }
+};
+</script>
+
+<template>
+    <nav class="simulation-tool-sidebar">
+        <button
+            class="btn btn-link"
+            :title="$t('additional:modules.tools.simulationTool.closeSimulationTool')"
+            @click="closeSimulationTool"
+        >
+            <i class="bi bi-x-lg" />
+        </button>
+        <button
+            class="btn btn-link"
+            :class="{ active: mode === 'home-panel' }"
+            :title="$t('additional:modules.tools.simulationTool.home')"
+            @click="() => setMode('home-panel')"
+        >
+            <i class="bi bi-house-fill" />
+        </button>
+        <button
+            class="btn btn-link"
+            :class="{ active: mode.includes('process') }"
+            :title="$t('additional:modules.tools.simulationTool.models')"
+            @click="() => setMode('process-list')"
+        >
+            <i class="bi bi-motherboard-fill" />
+        </button>
+        <button
+            class="btn btn-link"
+            :class="{ active: mode.includes('job')}"
+            :title="$t('additional:modules.tools.simulationTool.scenarios')"
+            @click="() => setMode('job-list')"
+        >
+            <i class="bi bi-clipboard-data-fill" />
+        </button>
+        <button
+            v-if="loggedIn"
+            class="btn btn-link"
+            :class="{ active: mode.includes('ensemble')}"
+            :title="$t('additional:modules.tools.simulationTool.ensembles')"
+            @click="() => setMode('ensemble-list')"
+        >
+            <i class="bi bi-boxes" />
+        </button>
+        <button
+            class="btn btn-link"
+            :class="{ active: mode === 'help-panel' || mode.includes('tutorial') }"
+            :title="$t('additional:modules.tools.simulationTool.help')"
+            @click="() => setMode('help-panel')"
+        >
+            <i class="bi bi-question-circle-fill" />
+        </button>
+    </nav>
+</template>
+
+<style scoped>
+    nav.simulation-tool-sidebar {
+        display: flex;
+        flex-direction: column;
+        width: 65px;
+        gap: 1.5rem;
+        background-color: var(--bs-primary);
+        padding: 0 .5rem;
+
+        .btn {
+            font-size: 2rem;
+
+            &.active {
+                background-color: var(--bs-light);
+            }
+
+            &:first-child {
+                margin-top: .5rem;
+                margin-bottom: 2rem;
+            }
+        }
+    }
+</style>
