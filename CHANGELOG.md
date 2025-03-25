@@ -38,6 +38,7 @@
 ### Removed
 
 ### Fixed
+- Boris: Change of the Bodenrichtwert layer was not written back to the layer config.
 
 ---
 

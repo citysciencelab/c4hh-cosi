@@ -92,6 +92,15 @@ const actions = {
         previousSelectedLayer.forEach(layer => {
             layer.visibility = false;
             previousYear = layer.name.split(".")[2];
+            dispatch("replaceByIdInLayerConfig", {
+                layerConfigs: [{
+                    id: layer.id,
+                    layer: {
+                        id: layer.id,
+                        visibility: false
+                    }
+                }]
+            }, {root: true});
         });
 
         dispatch("selectLayerByName", selectedLayerName);
@@ -192,13 +201,24 @@ const actions = {
      * @param {Number[]} [center] center coordinate of faked gfi
      * @returns {void}
      */
-    requestGFI ({rootGetters, state, dispatch}, {processFromParametricUrl, center}) {
+    async requestGFI ({rootGetters, state, dispatch}, {processFromParametricUrl, center}) {
         const selectedLayer = state.filteredLayerList.find(layer => layer.visibility === true),
             coordinates = processFromParametricUrl ? center : rootGetters["Maps/clickCoordinate"],
             map = mapCollection.getMap("2D"),
-            mapView = map.getView(),
-            groupedLayers = layerCollection.getLayerById(selectedLayer.id);
+            mapView = map.getView();
+        let groupedLayers = "",
+            url = null;
 
+        await dispatch("replaceByIdInLayerConfig", {
+            layerConfigs: [{
+                id: selectedLayer.id,
+                layer: {
+                    id: selectedLayer.id,
+                    visibility: true
+                }
+            }]
+        }, {root: true});
+        groupedLayers = layerCollection.getLayerById(selectedLayer.id);
         if (!selectedLayer) {
             console.error("No visible layer found in filteredLayerList.");
             return;
@@ -206,7 +226,6 @@ const actions = {
         if (!groupedLayers || !groupedLayers.layerSource || groupedLayers.layerSource.length === 0) {
             return;
         }
-        let url = null;
 
         if (Array.isArray(groupedLayers.layerSource)) {
             url = groupedLayers.layerSource[0].layerSource.getFeatureInfoUrl(coordinates, mapView.getResolution(), mapView.getProjection());

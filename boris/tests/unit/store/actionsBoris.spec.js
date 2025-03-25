@@ -100,7 +100,8 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
                 "isNeverVisibleInTree": true,
                 visibility: true,
                 "typ": "WMS",
-                "layers": "v_brw_zonen_geom_flaeche_2022"
+                "layers": "v_brw_zonen_geom_flaeche_2022",
+                id: 123
             },
             attribute2 = {
                 "name": "31.12.2020",
@@ -181,7 +182,16 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
     });
     describe("switchLayer", () => {
         it("handles layer switch for area to stripes layer", () => {
-            const selectedLayerName = "31.12.2017";
+            const selectedLayerName = "31.12.2017",
+                layer = {
+                    layerConfigs: [{
+                        id: 123,
+                        layer: {
+                            id: 123,
+                            visibility: false
+                        }
+                    }]
+                };
 
             state.selectedLayer = state.filteredLayerList.attribute1;
 
@@ -192,13 +202,15 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             expect(commit.args[0][1]).to.equal(selectedLayerName);
             expect(commit.args[1][0]).to.equal("setIsAreaLayer");
             expect(commit.args[1][1]).to.equal(false);
-            expect(dispatch.callCount).to.equal(3);
-            expect(dispatch.args[0][0]).to.equal("selectLayerByName");
-            expect(dispatch.args[0][1]).to.equal(selectedLayerName);
-            expect(dispatch.args[1][0]).to.equal("requestGFI");
-            expect(dispatch.args[1][1]).to.deep.equal({processFromParametricUrl: false, center: null});
-            expect(dispatch.args[2][0]).to.equal("toggleStripesLayer");
-            expect(dispatch.args[2][1]).to.equal(false);
+            expect(dispatch.callCount).to.equal(4);
+            expect(dispatch.args[0][0]).to.equal("replaceByIdInLayerConfig");
+            expect(dispatch.args[0][1]).to.deep.equal(layer);
+            expect(dispatch.args[1][0]).to.equal("selectLayerByName");
+            expect(dispatch.args[1][1]).to.equal(selectedLayerName);
+            expect(dispatch.args[2][0]).to.equal("requestGFI");
+            expect(dispatch.args[2][1]).to.deep.equal({processFromParametricUrl: false, center: null});
+            expect(dispatch.args[3][0]).to.equal("toggleStripesLayer");
+            expect(dispatch.args[3][1]).to.equal(false);
 
         });
         it("handles layer switch for stripes to point layer", () => {
@@ -206,7 +218,8 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
                 attribute1 = {
                     "name": "31.12.2017",
                     "isSelected": true,
-                    "isVisibleInMap": false
+                    "isVisibleInMap": false,
+                    id: 123
                 };
 
             state.filteredLayerList = [
@@ -238,17 +251,29 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             expect(dispatch.args[3][1]).to.equal(false);
         });
         it("handles layer switch for area to area layer", () => {
-            const selectedLayerName = "31.12.2020";
+            const selectedLayerName = "31.12.2020",
+                layer = {
+                    layerConfigs: [{
+                        id: 123,
+                        layer: {
+                            id: 123,
+                            visibility: false
+                        }
+                    }]
+                };
 
             state.selectedLayer = state.filteredLayerList[1];
 
             actions.switchLayer({rootGetters, state, dispatch, commit}, selectedLayerName);
             expect(commit.calledTwice).to.be.true;
-            expect(dispatch.calledThrice).to.be.true;
+            expect(dispatch.callCount).to.equal(4);
             expect(commit.args[1][0]).to.equal("setIsAreaLayer");
             expect(commit.args[1][1]).to.equal(true);
-            expect(dispatch.args[1][0]).to.equal("requestGFI");
-            expect(dispatch.args[2][0]).to.equal("toggleStripesLayer");
+            expect(dispatch.args[0][0]).to.equal("replaceByIdInLayerConfig");
+            expect(dispatch.args[0][1]).to.deep.equal(layer);
+            expect(dispatch.args[1][0]).to.equal("selectLayerByName");
+            expect(dispatch.args[2][0]).to.equal("requestGFI");
+            expect(dispatch.args[3][0]).to.equal("toggleStripesLayer");
         });
         it("handles layer switch for point to stripes layer", () => {
             const selectedLayerName = "31.12.2018",
@@ -324,7 +349,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         });
     });
     describe("requestGFI", () => {
-        it("requests GFI", () => {
+        it("requests GFI", async () => {
             sinon.stub(layerCollection, "getLayerById").returns(
                 {
                     layerSource: {
@@ -343,7 +368,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
                 processFromParametricUrl = "",
                 center = "";
 
-            actions.requestGFI({rootGetters, state, dispatch}, {processFromParametricUrl, center});
+            await actions.requestGFI({rootGetters, state, dispatch}, {processFromParametricUrl, center});
             expect(axiosStub.calledWith(url)).to.be.true;
         });
     });
