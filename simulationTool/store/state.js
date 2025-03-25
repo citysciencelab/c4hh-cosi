@@ -16,6 +16,7 @@
  * @property {string|null} selectedEnsembleId the selected ensemble id
  * @property {string|null} selectedJobId the selected job id
  * @property {string|null} selectedProcessId the selected process id
+ * @property {String|null} simulationApiUrl The URL for the Urban Model Platform API
  * @property {Object} userDetailsCache cache for user details
  */
 const state = {
@@ -37,6 +38,7 @@ const state = {
     selectedEnsembleId: null,
     selectedJobId: null,
     selectedProcessId: null,
+    simulationApiUrl: null,
     userDetailsCache: {}
 };
 

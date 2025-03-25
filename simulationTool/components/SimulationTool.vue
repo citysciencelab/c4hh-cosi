@@ -2,7 +2,7 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
 
-// import actions from "../store/actions";
+import actions from "../store/actions";
 import getters from "../store/getters";
 import mutations from "../store/mutations";
 
@@ -43,8 +43,8 @@ export default {
     mounted: async function () {
         await this.checkLoggedIn();
         this.maximizeDrawer();
-        // this.fetchProcesses();
-        // this.fetchJobs();
+        this.fetchProcesses();
+        this.fetchJobs();
         // this.fetchEnsembles();
         // this.fetchProviders();
     },
@@ -60,7 +60,7 @@ export default {
             "setCurrentMenuWidth"
         ]),
         ...mapMutations("Modules/SimulationTool", Object.keys(mutations)),
-        // ...mapActions("Modules/SimulationTool", Object.keys(actions)),
+        ...mapActions("Modules/SimulationTool", Object.keys(actions)),
         maximizeDrawer () {
             this.setCurrentMenuWidth({
                 side: "secondaryMenu",
