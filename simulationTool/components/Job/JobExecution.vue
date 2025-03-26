@@ -3,14 +3,14 @@ import {mapMutations, mapGetters, mapActions} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 import JobExecutionInput from "./JobExecutionInput.vue";
 import AsyncWrapper from "../AsyncWrapper.vue";
-// import ProcessSelect from "../Process/ProcessSelect.vue";
+import ProcessSelect from "../Process/ProcessSelect.vue";
 
 export default {
     name: "JobExecution",
     components: {
         AsyncWrapper,
         SectionHeader,
-        // ProcessSelect
+        ProcessSelect,
         JobExecutionInput
     },
     data () {
@@ -209,12 +209,12 @@ export default {
             icon="bi-box-fill"
         />
         <h3>{{ $t('additional:modules.tools.simulationTool.model') }}: {{ process?.title }}</h3>
-        <!-- <ProcessSelect
+        <ProcessSelect
             v-if="!process"
             @update:modelValue="(selectedProcessess) => {
                 setSelectedProcessId(selectedProcessess[0]?.id);
             }"
-        /> -->
+        />
         <AsyncWrapper :async-state="requestState">
             <form
                 ref="form"

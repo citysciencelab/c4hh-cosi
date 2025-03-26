@@ -1,4 +1,4 @@
-<!-- <script>
+<script>
 export default {
     name: "ProcessCard",
     props: {
@@ -8,16 +8,18 @@ export default {
         }
     },
     emits: [
-      "selected",
-      "tag-clicked"
+        "selected",
+        "tag-clicked"
     ],
     methods: {
         getProcessLink (process) {
             const link = process?.links?.find(({rel}) => rel === "about");
+
             return link ? link.href : "";
         },
         getProcessImageSource (process) {
             const image = process?.links?.find(({type}) => type === "image");
+
             return image ? image : "resources/img/Process_placeholder.png";
         }
     }
@@ -25,50 +27,56 @@ export default {
 </script>
 
 <template>
-  <div class="process-card card" style="width: 18rem;">
-      <img
-        class="card-img-top"
-        :src="getProcessImageSource(process)"
-        :alt="process.title + ' image'"
-      >
-      <div class="card-body">
-          <h5 class="card-title">
-            {{process.title}}
-          </h5>
-          <h6 class="card-subtitle mb-2 text-muted">
-            Version {{process.version}}
-          </h6>
-          <p class="card-text">
-            {{process.description}}
-          </p>
-          <div class="keywords">
-              <span
-                class="tag"
-                v-for="keyword in process.keywords"
-                :key="keyword"
-                @click="$emit('tag-clicked', keyword)"
-              >
-                #{{keyword}}
-              </span>
-          </div>
-          <div class="card-buttons">
-            <button
-              class="btn btn-secondary"
-              @click="$emit('selected', { id: process.id, mode: 'process-details'})"
-            >
-              <i class="bi bi-info-circle-fill">&nbsp;</i>
-              {{ $t("additional:modules.tools.simulationTool.additionalInfo") }}
-            </button>
-            <button
-              class="btn btn-primary"
-              @click="$emit('selected', { id: process.id, mode: 'job-execution'})"
-            >
-              <i class="bi bi-rocket">&nbsp;</i>
-              {{ $t("additional:modules.tools.simulationTool.simulate") }}
-            </button>
-          </div>
-      </div>
-  </div>
+    <div
+        class="process-card card"
+        style="width: 18rem;"
+    >
+        <img
+            class="card-img-top"
+            :src="getProcessImageSource(process)"
+            :alt="process.title + ' image'"
+        >
+        <div class="card-body">
+            <h5 class="card-title">
+                {{ process.title }}
+            </h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+                Version {{ process.version }}
+            </h6>
+            <p class="card-text">
+                {{ process.description }}
+            </p>
+            <div class="keywords">
+                <span
+                    v-for="keyword in process.keywords"
+                    :key="keyword"
+                    class="tag"
+                    role="button"
+                    tabindex="0"
+                    @click="$emit('tag-clicked', keyword)"
+                    @keydown="$emit('tag-clicked', keyword)"
+                >
+                    #{{ keyword }}
+                </span>
+            </div>
+            <div class="card-buttons">
+                <button
+                    class="btn btn-secondary"
+                    @click="$emit('selected', { id: process.id, mode: 'process-details'})"
+                >
+                    <i class="bi bi-info-circle-fill">&nbsp;</i>
+                    {{ $t("additional:modules.tools.simulationTool.additionalInfo") }}
+                </button>
+                <button
+                    class="btn btn-primary"
+                    @click="$emit('selected', { id: process.id, mode: 'job-execution'})"
+                >
+                    <i class="bi bi-rocket">&nbsp;</i>
+                    {{ $t("additional:modules.tools.simulationTool.simulate") }}
+                </button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style lang="scss" scoped>
@@ -123,4 +131,4 @@ export default {
 }
 
 
-</style> -->
+</style>

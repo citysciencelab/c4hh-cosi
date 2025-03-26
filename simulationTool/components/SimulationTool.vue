@@ -13,8 +13,8 @@ import HomePanel from "./HomePanel.vue";
 import JobDetails from "./Job/JobDetails.vue";
 import JobExecution from "./Job/JobExecution.vue";
 import JobList from "./Job/JobList.vue";
-// import ProcessDetails from "./Process/ProcessDetails.vue";
-// import ProcessList from "./Process/ProcessList.vue";
+import ProcessDetails from "./Process/ProcessDetails.vue";
+import ProcessList from "./Process/ProcessList.vue";
 import SideMenu from "./SideMenu.vue";
 // import TutorialPanel from "./HelpSection/TutorialPanel.vue";
 import HelpPanel from "./HelpSection/HelpPanel.vue";
@@ -32,8 +32,8 @@ export default {
         JobDetails,
         JobExecution,
         JobList,
-        // ProcessDetails,
-        // ProcessList,
+        ProcessDetails,
+        ProcessList,
         SideMenu
         // TutorialPanel
     },
@@ -95,14 +95,14 @@ export default {
 <template>
     <div id="tool-simulationTool">
         <div class="content">
-            <!-- <ProcessList
+            <ProcessList
                 v-if="mode === 'process-list'"
                 @selected="selectProcess"
             />
             <ProcessDetails
                 v-if="mode === 'process-details'"
                 @selected="selectProcess"
-            /> -->
+            />
             <HomePanel
                 v-if="mode === 'home-panel'"
                 @selected="selectProcess"

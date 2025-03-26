@@ -1,9 +1,9 @@
-<!-- <script>
-import { mapActions, mapGetters } from "vuex";
+<script>
+import {mapActions, mapGetters} from "vuex";
 
 import Multiselect from "vue-multiselect";
-import ProcessCard from './ProcessCard.vue';
-import SectionHeader from '../SectionHeader.vue';
+import ProcessCard from "./ProcessCard.vue";
+import SectionHeader from "../SectionHeader.vue";
 import LoadingMask from "../LoadingMask.vue";
 
 export default {
@@ -14,7 +14,6 @@ export default {
         ProcessCard,
         SectionHeader
     },
-    emits: ["selected"],
     props: {
         headerIsVisible: {
             type: Boolean,
@@ -22,11 +21,12 @@ export default {
             default: true
         }
     },
+    emits: ["selected"],
     data () {
         return {
             selectedTags: [],
             searchString: ""
-        }
+        };
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
@@ -34,12 +34,12 @@ export default {
             "processesLoading"
         ]),
         filteredProcesses: {
-            get() {
+            get () {
                 let filteredProcesses = this.processes;
+
                 if (this.selectedTags.length) {
                     filteredProcesses = filteredProcesses.filter(process => {
-                        return this.selectedTags.some(tag =>
-                            process.keywords?.includes(tag.name)
+                        return this.selectedTags.some(tag => process.keywords?.includes(tag.name)
                         );
                     });
                 }
@@ -53,12 +53,12 @@ export default {
                 }
                 return filteredProcesses;
             },
-            set(newProcesses) {
+            set (newProcesses) {
                 this.filteredProcesses = newProcesses;
             }
         },
         options: {
-            get() {
+            get () {
                 return this.processes.reduce((acc, process) => {
                     process.keywords?.forEach(keyword => {
                         if (!acc.some(tag => tag.name === keyword)) {
@@ -71,7 +71,7 @@ export default {
                     return acc;
                 }, []);
             },
-            set(newOptions) {
+            set (newOptions) {
                 this.options = newOptions;
             }
         }
@@ -80,36 +80,41 @@ export default {
         ...mapActions("Modules/SimulationTool", [
             "fetchProcesses"
         ]),
-        clearSearch() {
-            this.searchString = '';
+        clearSearch () {
+            this.searchString = "";
         }
-    },
-    emits: ["selected"]
+    }
 };
 </script>
 
 <template>
     <div class="process-list">
-        <SectionHeader v-if="headerIsVisible" :title="$t('additional:modules.tools.simulationTool.models')" icon="bi-cpu-fill" />
+        <SectionHeader
+            v-if="headerIsVisible"
+            :title="$t('additional:modules.tools.simulationTool.models')"
+            icon="bi-cpu-fill"
+        />
         <div class="process-list-toolbar">
             <div class="input-group search-wrapper">
                 <input
+                    v-model="searchString"
                     class="form-control"
                     :placeholder="$t('additional:modules.tools.simulationTool.search') + ' …'"
                     :aria-label="$t('additional:modules.tools.simulationTool.search')"
-                    v-model="searchString"
                 >
                 <i
                     v-if="searchString"
                     class="bi-x-lg"
-                    role="img"
+                    role="button"
+                    tabindex="0"
                     @click="clearSearch"
-                ></i>
+                    @keydown="clearSearch"
+                />
                 <i
                     v-else
                     class="bi-search"
                     role="img"
-                ></i>
+                />
             </div>
             <multiselect
                 v-model="selectedTags"
@@ -122,17 +127,20 @@ export default {
             />
             <button
                 class="btn btn-primary btn-sm"
-                @click="this.fetchProcesses"
                 :title="$t('additional:modules.tools.simulationTool.refresh')"
+                @click="fetchProcesses"
             >
-                <i class="bi-arrow-clockwise"></i>
+                <i class="bi-arrow-clockwise" />
             </button>
         </div>
         <LoadingMask
             v-if="processesLoading"
             :label="$t('additional:modules.tools.simulationTool.loadingModels') + '...'"
         />
-        <div v-else class="card-wrapper">
+        <div
+            v-else
+            class="card-wrapper"
+        >
             <ProcessCard
                 v-for="process in filteredProcesses"
                 :key="process.id"
@@ -191,4 +199,4 @@ export default {
     }
 }
 
-</style> -->
+</style>
