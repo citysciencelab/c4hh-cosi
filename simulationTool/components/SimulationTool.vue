@@ -10,9 +10,9 @@ import mutations from "../store/mutations";
 // import EnsembleCreation from "./Ensemble/EnsembleCreation.vue";
 // import EnsembleList from "./Ensemble/EnsembleList.vue";
 import HomePanel from "./HomePanel.vue";
-// import JobDetails from "./Job/JobDetails.vue";
-// import JobExecution from "./Job/JobExecution.vue";
-// import JobList from "./Job/JobList.vue";
+import JobDetails from "./Job/JobDetails.vue";
+import JobExecution from "./Job/JobExecution.vue";
+import JobList from "./Job/JobList.vue";
 // import ProcessDetails from "./Process/ProcessDetails.vue";
 // import ProcessList from "./Process/ProcessList.vue";
 import SideMenu from "./SideMenu.vue";
@@ -29,9 +29,9 @@ export default {
         // EnsembleList,
         HomePanel,
         HelpPanel,
-        // JobDetails,
-        // JobExecution,
-        // JobList,
+        JobDetails,
+        JobExecution,
+        JobList,
         // ProcessDetails,
         // ProcessList,
         SideMenu
@@ -110,7 +110,7 @@ export default {
             <HelpPanel
                 v-if="mode === 'help-panel'"
             />
-            <!-- <JobList
+            <JobList
                 v-if="mode === 'job-list'"
                 :jobs="jobs"
             />
@@ -120,7 +120,7 @@ export default {
             <JobDetails
                 v-if="mode === 'job-details'"
             />
-            <EnsembleList
+            <!--<EnsembleList
                 v-if="mode === 'ensemble-list'"
                 :ensembles="ensembles"
             />

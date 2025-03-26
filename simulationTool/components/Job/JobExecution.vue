@@ -1,19 +1,19 @@
-<!-- <script>
-import { mapMutations, mapGetters, mapActions } from "vuex";
+<script>
+import {mapMutations, mapGetters, mapActions} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 import JobExecutionInput from "./JobExecutionInput.vue";
 import AsyncWrapper from "../AsyncWrapper.vue";
-import ProcessSelect from "../Process/ProcessSelect.vue";
+// import ProcessSelect from "../Process/ProcessSelect.vue";
 
 export default {
     name: "JobExecution",
     components: {
         AsyncWrapper,
         SectionHeader,
-        ProcessSelect,
+        // ProcessSelect
         JobExecutionInput
     },
-    data() {
+    data () {
         return {
             process: null,
             executionValues: {},
@@ -29,25 +29,26 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
-            "selectedProcessId"
+            "selectedProcessId",
+            "simulationApiUrl"
         ]),
         ...mapGetters("Modules/Login", [
             "accessToken",
             "loggedIn"
         ])
     },
-    mounted: function () {
-        if (this.selectedProcessId) {
-            this.fetchProcess(this.selectedProcessId);
-        }
-    },
     watch: {
-        selectedProcessId: function(newProcessId) {
+        selectedProcessId: function (newProcessId) {
             if (newProcessId === null) {
                 this.process = null;
                 return;
             }
             this.fetchProcess(newProcessId);
+        }
+    },
+    mounted: function () {
+        if (this.selectedProcessId) {
+            this.fetchProcess(this.selectedProcessId);
         }
     },
     methods: {
@@ -65,6 +66,7 @@ export default {
          */
         async fetchProcess (processId) {
             let additionalHeaders = {};
+
             if (this.loggedIn) {
                 additionalHeaders = {
                     Authorization: `Bearer ${this.accessToken}`
@@ -73,33 +75,40 @@ export default {
 
             try {
                 this.requestState.loading = true;
-                const response = await fetch(`/api/processes/${processId}`,{
-                    headers: {
-                        "Content-Type": "application/json",
-                        ...additionalHeaders
-                    }
-                });
-                const result = await response.json();
+                const response = await fetch(`${this.simulationApiUrl}/processes/${processId}`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            ...additionalHeaders
+                        }
+                    }),
+                    result = await response.json();
+
                 if (!response.ok) {
-                    this.requestState.error = result.error_message || response.status + ': unknown errror';
-                } else {
+                    this.requestState.error = result.error_message || response.status + ": unknown errror";
+                }
+                else {
                     this.process = result;
                     this.setDefaultExecutionValues(result);
                 }
-            } catch (error) {
+            }
+            catch (error) {
                 this.requestState.error = error;
-            } finally {
+            }
+            finally {
                 this.requestState.loading = false;
             }
         },
         setDefaultExecutionValues (result) {
             this.executionValues = {};
             Object.entries(result.inputs).forEach(([key, input]) => {
-                let defaultValue
+                let defaultValue;
+
                 if (input.schema.default) {
                     defaultValue = input.schema.default;
-                } else if (input.schema.type === "boolean") {
+                }
+                else if (input.schema.type === "boolean") {
                     const required = input.schema.required || input.required || input.minOccurs > 0;
+
                     if (required) {
                         defaultValue = false;
                     }
@@ -139,6 +148,7 @@ export default {
                 } = this.executionValues;
 
                 let additionalHeaders = {};
+
                 if (this.loggedIn) {
                     additionalHeaders = {
                         Authorization: `Bearer ${this.accessToken}`
@@ -147,39 +157,42 @@ export default {
 
                 try {
                     this.executionRequestState.loading = true;
-                    const response = await fetch(`/api/processes/${this.selectedProcessId}/execution`, {
-                        method: "POST",
-                        body: JSON.stringify({
-                            job_name,
-                            inputs
+                    const response = await fetch(`${this.simulationApiUrl}/processes/${this.selectedProcessId}/execution`, {
+                            method: "POST",
+                            body: JSON.stringify({
+                                job_name,
+                                inputs
+                            }),
+                            headers: {
+                                "Content-Type": "application/json",
+                                ...additionalHeaders
+                            }
                         }),
-                        headers: {
-                            "Content-Type": "application/json",
-                            ...additionalHeaders
-                        }
-                    });
-                    const result = await response.json();
+                        result = await response.json();
+
                     if (!response.ok) {
-                        this.executionRequestState.error = result.error_message || response.status + ': unknown error';
-                    } else {
+                        this.executionRequestState.error = result.error_message || response.status + ": unknown error";
+                    }
+                    else {
                         this.resetExecutionValues();
 
                         this.setMode("job-details");
                         this.setSelectedJobId(result.jobID);
-                        if (!this.loggedIn) {
-                            if (!localStorage.getItem('jobs')) {
-                                localStorage.setItem('jobs', result.jobID);
-                            } else {
-                                localStorage.setItem('jobs', `${localStorage.getItem('jobs')},${result.jobID}`);
-                            }
+                        if (!this.loggedIn && !localStorage.getItem("jobs")) {
+                            localStorage.setItem("jobs", result.jobID);
+                        }
+                        else if (!this.loggedIn) {
+                            localStorage.setItem("jobs", `${localStorage.getItem("jobs")},${result.jobID}`);
                         }
 
                         this.fetchJobs();
                     }
 
-                } catch (error) {
+                }
+                catch (error) {
                     this.executionRequestState.error = error;
-                } finally {
+                }
+                finally {
                     this.executionRequestState.loading = false;
                 }
 
@@ -196,13 +209,13 @@ export default {
             icon="bi-box-fill"
         />
         <h3>{{ $t('additional:modules.tools.simulationTool.model') }}: {{ process?.title }}</h3>
-        <ProcessSelect
+        <!-- <ProcessSelect
             v-if="!process"
             @update:modelValue="(selectedProcessess) => {
-                this.setSelectedProcessId(selectedProcessess[0]?.id);
+                setSelectedProcessId(selectedProcessess[0]?.id);
             }"
-        />
-        <AsyncWrapper :asyncState="requestState" >
+        /> -->
+        <AsyncWrapper :async-state="requestState">
             <form
                 ref="form"
                 class="execution-form"
@@ -210,13 +223,16 @@ export default {
                 <label for="name_input">{{ $t('additional:modules.tools.simulationTool.scenarioName') }}:</label>
                 <input
                     id="name_input"
+                    v-model="executionValues.job_name"
                     class="form-control"
                     type="text"
-                    v-model="executionValues.job_name"
                     required
-                />
+                >
                 <h4>{{ $t('additional:modules.tools.simulationTool.inputParameters') }}</h4>
-                <div v-if="process" class="inputs">
+                <div
+                    v-if="process"
+                    class="inputs"
+                >
                     <template
                         v-for="(input, key) in process.inputs"
                         :key="`label_${key}`"
@@ -236,15 +252,15 @@ export default {
                     </template>
                 </div>
 
-                <AsyncWrapper :asyncState="executionRequestState" />
-                    <button
-                        class="btn btn-primary btn-lg"
-                        type="submit"
-                        @click="execute"
-                    >
-                        <i class="bi bi-box-fill">&nbsp;</i>
-                        {{ $t('additional:modules.tools.simulationTool.executeScenario') }}
-                    </button>
+                <AsyncWrapper :async-state="executionRequestState" />
+                <button
+                    class="btn btn-primary btn-lg"
+                    type="submit"
+                    @click="execute"
+                >
+                    <i class="bi bi-box-fill">&nbsp;</i>
+                    {{ $t('additional:modules.tools.simulationTool.executeScenario') }}
+                </button>
             </form>
         </AsyncWrapper>
     </div>
@@ -275,4 +291,4 @@ export default {
             }
         }
     }
-</style> -->
+</style>

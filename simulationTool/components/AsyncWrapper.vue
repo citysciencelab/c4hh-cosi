@@ -1,4 +1,4 @@
-<!-- <script>
+<script>
 import LoadingMask from "./LoadingMask.vue";
 
 export default {
@@ -14,7 +14,7 @@ export default {
                 loading: false,
                 error: null
             })
-        },
+        }
     }
 };
 </script>
@@ -25,14 +25,17 @@ export default {
             v-if="asyncState.loading"
             :label="$t('additional:modules.tools.simulationTool.loading')"
         />
-        <div v-else-if="asyncState.error" class="error-panel">
+        <div
+            v-else-if="asyncState.error"
+            class="error-panel"
+        >
             <p>
-                <i class="bi bi-exclamation-triangle-fill"></i>
+                <i class="bi bi-exclamation-triangle-fill" />
                 {{ $t("additional:modules.tools.simulationTool.errorLoadingData") }}:
             </p>
             <p>{{ asyncState.error }}</p>
         </div>
-        <slot v-else></slot>
+        <slot v-else />
     </div>
 </template>
 
@@ -52,4 +55,4 @@ export default {
         border: 1px solid var(--bs-danger-border-subtle);
         border-radius: var(--bs-border-radius-lg);
     }
-</style> -->
+</style>

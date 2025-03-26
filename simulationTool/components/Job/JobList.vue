@@ -1,5 +1,5 @@
-<!-- <script>
-import { mapActions, mapMutations, mapGetters } from "vuex";
+<script>
+import {mapActions, mapMutations, mapGetters} from "vuex";
 import Multiselect from "vue-multiselect";
 import SectionHeader from "../SectionHeader.vue";
 import LoadingMask from "../LoadingMask.vue";
@@ -16,15 +16,15 @@ export default {
     data () {
         return {
             options: [
-                { name: "accepted", code: "accepted" },
-                { name: "running", code: "running" },
-                { name: "successful", code: "successful" },
-                { name: "failed", code: "failed" },
-                { name: "dismissed", code: "dismissed" }
+                {name: "accepted", code: "accepted"},
+                {name: "running", code: "running"},
+                {name: "successful", code: "successful"},
+                {name: "failed", code: "failed"},
+                {name: "dismissed", code: "dismissed"}
             ],
             selectedStatus: [],
             searchString: ""
-        }
+        };
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
@@ -35,12 +35,12 @@ export default {
             "loggedIn"
         ]),
         filteredJobs: {
-            get() {
+            get () {
                 let filteredJobs = this.jobs;
+
                 if (this.selectedStatus.length) {
                     filteredJobs = filteredJobs.filter(job => {
-                        return this.selectedStatus.some(status =>
-                            job.status === status.code
+                        return this.selectedStatus.some(status => job.status === status.code
                         );
                     });
                 }
@@ -52,27 +52,28 @@ export default {
                             .includes(this.searchString.toLowerCase());
                     });
                 }
-                if (!this.loggedIn) {
-                    const jobs = localStorage.getItem('jobs');
-                    if (!jobs) {
-                        return [];
-                    }
-                    let ids = jobs.split(',');
-                    const otherIds = filteredJobs.map(job => job.jobID);
-                    filteredJobs = filteredJobs.filter(job => {
-                        return ids.includes(job.jobID);
-                    });
-                    ids = ids.filter(id => otherIds.includes(id));
-                    localStorage.setItem('jobs', ids);
-                }
+                // if (!this.loggedIn) {
+                //     const jobs = localStorage.getItem("jobs");
+
+                //     if (!jobs) {
+                //         return [];
+                //     }
+                //     let ids = jobs.split(",");
+
+                //     filteredJobs = filteredJobs.filter(job => {
+                //         return ids.includes(job.jobID);
+                //     });
+                //     ids = ids.filter(id => filteredJobs.map(job => job.jobID).includes(id));
+                //     localStorage.setItem("jobs", ids);
+                // }
                 return filteredJobs;
             },
-            set(newJobs) {
+            set (newJobs) {
                 this.filteredJobs = newJobs;
             }
         }
     },
-    mounted() {
+    mounted () {
         this.fetchJobs();
     },
     methods: {
@@ -85,10 +86,10 @@ export default {
         ...mapActions("Modules/SimulationTool", [
             "fetchJobs"
         ]),
-        clearSearch() {
-            this.searchString = '';
+        clearSearch () {
+            this.searchString = "";
         },
-        formatDateTime(dateTime) {
+        formatDateTime (dateTime) {
             return new Date(dateTime).toLocaleString({
                 year: "numeric",
                 month: "2-digit",
@@ -97,33 +98,36 @@ export default {
                 minute: "2-digit"
             });
         },
-        getJobName(job) {
+        getJobName (job) {
             return job.name || job.jobID;
         },
-        getModelName(job) {
+        getModelName (job) {
             return job.process_title || job.processID;
         },
-        onJobClick(job) {
+        onJobClick (job) {
             this.setSelectedJobId(job.jobID);
             this.setMode("job-details");
         },
-        onEnsembleClick(ensembleId) {
+        onEnsembleClick (ensembleId) {
             this.setSelectedEnsembleId(ensembleId);
             this.setMode("ensemble-details");
-        },
-    },
+        }
+    }
 };
 </script>
 
 <template>
     <div class="job-list">
-        <SectionHeader :title="$t('additional:modules.tools.simulationTool.scenarios')" icon="bi-box-fill">
+        <SectionHeader
+            :title="$t('additional:modules.tools.simulationTool.scenarios')"
+            icon="bi-box-fill"
+        >
             <template #actions>
                 <button
                     class="btn btn-primary"
                     @click="() => {
-                        this.setMode('job-execution')
-                        this.setSelectedProcessId(null)
+                        setMode('job-execution')
+                        setSelectedProcessId(null)
                     }"
                 >
                     <i class="bi bi-plus-lg">&nbsp;</i>
@@ -134,22 +138,24 @@ export default {
         <div class="job-list-toolbar">
             <div class="input-group search-wrapper">
                 <input
+                    v-model="searchString"
                     class="form-control"
                     :placeholder="$t('additional:modules.tools.simulationTool.search') + ' …'"
                     :aria-label="$t('additional:modules.tools.simulationTool.search')"
-                    v-model="searchString"
                 >
                 <i
                     v-if="searchString"
                     class="bi-x-lg"
-                    role="img"
+                    role="button"
+                    tabindex="0"
                     @click="clearSearch"
-                ></i>
+                    @keypress="clearSearch"
+                />
                 <i
                     v-else
                     class="bi-search"
                     role="img"
-                ></i>
+                />
             </div>
             <multiselect
                 v-model="selectedStatus"
@@ -157,23 +163,31 @@ export default {
                 :aria-label="$t('additional:modules.tools.simulationTool.filter')"
                 label="name"
                 track-by="code"
-                :options="this.options"
+                :options="options"
                 :multiple="true"
                 :open="true"
             >
                 <template #tag="{ option, remove }">
-                    <span class="multiselect__tag" :class="option.code" >
+                    <span
+                        class="multiselect__tag"
+                        :class="option.code"
+                    >
                         <span>{{ option.name }}</span>
                         <i
-                            tabindex="1"
+                            tabindex="0"
                             class="multiselect__tag-icon"
+                            role="button"
                             @click="remove(option)"
-                        ></i>
+                            @keypress="remove(option)"
+                        />
                     </span>
                 </template>
                 <template #option="p">
                     <div class="option__desc">
-                        <span class="option__title" :class="p.option.name">
+                        <span
+                            class="option__title"
+                            :class="p.option.name"
+                        >
                             {{ p.option.name }}
                         </span>
                     </div>
@@ -181,17 +195,20 @@ export default {
             </multiselect>
             <button
                 class="btn btn-primary btn-sm"
-                @click="this.fetchJobs"
                 :title="$t('additional:modules.tools.simulationTool.refresh')"
+                @click="fetchJobs"
             >
-                <i class="bi-arrow-clockwise"></i>
+                <i class="bi-arrow-clockwise" />
             </button>
         </div>
         <LoadingMask
             v-if="jobsLoading"
             :label="$t('additional:modules.tools.simulationTool.loadingScenarios') + '...'"
         />
-        <div v-else class="table-wrapper">
+        <div
+            v-else
+            class="table-wrapper"
+        >
             <table class="job-list-table">
                 <thead>
                     <tr>
@@ -199,29 +216,39 @@ export default {
                         <th>{{ $t('additional:modules.tools.simulationTool.model') }}</th>
                         <th>{{ $t('additional:modules.tools.simulationTool.date') }}</th>
                         <th>{{ $t('additional:modules.tools.simulationTool.status') }}</th>
-                        <th v-if="loggedIn">{{ $t('additional:modules.tools.simulationTool.user') }}</th>
-                        <th v-if="loggedIn">{{ $t('additional:modules.tools.simulationTool.ensembles') }}</th>
+                        <th v-if="loggedIn">
+                            {{ $t('additional:modules.tools.simulationTool.user') }}
+                        </th>
+                        <th v-if="loggedIn">
+                            {{ $t('additional:modules.tools.simulationTool.ensembles') }}
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="job in filteredJobs">
+                    <tr
+                        v-for="job in filteredJobs"
+                        :key="job.jobID"
+                    >
                         <td>
                             <button
                                 class="btn btn-link"
                                 @click="onJobClick(job)"
                             >
-                                {{this.getJobName(job)}}
+                                {{ getJobName(job) }}
                             </button>
                         </td>
                         <td>
-                            {{this.getModelName(job)}}
+                            {{ getModelName(job) }}
                         </td>
                         <td>
-                            {{this.formatDateTime(job.started)}}
+                            {{ formatDateTime(job.started) }}
                         </td>
                         <td>
-                            <div class="status" :class="job.status">
-                                {{job.status}}
+                            <div
+                                class="status"
+                                :class="job.status"
+                            >
+                                {{ job.status }}
                             </div>
                         </td>
                         <td v-if="loggedIn">
@@ -230,10 +257,11 @@ export default {
                         <td v-if="loggedIn">
                             <button
                                 v-for="ensemble in job.ensembles"
+                                :key="ensemble.id"
                                 class="btn btn-link"
                                 @click="onEnsembleClick(ensemble.id)"
                             >
-                                {{ensemble.name}}
+                                {{ ensemble.name }}
                             </button>
                         </td>
                     </tr>
@@ -312,4 +340,4 @@ export default {
             }
         }
     }
-</style> -->
+</style>

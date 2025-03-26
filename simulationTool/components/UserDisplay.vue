@@ -1,14 +1,10 @@
-<!-- <script>
-import { mapActions, mapGetters } from "vuex";
-import LoadingMask from "./LoadingMask.vue";
+<script>
+import {mapActions, mapGetters} from "vuex";
 
 export default {
     name: "UserDisplay",
-    components: {
-        LoadingMask
-    },
     props: {
-        user_id: {
+        userId: {
             type: String,
             default: null
         }
@@ -21,32 +17,31 @@ export default {
         }
     }),
     computed: {
-        ...mapGetters("Modules/Login", ["accessToken", "loggedIn"]),
+        ...mapGetters("Modules/Login", ["accessToken", "loggedIn"])
     },
-    mounted() {
+    mounted () {
         this.getUserName();
     },
     methods: {
         ...mapActions("Modules/SimulationTool", ["fetchUserDetails"]),
-        async getUserName() {
-            if (!this.loggedIn || !this.user_id) {
-                return 'Anonymous*';
+        async getUserName () {
+            if (!this.loggedIn || !this.userId) {
+                // return "Anonymous*";
             }
 
             try {
                 this.requestState.loading = true;
-                this.user = await this.fetchUserDetails(this.user_id);
-            } catch (error) {
+                this.user = await this.fetchUserDetails(this.userId);
+            }
+            catch (error) {
                 this.requestState.error = error;
-            } finally {
+            }
+            finally {
                 this.requestState.loading = false;
             }
         }
-    },
-    components: {
-        LoadingMask
     }
-}
+};
 </script>
 
 <template>
@@ -61,8 +56,13 @@ export default {
             v-if="user"
             :title="`${user.email} (${user.firstName} ${user.lastName})`"
             :alt="`${user.email} (${user.firstName} ${user.lastName})`"
-        >{{ user.firstName.toUpperCase()[0] + user.lastName.toUpperCase()[0] }}</div>
-        <div v-else class="user-not-found">
+        >
+            {{ user.firstName.toUpperCase()[0] + user.lastName.toUpperCase()[0] }}
+        </div>
+        <div
+            v-else
+            class="user-not-found"
+        >
             User not found
         </div>
     </div>
@@ -92,4 +92,4 @@ export default {
             padding-bottom: 100%;
         }
     }
-</style> -->
+</style>

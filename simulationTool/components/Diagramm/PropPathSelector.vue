@@ -1,95 +1,125 @@
-<!-- <script>
+<script>
 export default {
-  props: {
-    node: {
-      type: Object,
-      required: true
+    props: {
+        node: {
+            type: Object,
+            required: true
+        },
+        modelValue: {
+            type: String,
+            default: ""
+        },
+        rootNodeLabel: {
+            type: String,
+            default: "(Wurzel)"
+        }
     },
-    modelValue: {
-      type: String,
-      default: ''
+    emits: ["update:modelValue"],
+    data () {
+        return {
+            dropDownOpen: false
+        };
     },
-    rootNodeLabel: {
-      type: String,
-      default: '(Wurzel)'
+    computed: {
+        restPath () {
+            return this.modelValue ? this.modelValue.split(".").slice(1).join(".") : "";
+        },
+        currentKey () {
+            return this.modelValue ? this.modelValue.split(".")[0] : "";
+        },
+        hasValidChildren () {
+            const target = this.node && this.currentKey ? this.node[this.currentKey] : null;
+
+            return target && typeof target === "object" && Object.keys(target).length > 0;
+        },
+        iconClass () {
+            if (this.dropDownOpen) {
+                return "bi bi-caret-left-fill";
+            }
+            if (!this.hasValidChildren) {
+                return "";
+            }
+            if (this.modelValue) {
+                return "bi bi-arrow-right-short";
+            }
+            return "";
+        }
+    },
+    methods: {
+        toggleDropdown () {
+            this.dropDownOpen = !this.dropDownOpen;
+            if (this.dropDownOpen) {
+                document.addEventListener("click", this.handleClickOutside);
+            }
+            else {
+                document.removeEventListener("click", this.handleClickOutside);
+            }
+        },
+        handleClickOutside (event) {
+            const dropdown = this.$el.querySelector(".prop-path-dropdown");
+
+            if (dropdown && !dropdown.contains(event.target)) {
+                this.dropDownOpen = false;
+                document.removeEventListener("click", this.handleClickOutside);
+            }
+        },
+        getKeys (obj) {
+            return typeof obj === "object" ? Object.keys(obj) : [];
+        },
+        onChange (newValue) {
+            this.dropDownOpen = false;
+            this.$emit("update:modelValue", newValue);
+        },
+        onChildInput (val) {
+            const newValue = this.currentKey ? `${this.currentKey}.${val}` : val;
+
+            this.$emit("update:modelValue", newValue);
+        }
     }
-  },
-  data() {
-    return {
-      dropDownOpen: false,
-    };
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    toggleDropdown() {
-      this.dropDownOpen = !this.dropDownOpen;
-      if (this.dropDownOpen) {
-        document.addEventListener('click', this.handleClickOutside);
-      } else {
-        document.removeEventListener('click', this.handleClickOutside);
-      }
-    },
-    handleClickOutside(event) {
-      const dropdown = this.$el.querySelector('.prop-path-dropdown');
-      if (dropdown && !dropdown.contains(event.target)) {
-        this.dropDownOpen = false;
-        document.removeEventListener('click', this.handleClickOutside);
-      }
-    },
-    getKeys(obj) {
-      return typeof obj === 'object' ? Object.keys(obj) : [];
-    },
-    onChange(newValue) {
-      this.dropDownOpen = false;
-      this.$emit('update:modelValue', newValue);
-    },
-    onChildInput(val) {
-      const newValue = this.currentKey ? `${this.currentKey}.${val}` : val;
-      this.$emit('update:modelValue', newValue);
-    }
-  },
-  computed: {
-    restPath() {
-      return this.modelValue ? this.modelValue.split('.').slice(1).join('.') : '';
-    },
-    currentKey() {
-      return this.modelValue ? this.modelValue.split('.')[0] : '';
-    },
-    hasValidChildren() {
-      const target = this.node && this.currentKey ? this.node[this.currentKey] : null;
-      return target && typeof target === 'object' && Object.keys(target).length > 0;
-    },
-    iconClass() {
-      if (this.dropDownOpen) return "bi bi-caret-left-fill";
-      if (!this.hasValidChildren) return "";
-      if (this.modelValue) return "bi bi-arrow-right-short";
-      return "";
-    }
-  }
 };
 </script>
 
 <template>
-  <div class="prop-path-selector">
-    <div class="prop-path-dropdown">
-      <button @click="toggleDropdown" class="prop-path-dropdown-button">
-        <span>{{ currentKey || rootNodeLabel }}</span>
-        <i :class="iconClass"></i>
-      </button>
-      <ul v-if="dropDownOpen" class="prop-path-dropdown-list">
-        <li @click="onChange('')">{{ rootNodeLabel }}</li>
-        <li v-for="key in getKeys(node)" :key="key" @click="onChange(key)">
-          {{ key }}
-        </li>
-      </ul>
+    <div class="prop-path-selector">
+        <div class="prop-path-dropdown">
+            <button
+                class="prop-path-dropdown-button"
+                @click="toggleDropdown"
+            >
+                <span>{{ currentKey || rootNodeLabel }}</span>
+                <i :class="iconClass" />
+            </button>
+            <ul
+                v-if="dropDownOpen"
+                class="prop-path-dropdown-list"
+            >
+                <li
+                    tabindex="0"
+                    role="button"
+                    @click="onChange('')"
+                    @keypress="onChange('')"
+                >
+                    {{ rootNodeLabel }}
+                </li>
+                <li
+                    v-for="key in getKeys(node)"
+                    :key="key"
+                    tabindex="0"
+                    role="button"
+                    @click="onChange(key)"
+                    @keypress="onChange('')"
+                >
+                    {{ key }}
+                </li>
+            </ul>
+        </div>
+        <PropPathSelector
+            v-if="hasValidChildren"
+            :node="node[currentKey]"
+            :model-value="restPath"
+            @update:modelValue="onChildInput"
+        />
     </div>
-    <PropPathSelector
-      v-if="hasValidChildren"
-      :node="node[currentKey]"
-      :modelValue="restPath"
-      @update:modelValue="onChildInput"
-    />
-  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -141,4 +171,4 @@ export default {
       }
     }
   }
-</style> -->
+</style>

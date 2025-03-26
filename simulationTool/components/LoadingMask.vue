@@ -1,20 +1,25 @@
-<!-- <script>
+<script>
 export default {
-  name: "LoadingMask",
-  props: {
-    label: {
-      type: String,
-      default: ""
+    name: "LoadingMask",
+    props: {
+        label: {
+            type: String,
+            default: ""
+        }
     }
-  }
 };
 </script>
 
 <template>
-  <div class="loading-mask">
-    <div class="spinner"></div>
-    <div v-if="label" class="loading-label">{{ label }}</div>
-  </div>
+    <div class="loading-mask">
+        <div class="spinner" />
+        <div
+            v-if="label"
+            class="loading-label"
+        >
+            {{ label }}
+        </div>
+    </div>
 </template>
 
 <style scoped>
@@ -50,4 +55,4 @@ export default {
       transform: rotate(360deg);
     }
   }
-</style> -->
+</style>

@@ -1,4 +1,4 @@
-<!-- <script>
+<script>
 export default {
     name: "JobExecutionInput",
     props: {
@@ -101,7 +101,7 @@ export default {
                 class="bootstrap-icon"
                 @click="handleArrayValueDeletion(index)"
             >
-                <i class="bi-x-lg" ></i>
+                <i class="bi-x-lg" />
             </button>
         </div>
         <button
@@ -111,8 +111,8 @@ export default {
             class="btn btn-sm btn-secondary"
             @click="$emit('change', [...value, ''])"
         >
-            <i class="bi-plus-circle" ></i>
+            <i class="bi-plus-circle" />
             {{ $t("additional:modules.tools.simulationTool.inputArrayAddButton", { title: data.title }) }}
         </button>
     </div>
-</template> -->
+</template>

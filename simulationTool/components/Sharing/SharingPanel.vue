@@ -1,6 +1,6 @@
-<!-- <script>
-import { mapGetters } from "vuex";
-import AsyncWrapper from '../AsyncWrapper.vue';
+<script>
+import {mapGetters} from "vuex";
+import AsyncWrapper from "../AsyncWrapper.vue";
 import UserDisplay from "../UserDisplay.vue";
 
 export default {
@@ -20,7 +20,7 @@ export default {
         }
     },
     data: () => ({
-        email: '',
+        email: "",
         users: [],
         requestState: {
             loading: false,
@@ -29,17 +29,19 @@ export default {
     }),
     computed: {
         ...mapGetters("Modules/Login", ["accessToken", "loggedIn"]),
-        ownUserId() {
-            const decodedToken = JSON.parse(atob(this.accessToken.split('.')[1]));
+        ownUserId () {
+            const decodedToken = JSON.parse(atob(this.accessToken.split(".")[1]));
+
             return decodedToken.sub;
         }
     },
-    mounted() {
+    mounted () {
         this.fetchUsers();
     },
     methods: {
-        async fetchUsers() {
+        async fetchUsers () {
             let additionalHeaders = {};
+
             if (this.loggedIn) {
                 additionalHeaders = {
                     Authorization: `Bearer ${this.accessToken}`
@@ -47,57 +49,65 @@ export default {
             }
             try {
                 this.requestState.loading = true;
-                const response = await fetch(`/api/${this.endPoint}/${this.entityId}/users`,{
-                    headers: {
-                        "Content-Type": "application/json",
-                        ...additionalHeaders
-                    }
-                });
-                const result = await response.json();
+                const response = await fetch(`/api/${this.endPoint}/${this.entityId}/users`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            ...additionalHeaders
+                        }
+                    }),
+                    result = await response.json();
+
                 if (!response.ok) {
-                    this.requestState.error = result.error_message || response.status + ': unknown errror';
-                } else {
+                    this.requestState.error = result.error_message || response.status + ": unknown errror";
+                }
+                else {
                     this.users = result;
                 }
-            } catch (error) {
+            }
+            catch (error) {
                 this.requestState.error = error;
-            } finally {
+            }
+            finally {
                 this.requestState.loading = false;
             }
         },
-        async addUser() {
+        async addUser () {
             if (!this.loggedIn) {
                 return;
             }
             try {
                 this.requestState.loading = true;
-                const response = await fetch(`/api/${this.endPoint}/${this.entityId}/share/${this.email}`,{
+                const response = await fetch(`/api/${this.endPoint}/${this.entityId}/share/${this.email}`, {
                     headers: {
                         Authorization: `Bearer ${this.accessToken}`
                     }
                 });
+
                 if (!response.ok) {
-                    this.requestState.error = result.error_message || response.status + ': unknown errror';
-                } else {
-                    this.sharing = '';
+                    this.requestState.error = response.error_message || response.status + ": unknown errror";
+                }
+                else {
+                    this.sharing = "";
                     this.fetchUsers();
                 }
-            } catch (error) {
+            }
+            catch (error) {
                 this.requestState.error = error;
-            } finally {
+            }
+            finally {
                 this.requestState.loading = false;
-                this.email = '';
+                this.email = "";
             }
         }
     }
-}
+};
 </script>
 
 <template>
     <div class="sharing-panel">
         <div>
-            <span v-show="users.length">{{ $t('additional:modules.tools.simulationTool.currentlySharedWith')}}:</span>
-            <AsyncWrapper :asyncState="requestState">
+            <span v-show="users.length">{{ $t('additional:modules.tools.simulationTool.currentlySharedWith') }}:</span>
+            <AsyncWrapper :async-state="requestState">
                 <ul class="users">
                     <li
                         v-for="user in users"
@@ -115,8 +125,8 @@ export default {
         >
             <div class="input-group">
                 <input
-                    class="form-control form-control-sm"
                     v-model="email"
+                    class="form-control form-control-sm"
                     type="email"
                     :placeholder="$t('additional:modules.tools.simulationTool.enterUserEmail')"
                 >
@@ -179,4 +189,4 @@ export default {
             }
         }
     }
-</style> -->
+</style>
