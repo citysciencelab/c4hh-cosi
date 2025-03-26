@@ -4,6 +4,7 @@
  * @property {Array.<Object>} ensembles a list of ensembles
  * @property {boolean} ensemblesLoading flag indicating if ensembles are loading
  * @property {string} id the ID of the simulation tool
+ * @property {string} type the type of the simulation tool
  * @property {Object} jobResultData data of the job result
  * @property {Array.<Object>} jobs a list of jobs
  * @property {boolean} jobsLoading flag indicating if jobs are loading
@@ -23,6 +24,7 @@ const state = {
     ensembles: [],
     ensemblesLoading: false,
     id: "simulationTool",
+    type: "simulationTool",
     name: "additional:modules.tools.simulationTool.toolName",
     description: "additional:modules.tools.simulationTool.toolDescription",
     icon: "bi-sliders2",
