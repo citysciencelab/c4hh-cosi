@@ -127,7 +127,7 @@
 ### __Breaking Changes__
 Under the headline `deprecated` you can find several changes of removed deprecated properties and tools.
 In certain circumstances this means that you have to update your portal files (index.html, config.js and config.json) according to the new changes in order to use your portal furthermore.
-For further information about the changes for version 3.0.0 visit the [Masterportal Docs and Changelog](https://bitbucket.org/geowerkstatt-hamburg/masterportal/src/dev_vue/).
+For further information about the changes for version 3.0.0 visit the [Masterportal Docs and Changelog](https://bitbucket.org/geowerkstatt-hamburg/masterportal/src/dev/).
 
 ### Added
 - A mechanism was added to define searchInterfaces for the searchBar as an addon for version 3.0.
