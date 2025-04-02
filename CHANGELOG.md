@@ -3,7 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
+## 2025-04-02 v3.9.0
 
 ### __Breaking Changes__
 
@@ -33,10 +33,6 @@
             - @turf/intersect: 7.1.0 to 7.2.0
             - @turf/points-within-polygon: 7.1.0 to 7.2.0
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 - Boris: Change of the Bodenrichtwert layer was not written back to the layer config.
 
@@ -47,7 +43,7 @@
 - Boris: Design adjustments for the component buttons, including colors and hover effect.
 
 ### Fixed
-- StreetSmart: Fixed language switch, now supporting english, german and portuguese
+- StreetSmart: Fixed language switch, now supporting english, german and portuguese.
 
 ---
 
