@@ -88,6 +88,7 @@
           "notes": "Notes",
           "notLoggedIn": "You are not logged in!",
           "parameters": "Parameters",
+          "planningScenario": "Planning scenario",
           "privacy": "Privacy",
           "refresh": "Refresh",
           "removeJob": "Remove scenario from ensemble",

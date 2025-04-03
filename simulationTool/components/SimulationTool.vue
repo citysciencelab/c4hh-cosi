@@ -13,6 +13,7 @@ import HomePanel from "./HomePanel.vue";
 import JobDetails from "./Job/JobDetails.vue";
 import JobExecution from "./Job/JobExecution.vue";
 import JobList from "./Job/JobList.vue";
+import PlanningScenario from "./PlanningScenario/PlanningScenario.vue";
 import ProcessDetails from "./Process/ProcessDetails.vue";
 import ProcessList from "./Process/ProcessList.vue";
 import SideMenu from "./SideMenu.vue";
@@ -32,6 +33,7 @@ export default {
         JobDetails,
         JobExecution,
         JobList,
+        PlanningScenario,
         ProcessDetails,
         ProcessList,
         SideMenu
@@ -95,6 +97,9 @@ export default {
 <template>
     <div id="tool-simulationTool">
         <div class="content">
+            <PlanningScenario
+                v-if="mode === 'planningScenario'"
+            />
             <ProcessList
                 v-if="mode === 'process-list'"
                 @selected="selectProcess"

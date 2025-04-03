@@ -89,6 +89,7 @@
           "notes": "Notizen",
           "notLoggedIn": "Sie sind nicht angemeldet!",
           "parameters": "Parameter",
+          "planningScenario": "Planungsszenario",
           "privacy": "Datenschutz",
           "refresh": "Aktualisieren",
           "removeJob": "Szenario aus Ensemble entfernen",
@@ -156,4 +157,3 @@
       }
     }
   }
-  

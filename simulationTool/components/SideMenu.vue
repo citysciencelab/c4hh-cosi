@@ -72,6 +72,14 @@ export default {
         </button>
         <button
             class="btn btn-link"
+            :class="{ active: mode.includes('planningScenario') }"
+            :title="$t('additional:modules.tools.simulationTool.planningScenario')"
+            @click="() => setMode('planningScenario')"
+        >
+            <i class="bi bi-bounding-box-circles" />
+        </button>
+        <button
+            class="btn btn-link"
             :class="{ active: mode.includes('process') }"
             :title="$t('additional:modules.tools.simulationTool.models')"
             @click="() => setMode('process-list')"
