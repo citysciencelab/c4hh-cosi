@@ -20,8 +20,6 @@
 
 ## 2025-04-02 v3.9.0
 
-### __Breaking Changes__
-
 ### Added
 - Added 'addLayerRemotely' to version 3.x
 - Added SessionTool to version 3.x
