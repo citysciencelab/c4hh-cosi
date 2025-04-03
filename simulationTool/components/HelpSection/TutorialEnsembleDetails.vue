@@ -1,24 +1,22 @@
-<!-- <script>
-import TutorialPage from './TutorialPage.vue';
-import TutorialEnsembleDetails from '../../resources/img/TutorialEnsembleDetails.png';
+<script>
+import TutorialPage from "./TutorialPage.vue";
+import {mapGetters} from "vuex";
 
 export default {
-  components: { TutorialPage },
-  data() {
-    return {
-        TutorialEnsembleDetails
-    };
-  }
+    components: {TutorialPage},
+    computed: {
+        ...mapGetters("Modules/SimulationTool", ["img"])
+    }
 };
 </script>
 
 <template>
     <TutorialPage
-      :tutorialTitle="$t('additional:modules.tools.simulationTool.tutorial')"
-      :sectionTitle="$t('additional:modules.tools.simulationTool.ensembleDetails')"
-      :sections="[
-        { type: 'text', content: $t('additional:modules.tools.simulationTool.ensembleDetailsContent') },
-        { type: 'image', src: TutorialEnsembleDetails, alt: 'TutorialEnsembleDetails' },
-      ]"
+        :tutorial-title="$t('additional:modules.tools.simulationTool.tutorial')"
+        :section-title="$t('additional:modules.tools.simulationTool.ensembleDetails')"
+        :sections="[
+            { type: 'text', content: $t('additional:modules.tools.simulationTool.ensembleDetailsContent') },
+            { type: 'image', src: img.tutorialEnsembleDetails, alt: 'TutorialEnsembleDetails' },
+        ]"
     />
-  </template> -->
+</template>

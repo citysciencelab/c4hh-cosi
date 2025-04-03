@@ -1,24 +1,22 @@
-<!-- <script>
-import TutorialPage from './TutorialPage.vue';
-import TutorialLandingPage from '../../resources/img/TutorialLandingPage.png';
+<script>
+import {mapGetters} from "vuex";
+import TutorialPage from "./TutorialPage.vue";
 
 export default {
-  components: { TutorialPage },
-  data() {
-    return {
-        TutorialLandingPage
-    };
-  }
+    components: {TutorialPage},
+    computed: {
+        ...mapGetters("Modules/SimulationTool", ["img"])
+    }
 };
 </script>
 
 <template>
     <TutorialPage
-      :tutorialTitle="$t('additional:modules.tools.simulationTool.tutorial')"
-      :sectionTitle="$t('additional:modules.tools.simulationTool.landingPage')"
-      :sections="[
-        { type: 'text', content: $t('additional:modules.tools.simulationTool.landingPageContent') },
-        { type: 'image', src: TutorialLandingPage, alt: 'TutorialLandingPage' },
-      ]"
+        :tutorial-title="$t('additional:modules.tools.simulationTool.tutorial')"
+        :section-title="$t('additional:modules.tools.simulationTool.landingPage')"
+        :sections="[
+            { type: 'text', content: $t('additional:modules.tools.simulationTool.landingPageContent') },
+            { type: 'image', src: img.tutorialLandingPage, alt: 'TutorialLandingPage' },
+        ]"
     />
-  </template> -->
+</template>

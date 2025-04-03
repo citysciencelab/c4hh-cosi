@@ -85,7 +85,7 @@ export default {
     <div class="help-panel">
         <SectionHeader
             :title="$t('additional:modules.tools.simulationTool.help')"
-            icon="bi bi-question-circle-fill"
+            icon="bi bi-question-circle"
         />
 
         ToDo: implement Searchbar

@@ -1,28 +1,26 @@
-<!-- <script>
-import TutorialPage from './TutorialPage.vue';
-import TutorialModelInformation from '../../resources/img/TutorialModelInformation.png';
+<script>
+import TutorialPage from "./TutorialPage.vue";
+import {mapGetters} from "vuex";
 
 export default {
-  components: { TutorialPage },
-  data() {
-    return {
-        TutorialModelInformation
-    };
-  }
+    components: {TutorialPage},
+    computed: {
+        ...mapGetters("Modules/SimulationTool", ["img"])
+    }
 };
 </script>
 
 <template>
     <TutorialPage
-      :tutorialTitle="$t('additional:modules.tools.simulationTool.tutorial')"
-      :sectionTitle="$t('additional:modules.tools.simulationTool.modelInformation')"
-      :sections="[
-        { type: 'text', content: $t('additional:modules.tools.simulationTool.modelInformationContent') },
-        { type: 'image', src: TutorialModelInformation, alt: 'TutorialModelInformation' },
-      ]"
-      :hintsTitle="$t('additional:modules.tools.simulationTool.hints')"
-      :hints="[
-        $t('additional:modules.tools.simulationTool.modelInformationHint')
-      ]"
+        :tutorial-title="$t('additional:modules.tools.simulationTool.tutorial')"
+        :section-title="$t('additional:modules.tools.simulationTool.modelInformation')"
+        :sections="[
+            { type: 'text', content: $t('additional:modules.tools.simulationTool.modelInformationContent') },
+            { type: 'image', src: img.tutorialModelInformation, alt: 'TutorialModelInformation' },
+        ]"
+        :hints-title="$t('additional:modules.tools.simulationTool.hints')"
+        :hints="[
+            $t('additional:modules.tools.simulationTool.modelInformationHint')
+        ]"
     />
-  </template> -->
+</template>

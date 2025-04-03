@@ -17,7 +17,7 @@ import PlanningScenario from "./PlanningScenario/PlanningScenario.vue";
 import ProcessDetails from "./Process/ProcessDetails.vue";
 import ProcessList from "./Process/ProcessList.vue";
 import SideMenu from "./SideMenu.vue";
-// import TutorialPanel from "./HelpSection/TutorialPanel.vue";
+import TutorialPanel from "./HelpSection/TutorialPanel.vue";
 import HelpPanel from "./HelpSection/HelpPanel.vue";
 
 const MIN_WIDTH_PERCENT = 40;
@@ -36,8 +36,8 @@ export default {
         PlanningScenario,
         ProcessDetails,
         ProcessList,
-        SideMenu
-        // TutorialPanel
+        SideMenu,
+        TutorialPanel
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", Object.keys(getters))
@@ -134,10 +134,10 @@ export default {
             />
             <EnsembleDetails
                 v-if="mode === 'ensemble-details'"
-            />
+            /> -->
             <TutorialPanel
                 v-if="mode === 'tutorial-panel'"
-            /> -->
+            />
         </div>
         <SideMenu />
     </div>

@@ -1,14 +1,14 @@
-<!-- <script>
-import SectionHeader from '../SectionHeader.vue';
-import TutorialCreateEnsemble from './TutorialCreateEnsemble.vue';
-import TutorialCreateScenario from './TutorialCreateScenario.vue';
-import TutorialEnsembleDetails from './TutorialEnsembleDetails.vue';
-import TutorialEnsembleOverview from './TutorialEnsembleOverview.vue';
-import TutorialLandingPage from './TutorialLandingPage.vue';
-import TutorialModelInformation from './TutorialModelInformation.vue';
-import TutorialModelOverview from './TutorialModelOverview.vue';
-import TutorialScenarioOverview from './TutorialScenarioOverview.vue';
-import TutorialSzenarioDetails from './TutorialSzenarioDetails.vue';
+<script>
+import SectionHeader from "../SectionHeader.vue";
+import TutorialCreateEnsemble from "./TutorialCreateEnsemble.vue";
+import TutorialCreateScenario from "./TutorialCreateScenario.vue";
+import TutorialEnsembleDetails from "./TutorialEnsembleDetails.vue";
+import TutorialEnsembleOverview from "./TutorialEnsembleOverview.vue";
+import TutorialLandingPage from "./TutorialLandingPage.vue";
+import TutorialModelInformation from "./TutorialModelInformation.vue";
+import TutorialModelOverview from "./TutorialModelOverview.vue";
+import TutorialScenarioOverview from "./TutorialScenarioOverview.vue";
+import TutorialSzenarioDetails from "./TutorialSzenarioDetails.vue";
 
 export default {
     name: "TutorialPanel",
@@ -24,29 +24,29 @@ export default {
         TutorialEnsembleDetails,
         TutorialCreateEnsemble
     },
-    data() {
+    data () {
         return {
             currentIndex: 0,
             views: [
-                { name: 'TutorialLandingPage' },
-                { name: 'TutorialModelOverview' },
-                { name: 'TutorialModelInformation' },
-                { name: 'TutorialScenarioOverview' },
-                { name: 'TutorialCreateScenario' },
-                { name: 'TutorialSzenarioDetails' },
-                { name: 'TutorialEnsembleOverview' },
-                { name: 'TutorialEnsembleDetails' },
-                { name: 'TutorialCreateEnsemble' }
+                {name: "TutorialLandingPage"},
+                {name: "TutorialModelOverview"},
+                {name: "TutorialModelInformation"},
+                {name: "TutorialScenarioOverview"},
+                {name: "TutorialCreateScenario"},
+                {name: "TutorialSzenarioDetails"},
+                {name: "TutorialEnsembleOverview"},
+                {name: "TutorialEnsembleDetails"},
+                {name: "TutorialCreateEnsemble"}
             ]
         };
     },
     methods: {
-        nextView() {
+        nextView () {
             if (this.currentIndex < this.views.length - 1) {
                 this.currentIndex++;
             }
         },
-        previousView() {
+        previousView () {
             if (this.currentIndex > 0) {
                 this.currentIndex--;
             }
@@ -57,17 +57,28 @@ export default {
 
 <template>
     <div class="tutorial-panel">
-        <SectionHeader :title="$t('additional:modules.tools.simulationTool.help')" icon="bi bi-question-circle-fill" />
+        <SectionHeader
+            :title="$t('additional:modules.tools.simulationTool.help')"
+            icon="bi bi-question-circle-fill"
+        />
         <div class="segment-wrapper">
             <div class="element-wrapper">
                 <component :is="views[currentIndex].name" />
             </div>
             <div class="navigation-buttons btn-light">
-                <button @click="previousView" :disabled="currentIndex === 0" class="arrow-button">
-                    <i class="bi bi-chevron-left"></i>
+                <button
+                    :disabled="currentIndex === 0"
+                    class="arrow-button"
+                    @click="previousView"
+                >
+                    <i class="bi bi-chevron-left" />
                 </button>
-                <button @click="nextView" :disabled="currentIndex === views.length - 1" class="arrow-button">
-                    <i class="bi bi-chevron-right"></i>
+                <button
+                    :disabled="currentIndex === views.length - 1"
+                    class="arrow-button"
+                    @click="nextView"
+                >
+                    <i class="bi bi-chevron-right" />
                 </button>
             </div>
         </div>
@@ -142,4 +153,4 @@ export default {
         }
     }
 }
-</style> -->
+</style>

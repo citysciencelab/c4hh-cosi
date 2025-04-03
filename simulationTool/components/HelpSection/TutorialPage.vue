@@ -1,44 +1,70 @@
-<!-- <script>
+<script>
 export default {
-  name: 'TutorialPage',
-  props: {
-    tutorialTitle: String,
-    sectionTitle: String,
-    sections: Array,
-    hintsTitle: String,
-    hints: {
-      type: Array,
-      default: () => []
+    name: "TutorialPage",
+    props: {
+        tutorialTitle: {
+            type: String,
+            default: ""
+        },
+        sectionTitle: {
+            type: String,
+            default: ""
+        },
+        sections: {
+            type: Array,
+            default: () => []
+        },
+        hintsTitle: {
+            type: String,
+            default: ""
+        },
+        hints: {
+            type: Array,
+            default: () => []
+        }
     }
-  }
 };
 </script>
 
 <template>
     <div class="tutorial-page">
-      <div class="segment-header bold">
-        {{ tutorialTitle }}
-      </div>
-      <div class="segment-header">
-        {{ sectionTitle }}
-      </div>
-
-      <div v-for="(section, index) in sections" :key="index">
-        <p v-if="section.type === 'text'" v-html="section.content"></p>
-        <img v-if="section.type === 'image'" :src="section.src" :alt="section.alt" class="tutorial-image">
-      </div>
-
-      <div v-if="hints && hints.length > 0">
-        <div class="segment-header">
-          {{ hintsTitle }}
+        <div class="segment-header bold">
+            {{ tutorialTitle }}
         </div>
-        <hr class="section-divider" />
-        <p v-for="(hint, index) in hints" :key="index">
-          {{ hint }}
-        </p>
-      </div>
+        <div class="segment-header">
+            {{ sectionTitle }}
+        </div>
+
+        <div
+            v-for="(section, index) in sections"
+            :key="index"
+        >
+            <p
+                v-if="section.type === 'text'"
+                v-html="section.content"
+            />
+            <img
+                v-if="section.type === 'image'"
+                :src="section.src"
+                :alt="section.alt"
+                class="tutorial-image"
+            >
+        </div>
+
+        <div v-if="hints && hints.length > 0">
+            <div class="segment-header">
+                {{ hintsTitle }}
+            </div>
+            <hr class="section-divider">
+            <p
+                v-for="(hint, index) in hints"
+                :key="index"
+            >
+                {{ hint }}
+            </p>
+        </div>
     </div>
-  </template>
+</template>
 
   <style lang="scss">
   .tutorial-page {
@@ -74,4 +100,4 @@ export default {
     margin: 25px 0px;
   }
   </style>
-   -->
+
