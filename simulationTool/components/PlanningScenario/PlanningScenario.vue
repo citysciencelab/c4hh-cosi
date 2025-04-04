@@ -1,6 +1,11 @@
 <script>
+import PlanningScenarioOverview from "./PlanningScenarioOverview.vue";
+
 export default {
-    name: "PlanningScenario"
+    name: "PlanningScenario",
+    components: {
+        PlanningScenarioOverview
+    }
 };
 
 
@@ -8,7 +13,7 @@ export default {
 
 <template>
     <div>
-        PlanningScenario
+        <PlanningScenarioOverview />
     </div>
 </template>
 

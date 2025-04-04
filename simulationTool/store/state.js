@@ -9,6 +9,7 @@
  * @property {Array.<Object>} jobs a list of jobs
  * @property {boolean} jobsLoading flag indicating if jobs are loading
  * @property {string} mode the current view: 'processes', 'process', 'job' or 'map'
+ * @property {Object[]} planningScenarios - The list of planning scenarios.
  * @property {Object|null} process the current process
  * @property {Array.<Object>} processes a list of processes
  * @property {boolean} processesLoading flag indicating if processes are loading
@@ -32,6 +33,26 @@ const state = {
     jobs: [],
     jobsLoading: false,
     mode: "home-panel",
+    planningScenarios: [{
+        "id": "Szenario1",
+        "name": "Planungsszenario 1"
+    },
+    {
+        "id": "Szenario2",
+        "name": "Planungsszenario 2"
+    },
+    {
+        "id": "Szenario3",
+        "name": "Planungsszenario 3"
+    },
+    {
+        "id": "Szenario 4",
+        "name": "Planungsszenario 4"
+    },
+    {
+        "id": "Szenario 5",
+        "name": "Planungsszenario 5"
+    }],
     process: null,
     processes: [],
     processesLoading: false,
