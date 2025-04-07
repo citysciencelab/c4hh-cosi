@@ -1,6 +1,7 @@
 /**
  * User type definition
  * @typedef {Object} SimulationToolState
+ * @property {String} currentPlanningComponent the current open component in planningScenario.
  * @property {Array.<Object>} ensembles a list of ensembles
  * @property {boolean} ensemblesLoading flag indicating if ensembles are loading
  * @property {string} id the ID of the simulation tool
@@ -28,6 +29,7 @@ const state = {
     id: "simulationTool",
     type: "simulationTool",
     name: "additional:modules.tools.simulationTool.toolName",
+    currentPlanningComponent: "",
     description: "additional:modules.tools.simulationTool.toolDescription",
     icon: "bi-sliders2",
     img: {},

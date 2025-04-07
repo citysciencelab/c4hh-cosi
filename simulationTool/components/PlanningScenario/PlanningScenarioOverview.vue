@@ -9,7 +9,8 @@ export default {
         FileUpload,
         FlatButton,
         PlanningScenarioOverviewList
-    }
+    },
+    emits: ["openCreateScenario"]
 };
 
 </script>
@@ -22,6 +23,7 @@ export default {
         class="pe-2 mt-4"
         :aria-label="$t('additional:modules.tools.simulationTool.planningScenarioCreate')"
         :icon="'bi bi-pencil-square'"
+        :interaction="() => $emit('openCreateScenario')"
         :text="$t('additional:modules.tools.simulationTool.planningScenarioCreate')"
     />
     <FlatButton
