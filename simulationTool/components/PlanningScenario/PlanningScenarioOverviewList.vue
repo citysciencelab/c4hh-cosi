@@ -7,6 +7,7 @@ export default {
     components: {
         IconButton
     },
+    emits: ["download"],
     computed: {
         ...mapGetters("Modules/SimulationTool", ["planningScenarios"])
     },
@@ -51,9 +52,10 @@ export default {
                         :aria="$t('additional:modules.tools.simulationTool.planningScenarioEdit')"
                     />
                     <IconButton
+                        :aria="$t('additional:modules.tools.simulationTool.planningScenarioDownload')"
                         :class-array="['btn-light', 'me-2']"
                         :icon="'bi-download'"
-                        :aria="$t('additional:modules.tools.simulationTool.planningScenarioDownload')"
+                        :interaction="() => $emit('download', [scenario], scenario.name)"
                     />
                     <IconButton
                         :aria="$t('additional:modules.tools.simulationTool.planningScenarioDelete')"

@@ -95,6 +95,7 @@
           "planningScenarioDownloads": "Download all planning scenarios",
           "planningScenarioDelete": "Delete planning scenario",
           "planningScenarioEdit": "Edit planning scenario",
+          "planningScenarioAllFiles": "All scenarios",
           "privacy": "Privacy",
           "refresh": "Refresh",
           "removeJob": "Remove scenario from ensemble",

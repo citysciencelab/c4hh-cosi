@@ -1,5 +1,6 @@
 /**
  * User type definition
+ * @typedef {Object} downloadDataFormat the download data format.
  * @typedef {Object} SimulationToolState
  * @property {String} currentPlanningComponent the current open component in planningScenario.
  * @property {Array.<Object>} ensembles a list of ensembles
@@ -32,6 +33,70 @@ const state = {
     name: "additional:modules.tools.simulationTool.toolName",
     currentPlanningComponent: "",
     description: "additional:modules.tools.simulationTool.toolDescription",
+    downloadDataFormat: {
+        buffer: 0,
+        scenarioFeature: {
+            type: "FeatureCollection",
+            features: [
+                {
+                    type: "Feature",
+                    geometry: {
+                        type: "Polygon",
+                        coordinates: []
+                    },
+                    style: {
+                        strokeColor: "",
+                        strokewidth: ""
+                    }
+                }
+            ]
+        },
+        simulationId: "",
+        features: {
+            building: {
+                type: "FeatureCollection",
+                features: [
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "Polygon",
+                            coordinates: []
+                        },
+                        properties: {
+                            height: 0
+                        },
+                        style: {
+                            fillColor: "",
+                            strokeColor: "",
+                            strokewidth: "",
+                            opacity: ""
+                        }
+                    }
+                ]
+            },
+            street: {
+                type: "FeatureCollection",
+                features: [
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "Polygon",
+                            coordinates: []
+                        },
+                        properties: {
+                            height: 0
+                        },
+                        style: {
+                            fillColor: "",
+                            strokeColor: "",
+                            strokewidth: "",
+                            opacity: ""
+                        }
+                    }
+                ]
+            }
+        }
+    },
     icon: "bi-sliders2",
     img: {},
     jobResultData: {},
