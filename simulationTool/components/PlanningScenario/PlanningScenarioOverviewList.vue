@@ -1,6 +1,6 @@
 <script>
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 
 export default {
     name: "PlanningScenarioOverviewList",
@@ -9,6 +9,21 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", ["planningScenarios"])
+    },
+    methods: {
+        ...mapMutations("Modules/SimulationTool", ["setPlanningScenarios"]),
+
+        /**
+         * Removes a scenario by the passed id from the list of scenarios.
+         * @param {Object[]} scenarios - The current list of scenarios.
+         * @param {String} id - The id of the scenario to remove.
+         * @returns {void}
+         */
+        removeScenarioById (scenarios, id) {
+            const filteredScenarios = scenarios.filter(item => item.id !== id);
+
+            this.setPlanningScenarios(filteredScenarios);
+        }
     }
 };
 
@@ -41,9 +56,10 @@ export default {
                         :aria="$t('additional:modules.tools.simulationTool.planningScenarioDownload')"
                     />
                     <IconButton
+                        :aria="$t('additional:modules.tools.simulationTool.planningScenarioDelete')"
                         :class-array="['btn-light']"
                         :icon="'bi-trash'"
-                        :aria="$t('additional:modules.tools.simulationTool.planningScenarioDelete')"
+                        :interaction="() => removeScenarioById(planningScenarios, scenario.id)"
                     />
                 </div>
             </div>

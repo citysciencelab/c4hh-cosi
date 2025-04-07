@@ -1,7 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import PlanningScenarioOverviewList from "../../../PlanningScenarioOverviewList.vue";
+import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
@@ -15,18 +16,25 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
                         plugins: [store]
                     }
                 });
+            },
+            getMount: () => {
+                return mount(PlanningScenarioOverviewList, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
             }
         },
         planningScenarios = [{
-            "id": "Szenario1",
+            "id": "Scenario1",
             "name": "Planungsszenario 1"
         },
         {
-            "id": "Szenario2",
+            "id": "Scenario2",
             "name": "Planungsszenario 2"
         },
         {
-            "id": "Szenario3",
+            "id": "Scenario3",
             "name": "Planungsszenario 3"
         }];
 
@@ -41,7 +49,15 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
                         SimulationTool: {
                             namespaced: true,
                             getters: {
-                                planningScenarios: () => planningScenarios
+                                planningScenarios: (state) => state.planningScenarios
+                            },
+                            mutations: {
+                                setPlanningScenarios (state, value) {
+                                    state.planningScenarios = value;
+                                }
+                            },
+                            state: {
+                                planningScenarios: planningScenarios
                             }
                         }
                     }
@@ -73,6 +89,31 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
                 iconComponentsWrapper = listGroupItemWrapper.findAll("icon-button-stub");
 
             expect(iconComponentsWrapper).to.have.lengthOf(4);
+        });
+    });
+
+    describe("Methods", () => {
+        describe("removeScenarioById", () => {
+            it("should remove a scenario by the passed id from the list of scenarios", () => {
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.removeScenarioById(wrapper.vm.planningScenarios, "Scenario2");
+
+                expect(wrapper.vm.planningScenarios).to.have.lengthOf(2);
+                expect(wrapper.vm.planningScenarios.find(scenario => scenario.id === "Scenario2")).to.be.undefined;
+            });
+        });
+    });
+
+    describe("User Interaction", () => {
+        it("should call 'removeScenarioById' if user clicks the button to remove a scenario", async () => {
+            const wrapper = factory.getMount(),
+                buttonListWrapper = wrapper.findAll("button"),
+                spyRemoveScenarioById = sinon.spy(wrapper.vm, "removeScenarioById");
+
+            // delete first scenario
+            await buttonListWrapper.at(3).trigger("click");
+            expect(spyRemoveScenarioById.calledOnce).to.be.true;
         });
     });
 });
