@@ -21,6 +21,7 @@
  * @property {string|null} selectedJobId the selected job id
  * @property {string|null} selectedProcessId the selected process id
  * @property {String|null} simulationApiUrl The URL for the Urban Model Platform API
+ * @property {Object[]} simulations - A list of all available simulations.
  * @property {Object} userDetailsCache cache for user details
  */
 const state = {
@@ -66,6 +67,7 @@ const state = {
     selectedJobId: null,
     selectedProcessId: null,
     simulationApiUrl: null,
+    simulations: [],
     userDetailsCache: {}
 };
 
