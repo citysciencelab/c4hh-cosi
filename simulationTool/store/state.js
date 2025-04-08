@@ -32,6 +32,7 @@ const state = {
     type: "simulationTool",
     name: "additional:modules.tools.simulationTool.toolName",
     currentPlanningComponent: "",
+    currentPlanningScenarioId: "",
     description: "additional:modules.tools.simulationTool.toolDescription",
     downloadDataFormat: {
         buffer: 0,
@@ -105,7 +106,58 @@ const state = {
     mode: "home-panel",
     planningScenarios: [{
         "id": "Szenario1",
-        "name": "Planungsszenario 1"
+        "name": "Planungsszenario 1",
+        "features": {
+            "building": {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "id": "DEHHALKA10007tqf-piece",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [[566691.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566691.619, 5934737.624]]
+                            ]
+                        },
+                        "properties": {
+                            "id": 117244,
+                            "building_height": 30.352
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "EHHALKA10007tqf-piece",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [[566691.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566691.619, 5934737.624]]
+                            ]
+                        },
+                        "properties": {
+                            "id": 117245,
+                            "building_height": 30.352
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "DEHHALKA10007tqf-piece2",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [[566692.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566692.619, 5934737.624]]
+                            ]
+                        },
+                        "properties": {
+                            "id": 117244,
+                            "building_height": 20.352,
+                            "created": true
+                        }
+                    }
+                ]
+            },
+            "street": {}
+        }
     },
     {
         "id": "Szenario2",

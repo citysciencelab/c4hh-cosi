@@ -12,7 +12,11 @@ export default {
         ...mapGetters("Modules/SimulationTool", ["planningScenarios"])
     },
     methods: {
-        ...mapMutations("Modules/SimulationTool", ["setPlanningScenarios"]),
+        ...mapMutations("Modules/SimulationTool", [
+            "setPlanningScenarios",
+            "setCurrentPlanningComponent",
+            "setCurrentPlanningScenarioId"
+        ]),
 
         /**
          * Removes a scenario by the passed id from the list of scenarios.
@@ -24,6 +28,16 @@ export default {
             const filteredScenarios = scenarios.filter(item => item.id !== id);
 
             this.setPlanningScenarios(filteredScenarios);
+        },
+
+        /**
+         * Opens the landuse component and sets the id of the planning scenario to be edited.
+         * @param {String} id The id of the planning scenario.
+         * @returns {void}
+         */
+        openLanduseById (id) {
+            this.setCurrentPlanningScenarioId(id);
+            this.setCurrentPlanningComponent("landuse");
         }
     }
 };
@@ -50,6 +64,7 @@ export default {
                         :class-array="['btn-light', 'me-2']"
                         :icon="'bi-pencil-square'"
                         :aria="$t('additional:modules.tools.simulationTool.planningScenarioEdit')"
+                        :interaction="() => openLanduseById(scenario.id)"
                     />
                     <IconButton
                         :aria="$t('additional:modules.tools.simulationTool.planningScenarioDownload')"

@@ -2,12 +2,14 @@
 import {mapGetters, mapMutations} from "vuex";
 import PlanningScenarioCreate from "./PlanningScenarioCreate.vue";
 import PlanningScenarioOverview from "./PlanningScenarioOverview.vue";
+import PlanningScenarioLanduse from "./PlanningScenarioLanduse.vue";
 
 export default {
     name: "PlanningScenario",
     components: {
         PlanningScenarioCreate,
-        PlanningScenarioOverview
+        PlanningScenarioOverview,
+        PlanningScenarioLanduse
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
@@ -31,6 +33,9 @@ export default {
         />
         <PlanningScenarioCreate
             v-if="currentPlanningComponent === 'create'"
+        />
+        <PlanningScenarioLanduse
+            v-if="currentPlanningComponent === 'landuse'"
         />
     </div>
 </template>
