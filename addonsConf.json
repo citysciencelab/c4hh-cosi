@@ -96,5 +96,8 @@
   },
   "simulationTool": {
     "type": "tool"
+  },
+  "bimFabrikHH": {
+    "type": "tool"
   }
 }

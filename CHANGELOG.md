@@ -7,6 +7,7 @@
 ### __Breaking Changes__
 
 ### Added
+- Added 'BIMFabrikHH' to version 3.x
 
 ### Changed
 
