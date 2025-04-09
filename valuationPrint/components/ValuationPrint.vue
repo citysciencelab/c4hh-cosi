@@ -397,7 +397,12 @@ export default {
          */
         setSelectInteraction () {
             this.select = new Select({
-                layers: (layer) => layer.get("id") === this.parcelLayerId,
+                layers: (layer) => {
+                    if (layer.get("id") === this.parcelLayerId) {
+                        layer.setZIndex(9999999);
+                    }
+                    return layer.get("id") === this.parcelLayerId;
+                },
                 style: new Style({
                     fill: new Fill({
                         color: "rgba(255,255,255,0)"
