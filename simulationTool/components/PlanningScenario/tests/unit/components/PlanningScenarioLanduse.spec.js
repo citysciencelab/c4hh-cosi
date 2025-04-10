@@ -2,6 +2,8 @@ import {config, mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import PlanningScenarioLanduse from "../../../PlanningScenarioLanduse.vue";
+import sinon from "sinon";
+import axios from "axios";
 
 config.global.mocks.$t = key => key;
 
@@ -25,10 +27,11 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             }
         },
         planningScenarios = [{
-            "id": "Scenario1",
+            "id": "Szenario1",
             "name": "Planungsszenario 1",
-            "features": {
-                "building": {
+            "featuresLoaded": true,
+            "inputs": {
+                "buildings": {
                     "type": "FeatureCollection",
                     "features": [
                         {
@@ -76,16 +79,56 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                         }
                     ]
                 },
-                "street": {}
+                "roads": {}
             }
         },
         {
-            "id": "Scenario2",
-            "name": "Planungsszenario 2"
-        },
-        {
-            "id": "Scenario3",
-            "name": "Planungsszenario 3"
+            "id": "Szenario2",
+            "name": "Planungsszenario 2",
+            "inputs": {
+                "buildings": {
+                    "editable": true,
+                    "source": {
+                        "type": "oaf",
+                        "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/buildings_footprint/collections/buildings/"
+                    }
+                },
+                "dem": {
+                    "menu": "nowhere",
+                    "source": {
+                        "type": "string",
+                        "url": "url to source"
+                    }
+                },
+                "ground_absorption": {
+                    "menu": "nowhere",
+                    "source": {
+                        "type": "oaf",
+                        "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/ground_absorption/collections/ground"
+                    }
+                },
+                "roads": {
+                    "editable": true,
+                    "source": {
+                        "type": "oaf",
+                        "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/streets_traffic/collections/streets/"
+                    }
+                }
+            },
+            "scenarioFeature": {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [[10.004718316195724, 53.497158760096], [10.004989573473514, 53.49918395251746], [10.001050308002908, 53.498579259213344], [10.004718316195724, 53.497158760096]]
+                            ]
+                        }
+                    }
+                ]
+            }
         }];
 
     beforeEach(() => {
@@ -108,7 +151,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 }
                             },
                             state: {
-                                currentPlanningScenarioId: "Scenario1",
+                                currentPlanningScenarioId: "Szenario1",
                                 planningScenarios: planningScenarios
                             }
                         }
@@ -154,6 +197,35 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
                 expect(building1.properties.building_height).to.equal(30);
                 expect(building2.properties.building_height).to.equal(30);
+            });
+        });
+        describe("fetchFeatures", () => {
+            it("should set the expected features in the scenario parameter object", async () => {
+                const wrapper = factory.getShallowMount(),
+                    scenario = {
+                        simulationId: "simId"
+                    },
+                    simulations = [
+                        {
+                            id: "simId",
+                            inputs: {
+                                aNotEditableInput: {},
+                                anEditableInput: {
+                                    editable: true,
+                                    source: {
+                                        type: "oaf",
+                                        url: "https://a.url.com"
+                                    }
+                                }
+                            }
+                        }
+                    ];
+
+                sinon.stub(axios, "get").resolves({data: "Some features"});
+
+                await wrapper.vm.fetchFeatures(scenario, simulations[0].inputs, [0, 1, 0, 1], "CRS");
+
+                expect(scenario.inputs).to.deep.equal({anEditableInput: "Some features"});
             });
         });
     });

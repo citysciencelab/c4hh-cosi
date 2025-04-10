@@ -1,7 +1,9 @@
 <script>
+import axios from "axios";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import {mapGetters, mapMutations} from "vuex";
+import {Polygon} from "ol/geom";
 
 export default {
     name: "PlanningScenarioLanduse",
@@ -17,8 +19,30 @@ export default {
     computed: {
         ...mapGetters("Modules/SimulationTool", [
             "currentPlanningScenarioId",
-            "planningScenarios"
+            "planningScenarios",
+            "simulations"
         ]),
+
+        /**
+         * Gets the bounding box of the current planning scenario.
+         * @returns {Number[]} The bounding box as an extent.
+         */
+        currentBbox () {
+            const coordinates = this.currentPlanningScenario?.scenarioFeature?.features?.[0]?.geometry?.coordinates;
+
+            if (!coordinates) {
+                return undefined;
+            }
+            return new Polygon(coordinates).getExtent();
+        },
+
+        /**
+         * Gets the crs configured in the current simulation.
+         * @returns {String} The current crs.
+         */
+        currentCrs () {
+            return this.currentSimulation?.inputs?.crs;
+        },
 
         /**
          * Gets the currently selected planning scenario.
@@ -29,11 +53,32 @@ export default {
         },
 
         /**
+         * Gets the simulation config object that is set for the current planning scenario.
+         * @returns {Object} The current simulation config.
+         */
+        currentSimulation () {
+            return this.simulations.find(sim => sim.id === this.currentPlanningScenario.simulationId);
+        },
+
+        /**
+         * Gets all simulation inputs marked as editable.
+         * @returns {Object} An inputs object containing only the editable inputs.
+         */
+        editableInputs () {
+            if (!this.currentSimulation?.inputs) {
+                return undefined;
+            }
+            return Object.fromEntries(
+                Object.entries(this.currentSimulation.inputs).filter(inputEntry => inputEntry[1].editable)
+            );
+        },
+
+        /**
          * Gets all buildings in the current scenario that are not marked as created.
          * @return {Object[]} Array of existing buildings in current scenario.
          */
         existingBuildings () {
-            return this.currentPlanningScenario?.features?.building?.features
+            return this.currentPlanningScenario?.inputs?.buildings?.features
                 ?.filter(feature => !feature.properties.created)
                 ?? [];
         },
@@ -43,9 +88,25 @@ export default {
          * @return {Object[]} Array of created buildings in current scenario.
          */
         createdBuildings () {
-            return this.currentPlanningScenario?.features?.building?.features
+            return this.currentPlanningScenario?.inputs?.buildings?.features
                 ?.filter(feature => feature.properties.created)
                 ?? [];
+        }
+    },
+    async mounted () {
+        if (!this.currentPlanningScenario) {
+            return;
+        }
+        if (!this.currentPlanningScenario.featuresLoaded) {
+            try {
+                await this.fetchFeatures(
+                    this.currentPlanningScenario, this.editableInputs, this.currentBbox, this.currentCrs
+                );
+                this.currentPlanningScenario.featuresLoaded = true;
+            }
+            catch (error) {
+                console.warn(error);
+            }
         }
     },
     methods: {
@@ -62,6 +123,37 @@ export default {
         changeHeight (event, building) {
             building.properties ??= {};
             building.properties.building_height = event.target.valueAsNumber;
+        },
+
+        /**
+         * Performs GET-Requests for all editable oaf inputs and sets the features in the scenario parameter object.
+         * @param {Object} scenario The planning scenario for which the features are to be loaded.
+         * @param {Object} inputs Config object from simulation containing input types and sources.
+         * @param {Number[]} bbox The bbox for the oaf requests.
+         * @param {String} crs The crs for the simulation.
+         * @return {void}
+         */
+        async fetchFeatures (scenario, inputs, bbox, crs) {
+            const requests = {};
+
+            Object.entries(inputs).forEach(([inputKey, input]) => {
+                if (input.source?.type === "oaf") {
+                    const url = new URL("items", input.source.url);
+
+                    url.searchParams.set("bbox", bbox);
+                    url.searchParams.set("crs", crs);
+                    requests[inputKey] = axios.get(url.toString());
+                }
+            });
+
+            await Promise.all(Object.values(requests));
+
+            scenario.inputs ??= {};
+            Object.entries(requests).forEach(([inputKey, promise]) => {
+                promise.then(value => {
+                    scenario.inputs[inputKey] = value.data;
+                });
+            });
         }
     }
 };
@@ -249,6 +341,9 @@ export default {
                         </li>
                     </ul>
                 </div>
+            </div>
+            <div v-if="buildingsOrStreets === 'streets'">
+                {{ currentPlanningScenario?.inputs?.roads }}
             </div>
             <div class="position-sticky bottom-0 bg-body z-2 p-3 d-flex justify-content-between">
                 <FlatButton

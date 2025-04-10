@@ -107,8 +107,9 @@ const state = {
     planningScenarios: [{
         "id": "Szenario1",
         "name": "Planungsszenario 1",
-        "features": {
-            "building": {
+        "featuresLoaded": true,
+        "inputs": {
+            "buildings": {
                 "type": "FeatureCollection",
                 "features": [
                     {
@@ -156,12 +157,57 @@ const state = {
                     }
                 ]
             },
-            "street": {}
+            "roads": {}
         }
     },
     {
         "id": "Szenario2",
-        "name": "Planungsszenario 2"
+        "name": "Planungsszenario 2",
+        "simulationId": "noise_v4:traffic_noise_propagation",
+        "inputs": {
+            "buildings": {
+                "editable": true,
+                "source": {
+                    "type": "oaf",
+                    "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/buildings_footprint/collections/buildings/"
+                }
+            },
+            "dem": {
+                "menu": "nowhere",
+                "source": {
+                    "type": "string",
+                    "url": "url to source"
+                }
+            },
+            "ground_absorption": {
+                "menu": "nowhere",
+                "source": {
+                    "type": "oaf",
+                    "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/ground_absorption/collections/ground"
+                }
+            },
+            "roads": {
+                "editable": true,
+                "source": {
+                    "type": "oaf",
+                    "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/streets_traffic/collections/streets/"
+                }
+            }
+        },
+        "scenarioFeature": {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [[10.004718316195724, 53.497158760096], [10.004989573473514, 53.49918395251746], [10.001050308002908, 53.498579259213344], [10.004718316195724, 53.497158760096]]
+                        ]
+                    }
+                }
+            ]
+        }
     },
     {
         "id": "Szenario3",
