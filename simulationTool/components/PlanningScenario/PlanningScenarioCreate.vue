@@ -1,7 +1,6 @@
 <script>
 import DrawLayout from "../../../../src/shared/modules/draw/components/DrawLayout.vue";
-import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue"
-import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue";
 import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
 import Multiselect from "vue-multiselect";
 import SectionHeader from "../SectionHeader.vue";
@@ -14,7 +13,6 @@ export default {
     components: {
         DrawLayout,
         DrawTypes,
-        FlatButton,
         InputText,
         Multiselect,
         SectionHeader
