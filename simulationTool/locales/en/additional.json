@@ -36,7 +36,7 @@
           "createScenario": "Create scenario",
           "createScenarioContent": "The heart of the Scenario Explorer lies in the execution of simulations. On this page, you can create your own scenario by naming it individually and setting the required input parameters. Click on \"Run scenario\" to start the calculations and you will be automatically redirected to the scenario detail page.",
           "createScenarioHint": "By determining the input parameters, the limiting circumstances under which the respective model is simulated are set. Due to various types of uncertainties, it makes sense to run as many “what-if” scenarios as possible in addition to the “best case”, “worst case” and “business as usual” in order to cover and test a wide range of possible futures that contribute to more robust decision-making.",
-          "createUrbanPlanning": "Create urban planning",
+          "createUrbanPlanning": "Create planning scenario",
           "currentlySharedWith": "Currently shared with",
           "date": "Date",
           "definitions": "Definitions",

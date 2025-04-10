@@ -63,7 +63,8 @@ export default {
             "setPlanningScenarioSelectedDrawType",
             "setPlanningScenarioDrawTypesMain",
             "setPlanningScenarioSelectedDrawTypeMain",
-            "setSelectedInteraction"
+            "setSelectedInteraction",
+            "setCurrentPlanningComponent"
         ]),
 
         /**
@@ -195,7 +196,7 @@ export default {
                     id="save"
                     class="col col-md-6 offset-md-6"
                     :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-                    :interaction="() => ''"
+                    :interaction="() => setCurrentPlanningComponent('landuse')"
                     :text="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
                 />
             </div>
