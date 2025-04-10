@@ -1,8 +1,0 @@
-{
-    "modules": {
-        "bimfabrikhh": {
-            "name": "BIMFactoryHH",
-            "description": "Conversion of GIS data into IFC format"
-        }
-    }
-}

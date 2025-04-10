@@ -1,11 +1,11 @@
-import BimFabrikHHComponent from "./components/BimFabrikHH.vue";
-import BimFabrikHHStore from "./store/indexBimFabrikHH";
+import BimFactoryComponent from "./components/BimFactory.vue";
+import BimFactoryStore from "./store/indexBimFactory";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 
 export default {
-    component: BimFabrikHHComponent,
-    store: BimFabrikHHStore,
+    component: BimFactoryComponent,
+    store: BimFactoryStore,
     locales: {
         de: deLocale,
         en: enLocale

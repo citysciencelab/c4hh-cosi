@@ -1,5 +1,5 @@
 import {generateSimpleGetters} from "../../../src/shared/js/utils/generators";
-import state from "./stateBimFabrikHH";
+import state from "./stateBimFactory";
 
 const getters = {
     ...generateSimpleGetters(state)

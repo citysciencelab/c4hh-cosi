@@ -97,7 +97,7 @@
   "simulationTool": {
     "type": "tool"
   },
-  "bimFabrikHH": {
+  "bimFactory": {
     "type": "tool"
   }
 }
