@@ -11,6 +11,7 @@
           "application": "Application",
           "authRequest": "To get access to the full functionality you have to log in to the master portal first.",
           "buildings": "Buildings",
+          "back": "back",
           "cancel": "Cancel",
           "chart-bar": "Bar",
           "chart-line": "Line",

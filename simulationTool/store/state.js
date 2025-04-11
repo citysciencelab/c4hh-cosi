@@ -176,10 +176,10 @@ const state = {
         "name": "Planungsszenario 5"
     }],
     planningScenarioCurrentLayout: {
-        fillColor: [55, 126, 184],
-        fillTransparency: 0,
+        fillColor: [0, 0, 0],
+        fillTransparency: 100,
         strokeColor: [0, 0, 0],
-        strokeWidth: 1,
+        strokeWidth: 2,
         polygonDash: [10, 10]
     },
     planningScenarioDrawIcons: {
@@ -199,7 +199,7 @@ const state = {
         undo: "bi-arrow-left"
     },
     planningScenarioDrawTypesGeometrie: ["line", "box", "polygon", "circle", "doubleCircle"],
-    planningScenarioDrawTypesMain: ["pen", "box"],
+    planningScenarioDrawTypesMain: ["polygon", "box"],
     planningScenarioSelectedDrawType: "",
     planningScenarioSelectedDrawTypeMain: "",
     planningScenarioStrokeRange: [1, 16],

@@ -1,8 +1,9 @@
 <script>
 import DrawLayout from "../../../../src/shared/modules/draw/components/DrawLayout.vue";
 import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue";
+import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
-import Multiselect from "vue-multiselect";
 import SectionHeader from "../SectionHeader.vue";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector";
@@ -13,8 +14,9 @@ export default {
     components: {
         DrawLayout,
         DrawTypes,
+        FlatButton,
+        IconButton,
         InputText,
-        Multiselect,
         SectionHeader
     },
     data () {
@@ -62,39 +64,73 @@ export default {
             "setPlanningScenarioDrawTypesMain",
             "setPlanningScenarioSelectedDrawTypeMain",
             "setSelectedInteraction"
-        ])
+        ]),
+
+        /**
+         * Deletes all features from the source.
+         * @returns {void}
+         */
+        deleteAlL () {
+            this.source.clear();
+        }
     }
 };
 
 </script>
 
 <template>
-    <div class="planungs-scenarion">
+    <div class="planning-scenario">
         <SectionHeader
             :title="$t('additional:modules.tools.simulationTool.planningScenarioCreate')"
             icon="bi bi-person-fill"
         />
+        <h5 class="mb-3">
+            {{ $t('additional:modules.tools.simulationTool.planingAreaDraw') }}
+        </h5>
         <div
             id="draw-types"
             class="mb-5"
         >
             <div
                 id="draw-types"
-                class="mb-5"
+                class="mb-2"
             >
-                <DrawTypes
-                    :current-layout="planningScenarioCurrentLayout"
-                    :draw-icons="planningScenarioDrawIcons"
-                    :draw-types="planningScenarioDrawTypesMain"
-                    :selected-draw-type="planningScenarioSelectedDrawType"
-                    :selected-draw-type-main="planningScenarioSelectedDrawTypeMain"
-                    :selected-interaction="selectedInteraction"
-                    :set-selected-draw-type="setPlanningScenarioSelectedDrawType"
-                    :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
-                    :set-selected-interaction="setSelectedInteraction"
-                    :source="source"
-                    :should-emit-events="false"
-                />
+                <div
+                    class="row"
+                >
+                    <div
+                        class="col col-3"
+                    >
+                        <DrawTypes
+                            :current-layout="planningScenarioCurrentLayout"
+                            :draw-icons="planningScenarioDrawIcons"
+                            :draw-types="planningScenarioDrawTypesMain"
+                            :selected-draw-type="planningScenarioSelectedDrawType"
+                            :selected-draw-type-main="planningScenarioSelectedDrawTypeMain"
+                            :selected-interaction="selectedInteraction"
+                            :set-selected-draw-type="setPlanningScenarioSelectedDrawType"
+                            :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
+                            :set-selected-interaction="setSelectedInteraction"
+                            :source="source"
+                            :should-emit-events="false"
+                        />
+                    </div>
+                    <div
+                        class="col col-2"
+                    >
+                        <div class="row d-flex justify-content-center">
+                            <IconButton
+                                :class-array="['btn-primary']"
+                                :aria="$t('additional:modules.tools.simulationTool.delete')"
+                                icon="bi bi-trash"
+                                :interaction="() => deleteAlL()"
+                            />
+                            <p class="delete-all text-center">
+                                {{ $t('additional:modules.tools.simulationTool.delete') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 <DrawTypes
                     v-if="planningScenarioSelectedDrawTypeMain === 'geometries'"
                     class="mt-4"
@@ -120,90 +156,61 @@ export default {
                 />
             </div>
             <div
-                class="d-grid"
+                class="mb-4"
             >
-                <label
-                    class="pt-2"
-                    for="plsn-descr"
-                    tabindex="0"
-                    :aria-label="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
-                >
-                    <span>{{ $t('additional:modules.tools.simulationTool.planningScenarioDescr') }}</span>
-                </label>
                 <InputText
-                    id="'plsn-descr'"
+                    id="plsn-descr"
                     :label="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
                     :placeholder="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
                 />
             </div>
-            <div
-                class="d-grid"
-            >
-                <label
-                    class="pt-2"
-                    for="bez-pl"
-                    tabindex="0"
+            <div class="form-floating mb-3">
+                <select
+                    id="simulateForPlanning"
+                    class="form-select"
                     :aria-label="$t('additional:modules.tools.simulationTool.simulateForPlanningScenario')"
                 >
-                    <span>{{ $t('additional:modules.tools.simulationTool.simulateForPlanningScenario') }}</span>
+                    <option
+                        value=""
+                        selected=""
+                    >
+                        {{ "" }}
+                    </option>
+                </select>
+                <label for="simulateForPlanning">
+                    {{ $t('additional:modules.tools.simulationTool.simulateForPlanningScenario') }}
                 </label>
-                <multiselect
-                    v-model="selectedTags"
-                    :placeholder="$t('additional:modules.tools.simulationTool.planningScenario')"
-                    :aria-label="$t('additional:modules.tools.simulationTool.planningScenario')"
-                    label="name"
-                    track-by="code"
-                    :options="[]"
-                    :multiple="true"
-                />
             </div>
         </div>
-        <div class="d-flex">
-            <button
-                id="save"
-                tabindex="0"
-                class="btn btn-primary"
-                type="button"
-                :title="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-                :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-            >
-                {{ $t('additional:modules.tools.simulationTool.createUrbanPlanning') }}
-            </button>
+        <div class="container">
+            <div class="row">
+                <FlatButton
+                    id="back"
+                    class="col col-md-6"
+                    :aria-label="$t('additional:modules.tools.simulationTool.back')"
+                    :interaction="() => ''"
+                    :text="$t('additional:modules.tools.simulationTool.back')"
+                />
+                <FlatButton
+                    id="save"
+                    class="col col-md-6 offset-md-6"
+                    :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
+                    :interaction="() => ''"
+                    :text="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
+                />
+            </div>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.planungs-scenarion {
+@import "~variables";
+
+.planning-scenario {
     max-height: 100vh;
-    overflow-y: auto;
 }
-
-.button-wrapper {
-    padding: 0.25rem !important;
-    width: 82px;
-    height: 86px;
-    font-size: 12px;
-    text-align: center;
-    button {
-        margin-left: 6px;
-        font-size: 1.2rem;
-    }
-}
-
-.sub-header {
-    padding: 0 0 10px 15px;
-    font-size: 14px;
-    font-weight: 400;
-}
-
-.colorPicker {
-    width: 20px;
-    height: 3px;
-}
-
-.frame-width-font {
-    font-size: 12px;
+.delete-all {
+    font-size: $font_size_sm;
 }
 
 </style>
