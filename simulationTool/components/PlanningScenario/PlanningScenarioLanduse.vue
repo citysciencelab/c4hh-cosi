@@ -13,7 +13,7 @@ export default {
     },
     data () {
         return {
-            buildingsOrStreets: "buildings"
+            currentEditableInput: ""
         };
     },
     computed: {
@@ -68,8 +68,11 @@ export default {
             if (!this.currentSimulation?.inputs) {
                 return undefined;
             }
+
             return Object.fromEntries(
-                Object.entries(this.currentSimulation.inputs).filter(inputEntry => inputEntry[1].editable)
+                Object.entries(this.currentSimulation.inputs).filter(([, value]) => {
+                    return value.editable;
+                })
             );
         },
 
@@ -108,6 +111,8 @@ export default {
                 console.warn(error);
             }
         }
+
+        this.currentEditableInput = this.editableInputs ? Object.keys(this.editableInputs)[0] : "buildings";
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
@@ -168,41 +173,29 @@ export default {
         <div class="d-flex flex-column rounded shadow mt-4">
             <div class="position-sticky mt-2 mx-3 top-0 z-2 bg-body">
                 <h5>{{ currentPlanningScenario?.name }}</h5>
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <div class="form-check form-check-inline">
-                            <input
-                                id="radioBuildings"
-                                v-model="buildingsOrStreets"
-                                value="buildings"
-                                class="form-check-input"
-                                type="radio"
-                                checked
-                            >
-                            <label
-                                class="form-check-label"
-                                for="radioBuildings"
-                            >
-                                {{ $t('additional:modules.tools.simulationTool.buildings') }}
-                            </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input
-                                id="radioStreets"
-                                v-model="buildingsOrStreets"
-                                value="streets"
-                                class="form-check-input"
-                                type="radio"
-                            >
-                            <label
-                                class="form-check-label"
-                                for="radioStreets"
-                            >
-                                {{ $t('additional:modules.tools.simulationTool.streets') }}
-                            </label>
-                        </div>
+                <hr>
+                <div class="d-flex">
+                    <div
+                        v-for="(value, key, index) in editableInputs"
+                        :key="key"
+                        class="form-check form-check-inline"
+                    >
+                        <input
+                            :id="key"
+                            v-model="currentEditableInput"
+                            :value="key"
+                            class="form-check-input"
+                            type="radio"
+                            :checked="index === 0"
+                        >
+                        <label
+                            class="form-check-label"
+                            :for="key"
+                        >
+                            {{ value.label }}
+                        </label>
                     </div>
-                    <div v-if="buildingsOrStreets === 'buildings'">
+                    <div v-if="currentEditableInput === 'buildings'">
                         {{ $t('additional:modules.tools.simulationTool.hideExistingsBuildings') }}<br>
                         {{ $t('additional:modules.tools.simulationTool.off') }}
                         <div class="form-check form-check-inline form-switch">
@@ -217,7 +210,7 @@ export default {
                     </div>
                 </div>
                 <ul
-                    v-if="buildingsOrStreets === 'buildings'"
+                    v-if="currentEditableInput === 'buildings'"
                     class="nav nav-underline mt-3 d-flex"
                     role="tablist"
                 >
@@ -258,7 +251,7 @@ export default {
                 </ul>
             </div>
             <div
-                v-if="buildingsOrStreets === 'buildings'"
+                v-if="currentEditableInput === 'buildings'"
                 class="tab-content m-3"
             >
                 <div
@@ -342,12 +335,12 @@ export default {
                     </ul>
                 </div>
             </div>
-            <div v-if="buildingsOrStreets === 'streets'">
+            <div v-if="currentEditableInput === 'roads'">
                 {{ currentPlanningScenario?.inputs?.roads }}
             </div>
             <div class="position-sticky bottom-0 bg-body z-2 p-3 d-flex justify-content-between">
                 <FlatButton
-                    v-if="buildingsOrStreets === 'buildings'"
+                    v-if="currentEditableInput === 'buildings'"
                     class="m-3"
                     :secondary="true"
                     :text="$t('additional:modules.tools.simulationTool.newBuilding')"

@@ -110,6 +110,7 @@ const state = {
         "featuresLoaded": true,
         "inputs": {
             "buildings": {
+                "editable": true,
                 "type": "FeatureCollection",
                 "features": [
                     {

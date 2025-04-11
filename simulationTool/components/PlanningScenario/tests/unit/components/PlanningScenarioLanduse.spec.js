@@ -26,9 +26,26 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 });
             }
         },
+        simulations = [
+            {
+                "id": "noise_v4:traffic_noise_propagation",
+                "inputs": {
+                    "buildings": {
+                        "editable": true,
+                        "label": "Gebäude"
+                    },
+                    "crs": "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    "hospitals": {
+                        "editable": true,
+                        "label": "Krankenhäuser"
+                    }
+                }
+            }
+        ],
         planningScenarios = [{
             "id": "Szenario1",
             "name": "Planungsszenario 1",
+            "simulationId": "noise_v4:traffic_noise_propagation",
             "featuresLoaded": true,
             "inputs": {
                 "buildings": {
@@ -143,7 +160,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             namespaced: true,
                             getters: {
                                 currentPlanningScenarioId: (state) => state.currentPlanningScenarioId,
-                                planningScenarios: (state) => state.planningScenarios
+                                planningScenarios: (state) => state.planningScenarios,
+                                simulations: () => simulations
                             },
                             mutations: {
                                 setPlanningScenarios (state, value) {
@@ -168,11 +186,24 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             expect(wrapper.exists()).to.be.true;
         });
 
-        it("should render correct number of existing buildings as default view", () => {
-            const wrapper = factory.getShallowMount(),
-                activeTab = wrapper.get(".tab-pane.active");
+        it("should render two inputs with type radio", async () => {
+            let radioInputs = [];
+            const wrapper = factory.getShallowMount();
 
-            expect(activeTab.findAll(".list-group-item")).to.have.lengthOf(2);
+            await wrapper.vm.$nextTick();
+            radioInputs = wrapper.findAll("input[type='radio']");
+
+            expect(radioInputs).to.have.lengthOf(2);
+            expect(radioInputs.at(0).attributes("id")).to.be.equal("buildings");
+            expect(radioInputs.at(1).attributes("id")).to.be.equal("hospitals");
+        });
+
+        it("should render correct number of existing buildings as default view", async () => {
+            const wrapper = factory.getShallowMount();
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.get(".tab-pane.active").findAll(".list-group-item")).to.have.lengthOf(2);
         });
     });
 
@@ -205,7 +236,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                     scenario = {
                         simulationId: "simId"
                     },
-                    simulations = [
+                    scopeSimulations = [
                         {
                             id: "simId",
                             inputs: {
@@ -223,7 +254,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
                 sinon.stub(axios, "get").resolves({data: "Some features"});
 
-                await wrapper.vm.fetchFeatures(scenario, simulations[0].inputs, [0, 1, 0, 1], "CRS");
+                await wrapper.vm.fetchFeatures(scenario, scopeSimulations[0].inputs, [0, 1, 0, 1], "CRS");
 
                 expect(scenario.inputs).to.deep.equal({anEditableInput: "Some features"});
             });
