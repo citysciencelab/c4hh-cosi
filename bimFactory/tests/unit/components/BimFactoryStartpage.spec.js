@@ -42,7 +42,7 @@ describe("addons/bimFactory/components/BimFactoryStartpage.vue", () => {
         expect(wrapper.exists()).to.be.true;
     });
 
-    it("should exist have all necessary elements", async () => {
+    it("should have all necessary elements", async () => {
         const wrapper = shallowMount(Component, {
                 global: globalMocks
             }),

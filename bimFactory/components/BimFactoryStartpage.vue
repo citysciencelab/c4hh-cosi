@@ -5,6 +5,13 @@ import {mapGetters} from "vuex";
 export default {
     computed: {
         ...mapGetters("Modules/BimFactory", Object.keys(getters))
+    },
+    methods: {
+        openSelectedWorkflow (value) {
+            if (value !== "none") {
+                this.$emit("openWorkflow", value);
+            }
+        }
     }
 };
 </script>
@@ -37,6 +44,31 @@ export default {
                 </template>
             </i18next>
         </p>
+
+        <!-- list of available workflows -->
+        <div class="workflowSelection fullWidth">
+            <label for="availableWorkflows">
+                {{ $t('additional:modules.bimfactory.startPage.workflows.title') }}
+            </label>
+
+            <select
+                id="availableWorkflows"
+                class="form-select"
+                @change="openSelectedWorkflow($event.target.value)"
+            >
+                <option value="none">
+                    {{ $t('additional:modules.bimfactory.startPage.workflows.select') }}
+                </option>
+
+                <option
+                    v-for="workflow in workflowsJSON?.workflows"
+                    :key="workflow.id"
+                    :value="workflow.id"
+                >
+                    {{ workflow.name }}
+                </option>
+            </select>
+        </div>
 
         <!-- project description -->
         <p class="fullWidth">
@@ -88,6 +120,10 @@ export default {
 
        .fullWidth {
             width: 100%;
+        }
+
+        div.workflowSelection {
+            margin-bottom: 1rem;
         }
     }
 </style>

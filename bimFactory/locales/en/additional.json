@@ -21,7 +21,14 @@
                         "One application for all."
                     ]
                 },
-                "conceptAlt": "Concept of BIMFabrikHH"
+                "conceptAlt": "Concept of BIMFabrikHH",
+                "workflows": {
+                    "title": "Available workflows",
+                    "select": "Please choose a workflow!"
+                }
+            },
+            "workflow": {
+                "back": "Back to startpage"
             }
         }
     }

@@ -49,4 +49,16 @@ describe("addons/bimFactory/components/BimFactory.vue", () => {
 
         expect(wrapper.exists()).to.be.true;
     });
+
+    it("should switch to the correct workflow", async () => {
+        const wrapper = shallowMount(Component, {global: {plugins: [store]}});
+
+        expect(wrapper.vm.currentWorkflow).to.be.null;
+        wrapper.vm.openWorkflow(1);
+        expect(wrapper.vm.currentWorkflow).to.equal(1);
+        wrapper.vm.openWorkflow(2);
+        expect(wrapper.vm.currentWorkflow).to.equal(2);
+        wrapper.vm.openWorkflow("start");
+        expect(wrapper.vm.currentWorkflow).to.be.null;
+    });
 });

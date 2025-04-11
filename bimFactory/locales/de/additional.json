@@ -21,7 +21,14 @@
                         "Eine Anwendung für alle."
                     ]
                 },
-                "conceptAlt": "Konzept der BIMFabrikHH"
+                "conceptAlt": "Konzept der BIMFabrikHH",
+                "workflows": {
+                    "title": "Verfügbare Workflows",
+                    "select": "Bitte Workflow wählen!"
+                }
+            },
+            "workflow": {
+                "back": "Zurück zur Startseite"
             }
         }
     }

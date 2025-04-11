@@ -1,27 +1,32 @@
 <script>
 import getters from "../store/gettersBimFactory";
-import {mapGetters, mapMutations} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import BimFactoryStartpage from "./BimFactoryStartpage.vue";
+import BimFactoryWorkflow from "./BimFactoryWorkflow.vue";
 
 export default {
     name: "BimFactory",
     components: {
-        BimFactoryStartpage
+        BimFactoryStartpage,
+        BimFactoryWorkflow
+    },
+    data () {
+        return {
+            currentWorkflow: null
+        };
     },
     computed: {
         ...mapGetters("Modules/BimFactory", Object.keys(getters))
     },
     mounted () {
-        this.setCurrentMenuWidth({side: this.$parent.side, width: "35%"});
-        this.removeTitlesFromDOM();
-    },
-    unmounted () {
-        this.setCurrentMenuWidth({side: this.$parent.side, width: "25%"});
+        this.removeTitleFromDOM();
+        this.loadWorkflows();
     },
     methods: {
         ...mapMutations("Menu", ["setCurrentMenuWidth"]),
-        removeTitlesFromDOM () {
-            if (this.standAlonePortal && document.querySelector("#mp-subHeader-mainMenu")) {
+        ...mapActions("Modules/BimFactory", ["loadWorkflows"]),
+        removeTitleFromDOM () {
+            /* if (this.standAlonePortal && document.querySelector("#mp-subHeader-mainMenu")) {
                 // hide title of portal and increase logo size
                 document.querySelector("a#mp-menu-logo-mainMenu>h1").style.display = "none";
                 document.querySelector("a#mp-menu-logo-mainMenu>img").style.width = "100%";
@@ -30,6 +35,19 @@ export default {
             else {
                 // hide title of addon in right sidebar, when it is opened, because the Startpage will display the logo
                 document.querySelector("div#mp-menu-navigation-secondaryMenu>h4").style.display = "none";
+            }*/
+
+            if (!this.standAlonePortal) {
+                // hide title of addon in right sidebar, when it is opened, because the Startpage will display the logo
+                document.querySelector("div#mp-menu-navigation-secondaryMenu>h4").style.display = "none";
+            }
+        },
+        openWorkflow (value) {
+            if (value === "start") {
+                this.currentWorkflow = null;
+            }
+            else {
+                this.currentWorkflow = parseInt(value, 10);
             }
         }
     }
@@ -38,6 +56,15 @@ export default {
 
 <template>
     <div>
-        <BimFactoryStartpage />
+        <BimFactoryStartpage
+            v-if="currentWorkflow === null"
+            @openWorkflow="openWorkflow($event)"
+        />
+
+        <BimFactoryWorkflow
+            v-else
+            :workflow-id="currentWorkflow"
+            @openWorkflow="openWorkflow($event)"
+        />
     </div>
 </template>

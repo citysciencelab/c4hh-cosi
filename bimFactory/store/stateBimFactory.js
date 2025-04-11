@@ -11,9 +11,8 @@
  * @property {Boolean} isVisibleInMenu - if true, tool is selectable in menu (config-param)
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * @property {Boolean} standAlonePortal - flag if tool is used in a standalone portal, then titles are removed via CSS (config-param)
- * @property {String} workflowsJSON - path to the JSON file where all workflows are defined (config-param)
+ * @property {String} workflowsJSONPath - path to the JSON file where all workflows are defined (config-param)
  */
-
 
 const state = {
     supportedDevices: ["Desktop", "Mobile", "Table"],
@@ -26,7 +25,8 @@ const state = {
     isVisibleInMenu: true,
     deactivateGFI: true,
     standAlonePortal: false,
-    workflowsJSON: ""
+    workflowsJSONPath: "",
+    workflowsJSON: {}
 };
 
 export default state;
