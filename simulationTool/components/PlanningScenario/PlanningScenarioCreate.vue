@@ -30,12 +30,10 @@ export default {
         ...mapGetters("Modules/SimulationTool", [
             "planningScenarioCurrentLayout",
             "planningScenarioDrawIcons",
-            "planningScenarioDrawTypesGeometrie",
             "planningScenarioDrawTypesMain",
             "planningScenarioSelectedDrawType",
             "planningScenarioSelectedDrawTypeMain",
-            "planningScenarioStrokeRange",
-            "selectedInteraction"
+            "planningScenarioStrokeRange"
         ])
     },
     mounted () {
@@ -59,19 +57,18 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
+            "setCurrentPlanningComponent",
             "setPlanningScenarioCurrentLayout",
-            "setPlanningScenarioSelectedDrawType",
             "setPlanningScenarioDrawTypesMain",
-            "setPlanningScenarioSelectedDrawTypeMain",
-            "setSelectedInteraction",
-            "setCurrentPlanningComponent"
+            "setPlanningScenarioSelectedDrawType",
+            "setPlanningScenarioSelectedDrawTypeMain"
         ]),
 
         /**
          * Deletes all features from the source.
          * @returns {void}
          */
-        deleteAlL () {
+        deleteSource () {
             this.source.clear();
         }
     }
@@ -106,14 +103,11 @@ export default {
                             :current-layout="planningScenarioCurrentLayout"
                             :draw-icons="planningScenarioDrawIcons"
                             :draw-types="planningScenarioDrawTypesMain"
-                            :selected-draw-type="planningScenarioSelectedDrawType"
                             :selected-draw-type-main="planningScenarioSelectedDrawTypeMain"
-                            :selected-interaction="selectedInteraction"
                             :set-selected-draw-type="setPlanningScenarioSelectedDrawType"
                             :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
-                            :set-selected-interaction="setSelectedInteraction"
                             :source="source"
-                            :should-emit-events="false"
+                            @drawstart="deleteSource"
                         />
                     </div>
                     <div
@@ -124,7 +118,7 @@ export default {
                                 :class-array="['btn-primary']"
                                 :aria="$t('additional:modules.tools.simulationTool.delete')"
                                 icon="bi bi-trash"
-                                :interaction="() => deleteAlL()"
+                                :interaction="() => deleteSource()"
                             />
                             <p class="delete-all text-center">
                                 {{ $t('additional:modules.tools.simulationTool.delete') }}
@@ -132,17 +126,6 @@ export default {
                         </div>
                     </div>
                 </div>
-                <DrawTypes
-                    v-if="planningScenarioSelectedDrawTypeMain === 'geometries'"
-                    class="mt-4"
-                    :current-layout="planningScenarioCurrentLayout"
-                    :draw-icons="planningScenarioDrawIcons"
-                    :draw-types="planningScenarioDrawTypesGeometrie"
-                    :selected-draw-type="planningScenarioSelectedDrawType"
-                    :set-selected-draw-type="setPlanningScenarioSelectedDrawType"
-                    :source="source"
-                    :should-emit-events="false"
-                />
             </div>
             <div
                 id="draw-layouts"

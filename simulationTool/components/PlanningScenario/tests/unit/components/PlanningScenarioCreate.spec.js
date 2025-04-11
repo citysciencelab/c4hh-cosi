@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import PlanningScenarioCreate from "../../../PlanningScenarioCreate.vue";
 import sinon from "sinon";
@@ -12,6 +12,13 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
         store;
 
     const factory = {
+        getMount: () => {
+            return mount(PlanningScenarioCreate, {
+                global: {
+                    plugins: [store]
+                }
+            });
+        },
         getShallowMount: () => {
             return shallowMount(PlanningScenarioCreate, {
                 global: {
@@ -62,18 +69,10 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                                 planningScenarioDrawIcons: () => {
                                     return {
                                         box: "bi-square",
-                                        circle: "bi-circle",
-                                        doubleCircle: "bi-record-circle",
-                                        geometries: "bi-hexagon-fill",
-                                        line: "bi-slash-lg",
-                                        pen: "bi-pencil-fill",
-                                        point: "bi-circle-fill",
-                                        polygon: "bi-octagon",
-                                        symbols: "bi-circle-square"
+                                        polygon: "bi-octagon"
                                     };
                                 },
-                                planningScenarioDrawTypesGeometrie: () => ["line", "box", "polygon", "circle", "doubleCircle"],
-                                planningScenarioDrawTypesMain: () => ["pen", "geometries", "symbols"],
+                                planningScenarioDrawTypesMain: () => ["polygon", "box"],
                                 planningScenarioSelectedDrawType: () => selectedDrawType,
                                 planningScenarioSelectedDrawTypeMain: () => selectedDrawTypeMain,
                                 selectedInteraction: () => "draw",
@@ -138,6 +137,16 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                 saveButton = wrapper.find("#save");
 
             expect(saveButton.exists()).to.be.true;
+        });
+    });
+
+    describe("User Interaction", () => {
+        it("should call 'deleteSource' if user start drawing", async () => {
+            const spyDeleteSource = sinon.spy(PlanningScenarioCreate.methods, "deleteSource"),
+                wrapper = factory.getMount();
+
+            await wrapper.find("#draw-polygon").trigger("drawstart");
+            expect(spyDeleteSource.calledOnce).to.be.true;
         });
     });
 });
