@@ -68,7 +68,7 @@
           "glossar": "Glossar",
           "heightInM": "Höhe (m)",
           "help": "Hilfe",
-          "hideExistingsBuildings": "Vorhandene Gebäude ausblenden",
+          "hideExistingBuildings": "Vorhandene Gebäude ausblenden",
           "hints": "Schon gewusst?",
           "includedModels": "Enthaltene Modelle",
           "includedScenarios": "Enthaltene Szenarien",

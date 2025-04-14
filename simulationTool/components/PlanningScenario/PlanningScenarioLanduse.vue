@@ -3,6 +3,7 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import {mapGetters, mapMutations} from "vuex";
+import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import {Polygon} from "ol/geom";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
@@ -11,6 +12,7 @@ export default {
     components: {
         FlatButton,
         IconButton,
+        NavTab,
         SwitchInput
     },
     data () {
@@ -194,52 +196,32 @@ export default {
                     >
                         <SwitchInput
                             id="hideExistingBuildings"
-                            :label="$t('additional:modules.tools.simulationTool.hideExistingsBuildings')"
+                            :label="$t('additional:modules.tools.simulationTool.hideExistingBuildings')"
                             :aria="$t('additional:modules.tools.simulationTool.hideExistingsBuildings')"
                             :interaction="() => {}"
                         />
                     </div>
                 </div>
-                <ul
-                    v-if="currentEditableInput === 'buildings'"
-                    class="nav nav-underline mt-3 d-flex"
-                    role="tablist"
-                >
-                    <li
-                        class="nav-item flex-grow-1"
-                        role="presentation"
+                <div id="building-tabs-container">
+                    <ul
+                        v-if="currentEditableInput === 'buildings'"
+                        class="nav nav-tabs nav-justified mt-3 d-flex"
+                        role="tablist"
                     >
-                        <button
+                        <NavTab
                             id="existing-tab"
-                            class="nav-link p-1 w-100 active"
-                            data-bs-toggle="tab"
-                            data-bs-target="#existing"
-                            type="button"
-                            role="tab"
-                            aria-controls="existing"
-                            aria-selected="true"
-                        >
-                            {{ $t('additional:modules.tools.simulationTool.existingBuildings') }}
-                        </button>
-                    </li>
-                    <li
-                        class="nav-item flex-grow-1"
-                        role="presentation"
-                    >
-                        <button
+                            :active="true"
+                            :target="'#existing'"
+                            :label="'additional:modules.tools.simulationTool.existingBuildings'"
+                        />
+                        <NavTab
                             id="created-tab"
-                            class="nav-link p-1 w-100"
-                            data-bs-toggle="tab"
-                            data-bs-target="#created"
-                            type="button"
-                            role="tab"
-                            aria-controls="created"
-                            aria-selected="false"
-                        >
-                            {{ $t('additional:modules.tools.simulationTool.createdBuildings') }}
-                        </button>
-                    </li>
-                </ul>
+                            :active="false"
+                            :target="'#created'"
+                            :label="'additional:modules.tools.simulationTool.createdBuildings'"
+                        />
+                    </ul>
+                </div>
             </div>
             <div
                 v-if="currentEditableInput === 'buildings'"
@@ -348,9 +330,27 @@ export default {
 </template>
 
 <style scoped lang="scss">
+@import "~mixins";
+@import "~variables";
 
 .height-input {
     width: 6em;
+}
+
+#building-tabs-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.nav-tabs {
+    display: contents;
+    li {
+        list-style: none;
+    }
+    .nav-item {
+        flex: 1;
+    }
 }
 
 </style>
