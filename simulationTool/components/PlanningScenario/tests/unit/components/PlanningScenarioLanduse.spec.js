@@ -229,6 +229,20 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
     });
 
+    describe("Watchers", () => {
+        it("should call method 'parseAndAddFeatures' if data 'currentEditableInput' is changed", async () => {
+            const stubParseAndAddFeatures = sinon.stub(PlanningScenarioLanduse.methods, "parseAndAddFeatures"),
+                wrapper = factory.getShallowMount();
+
+            await wrapper.vm.$nextTick();
+            await wrapper.setData({
+                currentEditableInput: "Ich habe mich geaendert"
+            });
+
+            expect(stubParseAndAddFeatures.calledOnce).to.be.true;
+        });
+    });
+
     describe("methods", () => {
         describe("changeHeight", () => {
             it("should set correct value, no matter if object structure already exists or not", () => {

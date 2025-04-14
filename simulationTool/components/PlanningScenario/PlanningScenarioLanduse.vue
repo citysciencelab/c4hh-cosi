@@ -2,6 +2,8 @@
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
+import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import {Polygon} from "ol/geom";
@@ -28,11 +30,21 @@ export default {
         ]),
 
         /**
+         * Gets all buildings in the current scenario that are marked as created.
+         * @return {Object[]} Array of created buildings in current scenario.
+         */
+        createdBuildings () {
+            return this.planningScenario?.inputs?.buildings?.features
+                ?.filter(feature => feature.properties.created)
+                ?? [];
+        },
+
+        /**
          * Gets the bounding box of the current planning scenario.
          * @returns {Number[]} The bounding box as an extent.
          */
         currentBBoxGeometry () {
-            const coordinates = this.currentPlanningScenario?.scenarioFeature?.features?.[0]?.geometry?.coordinates;
+            const coordinates = this.planningScenario?.scenarioFeature?.features?.[0]?.geometry?.coordinates;
 
             if (!coordinates) {
                 return undefined;
@@ -49,19 +61,11 @@ export default {
         },
 
         /**
-         * Gets the currently selected planning scenario.
-         * @return {Object} The current planning scenario.
-         */
-        currentPlanningScenario () {
-            return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
-        },
-
-        /**
          * Gets the simulation config object that is set for the current planning scenario.
          * @returns {Object} The current simulation config.
          */
         currentSimulation () {
-            return this.simulations.find(sim => sim.id === this.currentPlanningScenario.simulationId);
+            return this.simulations.find(sim => sim.id === this.planningScenario.simulationId);
         },
 
         /**
@@ -85,38 +89,55 @@ export default {
          * @return {Object[]} Array of existing buildings in current scenario.
          */
         existingBuildings () {
-            return this.currentPlanningScenario?.inputs?.buildings?.features
+            return this.planningScenario?.inputs?.buildings?.features
                 ?.filter(feature => !feature.properties.created)
                 ?? [];
         },
 
         /**
-         * Gets all buildings in the current scenario that are marked as created.
-         * @return {Object[]} Array of created buildings in current scenario.
+         * Gets the currently selected planning scenario.
+         * @return {Object} The current planning scenario.
          */
-        createdBuildings () {
-            return this.currentPlanningScenario?.inputs?.buildings?.features
-                ?.filter(feature => feature.properties.created)
-                ?? [];
+        planningScenario () {
+            return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
         }
     },
+
+    watch: {
+        /**
+         *
+         * @param {String} currentEditableInput - The key of the current editable input.
+         */
+        currentEditableInput (currentEditableInput) {
+            const featuresOfInput = this.planningScenario.inputs[currentEditableInput]?.features;
+
+            if (featuresOfInput) {
+                this.clearFeatures();
+                this.parseAndAddFeatures(featuresOfInput);
+            }
+        }
+    },
+
     async mounted () {
-        if (!this.currentPlanningScenario) {
+        if (!this.planningScenario) {
             return;
         }
-        if (!this.currentPlanningScenario.featuresLoaded) {
+        if (!this.planningScenario.featuresLoaded) {
             try {
                 await this.fetchFeatures(
-                    this.currentPlanningScenario, this.editableInputs, this.currentBBoxGeometry, this.currentCrs
+                    this.planningScenario, this.editableInputs, this.currentBBoxGeometry, this.currentCrs
                 );
-                this.currentPlanningScenario.featuresLoaded = true;
+
+                this.planningScenario.featuresLoaded = true;
             }
             catch (error) {
                 console.warn(error);
             }
         }
-
-        this.currentEditableInput = this.editableInputs ? Object.keys(this.editableInputs)[0] : "buildings";
+        this.currentEditableInput = Object.keys(this.editableInputs)[0];
+    },
+    unmounted () {
+        this.clearFeatures();
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
@@ -132,6 +153,14 @@ export default {
         changeHeight (event, building) {
             building.properties ??= {};
             building.properties.building_height = event.target.valueAsNumber;
+        },
+
+        /**
+         * Removes all features from the source.
+         * @returns {void}
+         */
+        clearFeatures () {
+            this.getLayer().getLayerSource().clear();
         },
 
         /**
@@ -155,6 +184,36 @@ export default {
                     scenario.inputs[inputKey].features = await getOAFFeature.getOAFFeatureGet(input.source.url, input.source.collection, 100, filter, crs, crs);
                 }
             }
+        },
+
+        /**
+         * Creates a layer if it does not yet exist and returns it.
+         * @returns {Object} A VECTORBASE Layer
+         */
+        getLayer () {
+            if (typeof layerCollection.getLayerById("planning-scenario-landuse") !== "undefined") {
+                return layerCollection.getLayerById("planning-scenario-landuse");
+            }
+            const layer = layerFactory.createLayer({
+                typ: "VECTORBASE",
+                id: "planning-scenario-landuse",
+                name: "planning-scenario-landuse",
+                alwaysOnTop: true
+            });
+
+            layerCollection.addLayer(layer);
+            return layer;
+        },
+
+        /**
+         * Parses the given GeoJSON features to openlayers features and adds them to the source.
+         * @param {GeoJSON[]} features - An array of GeoJSON features.
+         * @returns {void}
+         */
+        parseAndAddFeatures (features) {
+            const olFeatures = getOAFFeature.readAllOAFToGeoJSON(features);
+
+            this.getLayer().getLayerSource().addFeatures(olFeatures);
         }
     }
 };
@@ -168,7 +227,7 @@ export default {
         </h4>
         <div class="d-flex flex-column rounded shadow mt-4">
             <div class="position-sticky mt-2 mx-3 top-0 z-2 bg-body">
-                <h5>{{ currentPlanningScenario?.name }}</h5>
+                <h5>{{ planningScenario?.name }}</h5>
                 <hr>
                 <div class="d-flex">
                     <div
@@ -310,7 +369,7 @@ export default {
                 </div>
             </div>
             <div v-if="currentEditableInput === 'roads'">
-                {{ currentPlanningScenario?.inputs?.roads }}
+                {{ planningScenario?.inputs?.roads }}
             </div>
             <div class="position-sticky bottom-0 bg-body z-2 p-3 d-flex justify-content-between">
                 <FlatButton
