@@ -21,6 +21,62 @@ export default {
     },
     data () {
         return {
+            currentScenarioData: {
+                "id": "Szenario6",
+                "name": "Planungsszenario 6",
+                "featuresLoaded": true,
+                "inputs": {
+                    "buildings": {
+                        "type": "FeatureCollection",
+                        "features": [
+                            {
+                                "type": "Feature",
+                                "id": "DEHHALKA10007tqf-piece",
+                                "geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": [
+                                        [[566691.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566691.619, 5934737.624]]
+                                    ]
+                                },
+                                "properties": {
+                                    "id": 117244,
+                                    "building_height": 30.352
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "id": "EHHALKA10007tqf-piece",
+                                "geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": [
+                                        [[566691.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566691.619, 5934737.624]]
+                                    ]
+                                },
+                                "properties": {
+                                    "id": 117245,
+                                    "building_height": 30.352
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "id": "DEHHALKA10007tqf-piece2",
+                                "geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": [
+                                        [[566692.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566692.619, 5934737.624]]
+                                    ]
+                                },
+                                "properties": {
+                                    "id": 117244,
+                                    "building_height": 20.352,
+                                    "created": true
+                                }
+                            }
+                        ]
+                    },
+                    "roads": {}
+                }
+            },
             layer: null,
             selectedTags: [],
             source: new VectorSource()
@@ -28,9 +84,11 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
+            "currentPlanningScenarioId",
             "planningScenarioCurrentLayout",
             "planningScenarioDrawIcons",
             "planningScenarioDrawTypesMain",
+            "planningScenarios",
             "planningScenarioSelectedDrawType",
             "planningScenarioSelectedDrawTypeMain",
             "planningScenarioStrokeRange"
@@ -58,11 +116,27 @@ export default {
     methods: {
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
+            "setCurrentPlanningScenarioId",
             "setPlanningScenarioCurrentLayout",
             "setPlanningScenarioDrawTypesMain",
+            "setPlanningScenarios",
             "setPlanningScenarioSelectedDrawType",
             "setPlanningScenarioSelectedDrawTypeMain"
         ]),
+
+
+        /**
+         * Create the current planning scenario with data.
+         * @returns {void}
+         */
+        create () {
+            if (!this.source?.getFeatures().length) {
+                return;
+            }
+
+            this.setCurrentPlanningScenarioData(this.source?.getFeatures(), this.planningScenarioCurrentLayout);
+            this.setCurrentPlanningComponent("landuse");
+        },
 
         /**
          * Deletes all features from the source.
@@ -70,6 +144,31 @@ export default {
          */
         deleteSource () {
             this.source.clear();
+        },
+
+        /**
+         * Sets current planning scenario data.
+         * @param {ol/Feature[]} features all features of current source
+         * @param {object} planningScenarioCurrentLayout the current style layout.
+         * @returns {void}
+         */
+        setCurrentPlanningScenarioData (features, planningScenarioCurrentLayout) {
+            this.currentScenarioData.scenarioFeature = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": features[0]?.getGeometry().getCoordinates()
+                        },
+                        "style": planningScenarioCurrentLayout
+                    }
+                ]
+            };
+
+            this.setPlanningScenarios([...this.planningScenarios, this.currentScenarioData]);
+            this.setCurrentPlanningScenarioId(this.currentScenarioData.id);
         }
     }
 };
@@ -179,7 +278,7 @@ export default {
                     id="save"
                     class="col col-md-6 offset-md-6"
                     :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-                    :interaction="() => setCurrentPlanningComponent('landuse')"
+                    :interaction="() => create()"
                     :text="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
                 />
             </div>

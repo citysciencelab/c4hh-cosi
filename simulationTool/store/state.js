@@ -52,51 +52,7 @@ const state = {
                 }
             ]
         },
-        simulationId: "",
-        features: {
-            building: {
-                type: "FeatureCollection",
-                features: [
-                    {
-                        type: "Feature",
-                        geometry: {
-                            type: "Polygon",
-                            coordinates: []
-                        },
-                        properties: {
-                            height: 0
-                        },
-                        style: {
-                            fillColor: "",
-                            strokeColor: "",
-                            strokewidth: "",
-                            opacity: ""
-                        }
-                    }
-                ]
-            },
-            street: {
-                type: "FeatureCollection",
-                features: [
-                    {
-                        type: "Feature",
-                        geometry: {
-                            type: "Polygon",
-                            coordinates: []
-                        },
-                        properties: {
-                            height: 0
-                        },
-                        style: {
-                            fillColor: "",
-                            strokeColor: "",
-                            strokewidth: "",
-                            opacity: ""
-                        }
-                    }
-                ]
-            }
-        }
+        simulationId: ""
     },
     icon: "bi-sliders2",
     img: {},
