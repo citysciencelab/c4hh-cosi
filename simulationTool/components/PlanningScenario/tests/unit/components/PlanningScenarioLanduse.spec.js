@@ -1,9 +1,9 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import getFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import PlanningScenarioLanduse from "../../../PlanningScenarioLanduse.vue";
 import sinon from "sinon";
-import axios from "axios";
 
 config.global.mocks.$t = key => key;
 
@@ -179,6 +179,10 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
     });
 
+    afterEach(() => {
+        sinon.restore();
+    });
+
     describe("Component DOM", () => {
         it("should exist", () => {
             const wrapper = factory.getShallowMount();
@@ -240,9 +244,15 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
         describe("fetchFeatures", () => {
             it("should set the expected features in the scenario parameter object", async () => {
+                sinon.stub(getFeature, "getOAFFeatureGet").resolves("features");
+                sinon.stub(getFeature, "getOAFGeometryFilter");
+
                 const wrapper = factory.getShallowMount(),
                     scenario = {
-                        simulationId: "simId"
+                        simulationId: "simId",
+                        inputs: {
+                            anEditableInput: {}
+                        }
                     },
                     scopeSimulations = [
                         {
@@ -253,6 +263,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                     editable: true,
                                     source: {
                                         type: "oaf",
+                                        collection: "buildings",
                                         url: "https://a.url.com"
                                     }
                                 }
@@ -260,11 +271,9 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                         }
                     ];
 
-                sinon.stub(axios, "get").resolves({data: "Some features"});
-
                 await wrapper.vm.fetchFeatures(scenario, scopeSimulations[0].inputs, [0, 1, 0, 1], "CRS");
 
-                expect(scenario.inputs).to.deep.equal({anEditableInput: "Some features"});
+                expect(scenario.inputs.anEditableInput).to.deep.equal({features: "features"});
             });
         });
     });

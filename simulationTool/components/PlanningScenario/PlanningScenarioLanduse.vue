@@ -1,6 +1,6 @@
 <script>
-import axios from "axios";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import {mapGetters, mapMutations} from "vuex";
 import {Polygon} from "ol/geom";
@@ -29,13 +29,13 @@ export default {
          * Gets the bounding box of the current planning scenario.
          * @returns {Number[]} The bounding box as an extent.
          */
-        currentBbox () {
+        currentBBoxGeometry () {
             const coordinates = this.currentPlanningScenario?.scenarioFeature?.features?.[0]?.geometry?.coordinates;
 
             if (!coordinates) {
                 return undefined;
             }
-            return new Polygon(coordinates).getExtent();
+            return new Polygon(coordinates);
         },
 
         /**
@@ -105,7 +105,7 @@ export default {
         if (!this.currentPlanningScenario.featuresLoaded) {
             try {
                 await this.fetchFeatures(
-                    this.currentPlanningScenario, this.editableInputs, this.currentBbox, this.currentCrs
+                    this.currentPlanningScenario, this.editableInputs, this.currentBBoxGeometry, this.currentCrs
                 );
                 this.currentPlanningScenario.featuresLoaded = true;
             }
@@ -136,31 +136,22 @@ export default {
          * Performs GET-Requests for all editable oaf inputs and sets the features in the scenario parameter object.
          * @param {Object} scenario The planning scenario for which the features are to be loaded.
          * @param {Object} inputs Config object from simulation containing input types and sources.
-         * @param {Number[]} bbox The bbox for the oaf requests.
+         * @param {ol/Geometry/Polygon} bboxGeometry - The polygon geometry of the bbox.
          * @param {String} crs The crs for the simulation.
          * @return {void}
          */
-        async fetchFeatures (scenario, inputs, bbox, crs) {
-            const requests = {};
+        async fetchFeatures (scenario, inputs, bboxGeometry, crs) {
+            const entries = Object.entries(inputs);
 
-            Object.entries(inputs).forEach(([inputKey, input]) => {
-                if (input.source?.type === "oaf") {
-                    const url = new URL("items", input.source.url);
+            for (let i = 0; i < entries.length; i++) {
+                const [inputKey, input] = entries[i];
 
-                    url.searchParams.set("bbox", bbox);
-                    url.searchParams.set("crs", crs);
-                    requests[inputKey] = axios.get(url.toString());
+                if (input?.source?.type === "oaf") {
+                    const filter = getOAFFeature.getOAFGeometryFilter(bboxGeometry, "geometry", "intersects");
+
+                    scenario.inputs[inputKey].features = await getOAFFeature.getOAFFeatureGet(input.source.url, input.source.collection, 100, filter, "http://www.opengis.net/def/crs/OGC/1.3/CRS84", crs);
                 }
-            });
-
-            await Promise.all(Object.values(requests));
-
-            scenario.inputs ??= {};
-            Object.entries(requests).forEach(([inputKey, promise]) => {
-                promise.then(value => {
-                    scenario.inputs[inputKey] = value.data;
-                });
-            });
+            }
         }
     }
 };
