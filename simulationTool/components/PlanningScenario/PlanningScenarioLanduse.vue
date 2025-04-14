@@ -4,12 +4,14 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import {mapGetters, mapMutations} from "vuex";
 import {Polygon} from "ol/geom";
+import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
     name: "PlanningScenarioLanduse",
     components: {
         FlatButton,
-        IconButton
+        IconButton,
+        SwitchInput
     },
     data () {
         return {
@@ -195,18 +197,16 @@ export default {
                             {{ value.label }}
                         </label>
                     </div>
-                    <div v-if="currentEditableInput === 'buildings'">
-                        {{ $t('additional:modules.tools.simulationTool.hideExistingsBuildings') }}<br>
-                        {{ $t('additional:modules.tools.simulationTool.off') }}
-                        <div class="form-check form-check-inline form-switch">
-                            <input
-                                id="hideExistingBuildings"
-                                class="form-check-input"
-                                type="checkbox"
-                                role="switch"
-                            >
-                            {{ $t('additional:modules.tools.simulationTool.on') }}
-                        </div>
+                    <div
+                        v-if="currentEditableInput === 'buildings'"
+                        class="form-check form-switch"
+                    >
+                        <SwitchInput
+                            id="hideExistingBuildings"
+                            :label="$t('additional:modules.tools.simulationTool.hideExistingsBuildings')"
+                            :aria="$t('additional:modules.tools.simulationTool.hideExistingsBuildings')"
+                            :interaction="() => {}"
+                        />
                     </div>
                 </div>
                 <ul

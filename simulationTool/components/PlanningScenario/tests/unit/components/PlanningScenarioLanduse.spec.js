@@ -205,6 +205,14 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
             expect(wrapper.get(".tab-pane.active").findAll(".list-group-item")).to.have.lengthOf(2);
         });
+        it("should render SwitchInput when currentEditableInput is 'buildings'", async () => {
+            const wrapper = factory.getShallowMount();
+
+            wrapper.vm.currentEditableInput = "buildings";
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findComponent({name: "SwitchInput"}).exists()).to.be.true;
+        });
     });
 
     describe("methods", () => {
