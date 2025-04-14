@@ -112,6 +112,7 @@
           "planningScenarioEdit": "Planungsszenario bearbeiten",
           "planningScenarioAllFiles": "Alle Szenarien",
           "planningScenarioSave": "Planungsgebiet speichern",
+          "planningScenarioInvalidName": "Bitte geben Sie einen Namen für das Planungsszenario ein!",
           "privacy": "Datenschutz",
           "refresh": "Aktualisieren",
           "removeJob": "Szenario aus Ensemble entfernen",

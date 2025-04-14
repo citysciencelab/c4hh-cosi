@@ -111,6 +111,7 @@
           "planningScenarioEdit": "Edit planning scenario",
           "planningScenarioAllFiles": "All scenarios",
           "planningScenarioSave": "Save planning scenario",
+          "planningScenarioInvalidName": "Please enter a name for the planning scenario!",
           "privacy": "Privacy",
           "refresh": "Refresh",
           "removeJob": "Remove scenario from ensemble",

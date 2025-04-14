@@ -138,6 +138,28 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
 
             expect(saveButton.exists()).to.be.true;
         });
+        it("should render invalid input field", async () => {
+            const wrapper = factory.getShallowMount();
+
+            await wrapper.setData({
+                isValid: false,
+                scenarioName: ""
+            });
+
+            expect(wrapper.find(".invalid-info").exists()).to.be.true;
+        });
+        it("should render disabled button", async () => {
+            const wrapper = factory.getShallowMount();
+
+            await wrapper.setData({
+                isValid: false,
+                scenarioName: ""
+            });
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find("#save").attributes("disabled")).to.equal("true");
+        });
     });
 
     describe("User Interaction", () => {
@@ -147,6 +169,22 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
 
             await wrapper.find("#draw-polygon").trigger("drawstart");
             expect(spyDeleteSource.calledOnce).to.be.true;
+        });
+    });
+    describe("Methods", () => {
+        it("should set isValid to true if input is not an empty string", () => {
+            const wrapper = factory.getMount();
+
+            wrapper.vm.checkInputString("PlanningScenario 1");
+
+            expect(wrapper.vm.isValid).to.be.equal(true);
+        });
+        it("should set isValid to false if input is an empty string", () => {
+            const wrapper = factory.getMount();
+
+            wrapper.vm.checkInputString("");
+
+            expect(wrapper.vm.isValid).to.be.equal(false);
         });
     });
 });

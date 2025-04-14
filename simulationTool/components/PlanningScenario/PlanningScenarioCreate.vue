@@ -79,7 +79,9 @@ export default {
             },
             layer: null,
             selectedTags: [],
-            source: new VectorSource()
+            source: new VectorSource(),
+            isValid: true,
+            scenarioName: "Planungsszenario"
         };
     },
     computed: {
@@ -136,6 +138,16 @@ export default {
 
             this.setCurrentPlanningScenarioData(this.source?.getFeatures(), this.planningScenarioCurrentLayout);
             this.setCurrentPlanningComponent("landuse");
+        },
+
+        /**
+         * Checks if a variable is a string and not empty.
+         * @param {String} inputString the user input.
+         * @returns {void}
+         */
+        checkInputString (inputString) {
+            this.isValid = Boolean(typeof inputString === "string" && inputString.length);
+            this.scenarioName = inputString;
         },
 
         /**
@@ -238,50 +250,57 @@ export default {
                     :stroke-range="planningScenarioStrokeRange"
                 />
             </div>
-            <div
-                class="mb-4"
-            >
+            <form>
                 <InputText
                     id="plsn-descr"
+                    :value="scenarioName"
+                    :class-obj="[isValid ? '': 'is-invalid']"
                     :label="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
                     :placeholder="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
+                    :input="(value) => checkInputString(value.trim())"
+                    required
                 />
-            </div>
-            <div class="form-floating mb-3">
-                <select
-                    id="simulateForPlanning"
-                    class="form-select"
-                    :aria-label="$t('additional:modules.tools.simulationTool.simulateForPlanningScenario')"
+                <div
+                    v-if="!isValid"
+                    class="mt-1 mb-3 invalid-info"
                 >
-                    <option
-                        value=""
-                        selected=""
+                    {{ $t('additional:modules.tools.simulationTool.planningScenarioInvalidName') }}
+                </div>
+                <div class="form-floating mb-3">
+                    <select
+                        id="simulateForPlanning"
+                        class="form-select"
+                        :aria-label="$t('additional:modules.tools.simulationTool.simulateForPlanningScenario')"
                     >
-                        {{ "" }}
-                    </option>
-                </select>
-                <label for="simulateForPlanning">
-                    {{ $t('additional:modules.tools.simulationTool.simulateForPlanningScenario') }}
-                </label>
-            </div>
-        </div>
-        <div class="container">
-            <div class="row">
-                <FlatButton
-                    id="back"
-                    class="col col-md-6"
-                    :aria-label="$t('additional:modules.tools.simulationTool.back')"
-                    :interaction="() => ''"
-                    :text="$t('additional:modules.tools.simulationTool.back')"
-                />
-                <FlatButton
-                    id="save"
-                    class="col col-md-6 offset-md-6"
-                    :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-                    :interaction="() => create()"
-                    :text="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-                />
-            </div>
+                        <option
+                            value=""
+                            selected=""
+                        >
+                            {{ "" }}
+                        </option>
+                    </select>
+                    <label for="simulateForPlanning">
+                        {{ $t('additional:modules.tools.simulationTool.simulateForPlanningScenario') }}
+                    </label>
+                </div>
+                <div
+                    class="d-flex justify-content-between"
+                >
+                    <FlatButton
+                        id="back"
+                        :aria-label="$t('additional:modules.tools.simulationTool.back')"
+                        :interaction="() => ''"
+                        :text="$t('additional:modules.tools.simulationTool.back')"
+                    />
+                    <FlatButton
+                        id="save"
+                        :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
+                        :interaction="() => create()"
+                        :text="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
+                        :disabled="!isValid || !source?.getFeatures().length > 0"
+                    />
+                </div>
+            </form>
         </div>
     </div>
 </template>
@@ -294,6 +313,11 @@ export default {
 }
 .delete-all {
     font-size: $font_size_sm;
+}
+.invalid-info {
+    max-width: fit-content;
+    font-size: $font_size_sm;
+    color: $danger;
 }
 
 </style>
