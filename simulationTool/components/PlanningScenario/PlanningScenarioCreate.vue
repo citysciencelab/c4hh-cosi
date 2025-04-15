@@ -86,7 +86,10 @@ export default {
                 return;
             }
 
-            this.setCurrentPlanningScenarioData(this.source?.getFeatures(), this.planningScenarioCurrentLayout);
+            this.setCurrentPlanningScenarioData(this.source?.getFeatures());
+            this.deleteSource();
+            this.setPlanningScenarioSelectedDrawType("");
+            this.setPlanningScenarioSelectedDrawTypeMain("");
             this.setCurrentPlanningComponent("landuse");
         },
 
@@ -122,22 +125,12 @@ export default {
         /**
          * Sets current planning scenario data.
          * @param {ol/Feature[]} features all features of current source
-         * @param {object} planningScenarioCurrentLayout the current style layout.
          * @returns {void}
          */
-        setCurrentPlanningScenarioData (features, planningScenarioCurrentLayout) {
+        setCurrentPlanningScenarioData (features) {
             this.currentScenarioData.scenarioFeature = {
                 "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Polygon",
-                            "coordinates": features[0]?.getGeometry().getCoordinates()
-                        },
-                        "style": planningScenarioCurrentLayout
-                    }
-                ]
+                "features": features
             };
 
             this.setPlanningScenarios([...this.planningScenarios, this.currentScenarioData]);

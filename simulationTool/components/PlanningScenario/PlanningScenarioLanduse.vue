@@ -6,7 +6,6 @@ import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
-import {Polygon} from "ol/geom";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
@@ -40,16 +39,11 @@ export default {
         },
 
         /**
-         * Gets the bounding box of the current planning scenario.
-         * @returns {Number[]} The bounding box as an extent.
+         * Gets the geometry of the current planning scenario.
+         * @returns {ol/Geometry} The geometry of the scenario feature.
          */
-        currentBBoxGeometry () {
-            const coordinates = this.planningScenario?.scenarioFeature?.features?.[0]?.geometry?.coordinates;
-
-            if (!coordinates) {
-                return undefined;
-            }
-            return new Polygon(coordinates);
+        currentScenarioGeometry () {
+            return this.planningScenario.scenarioFeature.features[0].getGeometry();
         },
 
         /**
@@ -115,6 +109,9 @@ export default {
                 this.clearFeatures();
                 this.parseAndAddFeatures(featuresOfInput);
             }
+            if (this.planningScenario?.scenarioFeature?.features?.[0]) {
+                this.getLayer().getLayerSource().addFeature(this.planningScenario.scenarioFeature.features[0]);
+            }
         }
     },
 
@@ -125,7 +122,7 @@ export default {
         if (!this.planningScenario.featuresLoaded) {
             try {
                 await this.fetchFeatures(
-                    this.planningScenario, this.editableInputs, this.currentBBoxGeometry, this.currentCrs
+                    this.planningScenario, this.editableInputs, this.currentScenarioGeometry, this.currentCrs
                 );
 
                 this.planningScenario.featuresLoaded = true;
