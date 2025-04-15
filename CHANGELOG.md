@@ -9,12 +9,14 @@
 ### Added
 
 ### Changed
+- Charts: Brought code up to date — same refactor as in v2 with the Chart.js update.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+- Fixed VerkehrsstärkenThemeLineChart tests, so that is does not need to be skipped anymore. 
 
 ---
 
