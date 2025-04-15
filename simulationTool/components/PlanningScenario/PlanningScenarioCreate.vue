@@ -115,6 +115,8 @@ export default {
         backToOverview () {
             this.deleteSource();
             this.setCurrentPlanningComponent("");
+            this.setPlanningScenarioSelectedDrawType("");
+            this.setPlanningScenarioSelectedDrawTypeMain("");
         },
 
         /**
