@@ -121,6 +121,12 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
 
             expect(input.exists()).to.be.true;
         });
+        it("should render input text for buffer", () => {
+            const wrapper = factory.getShallowMount(),
+                inputBuffer = wrapper.find("#buffer");
+
+            expect(inputBuffer.exists()).to.be.true;
+        });
         it("should render dropdown for simulation", () => {
             const wrapper = factory.getShallowMount(),
                 dropdown = wrapper.find("#simulateForPlanning");

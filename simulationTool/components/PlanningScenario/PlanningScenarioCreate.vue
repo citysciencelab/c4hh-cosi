@@ -245,6 +245,12 @@ export default {
                         {{ $t('additional:modules.tools.simulationTool.simulateForPlanningScenario') }}
                     </label>
                 </div>
+                <InputText
+                    id="buffer"
+                    :label="$t('additional:modules.tools.simulationTool.planningScenarioBBox')"
+                    :placeholder="$t('additional:modules.tools.simulationTool.planningScenarioBBox')"
+                    :type="'number'"
+                />
                 <div
                     class="d-flex justify-content-between"
                 >

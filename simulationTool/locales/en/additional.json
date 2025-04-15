@@ -112,6 +112,7 @@
           "planningScenarioAllFiles": "All scenarios",
           "planningScenarioSave": "Save planning scenario",
           "planningScenarioInvalidName": "Please enter a name for the planning scenario!",
+          "planningScenarioBBox": "Buffer around bounding box in metres",
           "privacy": "Privacy",
           "refresh": "Refresh",
           "removeJob": "Remove scenario from ensemble",

@@ -113,6 +113,7 @@
           "planningScenarioAllFiles": "Alle Szenarien",
           "planningScenarioSave": "Planungsgebiet speichern",
           "planningScenarioInvalidName": "Bitte geben Sie einen Namen für das Planungsszenario ein!",
+          "planningScenarioBBox": "Puffer um Bounding Box in Meter",
           "privacy": "Datenschutz",
           "refresh": "Aktualisieren",
           "removeJob": "Szenario aus Ensemble entfernen",
