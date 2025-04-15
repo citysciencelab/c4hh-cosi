@@ -22,66 +22,15 @@ export default {
     data () {
         return {
             currentScenarioData: {
-                "id": "Szenario6",
-                "name": "Planungsszenario 6",
-                "featuresLoaded": true,
-                "inputs": {
-                    "buildings": {
-                        "type": "FeatureCollection",
-                        "features": [
-                            {
-                                "type": "Feature",
-                                "id": "DEHHALKA10007tqf-piece",
-                                "geometry": {
-                                    "type": "Polygon",
-                                    "coordinates": [
-                                        [[566691.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566691.619, 5934737.624]]
-                                    ]
-                                },
-                                "properties": {
-                                    "id": 117244,
-                                    "building_height": 30.352
-                                }
-                            },
-                            {
-                                "type": "Feature",
-                                "id": "EHHALKA10007tqf-piece",
-                                "geometry": {
-                                    "type": "Polygon",
-                                    "coordinates": [
-                                        [[566691.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566691.619, 5934737.624]]
-                                    ]
-                                },
-                                "properties": {
-                                    "id": 117245,
-                                    "building_height": 30.352
-                                }
-                            },
-                            {
-                                "type": "Feature",
-                                "id": "DEHHALKA10007tqf-piece2",
-                                "geometry": {
-                                    "type": "Polygon",
-                                    "coordinates": [
-                                        [[566692.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566692.619, 5934737.624]]
-                                    ]
-                                },
-                                "properties": {
-                                    "id": 117244,
-                                    "building_height": 20.352,
-                                    "created": true
-                                }
-                            }
-                        ]
-                    },
-                    "roads": {}
-                }
+                id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+                name: "Neues Planungsszenario",
+                simulationId: "only-planning-scenario",
+                inputs: {}
             },
             layer: null,
             selectedTags: [],
             source: new VectorSource(),
-            isValid: true,
-            scenarioName: "Planungsszenario"
+            isValid: true
         };
     },
     computed: {
@@ -93,7 +42,8 @@ export default {
             "planningScenarios",
             "planningScenarioSelectedDrawType",
             "planningScenarioSelectedDrawTypeMain",
-            "planningScenarioStrokeRange"
+            "planningScenarioStrokeRange",
+            "simulations"
         ])
     },
     mounted () {
@@ -147,7 +97,7 @@ export default {
          */
         checkInputString (inputString) {
             this.isValid = Boolean(typeof inputString === "string" && inputString.length);
-            this.scenarioName = inputString;
+            this.currentScenarioData.name = inputString;
         },
 
         /**
@@ -263,7 +213,7 @@ export default {
             <form>
                 <InputText
                     id="plsn-descr"
-                    :value="scenarioName"
+                    :value="currentScenarioData.name"
                     :class-obj="[isValid ? '': 'is-invalid']"
                     :label="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
                     :placeholder="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
@@ -279,14 +229,16 @@ export default {
                 <div class="form-floating mb-3">
                     <select
                         id="simulateForPlanning"
+                        v-model="currentScenarioData.simulationId"
                         class="form-select"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulateForPlanningScenario')"
                     >
                         <option
-                            value=""
-                            selected=""
+                            v-for="simulation in simulations"
+                            :key="simulation.id"
+                            :value="simulation.id"
                         >
-                            {{ "" }}
+                            {{ simulation.title }}
                         </option>
                     </select>
                     <label for="simulateForPlanning">

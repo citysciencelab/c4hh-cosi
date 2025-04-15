@@ -76,7 +76,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                                 planningScenarioSelectedDrawType: () => selectedDrawType,
                                 planningScenarioSelectedDrawTypeMain: () => selectedDrawTypeMain,
                                 selectedInteraction: () => "draw",
-                                planningScenarioStrokeRange: () => [1, 16]
+                                planningScenarioStrokeRange: () => [1, 16],
+                                simulations: () => []
                             }
                         }
                     }

@@ -151,7 +151,8 @@ export default {
                 if (input?.source?.type === "oaf") {
                     const filter = getOAFFeature.getOAFGeometryFilter(bboxGeometry, "geometry", "intersects");
 
-                    scenario.inputs[inputKey].features = await getOAFFeature.getOAFFeatureGet(input.source.url, input.source.collection, 100, filter, "http://www.opengis.net/def/crs/OGC/1.3/CRS84", crs);
+                    scenario.inputs[inputKey] = {};
+                    scenario.inputs[inputKey].features = await getOAFFeature.getOAFFeatureGet(input.source.url, input.source.collection, 100, filter, crs, crs);
                 }
             }
         }
