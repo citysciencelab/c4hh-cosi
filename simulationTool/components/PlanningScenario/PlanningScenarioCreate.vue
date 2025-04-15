@@ -159,6 +159,15 @@ export default {
         },
 
         /**
+         * Handles click on back button.
+         * @returns {void}
+         */
+        backToOverview () {
+            this.deleteSource();
+            this.setCurrentPlanningComponent("");
+        },
+
+        /**
          * Sets current planning scenario data.
          * @param {ol/Feature[]} features all features of current source
          * @param {object} planningScenarioCurrentLayout the current style layout.
@@ -290,7 +299,7 @@ export default {
                     <FlatButton
                         id="back"
                         :aria-label="$t('additional:modules.tools.simulationTool.back')"
-                        :interaction="() => ''"
+                        :interaction="backToOverview"
                         :text="$t('additional:modules.tools.simulationTool.back')"
                     />
                     <FlatButton
