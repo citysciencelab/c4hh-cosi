@@ -214,6 +214,7 @@ export default {
                             :current-layout="planningScenarioCurrentLayout"
                             :draw-icons="planningScenarioDrawIcons"
                             :draw-types="planningScenarioDrawTypesMain"
+                            :selected-draw-type="planningScenarioSelectedDrawType"
                             :selected-draw-type-main="planningScenarioSelectedDrawTypeMain"
                             :set-selected-draw-type="setPlanningScenarioSelectedDrawType"
                             :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
