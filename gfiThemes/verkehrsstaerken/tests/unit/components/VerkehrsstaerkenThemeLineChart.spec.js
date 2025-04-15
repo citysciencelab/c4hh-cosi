@@ -5,8 +5,7 @@ import {nextTick} from "vue";
 
 config.global.mocks.$t = key => key;
 
-// see: https://lgv-hamburg.atlassian.net/browse/BG-5580
-describe.skip("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThemeLineChart.vue", () => {
+describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThemeLineChart.vue", () => {
 
     const dataset = [{"class": "dot", "style": "circle", "year": 2008, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2009, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 6}, {"class": "dot", "style": "circle", "year": 2010, "DTV": 17000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 6}, {"class": "dot", "style": "circle", "year": 2011, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2012, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2013, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2014, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2015, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot_visible", "style": "rect", "year": 2016, "DTV": 18000, "DTVw": 20000, "Schwerverkehrsanteil am DTVw": 6, "Baustelleneinfluss": "Ja"}, {"class": "dot", "style": "circle", "year": 2017, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2018, "DTV": 16000, "DTVw": 17000, "Schwerverkehrsanteil am DTVw": 5}];
     let wrapper;
@@ -113,11 +112,11 @@ describe.skip("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThem
     it("should returns an object with tooltip for the charts", () => {
         const result = wrapper.vm.createChartTooltip();
 
-        expect(result.bodyFontColor).to.equals("rgba(85, 85, 85, 1)");
+        expect(result.bodyColor).to.equals("rgba(85, 85, 85, 1)");
         expect(result.backgroundColor).to.equals("rgba(240, 240, 240, 1)");
 
         expect(result.callbacks.label).to.be.a("function");
-        expect(result.callbacks.label({value: 17000})).equals("17.000");
+        expect(result.callbacks.label({raw: 17000})).equals("17.000");
         expect(result.callbacks.title).to.be.a("function");
         expect(result.callbacks.title()).to.be.false;
     });
@@ -125,26 +124,26 @@ describe.skip("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThem
     it("should returns an object with scales for the charts ", () => {
         const result = wrapper.vm.createChartScales();
 
-        expect(result.xAxes[0].scaleLabel).to.deep.equals({
+        expect(result.x.title).to.deep.equals({
             display: true,
-            labelString: "additional:modules.tools.gfi.themes.verkehrsstaerken.year"
+            text: "additional:modules.tools.gfi.themes.verkehrsstaerken.year"
         });
-        expect(result.xAxes[0].ticks.min).equals(2008);
-        expect(result.xAxes[0].ticks.max).equals(2018);
-        expect(result.xAxes[0].gridLines).to.deep.equals({
+        expect(result.x.min).equals(2008);
+        expect(result.x.max).equals(2018);
+        expect(result.x.gridLines).to.deep.equals({
             color: "rgba(0, 0, 0, 1)",
             display: true,
             drawBorder: true,
             drawOnChartArea: false
         });
 
-        expect(result.yAxes[0].scaleLabel).to.deep.equals({
+        expect(result.y.title).to.deep.equals({
             display: true,
-            labelString: "additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay"
+            text: "additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay"
         });
-        expect(result.yAxes[0].ticks.beginAtZero).equals(true);
-        expect(result.yAxes[0].ticks.precision).equals(0);
-        expect(result.xAxes[0].gridLines).to.deep.equals({
+        expect(result.y.beginAtZero).equals(true);
+        expect(result.y.ticks.precision).equals(0);
+        expect(result.x.gridLines).to.deep.equals({
             color: "rgba(0, 0, 0, 1)",
             display: true,
             drawBorder: true,
