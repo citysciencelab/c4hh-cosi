@@ -77,6 +77,7 @@ export default {
         :icon="'bi bi-download'"
         :interaction="() => download(planningScenarios)"
         :text="$t('additional:modules.tools.simulationTool.planningScenarioDownloads')"
+        :disabled="!Array.isArray(planningScenarios) || !planningScenarios.length"
     />
     <FileUpload
         :id="'planningScenarioUpload'"
