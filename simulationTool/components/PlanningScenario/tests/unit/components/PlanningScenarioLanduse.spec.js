@@ -4,6 +4,7 @@ import {expect} from "chai";
 import getFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import PlanningScenarioLanduse from "../../../PlanningScenarioLanduse.vue";
 import sinon from "sinon";
+import layerCollection from "../../../../../../../src/core/layers/js/layerCollection.js";
 
 config.global.mocks.$t = key => key;
 
@@ -146,7 +147,15 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                     }
                 ]
             }
-        }];
+        }],
+        layer = {
+            getLayerSource: () => ({
+                clear: () => undefined,
+                hasFeature: () => undefined,
+                addFeature: () => undefined,
+                addFeatures: () => undefined
+            })
+        };
 
     beforeEach(() => {
         store = createStore({
@@ -177,6 +186,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 }
             }
         });
+
+        sinon.stub(layerCollection, "getLayerById").returns(layer);
     });
 
     afterEach(() => {
