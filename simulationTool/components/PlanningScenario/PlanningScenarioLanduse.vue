@@ -103,14 +103,15 @@ export default {
          * @param {String} currentEditableInput - The key of the current editable input.
          */
         currentEditableInput (currentEditableInput) {
-            const featuresOfInput = this.planningScenario.inputs[currentEditableInput]?.features;
+            const featuresOfInput = this.planningScenario.inputs[currentEditableInput]?.features,
+                scenarioFeature = this.planningScenario.scenarioFeature?.features?.[0];
 
             if (featuresOfInput) {
                 this.clearFeatures();
                 this.parseAndAddFeatures(featuresOfInput);
             }
-            if (this.planningScenario?.scenarioFeature?.features?.[0]) {
-                this.getLayer().getLayerSource().addFeature(this.planningScenario.scenarioFeature.features[0]);
+            if (scenarioFeature && !this.getLayer().getLayerSource().hasFeature(scenarioFeature)) {
+                this.getLayer().getLayerSource().addFeature(scenarioFeature);
             }
         }
     },
@@ -119,6 +120,7 @@ export default {
         if (!this.planningScenario) {
             return;
         }
+        this.currentEditableInput = Object.keys(this.editableInputs)[0];
         if (!this.planningScenario.featuresLoaded) {
             try {
                 await this.fetchFeatures(
@@ -131,7 +133,6 @@ export default {
                 console.warn(error);
             }
         }
-        this.currentEditableInput = Object.keys(this.editableInputs)[0];
     },
     unmounted () {
         this.clearFeatures();
@@ -247,14 +248,11 @@ export default {
                             {{ value.label }}
                         </label>
                     </div>
-                    <div
-                        v-if="currentEditableInput === 'buildings'"
-                        class="form-check form-switch"
-                    >
+                    <div class="form-check form-switch">
                         <SwitchInput
-                            id="hideExistingBuildings"
-                            :label="$t('additional:modules.tools.simulationTool.hideExistingBuildings')"
-                            :aria="$t('additional:modules.tools.simulationTool.hideExistingsBuildings')"
+                            id="hideExistingItems"
+                            :label="$t('additional:modules.tools.simulationTool.hideExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
+                            :aria="$t('additional:modules.tools.simulationTool.hideExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
                             :interaction="() => {}"
                         />
                     </div>
