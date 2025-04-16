@@ -98,21 +98,8 @@ export default {
     },
 
     watch: {
-        /**
-         *
-         * @param {String} currentEditableInput - The key of the current editable input.
-         */
-        currentEditableInput (currentEditableInput) {
-            const featuresOfInput = this.planningScenario.inputs[currentEditableInput]?.features,
-                scenarioFeature = this.planningScenario.scenarioFeature?.features?.[0];
-
-            if (featuresOfInput) {
-                this.clearFeatures();
-                this.parseAndAddFeatures(featuresOfInput);
-            }
-            if (scenarioFeature && !this.getLayer().getLayerSource().hasFeature(scenarioFeature)) {
-                this.getLayer().getLayerSource().addFeature(scenarioFeature);
-            }
+        currentEditableInput () {
+            this.updateFeatures();
         }
     },
 
@@ -133,6 +120,7 @@ export default {
                 console.warn(error);
             }
         }
+        this.updateFeatures();
     },
     unmounted () {
         this.clearFeatures();
@@ -212,6 +200,23 @@ export default {
             const olFeatures = getOAFFeature.readAllOAFToGeoJSON(features);
 
             this.getLayer().getLayerSource().addFeatures(olFeatures);
+        },
+
+        /**
+         * Updates the layer with the features of the current editable input and the scenario feature.
+         * @returns {void}
+         */
+        updateFeatures () {
+            const featuresOfInput = this.planningScenario.inputs[this.currentEditableInput]?.features,
+                scenarioFeature = this.planningScenario.scenarioFeature?.features?.[0];
+
+            if (featuresOfInput) {
+                this.clearFeatures();
+                this.parseAndAddFeatures(featuresOfInput);
+            }
+            if (scenarioFeature && !this.getLayer().getLayerSource().hasFeature(scenarioFeature)) {
+                this.getLayer().getLayerSource().addFeature(scenarioFeature);
+            }
         }
     }
 };

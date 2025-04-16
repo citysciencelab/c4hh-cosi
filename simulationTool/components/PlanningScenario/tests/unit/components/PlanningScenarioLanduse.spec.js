@@ -250,7 +250,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 currentEditableInput: "Ich habe mich geaendert"
             });
 
-            expect(stubParseAndAddFeatures.calledOnce).to.be.true;
+            expect(stubParseAndAddFeatures.called).to.be.true;
         });
     });
 
