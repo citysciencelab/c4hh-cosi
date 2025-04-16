@@ -52,6 +52,9 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                             namespaced: true,
                             actions: {},
                             getters: {
+                                drawTypeLabels: () => {
+                                    return [];
+                                },
                                 planningScenarioCurrentLayout: () => {
                                     return {
                                         fillColor: [55, 126, 184],
@@ -112,19 +115,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                 drawTypes = wrapper.find("#draw-types");
 
             expect(drawTypes.exists()).to.be.true;
-        });
-        it("should render delete button", () => {
-            const wrapper = factory.getShallowMount(),
-                deleteButton = wrapper.find(".delete-all");
-
-            expect(wrapper.findComponent({name: "IconButton"}).exists()).to.be.true;
-            expect(deleteButton.exists()).to.be.true;
-        });
-        it("should not render edit Icon", () => {
-            const wrapper = factory.getShallowMount(),
-                editButton = wrapper.find(".edit");
-
-            expect(editButton.exists()).to.be.false;
         });
         it("should render draw layout", () => {
             const wrapper = factory.getShallowMount(),

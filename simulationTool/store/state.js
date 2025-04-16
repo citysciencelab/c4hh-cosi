@@ -5,6 +5,7 @@
  * @property {string} currentInputName the current input name
  * @property {String} currentJobID The ID of the job that is currently displayed in jobResult component.
  * @property {String} currentPlanningComponent the current open component in planningScenario.
+ * @property {Object[]} drawTypeLabels - the array of type and labels.
  * @property {Array.<Object>} ensembles a list of ensembles
  * @property {boolean} ensemblesLoading flag indicating if ensembles are loading
  * @property {string} id the ID of the simulation tool
@@ -89,6 +90,7 @@ const state = {
         strokeWidth: 4
     },
     planningScenarioSelectInteraction: null,
+    drawTypeLabels: [{type: "polygon", label: "additional:modules.tools.simulationTool.freeForm"}, {type: "box", label: "additional:modules.tools.simulationTool.rectangle"}],
     planningScenarioSelectedDrawType: "",
     planningScenarioSelectedDrawTypeMain: "",
     planningScenarioSelectedInteraction: null,

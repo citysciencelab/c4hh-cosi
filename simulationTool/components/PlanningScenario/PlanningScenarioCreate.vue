@@ -46,6 +46,7 @@ export default {
             "planningScenarioCurrentLayout",
             "planningScenarioDrawIcons",
             "planningScenarioDrawTypesMain",
+            "drawTypeLabels",
             "planningScenarios",
             "planningScenarioSelectedDrawType",
             "planningScenarioSelectedDrawTypeMain",
@@ -115,6 +116,7 @@ export default {
             "setCurrentPlanningScenarioId",
             "setPlanningScenarioCurrentLayout",
             "setPlanningScenarioDrawTypesMain",
+            "setDrawTypeLabels",
             "setPlanningScenarios",
             "setPlanningScenarioSelectedDrawType",
             "setPlanningScenarioSelectedDrawTypeMain",
@@ -354,6 +356,7 @@ export default {
                             :draw-types="planningScenarioDrawTypesMain"
                             :selected-draw-type="planningScenarioSelectedDrawType"
                             :selected-draw-type-main="planningScenarioSelectedDrawTypeMain"
+                            :draw-type-labels="drawTypeLabels"
                             :selected-interaction="planningScenarioSelectedInteraction"
                             :set-selected-draw-type="setPlanningScenarioSelectedDrawType"
                             :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
@@ -372,10 +375,8 @@ export default {
                                         :aria="$t('additional:modules.tools.simulationTool.delete')"
                                         icon="bi bi-trash"
                                         :interaction="resetAll"
+                                        :label="$t('additional:modules.tools.simulationTool.delete')"
                                     />
-                                    <p class="delete-all text-center">
-                                        {{ $t('additional:modules.tools.simulationTool.delete') }}
-                                    </p>
                                 </div>
                             </div>
                             <div
@@ -390,11 +391,9 @@ export default {
                                         ]"
                                         :aria="$t('additional:modules.tools.simulationTool.geometryEdit')"
                                         icon="bi bi-tools"
+                                        :label="$t('additional:modules.tools.simulationTool.geometryEdit')"
                                         :interaction="editSource"
                                     />
-                                    <p class="edit text-center">
-                                        {{ $t('additional:modules.tools.simulationTool.geometryEdit') }}
-                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -490,9 +489,6 @@ export default {
 
 .planning-scenario {
     max-height: 100vh;
-}
-.delete-all, .edit {
-    font-size: $font_size_sm;
 }
 .invalid-info {
     max-width: fit-content;
