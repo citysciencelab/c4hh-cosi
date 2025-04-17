@@ -77,9 +77,17 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                                 planningScenarioSelectedDrawTypeMain: () => selectedDrawTypeMain,
                                 selectedInteraction: () => "draw",
                                 planningScenarioStrokeRange: () => [1, 16],
+                                planningScenarioSelectedInteraction: () => null,
                                 simulations: () => []
                             }
                         }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        addInteraction: sinon.stub(),
+                        removeInteraction: sinon.stub()
                     }
                 }
             }
@@ -107,7 +115,14 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
             const wrapper = factory.getShallowMount(),
                 deleteButton = wrapper.find(".delete-all");
 
+            expect(wrapper.findComponent({name: "IconButton"}).exists()).to.be.true;
             expect(deleteButton.exists()).to.be.true;
+        });
+        it("should not render edit Icon", () => {
+            const wrapper = factory.getShallowMount(),
+                editButton = wrapper.find(".edit");
+
+            expect(editButton.exists()).to.be.false;
         });
         it("should render draw layout", () => {
             const wrapper = factory.getShallowMount(),
@@ -170,12 +185,12 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
     });
 
     describe("User Interaction", () => {
-        it("should call 'deleteSource' if user start drawing", async () => {
-            const spyDeleteSource = sinon.spy(PlanningScenarioCreate.methods, "deleteSource"),
+        it("should call 'resetInteraction' if user start drawing", async () => {
+            const spyResetInteraction = sinon.spy(PlanningScenarioCreate.methods, "resetInteraction"),
                 wrapper = factory.getMount();
 
             await wrapper.find("#draw-polygon").trigger("drawstart");
-            expect(spyDeleteSource.calledOnce).to.be.true;
+            expect(spyResetInteraction.calledOnce).to.be.true;
         });
     });
     describe("Methods", () => {

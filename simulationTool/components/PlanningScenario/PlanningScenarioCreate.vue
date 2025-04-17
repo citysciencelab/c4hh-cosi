@@ -4,10 +4,11 @@ import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
+import {mapActions, mapGetters, mapMutations} from "vuex";
+import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import SectionHeader from "../SectionHeader.vue";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector";
-import {mapGetters, mapMutations} from "vuex";
 
 export default {
     name: "PlanningScenarioCreate",
@@ -21,6 +22,7 @@ export default {
     },
     data () {
         return {
+            currentModifyInteraction: null,
             currentScenarioData: {
                 id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
                 name: "Neues Planungsszenario",
@@ -42,9 +44,22 @@ export default {
             "planningScenarios",
             "planningScenarioSelectedDrawType",
             "planningScenarioSelectedDrawTypeMain",
+            "planningScenarioSelectedInteraction",
             "planningScenarioStrokeRange",
             "simulations"
         ])
+    },
+    watch: {
+        /**
+         * Decides if to remove edit interaction according to selected draw type.
+         * @param {String} val the main selected draw type.
+         */
+        planningScenarioSelectedDrawTypeMain (val) {
+            if (val !== "") {
+                this.removeInteraction(this.currentModifyInteraction);
+                this.currentModifyInteraction = null;
+            }
+        }
     },
     mounted () {
         // Note: the layer handling still needs to be revised!
@@ -66,6 +81,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
@@ -73,9 +89,20 @@ export default {
             "setPlanningScenarioDrawTypesMain",
             "setPlanningScenarios",
             "setPlanningScenarioSelectedDrawType",
-            "setPlanningScenarioSelectedDrawTypeMain"
+            "setPlanningScenarioSelectedDrawTypeMain",
+            "setPlanningScenarioSelectedInteraction"
         ]),
 
+        /**
+         * Handles click on back button.
+         * @returns {void}
+         */
+        backToOverview () {
+            this.deleteSource();
+            this.setCurrentPlanningComponent("");
+            this.setPlanningScenarioSelectedDrawType("");
+            this.setPlanningScenarioSelectedDrawTypeMain("");
+        },
 
         /**
          * Create the current planning scenario with data.
@@ -112,14 +139,26 @@ export default {
         },
 
         /**
-         * Handles click on back button.
+         * Edits the geometry of current source features.
          * @returns {void}
          */
-        backToOverview () {
-            this.deleteSource();
-            this.setCurrentPlanningComponent("");
+        editSource () {
             this.setPlanningScenarioSelectedDrawType("");
             this.setPlanningScenarioSelectedDrawTypeMain("");
+            this.setPlanningScenarioSelectedInteraction("");
+            this.removeInteraction(this.planningScenarioSelectedInteraction);
+            this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.source);
+            this.addInteraction(this.currentModifyInteraction);
+        },
+
+        /**
+         * Resets the interaction.
+         * @returns {void}
+         */
+        resetInteraction () {
+            this.deleteSource();
+            this.removeInteraction(this.currentModifyInteraction);
+            this.currentModifyInteraction = null;
         },
 
         /**
@@ -170,25 +209,48 @@ export default {
                             :draw-types="planningScenarioDrawTypesMain"
                             :selected-draw-type="planningScenarioSelectedDrawType"
                             :selected-draw-type-main="planningScenarioSelectedDrawTypeMain"
+                            :selected-interaction="planningScenarioSelectedInteraction"
                             :set-selected-draw-type="setPlanningScenarioSelectedDrawType"
                             :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
+                            :set-selected-interaction="setPlanningScenarioSelectedInteraction"
                             :source="source"
-                            @drawstart="deleteSource"
+                            @drawstart="resetInteraction"
                         />
                     </div>
-                    <div
-                        class="col col-2"
-                    >
-                        <div class="row d-flex justify-content-center">
-                            <IconButton
-                                :class-array="['btn-primary']"
-                                :aria="$t('additional:modules.tools.simulationTool.delete')"
-                                icon="bi bi-trash"
-                                :interaction="() => deleteSource()"
-                            />
-                            <p class="delete-all text-center">
-                                {{ $t('additional:modules.tools.simulationTool.delete') }}
-                            </p>
+                    <div class="col col-4">
+                        <div class="row d-flex">
+                            <div class="col col-4">
+                                <div class="row d-flex justify-content-center">
+                                    <IconButton
+                                        :class-array="['btn-primary']"
+                                        :aria="$t('additional:modules.tools.simulationTool.delete')"
+                                        icon="bi bi-trash"
+                                        :interaction="() => deleteSource()"
+                                    />
+                                    <p class="delete-all text-center">
+                                        {{ $t('additional:modules.tools.simulationTool.delete') }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div
+                                v-if="source?.getFeatures().length"
+                                class="col col-5"
+                            >
+                                <div class="row d-flex justify-content-center">
+                                    <IconButton
+                                        :class-array="[
+                                            'btn-primary',
+                                            currentModifyInteraction !== null ? 'active': '',
+                                        ]"
+                                        :aria="$t('additional:modules.tools.simulationTool.geometryEdit')"
+                                        icon="bi bi-tools"
+                                        :interaction="editSource"
+                                    />
+                                    <p class="edit text-center">
+                                        {{ $t('additional:modules.tools.simulationTool.geometryEdit') }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -274,7 +336,7 @@ export default {
 .planning-scenario {
     max-height: 100vh;
 }
-.delete-all {
+.delete-all, .edit {
     font-size: $font_size_sm;
 }
 .invalid-info {

@@ -13,6 +13,13 @@
  * @property {boolean} jobsLoading flag indicating if jobs are loading
  * @property {string} mode the current view: 'processes', 'process', 'job' or 'map'
  * @property {Object[]} planningScenarios - The list of planning scenarios.
+ * @property {Object[]} planningScenarioCurrentLayout - The current layout object as style.
+ * @property {Object[]} planningScenarioDrawIcons - The draw icons.
+ * @property {Object[]} planningScenarioDrawTypesMain - The main draw types.
+ * @property {Object[]} planningScenarioSelectedDrawType - The selected draw type.
+ * @property {Object[]} planningScenarioSelectedDrawTypeMain - The main selected draw type.
+ * @property {Object[]} planningScenarioSelectedInteraction - The selected draw interaction.
+ * @property {Object[]} planningScenarioStrokeRange - The stroke range.
  * @property {Object|null} process the current process
  * @property {Array.<Object>} processes a list of processes
  * @property {boolean} processesLoading flag indicating if processes are loading
@@ -75,6 +82,7 @@ const state = {
     planningScenarioDrawTypesMain: ["polygon", "box"],
     planningScenarioSelectedDrawType: "",
     planningScenarioSelectedDrawTypeMain: "",
+    planningScenarioSelectedInteraction: null,
     planningScenarioStrokeRange: [1, 16],
     process: null,
     processes: [],
