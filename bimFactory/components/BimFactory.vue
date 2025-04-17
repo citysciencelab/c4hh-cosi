@@ -55,7 +55,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="bimFactory">
         <BimFactoryStartpage
             v-if="currentWorkflow === null"
             @openWorkflow="openWorkflow($event)"
@@ -68,3 +68,10 @@ export default {
         />
     </div>
 </template>
+
+<style lang="scss" scoped>
+    div.bimFactory {
+        flex: 1;
+        overflow: hidden;
+    }
+</style>

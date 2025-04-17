@@ -1,62 +1,203 @@
 <script>
-import getters from "../store/gettersBimFactory";
-import {mapGetters} from "vuex";
+import {mapGetters, mapActions} from "vuex";
+import AccordionItem from "../../../src/shared/modules/accordion/components/AccordionItem.vue";
+import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 
 export default {
+    components: {
+        AccordionItem,
+        FlatButton
+    },
     props: {
         workflowId: {
             type: Number,
             required: true
         }
     },
+    data () {
+        return {
+            accordionItems: [],
+            showNextButton: true,
+            showBackButton: false
+        };
+    },
     computed: {
-        ...mapGetters("Modules/BimFactory", Object.keys(getters)),
+        ...mapGetters("Modules/BimFactory", ["getWorkflowForId", "getWorkflowDetailsForId"]),
         currentWorkflow () {
-            const result = this.workflowsJSON?.workflows?.filter((workflow) => {
-                return workflow.id === this.workflowId;
-            });
-
-            if (result && result.length === 1) {
-                return result[0];
-            }
-
-            return null;
+            return this.getWorkflowForId(this.workflowId);
         },
         foregroundLayers () {
             return this.currentWorkflow?.layerIds.foreground;
         },
         backgroundLayers () {
             return this.currentWorkflow?.layerIds.background;
+        },
+        currentWorkflowDetails () {
+            return this.getWorkflowDetailsForId(this.workflowId);
         }
     },
     watch: {
         workflowId (value) {
             console.warn("Die Layer müssen geändert werden!:" + value);
+        },
+        currentWorkflowDetails () {
+            this.initializeAccordionItems();
         }
     },
     mounted () {
         console.warn("Die Layer müssen geändert werden!");
+        this.loadSingleWorkflow(this.workflowId);
+        this.initializeAccordionItems();
+    },
+    methods: {
+        ...mapActions("Modules/BimFactory", ["loadSingleWorkflow"]),
+        initializeAccordionItems () {
+            this.accordionItems = this.currentWorkflowDetails ? JSON.parse(JSON.stringify(this.currentWorkflowDetails.steps)) : [];
+            if (this.accordionItems.length > 0) {
+                this.accordionItems.forEach((item) => {
+                    item.isOpen = false;
+                });
+
+                this.accordionItems[0].isOpen = true;
+            }
+        },
+        goForwards () {
+            for (let i = 0; i < this.accordionItems.length; i++) {
+                if (this.accordionItems[i].isOpen === true) {
+                    this.accordionItems[i].isOpen = false;
+                    this.accordionItems[i + 1].isOpen = true;
+                    this.checkNavigationButtons();
+                    break;
+                }
+            }
+        },
+        goBackwards () {
+            for (let i = 0; i < this.accordionItems.length; i++) {
+                if (this.accordionItems[i].isOpen === true) {
+                    this.accordionItems[i].isOpen = false;
+                    this.accordionItems[i - 1].isOpen = true;
+                    this.checkNavigationButtons();
+                    break;
+                }
+            }
+        },
+        openThis (event, index) {
+            if (event.target.classList.contains("accordion-button") && !event.target.classList.contains("collapsed")) {
+                this.accordionItems.forEach((item) => {
+                    item.isOpen = false;
+                });
+
+                this.accordionItems[index].isOpen = true;
+                this.checkNavigationButtons();
+            }
+        },
+        checkNavigationButtons () {
+            for (let i = 0; i < this.accordionItems.length; i++) {
+                if (this.accordionItems[i].isOpen === true) {
+                    this.showNextButton = i + 1 < this.accordionItems.length;
+                    this.showBackButton = i > 0;
+                    break;
+                }
+            }
+        }
     }
 };
 </script>
 
 <template>
     <div class="bimFactoryWorkflow">
-        <button @click="$emit('openWorkflow', 'start')">
-            {{ $t('additional:modules.bimfactory.workflow.back') }}
-        </button>
+        <FlatButton
+            :text="$t('additional:modules.bimfactory.workflow.backToStart')"
+            :interaction="() => {$emit('openWorkflow', 'start')}"
+            icon="bi bi-house"
+            :secondary="true"
+        />
 
-        <p>
+        <p class="bimFactoryWorkflowTitle">
             {{ currentWorkflow?.name }}
         </p>
+
+        <div class="bimFactoryWorkflowContent">
+            <div class="bimFactoryAccordion">
+                <AccordionItem
+                    v-for="(step, index) in accordionItems"
+                    :id="`accordion-item-${index}`"
+                    :key="index"
+                    :title="step.title"
+                    :is-open="step.isOpen"
+                    :coloured-header="true"
+                    @click="openThis($event, index)"
+                >
+                    {{ step.description }}
+                </AccordionItem>
+                <!-- ToDo: here will be the step components -->
+            </div>
+            <div class="navigationButtons">
+                <FlatButton
+                    v-if="showBackButton"
+                    :aria-label="$t('additional:modules.bimfactory.workflow.buttons.back')"
+                    :text="$t('additional:modules.bimfactory.workflow.buttons.back')"
+                    icon="bi-backspace"
+                    :secondary="true"
+                    @click="goBackwards()"
+                />
+
+                <div class="spacer-div" />
+
+                <FlatButton
+                    v-if="showNextButton"
+                    :aria-label="$t('additional:modules.bimfactory.workflow.buttons.next')"
+                    :text="$t('additional:modules.bimfactory.workflow.buttons.next')"
+                    icon="bi-backspace-reverse"
+                    :secondary="true"
+                    @click="goForwards()"
+                />
+            </div>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
     div.bimFactoryWorkflow {
         display: flex;
-        justify-content: center;
         flex-direction: column;
-        align-items: center;
+        height: 100%;
+
+        button.flat-button {
+            margin: 0 !important;
+        }
+
+        button.flat-button:hover {
+            background-color: #3C5F94 !important;
+            color: white;
+        }
+
+        p.bimFactoryWorkflowTitle {
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        div.bimFactoryWorkflowContent {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        div.bimFactoryAccordion {
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            flex: 1;
+            overflow: auto;
+        }
+
+        div.navigationButtons {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+            padding-top: 0.5rem;
+        }
     }
 </style>

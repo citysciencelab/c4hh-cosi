@@ -28,7 +28,11 @@
                 }
             },
             "workflow": {
-                "back": "Zurück zur Startseite"
+                "backToStart": "Zurück zur Startseite",
+                "buttons": {
+                    "back": "voriger Schritt",
+                    "next": "nächster Schritt"
+                }
             }
         }
     }

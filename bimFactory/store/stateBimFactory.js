@@ -26,7 +26,8 @@ const state = {
     deactivateGFI: true,
     standAlonePortal: false,
     workflowsJSONPath: "",
-    workflowsJSON: {}
+    workflowsJSON: {},
+    workflowsDetails: []
 };
 
 export default state;
