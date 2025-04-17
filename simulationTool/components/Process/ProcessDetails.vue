@@ -32,7 +32,8 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
-            "setMode"
+            "setMode",
+            "setPreviousComponentOfSimulation"
         ]),
         /**
          * Fetches a process from the simulation backend
@@ -77,6 +78,10 @@ export default {
             const image = process?.links?.find(({type}) => type === "image");
 
             return image ? image : "resources/img/Process_placeholder.png";
+        },
+        openSimulationParameter () {
+            this.setPreviousComponentOfSimulation("process-details");
+            this.$emit("selected", {id: this.selectedProcessId, mode: "simulationParameter"});
         }
     }
 };
@@ -164,10 +169,10 @@ export default {
                     </button>
                     <button
                         class="btn btn-primary"
-                        @click="$emit('selected', { id: process.id, mode: 'job-execution'})"
+                        @click="openSimulationParameter()"
                     >
                         <i class="bi bi-rocket">&nbsp;</i>
-                        {{ $t("additional:modules.tools.simulationTool.simulate") }}
+                        {{ $t("additional:modules.tools.simulationTool.select") }}
                     </button>
                 </div>
             </div>

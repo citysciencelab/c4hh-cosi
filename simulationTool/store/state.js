@@ -85,6 +85,7 @@ const state = {
     planningScenarioSelectedDrawTypeMain: "",
     planningScenarioSelectedInteraction: null,
     planningScenarioStrokeRange: [1, 16],
+    previousComponentOfSimulation: "home-panel",
     process: null,
     processes: [],
     processesLoading: false,

@@ -52,9 +52,12 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
                                 planningScenarios: (state) => state.planningScenarios
                             },
                             mutations: {
+                                setCurrentPlanningScenarioId: sinon.stub(),
+                                setMode: sinon.stub(),
                                 setPlanningScenarios (state, value) {
                                     state.planningScenarios = value;
-                                }
+                                },
+                                setPreviousComponentOfSimulation: sinon.stub()
                             },
                             state: {
                                 planningScenarios: planningScenarios
@@ -106,6 +109,15 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
     });
 
     describe("User Interaction", () => {
+        it("should call 'openSimulationParameter' if user clicks the button to open simulation parameter component", async () => {
+            const wrapper = factory.getMount(),
+                buttonListWrapper = wrapper.findAll("button"),
+                spyOpenSimulationParameter = sinon.spy(wrapper.vm, "openSimulationParameter");
+
+            await buttonListWrapper.at(0).trigger("click");
+            expect(spyOpenSimulationParameter.calledOnce).to.be.true;
+        });
+
         it("should call 'removeScenarioById' if user clicks the button to remove a scenario", async () => {
             const wrapper = factory.getMount(),
                 buttonListWrapper = wrapper.findAll("button"),

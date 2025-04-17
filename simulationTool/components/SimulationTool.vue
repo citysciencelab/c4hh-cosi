@@ -1,15 +1,14 @@
 
 <script>
-import {mapGetters, mapActions, mapMutations} from "vuex";
-
 import actions from "../store/actions";
 import getters from "../store/getters";
+import HelpPanel from "./HelpSection/HelpPanel.vue";
+import HomePanel from "./HomePanel.vue";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import mutations from "../store/mutations";
-
 // import EnsembleDetails from "./Ensemble/EnsembleDetails.vue";
 // import EnsembleCreation from "./Ensemble/EnsembleCreation.vue";
 // import EnsembleList from "./Ensemble/EnsembleList.vue";
-import HomePanel from "./HomePanel.vue";
 import JobDetails from "./Job/JobDetails.vue";
 import JobExecution from "./Job/JobExecution.vue";
 import JobList from "./Job/JobList.vue";
@@ -17,8 +16,8 @@ import PlanningScenario from "./PlanningScenario/PlanningScenario.vue";
 import ProcessDetails from "./Process/ProcessDetails.vue";
 import ProcessList from "./Process/ProcessList.vue";
 import SideMenu from "./SideMenu.vue";
+import simulationParameter from "./SimulationParameter/SimulationParameter.vue";
 import TutorialPanel from "./HelpSection/TutorialPanel.vue";
-import HelpPanel from "./HelpSection/HelpPanel.vue";
 
 const MIN_WIDTH_PERCENT = 40;
 
@@ -37,6 +36,7 @@ export default {
         ProcessDetails,
         ProcessList,
         SideMenu,
+        simulationParameter,
         TutorialPanel
     },
     computed: {
@@ -97,8 +97,15 @@ export default {
 <template>
     <div id="tool-simulationTool">
         <div class="content">
+            <HomePanel
+                v-if="mode === 'home-panel'"
+                @selected="selectProcess"
+            />
             <PlanningScenario
                 v-if="mode === 'planningScenario'"
+            />
+            <simulationParameter
+                v-if="mode === 'simulationParameter'"
             />
             <ProcessList
                 v-if="mode === 'process-list'"
@@ -106,10 +113,6 @@ export default {
             />
             <ProcessDetails
                 v-if="mode === 'process-details'"
-                @selected="selectProcess"
-            />
-            <HomePanel
-                v-if="mode === 'home-panel'"
                 @selected="selectProcess"
             />
             <HelpPanel

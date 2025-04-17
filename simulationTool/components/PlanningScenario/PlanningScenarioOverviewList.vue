@@ -13,9 +13,11 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
-            "setPlanningScenarios",
             "setCurrentPlanningComponent",
-            "setCurrentPlanningScenarioId"
+            "setCurrentPlanningScenarioId",
+            "setMode",
+            "setPlanningScenarios",
+            "setPreviousComponentOfSimulation"
         ]),
 
         /**
@@ -38,6 +40,17 @@ export default {
         openLanduseById (id) {
             this.setCurrentPlanningScenarioId(id);
             this.setCurrentPlanningComponent("landuse");
+        },
+
+        /**
+         * Opens the simulation parameter component.
+         * @param {String} id The id of the planning scenario.
+         * @returns {void}
+         */
+        openSimulationParameter (id) {
+            this.setCurrentPlanningScenarioId(id);
+            this.setPreviousComponentOfSimulation("planningScenario");
+            this.setMode("simulationParameter");
         }
     }
 };
@@ -58,6 +71,7 @@ export default {
                         :class-array="['btn-light', 'me-2']"
                         :icon="'bi-cup-hot'"
                         :aria="$t('additional:modules.tools.simulationTool.simlulationSetParams')"
+                        :interaction="() => openSimulationParameter(scenario.id)"
                     />
                     <div class="vr me-2" />
                     <IconButton

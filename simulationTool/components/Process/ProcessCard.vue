@@ -1,4 +1,6 @@
 <script>
+import {mapMutations} from "vuex";
+
 export default {
     name: "ProcessCard",
     props: {
@@ -12,6 +14,10 @@ export default {
         "tag-clicked"
     ],
     methods: {
+        ...mapMutations("Modules/SimulationTool", [
+            "setPreviousComponentOfSimulation"
+        ]),
+
         getProcessLink (process) {
             const link = process?.links?.find(({rel}) => rel === "about");
 
@@ -21,6 +27,10 @@ export default {
             const image = process?.links?.find(({type}) => type === "image");
 
             return image ? image : "resources/img/Process_placeholder.png";
+        },
+        openSimulationParameter () {
+            this.setPreviousComponentOfSimulation("process-list");
+            this.$emit("selected", {id: process.id, mode: "simulationParameter"});
         }
     }
 };
@@ -69,10 +79,10 @@ export default {
                 </button>
                 <button
                     class="btn btn-primary"
-                    @click="$emit('selected', { id: process.id, mode: 'job-execution'})"
+                    @click="openSimulationParameter()"
                 >
                     <i class="bi bi-rocket">&nbsp;</i>
-                    {{ $t("additional:modules.tools.simulationTool.simulate") }}
+                    {{ $t("additional:modules.tools.simulationTool.select") }}
                 </button>
             </div>
         </div>
