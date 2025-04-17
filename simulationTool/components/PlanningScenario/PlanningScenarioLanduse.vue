@@ -6,6 +6,7 @@ import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
+import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
@@ -14,6 +15,7 @@ export default {
         FlatButton,
         IconButton,
         NavTab,
+        SpinnerItem,
         SwitchInput
     },
     data () {
@@ -86,6 +88,14 @@ export default {
             return this.planningScenario?.inputs?.buildings?.features
                 ?.filter(feature => !feature.properties.created)
                 ?? [];
+        },
+
+        /**
+         * Gets if the features of planning scenario are loaded.
+         * @return {Boolean} true if the features are loaded.
+         */
+        isLoaded () {
+            return this.planningScenario.featuresLoaded;
         },
 
         /**
@@ -284,7 +294,7 @@ export default {
                 </div>
             </div>
             <div
-                v-if="currentEditableInput === 'buildings'"
+                v-if="isLoaded && currentEditableInput === 'buildings'"
                 class="tab-content m-3"
             >
                 <div
@@ -368,10 +378,13 @@ export default {
                     </ul>
                 </div>
             </div>
-            <div v-if="currentEditableInput === 'roads'">
+            <div v-if="isLoaded && currentEditableInput === 'roads'">
                 {{ planningScenario?.inputs?.roads }}
             </div>
-            <div class="position-sticky bottom-0 bg-body z-2 p-3 d-flex justify-content-between">
+            <div
+                v-if="isLoaded"
+                class="position-sticky bottom-0 bg-body z-2 p-3 d-flex justify-content-between"
+            >
                 <FlatButton
                     v-if="currentEditableInput === 'buildings'"
                     class="m-3"
@@ -384,6 +397,12 @@ export default {
                     :text="$t('additional:modules.tools.simulationTool.planningScenarioSave')"
                     :interaction="() => setCurrentPlanningComponent('')"
                 />
+            </div>
+            <div
+                v-if="!isLoaded"
+                class="is-loading"
+            >
+                <SpinnerItem />
             </div>
         </div>
     </div>
@@ -411,6 +430,17 @@ export default {
     .nav-item {
         flex: 1;
     }
+}
+
+.is-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% - 65px);
+    height: 80%;
+    background: rgba(255, 255, 255, 0.3);
+    text-align: center;
+    align-content: center;
 }
 
 </style>

@@ -213,6 +213,12 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             expect(radioInputs.at(1).attributes("id")).to.be.equal("hospitals");
         });
 
+        it("should not render SpinnerItem when features are not loaded", () => {
+            const wrapper = factory.getShallowMount();
+
+            expect(wrapper.findComponent({name: "SpinnerItem"}).exists()).to.be.false;
+        });
+
         it("should render correct number of existing buildings as default view", async () => {
             const wrapper = factory.getShallowMount();
 
@@ -222,9 +228,15 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
 
         it("should render SwitchInput when currentEditableInput is 'buildings'", async () => {
-            const wrapper = factory.getShallowMount();
+            const wrapper = shallowMount(PlanningScenarioLanduse, {
+                global: {
+                    plugins: [store]
+                },
+                computed: {
+                    isLoaded: () => true
+                }
+            });
 
-            wrapper.vm.currentEditableInput = "buildings";
             await wrapper.vm.$nextTick();
 
             expect(wrapper.findComponent({name: "SwitchInput"}).exists()).to.be.true;
