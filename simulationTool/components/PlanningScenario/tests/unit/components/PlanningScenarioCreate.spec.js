@@ -1,7 +1,10 @@
 import {createStore} from "vuex";
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
+import Feature from "ol/Feature.js";
+import layerFactory from "../../../../../../../src/core/layers/js/layerFactory";
 import PlanningScenarioCreate from "../../../PlanningScenarioCreate.vue";
+import {Polygon} from "ol/geom";
 import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
@@ -12,39 +15,30 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
         store;
 
     const factory = {
-        getMount: () => {
-            return mount(PlanningScenarioCreate, {
-                global: {
-                    plugins: [store]
-                }
-            });
-        },
-        getShallowMount: () => {
-            return shallowMount(PlanningScenarioCreate, {
-                global: {
-                    plugins: [store]
-                }
-            });
-        }
-    };
-
-    before(() => {
-        mapCollection.clear();
-        const map = {
-            id: "ol",
-            mode: "2D",
-            addLayer: sinon.spy(),
-            getLayers: () => {
-                return {
-                    getArray: () => []
-                };
+            getMount: () => {
+                return mount(PlanningScenarioCreate, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+            },
+            getShallowMount: () => {
+                return shallowMount(PlanningScenarioCreate, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
             }
-        };
-
-        mapCollection.addMap(map, "2D");
-    });
+        },
+        layer = layerFactory.createLayer({
+            typ: "VECTORBASE",
+            id: "planning-scenario",
+            name: "planning-scenario",
+            alwaysOnTop: true
+        });
 
     beforeEach(() => {
+        sinon.stub(PlanningScenarioCreate.methods, "getLayerSource").returns(layer.getLayerSource());
         selectedDrawType = "";
         selectedDrawTypeMain = "";
 
@@ -78,8 +72,16 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                                 selectedInteraction: () => "draw",
                                 planningScenarioStrokeRange: () => [1, 16],
                                 planningScenarioSelectedInteraction: () => null,
+                                simulationAreaStyle: () => "",
                                 simulations: () => []
                             }
+                        }
+                    },
+                    Maps: {
+                        namespaced: true,
+                        getters: {
+                            projectionCode: () => sinon.stub(),
+                            resolution: 0
                         }
                     }
                 },
@@ -97,7 +99,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
     afterEach(() => {
         sinon.restore();
     });
-
 
     describe("Component DOM", () => {
         it("should exist", () => {
@@ -184,6 +185,15 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
         });
     });
 
+    describe("Lifecycle Hooks", () => {
+        it("should set correct source in created", () => {
+            const wrapper = factory.getShallowMount();
+
+            expect(wrapper.vm.source).to.not.be.null;
+            expect(wrapper.vm.source).to.deep.equal(layer.getLayerSource());
+        });
+    });
+
     describe("User Interaction", () => {
         it("should call 'resetInteraction' if user start drawing", async () => {
             const spyResetInteraction = sinon.spy(PlanningScenarioCreate.methods, "resetInteraction"),
@@ -192,21 +202,53 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
             await wrapper.find("#draw-polygon").trigger("drawstart");
             expect(spyResetInteraction.calledOnce).to.be.true;
         });
+
+        it("should call 'addBBOX' if user stop drawing", async () => {
+            const stubAddBBOX = sinon.stub(PlanningScenarioCreate.methods, "addBBOX"),
+                wrapper = factory.getMount();
+
+            await wrapper.find("#draw-polygon").trigger("drawend");
+            expect(stubAddBBOX.calledOnce).to.be.true;
+        });
     });
     describe("Methods", () => {
-        it("should set isValid to true if input is not an empty string", () => {
-            const wrapper = factory.getMount();
+        describe("isValid", () => {
+            it("should set isValid to true if input is not an empty string", () => {
+                const wrapper = factory.getMount();
 
-            wrapper.vm.checkInputString("PlanningScenario 1");
+                wrapper.vm.checkInputString("PlanningScenario 1");
 
-            expect(wrapper.vm.isValid).to.be.equal(true);
+                expect(wrapper.vm.isValid).to.be.equal(true);
+            });
+            it("should set isValid to false if input is an empty string", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.checkInputString("");
+
+                expect(wrapper.vm.isValid).to.be.equal(false);
+            });
         });
-        it("should set isValid to false if input is an empty string", () => {
-            const wrapper = factory.getMount();
 
-            wrapper.vm.checkInputString("");
+        describe("addBBOX", () => {
+            it("should add a feature with the extent geometry of the passed feature (planning scenario) to the source", () => {
+                const wrapper = factory.getShallowMount(),
+                    feature = new Feature({
+                        geometry: new Polygon([[
+                            [574729.649, 5927590.856],
+                            [574676.641, 5927642.08],
+                            [574690.16, 5927655.429],
+                            [574705.504, 5927640.191],
+                            [574711.97, 5927633.768],
+                            [574742.688, 5927603.26],
+                            [574729.649, 5927590.856]]])
+                    }),
+                    extent = [574676.641, 5927590.856, 574742.688, 5927655.429];
 
-            expect(wrapper.vm.isValid).to.be.equal(false);
+                wrapper.vm.addBBOX({feature});
+
+                expect(wrapper.vm.source.getFeatures()[0].get("name")).to.be.equal("simulation-area");
+                expect(wrapper.vm.source.getFeatures()[0].getGeometry().getExtent()).to.deep.equal(extent);
+            });
         });
     });
 });

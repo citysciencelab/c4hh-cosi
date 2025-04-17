@@ -253,8 +253,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
     });
 
     describe("Watchers", () => {
-        it("should call method 'parseAndAddFeatures' if data 'currentEditableInput' is changed", async () => {
-            const stubParseAndAddFeatures = sinon.stub(PlanningScenarioLanduse.methods, "parseAndAddFeatures"),
+        it("should call method 'updateFeatures' if data 'currentEditableInput' is changed", async () => {
+            const stubUpdateFeatures = sinon.stub(PlanningScenarioLanduse.methods, "updateFeatures"),
                 wrapper = factory.getShallowMount();
 
             await wrapper.vm.$nextTick();
@@ -262,7 +262,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 currentEditableInput: "Ich habe mich geaendert"
             });
 
-            expect(stubParseAndAddFeatures.called).to.be.true;
+            expect(stubUpdateFeatures.called).to.be.true;
         });
     });
 

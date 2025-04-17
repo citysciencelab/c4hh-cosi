@@ -1,14 +1,17 @@
 <script>
 import DrawLayout from "../../../../src/shared/modules/draw/components/DrawLayout.vue";
 import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue";
+import Feature from "ol/Feature.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import {fromExtent} from "ol/geom/Polygon";
+import {GeoJSON} from "ol/format.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
+import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import SectionHeader from "../SectionHeader.vue";
-import VectorLayer from "ol/layer/Vector.js";
-import VectorSource from "ol/source/Vector";
 
 export default {
     name: "PlanningScenarioCreate",
@@ -29,9 +32,8 @@ export default {
                 simulationId: "only-planning-scenario",
                 inputs: {}
             },
-            layer: null,
             selectedTags: [],
-            source: new VectorSource(),
+            source: null,
             isValid: true
         };
     },
@@ -46,6 +48,7 @@ export default {
             "planningScenarioSelectedDrawTypeMain",
             "planningScenarioSelectedInteraction",
             "planningScenarioStrokeRange",
+            "simulationAreaStyle",
             "simulations"
         ])
     },
@@ -61,24 +64,8 @@ export default {
             }
         }
     },
-    mounted () {
-        // Note: the layer handling still needs to be revised!
-        const planningScenarioLayer = mapCollection.getMap("2D").getLayers().getArray().find(layer => layer.get("id") === "planningScenario");
-
-        if (typeof planningScenarioLayer === "undefined") {
-            this.layer = new VectorLayer({
-                id: "planningScenario",
-                name: "planningScenario",
-                source: this.source,
-                zIndex: 99999999999
-            });
-
-            mapCollection.getMap("2D").addLayer(this.layer);
-        }
-        else {
-            this.layer = planningScenarioLayer;
-            this.source = planningScenarioLayer.getSource();
-        }
+    created () {
+        this.source = this.getLayerSource();
     },
     methods: {
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
@@ -92,6 +79,21 @@ export default {
             "setPlanningScenarioSelectedDrawTypeMain",
             "setPlanningScenarioSelectedInteraction"
         ]),
+
+        /**
+         * Adds a feature for the extent(BBOX) of the planning scenario feature.
+         * @param {Object} evt - Draw event emitted by draw interaction.
+         * @return {void}
+         */
+        addBBOX (evt) {
+            const bbox = evt.feature.getGeometry().getExtent(),
+                featureBBOX = new Feature({
+                    geometry: fromExtent(bbox),
+                    name: "simulation-area"
+                });
+
+            this.getLayerSource().addFeature(featureBBOX);
+        },
 
         /**
          * Handles click on back button.
@@ -113,8 +115,7 @@ export default {
                 return;
             }
 
-            this.setCurrentPlanningScenarioData(this.source?.getFeatures());
-            this.deleteSource();
+            this.setCurrentPlanningScenarioData(this.source?.getFeatures(), this.planningScenarioCurrentLayout);
             this.setPlanningScenarioSelectedDrawType("");
             this.setPlanningScenarioSelectedDrawTypeMain("");
             this.setCurrentPlanningComponent("landuse");
@@ -151,6 +152,30 @@ export default {
             this.addInteraction(this.currentModifyInteraction);
         },
 
+        /*
+         * Creates a layer if it does not yet exist and returns its source.
+         * @returns {Object} A vector layer source.
+         */
+        getLayerSource () {
+            if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+                return layerCollection.getLayerById("planning-scenario").getLayerSource();
+            }
+            const layer = layerFactory.createLayer({
+                typ: "VECTORBASE",
+                id: "planning-scenario",
+                name: "planning-scenario",
+                alwaysOnTop: true
+            });
+
+            layer.getLayer().setStyle([{
+                filter: ["==", ["get", "name"], "simulation-area"],
+                style: this.simulationAreaStyle
+            }]);
+
+            layerCollection.addLayer(layer);
+            return layer.getLayerSource();
+        },
+
         /**
          * Resets the interaction.
          * @returns {void}
@@ -164,13 +189,17 @@ export default {
         /**
          * Sets current planning scenario data.
          * @param {ol/Feature[]} features all features of current source
+         * @param {Object} planningScenarioCurrentLayout - The layout object to be applied as the style for the scenario feature.
          * @returns {void}
          */
-        setCurrentPlanningScenarioData (features) {
-            this.currentScenarioData.scenarioFeature = {
-                "type": "FeatureCollection",
-                "features": features
-            };
+        setCurrentPlanningScenarioData (features, planningScenarioCurrentLayout) {
+            const geojsonFeatureCollection = new GeoJSON().writeFeaturesObject(features),
+                scenarioFeature = geojsonFeatureCollection.features.find(feature => {
+                    return feature.properties?.name !== "simulation-area";
+                });
+
+            scenarioFeature.style = planningScenarioCurrentLayout;
+            this.currentScenarioData.scenarioFeature = geojsonFeatureCollection;
 
             this.setPlanningScenarios([...this.planningScenarios, this.currentScenarioData]);
             this.setCurrentPlanningScenarioId(this.currentScenarioData.id);
@@ -215,6 +244,7 @@ export default {
                             :set-selected-interaction="setPlanningScenarioSelectedInteraction"
                             :source="source"
                             @drawstart="resetInteraction"
+                            @drawend="addBBOX"
                         />
                     </div>
                     <div class="col col-4">

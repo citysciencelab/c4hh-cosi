@@ -1,5 +1,6 @@
 <script>
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import {GeoJSON} from "ol/format.js";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
@@ -38,14 +39,6 @@ export default {
             return this.planningScenario?.inputs?.buildings?.features
                 ?.filter(feature => feature.properties.created)
                 ?? [];
-        },
-
-        /**
-         * Gets the geometry of the current planning scenario.
-         * @returns {ol/Geometry} The geometry of the scenario feature.
-         */
-        currentScenarioGeometry () {
-            return this.planningScenario.scenarioFeature.features[0].getGeometry();
         },
 
         /**
@@ -121,7 +114,7 @@ export default {
         if (!this.planningScenario.featuresLoaded) {
             try {
                 await this.fetchFeatures(
-                    this.planningScenario, this.editableInputs, this.currentScenarioGeometry, this.currentCrs
+                    this.planningScenario, this.editableInputs, this.getBBOXGeometry(this.planningScenario), this.currentCrs
                 );
 
                 this.planningScenario.featuresLoaded = true;
@@ -134,6 +127,7 @@ export default {
     },
     unmounted () {
         this.clearFeatures();
+        layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
@@ -156,7 +150,9 @@ export default {
          * @returns {void}
          */
         clearFeatures () {
-            this.getLayer().getLayerSource().clear();
+            if (this.getLayer().getLayerSource().getFeatures().length) {
+                this.getLayer().getLayerSource().clear();
+            }
         },
 
         /**
@@ -180,6 +176,23 @@ export default {
                     scenario.inputs[inputKey].features = await getOAFFeature.getOAFFeatureGet(input.source.url, input.source.collection, 100, filter, crs, crs);
                 }
             }
+        },
+
+        /**
+         * Gets the bounding box of the passed scenario.
+         * @param {Object} scenario - The current scenario.
+         * @returns {ol/Geometry/Polygon} The BBOX geometry.
+         */
+        getBBOXGeometry (scenario) {
+            const simulationAreaFeature = scenario.scenarioFeature?.features.find(feature => {
+                return feature.properties?.name === "simulation-area";
+            });
+
+            if (!simulationAreaFeature) {
+                return undefined;
+            }
+
+            return new GeoJSON().readFeature(simulationAreaFeature).getGeometry();
         },
 
         /**
@@ -217,15 +230,21 @@ export default {
          * @returns {void}
          */
         updateFeatures () {
+            if (!this.planningScenario.scenarioFeature) {
+                return;
+            }
+
             const featuresOfInput = this.planningScenario.inputs[this.currentEditableInput]?.features,
-                scenarioFeature = this.planningScenario.scenarioFeature?.features?.[0];
+                olFeatures = new GeoJSON().readFeatures(this.planningScenario.scenarioFeature);
+
 
             if (featuresOfInput) {
                 this.clearFeatures();
                 this.parseAndAddFeatures(featuresOfInput);
             }
-            if (scenarioFeature && !this.getLayer().getLayerSource().hasFeature(scenarioFeature)) {
-                this.getLayer().getLayerSource().addFeature(scenarioFeature);
+
+            if (olFeatures) {
+                layerCollection.getLayerById("planning-scenario").getLayerSource().addFeatures(olFeatures);
             }
         }
     }
