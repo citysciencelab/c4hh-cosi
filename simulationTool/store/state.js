@@ -20,6 +20,9 @@
  * @property {Object[]} planningScenarioSelectedDrawTypeMain - The main selected draw type.
  * @property {Object[]} planningScenarioSelectedInteraction - The selected draw interaction.
  * @property {Object[]} planningScenarioStrokeRange - The stroke range.
+ * @property {Object[]} landuseCurrentLayout - The current layout object as style for buildings or roads.
+ * @property {Object[]} landuseRoadDrawIcons - The draw icons for roads.
+ * @property {Object[]} landuseRoadDrawTypesMain - The main draw types for roads.
  * @property {Object|null} process the current process
  * @property {Array.<Object>} processes a list of processes
  * @property {boolean} processesLoading flag indicating if processes are loading
@@ -41,6 +44,7 @@ const state = {
     name: "additional:modules.tools.simulationTool.toolName",
     currentPlanningComponent: "",
     currentPlanningScenarioId: "",
+    currentInputName: "",
     description: "additional:modules.tools.simulationTool.toolDescription",
     downloadDataFormat: {
         buffer: 0,
@@ -67,6 +71,16 @@ const state = {
     jobResultData: {},
     jobs: [],
     jobsLoading: false,
+    landuseCurrentLayout: {
+        fillColor: [60, 95, 148],
+        fillTransparency: 0,
+        strokeColor: [0, 0, 0],
+        strokeWidth: 2
+    },
+    landuseRoadDrawIcons: {
+        line: "bi-slash-lg"
+    },
+    landuseRoadDrawTypesMain: ["line"],
     mode: "home-panel",
     planningScenarios: [],
     planningScenarioCurrentLayout: {

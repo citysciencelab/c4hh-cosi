@@ -131,7 +131,8 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
-            "setCurrentPlanningComponent"
+            "setCurrentPlanningComponent",
+            "setCurrentInputName"
         ]),
 
         /**
@@ -405,11 +406,11 @@ export default {
                 class="position-sticky bottom-0 bg-body z-2 p-3 d-flex justify-content-between"
             >
                 <FlatButton
-                    v-if="currentEditableInput === 'buildings'"
                     class="m-3"
                     :secondary="true"
                     :text="$t('additional:modules.tools.simulationTool.newBuilding')"
                     icon="bi-pencil-square"
+                    :interaction="() => [setCurrentPlanningComponent('newLanduse'), setCurrentInputName(currentEditableInput)]"
                 />
                 <FlatButton
                     class="m-3"

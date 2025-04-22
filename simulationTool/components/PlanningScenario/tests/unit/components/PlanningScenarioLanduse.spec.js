@@ -170,16 +170,26 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             getters: {
                                 currentPlanningScenarioId: (state) => state.currentPlanningScenarioId,
                                 planningScenarios: (state) => state.planningScenarios,
+                                setCurrentInputName: (state) => state.currentInputName,
+                                setCurrentPlanningComponent: (state) => state.currentPlanningComponent,
                                 simulations: () => simulations
                             },
                             mutations: {
                                 setPlanningScenarios (state, value) {
                                     state.planningScenarios = value;
+                                },
+                                setCurrentPlanningComponent (state, value) {
+                                    state.currentPlanningComponent = value;
+                                },
+                                setCurrentInputName (state, value) {
+                                    state.currentInputName = value;
                                 }
                             },
                             state: {
                                 currentPlanningScenarioId: "Szenario1",
-                                planningScenarios: planningScenarios
+                                planningScenarios: planningScenarios,
+                                currentInputName: "",
+                                currentPlanningComponent: ""
                             }
                         }
                     }
@@ -263,6 +273,17 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             });
 
             expect(stubUpdateFeatures.called).to.be.true;
+        });
+    });
+
+    describe("User Interaction", () => {
+        it("should call 'setCurrentPlanningComponent' if user clicks the button to open PlanningScenarioLanduseCreate", async () => {
+            const wrapper = factory.getMount(),
+                buttonListWrapper = wrapper.findAll("button"),
+                spyOpenLanduseCreate = sinon.spy(wrapper.vm, "setCurrentPlanningComponent");
+
+            await buttonListWrapper.at(0).trigger("click");
+            expect(spyOpenLanduseCreate.calledOnce).to.be.true;
         });
     });
 
