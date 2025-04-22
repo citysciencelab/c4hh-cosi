@@ -16,7 +16,7 @@
 ### Removed
 
 ### Fixed
-- Fixed VerkehrsstärkenThemeLineChart tests, so that is does not need to be skipped anymore. 
+- Fixed VerkehrsstärkenThemeLineChart tests, so that it does not need to be skipped anymore. 
 
 ---
 
