@@ -2,9 +2,10 @@ import {config, mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import getFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
+import layerCollection from "../../../../../../../src/core/layers/js/layerCollection.js";
 import PlanningScenarioLanduse from "../../../PlanningScenarioLanduse.vue";
 import sinon from "sinon";
-import layerCollection from "../../../../../../../src/core/layers/js/layerCollection.js";
+import VectorSource from "ol/source/Vector.js";
 
 config.global.mocks.$t = key => key;
 
@@ -143,18 +144,16 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             "coordinates": [
                                 [[10.004718316195724, 53.497158760096], [10.004989573473514, 53.49918395251746], [10.001050308002908, 53.498579259213344], [10.004718316195724, 53.497158760096]]
                             ]
+                        },
+                        "properties": {
+                            "name": "simulation-area"
                         }
                     }
                 ]
             }
         }],
         layer = {
-            getLayerSource: () => ({
-                clear: () => undefined,
-                hasFeature: () => undefined,
-                addFeature: () => undefined,
-                addFeatures: () => undefined
-            })
+            getLayerSource: () => new VectorSource()
         };
 
     beforeEach(() => {
@@ -205,13 +204,14 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
     });
 
     describe("Component DOM", () => {
-        it("should exist", () => {
+        it("should exist", async function () {
             const wrapper = factory.getShallowMount();
 
+            await wrapper.vm.$nextTick();
             expect(wrapper.exists()).to.be.true;
         });
 
-        it("should render two inputs with type radio", async () => {
+        it("should render two inputs with type radio", async function () {
             let radioInputs = [];
             const wrapper = factory.getShallowMount();
 
@@ -223,21 +223,14 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             expect(radioInputs.at(1).attributes("id")).to.be.equal("hospitals");
         });
 
-        it("should not render SpinnerItem when features are not loaded", () => {
-            const wrapper = factory.getShallowMount();
-
-            expect(wrapper.findComponent({name: "SpinnerItem"}).exists()).to.be.false;
-        });
-
-        it("should render correct number of existing buildings as default view", async () => {
+        it("should not render SpinnerItem when features are not loaded", async function () {
             const wrapper = factory.getShallowMount();
 
             await wrapper.vm.$nextTick();
-
-            expect(wrapper.get(".tab-pane.active").findAll(".list-group-item")).to.have.lengthOf(2);
+            expect(wrapper.findComponent({name: "SpinnerItem"}).exists()).to.be.false;
         });
 
-        it("should render SwitchInput when currentEditableInput is 'buildings'", async () => {
+        it("should render SwitchInput when currentEditableInput is 'buildings'", async function () {
             const wrapper = shallowMount(PlanningScenarioLanduse, {
                 global: {
                     plugins: [store]
@@ -252,7 +245,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             expect(wrapper.findComponent({name: "SwitchInput"}).exists()).to.be.true;
         });
 
-        it("should render NavTab when currentEditableInput is 'buildings'", async () => {
+        it("should render NavTab when currentEditableInput is 'buildings'", async function () {
             const wrapper = factory.getShallowMount();
 
             wrapper.vm.currentEditableInput = "buildings";
@@ -263,7 +256,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
     });
 
     describe("Watchers", () => {
-        it("should call method 'updateFeatures' if data 'currentEditableInput' is changed", async () => {
+        it("should call method 'updateFeatures' if data 'currentEditableInput' is changed", async function () {
             const stubUpdateFeatures = sinon.stub(PlanningScenarioLanduse.methods, "updateFeatures"),
                 wrapper = factory.getShallowMount();
 
@@ -277,41 +270,19 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
     });
 
     describe("User Interaction", () => {
-        it("should call 'setCurrentPlanningComponent' if user clicks the button to open PlanningScenarioLanduseCreate", async () => {
+        it("should call 'setCurrentPlanningComponent' if user clicks the button to open PlanningScenarioLanduseCreate", async function () {
             const wrapper = factory.getMount(),
                 buttonListWrapper = wrapper.findAll("button"),
                 spyOpenLanduseCreate = sinon.spy(wrapper.vm, "setCurrentPlanningComponent");
 
-            await buttonListWrapper.at(0).trigger("click");
+            await buttonListWrapper.at(2).trigger("click");
             expect(spyOpenLanduseCreate.calledOnce).to.be.true;
         });
     });
 
     describe("methods", () => {
-        describe("changeHeight", () => {
-            it("should set correct value, no matter if object structure already exists or not", () => {
-                const wrapper = factory.getShallowMount(),
-                    building1 = {
-                        properties: {
-                            building_height: 20
-                        }
-                    },
-                    building2 = {},
-                    event = {
-                        target: {
-                            valueAsNumber: 30
-                        }
-                    };
-
-                wrapper.vm.changeHeight(event, building1);
-                wrapper.vm.changeHeight(event, building2);
-
-                expect(building1.properties.building_height).to.equal(30);
-                expect(building2.properties.building_height).to.equal(30);
-            });
-        });
         describe("fetchFeatures", () => {
-            it("should set the expected features in the scenario parameter object", async () => {
+            it("should set the expected features in the scenario parameter object", async function () {
                 sinon.stub(getFeature, "getOAFFeatureGet").resolves("features");
                 sinon.stub(getFeature, "getOAFGeometryFilter");
 
@@ -342,6 +313,42 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 await wrapper.vm.fetchFeatures(scenario, scopeSimulations[0].inputs, [0, 1, 0, 1], "CRS");
 
                 expect(scenario.inputs.anEditableInput).to.deep.equal({features: "features"});
+            });
+        });
+
+        describe("setFeatureAttribute", () => {
+            it("should set correct value to the correct feature", async function () {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.vm.$nextTick();
+                wrapper.vm.setFeatureAttribute(20, "building_height", "DEHHALKA10007tqf-piece");
+                expect(planningScenarios[0].inputs.buildings.features[0].properties.building_height).to.equal(20);
+            });
+        });
+
+        describe("setFeatureStyle", () => {
+            it("should set null style to the correct feature", async function () {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.vm.$nextTick();
+                wrapper.vm.setFeatureStyle(null, "DEHHALKA10007tqf-piece");
+                expect(planningScenarios[0].inputs.buildings.features[0].style).to.be.null;
+            });
+            it("should set empty string as style to the correct feature", async function () {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.vm.$nextTick();
+                wrapper.vm.setFeatureStyle({}, "DEHHALKA10007tqf-piece");
+                expect(planningScenarios[0].inputs.buildings.features[0].style).to.be.equal("");
+            });
+        });
+        describe("removeFeature", () => {
+            it("should remove the correct feature", async function () {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.vm.$nextTick();
+                wrapper.vm.removeFeature("DEHHALKA10007tqf-piece2");
+                expect(planningScenarios[0].inputs.buildings.features.find(feature => feature.id === "DEHHALKA10007tqf-piece2")).to.be.undefined;
             });
         });
     });

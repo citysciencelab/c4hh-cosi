@@ -2,26 +2,28 @@
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {GeoJSON} from "ol/format.js";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
-import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
+import ListGroup from "../shared/ListGroup.vue";
 import {mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
+import Style from "ol/style/Style.js";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
     name: "PlanningScenarioLanduse",
     components: {
         FlatButton,
-        IconButton,
+        ListGroup,
         NavTab,
         SpinnerItem,
         SwitchInput
     },
     data () {
         return {
-            currentEditableInput: ""
+            currentEditableInput: "",
+            featuresByInput: []
         };
     },
     computed: {
@@ -31,14 +33,13 @@ export default {
             "simulations"
         ]),
 
+
         /**
-         * Gets all buildings in the current scenario that are marked as created.
-         * @return {Object[]} Array of created buildings in current scenario.
+         * Filters all features of the current input that are marked as created.
+         * @return {ol/Feature[]} Array of created features.
          */
-        createdBuildings () {
-            return this.planningScenario?.inputs?.buildings?.features
-                ?.filter(feature => feature.properties.created)
-                ?? [];
+        createdFeaturesByInput () {
+            return this.featuresByInput.filter(feature => feature.get("created") === true) || [];
         },
 
         /**
@@ -74,13 +75,15 @@ export default {
         },
 
         /**
-         * Gets all buildings in the current scenario that are not marked as created.
-         * @return {Object[]} Array of existing buildings in current scenario.
+         * Filters all features of the current input that are marked as not created.
+         * @return {ol/Feature[]} Array of created buildings in the current scenario.
          */
-        existingBuildings () {
-            return this.planningScenario?.inputs?.buildings?.features
-                ?.filter(feature => !feature.properties.created)
-                ?? [];
+        existingFeaturesByInput () {
+            return this.featuresByInput.filter(feature => {
+                const attribute = feature.get("created");
+
+                return attribute === undefined || attribute === false;
+            });
         },
 
         /**
@@ -111,6 +114,7 @@ export default {
             return;
         }
         this.currentEditableInput = Object.keys(this.editableInputs)[0];
+
         if (!this.planningScenario.featuresLoaded) {
             try {
                 await this.fetchFeatures(
@@ -123,6 +127,7 @@ export default {
                 console.warn(error);
             }
         }
+        this.addScenarioFeature();
         this.updateFeatures();
     },
     unmounted () {
@@ -136,14 +141,19 @@ export default {
         ]),
 
         /**
-         * Applies a height change to a building.
-         * @param {Object} event The event that contains that demanded heigth change.
-         * @param {Object} building The building whose heigth property is to be changed.
+         * Adds the scenario feature to its layer.
          * @returns {void}
          */
-        changeHeight (event, building) {
-            building.properties ??= {};
-            building.properties.building_height = event.target.valueAsNumber;
+        addScenarioFeature () {
+            if (!this.planningScenario.scenarioFeature) {
+                return;
+            }
+
+            const olFeatures = new GeoJSON().readFeatures(this.planningScenario.scenarioFeature);
+
+            if (olFeatures) {
+                layerCollection.getLayerById("planning-scenario").getLayerSource().addFeatures(olFeatures);
+            }
         },
 
         /**
@@ -151,8 +161,8 @@ export default {
          * @returns {void}
          */
         clearFeatures () {
-            if (this.getLayer().getLayerSource().getFeatures().length) {
-                this.getLayer().getLayerSource().clear();
+            if (this.getLayerSource().getFeatures().length) {
+                this.getLayerSource().clear(true);
             }
         },
 
@@ -197,12 +207,21 @@ export default {
         },
 
         /**
-         * Creates a layer if it does not yet exist and returns it.
-         * @returns {Object} A VECTORBASE Layer
+         * Gets the features of an input.
+         * @param {String} key - The key of the input.
+         * @returns {Object[]} An array of geojson features.
          */
-        getLayer () {
+        getInputFeatures (key) {
+            return this.planningScenario.inputs[key].features;
+        },
+
+        /*
+         * Creates a layer if it does not yet exist and returns its source.
+         * @returns {ol/source/Vector} A vector source.
+         */
+        getLayerSource () {
             if (typeof layerCollection.getLayerById("planning-scenario-landuse") !== "undefined") {
-                return layerCollection.getLayerById("planning-scenario-landuse");
+                return layerCollection.getLayerById("planning-scenario-landuse").getLayerSource();
             }
             const layer = layerFactory.createLayer({
                 typ: "VECTORBASE",
@@ -212,7 +231,7 @@ export default {
             });
 
             layerCollection.addLayer(layer);
-            return layer;
+            return layer.getLayerSource();
         },
 
         /**
@@ -221,31 +240,80 @@ export default {
          * @returns {void}
          */
         parseAndAddFeatures (features) {
-            const olFeatures = getOAFFeature.readAllOAFToGeoJSON(features);
+            const geoJsonParser = new GeoJSON();
 
-            this.getLayer().getLayerSource().addFeatures(olFeatures);
+            features.forEach(feature => {
+                const olFeature = geoJsonParser.readFeature(feature);
+
+                olFeature.setId(feature.id);
+                if (feature.style === "") {
+                    olFeature.setStyle(new Style());
+                }
+                else {
+                    olFeature.setStyle(null);
+                }
+
+                this.getLayerSource().addFeature(olFeature);
+            });
+
+            this.featuresByInput = this.getLayerSource().getFeatures();
         },
 
         /**
-         * Updates the layer with the features of the current editable input and the scenario feature.
+         * Removes a feature from the current editable input.
+         * @param {String} id - The id of the feature to be removed.
+         * @returns {void}
+         */
+        removeFeature (id) {
+            this.planningScenario.inputs[this.currentEditableInput].features = this.getInputFeatures(this.currentEditableInput).filter(feature => {
+                return feature.id !== id;
+            });
+            this.updateFeatures();
+        },
+
+        /**
+         * Sets a feature attribute of the current editable input.
+         * @param {String} value - The value to be set.
+         * @param {String} key - The key of the attribute to be set.
+         * @param {String} id - The id of the feature to be updated.
+         * @returns {void}
+         */
+        setFeatureAttribute (value, key, id) {
+            this.getInputFeatures(this.currentEditableInput).map(feature => {
+                if (feature.id === id) {
+                    feature.properties[key] = value;
+                }
+                return feature;
+            });
+            this.updateFeatures();
+        },
+
+        /**
+         * Sets the style of a feature of the current editable input.
+         * @param {ol/style/Style} style - The style to be set.
+         * @param {String} id - The id of the feature to be updated.
+         * @returns {void}
+         */
+        setFeatureStyle (style, id) {
+            this.getInputFeatures(this.currentEditableInput).map(feature => {
+                if (feature.id === id) {
+                    feature.style = style === null ? null : "";
+                }
+                return feature;
+            });
+            this.updateFeatures();
+        },
+
+        /**
+         * Updates the features of the current input.
          * @returns {void}
          */
         updateFeatures () {
-            if (!this.planningScenario.scenarioFeature) {
-                return;
-            }
-
-            const featuresOfInput = this.planningScenario.inputs[this.currentEditableInput]?.features,
-                olFeatures = new GeoJSON().readFeatures(this.planningScenario.scenarioFeature);
-
+            const featuresOfInput = this.getInputFeatures(this.currentEditableInput);
 
             if (featuresOfInput) {
                 this.clearFeatures();
                 this.parseAndAddFeatures(featuresOfInput);
-            }
-
-            if (olFeatures) {
-                layerCollection.getLayerById("planning-scenario").getLayerSource().addFeatures(olFeatures);
             }
         }
     }
@@ -294,7 +362,6 @@ export default {
                 </div>
                 <div id="building-tabs-container">
                     <ul
-                        v-if="currentEditableInput === 'buildings'"
                         class="nav nav-tabs nav-justified mt-3 d-flex"
                         role="tablist"
                     >
@@ -314,7 +381,7 @@ export default {
                 </div>
             </div>
             <div
-                v-if="isLoaded && currentEditableInput === 'buildings'"
+                v-if="isLoaded"
                 class="tab-content m-3"
             >
                 <div
@@ -324,38 +391,12 @@ export default {
                     aria-labelledby="existing-tab"
                     tabindex="0"
                 >
-                    <ul class="list-group list-group-flush">
-                        <li
-                            v-for="building in existingBuildings"
-                            :key="building.id"
-                            class="list-group-item list-group-item-action"
-                        >
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    {{ building.properties?.id }}
-                                </div>
-                                <div class="d-flex">
-                                    <label
-                                        for="height"
-                                        class="col-form-label mx-2"
-                                    >
-                                        {{ $t('additional:modules.tools.simulationTool.heightInM') }}
-                                    </label>
-                                    <input
-                                        id="height"
-                                        type="number"
-                                        class="form-control text-end height-input"
-                                        :value="building.properties?.building_height"
-                                        @input="event => changeHeight(event, building)"
-                                    >
-                                </div>
-                                <IconButton
-                                    icon="bi-eye"
-                                    :aria="$t('additional:modules.tools.simulationTool.toggleVisibility')"
-                                />
-                            </div>
-                        </li>
-                    </ul>
+                    <ListGroup
+                        :item-list="existingFeaturesByInput"
+                        @removeFeature="removeFeature"
+                        @setFeatureAttribute="setFeatureAttribute"
+                        @setFeatureStyle="setFeatureStyle"
+                    />
                 </div>
                 <div
                     id="created"
@@ -364,42 +405,13 @@ export default {
                     aria-labelledby="created-tab"
                     tabindex="0"
                 >
-                    <ul class="list-group list-group-flush">
-                        <li
-                            v-for="building in createdBuildings"
-                            :key="building.id"
-                            class="list-group-item list-group-item-action"
-                        >
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    {{ building.properties?.id }}
-                                </div>
-                                <div class="d-flex">
-                                    <label
-                                        for="height"
-                                        class="col-form-label mx-2"
-                                    >
-                                        {{ $t('additional:modules.tools.simulationTool.heightInM') }}
-                                    </label>
-                                    <input
-                                        id="height"
-                                        type="number"
-                                        class="form-control text-end height-input"
-                                        :value="building.properties?.building_height"
-                                        @input="event => changeHeight(event, building)"
-                                    >
-                                </div>
-                                <IconButton
-                                    icon="bi-eye"
-                                    :aria="$t('additional:modules.tools.simulationTool.toggleVisibility')"
-                                />
-                            </div>
-                        </li>
-                    </ul>
+                    <ListGroup
+                        :item-list="createdFeaturesByInput"
+                        @removeFeature="removeFeature"
+                        @setFeatureAttribute="setFeatureAttribute"
+                        @setFeatureStyle="setFeatureStyle"
+                    />
                 </div>
-            </div>
-            <div v-if="isLoaded && currentEditableInput === 'roads'">
-                {{ planningScenario?.inputs?.roads }}
             </div>
             <div
                 v-if="isLoaded"
