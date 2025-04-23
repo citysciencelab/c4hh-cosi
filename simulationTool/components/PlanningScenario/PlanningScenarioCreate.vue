@@ -1,4 +1,5 @@
 <script>
+import {buffer} from "ol/extent";
 import DrawLayout from "../../../../src/shared/modules/draw/components/DrawLayout.vue";
 import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue";
 import Feature from "ol/Feature.js";
@@ -25,6 +26,7 @@ export default {
     },
     data () {
         return {
+            bufferVal: "0",
             currentModifyInteraction: null,
             currentScenarioData: {
                 id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
@@ -32,9 +34,9 @@ export default {
                 simulationId: "only-planning-scenario",
                 inputs: {}
             },
+            isValid: true,
             selectedTags: [],
-            source: null,
-            isValid: true
+            source: null
         };
     },
     computed: {
@@ -86,11 +88,21 @@ export default {
          * @return {void}
          */
         addBBOX (evt) {
-            const bbox = evt.feature.getGeometry().getExtent(),
-                featureBBOX = new Feature({
-                    geometry: fromExtent(bbox),
-                    name: "simulation-area"
-                });
+            const extent = buffer(evt.feature.getGeometry().getExtent(), parseFloat(this.bufferVal));
+
+            this.addBBoxFeature(extent);
+        },
+
+        /**
+         * Adds a feature for the extent(BBOX).
+         * @param {Number[]} extent - the extent of BBox.
+         * @return {void}
+         */
+        addBBoxFeature (extent) {
+            const featureBBOX = new Feature({
+                geometry: fromExtent(extent),
+                name: "simulation-area"
+            });
 
             this.getLayerSource().addFeature(featureBBOX);
         },
@@ -150,6 +162,7 @@ export default {
             this.removeInteraction(this.planningScenarioSelectedInteraction);
             this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.source);
             this.addInteraction(this.currentModifyInteraction);
+            this.modifyBBOX(this.currentModifyInteraction);
         },
 
         /*
@@ -174,6 +187,57 @@ export default {
 
             layerCollection.addLayer(layer);
             return layer.getLayerSource();
+        },
+
+
+        /**
+         * Modifies the BBox after modifying the feature.
+         * @param {ol/interaction/Modify} interaction The current modify interaction.
+         * @return {void}
+         */
+        modifyBBOX (interaction) {
+            if (interaction !== null) {
+                this.currentModifyInteraction.on("modifystart", async () => {
+                    this.removeBBoxFeature();
+                });
+
+                this.currentModifyInteraction.on("modifyend", async () => {
+                    const extent = buffer(this.source.getFeatures()[0].getGeometry().getExtent(), parseFloat(this.bufferVal));
+
+                    this.addBBoxFeature(extent);
+                });
+            }
+        },
+
+        /**
+         * Modifies the BBox when buffer is changed.
+         * @param {Number} val The buffer value.
+         * @return {void}
+         */
+        modifyBBoxByBuffer (val) {
+            this.bufferVal = parseFloat(val) >= 0 ? val : "0";
+
+            if (!this.source.getFeatures().length) {
+                return;
+            }
+
+            const scenarioFeature = this.source.getFeatures().filter(feature => feature.get("name") !== "simulation-area")[0],
+                extent = scenarioFeature?.getGeometry()?.getExtent();
+
+            if (extent) {
+                this.removeBBoxFeature();
+                this.addBBoxFeature(buffer(extent, parseFloat(this.bufferVal)));
+            }
+        },
+
+        /**
+         * Removes the bbox feature from current planning scenario layer.
+         * @returns {void}
+         */
+        removeBBoxFeature () {
+            const featureBBox = this.source.getFeatures().filter(feature => feature.get("name") === "simulation-area")[0];
+
+            this.source.removeFeature(featureBBox);
         },
 
         /**
@@ -334,9 +398,11 @@ export default {
                 </div>
                 <InputText
                     id="buffer"
+                    :input="modifyBBoxByBuffer"
                     :label="$t('additional:modules.tools.simulationTool.planningScenarioBBox')"
                     :placeholder="$t('additional:modules.tools.simulationTool.planningScenarioBBox')"
                     :type="'number'"
+                    :value="bufferVal"
                 />
                 <div
                     class="d-flex justify-content-between"

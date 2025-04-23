@@ -250,5 +250,67 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                 expect(wrapper.vm.source.getFeatures()[0].getGeometry().getExtent()).to.deep.equal(extent);
             });
         });
+
+        describe("modifyBBoxByBuffer", () => {
+            it("should not modify BBox feature if there is no feature", async () => {
+                const wrapper = factory.getShallowMount(),
+                    spyAddBBoxFeature = sinon.spy(PlanningScenarioCreate.methods, "addBBoxFeature"),
+                    spyRemoveBBoxFeature = sinon.spy(PlanningScenarioCreate.methods, "removeBBoxFeature");
+
+                wrapper.vm.modifyBBoxByBuffer("10");
+                await wrapper.vm.$nextTick();
+
+                expect(spyAddBBoxFeature.notCalled).to.be.true;
+                expect(spyRemoveBBoxFeature.notCalled).to.be.true;
+            });
+
+            it("should not modify BBox feature if there is no planning scenario feature", async () => {
+                const wrapper = factory.getShallowMount(),
+                    feature = new Feature({
+                        geometry: new Polygon([[
+                            [574729.649, 5927590.856],
+                            [574676.641, 5927642.08],
+                            [574690.16, 5927655.429],
+                            [574705.504, 5927640.191],
+                            [574711.97, 5927633.768],
+                            [574742.688, 5927603.26],
+                            [574729.649, 5927590.856]]])
+                    }),
+                    spyAddBBoxFeature = sinon.spy(PlanningScenarioCreate.methods, "addBBoxFeature"),
+                    spyRemoveBBoxFeature = sinon.spy(PlanningScenarioCreate.methods, "removeBBoxFeature");
+
+                wrapper.vm.addBBOX({feature});
+                await wrapper.vm.$nextTick();
+                wrapper.vm.modifyBBoxByBuffer("10");
+                await wrapper.vm.$nextTick();
+
+                expect(spyAddBBoxFeature.notCalled).to.be.true;
+                expect(spyRemoveBBoxFeature.notCalled).to.be.true;
+            });
+        });
+
+        describe("removeBBoxFeature", () => {
+            it("should remove BBox feature", async () => {
+                const wrapper = factory.getShallowMount(),
+                    feature = new Feature({
+                        geometry: new Polygon([[
+                            [574729.649, 5927590.856],
+                            [574676.641, 5927642.08],
+                            [574690.16, 5927655.429],
+                            [574705.504, 5927640.191],
+                            [574711.97, 5927633.768],
+                            [574742.688, 5927603.26],
+                            [574729.649, 5927590.856]]])
+                    });
+
+                wrapper.vm.source.clear();
+                wrapper.vm.addBBOX({feature});
+                await wrapper.vm.$nextTick();
+                wrapper.vm.removeBBoxFeature();
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.source.getFeatures().length).to.be.equal(0);
+            });
+        });
     });
 });
