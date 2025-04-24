@@ -253,6 +253,38 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
             expect(wrapper.findComponent({name: "NavTab"}).exists()).to.be.true;
         });
+
+        it("should render text of button when currentEditableInput is 'buildings'", async () => {
+            const wrapper = shallowMount(PlanningScenarioLanduse, {
+                global: {
+                    plugins: [store]
+                },
+                computed: {
+                    isLoaded: () => true
+                }
+            });
+
+            wrapper.vm.currentEditableInput = "buildings";
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findAllComponents({name: "FlatButton"}).at(0).attributes().text).to.be.equal("additional:modules.tools.simulationTool.newBuilding");
+        });
+
+        it("should render text of button when currentEditableInput is not 'buildings'", async () => {
+            const wrapper = shallowMount(PlanningScenarioLanduse, {
+                global: {
+                    plugins: [store]
+                },
+                computed: {
+                    isLoaded: () => true
+                }
+            });
+
+            wrapper.vm.currentEditableInput = "roads";
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findAllComponents({name: "FlatButton"}).at(0).attributes().text).to.be.equal("additional:modules.tools.simulationTool.newRoad");
+        });
     });
 
     describe("Watchers", () => {

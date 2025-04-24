@@ -212,7 +212,7 @@ export default {
          * @returns {Object[]} An array of geojson features.
          */
         getInputFeatures (key) {
-            return this.planningScenario.inputs[key].features;
+            return this.planningScenario?.inputs[key].features;
         },
 
         /*
@@ -420,7 +420,7 @@ export default {
                 <FlatButton
                     class="m-3"
                     :secondary="true"
-                    :text="$t('additional:modules.tools.simulationTool.newBuilding')"
+                    :text="currentEditableInput === 'buildings' ? $t('additional:modules.tools.simulationTool.newBuilding') : $t('additional:modules.tools.simulationTool.newRoad')"
                     icon="bi-pencil-square"
                     :interaction="() => [setCurrentPlanningComponent('newLanduse'), setCurrentInputName(currentEditableInput)]"
                 />
