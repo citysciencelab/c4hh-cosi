@@ -1,6 +1,10 @@
 <script>
+import {extractEventCoordinates} from "../../../../src/shared/js/utils/extractEventCoordinates";
+import {GeoJSON} from "ol/format.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
-import {mapGetters, mapMutations} from "vuex";
+import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerFactory from "../../../../src/core/layers/js/layerFactory";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 
 export default {
     name: "PlanningScenarioOverviewList",
@@ -9,9 +13,28 @@ export default {
     },
     emits: ["download"],
     computed: {
-        ...mapGetters("Modules/SimulationTool", ["planningScenarios"])
+        ...mapGetters("Modules/SimulationTool", ["currentPlanningScenarioId", "planningScenarios"]),
+        /**
+         * Gets the currently selected planning scenario.
+         * @return {Object} The current planning scenario.
+         */
+        planningScenario () {
+            return this.planningScenarios?.find(scenario => scenario.id === this.currentPlanningScenarioId);
+        }
+    },
+    mounted () {
+        if (!this.planningScenario) {
+            return;
+        }
+        this.setCurrentPlanningScenarioId("");
+        this.updateFeatures();
+    },
+    unmounted () {
+        this.getLayer().getLayerSource().clear();
+        layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
     },
     methods: {
+        ...mapActions("Maps", ["zoomToExtent"]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
@@ -21,15 +44,22 @@ export default {
         ]),
 
         /**
-         * Removes a scenario by the passed id from the list of scenarios.
-         * @param {Object[]} scenarios - The current list of scenarios.
-         * @param {String} id - The id of the scenario to remove.
-         * @returns {void}
+         * Creates a layer if it does not yet exist and returns it.
+         * @returns {Object} A VECTORBASE Layer
          */
-        removeScenarioById (scenarios, id) {
-            const filteredScenarios = scenarios.filter(item => item.id !== id);
+        getLayer () {
+            if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+                return layerCollection.getLayerById("planning-scenario");
+            }
+            const layer = layerFactory.createLayer({
+                typ: "VECTORBASE",
+                id: "planning-scenario",
+                name: "planning-scenario",
+                alwaysOnTop: true
+            });
 
-            this.setPlanningScenarios(filteredScenarios);
+            layerCollection.addLayer(layer);
+            return layer;
         },
 
         /**
@@ -51,18 +81,74 @@ export default {
             this.setCurrentPlanningScenarioId(id);
             this.setPreviousComponentOfSimulation("planningScenario");
             this.setMode("simulationParameter");
+        },
+
+        /**
+         * Removes a scenario by the passed id from the list of scenarios.
+         * @param {Object[]} scenarios - The current list of scenarios.
+         * @param {String} id - The id of the scenario to remove.
+         * @returns {void}
+         */
+        removeScenarioById (scenarios, id) {
+            const filteredScenarios = scenarios.filter(item => item.id !== id);
+
+            this.setPlanningScenarios(filteredScenarios);
+        },
+
+        /**
+         * Toggle the planning scenario depending on given id.
+         * @param {String} id The id of the planning scenario.
+         * @returns {void}
+         */
+        toggleList (id) {
+            this.getLayer().getLayerSource().clear();
+            this.setCurrentPlanningScenarioId(id);
+            this.updateFeatures();
+            this.zoomToFeature();
+        },
+        /**
+         * Updates the layer with the the scenario feature.
+         * @returns {void}
+         */
+        updateFeatures () {
+            if (!this.planningScenario?.scenarioFeature) {
+                return;
+            }
+
+            const olFeatures = new GeoJSON().readFeatures(this.planningScenario.scenarioFeature);
+
+            if (olFeatures) {
+                layerCollection.getLayerById("planning-scenario").getLayerSource().addFeatures(olFeatures);
+            }
+        },
+        /**
+         * Zoom to current feature.
+         * @returns {void}
+         */
+        zoomToFeature () {
+            if (!this.planningScenario?.scenarioFeature) {
+                return;
+            }
+            const olFeatures = new GeoJSON().readFeatures(this.planningScenario.scenarioFeature),
+                coordinate = extractEventCoordinates(olFeatures[0].getGeometry().getExtent());
+
+            this.zoomToExtent({extent: coordinate, options: {maxZoom: 7}});
         }
     }
 };
 
 </script>
 <template>
-    <ul class="list-group list-group-flush mt-4">
-        <li
+    <div class="list-group list-group-flush mt-4">
+        <div
             v-for="scenario in planningScenarios"
             :key="scenario.id"
+            role="button"
+            tabindex="0"
             class="list-group-item list-group-item-action"
-            aria-current="true"
+            :class="{selected: scenario.id === currentPlanningScenarioId}"
+            @click="toggleList(scenario.id)"
+            @keydown="toggleList(scenario.id)"
         >
             <div class="d-flex justify-content-between align-items-center">
                 <span class="d-flex">{{ scenario.name }}</span>
@@ -94,12 +180,17 @@ export default {
                     />
                 </div>
             </div>
-        </li>
-    </ul>
+        </div>
+    </div>
 </template>
 
 <style scoped lang="scss">
+@import "~variables";
+
     .list-group-item:hover {
         cursor:pointer;
+    }
+    .selected {
+        background-color: $light_blue
     }
 </style>

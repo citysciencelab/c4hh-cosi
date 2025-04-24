@@ -3,6 +3,7 @@ import {expect} from "chai";
 import {createStore} from "vuex";
 import PlanningScenarioOverviewList from "../../../PlanningScenarioOverviewList.vue";
 import sinon from "sinon";
+import layerCollection from "../../../../../../../src/core/layers/js/layerCollection.js";
 
 config.global.mocks.$t = key => key;
 
@@ -27,16 +28,66 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
         },
         planningScenarios = [{
             "id": "Scenario1",
-            "name": "Planungsszenario 1"
+            "name": "Planungsszenario 1",
+            "scenarioFeature": {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [[10.004718316195724, 53.497158760096], [10.004989573473514, 53.49918395251746], [10.001050308002908, 53.498579259213344], [10.004718316195724, 53.497158760096]]
+                            ]
+                        }
+                    }
+                ]
+            }
         },
         {
             "id": "Scenario2",
-            "name": "Planungsszenario 2"
+            "name": "Planungsszenario 2",
+            "scenarioFeature": {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [[10.004718316195724, 53.497158760096], [10.004989573473514, 53.49918395251746], [10.001050308002908, 53.498579259213344], [10.004718316195724, 53.497158760096]]
+                            ]
+                        }
+                    }
+                ]
+            }
         },
         {
             "id": "Scenario3",
-            "name": "Planungsszenario 3"
-        }];
+            "name": "Planungsszenario 3",
+            "scenarioFeature": {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [[10.004718316195724, 53.497158760096], [10.004989573473514, 53.49918395251746], [10.001050308002908, 53.498579259213344], [10.004718316195724, 53.497158760096]]
+                            ]
+                        }
+                    }
+                ]
+            }
+        }],
+        currentPlanningScenarioId = "Scenario3",
+        layer = {
+            getLayerSource: () => ({
+                clear: () => undefined,
+                addFeature: () => undefined,
+                addFeatures: () => undefined
+            })
+        };
 
     beforeEach(() => {
         store = createStore({
@@ -49,24 +100,35 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
                         SimulationTool: {
                             namespaced: true,
                             getters: {
-                                planningScenarios: (state) => state.planningScenarios
+                                planningScenarios: (state) => state.planningScenarios,
+                                currentPlanningScenarioId: (state) => state.currentPlanningScenarioId
                             },
                             mutations: {
-                                setCurrentPlanningScenarioId: sinon.stub(),
                                 setMode: sinon.stub(),
                                 setPlanningScenarios (state, value) {
                                     state.planningScenarios = value;
                                 },
+                                setCurrentPlanningScenarioId (state, value) {
+                                    state.currentPlanningScenarioId = value;
+                                },
                                 setPreviousComponentOfSimulation: sinon.stub()
                             },
                             state: {
-                                planningScenarios: planningScenarios
+                                planningScenarios: planningScenarios,
+                                currentPlanningScenarioId: currentPlanningScenarioId
                             }
                         }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        zoomToExtent: sinon.spy()
                     }
                 }
             }
         });
+        sinon.stub(layerCollection, "getLayerById").returns(layer);
     });
 
     describe("Component DOM", () => {
@@ -104,6 +166,22 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
 
                 expect(wrapper.vm.planningScenarios).to.have.lengthOf(2);
                 expect(wrapper.vm.planningScenarios.find(scenario => scenario.id === "Scenario2")).to.be.undefined;
+            });
+        });
+        describe("toggleList", () => {
+            it("should set new scenario id", () => {
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.toggleList("Scenario2");
+
+                expect(wrapper.vm.currentPlanningScenarioId).to.be.equal("Scenario2");
+            });
+            it("should set new scenario id", () => {
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.toggleList("Scenario2");
+
+                expect(wrapper.vm.currentPlanningScenarioId).to.be.equal("Scenario2");
             });
         });
     });
