@@ -251,21 +251,19 @@ export default {
         },
         /**
          * Computes whether infiltration is at least likely on the parcel
-         * @returns {Boolean} True if there is a non-zero value for möglich or wahrscheinlich in the corresponding table, false if not.
+         * @returns {Boolean} True if there is an area on the parcel with the infiltration category möglich or wahrscheinlich, false if not.
          */
         infiltrationLikelyParcel () {
-            return this.infiltrationTableParcel
-                .filter(row => row[0] === "möglich" || row[0] === "wahrscheinlich")
-                .some(row => row[1] !== "0");
+            return this.data.infiltration.values?.möglich_area > 0
+                || this.data.infiltration.values?.wahrscheinlich_area > 0;
         },
         /**
          * Computes whether infiltration is at least likely on the unbuilt area
-         * @returns {Boolean} True if there is a non-zero value for möglich or wahrscheinlich in the corresponding table, false if not.
+         * @returns {Boolean} True if there is an area on the unbuilt area with the infiltration category möglich or wahrscheinlich, false if not.
          */
         infiltrationLikelyUnbuilt () {
-            return this.infiltrationTableUnbuilt
-                .filter(row => row[0] === "möglich" || row[0] === "wahrscheinlich")
-                .some(row => row[1] !== "0");
+            return this.groupedParcelFeatures?.möglich_area > 0
+                || this.groupedParcelFeatures?.wahrscheinlich_area > 0;
         },
         /**
          * Computes whether the parcel is in an ÜSG area
