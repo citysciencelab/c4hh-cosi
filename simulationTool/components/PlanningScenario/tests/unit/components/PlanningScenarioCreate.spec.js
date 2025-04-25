@@ -246,7 +246,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
 
                 wrapper.vm.addBBOX({feature});
 
-                expect(wrapper.vm.source.getFeatures()[0].get("name")).to.be.equal("simulation-area");
+                expect(wrapper.vm.source.getFeatures()[0].get("id")).to.be.equal("simulation-area");
                 expect(wrapper.vm.source.getFeatures()[0].getGeometry().getExtent()).to.deep.equal(extent);
             });
         });

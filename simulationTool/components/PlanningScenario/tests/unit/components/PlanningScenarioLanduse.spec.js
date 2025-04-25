@@ -99,6 +99,10 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                     ]
                 },
                 "roads": {}
+            },
+            "scenarioFeature": {
+                "type": "FeatureCollection",
+                "features": []
             }
         },
         {
@@ -146,7 +150,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             ]
                         },
                         "properties": {
-                            "name": "simulation-area"
+                            "id": "simulation-area"
                         }
                     }
                 ]

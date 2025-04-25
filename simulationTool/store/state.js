@@ -110,10 +110,10 @@ const state = {
     selectedProcessId: null,
     simulationApiUrl: null,
     simulationAreaStyle: {
-        "fill-color": [255, 255, 255, 0],
-        "stroke-color": [66, 66, 66, 1],
-        "stroke-line-dash": [5, 8],
-        "stroke-width": 2
+        fillColor: [255, 255, 255, 0],
+        strokeColor: [66, 66, 66, 1],
+        strokeLineDash: [5, 8],
+        strokeWidth: 2
     },
     simulations: [],
     userDetailsCache: {}

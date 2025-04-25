@@ -1,5 +1,6 @@
 <script>
 import {buffer} from "ol/extent";
+import ConvertStyle from "../../js/convertStyle";
 import DrawLayout from "../../../../src/shared/modules/draw/components/DrawLayout.vue";
 import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue";
 import Feature from "ol/Feature.js";
@@ -70,7 +71,7 @@ export default {
         this.source = this.getLayerSource();
     },
     methods: {
-        ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
+        ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent"]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
@@ -90,20 +91,23 @@ export default {
         addBBOX (evt) {
             const extent = buffer(evt.feature.getGeometry().getExtent(), parseFloat(this.bufferVal));
 
+            // evt.feature.set("id", "planning-scenario-area");
             this.addBBoxFeature(extent);
+            this.zoomToExtent({extent, options: {maxZoom: 7}});
         },
 
         /**
-         * Adds a feature for the extent(BBOX).
+         * Adds a feature for the extent(BBOX = Simulation Area) and sets the style.
          * @param {Number[]} extent - the extent of BBox.
          * @return {void}
          */
         addBBoxFeature (extent) {
             const featureBBOX = new Feature({
                 geometry: fromExtent(extent),
-                name: "simulation-area"
+                id: "simulation-area"
             });
 
+            featureBBOX.setStyle(ConvertStyle.geoJsonToOpenlayers(this.simulationAreaStyle));
             this.getLayerSource().addFeature(featureBBOX);
         },
 
@@ -127,7 +131,7 @@ export default {
                 return;
             }
 
-            this.setCurrentPlanningScenarioData(this.source?.getFeatures(), this.planningScenarioCurrentLayout);
+            this.setCurrentPlanningScenarioData(this.source?.getFeatures());
             this.setPlanningScenarioSelectedDrawType("");
             this.setPlanningScenarioSelectedDrawTypeMain("");
             this.setCurrentPlanningComponent("landuse");
@@ -180,10 +184,7 @@ export default {
                 alwaysOnTop: true
             });
 
-            layer.getLayer().setStyle([{
-                filter: ["==", ["get", "name"], "simulation-area"],
-                style: this.simulationAreaStyle
-            }]);
+            // layer.getLayer().setStyle([this.simulationAreaStyle]);
 
             layerCollection.addLayer(layer);
             return layer.getLayerSource();
@@ -221,7 +222,7 @@ export default {
                 return;
             }
 
-            const scenarioFeature = this.source.getFeatures().filter(feature => feature.get("name") !== "simulation-area")[0],
+            const scenarioFeature = this.source.getFeatures().filter(feature => feature.get("id") !== "simulation-area")[0],
                 extent = scenarioFeature?.getGeometry()?.getExtent();
 
             if (extent) {
@@ -235,7 +236,7 @@ export default {
          * @returns {void}
          */
         removeBBoxFeature () {
-            const featureBBox = this.source.getFeatures().filter(feature => feature.get("name") === "simulation-area")[0];
+            const featureBBox = this.source.getFeatures().filter(feature => feature.get("id") === "simulation-area")[0];
 
             this.source.removeFeature(featureBBox);
         },
@@ -253,17 +254,23 @@ export default {
         /**
          * Sets current planning scenario data.
          * @param {ol/Feature[]} features all features of current source
-         * @param {Object} planningScenarioCurrentLayout - The layout object to be applied as the style for the scenario feature.
          * @returns {void}
          */
-        setCurrentPlanningScenarioData (features, planningScenarioCurrentLayout) {
-            const geojsonFeatureCollection = new GeoJSON().writeFeaturesObject(features),
-                scenarioFeature = geojsonFeatureCollection.features.find(feature => {
-                    return feature.properties?.name !== "simulation-area";
-                });
+        setCurrentPlanningScenarioData (features) {
+            const geoJsonFeatures = [],
+                geoJsonParser = new GeoJSON();
 
-            scenarioFeature.style = planningScenarioCurrentLayout;
-            this.currentScenarioData.scenarioFeature = geojsonFeatureCollection;
+            features.forEach(feature => {
+                const geojsonFeature = geoJsonParser.writeFeatureObject(feature);
+
+                geojsonFeature.style = ConvertStyle.openlayersToGeoJson(feature.getStyle());
+                geoJsonFeatures.push(geojsonFeature);
+            });
+
+            this.currentScenarioData.scenarioFeature = {
+                type: "FeatureCollection",
+                features: geoJsonFeatures
+            };
 
             this.setPlanningScenarios([...this.planningScenarios, this.currentScenarioData]);
             this.setCurrentPlanningScenarioId(this.currentScenarioData.id);

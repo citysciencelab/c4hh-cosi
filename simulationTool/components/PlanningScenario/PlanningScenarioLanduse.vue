@@ -1,4 +1,6 @@
 <script>
+import ConvertStyle from "../../js/convertStyle";
+import {Style} from "ol/style.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {GeoJSON} from "ol/format.js";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
@@ -8,7 +10,6 @@ import ListGroup from "../shared/ListGroup.vue";
 import {mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
-import Style from "ol/style/Style.js";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
@@ -30,7 +31,8 @@ export default {
         ...mapGetters("Modules/SimulationTool", [
             "currentPlanningScenarioId",
             "planningScenarios",
-            "simulations"
+            "simulations",
+            "simulationAreaStyle"
         ]),
 
 
@@ -127,7 +129,7 @@ export default {
                 console.warn(error);
             }
         }
-        this.addScenarioFeature();
+        this.addScenarioFeatures(this.planningScenario.scenarioFeature.features);
         this.updateFeatures();
     },
     unmounted () {
@@ -141,19 +143,24 @@ export default {
         ]),
 
         /**
-         * Adds the scenario feature to its layer.
+         * Adds the scenario features to its layer.
+         * @param {GeoJSON[]} features - An array of GeoJSON features.
          * @returns {void}
          */
-        addScenarioFeature () {
-            if (!this.planningScenario.scenarioFeature) {
+        addScenarioFeatures (features) {
+            if (!features) {
                 return;
             }
 
-            const olFeatures = new GeoJSON().readFeatures(this.planningScenario.scenarioFeature);
+            const geoJsonParser = new GeoJSON(),
+                layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource();
 
-            if (olFeatures) {
-                layerCollection.getLayerById("planning-scenario").getLayerSource().addFeatures(olFeatures);
-            }
+            features.forEach(feature => {
+                const olFeature = geoJsonParser.readFeature(feature);
+
+                olFeature.setStyle(ConvertStyle.geoJsonToOpenlayers(feature.style));
+                layerSource.addFeature(olFeature);
+            });
         },
 
         /**
@@ -196,7 +203,7 @@ export default {
          */
         getBBOXGeometry (scenario) {
             const simulationAreaFeature = scenario.scenarioFeature?.features.find(feature => {
-                return feature.properties?.name === "simulation-area";
+                return feature.properties?.id === "simulation-area";
             });
 
             if (!simulationAreaFeature) {
