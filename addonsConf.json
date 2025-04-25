@@ -110,5 +110,8 @@
   "snippetChart": {
     "path": "filterSnippets/snippetChart",
     "type": "filterSnippet"
+  },
+  "cesium3dtilesinspector": {
+    "type": "javascript"
   }
 }
