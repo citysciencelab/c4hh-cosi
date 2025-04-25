@@ -314,6 +314,24 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             await buttonListWrapper.at(2).trigger("click");
             expect(spyOpenLanduseCreate.calledOnce).to.be.true;
         });
+
+        it("should call 'setCurrentInputName' if user clicks the button to open PlanningScenarioLanduseCreate", async function () {
+            const wrapper = factory.getMount(),
+                buttonListWrapper = wrapper.findAll("button"),
+                spyOpenLanduseCreate = sinon.spy(wrapper.vm, "setCurrentInputName");
+
+            await buttonListWrapper.at(2).trigger("click");
+            expect(spyOpenLanduseCreate.calledOnce).to.be.true;
+        });
+
+        it("should call 'save' if user clicks the button to save planning scenario", async function () {
+            const wrapper = factory.getMount(),
+                buttonListWrapper = wrapper.findAll("button"),
+                spySave = sinon.spy(wrapper.vm, "save");
+
+            await buttonListWrapper.at(3).trigger("click");
+            expect(spySave.calledOnce).to.be.true;
+        });
     });
 
     describe("methods", () => {

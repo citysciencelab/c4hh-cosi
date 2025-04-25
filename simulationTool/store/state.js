@@ -16,6 +16,7 @@
  * @property {Object[]} planningScenarioCurrentLayout - The current layout object as style.
  * @property {Object[]} planningScenarioDrawIcons - The draw icons.
  * @property {Object[]} planningScenarioDrawTypesMain - The main draw types.
+ * @property {Object[]} planningScenarioHighlightFeatureStyle - The highlight feature style.
  * @property {Object[]} planningScenarioSelectedDrawType - The selected draw type.
  * @property {Object[]} planningScenarioSelectedDrawTypeMain - The main selected draw type.
  * @property {Object[]} planningScenarioSelectedInteraction - The selected draw interaction.
@@ -95,6 +96,10 @@ const state = {
         polygon: "bi-octagon"
     },
     planningScenarioDrawTypesMain: ["polygon", "box"],
+    planningScenarioHighlightFeatureStyle: {
+        strokeColor: "#3C5F94",
+        strokeWidth: 4
+    },
     planningScenarioSelectedDrawType: "",
     planningScenarioSelectedDrawTypeMain: "",
     planningScenarioSelectedInteraction: null,

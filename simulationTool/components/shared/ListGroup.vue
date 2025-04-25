@@ -21,6 +21,11 @@ export default {
             default: true
         }
     },
+    data () {
+        return {
+            currentHightlightFeatureId: ""
+        };
+    },
     computed: {
         /**
          * Checks if the first feature in the list has more than three properties, include the geometry.
@@ -37,9 +42,10 @@ export default {
          * @returns {String} The icon class.
          */
         getIcon (feature) {
-            if (feature && feature.getStyle() === null) {
+            if (feature && (feature.getStyle() === null || feature.getStyle()?.getStroke() !== null)) {
                 return "bi-eye";
             }
+
             return "bi-eye-slash";
         },
 
@@ -67,6 +73,16 @@ export default {
         },
 
         /**
+         * Emits 'setHighlightFeature' to update a specific style of the feature.
+         * @param {String} id - The feature id.
+         * @returns {void}
+         */
+        setHighlightFeature (id) {
+            this.currentHightlightFeatureId = id;
+            this.$emit("setHighlightFeature", id);
+        },
+
+        /**
          * Emits 'setFeatureStyle' to toggle the style of the given feature.
          * If the features current style is `null`, a new empty `Style` is assigned to it.
          * If the feature already has a style, it is reset to `null`.
@@ -75,24 +91,37 @@ export default {
          * @returns {void}
         */
         toggleStyle (feature) {
-            if (feature.getStyle() === null) {
+            if (feature.getId() === this.currentHightlightFeatureId) {
+                if (feature.getStyle()?.getStroke() !== null) {
+                    this.$emit("setFeatureStyle", new Style(), feature.getId());
+                }
+                else {
+                    this.$emit("setFeatureStyle", null, feature.getId());
+                    this.$emit("setHighlightFeature", feature.getId());
+                }
+            }
+            else if (feature.getStyle() === null) {
                 this.$emit("setFeatureStyle", new Style(), feature.getId());
             }
             else {
                 this.$emit("setFeatureStyle", null, feature.getId());
             }
-
         }
     }
 };
 </script>
 
 <template>
-    <ul class="list-group list-group-flush">
-        <li
+    <div class="list-group list-group-flush">
+        <div
             v-for="(feature, index) in itemList"
             :key="index"
             class="list-group-item list-group-item-action"
+            :class="feature.getId() === currentHightlightFeatureId ? 'selected' : ''"
+            role="button"
+            tabindex="0"
+            @click="setHighlightFeature(feature.getId())"
+            @keydown.enter="setHighlightFeature(feature.getId())"
         >
             <div class="d-flex justify-content-between align-items-center">
                 <template v-if="!hasMultipleProperties">
@@ -114,6 +143,7 @@ export default {
                             class="form-control text-end w-50"
                             :value="value"
                             @input="event => setFeatureAttribute(event.target.value, key, feature)"
+                            @click.stop="() => {}"
                         >
                     </div>
                 </template>
@@ -132,16 +162,24 @@ export default {
                     :icon="getIcon(feature)"
                     class="me-3"
                     :aria="$t('additional:modules.tools.simulationTool.toggleVisibility')"
-                    @click="toggleStyle(feature)"
+                    @click.stop="toggleStyle(feature)"
                 />
                 <IconButton
                     v-if="removeable"
                     icon="bi-trash"
                     :aria="$t('additional:modules.tools.simulationTool.toggleVisibility')"
-                    @click="$emit('removeFeature', feature.getId())"
+                    @click.stop="$emit('removeFeature', feature.getId())"
                 />
             </div>
-        </li>
-    </ul>
+        </div>
+    </div>
 </template>
+
+<style scoped lang="scss">
+@import "~variables";
+
+.selected {
+    background-color: $light_blue;
+}
+</style>
 

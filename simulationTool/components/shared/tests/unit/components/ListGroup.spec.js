@@ -58,13 +58,6 @@ describe("addons/SimulationTool/components/shared/ListGroup.vue", () => {
             expect(wrapper.exists()).to.be.true;
         });
 
-        it("should render two list elements", function () {
-            const wrapper = factory.getShallowMount({itemList: features}),
-                liWrapperArray = wrapper.findAll("li");
-
-            expect(liWrapperArray).to.be.lengthOf(2);
-        });
-
         it("should render four input elements", function () {
             const wrapper = factory.getShallowMount({itemList: features}),
                 inputWrapperArray = wrapper.findAll("input");

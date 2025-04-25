@@ -4,6 +4,7 @@ import {Style} from "ol/style.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {GeoJSON} from "ol/format.js";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
+import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import ListGroup from "../shared/ListGroup.vue";
@@ -11,6 +12,7 @@ import {mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
+import {Stroke} from "ol/style";
 
 export default {
     name: "PlanningScenarioLanduse",
@@ -32,9 +34,10 @@ export default {
             "currentPlanningScenarioId",
             "planningScenarios",
             "simulations",
-            "simulationAreaStyle"
+            "simulationAreaStyle",
+            "planningScenarioCurrentLayout",
+            "planningScenarioHighlightFeatureStyle"
         ]),
-
 
         /**
          * Filters all features of the current input that are marked as created.
@@ -253,8 +256,17 @@ export default {
                 const olFeature = geoJsonParser.readFeature(feature);
 
                 olFeature.setId(feature.id);
+
                 if (feature.style === "") {
                     olFeature.setStyle(new Style());
+                }
+                else if (isObject(feature.style)) {
+                    olFeature.setStyle(new Style({
+                        stroke: new Stroke({
+                            color: feature.style.strokeColor,
+                            width: feature.style.strokeWidth
+                        })
+                    }));
                 }
                 else {
                     olFeature.setStyle(null);
@@ -276,6 +288,15 @@ export default {
                 return feature.id !== id;
             });
             this.updateFeatures();
+        },
+
+        /**
+         * Saves the planning scenario and reset the highlight features.
+         * @returns {void}
+         */
+        save () {
+            this.setHighlightFeature();
+            this.setCurrentPlanningComponent("");
         },
 
         /**
@@ -305,6 +326,26 @@ export default {
             this.getInputFeatures(this.currentEditableInput).map(feature => {
                 if (feature.id === id) {
                     feature.style = style === null ? null : "";
+                }
+                return feature;
+            });
+            this.updateFeatures();
+        },
+
+        /**
+         * Sets the highlight feature with style.
+         * @param {String} id - The id of the feature..
+         * @returns {void}
+         */
+        setHighlightFeature (id) {
+            this.getInputFeatures(this.currentEditableInput).map(feature => {
+                if (feature.style !== "") {
+                    if (feature.id === id) {
+                        feature.style = this.planningScenarioHighlightFeatureStyle;
+                    }
+                    else {
+                        feature.style = null;
+                    }
                 }
                 return feature;
             });
@@ -403,6 +444,7 @@ export default {
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
                         @setFeatureStyle="setFeatureStyle"
+                        @setHighlightFeature="setHighlightFeature"
                     />
                 </div>
                 <div
@@ -434,7 +476,7 @@ export default {
                 <FlatButton
                     class="m-3"
                     :text="$t('additional:modules.tools.simulationTool.planningScenarioSave')"
-                    :interaction="() => setCurrentPlanningComponent('')"
+                    :interaction="() => save()"
                 />
             </div>
             <div
