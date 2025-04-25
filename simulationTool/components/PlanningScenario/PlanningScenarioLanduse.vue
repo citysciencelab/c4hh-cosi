@@ -369,13 +369,13 @@ export default {
                             id="existing-tab"
                             :active="true"
                             :target="'#existing'"
-                            :label="'additional:modules.tools.simulationTool.existingBuildings'"
+                            :label="'additional:modules.tools.simulationTool.existingFeatures'"
                         />
                         <NavTab
                             id="created-tab"
                             :active="false"
                             :target="'#created'"
-                            :label="'additional:modules.tools.simulationTool.createdBuildings'"
+                            :label="'additional:modules.tools.simulationTool.createdFeatures'"
                         />
                     </ul>
                 </div>
