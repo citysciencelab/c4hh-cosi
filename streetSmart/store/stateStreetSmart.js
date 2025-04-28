@@ -12,7 +12,7 @@
  * @property {String[]} supportedDevices Devices on which the module is displayed.
  * @property {String[]} supportedMapModes Map mode in which this module can be used.
  * @property {String} type type of the viewer component
- *
+ * @property {String} streetSmartSRS The Spatial Reference System (SRS) used for panorama positioning, e.g., "EPSG:25832". If null, the default SRS is used.
  * @property {Number[]} lastCoordinates the last clicked coordinates
  * @property {Number} lastYaw the last recorded yaw/rotation
  * @property {Boolean} packagesLoaded represents if packages are loaded.
