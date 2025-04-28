@@ -52,10 +52,43 @@ export default {
             "planningScenarioSelectedInteraction",
             "planningScenarioStrokeRange",
             "simulationAreaStyle",
+            "simulationAreaStyleInvalid",
             "simulations"
-        ])
+        ]),
+
+        /**
+         * Gets the maximum area that is configured in the currently selected simulation.
+         * @returns {Number} The maximum area of the current simulation.
+         */
+        currentMaxArea () {
+            return this.simulations.find(
+                simulation => simulation.id === this.currentScenarioData.simulationId
+            )?.maxSizeArea;
+        },
+
+        /**
+         * Checks if the current maximum area is exceeded.
+         * @returns {Boolean} True if the maximum area is exceeded, false otherwise.
+         */
+        isMaxAreaExceeded () {
+            return this.source?.getFeatures()?.some(
+                feature => feature.getGeometry()?.getArea() > this.currentMaxArea
+            ) ?? false;
+        }
     },
     watch: {
+        /**
+         * Is called when the current max area is exceeded or no longer exceeded.
+         * Changes the style of the simulation area.
+         */
+        isMaxAreaExceeded () {
+            const bboxFeature = this.source?.getFeatures().find(feature => feature.get("id") === "simulation-area");
+
+            bboxFeature?.setStyle(ConvertStyle.geoJsonToOpenlayers(
+                this.isMaxAreaExceeded ? this.simulationAreaStyleInvalid : this.simulationAreaStyle
+            ));
+        },
+
         /**
          * Decides if to remove edit interaction according to selected draw type.
          * @param {String} val the main selected draw type.
@@ -107,8 +140,10 @@ export default {
                 id: "simulation-area"
             });
 
-            featureBBOX.setStyle(ConvertStyle.geoJsonToOpenlayers(this.simulationAreaStyle));
-            this.getLayerSource().addFeature(featureBBOX);
+            this.source.addFeature(featureBBOX);
+            featureBBOX.setStyle(ConvertStyle.geoJsonToOpenlayers(
+                this.isMaxAreaExceeded ? this.simulationAreaStyleInvalid : this.simulationAreaStyle
+            ));
         },
 
         /**
@@ -412,6 +447,13 @@ export default {
                     :value="bufferVal"
                 />
                 <div
+                    v-if="isMaxAreaExceeded"
+                    class="alert alert-danger"
+                    role="alert"
+                >
+                    {{ $t('additional:modules.tools.simulationTool.maxAreaExceeded', {maxArea: currentMaxArea}) }}
+                </div>
+                <div
                     class="d-flex justify-content-between"
                 >
                     <FlatButton
@@ -425,7 +467,7 @@ export default {
                         :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
                         :interaction="() => create()"
                         :text="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-                        :disabled="!isValid || !source?.getFeatures().length > 0"
+                        :disabled="!isValid || !source?.getFeatures().length > 0 || isMaxAreaExceeded"
                     />
                 </div>
             </form>

@@ -120,6 +120,13 @@ const state = {
         strokeLineDash: [5, 8],
         strokeWidth: 2
     },
+    simulationAreaStyleInvalid: {
+        fillColor: [255, 255, 255, 0],
+        strokeColor: [225, 0, 25, 1],
+        strokeLineDash: [5, 8],
+        strokeWidth: 4,
+        zIndex: Number.POSITIVE_INFINITY
+    },
     simulations: [],
     userDetailsCache: {}
 };
