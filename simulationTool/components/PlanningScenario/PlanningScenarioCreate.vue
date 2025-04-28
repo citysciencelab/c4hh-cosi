@@ -173,6 +173,7 @@ export default {
             this.setCurrentPlanningScenarioData(this.source?.getFeatures());
             this.setPlanningScenarioSelectedDrawType("");
             this.setPlanningScenarioSelectedDrawTypeMain("");
+            this.resetInteraction();
             this.setCurrentPlanningComponent("landuse");
         },
 
@@ -187,11 +188,29 @@ export default {
         },
 
         /**
+         * Clears the current draw interaction and deletes the source.
+         * @returns {void}
+         */
+        clearDraw () {
+            this.deleteSource();
+            this.resetInteraction();
+        },
+
+        /**
          * Deletes all features from the source.
          * @returns {void}
          */
         deleteSource () {
             this.source.clear();
+        },
+
+        /**
+         * Calls deleteSource and resetInteraction.
+         * @returns {void}
+         */
+        deleteSourceAndReset () {
+            this.deleteSource();
+            this.resetInteraction();
         },
 
         /**
@@ -285,7 +304,6 @@ export default {
          * @returns {void}
          */
         resetInteraction () {
-            this.deleteSource();
             this.removeInteraction(this.currentModifyInteraction);
             this.currentModifyInteraction = null;
         },
@@ -353,7 +371,7 @@ export default {
                             :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
                             :set-selected-interaction="setPlanningScenarioSelectedInteraction"
                             :source="source"
-                            @drawstart="resetInteraction"
+                            @drawstart="clearDraw"
                             @drawend="addBBOX"
                         />
                     </div>
@@ -365,7 +383,7 @@ export default {
                                         :class-array="['btn-primary']"
                                         :aria="$t('additional:modules.tools.simulationTool.delete')"
                                         icon="bi bi-trash"
-                                        :interaction="() => deleteSource()"
+                                        :interaction="() => deleteSourceAndReset()"
                                     />
                                     <p class="delete-all text-center">
                                         {{ $t('additional:modules.tools.simulationTool.delete') }}

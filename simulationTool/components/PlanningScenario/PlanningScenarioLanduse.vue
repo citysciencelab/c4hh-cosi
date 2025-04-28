@@ -114,6 +114,10 @@ export default {
         }
     },
 
+    created () {
+        this.featureLayerId = "planning-scenario-landuse";
+    },
+
     async mounted () {
         if (!this.planningScenario) {
             return;
@@ -230,13 +234,13 @@ export default {
          * @returns {ol/source/Vector} A vector source.
          */
         getLayerSource () {
-            if (typeof layerCollection.getLayerById("planning-scenario-landuse") !== "undefined") {
-                return layerCollection.getLayerById("planning-scenario-landuse").getLayerSource();
+            if (typeof layerCollection.getLayerById(this.featureLayerId) !== "undefined") {
+                return layerCollection.getLayerById(this.featureLayerId).getLayerSource();
             }
             const layer = layerFactory.createLayer({
                 typ: "VECTORBASE",
-                id: "planning-scenario-landuse",
-                name: "planning-scenario-landuse",
+                id: this.featureLayerId,
+                name: this.featureLayerId,
                 alwaysOnTop: true
             });
 
@@ -352,6 +356,18 @@ export default {
             this.updateFeatures();
         },
 
+        /*
+         * Toggles the visibility of the planning scenario layer.
+         * @returns {void}
+         */
+        toggleFeatureLayerVisibilty () {
+            const layer = layerCollection.getLayerById(this.featureLayerId);
+
+            if (layer) {
+                layer.layer.setVisible(!layer.layer.isVisible());
+            }
+        },
+
         /**
          * Updates the features of the current input.
          * @returns {void}
@@ -404,7 +420,7 @@ export default {
                             id="hideExistingItems"
                             :label="$t('additional:modules.tools.simulationTool.hideExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
                             :aria="$t('additional:modules.tools.simulationTool.hideExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
-                            :interaction="() => {}"
+                            :interaction="toggleFeatureLayerVisibilty"
                         />
                     </div>
                 </div>
