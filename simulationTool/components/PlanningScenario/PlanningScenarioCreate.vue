@@ -103,6 +103,10 @@ export default {
     created () {
         this.source = this.getLayerSource();
     },
+    unmounted () {
+        this.removeInteraction(this.currentModifyInteraction);
+        this.currentModifyInteraction = null;
+    },
     methods: {
         ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent"]),
         ...mapMutations("Modules/SimulationTool", [
