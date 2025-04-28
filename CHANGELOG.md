@@ -9,7 +9,7 @@
 ### Added
 
 ### Changed
-- Boris: Design adjustments for the component buttons, including colors and hover effect. 
+- Charts: Brought code up to date — same refactor as in v2 with the Chart.js update.
 - StreetSmart: Changed EPSG to resolve false heigth in viewer.
 
 ### Deprecated
