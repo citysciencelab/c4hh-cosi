@@ -2,7 +2,6 @@ import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature";
 import ListGroup from "../../../components/ListGroup.vue";
-import Style from "ol/style/Style.js";
 
 config.global.mocks.$t = key => key;
 
@@ -28,7 +27,8 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
             new Feature({
                 id: "one",
                 height: "100",
-                geometry: ""
+                geometry: "",
+                created: false
             }),
             new Feature({
                 id: "two",
@@ -41,13 +41,15 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
                 id: "one",
                 height: "100",
                 geometry: "",
-                width: "100"
+                width: "100",
+                cool: true
             }),
             new Feature({
                 id: "two",
                 height: "200",
                 geometry: "",
-                width: "200"
+                width: "200",
+                cool: true
             })
         ];
 
@@ -119,15 +121,6 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
             expect(wrapper.emitted().setFeatureAttribute[0]).to.deep.equal(["1000", "id", undefined]);
         });
 
-        it("should emit 'setFeatureStyle' with the right values", async function () {
-            const wrapper = factory.getMount({itemList: features}),
-                buttonWrapper = wrapper.find(".bi-eye");
-
-            await buttonWrapper.trigger("click");
-
-            expect(wrapper.emitted()).to.have.property("setFeatureStyle");
-            expect(wrapper.emitted().setFeatureStyle[0]).to.deep.equal([new Style(), undefined]);
-        });
 
         it("should emit 'removeFeature' with the right values", async function () {
             const wrapper = factory.getMount({itemList: features}),
@@ -143,10 +136,10 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
     describe("Methods", () => {
         describe("getIcon", () => {
             it("should return the right icon if feature is visible", function () {
-                const wrapper = factory.getShallowMount({itemList: features}),
-                    icon = wrapper.vm.getIcon(features[0]);
+                const wrapper = factory.getShallowMount({itemList: features});
 
-                expect(icon).to.be.equal("bi-eye");
+                features[0].setStyle(null);
+                expect(wrapper.vm.getIcon(features[0])).to.be.equal("bi-eye");
             });
 
             it("should return the right icon wif feature is not visible", function () {
@@ -177,10 +170,16 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
             });
         });
 
-        describe("propertiesWithoutGeometry", () => {
+        describe("extractedProperties", () => {
             it("should return feature properties without the geometry", function () {
-                const wrapper = factory.getShallowMount({itemList: features}),
-                    properties = wrapper.vm.propertiesWithoutGeometry(features[0]);
+                const feature = new Feature({
+                        id: "one",
+                        height: "100",
+                        geometry: "",
+                        created: false
+                    }),
+                    wrapper = factory.getShallowMount({itemList: [feature]}),
+                    properties = wrapper.vm.extractedProperties(feature);
 
                 expect(properties).to.deep.equal({id: "one", height: "100"});
             });

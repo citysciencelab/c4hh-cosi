@@ -1,6 +1,8 @@
 <script>
+import ConvertStyle from "../../../js/convertStyle";
 import {getMappedProperty} from "../js/getMappedProperty";
 import IconButton from "../../../../../src/shared/modules/buttons/components/IconButton.vue";
+import {mapGetters} from "vuex";
 import Style from "ol/style/Style.js";
 
 export default {
@@ -34,21 +36,43 @@ export default {
             default: () => []
         }
     },
+    emits: [
+        "setFeatureAttribute",
+        "setFeatureStyle",
+        "removeFeature"
+    ],
     data () {
         return {
             currentHightlightFeatureId: ""
         };
     },
     computed: {
+        ...mapGetters("Modules/SimulationTool", {
+            highlightStyle: "planningScenarioHighlightFeatureStyle"
+        }),
+
         /**
          * Checks if the first feature in the list has more than three properties, include the geometry.
          * @returns {Boolean} True if the first feature has more than three properties, false otherwise.
          */
         hasMultipleProperties () {
-            return Object.keys(this.itemList[0].getProperties()).length > 3;
+            return Object.keys(this.itemList[0].getProperties()).length > 4;
         }
     },
     methods: {
+        /**
+         * Extracts the properties of a given feature, excluding specific keys.
+         * @param {ol/Feature} feature - The feature object containing properties.
+         * @returns {Object} A new object containing all properties of the feature except for `geometry` and `created`.
+         */
+        extractedProperties (feature) {
+            const properties = {...feature.getProperties()};
+
+            delete properties.geometry;
+            delete properties.created;
+            return properties;
+        },
+
         /**
          * Determines the appropriate icon class based on the style of the given feature.
          * @param {ol/Feature} feature - The feature object to evaluate.
@@ -94,18 +118,6 @@ export default {
         },
 
         /**
-         * Extracts the properties of a feature, excluding the geometry property.
-         * @param {ol/Feature} feature - The feature.
-         * @returns {Object} All properties of the feature except the geometry.
-         */
-        propertiesWithoutGeometry (feature) {
-            const properties = {...feature.getProperties()};
-
-            delete properties.geometry;
-            return properties;
-        },
-
-        /**
          * Emits 'setFeatureAttribute' to update a specific attribute of a feature with a new value.
          * @param {InputEvent} event - The event containing the new value.
          * @param {String|Number} oldValue - The old value of the attribute.
@@ -119,6 +131,7 @@ export default {
             if (Number.isNaN(value)) {
                 return;
             }
+            feature.set(key, value);
             this.$emit("setFeatureAttribute", value, key, feature.getId());
         },
 
@@ -127,34 +140,36 @@ export default {
          * @param {String} id - The feature id.
          * @returns {void}
          */
-        setHighlightFeature (id) {
-            this.currentHightlightFeatureId = id;
-            this.$emit("setHighlightFeature", id);
+
+        /**
+         * Sets the highlight style for a given feature and resets the style of the previously highlighted feature.
+         * @param {Object} feature - The feature to be highlighted.
+         * @returns {void}
+         */
+        setHighlightFeature (feature) {
+            const oldHighlightFeature = this.itemList.find(item => item.getId() === this.currentHightlightFeatureId);
+
+            if (oldHighlightFeature) {
+                this.$emit("setFeatureStyle", oldHighlightFeature);
+            }
+            this.currentHightlightFeatureId = feature.getId();
+            feature.setStyle(ConvertStyle.geoJsonToOpenlayers(this.highlightStyle));
         },
 
         /**
-         * Emits 'setFeatureStyle' to toggle the style of the given feature.
-         * If the features current style is `null`, a new empty `Style` is assigned to it.
-         * If the feature already has a style, it is reset to `null`.
-         * Empty Style = not visible. Null = layer style.
-         * @param {ol/Feature} feature - The feature whose style is being toggled.
+         * Toggles the style of a given feature.
+         * If the feature currently has a stroke style, it resets the style to a new empty `Style` object.
+         * Otherwise, it emits an event to set the feature's style externally.
+         * Empty Style = not visible
+         * @param {Object} feature - The feature whose style is to be toggled.
          * @returns {void}
          */
         toggleStyle (feature) {
-            if (feature.getId() === this.currentHightlightFeatureId) {
-                if (feature.getStyle()?.getStroke() !== null) {
-                    this.$emit("setFeatureStyle", new Style(), feature.getId());
-                }
-                else {
-                    this.$emit("setFeatureStyle", null, feature.getId());
-                    this.$emit("setHighlightFeature", feature.getId());
-                }
-            }
-            else if (feature.getStyle() === null) {
-                this.$emit("setFeatureStyle", new Style(), feature.getId());
+            if (feature.getStyle()?.getStroke() !== null) {
+                feature.setStyle(new Style());
             }
             else {
-                this.$emit("setFeatureStyle", null, feature.getId());
+                this.$emit("setFeatureStyle", feature);
             }
         }
     }
@@ -170,13 +185,13 @@ export default {
             :class="feature.getId() === currentHightlightFeatureId ? 'selected' : ''"
             role="button"
             tabindex="0"
-            @click="setHighlightFeature(feature.getId())"
-            @keydown.enter="setHighlightFeature(feature.getId())"
+            @click="setHighlightFeature(feature)"
+            @keydown.enter="setHighlightFeature(feature)"
         >
             <div class="d-flex justify-content-between align-items-center">
                 <template v-if="!hasMultipleProperties">
                     <div
-                        v-for="(value, key, idx) in propertiesWithoutGeometry(feature)"
+                        v-for="(value, key, idx) in extractedProperties(feature)"
                         :key="listKey + key"
                         class="d-flex me-3 no-stepper-arrows"
                         :class="idx === 0 ? 'flex-grow-1' : ''"

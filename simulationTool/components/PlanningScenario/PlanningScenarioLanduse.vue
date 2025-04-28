@@ -1,6 +1,6 @@
 <script>
+import ConvertFeature from "../../js/convertFeatures";
 import ConvertStyle from "../../js/convertStyle";
-import {Style} from "ol/style.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {GeoJSON} from "ol/format.js";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
@@ -12,7 +12,6 @@ import {mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import {Stroke} from "ol/style";
 
 export default {
     name: "PlanningScenarioLanduse",
@@ -25,14 +24,16 @@ export default {
     },
     data () {
         return {
-            currentEditableInput: "",
             featuresByInput: [],
             featureLayerId: "planning-scenario-landuse"
         };
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
+            "currentEditableInput",
             "currentPlanningScenarioId",
+            "currentPlanningComponent",
+            "landuseActiveTab",
             "planningScenarios",
             "simulations",
             "simulationAreaStyle",
@@ -147,7 +148,10 @@ export default {
             return;
         }
         this.initializeShowExistingItems();
-        this.currentEditableInput = Object.keys(this.editableInputs)[0];
+
+        if (this.currentEditableInput === "") {
+            this.setCurrentEditableInput(Object.keys(this.editableInputs)[0]);
+        }
 
         if (!this.planningScenario.featuresLoaded) {
             try {
@@ -167,11 +171,14 @@ export default {
         }
     },
     unmounted () {
-        this.clearFeatures();
-        layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+        if (this.currentPlanningComponent !== "newLanduse") {
+            this.clearFeatures();
+            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+        }
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
+            "setCurrentEditableInput",
             "setCurrentPlanningComponent",
             "setCurrentInputName"
         ]),
@@ -186,15 +193,10 @@ export default {
                 return;
             }
 
-            const geoJsonParser = new GeoJSON(),
-                layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource();
+            const layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource(),
+                olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
 
-            features.forEach(feature => {
-                const olFeature = geoJsonParser.readFeature(feature);
-
-                olFeature.setStyle(ConvertStyle.geoJsonToOpenlayers(feature.style));
-                layerSource.addFeature(olFeature);
-            });
+            layerSource.addFeatures(olFeatures);
         },
 
         /**
@@ -301,36 +303,12 @@ export default {
          * @returns {void}
          */
         parseAndAddFeatures (features) {
-            const geoJsonParser = new GeoJSON(),
-                featuresToPutOnMap = [];
-
-            features.forEach(feature => {
-                const olFeature = geoJsonParser.readFeature(feature);
-
-                olFeature.setId(feature.id);
-
-                if (feature.style === "") {
-                    olFeature.setStyle(new Style());
-                }
-                else if (isObject(feature.style)) {
-                    olFeature.setStyle(new Style({
-                        stroke: new Stroke({
-                            color: feature.style.strokeColor,
-                            width: feature.style.strokeWidth
-                        })
-                    }));
-                }
-                else {
-                    olFeature.setStyle(null);
-                }
-                featuresToPutOnMap.push(olFeature);
-
-            });
+            const olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
 
             if (this.isShowToggleChecked) {
-                this.getLayerSource().addFeatures(featuresToPutOnMap);
+                this.getLayerSource().addFeatures(olFeatures);
             }
-            this.featuresByInput = featuresToPutOnMap;
+            this.featuresByInput = this.getLayerSource().getFeatures();
         },
 
         /**
@@ -350,7 +328,6 @@ export default {
          * @returns {void}
          */
         save () {
-            this.setHighlightFeature();
             this.setCurrentPlanningComponent("");
         },
 
@@ -377,34 +354,17 @@ export default {
          * @param {String} id - The id of the feature to be updated.
          * @returns {void}
          */
-        setFeatureStyle (style, id) {
-            this.getInputFeatures(this.currentEditableInput).map(feature => {
-                if (feature.id === id) {
-                    feature.style = style === null ? null : "";
-                }
-                return feature;
-            });
-            this.updateFeatures(this.currentEditableInput);
-        },
+        setFeatureStyle (olFeature) {
+            const foundFeature = this.getInputFeatures(this.currentEditableInput).find(feature => feature.id === olFeature.getId());
 
-        /**
-         * Sets the highlight feature with style.
-         * @param {String} id - The id of the feature..
-         * @returns {void}
-         */
-        setHighlightFeature (id) {
-            this.getInputFeatures(this.currentEditableInput).map(feature => {
-                if (feature.style !== "") {
-                    if (feature.id === id) {
-                        feature.style = this.planningScenarioHighlightFeatureStyle;
-                    }
-                    else {
-                        feature.style = null;
-                    }
-                }
-                return feature;
-            });
-            this.updateFeatures(this.currentEditableInput);
+            if (foundFeature && foundFeature.style) {
+                const olStyle = ConvertStyle.geoJsonToOpenlayers(foundFeature.style);
+
+                olFeature.setStyle(olStyle);
+            }
+            else {
+                olFeature.setStyle(null);
+            }
         },
 
         /*
@@ -448,17 +408,17 @@ export default {
                 <hr>
                 <div class="d-flex">
                     <div
-                        v-for="(value, key, index) in editableInputs"
+                        v-for="(value, key) in editableInputs"
                         :key="key"
                         class="form-check form-check-inline"
                     >
                         <input
                             :id="key"
-                            v-model="currentEditableInput"
                             :value="key"
                             class="form-check-input"
                             type="radio"
-                            :checked="index === 0"
+                            :checked="key === currentEditableInput"
+                            @input="setCurrentEditableInput(key)"
                         >
                         <label
                             class="form-check-label"
@@ -479,18 +439,19 @@ export default {
                 </div>
                 <div id="building-tabs-container">
                     <ul
+                        id="feature-tabs"
                         class="nav nav-tabs nav-justified mt-3 d-flex"
                         role="tablist"
                     >
                         <NavTab
                             id="existing-tab"
-                            :active="true"
+                            :active="landuseActiveTab === 'existing'"
                             :target="'#existing'"
                             :label="'additional:modules.tools.simulationTool.existingFeatures'"
                         />
                         <NavTab
                             id="created-tab"
-                            :active="false"
+                            :active="landuseActiveTab === 'created'"
                             :target="'#created'"
                             :label="'additional:modules.tools.simulationTool.createdFeatures'"
                         />
@@ -503,7 +464,8 @@ export default {
             >
                 <div
                     id="existing"
-                    class="tab-pane active"
+                    class="tab-pane"
+                    :class="[landuseActiveTab === 'existing' ? 'active' : '']"
                     role="tabpanel"
                     aria-labelledby="existing-tab"
                     tabindex="0"
@@ -516,12 +478,12 @@ export default {
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
                         @setFeatureStyle="setFeatureStyle"
-                        @setHighlightFeature="setHighlightFeature"
                     />
                 </div>
                 <div
                     id="created"
                     class="tab-pane"
+                    :class="[landuseActiveTab === 'created' ? 'active' : '']"
                     role="tabpanel"
                     aria-labelledby="created-tab"
                     tabindex="0"
@@ -543,7 +505,6 @@ export default {
             >
                 <FlatButton
                     class="m-3"
-                    :secondary="true"
                     :text="currentEditableInput === 'buildings' ? $t('additional:modules.tools.simulationTool.newBuilding') : $t('additional:modules.tools.simulationTool.newRoad')"
                     icon="bi-pencil-square"
                     :interaction="() => [setCurrentPlanningComponent('newLanduse'), setCurrentInputName(currentEditableInput)]"

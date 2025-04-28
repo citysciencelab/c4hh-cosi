@@ -6,7 +6,6 @@ import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.
 import Feature from "ol/Feature.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {fromExtent} from "ol/geom/Polygon";
-import {GeoJSON} from "ol/format.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
@@ -14,6 +13,7 @@ import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import SectionHeader from "../SectionHeader.vue";
+import convertFeatures from "../../js/convertFeatures";
 
 export default {
     name: "PlanningScenarioCreate",
@@ -210,13 +210,19 @@ export default {
          * @returns {void}
          */
         editSource () {
-            this.setPlanningScenarioSelectedDrawType("");
-            this.setPlanningScenarioSelectedDrawTypeMain("");
-            this.setPlanningScenarioSelectedInteraction("");
-            this.removeInteraction(this.planningScenarioSelectedInteraction);
-            this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.source);
-            this.addInteraction(this.currentModifyInteraction);
-            this.modifyBBOX(this.currentModifyInteraction);
+            if (this.currentModifyInteraction === null) {
+                this.setPlanningScenarioSelectedDrawType("");
+                this.setPlanningScenarioSelectedDrawTypeMain("");
+                this.setPlanningScenarioSelectedInteraction("");
+                this.removeInteraction(this.planningScenarioSelectedInteraction);
+                this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.source);
+                this.addInteraction(this.currentModifyInteraction);
+                this.modifyBBOX(this.currentModifyInteraction);
+            }
+            else {
+                this.removeInteraction(this.currentModifyInteraction);
+                this.currentModifyInteraction = null;
+            }
         },
 
         /*
@@ -306,19 +312,9 @@ export default {
          * @returns {void}
          */
         setCurrentPlanningScenarioData (features) {
-            const geoJsonFeatures = [],
-                geoJsonParser = new GeoJSON();
-
-            features.forEach(feature => {
-                const geojsonFeature = geoJsonParser.writeFeatureObject(feature);
-
-                geojsonFeature.style = ConvertStyle.openlayersToGeoJson(feature.getStyle());
-                geoJsonFeatures.push(geojsonFeature);
-            });
-
             this.currentScenarioData.scenarioFeature = {
                 type: "FeatureCollection",
-                features: geoJsonFeatures
+                features: convertFeatures.openlayersToGeoJson(features)
             };
 
             this.setPlanningScenarios([...this.planningScenarios, this.currentScenarioData]);

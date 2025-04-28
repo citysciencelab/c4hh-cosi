@@ -26,7 +26,141 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             id: "planning-scenario",
             name: "planning-scenario",
             alwaysOnTop: true
-        });
+        }),
+        simulations = [
+            {
+                "id": "noise_v4:traffic_noise_propagation",
+                "inputs": {
+                    "buildings": {
+                        "editable": true,
+                        "label": "Gebäude"
+                    },
+                    "crs": "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    "hospitals": {
+                        "editable": true,
+                        "label": "Krankenhäuser"
+                    }
+                }
+            }
+        ],
+        planningScenarios = [{
+            "id": "Szenario1",
+            "name": "Planungsszenario 1",
+            "simulationId": "noise_v4:traffic_noise_propagation",
+            "featuresLoaded": true,
+            "inputs": {
+                "buildings": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "id": "DEHHALKA10007tqf-piece",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [
+                                    [[566691.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566691.619, 5934737.624]]
+                                ]
+                            },
+                            "properties": {
+                                "id": 117244,
+                                "building_height": 30.352
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "EHHALKA10007tqf-piece",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [
+                                    [[566691.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566691.619, 5934737.624]]
+                                ]
+                            },
+                            "properties": {
+                                "id": 117245,
+                                "building_height": 30.352
+                            },
+                            "style": {
+                                "fillColor": [0, 0, 0],
+                                "fillTransparency": 0,
+                                "strokeColor": [0, 0, 0],
+                                "strokeWidth": 2
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "DEHHALKA10007tqf-piece2",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [
+                                    [[566692.619, 5934737.624], [566678.396, 5934719.947], [566678.335, 5934719.865], [566692.619, 5934737.624]]
+                                ]
+                            },
+                            "properties": {
+                                "id": 117244,
+                                "building_height": 20.352,
+                                "created": true
+                            }
+                        }
+                    ]
+                },
+                "roads": {}
+            },
+            "scenarioFeature": {
+                "type": "FeatureCollection",
+                "features": []
+            }
+        },
+        {
+            "id": "Szenario2",
+            "name": "Planungsszenario 2",
+            "inputs": {
+                "buildings": {
+                    "editable": true,
+                    "source": {
+                        "type": "oaf",
+                        "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/buildings_footprint/collections/buildings/"
+                    }
+                },
+                "dem": {
+                    "menu": "nowhere",
+                    "source": {
+                        "type": "string",
+                        "url": "url to source"
+                    }
+                },
+                "ground_absorption": {
+                    "menu": "nowhere",
+                    "source": {
+                        "type": "oaf",
+                        "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/ground_absorption/collections/ground"
+                    }
+                },
+                "roads": {
+                    "editable": true,
+                    "source": {
+                        "type": "oaf",
+                        "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/streets_traffic/collections/streets/"
+                    }
+                }
+            },
+            "scenarioFeature": {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [[10.004718316195724, 53.497158760096], [10.004989573473514, 53.49918395251746], [10.001050308002908, 53.498579259213344], [10.004718316195724, 53.497158760096]]
+                            ]
+                        },
+                        "properties": {
+                            "id": "simulation-area"
+                        }
+                    }
+                ]
+            }
+        }];
 
     beforeEach(() => {
         sinon.stub(PlanningScenarioLanduseCreate.methods, "getLayerSource").returns(layer.getLayerSource());
@@ -43,6 +177,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             namespaced: true,
                             actions: {},
                             getters: {
+                                currentEditableInput: () => "buildings",
+                                currentPlanningScenarioId: () => "Szenario1",
                                 landuseCurrentLayout: () => {
                                     return {
                                         fillColor: [55, 126, 184],
@@ -63,6 +199,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 selectedInteraction: () => "draw",
                                 planningScenarioStrokeRange: () => [1, 16],
                                 planningScenarioSelectedInteraction: () => null,
+                                planningScenarios: () => planningScenarios,
+                                simulations: () => simulations,
                                 currentInputName: () => "buildings"
                             }
                         }

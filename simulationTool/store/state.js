@@ -1,6 +1,8 @@
 /**
  * User type definition
  * @typedef {Object} SimulationToolState
+ * @property {string} currentEditableInput - The current editable input (e.g. buildings)
+ * @property {string} currentInputName the current input name
  * @property {String} currentPlanningComponent the current open component in planningScenario.
  * @property {Array.<Object>} ensembles a list of ensembles
  * @property {boolean} ensemblesLoading flag indicating if ensembles are loading
@@ -20,6 +22,7 @@
  * @property {Object[]} planningScenarioSelectedDrawTypeMain - The main selected draw type.
  * @property {Object[]} planningScenarioSelectedInteraction - The selected draw interaction.
  * @property {Object[]} planningScenarioStrokeRange - The stroke range.
+ * @property {String} landuseActiveTab - The active tab in the landuse panel (existing or created).
  * @property {Object[]} landuseCurrentLayout - The current layout object as style for buildings or roads.
  * @property {Object[]} landuseRoadDrawIcons - The draw icons for roads.
  * @property {Object[]} landuseRoadDrawTypesMain - The main draw types for roads.
@@ -42,6 +45,7 @@ const state = {
     id: "simulationTool",
     type: "simulationTool",
     name: "additional:modules.tools.simulationTool.toolName",
+    currentEditableInput: "",
     currentPlanningComponent: "",
     currentPlanningScenarioId: "",
     currentInputName: "",
@@ -51,6 +55,7 @@ const state = {
     jobResultData: {},
     jobs: [],
     jobsLoading: false,
+    landuseActiveTab: "existing",
     landuseCurrentLayout: {
         fillColor: [60, 95, 148],
         fillTransparency: 0,
@@ -76,7 +81,9 @@ const state = {
     },
     planningScenarioDrawTypesMain: ["polygon", "box"],
     planningScenarioHighlightFeatureStyle: {
-        strokeColor: "#3C5F94",
+        fillColor: [0, 0, 0],
+        fillTransparency: 100,
+        strokeColor: [60, 95, 148, 1],
         strokeWidth: 4
     },
     planningScenarioSelectedDrawType: "",

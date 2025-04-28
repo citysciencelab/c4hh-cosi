@@ -1,6 +1,7 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import Feature from "ol/Feature.js";
 import getFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import layerCollection from "../../../../../../../src/core/layers/js/layerCollection.js";
 import PlanningScenarioLanduse from "../../../PlanningScenarioLanduse.vue";
@@ -79,6 +80,12 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             "properties": {
                                 "id": 117245,
                                 "building_height": 30.352
+                            },
+                            "style": {
+                                "fillColor": [0, 0, 0],
+                                "fillTransparency": 0,
+                                "strokeColor": [0, 0, 0],
+                                "strokeWidth": 2
                             }
                         },
                         {
@@ -167,22 +174,26 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         store = createStore({
             namespaced: true,
             modules: {
-                namespaced: true,
                 Modules: {
                     namespaced: true,
                     modules: {
                         SimulationTool: {
                             namespaced: true,
                             getters: {
+                                currentEditableInput: (state) => state.currentEditableInput,
                                 currentPlanningScenarioId: (state) => state.currentPlanningScenarioId,
                                 planningScenarios: (state) => state.planningScenarios,
-                                setCurrentInputName: (state) => state.currentInputName,
-                                setCurrentPlanningComponent: (state) => state.currentPlanningComponent,
+                                currentInputName: (state) => state.currentInputName,
+                                currentPlanningComponent: (state) => state.currentPlanningComponent,
+                                landuseActiveTab: (state) => state.landuseActiveTab,
                                 simulations: () => simulations
                             },
                             mutations: {
                                 setPlanningScenarios (state, value) {
                                     state.planningScenarios = value;
+                                },
+                                setCurrentEditableInput (state, value) {
+                                    state.currentEditableInput = value;
                                 },
                                 setCurrentPlanningComponent (state, value) {
                                     state.currentPlanningComponent = value;
@@ -194,8 +205,10 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             state: {
                                 currentPlanningScenarioId: "Szenario1",
                                 planningScenarios: planningScenarios,
+                                currentEditableInput: "buildings",
                                 currentInputName: "",
-                                currentPlanningComponent: ""
+                                currentPlanningComponent: "",
+                                landuseActiveTab: "existing"
                             }
                         }
                     }
@@ -238,14 +251,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
 
         it("should render SwitchInput when currentEditableInput is 'buildings'", async function () {
-            const wrapper = shallowMount(PlanningScenarioLanduse, {
-                global: {
-                    plugins: [store]
-                },
-                computed: {
-                    isLoaded: () => true
-                }
-            });
+            const wrapper = factory.getShallowMount();
 
             await wrapper.vm.$nextTick();
 
@@ -255,39 +261,24 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         it("should render NavTab when currentEditableInput is 'buildings'", async function () {
             const wrapper = factory.getShallowMount();
 
-            wrapper.vm.currentEditableInput = "buildings";
             await wrapper.vm.$nextTick();
 
             expect(wrapper.findComponent({name: "NavTab"}).exists()).to.be.true;
         });
 
         it("should render text of button when currentEditableInput is 'buildings'", async () => {
-            const wrapper = shallowMount(PlanningScenarioLanduse, {
-                global: {
-                    plugins: [store]
-                },
-                computed: {
-                    isLoaded: () => true
-                }
-            });
+            const wrapper = factory.getShallowMount();
 
-            wrapper.vm.currentEditableInput = "buildings";
             await wrapper.vm.$nextTick();
 
             expect(wrapper.findAllComponents({name: "FlatButton"}).at(0).attributes().text).to.be.equal("additional:modules.tools.simulationTool.newBuilding");
         });
 
         it("should render text of button when currentEditableInput is not 'buildings'", async () => {
-            const wrapper = shallowMount(PlanningScenarioLanduse, {
-                global: {
-                    plugins: [store]
-                },
-                computed: {
-                    isLoaded: () => true
-                }
-            });
+            const wrapper = factory.getShallowMount();
 
-            wrapper.vm.currentEditableInput = "roads";
+            await wrapper.vm.$nextTick();
+            wrapper.vm.setCurrentEditableInput("roads");
             await wrapper.vm.$nextTick();
 
             expect(wrapper.findAllComponents({name: "FlatButton"}).at(0).attributes().text).to.be.equal("additional:modules.tools.simulationTool.newRoad");
@@ -300,9 +291,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 wrapper = factory.getShallowMount();
 
             await wrapper.vm.$nextTick();
-            await wrapper.setData({
-                currentEditableInput: "Ich habe mich geaendert"
-            });
+            wrapper.vm.setCurrentEditableInput("Ich habe mich geaendert");
+            await wrapper.vm.$nextTick();
 
             expect(stubUpdateFeatures.called).to.be.true;
         });
@@ -405,19 +395,25 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
 
         describe("setFeatureStyle", () => {
-            it("should set null style to the correct feature", async () => {
-                const wrapper = factory.getShallowMount();
+            it("should set null style to the feature", async function () {
+                const wrapper = factory.getShallowMount(),
+                    feature = new Feature();
 
+                feature.setId("DEHHALKA10007tqf-piece");
                 await wrapper.vm.$nextTick();
-                wrapper.vm.setFeatureStyle(null, "DEHHALKA10007tqf-piece");
-                expect(planningScenarios[0].inputs.buildings.features[0].style).to.be.null;
+                wrapper.vm.setFeatureStyle(feature);
+
+                expect(feature.getStyle()).to.be.null;
             });
-            it("should set empty string as style to the correct feature", async () => {
-                const wrapper = factory.getShallowMount();
+            it("should set a style to the feature", async function () {
+                const wrapper = factory.getShallowMount(),
+                    feature = new Feature();
 
+                feature.setId("EHHALKA10007tqf-piece");
                 await wrapper.vm.$nextTick();
-                wrapper.vm.setFeatureStyle({}, "DEHHALKA10007tqf-piece");
-                expect(planningScenarios[0].inputs.buildings.features[0].style).to.be.equal("");
+                wrapper.vm.setFeatureStyle(feature);
+
+                expect(feature.getStyle()).to.be.not.null;
             });
         });
         describe("removeFeature", () => {

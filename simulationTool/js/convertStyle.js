@@ -32,7 +32,7 @@ function geoJsonToOpenlayers (style) {
  */
 function openlayersToGeoJson (style) {
     return {
-        fillColor: style.getFill().getColor(),
+        fillColor: style?.getFill()?.getColor(),
         strokeColor: style.getStroke().getColor(),
         strokeLineDash: style.getStroke().getLineDash(),
         strokeWidth: style.getStroke().getWidth()

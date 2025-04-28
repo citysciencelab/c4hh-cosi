@@ -1,73 +1,178 @@
 <script>
+import ConvertFeature from "../../js/convertFeatures";
+import ConvertStyle from "../../js/convertStyle";
 import DrawLayout from "../../../../src/shared/modules/draw/components/DrawLayout.vue";
 import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue";
+import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
+import ListGroup from "../shared/components/ListGroup.vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
+import {uniqueId} from "../../../../src/shared/js/utils/uniqueId.js";
 
 export default {
     name: "PlanningScenarioLanduseCreate",
     components: {
         DrawLayout,
         DrawTypes,
+        FlatButton,
         IconButton,
+        ListGroup,
         SectionHeader
     },
     data () {
         return {
-            source: null,
-            currentModifyInteraction: null
+            createdFeatures: [],
+            currentModifyInteraction: null,
+            source: null
         };
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
+            "currentPlanningScenarioId",
+            "currentEditableInput",
             "currentInputName",
             "landuseCurrentLayout",
             "landuseRoadDrawIcons",
             "landuseRoadDrawTypesMain",
             "planningScenarioDrawIcons",
             "planningScenarioDrawTypesMain",
+            "planningScenarioHighlightFeatureStyle",
             "planningScenarioSelectedDrawType",
             "planningScenarioSelectedDrawTypeMain",
             "planningScenarioSelectedInteraction",
-            "planningScenarioStrokeRange"
-        ])
+            "planningScenarioStrokeRange",
+            "planningScenarios",
+            "simulations"
+        ]),
+
+        /**
+         * Gets the simulation config object that is set for the current planning scenario.
+         * @returns {Object} The current simulation config.
+         */
+        currentSimulation () {
+            return this.simulations.find(sim => sim.id === this.planningScenario.simulationId);
+        },
+
+        /**
+         * Gets all simulation inputs marked as editable.
+         * @returns {Object} An inputs object containing only the editable inputs.
+         */
+        editableInputs () {
+            if (!this.currentSimulation?.inputs) {
+                return undefined;
+            }
+
+            return Object.fromEntries(
+                Object.entries(this.currentSimulation.inputs).filter(([, value]) => {
+                    return value.editable;
+                })
+            );
+        },
+
+        /**
+         * Gets the mapped properties.
+         * @return {Object} The mapped properties.
+         */
+        getPropertiesMapping () {
+            return this.editableInputs[this.currentEditableInput]?.propertiesMapping;
+        },
+
+        /**
+         * Gets the currently selected planning scenario.
+         * @return {Object} The current planning scenario.
+         */
+        planningScenario () {
+            return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+        }
     },
     mounted () {
         this.source = this.getLayerSource();
+        this.createdFeatures = this.getLayerSource().getFeatures().filter(feature => feature.get("created") === true);
     },
     methods: {
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapMutations("Modules/SimulationTool", [
+            "setLanduseActiveTab",
             "setLanduseCurrentLayout",
+            "setCurrentPlanningComponent",
             "setPlanningScenarioDrawType",
             "setplanningScenarioDrawTypesMain",
             "setPlanningScenarioSelectedDrawType",
             "setPlanningScenarioSelectedDrawTypeMain",
             "setPlanningScenarioSelectedInteraction"
         ]),
+
         /**
-         * Deletes all features from the source.
+         * Adds a feature to the current editable input of the planning scenario.
+         * @param {Object} evt - Draw event emitted by draw interaction.
+         * @return {void}
+         */
+        addInputFeature (evt) {
+            const olFeature = this.setFeatureProperties(evt.feature),
+                geojsonFeature = ConvertFeature.openlayersToGeoJson([olFeature])[0];
+
+            this.createdFeatures = this.getLayerSource().getFeatures().filter(feature => feature.get("created") === true).concat(evt.feature);
+            this.getInputFeatures(this.currentEditableInput).push(geojsonFeature);
+        },
+
+        /**
+         * Navigates back to the "landuse" component and resets various states related to the planning scenario.
+         * @return {void}
+         */
+        backToLanduse () {
+            this.setLanduseActiveTab("created");
+            this.setCurrentPlanningComponent("landuse");
+            this.setPlanningScenarioSelectedDrawType("");
+            this.setPlanningScenarioSelectedDrawTypeMain("");
+            this.setPlanningScenarioSelectedInteraction("");
+            this.removeInteraction(this.currentModifyInteraction);
+            this.currentModifyInteraction = null;
+        },
+
+        /**
+         * Removes all features from the source.
          * @returns {void}
          */
-        deleteSource () {
-            this.source.clear();
+        clearFeatures () {
+            if (this.getLayerSource().getFeatures().length) {
+                this.getLayerSource().clear(true);
+            }
         },
+
         /**
          * Edits the geometry of current source features.
          * @returns {void}
          */
         editSource () {
-            this.setPlanningScenarioSelectedDrawType("");
-            this.setPlanningScenarioSelectedDrawTypeMain("");
-            this.setPlanningScenarioSelectedInteraction("");
-            this.removeInteraction(this.planningScenarioSelectedInteraction);
-            this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.source);
-            this.addInteraction(this.currentModifyInteraction);
+            if (this.currentModifyInteraction === null) {
+                this.setPlanningScenarioSelectedDrawType("");
+                this.setPlanningScenarioSelectedDrawTypeMain("");
+                this.setPlanningScenarioSelectedInteraction("");
+                this.removeInteraction(this.planningScenarioSelectedInteraction);
+                this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.source);
+                this.currentModifyInteraction.on("modifyend", this.updateGeometry);
+                this.addInteraction(this.currentModifyInteraction);
+            }
+            else {
+                this.removeInteraction(this.currentModifyInteraction);
+                this.currentModifyInteraction = null;
+            }
         },
+
+
+        /**
+         * Gets the features of an input.
+         * @param {String} key - The key of the input.
+         * @returns {Object[]} An array of geojson features.
+         */
+        getInputFeatures (key) {
+            return this.planningScenario?.inputs[key].features;
+        },
+
         /*
          * Creates a layer if it does not yet exist and returns its source.
          * @returns {Object} A vector layer source.
@@ -86,6 +191,88 @@ export default {
             layerCollection.addLayer(layer);
 
             return layer.getLayerSource();
+        },
+
+        /**
+         * Removes a feature from the current editable input and from the layer source.
+         * Updates the `createdFeatures` array to include only features marked as "created" in the layer source.
+         * @param {String} id - The id of the feature to be removed.
+         * @returns {void}
+         */
+        removeFeature (id) {
+            this.planningScenario.inputs[this.currentEditableInput].features = this.getInputFeatures(this.currentEditableInput).filter(feature => {
+                return feature.id !== id;
+            });
+
+            this.getLayerSource().removeFeature(this.getLayerSource().getFeatureById(id));
+            this.createdFeatures = this.getLayerSource().getFeatures().filter(feature => feature.get("created") === true);
+        },
+
+        /**
+         * Sets a feature attribute of the current editable input.
+         * @param {String} value - The value to be set.
+         * @param {String} key - The key of the attribute to be set.
+         * @param {String} id - The id of the feature to be updated.
+         * @returns {void}
+         */
+        setFeatureAttribute (value, key, id) {
+            const foundFeature = this.getInputFeatures(this.currentEditableInput).find(feature => feature.id === id);
+
+            if (foundFeature) {
+                foundFeature.properties[key] = value;
+            }
+        },
+
+        /**
+         * Sets properties for a given feature, initializing them with empty values
+         * and adding specific attributes like "created" and a unique ID.
+         * @param {ol/Feature} feature - The feature object to set properties for.
+         * @returns {ol/Feature} The updated feature object with initialized properties.
+         */
+        setFeatureProperties (feature) {
+            const properties = this.getInputFeatures(this.currentEditableInput)[0].properties;
+
+            Object.keys(properties).forEach(key => {
+                feature.set(key, "");
+            });
+            feature.set("created", true);
+            feature.setId(uniqueId(this.currentEditableInput + "-"));
+
+            return feature;
+        },
+
+        /**
+         * Sets the style of the given OpenLayers feature based on the corresponding feature's style
+         * from the input features of the current editable input.
+         * @param {ol/Feature} olFeature - The OpenLayers feature whose style needs to be set.
+         * @returns {void}
+         */
+        setFeatureStyle (olFeature) {
+            const foundFeature = this.getInputFeatures(this.currentEditableInput).find(feature => feature.id === olFeature.getId());
+
+            if (foundFeature && foundFeature.style) {
+                const olStyle = ConvertStyle.geoJsonToOpenlayers(foundFeature.style);
+
+                olFeature.setStyle(olStyle);
+            }
+        },
+
+        /**
+         * Updates the geometry of the features in the current editable input
+         * based on the modified features from the event from the modify interaction.
+         * @param {Object} evt - The event object containing modified features.
+         * @returns {void}
+         */
+        updateGeometry (evt) {
+            evt.features.forEach((feature) => {
+                const geometry = feature.getGeometry().getCoordinates(),
+                    geojsonFeatures = this.getInputFeatures(this.currentEditableInput),
+                    featureIndex = geojsonFeatures.findIndex(f => f.id === feature.getId());
+
+                if (featureIndex !== -1) {
+                    geojsonFeatures[featureIndex].geometry.coordinates = geometry;
+                }
+            });
         }
     }
 };
@@ -124,24 +311,13 @@ export default {
                             :selected-interaction="planningScenarioSelectedInteraction"
                             :set-selected-draw-type="setPlanningScenarioSelectedDrawType"
                             :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
+                            :set-selected-interaction="setPlanningScenarioSelectedInteraction"
                             :source="source"
+                            @drawend="addInputFeature"
                         />
                     </div>
                     <div class="col col-4">
                         <div class="row d-flex">
-                            <div class="col col-4">
-                                <div class="row d-flex justify-content-center">
-                                    <IconButton
-                                        :class-array="['btn-primary']"
-                                        :aria="$t('additional:modules.tools.simulationTool.delete')"
-                                        icon="bi bi-trash"
-                                        :interaction="() => deleteSource()"
-                                    />
-                                    <p class="delete-all text-center">
-                                        {{ $t('additional:modules.tools.simulationTool.delete') }}
-                                    </p>
-                                </div>
-                            </div>
                             <div
                                 v-if="source?.getFeatures().length"
                                 class="col col-5"
@@ -174,6 +350,23 @@ export default {
                         :selected-draw-type="planningScenarioSelectedDrawType"
                         :set-current-layout="setLanduseCurrentLayout"
                         :stroke-range="planningScenarioStrokeRange"
+                    />
+                </div>
+                <ListGroup
+                    :item-list="createdFeatures"
+                    :properties-mapping="getPropertiesMapping"
+                    @removeFeature="removeFeature"
+                    @setFeatureAttribute="setFeatureAttribute"
+                    @setFeatureStyle="setFeatureStyle"
+                />
+                <div
+                    class="d-flex justify-content-between"
+                >
+                    <FlatButton
+                        id="back"
+                        :aria-label="$t('additional:modules.tools.simulationTool.back')"
+                        :text="$t('additional:modules.tools.simulationTool.back')"
+                        :interaction="backToLanduse"
                     />
                 </div>
             </div>
