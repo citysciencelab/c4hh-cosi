@@ -33,7 +33,7 @@ const state = {
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D", "3D"],
     type: "streetSmart",
-    streetsmartSRS: null,
+    streetSmartSRS: null,
     lastCoordinates: [],
     lastYaw: 0,
     packagesLoaded: false,

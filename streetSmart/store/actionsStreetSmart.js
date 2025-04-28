@@ -52,7 +52,7 @@ const actions = {
                 username: service.params.username,
                 password: service.params.password,
                 apiKey: service.params.apiKey,
-                srs: state.streetsmartSRS ? state.streetsmartSRS : projection,
+                srs: state.streetSmartSRS ? state.streetSmartSRS : projection,
                 locale: locale ? locale : service.params.locale
             };
 
@@ -130,7 +130,7 @@ const actions = {
                     },
                     {
                         viewerType: [StreetSmartApi.ViewerType.PANORAMA],
-                        srs: state.streetsmartSRS ? state.streetsmartSRS : projection,
+                        srs: state.streetSmartSRS ? state.streetSmartSRS : projection,
                         panoramaViewer: {
                             replace: true,
                             timeTravelVisible: state.timeTravelVisible,
