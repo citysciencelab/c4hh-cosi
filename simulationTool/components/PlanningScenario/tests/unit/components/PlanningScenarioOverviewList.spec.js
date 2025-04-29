@@ -129,6 +129,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
             }
         });
         sinon.stub(layerCollection, "getLayerById").returns(layer);
+        sinon.stub(PlanningScenarioOverviewList.methods, "updateFeatures").returns("");
     });
 
     describe("Component DOM", () => {

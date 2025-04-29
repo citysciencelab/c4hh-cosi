@@ -1,6 +1,8 @@
 <script>
 import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 
@@ -13,6 +15,7 @@ export default {
     },
     data () {
         return {
+            currentId: "",
             selectedPlanningScenarios: ""
         };
     },
@@ -21,12 +24,16 @@ export default {
     },
     mounted () {
         if (this.previousComponentOfSimulation === "planningScenario" && this.currentPlanningScenarioId !== "") {
-            this.selectedPlanningScenarios = this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+            this.selectedPlanningScenarios = this.planningScenarios.find(scenario => {
+                return scenario.id === this.currentPlanningScenarioId;
+            });
+            this.currentId = this.selectedPlanningScenarios.id;
         }
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
+            "setCurrentPlanningScenarioId",
             "setMode"
         ]),
 
@@ -36,6 +43,28 @@ export default {
          */
         backToPrevious () {
             this.setMode(this.previousComponentOfSimulation);
+            if (this.previousComponentOfSimulation === "planningScenario") {
+                this.setCurrentPlanningScenarioId("");
+                this.getLayer().getLayerSource().clear();
+            }
+        },
+        /**
+         * Creates a layer if it does not yet exist and returns it.
+         * @returns {Object} A VECTORBASE Layer
+         */
+        getLayer () {
+            if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+                return layerCollection.getLayerById("planning-scenario");
+            }
+            const layer = layerFactory.createLayer({
+                typ: "VECTORBASE",
+                id: "planning-scenario",
+                name: "planning-scenario",
+                alwaysOnTop: true
+            });
+
+            layerCollection.addLayer(layer);
+            return layer;
         },
 
         /**
@@ -61,13 +90,13 @@ export default {
                 <div class="form-floating mb-3">
                     <select
                         id="simulateForPlanning"
-                        v-model="selectedPlanningScenarios.id"
+                        v-model="currentId"
                         class="form-select"
                         :aria-label="$t('additional:modules.tools.simulationTool.selectPlanningScenario')"
                     >
                         <option
-                            v-for="scenario in planningScenarios"
-                            :key="scenario.id"
+                            v-for="(scenario, i) in planningScenarios"
+                            :key="i"
                             :value="scenario.id"
                         >
                             {{ scenario.name }}

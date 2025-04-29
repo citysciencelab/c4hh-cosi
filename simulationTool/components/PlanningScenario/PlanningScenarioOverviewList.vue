@@ -1,4 +1,5 @@
 <script>
+import ConvertStyle from "../../js/convertStyle";
 import {extractEventCoordinates} from "../../../../src/shared/js/utils/extractEventCoordinates";
 import {GeoJSON} from "ol/format.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
@@ -27,7 +28,6 @@ export default {
             return;
         }
         this.setCurrentPlanningScenarioId("");
-        this.updateFeatures();
     },
     unmounted () {
         this.getLayer().getLayerSource().clear();
@@ -107,7 +107,7 @@ export default {
             this.zoomToFeature();
         },
         /**
-         * Updates the layer with the the scenario feature.
+         * Updates the layer with the scenario features.
          * @returns {void}
          */
         updateFeatures () {
@@ -115,11 +115,17 @@ export default {
                 return;
             }
 
-            const olFeatures = new GeoJSON().readFeatures(this.planningScenario.scenarioFeature);
+            this.getLayer().getLayerSource().clear();
 
-            if (olFeatures) {
-                layerCollection.getLayerById("planning-scenario").getLayerSource().addFeatures(olFeatures);
-            }
+            const geoJsonParser = new GeoJSON(),
+                layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource();
+
+            this.planningScenario.scenarioFeature.features.forEach(feat => {
+                const olFeature = geoJsonParser.readFeature(feat);
+
+                olFeature.setStyle(ConvertStyle.geoJsonToOpenlayers(feat.style));
+                layerSource.addFeature(olFeature);
+            });
         },
         /**
          * Zoom to current feature.
