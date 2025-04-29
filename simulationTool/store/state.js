@@ -1,6 +1,5 @@
 /**
  * User type definition
- * @typedef {Object} downloadDataFormat the download data format.
  * @typedef {Object} SimulationToolState
  * @property {String} currentPlanningComponent the current open component in planningScenario.
  * @property {Array.<Object>} ensembles a list of ensembles
@@ -47,26 +46,6 @@ const state = {
     currentPlanningScenarioId: "",
     currentInputName: "",
     description: "additional:modules.tools.simulationTool.toolDescription",
-    downloadDataFormat: {
-        buffer: 0,
-        scenarioFeature: {
-            type: "FeatureCollection",
-            features: [
-                {
-                    type: "Feature",
-                    geometry: {
-                        type: "Polygon",
-                        coordinates: []
-                    },
-                    style: {
-                        strokeColor: "",
-                        strokewidth: ""
-                    }
-                }
-            ]
-        },
-        simulationId: ""
-    },
     icon: "bi-sliders2",
     img: {},
     jobResultData: {},

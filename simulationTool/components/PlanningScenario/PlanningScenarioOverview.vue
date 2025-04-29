@@ -14,7 +14,7 @@ export default {
     },
     emits: ["openCreateScenario"],
     computed: {
-        ...mapGetters("Modules/SimulationTool", ["planningScenarios", "downloadDataFormat"])
+        ...mapGetters("Modules/SimulationTool", ["planningScenarios"])
     },
     methods: {
         /**
@@ -41,16 +41,8 @@ export default {
             if (!Array.isArray(scenarios) || !scenarios.length) {
                 return;
             }
-
-            const blobScenario = [];
-
-            scenarios.forEach(scenario => {
-                blobScenario.push(
-                    {...scenario, ...this.downloadDataFormat}
-                );
-            });
-
-            this.createFile(new Blob([JSON.stringify(blobScenario)], {type: "application/json;"}), name);
+            
+            this.createFile(new Blob([JSON.stringify(scenarios)], {type: "application/json;"}), name);
         }
 
     }
