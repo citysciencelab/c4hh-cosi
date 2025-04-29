@@ -262,8 +262,12 @@ export default {
          * @returns {Boolean} True if there is an area on the unbuilt area with the infiltration category möglich or wahrscheinlich, false if not.
          */
         infiltrationLikelyUnbuilt () {
-            return this.groupedParcelFeatures?.möglich_area > 0
-                || this.groupedParcelFeatures?.wahrscheinlich_area > 0;
+            const groupedParcelFeatures = this.parcel[0]
+                ? spatialOperations.calcArea(this.data.infiltration.geoJsonParcelFeatures ?? [], this.parcel[0], "versickerungswahrscheinlichkeit")
+                : undefined;
+
+            return groupedParcelFeatures?.möglich_area > 0
+                || groupedParcelFeatures?.wahrscheinlich_area > 0;
         },
         /**
          * Computes whether the parcel is in an ÜSG area
