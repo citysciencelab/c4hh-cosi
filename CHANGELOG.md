@@ -34,7 +34,8 @@
 - StreetSmart: Changed EPSG to resolve false heigth in viewer.
 
 ### Fixed
-- Fixed VerkehrsstärkenThemeLineChart tests, so that it does not need to be skipped anymore. 
+- Fixed VerkehrsstärkenThemeLineChart tests, so that it does not need to be skipped anymore.
+- StreetSmart: Remove array property filterByList which was set in the streetSmart api.
 
 ---
 

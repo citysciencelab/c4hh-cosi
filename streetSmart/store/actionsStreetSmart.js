@@ -210,6 +210,7 @@ const actions = {
         StreetSmartApi.destroy({
             targetElement: document.getElementById("street-smart")
         });
+        delete Array.prototype.filterByList;
     },
 
     /**
