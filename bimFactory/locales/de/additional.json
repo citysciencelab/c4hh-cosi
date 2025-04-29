@@ -32,6 +32,13 @@
                 "buttons": {
                     "back": "voriger Schritt",
                     "next": "nächster Schritt"
+                },
+                "components": {
+                    "filter": {
+                      "select": "Auswahl des Gebietes durch",
+                      "numberSelectedTiles": "Tiles ausgewählt",
+                      "noDataAvailable": "Für die Auswahl sind keine Daten vorhanden"
+                    }
                 }
             }
         }

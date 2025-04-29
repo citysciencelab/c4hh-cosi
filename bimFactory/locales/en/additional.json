@@ -32,6 +32,13 @@
                 "buttons": {
                     "back": "previous step",
                     "next": "next step"
+                },
+                "components": {
+                    "filter": {
+                      "select": "Selection of the area by",
+                      "numberSelectedTiles": "Tiles selected",
+                      "noDataAvailable": "There is no data available for the selected area"
+                    }
                 }
             }
         }

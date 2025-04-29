@@ -17,11 +17,14 @@
  * @property {Object} workflowFormData - object containing the form data for the workflow
  * @property {Number} previousWorkflowBackgroundLayer - Id of background layer which needs to be turned off on workflow switch
  * @property {Array} previousWorkflowForegroundLayers - Array of foreground layers which need to be turned off on workflow switch
+ * @property {Object} filteredData - object containing the filtered data returned by the filter endpoint
+ * @property {Boolean} isLoading - indicates whether data is being loaded from the endpoint
+ * @property {Object} filterLayer - object containing the polygon used to filter the required data
  */
 
 const state = {
     supportedDevices: ["Desktop", "Mobile", "Table"],
-    supportedMapModes: ["2D"],
+    supportedMapModes: ["2D", "3D"],
     type: "bimFactory",
     id: "bimFactory",
     name: "additional:modules.bimfactory.name",
@@ -35,7 +38,10 @@ const state = {
     workflowsDetails: [],
     workflowFormData: {},
     previousWorkflowBackgroundLayer: null,
-    previousWorkflowForegroundLayers: []
+    previousWorkflowForegroundLayers: [],
+    filteredData: {},
+    isLoading: false,
+    filterLayer: undefined
 };
 
 export default state;

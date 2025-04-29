@@ -1,10 +1,12 @@
 <script>
 import BimFactoryWorkflowInputText from "./BimFactoryWorkflowInputText.vue";
 import BimFactoryWorkflowDetailSelector from "./BimFactoryWorkflowDetailSelector.vue";
+import BimFactoryWorkflowFilter from "./BimFactoryWorkflowFilter.vue";
 
 export default {
     components: {
         BimFactoryWorkflowInputText,
+        BimFactoryWorkflowFilter,
         BimFactoryWorkflowDetailSelector
     },
     props: {
@@ -46,6 +48,7 @@ export default {
                             <div
                                 v-for="(component, j) in container.components"
                                 :key="j"
+                                class="containerComponent"
                             >
                                 <component
                                     :is="component.type"
@@ -54,6 +57,7 @@ export default {
                                         containerId: container.containerId,
                                         containerTitle: container.containerTitle
                                     }"
+                                    :is-open="step.isOpen"
                                 />
                             </div>
                         </div>
@@ -92,6 +96,7 @@ div.BimFactoryWorkflowStep {
                 flex-direction: column;
                 flex: 1 1 auto;
                 min-width: 0;
+                width: 100%;
 
                     div.containerTitle {
                         font-size: 1rem;
@@ -102,6 +107,10 @@ div.BimFactoryWorkflowStep {
                         display: flex;
                         flex-wrap: wrap;
                         gap: 0.5rem;
+
+                        div.containerComponent {
+                            width: 100%;
+                        }
                     }
                 }
             }

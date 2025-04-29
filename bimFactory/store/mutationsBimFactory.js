@@ -33,6 +33,15 @@ const mutations = {
                 container.components[machineName].value = value;
             }
         });
+    },
+    /**
+     * Sets the bounding box (bbox) in the workflow form data.
+     *
+     * @param {Object} state - The current state of the store.
+     * @param {Object} bbox - Object containing the bounding box coordinates.
+     */
+    setWorkflowFormDataBbox (state, bbox) {
+        state.workflowFormData.bbox = bbox;
     }
 };
 

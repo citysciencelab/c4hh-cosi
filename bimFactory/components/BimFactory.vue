@@ -22,6 +22,10 @@ export default {
         this.removeTitleFromDOM();
         this.loadWorkflows();
     },
+    // eslint-disable-next-line no-empty-function
+    activated () {},
+    // eslint-disable-next-line no-empty-function
+    deactivated () {},
     methods: {
         ...mapMutations("Menu", ["setCurrentMenuWidth"]),
         ...mapActions("Modules/BimFactory", ["loadWorkflows"]),
