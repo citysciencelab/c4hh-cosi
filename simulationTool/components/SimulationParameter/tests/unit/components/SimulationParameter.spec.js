@@ -3,11 +3,12 @@ import {expect} from "chai";
 import {createStore} from "vuex";
 import SimulationParameter from "../../../SimulationParameter.vue";
 import sinon from "sinon";
+import axios from "axios";
 
 config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/SimulationParameter/SimulationParameter.vue", () => {
-    let store;
+    let store, axiosStub;
 
     const factory = {
         getShallowMount: () => {
@@ -37,9 +38,20 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
                         SimulationTool: {
                             namespaced: true,
                             getters: {
-                                currentPlanningScenarioId: sinon.stub(),
-                                planningScenarios: () => [],
-                                previousComponentOfSimulation: sinon.stub()
+                                currentPlanningScenarioId: () => "planningScenarioId",
+                                planningScenarios: () => [
+                                    {
+                                        id: "planningScenarioId",
+                                        simulationId: "simulationId"
+                                    }
+                                ],
+                                previousComponentOfSimulation: sinon.stub(),
+                                simulations: () => [
+                                    {
+                                        id: "simulationId",
+                                        url: "http://www.simulation.hamburg"
+                                    }
+                                ]
                             },
                             mutations: {
                                 setCurrentPlanningComponent: sinon.stub(),
@@ -50,6 +62,12 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
                 }
             }
         });
+
+        axiosStub = sinon.stub(axios, "get").resolves({data: {}});
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe("Component DOM", () => {
@@ -78,6 +96,44 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
         });
     });
 
+    describe("Computed Properties", () => {
+        it("should return the correct value for 'objectTypeInputs'", async () => {
+            const wrapper = factory.getShallowMount();
+
+            await wrapper.setData({
+                processDescription: {
+                    inputs: {
+                        objectType: {schema: {type: "object"}},
+                        stringType: {schema: {type: "string"}},
+                        otherType: {schema: {type: "geojson"}}
+                    }
+                }
+            });
+
+            expect(wrapper.vm.objectTypeInputs).to.deep.equal({
+                objectType: {schema: {type: "object"}}
+            });
+        });
+
+        it("should return the correct value for 'stringTypeInputs'", async () => {
+            const wrapper = factory.getShallowMount();
+
+            await wrapper.setData({
+                processDescription: {
+                    inputs: {
+                        objectType: {schema: {type: "object"}},
+                        stringType: {schema: {type: "string"}},
+                        otherType: {schema: {type: "geojson"}}
+                    }
+                }
+            });
+
+            expect(wrapper.vm.stringTypeInputs).to.deep.equal({
+                stringType: {schema: {type: "string"}}
+            });
+        });
+    });
+
     describe("User Interaction", () => {
         it("should call 'openCreatePlanningScenario' if user clicks the button to create a new planning scenario", async () => {
             const wrapper = factory.getMount(),
@@ -90,11 +146,46 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
 
         it("should call 'backToPrevious' if user clicks the button back to previous component", async () => {
             const wrapper = factory.getMount(),
-                buttonListWrapper = wrapper.findAll("button"),
+                button = wrapper.find("#back"),
                 spyBackToPrevious = sinon.spy(wrapper.vm, "backToPrevious");
 
-            await buttonListWrapper.at(1).trigger("click");
+            await button.trigger("click");
             expect(spyBackToPrevious.calledOnce).to.be.true;
+        });
+    });
+
+    describe("Methods", () => {
+        describe("fetchProcessDescription", () => {
+            it("should return undefined if the given parameter is not correct", async () => {
+                const wrapper = factory.getShallowMount();
+
+                expect(await wrapper.vm.fetchProcessDescription(null)).to.equal(undefined);
+                expect(await wrapper.vm.fetchProcessDescription({})).to.equal(undefined);
+                expect(await wrapper.vm.fetchProcessDescription([])).to.equal(undefined);
+                expect(await wrapper.vm.fetchProcessDescription(true)).to.equal(undefined);
+                expect(await wrapper.vm.fetchProcessDescription(110)).to.equal(undefined);
+                expect(await wrapper.vm.fetchProcessDescription("str")).to.equal(undefined);
+                expect(await wrapper.vm.fetchProcessDescription("")).to.equal(undefined);
+            });
+
+            it("should call axios.get with the correct URL", async () => {
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.fetchProcessDescription(wrapper.vm.simulation);
+                expect(axiosStub.calledWithMatch({href: "http://www.simulation.hamburg/api/processes/simulationId"})).to.be.true;
+            });
+
+            it("should set processDescription to the response data", async () => {
+                const wrapper = factory.getShallowMount(),
+                    responseData = {data: "test"};
+
+                axiosStub.resolves(responseData);
+                await wrapper.setData({
+                    processDescription: await wrapper.vm.fetchProcessDescription(wrapper.vm.simulation)
+                });
+
+                expect(wrapper.vm.processDescription).to.equal("test");
+            });
         });
     });
 });

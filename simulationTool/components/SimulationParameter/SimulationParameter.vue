@@ -1,4 +1,6 @@
 <script>
+import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
+import axios from "axios";
 import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
@@ -9,26 +11,76 @@ import SectionHeader from "../SectionHeader.vue";
 export default {
     name: "SimulationParameter",
     components: {
+        AccordionItem,
         FileUpload,
         FlatButton,
         SectionHeader
     },
     data () {
         return {
-            currentId: "",
-            selectedPlanningScenarios: ""
+            processDescription: undefined
         };
     },
     computed: {
-        ...mapGetters("Modules/SimulationTool", ["currentPlanningScenarioId", "planningScenarios", "previousComponentOfSimulation"])
-    },
-    mounted () {
-        if (this.previousComponentOfSimulation === "planningScenario" && this.currentPlanningScenarioId !== "") {
-            this.selectedPlanningScenarios = this.planningScenarios.find(scenario => {
-                return scenario.id === this.currentPlanningScenarioId;
-            });
-            this.currentId = this.selectedPlanningScenarios.id;
+        ...mapGetters("Modules/SimulationTool", [
+            "currentPlanningScenarioId",
+            "planningScenarios",
+            "previousComponentOfSimulation",
+            "simulations"
+        ]),
+
+        /**
+         * Get the current planning scenario.
+         * @returns {Object} The current planning scenario.
+         */
+        currentPlanningScenario () {
+            return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+        },
+
+        /**
+         * Get an inputs object from the process description containing only the inputs of type "object".
+         * Also filters out inputs that the config defines as not editable or not having a menu position.
+         * @returns {Object} The inputs object.
+         */
+        objectTypeInputs () {
+            if (typeof this.processDescription?.inputs !== "object") {
+                return {};
+            }
+
+            return Object.fromEntries(Object.entries(this.processDescription?.inputs).filter(
+                ([inputKey, input]) => input.schema?.type === "object"
+                    && this.simulation?.inputs?.[inputKey]?.menu !== "nowhere"
+                    && !this.simulation?.inputs?.[inputKey]?.editable
+            ));
+        },
+
+        /**
+         * Get the simulation configuration to the currently selected planning scenario.
+         * @returns {Object} The current simulation configuration.
+         */
+        simulation () {
+            return this.simulations.find(simulation => simulation.id === this.currentPlanningScenario?.simulationId);
+        },
+
+        /**
+         * Get an inputs object from the process description containing only the inputs of type "string".
+         * Also filters out inputs that the config defines as not editable or not having a menu position.
+         * @returns {Object} The inputs object.
+         */
+        stringTypeInputs () {
+            if (typeof this.processDescription?.inputs !== "object") {
+                return {};
+            }
+
+            return Object.fromEntries(Object.entries(this.processDescription?.inputs).filter(
+                ([inputKey, input]) => input.schema?.type === "string"
+                    && this.simulation?.inputs?.[inputKey]?.menu !== "nowhere"
+                    && !this.simulation?.inputs?.[inputKey]?.editable
+            ));
         }
+    },
+    async mounted () {
+        this.processDescription = await this.fetchProcessDescription(this.simulation);
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
@@ -68,6 +120,40 @@ export default {
         },
 
         /**
+         * Fetches the process description from the simulation URL.
+         * @param {Object} simulation The simulation configuration object containing url and id.
+         * @returns {Promise<Object|undefined>} The process description or undefined if an error occurs.
+         */
+        async fetchProcessDescription (simulation) {
+            if (!simulation?.url) {
+                console.warn("Simulation URL is not defined.");
+                return undefined;
+            }
+
+            try {
+                const url = new URL(`api/processes/${simulation.id}`, simulation.url),
+                    response = await axios.get(url);
+
+                return response.data;
+
+            }
+            catch (error) {
+                console.warn("Error fetching process description:", error);
+                return undefined;
+            }
+        },
+
+        /**
+         * Event handler for change of selected planning scenario.
+         * @param {Object} event The change event.
+         * @returns {void}
+         */
+        async onPlanningScenarioChange (event) {
+            this.setCurrentPlanningScenarioId(event.target.value);
+            this.processDescription = await this.fetchProcessDescription(this.simulation);
+        },
+
+        /**
          * Opens create planning scenario component.
          * @returns {void}
          */
@@ -80,7 +166,7 @@ export default {
 </script>
 
 <template>
-    <div class="simulation">
+    <div class="vh-100 overflow-y-auto">
         <SectionHeader
             :title="$t('additional:modules.tools.simulationTool.simlulationSetParams')"
             icon="bi bi-person-fill"
@@ -90,9 +176,10 @@ export default {
                 <div class="form-floating mb-3">
                     <select
                         id="simulateForPlanning"
-                        v-model="currentId"
                         class="form-select"
                         :aria-label="$t('additional:modules.tools.simulationTool.selectPlanningScenario')"
+                        :value="currentPlanningScenarioId"
+                        @change="onPlanningScenarioChange"
                     >
                         <option
                             v-for="(scenario, i) in planningScenarios"
@@ -127,6 +214,50 @@ export default {
             :drop="() => true"
             class="col-md-12"
         />
+        <hr>
+        <AccordionItem
+            id="advanced-simulation-parameters"
+            :title="$t('Erweitere Parameter')"
+        >
+            <div
+                v-for="(input, inputKey) in stringTypeInputs"
+                :key="inputKey"
+            >
+                <label :for="inputKey">
+                    {{ inputKey }}
+                </label>
+                <input
+                    :id="inputKey"
+                    type="text"
+                    class="form-control mb-3"
+                    :value="input.default"
+                    :aria-label="inputKey"
+                >
+            </div>
+            <AccordionItem
+                v-for="(input, inputKey) in objectTypeInputs"
+                :id="inputKey"
+                :key="inputKey"
+                :title="inputKey"
+                font-size="font-size-small"
+            >
+                <div
+                    v-for="(property, propertyKey) in input.schema.properties"
+                    :key="propertyKey"
+                >
+                    <label :for="`${inputKey}-${propertyKey}`">
+                        {{ propertyKey }}
+                    </label>
+                    <input
+                        :id="`${inputKey}-${propertyKey}`"
+                        type="text"
+                        class="form-control mb-3"
+                        :value="property.default"
+                        :aria-label="`${inputKey}-${propertyKey}`"
+                    >
+                </div>
+            </AccordionItem>
+        </AccordionItem>
         <div
             class="mb-5"
         >
