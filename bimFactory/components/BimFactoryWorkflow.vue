@@ -2,11 +2,13 @@
 import {mapGetters, mapActions} from "vuex";
 import AccordionItem from "../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
+import BimFactoryWorkflowStep from "./BimFactoryWorkflowStep.vue";
 
 export default {
     components: {
         AccordionItem,
-        FlatButton
+        FlatButton,
+        BimFactoryWorkflowStep
     },
     props: {
         workflowId: {
@@ -40,13 +42,16 @@ export default {
         workflowId (value) {
             console.warn("Die Layer müssen geändert werden!:" + value);
         },
-        currentWorkflowDetails () {
-            this.initializeAccordionItems();
+        currentWorkflowDetails: {
+            handler () {
+                this.initializeAccordionItems();
+            },
+            immediate: true
         }
     },
-    mounted () {
+    async mounted () {
         console.warn("Die Layer müssen geändert werden!");
-        this.loadSingleWorkflow(this.workflowId);
+        await this.loadSingleWorkflow(this.workflowId);
         this.initializeAccordionItems();
     },
     methods: {
@@ -110,7 +115,6 @@ export default {
             :text="$t('additional:modules.bimfactory.workflow.backToStart')"
             :interaction="() => {$emit('openWorkflow', 'start')}"
             icon="bi bi-house"
-            :secondary="true"
         />
 
         <p class="bimFactoryWorkflowTitle">
@@ -128,9 +132,10 @@ export default {
                     :coloured-header="true"
                     @click="openThis($event, index)"
                 >
-                    {{ step.description }}
+                    <BimFactoryWorkflowStep
+                        :step="step"
+                    />
                 </AccordionItem>
-                <!-- ToDo: here will be the step components -->
             </div>
             <div class="navigationButtons">
                 <FlatButton
@@ -138,7 +143,6 @@ export default {
                     :aria-label="$t('additional:modules.bimfactory.workflow.buttons.back')"
                     :text="$t('additional:modules.bimfactory.workflow.buttons.back')"
                     icon="bi-backspace"
-                    :secondary="true"
                     @click="goBackwards()"
                 />
 
@@ -149,7 +153,6 @@ export default {
                     :aria-label="$t('additional:modules.bimfactory.workflow.buttons.next')"
                     :text="$t('additional:modules.bimfactory.workflow.buttons.next')"
                     icon="bi-backspace-reverse"
-                    :secondary="true"
                     @click="goForwards()"
                 />
             </div>
@@ -163,17 +166,8 @@ export default {
         flex-direction: column;
         height: 100%;
 
-        button.flat-button {
-            margin: 0 !important;
-        }
-
-        button.flat-button:hover {
-            background-color: #3C5F94 !important;
-            color: white;
-        }
-
         p.bimFactoryWorkflowTitle {
-            margin: 1rem 0 0.5rem 0;
+            margin: 0;
         }
 
         div.bimFactoryWorkflowContent {
@@ -198,6 +192,10 @@ export default {
             justify-content: space-between;
             width: 100%;
             padding-top: 0.5rem;
+
+            button.flat-button {
+                margin: 0 !important;
+            }
         }
     }
 </style>
