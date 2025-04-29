@@ -191,7 +191,7 @@ export default {
          * Clears the current draw interaction and deletes the source.
          * @returns {void}
          */
-        clearDraw () {
+        resetAll () {
             this.deleteSource();
             this.resetInteraction();
         },
@@ -202,15 +202,6 @@ export default {
          */
         deleteSource () {
             this.source.clear();
-        },
-
-        /**
-         * Calls deleteSource and resetInteraction.
-         * @returns {void}
-         */
-        deleteSourceAndReset () {
-            this.deleteSource();
-            this.resetInteraction();
         },
 
         /**
@@ -371,7 +362,7 @@ export default {
                             :set-selected-draw-type-main="setPlanningScenarioSelectedDrawTypeMain"
                             :set-selected-interaction="setPlanningScenarioSelectedInteraction"
                             :source="source"
-                            @drawstart="clearDraw"
+                            @drawstart="resetAll"
                             @drawend="addBBOX"
                         />
                     </div>
@@ -383,7 +374,7 @@ export default {
                                         :class-array="['btn-primary']"
                                         :aria="$t('additional:modules.tools.simulationTool.delete')"
                                         icon="bi bi-trash"
-                                        :interaction="() => deleteSourceAndReset()"
+                                        :interaction="resetAll"
                                     />
                                     <p class="delete-all text-center">
                                         {{ $t('additional:modules.tools.simulationTool.delete') }}

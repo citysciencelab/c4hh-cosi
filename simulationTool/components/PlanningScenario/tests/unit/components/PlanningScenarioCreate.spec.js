@@ -89,7 +89,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                     namespaced: true,
                     actions: {
                         addInteraction: sinon.stub(),
-                        removeInteraction: sinon.stub()
+                        removeInteraction: sinon.stub(),
+                        zoomToExtent: sinon.stub()
                     }
                 }
             }

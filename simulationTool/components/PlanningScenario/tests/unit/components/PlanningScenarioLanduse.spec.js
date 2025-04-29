@@ -157,6 +157,9 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             }
         }],
         layer = {
+            getLayer: () => ({
+                setVisible: () => undefined
+            }),
             getLayerSource: () => new VectorSource()
         };
 

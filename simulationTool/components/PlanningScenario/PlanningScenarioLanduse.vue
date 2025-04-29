@@ -26,7 +26,8 @@ export default {
     data () {
         return {
             currentEditableInput: "",
-            featuresByInput: []
+            featuresByInput: [],
+            featureLayerId: "planning-scenario-landuse"
         };
     },
     computed: {
@@ -114,10 +115,6 @@ export default {
         }
     },
 
-    created () {
-        this.featureLayerId = "planning-scenario-landuse";
-    },
-
     async mounted () {
         if (!this.planningScenario) {
             return;
@@ -137,6 +134,7 @@ export default {
             }
         }
         this.addScenarioFeatures(this.planningScenario.scenarioFeature.features);
+        layerCollection.getLayerById(this.featureLayerId)?.getLayer()?.setVisible(!this.planningScenario.hideExistingItems);
         this.updateFeatures();
     },
     unmounted () {
@@ -358,13 +356,16 @@ export default {
 
         /*
          * Toggles the visibility of the planning scenario layer.
+         @param {Event} event - The event object.
          * @returns {void}
          */
-        toggleFeatureLayerVisibilty () {
+        toggleFeatureLayerVisibilty (event) {
+            this.planningScenario.hideExistingItems = event.target.checked;
+
             const layer = layerCollection.getLayerById(this.featureLayerId);
 
             if (layer) {
-                layer.layer.setVisible(!layer.layer.isVisible());
+                layer.layer.setVisible(!this.planningScenario.hideExistingItems);
             }
         },
 
@@ -421,6 +422,7 @@ export default {
                             :label="$t('additional:modules.tools.simulationTool.hideExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
                             :aria="$t('additional:modules.tools.simulationTool.hideExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
                             :interaction="toggleFeatureLayerVisibilty"
+                            :checked="planningScenario?.hideExistingItems"
                         />
                     </div>
                 </div>
