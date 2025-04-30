@@ -536,7 +536,7 @@ export default {
     top: 0;
     left: 0;
     width: calc(100% - 65px);
-    height: 80%;
+    height: 100%;
     background: rgba(255, 255, 255, 0.3);
     text-align: center;
     align-content: center;
