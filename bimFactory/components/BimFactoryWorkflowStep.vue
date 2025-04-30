@@ -47,7 +47,11 @@ export default {
                             >
                                 <component
                                     :is="component.type"
-                                    :config="component"
+                                    :config="{
+                                        component,
+                                        containerId: container.containerId,
+                                        containerTitle: container.containerTitle
+                                    }"
                                 />
                             </div>
                         </div>
@@ -84,7 +88,8 @@ div.BimFactoryWorkflowStep {
                 div.bimContainer {
                 display: flex;
                 flex-direction: column;
-                flex: 1 1 0;
+                flex: 1 1 auto;
+                min-width: 0;
 
                     div.containerTitle {
                         font-size: 1rem;

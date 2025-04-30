@@ -24,7 +24,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/BimFactory", ["getWorkflowForId", "getWorkflowDetailsForId"]),
+        ...mapGetters("Modules/BimFactory", ["getWorkflowForId", "getWorkflowDetailsForId", "workflowFormData"]),
         currentWorkflow () {
             return this.getWorkflowForId(this.workflowId);
         },
@@ -53,9 +53,44 @@ export default {
         console.warn("Die Layer müssen geändert werden!");
         await this.loadSingleWorkflow(this.workflowId);
         this.initializeAccordionItems();
+        this.initializeWorkflowFormData();
     },
     methods: {
         ...mapActions("Modules/BimFactory", ["loadSingleWorkflow"]),
+        initializeWorkflowFormData () {
+            const formData = {
+                containers: []
+            };
+
+            this.accordionItems.forEach(step => {
+                if (!step.sections) {
+                    return;
+                }
+                step.sections.forEach(section => {
+                    section.containers.forEach(container => {
+                        const containerData = {
+                            containerId: container.containerId,
+                            containerTitle: container.containerTitle,
+                            components: {}
+                        };
+
+                        container.components.forEach(element => {
+                            if (["BimFactoryWorkflowInputText", "BimFactoryWorkflowDetailSelector"].includes(element.type)) {
+                                containerData.components[element.machineName] = {
+                                    title: element.title,
+                                    value: element.defaultValue || ""
+                                };
+                            }
+                        });
+
+                        if (Object.keys(containerData.components).length > 0) {
+                            formData.containers.push(containerData);
+                        }
+                    });
+                });
+            });
+            this.$store.commit("Modules/BimFactory/initializeWorkflowFormData", formData);
+        },
         initializeAccordionItems () {
             this.accordionItems = this.currentWorkflowDetails ? JSON.parse(JSON.stringify(this.currentWorkflowDetails.steps)) : [];
             if (this.accordionItems.length > 0) {

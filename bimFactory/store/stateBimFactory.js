@@ -12,6 +12,9 @@
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * @property {Boolean} standAlonePortal - flag if tool is used in a standalone portal, then titles are removed via CSS (config-param)
  * @property {String} workflowsJSONPath - path to the JSON file where all workflows are defined (config-param)
+ * @property {Object} workflowsJSON - JSON object containing all workflows
+ * @property {Array} workflowsDetails - array of workflow details
+ * @property {Object} workflowFormData - object containing the form data for the workflow
  */
 
 const state = {
@@ -27,7 +30,8 @@ const state = {
     standAlonePortal: false,
     workflowsJSONPath: "",
     workflowsJSON: {},
-    workflowsDetails: []
+    workflowsDetails: [],
+    workflowFormData: {}
 };
 
 export default state;

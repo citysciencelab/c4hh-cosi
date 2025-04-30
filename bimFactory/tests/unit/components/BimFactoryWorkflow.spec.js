@@ -1,10 +1,12 @@
 import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
+import sinon from "sinon";
 
 import Component from "../../../components/BimFactoryWorkflow.vue";
 
 config.global.mocks.$t = key => key;
+
 
 describe("addons/bimFactory/components/BimFactoryWorkflow.vue", () => {
     const mockWorkflows = {
@@ -319,13 +321,14 @@ describe("addons/bimFactory/components/BimFactoryWorkflow.vue", () => {
                                 }
                             },
                             actions: {
-                                loadSingleWorkflow: () => {
-                                    return null;
-                                }
+                                loadSingleWorkflow: sinon.stub().resolves(mockWorkflowDetails)
                             },
                             mutations: {
                                 setWorkflowsDetails (state, payload) {
                                     state.workflowsDetails.push(payload);
+                                },
+                                initializeWorkflowFormData (state, payload) {
+                                    state.workflowFormData = payload;
                                 }
                             }
                         }
