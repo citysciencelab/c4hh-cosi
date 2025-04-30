@@ -1,4 +1,22 @@
-const actions = {
+import isObject from "../../../src/shared/js/utils/isObject";
+
+export default {
+    /**
+     * Add files and parse them into planning scenarios.
+     * @param {Object} param.dispatch the dispatch
+     * @param {Object[]} files the imported files.
+     * @returns {void}
+     */
+    addFile ({dispatch}, files) {
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+
+            reader.readAsText(file);
+            reader.onload = async f => {
+                dispatch("parseScenarioFromImport", f?.target?.result);
+            };
+        });
+    },
     // async fetchProviders ({commit}) {
     //     commit("setProvidersLoading", true);
     //     console.log(Config.simulationApiUrl);
@@ -79,7 +97,53 @@ const actions = {
             commit("setJobsLoading", false);
         }
 
-    }
+    },
+
+    /**
+     * Checks if the content is in valid format.
+     * @param {Object} param.dispatch the dispatch
+     * @param {Object} val single scenario content.
+     * @returns {Boolean} true if the content is in right format.
+     */
+    isFormatValid ({dispatch}, val) {
+        if (!isObject(val)) {
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat")
+            }, {root: true});
+            return false;
+        }
+        else if (typeof val.id === "undefined") {
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "id"})
+            }, {root: true});
+            return false;
+        }
+        else if (typeof val.name === "undefined") {
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "name"})
+            }, {root: true});
+            return false;
+        }
+        else if (typeof val.inputs === "undefined" || (typeof val.inputs.buildings === "undefined" && typeof val.inputs.roads === "undefined")) {
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "inputs"})
+            }, {root: true});
+            return false;
+        }
+        else if (typeof val.scenarioFeature === "undefined" || (typeof val.scenarioFeature.type === "undefined" || typeof val.scenarioFeature.features === "undefined")) {
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "scenarioFeature"})
+            }, {root: true});
+            return false;
+        }
+
+        return true;
+    },
 
     // async fetchEnsembles ({commit, getters, rootGetters}) {
     //     if (!rootGetters["Modules/Login/loggedIn"]) {
@@ -177,6 +241,43 @@ const actions = {
 
     //     return fetchPromise;
     // }
-};
 
-export default actions;
+    /**
+     * Parses the file content into planning scenarios.
+     * @param {Object} param.commit the commit
+     * @param {Object} param.getters the getters
+     * @param {Object} param.dispatch the dispatch
+     * @param {String} content the imported file content.
+     * @returns {void}
+     */
+    async parseScenarioFromImport ({commit, getters, dispatch}, content) {
+        if (typeof content !== "string") {
+            return;
+        }
+
+        const parsedContent = JSON.parse(content);
+
+        for (const val of parsedContent) {
+            const isValid = await dispatch("isFormatValid", val);
+
+            if (isValid) {
+                if (!getters.planningScenarios.some(scenario => scenario.id === val.id)) {
+                    commit("setPlanningScenarios", [...getters.planningScenarios, val]);
+                    if (getters.currentPlanningScenarioId === val.id) {
+                        commit("setCurrentPlanningScenarioId", "");
+                    }
+                    dispatch("Alerting/addSingleAlert", {
+                        category: "info",
+                        content: i18next.t("additional:modules.tools.simulationTool.planningScenarioImported", {id: val.id, name: val.name})
+                    }, {root: true});
+                }
+                else {
+                    dispatch("Alerting/addSingleAlert", {
+                        category: "warning",
+                        content: i18next.t("additional:modules.tools.simulationTool.planningScenarioAlreadyExisted", {id: val.id, name: val.name})
+                    }, {root: true});
+                }
+            }
+        }
+    }
+};

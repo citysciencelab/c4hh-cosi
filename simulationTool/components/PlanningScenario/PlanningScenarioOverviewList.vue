@@ -193,10 +193,11 @@ export default {
 <style scoped lang="scss">
 @import "~variables";
 
-    .list-group-item:hover {
-        cursor:pointer;
-    }
-    .selected {
-        background-color: $light_blue
-    }
+.list-group-item:hover {
+    cursor: pointer;
+}
+
+.selected {
+    background-color: $light_blue
+}
 </style>

@@ -5,7 +5,7 @@ import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpl
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 
 export default {
@@ -83,6 +83,7 @@ export default {
         this.processDescription = await this.fetchProcessDescription(this.simulation);
     },
     methods: {
+        ...mapActions("Modules/SimulationTool", ["addFile"]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
@@ -154,12 +155,46 @@ export default {
         },
 
         /**
+         * Called when user drops a file in the upload container
+         * @param {HTMLInputEvent} e event with the files
+         * @returns {void}
+         */
+        onDrop (e) {
+            if (e.dataTransfer.files !== undefined) {
+                this.addFile(e.dataTransfer.files);
+            }
+        },
+
+        /**
+         * Called when user uploads a file to process
+         * @param {HTMLInputEvent} e event with the files
+         * @returns {void}
+         */
+        onInputChange (e) {
+            if (e.target.files !== undefined) {
+                this.addFile(e.target.files);
+                e.target.value = null;
+            }
+        },
+
+        /**
          * Opens create planning scenario component.
          * @returns {void}
          */
         openCreatePlanningScenario () {
             this.setMode("planningScenario");
             this.setCurrentPlanningComponent("create");
+        },
+
+        /**
+         * Called when user clicks to input files
+         * @param {HTMLInputEvent} e event with click.
+         * @returns {void}
+         */
+        triggerClickOnFileInput (e) {
+            if (e.which === 32 || e.which === 13) {
+                this.$refs["upload-input-file"].click();
+            }
         }
     }
 };
@@ -209,9 +244,9 @@ export default {
         </h6>
         <FileUpload
             :id="'planningScenarioUpload'"
-            :keydown="() => true"
-            :change="() => true"
-            :drop="() => true"
+            :keydown="(e) => triggerClickOnFileInput(e)"
+            :change="(e) => onInputChange(e)"
+            :drop="(e) => onDrop(e)"
             class="col-md-12"
         />
         <hr>
