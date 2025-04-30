@@ -11,17 +11,6 @@ const mutations = {
     ...generateSimpleMutations(stateSdpAddon),
 
     /**
-     * If name from config.json starts with "translate#", the corrected key is set to name here.
-     * @param {Object} state vuex element
-     * @param {String} payload name of this component
-     * @returns {void}
-     */
-    applyTranslationKey: (state, payload) => {
-        if (payload && payload.indexOf("translate#") > -1) {
-            state.name = payload.substring("translate#".length);
-        }
-    },
-    /**
      * Sets the selectedAreaGeoJson from the selected area by the graphicalSelect snippet
      * @param {Object} state vuex element
      * @param {Object} selectedAreaGeoJson of the selected area by the graphicalSelect snippet

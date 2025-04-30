@@ -14,7 +14,7 @@ describe("addons/vcOblique/components/VcOblique.vue", () => {
                 tools: {
                     children: {
                         vcOblique: {
-                            "name": "translate#additional:modules.tools.obliqueViewer.title",
+                            "name": "additional:modules.tools.obliqueViewer.title",
                             "icon": "bi-image",
                             "styleId": "obliqueViewer"
                         }

@@ -13,6 +13,7 @@
 ### Deprecated
 
 ### Removed
+- Removed since version 3 not used state property `deactivateGFI` and `translate#` in language-keys.
 
 ### Fixed
 - CommuterFlows: Ensures the layer always renders on top, preventing commuter flow visualization from disappearing behind the baselayer.

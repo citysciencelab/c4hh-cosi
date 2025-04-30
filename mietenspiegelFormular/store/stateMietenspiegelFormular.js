@@ -8,7 +8,6 @@
  * @property {Boolean} renderToWindow - If true, tool is rendered in a window, else in sidebar.
  * @property {Boolean} resizableWindow - If true, window is resizable.
  * @property {Boolean} isVisibleInMenu - If true, tool is selectable in menu.
- * @property {Boolean} deactivateGFI - Flag if tool should deactivate gfi.
  */
 const state = {
     id: "mietenspiegelFormular",

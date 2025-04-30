@@ -148,7 +148,6 @@ export default {
     mounted () {
         this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
         document.getElementById("mp-menu-secondaryMenu").style.width = "440px";
-        this.applyTranslationKey(this.name);
         if (this.wfsApi === null) {
             // the wfsApi can't be loaded on created or mounted, beacause the serviceURL might not be there yet
             this.wfsApi = new CommuterApi({

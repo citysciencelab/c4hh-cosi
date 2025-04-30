@@ -77,7 +77,7 @@ For the Commuter Flows tool, many small things are made configurable to customiz
 ```
 #!json
 "CommuterFlows": {
-    "name": "translate#additional:modules.tools.CommuterFlows.titleLabel",
+    "name": "additional:modules.tools.CommuterFlows.titleLabel",
     "icon": "bi-arrow-left-right",
     "metaVerPath": "https://metaver.de/trefferanzeige?docuuid=4FC611E9-DDA4-42E5-9EE9-F118BCBB2D89",
     "blacklistedDistricts": ["Bremen", "Berlin", "Kiel", "Hannover"],

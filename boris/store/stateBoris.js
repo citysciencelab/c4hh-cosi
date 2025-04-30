@@ -5,7 +5,6 @@
  * @property {String} name - displayed as the title
  * @property {String} icon - icon next to the title
  * @property {Boolean} isVisibleInMenu - if true, tool is selectable in menu (config-param)
- * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * @property {Object} filteredLayerList - list of wms layers without the stripes layers
  * @property {Boolean} isAreaLayer - true if it is a polygon layer, then stripes layer can be toggled (true/false)
  * @property {Boolean} isStripesLayer - true or false if stripes layer is turned on or off
@@ -38,7 +37,6 @@ const state = {
     name: "additional:modules.boris.name",
     icon: "bi-vinyl",
     isVisibleInMenu: true,
-    deactivateGFI: false,
     filteredLayerList: [],
     hasMouseMapInteractions: true,
     isAreaLayer: true,

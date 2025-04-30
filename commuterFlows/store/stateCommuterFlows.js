@@ -8,7 +8,6 @@
  * @property {Boolean} renderToWindow if true, tool is rendered in a window, else in sidebar (config-param)
  * @property {Boolean} resizableWindow if true, window is resizable (config-param)
  * @property {Boolean} isVisibleInMenu if true, tool is selectable in menu (config-param)
- * @property {Boolean} deactivateGFI flag if tool should deactivate gfi (config-param)
  * @property {String} metaVerPath the path to find more information about metaVer
  * @property {String[]} blacklistedDistricts districts (or cities) to not show in any case
  * @property {String} serviceURL the url to the commuter service (wfs)
@@ -41,7 +40,6 @@ const state = {
     renderToWindow: true,
     resizableWindow: true,
     isVisibleInMenu: true,
-    deactivateGFI: true,
     metaVerPath: "",
     blacklistedDistricts: [],
     serviceURL: "",

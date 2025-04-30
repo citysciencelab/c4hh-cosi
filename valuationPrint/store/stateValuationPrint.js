@@ -9,7 +9,6 @@
  * @property {Boolean} renderToWindow - If true, tool is rendered in a window, else in sidebar.
  * @property {Boolean} resizableWindow - If true, window is resizable.
  * @property {Boolean} isVisibleInMenu - If true, tool is selectable in menu.
- * @property {Boolean} deactivateGFI - Flag if tool should deactivate gfi.
  * @property {Number} parcelLayerZoomLevel - Minimum zoom level at which parcel layer is visible. Tunable for performance reasons.
  * @property {Boolean} showStatusLog -If set to false, status log ("Statusverlauf") is never renderend.
  * @property {Boolean} multiSelectParcels - If true, user can have more than one parcel selected at a time.
@@ -38,7 +37,6 @@ const state = {
     renderToWindow: false,
     resizableWindow: true,
     isVisibleInMenu: true,
-    deactivateGFI: false,
     parcelLayerZoomLevel: 7,
     showStatusLog: true,
     multiSelectParcels: false,
