@@ -16,9 +16,17 @@ export default {
             type: Array,
             default: () => []
         },
+        listKey: {
+            type: String,
+            default: () => ""
+        },
         removeable: {
             type: Boolean,
             default: true
+        },
+        shownProperties: {
+            type: Array,
+            default: () => []
         }
     },
     data () {
@@ -47,6 +55,32 @@ export default {
             }
 
             return "bi-eye-slash";
+        },
+
+        /**
+         * Gets the properties of a feature to be shown in list.
+         * @param {ol/Feature} feature - The feature.
+         * @param {String[]} shownProperties - the properties of features to be shown in list.
+         * @returns {Object} All shown properties of the feature.
+         */
+        getShownProperties (feature, shownProperties) {
+            if (!Array.isArray(shownProperties) || !shownProperties.length) {
+                return undefined;
+            }
+
+            const result = {};
+
+            Object.keys(feature.getProperties()).forEach(key => {
+                if (shownProperties.includes(key)) {
+                    result[key] = feature.getProperties()[key];
+                }
+            });
+
+            if (Object.keys(result).length) {
+                return result;
+            }
+
+            return undefined;
         },
 
         /**
@@ -127,28 +161,45 @@ export default {
                 <template v-if="!hasMultipleProperties">
                     <div
                         v-for="(value, key, idx) in propertiesWithoutGeometry(feature)"
-                        :key="key"
+                        :key="listKey + key"
                         class="d-flex me-3"
                         :class="idx === 0 ? 'flex-grow-1' : ''"
                     >
                         <label
-                            :for="'property-' + key + '-' + idx"
+                            :for="'property-' + listKey + '-' + key + '-' + idx"
                             class="col-form-label me-3"
                         >
                             {{ key }}
                         </label>
                         <input
-                            :id="'property-' + key + '-' + idx"
+                            :id="'property-' + listKey + '-' + key + '-' + idx"
                             type="text"
                             class="form-control text-end w-50"
                             :value="value"
                             @input="event => setFeatureAttribute(event.target.value, key, feature)"
-                            @click.stop="() => {}"
                         >
                     </div>
                 </template>
                 <template v-else>
-                    <div class="flex-grow-1">
+                    <div v-if="typeof getShownProperties(feature, shownProperties) !== 'undefined'">
+                        <div
+                            v-for="(value, key, idx) in getShownProperties(feature, shownProperties)"
+                            :key="listKey + key"
+                            class="d-flex"
+                            :class="idx === 0 ? 'flex-grow-1' : ''"
+                        >
+                            <input
+                                :id="'property-' + listKey + '-' + key + '-' + idx"
+                                type="text"
+                                class="form-control"
+                                :value="value"
+                                @input="event => setFeatureAttribute(event.target.value, key, feature)"
+                            >
+                        </div>
+                    </div>
+                    <div
+                        :class="typeof getShownProperties(feature, shownProperties) === 'undefined' ? 'flex-grow-1' : ''"
+                    >
                         <button
                             type="button"
                             class="btn btn-link"

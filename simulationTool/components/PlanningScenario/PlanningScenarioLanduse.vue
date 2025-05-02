@@ -106,6 +106,14 @@ export default {
          */
         planningScenario () {
             return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+        },
+
+        /**
+         * Gets the shown properties of the feature in the list
+         * @return {String[]} The shown properties.
+         */
+        getPropertiesToShow () {
+            return this.editableInputs[this.currentEditableInput]?.propertiesToShow;
         }
     },
 
@@ -459,6 +467,8 @@ export default {
                 >
                     <ListGroup
                         :item-list="existingFeaturesByInput"
+                        :list-key="currentEditableInput"
+                        :shown-properties="getPropertiesToShow"
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
                         @setFeatureStyle="setFeatureStyle"
@@ -474,6 +484,8 @@ export default {
                 >
                     <ListGroup
                         :item-list="createdFeaturesByInput"
+                        :list-key="currentEditableInput"
+                        :shown-properties="getPropertiesToShow"
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
                         @setFeatureStyle="setFeatureStyle"

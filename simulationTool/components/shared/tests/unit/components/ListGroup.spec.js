@@ -72,6 +72,13 @@ describe("addons/SimulationTool/components/shared/ListGroup.vue", () => {
             expect(inputWrapperArray).to.be.lengthOf(0);
         });
 
+        it("should render input elements with shownProperties", function () {
+            const wrapper = factory.getShallowMount({itemList: featuresMore, shownProperties: ["width"]}),
+                inputWrapperArray = wrapper.findAll("input");
+
+            expect(inputWrapperArray).to.be.lengthOf(2);
+        });
+
         it("should render two button elements", function () {
             const wrapper = factory.getShallowMount({itemList: featuresMore}),
                 inputWrapperArray = wrapper.findAll("button");
@@ -147,6 +154,26 @@ describe("addons/SimulationTool/components/shared/ListGroup.vue", () => {
                     icon = wrapper.vm.getIcon(false);
 
                 expect(icon).to.be.equal("bi-eye-slash");
+            });
+        });
+
+        describe("getShownProperties", () => {
+            it("should return undefined if there are no shownProperties as props", function () {
+                const wrapper = factory.getShallowMount({itemList: featuresMore});
+
+                expect(wrapper.vm.getShownProperties(featuresMore, [])).to.equal(undefined);
+            });
+
+            it("should return undefined if there are no found properties", function () {
+                const wrapper = factory.getShallowMount({itemList: featuresMore});
+
+                expect(wrapper.vm.getShownProperties(featuresMore[0], ["name"])).to.equal(undefined);
+            });
+
+            it("should return found feature properties", function () {
+                const wrapper = factory.getShallowMount({itemList: featuresMore});
+
+                expect(wrapper.vm.getShownProperties(featuresMore[0], ["height"])).to.deep.equal({height: "100"});
             });
         });
 
