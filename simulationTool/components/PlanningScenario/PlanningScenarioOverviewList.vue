@@ -161,14 +161,14 @@ export default {
                 <div class="d-flex">
                     <IconButton
                         :class-array="['btn-light', 'me-2']"
-                        :icon="'bi-cup-hot'"
+                        :icon="'bi-pencil-square'"
                         :aria="$t('additional:modules.tools.simulationTool.simlulationSetParams')"
                         :interaction="() => openSimulationParameter(scenario.id)"
                     />
                     <div class="vr me-2" />
                     <IconButton
                         :class-array="['btn-light', 'me-2']"
-                        :icon="'bi-pencil-square'"
+                        :icon="'bi-gear'"
                         :aria="$t('additional:modules.tools.simulationTool.planningScenarioEdit')"
                         :interaction="() => openLanduseById(scenario.id)"
                     />
