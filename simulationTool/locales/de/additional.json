@@ -70,7 +70,7 @@
           "glossar": "Glossar",
           "heightInM": "Höhe (m)",
           "help": "Hilfe",
-          "hideExisting": "Vorhandene {{items}} ausblenden",
+          "showExisting": "Vorhandene {{items}} anzeigen",
           "hints": "Schon gewusst?",
           "includedModels": "Enthaltene Modelle",
           "includedScenarios": "Enthaltene Szenarien",

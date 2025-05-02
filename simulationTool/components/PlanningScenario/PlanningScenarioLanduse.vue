@@ -114,18 +114,35 @@ export default {
          */
         getPropertiesToShow () {
             return this.editableInputs[this.currentEditableInput]?.propertiesToShow;
+        },
+
+        /**
+         * Checks if the value for the currentEditableInput is true which results in a checked toggle.
+         * @returns {Boolean} true if the toggle is checked.
+         */
+        isShowToggleChecked () {
+            if (isObject(this.planningScenario?.showExistingItems)) {
+                return this.planningScenario?.showExistingItems[this.currentEditableInput] ?? false;
+            }
+            return false;
         }
     },
 
     watch: {
-        currentEditableInput () {
-            this.updateFeatures();
+        currentEditableInput (newValue) {
+            this.updateFeatures(newValue);
         }
     },
 
     async mounted () {
         if (!this.planningScenario) {
             return;
+        }
+        if (!isObject(this.planningScenario.showExistingItems)) {
+            this.planningScenario.showExistingItems = {};
+            Object.keys(this.editableInputs).forEach(input => {
+                this.planningScenario.showExistingItems[input] = true;
+            });
         }
         this.currentEditableInput = Object.keys(this.editableInputs)[0];
 
@@ -141,9 +158,11 @@ export default {
                 console.warn(error);
             }
         }
-        this.addScenarioFeatures(this.planningScenario.scenarioFeature.features);
-        layerCollection.getLayerById(this.featureLayerId)?.getLayer()?.setVisible(!this.planningScenario.hideExistingItems);
-        this.updateFeatures();
+        if (this.planningScenario.showExistingItems[this.currentEditableInput] === true) {
+            this.addScenarioFeatures(this.planningScenario.scenarioFeature.features);
+            this.updateFeatures();
+        }
+        // layerCollection.getLayerById(this.featureLayerId)?.getLayer()?.setVisible(this.planningScenario.showExistingItems[this.currentEditableInput]);
     },
     unmounted () {
         this.clearFeatures();
@@ -364,28 +383,27 @@ export default {
 
         /*
          * Toggles the visibility of the planning scenario layer.
-         @param {Event} event - The event object.
+         * @param {Event} event - The event object.
          * @returns {void}
          */
         toggleFeatureLayerVisibilty (event) {
-            this.planningScenario.hideExistingItems = event.target.checked;
+            this.planningScenario.showExistingItems[this.currentEditableInput] = event.target.checked;
 
-            const layer = layerCollection.getLayerById(this.featureLayerId);
-
-            if (layer) {
-                layer.layer.setVisible(!this.planningScenario.hideExistingItems);
-            }
+            this.updateFeatures();
         },
 
         /**
          * Updates the features of the current input.
          * @returns {void}
          */
-        updateFeatures () {
-            const featuresOfInput = this.getInputFeatures(this.currentEditableInput);
+        updateFeatures (newInput) {
+            const featuresOfInput = this.getInputFeatures(newInput || this.currentEditableInput);
 
-            if (featuresOfInput) {
-                this.clearFeatures();
+            if (!featuresOfInput) {
+                return;
+            }
+            this.clearFeatures();
+            if (this.planningScenario.showExistingItems[this.currentEditableInput] === true) {
                 this.parseAndAddFeatures(featuresOfInput);
             }
         }
@@ -426,11 +444,11 @@ export default {
                     </div>
                     <div class="form-check form-switch">
                         <SwitchInput
-                            id="hideExistingItems"
-                            :label="$t('additional:modules.tools.simulationTool.hideExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
-                            :aria="$t('additional:modules.tools.simulationTool.hideExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
+                            id="showExistingItems"
+                            :label="$t('additional:modules.tools.simulationTool.showExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
+                            :aria="$t('additional:modules.tools.simulationTool.showExisting', {items: $t(`additional:modules.tools.simulationTool.${currentEditableInput}`)})"
                             :interaction="toggleFeatureLayerVisibilty"
-                            :checked="planningScenario?.hideExistingItems"
+                            :checked="isShowToggleChecked"
                         />
                     </div>
                 </div>

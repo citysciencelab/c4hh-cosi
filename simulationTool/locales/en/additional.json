@@ -69,7 +69,7 @@
           "glossar": "Glossary",
           "heightInM": "Height (m)",
           "help": "Help",
-          "hideExisting": "Hide existing {{items}}",
+          "showExisting": "Show existing {{items}}",
           "hints": "Did you know?",
           "includedModels": "Included models",
           "includedScenarios": "Included scenarios",
