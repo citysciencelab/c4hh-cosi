@@ -80,12 +80,13 @@ export default {
         /**
          * Is called when the current max area is exceeded or no longer exceeded.
          * Changes the style of the simulation area.
+         * @param {Boolean} val value if the max area is exceeded.
          */
-        isMaxAreaExceeded () {
+        isMaxAreaExceeded (val) {
             const bboxFeature = this.source?.getFeatures().find(feature => feature.get("id") === "simulation-area");
 
             bboxFeature?.setStyle(ConvertStyle.geoJsonToOpenlayers(
-                this.isMaxAreaExceeded ? this.simulationAreaStyleInvalid : this.simulationAreaStyle
+                val ? this.simulationAreaStyleInvalid : this.simulationAreaStyle
             ));
         },
 
@@ -464,7 +465,7 @@ export default {
                     class="alert alert-danger"
                     role="alert"
                 >
-                    {{ $t('additional:modules.tools.simulationTool.maxAreaExceeded', {maxArea: currentMaxArea}) }}
+                    {{ $t('additional:modules.tools.simulationTool.maxAreaExceeded', {maxArea: currentMaxArea * 0.0001}) }}
                 </div>
                 <div
                     class="d-flex justify-content-between"

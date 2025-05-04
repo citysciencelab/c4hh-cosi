@@ -91,7 +91,7 @@
           "loadingEnsembles": "Lade Ensembles",
           "loadingModels": "Lade Modelle",
           "loadingScenarios": "Lade Szenarien",
-          "maxAreaExceeded": "Die aktuelle Bounding Box überschreitet die maximale Fläche von {{maxArea}} m² für die gewählte Simulation.",
+          "maxAreaExceeded": "Die aktuelle Bounding Box überschreitet die maximale Fläche von {{maxArea}} ha für die gewählte Simulation.",
           "model": "Modell",
           "modelDetails": "Modell Details",
           "modelInformation": "Modellinformationen",
