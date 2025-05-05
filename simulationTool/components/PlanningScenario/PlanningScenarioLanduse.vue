@@ -138,12 +138,7 @@ export default {
         if (!this.planningScenario) {
             return;
         }
-        if (!isObject(this.planningScenario.showExistingItems)) {
-            this.planningScenario.showExistingItems = {};
-            Object.keys(this.editableInputs).forEach(input => {
-                this.planningScenario.showExistingItems[input] = true;
-            });
-        }
+        this.initializeShowExistingItems();
         this.currentEditableInput = Object.keys(this.editableInputs)[0];
 
         if (!this.planningScenario.featuresLoaded) {
@@ -158,11 +153,10 @@ export default {
                 console.warn(error);
             }
         }
-        if (this.planningScenario.showExistingItems[this.currentEditableInput] === true) {
+        if (this.isShowToggleChecked) {
             this.addScenarioFeatures(this.planningScenario.scenarioFeature.features);
-            this.updateFeatures();
+            this.updateFeatures(this.currentEditableInput);
         }
-        // layerCollection.getLayerById(this.featureLayerId)?.getLayer()?.setVisible(this.planningScenario.showExistingItems[this.currentEditableInput]);
     },
     unmounted () {
         this.clearFeatures();
@@ -274,12 +268,31 @@ export default {
         },
 
         /**
+         * Ensures that the showExistingItems object in the planning scenario
+         * is initialized if it has not been set previously.
+         * @returns {void}
+         */
+        initializeShowExistingItems () {
+            if (isObject(this.planningScenario.showExistingItems)) {
+                return;
+            }
+            this.planningScenario.showExistingItems = {};
+            if (!isObject(this.editableInputs)) {
+                return;
+            }
+            Object.keys(this.editableInputs).forEach(input => {
+                this.planningScenario.showExistingItems[input] = true;
+            });
+        },
+
+        /**
          * Parses the given GeoJSON features to openlayers features and adds them to the source.
          * @param {GeoJSON[]} features - An array of GeoJSON features.
          * @returns {void}
          */
         parseAndAddFeatures (features) {
-            const geoJsonParser = new GeoJSON();
+            const geoJsonParser = new GeoJSON(),
+                featuresToPutOnMap = [];
 
             features.forEach(feature => {
                 const olFeature = geoJsonParser.readFeature(feature);
@@ -300,11 +313,14 @@ export default {
                 else {
                     olFeature.setStyle(null);
                 }
+                featuresToPutOnMap.push(olFeature);
 
-                this.getLayerSource().addFeature(olFeature);
             });
 
-            this.featuresByInput = this.getLayerSource().getFeatures();
+            if (this.isShowToggleChecked) {
+                this.getLayerSource().addFeatures(featuresToPutOnMap);
+            }
+            this.featuresByInput = featuresToPutOnMap;
         },
 
         /**
@@ -316,7 +332,7 @@ export default {
             this.planningScenario.inputs[this.currentEditableInput].features = this.getInputFeatures(this.currentEditableInput).filter(feature => {
                 return feature.id !== id;
             });
-            this.updateFeatures();
+            this.updateFeatures(this.currentEditableInput);
         },
 
         /**
@@ -342,7 +358,7 @@ export default {
                 }
                 return feature;
             });
-            this.updateFeatures();
+            this.updateFeatures(this.currentEditableInput);
         },
 
         /**
@@ -358,7 +374,7 @@ export default {
                 }
                 return feature;
             });
-            this.updateFeatures();
+            this.updateFeatures(this.currentEditableInput);
         },
 
         /**
@@ -378,7 +394,7 @@ export default {
                 }
                 return feature;
             });
-            this.updateFeatures();
+            this.updateFeatures(this.currentEditableInput);
         },
 
         /*
@@ -389,23 +405,22 @@ export default {
         toggleFeatureLayerVisibilty (event) {
             this.planningScenario.showExistingItems[this.currentEditableInput] = event.target.checked;
 
-            this.updateFeatures();
+            this.updateFeatures(this.currentEditableInput);
         },
 
         /**
-         * Updates the features of the current input.
+         * Updates the features for the given input.
+         * @param {String} editableInput - The key of the input to update features for.
          * @returns {void}
          */
-        updateFeatures (newInput) {
-            const featuresOfInput = this.getInputFeatures(newInput || this.currentEditableInput);
+        updateFeatures (editableInput) {
+            const featuresOfInput = this.getInputFeatures(editableInput);
 
             if (!featuresOfInput) {
                 return;
             }
             this.clearFeatures();
-            if (this.planningScenario.showExistingItems[this.currentEditableInput] === true) {
-                this.parseAndAddFeatures(featuresOfInput);
-            }
+            this.parseAndAddFeatures(featuresOfInput);
         }
     }
 };

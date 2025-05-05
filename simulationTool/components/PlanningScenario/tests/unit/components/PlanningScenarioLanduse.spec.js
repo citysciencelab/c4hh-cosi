@@ -338,6 +338,27 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
     });
 
     describe("methods", () => {
+        describe("initializeShowExistingItems", () => {
+            it("should set the correct value to showExistingItems", async () => {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.vm.$nextTick();
+                wrapper.vm.planningScenarios[0].showExistingItems = undefined;
+                wrapper.vm.initializeShowExistingItems();
+                expect(wrapper.vm.planningScenarios[0].showExistingItems).to.deep.equal({
+                    buildings: true,
+                    hospitals: true
+                });
+            });
+            it("should not set the object if showExistingItems is already set", async () => {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.vm.$nextTick();
+                wrapper.vm.planningScenarios[0].showExistingItems = {};
+                wrapper.vm.initializeShowExistingItems();
+                expect(wrapper.vm.planningScenarios[0].showExistingItems).to.deep.equal({});
+            });
+        });
         describe("fetchFeatures", () => {
             it("should set the expected features in the scenario parameter object", async function () {
                 sinon.stub(getFeature, "getOAFFeatureGet").resolves("features");
@@ -374,7 +395,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
 
         describe("setFeatureAttribute", () => {
-            it("should set correct value to the correct feature", async function () {
+            it("should set correct value to the correct feature", async () => {
                 const wrapper = factory.getShallowMount();
 
                 await wrapper.vm.$nextTick();
@@ -384,14 +405,14 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
 
         describe("setFeatureStyle", () => {
-            it("should set null style to the correct feature", async function () {
+            it("should set null style to the correct feature", async () => {
                 const wrapper = factory.getShallowMount();
 
                 await wrapper.vm.$nextTick();
                 wrapper.vm.setFeatureStyle(null, "DEHHALKA10007tqf-piece");
                 expect(planningScenarios[0].inputs.buildings.features[0].style).to.be.null;
             });
-            it("should set empty string as style to the correct feature", async function () {
+            it("should set empty string as style to the correct feature", async () => {
                 const wrapper = factory.getShallowMount();
 
                 await wrapper.vm.$nextTick();
@@ -400,12 +421,38 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             });
         });
         describe("removeFeature", () => {
-            it("should remove the correct feature", async function () {
+            it("should remove the correct feature", async () => {
                 const wrapper = factory.getShallowMount();
 
                 await wrapper.vm.$nextTick();
                 wrapper.vm.removeFeature("DEHHALKA10007tqf-piece2");
                 expect(planningScenarios[0].inputs.buildings.features.find(feature => feature.id === "DEHHALKA10007tqf-piece2")).to.be.undefined;
+            });
+        });
+        describe("updateFeatures", () => {
+            it("should call getInputFeatures with the correct parameter", () => {
+                const wrapper = factory.getShallowMount(),
+                    editableInput = "testInput",
+                    getInputFeaturesStub = sinon.stub(wrapper.vm, "getInputFeatures").returns(undefined);
+
+                wrapper.vm.updateFeatures(editableInput);
+
+                expect(getInputFeaturesStub.calledOnceWith(editableInput)).to.be.true;
+            });
+
+            it("should call clearFeatures and parseAndAddFeatures when features are returned", () => {
+                const wrapper = factory.getShallowMount(),
+                    editableInput = "testInput",
+                    features = ["feature1", "feature2"],
+                    clearFeaturesStub = sinon.stub(wrapper.vm, "clearFeatures"),
+                    parseAndAddFeaturesStub = sinon.stub(wrapper.vm, "parseAndAddFeatures");
+
+                sinon.stub(wrapper.vm, "getInputFeatures").returns(features);
+
+                wrapper.vm.updateFeatures(editableInput);
+
+                expect(clearFeaturesStub.calledOnce).to.be.true;
+                expect(parseAndAddFeaturesStub.calledOnceWith(features)).to.be.true;
             });
         });
     });
