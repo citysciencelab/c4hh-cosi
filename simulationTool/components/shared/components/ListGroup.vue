@@ -94,6 +94,19 @@ export default {
         },
 
         /**
+         * Replaces point with comma in the given value.
+         * @param {number} val - The given value as Number.
+         * @returns {*|string} Returns the modified Number as string.
+         */
+        setComma (val) {
+            if (typeof val !== "number") {
+                return val;
+            }
+
+            return val.toString().replace(/\./g, ",");
+        },
+
+        /**
          * Extracts the properties of a feature, excluding the geometry property.
          * @param {ol/Feature} feature - The feature.
          * @returns {Object} All properties of the feature except the geometry.
@@ -133,7 +146,7 @@ export default {
          * Empty Style = not visible. Null = layer style.
          * @param {ol/Feature} feature - The feature whose style is being toggled.
          * @returns {void}
-        */
+         */
         toggleStyle (feature) {
             if (feature.getId() === this.currentHightlightFeatureId) {
                 if (feature.getStyle()?.getStroke() !== null) {
@@ -185,7 +198,7 @@ export default {
                             :id="'property-' + listKey + '-' + key + '-' + idx"
                             type="text"
                             class="form-control text-end w-50"
-                            :value="value"
+                            :value="setComma(value)"
                             @input="event => setFeatureAttribute(event.target.value, key, feature)"
                         >
                     </div>
