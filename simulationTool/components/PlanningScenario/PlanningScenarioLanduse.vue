@@ -7,7 +7,7 @@ import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
-import ListGroup from "../shared/ListGroup.vue";
+import ListGroup from "../shared/components/ListGroup.vue";
 import {mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
@@ -106,6 +106,14 @@ export default {
          */
         planningScenario () {
             return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+        },
+
+        /**
+         * Gets the mapped properties.
+         * @return {Object} The mapped properties.
+         */
+        getPropertiesMapping () {
+            return this.editableInputs[this.currentEditableInput]?.propertiesMapping;
         },
 
         /**
@@ -501,6 +509,7 @@ export default {
                     <ListGroup
                         :item-list="existingFeaturesByInput"
                         :list-key="currentEditableInput"
+                        :properties-mapping="getPropertiesMapping"
                         :shown-properties="getPropertiesToShow"
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
@@ -518,6 +527,7 @@ export default {
                     <ListGroup
                         :item-list="createdFeaturesByInput"
                         :list-key="currentEditableInput"
+                        :properties-mapping="getPropertiesMapping"
                         :shown-properties="getPropertiesToShow"
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"

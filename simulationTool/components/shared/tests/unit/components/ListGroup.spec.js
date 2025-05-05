@@ -1,12 +1,12 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature";
-import ListGroup from "../../../ListGroup.vue";
+import ListGroup from "../../../components/ListGroup.vue";
 import Style from "ol/style/Style.js";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/SimulationTool/components/shared/ListGroup.vue", () => {
+describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () => {
 
     const factory = {
             getShallowMount: (props = {}) => {

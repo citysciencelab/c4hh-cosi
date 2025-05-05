@@ -1,5 +1,6 @@
 <script>
-import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
+import {getMappedProperty} from "../js/getMappedProperty";
+import IconButton from "../../../../../src/shared/modules/buttons/components/IconButton.vue";
 import Style from "ol/style/Style.js";
 
 export default {
@@ -19,6 +20,10 @@ export default {
         listKey: {
             type: String,
             default: () => ""
+        },
+        propertiesMapping: {
+            type: Object,
+            default: () => undefined
         },
         removeable: {
             type: Boolean,
@@ -56,6 +61,11 @@ export default {
 
             return "bi-eye-slash";
         },
+
+        /**
+         * Gets the mapped property from key and configured object.
+         */
+        getMappedProperty,
 
         /**
          * Gets the properties of a feature to be shown in list.
@@ -169,7 +179,7 @@ export default {
                             :for="'property-' + listKey + '-' + key + '-' + idx"
                             class="col-form-label me-3"
                         >
-                            {{ key }}
+                            {{ getMappedProperty(key, propertiesMapping) }}
                         </label>
                         <input
                             :id="'property-' + listKey + '-' + key + '-' + idx"

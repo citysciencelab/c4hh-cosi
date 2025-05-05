@@ -3,6 +3,7 @@ import AccordionItem from "../../../../src/shared/modules/accordion/components/A
 import axios from "axios";
 import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import {getMappedProperty} from "../shared/js/getMappedProperty";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
@@ -145,6 +146,11 @@ export default {
         },
 
         /**
+         * Gets the mapped property from key and configured object.
+         */
+        getMappedProperty,
+
+        /**
          * Event handler for change of selected planning scenario.
          * @param {Object} event The change event.
          * @returns {void}
@@ -259,7 +265,7 @@ export default {
                 :key="inputKey"
             >
                 <label :for="inputKey">
-                    {{ inputKey }}
+                    {{ getMappedProperty(inputKey, simulation?.inputs[inputKey]?.propertiesMapping) }}
                 </label>
                 <input
                     :id="inputKey"
@@ -281,7 +287,7 @@ export default {
                     :key="propertyKey"
                 >
                     <label :for="`${inputKey}-${propertyKey}`">
-                        {{ propertyKey }}
+                        {{ getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping) }}
                     </label>
                     <input
                         :id="`${inputKey}-${propertyKey}`"
