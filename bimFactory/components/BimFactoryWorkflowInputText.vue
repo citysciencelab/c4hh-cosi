@@ -14,14 +14,10 @@ export default {
             required: true
         }
     },
-    data () {
-        return {};
-    },
     methods: {
-        updateWorkflowFormData (title, machineName, value) {
+        updateWorkflowFormData (machineName, value) {
             this.$store.commit("Modules/BimFactory/updateWorkflowFormData", {
                 containerId: this.config.containerId,
-                title: title,
                 machineName: machineName,
                 value: value
             });
@@ -37,7 +33,7 @@ export default {
             :label="config.component.title"
             :value="config.component.defaultValue"
             :placeholder="config.component.defaultValue"
-            @input="updateWorkflowFormData(config.component.title, config.component.machineName, $event.target.value)"
+            @input="updateWorkflowFormData(config.component.machineName, $event.target.value)"
         />
     </div>
 </template>

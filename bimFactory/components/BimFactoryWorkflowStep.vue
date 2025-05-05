@@ -1,9 +1,11 @@
 <script>
 import BimFactoryWorkflowInputText from "./BimFactoryWorkflowInputText.vue";
+import BimFactoryWorkflowDetailSelector from "./BimFactoryWorkflowDetailSelector.vue";
 
 export default {
     components: {
-        BimFactoryWorkflowInputText
+        BimFactoryWorkflowInputText,
+        BimFactoryWorkflowDetailSelector
     },
     props: {
         step: {
