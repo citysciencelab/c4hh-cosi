@@ -4,6 +4,8 @@
       "tools": {
         "simulationTool": {
           "additionalInfo": "Mehr Informationen",
+          "chooseOutputParam": "Ausgabeparameter auswählen",
+          "outputParam": "Ausgabe Parameter",
           "toolName": "Scenario Explorer",
           "toolDescription": "Erstelle mittels digitaler Simulationsmodelle Szenarien und Ensembles, um mögliche zukünftige Entwicklungen zu untersuchen und zu vergleichen.",
           "addOrSelectValue": "Wert auswählen oder hinzufügen ...",

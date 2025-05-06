@@ -11,6 +11,7 @@ import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
 import SliderItem from "../../../../src/shared/modules/slider/components/SliderItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
+import Multiselect from "vue-multiselect";
 
 export default {
     name: "SimulationParameter",
@@ -21,7 +22,8 @@ export default {
         InputText,
         SectionHeader,
         SliderItem,
-        SwitchInput
+        SwitchInput,
+        Multiselect
     },
     data () {
         return {
@@ -30,7 +32,8 @@ export default {
             parameterValue: {},
             processDescription: undefined,
             processHandler: undefined,
-            requestBody: {}
+            requestBody: {},
+            selectedOutputOptions: []
         };
     },
     computed: {
@@ -40,6 +43,24 @@ export default {
             "previousComponentOfSimulation",
             "simulations"
         ]),
+
+        /**
+         * Returns an array of Objects with code and name property for multiselect options.
+         * @return {Object[]} The array of Objects for options.
+         */
+        outputOptions () {
+            const optionsArray = [];
+
+            if (typeof this.processDescription !== "object") {
+                return optionsArray;
+            }
+
+            Object.keys(this.processDescription?.outputs).forEach(key => {
+                optionsArray.push({code: key, name: this.processDescription?.outputs[key]?.title});
+            });
+
+            return optionsArray;
+        },
 
         /**
          * Get the current planning scenario.
@@ -91,9 +112,17 @@ export default {
             ));
         }
     },
-    mounted () {
+    watch: {
+        selectedOutputOptions () {
+            this.requestBody.outputs = {};
+            this.selectedOutputOptions.forEach(elem => {
+                this.requestBody.outputs[elem.code] = {};
+            });
+        }
+    },
+    async mounted () {
         if (this.simulation) {
-            this.prepareRequestBody();
+            await this.prepareRequestBody();
         }
     },
     methods: {
@@ -115,7 +144,6 @@ export default {
                 this.getLayer().getLayerSource().clear();
             }
         },
-
         /**
          * Creates a layer if it does not yet exist and returns it.
          * @returns {Object} A VECTORBASE Layer
@@ -222,7 +250,7 @@ export default {
                 ...this.currentPlanningScenario.inputs,
                 crs: this.simulation?.inputs?.crs
             };
-            this.requestBody.outputs = {noise_night: {}}; // TODO: Let user select output from process description
+            this.requestBody.outputs = {};
         },
 
         /**
@@ -329,8 +357,8 @@ export default {
                 <InputText
                     :id="inputKey"
                     class="form-control mb-3"
-                    :label="getMappedProperty(inputKey, simulation?.inputs[inputKey]?.propertiesMapping)"
-                    :placeholder="getMappedProperty(inputKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                    :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                    :placeholder="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                     :value="input.default"
                 />
             </div>
@@ -338,7 +366,7 @@ export default {
                 v-for="(input, inputKey) in objectTypeInputs"
                 :id="inputKey"
                 :key="inputKey"
-                :title="getMappedProperty(inputKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                :title="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                 font-size="font-size-small"
             >
                 <div
@@ -349,8 +377,8 @@ export default {
                         <InputText
                             :id="`${inputKey}-${propertyKey}`"
                             class="form-control mb-3"
-                            :label="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
-                            :placeholder="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                            :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                            :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :value="property.default"
                         />
                     </template>
@@ -358,15 +386,15 @@ export default {
                         <div class="form-switch">
                             <SwitchInput
                                 :id="`${inputKey}-${propertyKey}`"
-                                :label="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
-                                :aria="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                                :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                                :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                 :checked="property?.default"
                             />
                         </div>
                     </template>
                     <template v-else-if="property?.type === 'number' || property?.type === 'integer'">
                         <label :for="`${inputKey}-${propertyKey}`">
-                            {{ getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping) }}
+                            {{ getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}
                         </label>
                         <div class="d-flex justify-content-between value">
                             <span>{{ property?.minimum }}</span>
@@ -375,7 +403,7 @@ export default {
                         </div>
                         <SliderItem
                             :id="`${inputKey}-${propertyKey}`"
-                            :aria="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                            :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :class-array="['mb-3']"
                             :min="property?.minimum"
                             :max="property?.maximum"
@@ -387,6 +415,50 @@ export default {
                 </div>
             </AccordionItem>
         </AccordionItem>
+        <label
+            for="outputParam"
+            class="typo__label"
+        >
+            {{ $t('additional:modules.tools.simulationTool.chooseOutputParam') }}
+        </label>
+        <multiselect
+            id="outputParam"
+            v-model="selectedOutputOptions"
+            :placeholder="$t('additional:modules.tools.simulationTool.outputParam')"
+            :aria-label="$t('additional:modules.tools.simulationTool.outputParam')"
+            label="name"
+            track-by="code"
+            :options="outputOptions"
+            :searchable="true"
+            :multiple="true"
+            :open="true"
+        >
+            <template #tag="{ option, remove }">
+                <span
+                    class="multiselect__tag"
+                    :class="option.code"
+                >
+                    <span>{{ option.name }}</span>
+                    <i
+                        tabindex="0"
+                        class="multiselect__tag-icon"
+                        role="button"
+                        @click="remove(option)"
+                        @keypress="remove(option)"
+                    />
+                </span>
+            </template>
+            <template #option="p">
+                <div class="option__desc">
+                    <span
+                        class="option__title"
+                        :class="p.option.name"
+                    >
+                        {{ p.option.name }}
+                    </span>
+                </div>
+            </template>
+        </multiselect>
         <div
             class="mb-5"
         >
@@ -419,6 +491,11 @@ export default {
 
 <style lang="scss" scoped>
 @import "~variables";
+
+.multiselect__tag {
+    background-color: #3C5F94;
+    color: #ffffff;
+}
 
 .d-flex {
     .select-scenario {

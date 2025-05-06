@@ -3,6 +3,8 @@
       "tools": {
         "simulationTool": {
           "additionalInfo": "More information",
+          "chooseOutputParam": "Choose output parameter",
+          "outputParam": "Output parameter",
           "toolName": "Scenario Explorer",
           "toolDescription": "Create, simulate and compare scenarios and ensembles",
           "addOrSelectValue": "Select or add value...",

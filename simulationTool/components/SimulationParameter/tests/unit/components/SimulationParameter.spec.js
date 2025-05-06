@@ -74,39 +74,82 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
 
     describe("Component DOM", () => {
         it("should exist", () => {
-            const wrapper = factory.getShallowMount();
+            const wrapper = factory.getMount();
 
             expect(wrapper.exists()).to.be.true;
         });
 
         it("should render SectionHeader component", () => {
-            const wrapper = factory.getShallowMount();
+            const wrapper = factory.getMount();
 
             expect(wrapper.findComponent({name: "SectionHeader"}).exists()).to.be.true;
         });
 
         it("should render AccordionItem component", () => {
-            const wrapper = factory.getShallowMount();
+            const wrapper = factory.getMount();
 
             expect(wrapper.findComponent({name: "AccordionItem"}).exists()).to.be.true;
         });
 
         it("should render FlatButton component", () => {
-            const wrapper = factory.getShallowMount();
+            const wrapper = factory.getMount();
 
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
         });
 
         it("should render FileUpload component", () => {
-            const wrapper = factory.getShallowMount();
+            const wrapper = factory.getMount();
 
             expect(wrapper.findComponent({name: "FileUpload"}).exists()).to.be.true;
         });
     });
 
     describe("Computed Properties", () => {
+        it("should return an array of Objects with code and name property for multiselect options", async () => {
+            const wrapper = factory.getMount(),
+                expected = [
+                    {
+                        "code": "noise_day",
+                        "name": "Noise isosurface day"
+                    },
+                    {
+                        "code": "noise_den",
+                        "name": "Noise isosurface day-evening-night"
+                    },
+                    {
+                        "code": "noise_evening",
+                        "name": "Noise isosurface evening"
+                    },
+                    {
+                        "code": "noise_night",
+                        "name": "Noise isosurface night"
+                    }
+                ];
+
+            await wrapper.setData({
+                processDescription: {
+                    outputs: {
+                        "noise_day": {
+                            "title": "Noise isosurface day"
+                        },
+                        "noise_den": {
+                            "title": "Noise isosurface day-evening-night"
+                        },
+                        "noise_evening": {
+                            "title": "Noise isosurface evening"
+                        },
+                        "noise_night": {
+                            "title": "Noise isosurface night"
+                        }
+                    }
+                }
+            });
+
+            expect(wrapper.vm.outputOptions).to.deep.equal(expected);
+        });
+
         it("should return the correct value for 'objectTypeInputs'", async () => {
-            const wrapper = factory.getShallowMount();
+            const wrapper = factory.getMount();
 
             await wrapper.setData({
                 processDescription: {
@@ -114,7 +157,8 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
                         objectType: {schema: {type: "object"}},
                         stringType: {schema: {type: "string"}},
                         otherType: {schema: {type: "geojson"}}
-                    }
+                    },
+                    outputs: {}
                 }
             });
 
@@ -124,7 +168,7 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
         });
 
         it("should return the correct value for 'stringTypeInputs'", async () => {
-            const wrapper = factory.getShallowMount();
+            const wrapper = factory.getMount();
 
             await wrapper.setData({
                 processDescription: {
@@ -132,7 +176,8 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
                         objectType: {schema: {type: "object"}},
                         stringType: {schema: {type: "string"}},
                         otherType: {schema: {type: "geojson"}}
-                    }
+                    },
+                    outputs: {}
                 }
             });
 
@@ -165,7 +210,7 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
     describe("Methods", () => {
         describe("getParameterValue", () => {
             it("should return default value if the keys are not string", () => {
-                const wrapper = factory.getShallowMount();
+                const wrapper = factory.getMount();
 
                 expect(wrapper.vm.getParameterValue(null, "key2", "value")).to.equal("value");
                 expect(wrapper.vm.getParameterValue(0, "key2", "value")).to.equal("value");
@@ -182,13 +227,13 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
             });
 
             it("should return default value if there are no set value according to the key", () => {
-                const wrapper = factory.getShallowMount();
+                const wrapper = factory.getMount();
 
                 expect(wrapper.vm.getParameterValue("key1", "key2", "value")).to.equal("value");
             });
 
             it("should return the value according to the key", async () => {
-                const wrapper = factory.getShallowMount(),
+                const wrapper = factory.getMount(),
                     parameterValue = {},
                     key = "key1-key2";
 
@@ -201,7 +246,7 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
 
         describe("setParameterValue", () => {
             it("should not set value if the keys are not string", async () => {
-                const wrapper = factory.getShallowMount();
+                const wrapper = factory.getMount();
 
                 await wrapper.setData({parameterValue: {}});
 
@@ -220,7 +265,7 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
             });
 
             it("should set value", async () => {
-                const wrapper = factory.getShallowMount();
+                const wrapper = factory.getMount();
 
                 await wrapper.setData({parameterValue: {}});
 
