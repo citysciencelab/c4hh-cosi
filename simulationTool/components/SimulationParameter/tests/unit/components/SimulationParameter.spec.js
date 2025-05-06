@@ -8,7 +8,7 @@ import axios from "axios";
 config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/SimulationParameter/SimulationParameter.vue", () => {
-    let store;
+    let consoleWarnSpy, store;
 
     const factory = {
         getShallowMount: () => {
@@ -28,6 +28,7 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
     };
 
     beforeEach(() => {
+        consoleWarnSpy = sinon.spy();
         store = createStore({
             namespaced: true,
             modules: {
@@ -64,6 +65,7 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
         });
 
         sinon.stub(axios, "get").resolves({data: {}});
+        sinon.stub(console, "warn").callsFake(consoleWarnSpy);
     });
 
     afterEach(() => {
@@ -81,6 +83,12 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
             const wrapper = factory.getShallowMount();
 
             expect(wrapper.findComponent({name: "SectionHeader"}).exists()).to.be.true;
+        });
+
+        it("should render AccordionItem component", () => {
+            const wrapper = factory.getShallowMount();
+
+            expect(wrapper.findComponent({name: "AccordionItem"}).exists()).to.be.true;
         });
 
         it("should render FlatButton component", () => {
@@ -151,6 +159,74 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
 
             await button.trigger("click");
             expect(spyBackToPrevious.calledOnce).to.be.true;
+        });
+    });
+
+    describe("Methods", () => {
+        describe("getParameterValue", () => {
+            it("should return default value if the keys are not string", () => {
+                const wrapper = factory.getShallowMount();
+
+                expect(wrapper.vm.getParameterValue(null, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue(0, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue(undefined, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue(true, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue([], "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue({}, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue("key1", null, "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue("key1", 0, "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue("key1", undefined, "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue("key1", true, "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue("key1", [], "value")).to.equal("value");
+                expect(wrapper.vm.getParameterValue("key1", {}, "value")).to.equal("value");
+            });
+
+            it("should return default value if there are no set value according to the key", () => {
+                const wrapper = factory.getShallowMount();
+
+                expect(wrapper.vm.getParameterValue("key1", "key2", "value")).to.equal("value");
+            });
+
+            it("should return the value according to the key", async () => {
+                const wrapper = factory.getShallowMount(),
+                    parameterValue = {},
+                    key = "key1-key2";
+
+                parameterValue[key] = "result";
+
+                await wrapper.setData({parameterValue: parameterValue});
+                expect(wrapper.vm.getParameterValue("key1", "key2", "value")).to.equal("result");
+            });
+        });
+
+        describe("setParameterValue", () => {
+            it("should not set value if the keys are not string", async () => {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.setData({parameterValue: {}});
+
+                await wrapper.vm.setParameterValue(null, "key2", "value");
+                expect(wrapper.vm.parameterValue).to.deep.equal({});
+                await wrapper.vm.setParameterValue(0, "key2", "value");
+                expect(wrapper.vm.parameterValue).to.deep.equal({});
+                await wrapper.vm.setParameterValue(undefined, "key2", "value");
+                expect(wrapper.vm.parameterValue).to.deep.equal({});
+                await wrapper.vm.setParameterValue(true, "key2", "value");
+                expect(wrapper.vm.parameterValue).to.deep.equal({});
+                await wrapper.vm.setParameterValue([], "key2", "value");
+                expect(wrapper.vm.parameterValue).to.deep.equal({});
+                await wrapper.vm.setParameterValue({}, "key2", "value");
+                expect(wrapper.vm.parameterValue).to.deep.equal({});
+            });
+
+            it("should set value", async () => {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.setData({parameterValue: {}});
+
+                await wrapper.vm.setParameterValue("key1", "key2", "value");
+                expect(wrapper.vm.parameterValue["key1-key2"]).to.equal("value");
+            });
         });
     });
 });

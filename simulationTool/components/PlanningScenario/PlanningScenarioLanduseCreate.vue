@@ -8,7 +8,6 @@ import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactio
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 
-
 export default {
     name: "PlanningScenarioLanduseCreate",
     components: {

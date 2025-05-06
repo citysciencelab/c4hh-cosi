@@ -162,7 +162,7 @@ export default {
                     <IconButton
                         :class-array="['btn-light', 'me-2']"
                         :icon="'bi-pencil-square'"
-                        :aria="$t('additional:modules.tools.simulationTool.simlulationSetParams')"
+                        :aria="$t('additional:modules.tools.simulationTool.simulationSetParams')"
                         :interaction="() => openSimulationParameter(scenario.id)"
                     />
                     <div class="vr me-2" />

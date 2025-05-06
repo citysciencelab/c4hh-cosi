@@ -3,11 +3,14 @@ import AccordionItem from "../../../../src/shared/modules/accordion/components/A
 import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
+import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
+import SliderItem from "../../../../src/shared/modules/slider/components/SliderItem.vue";
+import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
     name: "SimulationParameter",
@@ -15,12 +18,16 @@ export default {
         AccordionItem,
         FileUpload,
         FlatButton,
-        SectionHeader
+        InputText,
+        SectionHeader,
+        SliderItem,
+        SwitchInput
     },
     data () {
         return {
             jobResults: undefined,
             jobStatus: undefined,
+            parameterValue: {},
             processDescription: undefined,
             processHandler: undefined,
             requestBody: {}
@@ -108,6 +115,7 @@ export default {
                 this.getLayer().getLayerSource().clear();
             }
         },
+
         /**
          * Creates a layer if it does not yet exist and returns it.
          * @returns {Object} A VECTORBASE Layer
@@ -131,6 +139,27 @@ export default {
          * Gets the mapped property from key and configured object.
          */
         getMappedProperty,
+
+        /**
+         * Gets the parameter value according to input and property as key.
+         * @param {String} inputKey the input key.
+         * @param {String} propertyKey the property key.
+         * @param {String} val the value.
+         * @returns {String} the parameter value. It could be the rendered value or default value.
+         */
+        getParameterValue (inputKey, propertyKey, val) {
+            if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
+                return val;
+            }
+
+            const key = inputKey + "-" + propertyKey;
+
+            if (typeof this.parameterValue[key] !== "undefined") {
+                return this.parameterValue[key];
+            }
+
+            return val;
+        },
 
         /**
          * Event handler for change of selected planning scenario.
@@ -209,6 +238,23 @@ export default {
         },
 
         /**
+         * Sets the parameter value according to input and property as key.
+         * @param {String} inputKey the input key.
+         * @param {String} propertyKey the property key.
+         * @param {String} val the value.
+         * @returns {void}
+         */
+        setParameterValue (inputKey, propertyKey, val) {
+            if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
+                return;
+            }
+
+            const key = inputKey + "-" + propertyKey;
+
+            this.parameterValue[key] = val;
+        },
+
+        /**
          * Called when user clicks to input files
          * @param {HTMLInputEvent} e event with click.
          * @returns {void}
@@ -225,7 +271,7 @@ export default {
 <template>
     <div class="vh-100 overflow-y-auto">
         <SectionHeader
-            :title="$t('additional:modules.tools.simulationTool.simlulationSetParams')"
+            :title="$t('additional:modules.tools.simulationTool.simulationSetParams')"
             icon="bi bi-person-fill"
         />
         <div class="row d-flex">
@@ -274,44 +320,70 @@ export default {
         <hr>
         <AccordionItem
             id="advanced-simulation-parameters"
-            :title="$t('Erweitere Parameter')"
+            :title="$t('additional:modules.tools.simulationTool.simulationAdditionalParameter')"
         >
             <div
                 v-for="(input, inputKey) in stringTypeInputs"
                 :key="inputKey"
             >
-                <label :for="inputKey">
-                    {{ getMappedProperty(inputKey, simulation?.inputs[inputKey]?.propertiesMapping) }}
-                </label>
-                <input
+                <InputText
                     :id="inputKey"
-                    type="text"
                     class="form-control mb-3"
+                    :label="getMappedProperty(inputKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                    :placeholder="getMappedProperty(inputKey, simulation?.inputs[inputKey]?.propertiesMapping)"
                     :value="input.default"
-                    :aria-label="inputKey"
-                >
+                />
             </div>
             <AccordionItem
                 v-for="(input, inputKey) in objectTypeInputs"
                 :id="inputKey"
                 :key="inputKey"
-                :title="inputKey"
+                :title="getMappedProperty(inputKey, simulation?.inputs[inputKey]?.propertiesMapping)"
                 font-size="font-size-small"
             >
                 <div
                     v-for="(property, propertyKey) in input.schema.properties"
                     :key="propertyKey"
                 >
-                    <label :for="`${inputKey}-${propertyKey}`">
-                        {{ getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping) }}
-                    </label>
-                    <input
-                        :id="`${inputKey}-${propertyKey}`"
-                        type="text"
-                        class="form-control mb-3"
-                        :value="property.default"
-                        :aria-label="`${inputKey}-${propertyKey}`"
-                    >
+                    <template v-if="property?.type === 'string'">
+                        <InputText
+                            :id="`${inputKey}-${propertyKey}`"
+                            class="form-control mb-3"
+                            :label="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                            :placeholder="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                            :value="property.default"
+                        />
+                    </template>
+                    <template v-else-if="property?.type === 'boolean'">
+                        <div class="form-switch">
+                            <SwitchInput
+                                :id="`${inputKey}-${propertyKey}`"
+                                :label="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                                :aria="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                                :checked="property?.default"
+                            />
+                        </div>
+                    </template>
+                    <template v-else-if="property?.type === 'number' || property?.type === 'integer'">
+                        <label :for="`${inputKey}-${propertyKey}`">
+                            {{ getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping) }}
+                        </label>
+                        <div class="d-flex justify-content-between value">
+                            <span>{{ property?.minimum }}</span>
+                            <span><b>{{ getParameterValue(inputKey, propertyKey, property?.default) }}</b></span>
+                            <span>{{ property?.maximum }}</span>
+                        </div>
+                        <SliderItem
+                            :id="`${inputKey}-${propertyKey}`"
+                            :aria="getMappedProperty(propertyKey, simulation?.inputs[inputKey]?.propertiesMapping)"
+                            :class-array="['mb-3']"
+                            :min="property?.minimum"
+                            :max="property?.maximum"
+                            :step="property?.type === 'integer' ? 1 : 0.1"
+                            :value="getParameterValue(inputKey, propertyKey, property?.default)"
+                            :interaction="$event=> setParameterValue(inputKey, propertyKey, Number($event.target.value))"
+                        />
+                    </template>
                 </div>
             </AccordionItem>
         </AccordionItem>
@@ -349,15 +421,18 @@ export default {
 @import "~variables";
 
 .d-flex {
-    margin-bottom: 30px;
     .select-scenario {
         padding-top: 30px;
+        margin-bottom: 30px;
     }
     .create-scenario {
         padding-top: 10px;
         button {
             min-height: 3.5rem;
         }
+    }
+    .value {
+        margin-top: 5px;
     }
 }
 form {

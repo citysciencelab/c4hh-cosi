@@ -81,7 +81,7 @@ export default {
         <button
             class="btn btn-link"
             :class="{ active: mode.includes('simulationParameter') }"
-            :title="$t('additional:modules.tools.simulationTool.simlulationSetParams')"
+            :title="$t('additional:modules.tools.simulationTool.simulationSetParams')"
             @click="() => setMode('simulationParameter')"
         >
             <i class="bi bi-pencil-square" />
