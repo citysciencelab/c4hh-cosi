@@ -185,21 +185,5 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
                 expect(properties).to.deep.equal({id: "one", height: "100"});
             });
         });
-
-        describe("setComma", () => {
-            it("should return the same given parameter, if the given parameter is not a number", function () {
-                const wrapper = factory.getShallowMount({itemList: features});
-
-                expect(wrapper.vm.setComma("123")).to.equal("123");
-                expect(wrapper.vm.setComma(undefined)).to.equal(undefined);
-                expect(wrapper.vm.setComma(null)).to.equal(null);
-            });
-            it("should return the given Number as string with comma instead point", function () {
-                const wrapper = factory.getShallowMount({itemList: features}),
-                    ret = wrapper.vm.setComma(12.12);
-
-                expect(ret).to.equal("12,12");
-            });
-        });
     });
 });

@@ -356,7 +356,7 @@ export default {
 
         /**
          * Sets a feature attribute of the current editable input.
-         * @param {String} value - The value to be set.
+         * @param {String|Number} value - The value to be set.
          * @param {String} key - The key of the attribute to be set.
          * @param {String} id - The id of the feature to be updated.
          * @returns {void}

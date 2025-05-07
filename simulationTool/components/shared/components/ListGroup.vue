@@ -94,19 +94,6 @@ export default {
         },
 
         /**
-         * Replaces point with comma in the given value.
-         * @param {number} val - The given value as Number.
-         * @returns {*|string} Returns the modified Number as string.
-         */
-        setComma (val) {
-            if (typeof val !== "number") {
-                return val;
-            }
-
-            return val.toString().replace(/\./g, ",");
-        },
-
-        /**
          * Extracts the properties of a feature, excluding the geometry property.
          * @param {ol/Feature} feature - The feature.
          * @returns {Object} All properties of the feature except the geometry.
@@ -120,12 +107,18 @@ export default {
 
         /**
          * Emits 'setFeatureAttribute' to update a specific attribute of a feature with a new value.
-         * @param {String} value - The value to set.
+         * @param {InputEvent} event - The event containing the new value.
+         * @param {String|Number} oldValue - The old value of the attribute.
          * @param {String} key - The key of the attribute to be updated.
          * @param {ol/Feature} feature - The feature whose attribute needs to be updated.
          * @returns {void}
          */
-        setFeatureAttribute (value, key, feature) {
+        setFeatureAttribute (event, oldValue, key, feature) {
+            const value = typeof oldValue === "number" ? event?.target?.valueAsNumber : event?.target?.value;
+
+            if (Number.isNaN(value)) {
+                return;
+            }
             this.$emit("setFeatureAttribute", value, key, feature.getId());
         },
 
@@ -185,7 +178,7 @@ export default {
                     <div
                         v-for="(value, key, idx) in propertiesWithoutGeometry(feature)"
                         :key="listKey + key"
-                        class="d-flex me-3"
+                        class="d-flex me-3 no-stepper-arrows"
                         :class="idx === 0 ? 'flex-grow-1' : ''"
                     >
                         <label
@@ -196,10 +189,11 @@ export default {
                         </label>
                         <input
                             :id="'property-' + listKey + '-' + key + '-' + idx"
-                            type="text"
+                            :type="typeof value === 'number' ? 'number' : 'text'"
                             class="form-control text-end w-50"
-                            :value="setComma(value)"
-                            @input="event => setFeatureAttribute(event.target.value, key, feature)"
+                            :value="value"
+                            :inputmode="typeof value === 'number' ? 'decimal' : 'text'"
+                            @input="event => setFeatureAttribute(event, value, key, feature)"
                         >
                     </div>
                 </template>
@@ -208,15 +202,16 @@ export default {
                         <div
                             v-for="(value, key, idx) in getShownProperties(feature, shownProperties)"
                             :key="listKey + key"
-                            class="d-flex"
+                            class="d-flex no-stepper-arrows"
                             :class="idx === 0 ? 'flex-grow-1' : ''"
                         >
                             <input
                                 :id="'property-' + listKey + '-' + key + '-' + idx"
-                                type="text"
+                                :type="typeof value === 'number' ? 'number' : 'text'"
                                 class="form-control"
                                 :value="value"
-                                @input="event => setFeatureAttribute(event.target.value, key, feature)"
+                                :inputmode="typeof value === 'number' ? 'decimal' : 'text'"
+                                @input="event => setFeatureAttribute(event, value, key, feature)"
                             >
                         </div>
                     </div>
@@ -251,6 +246,14 @@ export default {
 
 <style scoped lang="scss">
 @import "~variables";
+
+.no-stepper-arrows {
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+}
 
 .selected {
     background-color: $light_blue;
