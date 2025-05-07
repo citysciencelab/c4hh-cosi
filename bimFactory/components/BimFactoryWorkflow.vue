@@ -1,5 +1,5 @@
 <script>
-import {mapGetters, mapActions} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import AccordionItem from "../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import BimFactoryWorkflowStep from "./BimFactoryWorkflowStep.vue";
@@ -24,7 +24,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/BimFactory", ["getWorkflowForId", "getWorkflowDetailsForId", "workflowFormData"]),
+        ...mapGetters("Modules/BimFactory", ["getWorkflowForId", "getWorkflowDetailsForId", "workflowFormData", "previousWorkflowBackgroundLayer", "previousWorkflowForegroundLayers"]),
+        ...mapGetters(["visibleBaselayerConfigs"]),
         currentWorkflow () {
             return this.getWorkflowForId(this.workflowId);
         },
@@ -39,9 +40,6 @@ export default {
         }
     },
     watch: {
-        workflowId (value) {
-            console.warn("Die Layer müssen geändert werden!:" + value);
-        },
         currentWorkflowDetails: {
             handler () {
                 this.initializeAccordionItems();
@@ -50,13 +48,50 @@ export default {
         }
     },
     async mounted () {
-        console.warn("Die Layer müssen geändert werden!");
+        this.setCurrentWorkflowLayers();
         await this.loadSingleWorkflow(this.workflowId);
         this.initializeAccordionItems();
         this.initializeWorkflowFormData();
     },
+    beforeUnmount () {
+        if (this.previousWorkflowBackgroundLayer && this.previousWorkflowBackgroundLayer !== this.visibleBaselayerConfigs[0].id) {
+            this.replaceByIdInLayerConfig({
+                layerConfigs: [{
+                    id: this.visibleBaselayerConfigs[0].id,
+                    layer: {
+                        visibility: true
+                    }
+                }]
+            });
+
+            this.replaceByIdInLayerConfig({
+                layerConfigs: [{
+                    id: this.previousWorkflowBackgroundLayer,
+                    layer: {
+                        visibility: false
+                    }
+                }]
+            });
+        }
+
+        if (this.previousWorkflowForegroundLayers.length) {
+            this.previousWorkflowForegroundLayers.forEach(layer => {
+                this.replaceByIdInLayerConfig({
+                    layerConfigs: [{
+                        id: layer,
+                        layer: {
+                            visibility: false
+                        }
+                    }]
+                });
+            });
+        }
+    },
     methods: {
         ...mapActions("Modules/BimFactory", ["loadSingleWorkflow"]),
+        ...mapActions(["replaceByIdInLayerConfig"]),
+        ...mapActions("Modules/BaselayerSwitcher", ["updateLayerVisibilityAndZIndex"]),
+        ...mapMutations("Modules/BimFactory", ["setPreviousWorkflowBackgroundLayer", "setPreviousWorkflowForegroundLayers"]),
         initializeWorkflowFormData () {
             const formData = {
                 containers: []
@@ -139,6 +174,39 @@ export default {
                     break;
                 }
             }
+        },
+        setCurrentWorkflowLayers () {
+            if (this.backgroundLayers) {
+                this.replaceByIdInLayerConfig({
+                    layerConfigs: [{
+                        id: this.backgroundLayers[0],
+                        layer: {
+                            visibility: true
+                        }
+                    }]
+                });
+
+                if (this.previousWorkflowBackgroundLayer !== this.backgroundLayers[0]) {
+                    this.setPreviousWorkflowBackgroundLayer(this.backgroundLayers[0]);
+                }
+            }
+
+            const previousWorkflowForegroundLayers = [];
+
+            this.foregroundLayers?.forEach(layer => {
+                this.replaceByIdInLayerConfig({
+                    layerConfigs: [{
+                        id: layer,
+                        layer: {
+                            visibility: true
+                        }
+                    }]
+                });
+
+                previousWorkflowForegroundLayers.push(layer);
+            });
+
+            this.setPreviousWorkflowForegroundLayers(previousWorkflowForegroundLayers);
         }
     }
 };

@@ -318,7 +318,8 @@ describe("addons/bimFactory/components/BimFactoryWorkflow.vue", () => {
                                         res = null;
                                     }
                                     return res;
-                                }
+                                },
+                                previousWorkflowBackgroundLayer: sinon.spy()
                             },
                             actions: {
                                 loadSingleWorkflow: sinon.stub().resolves(mockWorkflowDetails)
@@ -329,11 +330,16 @@ describe("addons/bimFactory/components/BimFactoryWorkflow.vue", () => {
                                 },
                                 initializeWorkflowFormData (state, payload) {
                                     state.workflowFormData = payload;
-                                }
+                                },
+                                setPreviousWorkflowBackgroundLayer: sinon.spy(),
+                                setPreviousWorkflowForegroundLayers: sinon.spy()
                             }
                         }
                     }
                 }
+            },
+            actions: {
+                replaceByIdInLayerConfig: sinon.stub().resolves()
             }
         }),
         globalMocks = {
@@ -405,5 +411,56 @@ describe("addons/bimFactory/components/BimFactoryWorkflow.vue", () => {
 
         expect(wrapper.exists()).to.be.true;
         expect(wrapper.vm.currentWorkflowDetails).to.be.null;
+    });
+
+    it("should correctly set the current workflow layers", async () => {
+        const wrapper = shallowMount(Component, {
+                global: globalMocks,
+                propsData: {
+                    workflowId: 1
+                }
+            }),
+            replaceByIdInLayerConfigStub = sinon.stub().resolves();
+
+        // Update the store to use the stubbed action
+        store._actions.replaceByIdInLayerConfig[0] = replaceByIdInLayerConfigStub;
+        wrapper.setData({currentWorkflow: mockWorkflows.workflows[0]});
+        wrapper.vm.setCurrentWorkflowLayers();
+
+        // Assert that replaceByIdInLayerConfig was called for the background layer
+        sinon.assert.calledWith(replaceByIdInLayerConfigStub, sinon.match({
+            layerConfigs: [
+                {
+                    id: "123", // Background layer ID for workflowId 1
+                    layer: {
+                        visibility: true
+                    }
+                }
+            ]
+        }));
+
+        // Assert that replaceByIdInLayerConfig was called for each foreground layer
+        sinon.assert.calledWith(replaceByIdInLayerConfigStub, sinon.match({
+            layerConfigs: [
+                {
+                    id: "182",
+                    layer: {
+                        visibility: true
+                    }
+                }
+            ]
+        }));
+
+        sinon.assert.calledWith(replaceByIdInLayerConfigStub, sinon.match({
+            layerConfigs: [
+                {
+                    id: "234",
+                    layer: {
+                        visibility: true
+                    }
+                }
+            ]
+        }));
+
     });
 });

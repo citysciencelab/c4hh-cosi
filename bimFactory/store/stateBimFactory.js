@@ -15,6 +15,8 @@
  * @property {Object} workflowsJSON - JSON object containing all workflows
  * @property {Array} workflowsDetails - array of workflow details
  * @property {Object} workflowFormData - object containing the form data for the workflow
+ * @property {Number} previousWorkflowBackgroundLayer - Id of background layer which needs to be turned off on workflow switch
+ * @property {Array} previousWorkflowForegroundLayers - Array of foreground layers which need to be turned off on workflow switch
  */
 
 const state = {
@@ -31,7 +33,9 @@ const state = {
     workflowsJSONPath: "",
     workflowsJSON: {},
     workflowsDetails: [],
-    workflowFormData: {}
+    workflowFormData: {},
+    previousWorkflowBackgroundLayer: null,
+    previousWorkflowForegroundLayers: []
 };
 
 export default state;
