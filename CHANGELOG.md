@@ -3,18 +3,11 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
-
-### Added
+## 2025-05-07 v3.10.0
 
 ### Changed
 - Charts: Brought code up to date — same refactor as in v2 with the Chart.js update.
 - StreetSmart: Changed EPSG to resolve false heigth in viewer.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - Fixed VerkehrsstärkenThemeLineChart tests, so that it does not need to be skipped anymore. 
