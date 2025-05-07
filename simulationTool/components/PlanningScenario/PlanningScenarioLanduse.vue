@@ -224,8 +224,10 @@ export default {
                 if (input?.source?.type === "oaf") {
                     const filter = getOAFFeature.getOAFGeometryFilter(bboxGeometry, "geometry", "intersects");
 
-                    scenario.inputs[inputKey] = {};
-                    scenario.inputs[inputKey].features = await getOAFFeature.getOAFFeatureGet(input.source.url, input.source.collection, 100, filter, crs, crs);
+                    scenario.inputs[inputKey] = {
+                        type: "FeatureCollection",
+                        features: await getOAFFeature.getOAFFeatureGet(input.source.url, input.source.collection, 100, filter, crs, crs)
+                    };
                 }
             }
         },
@@ -253,7 +255,7 @@ export default {
          * @returns {Object[]} An array of geojson features.
          */
         getInputFeatures (key) {
-            return this.planningScenario?.inputs[key].features;
+            return this.planningScenario?.inputs[key]?.features;
         },
 
         /*

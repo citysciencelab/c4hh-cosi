@@ -8,7 +8,7 @@ import axios from "axios";
 config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/SimulationParameter/SimulationParameter.vue", () => {
-    let store, axiosStub;
+    let store;
 
     const factory = {
         getShallowMount: () => {
@@ -63,7 +63,7 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
             }
         });
 
-        axiosStub = sinon.stub(axios, "get").resolves({data: {}});
+        sinon.stub(axios, "get").resolves({data: {}});
     });
 
     afterEach(() => {
@@ -151,41 +151,6 @@ describe("addons/SimulationTool/components/SimulationParameter/SimulationParamet
 
             await button.trigger("click");
             expect(spyBackToPrevious.calledOnce).to.be.true;
-        });
-    });
-
-    describe("Methods", () => {
-        describe("fetchProcessDescription", () => {
-            it("should return undefined if the given parameter is not correct", async () => {
-                const wrapper = factory.getShallowMount();
-
-                expect(await wrapper.vm.fetchProcessDescription(null)).to.equal(undefined);
-                expect(await wrapper.vm.fetchProcessDescription({})).to.equal(undefined);
-                expect(await wrapper.vm.fetchProcessDescription([])).to.equal(undefined);
-                expect(await wrapper.vm.fetchProcessDescription(true)).to.equal(undefined);
-                expect(await wrapper.vm.fetchProcessDescription(110)).to.equal(undefined);
-                expect(await wrapper.vm.fetchProcessDescription("str")).to.equal(undefined);
-                expect(await wrapper.vm.fetchProcessDescription("")).to.equal(undefined);
-            });
-
-            it("should call axios.get with the correct URL", async () => {
-                const wrapper = factory.getShallowMount();
-
-                wrapper.vm.fetchProcessDescription(wrapper.vm.simulation);
-                expect(axiosStub.calledWithMatch({href: "http://www.simulation.hamburg/api/processes/simulationId"})).to.be.true;
-            });
-
-            it("should set processDescription to the response data", async () => {
-                const wrapper = factory.getShallowMount(),
-                    responseData = {data: "test"};
-
-                axiosStub.resolves(responseData);
-                await wrapper.setData({
-                    processDescription: await wrapper.vm.fetchProcessDescription(wrapper.vm.simulation)
-                });
-
-                expect(wrapper.vm.processDescription).to.equal("test");
-            });
         });
     });
 });

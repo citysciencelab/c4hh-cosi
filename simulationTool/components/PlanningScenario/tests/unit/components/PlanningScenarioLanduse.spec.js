@@ -390,7 +390,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
                 await wrapper.vm.fetchFeatures(scenario, scopeSimulations[0].inputs, [0, 1, 0, 1], "CRS");
 
-                expect(scenario.inputs.anEditableInput).to.deep.equal({features: "features"});
+                expect(scenario.inputs.anEditableInput).to.deep.equal({type: "FeatureCollection", features: "features"});
             });
         });
 

@@ -1,12 +1,12 @@
 <script>
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
-import axios from "axios";
 import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
 
 export default {
@@ -19,7 +19,11 @@ export default {
     },
     data () {
         return {
-            processDescription: undefined
+            jobResults: undefined,
+            jobStatus: undefined,
+            processDescription: undefined,
+            processHandler: undefined,
+            requestBody: {}
         };
     },
     computed: {
@@ -80,8 +84,10 @@ export default {
             ));
         }
     },
-    async mounted () {
-        this.processDescription = await this.fetchProcessDescription(this.simulation);
+    mounted () {
+        if (this.simulation) {
+            this.prepareRequestBody();
+        }
     },
     methods: {
         ...mapActions("Modules/SimulationTool", ["addFile"]),
@@ -122,30 +128,6 @@ export default {
         },
 
         /**
-         * Fetches the process description from the simulation URL.
-         * @param {Object} simulation The simulation configuration object containing url and id.
-         * @returns {Promise<Object|undefined>} The process description or undefined if an error occurs.
-         */
-        async fetchProcessDescription (simulation) {
-            if (!simulation?.url) {
-                console.warn("Simulation URL is not defined.");
-                return undefined;
-            }
-
-            try {
-                const url = new URL(`api/processes/${simulation.id}`, simulation.url),
-                    response = await axios.get(url);
-
-                return response.data;
-
-            }
-            catch (error) {
-                console.warn("Error fetching process description:", error);
-                return undefined;
-            }
-        },
-
-        /**
          * Gets the mapped property from key and configured object.
          */
         getMappedProperty,
@@ -157,7 +139,15 @@ export default {
          */
         async onPlanningScenarioChange (event) {
             this.setCurrentPlanningScenarioId(event.target.value);
-            this.processDescription = await this.fetchProcessDescription(this.simulation);
+            this.prepareRequestBody();
+        },
+
+        /**
+         * Event handler for progress update of the simulation.
+         * @param {Object} jobStatus The job status object.
+         */
+        onProgressUpdate (jobStatus) {
+            this.jobStatus = jobStatus;
         },
 
         /**
@@ -190,6 +180,32 @@ export default {
         openCreatePlanningScenario () {
             this.setMode("planningScenario");
             this.setCurrentPlanningComponent("create");
+        },
+
+        /** Prepares the request body for the simulation.
+         * @returns {void}
+         */
+        async prepareRequestBody () {
+            this.processHandler = new OgcApiProcess(this.simulation.url, this.simulation.id);
+            this.processDescription = await this.processHandler.getDescription();
+            this.requestBody.inputs = {
+                ...OgcApiProcess.getInputDefaultsFromDescription(this.processDescription),
+                ...this.currentPlanningScenario.inputs,
+                crs: this.simulation?.inputs?.crs
+            };
+            this.requestBody.outputs = {noise_night: {}}; // TODO: Let user select output from process description
+        },
+
+        /**
+         * Starts the simulation.
+         * @returns {void}
+         */
+        async startSimulation () {
+            this.jobResults = await this.processHandler.executeAndGetResults(
+                this.requestBody,
+                this.simulation.pollingInterval,
+                this.onProgressUpdate
+            );
         },
 
         /**
@@ -310,15 +326,21 @@ export default {
                         id="back"
                         :aria-label="$t('additional:modules.tools.simulationTool.back')"
                         :interaction="() => backToPrevious()"
+                        :disabled="jobStatus?.status === 'running'"
                         :text="$t('additional:modules.tools.simulationTool.back')"
                     />
                     <FlatButton
                         id="start"
+                        :interaction="startSimulation"
+                        :disabled="jobStatus?.status === 'running'"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
                     />
                 </div>
             </form>
+            Job status: {{ jobStatus?.status }} <br>
+            Job progress: {{ jobStatus?.progress }} % <br>
+            Job Result: <br> {{ JSON.stringify(jobResults) }}
         </div>
     </div>
 </template>
