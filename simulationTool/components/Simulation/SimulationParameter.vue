@@ -300,7 +300,6 @@ export default {
     <div class="vh-100 overflow-y-auto">
         <SectionHeader
             :title="$t('additional:modules.tools.simulationTool.simulationSetParams')"
-            icon="bi bi-person-fill"
         />
         <div class="row d-flex">
             <div class="col col-6 select-scenario">

@@ -7,7 +7,7 @@ import axios from "axios";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/SimulationTool/components/SimulationParameter/SimulationParameter.vue", () => {
+describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
     let consoleWarnSpy, store;
 
     const factory = {

@@ -158,6 +158,7 @@
           "simulateEnsemble": "Simulate ensemble",
           "simulateForPlanningScenario": "Simulation for planning scenario",
           "simulationAdditionalParameter": "Additional Parameter",
+          "simulationList": "List of performed simulations",
           "simulationSetParams": "Set parameters for simulation",
           "simulationStart": "Start Simulation",
           "started": "Started",

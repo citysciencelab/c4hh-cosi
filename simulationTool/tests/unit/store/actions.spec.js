@@ -11,7 +11,7 @@ before(() => {
     });
 });
 
-describe("addons/SimulationTool/components/SimulationParameter/store/actionsMouseHover", () => {
+describe("addons/SimulationTool/store/actions", () => {
     describe("isFormatValid", () => {
         let payload = "";
 

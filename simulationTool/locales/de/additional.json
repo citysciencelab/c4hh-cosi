@@ -160,6 +160,7 @@
           "simulateEnsemble": "Ensemble simulieren",
           "simulateForPlanningScenario": "Simulation für Planungsszenario",
           "simulationAdditionalParameter": "Erweitere Parameter",
+          "simulationList": "Liste der durchgeführten Simulation",
           "simulationSetParams": "Parameter für Simulation einstellen",
           "simulationStart": "Simulation starten",
           "started": "Gestartet",

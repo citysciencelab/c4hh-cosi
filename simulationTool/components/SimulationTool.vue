@@ -16,7 +16,8 @@ import PlanningScenario from "./PlanningScenario/PlanningScenario.vue";
 import ProcessDetails from "./Process/ProcessDetails.vue";
 import ProcessList from "./Process/ProcessList.vue";
 import SideMenu from "./SideMenu.vue";
-import simulationParameter from "./SimulationParameter/SimulationParameter.vue";
+import SimulationList from "./Simulation/SimulationList.vue";
+import SimulationParameter from "./Simulation/SimulationParameter.vue";
 import TutorialPanel from "./HelpSection/TutorialPanel.vue";
 
 const MIN_WIDTH_PERCENT = 40;
@@ -36,7 +37,8 @@ export default {
         ProcessDetails,
         ProcessList,
         SideMenu,
-        simulationParameter,
+        SimulationList,
+        SimulationParameter,
         TutorialPanel
     },
     computed: {
@@ -104,7 +106,10 @@ export default {
             <PlanningScenario
                 v-if="mode === 'planningScenario'"
             />
-            <simulationParameter
+            <SimulationList
+                v-if="mode === 'simulationList'"
+            />
+            <SimulationParameter
                 v-if="mode === 'simulationParameter'"
             />
             <ProcessList
