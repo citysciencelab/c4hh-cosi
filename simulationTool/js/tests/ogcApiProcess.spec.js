@@ -107,6 +107,23 @@ describe("addons/simulationTool/js/ogcApiProcess.js", () => {
         });
     });
 
+    describe("pollJobStatusAndGetResults", () => {
+        it("should poll the job status and fetch results when successful", async () => {
+            const ogcApiProcess = new OgcApiProcess("http://example.com/ogcapi/", "process123"),
+                mockJobResultsResponse = {result: "mock result"},
+                jobStatusStub = sinon.stub(ogcApiProcess, "getJobStatus").resolves({status: "successful"}),
+                jobResultsStub = sinon.stub(ogcApiProcess, "getJobResults").resolves(mockJobResultsResponse),
+                results = await ogcApiProcess.pollJobStatusAndGetResults("job123");
+
+            expect(jobStatusStub.calledOnce).to.be.true;
+            expect(jobResultsStub.calledOnce).to.be.true;
+            expect(results).to.deep.equal(mockJobResultsResponse);
+
+            jobStatusStub.restore();
+            jobResultsStub.restore();
+        });
+    });
+
     describe("executeAndGetResults", () => {
         it("should execute the process and fetch the job result", async () => {
             const baseUrl = "http://example.com/ogcapi/",

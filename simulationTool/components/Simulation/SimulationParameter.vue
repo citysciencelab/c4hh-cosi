@@ -258,8 +258,20 @@ export default {
          * @returns {void}
          */
         async startSimulation () {
-            this.jobResults = await this.processHandler.executeAndGetResults(
-                this.requestBody,
+            const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
+                executeResponse = await this.processHandler.execute(this.requestBody),
+                jobID = executeResponse.jobID;
+
+            if (!jobID) {
+                console.warn("No job ID returned from process execution.");
+                return;
+            }
+
+            scenario.jobs ??= {};
+            scenario.jobs[jobID] = {requestBody: this.requestBody};
+
+            this.jobResults = await this.processHandler.pollJobStatusAndGetResults( // Das soll später auch im szenario gespeichert werden
+                jobID,
                 this.simulation.pollingInterval,
                 this.onProgressUpdate
             );
@@ -469,13 +481,11 @@ export default {
                         id="back"
                         :aria-label="$t('additional:modules.tools.simulationTool.back')"
                         :interaction="() => backToPrevious()"
-                        :disabled="jobStatus?.status === 'running'"
                         :text="$t('additional:modules.tools.simulationTool.back')"
                     />
                     <FlatButton
                         id="start"
                         :interaction="startSimulation"
-                        :disabled="jobStatus?.status === 'running'"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
                     />

@@ -84,11 +84,11 @@ export default class OgcApiProcess {
 
     /**
      * Fetches the status of a job with the given job ID.
-     * @param {string} jobId - The ID of the job.
+     * @param {string} jobID - The ID of the job.
      * @returns {Promise<Object>} The job status object.
      */
-    async getJobStatus (jobId) {
-        const url = new URL(`jobs/${jobId}`, this.baseUrl),
+    async getJobStatus (jobID) {
+        const url = new URL(`jobs/${jobID}`, this.baseUrl),
             response = await axios.get(url);
 
         return response.data;
@@ -96,18 +96,50 @@ export default class OgcApiProcess {
 
     /**
      * Fetches the result of a job with the given job ID.
-     * @param {string} jobId - The ID of the job.
+     * @param {string} jobID - The ID of the job.
      * @returns {Promise<Object>} The job results object.
      */
-    async getJobResults (jobId) {
-        const url = new URL(`jobs/${jobId}/results`, this.baseUrl),
+    async getJobResults (jobID) {
+        const url = new URL(`jobs/${jobID}/results`, this.baseUrl),
             response = await axios.get(url);
 
         return response.data;
     }
 
     /**
+     * Polls the job status and retrieves the results.
+     * @param {string} jobID - The ID of the job.
+     * @param {number} [pollingInterval=1000] - The interval in milliseconds to poll for job status.
+     * @param {function} [onProgressUpdate=null] - Optional callback function to handle progress updates.
+     * @returns {Promise<Object>} The job results object.
+     * @throws {Error} If an error occurs during execution or if the job fails.
+    */
+    async pollJobStatusAndGetResults (jobID, pollingInterval = 1000, onProgressUpdate = null) {
+        try {
+            let jobStatus = await this.getJobStatus(jobID);
+
+            while (jobStatus?.status === "running") {
+                await new Promise(resolve => setTimeout(resolve, pollingInterval));
+                jobStatus = await this.getJobStatus(jobID);
+                onProgressUpdate?.({...jobStatus});
+            }
+
+            if (jobStatus?.status !== "successful") {
+                console.warn(`Job failed with status: ${jobStatus?.status}`);
+            }
+
+            return await this.getJobResults(jobID);
+        }
+        catch (error) {
+            console.warn("Error polling job status and getting results:", error);
+            throw error;
+        }
+    }
+
+    /**
      * Executes the process, polls for the job status, and retrieves the results.
+     * Encapsulates job ID handling, which can be convenient in simple use cases.
+     * In more complex use cases that require dealing with job IDs, the execute and pollJobStatusAndGetResults methods should be used.
      * @param {Object} requestBody - The request body for the process execution.
      * @param {number} [pollingInterval=1000] - The interval in milliseconds to poll for job status.
      * @param {function} [onProgressUpdate=null] - Optional callback function to handle progress updates.
@@ -117,25 +149,13 @@ export default class OgcApiProcess {
     async executeAndGetResults (requestBody, pollingInterval = 1000, onProgressUpdate = null) {
         try {
             const executeResponse = await this.execute(requestBody),
-                jobId = executeResponse?.jobID;
+                jobID = executeResponse?.jobID;
 
-            if (!jobId) {
+            if (!jobID) {
                 console.warn("No job ID returned from the execute request.");
             }
 
-            let jobStatus = await this.getJobStatus(jobId);
-
-            while (jobStatus?.status === "running") {
-                await new Promise(resolve => setTimeout(resolve, pollingInterval));
-                jobStatus = await this.getJobStatus(jobId);
-                onProgressUpdate?.({...jobStatus});
-            }
-
-            if (jobStatus?.status !== "successful") {
-                console.warn(`Job failed with status: ${jobStatus?.status}`);
-            }
-
-            return await this.getJobResults(jobId);
+            return await this.pollJobStatusAndGetResults(jobID, pollingInterval, onProgressUpdate);
         }
         catch (error) {
             console.warn("Error executing process and getting job result:", error);
