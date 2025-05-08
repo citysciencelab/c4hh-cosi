@@ -161,6 +161,7 @@
           "simulationList": "List of performed simulations",
           "simulationSetParams": "Set parameters for simulation",
           "simulationStart": "Start Simulation",
+          "simulationResults": "Simulation results",
           "started": "Started",
           "status": "Status",
           "title": "Simulations",

@@ -163,6 +163,7 @@
           "simulationList": "Liste der durchgeführten Simulation",
           "simulationSetParams": "Parameter für Simulation einstellen",
           "simulationStart": "Simulation starten",
+          "simulationResults": "Ergebnis der Simulationen",
           "started": "Gestartet",
           "status": "Status",
           "title": "Simulationen",

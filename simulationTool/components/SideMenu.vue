@@ -96,6 +96,14 @@ export default {
         </button>
         <button
             class="btn btn-link"
+            :class="{ active: mode.includes('simulationResults') }"
+            :title="$t('additional:modules.tools.simulationTool.simulationResults')"
+            @click="() => setMode('simulationResults')"
+        >
+            <i class="bi bi-stickies" />
+        </button>
+        <button
+            class="btn btn-link"
             :class="{ active: mode.includes('process') }"
             :title="$t('additional:modules.tools.simulationTool.models')"
             @click="() => setMode('process-list')"
