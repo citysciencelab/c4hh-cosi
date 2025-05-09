@@ -268,7 +268,7 @@ export default {
             }
 
             scenario.jobs ??= {};
-            scenario.jobs[jobID] = {requestBody: this.requestBody};
+            scenario.jobs[jobID] = {requestBody: JSON.parse(JSON.stringify(this.requestBody))}; // Deep copy to avoid reference issues.
 
             this.jobResults = await this.processHandler.pollJobStatusAndGetResults( // Das soll später auch im szenario gespeichert werden
                 jobID,
