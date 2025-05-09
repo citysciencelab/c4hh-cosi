@@ -130,8 +130,8 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
 
             expect(commit.calledOnce).to.be.true;
             expect(commit.args[0][0]).to.equal("setFilteredLayerList");
-            expect(resultArray[1]).to.deep.equal(layer3);
-            expect(resultArray).to.deep.equal([layer2, layer3]);
+            expect(resultArray[1]).to.deep.equal(layer2);
+            expect(resultArray).to.deep.equal([layer1, layer2, layer3]);
         });
     });
     describe("handleUrlParameters", () => {
