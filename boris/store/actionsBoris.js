@@ -14,12 +14,9 @@ const actions = {
      * @returns {void}
      */
     initialize ({commit, rootGetters}) {
-        let layerList = rootGetters.layerConfigsByAttributes({isNeverVisibleInTree: true});
+        const layerList = rootGetters.layerConfigsByAttributes({isNeverVisibleInTree: true});
 
         if (layerList) {
-            layerList = layerList.filter(function (layer) {
-                return layer.gfiAttributes !== "ignore";
-            });
             commit("setFilteredLayerList", layerList);
         }
     },

@@ -17,6 +17,7 @@
 
 ### Fixed
 - CommuterFlows: Ensures the layer always renders on top, preventing commuter flow visualization from disappearing behind the baselayer.
+- Boris: Fixed that all Layers are shown in DropDown Menu, even if gfiAttributes are set to ignore. 
 
 ---
 
