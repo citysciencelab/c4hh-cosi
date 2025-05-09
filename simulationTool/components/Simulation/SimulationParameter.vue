@@ -1,33 +1,31 @@
 <script>
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
+import DynamicInputByType from "../shared/components/DynamicInputByType.vue";
 import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
-import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
+import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
-import SliderItem from "../../../../src/shared/modules/slider/components/SliderItem.vue";
-import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
     name: "SimulationParameter",
     components: {
         AccordionItem,
+        DynamicInputByType,
         FileUpload,
         FlatButton,
-        InputText,
-        SectionHeader,
-        SliderItem,
-        SwitchInput
+        SectionHeader
     },
     data () {
         return {
             jobResults: undefined,
             jobStatus: undefined,
             parameterValue: {},
+            primaryTypeInputs: {},
             processDescription: undefined,
             processHandler: undefined,
             requestBody: {},
@@ -53,7 +51,7 @@ export default {
                 return optionsArray;
             }
 
-            Object.keys(this.processDescription?.outputs).forEach(key => {
+            Object.keys(this.processDescription?.outputs || {}).forEach(key => {
                 optionsArray.push({code: key, name: this.processDescription?.outputs[key]?.title});
             });
 
@@ -83,6 +81,14 @@ export default {
                     && this.simulation?.inputs?.[inputKey]?.menu !== "nowhere"
                     && !this.simulation?.inputs?.[inputKey]?.editable
             ));
+        },
+
+        /**
+         * Gets the keys of the primaryTypeInputs object.
+         * @returns {String[]} The keys of the primaryTypeInputs object.
+         */
+        primaryTypeInputsKeys () {
+            return Object.keys(this.primaryTypeInputs);
         },
 
         /**
@@ -125,6 +131,7 @@ export default {
     async mounted () {
         if (this.simulation) {
             await this.prepareRequestBody();
+            this.primaryTypeInputs = this.getPrimaryTypeInputs();
         }
 
         this.selectedOutputOptions = this.outputOptions;
@@ -147,6 +154,22 @@ export default {
                 this.setCurrentPlanningScenarioId("");
                 this.getLayer().getLayerSource().clear();
             }
+        },
+
+        /**
+         * Excludes the primary type keys from the given object.
+         * @param {Object} properties The properties object.
+         * @returns {Object} The filtered properties object.
+         */
+        excludePrimaryTypeKeys (properties) {
+            const result = {};
+
+            Object.entries(properties || {}).forEach(([propertyKey, property]) => {
+                if (!this.primaryTypeInputsKeys.includes(propertyKey)) {
+                    result[propertyKey] = property;
+                }
+            });
+            return result;
         },
         /**
          * Creates a layer if it does not yet exist and returns it.
@@ -191,6 +214,41 @@ export default {
             }
 
             return val;
+        },
+
+        /**
+         * Gets the inputs of the primary type from the process description.
+         * @returns {Object} The inputs of the primary type.
+         */
+        getPrimaryTypeInputs () {
+            const propertiesToExtract = {};
+
+            if (!isObject(this.processDescription?.inputs)) {
+                return propertiesToExtract;
+            }
+            Object.entries(this.processDescription?.inputs).forEach(([inputKey, input]) => {
+                if (this.simulation?.inputs?.[inputKey]?.menu !== "primary") {
+                    return;
+                }
+                if (input.schema?.type === "object") {
+                    const foundProperties = Object.entries(input.schema.properties || {}).filter(([propertyKey]) => {
+                        return this.simulation?.inputs?.[inputKey]?.primaryProperties?.includes(propertyKey);
+                    });
+
+                    foundProperties.forEach(([foundPropKey, foundPropVal]) => {
+                        propertiesToExtract[foundPropKey] = {...foundPropVal};
+                        propertiesToExtract[foundPropKey].inputKey = inputKey;
+                    });
+                }
+                else if (input.schema?.type === "string") {
+                    propertiesToExtract[inputKey] = {...input};
+                    propertiesToExtract[inputKey].type = "string";
+                    propertiesToExtract[inputKey].inputKey = inputKey;
+                    delete propertiesToExtract[inputKey].schema;
+                    delete propertiesToExtract[inputKey].title;
+                }
+            });
+            return propertiesToExtract;
         },
 
         /**
@@ -363,76 +421,76 @@ export default {
             :drop="(e) => onDrop(e)"
             class="col-md-12"
         />
-        <hr>
-        <AccordionItem
-            id="advanced-simulation-parameters"
-            :title="$t('additional:modules.tools.simulationTool.simulationAdditionalParameter')"
-        >
-            <div
-                v-for="(input, inputKey) in stringTypeInputs"
-                :key="inputKey"
-            >
-                <InputText
-                    :id="inputKey"
-                    class="form-control mb-3"
-                    :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                    :placeholder="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                    :value="input.default"
-                />
-            </div>
-            <AccordionItem
-                v-for="(input, inputKey) in objectTypeInputs"
-                :id="inputKey"
-                :key="inputKey"
-                :title="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                font-size="font-size-small"
-            >
+        <div v-if="primaryTypeInputsKeys.length">
+            <hr>
+            <div>
                 <div
-                    v-for="(property, propertyKey) in input.schema.properties"
+                    v-for="(input, propertyKey) in primaryTypeInputs"
                     :key="propertyKey"
                 >
-                    <template v-if="property?.type === 'string'">
-                        <InputText
-                            :id="`${inputKey}-${propertyKey}`"
-                            class="form-control mb-3"
-                            :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :value="property.default"
-                        />
-                    </template>
-                    <template v-else-if="property?.type === 'boolean'">
-                        <div class="form-switch">
-                            <SwitchInput
-                                :id="`${inputKey}-${propertyKey}`"
-                                :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                                :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                                :checked="property?.default"
-                            />
-                        </div>
-                    </template>
-                    <template v-else-if="property?.type === 'number' || property?.type === 'integer'">
-                        <label :for="`${inputKey}-${propertyKey}`">
-                            {{ getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}
-                        </label>
-                        <div class="d-flex justify-content-between value">
-                            <span>{{ property?.minimum }}</span>
-                            <span><b>{{ getParameterValue(inputKey, propertyKey, property?.default) }}</b></span>
-                            <span>{{ property?.maximum }}</span>
-                        </div>
-                        <SliderItem
-                            :id="`${inputKey}-${propertyKey}`"
-                            :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :class-array="['mb-3']"
-                            :min="property?.minimum"
-                            :max="property?.maximum"
-                            :step="property?.type === 'integer' ? 1 : 0.1"
-                            :value="getParameterValue(inputKey, propertyKey, property?.default)"
-                            :interaction="$event=> setParameterValue(inputKey, propertyKey, Number($event.target.value))"
-                        />
-                    </template>
+                    <DynamicInputByType
+                        :id="propertyKey"
+                        :input-type="input.type"
+                        :label="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
+                        :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
+                        :value="getParameterValue(input.inputKey, propertyKey, input.default)"
+                        :min="input.minimum"
+                        :max="input.maximum"
+                        :aria="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
+                        @update:value="setParameterValue(input.inputKey, propertyKey, $event)"
+                        @update:checked="setParameterValue(input.inputKey, propertyKey, $event)"
+                    />
                 </div>
+            </div>
+        </div>
+        <div v-if="Object.keys(stringTypeInputs).length || Object.keys(objectTypeInputs).length">
+            <hr>
+            <AccordionItem
+                id="advanced-simulation-parameters"
+                :title="$t('additional:modules.tools.simulationTool.simulationAdditionalParameter')"
+            >
+                <div
+                    v-for="(input, inputKey) in excludePrimaryTypeKeys(stringTypeInputs)"
+                    :key="inputKey"
+                >
+                    <DynamicInputByType
+                        :id="inputKey"
+                        input-type="string"
+                        :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                        :placeholder="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                        :value="input.default"
+                        @update:value="setParameterValue(inputKey, inputKey, $event)"
+                    />
+                </div>
+                <AccordionItem
+                    v-for="(input, inputKey) in objectTypeInputs"
+                    :id="inputKey"
+                    :key="inputKey"
+                    :title="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                    font-size="font-size-small"
+                >
+                    <div
+                        v-for="(property, propertyKey) in excludePrimaryTypeKeys(input.schema.properties)"
+                        :key="propertyKey"
+                    >
+                        <DynamicInputByType
+                            :id="`${inputKey}-${propertyKey}`"
+                            :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                            :max="property.maximum"
+                            :min="property.minimum"
+                            :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                            :input-type="property.type"
+                            :step="property.type === 'integer' ? 1 : 0.1"
+                            :value="getParameterValue(inputKey, propertyKey, property?.default)"
+                            :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                            :checked="typeof property.default === 'boolean' ? property.default : false"
+                            @update:value="setParameterValue(inputKey, propertyKey, $event)"
+                            @update:checked="setParameterValue(inputKey, propertyKey, $event)"
+                        />
+                    </div>
+                </AccordionItem>
             </AccordionItem>
-        </AccordionItem>
+        </div>
         <label
             for="simulateForOutput"
             class="typo__label"

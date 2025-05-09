@@ -27,9 +27,11 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
         }
     };
 
-    beforeEach(() => {
-        consoleWarnSpy = sinon.spy();
-        store = createStore({
+    /**
+     * Creates a Vuex store with a mock state and getters for the SimulationTool module.
+     */
+    function getStore (simulations) {
+        return createStore({
             namespaced: true,
             modules: {
                 namespaced: true,
@@ -48,9 +50,16 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                                 ],
                                 previousComponentOfSimulation: sinon.stub(),
                                 simulations: () => [
+                                    simulations ||
                                     {
                                         id: "simulationId",
-                                        url: "http://www.simulation.hamburg"
+                                        inputs: {
+                                            input1: {
+                                                menu: "primary",
+                                                primaryProperties: ["prop1"]
+                                            },
+                                            input2: {menu: "primary"}
+                                        }
                                     }
                                 ]
                             },
@@ -58,11 +67,23 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                                 setCurrentPlanningComponent: sinon.stub(),
                                 setMode: sinon.stub()
                             }
+                        },
+                        ResizeHandle: {
+                            namespaced: true,
+                            getters: {
+                                mainMenuWidth: () => 800,
+                                secondaryMenuWidth: () => 800
+                            }
                         }
                     }
                 }
             }
         });
+    }
+
+    beforeEach(() => {
+        consoleWarnSpy = sinon.spy();
+        store = getStore();
 
         sinon.stub(axios, "get").resolves({data: {}});
         sinon.stub(console, "warn").callsFake(consoleWarnSpy);
@@ -83,12 +104,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             const wrapper = factory.getMount();
 
             expect(wrapper.findComponent({name: "SectionHeader"}).exists()).to.be.true;
-        });
-
-        it("should render AccordionItem component", () => {
-            const wrapper = factory.getMount();
-
-            expect(wrapper.findComponent({name: "AccordionItem"}).exists()).to.be.true;
         });
 
         it("should render FlatButton component", () => {
@@ -271,6 +286,128 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
                 await wrapper.vm.setParameterValue("key1", "key2", "value");
                 expect(wrapper.vm.parameterValue["key1-key2"]).to.equal("value");
+            });
+        });
+
+        describe("getPrimaryTypeInputs", () => {
+            it("should return an empty object if processDescription.inputs is not an object", async () => {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.vm.$nextTick();
+                wrapper.setData({processDescription: {inputs: null}});
+                expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal({});
+
+                wrapper.setData({processDescription: {inputs: undefined}});
+                expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal({});
+
+                wrapper.setData({processDescription: {inputs: "notAnObject"}});
+                expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal({});
+            });
+
+            it("should return an empty object if no inputs have 'menu' set to 'primary'", async () => {
+                store = getStore({
+                    id: "simulationId",
+                    inputs: {
+                        input1: {menu: "secondary"},
+                        input2: {menu: "secondary"}
+                    }
+                });
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.vm.$nextTick();
+                wrapper.setData({
+                    processDescription: {
+                        inputs: {
+                            input1: {schema: {type: "object"}},
+                            input2: {schema: {type: "string"}}
+                        }
+                    }
+                });
+
+                expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal({});
+            });
+
+            it("should extract properties of type 'object' with primary properties", async () => {
+                const wrapper = factory.getShallowMount(),
+                    expected = {
+                        prop1: {
+                            type: "string",
+                            inputKey: "input1"
+                        }
+                    };
+
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setData({
+                    processDescription: {
+                        inputs: {
+                            input1: {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        prop1: {type: "string"},
+                                        prop2: {type: "number"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal(expected);
+            });
+
+            it("should extract inputs of type 'string'", () => {
+                const wrapper = factory.getMount(),
+                    expected = {
+                        input1: {
+                            type: "string",
+                            inputKey: "input1"
+                        }
+                    };
+
+                wrapper.setData({
+                    processDescription: {
+                        inputs: {
+                            input1: {schema: {type: "string"}, title: "Input 1"}
+                        }
+                    }
+                });
+
+                expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal(expected);
+            });
+
+            it("should handle a mix of object and string inputs", () => {
+                const wrapper = factory.getMount(),
+                    expected = {
+                        prop1: {
+                            type: "string",
+                            inputKey: "input1"
+                        },
+                        input2: {
+                            type: "string",
+                            inputKey: "input2"
+                        }
+                    };
+
+                wrapper.setData({
+                    processDescription: {
+                        inputs: {
+                            input1: {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        prop1: {type: "string"},
+                                        prop2: {type: "number"}
+                                    }
+                                }
+                            },
+                            input2: {schema: {type: "string"}, title: "Input 2"}
+                        }
+                    }
+                });
+
+                expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal(expected);
             });
         });
     });
