@@ -105,7 +105,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
     });
 
     describe("Computed Properties", () => {
-        it("should return an array of Objects with code and name property for multiselect options", async () => {
+        it("should return an array of Objects with code and name property for select options", async () => {
             const wrapper = factory.getMount(),
                 expected = [
                     {

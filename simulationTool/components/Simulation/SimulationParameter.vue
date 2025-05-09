@@ -11,7 +11,6 @@ import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
 import SliderItem from "../../../../src/shared/modules/slider/components/SliderItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import Multiselect from "vue-multiselect";
 
 export default {
     name: "SimulationParameter",
@@ -22,8 +21,7 @@ export default {
         InputText,
         SectionHeader,
         SliderItem,
-        SwitchInput,
-        Multiselect
+        SwitchInput
     },
     data () {
         return {
@@ -45,7 +43,7 @@ export default {
         ]),
 
         /**
-         * Returns an array of Objects with code and name property for multiselect options.
+         * Returns an array of Objects with code and name property for select options.
          * @return {Object[]} The array of Objects for options.
          */
         outputOptions () {
@@ -113,9 +111,13 @@ export default {
         }
     },
     watch: {
-        selectedOutputOptions () {
+        /**
+         * Changes the requestBody according to the selected outputs.
+         * @param {Object[]} val the selected outputs.
+         */
+        selectedOutputOptions (val) {
             this.requestBody.outputs = {};
-            this.selectedOutputOptions.forEach(elem => {
+            val.forEach(elem => {
                 this.requestBody.outputs[elem.code] = {};
             });
         }
@@ -124,6 +126,8 @@ export default {
         if (this.simulation) {
             await this.prepareRequestBody();
         }
+
+        this.selectedOutputOptions = this.outputOptions;
     },
     methods: {
         ...mapActions("Modules/SimulationTool", ["addFile"]),
@@ -427,49 +431,29 @@ export default {
             </AccordionItem>
         </AccordionItem>
         <label
-            for="outputParam"
+            for="simulateForOutput"
             class="typo__label"
         >
             {{ $t('additional:modules.tools.simulationTool.chooseOutputParam') }}
         </label>
-        <multiselect
-            id="outputParam"
-            v-model="selectedOutputOptions"
-            :placeholder="$t('additional:modules.tools.simulationTool.outputParam')"
-            :aria-label="$t('additional:modules.tools.simulationTool.outputParam')"
-            label="name"
-            track-by="code"
-            :options="outputOptions"
-            :searchable="true"
-            :multiple="true"
-            :open="true"
-        >
-            <template #tag="{ option, remove }">
-                <span
-                    class="multiselect__tag"
-                    :class="option.code"
+        <div class="mb-3">
+            <select
+                id="simulateForOutput"
+                v-model="selectedOutputOptions"
+                class="form-select"
+                :aria-label="$t('additional:modules.tools.simulationTool.outputParam')"
+                multiple
+            >
+                <option
+                    v-for="(option, i) in outputOptions"
+                    :key="option.name + i"
+                    :value="option"
+                    selected
                 >
-                    <span>{{ option.name }}</span>
-                    <i
-                        tabindex="0"
-                        class="multiselect__tag-icon"
-                        role="button"
-                        @click="remove(option)"
-                        @keypress="remove(option)"
-                    />
-                </span>
-            </template>
-            <template #option="p">
-                <div class="option__desc">
-                    <span
-                        class="option__title"
-                        :class="p.option.name"
-                    >
-                        {{ p.option.name }}
-                    </span>
-                </div>
-            </template>
-        </multiselect>
+                    {{ option.name }}
+                </option>
+            </select>
+        </div>
         <div
             class="mb-5"
         >
@@ -500,11 +484,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "~variables";
-
-.multiselect__tag {
-    background-color: #3C5F94;
-    color: #ffffff;
-}
 
 .d-flex {
     .select-scenario {
