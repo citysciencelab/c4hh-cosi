@@ -279,6 +279,9 @@ export default {
                 this.simulation.pollingInterval,
                 this.onProgressUpdate
             );
+
+            Object.assign(scenario.jobs[jobID], {jobStatus: typeof this.jobStatus !== "undefined" ? JSON.parse(JSON.stringify(this.jobStatus)) : this.jobStatus});
+            Object.assign(scenario.jobs[jobID], {jobResult: typeof this.jobResults !== "undefined" ? JSON.parse(JSON.stringify(this.jobResults)) : this.jobResults});
         },
 
         /**
