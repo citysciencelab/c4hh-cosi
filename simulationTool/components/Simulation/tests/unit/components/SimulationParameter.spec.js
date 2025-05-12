@@ -223,69 +223,91 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
     });
 
     describe("Methods", () => {
-        describe("getParameterValue", () => {
+        describe("getInputsValue", () => {
             it("should return default value if the keys are not string", () => {
                 const wrapper = factory.getMount();
 
-                expect(wrapper.vm.getParameterValue(null, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue(0, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue(undefined, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue(true, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue([], "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue({}, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue("key1", null, "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue("key1", 0, "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue("key1", undefined, "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue("key1", true, "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue("key1", [], "value")).to.equal("value");
-                expect(wrapper.vm.getParameterValue("key1", {}, "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue(null, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue(0, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue(undefined, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue(true, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue([], "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue({}, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue("key1", null, "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue("key1", 0, "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue("key1", undefined, "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue("key1", true, "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue("key1", [], "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue("key1", {}, "value")).to.equal("value");
             });
 
             it("should return default value if there are no set value according to the key", () => {
                 const wrapper = factory.getMount();
 
-                expect(wrapper.vm.getParameterValue("key1", "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getInputsValue("key1", "key2", "value")).to.equal("value");
             });
 
             it("should return the value according to the key", async () => {
                 const wrapper = factory.getMount(),
-                    parameterValue = {},
-                    key = "key1-key2";
+                    inputsValue = {
+                        "key1": {
+                            "key2": "result"
+                        }
+                    };
 
-                parameterValue[key] = "result";
-
-                await wrapper.setData({parameterValue: parameterValue});
-                expect(wrapper.vm.getParameterValue("key1", "key2", "value")).to.equal("result");
+                await wrapper.setData({inputsValue: inputsValue});
+                expect(wrapper.vm.getInputsValue("key1", "key2", "value")).to.equal("result");
             });
         });
 
-        describe("setParameterValue", () => {
+        describe("setInputsValue", () => {
             it("should not set value if the keys are not string", async () => {
                 const wrapper = factory.getMount();
 
-                await wrapper.setData({parameterValue: {}});
+                await wrapper.setData({inputsValue: {}});
 
-                await wrapper.vm.setParameterValue(null, "key2", "value");
-                expect(wrapper.vm.parameterValue).to.deep.equal({});
-                await wrapper.vm.setParameterValue(0, "key2", "value");
-                expect(wrapper.vm.parameterValue).to.deep.equal({});
-                await wrapper.vm.setParameterValue(undefined, "key2", "value");
-                expect(wrapper.vm.parameterValue).to.deep.equal({});
-                await wrapper.vm.setParameterValue(true, "key2", "value");
-                expect(wrapper.vm.parameterValue).to.deep.equal({});
-                await wrapper.vm.setParameterValue([], "key2", "value");
-                expect(wrapper.vm.parameterValue).to.deep.equal({});
-                await wrapper.vm.setParameterValue({}, "key2", "value");
-                expect(wrapper.vm.parameterValue).to.deep.equal({});
+                await wrapper.vm.setInputsValue(null, "key2", "value");
+                expect(wrapper.vm.inputsValue).to.deep.equal({});
+                await wrapper.vm.setInputsValue(0, "key2", "value");
+                expect(wrapper.vm.inputsValue).to.deep.equal({});
+                await wrapper.vm.setInputsValue(undefined, "key2", "value");
+                expect(wrapper.vm.inputsValue).to.deep.equal({});
+                await wrapper.vm.setInputsValue(true, "key2", "value");
+                expect(wrapper.vm.inputsValue).to.deep.equal({});
+                await wrapper.vm.setInputsValue([], "key2", "value");
+                expect(wrapper.vm.inputsValue).to.deep.equal({});
+                await wrapper.vm.setInputsValue({}, "key2", "value");
+                expect(wrapper.vm.inputsValue).to.deep.equal({});
             });
 
-            it("should set value", async () => {
+            it("should set value with only one level key", async () => {
                 const wrapper = factory.getMount();
 
-                await wrapper.setData({parameterValue: {}});
+                await wrapper.setData({inputsValue: {}});
+                await wrapper.vm.$nextTick();
 
-                await wrapper.vm.setParameterValue("key1", "key2", "value");
-                expect(wrapper.vm.parameterValue["key1-key2"]).to.equal("value");
+                await wrapper.vm.setInputsValue("key1", "", "value");
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.inputsValue).to.deep.equal({
+                    key1: "value"
+                });
+            });
+
+            it("should set value with only two level key", async () => {
+                const wrapper = factory.getMount();
+
+                await wrapper.setData({inputsValue: {}});
+                await wrapper.vm.$nextTick();
+
+                await wrapper.vm.setInputsValue("key1", "key2", "value");
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.inputsValue).to.deep.equal({
+                    key1: {
+                        key2: "value"
+                    }
+                });
             });
         });
 

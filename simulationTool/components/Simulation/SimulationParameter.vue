@@ -22,9 +22,9 @@ export default {
     },
     data () {
         return {
+            inputsValue: {},
             jobResults: undefined,
             jobStatus: undefined,
-            parameterValue: {},
             primaryTypeInputs: {},
             processDescription: undefined,
             processHandler: undefined,
@@ -118,6 +118,21 @@ export default {
     },
     watch: {
         /**
+         * Renders the new inputs according to the inputs value.
+         * @param {Object[]} val the inputs value.
+         */
+        inputsValue: {
+            handler (val) {
+                this.requestBody.inputs = {
+                    ...val,
+                    ...this.currentPlanningScenario.inputs,
+                    crs: this.simulation?.inputs?.crs
+                };
+            },
+            deep: true
+        },
+
+        /**
          * Changes the requestBody according to the selected outputs.
          * @param {Object[]} val the selected outputs.
          */
@@ -171,6 +186,26 @@ export default {
             });
             return result;
         },
+
+        /**
+         * Gets the inputs value according to input and property as key.
+         * @param {String} inputKey the input key.
+         * @param {String} propertyKey the property key.
+         * @param {String} val the value.
+         * @returns {String} the parameter value. It could be the rendered value or default value.
+         */
+        getInputsValue (inputKey, propertyKey, val) {
+            if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
+                return val;
+            }
+
+            if (typeof this.inputsValue[inputKey]?.[propertyKey] !== "undefined") {
+                return this.inputsValue[inputKey][propertyKey];
+            }
+
+            return val;
+        },
+
         /**
          * Creates a layer if it does not yet exist and returns it.
          * @returns {Object} A VECTORBASE Layer
@@ -194,27 +229,6 @@ export default {
          * Gets the mapped property from key and configured object.
          */
         getMappedProperty,
-
-        /**
-         * Gets the parameter value according to input and property as key.
-         * @param {String} inputKey the input key.
-         * @param {String} propertyKey the property key.
-         * @param {String} val the value.
-         * @returns {String} the parameter value. It could be the rendered value or default value.
-         */
-        getParameterValue (inputKey, propertyKey, val) {
-            if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
-                return val;
-            }
-
-            const key = inputKey + "-" + propertyKey;
-
-            if (typeof this.parameterValue[key] !== "undefined") {
-                return this.parameterValue[key];
-            }
-
-            return val;
-        },
 
         /**
          * Gets the inputs of the primary type from the process description.
@@ -307,11 +321,13 @@ export default {
         async prepareRequestBody () {
             this.processHandler = new OgcApiProcess(this.simulation.url, this.simulation.id);
             this.processDescription = await this.processHandler.getDescription();
+            this.inputsValue = OgcApiProcess.getInputDefaultsFromDescription(this.processDescription);
             this.requestBody.inputs = {
-                ...OgcApiProcess.getInputDefaultsFromDescription(this.processDescription),
+                ...this.inputsValue,
                 ...this.currentPlanningScenario.inputs,
                 crs: this.simulation?.inputs?.crs
             };
+
             this.requestBody.outputs = {};
         },
 
@@ -343,20 +359,27 @@ export default {
         },
 
         /**
-         * Sets the parameter value according to input and property as key.
+         * Sets the inputs value according to input and property as key.
          * @param {String} inputKey the input key.
          * @param {String} propertyKey the property key.
          * @param {String} val the value.
          * @returns {void}
          */
-        setParameterValue (inputKey, propertyKey, val) {
+        setInputsValue (inputKey, propertyKey, val) {
             if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
                 return;
             }
 
-            const key = inputKey + "-" + propertyKey;
+            if (propertyKey === "") {
+                this.inputsValue[inputKey] = val;
+                return;
+            }
 
-            this.parameterValue[key] = val;
+            if (typeof this.inputsValue[inputKey] === "undefined") {
+                this.inputsValue[inputKey] = {};
+            }
+
+            this.inputsValue[inputKey][propertyKey] = val;
         },
 
         /**
@@ -433,12 +456,12 @@ export default {
                         :input-type="input.type"
                         :label="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
                         :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
-                        :value="getParameterValue(input.inputKey, propertyKey, input.default)"
+                        :value="getInputsValue(input.inputKey, propertyKey, input.default)"
                         :min="input.minimum"
                         :max="input.maximum"
                         :aria="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
-                        @update:value="setParameterValue(input.inputKey, propertyKey, $event)"
-                        @update:checked="setParameterValue(input.inputKey, propertyKey, $event)"
+                        @update:value="setInputsValue(input.inputKey, propertyKey, $event)"
+                        @update:checked="setInputsValue(input.inputKey, propertyKey, $event)"
                     />
                 </div>
             </div>
@@ -459,7 +482,7 @@ export default {
                         :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                         :placeholder="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                         :value="input.default"
-                        @update:value="setParameterValue(inputKey, inputKey, $event)"
+                        @update:value="setInputsValue(inputKey, '', $event)"
                     />
                 </div>
                 <AccordionItem
@@ -481,11 +504,11 @@ export default {
                             :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :input-type="property.type"
                             :step="property.type === 'integer' ? 1 : 0.1"
-                            :value="getParameterValue(inputKey, propertyKey, property?.default)"
+                            :value="getInputsValue(inputKey, propertyKey, property?.default)"
                             :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :checked="typeof property.default === 'boolean' ? property.default : false"
-                            @update:value="setParameterValue(inputKey, propertyKey, $event)"
-                            @update:checked="setParameterValue(inputKey, propertyKey, $event)"
+                            @update:value="setInputsValue(inputKey, propertyKey, $event)"
+                            @update:checked="setInputsValue(inputKey, propertyKey, $event)"
                         />
                     </div>
                 </AccordionItem>
