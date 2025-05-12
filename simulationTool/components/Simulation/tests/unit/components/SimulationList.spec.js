@@ -36,6 +36,9 @@ describe("addons/SimulationTool/components/Simulation/SimulationList.vue", () =>
                     modules: {
                         SimulationTool: {
                             namespaced: true,
+                            getters: {
+                                planningScenarios: () => []
+                            },
                             mutations: {
                                 setCurrentPlanningComponent: sinon.stub(),
                                 setMode: sinon.stub()

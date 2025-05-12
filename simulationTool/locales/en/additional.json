@@ -107,6 +107,7 @@
           "newRoad": "New Road",
           "newEnsemble": "New ensemble",
           "newScenario": "New scenario",
+          "noJobs": "There are no simulations available to display. You can either conduct new simulations or import existing ones.",
           "notes": "Notes",
           "notLoggedIn": "You are not logged in!",
           "parameters": "Parameters",

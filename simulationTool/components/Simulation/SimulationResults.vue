@@ -1,10 +1,14 @@
 <script>
+import {mapGetters} from "vuex/dist/vuex.cjs.js";
 import SectionHeader from "../SectionHeader.vue";
 
 export default {
     name: "SimulationResults",
     components: {
         SectionHeader
+    },
+    computed: {
+        ...mapGetters("Modules/SimulationTool", ["currentJobID"])
     }
 };
 </script>
@@ -14,6 +18,7 @@ export default {
         <SectionHeader
             :title="$t('additional:modules.tools.simulationTool.simulationResults')"
         />
+        {{ currentJobID }}
     </div>
 </template>
 

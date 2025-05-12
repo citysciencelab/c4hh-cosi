@@ -36,6 +36,9 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                     namespaced: true,
                     modules: {
                         SimulationTool: {
+                            getters: {
+                                currentJobID: () => ""
+                            },
                             namespaced: true
                         }
                     }

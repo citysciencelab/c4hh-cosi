@@ -104,6 +104,7 @@
           "modelOverviewHint": "Im Gegensatz zu statischen Modellen sind Simulationen dynamische Modelle mit einer fortschreitenden Indexvariable, welche typischerweise Zeit darstellt.",
           "models": "Modelle",
           "montecarlo": "Monte Carlo",
+          "noJobs": "Es sind keine durchgeführten Simulationen zur Anzeige verfügbar. Simulationen können neu ausgeführt oder importiert werden.",
           "name": "Name",
           "newBuilding": "Neues Gebäude",
           "newRoad": "Neue Straße",

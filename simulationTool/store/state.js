@@ -3,6 +3,7 @@
  * @typedef {Object} SimulationToolState
  * @property {string} currentEditableInput - The current editable input (e.g. buildings)
  * @property {string} currentInputName the current input name
+ * @property {String} currentJobID The ID of the job that is currently displayed in jobResult component.
  * @property {String} currentPlanningComponent the current open component in planningScenario.
  * @property {Array.<Object>} ensembles a list of ensembles
  * @property {boolean} ensemblesLoading flag indicating if ensembles are loading
@@ -46,6 +47,7 @@ const state = {
     type: "simulationTool",
     name: "additional:modules.tools.simulationTool.toolName",
     currentEditableInput: "",
+    currentJobID: "",
     currentPlanningComponent: "",
     currentPlanningScenarioId: "",
     currentInputName: "",
