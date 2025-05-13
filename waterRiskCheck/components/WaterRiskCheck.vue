@@ -992,7 +992,7 @@ export default {
                             <div class="col col-2 col-md-2 d-flex flex-wrap align-items-center">
                                 <img
                                     class="header-logo pe-3"
-                                    :src="'./assets/logo_without_text.png'"
+                                    :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
                                     :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
                                 >
                             </div>
@@ -1055,16 +1055,17 @@ export default {
                         >
                             <img
                                 class="header-logo float-end"
-                                :src="'./assets/logo_without_text.png'"
+                                :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
                                 :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
                             >
                         </div>
                     </div>
                 </div>
                 <div class="row mb-3 mt-2">
-                    <p class="hint-text col offset-md-1">
-                        {{ $t("additional:modules.waterRiskCheck.informationText") }}
-                    </p>
+                    <p
+                        class="hint-text col offset-md-1"
+                        v-html="$t('additional:modules.waterRiskCheck.informationText')"
+                    />
                 </div>
                 <div class="row">
                     <div class="col d-flex justify-content-center mt-3">
@@ -1107,7 +1108,7 @@ export default {
                     >
                         <img
                             class="header-logo float-end"
-                            :src="'./assets/logo_without_text.png'"
+                            :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
                             :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
                         >
                     </div>
@@ -1251,7 +1252,7 @@ export default {
                     </p>
                 </div>
                 <div>
-                    <div class="row mb-3">
+                    <div class="row align-items-center mb-3">
                         <h5 class="col col-md">
                             {{ $t('additional:modules.waterRiskCheck.downloadPageTitle') }}
                         </h5>
@@ -1260,17 +1261,13 @@ export default {
                         >
                             <img
                                 class="header-logo float-end"
-                                :src="'./assets/logo_without_text.png'"
+                                :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
                                 :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
                             >
                         </div>
                     </div>
                     <p class="download-text">
                         {{ $t('additional:modules.waterRiskCheck.downloadInformationText') }}
-                    </p>
-                    <br>
-                    <p class="download-text">
-                        {{ $t('additional:modules.waterRiskCheck.downloadInformationTextRestart') }}
                     </p>
                     <div
                         ref="downloadSection"
@@ -1291,6 +1288,9 @@ export default {
                                         :interaction="() => startDownload()"
                                     />
                                 </div>
+                                <p class="download-text ps-0 pb-3">
+                                    {{ $t('additional:modules.waterRiskCheck.downloadInformationTextRestart') }}
+                                </p>
                                 <div
                                     class="d-flex justify-content-center pt-1 pb-3"
                                 >
