@@ -15,6 +15,7 @@
 ### Removed
 
 ### Fixed
+- CommuterFlows: Ensures the layer always renders on top, preventing commuter flow visualization from disappearing behind the baselayer.
 
 ---
 
