@@ -111,7 +111,7 @@ export class CommuterOL {
                     visibility: true,
                     type: "layer",
                     showLayerInTree: false,
-                    typ: "VECTORBASE", 
+                    typ: "VECTORBASE",
                     alwaysOnTop: true
                 });
 
