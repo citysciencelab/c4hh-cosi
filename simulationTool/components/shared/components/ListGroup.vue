@@ -47,7 +47,8 @@ export default {
     ],
     data () {
         return {
-            currentHightlightFeatureId: ""
+            currentHightlightFeatureId: "",
+            currentFeature: undefined
         };
     },
     computed: {
@@ -60,7 +61,9 @@ export default {
          * @returns {Boolean} True if the first feature has more than three properties, false otherwise.
          */
         hasMultipleProperties () {
-            return Object.keys(this.itemList[0].getProperties()).length > 4;
+            const properties = this.extractedProperties(this.itemList[0]);
+
+            return Object.keys(properties).length > 4;
         }
     },
     watch: {
@@ -83,6 +86,7 @@ export default {
 
             delete properties.geometry;
             delete properties.created;
+            delete properties.fid;
             return properties;
         },
 
@@ -131,6 +135,20 @@ export default {
         },
 
         /**
+         * Sets the current feature to show properties or not.
+         * @param {ol/Feature} feature - The feature to be set as current.
+         * @returns {void}
+         */
+        setCurrentFeature (feature) {
+            if (feature.getId() === this.currentFeature?.getId()) {
+                this.currentFeature = undefined;
+            }
+            else {
+                this.currentFeature = feature;
+            }
+        },
+
+        /**
          * Emits 'setFeatureAttribute' to update a specific attribute of a feature with a new value.
          * @param {InputEvent} event - The event containing the new value.
          * @param {String|Number} oldValue - The old value of the attribute.
@@ -141,9 +159,6 @@ export default {
         setFeatureAttribute (event, oldValue, key, feature) {
             const value = typeof oldValue === "number" ? event?.target?.valueAsNumber : event?.target?.value;
 
-            if (Number.isNaN(value)) {
-                return;
-            }
             feature.set(key, value);
             this.$emit("setFeatureAttribute", value, key, feature.getId());
         },
@@ -173,14 +188,16 @@ export default {
         <div
             v-for="(feature, index) in itemList"
             :key="index"
-            class="list-group-item list-group-item-action"
-            :class="feature.getId() === currentHightlightFeatureId ? 'selected' : ''"
+            class="list-group-item list-group-item-action p-0"
             role="button"
             tabindex="0"
             @click="$emit('setHighlightFeature', feature)"
             @keydown.enter="$emit('setHighlightFeature', feature)"
         >
-            <div class="d-flex justify-content-between align-items-center">
+            <div
+                class="d-flex justify-content-between align-items-center p-2"
+                :class="feature.getId() === currentHightlightFeatureId ? 'selected' : ''"
+            >
                 <template v-if="!hasMultipleProperties">
                     <div
                         v-for="(value, key, idx) in extractedProperties(feature)"
@@ -228,7 +245,12 @@ export default {
                         <button
                             type="button"
                             class="btn btn-link"
+                            @click="setCurrentFeature(feature)"
                         >
+                            <i
+                                :class="currentFeature?.getId() === feature.getId() ? 'bi-chevron-down' : 'bi-chevron-up'"
+                                role="img"
+                            />
                             {{ $t('additional:modules.tools.simulationTool.showProperties') }}
                         </button>
                     </div>
@@ -247,6 +269,32 @@ export default {
                     @click.stop="$emit('removeFeature', feature.getId())"
                 />
             </div>
+            <template
+                v-if="currentFeature?.getId() === feature.getId()"
+            >
+                <div
+                    v-for="(value, key, idx) in extractedProperties(feature)"
+                    :key="idx"
+                    class="m-3 d-flex justify-content-between"
+                >
+                    <template v-if="getMappedProperty(key, propertiesMapping) !== key">
+                        <label
+                            :for="`${key}-${feature.getId()}`"
+                            class="col-form-label"
+                        >
+                            {{ getMappedProperty(key, propertiesMapping) }}
+                        </label>
+                        <input
+                            :id="`${key}-${feature.getId()}`"
+                            :type="typeof value === 'number' ? 'number' : 'text'"
+                            class="form-control text-end w-50"
+                            :value="value"
+                            :inputmode="typeof value === 'number' ? 'decimal' : 'text'"
+                            @input="event => setFeatureAttribute(event, value, key, feature)"
+                        >
+                    </template>
+                </div>
+            </template>
         </div>
     </div>
 </template>

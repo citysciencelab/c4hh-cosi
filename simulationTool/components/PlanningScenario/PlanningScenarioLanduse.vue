@@ -386,6 +386,7 @@ export default {
                 }
                 return feature;
             });
+
             this.updateFeatures(this.currentEditableInput);
         },
 

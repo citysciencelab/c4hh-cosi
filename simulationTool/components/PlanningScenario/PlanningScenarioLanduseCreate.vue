@@ -4,6 +4,7 @@ import ConvertStyle from "../../js/convertStyle";
 import DrawLayout from "../../../../src/shared/modules/draw/components/DrawLayout.vue";
 import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
@@ -27,6 +28,7 @@ export default {
         return {
             createdFeatures: [],
             currentModifyInteraction: null,
+            schema: null,
             source: null
         };
     },
@@ -75,11 +77,27 @@ export default {
         },
 
         /**
+         * Gets the source of the current editable input.
+         * @returns {Object} The source of the current editable input.
+         */
+        getInputSource () {
+            return this.editableInputs[this.currentEditableInput]?.source;
+        },
+
+        /**
          * Gets the mapped properties.
          * @return {Object} The mapped properties.
          */
         getPropertiesMapping () {
             return this.editableInputs[this.currentEditableInput]?.propertiesMapping;
+        },
+
+        /**
+         * Gets the shown properties of the feature in the list
+         * @return {String[]} The shown properties.
+         */
+        getPropertiesToShow () {
+            return this.editableInputs[this.currentEditableInput]?.propertiesToShow;
         },
 
         /**
@@ -90,7 +108,8 @@ export default {
             return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
         }
     },
-    mounted () {
+    async mounted () {
+        this.schema = await getOAFFeature.getCollectionSchema(this.getInputSource.url, this.getInputSource?.collection);
         this.source = this.getLayerSource();
         this.createdFeatures = this.getLayerSource().getFeatures().filter(feature => feature.get("created") === true);
         this.removeInteraction(this.planningScenarioSelectInteraction);
@@ -114,7 +133,7 @@ export default {
          * @return {void}
          */
         addInputFeature (evt) {
-            const olFeature = this.setFeatureProperties(evt.feature),
+            const olFeature = this.setFeatureProperties(evt.feature, this.schema?.properties),
                 geojsonFeature = ConvertFeature.openlayersToGeoJson([olFeature])[0];
 
             this.createdFeatures = this.getLayerSource().getFeatures().filter(feature => feature.get("created") === true).concat(evt.feature);
@@ -231,7 +250,7 @@ export default {
          * @param {ol/Feature} feature - The feature object to set properties for.
          * @returns {ol/Feature} The updated feature object with initialized properties.
          */
-        setFeatureProperties (feature) {
+        setFeatureProperties (feature, properties) {
             if (!this.getInputFeatures(this.currentEditableInput).length) {
                 feature.set("created", true);
                 feature.setId(uniqueId(this.currentEditableInput + "-"));
@@ -239,10 +258,10 @@ export default {
                 return feature;
             }
 
-            const properties = this.getInputFeatures(this.currentEditableInput)[0].properties;
-
-            Object.keys(properties).forEach(key => {
-                feature.set(key, "");
+            Object.keys(properties).forEach(property => {
+                if (feature.getProperties()[property] === undefined) {
+                    feature.set(property, "");
+                }
             });
             feature.set("created", true);
             feature.setId(uniqueId(this.currentEditableInput + "-"));
@@ -289,7 +308,7 @@ export default {
 </script>
 
 <template>
-    <div class="planning-scenario-landuse-create">
+    <div class="vh-100 overflow-y-auto">
         <SectionHeader
             :title="$t(`additional:modules.tools.simulationTool.create${currentInputName}`)"
         />
@@ -364,12 +383,13 @@ export default {
                 <ListGroup
                     :item-list="createdFeatures"
                     :properties-mapping="getPropertiesMapping"
+                    :shown-properties="getPropertiesToShow"
                     @removeFeature="removeFeature"
                     @setFeatureAttribute="setFeatureAttribute"
                     @setFeatureStyle="setFeatureStyle"
                 />
                 <div
-                    class="d-flex justify-content-between"
+                    class="position-sticky bottom-0 bg-body z-3 p-3 d-flex justify-content-between"
                 >
                     <FlatButton
                         id="back"

@@ -1,6 +1,8 @@
 import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
+import Feature from "ol/Feature";
+import getOAFFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import layerFactory from "../../../../../../../src/core/layers/js/layerFactory";
 import PlanningScenarioLanduseCreate from "../../../PlanningScenarioLanduseCreate.vue";
 import sinon from "sinon";
@@ -33,7 +35,12 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 "inputs": {
                     "buildings": {
                         "editable": true,
-                        "label": "Gebäude"
+                        "label": "Gebäude",
+                        "source": {
+                            "type": "oaf",
+                            "collection": "buildings",
+                            "url": "https://ump-lgv.germanywestcentral.cloudapp.azure.com/oaf/buildings_footprint"
+                        }
                     },
                     "crs": "http://www.opengis.net/def/crs/EPSG/0/25832",
                     "hospitals": {
@@ -164,6 +171,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
     beforeEach(() => {
         sinon.stub(PlanningScenarioLanduseCreate.methods, "getLayerSource").returns(layer.getLayerSource());
+        // sinon.stub(getOAFFeature, "getCollectionSchema").returns([]);
         selectedDrawType = "";
         selectedDrawTypeMain = "";
 
@@ -221,22 +229,47 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         });
     });
     describe("Component DOM", () => {
-        it("should exist", () => {
+        it("should exist", async function () {
             const wrapper = factory.getShallowMount();
 
             expect(wrapper.exists()).to.be.true;
         });
-        it("should render draw types", () => {
+        it("should render draw types", async function () {
             const wrapper = factory.getShallowMount(),
                 drawTypes = wrapper.find("#draw-types");
 
             expect(drawTypes.exists()).to.be.true;
         });
-        it("should render draw layouts", () => {
+        it("should render draw layouts", async function () {
             const wrapper = factory.getShallowMount(),
                 drawLayouts = wrapper.find("#draw-layouts");
 
             expect(drawLayouts.exists()).to.be.true;
+        });
+    });
+
+    describe("Hooks", () => {
+        it("should call 'getCollectionSchema' when component is mounted", async function () {
+            const getCollectionSchemaStub = sinon.stub(getOAFFeature, "getCollectionSchema");
+
+            factory.getShallowMount();
+            expect(getCollectionSchemaStub.calledOnce).to.be.true;
+        });
+    });
+
+    describe("Methods", () => {
+        describe("setFeatureProperties", () => {
+            it("should set the given properties to the passed feature", async function () {
+                const feature = new Feature(),
+                    properties = {
+                        "cool": true,
+                        "hot": false
+                    },
+                    wrapper = factory.getShallowMount(),
+                    updatedFeature = wrapper.vm.setFeatureProperties(feature, properties);
+
+                expect(updatedFeature.getProperties()).to.deep.equal({cool: "", hot: "", created: true});
+            });
         });
     });
 });

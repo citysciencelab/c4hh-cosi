@@ -42,14 +42,16 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
                 height: "100",
                 geometry: "",
                 width: "100",
-                cool: true
+                cool: true,
+                hot: false
             }),
             new Feature({
                 id: "two",
                 height: "200",
                 geometry: "",
                 width: "200",
-                cool: true
+                cool: true,
+                hot: false
             })
         ];
 
@@ -65,13 +67,6 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
                 inputWrapperArray = wrapper.findAll("input");
 
             expect(inputWrapperArray).to.be.lengthOf(4);
-        });
-
-        it("should not render input elements", function () {
-            const wrapper = factory.getShallowMount({itemList: featuresMore}),
-                inputWrapperArray = wrapper.findAll("input");
-
-            expect(inputWrapperArray).to.be.lengthOf(0);
         });
 
         it("should render input elements with shownProperties", function () {
@@ -93,6 +88,16 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
                 iconButtonWrapperArray = wrapper.findAllComponents({name: "IconButton"});
 
             expect(iconButtonWrapperArray).to.be.lengthOf(4);
+        });
+
+        it("should render label and input for attribute 'cool'", function () {
+            const wrapper = factory.getShallowMount({itemList: featuresMore, propertiesMapping: {cool: "Super cool"}});
+
+            featuresMore[0].setId("one");
+            wrapper.vm.setCurrentFeature(featuresMore[0]);
+
+            expect(wrapper.find("label[for='cool-undefined']").text()).to.be.equal("Super cool");
+            expect(wrapper.find("input[id='cool-undefined']").exists()).to.be.true;
         });
     });
 
@@ -176,12 +181,45 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
                         id: "one",
                         height: "100",
                         geometry: "",
-                        created: false
+                        created: false,
+                        fid: "1000Mark"
                     }),
                     wrapper = factory.getShallowMount({itemList: [feature]}),
                     properties = wrapper.vm.extractedProperties(feature);
 
                 expect(properties).to.deep.equal({id: "one", height: "100"});
+            });
+        });
+
+
+        describe("setCurrentFeature", () => {
+            it("should set the given feature as current feature", function () {
+                const feature = new Feature({
+                        id: "thousand",
+                        height: "100",
+                        geometry: "",
+                        created: false,
+                        fid: "1000Mark"
+                    }),
+                    wrapper = factory.getShallowMount({itemList: featuresMore});
+
+                feature.setId("thousand");
+                wrapper.vm.setCurrentFeature(feature);
+                expect(wrapper.vm.currentFeature).to.deep.equal(feature);
+            });
+
+            it("should set the current feature to undefined", function () {
+                const feature = new Feature({
+                        id: "thousand",
+                        height: "100",
+                        geometry: "",
+                        created: false,
+                        fid: "1000Mark"
+                    }),
+                    wrapper = factory.getShallowMount({itemList: featuresMore});
+
+                wrapper.vm.setCurrentFeature(feature);
+                expect(wrapper.vm.currentFeature).to.be.undefined;
             });
         });
     });
