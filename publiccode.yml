@@ -1,0 +1,97 @@
+# This repository adheres to the publiccode.yml standard by including this
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.3'
+categories:
+  - geographic-information-systems, addons, map-application
+description:
+  de:
+    apiDocumentation: 'https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/readme.txt'
+    documentation: 'https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/'
+    features:
+      - OGC-konform
+      - Konfigurierbar
+      - Responsiv
+      - OpenSource
+      - Adminfreundlich
+      - Modular
+      - Metadatenintegration
+    genericName: 'Masterportal Addons'
+    localisedName: Masterportal Addons
+    longDescription: |3
+       Die Masterportal Addons beinhalten spezielle Anwendungen, die individuell in die Open Source Software Masterportal per Konfiguration integriert werden können. Das Masterportal ist ein flexibler Baukasten für Geoportale im Web. In Hamburg kommt das Masterportal immer dann zum Einsatz, wenn webbasierte Kartenanwendungen benötigt werden – als eigenständige Anwendung oder als Teil einer E-Government-Lösung. Auch in anderen Städten und Kreisen wird das [++Masterportal++] eingesetzt und in einer Kooperation von mehr als 30 Partnern aus der Verwaltung weiterentwickelt. Die Masterportal Addons sind Open-Source-Software. Es ist unter der [++MIT-Lizenz++](https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/License.txt) veröffentlicht.
+    shortDescription: ' Addons beinhalten spezielle Anwendungen für die Software Masterportal, das ein flexibler Baukasten für Geoportale im Web ist.'
+developmentStatus: stable
+intendedAudience:
+  countries:
+    - de
+    - ch
+    - aut
+    - fr
+    - nl
+    - pl
+    - cz
+    - gb
+  scope:
+    - welfare
+    - agriculture
+    - culture
+    - defence
+    - education
+    - emergency-services
+    - employment
+    - energy
+    - environment
+    - finance-and-economic-development
+    - foreign-affairs
+    - government
+    - healthcare
+    - infrastructures
+    - local-authorities
+    - manufacturing
+    - research
+    - justice
+    - science-and-technology
+    - security
+    - research
+    - society
+    - sport
+    - tourism
+    - transportation
+landingURL: 'https://www.masterportal.org'
+legal:
+  license: MIT
+  mainCopyrightOwner: 'Freie und Hansestadt Hamburg, Landesbetrieb Geoinformation und Vermessung'
+  repoOwner: 'Freie und Hansestadt Hamburg, Landesbetrieb Geoinformation und Vermessung'
+localisation:
+  availableLanguages:
+    - de
+    - en
+    - es
+    - it
+    - pt
+    - ru
+    - tr
+    - ua
+    - nl
+  localisationReady: true
+logo: |-
+  https://www.masterportal.org/fileadmin/_processed_/7/d/csm_news_masterportal_ce24f3cc3d.jpg
+maintenance:
+  contacts:
+    - name: Betrieb Webanwendungen
+      affiliation:  Freie und Hansestadt Hamburg, Landesbetrieb Geoinformation und Vermessung
+  contractors:
+    - name: Landesbetrieb Geoinformation und Vermessung
+      until: '2026-12-01'
+      website: 'https://www.hamburg.de/bsw/landesbetrieb-geoinformation-und-vermessung/'
+  type: community
+name: Masterportal Addons
+platforms:
+  - web
+releaseDate: '2025-05-07'
+roadmap: 'https://bitbucket.org/geowerkstatt-hamburg/masterportal/src/dev/'
+softwareType: standalone/web
+softwareVersion: 3.10.0
+url: 'https://bitbucket.org/geowerkstatt-hamburg/addons.git'
