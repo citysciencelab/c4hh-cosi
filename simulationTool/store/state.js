@@ -74,8 +74,7 @@ const state = {
         fillColor: [0, 0, 0],
         fillTransparency: 100,
         strokeColor: [0, 0, 0],
-        strokeWidth: 2,
-        polygonDash: [10, 10]
+        strokeWidth: 2
     },
     planningScenarioDrawIcons: {
         box: "bi-square",
