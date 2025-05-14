@@ -196,6 +196,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 planningScenarioDrawTypesMain: () => ["polygon", "box"],
                                 planningScenarioSelectedDrawType: () => selectedDrawType,
                                 planningScenarioSelectedDrawTypeMain: () => selectedDrawTypeMain,
+                                planningScenarioSelectInteraction: () => sinon.stub(),
                                 selectedInteraction: () => "draw",
                                 planningScenarioStrokeRange: () => [1, 16],
                                 planningScenarioSelectedInteraction: () => null,
@@ -204,6 +205,13 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 currentInputName: () => "buildings"
                             }
                         }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        addInteraction: sinon.stub(),
+                        removeInteraction: sinon.stub()
                     }
                 }
             }

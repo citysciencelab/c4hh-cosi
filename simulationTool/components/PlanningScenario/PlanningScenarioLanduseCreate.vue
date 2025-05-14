@@ -44,6 +44,7 @@ export default {
             "planningScenarioSelectedDrawType",
             "planningScenarioSelectedDrawTypeMain",
             "planningScenarioSelectedInteraction",
+            "planningScenarioSelectInteraction",
             "planningScenarioStrokeRange",
             "planningScenarios",
             "simulations"
@@ -92,6 +93,7 @@ export default {
     mounted () {
         this.source = this.getLayerSource();
         this.createdFeatures = this.getLayerSource().getFeatures().filter(feature => feature.get("created") === true);
+        this.removeInteraction(this.planningScenarioSelectInteraction);
     },
     methods: {
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),

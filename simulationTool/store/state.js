@@ -19,9 +19,10 @@
  * @property {Object[]} planningScenarioDrawIcons - The draw icons.
  * @property {Object[]} planningScenarioDrawTypesMain - The main draw types.
  * @property {Object[]} planningScenarioHighlightFeatureStyle - The highlight feature style.
+ * @property {ol/interaction/Select} planningScenarioSelectInteraction - The current select interactions.
  * @property {Object[]} planningScenarioSelectedDrawType - The selected draw type.
  * @property {Object[]} planningScenarioSelectedDrawTypeMain - The main selected draw type.
- * @property {Object[]} planningScenarioSelectedInteraction - The selected draw interaction.
+ * @property {Object[]} planningScenarioSelectedInteraction - The selected interaction.
  * @property {Object[]} planningScenarioStrokeRange - The stroke range.
  * @property {String} landuseActiveTab - The active tab in the landuse panel (existing or created).
  * @property {Object[]} landuseCurrentLayout - The current layout object as style for buildings or roads.
@@ -87,6 +88,7 @@ const state = {
         strokeColor: [60, 95, 148, 1],
         strokeWidth: 4
     },
+    planningScenarioSelectInteraction: null,
     planningScenarioSelectedDrawType: "",
     planningScenarioSelectedDrawTypeMain: "",
     planningScenarioSelectedInteraction: null,

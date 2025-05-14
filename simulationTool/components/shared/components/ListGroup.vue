@@ -1,5 +1,4 @@
 <script>
-import ConvertStyle from "../../../js/convertStyle";
 import {getMappedProperty} from "../js/getMappedProperty";
 import IconButton from "../../../../../src/shared/modules/buttons/components/IconButton.vue";
 import {mapGetters} from "vuex";
@@ -14,6 +13,10 @@ export default {
         hideable: {
             type: Boolean,
             default: true
+        },
+        highlightFeatureId: {
+            type: [Number, String],
+            default: () => ""
         },
         itemList: {
             type: Array,
@@ -39,6 +42,7 @@ export default {
     emits: [
         "setFeatureAttribute",
         "setFeatureStyle",
+        "setHighlightFeature",
         "removeFeature"
     ],
     data () {
@@ -57,6 +61,15 @@ export default {
          */
         hasMultipleProperties () {
             return Object.keys(this.itemList[0].getProperties()).length > 4;
+        }
+    },
+    watch: {
+        /**
+         * Sets the current highlight feature id accroding to the props.
+         * @param {String} val the highlight feature id from props.
+         */
+        highlightFeatureId (val) {
+            this.currentHightlightFeatureId = val;
         }
     },
     methods: {
@@ -136,27 +149,6 @@ export default {
         },
 
         /**
-         * Emits 'setHighlightFeature' to update a specific style of the feature.
-         * @param {String} id - The feature id.
-         * @returns {void}
-         */
-
-        /**
-         * Sets the highlight style for a given feature and resets the style of the previously highlighted feature.
-         * @param {Object} feature - The feature to be highlighted.
-         * @returns {void}
-         */
-        setHighlightFeature (feature) {
-            const oldHighlightFeature = this.itemList.find(item => item.getId() === this.currentHightlightFeatureId);
-
-            if (oldHighlightFeature) {
-                this.$emit("setFeatureStyle", oldHighlightFeature);
-            }
-            this.currentHightlightFeatureId = feature.getId();
-            feature.setStyle(ConvertStyle.geoJsonToOpenlayers(this.highlightStyle));
-        },
-
-        /**
          * Toggles the style of a given feature.
          * If the feature currently has a stroke style, it resets the style to a new empty `Style` object.
          * Otherwise, it emits an event to set the feature's style externally.
@@ -185,8 +177,8 @@ export default {
             :class="feature.getId() === currentHightlightFeatureId ? 'selected' : ''"
             role="button"
             tabindex="0"
-            @click="setHighlightFeature(feature)"
-            @keydown.enter="setHighlightFeature(feature)"
+            @click="$emit('setHighlightFeature', feature)"
+            @keydown.enter="$emit('setHighlightFeature', feature)"
         >
             <div class="d-flex justify-content-between align-items-center">
                 <template v-if="!hasMultipleProperties">

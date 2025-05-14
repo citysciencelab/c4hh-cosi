@@ -1,4 +1,5 @@
 import {Fill, Stroke, Style} from "ol/style.js";
+import isObject from "../../../src/shared/js/utils/isObject";
 
 /**
  * Converts GeoJSON style to OpenLayers style.
@@ -6,6 +7,10 @@ import {Fill, Stroke, Style} from "ol/style.js";
  * @returns {ol/Style} The OpenLayers style.
  */
 function geoJsonToOpenlayers (style) {
+    if (!isObject(style)) {
+        return undefined;
+    }
+
     if (style.fillTransparency) {
         const fillOpacity = 1 - (style.fillTransparency / 100),
             fillColorRgba = [...style.fillColor, fillOpacity];

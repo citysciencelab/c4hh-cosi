@@ -186,6 +186,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 currentInputName: (state) => state.currentInputName,
                                 currentPlanningComponent: (state) => state.currentPlanningComponent,
                                 landuseActiveTab: (state) => state.landuseActiveTab,
+                                planningScenarioHighlightFeatureStyle: (state) => state.planningScenarioHighlightFeatureStyle,
+                                planningScenarioSelectInteraction: (state) => state.planningScenarioSelectInteraction,
                                 simulations: () => simulations
                             },
                             mutations: {
@@ -200,6 +202,12 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 },
                                 setCurrentInputName (state, value) {
                                     state.currentInputName = value;
+                                },
+                                setLanduseActiveTab (state, value) {
+                                    state.landuseActiveTab = value;
+                                },
+                                setPlanningScenarioSelectInteraction (state, value) {
+                                    state.planningScenarioSelectInteraction = value;
                                 }
                             },
                             state: {
@@ -208,9 +216,18 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 currentEditableInput: "buildings",
                                 currentInputName: "",
                                 currentPlanningComponent: "",
-                                landuseActiveTab: "existing"
+                                landuseActiveTab: "existing",
+                                planningScenarioHighlightFeatureStyle: sinon.stub(),
+                                planningScenarioSelectInteraction: sinon.stub()
                             }
                         }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        addInteraction: sinon.stub(),
+                        removeInteraction: sinon.stub()
                     }
                 }
             }
@@ -294,7 +311,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             expect(wrapper.findAllComponents({name: "FlatButton"}).at(0).attributes().text).to.be.equal("additional:modules.tools.simulationTool.newRoad");
         });
 
-        it("should render alert info when features are not loaded", async function () {
+        it("should not render alert info when features are not loaded", async function () {
             const wrapper = shallowMount(PlanningScenarioLanduse, {
                 global: {
                     plugins: [store]

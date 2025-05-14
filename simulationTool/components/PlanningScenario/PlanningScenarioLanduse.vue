@@ -8,8 +8,10 @@ import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import ListGroup from "../shared/components/ListGroup.vue";
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
+import {Select} from "ol/interaction";
+import {singleClick} from "ol/events/condition";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
@@ -25,7 +27,8 @@ export default {
     data () {
         return {
             featuresByInput: [],
-            featureLayerId: "planning-scenario-landuse"
+            featureLayerId: "planning-scenario-landuse",
+            highlightFeatureId: ""
         };
     },
     computed: {
@@ -39,7 +42,8 @@ export default {
             "simulationAreaStyle",
             "simulationAreaStyleInvalid",
             "planningScenarioCurrentLayout",
-            "planningScenarioHighlightFeatureStyle"
+            "planningScenarioHighlightFeatureStyle",
+            "planningScenarioSelectInteraction"
         ]),
 
         /**
@@ -153,7 +157,6 @@ export default {
             return false;
         }
     },
-
     watch: {
         currentEditableInput (newValue) {
             this.updateFeatures(newValue);
@@ -174,7 +177,9 @@ export default {
             immediate: true
         }
     },
-
+    created () {
+        this.setSelectInteraction();
+    },
     async mounted () {
         if (!this.planningScenario) {
             return;
@@ -206,13 +211,17 @@ export default {
         if (this.currentPlanningComponent !== "newLanduse") {
             this.clearFeatures();
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+            this.removeInteraction(this.planningScenarioSelectInteraction);
         }
     },
     methods: {
+        ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentEditableInput",
             "setCurrentPlanningComponent",
-            "setCurrentInputName"
+            "setCurrentInputName",
+            "setLanduseActiveTab",
+            "setPlanningScenarioSelectInteraction"
         ]),
 
         /**
@@ -382,8 +391,7 @@ export default {
 
         /**
          * Sets the style of a feature of the current editable input.
-         * @param {ol/style/Style} style - The style to be set.
-         * @param {String} id - The id of the feature to be updated.
+         * @param {ol/Feature} olFeature - The feature.
          * @returns {void}
          */
         setFeatureStyle (olFeature) {
@@ -396,6 +404,52 @@ export default {
             }
             else {
                 olFeature.setStyle(null);
+            }
+        },
+
+        /**
+         * Sets the highlight feature in select.
+         * @param {ol/Feature} feature - The feature.
+         * @returns {void}
+         */
+        setHighlightFeature (feature) {
+            this.planningScenarioSelectInteraction.getFeatures().clear();
+            this.planningScenarioSelectInteraction.getFeatures().push(feature);
+            this.highlightFeatureId = feature?.getId();
+        },
+
+        /**
+         * Sets the select interaction (non-reactive state), adds it a "change:active" listener and adds it to the map.
+         * @returns {void}
+         */
+        setSelectInteraction () {
+            this.setPlanningScenarioSelectInteraction(new Select({
+                layers: (layer) => {
+                    return layer.get("id") === this.featureLayerId;
+                },
+                style: ConvertStyle.geoJsonToOpenlayers(this.planningScenarioHighlightFeatureStyle),
+                addCondition: singleClick
+            }));
+
+            if (typeof this.planningScenarioSelectInteraction !== "undefined") {
+                this.planningScenarioSelectInteraction.on("select", event => {
+                    const currentFeature = event.selected[0];
+
+                    if (this.planningScenarioSelectInteraction.getFeatures().getLength() > 1) {
+                        this.planningScenarioSelectInteraction.getFeatures().clear();
+                        this.planningScenarioSelectInteraction.getFeatures().push(currentFeature);
+                    }
+
+                    this.highlightFeatureId = currentFeature.getId();
+
+                    if (currentFeature.get("created")) {
+                        this.setLanduseActiveTab("created");
+                    }
+                    else {
+                        this.setLanduseActiveTab("existing");
+                    }
+                });
+                this.addInteraction(this.planningScenarioSelectInteraction);
             }
         },
 
@@ -503,6 +557,7 @@ export default {
                     tabindex="0"
                 >
                     <ListGroup
+                        :highlight-feature-id="highlightFeatureId"
                         :item-list="existingFeaturesByInput"
                         :list-key="currentEditableInput"
                         :properties-mapping="getPropertiesMapping"
@@ -510,6 +565,7 @@ export default {
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
                         @setFeatureStyle="setFeatureStyle"
+                        @setHighlightFeature="setHighlightFeature"
                     />
                 </div>
                 <div
@@ -521,6 +577,7 @@ export default {
                     tabindex="0"
                 >
                     <ListGroup
+                        :highlight-feature-id="highlightFeatureId"
                         :item-list="createdFeaturesByInput"
                         :list-key="currentEditableInput"
                         :properties-mapping="getPropertiesMapping"
@@ -528,6 +585,7 @@ export default {
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
                         @setFeatureStyle="setFeatureStyle"
+                        @setHighlightFeature="setHighlightFeature"
                     />
                 </div>
             </div>
