@@ -37,7 +37,13 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                     modules: {
                         SimulationTool: {
                             getters: {
-                                currentJobID: () => ""
+                                currentJobID: () => "jobNo5",
+                                planningScenarios: () => [
+                                    {jobs: {jobNo5: {requestBody: {inputs:
+                                        {anInput: {aProperty: "aValue"}}
+                                    }}}}
+                                ],
+                                simulations: () => []
                             },
                             namespaced: true
                         }
@@ -62,6 +68,23 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
             const wrapper = factory.getMount();
 
             expect(wrapper.findComponent({name: "SectionHeader"}).exists()).to.be.true;
+        });
+
+        it("should render inputs accordeon", () => {
+            const wrapper = factory.getMount();
+
+            expect(wrapper.findAllComponents({name: "AccordionItem"})
+                .find(accordionWrapper => accordionWrapper.vm.id === "simulation-results-accordion-inputs")
+                .exists()).to.be.true;
+        });
+
+        it("should render correct inputs", () => {
+            const wrapper = factory.getMount(),
+                inputsAccordion = wrapper.findAllComponents({name: "AccordionItem"})
+                    .find(accordionWrapper => accordionWrapper.vm.id === "simulation-results-accordion-inputs");
+
+            expect(inputsAccordion.text()).to.include("aProperty");
+            expect(inputsAccordion.text()).to.include("aValue");
         });
     });
 });
