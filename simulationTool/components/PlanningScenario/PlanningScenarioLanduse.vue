@@ -37,6 +37,7 @@ export default {
             "planningScenarios",
             "simulations",
             "simulationAreaStyle",
+            "simulationAreaStyleInvalid",
             "planningScenarioCurrentLayout",
             "planningScenarioHighlightFeatureStyle"
         ]),
@@ -126,6 +127,22 @@ export default {
         },
 
         /**
+         * Checks if there is empty feature in scenario.
+         * @return {Boolean} true if there is empty feature.
+         */
+        isEmptyFeature () {
+            let isEmpty = false;
+
+            Object.keys(this.editableInputs).forEach(key => {
+                if (typeof this.planningScenario?.inputs[key]?.features === "undefined" || !this.planningScenario?.inputs[key]?.features.length) {
+                    isEmpty = true;
+                }
+            });
+
+            return isEmpty;
+        },
+
+        /**
          * Checks if the value for the currentEditableInput is true which results in a checked toggle.
          * @returns {Boolean} true if the toggle is checked.
          */
@@ -140,6 +157,21 @@ export default {
     watch: {
         currentEditableInput (newValue) {
             this.updateFeatures(newValue);
+        },
+
+        /**
+         * Sets different style of simulation area if there are no features.
+         * @param {Boolean} val if there is empty feature.
+         */
+        isEmptyFeature: {
+            handler (val) {
+                const simulationAreaFeature = layerCollection.getLayerById("planning-scenario").getLayerSource().getFeatures().filter(feature => feature.get("id") === "simulation-area")[0];
+
+                simulationAreaFeature?.setStyle(ConvertStyle.geoJsonToOpenlayers(
+                    val ? this.simulationAreaStyleInvalid : this.simulationAreaStyle
+                ));
+            },
+            immediate: true
         }
     },
 
@@ -500,6 +532,13 @@ export default {
                 </div>
             </div>
             <div
+                v-if="isLoaded && isEmptyFeature"
+                class="alert alert-danger"
+                role="alert"
+            >
+                {{ $t('additional:modules.tools.simulationTool.planningScenarioEmptyFeature') }}
+            </div>
+            <div
                 v-if="isLoaded"
                 class="position-sticky bottom-0 bg-body z-2 p-3 d-flex justify-content-between"
             >
@@ -512,6 +551,7 @@ export default {
                 <FlatButton
                     class="m-3"
                     :text="$t('additional:modules.tools.simulationTool.planningScenarioSave')"
+                    :disabled="isEmptyFeature"
                     :interaction="() => save()"
                 />
             </div>

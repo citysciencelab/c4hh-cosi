@@ -283,6 +283,50 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
             expect(wrapper.findAllComponents({name: "FlatButton"}).at(0).attributes().text).to.be.equal("additional:modules.tools.simulationTool.newRoad");
         });
+
+        it("should render text of button when currentEditableInput is not 'buildings'", async () => {
+            const wrapper = factory.getShallowMount();
+
+            await wrapper.vm.$nextTick();
+            wrapper.vm.setCurrentEditableInput("roads");
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findAllComponents({name: "FlatButton"}).at(0).attributes().text).to.be.equal("additional:modules.tools.simulationTool.newRoad");
+        });
+
+        it("should render alert info when features are not loaded", async function () {
+            const wrapper = shallowMount(PlanningScenarioLanduse, {
+                global: {
+                    plugins: [store]
+                },
+                computed: {
+                    currentEditableInput: sinon.stub(),
+                    isEmptyFeature: () => true,
+                    isLoaded: () => false,
+                    landuseActiveTab: sinon.stub()
+                }
+            });
+
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find(".alert-danger").exists()).to.be.false;
+        });
+
+        it("should render alert info when features are not loaded", async function () {
+            const wrapper = shallowMount(PlanningScenarioLanduse, {
+                global: {
+                    plugins: [store]
+                },
+                computed: {
+                    currentEditableInput: sinon.stub(),
+                    isEmptyFeature: () => true,
+                    isLoaded: () => true,
+                    landuseActiveTab: sinon.stub()
+                }
+            });
+
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find(".alert-danger").exists()).to.be.true;
+        });
     });
 
     describe("Watchers", () => {
@@ -311,14 +355,26 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         it("should call 'setCurrentInputName' if user clicks the button to open PlanningScenarioLanduseCreate", async function () {
             const wrapper = factory.getMount(),
                 buttonListWrapper = wrapper.findAll("button"),
-                spyOpenLanduseCreate = sinon.spy(wrapper.vm, "setCurrentInputName");
+                spyOpenLanduseCreate = sinon.spy(wrapper.vm, "setCurrentInputName"),
+                spyCurrentPlanningComponent = sinon.spy(wrapper.vm, "setCurrentPlanningComponent");
 
             await buttonListWrapper.at(2).trigger("click");
             expect(spyOpenLanduseCreate.calledOnce).to.be.true;
+            expect(spyCurrentPlanningComponent.calledOnce).to.be.true;
         });
 
         it("should call 'save' if user clicks the button to save planning scenario", async function () {
-            const wrapper = factory.getMount(),
+            const wrapper = mount(PlanningScenarioLanduse, {
+                    global: {
+                        plugins: [store]
+                    },
+                    computed: {
+                        currentEditableInput: () => "buildings",
+                        isEmptyFeature: () => false,
+                        isLoaded: () => true,
+                        landuseActiveTab: () => "buildings"
+                    }
+                }),
                 buttonListWrapper = wrapper.findAll("button"),
                 spySave = sinon.spy(wrapper.vm, "save");
 

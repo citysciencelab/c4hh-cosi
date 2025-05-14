@@ -122,6 +122,7 @@
           "planningScenarioDownload": "Download planning scenario",
           "planningScenarioDownloads": "Download all planning scenarios",
           "planningScenarioEdit": "Edit planning scenario",
+          "planningScenarioEmptyFeature": "At least 1 existing or created Feature from buildings and roads is required so that die Simulation works later",
           "planningScenarioImported": "The Scenario <b>{{name}}</b> with Id {{id}} is imported.",
           "planningScenarioInvalidName": "Please enter a name for the planning scenario!",
           "planningScenarioMissedKey": "{{key}} is required.",

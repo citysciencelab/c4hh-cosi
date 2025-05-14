@@ -230,6 +230,13 @@ export default {
          * @returns {ol/Feature} The updated feature object with initialized properties.
          */
         setFeatureProperties (feature) {
+            if (!this.getInputFeatures(this.currentEditableInput).length) {
+                feature.set("created", true);
+                feature.setId(uniqueId(this.currentEditableInput + "-"));
+
+                return feature;
+            }
+
             const properties = this.getInputFeatures(this.currentEditableInput)[0].properties;
 
             Object.keys(properties).forEach(key => {

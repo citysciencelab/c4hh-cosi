@@ -124,6 +124,7 @@
           "planningScenarioDownload": "Planungsszenario herunterladen",
           "planningScenarioDownloads": "Alle Planungsszenarien herunterladen",
           "planningScenarioEdit": "Planungsszenario bearbeiten",
+          "planningScenarioEmptyFeature": "Es muss mindestens 1 Gebäude und mindestens 1 Straße vorhanden sein (im Bestand oder erstellt), damit die Simulation später funktioniert.",
           "planningScenarioImported": "Das Planungsszenario <b>{{name}}</b> mit der Id {{id}} ist importiert.",
           "planningScenarioInvalidName": "Bitte geben Sie einen Namen für das Planungsszenario ein!",
           "planningScenarioMissedKey": "{{key}} ist erforderlich.",
