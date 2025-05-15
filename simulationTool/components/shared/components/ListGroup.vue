@@ -37,6 +37,10 @@ export default {
         shownProperties: {
             type: Array,
             default: () => []
+        },
+        sortBy: {
+            type: String,
+            default: () => ""
         }
     },
     emits: [
@@ -64,6 +68,28 @@ export default {
             const properties = this.extractedProperties(this.itemList[0]);
 
             return Object.keys(properties).length > 4;
+        },
+
+        /**
+         * Returns the sorted item list according to configured property.
+         * @returns {Object[]} the sorted item list.
+         */
+        sortedItemList () {
+            const list = this.itemList;
+
+            if (typeof this.sortBy === "string" && this.sortBy !== "" && list.length) {
+                list.sort((a, b) => {
+                    if (a.get(this.sortBy) > b.get(this.sortBy)) {
+                        return 1;
+                    }
+                    else if (a.get(this.sortBy) < b.get(this.sortBy)) {
+                        return -1;
+                    }
+                    return 0;
+                });
+            }
+
+            return list;
         }
     },
     watch: {
@@ -87,6 +113,7 @@ export default {
             delete properties.geometry;
             delete properties.created;
             delete properties.fid;
+
             return properties;
         },
 
@@ -186,7 +213,7 @@ export default {
 <template>
     <div class="list-group list-group-flush">
         <div
-            v-for="(feature, index) in itemList"
+            v-for="(feature, index) in sortedItemList"
             :key="index"
             class="list-group-item list-group-item-action p-0"
             role="button"

@@ -113,6 +113,34 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
 
             expect(wrapper.vm.hasMultipleProperties).to.be.true;
         });
+
+        it("should get original item list ", function () {
+            const wrapper = factory.getShallowMount({itemList: featuresMore, sortBy: ""});
+
+            expect(wrapper.vm.sortedItemList).to.deep.equal(featuresMore);
+        });
+
+        it("should get sorted item list ", function () {
+            const reversedFeature = [
+                    new Feature({
+                        id: "two",
+                        height: "200",
+                        geometry: "",
+                        width: "200",
+                        cool: true
+                    }),
+                    new Feature({
+                        id: "one",
+                        height: "100",
+                        geometry: "",
+                        width: "100",
+                        cool: true
+                    })
+                ],
+                wrapper = factory.getShallowMount({itemList: reversedFeature, sortBy: "height"});
+
+            expect(wrapper.vm.sortedItemList[0].get("height")).to.equal("100");
+        });
     });
 
     describe("User Intactions", () => {

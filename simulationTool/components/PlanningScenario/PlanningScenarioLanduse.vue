@@ -155,6 +155,14 @@ export default {
                 return this.planningScenario?.showExistingItems[this.currentEditableInput] ?? false;
             }
             return false;
+        },
+
+        /**
+         * Gets the property to be sorted by.
+         * @return {String} The property to be sorted by.
+         */
+        sortBy () {
+            return this.editableInputs[this.currentEditableInput]?.sortBy;
         }
     },
     watch: {
@@ -546,6 +554,7 @@ export default {
                         :list-key="currentEditableInput"
                         :properties-mapping="getPropertiesMapping"
                         :shown-properties="getPropertiesToShow"
+                        :sort-by="sortBy"
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
                         @setFeatureStyle="setFeatureStyle"
@@ -566,6 +575,7 @@ export default {
                         :list-key="currentEditableInput"
                         :properties-mapping="getPropertiesMapping"
                         :shown-properties="getPropertiesToShow"
+                        :sort-by="sortBy"
                         @removeFeature="removeFeature"
                         @setFeatureAttribute="setFeatureAttribute"
                         @setFeatureStyle="setFeatureStyle"
