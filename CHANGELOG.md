@@ -16,8 +16,14 @@
 - Removed since version 3 not used state property `deactivateGFI` and `translate#` in language-keys.
 
 ### Fixed
-- CommuterFlows: Ensures the layer always renders on top, preventing commuter flow visualization from disappearing behind the baselayer.
 - Boris: Fixed that all Layers are shown in DropDown Menu, even if gfiAttributes are set to ignore. 
+
+---
+
+## 2025-05-15 v3.10.1
+
+### Fixed
+- CommuterFlows: Ensures the layer always renders on top, preventing commuter flow visualization from disappearing behind the baselayer.
 
 ---
 
