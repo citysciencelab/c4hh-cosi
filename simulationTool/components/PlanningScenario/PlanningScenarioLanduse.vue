@@ -2,7 +2,7 @@
 import ConvertFeature from "../../js/convertFeatures";
 import ConvertStyle from "../../js/convertStyle";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
-import {GeoJSON} from "ol/format.js";
+import getBBOXGeometry from "../shared/js/getBBoxGeometry";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
@@ -193,7 +193,7 @@ export default {
         if (!this.planningScenario.featuresLoaded) {
             try {
                 await this.fetchFeatures(
-                    this.planningScenario, this.editableInputs, this.getBBOXGeometry(this.planningScenario), this.currentCrs
+                    this.planningScenario, this.editableInputs, getBBOXGeometry(this.planningScenario), this.currentCrs
                 );
 
                 this.planningScenario.featuresLoaded = true;
@@ -273,23 +273,6 @@ export default {
                     };
                 }
             }
-        },
-
-        /**
-         * Gets the bounding box of the passed scenario.
-         * @param {Object} scenario - The current scenario.
-         * @returns {ol/Geometry/Polygon} The BBOX geometry.
-         */
-        getBBOXGeometry (scenario) {
-            const simulationAreaFeature = scenario.scenarioFeature?.features.find(feature => {
-                return feature.properties?.id === "simulation-area";
-            });
-
-            if (!simulationAreaFeature) {
-                return undefined;
-            }
-
-            return new GeoJSON().readFeature(simulationAreaFeature).getGeometry();
         },
 
         /**

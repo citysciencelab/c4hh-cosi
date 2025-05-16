@@ -3,13 +3,17 @@ import AccordionItem from "../../../../src/shared/modules/accordion/components/A
 import DynamicInputByType from "../shared/components/DynamicInputByType.vue";
 import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import getBBOXGeometry from "../shared/js/getBBoxGeometry";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
+import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
+import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
+import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
     name: "SimulationParameter",
@@ -18,13 +22,16 @@ export default {
         DynamicInputByType,
         FileUpload,
         FlatButton,
-        SectionHeader
+        SectionHeader,
+        SpinnerItem,
+        SwitchInput
     },
     data () {
         return {
             inputsValue: {},
             jobResults: undefined,
             jobStatus: undefined,
+            oafLoadingStates: {},
             primaryTypeInputs: {},
             processDescription: undefined,
             processHandler: undefined,
@@ -39,6 +46,49 @@ export default {
             "previousComponentOfSimulation",
             "simulations"
         ]),
+
+        /**
+         * Get the optional inputs of type FeatureCollection from the process description.
+         * @returns {Object} An object of inputs.
+         */
+        optionalOafTypeInputs () {
+            if (!isObject(this.processDescription?.inputs)) {
+                return {};
+            }
+
+            return Object.fromEntries(
+                Object.entries(this.processDescription?.inputs).filter(([, input]) => {
+                    return input.minOccurs === 0
+                        && input.schema?.allOf?.some(schema => schema.format === "geojson-feature-collection");
+                })
+            );
+        },
+
+        /**
+         * Get the subset of optionalOafTypeInputs that is neither primary nor invisible.
+         * @returns {Object} An object of inputs.
+         */
+        optionalOafTypeInputsAdvanced () {
+            return Object.fromEntries(
+                Object.entries(this.optionalOafTypeInputs).filter(([inputKey]) => {
+                    return this.simulation?.inputs?.[inputKey]?.menu !== "primary"
+                        && this.simulation?.inputs?.[inputKey]?.menu !== "nowhere";
+                })
+            );
+        },
+
+        /**
+         * Get the subset of optionalOafTypeInputs that is primary.
+         * @returns {Object} An object of inputs.
+         */
+        optionalOafTypeInputsPrimary () {
+            return Object.fromEntries(
+                Object.entries(this.optionalOafTypeInputs).filter(([inputKey]) => {
+                    return this.simulation?.inputs?.[inputKey]?.menu === "primary";
+                })
+            );
+        },
+
 
         /**
          * Returns an array of Objects with code and name property for select options.
@@ -266,6 +316,38 @@ export default {
         },
 
         /**
+         * Event handler for change of switch for oaf input type.
+         * Loads the data from the source if it is not already loaded.
+         * @param {Object} event The change event.
+         * @param {String} inputKey The input key.
+         * @returns {void}
+         */
+        async onOafSwitchChange (event, inputKey) {
+            const scenarioInputs = this.currentPlanningScenario.inputs;
+
+            if (!scenarioInputs[inputKey]) {
+                this.oafLoadingStates[inputKey] = true;
+
+                const source = this.simulation.inputs[inputKey].source,
+                    crs = this.simulation.inputs.crs,
+                    filter = getOAFFeature.getOAFGeometryFilter(getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects");
+
+                scenarioInputs[inputKey] = {
+                    type: "FeatureCollection",
+                    features: await getOAFFeature.getOAFFeatureGet(
+                        source.url, source.collection, 100, filter, crs, crs
+                    )
+                };
+
+                this.oafLoadingStates[inputKey] = false;
+            }
+
+            this.requestBody.inputs[inputKey] = event.target.checked
+                ? scenarioInputs[inputKey]
+                : undefined;
+        },
+
+        /**
          * Event handler for change of selected planning scenario.
          * @param {Object} event The change event.
          * @returns {void}
@@ -466,12 +548,66 @@ export default {
                 </div>
             </div>
         </div>
+        <div
+            v-for="(input, inputKey) in optionalOafTypeInputsPrimary"
+            :key="inputKey"
+            class="mb-2"
+        >
+            <div
+                v-if="oafLoadingStates[inputKey]"
+                class="d-flex align-items-center"
+            >
+                <SpinnerItem />
+                <span class="ms-2">
+                    {{ getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}
+                </span>
+            </div>
+            <div
+                v-else
+                class="form-switch"
+            >
+                <SwitchInput
+                    :id="`simulation-parameter-switch-input-${inputKey}`"
+                    :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                    :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                    :interaction="event => onOafSwitchChange(event, inputKey)"
+                    :checked="Object.hasOwn(currentPlanningScenario?.inputs, inputKey)"
+                />
+            </div>
+        </div>
         <div v-if="Object.keys(stringTypeInputs).length || Object.keys(objectTypeInputs).length">
             <hr>
             <AccordionItem
                 id="advanced-simulation-parameters"
                 :title="$t('additional:modules.tools.simulationTool.simulationAdditionalParameter')"
             >
+                <div
+                    v-for="(input, inputKey) in optionalOafTypeInputsAdvanced"
+                    :key="inputKey"
+                    class="mb-2"
+                >
+                    <div
+                        v-if="oafLoadingStates[inputKey]"
+                        class="d-flex align-items-center"
+                    >
+                        <SpinnerItem />
+                        <span class="ms-2">
+                            {{ getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}
+                        </span>
+                    </div>
+                    <div
+                        v-else
+                        class="form-switch"
+                    >
+                        <SwitchInput
+                            :id="`simulation-parameter-switch-input-${inputKey}`"
+                            :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                            :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                            :interaction="event => onOafSwitchChange(event, inputKey)"
+                            :checked="Object.hasOwn(currentPlanningScenario?.inputs, inputKey)"
+                        />
+                    </div>
+                </div>
                 <div
                     v-for="(input, inputKey) in excludePrimaryTypeKeys(stringTypeInputs)"
                     :key="inputKey"

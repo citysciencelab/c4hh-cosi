@@ -4,6 +4,7 @@ import {createStore} from "vuex";
 import SimulationParameter from "../../../SimulationParameter.vue";
 import sinon from "sinon";
 import axios from "axios";
+import getOAFFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature";
 
 config.global.mocks.$t = key => key;
 
@@ -45,6 +46,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                                 planningScenarios: () => [
                                     {
                                         id: "planningScenarioId",
+                                        inputs: {},
                                         simulationId: "simulationId"
                                     }
                                 ],
@@ -58,7 +60,8 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                                                 menu: "primary",
                                                 primaryProperties: ["prop1"]
                                             },
-                                            input2: {menu: "primary"}
+                                            input2: {menu: "primary"},
+                                            anOafInput: {source: {}}
                                         }
                                     }
                                 ]
@@ -430,6 +433,50 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 });
 
                 expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal(expected);
+            });
+        });
+
+        describe("onOafSwitchChange", () => {
+            it("should request the features if they do not exist in the scenario", async () => {
+                const wrapper = factory.getMount(),
+                    getStub = sinon.stub(getOAFFeature, "getOAFFeatureGet");
+
+                sinon.stub(getOAFFeature, "getOAFGeometryFilter");
+
+                wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+
+                expect(getStub.calledOnce).to.be.true;
+            });
+
+            it("should not request the features if they exist in the scenario", async () => {
+                const wrapper = factory.getMount(),
+                    getStub = sinon.stub(getOAFFeature, "getOAFFeatureGet");
+
+                wrapper.vm.currentPlanningScenario.inputs.anOafInput = {};
+
+                wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+
+                expect(getStub.called).to.be.false;
+            });
+
+            it("should set the input in the requestBody", async () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.requestBody.inputs = {};
+                wrapper.vm.currentPlanningScenario.inputs.anOafInput = "aValue";
+                wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+
+                expect(wrapper.vm.requestBody.inputs.anOafInput).to.deep.equal("aValue");
+            });
+
+            it("should remove the input from the requestBody if the switch is unchecked", async () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.requestBody.inputs = {anOafInput: "aValue"};
+                wrapper.vm.currentPlanningScenario.inputs.anOafInput = "aValue";
+                wrapper.vm.onOafSwitchChange({target: {checked: false}}, "anOafInput");
+
+                expect(wrapper.vm.requestBody.inputs.anOafInput).to.be.undefined;
             });
         });
     });
