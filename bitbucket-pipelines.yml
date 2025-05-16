@@ -13,10 +13,10 @@ pipelines:
                         - echo 'deploy to opencode:'$BITBUCKET_TAG
                         - git fetch --all --tags
                         - git checkout tags/$BITBUCKET_TAG
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/addons.git $BITBUCKET_TAG
-                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/addons.git
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal-addons.git $BITBUCKET_TAG
+                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal-addons.git
                         - cd addons
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/addons.git -f
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal-addons.git -f
     custom: # Pipelines that are triggered manually
         npm audit:
             -   step:
@@ -37,7 +37,7 @@ pipelines:
                         - git fetch --all --tags
                         - echo 'deply to opencode:'$BITBUCKET_TAG
                         - git checkout tags/$BITBUCKET_TAG
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/addons.git $BITBUCKET_TAG
-                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/addons.git
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal-addons.git $BITBUCKET_TAG
+                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal-addons.git
                         - cd addons
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/addons.git -f
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal-addons.git -f
