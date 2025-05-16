@@ -47,7 +47,6 @@ function checkAndCreateInspector () {
         console.log(123);
         store.watch((_, rootGetters) => rootGetters["Maps/mode"], mapModeFromGetters => {
             console.log("drin");
-            
             if (mapModeFromGetters === "3D") {
                 createCesium3DTilesInspector();
             }
