@@ -20,6 +20,8 @@
  * @property {Object} filteredData - object containing the filtered data returned by the filter endpoint
  * @property {Boolean} isLoading - indicates whether data is being loaded from the endpoint
  * @property {Object} filterLayer - object containing the polygon used to filter the required data
+ * @property {Object} generatedIfcUrl - Object containing the generated IFC URL details for each workflow
+ * @property {String} currentWorkflowId - Id representing the currently active workflow
  */
 
 const state = {
@@ -41,7 +43,9 @@ const state = {
     previousWorkflowForegroundLayers: [],
     filteredData: {},
     isLoading: false,
-    filterLayer: undefined
+    filterLayer: undefined,
+    generatedIfcUrl: {},
+    currentWorkflowId: undefined
 };
 
 export default state;

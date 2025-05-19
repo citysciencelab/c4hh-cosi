@@ -38,6 +38,10 @@
                       "select": "Selection of the area by",
                       "numberSelectedTiles": "Tiles selected",
                       "noDataAvailable": "There is no data available for the selected area"
+                    },
+                    "submit": {
+                        "openIfcInBimViewer": "Open IFC file in BimViewer",
+                      "openIfcLink": "Download IFC file"
                     }
                 }
             }

@@ -38,6 +38,10 @@
                       "select": "Auswahl des Gebietes durch",
                       "numberSelectedTiles": "Tiles ausgewählt",
                       "noDataAvailable": "Für die Auswahl sind keine Daten vorhanden"
+                    },
+                    "submit": {
+                      "openIfcInBimViewer": "IFC-Datei im BimViewer öffnen",
+                      "openIfcLink": "IFC-Datei herunterladen"
                     }
                 }
             }

@@ -2,12 +2,14 @@
 import BimFactoryWorkflowInputText from "./BimFactoryWorkflowInputText.vue";
 import BimFactoryWorkflowDetailSelector from "./BimFactoryWorkflowDetailSelector.vue";
 import BimFactoryWorkflowFilter from "./BimFactoryWorkflowFilter.vue";
+import BimFactoryWorkflowSubmit from "./BimFactoryWorkflowSubmit.vue";
 
 export default {
     components: {
         BimFactoryWorkflowInputText,
         BimFactoryWorkflowFilter,
-        BimFactoryWorkflowDetailSelector
+        BimFactoryWorkflowDetailSelector,
+        BimFactoryWorkflowSubmit
     },
     props: {
         step: {

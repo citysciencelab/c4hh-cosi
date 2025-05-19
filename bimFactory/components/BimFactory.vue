@@ -21,13 +21,11 @@ export default {
     mounted () {
         this.removeTitleFromDOM();
         this.loadWorkflows();
+        this.setCurrentMouseMapInteractionsComponent(this.type);
     },
-    // eslint-disable-next-line no-empty-function
-    activated () {},
-    // eslint-disable-next-line no-empty-function
-    deactivated () {},
     methods: {
-        ...mapMutations("Menu", ["setCurrentMenuWidth"]),
+        ...mapMutations("Menu", ["setCurrentMenuWidth", "setCurrentMouseMapInteractionsComponent"]),
+        ...mapMutations("Modules/BimFactory", ["setCurrentWorkflowId"]),
         ...mapActions("Modules/BimFactory", ["loadWorkflows"]),
         removeTitleFromDOM () {
             /* if (this.standAlonePortal && document.querySelector("#mp-subHeader-mainMenu")) {
@@ -53,6 +51,8 @@ export default {
             else {
                 this.currentWorkflow = parseInt(value, 10);
             }
+
+            this.setCurrentWorkflowId(this.currentWorkflow);
         }
     }
 };
