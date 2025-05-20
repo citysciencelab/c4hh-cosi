@@ -1,9 +1,13 @@
 <script>
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
+import ConvertFeature from "../../js/convertFeatures";
+import ConvertStyle from "../../js/convertStyle";
 import dayjs from "dayjs";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
 import isObject from "../../../../src/shared/js/utils/isObject";
-import {mapGetters} from "vuex/dist/vuex.cjs.js";
+import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerFactory from "../../../../src/core/layers/js/layerFactory";
+import {mapActions, mapGetters} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 
 export default {
@@ -14,14 +18,20 @@ export default {
     },
     data () {
         return {
+            finished: "",
             jobStatus: {},
+            layer: undefined,
             scenarioName: "",
-            started: "",
-            finished: ""
+            started: ""
         };
     },
     computed: {
-        ...mapGetters("Modules/SimulationTool", ["currentJobID", "planningScenarios", "simulations"]),
+        ...mapGetters("Modules/SimulationTool", [
+            "currentJobID",
+            "planningScenarios",
+            "simulations",
+            "simulationResultStyle"
+        ]),
 
         /**
          * Get the current job based on the current job ID.
@@ -50,25 +60,85 @@ export default {
     mounted () {
         this.planningScenarios?.forEach(scenario => {
             this.setData(scenario, this.currentJobID);
+            this.showFeatures(scenario, this.currentJobID);
         });
     },
+    unmounted () {
+        if (typeof this.layer !== "undefined") {
+            this.layer.getLayerSource().clear();
+        }
+    },
     methods: {
+        ...mapActions("Maps", ["zoomToExtent"]),
+
         getMappedProperty,
         /**
          * Sets the job status data.
          * @param {Object} scenario - The scenario
-         * @param {string} jobId - The jobId
+         * @param {string} jobID - The job id.
          * @returns {void}
          */
-        setData (scenario, jobId) {
-            if (!isObject(scenario) || !isObject(scenario.jobs) || typeof jobId !== "string") {
+        setData (scenario, jobID) {
+            if (!isObject(scenario) || !isObject(scenario.jobs) || typeof jobID !== "string") {
                 return;
             }
 
-            this.jobStatus = scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobId)]?.jobStatus;
+            if (typeof scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)] === "undefined") {
+                return;
+            }
+
+            this.jobStatus = scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)]?.jobStatus;
             this.scenarioName = scenario.name;
             this.started = this.jobStatus?.started ? dayjs(this.jobStatus?.started).format("DD.MM.YYYY, hh:mm:ss") : this.jobStatus?.started;
             this.finished = this.jobStatus?.finished ? dayjs(this.jobStatus?.finished).format("DD.MM.YYYY, hh:mm:ss") : this.jobStatus?.finished;
+        },
+
+        /**
+         * Shows features in map.
+         * @param {Object} scenario - The scenario
+         * @param {String} jobID the job id.
+         * @returns {void}
+         */
+        showFeatures (scenario, jobID) {
+            const jobResult = scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)]?.jobResult,
+                layerName = "simulation-results";
+
+            if (!isObject(jobResult) || typeof jobID !== "string") {
+                return;
+            }
+
+            if (typeof layerCollection.getLayerById(layerName) !== "undefined") {
+                this.layer = layerCollection.getLayerById(layerName);
+                this.layer.getLayerSource().clear();
+            }
+            else {
+                this.layer = layerFactory.createLayer({
+                    typ: "VECTORBASE",
+                    id: layerName,
+                    name: layerName,
+                    alwaysOnTop: true
+                });
+
+                layerCollection.addLayer(this.layer);
+            }
+
+            Object.keys(jobResult).forEach(key => {
+                if (!Array.isArray(jobResult[key]?.features) || !jobResult[key]?.features.length) {
+                    return;
+                }
+
+                const geojsonFeature = ConvertFeature.geoJsonToOpenlayers(jobResult[key]?.features);
+
+                geojsonFeature.forEach(feature => {
+                    feature.set("jobID", jobID);
+                    feature.set("output", key);
+                });
+
+                this.layer?.setStyle(ConvertStyle.geoJsonToOpenlayers(this.simulationResultStyle));
+                this.layer.getLayerSource().addFeatures(geojsonFeature);
+            });
+
+            this.zoomToExtent({extent: this.layer.getLayerSource().getExtent(), options: {maxZoom: 7}});
         }
     }
 };
@@ -128,7 +198,7 @@ export default {
                 <div
                     class="me-2"
                 >
-                    {{ jobStatus.status }}
+                    {{ jobStatus?.status }}
                 </div>
             </div>
             <AccordionItem
