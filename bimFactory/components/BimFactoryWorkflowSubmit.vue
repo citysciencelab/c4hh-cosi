@@ -85,6 +85,9 @@ export default {
         },
         ifcUrl () {
             return this.generatedIfcUrl ? this.generatedIfcUrl[this.currentWorkflowId] : "";
+        },
+        generateIfcReady () {
+            return this.workflowFormData?.bbox && typeof this.workflowFormData.bbox === "object";
         }
     },
     watch: {
@@ -156,7 +159,14 @@ export default {
         :text="config.component.title"
         :interaction="() => onSubmit()"
         icon="bi bi-box"
+        :disabled="!generateIfcReady"
     />
+
+    <span
+        v-if="!generateIfcReady"
+    >
+        {{ $t("additional:modules.bimfactory.workflow.components.submit.filterMissingNote") }}
+    </span>
 
     <FlatButton
         v-if="bimViewerConfigured && ifcUrl && !isMobile"

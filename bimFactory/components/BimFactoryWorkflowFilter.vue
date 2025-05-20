@@ -42,6 +42,11 @@ export default {
         ]),
         displayData () {
             return this.data;
+        },
+        filterNote () {
+            return !this.data && this.selectedAreaGeoJson?.coordinates
+                ? this.$t("additional:modules.bimfactory.workflow.components.filter.filterNote")
+                : undefined;
         }
     },
     watch: {
@@ -70,6 +75,10 @@ export default {
         },
         isOpen (newValue) {
             this.$refs.graphicalSelect.setStatus(newValue);
+        },
+        selectedAreaGeoJson () {
+            this.data = null;
+            this.setWorkflowFormDataBbox("empty");
         }
     },
     mounted () {
@@ -80,7 +89,7 @@ export default {
     methods: {
         ...mapActions("Maps", ["changeMapMode"]),
         ...mapActions("Modules/BimFactory", ["filterRequests"]),
-        ...mapMutations("Modules/BimFactory", ["setFilterLayer"]),
+        ...mapMutations("Modules/BimFactory", ["setFilterLayer", "setWorkflowFormDataBbox"]),
         onFilter () {
             const polygon = new Polygon(this.selectedAreaGeoJson.coordinates),
                 bbox = polygon.getExtent(),
@@ -97,7 +106,7 @@ export default {
 
             this.filterRequests({bboxLowerLeftCorner, bboxUpperRightCorner, endpoint: this.config.component.endpoint});
 
-            this.$store.commit("Modules/BimFactory/setWorkflowFormDataBbox", transformedBbox);
+            this.setWorkflowFormDataBbox(transformedBbox);
 
             this.setFilterLayer(polygon);
         }
@@ -122,6 +131,8 @@ export default {
             icon="bi bi-bounding-box-circles"
             :disabled="!selectedAreaGeoJson"
         />
+
+        <span class="filterNote">{{ filterNote }}</span>
 
         <SpinnerItem
             v-if="isLoading"
@@ -174,6 +185,10 @@ div.bimFactoryWorkflowFilter {
 
     ul.responseList {
         list-style-type: none;
+    }
+
+    span.filterNote {
+        margin-left: 0.25rem;
     }
 }
 </style>

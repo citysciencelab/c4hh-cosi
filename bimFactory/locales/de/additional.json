@@ -37,11 +37,13 @@
                     "filter": {
                       "select": "Auswahl des Gebietes durch",
                       "numberSelectedTiles": "Tiles ausgewählt",
-                      "noDataAvailable": "Für die Auswahl sind keine Daten vorhanden"
+                      "noDataAvailable": "Für die Auswahl sind keine Daten vorhanden",
+                      "filterNote": "Bitte den Filter Button klicken"
                     },
                     "submit": {
                       "openIfcInBimViewer": "IFC-Datei im BimViewer öffnen",
-                      "openIfcLink": "IFC-Datei herunterladen"
+                      "openIfcLink": "IFC-Datei herunterladen",
+                      "filterMissingNote": "Bitte ein Gebiet einzeichnen bzw. den Filter Button klicken"
                     }
                 }
             }

@@ -2,9 +2,9 @@ import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
+import BimFactory from "../../../store/indexBimFactory";
 
 import Component from "../../../components/BimFactory.vue";
-import BimFactory from "../../../store/indexBimFactory";
 
 config.global.mocks.$t = key => key;
 
@@ -34,7 +34,8 @@ describe("addons/bimFactory/components/BimFactory.vue", () => {
             Menu: {
                 namespaced: true,
                 mutations: {
-                    setCurrentMenuWidth: sinon.stub()
+                    setCurrentMenuWidth: sinon.stub(),
+                    setCurrentMouseMapInteractionsComponent: () => "bimFactory"
                 }
             }
         }

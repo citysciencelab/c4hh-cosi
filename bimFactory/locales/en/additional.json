@@ -37,11 +37,13 @@
                     "filter": {
                       "select": "Selection of the area by",
                       "numberSelectedTiles": "Tiles selected",
-                      "noDataAvailable": "There is no data available for the selected area"
+                      "noDataAvailable": "There is no data available for the selected area",
+                      "filterNote": "Please click on the filter button"
                     },
                     "submit": {
                         "openIfcInBimViewer": "Open IFC file in BimViewer",
-                      "openIfcLink": "Download IFC file"
+                        "openIfcLink": "Download IFC file",
+                        "filterMissingNote": "Please draw an area on the map or click the filter button"
                     }
                 }
             }
