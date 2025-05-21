@@ -39,7 +39,6 @@
  * @property {Object[]} simulations - A list of all available simulations.
  * @property {String|null} simulationApiUrl The URL for the Urban Model Platform API
  * @property {Object} simulationAreaStyle - The default style for the simulation area (BBOX/Extent of planning scenario)
- * @property {Object} simulationResultStyle - The default style for the simulation result.
  * @property {Object} userDetailsCache cache for user details
  */
 const state = {
@@ -116,11 +115,6 @@ const state = {
         strokeLineDash: [5, 8],
         strokeWidth: 4,
         zIndex: Number.POSITIVE_INFINITY
-    },
-    simulationResultStyle: {
-        fillColor: [225, 0, 25, 1],
-        strokeColor: [225, 0, 25, 1],
-        strokeWidth: 1
     },
     simulations: [],
     userDetailsCache: {}

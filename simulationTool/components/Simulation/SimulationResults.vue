@@ -29,8 +29,7 @@ export default {
         ...mapGetters("Modules/SimulationTool", [
             "currentJobID",
             "planningScenarios",
-            "simulations",
-            "simulationResultStyle"
+            "simulations"
         ]),
 
         /**
@@ -47,6 +46,14 @@ export default {
          */
         currentPlanningScenario () {
             return this.planningScenarios?.find(scenario => scenario?.jobs?.[this.currentJobID]);
+        },
+
+        /**
+         * Gets the style object from current simulation.
+         * @returns {Object} The current style object.
+         */
+        currentStyle () {
+            return this.simulation?.resultStyle;
         },
 
         /**
@@ -72,6 +79,7 @@ export default {
         ...mapActions("Maps", ["zoomToExtent"]),
 
         getMappedProperty,
+
         /**
          * Sets the job status data.
          * @param {Object} scenario - The scenario
@@ -94,16 +102,42 @@ export default {
         },
 
         /**
+         * Sets the Feature style according to the value of property.
+         * @param {ol/Feature} feature - The feature.
+         * @param {Object} currentStyles - The current style objects.
+         * @returns {void}
+         */
+        setFeatureStyle (feature, currentStyles) {
+            let style = null;
+
+            if (!isObject(currentStyles) || !Array.isArray(currentStyles?.styles)) {
+                feature.setStyle(style);
+                return;
+            }
+
+            if (currentStyles?.type === "polygon") {
+                style = currentStyles.styles.find(styleObj => feature.get(currentStyles?.property) === styleObj?.value)?.style;
+                style = typeof style !== "undefined" ? ConvertStyle.geoJsonToOpenlayers(style) : null;
+            }
+
+            feature.setStyle(style);
+        },
+
+        /**
          * Shows features in map.
          * @param {Object} scenario - The scenario
          * @param {String} jobID the job id.
          * @returns {void}
          */
         showFeatures (scenario, jobID) {
-            const jobResult = scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)]?.jobResult,
+            if (!isObject(scenario) || typeof jobID !== "string") {
+                return;
+            }
+
+            const jobResult = scenario?.jobs[Object.keys(scenario?.jobs).find(key => key === jobID)]?.jobResult,
                 layerName = "simulation-results";
 
-            if (!isObject(jobResult) || typeof jobID !== "string") {
+            if (!isObject(jobResult)) {
                 return;
             }
 
@@ -132,9 +166,9 @@ export default {
                 geojsonFeature.forEach(feature => {
                     feature.set("jobID", jobID);
                     feature.set("output", key);
+                    this.setFeatureStyle(feature, this.currentStyle);
                 });
 
-                this.layer?.setStyle(ConvertStyle.geoJsonToOpenlayers(this.simulationResultStyle));
                 this.layer.getLayerSource().addFeatures(geojsonFeature);
             });
 
