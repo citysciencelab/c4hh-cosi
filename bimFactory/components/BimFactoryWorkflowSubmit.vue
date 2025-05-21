@@ -159,7 +159,7 @@ export default {
         :text="config.component.title"
         :interaction="() => onSubmit()"
         icon="bi bi-box"
-        :disabled="!generateIfcReady"
+        :disabled="!generateIfcReady || isLoading"
     />
 
     <span

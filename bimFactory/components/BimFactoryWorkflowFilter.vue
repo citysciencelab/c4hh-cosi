@@ -38,7 +38,8 @@ export default {
         ...mapGetters("Modules/BimFactory", [
             "filteredData",
             "isLoading",
-            "filterLayer"
+            "filterLayer",
+            "workflowFormData"
         ]),
         displayData () {
             return this.data;
@@ -76,9 +77,17 @@ export default {
         isOpen (newValue) {
             this.$refs.graphicalSelect.setStatus(newValue);
         },
-        selectedAreaGeoJson () {
+        selectedAreaGeoJson (newVal) {
             this.data = null;
             this.setWorkflowFormDataBbox("empty");
+            this.setGeneratedIfcUrl({});
+            this.setFilterLayer(new Polygon(newVal.coordinates));
+        },
+        workflowFormData: {
+            handler () {
+                this.setGeneratedIfcUrl({});
+            },
+            deep: true
         }
     },
     mounted () {
@@ -89,7 +98,7 @@ export default {
     methods: {
         ...mapActions("Maps", ["changeMapMode"]),
         ...mapActions("Modules/BimFactory", ["filterRequests"]),
-        ...mapMutations("Modules/BimFactory", ["setFilterLayer", "setWorkflowFormDataBbox"]),
+        ...mapMutations("Modules/BimFactory", ["setFilterLayer", "setWorkflowFormDataBbox", "setGeneratedIfcUrl"]),
         onFilter () {
             const polygon = new Polygon(this.selectedAreaGeoJson.coordinates),
                 bbox = polygon.getExtent(),
@@ -109,6 +118,7 @@ export default {
             this.setWorkflowFormDataBbox(transformedBbox);
 
             this.setFilterLayer(polygon);
+            this.setGeneratedIfcUrl({});
         }
     }
 };
