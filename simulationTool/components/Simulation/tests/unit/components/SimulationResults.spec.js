@@ -57,7 +57,27 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                                     {
                                         id: "planningScenarioId",
                                         simulationId: "simulationId",
-                                        jobs: {jobNo5: {requestBody: {inputs: {anInput: {aProperty: "aValue"}}}}}
+                                        jobs: {
+                                            jobNo5: {
+                                                requestBody: {inputs: {anInput: {aProperty: "aValue"}}},
+                                                jobResult: {
+                                                    "noise_day": {
+                                                        "type": "FeatureCollection",
+                                                        "features": [{
+                                                            "type": "Feature",
+                                                            "properties": {},
+                                                            "geometry": {
+                                                                "coordinates": [
+                                                                    9.984960104804372,
+                                                                    53.55774883772011
+                                                                ],
+                                                                "type": "Point"
+                                                            }
+                                                        }]
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 ],
                                 simulations: () => []
@@ -243,15 +263,15 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                 expect(spyZoomToExtent.calledOnce).to.be.false;
                 await wrapper.vm.showFeatures([]);
                 expect(spyZoomToExtent.calledOnce).to.be.false;
-                await wrapper.vm.showFeatures({jobs: {"id": {}}}, null);
+                await wrapper.vm.showFeatures("jobNo5", null);
                 expect(spyZoomToExtent.calledOnce).to.be.false;
-                await wrapper.vm.showFeatures({jobs: {"id": {}}}, 0);
+                await wrapper.vm.showFeatures("jobNo5", 0);
                 expect(spyZoomToExtent.calledOnce).to.be.false;
-                await wrapper.vm.showFeatures({jobs: {"id": {}}}, false);
+                await wrapper.vm.showFeatures("jobNo5", false);
                 expect(spyZoomToExtent.calledOnce).to.be.false;
-                await wrapper.vm.showFeatures({jobs: {"id": {}}}, []);
+                await wrapper.vm.showFeatures("jobNo5", []);
                 expect(spyZoomToExtent.calledOnce).to.be.false;
-                await wrapper.vm.showFeatures({jobs: {"id": {}}}, {});
+                await wrapper.vm.showFeatures();
                 expect(spyZoomToExtent.calledOnce).to.be.false;
             });
 
@@ -259,17 +279,90 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                 const wrapper = factory.getMount(),
                     spyZoomToExtent = sinon.spy(wrapper.vm, "zoomToExtent");
 
-                await wrapper.vm.showFeatures({jobs: {"id1": {}}}, "id2");
+                await wrapper.vm.showFeatures("jobNo5", {"noise_day": {"features": [], "type": "FeatureCollection"}});
                 expect(spyZoomToExtent.calledOnce).to.be.false;
-                await wrapper.vm.showFeatures({jobs: {"id1": {}}}, "id3");
+                await wrapper.vm.showFeatures("jobNo5", {"noise_day": {"features": [], "type": "FeatureCollection"}});
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+            });
+
+            it("should not call function zoomToExtent if the job result is null", async () => {
+                const wrapper = factory.getMount(),
+                    spyZoomToExtent = sinon.spy(wrapper.vm, "zoomToExtent");
+
+                await wrapper.vm.showFeatures("jobNo5", undefined);
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+            });
+
+            it("should not call function zoomToExtent if the output is not correct", async () => {
+                const wrapper = factory.getMount(),
+                    spyZoomToExtent = sinon.spy(wrapper.vm, "zoomToExtent"),
+                    feature = {
+                        "type": "Feature",
+                        "properties": {
+                            "id": 141663,
+                            "building_height": 97.196,
+                            "street": "Dammtorwall"
+                        },
+                        "geometry": {
+                            "coordinates": [
+                                9.984960104804372,
+                                53.55774883772011
+                            ],
+                            "type": "Point"
+                        }
+                    },
+                    result = {
+                        "noise_day": {
+                            "type": "FeatureCollection",
+                            "features": [feature]
+                        }
+                    };
+
+                await wrapper.vm.showFeatures("jobNo5", result, null);
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+                await wrapper.vm.showFeatures("jobNo5", result, 0);
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+                await wrapper.vm.showFeatures("jobNo5", result, false);
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+                await wrapper.vm.showFeatures("jobNo5", result, "");
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+                await wrapper.vm.showFeatures("jobNo5", result, []);
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+                await wrapper.vm.showFeatures("jobNo5", result, "str");
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+                await wrapper.vm.showFeatures("jobNo5", result, 123);
+                expect(spyZoomToExtent.calledOnce).to.be.false;
+                await wrapper.vm.showFeatures("jobNo5", result, ["wrongOutput"]);
                 expect(spyZoomToExtent.calledOnce).to.be.false;
             });
 
             it("should call function zoomToExtent", async () => {
                 const wrapper = factory.getMount(),
-                    spyZoomToExtent = sinon.spy(wrapper.vm, "zoomToExtent");
+                    spyZoomToExtent = sinon.spy(wrapper.vm, "zoomToExtent"),
+                    feature = {
+                        "type": "Feature",
+                        "properties": {
+                            "id": 141663,
+                            "building_height": 97.196,
+                            "street": "Dammtorwall"
+                        },
+                        "geometry": {
+                            "coordinates": [
+                                9.984960104804372,
+                                53.55774883772011
+                            ],
+                            "type": "Point"
+                        }
+                    },
+                    result = {
+                        "noise_day": {
+                            "type": "FeatureCollection",
+                            "features": [feature]
+                        }
+                    },
+                    output = ["noise_day"];
 
-                await wrapper.vm.showFeatures({jobs: {"id1": {"jobResult": {}}}}, "id1");
+                await wrapper.vm.showFeatures("jobNo5", result, output);
                 expect(spyZoomToExtent.calledOnce).to.be.true;
             });
         });

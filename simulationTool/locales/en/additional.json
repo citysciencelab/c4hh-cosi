@@ -157,6 +157,7 @@
           "sharing": "Sharing",
           "showChart": "Show chart",
           "showProperties": "Edit parameters",
+          "showResults": "Show results",
           "simulate": "Simulate",
           "simulateEnsemble": "Simulate ensemble",
           "simulateForPlanningScenario": "Simulation for planning scenario",

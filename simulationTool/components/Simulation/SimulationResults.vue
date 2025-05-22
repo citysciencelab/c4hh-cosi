@@ -19,17 +19,21 @@ export default {
     data () {
         return {
             finished: "",
+            jobResult: {},
             jobStatus: {},
-            layer: undefined,
+            layers: [],
             scenarioName: "",
-            started: ""
+            started: "",
+            outputs: [],
+            currentOutput: ""
         };
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
             "currentJobID",
             "planningScenarios",
-            "simulations"
+            "simulations",
+            "simulationResultStyle"
         ]),
 
         /**
@@ -64,15 +68,31 @@ export default {
             return this.simulations?.find(simulation => simulation.id === this.currentPlanningScenario?.simulationId);
         }
     },
+    watch: {
+        /**
+         * Sets the visibility of output, only the layer of current output shows.
+         * @param {String} val - The current output.
+         */
+        currentOutput (val) {
+            this.layers.forEach(layer => {
+                if (typeof layer?.layer?.get !== "function") {
+                    return;
+                }
+                layer.layer.setVisible(layer.layer.get("id") === val);
+            });
+        }
+    },
     mounted () {
         this.planningScenarios?.forEach(scenario => {
             this.setData(scenario, this.currentJobID);
-            this.showFeatures(scenario, this.currentJobID);
+            this.showFeatures(this.currentJobID, this.jobResult, this.outputs);
         });
     },
     unmounted () {
-        if (typeof this.layer !== "undefined") {
-            this.layer.getLayerSource().clear();
+        if (this.layers.length) {
+            this.layers.forEach(layer => {
+                layer.getLayerSource().clear();
+            });
         }
     },
     methods: {
@@ -95,7 +115,13 @@ export default {
                 return;
             }
 
+            this.jobResult = scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)]?.jobResult;
             this.jobStatus = scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)]?.jobStatus;
+
+            if (isObject(this.jobResult)) {
+                this.outputs = Object.keys(this.jobResult);
+            }
+
             this.scenarioName = scenario.name;
             this.started = this.jobStatus?.started ? dayjs(this.jobStatus?.started).format("DD.MM.YYYY, hh:mm:ss") : this.jobStatus?.started;
             this.finished = this.jobStatus?.finished ? dayjs(this.jobStatus?.finished).format("DD.MM.YYYY, hh:mm:ss") : this.jobStatus?.finished;
@@ -124,55 +150,60 @@ export default {
         },
 
         /**
-         * Shows features in map.
-         * @param {Object} scenario - The scenario
-         * @param {String} jobID the job id.
+         * Sets the current output.
+         * @param {String} output - The output.
          * @returns {void}
          */
-        showFeatures (scenario, jobID) {
-            if (!isObject(scenario) || typeof jobID !== "string") {
+        setCurrentOutput (output) {
+            this.currentOutput = output;
+        },
+
+        /**
+         * Shows features in map.
+         * @param {String} jobID the job id.
+         * @param {Object} jobResult - The job result.
+         * @param {String[]} outputs - The output array.
+         * @returns {void}
+         */
+        showFeatures (jobID, jobResult, outputs) {
+            if (typeof jobID !== "string" || !isObject(jobResult) || !Array.isArray(outputs)) {
                 return;
             }
 
-            const jobResult = scenario?.jobs[Object.keys(scenario?.jobs).find(key => key === jobID)]?.jobResult,
-                layerName = "simulation-results";
-
-            if (!isObject(jobResult)) {
-                return;
-            }
-
-            if (typeof layerCollection.getLayerById(layerName) !== "undefined") {
-                this.layer = layerCollection.getLayerById(layerName);
-                this.layer.getLayerSource().clear();
-            }
-            else {
-                this.layer = layerFactory.createLayer({
-                    typ: "VECTORBASE",
-                    id: layerName,
-                    name: layerName,
-                    alwaysOnTop: true
-                });
-
-                layerCollection.addLayer(this.layer);
-            }
-
-            Object.keys(jobResult).forEach(key => {
-                if (!Array.isArray(jobResult[key]?.features) || !jobResult[key]?.features.length) {
+            outputs.forEach(output => {
+                if (!Array.isArray(jobResult[output]?.features) || !jobResult[output]?.features.length) {
                     return;
                 }
 
-                const geojsonFeature = ConvertFeature.geoJsonToOpenlayers(jobResult[key]?.features);
+                const geojsonFeature = ConvertFeature.geoJsonToOpenlayers(jobResult[output]?.features);
+                let layer;
+
+                if (typeof layerCollection.getLayerById(output) !== "undefined") {
+                    layer = layerCollection.getLayerById(output);
+                    layer?.getLayerSource()?.clear();
+                }
+                else {
+                    layer = layerFactory.createLayer({
+                        typ: "VECTORBASE",
+                        id: output,
+                        name: output,
+                        alwaysOnTop: true
+                    });
+
+                    layerCollection.addLayer(layer);
+                }
 
                 geojsonFeature.forEach(feature => {
                     feature.set("jobID", jobID);
-                    feature.set("output", key);
                     this.setFeatureStyle(feature, this.currentStyle);
                 });
+                this.layer?.setStyle(ConvertStyle.geoJsonToOpenlayers(this.simulationResultStyle));
+                layer.getLayerSource().addFeatures(geojsonFeature);
 
-                this.layer.getLayerSource().addFeatures(geojsonFeature);
+                this.layers.push(layer);
+                this.zoomToExtent({extent: layer.getLayerSource()?.getExtent(), options: {maxZoom: 7}});
             });
-
-            this.zoomToExtent({extent: this.layer.getLayerSource().getExtent(), options: {maxZoom: 7}});
+            this.setCurrentOutput(outputs[0]);
         }
     }
 };
@@ -233,6 +264,33 @@ export default {
                     class="me-2"
                 >
                     {{ jobStatus?.status }}
+                </div>
+            </div>
+            <div>
+                <div
+                    class="me-2 fw-bold"
+                >
+                    {{ $t('additional:modules.tools.simulationTool.showResults') }}:
+                </div>
+                <div
+                    v-for="output in outputs"
+                    :key="output"
+                    class="md-12"
+                >
+                    <input
+                        :id="output"
+                        :value="output"
+                        class="form-check-input"
+                        type="radio"
+                        :checked="output === currentOutput"
+                        @input="setCurrentOutput(output)"
+                    >
+                    <label
+                        class="form-check-label"
+                        :for="output"
+                    >
+                        {{ output }}
+                    </label>
                 </div>
             </div>
             <AccordionItem
