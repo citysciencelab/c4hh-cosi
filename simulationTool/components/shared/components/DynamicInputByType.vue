@@ -57,7 +57,6 @@ export default {
 };
 </script>
 
-
 <template>
     <div>
         <template v-if="inputType === 'string'">
@@ -66,8 +65,8 @@ export default {
                 class="form-control mb-3"
                 :label="label"
                 :placeholder="placeholder"
-                :value="value"
-                @change="$emit('update:value', $event.target.value)"
+                :model-value="value"
+                @update:modelValue="$emit('update:value', $event)"
             />
         </template>
         <template v-else-if="inputType === 'boolean'">

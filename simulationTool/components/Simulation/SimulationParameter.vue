@@ -514,14 +514,6 @@ export default {
             return requestBodies;
         },
 
-        /**
-         * Sets the current simulation name.
-         * @param {String} evt - The input text as simulation name.
-         * @returns {void}
-         */
-        setSimulationName (evt) {
-            this.simulationName = evt;
-        },
 
         /**
          * Starts the simulation.
@@ -682,9 +674,9 @@ export default {
             </h5>
             <InputText
                 id="simulation-name"
+                v-model="simulationName"
                 :label="$t('additional:modules.tools.simulationTool.simulationName')"
                 :placeholder="$t('additional:modules.tools.simulationTool.simulationName')"
-                :input="setSimulationName"
             />
             <div class="form-floating mb-3">
                 <select

@@ -419,12 +419,12 @@ export default {
             <form>
                 <InputText
                     id="plsn-descr"
-                    :value="currentScenarioData.name"
+                    :model-value="currentScenarioData.name"
                     :class-obj="[isValid ? '': 'is-invalid']"
                     :label="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
                     :placeholder="$t('additional:modules.tools.simulationTool.planningScenarioDescr')"
-                    :input="(value) => checkInputString(value.trim())"
                     required
+                    @update:modelValue="(value) => checkInputString(value.trim())"
                 />
                 <div
                     v-if="!isValid"
@@ -453,11 +453,11 @@ export default {
                 </div>
                 <InputText
                     id="buffer"
-                    :input="modifyBBoxByBuffer"
+                    :model-value="bufferVal"
                     :label="$t('additional:modules.tools.simulationTool.planningScenarioBBox')"
                     :placeholder="$t('additional:modules.tools.simulationTool.planningScenarioBBox')"
                     :type="'number'"
-                    :value="bufferVal"
+                    @update:modelValue="modifyBBoxByBuffer"
                 />
                 <div
                     v-if="isMaxAreaExceeded"

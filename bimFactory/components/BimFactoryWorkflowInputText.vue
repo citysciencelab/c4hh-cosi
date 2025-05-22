@@ -37,9 +37,9 @@ export default {
         <InputText
             :id="config.component.machineName"
             :label="config.component.title"
-            :value="config.component.defaultValue"
+            :model-value="config.component.defaultValue"
             :placeholder="config.component.defaultValue"
-            @input="updateWorkflowFormData(config.component.machineName, $event.target.value)"
+            @update:modelValue="val => updateWorkflowFormData(config.component.machineName, val)"
         />
     </div>
 </template>

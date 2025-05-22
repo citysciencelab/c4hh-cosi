@@ -9,6 +9,7 @@
 ### Added
 
 ### Changed
+- Modifying the InputText component to work according to the changes in Masterportal.
 
 ### Deprecated
 
