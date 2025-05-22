@@ -38,7 +38,9 @@
                       "select": "Selection of the area by",
                       "numberSelectedTiles": "Tiles selected",
                       "noDataAvailable": "There is no data available for the selected area",
-                      "filterNote": "Please click on the filter button"
+                      "filterNote": "Please click on the filter button",
+                      "message3D": "In 3D mode, no outline can be drawn. Please switch to 2D mode.",
+                      "message3DTitle": "Switch 3D mode"
                     },
                     "submit": {
                         "openIfcInBimViewer": "Open IFC file in BimViewer",

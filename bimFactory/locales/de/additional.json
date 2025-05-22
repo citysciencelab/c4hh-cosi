@@ -38,7 +38,9 @@
                       "select": "Auswahl des Gebietes durch",
                       "numberSelectedTiles": "Tiles ausgewählt",
                       "noDataAvailable": "Für die Auswahl sind keine Daten vorhanden",
-                      "filterNote": "Bitte den Filter Button klicken"
+                      "filterNote": "Bitte den Filter Button klicken",
+                      "message3D": "Im 3D Modus kann kein Umring gezeichnet werden. Bitte zum Zeichnen in den 2D Modus wechseln.",
+                      "message3DTitle": "3D Modus umschalten"
                     },
                     "submit": {
                       "openIfcInBimViewer": "IFC-Datei im BimViewer öffnen",

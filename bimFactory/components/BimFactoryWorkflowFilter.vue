@@ -83,6 +83,15 @@ export default {
             this.setGeneratedIfcUrl({});
             this.setFilterLayer(new Polygon(newVal.coordinates));
         },
+        mode (newVal) {
+            if (newVal === "3D") {
+                this.addSingleAlert({
+                    content: this.$t("additional:modules.bimfactory.workflow.components.filter.message3D"),
+                    category: "warn",
+                    title: this.$t("additional:modules.bimfactory.workflow.components.filter.message3DTitle")
+                });
+            }
+        },
         workflowFormData: {
             handler () {
                 this.setGeneratedIfcUrl({});
@@ -98,6 +107,7 @@ export default {
     methods: {
         ...mapActions("Maps", ["changeMapMode"]),
         ...mapActions("Modules/BimFactory", ["filterRequests"]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
         ...mapMutations("Modules/BimFactory", ["setFilterLayer", "setWorkflowFormDataBbox", "setGeneratedIfcUrl"]),
         onFilter () {
             const polygon = new Polygon(this.selectedAreaGeoJson.coordinates),
