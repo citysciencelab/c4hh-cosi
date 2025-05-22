@@ -8,6 +8,10 @@ import getOAFFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeat
 
 config.global.mocks.$t = key => key;
 
+afterEach(() => {
+    sinon.restore();
+});
+
 describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
     let consoleWarnSpy, store;
 

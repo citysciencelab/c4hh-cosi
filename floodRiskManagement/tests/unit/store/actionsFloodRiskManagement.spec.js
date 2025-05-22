@@ -4,6 +4,10 @@ import sinon from "sinon";
 
 const {activatePrintStarted, createPrintJob, waitForPrintJob, waitForPrintJobSuccess} = actions;
 
+afterEach(() => {
+    sinon.restore();
+});
+
 describe("addons/floodRiskManagement/store/actionsFloodRiskManagement", function () {
     describe("activatePrintStarted", function () {
         it("should set activatePrintStarted to true", done => {

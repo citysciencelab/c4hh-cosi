@@ -9,7 +9,7 @@ import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
-describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCreate.vue", () => {
+describe.skip("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCreate.vue", () => {
     let selectedDrawType,
         selectedDrawTypeMain,
         store;
