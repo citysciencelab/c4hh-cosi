@@ -19,6 +19,7 @@
  * @property {Array} previousWorkflowForegroundLayers - Array of foreground layers which need to be turned off on workflow switch
  * @property {Object} filteredData - object containing the filtered data returned by the filter endpoint
  * @property {Boolean} isLoading - indicates whether data is being loaded from the endpoint
+ * @property {false|String} isRequestErrorGeneral - General error message from the endpoint
  * @property {Object} filterLayer - object containing the polygon used to filter the required data
  * @property {Object} generatedIfcUrl - Object containing the generated IFC URL details for each workflow
  * @property {String} currentWorkflowId - Id representing the currently active workflow
@@ -43,6 +44,7 @@ const state = {
     previousWorkflowForegroundLayers: [],
     filteredData: {},
     isLoading: false,
+    isRequestErrorGeneral: false,
     filterLayer: undefined,
     generatedIfcUrl: {},
     currentWorkflowId: undefined

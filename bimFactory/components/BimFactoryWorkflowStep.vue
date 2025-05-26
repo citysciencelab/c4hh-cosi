@@ -3,13 +3,15 @@ import BimFactoryWorkflowInputText from "./BimFactoryWorkflowInputText.vue";
 import BimFactoryWorkflowDetailSelector from "./BimFactoryWorkflowDetailSelector.vue";
 import BimFactoryWorkflowFilter from "./BimFactoryWorkflowFilter.vue";
 import BimFactoryWorkflowSubmit from "./BimFactoryWorkflowSubmit.vue";
+import BimFactoryWorkflowInputErrors from "./BimFactoryWorkflowInputErrors.vue";
 
 export default {
     components: {
         BimFactoryWorkflowInputText,
         BimFactoryWorkflowFilter,
         BimFactoryWorkflowDetailSelector,
-        BimFactoryWorkflowSubmit
+        BimFactoryWorkflowSubmit,
+        BimFactoryWorkflowInputErrors
     },
     props: {
         step: {
@@ -60,6 +62,11 @@ export default {
                                         containerTitle: container.containerTitle
                                     }"
                                     :is-open="step.isOpen"
+                                />
+
+                                <BimFactoryWorkflowInputErrors
+                                    v-if="component.errors?.length > 0"
+                                    :config="component.errors"
                                 />
                             </div>
                         </div>

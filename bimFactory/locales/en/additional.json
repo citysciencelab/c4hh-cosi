@@ -35,17 +35,21 @@
                 },
                 "components": {
                     "filter": {
-                      "select": "Selection of the area by",
-                      "numberSelectedTiles": "Tiles selected",
-                      "noDataAvailable": "There is no data available for the selected area",
-                      "filterNote": "Please click on the filter button",
-                      "message3D": "In 3D mode, no outline can be drawn. Please switch to 2D mode.",
-                      "message3DTitle": "Switch 3D mode"
+                        "select": "Selection of the area by",
+                        "numberSelectedTiles": "Tiles selected",
+                        "noDataAvailable": "There is no data available for the selected area",
+                        "filterNote": "Please click on the filter button",
+                        "message3D": "In 3D mode, no outline can be drawn. Please switch to 2D mode.",
+                        "message3DTitle": "Switch 3D mode"
                     },
                     "submit": {
                         "openIfcInBimViewer": "Open IFC file in BimViewer",
                         "openIfcLink": "Download IFC file",
-                        "filterMissingNote": "Please draw an area on the map or click the filter button"
+                        "filterMissingNote": "Please draw an area on the map or click the filter button",
+                        "generalErrorIntroText": "One or more errors were found. Please check the form."
+                    },
+                    "inputerrors": {
+                        "errorMessage": "Message: "
                     }
                 }
             }

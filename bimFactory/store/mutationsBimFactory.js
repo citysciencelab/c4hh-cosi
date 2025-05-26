@@ -42,6 +42,59 @@ const mutations = {
      */
     setWorkflowFormDataBbox (state, bbox) {
         state.workflowFormData.bbox = bbox;
+    },
+    /**
+     * Adds an error to a specific component in the workflowsDetails structure.
+     * @param {Object} state - The Vuex state object.
+     * @param {Object} payload - Contains all indices and the errorItem.
+     * @param {number} payload.workflowIdx
+     * @param {number} payload.stepIdx
+     * @param {number} payload.sectionIdx
+     * @param {number} payload.containerIdx
+     * @param {number} payload.componentIdx
+     * @param {Object} payload.errorItem
+     */
+    addErrorToComponent (state, {workflowIdx, stepIdx, sectionIdx, containerIdx, componentIdx, errorItem}) {
+        const component = state.workflowsDetails[workflowIdx]
+            .steps[stepIdx]
+            .sections[sectionIdx]
+            .containers[containerIdx]
+            .components[componentIdx];
+
+        component.errors = [];
+        component.errors.push(errorItem);
+    },
+    /**
+     * Clears all error arrays in all components.
+     *
+     * @param {Object} state - The Vuex state object.
+     */
+    clearAllComponentErrors (state) {
+        state.workflowsDetails.forEach(workflow => {
+            if (!workflow.steps) {
+                return;
+            }
+            workflow.steps.forEach(step => {
+                if (!step.sections) {
+                    return;
+                }
+                step.sections.forEach(section => {
+                    if (!section.containers) {
+                        return;
+                    }
+                    section.containers.forEach(container => {
+                        if (!container.components) {
+                            return;
+                        }
+                        container.components.forEach(component => {
+                            if (Array.isArray(component.errors)) {
+                                component.errors = [];
+                            }
+                        });
+                    });
+                });
+            });
+        });
     }
 };
 

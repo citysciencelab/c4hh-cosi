@@ -24,7 +24,14 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/BimFactory", ["getWorkflowForId", "getWorkflowDetailsForId", "workflowFormData", "previousWorkflowBackgroundLayer", "previousWorkflowForegroundLayers"]),
+        ...mapGetters("Modules/BimFactory", [
+            "getWorkflowForId",
+            "getWorkflowDetailsForId",
+            "workflowFormData",
+            "previousWorkflowBackgroundLayer",
+            "previousWorkflowForegroundLayers",
+            "isRequestErrorGeneral"
+        ]),
         ...mapGetters(["visibleBaselayerConfigs"]),
         currentWorkflow () {
             return this.getWorkflowForId(this.workflowId);
@@ -44,13 +51,14 @@ export default {
             handler () {
                 this.initializeAccordionItems();
             },
-            immediate: true
+            immediate: true,
+            deep: true
         }
     },
     async mounted () {
         this.setCurrentWorkflowLayers();
         await this.loadSingleWorkflow(this.workflowId);
-        this.initializeAccordionItems();
+        this.initializeAccordionItems(true);
         this.initializeWorkflowFormData();
     },
     beforeUnmount () {
@@ -126,14 +134,28 @@ export default {
             });
             this.$store.commit("Modules/BimFactory/initializeWorkflowFormData", formData);
         },
-        initializeAccordionItems () {
+        /**
+         * Initializes and re-initializes the accordeon e.g. after a form submit/response.
+         * @param {boolean} firstRun Flag to Initialize the accordeon
+         */
+        initializeAccordionItems (firstRun = false) {
             this.accordionItems = this.currentWorkflowDetails ? JSON.parse(JSON.stringify(this.currentWorkflowDetails.steps)) : [];
             if (this.accordionItems.length > 0) {
-                this.accordionItems.forEach((item) => {
-                    item.isOpen = false;
-                });
+                if (firstRun) {
+                    this.accordionItems.forEach((item) => {
+                        item.isOpen = false;
+                    });
 
-                this.accordionItems[0].isOpen = true;
+                    this.accordionItems[0].isOpen = true;
+                }
+                else {
+                    this.accordionItems.forEach((item) => {
+                        item.isError = this.checkForErrors(item);
+                        item.isOpen = item.isError;
+                    });
+
+                    this.accordionItems[this.accordionItems.length - 1].isOpen = true;
+                }
             }
         },
         goForwards () {
@@ -165,6 +187,28 @@ export default {
                 this.accordionItems[index].isOpen = true;
                 this.checkNavigationButtons();
             }
+        },
+        checkForErrors (item) {
+            if (!item || !item.sections) {
+                return false;
+            }
+
+            for (const section of item.sections) {
+                if (!section.containers) {
+                    continue;
+                }
+                for (const container of section.containers) {
+                    if (!container.components) {
+                        continue;
+                    }
+                    for (const component of container.components) {
+                        if (Array.isArray(component.errors) && component.errors.length > 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         },
         checkNavigationButtons () {
             for (let i = 0; i < this.accordionItems.length; i++) {
@@ -233,6 +277,7 @@ export default {
                     :title="step.title"
                     :is-open="step.isOpen"
                     :coloured-header="true"
+                    :class="step.isError ? 'error' : ''"
                     @click="openThis($event, index)"
                 >
                     <BimFactoryWorkflowStep
@@ -240,6 +285,7 @@ export default {
                     />
                 </AccordionItem>
             </div>
+
             <div class="navigationButtons">
                 <FlatButton
                     v-if="showBackButton"
@@ -264,6 +310,8 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+    @import "~variables";
+
     div.bimFactoryWorkflow {
         display: flex;
         flex-direction: column;
@@ -287,6 +335,11 @@ export default {
             justify-content: left;
             flex: 1;
             overflow: auto;
+
+            .error {
+                border-left: 2px solid $light_red;
+                border-left-style: dotted;
+            }
         }
 
         div.navigationButtons {

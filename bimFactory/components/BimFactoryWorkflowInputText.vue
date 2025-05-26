@@ -43,9 +43,10 @@ div.BimFactoryWorkflowInputText {
     div.form-floating {
      > input {
             border: none;
-            border-bottom: 0.0625rem solid grey;
+            border-top: 0.0625rem solid grey;
             border-radius: 0;
             box-shadow: none;
+            margin-top: 0.5rem;
         }
     }
 }

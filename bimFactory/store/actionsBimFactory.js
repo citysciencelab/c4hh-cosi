@@ -68,17 +68,18 @@ export default {
      * Once the job is successful, retrieves the generated IFC file URL and commits it to the store.
      *
      * @param {Object} context - The Vuex context object.
-     * @param {Function} context.commit - The Vuex commit function.
      * @param {Object} payload - The payload containing request parameters.
-     * @param {string} payload.endpoint - The endpoint URL to send the create IFC request to.
-     * @param {Object} payload.requestData - The required request data to be sent in the POST request body.
-     * @param {String} payload.currentWorkflowId - The Id of the current workflow.
+     *          {endpoint: string} - The endpoint URL to send the create IFC request to.
+     *          {requestData: Object} - The required request data to be sent in the POST request body.
+     *          {currentWorkflowId: String} - The Id of the current workflow.
      * @returns {Promise<void>} Resolves when the job is completed and the IFC file URL is committed.
      */
-    async submitCreateIfcRequest ({commit, state}, payload) {
+    async submitCreateIfcRequest ({commit, state, dispatch}, payload) {
         const requestUrl = payload.endpoint;
 
         commit("setIsLoading", true);
+        commit("setIsRequestErrorGeneral", false);
+        commit("clearAllComponentErrors");
 
         await axios.post(requestUrl,
             payload.requestData,
@@ -113,8 +114,87 @@ export default {
             }
         ).catch(error => {
             commit("setIsLoading", false);
-            console.error(error);
+            dispatch("parseErrorResponse", error);
         });
+    },
+    /**
+     * Checks whether bbox or machineName exist in the error location "loc".
+     *
+     * @param {Object} _ - Unused Vuex context.
+     * @param {Object} errorItem - The error item from the server response {msg: string, type:string, loc: array}.
+     * @returns {Object} An object containing the detected machineName or type.
+     */
+    detectMachineName (_, errorItem) {
+        const
+            loc = errorItem.loc,
+            compIdx = loc.indexOf("components");
+
+        if (loc.includes("bbox")) {
+            return {type: "BimFactoryWorkflowFilter"};
+        }
+
+        if (compIdx !== -1 && loc.length > compIdx + 1) {
+            const
+                machineName = loc[compIdx + 1];
+
+            return {machineName};
+        }
+
+        return {};
+    },
+    /**
+     * Parse the error response from server and put the error in its place in the data structure of components
+     * @param {Object} ctx - The Vuex context object.
+     * @param {Object} errorObject from server response
+     */
+    async parseErrorResponse ({state, commit, dispatch}, errorObject) {
+        commit("setIsRequestErrorGeneral", errorObject.message);
+
+        await Promise.all(errorObject.response.data.detail.map(async errorItem => {
+            const {machineName, type} = await dispatch("detectMachineName", errorItem);
+
+            // break after first match per machineName. backend delivers currently only one error per machineName.
+            let targetFound = false;
+
+            state.workflowsDetails.forEach((workflow, workflowIdx) => {
+                if (targetFound || !workflow.steps) {
+                    return;
+                }
+                workflow.steps.forEach((step, stepIdx) => {
+                    if (targetFound || !step.sections) {
+                        return;
+                    }
+
+                    step.sections.forEach((section, sectionIdx) => {
+                        section.containers.forEach((container, containerIdx) => {
+                            container.components.forEach((component, componentIdx) => {
+                                if (!targetFound
+                                    && (
+                                        (type === "BimFactoryWorkflowFilter" && component.type === type)
+                                        || (component.machineName === machineName)
+                                    )
+                                ) {
+                                    // drop overhead
+                                    delete errorItem.input;
+
+                                    commit("addErrorToComponent", {
+                                        workflowIdx,
+                                        stepIdx,
+                                        sectionIdx,
+                                        containerIdx,
+                                        componentIdx,
+                                        errorItem
+                                    });
+
+                                    targetFound = true;
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+        })
+        );
     },
     /**
      * Forces the download of a file from a given URL.

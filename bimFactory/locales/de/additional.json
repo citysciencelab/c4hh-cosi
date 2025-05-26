@@ -35,18 +35,23 @@
                 },
                 "components": {
                     "filter": {
-                      "select": "Auswahl des Gebietes durch",
-                      "numberSelectedTiles": "Tiles ausgewählt",
-                      "noDataAvailable": "Für die Auswahl sind keine Daten vorhanden",
-                      "filterNote": "Bitte den Filter Button klicken",
-                      "message3D": "Im 3D Modus kann kein Umring gezeichnet werden. Bitte zum Zeichnen in den 2D Modus wechseln.",
-                      "message3DTitle": "3D Modus umschalten"
+                        "select": "Auswahl des Gebietes durch",
+                        "numberSelectedTiles": "Tiles ausgewählt",
+                        "noDataAvailable": "Für die Auswahl sind keine Daten vorhanden",
+                        "filterNote": "Bitte den Filter Button klicken",
+                        "message3D": "Im 3D Modus kann kein Umring gezeichnet werden. Bitte zum Zeichnen in den 2D Modus wechseln.",
+                        "message3DTitle": "3D Modus umschalten"
                     },
                     "submit": {
-                      "openIfcInBimViewer": "IFC-Datei im BimViewer öffnen",
-                      "openIfcLink": "IFC-Datei herunterladen",
-                      "filterMissingNote": "Bitte ein Gebiet einzeichnen bzw. den Filter Button klicken"
+                        "openIfcInBimViewer": "IFC-Datei im BimViewer öffnen",
+                        "openIfcLink": "IFC-Datei herunterladen",
+                        "filterMissingNote": "Bitte ein Gebiet einzeichnen bzw. den Filter Button klicken",
+                        "generalErrorIntroText": "Es wurden ein oder mehrere Fehler gefunden. Bitte überprüfen Sie das Formular."
+                    },
+                    "inputerrors": {
+                        "errorMessage": "Meldung: "
                     }
+
                 }
             }
         }

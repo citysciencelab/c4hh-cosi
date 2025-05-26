@@ -1,6 +1,7 @@
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import BimFactoryWorkflowStep from "../../../components/BimFactoryWorkflowStep.vue";
+import BimFactoryWorkflowInputErrors from "../../../components/BimFactoryWorkflowInputErrors.vue";
 
 config.global.mocks.$t = key => key;
 
@@ -188,6 +189,53 @@ describe("BimFactoryWorkflowStep.vue", () => {
                     ]
                 }
             ]
+        },
+        mockStep5 = {
+            "description": "checks component BimFactoryWorkflowInputErrors with error output",
+            "isOpen": true,
+            "sections": [
+                {
+                    "direction": "row",
+                    "containers": [
+                        {
+                            "containerId": "c1",
+                            "containerTitle": "Container 1",
+                            "direction": "column",
+                            "components": [
+                                {
+                                    "type": "BimFactoryWorkflowInputText",
+                                    "errors": [
+                                        {"msg": "Error 1", "type": "string_type"},
+                                        {"msg": "Error 2", "type": "number_type"}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        mockStep6 = {
+            "description": "checks not render BimFactoryWorkflowInputErrors when no errors",
+            "isOpen": true,
+            "sections": [
+                {
+                    "direction": "row",
+                    "containers": [
+                        {
+                            "containerId": "c1",
+                            "containerTitle": "Container 1",
+                            "direction": "column",
+                            "components": [
+                                {
+                                    "type": "BimFactoryWorkflowInputText",
+                                    "errors": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         };
 
     let wrapper;
@@ -253,5 +301,28 @@ describe("BimFactoryWorkflowStep.vue", () => {
 
             expect(containerDiv.classes()).to.include(`flex-${direction}`);
         });
+    });
+
+    it("mockStep5: checks component BimFactoryWorkflowInputErrors with error output", () => {
+        wrapper = mountComponent(mockStep5);
+
+        const
+            errorComponents = wrapper.findAllComponents(BimFactoryWorkflowInputErrors),
+            errorProps = errorComponents[0].props("config");
+
+        expect(errorComponents.length).to.equal(1);
+
+        expect(errorProps.length).to.equal(2);
+        expect(errorProps[0].msg).to.equal("Error 1");
+        expect(errorProps[1].msg).to.equal("Error 2");
+    });
+
+    it("mockStep6: checks not render BimFactoryWorkflowInputErrors when no errors", () => {
+        wrapper = mountComponent(mockStep6);
+
+        const
+            errorComponents = wrapper.findAllComponents(BimFactoryWorkflowInputErrors);
+
+        expect(errorComponents.length).to.equal(0);
     });
 });

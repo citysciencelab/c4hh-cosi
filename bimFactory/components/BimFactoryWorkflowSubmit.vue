@@ -29,7 +29,8 @@ export default {
             "isLoading",
             "workflowFormData",
             "generatedIfcUrl",
-            "currentWorkflowId"
+            "currentWorkflowId",
+            "isRequestErrorGeneral"
         ]),
         ...mapGetters("Menu", [
             "mainMenu",
@@ -155,38 +156,65 @@ export default {
 </script>
 
 <template>
-    <FlatButton
-        :text="config.component.title"
-        :interaction="() => onSubmit()"
-        icon="bi bi-box"
-        :disabled="!generateIfcReady || isLoading"
-    />
+    <div class="BimFactoryWorkflowSubmit">
+        <FlatButton
+            :text="config.component.title"
+            :interaction="() => onSubmit()"
+            icon="bi bi-box"
+            :disabled="!generateIfcReady || isLoading"
+        />
 
-    <span
-        v-if="!generateIfcReady"
-    >
-        {{ $t("additional:modules.bimfactory.workflow.components.submit.filterMissingNote") }}
-    </span>
+        <span
+            v-if="!generateIfcReady"
+        >
+            {{ $t("additional:modules.bimfactory.workflow.components.submit.filterMissingNote") }}
+        </span>
 
-    <FlatButton
-        v-if="bimViewerConfigured && ifcUrl && !isMobile"
-        :text="$t('additional:modules.bimfactory.workflow.components.submit.openIfcInBimViewer')"
-        icon="bi-file-earmark-plus"
-        :secondary="true"
-        :interaction="() => openIFC()"
-    />
+        <p
+            v-if="isRequestErrorGeneral"
+            class="error"
+        >
+            <i class="bi-exclamation-triangle" />
 
-    <FlatButton
-        v-if="ifcUrl"
-        :text="$t('additional:modules.bimfactory.workflow.components.submit.openIfcLink')"
-        icon="bi-save-fill"
-        :secondary="true"
-        :interaction="() => openGeneratedIfcUrl()"
-    />
+            {{ $t('additional:modules.bimfactory.workflow.components.submit.generalErrorIntroText') }}<br>
 
-    <SpinnerItem
-        v-if="isLoading"
-        custom-class="spinner"
-        class="ms-3"
-    />
+            <span>
+                {{ isRequestErrorGeneral }}
+            </span>
+        </p>
+
+        <FlatButton
+            v-if="bimViewerConfigured && ifcUrl && !isMobile"
+            :text="$t('additional:modules.bimfactory.workflow.components.submit.openIfcInBimViewer')"
+            icon="bi-file-earmark-plus"
+            :secondary="true"
+            :interaction="() => openIFC()"
+        />
+
+        <FlatButton
+            v-if="ifcUrl"
+            :text="$t('additional:modules.bimfactory.workflow.components.submit.openIfcLink')"
+            icon="bi-save-fill"
+            :secondary="true"
+            :interaction="() => openGeneratedIfcUrl()"
+        />
+
+        <SpinnerItem
+            v-if="isLoading"
+            custom-class="spinner"
+            class="ms-3"
+        />
+    </div>
 </template>
+
+<style lang="scss" scoped>
+    @import "~variables";
+
+    div.BimFactoryWorkflowSubmit {
+        p {
+            &.error {
+                color: $light_red;
+            }
+        }
+    }
+</style>
