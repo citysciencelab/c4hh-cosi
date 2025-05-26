@@ -4,17 +4,19 @@ import ConvertFeature from "../../js/convertFeatures";
 import ConvertStyle from "../../js/convertStyle";
 import dayjs from "dayjs";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
+import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
-import {mapActions, mapGetters} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 
 export default {
     name: "SimulationResults",
     components: {
         AccordionItem,
-        SectionHeader
+        SectionHeader,
+        FlatButton
     },
     data () {
         return {
@@ -24,15 +26,15 @@ export default {
             jobStatus: {},
             layers: [],
             started: "",
-            status: ""
+            status: "",
+            simulationName: "Simulation name placeholder"
         };
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
             "currentJobID",
             "planningScenarios",
-            "simulations",
-            "simulationResultStyle"
+            "simulations"
         ]),
 
         /**
@@ -146,7 +148,9 @@ export default {
     },
     methods: {
         ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),
-
+        ...mapMutations("Modules/SimulationTool", [
+            "setMode"
+        ]),
         getMappedProperty,
 
         /**
@@ -238,81 +242,120 @@ export default {
         />
         <div v-if="currentJobID">
             <div
-                class="d-flex"
+                class="d-flex flex-column"
             >
-                <div
-                    class="me-2"
+                <h5
+                    class="mb-3"
                 >
-                    {{ $t('additional:modules.tools.simulationTool.planningScenario') }} {{ currentPlanningScenario?.name }}
-                </div>
+                    {{ currentPlanningScenario?.name }}
+                </h5>
             </div>
-            <div
-                class="d-flex"
-            >
+            <div class="result-container">
                 <div
-                    class="me-2 fw-bold"
+                    class="d-flex flex-column"
                 >
-                    {{ $t('additional:modules.tools.simulationTool.started') }}:
-                </div>
-                <div
-                    class="me-2"
-                >
-                    {{ started }}
-                </div>
-            </div>
-            <div
-                class="d-flex"
-            >
-                <div
-                    class="me-2 fw-bold"
-                >
-                    {{ $t('additional:modules.tools.simulationTool.finished') }}:
-                </div>
-                <div
-                    class="me-2"
-                >
-                    {{ finished }}
-                </div>
-            </div>
-            <div
-                class="d-flex"
-            >
-                <div
-                    class="me-2 fw-bold"
-                >
-                    {{ $t('additional:modules.tools.simulationTool.status') }}:
-                </div>
-                <div
-                    class="me-2"
-                >
-                    {{ status }}
-                </div>
-            </div>
-            <div>
-                <div
-                    class="me-2 fw-bold"
-                >
-                    {{ $t('additional:modules.tools.simulationTool.showResults') }}:
-                </div>
-                <div
-                    v-for="output in outputs"
-                    :key="output"
-                    class="md-12"
-                >
-                    <input
-                        :id="output"
-                        :value="output"
-                        class="form-check-input"
-                        type="radio"
-                        :checked="output === currentOutput"
-                        @input="setCurrentOutput(output)"
+                    <div
+                        class="me-2 ps-label"
                     >
-                    <label
-                        class="form-check-label"
-                        :for="output"
+                        {{ $t('additional:modules.tools.simulationTool.name') }}
+                    </div>
+                    <div
+                        class="me-2 font-bold"
                     >
-                        {{ getMappedProperty(output, simulation?.outputs?.propertiesMapping) }}
-                    </label>
+                        {{ simulationName }}
+                    </div>
+                </div>
+                <div
+                    class="d-flex flex-column"
+                >
+                    <div
+                        class="me-2 ps-label"
+                    >
+                        {{ $t('additional:modules.tools.simulationTool.started') }}
+                    </div>
+                    <div
+                        class="me-2 font-bold"
+                    >
+                        {{ started }}
+                    </div>
+                </div>
+                <div
+                    class="d-flex flex-column"
+                >
+                    <div
+                        class="me-2 ps-label"
+                    >
+                        {{ $t('additional:modules.tools.simulationTool.finished') }}
+                    </div>
+                    <div
+                        class="me-2 font-bold"
+                    >
+                        {{ finished }}
+                    </div>
+                </div>
+                <div
+                    class="d-flex flex-column"
+                >
+                    <div
+                        class="me-2 ps-label"
+                    >
+                        {{ $t('additional:modules.tools.simulationTool.status') }}
+                    </div>
+                    <div
+                        class="me-2 ps-label"
+                    >
+                        <span
+                            v-if="status === 'successful'"
+                            class="status success"
+                        >
+                            {{ $t('additional:modules.tools.simulationTool.successfull') }}
+                        </span>
+                        <span
+                            v-else-if="status === 'accepted'"
+                            class="status running"
+                        >
+                            {{ $t('additional:modules.tools.simulationTool.started') }}
+                        </span>
+                        <span
+                            v-else-if="typeof status === 'undefined'"
+                            class="status error"
+                        >
+                            {{ $t('additional:modules.tools.simulationTool.unsuccessfull') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="result-output-container">
+                <h5
+                    class="mb-3"
+                >
+                    {{ $t('additional:modules.tools.simulationTool.showResults') }}
+                </h5>
+                <div
+                    class="list-group list-group-flush mt-3"
+                >
+                    <div
+                        v-for="output in outputs"
+                        :key="output"
+                        class="form-check list-group-item list-group-item-action"
+                        :class="output === currentOutput ? 'selected-ouput' : ''"
+                    >
+                        <input
+                            :id="output"
+                            :value="output"
+                            class="form-check-input d-flex justify-content-between align-items-center"
+                            type="radio"
+                            :checked="output === currentOutput"
+                            @input="setCurrentOutput(output)"
+                        >
+                        <label
+                            class="form-check-label d-flex justify-content-between align-items-center"
+                            :for="output"
+                        >
+                            {{ getMappedProperty(output, simulation?.outputs?.propertiesMapping) }}
+                        </label>
+                    </div>
                 </div>
             </div>
             <AccordionItem
@@ -336,6 +379,11 @@ export default {
                     </div>
                 </div>
             </AccordionItem>
+            <AccordionItem
+                v-if="currentJob"
+                id="simulation-results-accordion-legend"
+                :title="$t('additional:modules.tools.simulationTool.legend')"
+            />
         </div>
         <div
             v-else
@@ -343,10 +391,88 @@ export default {
         >
             {{ $t('additional:modules.tools.simulationTool.noJobsSelected') }}
         </div>
+        <div
+            class="my-5"
+        >
+            <form>
+                <div
+                    class="d-flex justify-content-between button"
+                >
+                    <FlatButton
+                        id="back"
+                        :icon="'bi bi-gear'"
+                        :aria-label="$t('additional:modules.tools.simulationTool.showProperties')"
+                        :text="$t('additional:modules.tools.simulationTool.showProperties')"
+                        @click="() => setMode('simulationParameter')"
+                    />
+                    <FlatButton
+                        id="start"
+                        :icon="'bi bi-list-task'"
+                        :aria-label="$t('additional:modules.tools.simulationTool.toSimulations')"
+                        :text="$t('additional:modules.tools.simulationTool.toSimulations')"
+                        @click="() => setMode('simulationList')"
+                    />
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 @import "~variables";
+.selected-ouput {
+    background-color: $light_blue;
+}
+.result-output-container .form-check {
+    margin-bottom: 0;
+}
+.result-output-container label {
+    padding-left: 1.313rem;
+}
+.result-output-container .form-check .form-check-input {
+    margin-left: -0.625rem;
+}
+.result-output-container {
+    margin-left: 0.625rem;
+}
+.result-output-container .list-group-item-action {
+    margin-left: 0.625rem;
+}
+.result-output-container .list-group-item-action:active {
+    background-color: $light_blue;
+}
+.result-container {
+    margin-left: 0.625rem;
+}
+.ps-label {
+    font-size: $font_size_sm;
+}
+.font-bold {
+    font-family: $font_family_accent;
+}
+.status {
+    line-height: 1.125rem;
+    text-align: center;
+    user-select: none;
+    color: #ffffff;
+    display: inline-block;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 100;
+    vertical-align: middle;
+    border-radius: 0.938rem;
+}
+.error {
+    background-color: #e10019;
+    border-color: #e10019;
+}
+.success {
+    background-color: #198754;
+    border-color: #198754;
+}
+.running {
+    background-color: #3C5F94;
+    border-color: #3C5F94;
+}
 
 </style>
