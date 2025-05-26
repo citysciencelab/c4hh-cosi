@@ -6,10 +6,12 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import getBBOXGeometry from "../shared/js/getBBoxGeometry";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
+import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import Multiselect from "vue-multiselect";
 import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
@@ -22,6 +24,8 @@ export default {
         DynamicInputByType,
         FileUpload,
         FlatButton,
+        InputText,
+        Multiselect,
         SectionHeader,
         SpinnerItem,
         SwitchInput
@@ -204,6 +208,7 @@ export default {
     methods: {
         ...mapActions("Modules/SimulationTool", ["addFile"]),
         ...mapMutations("Modules/SimulationTool", [
+            "setCurrentJobID",
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
             "setMode"
@@ -397,6 +402,16 @@ export default {
             this.setCurrentPlanningComponent("create");
         },
 
+        /**
+         * Opens simulation results component.
+         * @param {String} jobID - ID of the job to open.
+         * @returns {void}
+         */
+        openJob (jobID) {
+            this.setMode("simulationResults");
+            this.setCurrentJobID(jobID);
+        },
+
         /** Prepares the request body for the simulation.
          * @returns {void}
          */
@@ -438,6 +453,8 @@ export default {
 
             Object.assign(scenario.jobs[jobID], {jobStatus: typeof this.jobStatus !== "undefined" ? JSON.parse(JSON.stringify(this.jobStatus)) : this.jobStatus});
             Object.assign(scenario.jobs[jobID], {jobResult: typeof this.jobResults !== "undefined" ? JSON.parse(JSON.stringify(this.jobResults)) : this.jobResults});
+
+            this.openJob(jobID);
         },
 
         /**
@@ -483,37 +500,42 @@ export default {
         <SectionHeader
             :title="$t('additional:modules.tools.simulationTool.simulationSetParams')"
         />
-        <div class="row d-flex">
-            <div class="col col-6 select-scenario">
-                <div class="form-floating mb-3">
-                    <select
-                        id="simulateForPlanning"
-                        class="form-select"
-                        :aria-label="$t('additional:modules.tools.simulationTool.selectPlanningScenario')"
-                        :value="currentPlanningScenarioId"
-                        @change="onPlanningScenarioChange"
-                    >
-                        <option
-                            v-for="(scenario, i) in planningScenarios"
-                            :key="i"
-                            :value="scenario.id"
+        <h5 class="mb-3">
+            {{ $t('additional:modules.tools.simulationTool.planningScenario') }}
+        </h5>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 select-scenario">
+                    <div class="form-floating mb-3">
+                        <select
+                            id="planingScenario"
+                            class="form-select"
+                            :aria-label="$t('additional:modules.tools.simulationTool.selectPlanningScenario')"
+                            :value="currentPlanningScenarioId"
+                            @change="onPlanningScenarioChange"
                         >
-                            {{ scenario.name }}
-                        </option>
-                    </select>
-                    <label for="simulateForPlanning">
-                        {{ $t('additional:modules.tools.simulationTool.selectPlanningScenario') }}
-                    </label>
+                            <option
+                                v-for="(scenario, i) in planningScenarios"
+                                :key="i"
+                                :value="scenario.id"
+                            >
+                                {{ scenario.name }}
+                            </option>
+                        </select>
+                        <label for="simulateForPlanning">
+                            {{ $t('additional:modules.tools.simulationTool.selectPlanningScenario') }}
+                        </label>
+                    </div>
                 </div>
-            </div>
-            <div class="col col-6 create-scenario">
-                <FlatButton
-                    class="pe-2 mt-4"
-                    :aria-label="$t('additional:modules.tools.simulationTool.planningScenarioCreate')"
-                    :icon="'bi bi-pencil-square'"
-                    :interaction="() => openCreatePlanningScenario()"
-                    :text="$t('additional:modules.tools.simulationTool.planningScenarioCreate')"
-                />
+                <div class="col-md-6 create-scenario pt-0">
+                    <FlatButton
+                        class="pe-2"
+                        :aria-label="$t('additional:modules.tools.simulationTool.planningScenarioCreate')"
+                        :icon="'bi bi-pencil-square'"
+                        :interaction="() => openCreatePlanningScenario()"
+                        :text="$t('additional:modules.tools.simulationTool.planningScenarioCreate')"
+                    />
+                </div>
             </div>
         </div>
         <h6 class="mb-3">
@@ -526,153 +548,188 @@ export default {
             :drop="(e) => onDrop(e)"
             class="col-md-12"
         />
-        <div v-if="primaryTypeInputsKeys.length">
-            <hr>
-            <div>
-                <div
-                    v-for="(input, propertyKey) in primaryTypeInputs"
-                    :key="propertyKey"
+        <hr>
+        <div v-if="currentPlanningScenario">
+            <h5 class="my-4">
+                {{ $t('additional:modules.tools.simulationTool.addSimulation') }}
+            </h5>
+            <InputText
+                id="simulation-name"
+                :label="$t('additional:modules.tools.simulationTool.simulationName')"
+                :placeholder="$t('additional:modules.tools.simulationTool.simulationName')"
+            />
+            <div class="form-floating mb-3">
+                <select
+                    id="simulateForPlanning"
+                    class="form-select"
+                    :aria-label="$t('additional:modules.tools.simulationTool.selectSimulation')"
                 >
-                    <DynamicInputByType
-                        :id="propertyKey"
-                        :input-type="input.type"
-                        :label="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
-                        :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
-                        :value="getInputsValue(input.inputKey, propertyKey, input.default)"
-                        :min="input.minimum"
-                        :max="input.maximum"
-                        :aria="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
-                        @update:value="setInputsValue(input.inputKey, propertyKey, $event)"
-                        @update:checked="setInputsValue(input.inputKey, propertyKey, $event)"
-                    />
-                </div>
-            </div>
-        </div>
-        <div
-            v-for="(input, inputKey) in optionalOafTypeInputsPrimary"
-            :key="inputKey"
-            class="mb-2"
-        >
-            <div
-                v-if="oafLoadingStates[inputKey]"
-                class="d-flex align-items-center"
-            >
-                <SpinnerItem />
-                <span class="ms-2">
-                    {{ getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}
-                </span>
-            </div>
-            <div
-                v-else
-                class="form-switch"
-            >
-                <SwitchInput
-                    :id="`simulation-parameter-switch-input-${inputKey}`"
-                    :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                    :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                    :interaction="event => onOafSwitchChange(event, inputKey)"
-                    :checked="Object.hasOwn(currentPlanningScenario?.inputs, inputKey)"
-                />
-            </div>
-        </div>
-        <div v-if="Object.keys(stringTypeInputs).length || Object.keys(objectTypeInputs).length">
-            <hr>
-            <AccordionItem
-                id="advanced-simulation-parameters"
-                :title="$t('additional:modules.tools.simulationTool.simulationAdditionalParameter')"
-            >
-                <div
-                    v-for="(input, inputKey) in optionalOafTypeInputsAdvanced"
-                    :key="inputKey"
-                    class="mb-2"
-                >
-                    <div
-                        v-if="oafLoadingStates[inputKey]"
-                        class="d-flex align-items-center"
+                    <option
+                        v-for="model in simulations"
+                        :key="model.id"
+                        :value="model.id"
                     >
-                        <SpinnerItem />
-                        <span class="ms-2">
-                            {{ getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}
-                        </span>
-                    </div>
+                        {{ model.title }}
+                    </option>
+                </select>
+                <label for="simulateForPlanning">
+                    {{ $t('additional:modules.tools.simulationTool.selectSimulation') }}
+                </label>
+            </div>
+            <div v-if="primaryTypeInputsKeys.length">
+                <div>
+                    <h6 class="mt-5 mb-3">
+                        {{ $t('additional:modules.tools.simulationTool.parameters') }}
+                    </h6>
                     <div
-                        v-else
-                        class="form-switch"
-                    >
-                        <SwitchInput
-                            :id="`simulation-parameter-switch-input-${inputKey}`"
-                            :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :interaction="event => onOafSwitchChange(event, inputKey)"
-                            :checked="Object.hasOwn(currentPlanningScenario?.inputs, inputKey)"
-                        />
-                    </div>
-                </div>
-                <div
-                    v-for="(input, inputKey) in excludePrimaryTypeKeys(stringTypeInputs)"
-                    :key="inputKey"
-                >
-                    <DynamicInputByType
-                        :id="inputKey"
-                        input-type="string"
-                        :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                        :placeholder="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                        :value="input.default"
-                        @update:value="setInputsValue(inputKey, '', $event)"
-                    />
-                </div>
-                <AccordionItem
-                    v-for="(input, inputKey) in objectTypeInputs"
-                    :id="inputKey"
-                    :key="inputKey"
-                    :title="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                    font-size="font-size-small"
-                >
-                    <div
-                        v-for="(property, propertyKey) in excludePrimaryTypeKeys(input.schema.properties)"
+                        v-for="(input, propertyKey) in primaryTypeInputs"
                         :key="propertyKey"
                     >
                         <DynamicInputByType
-                            :id="`${inputKey}-${propertyKey}`"
-                            :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :max="property.maximum"
-                            :min="property.minimum"
-                            :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :input-type="property.type"
-                            :step="property.type === 'integer' ? 1 : 0.1"
-                            :value="getInputsValue(inputKey, propertyKey, property?.default)"
-                            :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :checked="typeof property.default === 'boolean' ? property.default : false"
-                            @update:value="setInputsValue(inputKey, propertyKey, $event)"
-                            @update:checked="setInputsValue(inputKey, propertyKey, $event)"
+                            :id="propertyKey"
+                            :input-type="input.type"
+                            :label="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
+                            :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
+                            :value="getInputsValue(input.inputKey, propertyKey, input.default)"
+                            :min="input.minimum"
+                            :max="input.maximum"
+                            :aria="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
+                            @update:value="setInputsValue(input.inputKey, propertyKey, $event)"
+                            @update:checked="setInputsValue(input.inputKey, propertyKey, $event)"
                         />
                     </div>
-                </AccordionItem>
-            </AccordionItem>
-        </div>
-        <label
-            for="simulateForOutput"
-            class="typo__label"
-        >
-            {{ $t('additional:modules.tools.simulationTool.chooseOutputParam') }}
-        </label>
-        <div class="mb-3">
-            <select
-                id="simulateForOutput"
-                v-model="selectedOutputOptions"
-                class="form-select"
-                :aria-label="$t('additional:modules.tools.simulationTool.outputParam')"
-                multiple
+                </div>
+            </div>
+            <div
+                v-for="(input, inputKey) in optionalOafTypeInputsPrimary"
+                :key="inputKey"
+                class="mb-2"
             >
-                <option
-                    v-for="(option, i) in outputOptions"
-                    :key="option.name + i"
-                    :value="option"
-                    selected
+                <div
+                    v-if="oafLoadingStates[inputKey]"
+                    class="d-flex align-items-center"
                 >
-                    {{ option.name }}
-                </option>
-            </select>
+                    <SpinnerItem />
+                    <span class="ms-2">
+                        {{ getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}
+                    </span>
+                </div>
+                <div
+                    v-else
+                    class="form-switch"
+                >
+                    <SwitchInput
+                        :id="`simulation-parameter-switch-input-${inputKey}`"
+                        :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                        :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                        :interaction="event => onOafSwitchChange(event, inputKey)"
+                        :checked="Object.hasOwn(currentPlanningScenario?.inputs, inputKey)"
+                    />
+                </div>
+            </div>
+            <div v-if="Object.keys(stringTypeInputs).length || Object.keys(objectTypeInputs).length">
+                <hr>
+                <AccordionItem
+                    id="advanced-simulation-parameters"
+                    :title="$t('additional:modules.tools.simulationTool.simulationAdditionalParameter')"
+                >
+                    <div
+                        v-for="(input, inputKey) in optionalOafTypeInputsAdvanced"
+                        :key="inputKey"
+                        class="mb-2"
+                    >
+                        <div
+                            v-if="oafLoadingStates[inputKey]"
+                            class="d-flex align-items-center"
+                        >
+                            <SpinnerItem />
+                            <span class="ms-2">
+                                {{ getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}
+                            </span>
+                        </div>
+                        <div
+                            v-else
+                            class="form-switch"
+                        >
+                            <SwitchInput
+                                :id="`simulation-parameter-switch-input-${inputKey}`"
+                                :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                                :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                                :interaction="event => onOafSwitchChange(event, inputKey)"
+                                :checked="Object.hasOwn(currentPlanningScenario?.inputs, inputKey)"
+                            />
+                        </div>
+                    </div>
+                    <div
+                        v-for="(input, inputKey) in excludePrimaryTypeKeys(stringTypeInputs)"
+                        :key="inputKey"
+                    >
+                        <DynamicInputByType
+                            :id="inputKey"
+                            input-type="string"
+                            :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                            :placeholder="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                            :value="input.default"
+                            @update:value="setInputsValue(inputKey, '', $event)"
+                        />
+                    </div>
+                    <AccordionItem
+                        v-for="(input, inputKey) in objectTypeInputs"
+                        :id="inputKey"
+                        :key="inputKey"
+                        :title="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                        font-size="font-size-small"
+                    >
+                        <div
+                            v-for="(property, propertyKey) in excludePrimaryTypeKeys(input.schema.properties)"
+                            :key="propertyKey"
+                        >
+                            <DynamicInputByType
+                                :id="`${inputKey}-${propertyKey}`"
+                                :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                                :max="property.maximum"
+                                :min="property.minimum"
+                                :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                                :input-type="property.type"
+                                :step="property.type === 'integer' ? 1 : 0.1"
+                                :value="getInputsValue(inputKey, propertyKey, property?.default)"
+                                :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                                :checked="typeof property.default === 'boolean' ? property.default : false"
+                                @update:value="setInputsValue(inputKey, propertyKey, $event)"
+                                @update:checked="setInputsValue(inputKey, propertyKey, $event)"
+                            />
+                        </div>
+                    </AccordionItem>
+                </AccordionItem>
+            </div>
+            <h6 class="mt-2 mb-3">
+                {{ $t('additional:modules.tools.simulationTool.outputParam') }}
+            </h6>
+            <Multiselect
+                id="outputParam"
+                v-model="selectedOutputOptions"
+                :placeholder="$t('additional:modules.tools.simulationTool.chooseOutputParam')"
+                :aria-label="$t('additional:modules.tools.simulationTool.chooseOutputParam')"
+                label="name"
+                track-by="code"
+                :show-labels="false"
+                :allow-empty="false"
+                :options="outputOptions"
+                :searchable="true"
+                :multiple="true"
+                :open="true"
+            >
+                <template #tag="{ option, remove }">
+                    <button
+                        class="multiselect__tag"
+                        :class="option.code"
+                        @click="remove(option)"
+                        @keypress="remove(option)"
+                    >
+                        {{ option.name }}
+                    </button>
+                </template>
+            </Multiselect>
         </div>
         <div
             class="mb-5"
@@ -692,6 +749,7 @@ export default {
                         :interaction="startSimulation"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
+                        :disabled="!currentPlanningScenario"
                     />
                 </div>
             </form>
@@ -707,7 +765,6 @@ export default {
 
 .d-flex {
     .select-scenario {
-        padding-top: 30px;
         margin-bottom: 30px;
     }
     .create-scenario {
@@ -724,6 +781,32 @@ form {
     .button {
         margin-top: 40px;
     }
+}
+h6 {
+    font-size: $font_size_big;
+}
+
+</style>
+
+<style lang="scss">
+@import "~variables";
+
+.multiselect__tag {
+        background: $secondary;
+        border-radius: $badge-border-radius;
+        border: none;
+        padding-top: 5px;
+        color: $white;
+}
+.multiselect__option--selected.multiselect__option--highlight,
+.multiselect__option--selected.multiselect__option--highlight:after,
+.multiselect__option:after,
+.multiselect__option--selected,
+.multiselect__option--selected:after{
+  font-size: $font_size_sm;
+  background: $light-blue;
+  color: $black;
+  font-weight: normal;
 }
 
 </style>

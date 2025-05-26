@@ -4,8 +4,9 @@
       "tools": {
         "simulationTool": {
           "additionalInfo": "Mehr Informationen",
+          "addSimulation": "Simulation hinzufügen",
           "chooseOutputParam": "Ausgabeparameter auswählen",
-          "outputParam": "Ausgabe Parameter",
+          "outputParam": "Ausgabeparameter",
           "toolName": "Scenario Explorer",
           "toolDescription": "Erstelle mittels digitaler Simulationsmodelle Szenarien und Ensembles, um mögliche zukünftige Entwicklungen zu untersuchen und zu vergleichen.",
           "addOrSelectValue": "Wert auswählen oder hinzufügen ...",
@@ -153,6 +154,7 @@
           "searchModels": "Nach Modellen suchen",
           "select": "Auswählen",
           "selectPlanningScenario": "Planungsszenario auswählen",
+          "selectSimulation": "Simulationsmodell auswählen",
           "send": "Absenden",
           "settings": "Einstellungen",
           "shareWithUser": "Mit Benutzer teilen",
@@ -165,6 +167,7 @@
           "simulateForPlanningScenario": "Simulation für Planungsszenario",
           "simulationAdditionalParameter": "Erweitere Parameter",
           "simulationList": "Liste der durchgeführten Simulation",
+          "simulationName": "Name der Simulation",
           "simulationSetParams": "Parameter für Simulation einstellen",
           "simulationStart": "Simulation starten",
           "simulationResults": "Ergebnis der Simulation",

@@ -3,6 +3,7 @@
       "tools": {
         "simulationTool": {
           "additionalInfo": "More information",
+          "addSimulation": "Add Simulation",
           "chooseOutputParam": "Choose output parameter",
           "outputParam": "Output parameter",
           "toolName": "Scenario Explorer",
@@ -151,6 +152,7 @@
           "searchModels": "Search models",
           "select": "Select",
           "selectPlanningScenario": "Select planning scenario",
+          "selectSimulation": "Select simulation model",
           "send": "Send",
           "settings": "Settings",
           "shareWithUser": "Share with user",
@@ -163,6 +165,7 @@
           "simulateForPlanningScenario": "Simulation for planning scenario",
           "simulationAdditionalParameter": "Additional Parameter",
           "simulationList": "List of performed simulations",
+          "simulationName": "Simulation name",
           "simulationSetParams": "Set parameters for simulation",
           "simulationStart": "Start Simulation",
           "simulationResults": "Simulation results",
