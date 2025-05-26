@@ -151,6 +151,7 @@ export default {
         ...mapMutations("Modules/SimulationTool", [
             "setMode"
         ]),
+
         getMappedProperty,
 
         /**
