@@ -32,7 +32,6 @@ export default {
     },
     data () {
         return {
-            inputsValue: {},
             jobResults: undefined,
             jobStatus: undefined,
             oafLoadingStates: {},
@@ -172,21 +171,6 @@ export default {
     },
     watch: {
         /**
-         * Renders the new inputs according to the inputs value.
-         * @param {Object[]} val the inputs value.
-         */
-        inputsValue: {
-            handler (val) {
-                this.requestBody.inputs = {
-                    ...val,
-                    ...this.currentPlanningScenario.inputs,
-                    crs: this.simulation?.inputs?.crs
-                };
-            },
-            deep: true
-        },
-
-        /**
          * Changes the requestBody according to the selected outputs.
          * @param {Object[]} val the selected outputs.
          */
@@ -202,7 +186,6 @@ export default {
             await this.prepareRequestBody();
             this.primaryTypeInputs = this.getPrimaryTypeInputs();
         }
-
         this.selectedOutputOptions = this.outputOptions;
     },
     methods: {
@@ -242,20 +225,26 @@ export default {
             return result;
         },
 
+        getBBOXGeometry,
+
         /**
-         * Gets the inputs value according to input and property as key.
+         * Gets the requestBody inputs value according to input and property as key.
          * @param {String} inputKey the input key.
          * @param {String} propertyKey the property key.
          * @param {String} val the value.
          * @returns {String} the parameter value. It could be the rendered value or default value.
          */
-        getInputsValue (inputKey, propertyKey, val) {
+        getRequestBodyInputByKey (inputKey, propertyKey, val) {
             if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
                 return val;
             }
 
-            if (typeof this.inputsValue[inputKey]?.[propertyKey] !== "undefined") {
-                return this.inputsValue[inputKey][propertyKey];
+            if (typeof this?.requestBody?.inputs?.[inputKey]?.[propertyKey] !== "undefined") {
+                return this.requestBody.inputs[inputKey][propertyKey];
+            }
+
+            if (propertyKey === "") {
+                return this?.requestBody?.inputs?.[inputKey];
             }
 
             return val;
@@ -321,35 +310,71 @@ export default {
         },
 
         /**
+         * Gets the optional BBOX URL inputs from the process description.
+         * It returns an object with the inputKey as key and the URL as value.
+         * @returns {Object} The optional BBOX URL inputs.
+         */
+        getOptionalBBOXUrlInputs () {
+            if (!isObject(this.processDescription?.inputs)) {
+                return {};
+            }
+            const result = {};
+
+            Object.keys(this.processDescription.inputs).forEach(inputKey => {
+                const input = this.processDescription.inputs[inputKey];
+
+                if (input.schema?.type === "string"
+                    && input.schema?.format === "uri"
+                    && this.simulation?.inputs?.[inputKey]?.source?.type === "optional_bbox_url") {
+                    result[inputKey] = this.simulation?.inputs?.[inputKey]?.source?.url;
+                }
+            });
+            return result;
+        },
+
+        /**
+         * Checks if the value for the given inputKey is set.
+         * @param {String} inputKey The input key.
+         * @param {String} defaultVal The default value.
+         * @returns {Boolean} true if the input is checked, false otherwise.
+         */
+        isValueSet (inputKey, defaultVal) {
+            return typeof this.getRequestBodyInputByKey(inputKey, "", defaultVal) !== "undefined";
+        },
+
+        /**
          * Event handler for change of switch for oaf input type.
          * Loads the data from the source if it is not already loaded.
+         * Caches the data in the current planning scenario.
          * @param {Object} event The change event.
          * @param {String} inputKey The input key.
          * @returns {void}
          */
         async onOafSwitchChange (event, inputKey) {
-            const scenarioInputs = this.currentPlanningScenario.inputs;
+            if (!event?.target?.checked) {
+                this.setRequestBodyInput(inputKey, "", undefined);
+                return;
+            }
+            if (this.currentPlanningScenario.inputs[inputKey]) {
+                this.setRequestBodyInput(inputKey, "", this.currentPlanningScenario.inputs[inputKey]);
+                return;
+            }
+            this.oafLoadingStates[inputKey] = true;
 
-            if (!scenarioInputs[inputKey]) {
-                this.oafLoadingStates[inputKey] = true;
-
-                const source = this.simulation.inputs[inputKey].source,
-                    crs = this.simulation.inputs.crs,
-                    filter = getOAFFeature.getOAFGeometryFilter(getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects");
-
-                scenarioInputs[inputKey] = {
+            const source = this.simulation.inputs[inputKey].source,
+                crs = this.simulation.inputs.crs,
+                filter = getOAFFeature.getOAFGeometryFilter(this.getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects"),
+                featureCollection = {
                     type: "FeatureCollection",
                     features: await getOAFFeature.getOAFFeatureGet(
                         source.url, source.collection, 100, filter, crs, crs
                     )
                 };
 
-                this.oafLoadingStates[inputKey] = false;
-            }
+            this.setRequestBodyInput(inputKey, "", featureCollection);
+            this.oafLoadingStates[inputKey] = false;
 
-            this.requestBody.inputs[inputKey] = event.target.checked
-                ? scenarioInputs[inputKey]
-                : undefined;
+            this.currentPlanningScenario.inputs[inputKey] = featureCollection;
         },
 
         /**
@@ -365,6 +390,7 @@ export default {
         /**
          * Event handler for progress update of the simulation.
          * @param {Object} jobStatus The job status object.
+         * @returns {void}
          */
         onProgressUpdate (jobStatus) {
             this.jobStatus = jobStatus;
@@ -418,9 +444,8 @@ export default {
         async prepareRequestBody () {
             this.processHandler = new OgcApiProcess(this.simulation.url, this.simulation.id);
             this.processDescription = await this.processHandler.getDescription();
-            this.inputsValue = OgcApiProcess.getInputDefaultsFromDescription(this.processDescription);
             this.requestBody.inputs = {
-                ...this.inputsValue,
+                ...OgcApiProcess.getInputDefaultsFromDescription(this.processDescription),
                 ...this.currentPlanningScenario.inputs,
                 crs: this.simulation?.inputs?.crs
             };
@@ -458,27 +483,41 @@ export default {
         },
 
         /**
-         * Sets the inputs value according to input and property as key.
+         * Sets the inputs value of the request body input according to inputKey and property as key.
          * @param {String} inputKey the input key.
          * @param {String} propertyKey the property key.
          * @param {String} val the value.
          * @returns {void}
          */
-        setInputsValue (inputKey, propertyKey, val) {
+        setRequestBodyInput (inputKey, propertyKey, val) {
             if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
                 return;
             }
 
             if (propertyKey === "") {
-                this.inputsValue[inputKey] = val;
+                this.requestBody.inputs[inputKey] = val;
                 return;
             }
 
-            if (typeof this.inputsValue[inputKey] === "undefined") {
-                this.inputsValue[inputKey] = {};
+            if (typeof this.requestBody.inputs[inputKey] === "undefined") {
+                this.requestBody.inputs[inputKey] = {};
             }
+            this.requestBody.inputs[inputKey][propertyKey] = val;
+        },
 
-            this.inputsValue[inputKey][propertyKey] = val;
+        /**
+         * Toggles the optional BBOX URL inputs for the given key.
+         * @param {String} inputKey The input key.
+         * @param {Object} event The event object.
+         */
+        toggleOptionalBBOXUrlInputs (inputKey, event) {
+            if (!event?.target?.checked) {
+                this.setRequestBodyInput(inputKey, "", undefined);
+                return;
+            }
+            const completedURI = `${this.getOptionalBBOXUrlInputs()[inputKey]}/${this.getBBOXGeometry(this.currentPlanningScenario)?.getExtent()}/500x500.tif?coord_crs=epsg:25832`;
+
+            this.setRequestBodyInput(inputKey, "", completedURI);
         },
 
         /**
@@ -590,12 +629,12 @@ export default {
                             :input-type="input.type"
                             :label="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
                             :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
-                            :value="getInputsValue(input.inputKey, propertyKey, input.default)"
+                            :value="getRequestBodyInputByKey(input.inputKey, propertyKey, input.default)"
                             :min="input.minimum"
                             :max="input.maximum"
                             :aria="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
-                            @update:value="setInputsValue(input.inputKey, propertyKey, $event)"
-                            @update:checked="setInputsValue(input.inputKey, propertyKey, $event)"
+                            @update:value="setRequestBodyInput(input.inputKey, propertyKey, $event)"
+                            @update:checked="setRequestBodyInput(input.inputKey, propertyKey, $event)"
                         />
                     </div>
                 </div>
@@ -623,7 +662,7 @@ export default {
                         :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                         :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                         :interaction="event => onOafSwitchChange(event, inputKey)"
-                        :checked="Object.hasOwn(currentPlanningScenario?.inputs, inputKey)"
+                        :checked="isValueSet(inputKey, input?.default)"
                     />
                 </div>
             </div>
@@ -656,7 +695,7 @@ export default {
                                 :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                 :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                 :interaction="event => onOafSwitchChange(event, inputKey)"
-                                :checked="Object.hasOwn(currentPlanningScenario?.inputs, inputKey)"
+                                :checked="isValueSet(inputKey, input?.default)"
                             />
                         </div>
                     </div>
@@ -664,13 +703,27 @@ export default {
                         v-for="(input, inputKey) in excludePrimaryTypeKeys(stringTypeInputs)"
                         :key="inputKey"
                     >
+                        <div
+                            v-if="getOptionalBBOXUrlInputs()[inputKey]"
+                            class="form-switch"
+                        >
+                            <SwitchInput
+                                :id="`simulation-parameter-switch-input-${inputKey}`"
+                                :ref="`simulation-parameter-switch-input-${inputKey}`"
+                                :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                                :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
+                                :interaction="event => toggleOptionalBBOXUrlInputs(inputKey, event)"
+                                :checked="isValueSet(inputKey, input?.default)"
+                            />
+                        </div>
                         <DynamicInputByType
+                            v-else
                             :id="inputKey"
                             input-type="string"
                             :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :placeholder="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
-                            :value="input.default"
-                            @update:value="setInputsValue(inputKey, '', $event)"
+                            :value="getRequestBodyInputByKey(inputKey, '', input.default)"
+                            @update:value="setRequestBodyInput(inputKey, '', $event)"
                         />
                     </div>
                     <AccordionItem
@@ -692,11 +745,11 @@ export default {
                                 :placeholder="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                 :input-type="property.type"
                                 :step="property.type === 'integer' ? 1 : 0.1"
-                                :value="getInputsValue(inputKey, propertyKey, property?.default)"
+                                :value="getRequestBodyInputByKey(inputKey, propertyKey, property?.default)"
                                 :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                 :checked="typeof property.default === 'boolean' ? property.default : false"
-                                @update:value="setInputsValue(inputKey, propertyKey, $event)"
-                                @update:checked="setInputsValue(inputKey, propertyKey, $event)"
+                                @update:value="setRequestBodyInput(inputKey, propertyKey, $event)"
+                                @update:checked="setRequestBodyInput(inputKey, propertyKey, $event)"
                             />
                         </div>
                     </AccordionItem>

@@ -226,73 +226,83 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
     });
 
     describe("Methods", () => {
-        describe("getInputsValue", () => {
+        describe("getRequestBodyInputByKey", () => {
             it("should return default value if the keys are not string", () => {
                 const wrapper = factory.getMount();
 
-                expect(wrapper.vm.getInputsValue(null, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue(0, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue(undefined, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue(true, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue([], "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue({}, "key2", "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue("key1", null, "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue("key1", 0, "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue("key1", undefined, "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue("key1", true, "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue("key1", [], "value")).to.equal("value");
-                expect(wrapper.vm.getInputsValue("key1", {}, "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey(null, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey(0, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey(undefined, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey(true, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey([], "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey({}, "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", null, "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", 0, "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", undefined, "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", true, "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", [], "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", {}, "value")).to.equal("value");
             });
 
             it("should return default value if there are no set value according to the key", () => {
                 const wrapper = factory.getMount();
 
-                expect(wrapper.vm.getInputsValue("key1", "key2", "value")).to.equal("value");
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", "key2", "value")).to.equal("value");
             });
 
             it("should return the value according to the key", async () => {
                 const wrapper = factory.getMount(),
-                    inputsValue = {
+                    inputs = {
                         "key1": {
                             "key2": "result"
                         }
                     };
 
-                await wrapper.setData({inputsValue: inputsValue});
-                expect(wrapper.vm.getInputsValue("key1", "key2", "value")).to.equal("result");
+                await wrapper.setData({requestBody: {inputs: inputs}});
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", "key2", "value")).to.equal("result");
+            });
+
+            it("should return the input object if propertyKey is an empty string", async () => {
+                const wrapper = factory.getMount(),
+                    inputs = {
+                        "key1": "result"
+                    };
+
+                await wrapper.setData({requestBody: {inputs: inputs}});
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", "", "value")).to.equal("result");
             });
         });
 
-        describe("setInputsValue", () => {
+        describe("setRequestBodyInput", () => {
             it("should not set value if the keys are not string", async () => {
                 const wrapper = factory.getMount();
 
-                await wrapper.setData({inputsValue: {}});
+                await wrapper.setData({requestBody: {inputs: {}}});
 
-                await wrapper.vm.setInputsValue(null, "key2", "value");
-                expect(wrapper.vm.inputsValue).to.deep.equal({});
-                await wrapper.vm.setInputsValue(0, "key2", "value");
-                expect(wrapper.vm.inputsValue).to.deep.equal({});
-                await wrapper.vm.setInputsValue(undefined, "key2", "value");
-                expect(wrapper.vm.inputsValue).to.deep.equal({});
-                await wrapper.vm.setInputsValue(true, "key2", "value");
-                expect(wrapper.vm.inputsValue).to.deep.equal({});
-                await wrapper.vm.setInputsValue([], "key2", "value");
-                expect(wrapper.vm.inputsValue).to.deep.equal({});
-                await wrapper.vm.setInputsValue({}, "key2", "value");
-                expect(wrapper.vm.inputsValue).to.deep.equal({});
+                await wrapper.vm.setRequestBodyInput(null, "key2", "value");
+                expect(wrapper.vm.requestBody.inputs).to.deep.equal({});
+                await wrapper.vm.setRequestBodyInput(0, "key2", "value");
+                expect(wrapper.vm.requestBody.inputs).to.deep.equal({});
+                await wrapper.vm.setRequestBodyInput(undefined, "key2", "value");
+                expect(wrapper.vm.requestBody.inputs).to.deep.equal({});
+                await wrapper.vm.setRequestBodyInput(true, "key2", "value");
+                expect(wrapper.vm.requestBody.inputs).to.deep.equal({});
+                await wrapper.vm.setRequestBodyInput([], "key2", "value");
+                expect(wrapper.vm.requestBody.inputs).to.deep.equal({});
+                await wrapper.vm.setRequestBodyInput({}, "key2", "value");
+                expect(wrapper.vm.requestBody.inputs).to.deep.equal({});
             });
 
             it("should set value with only one level key", async () => {
                 const wrapper = factory.getMount();
 
-                await wrapper.setData({inputsValue: {}});
+                await wrapper.setData({requestBody: {inputs: {}}});
                 await wrapper.vm.$nextTick();
 
-                await wrapper.vm.setInputsValue("key1", "", "value");
+                await wrapper.vm.setRequestBodyInput("key1", "", "value");
                 await wrapper.vm.$nextTick();
 
-                expect(wrapper.vm.inputsValue).to.deep.equal({
+                expect(wrapper.vm.requestBody.inputs).to.deep.equal({
                     key1: "value"
                 });
             });
@@ -300,13 +310,13 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             it("should set value with only two level key", async () => {
                 const wrapper = factory.getMount();
 
-                await wrapper.setData({inputsValue: {}});
+                await wrapper.setData({requestBody: {inputs: {}}});
                 await wrapper.vm.$nextTick();
 
-                await wrapper.vm.setInputsValue("key1", "key2", "value");
+                await wrapper.vm.setRequestBodyInput("key1", "key2", "value");
                 await wrapper.vm.$nextTick();
 
-                expect(wrapper.vm.inputsValue).to.deep.equal({
+                expect(wrapper.vm.requestBody.inputs).to.deep.equal({
                     key1: {
                         key2: "value"
                     }
@@ -433,6 +443,135 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 });
 
                 expect(wrapper.vm.getPrimaryTypeInputs()).to.deep.equal(expected);
+            });
+        });
+
+        describe("getOptionalBBOXUrlInputs", () => {
+            it("should return an empty object if processDescription.inputs is not an object", () => {
+                const wrapper = factory.getShallowMount();
+
+                wrapper.setData({processDescription: {inputs: null}});
+                expect(wrapper.vm.getOptionalBBOXUrlInputs()).to.deep.equal({});
+
+                wrapper.setData({processDescription: {inputs: undefined}});
+                expect(wrapper.vm.getOptionalBBOXUrlInputs()).to.deep.equal({});
+
+                wrapper.setData({processDescription: {inputs: "notAnObject"}});
+                expect(wrapper.vm.getOptionalBBOXUrlInputs()).to.deep.equal({});
+            });
+
+            it("should return an empty object if no inputs match the criteria", () => {
+                store = getStore({
+                    id: "simulationId",
+                    inputs: {
+                        input1: {source: {type: "other_type"}},
+                        input2: {source: {type: "optional_bbox_url"}}
+                    }
+                });
+                const wrapper = factory.getShallowMount();
+
+                wrapper.setData({
+                    processDescription: {
+                        inputs: {
+                            input1: {schema: {type: "string", format: "text"}},
+                            input2: {schema: {type: "object"}}
+                        }
+                    }
+                });
+
+                expect(wrapper.vm.getOptionalBBOXUrlInputs()).to.deep.equal({});
+            });
+
+            it("should return the correct inputs matching the criteria", () => {
+                store = getStore({
+                    id: "simulationId",
+                    inputs: {
+                        input1: {source: {type: "optional_bbox_url", url: "http://example.com/input1"}},
+                        input2: {source: {type: "optional_bbox_url", url: "http://example.com/input2"}}
+                    }
+                });
+                const wrapper = factory.getShallowMount();
+
+                wrapper.setData({
+                    processDescription: {
+                        inputs: {
+                            input1: {schema: {type: "string", format: "uri"}},
+                            input2: {schema: {type: "string", format: "uri"}}
+                        }
+                    }
+                });
+
+                expect(wrapper.vm.getOptionalBBOXUrlInputs()).to.deep.equal({
+                    input1: "http://example.com/input1",
+                    input2: "http://example.com/input2"
+                });
+            });
+
+            it("should handle mixed valid and invalid inputs", () => {
+                store = getStore({
+                    id: "simulationId",
+                    inputs: {
+                        input1: {source: {type: "optional_bbox_url", url: "http://example.com/input1"}},
+                        input2: {source: {type: "other_type", url: "http://example.com/input2"}},
+                        input3: {source: {type: "optional_bbox_url", url: "http://example.com/input3"}}
+                    }
+                });
+                const wrapper = factory.getShallowMount();
+
+                wrapper.setData({
+                    processDescription: {
+                        inputs: {
+                            input1: {schema: {type: "string", format: "uri"}},
+                            input2: {schema: {type: "string", format: "text"}},
+                            input3: {schema: {type: "string", format: "uri"}}
+                        }
+                    }
+                });
+
+                expect(wrapper.vm.getOptionalBBOXUrlInputs()).to.deep.equal({
+                    input1: "http://example.com/input1",
+                    input3: "http://example.com/input3"
+                });
+            });
+        });
+
+        describe("toggleOptionalBBOXUrlInputs", () => {
+            it("should set input and set the correct value", async () => {
+                const wrapper = factory.getShallowMount(),
+                    mockBBOXUrl = "http://example.com/bbox/extent/500x500.tif?coord_crs=epsg:25832";
+
+                sinon.stub(wrapper.vm, "getOptionalBBOXUrlInputs").returns({
+                    input1: "http://example.com/bbox"
+                });
+                sinon.stub(wrapper.vm, "getBBOXGeometry").returns({
+                    getExtent: () => "extent"
+                });
+
+                await wrapper.setData({
+                    requestBody: {inputs: {}},
+                    currentPlanningScenario: {}
+                });
+
+                wrapper.vm.toggleOptionalBBOXUrlInputs("input1", {target: {checked: true}});
+
+                expect(wrapper.vm.requestBody.inputs.input1).to.equal(mockBBOXUrl);
+            });
+            it("should set the input to undefined if the checkbox is unchecked", async () => {
+                const wrapper = factory.getShallowMount();
+
+                await wrapper.setData({
+                    requestBody: {inputs: {}}
+                });
+                wrapper.vm.toggleOptionalBBOXUrlInputs("input1");
+                expect(wrapper.vm.requestBody.inputs.input1).to.be.undefined;
+            });
+            it("should delete the property from requestBody if the checkbox is unchecked and it existed already", async () => {
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.requestBody = {inputs: {input1: "value"}};
+                wrapper.vm.toggleOptionalBBOXUrlInputs("input1", {target: {checked: false}});
+
+                expect(wrapper.vm.requestBody.inputs.input1).to.be.undefined;
             });
         });
 
