@@ -37,6 +37,7 @@ export default {
             "currentPlanningScenarioId",
             "currentEditableInput",
             "currentInputName",
+            "drawTypeLabels",
             "landuseCurrentLayout",
             "landuseRoadDrawIcons",
             "landuseRoadDrawTypesMain",
@@ -120,6 +121,7 @@ export default {
             "setLanduseActiveTab",
             "setLanduseCurrentLayout",
             "setCurrentPlanningComponent",
+            "setDrawTypeLabels",
             "setPlanningScenarioDrawType",
             "setplanningScenarioDrawTypesMain",
             "setPlanningScenarioSelectedDrawType",
@@ -334,6 +336,7 @@ export default {
                             :current-layout="landuseCurrentLayout"
                             :draw-icons="currentInputName === 'roads' ? landuseRoadDrawIcons : planningScenarioDrawIcons"
                             :draw-types="currentInputName === 'roads' ? landuseRoadDrawTypesMain : planningScenarioDrawTypesMain"
+                            :draw-type-labels="drawTypeLabels"
                             :selected-draw-type="planningScenarioSelectedDrawType"
                             :selected-draw-type-main="planningScenarioSelectedDrawTypeMain"
                             :selected-interaction="planningScenarioSelectedInteraction"
@@ -359,10 +362,8 @@ export default {
                                         :aria="$t('additional:modules.tools.simulationTool.geometryEdit')"
                                         icon="bi bi-tools"
                                         :interaction="editSource"
+                                        :label="$t('additional:modules.tools.simulationTool.geometryEdit')"
                                     />
-                                    <p class="edit text-center">
-                                        {{ $t('additional:modules.tools.simulationTool.geometryEdit') }}
-                                    </p>
                                 </div>
                             </div>
                         </div>

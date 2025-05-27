@@ -90,7 +90,7 @@ const state = {
         strokeWidth: 4
     },
     planningScenarioSelectInteraction: null,
-    drawTypeLabels: [{type: "polygon", label: "additional:modules.tools.simulationTool.freeForm"}, {type: "box", label: "additional:modules.tools.simulationTool.rectangle"}],
+    drawTypeLabels: [{type: "polygon", label: "additional:modules.tools.simulationTool.freeForm"}, {type: "box", label: "additional:modules.tools.simulationTool.rectangle"}, {type: "line", label: "additional:modules.tools.simulationTool.line"}],
     planningScenarioSelectedDrawType: "",
     planningScenarioSelectedDrawTypeMain: "",
     planningScenarioSelectedInteraction: null,
