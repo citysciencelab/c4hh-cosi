@@ -111,7 +111,7 @@
     "path": "filterSnippets/snippetChart",
     "type": "filterSnippet"
   },
-  "cesium3dtilesinspector": {
+  "cesium3dTilesInspector": {
     "type": "javascript"
   }
 }

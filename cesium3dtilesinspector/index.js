@@ -1,5 +1,5 @@
-import * as cesium3dtilesinspector from "./cesium3dtilesinspector";
+import * as cesium3dTilesInspector from "./cesium3dTilesInspector";
 
 export default {
-    cesium3dtilesinspector
+    cesium3dTilesInspector
 };
