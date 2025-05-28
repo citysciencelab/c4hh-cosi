@@ -1,6 +1,7 @@
 import {config, shallowMount} from "@vue/test-utils";
 import BimFactoryWorkflowDetailSelector from "../../../components/BimFactoryWorkflowDetailSelector.vue";
 import {expect} from "chai";
+import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
@@ -99,5 +100,49 @@ describe("BimFactoryWorkflowDetailSelector.vue", () => {
     it("checks updateSelectedValue()", () => {
         wrapper.vm.updateSelectedValue(33);
         expect(wrapper.vm.selectedValue).to.equal(33);
+    });
+
+    it("commits clearComponentErrors() to the store on updateSelectedValue", async () => {
+        const commitSpy = sinon.spy();
+
+        wrapper = shallowMount(BimFactoryWorkflowDetailSelector, {
+            props: {config: workflowConfig},
+            global: {
+                mocks: {
+                    $store: {commit: commitSpy},
+                    $t: k => k
+                }
+            }
+        });
+
+        await wrapper.vm.updateSelectedValue(2);
+
+        expect(commitSpy.calledWith("Modules/BimFactory/clearComponentErrors", {
+            containerId: workflowConfig.containerId,
+            machineName: workflowConfig.component.machineName,
+            emptyError: true
+        })).to.be.true;
+    });
+
+    it("commits updateWorkflowFormData() to the store on updateSelectedValue()", async () => {
+        const commitSpy = sinon.spy();
+
+        wrapper = shallowMount(BimFactoryWorkflowDetailSelector, {
+            props: {config: workflowConfig},
+            global: {
+                mocks: {
+                    $store: {commit: commitSpy},
+                    $t: k => k
+                }
+            }
+        });
+
+        await wrapper.vm.updateSelectedValue(2);
+
+        expect(commitSpy.calledWith("Modules/BimFactory/updateWorkflowFormData", {
+            containerId: workflowConfig.containerId,
+            machineName: workflowConfig.component.machineName,
+            value: 2
+        })).to.be.true;
     });
 });

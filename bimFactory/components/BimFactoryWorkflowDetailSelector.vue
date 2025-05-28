@@ -23,6 +23,12 @@ export default {
         updateSelectedValue (value) {
             this.selectedValue = value;
 
+            this.$store.commit("Modules/BimFactory/clearComponentErrors", {
+                containerId: this.config.containerId,
+                machineName: this.config.component.machineName,
+                emptyError: true
+            });
+
             this.$store.commit("Modules/BimFactory/updateWorkflowFormData", {
                 containerId: this.config.containerId,
                 machineName: this.config.component.machineName,

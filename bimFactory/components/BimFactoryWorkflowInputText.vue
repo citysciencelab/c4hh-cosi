@@ -16,6 +16,12 @@ export default {
     },
     methods: {
         updateWorkflowFormData (machineName, value) {
+            this.$store.commit("Modules/BimFactory/clearComponentErrors", {
+                containerId: this.config.containerId,
+                machineName: machineName,
+                emptyError: true
+            });
+
             this.$store.commit("Modules/BimFactory/updateWorkflowFormData", {
                 containerId: this.config.containerId,
                 machineName: machineName,

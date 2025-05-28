@@ -79,7 +79,7 @@ export default {
 
         commit("setIsLoading", true);
         commit("setIsRequestErrorGeneral", false);
-        commit("clearAllComponentErrors");
+        commit("clearComponentErrors");
 
         await axios.post(requestUrl,
             payload.requestData,

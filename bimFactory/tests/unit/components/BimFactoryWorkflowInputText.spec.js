@@ -1,6 +1,7 @@
 import {config, mount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import sinon from "sinon";
 import BimFactoryWorkflowInputText from "../../../components/BimFactoryWorkflowInputText.vue";
 
 config.global.mocks.$t = key => key;
@@ -81,7 +82,8 @@ describe("BimFactoryWorkflowInputText.vue", () => {
                                     if (container && container.components[machineName]) {
                                         container.components[machineName].value = value;
                                     }
-                                }
+                                },
+                                clearComponentErrors: sinon.stub()
                             }
                         }
                     }
@@ -126,7 +128,7 @@ describe("BimFactoryWorkflowInputText.vue", () => {
             expect(inputText.element.value).to.equal(mockConfig.component.defaultValue);
         });
 
-        it(`commits 'updateWorkflowFormData' to the store on input event for ${mockConfig.component.title}`, async () => {
+        it(`commits updateWorkflowFormData() to the store on input event for ${mockConfig.component.title}`, async () => {
             wrapper = mountComponent(mockConfig);
 
             const inputText = wrapper.find(`#${mockConfig.component.machineName}`),
@@ -154,5 +156,70 @@ describe("BimFactoryWorkflowInputText.vue", () => {
                 global: globalMocks
             });
         }).to.throw();
+    });
+
+    it("checks clearComponentErrors() to the store on input event", async () => {
+        let inputText = "";
+
+        const
+            commitSpy = sinon.spy();
+
+
+        wrapper = mount(BimFactoryWorkflowInputText, {
+            props: {
+                config: mockConfigForStep2Component1
+            },
+            global: {
+                mocks: {
+                    $store: {commit: commitSpy},
+                    $t: k => k
+                }
+            }
+        });
+
+        inputText = wrapper.find(`#${mockConfigForStep2Component1.component.machineName}`);
+
+        inputText.element.value = "new value";
+
+        await inputText.trigger("input");
+
+        expect(commitSpy.calledWith("Modules/BimFactory/clearComponentErrors", {
+            containerId: mockConfigForStep2Component1.containerId,
+            machineName: mockConfigForStep2Component1.component.machineName,
+            emptyError: true
+        })).to.be.true;
+    });
+
+    it("checks clearComponentErrors() before updateWorkflowFormData() on input", async () => {
+        const commitSpy = sinon.spy();
+
+        let
+            inputText = "",
+            firstCall = commitSpy,
+            secondCall = commitSpy;
+
+        wrapper = mount(BimFactoryWorkflowInputText, {
+            props: {
+                config: mockConfigForStep2Component1
+            },
+            global: {
+                mocks: {
+                    $store: {commit: commitSpy},
+                    $t: k => k
+                }
+            }
+        });
+
+        inputText = wrapper.find(`#${mockConfigForStep2Component1.component.machineName}`);
+
+        inputText.element.value = "Noch ein Wert";
+
+        await inputText.trigger("input");
+
+        firstCall = commitSpy.getCall(0).args[0];
+        secondCall = commitSpy.getCall(1).args[0];
+
+        expect(firstCall).to.equal("Modules/BimFactory/clearComponentErrors");
+        expect(secondCall).to.equal("Modules/BimFactory/updateWorkflowFormData");
     });
 });

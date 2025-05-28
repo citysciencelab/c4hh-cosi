@@ -28,9 +28,14 @@ export default {
                 {{ idx + 1 }}.
             </span>
 
-            {{ $t('additional:modules.bimfactory.workflow.components.inputerrors.errorMessage') }}
+            <span v-if="item.msg !== ''">
+                {{ $t('additional:modules.bimfactory.workflow.components.inputerrors.errorMessage') }}
+            </span>
 
-            <span class="error">
+            <span
+                v-if="item.msg !== ''"
+                class="error"
+            >
                 {{ item.msg }}
             </span>
         </div>

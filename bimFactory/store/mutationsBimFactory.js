@@ -65,30 +65,49 @@ const mutations = {
         component.errors.push(errorItem);
     },
     /**
-     * Clears all error arrays in all components.
-     *
-     * @param {Object} state - The Vuex state object.
+     * Clears errors in components..
+     * - no params: all errors to reset.
+     * - With containerId and machineName: Just this error to be removed.
+     * @param {Object} state - Der Vuex-Status.
+     * @param {Object} payload - Optional: {containerId:string, machineName:string, emptyError:boolean}
+     * @param {Boolean} payload.emptyError - Cleans the error string to be invisible after changing a form value
      */
-    clearAllComponentErrors (state) {
+    clearComponentErrors (state, payload = {}) {
+        const {containerId, machineName, emptyError} = payload;
+
         state.workflowsDetails.forEach(workflow => {
             if (!workflow.steps) {
                 return;
             }
+
             workflow.steps.forEach(step => {
                 if (!step.sections) {
                     return;
                 }
+
                 step.sections.forEach(section => {
                     if (!section.containers) {
                         return;
                     }
+
                     section.containers.forEach(container => {
                         if (!container.components) {
                             return;
                         }
+
                         container.components.forEach(component => {
-                            if (Array.isArray(component.errors)) {
-                                component.errors = [];
+                            const match = !containerId || (
+                                container.containerId === containerId &&
+                                component.machineName === machineName
+                            );
+
+                            if (match && Array.isArray(component.errors)) {
+                                if (emptyError) {
+                                    component.errors = [{"msg": ""}];
+                                }
+                                else {
+                                    component.errors = [];
+                                }
                             }
                         });
                     });
