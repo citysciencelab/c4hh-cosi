@@ -32,6 +32,7 @@ export default {
     },
     data () {
         return {
+            currentSimulationId: "",
             jobResults: undefined,
             jobStatus: undefined,
             oafLoadingStates: {},
@@ -157,7 +158,7 @@ export default {
          * @returns {Object} The current simulation configuration.
          */
         simulation () {
-            return this.simulations.find(simulation => simulation.id === this.currentPlanningScenario?.simulationId);
+            return this.simulations.find(simulation => simulation.id === this.currentSimulationId);
         },
 
         /**
@@ -187,15 +188,20 @@ export default {
             val.forEach(elem => {
                 this.requestBody.outputs[elem.code] = {};
             });
+        },
+
+        currentSimulationId: {
+            async handler () {
+                if (this.simulation) {
+                    await this.prepareRequestBody();
+                    this.primaryTypeInputs = this.getPrimaryTypeInputs();
+                    this.selectedOutputOptions = this.outputOptions;
+                }
+            },
+            immediate: true
         }
     },
-    async mounted () {
-        if (this.simulation) {
-            await this.prepareRequestBody();
-            this.primaryTypeInputs = this.getPrimaryTypeInputs();
-        }
-        this.selectedOutputOptions = this.outputOptions;
-    },
+
     methods: {
         ...mapActions("Modules/SimulationTool", ["addFile"]),
         ...mapMutations("Modules/SimulationTool", [
@@ -392,7 +398,7 @@ export default {
          */
         async onPlanningScenarioChange (event) {
             this.setCurrentPlanningScenarioId(event.target.value);
-            this.prepareRequestBody();
+            this.currentSimulationId = "";
         },
 
         /**
@@ -454,8 +460,7 @@ export default {
             this.processDescription = await this.processHandler.getDescription();
             this.requestBody.inputs = {
                 ...OgcApiProcess.getInputDefaultsFromDescription(this.processDescription),
-                ...this.currentPlanningScenario.inputs,
-                crs: this.simulation?.inputs?.crs
+                ...this.currentPlanningScenario.inputs
             };
 
             this.requestBody.outputs = {};
@@ -486,6 +491,7 @@ export default {
 
             Object.assign(scenario.jobs[jobID], {jobStatus: typeof this.jobStatus !== "undefined" ? JSON.parse(JSON.stringify(this.jobStatus)) : this.jobStatus});
             Object.assign(scenario.jobs[jobID], {jobResult: typeof this.jobResults !== "undefined" ? JSON.parse(JSON.stringify(this.jobResults)) : this.jobResults});
+            Object.assign(scenario.jobs[jobID], {simulation: JSON.parse(JSON.stringify(this.simulation))}); // Vorläufige Lösung, muss ggf. geändert werden
 
             this.openJob(jobID);
         },
@@ -608,6 +614,7 @@ export default {
             <div class="form-floating mb-3">
                 <select
                     id="simulateForPlanning"
+                    v-model="currentSimulationId"
                     class="form-select"
                     :aria-label="$t('additional:modules.tools.simulationTool.selectSimulation')"
                 >
@@ -810,7 +817,7 @@ export default {
                         :interaction="startSimulation"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
-                        :disabled="!currentPlanningScenario || isSomeOafLoading"
+                        :disabled="!currentPlanningScenario || isSomeOafLoading || !currentSimulationId"
                     />
                 </div>
             </form>

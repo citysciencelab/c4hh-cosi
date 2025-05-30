@@ -36,6 +36,7 @@ export default {
             "currentEditableInput",
             "currentPlanningScenarioId",
             "currentPlanningComponent",
+            "dataSources",
             "landuseActiveTab",
             "planningScenarios",
             "simulations",
@@ -59,15 +60,15 @@ export default {
          * @returns {String} The current crs.
          */
         currentCrs () {
-            return this.currentSimulation?.inputs?.crs;
+            return this.currentDataSource?.inputs?.crs;
         },
 
         /**
-         * Gets the simulation config object that is set for the current planning scenario.
-         * @returns {Object} The current simulation config.
+         * Gets the data source config object that is set for the current planning scenario.
+         * @returns {Object} The current data source config.
          */
-        currentSimulation () {
-            return this.simulations.find(sim => sim.id === this.planningScenario.simulationId);
+        currentDataSource () {
+            return this.dataSources.find(ds => ds.id === this.planningScenario.dataSourceId);
         },
 
         /**
@@ -75,12 +76,12 @@ export default {
          * @returns {Object} An inputs object containing only the editable inputs.
          */
         editableInputs () {
-            if (!this.currentSimulation?.inputs) {
-                return undefined;
+            if (!this.currentDataSource?.inputs) {
+                return {};
             }
 
             return Object.fromEntries(
-                Object.entries(this.currentSimulation.inputs).filter(([, value]) => {
+                Object.entries(this.currentDataSource.inputs).filter(([, value]) => {
                     return value.editable;
                 })
             );
@@ -192,6 +193,9 @@ export default {
         if (!this.planningScenario) {
             return;
         }
+        this.planningScenario.inputs ??= {};
+        this.planningScenario.inputs.crs = this.currentCrs;
+
         this.initializeShowExistingItems();
 
         if (this.currentEditableInput === "") {

@@ -61,11 +61,12 @@ export default {
         },
 
         /**
-        * Get the simulation configuration to the currently selected planning scenario.
+        * Get the simulation configuration for the current job.
+        * May change, when more features for multiple simulations are added!
         * @returns {Object} The current simulation configuration.
         */
         simulation () {
-            return this.simulations?.find(simulation => simulation.id === this.currentPlanningScenario?.simulationId);
+            return this.currentJob?.simulation;
         }
     },
     watch: {

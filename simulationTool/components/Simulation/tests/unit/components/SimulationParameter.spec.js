@@ -14,6 +14,11 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
     const factory = {
         getShallowMount: () => {
             return shallowMount(SimulationParameter, {
+                data () {
+                    return {
+                        currentSimulationId: "simulationId"
+                    };
+                },
                 global: {
                     plugins: [store]
                 }
@@ -21,6 +26,11 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
         },
         getMount: () => {
             return mount(SimulationParameter, {
+                data () {
+                    return {
+                        currentSimulationId: "simulationId"
+                    };
+                },
                 global: {
                     plugins: [store]
                 }
@@ -46,8 +56,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                                 planningScenarios: () => [
                                     {
                                         id: "planningScenarioId",
-                                        inputs: {},
-                                        simulationId: "simulationId"
+                                        inputs: {}
                                     }
                                 ],
                                 previousComponentOfSimulation: sinon.stub(),

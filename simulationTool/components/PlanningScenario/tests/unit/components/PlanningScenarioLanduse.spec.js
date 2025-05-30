@@ -29,9 +29,10 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 });
             }
         },
-        simulations = [
+        dataSources = [
             {
-                "id": "noise_v4:traffic_noise_propagation",
+                "id": "default",
+                "title": "Gebäude und Straßen (für Lärm- und Windsimulation)",
                 "inputs": {
                     "buildings": {
                         "editable": true,
@@ -45,10 +46,23 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 }
             }
         ],
+        simulations = [
+            {
+                "id": "noise_v4:traffic_noise_propagation",
+                "inputs": {
+                    "buildings": {
+                        "editable": true
+                    },
+                    "hospitals": {
+                        "editable": true
+                    }
+                }
+            }
+        ],
         planningScenarios = [{
             "id": "Szenario1",
             "name": "Planungsszenario 1",
-            "simulationId": "noise_v4:traffic_noise_propagation",
+            "dataSourceId": "default",
             "featuresLoaded": true,
             "inputs": {
                 "buildings": {
@@ -182,6 +196,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             getters: {
                                 currentEditableInput: (state) => state.currentEditableInput,
                                 currentPlanningScenarioId: (state) => state.currentPlanningScenarioId,
+                                dataSources: (state) => state.dataSources,
                                 planningScenarios: (state) => state.planningScenarios,
                                 currentInputName: (state) => state.currentInputName,
                                 currentPlanningComponent: (state) => state.currentPlanningComponent,
@@ -212,6 +227,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             },
                             state: {
                                 currentPlanningScenarioId: "Szenario1",
+                                dataSources: dataSources,
                                 planningScenarios: planningScenarios,
                                 currentEditableInput: "buildings",
                                 currentInputName: "",

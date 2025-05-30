@@ -52,6 +52,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                             namespaced: true,
                             actions: {},
                             getters: {
+                                dataSources: () => [],
                                 drawTypeLabels: () => {
                                     return [];
                                 },
@@ -134,9 +135,9 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
 
             expect(inputBuffer.exists()).to.be.true;
         });
-        it("should render dropdown for simulation", () => {
+        it("should render dropdown for data source", () => {
             const wrapper = factory.getShallowMount(),
-                dropdown = wrapper.find("#simulateForPlanning");
+                dropdown = wrapper.find("#dataSourceForPlanning");
 
             expect(dropdown.exists()).to.be.true;
         });

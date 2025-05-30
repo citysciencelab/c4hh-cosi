@@ -5,6 +5,7 @@
  * @property {string} currentInputName the current input name
  * @property {String} currentJobID The ID of the job that is currently displayed in jobResult component.
  * @property {String} currentPlanningComponent the current open component in planningScenario.
+ * @property {Object[]} dataSources - Array of data source configurations.
  * @property {Object[]} drawTypeLabels - the array of type and labels.
  * @property {Array.<Object>} ensembles a list of ensembles
  * @property {boolean} ensemblesLoading flag indicating if ensembles are loading
@@ -53,6 +54,7 @@ const state = {
     currentPlanningComponent: "",
     currentPlanningScenarioId: "",
     currentInputName: "",
+    dataSources: [],
     description: "additional:modules.tools.simulationTool.toolDescription",
     icon: "bi-sliders2",
     img: {},

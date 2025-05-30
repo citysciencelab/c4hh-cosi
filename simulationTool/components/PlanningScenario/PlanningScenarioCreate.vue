@@ -32,7 +32,7 @@ export default {
             currentScenarioData: {
                 id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
                 name: "Neues Planungsszenario",
-                simulationId: "only-planning-scenario",
+                dataSourceId: "default",
                 inputs: {}
             },
             isValid: true,
@@ -43,6 +43,7 @@ export default {
     computed: {
         ...mapGetters("Modules/SimulationTool", [
             "currentPlanningScenarioId",
+            "dataSources",
             "planningScenarioCurrentLayout",
             "planningScenarioDrawIcons",
             "planningScenarioDrawTypesMain",
@@ -58,12 +59,12 @@ export default {
         ]),
 
         /**
-         * Gets the maximum area that is configured in the currently selected simulation.
-         * @returns {Number} The maximum area of the current simulation.
+         * Gets the maximum area that is configured in the currently selected data source.
+         * @returns {Number} The maximum area of the current data source.
          */
         currentMaxArea () {
-            return this.simulations.find(
-                simulation => simulation.id === this.currentScenarioData.simulationId
+            return this.dataSources.find(
+                ds => ds.id === this.currentScenarioData.dataSourceId
             )?.maxSizeArea;
         },
 
@@ -430,21 +431,21 @@ export default {
                 </div>
                 <div class="form-floating mb-3">
                     <select
-                        id="simulateForPlanning"
-                        v-model="currentScenarioData.simulationId"
+                        id="dataSourceForPlanning"
+                        v-model="currentScenarioData.dataSourceId"
                         class="form-select"
-                        :aria-label="$t('additional:modules.tools.simulationTool.simulateForPlanningScenario')"
+                        :aria-label="$t('additional:modules.tools.simulationTool.dataSourceForPlanningScenario')"
                     >
                         <option
-                            v-for="simulation in simulations"
-                            :key="simulation.id"
-                            :value="simulation.id"
+                            v-for="dataSource in dataSources"
+                            :key="dataSource.id"
+                            :value="dataSource.id"
                         >
-                            {{ simulation.title }}
+                            {{ dataSource.title }}
                         </option>
                     </select>
-                    <label for="simulateForPlanning">
-                        {{ $t('additional:modules.tools.simulationTool.simulateForPlanningScenario') }}
+                    <label for="dataSourceForPlanning">
+                        {{ $t('additional:modules.tools.simulationTool.dataSourceForPlanningScenario') }}
                     </label>
                 </div>
                 <InputText
