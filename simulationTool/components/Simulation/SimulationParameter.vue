@@ -51,6 +51,22 @@ export default {
         ]),
 
         /**
+         * Get the current planning scenario.
+         * @returns {Object} The current planning scenario.
+         */
+        currentPlanningScenario () {
+            return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+        },
+
+        /**
+         * Checks if any  value in `oafLoadingStates` is `true`.
+         * @returns {boolean} true if true, false otherwise.
+         */
+        isSomeOafLoading () {
+            return Object.values(this.oafLoadingStates).some(value => value === true);
+        },
+
+        /**
          * Get the optional inputs of type FeatureCollection from the process description.
          * @returns {Object} An object of inputs.
          */
@@ -109,14 +125,6 @@ export default {
             });
 
             return optionsArray;
-        },
-
-        /**
-         * Get the current planning scenario.
-         * @returns {Object} The current planning scenario.
-         */
-        currentPlanningScenario () {
-            return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
         },
 
         /**
@@ -798,11 +806,11 @@ export default {
                         :text="$t('additional:modules.tools.simulationTool.back')"
                     />
                     <FlatButton
-                        id="start"
+                        id="startSimulation"
                         :interaction="startSimulation"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
-                        :disabled="!currentPlanningScenario"
+                        :disabled="!currentPlanningScenario || isSomeOafLoading"
                     />
                 </div>
             </form>

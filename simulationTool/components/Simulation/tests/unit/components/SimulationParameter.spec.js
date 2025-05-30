@@ -120,6 +120,23 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
             expect(wrapper.findComponent({name: "FileUpload"}).exists()).to.be.true;
         });
+
+        it("should render FlatButton to start a simulation", () => {
+            const wrapper = factory.getMount();
+
+            expect(wrapper.find("#startSimulation").exists()).to.be.true;
+        });
+
+        it("should render disabled FlatButton to start a simulation", async () => {
+            const wrapper = factory.getMount();
+
+            await wrapper.setData({
+                oafLoadingStates: {
+                    "key": true
+                }
+            });
+            expect(wrapper.find("#startSimulation").attributes()).have.property("disabled");
+        });
     });
 
     describe("Computed Properties", () => {
@@ -202,6 +219,18 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             expect(wrapper.vm.stringTypeInputs).to.deep.equal({
                 stringType: {schema: {type: "string"}}
             });
+        });
+
+        it("should return the correct value for 'isSomeOafLoading'", async () => {
+            const wrapper = factory.getShallowMount();
+
+            expect(wrapper.vm.isSomeOafLoading).to.be.false;
+            await wrapper.setData({
+                oafLoadingStates: {
+                    "key": true
+                }
+            });
+            expect(wrapper.vm.isSomeOafLoading).to.be.true;
         });
     });
 
