@@ -2,14 +2,23 @@
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import ConvertFeature from "../../js/convertFeatures";
 import ConvertStyle from "../../js/convertStyle";
+import CircleStyle from "ol/style/Circle";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
+import {Feature} from "ol";
 import FeaturesHandler from "../../../../src/modules/statisticDashboard/js/handleFeatures.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import Fill from "ol/style/Fill";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
+import {LineString} from "ol/geom";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
+import {Select, Translate} from "ol/interaction";
+import {singleClick} from "ol/events/condition";
+import Stroke from "ol/style/Stroke";
+import Style from "ol/style/Style";
+import Text from "ol/style/Text";
 
 export default {
     name: "SimulationResults",
@@ -27,7 +36,10 @@ export default {
             legendValue: [],
             outputs: [],
             progressValues: [],
-            startTimes: []
+            startTimes: [],
+            outputSelectInteraction: {},
+            tableFeaturesCollection: {},
+            lineFeaturesCollection: {}
         };
     },
     computed: {
@@ -177,7 +189,15 @@ export default {
                 if (typeof layer?.layer?.get !== "function") {
                     return;
                 }
-                layer.layer.setVisible(layer.layer.get("id") === val);
+                const isOutputSelected = layer.layer.get("id") === `${this.simulationIdForResults}-${val}`;
+
+                layer.layer.setVisible(isOutputSelected);
+                if (isOutputSelected && this.isTableMode) {
+                    Object.values(this.outputSelectInteraction).forEach(interactionsOnLayer => Object.values(interactionsOnLayer).forEach(interaction => this.removeInteraction(interaction)));
+                    Object.values(this.outputSelectInteraction[layer.layer.get("id")]).forEach(interaction => {
+                        this.addInteraction(interaction);
+                    });
+                }
             });
         }
     },
@@ -193,12 +213,75 @@ export default {
                 layer.getLayerSource().clear();
             });
         }
+        Object.values(this.outputSelectInteraction).forEach(interactionsOnLayer => Object.values(interactionsOnLayer).forEach(interaction => this.removeInteraction(interaction)));
     },
     methods: {
         ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),
+        ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapMutations("Modules/SimulationTool", [
             "setMode"
         ]),
+
+        /**
+         * Adds a select for given layer.
+         * @param {Number} layerId - The layerId.
+         * @param {Object} interaction - The interaction object to add.
+         * @param {String} eventType - The type of event to listen for (e.g., "select", "translating").
+         * @param {Function} listener - The listener function to handle the select event.
+         * @returns {void}
+         */
+        addSelectInteractionForGivenLayer (layerId, interaction, eventType, listener) {
+            if (this.outputSelectInteraction[layerId]?.[eventType] || !isObject(interaction)) {
+                return;
+            }
+            interaction.on(eventType, listener);
+
+            if (!isObject(this.outputSelectInteraction[layerId])) {
+                this.outputSelectInteraction[layerId] = {};
+            }
+            this.outputSelectInteraction[layerId][eventType] = interaction;
+            this.addInteraction(interaction);
+        },
+
+        /**
+         * Creates or updates a layer with the given layerId.
+         * @param {String} layerId - The ID of the layer to create or update.
+         * @returns {Object} The created or updated layer.
+         */
+        createOrUpdateLayer (layerId) {
+            if (typeof layerCollection.getLayerById(layerId) !== "undefined") {
+                const layer = layerCollection.getLayerById(layerId);
+
+                layer.getLayerSource().clear();
+                return layer;
+            }
+            const layer = layerFactory.createLayer({
+                typ: "VECTORBASE",
+                id: layerId,
+                name: layerId,
+                alwaysOnTop: true
+            });
+
+            layer.layer.setZIndex(9999998);
+            return layer;
+        },
+
+        /**
+         * Gets all z-values from a table feature.
+         * @param {ol/Feature} feature - The feature to extract z-values from.
+         * @returns {String[]} An array of z-values sorted in descending order.
+         */
+        getAllZValuesFromTableFeature (feature) {
+            const featureProps = feature.getProperties(),
+                allZValues = Object.entries(featureProps).filter(([key]) => key.startsWith("custom-z-")).sort((a, b) => {
+                    const zA = parseFloat(a[0].replace("custom-z-", "")),
+                        zB = parseFloat(b[0].replace("custom-z-", ""));
+
+                    return zB - zA;
+                });
+
+            return allZValues;
+        },
 
         /**
          * Gets the legend value of style.
@@ -228,6 +311,57 @@ export default {
             }
 
             return legendValue;
+        },
+
+        /**
+         * Formats key-value pairs into a string representation.
+         * @param {String[][]} list - An array of key-value pairs, where each pair is an array of [key, value].
+         * @param {String} prefixToRemove - The prefix to remove from the keys.
+         * @param {String} [suffix="m"] - The suffix to append to the keys (default is "m").
+         * @returns {String} A string representation of the key-value pairs, each pair on a new line.
+         */
+        formatKeyValuePairs (list, prefixToRemove, suffix = "m") {
+            const maxKeyLength = Math.max(...list.map(([k]) => String(k).length), 0);
+
+            return list.map(([key, value]) => {
+                const paddedKey = `${key + suffix}`.padEnd(maxKeyLength + 1, " ");
+
+                return `${paddedKey.slice(prefixToRemove.length)}: ${value}`;
+            }).join("\n");
+        },
+
+        /**
+         * Creates a feature style for displaying a table like view with key-value pairs.
+         * @param {String} tableText - The text to display in the table.
+         * @returns {ol/style/Style} An OpenLayers style object with a circle and text style for the feature.
+         */
+        getFeatureStyleTable (tableText) {
+            return new Style({
+                text: new Text({
+                    text: tableText,
+                    justify: "left",
+                    font: "11px monospace",
+                    fill: new Fill({color: "#000"}),
+                    stroke: new Stroke({color: "#fff", width: 3}),
+                    padding: [2, 2, 2, 2],
+                    backgroundFill: new Fill({color: "rgba(255, 255, 255, 0.8)"}),
+                    backgroundStroke: new Stroke({color: "black", width: 1})
+                })
+            });
+        },
+
+        /**
+         * Creates a feature style for displaying a circle with a specific style.
+         * @returns {ol/style/Style} An OpenLayers style object with a circle style for the feature.
+         */
+        getFeatureStyleCircle () {
+            return new Style({
+                image: new CircleStyle({
+                    radius: 8,
+                    fill: new Fill({color: "rgba(255, 153, 0, 0.8)"}),
+                    stroke: new Stroke({color: "#fff", width: 2})
+                })
+            });
         },
 
         getMappedProperty,
@@ -284,38 +418,178 @@ export default {
             }
 
             outputs.forEach(output => {
-                let layer;
-
-                if (typeof layerCollection.getLayerById(output) !== "undefined") {
-                    layer = layerCollection.getLayerById(output);
-                    layer?.getLayerSource()?.clear();
-                }
-                else {
-                    layer = layerFactory.createLayer({
-                        typ: "VECTORBASE",
-                        id: output,
-                        name: output
-                    });
-
-                    layer?.layer.setZIndex(9999998);
-
-                    layerCollection.addLayer(layer);
-                }
+                const layerId = `${simulationId}-${output}`,
+                    layer = this.createOrUpdateLayer(layerId),
+                    layerSource = layer.getLayerSource();
 
                 Object.values(jobs).forEach(job => {
-                    const featuresToAdd = ConvertFeature.geoJsonToOpenlayers(job.jobResults?.[output]?.features || []);
+                    const featuresToAdd = ConvertFeature.geoJsonToOpenlayers(job.jobResults?.[output]?.features || []),
+                        foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
+                        isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
 
+                    if (isTableMode) {
+                        this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
+                        return;
+                    }
                     featuresToAdd?.forEach(feature => {
                         feature.set("simulationId", simulationId);
                         this.setFeatureStyle(feature, job.resultStyle);
                     });
-                    layer.getLayerSource().addFeatures(featuresToAdd);
+                    layerSource.addFeatures(featuresToAdd);
                 });
 
-                this.layers.push(layer);
+                if (!this.layers.some(existingLayer => existingLayer?.get?.("id") === layerId)) {
+                    this.layers.push(layer);
+                }
+                if (!layerCollection.getLayerById(layerId)) {
+                    layerCollection.addLayer(layer);
+                }
             });
             this.setCurrentOutput(outputs[0]);
             this.setLegendValue();
+        },
+
+        /**
+         * Stores a translated point feature and creates a line feature connecting the original point to the translated point.
+         * It updates the table features collection with the translated point and its properties.
+         * @param {ol/Feature} feature - The original feature to be translated.
+         * @param {String} layerId - The ID of the layer to which the feature belongs.
+         * @param {String} toShowAttrKey - The attribute key to show in the table.
+         * @param {String} originalXYKey - The key used to store the original XY coordinates of the feature.
+         * @param {String} customZKey - The key used to identify custom Z values in the table features.
+         * @returns {void}
+         */
+        storeTranslatedPointAndCreateLine (feature, layerId, toShowAttrKey, originalXYKey, customZKey) {
+            const featureGeometry = feature.getGeometry(),
+                [x, y, z] = featureGeometry.getCoordinates().toString().split(","),
+                coordinate2d = `${x},${y}`;
+            let zValue;
+
+            if (!isObject(this.tableFeaturesCollection[layerId][coordinate2d])) {
+                const clonedFeature = feature.clone();
+
+                clonedFeature.getGeometry().translate(0, 20);
+                this.tableFeaturesCollection[layerId][coordinate2d] = clonedFeature;
+            }
+            Object.entries(feature.getProperties()).forEach(([key, value]) => {
+                if (toShowAttrKey === key) {
+                    zValue = typeof value === "undefined" ? "---" : value;
+                }
+            });
+            this.tableFeaturesCollection[layerId][coordinate2d].set(customZKey + z, zValue);
+            this.tableFeaturesCollection[layerId][coordinate2d].set(originalXYKey, coordinate2d);
+            this.lineFeaturesCollection[layerId][`${coordinate2d},${z}`] = new Feature(new LineString([
+                featureGeometry.getCoordinates(),
+                this.tableFeaturesCollection[layerId][coordinate2d].getGeometry().getCoordinates()
+            ]));
+        },
+
+        /**
+         * Processes and styles point features for table view.
+         * @param {String} layerId - The ID of the layer.
+         * @param {Object} layer - The layer object containing the OpenLayers layer.
+         * @param {ol/source/Vector} layerSource - The source of the layer.
+         * @param {ol/Feature[]} geojsonFeature - The GeoJSON features to process.
+         * @param {String} simulationId - The simulation ID.
+         * @param {String} toShowAttrKey - The attribute key to show in the table.
+         * @returns {void}
+         */
+        processAndStylePointFeaturesForTable (layerId, layer, layerSource, geojsonFeature, simulationId, toShowAttrKey) {
+            const originalXYKey = "og-xy",
+                customZKey = "custom-z-";
+
+            this.tableFeaturesCollection[layerId] = this.tableFeaturesCollection[layerId] || {};
+            this.lineFeaturesCollection[layerId] = this.lineFeaturesCollection[layerId] || {};
+            this.addSelectInteractionForGivenLayer(layerId, new Select({
+                style: null,
+                layers: [layer.layer],
+                filter: feature => typeof feature.get("simulationId") !== "undefined",
+                toggleCondition: singleClick
+            }), "select", event => this.onFeatureSelect(event, `${this.simulationIdForResults}-${this.currentOutput}`, layerSource, customZKey));
+
+            geojsonFeature.forEach(feature => {
+                if (feature.getGeometry()?.getType() === "Point") {
+                    this.storeTranslatedPointAndCreateLine(feature, layerId, toShowAttrKey, originalXYKey, customZKey);
+                }
+                feature.set("simulationId", simulationId);
+                feature.setStyle(this.getFeatureStyleCircle());
+            });
+            Object.values(this.tableFeaturesCollection[layerId]).forEach(feature => {
+                const allZValues = this.getAllZValuesFromTableFeature(feature);
+
+                feature.setStyle(this.getFeatureStyleTable(this.formatKeyValuePairs(allZValues, customZKey)));
+            });
+            layerSource.addFeatures([...geojsonFeature, ...Object.values(this.tableFeaturesCollection[layerId]), ...Object.values(this.lineFeaturesCollection[layerId])]);
+
+            this.addSelectInteractionForGivenLayer(layerId, new Translate({
+                filter: feature => typeof feature.get(originalXYKey) !== "undefined"
+            }), "translating", event => this.onFeatureMove(event, `${this.simulationIdForResults}-${this.currentOutput}`, originalXYKey, customZKey));
+        },
+
+        /**
+         * Handles the movement of a feature during translation.
+         * It updates the coordinates of the line features associated with the moved feature.
+         * @param {Object} event - The event object containing the moved features.
+         * @param {String} layerId - The ID of the layer containing the features.
+         * @param {String} originalXYKey - The key used to store the original XY coordinates of the feature.
+         * @param {String} customZKey - The key used to identify custom Z values in the table features.
+         * @returns {void}
+         */
+        onFeatureMove (event, layerId, originalXYKey, customZKey) {
+            if (!event.features.getLength()) {
+                return;
+            }
+            const tableFeature = event.features.getArray()[0],
+                tableFeatureProps = tableFeature?.getProperties?.(),
+                z = [];
+            let xy;
+
+            if (!isObject(tableFeature.getGeometry())) {
+                return;
+            }
+            Object.entries(tableFeatureProps).forEach(([key, value]) => {
+                if (key === originalXYKey) {
+                    xy = value;
+                }
+                else if (key.startsWith(customZKey)) {
+                    z.push(key.replace(customZKey, ""));
+                }
+            });
+            z.forEach(zValue => {
+                this.lineFeaturesCollection[layerId][`${xy},${zValue}`].getGeometry().setCoordinates([
+                    [...xy.split(",").map(val => parseFloat(val)), parseFloat(zValue)],
+                    tableFeature.getGeometry().getCoordinates()
+                ]);
+            });
+        },
+
+        /**
+         * Handles feature selection and deselection events.
+         * If a feature is selected, it updates the style of the corresponding table feature and toggles the visibility of related line features.
+         * If a feature is deselected, it resets the style of the corresponding table feature and shows the related line features.
+         * @param {Object} event - The event object containing selected and deselected features.
+         * @param {String} layerId - The ID of the layer containing the features.
+         * @param {ol/source/Vector} layerSource - The source of the layer containing the features.
+         * @param {String} customZKey - The key used to identify custom Z values in the table features.
+         * @returns {void}
+         */
+        onFeatureSelect (event, layerId, layerSource, customZKey) {
+            const currentFeature = event.selected[0] || event.deselected[0],
+                featureCoordinateAsString = currentFeature.getGeometry().getCoordinates().toString(),
+                keyOfTableFeature = featureCoordinateAsString.split(",").slice(0, -1).join(","),
+                tableFeature = this.tableFeaturesCollection[layerId][keyOfTableFeature],
+                hideFeatures = Array.isArray(event.selected) && event.selected.length > 0;
+
+            if (tableFeature) {
+                tableFeature.setStyle(hideFeatures ? new Style(null) : this.getFeatureStyleTable(this.formatKeyValuePairs(this.getAllZValuesFromTableFeature(tableFeature), customZKey)));
+                const multipleLines = Object.keys(this.lineFeaturesCollection[layerId]).filter(key => key.startsWith(keyOfTableFeature)),
+                    bulkUpdate = [];
+
+                multipleLines.forEach(featureXYZ => {
+                    bulkUpdate.push(this.lineFeaturesCollection[layerId][featureXYZ]);
+                });
+                hideFeatures ? layerSource.removeFeatures(bulkUpdate) : layerSource.addFeatures(bulkUpdate);
+            }
         }
     }
 };
