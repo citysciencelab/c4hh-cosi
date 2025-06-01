@@ -141,23 +141,38 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
     describe("Computed Properties", () => {
         it("should return an array of Objects with code and name property for select options", async () => {
-            const wrapper = factory.getMount(),
+            store = getStore({
+                id: "simulationId",
+                inputs: {
+                    input1: {source: {type: "optional_bbox_url", url: "http://example.com/input1"}},
+                    input2: {source: {type: "optional_bbox_url", url: "http://example.com/input2"}}
+                },
+                outputs: {
+                    propertiesMapping: {
+                        noise_day: "Lärm des Tages",
+                        noise_den: "Lärm des Tages und der Nacht",
+                        noise_evening: "Lärm des Abends",
+                        noise_night: "Lärm der Nacht"
+                    }
+                }
+            });
+            const wrapper = factory.getShallowMount(),
                 expected = [
                     {
                         "code": "noise_day",
-                        "name": "Noise isosurface day"
+                        "name": "Lärm des Tages"
                     },
                     {
                         "code": "noise_den",
-                        "name": "Noise isosurface day-evening-night"
+                        "name": "Lärm des Tages und der Nacht"
                     },
                     {
                         "code": "noise_evening",
-                        "name": "Noise isosurface evening"
+                        "name": "Lärm des Abends"
                     },
                     {
                         "code": "noise_night",
-                        "name": "Noise isosurface night"
+                        "name": "Lärm der Nacht"
                     }
                 ];
 

@@ -289,7 +289,7 @@ export default {
                         class="form-check-label"
                         :for="output"
                     >
-                        {{ output }}
+                        {{ getMappedProperty(output, simulation?.outputs?.propertiesMapping) }}
                     </label>
                 </div>
             </div>

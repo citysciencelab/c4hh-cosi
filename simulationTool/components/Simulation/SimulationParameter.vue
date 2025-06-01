@@ -121,7 +121,7 @@ export default {
             }
 
             Object.keys(this.processDescription?.outputs || {}).forEach(key => {
-                optionsArray.push({code: key, name: this.processDescription?.outputs[key]?.title});
+                optionsArray.push({code: key, name: this.getMappedProperty(key, this.simulation?.outputs?.propertiesMapping)});
             });
 
             return optionsArray;
