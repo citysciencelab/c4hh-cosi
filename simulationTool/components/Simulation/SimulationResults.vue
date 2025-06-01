@@ -186,9 +186,10 @@ export default {
                     layer = layerFactory.createLayer({
                         typ: "VECTORBASE",
                         id: output,
-                        name: output,
-                        alwaysOnTop: true
+                        name: output
                     });
+
+                    layer?.layer.setZIndex(9999998);
 
                     layerCollection.addLayer(layer);
                 }
@@ -197,7 +198,7 @@ export default {
                     feature.set("jobID", jobID);
                     this.setFeatureStyle(feature, this.currentStyle);
                 });
-                this.layer?.setStyle(ConvertStyle.geoJsonToOpenlayers(this.simulationResultStyle));
+
                 layer.getLayerSource().addFeatures(geojsonFeature);
 
                 this.layers.push(layer);
