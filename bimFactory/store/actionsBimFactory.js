@@ -4,7 +4,8 @@ export default {
 
     async loadWorkflows ({state, commit}) {
         if (state.workflowsJSONPath.length !== 0) {
-            const response = await axios.get(state.workflowsJSONPath);
+            const timestamp = Date.now(),
+                response = await axios.get(state.workflowsJSONPath + "?t=" + timestamp);
 
             if (response && response.data) {
                 commit("setWorkflowsJSON", response.data);
@@ -17,7 +18,8 @@ export default {
             const path = getters.getWorkflowForId(workflowId)?.config;
 
             if (path && path.length !== 0) {
-                const response = await axios.get(path);
+                const timestamp = Date.now(),
+                    response = await axios.get(path + "?t=" + timestamp);
 
                 if (response && response.data) {
                     state.workflowsDetails.push(response.data);
