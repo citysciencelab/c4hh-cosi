@@ -70,6 +70,10 @@ export default {
         }
     },
     watch: {
+        simulation () {
+            this.update();
+        },
+
         /**
          * Sets the visibility of output, only the layer of current output shows.
          * @param {String} val - The current output.
@@ -84,10 +88,7 @@ export default {
         }
     },
     mounted () {
-        this.planningScenarios?.forEach(scenario => {
-            this.setData(scenario, this.currentJobID);
-            this.showFeatures(this.currentJobID, this.jobResult, this.outputs);
-        });
+        this.update();
     },
     unmounted () {
         if (this.layers.length) {
@@ -101,6 +102,16 @@ export default {
 
         getMappedProperty,
 
+        /**
+         * Updates the data and features on the map.
+         * @returns {void}
+         */
+        update () {
+            this.planningScenarios?.forEach(scenario => {
+                this.setData(scenario, this.currentJobID);
+                this.showFeatures(this.currentJobID, this.jobResult, this.outputs);
+            });
+        },
         /**
          * Sets the job status data.
          * @param {Object} scenario - The scenario
