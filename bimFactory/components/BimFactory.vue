@@ -25,7 +25,7 @@ export default {
     },
     methods: {
         ...mapMutations("Menu", ["setCurrentMenuWidth", "setCurrentMouseMapInteractionsComponent"]),
-        ...mapMutations("Modules/BimFactory", ["setCurrentWorkflowId", "setGeneratedIfcUrl"]),
+        ...mapMutations("Modules/BimFactory", ["setCurrentWorkflowId", "setGeneratedIfcUrl", "setIsRequestErrorGeneral"]),
         ...mapActions("Modules/BimFactory", ["loadWorkflows"]),
         removeTitleFromDOM () {
             /* if (this.standAlonePortal && document.querySelector("#mp-subHeader-mainMenu")) {
@@ -48,6 +48,7 @@ export default {
             if (value === "start") {
                 this.currentWorkflow = null;
                 this.setGeneratedIfcUrl({});
+                this.setIsRequestErrorGeneral(false);
             }
             else {
                 this.currentWorkflow = parseInt(value, 10);

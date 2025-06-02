@@ -46,7 +46,8 @@
                         "openIfcInBimViewer": "Open IFC file in BimViewer",
                         "openIfcLink": "Download IFC file",
                         "filterMissingNote": "Please draw an area on the map or click the filter button",
-                        "generalErrorIntroText": "One or more errors were found. Please check the form."
+                        "generalErrorIntroText": "One or more errors were found. Please check the form.",
+                        "timeOutMessage": "The time limit of 10 minutes was exceeded and the process was aborted."
                     },
                     "inputerrors": {
                         "errorMessage": "Message: "

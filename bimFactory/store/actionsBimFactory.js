@@ -74,7 +74,7 @@ export default {
      *          {currentWorkflowId: String} - The Id of the current workflow.
      * @returns {Promise<void>} Resolves when the job is completed and the IFC file URL is committed.
      */
-    async submitCreateIfcRequest ({commit, state, dispatch}, payload) {
+    async submitCreateIfcRequest ({commit, getters, state, dispatch}, payload) {
         const requestUrl = payload.endpoint;
 
         commit("setIsLoading", true);
@@ -93,7 +93,20 @@ export default {
                 const jobId = response.data.id,
                     url = new URL(requestUrl),
                     updatedUrl = `${url.origin}/jobs/${jobId}`,
+                    timestamp = new Date().toISOString(),
                     interval = setInterval(async () => {
+                        const tenMinutesLater = new Date(new Date(timestamp).getTime() + 10 * 60 * 1000).toISOString();
+
+                        if (typeof getters.isRequestErrorGeneral === "string" && getters.isRequestErrorGeneral.length > 0) {
+                            clearInterval(interval);
+                        }
+                        // abort the request if it takes longer than 10 minutes to process
+                        else if (new Date().toISOString() > tenMinutesLater) {
+                            clearInterval(interval);
+                            commit("setIsLoading", false);
+                            commit("setIsRequestErrorGeneral", i18next.t("additional:modules.bimfactory.workflow.components.submit.timeOutMessage"));
+                        }
+
                         try {
                             const resultResponse = await axios.get(updatedUrl, {
                                 headers: {
@@ -106,9 +119,17 @@ export default {
                                 state.generatedIfcUrl[payload.currentWorkflowId] = resultResponse.data.results.model["url-https"];
                                 commit("setIsLoading", false);
                             }
+                            else if (resultResponse && resultResponse.data && resultResponse.data.status === "failed") {
+                                commit("setIsLoading", false);
+                                commit("setIsRequestErrorGeneral", resultResponse.data.message);
+                                clearInterval(interval);
+                            }
                         }
                         catch (error) {
                             console.error("Error fetching results:", error);
+                            commit("setIsLoading", false);
+                            clearInterval(interval);
+                            commit("setIsRequestErrorGeneral", error);
                         }
                     }, 3000);
             }
