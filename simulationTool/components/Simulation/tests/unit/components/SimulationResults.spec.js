@@ -143,31 +143,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
     });
 
     describe("Methods", () => {
-        describe("setData", () => {
-            it("should return undefined, if the first param is not correct", () => {
-                const wrapper = factory.getMount();
-
-                expect(wrapper.vm.setData(null)).to.equal(undefined);
-                expect(wrapper.vm.setData(undefined)).to.equal(undefined);
-                expect(wrapper.vm.setData("")).to.equal(undefined);
-                expect(wrapper.vm.setData(123)).to.equal(undefined);
-                expect(wrapper.vm.setData("str")).to.equal(undefined);
-                expect(wrapper.vm.setData([])).to.equal(undefined);
-                expect(wrapper.vm.setData()).to.equal(undefined);
-            });
-
-            it("should return undefined, if the second param is not a string", () => {
-                const wrapper = factory.getMount(),
-                    obj = {foo: 123};
-
-                expect(wrapper.vm.setData(obj, null)).to.equal(undefined);
-                expect(wrapper.vm.setData(obj, undefined)).to.equal(undefined);
-                expect(wrapper.vm.setData(obj, 123)).to.equal(undefined);
-                expect(wrapper.vm.setData(obj, [])).to.equal(undefined);
-                expect(wrapper.vm.setData(obj, {})).to.equal(undefined);
-            });
-        });
-
         describe("setFeatureStyle", () => {
             it("should set null as style to feature if style is not in right format", async () => {
                 const wrapper = factory.getMount(),

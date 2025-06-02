@@ -18,14 +18,13 @@ export default {
     },
     data () {
         return {
+            currentOutput: "",
             finished: "",
             jobResult: {},
             jobStatus: {},
             layers: [],
-            scenarioName: "",
             started: "",
-            outputs: [],
-            currentOutput: ""
+            status: ""
         };
     },
     computed: {
@@ -45,6 +44,22 @@ export default {
         },
 
         /**
+         * Get the current job status based on the current job.
+         * @returns {Object} The current job status.
+         */
+        currentJobResult () {
+            return this.currentJob?.jobResult;
+        },
+
+        /**
+         * Get the current job status based on the current job.
+         * @returns {Object} The current job status.
+         */
+        currentJobStatus () {
+            return this.currentJob?.jobStatus;
+        },
+
+        /**
          * Get the planning scenario containing the current job.
          * @returns {Object} The current planning scenario.
          */
@@ -61,6 +76,18 @@ export default {
         },
 
         /**
+         * Gets the outputs of results.
+         * @returns {String[]} The outputs of results.
+         */
+        outputs () {
+            if (isObject(this.currentJobResult)) {
+                return Object.keys(this.currentJobResult);
+            }
+
+            return [];
+        },
+
+        /**
         * Get the simulation configuration for the current job.
         * May change, when more features for multiple simulations are added!
         * @returns {Object} The current simulation configuration.
@@ -70,8 +97,24 @@ export default {
         }
     },
     watch: {
+        /**
+         * Shows the feature when the simulation is changed.
+         */
         simulation () {
-            this.update();
+            this.showFeatures(this.currentJobID, this.currentJobResult, this.outputs);
+        },
+
+        /**
+         * Sets different value of variable when the job status is changed.
+         * @param {Object} val - The current job status.
+         */
+        currentJobStatus: {
+            handler (val) {
+                this.started = val?.started ? dayjs(val?.started).format("DD.MM.YYYY, hh:mm:ss") : val?.started;
+                this.status = val?.status;
+                this.finished = val?.finished ? dayjs(val?.finished).format("DD.MM.YYYY, hh:mm:ss") : val?.finished;
+            },
+            immediate: true
         },
 
         /**
@@ -88,7 +131,7 @@ export default {
         }
     },
     mounted () {
-        this.update();
+        this.showFeatures(this.currentJobID, this.currentJobResult, this.outputs);
     },
     unmounted () {
         if (this.layers.length) {
@@ -101,43 +144,6 @@ export default {
         ...mapActions("Maps", ["zoomToExtent"]),
 
         getMappedProperty,
-
-        /**
-         * Updates the data and features on the map.
-         * @returns {void}
-         */
-        update () {
-            this.planningScenarios?.forEach(scenario => {
-                this.setData(scenario, this.currentJobID);
-                this.showFeatures(this.currentJobID, this.jobResult, this.outputs);
-            });
-        },
-        /**
-         * Sets the job status data.
-         * @param {Object} scenario - The scenario
-         * @param {string} jobID - The job id.
-         * @returns {void}
-         */
-        setData (scenario, jobID) {
-            if (!isObject(scenario) || !isObject(scenario.jobs) || typeof jobID !== "string") {
-                return;
-            }
-
-            if (typeof scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)] === "undefined") {
-                return;
-            }
-
-            this.jobResult = scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)]?.jobResult;
-            this.jobStatus = scenario.jobs[Object.keys(scenario.jobs).find(key => key === jobID)]?.jobStatus;
-
-            if (isObject(this.jobResult)) {
-                this.outputs = Object.keys(this.jobResult);
-            }
-
-            this.scenarioName = scenario.name;
-            this.started = this.jobStatus?.started ? dayjs(this.jobStatus?.started).format("DD.MM.YYYY, hh:mm:ss") : this.jobStatus?.started;
-            this.finished = this.jobStatus?.finished ? dayjs(this.jobStatus?.finished).format("DD.MM.YYYY, hh:mm:ss") : this.jobStatus?.finished;
-        },
 
         /**
          * Sets the Feature style according to the value of property.
@@ -234,7 +240,7 @@ export default {
                 <div
                     class="me-2"
                 >
-                    {{ $t('additional:modules.tools.simulationTool.planningScenario') }} {{ scenarioName }}
+                    {{ $t('additional:modules.tools.simulationTool.planningScenario') }} {{ currentPlanningScenario?.name }}
                 </div>
             </div>
             <div
@@ -276,7 +282,7 @@ export default {
                 <div
                     class="me-2"
                 >
-                    {{ jobStatus?.status }}
+                    {{ status }}
                 </div>
             </div>
             <div>

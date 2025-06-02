@@ -33,8 +33,8 @@ export default {
     data () {
         return {
             currentSimulationId: "",
+            jobID: "",
             jobResults: undefined,
-            jobStatus: undefined,
             oafLoadingStates: {},
             primaryTypeInputs: {},
             processDescription: undefined,
@@ -407,7 +407,9 @@ export default {
          * @returns {void}
          */
         onProgressUpdate (jobStatus) {
-            this.jobStatus = jobStatus;
+            const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId);
+
+            Object.assign(scenario.jobs[this.jobID], {jobStatus: typeof jobStatus !== "undefined" ? JSON.parse(JSON.stringify(jobStatus)) : jobStatus});
         },
 
         /**
@@ -480,8 +482,11 @@ export default {
                 return;
             }
 
+            this.jobID = jobID;
             scenario.jobs ??= {};
             scenario.jobs[jobID] = {requestBody: JSON.parse(JSON.stringify(this.requestBody))}; // Deep copy to avoid reference issues.
+
+            this.openJob(jobID);
 
             this.jobResults = await this.processHandler.pollJobStatusAndGetResults( // Das soll später auch im szenario gespeichert werden
                 jobID,
@@ -489,11 +494,8 @@ export default {
                 this.onProgressUpdate
             );
 
-            Object.assign(scenario.jobs[jobID], {jobStatus: typeof this.jobStatus !== "undefined" ? JSON.parse(JSON.stringify(this.jobStatus)) : this.jobStatus});
             Object.assign(scenario.jobs[jobID], {jobResult: typeof this.jobResults !== "undefined" ? JSON.parse(JSON.stringify(this.jobResults)) : this.jobResults});
             Object.assign(scenario.jobs[jobID], {simulation: JSON.parse(JSON.stringify(this.simulation))}); // Vorläufige Lösung, muss ggf. geändert werden
-
-            this.openJob(jobID);
         },
 
         /**
@@ -821,9 +823,6 @@ export default {
                     />
                 </div>
             </form>
-            Job status: {{ jobStatus?.status }} <br>
-            Job progress: {{ jobStatus?.progress }} % <br>
-            Job Result: <br> {{ JSON.stringify(jobResults) }}
         </div>
     </div>
 </template>
