@@ -61,7 +61,10 @@ export default {
 </script>
 
 <template>
-    <div class="bimFactory">
+    <div
+        class="bimFactory"
+        :class="{'overflowHidden': currentWorkflow !== null}"
+    >
         <BimFactoryStartpage
             v-if="currentWorkflow === null"
             @openWorkflow="openWorkflow($event)"
@@ -78,6 +81,8 @@ export default {
 <style lang="scss" scoped>
     div.bimFactory {
         flex: 1;
+    }
+    div.overflowHidden {
         overflow: hidden;
     }
 </style>

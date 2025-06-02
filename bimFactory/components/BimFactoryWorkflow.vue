@@ -337,7 +337,7 @@ export default {
             overflow: auto;
 
             .error {
-                border-left: 2px solid $light_red;
+                border-left: 0.125rem solid $light_red;
                 border-left-style: dotted;
             }
         }

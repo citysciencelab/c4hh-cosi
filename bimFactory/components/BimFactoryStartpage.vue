@@ -99,7 +99,6 @@ export default {
 <style lang="scss" scoped>
     div.bimFactoryStartPage {
         display: flex;
-        justify-content: center;
         flex-direction: column;
         align-items: center;
 
@@ -107,10 +106,10 @@ export default {
             width: 100%;
             margin-bottom: 2rem;
             border-color: rgb(229, 231, 235);
-            border-radius: 4px;
+            border-radius: 0.25rem;
             border-style: solid;
-            border-width: 1px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, .2), 0 2px 2px rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .12);
+            border-width: 0.0625rem;
+            box-shadow: 0 0.0625rem 0.3125rem rgba(0, 0, 0, .2), 0 0.125rem 0.125rem rgba(0, 0, 0, .14), 0 0.1875rem 0.0625rem -0.125rem rgba(0, 0, 0, .12);
         }
 
         img.bimFactoryConcept {
