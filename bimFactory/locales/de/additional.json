@@ -43,7 +43,7 @@
                         "message3DTitle": "3D Modus umschalten"
                     },
                     "submit": {
-                        "openIfcInBimViewer": "IFC-Datei im BimViewer öffnen",
+                        "openIfcInBimViewer": "IFC-Datei im BIM Viewer öffnen",
                         "openIfcLink": "IFC-Datei herunterladen",
                         "filterMissingNote": "Bitte ein Gebiet einzeichnen bzw. den Filter Button klicken",
                         "generalErrorIntroText": "Es wurden ein oder mehrere Fehler gefunden. Bitte überprüfen Sie das Formular.",

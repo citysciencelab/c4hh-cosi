@@ -43,7 +43,7 @@
                         "message3DTitle": "Switch 3D mode"
                     },
                     "submit": {
-                        "openIfcInBimViewer": "Open IFC file in BimViewer",
+                        "openIfcInBimViewer": "Open IFC file in BIM Viewer",
                         "openIfcLink": "Download IFC file",
                         "filterMissingNote": "Please draw an area on the map or click the filter button",
                         "generalErrorIntroText": "One or more errors were found. Please check the form.",
