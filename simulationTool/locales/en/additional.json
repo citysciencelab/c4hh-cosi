@@ -119,6 +119,7 @@
           "planningScenarioAllFiles": "All scenarios",
           "planningScenarioAlreadyExisted": "The Scenario <b>{{name}}</b> with Id {{id}} is already existed.",
           "planningScenarioBBox": "Buffer of the bounding box around the planning area in m",
+          "planningScenarioCancel": "Cancel and create a new planning scenario",
           "planningScenarioCreate": "Create new planning scenario",
           "planningScenarioDelete": "Delete planning scenario",
           "planningScenarioDescr": "Description Planning scenario",

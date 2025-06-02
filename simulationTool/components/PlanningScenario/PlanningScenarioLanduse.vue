@@ -233,6 +233,7 @@ export default {
             "setCurrentPlanningComponent",
             "setCurrentInputName",
             "setLanduseActiveTab",
+            "setPlanningScenarios",
             "setPlanningScenarioSelectInteraction"
         ]),
 
@@ -250,6 +251,20 @@ export default {
                 olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
 
             layerSource.addFeatures(olFeatures);
+        },
+
+        /**
+         * Removes all features and the current planning scenario and opens the planning scenario create component.
+         * @returns {void}
+         */
+        cancel () {
+            const filteredScenarios = this.planningScenarios?.filter(item => item.id !== this.planningScenario?.id);
+
+            this.setPlanningScenarios(filteredScenarios);
+            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+            this.removeInteraction(this.planningScenarioSelectInteraction);
+            this.clearFeatures();
+            this.setCurrentPlanningComponent("create");
         },
 
         /**
@@ -606,9 +621,8 @@ export default {
                 />
                 <FlatButton
                     class="m-3"
-                    :text="$t('additional:modules.tools.simulationTool.planningScenarioSave')"
-                    :disabled="isEmptyFeature"
-                    :interaction="() => save()"
+                    :text="!isEmptyFeature ? $t('additional:modules.tools.simulationTool.planningScenarioSave') : $t('additional:modules.tools.simulationTool.planningScenarioCancel')"
+                    :interaction="() => !isEmptyFeature ? save() : cancel()"
                 />
             </div>
             <div

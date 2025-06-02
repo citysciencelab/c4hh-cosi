@@ -182,7 +182,8 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 setVisible: () => undefined
             }),
             getLayerSource: () => new VectorSource()
-        };
+        },
+        stubSetPlanningScenario = sinon.stub();
 
     beforeEach(() => {
         store = createStore({
@@ -206,9 +207,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 simulations: () => simulations
                             },
                             mutations: {
-                                setPlanningScenarios (state, value) {
-                                    state.planningScenarios = value;
-                                },
+                                setPlanningScenarios: stubSetPlanningScenario,
                                 setCurrentEditableInput (state, value) {
                                     state.currentEditableInput = value;
                                 },
@@ -359,6 +358,22 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
             await wrapper.vm.$nextTick();
             expect(wrapper.find(".alert-danger").exists()).to.be.true;
+        });
+        it("should render cancel text in button when features are not loaded", async function () {
+            const wrapper = shallowMount(PlanningScenarioLanduse, {
+                global: {
+                    plugins: [store]
+                },
+                computed: {
+                    currentEditableInput: sinon.stub(),
+                    isEmptyFeature: () => true,
+                    isLoaded: () => true,
+                    landuseActiveTab: sinon.stub()
+                }
+            });
+
+            await wrapper.vm.$nextTick();
+            expect(wrapper.findAllComponents({name: "FlatButton"}).at(1).attributes().text).to.be.equal("additional:modules.tools.simulationTool.planningScenarioCancel");
         });
     });
 
@@ -538,6 +553,23 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
                 expect(clearFeaturesStub.calledOnce).to.be.true;
                 expect(parseAndAddFeaturesStub.calledOnceWith(features)).to.be.true;
+            });
+        });
+        describe("cancel", () => {
+            it("should call setPlanningScenario", () => {
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.cancel();
+
+                expect(stubSetPlanningScenario.calledOnce).to.be.true;
+            });
+            it("should call clear features", () => {
+                const wrapper = factory.getShallowMount(),
+                    spyClearFeatures = sinon.spy(wrapper.vm, "clearFeatures");
+
+                wrapper.vm.cancel();
+
+                expect(spyClearFeatures.calledOnce).to.be.true;
             });
         });
     });

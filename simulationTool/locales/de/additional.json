@@ -121,6 +121,7 @@
           "planningScenarioAllFiles": "Alle Szenarien",
           "planningScenarioAlreadyExisted": "Das Szenario <b>{{name}}</b> mit der Id {{id}} existiert bereits.",
           "planningScenarioBBox": "Puffer der Bounding Box um das Planungsgebiet in m",
+          "planningScenarioCancel": "Abbrechen und neues Planungszenario erstellen",
           "planningScenarioCreate": "Neues Planungsszenario erstellen",
           "planningScenarioDelete": "Planungsszenario löschen",
           "planningScenarioDescr": "Bezeichnung Planungsszenario",
