@@ -94,11 +94,12 @@ export default {
     },
     watch: {
         /**
-         * Sets the current highlight feature id accroding to the props.
+         * Sets the current highlight feature id according to the props.
          * @param {String} val the highlight feature id from props.
          */
         highlightFeatureId (val) {
             this.currentHightlightFeatureId = val;
+            this.scrollToHighlightFeature(val);
         }
     },
     methods: {
@@ -191,6 +192,22 @@ export default {
         },
 
         /**
+         * Scrolls to the highlight feature list.
+         * @param {String} val - The feature id as list div id.
+         * @returns {void}
+         */
+        scrollToHighlightFeature (val) {
+            if (typeof val !== "string") {
+                return;
+            }
+
+            document.getElementById(val).scrollIntoView({
+                block: "center",
+                behavior: "smooth"
+            });
+        },
+
+        /**
          * Toggles the style of a given feature.
          * If the feature currently has a stroke style, it resets the style to a new empty `Style` object.
          * Otherwise, it emits an event to set the feature's style externally.
@@ -214,6 +231,7 @@ export default {
     <div class="list-group list-group-flush">
         <div
             v-for="(feature, index) in sortedItemList"
+            :id="feature.getId()"
             :key="index"
             class="list-group-item list-group-item-action p-0"
             role="button"
