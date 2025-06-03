@@ -131,6 +131,10 @@ export default {
         }
     },
     mounted () {
+        if (typeof this.currentPlanningScenario !== "undefined") {
+            this.updateFeatures();
+            this.zoomToFeature();
+        }
         this.showFeatures(this.currentJobID, this.currentJobResult, this.outputs);
     },
     unmounted () {
@@ -141,7 +145,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Maps", ["zoomToExtent"]),
+        ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),
 
         getMappedProperty,
 
@@ -220,7 +224,6 @@ export default {
                 layer.getLayerSource().addFeatures(geojsonFeature);
 
                 this.layers.push(layer);
-                this.zoomToExtent({extent: layer.getLayerSource()?.getExtent(), options: {maxZoom: 7}});
             });
             this.setCurrentOutput(outputs[0]);
         }

@@ -180,6 +180,14 @@ export default {
     },
     watch: {
         /**
+         * Render current scenario feature and shows it.
+         */
+        currentPlanningScenario () {
+            this.updateFeatures();
+            this.zoomToFeature();
+        },
+
+        /**
          * Changes the requestBody according to the selected outputs.
          * @param {Object[]} val the selected outputs.
          */
@@ -201,9 +209,19 @@ export default {
             immediate: true
         }
     },
-
+    mounted () {
+        if (typeof this.currentPlanningScenario !== "undefined") {
+            this.updateFeatures();
+            this.zoomToFeature();
+        }
+    },
+    unmounted () {
+        if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+        }
+    },
     methods: {
-        ...mapActions("Modules/SimulationTool", ["addFile"]),
+        ...mapActions("Modules/SimulationTool", ["addFile", "updateFeatures", "zoomToFeature"]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentJobID",
             "setCurrentPlanningComponent",

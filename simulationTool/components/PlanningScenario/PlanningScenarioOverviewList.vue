@@ -1,7 +1,4 @@
 <script>
-import ConvertStyle from "../../js/convertStyle";
-import {extractEventCoordinates} from "../../../../src/shared/js/utils/extractEventCoordinates";
-import {GeoJSON} from "ol/format.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
@@ -28,13 +25,10 @@ export default {
             return;
         }
         this.setCurrentPlanningScenarioId("");
-    },
-    unmounted () {
         this.getLayer().getLayerSource().clear();
-        layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
     },
     methods: {
-        ...mapActions("Maps", ["zoomToExtent"]),
+        ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
@@ -103,42 +97,10 @@ export default {
         toggleList (id) {
             this.getLayer().getLayerSource().clear();
             this.setCurrentPlanningScenarioId(id);
-            this.updateFeatures();
-            this.zoomToFeature();
-        },
-        /**
-         * Updates the layer with the scenario features.
-         * @returns {void}
-         */
-        updateFeatures () {
-            if (!this.planningScenario?.scenarioFeature) {
-                return;
+            if (this.planningScenario?.scenarioFeature) {
+                this.updateFeatures();
+                this.zoomToFeature();
             }
-
-            this.getLayer().getLayerSource().clear();
-
-            const geoJsonParser = new GeoJSON(),
-                layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource();
-
-            this.planningScenario.scenarioFeature.features.forEach(feat => {
-                const olFeature = geoJsonParser.readFeature(feat);
-
-                olFeature.setStyle(ConvertStyle.geoJsonToOpenlayers(feat.style));
-                layerSource.addFeature(olFeature);
-            });
-        },
-        /**
-         * Zoom to current feature.
-         * @returns {void}
-         */
-        zoomToFeature () {
-            if (!this.planningScenario?.scenarioFeature) {
-                return;
-            }
-            const olFeatures = new GeoJSON().readFeatures(this.planningScenario.scenarioFeature),
-                coordinate = extractEventCoordinates(olFeatures[0].getGeometry().getExtent());
-
-            this.zoomToExtent({extent: coordinate, options: {maxZoom: 7}});
         }
     }
 };

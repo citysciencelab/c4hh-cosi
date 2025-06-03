@@ -1,5 +1,6 @@
 <script>
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import {mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 
@@ -26,7 +27,8 @@ export default {
                 for (const jobID in scenario.jobs) {
                     const listEntry = {
                         jobID: jobID,
-                        scenarioName: scenario.name
+                        scenarioName: scenario.name,
+                        scenarioId: scenario.id
                     };
 
                     list.push(listEntry);
@@ -36,10 +38,16 @@ export default {
             return list;
         }
     },
+    mounted () {
+        if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+        }
+    },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentJobID",
             "setCurrentPlanningComponent",
+            "setCurrentPlanningScenarioId",
             "setMode"
         ]),
 
@@ -55,11 +63,13 @@ export default {
         /**
          * Opens simulation results component.
          * @param {String} jobID - ID of the job to open.
+         * @param {String} scenarioId - ID of the scenario.
          * @returns {void}
          */
-        openJob (jobID) {
+        openJob (jobID, scenarioId) {
             this.setMode("simulationResults");
             this.setCurrentJobID(jobID);
+            this.setCurrentPlanningScenarioId(scenarioId);
         }
     }
 };
@@ -90,8 +100,8 @@ export default {
                         <a
                             role="button"
                             tabindex="0"
-                            @click="() => openJob(jobEntry.jobID)"
-                            @keypress="() => openJob(jobEntry.jobID)"
+                            @click="() => openJob(jobEntry.jobID, jobEntry.scenarioId)"
+                            @keypress="() => openJob(jobEntry.jobID, jobEntry.scenarioId)"
                         >
                             {{ jobEntry.jobID }}
                         </a>

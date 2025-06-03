@@ -106,6 +106,9 @@ export default {
     created () {
         this.source = this.getLayerSource();
     },
+    mounted () {
+        this.deleteSource();
+    },
     unmounted () {
         this.removeInteraction(this.currentModifyInteraction);
         this.currentModifyInteraction = null;

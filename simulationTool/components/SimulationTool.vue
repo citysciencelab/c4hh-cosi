@@ -12,6 +12,7 @@ import mutations from "../store/mutations";
 import JobDetails from "./Job/JobDetails.vue";
 import JobExecution from "./Job/JobExecution.vue";
 import JobList from "./Job/JobList.vue";
+import layerCollection from "../../../src/core/layers/js/layerCollection";
 import PlanningScenario from "./PlanningScenario/PlanningScenario.vue";
 import ProcessDetails from "./Process/ProcessDetails.vue";
 import ProcessList from "./Process/ProcessList.vue";
@@ -53,6 +54,11 @@ export default {
         this.fetchJobs();
         // this.fetchEnsembles();
         // this.fetchProviders();
+    },
+    unmounted () {
+        if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+        }
     },
     /**
      * Put initialize here if mounting occurs after config parsing

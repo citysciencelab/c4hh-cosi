@@ -4,6 +4,7 @@ import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpl
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {mapActions, mapGetters} from "vuex";
 import PlanningScenarioOverviewList from "./PlanningScenarioOverviewList.vue";
+import layerCollection from "../../../../src/core/layers/js/layerCollection";
 
 export default {
     name: "PlanningScenarioOverview",
@@ -15,6 +16,11 @@ export default {
     emits: ["openCreateScenario"],
     computed: {
         ...mapGetters("Modules/SimulationTool", ["planningScenarios"])
+    },
+    mounted () {
+        if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+        }
     },
     methods: {
         ...mapActions("Modules/SimulationTool", ["addFile"]),

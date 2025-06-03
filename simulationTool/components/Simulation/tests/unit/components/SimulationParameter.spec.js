@@ -57,6 +57,10 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     modules: {
                         SimulationTool: {
                             namespaced: true,
+                            actions: {
+                                updateFeatures: () => sinon.stub(),
+                                zoomToFeature: () => sinon.stub()
+                            },
                             getters: {
                                 currentPlanningScenarioId: () => "planningScenarioId",
                                 planningScenarios: () => [

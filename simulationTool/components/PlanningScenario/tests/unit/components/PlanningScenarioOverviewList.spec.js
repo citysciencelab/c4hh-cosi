@@ -103,6 +103,10 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOver
                     modules: {
                         SimulationTool: {
                             namespaced: true,
+                            actions: {
+                                updateFeatures: () => sinon.stub(),
+                                zoomToFeature: () => sinon.stub()
+                            },
                             getters: {
                                 planningScenarios: (state) => state.planningScenarios,
                                 currentPlanningScenarioId: (state) => state.currentPlanningScenarioId

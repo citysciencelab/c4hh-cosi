@@ -1,4 +1,8 @@
+import {GeoJSON} from "ol/format.js";
 import isObject from "../../../src/shared/js/utils/isObject";
+import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEventCoordinates";
+import layerCollection from "../../../src/core/layers/js/layerCollection";
+import ConvertStyle from "../js/convertStyle";
 
 export default {
     /**
@@ -279,5 +283,39 @@ export default {
                 }
             }
         }
+    },
+
+    /**
+     * Updates the layer with the scenario features.
+     * @param {Object} param.getters the getters.
+     * @returns {void}
+     */
+    updateFeatures ({getters}) {
+        const currentPlanningScenario = getters.planningScenarios.find(scenario => scenario.id === getters.currentPlanningScenarioId),
+            geoJsonParser = new GeoJSON(),
+            layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource();
+
+        layerSource.clear();
+
+        currentPlanningScenario.scenarioFeature.features.forEach(feat => {
+            const olFeature = geoJsonParser.readFeature(feat);
+
+            olFeature.setStyle(ConvertStyle.geoJsonToOpenlayers(feat.style));
+            layerSource.addFeature(olFeature);
+        });
+    },
+
+    /**
+     * Zooms to the features.
+     * @param {Object} param.dispatch the dispatch.
+     * @param {Object} param.getters the getters.
+     * @returns {void}.
+     */
+    zoomToFeature ({dispatch, getters}) {
+        const currentPlanningScenario = getters.planningScenarios.find(scenario => scenario.id === getters.currentPlanningScenarioId),
+            olFeatures = new GeoJSON().readFeatures(currentPlanningScenario?.scenarioFeature),
+            coordinate = extractEventCoordinates(olFeatures[0].getGeometry().getExtent());
+
+        dispatch("Maps/zoomToExtent", {extent: coordinate, options: {maxZoom: 7}}, {root: true});
     }
 };
