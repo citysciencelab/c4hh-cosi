@@ -149,8 +149,8 @@ export default {
 
             const result = {};
 
-            Object.keys(feature.getProperties()).forEach(key => {
-                if (shownProperties.includes(key)) {
+            shownProperties.forEach(key => {
+                if (Object.prototype.hasOwnProperty.call(feature.getProperties(), key)) {
                     result[key] = feature.getProperties()[key];
                 }
             });
@@ -245,7 +245,7 @@ export default {
             >
                 <template v-if="!hasMultipleProperties">
                     <div
-                        v-for="(value, key, idx) in extractedProperties(feature)"
+                        v-for="(value, key, idx) in getShownProperties(feature, shownProperties)"
                         :key="listKey + key"
                         class="d-flex me-3 no-stepper-arrows"
                         :class="idx === 0 ? 'flex-grow-1' : ''"

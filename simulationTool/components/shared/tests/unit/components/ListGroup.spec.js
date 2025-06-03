@@ -63,7 +63,7 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
         });
 
         it("should render four input elements", function () {
-            const wrapper = factory.getShallowMount({itemList: features}),
+            const wrapper = factory.getShallowMount({itemList: features, shownProperties: ["height", "id"]}),
                 inputWrapperArray = wrapper.findAll("input");
 
             expect(inputWrapperArray).to.be.lengthOf(4);
@@ -145,7 +145,7 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
 
     describe("User Intactions", () => {
         it("should emit 'setFeatureAttribute' with the right values", async function () {
-            const wrapper = factory.getMount({itemList: features}),
+            const wrapper = factory.getMount({itemList: features, shownProperties: ["id"]}),
                 inputWrapper = wrapper.find("input");
 
             await inputWrapper.setValue("1000");
