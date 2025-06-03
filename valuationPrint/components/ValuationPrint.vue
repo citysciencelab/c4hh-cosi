@@ -863,8 +863,7 @@ export default {
                                             :aria="$t('additional:modules.valuationPrint.removeButton')"
                                             :icon="'bi-trash'"
                                             :interaction="() => removeFeature(feature)"
-                                            class="col col-md-1"
-                                            :class-array="['remove', 'btn-sm']"
+                                            :class-array="['remove', 'btn-sm', 'col', 'col-md-1']"
                                         />
                                     </div>
                                 </li>
