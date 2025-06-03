@@ -376,7 +376,7 @@ export default {
             this.oafLoadingStates[inputKey] = true;
 
             const source = this.simulation.inputs[inputKey].source,
-                crs = this.simulation.inputs.crs,
+                crs = this.requestBody.inputs.crs,
                 filter = getOAFFeature.getOAFGeometryFilter(this.getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects"),
                 featureCollection = {
                     type: "FeatureCollection",
@@ -469,10 +469,31 @@ export default {
         },
 
         /**
+         * Removes all inputs of type "FeatureCollection" from the request body that have no features.
+         * @param {Object} requestBody - The original request body. Is modified in place.
+         * @returns {Object} The modified request body.
+         */
+        removeEmptyCollections (requestBody) {
+            if (!isObject(requestBody?.inputs)) {
+                return requestBody;
+            }
+
+            requestBody.inputs = Object.fromEntries(
+                Object.entries(requestBody.inputs).filter(
+                    ([, input]) => input.type !== "FeatureCollection" || input.features?.length > 0
+                )
+            );
+
+            return requestBody;
+        },
+
+        /**
          * Starts the simulation.
          * @returns {void}
          */
         async startSimulation () {
+            this.removeEmptyCollections(this.requestBody);
+
             const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
                 executeResponse = await this.processHandler.execute(this.requestBody),
                 jobID = executeResponse.jobID;

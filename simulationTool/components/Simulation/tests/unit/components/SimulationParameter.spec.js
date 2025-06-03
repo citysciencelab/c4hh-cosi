@@ -16,7 +16,8 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             return shallowMount(SimulationParameter, {
                 data () {
                     return {
-                        currentSimulationId: "simulationId"
+                        currentSimulationId: "simulationId",
+                        requestBody: {inputs: {}}
                     };
                 },
                 global: {
@@ -28,7 +29,8 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             return mount(SimulationParameter, {
                 data () {
                     return {
-                        currentSimulationId: "simulationId"
+                        currentSimulationId: "simulationId",
+                        requestBody: {inputs: {}}
                     };
                 },
                 global: {
@@ -323,6 +325,29 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
                 await wrapper.setData({requestBody: {inputs: inputs}});
                 expect(wrapper.vm.getRequestBodyInputByKey("key1", "", "value")).to.equal("result");
+            });
+        });
+
+        describe("removeEmptyCollections", () => {
+            it("should remove empty collections from the requestBody", () => {
+                const wrapper = factory.getShallowMount(),
+                    oldRequestBody = {
+                        inputs: {
+                            emptyCollection: {type: "FeatureCollection", features: []},
+                            nonEmptyCollection: {type: "FeatureCollection", features: [{}]},
+                            differentInputType: "someValue"
+                        }
+                    },
+                    expectedRequestBody = {
+                        inputs: {
+                            nonEmptyCollection: {type: "FeatureCollection", features: [{}]},
+                            differentInputType: "someValue"
+                        }
+                    },
+                    result = wrapper.vm.removeEmptyCollections(oldRequestBody);
+
+                expect(result).to.deep.equal(expectedRequestBody);
+                expect(oldRequestBody).to.deep.equal(expectedRequestBody);
             });
         });
 
@@ -635,7 +660,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
                 sinon.stub(getOAFFeature, "getOAFGeometryFilter");
 
-                wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+                await wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
 
                 expect(getStub.calledOnce).to.be.true;
             });
@@ -646,7 +671,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
                 wrapper.vm.currentPlanningScenario.inputs.anOafInput = {};
 
-                wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+                await wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
 
                 expect(getStub.called).to.be.false;
             });
@@ -656,7 +681,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
                 wrapper.vm.requestBody.inputs = {};
                 wrapper.vm.currentPlanningScenario.inputs.anOafInput = "aValue";
-                wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+                await wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
 
                 expect(wrapper.vm.requestBody.inputs.anOafInput).to.deep.equal("aValue");
             });
@@ -666,7 +691,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
                 wrapper.vm.requestBody.inputs = {anOafInput: "aValue"};
                 wrapper.vm.currentPlanningScenario.inputs.anOafInput = "aValue";
-                wrapper.vm.onOafSwitchChange({target: {checked: false}}, "anOafInput");
+                await wrapper.vm.onOafSwitchChange({target: {checked: false}}, "anOafInput");
 
                 expect(wrapper.vm.requestBody.inputs.anOafInput).to.be.undefined;
             });
