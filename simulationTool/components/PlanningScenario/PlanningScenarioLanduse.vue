@@ -670,4 +670,7 @@ export default {
     align-content: center;
 }
 
+.tab-content {
+    z-index: 0;
+}
 </style>
