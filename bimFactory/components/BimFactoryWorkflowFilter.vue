@@ -27,7 +27,11 @@ export default {
     },
     data () {
         return {
-            data: null
+            data: null,
+            drawOptions: {
+                "Box": this.$t("common:shared.modules.graphicalSelect.selectBySquare"),
+                "Polygon": this.$t("common:shared.modules.graphicalSelect.selectByPolygon")
+            }
         };
     },
     computed: {
@@ -142,6 +146,7 @@ export default {
                 ref="graphicalSelect"
                 :label="$t('additional:modules.bimfactory.workflow.components.filter.select')"
                 :start-geometry="filterLayer"
+                :options="drawOptions"
             />
         </div>
 
