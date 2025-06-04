@@ -140,7 +140,7 @@ export default {
             "alkisBaseUrl",
             "reportPath"
         ]),
-        ...mapGetters(["restServiceById"]),
+        ...mapGetters(["restServiceById", "isMobile"]),
         ...mapGetters("Modules/SearchBar", [
             "searchResults"
         ]),
@@ -356,6 +356,9 @@ export default {
                 this.resetAll(false);
             }
             this.walkTroughToFetchAndAdd();
+            if (this.isMobile) {
+                this.closeMenu("mainMenu");
+            }
         },
 
         isCreatingPDF () {
@@ -412,6 +415,10 @@ export default {
         ...mapActions("Modules/WaterRiskCheck", [
             "setAddress"
         ]),
+        ...mapActions("Menu", [
+            "closeMenu"
+        ]),
+
         /**
          * Creates a layer for the display of parcels and buildings on the map.
          * @returns {void}

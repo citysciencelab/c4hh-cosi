@@ -72,7 +72,8 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                         return {
                             url: "https://this.could.be.your.url/examplePortal"
                         };
-                    }
+                    },
+                    isMobile: () => false
                 }
             });
         }
