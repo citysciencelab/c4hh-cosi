@@ -37,6 +37,7 @@ export default {
             "currentPlanningScenarioId",
             "currentEditableInput",
             "currentInputName",
+            "dataSources",
             "drawTypeLabels",
             "landuseCurrentLayout",
             "landuseRoadDrawIcons",
@@ -49,29 +50,28 @@ export default {
             "planningScenarioSelectedInteraction",
             "planningScenarioSelectInteraction",
             "planningScenarioStrokeRange",
-            "planningScenarios",
-            "simulations"
+            "planningScenarios"
         ]),
 
         /**
-         * Gets the simulation config object that is set for the current planning scenario.
+         * Gets the data source config object that is set for the current planning scenario.
          * @returns {Object} The current simulation config.
          */
-        currentSimulation () {
-            return this.simulations.find(sim => sim.id === this.planningScenario.simulationId);
+        currentDataSource () {
+            return this.dataSources.find(dataSource => dataSource.id === this.planningScenario.dataSourceId);
         },
 
         /**
-         * Gets all simulation inputs marked as editable.
+         * Gets all current data source inputs marked as editable.
          * @returns {Object} An inputs object containing only the editable inputs.
          */
         editableInputs () {
-            if (!this.currentSimulation?.inputs) {
+            if (!this.currentDataSource?.inputs) {
                 return undefined;
             }
 
             return Object.fromEntries(
-                Object.entries(this.currentSimulation.inputs).filter(([, value]) => {
+                Object.entries(this.currentDataSource.inputs).filter(([, value]) => {
                     return value.editable;
                 })
             );

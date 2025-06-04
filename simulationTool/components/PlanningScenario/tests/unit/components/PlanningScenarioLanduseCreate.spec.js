@@ -29,9 +29,9 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             name: "planning-scenario",
             alwaysOnTop: true
         }),
-        simulations = [
+        dataSources = [
             {
-                "id": "noise_v4:traffic_noise_propagation",
+                "id": "default",
                 "inputs": {
                     "buildings": {
                         "editable": true,
@@ -53,7 +53,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         planningScenarios = [{
             "id": "Szenario1",
             "name": "Planungsszenario 1",
-            "simulationId": "noise_v4:traffic_noise_propagation",
+            "dataSourceId": "default",
             "featuresLoaded": true,
             "inputs": {
                 "buildings": {
@@ -187,6 +187,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                             getters: {
                                 currentEditableInput: () => "buildings",
                                 currentPlanningScenarioId: () => "Szenario1",
+                                drawTypeLabels: () => [],
                                 landuseCurrentLayout: () => {
                                     return {
                                         fillColor: [55, 126, 184],
@@ -209,7 +210,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                                 planningScenarioStrokeRange: () => [1, 16],
                                 planningScenarioSelectedInteraction: () => null,
                                 planningScenarios: () => planningScenarios,
-                                simulations: () => simulations,
+                                dataSources: () => dataSources,
                                 currentInputName: () => "buildings"
                             }
                         }
