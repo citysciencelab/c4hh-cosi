@@ -3,14 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
-
-### Added
-
-### Changed
-
-### Deprecated
+## 2025-06-04 v3.11.0
 
 ### Removed
 - Removed since version 3 not used state property `deactivateGFI` and `translate#` in language-keys.
