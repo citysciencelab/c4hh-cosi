@@ -2,7 +2,7 @@ import store from "../../src/app-store";
 
 /**
  * Creates an inspector for tiles as shown in the example https://sandcastle.cesium.com/?src=3D%20Tiles%20Inspector.html
- * This function checks the state of the menu and the map mode and creates or removes the inspector accordingly.
+ * This function checks the state of the menu and the map mode every second and creates or removes the inspector accordingly.
  * It also adds drag-and-drop functionality to the inspector.
  * @returns {void}
  */
@@ -48,7 +48,6 @@ function createCesium3dTilesInspector () {
 /**
  * Adds drag-and-drop functionality to the inspector element.
  * The inspector can be moved by holding the middle mouse button (mouse button 1).
- * The function updates the element's position on mouse movement.
  * @param {HTMLElement} element - The DOM element to be moved.
  * @returns {void}
  */
@@ -83,25 +82,20 @@ function addDragFunctionality (element) {
 }
 
 /**
- * Checks if Cesium is defined and starts the function to create the 3D Tiles Inspector.
+ * Checks if Cesium is defined and starts the function to create the 3D Tiles Inspector once Cesium is available.
  * If Cesium is not defined, it checks every second until it is defined.
- * Once Cesium is available and the map mode is "3D", it creates the inspector.
  * @returns {void}
  */
-function checkAndCreateInspector () {
-    let mapMode = store.getters["Maps/mode"];
+function checkCesiumAndCreateInspector () {
     const checkCesiumInterval = setInterval(function () {
-        if (typeof Cesium !== "undefined" && mapMode === "3D") {
+        if (typeof Cesium !== "undefined") {
             clearInterval(checkCesiumInterval);
             createCesium3dTilesInspector();
-        }
-        else {
-            mapMode = store.getters["Maps/mode"];
         }
     }, 1000);
 }
 
-checkAndCreateInspector();
+checkCesiumAndCreateInspector();
 
 export {
     createCesium3dTilesInspector
