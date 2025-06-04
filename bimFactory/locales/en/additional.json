@@ -28,6 +28,7 @@
                 }
             },
             "workflow": {
+                "headerImageAlt": "Header image for \"{{workflowTitle}}\"",
                 "backToStart": "Back to startpage",
                 "buttons": {
                     "back": "previous step",

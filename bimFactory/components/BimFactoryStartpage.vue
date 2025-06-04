@@ -1,10 +1,9 @@
 <script>
-import getters from "../store/gettersBimFactory";
 import {mapGetters} from "vuex";
 
 export default {
     computed: {
-        ...mapGetters("Modules/BimFactory", Object.keys(getters))
+        ...mapGetters("Modules/BimFactory", ["standAlonePortal", "workflowsJSON"])
     },
     methods: {
         openSelectedWorkflow (value) {

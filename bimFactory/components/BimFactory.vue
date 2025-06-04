@@ -1,5 +1,4 @@
 <script>
-import getters from "../store/gettersBimFactory";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import BimFactoryStartpage from "./BimFactoryStartpage.vue";
 import BimFactoryWorkflow from "./BimFactoryWorkflow.vue";
@@ -16,7 +15,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/BimFactory", Object.keys(getters))
+        ...mapGetters("Modules/BimFactory", ["standAlonePortal", "type"])
     },
     mounted () {
         this.removeTitleFromDOM();

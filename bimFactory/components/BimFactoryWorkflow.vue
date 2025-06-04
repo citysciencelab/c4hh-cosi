@@ -264,12 +264,23 @@ export default {
             icon="bi bi-house"
         />
 
-        <p class="bimFactoryWorkflowTitle">
-            {{ currentWorkflow?.name }}
-        </p>
-
         <div class="bimFactoryWorkflowContent">
             <div class="bimFactoryAccordion">
+                <img
+                    v-if="currentWorkflowDetails?.imgSrc"
+                    :src="currentWorkflowDetails?.imgSrc"
+                    :alt="$t('additional:modules.bimfactory.workflow.headerImageAlt', {workflowTitle: currentWorkflowDetails?.title})"
+                    :title="$t('additional:modules.bimfactory.workflow.headerImageAlt', {workflowTitle: currentWorkflowDetails?.title})"
+                    class="rounded"
+                >
+
+                <h5
+                    v-else-if="currentWorkflowDetails?.title"
+                    class="bimFactoryWorkflowTitle"
+                >
+                    {{ currentWorkflowDetails?.title }}
+                </h5>
+
                 <AccordionItem
                     v-for="(step, index) in accordionItems"
                     :id="`accordion-item-${index}`"
@@ -317,8 +328,8 @@ export default {
         flex-direction: column;
         height: 100%;
 
-        p.bimFactoryWorkflowTitle {
-            margin: 0;
+        h5.bimFactoryWorkflowTitle {
+            margin: 0 0 0.5rem 0.5rem;
         }
 
         div.bimFactoryWorkflowContent {
