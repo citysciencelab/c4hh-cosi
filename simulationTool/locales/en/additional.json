@@ -135,6 +135,7 @@
           "planningScenarioUpload": "Upload planning scenario",
           "planningScenarioWrongFormat": "The content is in invalid format",
           "privacy": "Privacy",
+          "progress": "Calculation progress",
           "refresh": "Refresh",
           "roads": "roads",
           "removeJob": "Remove scenario from ensemble",

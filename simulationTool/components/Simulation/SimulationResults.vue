@@ -62,6 +62,14 @@ export default {
         },
 
         /**
+         * Get the current progress of the current job and get 0 by undefined.
+         * @returns {String} The current progress
+         */
+        currentProgress () {
+            return typeof this.currentJobStatus?.progress === "undefined" ? 0 : this.currentJobStatus?.progress;
+        },
+
+        /**
          * Get the planning scenario containing the current job.
          * @returns {Object} The current planning scenario.
          */
@@ -281,6 +289,7 @@ export default {
                     </div>
                 </div>
                 <div
+                    v-if="finished"
                     class="d-flex flex-column"
                 >
                     <div
@@ -306,19 +315,25 @@ export default {
                         class="me-2 ps-label"
                     >
                         <span
-                            v-if="status === 'successful'"
+                            v-if="status === 'accepted' || typeof status === 'undefined'"
+                            class="status running"
+                        >
+                            {{ $t('additional:modules.tools.simulationTool.progress') }}: {{ currentProgress }}%
+                        </span>
+                        <span
+                            v-else-if="status === 'successful'"
                             class="status success"
                         >
                             {{ $t('additional:modules.tools.simulationTool.successfull') }}
                         </span>
                         <span
-                            v-else-if="status === 'accepted'"
-                            class="status running"
+                            v-else-if="status === 'unsuccessfull'"
+                            class="status unsuccessfull"
                         >
-                            {{ $t('additional:modules.tools.simulationTool.started') }}
+                            {{ $t('additional:modules.tools.simulationTool.unsuccessfull') }}
                         </span>
                         <span
-                            v-else-if="typeof status === 'undefined'"
+                            v-else
                             class="status error"
                         >
                             {{ $t('additional:modules.tools.simulationTool.unsuccessfull') }}
