@@ -46,6 +46,9 @@ export default {
 
 <style lang="scss">
 div.BimFactoryWorkflowInputText {
+    /* necessary to get a dense form, because the InputText-Component uses class .mb-3 with '!important' to force 1rem margin-bottom */
+    margin-bottom: -1rem;
+
     div.form-floating {
      > input {
             border: none;

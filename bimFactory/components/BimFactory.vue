@@ -61,6 +61,7 @@ export default {
 
 <template>
     <div
+        id="bim-factory"
         class="bimFactory"
         :class="{'overflowHidden': currentWorkflow !== null}"
     >

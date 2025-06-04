@@ -160,13 +160,19 @@ export default {
             class="ms-3"
         />
 
-        <TableComponent
-            v-if="typeof displayData === 'object' && displayData?.headers?.length && config.component.renderAs === 'table' && !isLoading"
-            :data="displayData"
-            :max-attributes-to-show="1000"
-            :dynamic-column-table="true"
-            :fixed-data="{items: []}"
-        />
+        <div v-if="typeof displayData === 'object' && displayData?.headers?.length && config.component.renderAs === 'table' && !isLoading">
+            <TableComponent
+                :data="displayData"
+                :max-attributes-to-show="1000"
+                :dynamic-column-table="true"
+                :fixed-data="{items: []}"
+                table-class="filteredResultsTable"
+            />
+
+            <p class="filteredElementsNumber">
+                {{ displayData?.items?.length + " " + $t('additional:modules.bimfactory.workflow.components.filter.numberFilteredElement') }}
+            </p>
+        </div>
 
         <div v-else-if="displayData?.length && config.component.renderAs === 'list' && !isLoading">
             <span class="selectedTiles">
@@ -191,24 +197,45 @@ export default {
     </div>
 </template>
 
-<style scoped>
-div.bimFactoryWorkflowFilter {
-    width: 100%;
+<style lang="scss">
+#bim-factory {
+    div.bimFactoryWorkflowFilter {
+        width: 100%;
 
-    div.filterSelect {
-        margin: 0.5rem 0.75rem 0.5rem 0;
-    }
+        div.filterSelect {
+            margin: 0.5rem 0.75rem 0.5rem 0;
+        }
 
-    span.selectedTiles {
-        margin-left: 0.25rem;
-    }
+        span.selectedTiles {
+            margin-left: 0.25rem;
+        }
 
-    ul.responseList {
-        list-style-type: none;
-    }
+        ul.responseList {
+            list-style-type: none;
+        }
 
-    span.filterNote {
-        margin-left: 0.25rem;
+        span.filterNote {
+            margin-left: 0.25rem;
+        }
+
+        div.filteredResultsTable {
+            max-height: 20rem;
+
+            table {
+                td {
+                    white-space: nowrap;
+
+                    p {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+
+        p.filteredElementsNumber {
+            text-align: right;
+            margin-right: 1rem;
+        }
     }
 }
 </style>

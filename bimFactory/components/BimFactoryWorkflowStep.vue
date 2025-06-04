@@ -115,7 +115,6 @@ div.BimFactoryWorkflowStep {
                     div.containerContent {
                         display: flex;
                         flex-wrap: wrap;
-                        gap: 0.5rem;
 
                         div.containerComponent {
                             width: 100%;
