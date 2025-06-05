@@ -341,8 +341,40 @@ export default {
                     </div>
                 </div>
             </div>
+            <AccordionItem
+                v-if="currentJob"
+                id="simulation-results-accordion-inputs"
+                class="ms-2 my-2"
+                :title="$t('additional:modules.tools.simulationTool.inputParameters')"
+            >
+                <div
+                    v-for="(input, inputKey) in currentJob?.requestBody?.inputs"
+                    :key="inputKey"
+                >
+                    <div
+                        v-if="typeof input === 'object' && input?.type !== 'FeatureCollection'"
+                        class="container"
+                    >
+                        <div
+                            v-for="(property, propertyKey) in input"
+                            :key="`${inputKey}-${propertyKey}`"
+                            class="py-1 row"
+                        >
+                            <div class="col col-md-5">
+                                {{ getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping) + ":" }}
+                            </div>
+                            <div class="col col-md-7 font-bold align-self-center">
+                                {{ property }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </AccordionItem>
             <hr>
-            <div class="result-output-container">
+            <div
+                v-if="status === 'successful'"
+                class="result-output-container"
+            >
                 <h5
                     class="mb-3"
                 >
@@ -374,32 +406,14 @@ export default {
                     </div>
                 </div>
             </div>
-            <AccordionItem
-                v-if="currentJob"
-                id="simulation-results-accordion-inputs"
-                :title="$t('additional:modules.tools.simulationTool.inputParameters')"
-            >
-                <div
-                    v-for="(input, inputKey) in currentJob?.requestBody?.inputs"
-                    :key="inputKey"
-                >
-                    <div
-                        v-if="typeof input === 'object' && input?.type !== 'FeatureCollection'"
-                    >
-                        <div
-                            v-for="(property, propertyKey) in input"
-                            :key="`${inputKey}-${propertyKey}`"
-                        >
-                            {{ getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping) }}: {{ property }} <br>
-                        </div>
-                    </div>
-                </div>
-            </AccordionItem>
-            <AccordionItem
-                v-if="currentJob"
-                id="simulation-results-accordion-legend"
-                :title="$t('additional:modules.tools.simulationTool.legend')"
-            />
+            <div v-if="status === 'successful'">
+                <hr>
+                <AccordionItem
+                    id="simulation-results-accordion-legend"
+                    class="mt-4"
+                    :title="$t('additional:modules.tools.simulationTool.legend')"
+                />
+            </div>
         </div>
         <div
             v-else
