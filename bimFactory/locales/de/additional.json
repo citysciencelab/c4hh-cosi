@@ -48,7 +48,7 @@
                         "openIfcInBimViewer": "IFC-Datei im BIM Viewer öffnen",
                         "openIfcLink": "IFC-Datei herunterladen",
                         "filterMissingNote": "Bitte ein Gebiet einzeichnen bzw. den Filter Button klicken",
-                        "generalErrorIntroText": "Es wurden ein oder mehrere Fehler gefunden. Bitte überprüfen Sie das Formular.",
+                        "generalErrorIntroText": "Es wurden ein oder mehrere Fehler gefunden.",
                         "timeOutMessage": "Die Zeit von 10 Minuten wurde überschritten und der Prozess abgebrochen."
                     },
                     "inputerrors": {

@@ -81,47 +81,48 @@ export default {
     </div>
 </template>
 
-<style lang="scss" scoped>
-
-div.BimFactoryWorkflowDetailSelector {
-    div.items {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-    }
-
-    button.item {
-        box-shadow: 0 0.0625rem 0.3125rem rgba(0, 0, 0, .2),
-                    0 0.125rem 0.125rem rgba(0, 0, 0, .14),
-                    0 0.1875rem 0.0625rem -0.125rem rgba(0, 0, 0, .12);
-        border-radius: 0.25rem;
-        margin: 0.25rem;
-        background: white;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-
-        img.itemImage {
+<style lang="scss">
+#bim-factory {
+    div.BimFactoryWorkflowDetailSelector {
+        div.items {
+            display: flex;
+            flex-direction: row;
             width: 100%;
-            height: auto;
-            object-fit: contain;
-            display: block;
         }
 
-        div.imageCaption {
-            font-size: 1rem;
-            text-align: center;
+        button.item {
+            box-shadow: 0 0.0625rem 0.3125rem rgba(0, 0, 0, .2),
+                        0 0.125rem 0.125rem rgba(0, 0, 0, .14),
+                        0 0.1875rem 0.0625rem -0.125rem rgba(0, 0, 0, .12);
+            border-radius: 0.25rem;
+            margin: 0.25rem;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            img.itemImage {
+                width: 100%;
+                height: auto;
+                object-fit: contain;
+                display: block;
+            }
+
+            div.imageCaption {
+                font-size: 1rem;
+                text-align: center;
+            }
         }
-    }
 
-    div.sliderRow {
-        display: flex;
-        margin-top: 1rem;
+        div.sliderRow {
+            display: flex;
+            margin-top: 1rem;
 
-        div.sliderSpacer {
-            width: 14%;
+            div.sliderSpacer {
+                width: 14%;
+            }
         }
     }
 }

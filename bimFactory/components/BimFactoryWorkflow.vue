@@ -320,48 +320,50 @@ export default {
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
     @import "~variables";
 
-    div.bimFactoryWorkflow {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-
-        h5.bimFactoryWorkflowTitle {
-            margin: 0 0 0.5rem 0.5rem;
-        }
-
-        div.bimFactoryWorkflowContent {
+    #bim-factory {
+        div.bimFactoryWorkflow {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            flex: 1;
-            overflow: hidden;
-        }
+            height: 100%;
 
-        div.bimFactoryAccordion {
-            display: flex;
-            flex-direction: column;
-            justify-content: left;
-            flex: 1;
-            overflow: auto;
-
-            .error {
-                border-left: 0.125rem solid $light_red;
-                border-left-style: dotted;
+            h5.bimFactoryWorkflowTitle {
+                margin: 0 0 0.5rem 0.5rem;
             }
-        }
 
-        div.navigationButtons {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            width: 100%;
-            padding-top: 0.5rem;
+            div.bimFactoryWorkflowContent {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                flex: 1;
+                overflow: hidden;
+            }
 
-            button.flat-button {
-                margin: 0 !important;
+            div.bimFactoryAccordion {
+                display: flex;
+                flex-direction: column;
+                justify-content: left;
+                flex: 1;
+                overflow: auto;
+
+                .error {
+                    border-left: 0.125rem solid $light_red;
+                    border-left-style: dotted;
+                }
+            }
+
+            div.navigationButtons {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+                padding-top: 0.5rem;
+
+                button.flat-button {
+                    margin: 0 !important;
+                }
             }
         }
     }

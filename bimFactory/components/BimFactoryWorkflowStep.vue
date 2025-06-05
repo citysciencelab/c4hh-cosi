@@ -77,47 +77,49 @@ export default {
     </div>
 </template>
 
-<style lang="scss" scoped>
-div.BimFactoryWorkflowStep {
-    display: flex;
-    flex-direction: column;
-
-    div.sections {
+<style lang="scss">
+#bim-factory {
+    div.BimFactoryWorkflowStep {
         display: flex;
         flex-direction: column;
-        box-shadow: 0 0.0625rem 0.3125rem rgba(0, 0, 0, .2),
-                    0 0.125rem 0.125rem rgba(0, 0, 0, .14),
-                    0 0.1875rem 0.0625rem -0.125rem rgba(0, 0, 0, .12);
-        border-radius: 0.25rem;
-        padding: 0.75rem;
 
-        div.section {
-        display: flex;
+        div.sections {
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0.0625rem 0.3125rem rgba(0, 0, 0, .2),
+                        0 0.125rem 0.125rem rgba(0, 0, 0, .14),
+                        0 0.1875rem 0.0625rem -0.125rem rgba(0, 0, 0, .12);
+            border-radius: 0.25rem;
+            padding: 0.75rem;
 
-            div.containers {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 1rem;
-                width: 100%;
+            div.section {
+            display: flex;
 
-                div.bimContainer {
-                display: flex;
-                flex-direction: column;
-                flex: 1 1 auto;
-                min-width: 0;
-                width: 100%;
+                div.containers {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                    width: 100%;
 
-                    div.containerTitle {
-                        font-size: 1rem;
-                        font-weight: bold;
-                    }
-
-                    div.containerContent {
+                    div.bimContainer {
                         display: flex;
-                        flex-wrap: wrap;
+                        flex-direction: column;
+                        flex: 1 1 auto;
+                        min-width: 0;
+                        width: 100%;
 
-                        div.containerComponent {
-                            width: 100%;
+                        div.containerTitle {
+                            font-size: 1rem;
+                            font-weight: bold;
+                        }
+
+                        div.containerContent {
+                            display: flex;
+                            flex-wrap: wrap;
+
+                            div.containerComponent {
+                                width: 100%;
+                            }
                         }
                     }
                 }

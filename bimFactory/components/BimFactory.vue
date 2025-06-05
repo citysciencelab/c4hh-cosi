@@ -62,7 +62,6 @@ export default {
 <template>
     <div
         id="bim-factory"
-        class="bimFactory"
         :class="{'overflowHidden': currentWorkflow !== null}"
     >
         <BimFactoryStartpage
@@ -78,11 +77,12 @@ export default {
     </div>
 </template>
 
-<style lang="scss" scoped>
-    div.bimFactory {
-        flex: 1;
-    }
-    div.overflowHidden {
+<style lang="scss">
+#bim-factory {
+    flex: 1;
+
+    &.overflowHidden {
         overflow: hidden;
     }
+}
 </style>

@@ -207,13 +207,15 @@ export default {
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
     @import "~variables";
 
-    div.BimFactoryWorkflowSubmit {
-        p {
-            &.error {
-                color: $light_red;
+    #bim-factory {
+        div.BimFactoryWorkflowSubmit {
+            p {
+                &.error {
+                    color: $light_red;
+                }
             }
         }
     }

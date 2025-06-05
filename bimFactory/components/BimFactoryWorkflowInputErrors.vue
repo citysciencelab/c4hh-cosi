@@ -42,18 +42,21 @@ export default {
     </div>
 </template>
 
-<style lang="scss" scoped>
-div.BimFactoryWorkflowInputErrors {
-    @import "~variables";
+<style lang="scss">
+@import "~variables";
 
-    div.errorline {
-        font-size: smaller;
-        margin: 0.5rem 0 0.5rem 0.813rem;
-    }
+#bim-factory {
+    div.BimFactoryWorkflowInputErrors {
 
-    div {
-        span.error {
-            color: $light_red;
+        div.errorline {
+            font-size: smaller;
+            margin: 0.5rem 0 0.5rem 0.813rem;
+        }
+
+        div {
+            span.error {
+                color: $light_red;
+            }
         }
     }
 }
