@@ -231,25 +231,30 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         it("should exist", async function () {
             const wrapper = factory.getShallowMount();
 
+            await wrapper.vm.$nextTick();
             expect(wrapper.exists()).to.be.true;
         });
         it("should render draw types", async function () {
             const wrapper = factory.getShallowMount(),
                 drawTypes = wrapper.find("#draw-types");
 
+            await wrapper.vm.$nextTick();
             expect(drawTypes.exists()).to.be.true;
         });
         it("should render draw layouts", async function () {
             const wrapper = factory.getShallowMount(),
                 drawLayouts = wrapper.find("#draw-layouts");
 
+            await wrapper.vm.$nextTick();
             expect(drawLayouts.exists()).to.be.true;
         });
     });
 
     describe("Hooks", () => {
         it("should call 'getCollectionSchema' when component is mounted", async function () {
-            factory.getShallowMount();
+            const wrapper = factory.getShallowMount();
+
+            await wrapper.vm.$nextTick();
             expect(getCollectionSchemaStub.calledOnce).to.be.true;
         });
     });
@@ -258,14 +263,10 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         describe("setFeatureProperties", () => {
             it("should set the given properties to the passed feature", async function () {
                 const feature = new Feature(),
-                    properties = {
-                        "cool": true,
-                        "hot": false
-                    },
-                    wrapper = factory.getShallowMount(),
-                    updatedFeature = wrapper.vm.setFeatureProperties(feature, properties);
+                    wrapper = factory.getShallowMount();
 
-                expect(updatedFeature.getProperties()).to.deep.equal({cool: "", hot: "", created: true});
+                await wrapper.vm.$nextTick();
+                expect(wrapper.vm.setFeatureProperties(feature, ["cool", "hot"]).getProperties()).to.have.all.keys(["cool", "hot", "created", "id"]);
             });
         });
     });

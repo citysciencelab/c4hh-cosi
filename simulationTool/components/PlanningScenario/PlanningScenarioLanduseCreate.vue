@@ -135,7 +135,7 @@ export default {
          * @return {void}
          */
         addInputFeature (evt) {
-            const olFeature = this.setFeatureProperties(evt.feature, this.schema?.properties),
+            const olFeature = this.setFeatureProperties(evt.feature, this.getPropertiesToShow),
                 geojsonFeature = ConvertFeature.openlayersToGeoJson([olFeature])[0];
 
             this.createdFeatures = this.getLayerSource().getFeatures().filter(feature => feature.get("created") === true).concat(evt.feature);
@@ -250,23 +250,28 @@ export default {
          * Sets properties for a given feature, initializing them with empty values
          * and adding specific attributes like "created" and a unique ID.
          * @param {ol/Feature} feature - The feature object to set properties for.
+         * @param {String[]} propertiesToShow - An array of property names to set on the feature.
          * @returns {ol/Feature} The updated feature object with initialized properties.
          */
-        setFeatureProperties (feature, properties) {
+        setFeatureProperties (feature, propertiesToShow) {
+            const uniqId = parseInt(uniqueId(), 10);
+
             if (!this.getInputFeatures(this.currentEditableInput).length) {
                 feature.set("created", true);
-                feature.setId(uniqueId(this.currentEditableInput + "-"));
+                feature.setId(uniqId);
+                feature.set("id", uniqId);
 
                 return feature;
             }
 
-            Object.keys(properties).forEach(property => {
+            propertiesToShow.forEach(property => {
                 if (feature.getProperties()[property] === undefined) {
-                    feature.set(property, "");
+                    feature.set(property, null);
                 }
             });
             feature.set("created", true);
-            feature.setId(uniqueId(this.currentEditableInput + "-"));
+            feature.setId(uniqId);
+            feature.set("id", uniqId);
 
             return feature;
         },
@@ -383,6 +388,8 @@ export default {
                 </div>
                 <ListGroup
                     :item-list="createdFeatures"
+                    :item-schema="schema"
+                    :list-key="currentEditableInput"
                     :properties-mapping="getPropertiesMapping"
                     :shown-properties="getPropertiesToShow"
                     @removeFeature="removeFeature"

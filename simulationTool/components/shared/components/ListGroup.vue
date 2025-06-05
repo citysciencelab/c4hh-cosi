@@ -22,6 +22,10 @@ export default {
             type: Array,
             default: () => []
         },
+        itemSchema: {
+            type: Object,
+            default: () => undefined
+        },
         listKey: {
             type: String,
             default: () => ""
@@ -61,13 +65,11 @@ export default {
         }),
 
         /**
-         * Checks if the first feature in the list has more than three properties, include the geometry.
-         * @returns {Boolean} True if the first feature has more than three properties, false otherwise.
+         * Determines if the `propertiesMapping` object contains more than two properties.
+         * @returns {boolean} `true` if the number of keys in `propertiesMapping` exceeds 2, otherwise `false`.
          */
         hasMultipleProperties () {
-            const properties = this.extractedProperties(this.itemList[0]);
-
-            return Object.keys(properties).length > 4;
+            return Object.keys(this.propertiesMapping).length > 2;
         },
 
         /**
@@ -103,20 +105,6 @@ export default {
         }
     },
     methods: {
-        /**
-         * Extracts the properties of a given feature, excluding specific keys.
-         * @param {ol/Feature} feature - The feature object containing properties.
-         * @returns {Object} A new object containing all properties of the feature except for `geometry` and `created`.
-         */
-        extractedProperties (feature) {
-            const properties = {...feature.getProperties()};
-
-            delete properties.geometry;
-            delete properties.created;
-            delete properties.fid;
-
-            return properties;
-        },
 
         /**
          * Determines the appropriate icon class based on the style of the given feature.
@@ -179,13 +167,13 @@ export default {
         /**
          * Emits 'setFeatureAttribute' to update a specific attribute of a feature with a new value.
          * @param {InputEvent} event - The event containing the new value.
-         * @param {String|Number} oldValue - The old value of the attribute.
          * @param {String} key - The key of the attribute to be updated.
          * @param {ol/Feature} feature - The feature whose attribute needs to be updated.
+         * @param {String} type - The type of the attribute (e.g., "number" or "string").
          * @returns {void}
          */
-        setFeatureAttribute (event, oldValue, key, feature) {
-            const value = typeof oldValue === "number" ? event?.target?.valueAsNumber : event?.target?.value;
+        setFeatureAttribute (event, key, feature, type) {
+            const value = type === "number" ? event?.target?.valueAsNumber : event?.target?.value;
 
             feature.set(key, value);
             this.$emit("setFeatureAttribute", value, key, feature.getId());
@@ -243,63 +231,43 @@ export default {
                 class="d-flex justify-content-between align-items-center p-2"
                 :class="feature.getId() === currentHightlightFeatureId ? 'selected' : ''"
             >
-                <template v-if="!hasMultipleProperties">
-                    <div
-                        v-for="(value, key, idx) in getShownProperties(feature, shownProperties)"
-                        :key="listKey + key"
-                        class="d-flex me-3 no-stepper-arrows"
-                        :class="idx === 0 ? 'flex-grow-1' : ''"
+                <div
+                    v-for="(value, key, idx) in getShownProperties(feature, shownProperties)"
+                    :key="listKey + key"
+                    class="d-flex me-3 no-stepper-arrows"
+                    :class="idx === 0 ? 'flex-grow-1' : ''"
+                >
+                    <label
+                        :for="'property-' + listKey + '-' + key + '-' + idx"
+                        class="col-form-label me-3"
                     >
-                        <label
-                            :for="'property-' + listKey + '-' + key + '-' + idx"
-                            class="col-form-label me-3"
-                        >
-                            {{ getMappedProperty(key, propertiesMapping) }}
-                        </label>
-                        <input
-                            :id="'property-' + listKey + '-' + key + '-' + idx"
-                            :type="typeof value === 'number' ? 'number' : 'text'"
-                            class="form-control text-end w-50"
-                            :value="value"
-                            :inputmode="typeof value === 'number' ? 'decimal' : 'text'"
-                            @input="event => setFeatureAttribute(event, value, key, feature)"
-                        >
-                    </div>
-                </template>
-                <template v-else>
-                    <div v-if="typeof getShownProperties(feature, shownProperties) !== 'undefined'">
-                        <div
-                            v-for="(value, key, idx) in getShownProperties(feature, shownProperties)"
-                            :key="listKey + key"
-                            class="d-flex no-stepper-arrows"
-                            :class="idx === 0 ? 'flex-grow-1' : ''"
-                        >
-                            <input
-                                :id="'property-' + listKey + '-' + key + '-' + idx"
-                                :type="typeof value === 'number' ? 'number' : 'text'"
-                                class="form-control"
-                                :value="value"
-                                :inputmode="typeof value === 'number' ? 'decimal' : 'text'"
-                                @input="event => setFeatureAttribute(event, value, key, feature)"
-                            >
-                        </div>
-                    </div>
-                    <div
-                        :class="typeof getShownProperties(feature, shownProperties) === 'undefined' ? 'flex-grow-1' : ''"
+                        {{ getMappedProperty(key, propertiesMapping) }}
+                    </label>
+                    <input
+                        :id="'property-' + listKey + '-' + key + '-' + idx"
+                        :type="typeof value === 'number' ? 'number' : 'text'"
+                        class="form-control text-end w-50"
+                        :value="value"
+                        :inputmode="typeof value === 'number' ? 'decimal' : 'text'"
+                        @input="event => setFeatureAttribute(event, key, feature, itemSchema.properties[key].type)"
                     >
-                        <button
-                            type="button"
-                            class="btn btn-link"
-                            @click="setCurrentFeature(feature)"
-                        >
-                            <i
-                                :class="currentFeature?.getId() === feature.getId() ? 'bi-chevron-down' : 'bi-chevron-up'"
-                                role="img"
-                            />
-                            {{ $t('additional:modules.tools.simulationTool.showProperties') }}
-                        </button>
-                    </div>
-                </template>
+                </div>
+                <div
+                    v-if="hasMultipleProperties"
+                    :class="typeof getShownProperties(feature, shownProperties) === 'undefined' ? 'flex-grow-1' : ''"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-link"
+                        @click="setCurrentFeature(feature)"
+                    >
+                        <i
+                            :class="currentFeature?.getId() === feature.getId() ? 'bi-chevron-down' : 'bi-chevron-up'"
+                            role="img"
+                        />
+                        {{ $t('additional:modules.tools.simulationTool.showProperties') }}
+                    </button>
+                </div>
                 <IconButton
                     v-if="hideable"
                     :icon="getIcon(feature)"
@@ -318,24 +286,29 @@ export default {
                 v-if="currentFeature?.getId() === feature.getId()"
             >
                 <div
-                    v-for="(value, key, idx) in extractedProperties(feature)"
+                    v-for="(value, key, idx) in propertiesMapping"
                     :key="idx"
-                    class="m-3 d-flex justify-content-between"
+                    class="m-3 d-flex justify-content-between no-stepper-arrows"
                 >
                     <template v-if="getMappedProperty(key, propertiesMapping) !== key">
                         <label
                             :for="`${key}-${feature.getId()}`"
                             class="col-form-label"
                         >
+                            <i
+                                v-if="feature.get(key) === undefined"
+                                class="bi-exclamation-triangle-fill text-warning fs-5 me-2"
+                                role="img"
+                            />
                             {{ getMappedProperty(key, propertiesMapping) }}
                         </label>
                         <input
                             :id="`${key}-${feature.getId()}`"
-                            :type="typeof value === 'number' ? 'number' : 'text'"
+                            :type="itemSchema.properties[key].type === 'number' ? 'number' : 'text'"
                             class="form-control text-end w-50"
-                            :value="value"
-                            :inputmode="typeof value === 'number' ? 'decimal' : 'text'"
-                            @input="event => setFeatureAttribute(event, value, key, feature)"
+                            :value="feature.get(key)"
+                            :inputmode="itemSchema.properties[key].type === 'number' ? 'decimal' : 'text'"
+                            @input="event => setFeatureAttribute(event, key, feature, itemSchema.properties[key].type)"
                         >
                     </template>
                 </div>

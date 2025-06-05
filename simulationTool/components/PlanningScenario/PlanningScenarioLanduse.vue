@@ -28,7 +28,8 @@ export default {
         return {
             featuresByInput: [],
             featureLayerId: "planning-scenario-landuse",
-            highlightFeatureId: ""
+            highlightFeatureId: "",
+            schema: null
         };
     },
     computed: {
@@ -116,6 +117,14 @@ export default {
         },
 
         /**
+         * Gets the source of the current editable input.
+         * @returns {Object} The source of the current editable input.
+         */
+        getInputSource () {
+            return this.editableInputs[this.currentEditableInput]?.source;
+        },
+
+        /**
          * Gets the mapped properties.
          * @return {Object} The mapped properties.
          */
@@ -167,8 +176,11 @@ export default {
         }
     },
     watch: {
-        currentEditableInput (newValue) {
+        async currentEditableInput (newValue) {
             this.updateFeatures(newValue);
+            if (typeof this.getInputSource !== "undefined") {
+                this.schema = await getOAFFeature.getCollectionSchema(this.getInputSource.url, this.getInputSource?.collection);
+            }
         },
 
         /**
@@ -200,6 +212,9 @@ export default {
 
         if (this.currentEditableInput === "") {
             this.setCurrentEditableInput(Object.keys(this.editableInputs)[0]);
+        }
+        if (typeof this.getInputSource !== "undefined") {
+            this.schema = await getOAFFeature.getCollectionSchema(this.getInputSource.url, this.getInputSource?.collection);
         }
 
         if (!this.planningScenario.featuresLoaded) {
@@ -570,6 +585,7 @@ export default {
                     <ListGroup
                         :highlight-feature-id="highlightFeatureId"
                         :item-list="existingFeaturesByInput"
+                        :item-schema="schema"
                         :list-key="currentEditableInput"
                         :properties-mapping="getPropertiesMapping"
                         :shown-properties="getPropertiesToShow"
@@ -591,6 +607,7 @@ export default {
                     <ListGroup
                         :highlight-feature-id="highlightFeatureId"
                         :item-list="createdFeaturesByInput"
+                        :item-schema="schema"
                         :list-key="currentEditableInput"
                         :properties-mapping="getPropertiesMapping"
                         :shown-properties="getPropertiesToShow"
