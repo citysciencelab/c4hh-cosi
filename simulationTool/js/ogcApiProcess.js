@@ -118,6 +118,8 @@ export default class OgcApiProcess {
         try {
             let jobStatus = await this.getJobStatus(jobID);
 
+            onProgressUpdate?.({...jobStatus});
+
             while (jobStatus?.status === "running" || jobStatus?.status === "accepted") {
                 await new Promise(resolve => setTimeout(resolve, pollingInterval));
                 jobStatus = await this.getJobStatus(jobID);
