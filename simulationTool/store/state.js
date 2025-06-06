@@ -3,7 +3,6 @@
  * @typedef {Object} SimulationToolState
  * @property {string} currentEditableInput - The current editable input (e.g. buildings)
  * @property {string} currentInputName the current input name
- * @property {String} currentJobID The ID of the job that is currently displayed in jobResult component.
  * @property {String} currentPlanningComponent the current open component in planningScenario.
  * @property {Object[]} dataSources - Array of data source configurations.
  * @property {Object[]} drawTypeLabels - the array of type and labels.
@@ -31,6 +30,7 @@
  * @property {Object[]} landuseCurrentLayout - The current layout object as style for buildings or roads.
  * @property {Object[]} landuseRoadDrawIcons - The draw icons for roads.
  * @property {Object[]} landuseRoadDrawTypesMain - The main draw types for roads.
+ * @property {number} onJobStatusChange - Counter for job status changes, used to trigger updates.
  * @property {Object|null} process the current process
  * @property {Array.<Object>} processes a list of processes
  * @property {boolean} processesLoading flag indicating if processes are loading
@@ -39,6 +39,7 @@
  * @property {string|null} selectedEnsembleId the selected ensemble id
  * @property {string|null} selectedJobId the selected job id
  * @property {string|null} selectedProcessId the selected process id
+ * @property {String} simulationIdForResults The Id of the simulation that is currently displayed in simulationResult component.
  * @property {Object[]} simulations - A list of all available simulations.
  * @property {String|null} simulationApiUrl The URL for the Urban Model Platform API
  * @property {Object} simulationAreaStyle - The default style for the simulation area (BBOX/Extent of planning scenario)
@@ -51,7 +52,6 @@ const state = {
     type: "simulationTool",
     name: "additional:modules.tools.simulationTool.toolName",
     currentEditableInput: "",
-    currentJobID: "",
     currentPlanningComponent: "",
     currentPlanningScenarioId: "",
     currentInputName: "",
@@ -75,6 +75,7 @@ const state = {
     },
     landuseRoadDrawTypesMain: ["line"],
     mode: "home-panel",
+    onJobStatusChange: 0,
     planningScenarios: [],
     planningScenarioCurrentLayout: {
         fillColor: [0, 0, 0],
@@ -122,6 +123,7 @@ const state = {
         strokeWidth: 4,
         zIndex: Number.POSITIVE_INFINITY
     },
+    simulationIdForResults: "",
     simulations: [],
     userDetailsCache: {}
 };

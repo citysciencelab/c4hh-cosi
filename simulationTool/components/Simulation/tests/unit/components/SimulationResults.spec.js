@@ -57,33 +57,40 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                             },
                             getters: {
                                 currentJobID: () => "jobNo5",
+                                onJobStatusChange: () => 0,
                                 planningScenarios: () => [
                                     {
                                         id: "planningScenarioId",
                                         simulationId: "simulationId",
-                                        jobs: {
-                                            jobNo5: {
-                                                requestBody: {inputs: {anInput: {aProperty: "aValue"}}},
-                                                jobResult: {
-                                                    "noise_day": {
-                                                        "type": "FeatureCollection",
-                                                        "features": [{
-                                                            "type": "Feature",
-                                                            "properties": {},
-                                                            "geometry": {
-                                                                "coordinates": [
-                                                                    9.984960104804372,
-                                                                    53.55774883772011
-                                                                ],
-                                                                "type": "Point"
+                                        simulations: {
+                                            simulationId: {
+                                                name: "Neue Simulation",
+                                                jobs: {
+                                                    jobNo5: {
+                                                        requestBody: {inputs: {anInput: {aProperty: "aValue"}}},
+                                                        jobResult: {
+                                                            "noise_day": {
+                                                                "type": "FeatureCollection",
+                                                                "features": [{
+                                                                    "type": "Feature",
+                                                                    "properties": {},
+                                                                    "geometry": {
+                                                                        "coordinates": [
+                                                                            9.984960104804372,
+                                                                            53.55774883772011
+                                                                        ],
+                                                                        "type": "Point"
+                                                                    }
+                                                                }]
                                                             }
-                                                        }]
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 ],
+                                simulationIdForResults: () => "simulationId",
                                 simulations: () => []
                             },
                             mutations: {

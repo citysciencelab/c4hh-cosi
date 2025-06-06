@@ -149,6 +149,16 @@ export default {
         return true;
     },
 
+    /**
+     * Increments the job status change counter.
+     * @param {Object} context.commit the commit
+     * @param {Object} context.getters the getters
+     * @return {void}
+     */
+    jobStatusChanged ({commit, getters}) {
+        commit("setOnJobStatusChange", getters.onJobStatusChange + 1);
+    },
+
     // async fetchEnsembles ({commit, getters, rootGetters}) {
     //     if (!rootGetters["Modules/Login/loggedIn"]) {
     //         return;

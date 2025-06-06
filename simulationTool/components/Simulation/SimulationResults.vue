@@ -2,7 +2,6 @@
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import ConvertFeature from "../../js/convertFeatures";
 import ConvertStyle from "../../js/convertStyle";
-import dayjs from "dayjs";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
 import FeaturesHandler from "../../../../src/modules/statisticDashboard/js/handleFeatures.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
@@ -22,116 +21,149 @@ export default {
     data () {
         return {
             currentOutput: "",
-            finished: "",
-            jobResult: {},
-            jobStatus: {},
+            finishedTimes: [],
+            jobStatusTags: [],
             layers: [],
             legendValue: [],
-            started: "",
-            status: ""
+            outputs: [],
+            progressValues: [],
+            startTimes: []
         };
     },
     computed: {
         ...mapGetters("Modules/SimulationTool", [
-            "currentJobID",
+            "onJobStatusChange",
             "planningScenarios",
+            "simulations",
+            "simulationIdForResults",
+            "simulationResultStyle",
             "simulations"
         ]),
 
         /**
-         * Get the current job based on the current job ID.
-         * @returns {Object} The current job.
-         */
-        currentJob () {
-            return this.currentPlanningScenario?.jobs?.[this.currentJobID];
-        },
-
-        /**
-         * Get the current job status based on the current job.
-         * @returns {Object} The current job status.
-         */
-        currentJobResult () {
-            return this.currentJob?.jobResult;
-        },
-
-        /**
-         * Get the current job status based on the current job.
-         * @returns {Object} The current job status.
-         */
-        currentJobStatus () {
-            return this.currentJob?.jobStatus;
-        },
-
-        /**
-         * Get the current progress of the current job and get 0 by undefined.
-         * @returns {String} The current progress
-         */
-        currentProgress () {
-            return typeof this.currentJobStatus?.progress === "undefined" ? 0 : this.currentJobStatus?.progress;
-        },
-
-        /**
-         * Get the planning scenario containing the current job.
+         * Get the planning scenario containing the current simulation.
          * @returns {Object} The current planning scenario.
          */
         currentPlanningScenario () {
-            return this.planningScenarios?.find(scenario => scenario?.jobs?.[this.currentJobID]);
+            return this.planningScenarios?.find(scenario => scenario?.simulations?.[this.simulationIdForResults]);
         },
 
         /**
-         * Get the current simulation name based on the current job.
-         * @returns {Object} The current job simulation name.
+         * Get the current simulation based on the current simulation id.
+         * @returns {Object} The current simulation.
          */
-        currentSimulationName () {
-            return this.currentJob?.simulationName;
+        currentSimulation () {
+            return this.currentPlanningScenario?.simulations?.[this.simulationIdForResults];
         },
 
         /**
-         * Gets the style object from current simulation.
-         * @returns {Object} The current style object.
+         * Get the earliest start time of all jobs.
+         * @returns {String} The earliest time.
          */
-        currentStyle () {
-            return this.simulation?.resultStyle;
-        },
+        earliestStartTime () {
+            const timeValues = this.startTimes
+                    .map(time => new Date(time).getTime())
+                    .filter(value => Number.isFinite(value)),
+                earliestTimeValue = Math.min(...timeValues);
 
-        /**
-         * Gets the outputs of results.
-         * @returns {String[]} The outputs of results.
-         */
-        outputs () {
-            if (isObject(this.currentJobResult)) {
-                return Object.keys(this.currentJobResult);
+            if (!Number.isFinite(earliestTimeValue)) {
+                return "";
             }
-
-            return [];
+            return new Date(earliestTimeValue)
+                .toLocaleString("de-DE", {dateStyle: "medium", timeStyle: "medium"});
         },
 
         /**
-        * Get the simulation configuration for the current job.
-        * May change, when more features for multiple simulations are added!
+         * Get the inputs for inputs accordion.
+         * @returns {Object} The inputs.
+         */
+        inputsToShow () {
+            const inputs = {};
+
+            Object.values(this.jobs)
+                .map(job => job.requestBody?.inputs)
+                .filter(inputsObj => isObject(inputsObj))
+                .flatMap(inputsObj => Object.entries(inputsObj))
+                .forEach(([inputKey, input]) => {
+                    inputs[inputKey] = input;
+                });
+
+            return inputs;
+        },
+
+        /**
+         * Get current jobs object or an empty object.
+         * @returns {Object} The jobs object or {}.
+         */
+        jobs () {
+            if (!isObject(this.currentSimulation?.jobs)) {
+                return {};
+            }
+            return this.currentSimulation.jobs;
+        },
+
+        /**
+         * Average progress of all jobs.
+         * @returns {Number} The average progress of all jobs.
+         */
+        meanProgress () {
+            if (!this.progressValues.length) {
+                return 0;
+            }
+            const sum = this.progressValues.reduce((total, each) => total + each, 0);
+
+            return Math.round(sum / this.progressValues.length);
+        },
+
+        /**
+         * Get the latest finished time of all jobs.
+         * @returns {String} The latest finished time.
+         */
+        latestFinishedTime () {
+            const timeValues = this.finishedTimes
+                    .map(time => new Date(time).getTime())
+                    .filter(value => Number.isFinite(value)),
+                latestTimeValue = Math.max(...timeValues);
+
+            if (!Number.isFinite(latestTimeValue)) {
+                return "";
+            }
+            return new Date(latestTimeValue)
+                .toLocaleString("de-DE", {dateStyle: "medium", timeStyle: "medium"});
+        },
+
+        /**
+         * Get the worst (least successful) job status tag.
+         * @returns {String} The worst job status tag.
+         */
+        worstJobStatusTag () {
+            return ["failed", "accepted", "running", "successful"].find(
+                status => this.jobStatusTags.includes(status)
+            );
+        },
+
+        /**
+        * Get the simulation configuration for the current simulation.
         * @returns {Object} The current simulation configuration.
         */
-        simulation () {
-            return this.currentJob?.simulation;
+        simulationConfig () {
+            return this.simulations.find(simulation => simulation.id === this.currentSimulation.configId);
         }
     },
     watch: {
         /**
-         * Shows the feature when the simulation is changed.
+         * Watches for changes in the job status and updates the job status tags, start times, finished times, progress values and outputs.
+         * Also calls showFeatures to display the features on the map.
+         * @param {Object} jobs - The jobs object.
          */
-        simulation () {
-            this.showFeatures(this.currentJobID, this.currentJobResult, this.outputs);
-        },
-
-        /**
-         * Sets different value of variable when the job status is changed.
-         * @param {Object} val - The current job status.
-         */
-        currentJobStatus: {
-            handler (val) {
-                this.started = val?.started ? dayjs(val?.started).format("DD.MM.YYYY, hh:mm:ss") : val?.started;
-                this.status = val?.status;
-                this.finished = val?.finished ? dayjs(val?.finished).format("DD.MM.YYYY, hh:mm:ss") : val?.finished;
+        onJobStatusChange: {
+            handler () {
+                this.jobStatusTags = Object.values(this.jobs).map(job => job.jobStatus?.status);
+                this.startTimes = Object.values(this.jobs).map(job => job.jobStatus?.started).filter(time => time);
+                this.finishedTimes = Object.values(this.jobs).map(job => job.jobStatus?.finished).filter(time => time);
+                this.progressValues = Object.values(this.jobs).map(job => job.jobStatus?.progress).filter(progress => Number.isFinite(progress));
+                this.outputs = Object.keys(Object.values(this.jobs)[0]?.jobResults || {});
+                this.showFeatures(this.simulationIdForResults, this.jobs, this.outputs);
             },
             immediate: true
         },
@@ -154,7 +186,6 @@ export default {
             this.updateFeatures();
             this.zoomToFeature();
         }
-        this.showFeatures(this.currentJobID, this.currentJobResult, this.outputs);
     },
     unmounted () {
         if (this.layers.length) {
@@ -242,22 +273,17 @@ export default {
 
         /**
          * Shows features in map.
-         * @param {String} jobID the job id.
-         * @param {Object} jobResult - The job result.
+         * @param {String} simulationId the simulation id.
+         * @param {Object} jobs - The jobs.
          * @param {String[]} outputs - The output array.
          * @returns {void}
          */
-        showFeatures (jobID, jobResult, outputs) {
-            if (typeof jobID !== "string" || !isObject(jobResult) || !Array.isArray(outputs)) {
+        showFeatures (simulationId, jobs, outputs) {
+            if (typeof simulationId !== "string" || !isObject(jobs) || !Array.isArray(outputs)) {
                 return;
             }
 
             outputs.forEach(output => {
-                if (!Array.isArray(jobResult[output]?.features) || !jobResult[output]?.features.length) {
-                    return;
-                }
-
-                const geojsonFeature = ConvertFeature.geoJsonToOpenlayers(jobResult[output]?.features);
                 let layer;
 
                 if (typeof layerCollection.getLayerById(output) !== "undefined") {
@@ -276,12 +302,15 @@ export default {
                     layerCollection.addLayer(layer);
                 }
 
-                geojsonFeature.forEach(feature => {
-                    feature.set("jobID", jobID);
-                    this.setFeatureStyle(feature, this.currentStyle);
-                });
+                Object.values(jobs).forEach(job => {
+                    const featuresToAdd = ConvertFeature.geoJsonToOpenlayers(job.jobResults?.[output]?.features || []);
 
-                layer.getLayerSource().addFeatures(geojsonFeature);
+                    featuresToAdd?.forEach(feature => {
+                        feature.set("simulationId", simulationId);
+                        this.setFeatureStyle(feature, job.resultStyle);
+                    });
+                    layer.getLayerSource().addFeatures(featuresToAdd);
+                });
 
                 this.layers.push(layer);
             });
@@ -297,7 +326,7 @@ export default {
         <SectionHeader
             :title="$t('additional:modules.tools.simulationTool.simulationResults')"
         />
-        <div v-if="currentJobID">
+        <div v-if="simulationIdForResults">
             <div
                 class="d-flex flex-column"
             >
@@ -319,7 +348,7 @@ export default {
                     <div
                         class="me-2 font-bold"
                     >
-                        {{ currentSimulationName }}
+                        {{ currentSimulation?.name }}
                     </div>
                 </div>
                 <div
@@ -333,11 +362,11 @@ export default {
                     <div
                         class="me-2 font-bold"
                     >
-                        {{ started }}
+                        {{ earliestStartTime }}
                     </div>
                 </div>
                 <div
-                    v-if="finished"
+                    v-if="latestFinishedTime"
                     class="d-flex flex-column"
                 >
                     <div
@@ -348,7 +377,7 @@ export default {
                     <div
                         class="me-2 font-bold"
                     >
-                        {{ finished }}
+                        {{ latestFinishedTime }}
                     </div>
                 </div>
                 <div
@@ -363,19 +392,19 @@ export default {
                         class="me-2 ps-label"
                     >
                         <span
-                            v-if="status === 'accepted' || typeof status === 'undefined'"
+                            v-if="worstJobStatusTag === 'accepted' || typeof worstJobStatusTag === 'undefined'"
                             class="status running"
                         >
-                            {{ $t('additional:modules.tools.simulationTool.progress') }}: {{ currentProgress }}%
+                            {{ $t('additional:modules.tools.simulationTool.progress') }}: {{ meanProgress }}%
                         </span>
                         <span
-                            v-else-if="status === 'successful'"
+                            v-else-if="worstJobStatusTag === 'successful'"
                             class="status success"
                         >
                             {{ $t('additional:modules.tools.simulationTool.successfull') }}
                         </span>
                         <span
-                            v-else-if="status === 'unsuccessfull'"
+                            v-else-if="worstJobStatusTag === 'unsuccessfull'"
                             class="status unsuccessfull"
                         >
                             {{ $t('additional:modules.tools.simulationTool.unsuccessfull') }}
@@ -390,13 +419,13 @@ export default {
                 </div>
             </div>
             <AccordionItem
-                v-if="currentJob"
+                v-if="currentSimulation?.jobs"
                 id="simulation-results-accordion-inputs"
                 class="ms-2 my-2"
                 :title="$t('additional:modules.tools.simulationTool.inputParameters')"
             >
                 <div
-                    v-for="(input, inputKey) in currentJob?.requestBody?.inputs"
+                    v-for="(input, inputKey) in inputsToShow"
                     :key="inputKey"
                 >
                     <div
@@ -409,7 +438,7 @@ export default {
                             class="py-1 row"
                         >
                             <div class="col col-md-5">
-                                {{ getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping) + ":" }}
+                                {{ getMappedProperty(propertyKey, simulationConfig?.inputs?.[inputKey]?.propertiesMapping) + ":" }}
                             </div>
                             <div class="col col-md-7 font-bold align-self-center">
                                 {{ property }}
@@ -420,7 +449,7 @@ export default {
             </AccordionItem>
             <hr>
             <div
-                v-if="status === 'successful'"
+                v-if="worstJobStatusTag === 'successful'"
                 class="result-output-container"
             >
                 <h5
@@ -449,12 +478,12 @@ export default {
                             class="form-check-label d-flex justify-content-between align-items-center"
                             :for="output"
                         >
-                            {{ getMappedProperty(output, simulation?.outputs?.propertiesMapping) }}
+                            {{ getMappedProperty(output, simulationConfig?.outputs?.propertiesMapping) }}
                         </label>
                     </div>
                 </div>
             </div>
-            <div v-if="status === 'successful' && legendValue.length">
+            <div v-if="worstJobStatusTag === 'successful' && legendValue.length">
                 <hr>
                 <AccordionItem
                     id="simulation-results-accordion-legend"

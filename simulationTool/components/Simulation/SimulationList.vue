@@ -1,5 +1,6 @@
 <script>
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import {mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
@@ -17,22 +18,26 @@ export default {
         ...mapGetters("Modules/SimulationTool", ["planningScenarios"]),
 
         /**
-         * Returns a list of all jobs in all planning scenarios.
-         * @returns {Object[]} - List of jobs with jobID and scenarioName.
+         * Returns a list of all conducted simulations in all planning scenarios.
+         * @returns {Object[]} - List of simulations with simulation name and scenario name.
          */
-        jobList () {
+        simulationList () {
             const list = [];
 
             this.planningScenarios?.forEach(scenario => {
-                for (const jobID in scenario.jobs) {
+                if (!isObject(scenario.simulations)) {
+                    return;
+                }
+                Object.entries(scenario.simulations).forEach(([simulationId, simulation]) => {
                     const listEntry = {
-                        jobID: jobID,
                         scenarioName: scenario.name,
-                        scenarioId: scenario.id
+                        scenarioId: scenario.id,
+                        simulationId: simulationId,
+                        simulationName: simulation.name
                     };
 
                     list.push(listEntry);
-                }
+                });
             });
 
             return list;
@@ -45,10 +50,10 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
-            "setCurrentJobID",
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
-            "setMode"
+            "setMode",
+            "setSimulationIdForResults"
         ]),
 
         /**
@@ -62,13 +67,13 @@ export default {
 
         /**
          * Opens simulation results component.
-         * @param {String} jobID - ID of the job to open.
+         * @param {String} simulationId - Id of the simulation to open.
          * @param {String} scenarioId - ID of the scenario.
          * @returns {void}
          */
-        openJob (jobID, scenarioId) {
+        openSimulation (simulationId, scenarioId) {
             this.setMode("simulationResults");
-            this.setCurrentJobID(jobID);
+            this.setSimulationIdForResults(simulationId);
             this.setCurrentPlanningScenarioId(scenarioId);
         }
     }
@@ -80,34 +85,34 @@ export default {
         <SectionHeader
             :title="$t('additional:modules.tools.simulationTool.simulationList')"
         />
-        <table v-if="jobList.length">
+        <table v-if="simulationList.length">
             <thead>
                 <tr>
                     <th>
-                        JobID
+                        {{ $t('additional:modules.tools.simulationTool.simulationName') }}
                     </th>
                     <th>
-                        Planungsszenario
+                        {{ $t('additional:modules.tools.simulationTool.planningScenario') }}
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr
-                    v-for="jobEntry in jobList"
-                    :key="jobEntry.jobID"
+                    v-for="simulationEntry in simulationList"
+                    :key="simulationEntry.simulationId"
                 >
                     <td>
                         <a
                             role="button"
                             tabindex="0"
-                            @click="() => openJob(jobEntry.jobID, jobEntry.scenarioId)"
-                            @keypress="() => openJob(jobEntry.jobID, jobEntry.scenarioId)"
+                            @click="() => openSimulation(simulationEntry.simulationId, simulationEntry.scenarioId)"
+                            @keypress="() => openSimulation(simulationEntry.simulationId, simulationEntry.scenarioId)"
                         >
-                            {{ jobEntry.jobID }}
+                            {{ simulationEntry.simulationName }}
                         </a>
                     </td>
                     <td>
-                        {{ jobEntry.scenarioName }}
+                        {{ simulationEntry.scenarioName }}
                     </td>
                 </tr>
             </tbody>

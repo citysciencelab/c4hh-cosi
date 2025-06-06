@@ -33,13 +33,11 @@ export default {
     data () {
         return {
             currentSimulationId: "",
-            jobID: "",
-            jobResults: undefined,
             oafLoadingStates: {},
             primaryTypeInputs: {},
-            processDescription: undefined,
-            processHandler: undefined,
-            requestBody: {},
+            processDescriptions: [],
+            processHandlers: [],
+            requestBodies: [],
             selectedOutputOptions: [],
             simulationName: ""
         };
@@ -53,11 +51,24 @@ export default {
         ]),
 
         /**
-         * Get the current planning scenario.
+         * Gets the current planning scenario.
          * @returns {Object} The current planning scenario.
          */
         currentPlanningScenario () {
             return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+        },
+
+        /**
+         * Gets the combined inputs from all process descriptions.
+         * This includes every input that is defined in at least one process description.
+         * @returns {Object} The combined inputs.
+         */
+        combinedInputs () {
+            if (!this.processDescriptions.length) {
+                return {};
+            }
+
+            return this.processDescriptions.reduce((inputs, description) => Object.assign(inputs, description.inputs), {});
         },
 
         /**
@@ -69,16 +80,12 @@ export default {
         },
 
         /**
-         * Get the optional inputs of type FeatureCollection from the process description.
+         * Gets the optional inputs of type FeatureCollection from the process description.
          * @returns {Object} An object of inputs.
          */
         optionalOafTypeInputs () {
-            if (!isObject(this.processDescription?.inputs)) {
-                return {};
-            }
-
             return Object.fromEntries(
-                Object.entries(this.processDescription?.inputs).filter(([, input]) => {
+                Object.entries(this.combinedInputs).filter(([, input]) => {
                     return input.minOccurs === 0
                         && input.schema?.allOf?.some(schema => schema.format === "geojson-feature-collection");
                 })
@@ -86,7 +93,7 @@ export default {
         },
 
         /**
-         * Get the subset of optionalOafTypeInputs that is neither primary nor invisible.
+         * Gets the subset of optionalOafTypeInputs that is neither primary nor invisible.
          * @returns {Object} An object of inputs.
          */
         optionalOafTypeInputsAdvanced () {
@@ -99,7 +106,7 @@ export default {
         },
 
         /**
-         * Get the subset of optionalOafTypeInputs that is primary.
+         * Gets the subset of optionalOafTypeInputs that is primary.
          * @returns {Object} An object of inputs.
          */
         optionalOafTypeInputsPrimary () {
@@ -113,33 +120,34 @@ export default {
 
         /**
          * Returns an array of Objects with code and name property for select options.
+         * Returns only those outputs that are defined in all process descriptions.
          * @return {Object[]} The array of Objects for options.
          */
         outputOptions () {
-            const optionsArray = [];
-
-            if (typeof this.processDescription !== "object") {
-                return optionsArray;
+            if (!this.processDescriptions.length ||
+                this.processDescriptions.some(description => !isObject(description.outputs))
+            ) {
+                return [];
             }
 
-            Object.keys(this.processDescription?.outputs || {}).forEach(key => {
-                optionsArray.push({code: key, name: this.getMappedProperty(key, this.simulation?.outputs?.propertiesMapping)});
-            });
+            const [firstDescription, ...otherDescriptions] = this.processDescriptions,
+                keysExistingInAllDescriptions = Object.keys(firstDescription.outputs).filter(
+                    outputKey => otherDescriptions.every(description => description.outputs[outputKey])
+                );
 
-            return optionsArray;
+            return keysExistingInAllDescriptions.map(key => ({
+                code: key,
+                name: this.getMappedProperty(key, this.simulation?.outputs?.propertiesMapping)
+            }));
         },
 
         /**
-         * Get an inputs object from the process description containing only the inputs of type "object".
+         * Gets an inputs object from the process description containing only the inputs of type "object".
          * Also filters out inputs that the config defines as not editable or not having a menu position.
          * @returns {Object} The inputs object.
          */
         objectTypeInputs () {
-            if (typeof this.processDescription?.inputs !== "object") {
-                return {};
-            }
-
-            return Object.fromEntries(Object.entries(this.processDescription?.inputs).filter(
+            return Object.fromEntries(Object.entries(this.combinedInputs).filter(
                 ([inputKey, input]) => input.schema?.type === "object"
                     && this.simulation?.inputs?.[inputKey]?.menu !== "nowhere"
                     && !this.simulation?.inputs?.[inputKey]?.editable
@@ -155,7 +163,7 @@ export default {
         },
 
         /**
-         * Get the simulation configuration to the currently selected planning scenario.
+         * Gets the simulation configuration to the currently selected planning scenario.
          * @returns {Object} The current simulation configuration.
          */
         simulation () {
@@ -163,16 +171,12 @@ export default {
         },
 
         /**
-         * Get an inputs object from the process description containing only the inputs of type "string".
+         * Gets an inputs object from the process description containing only the inputs of type "string".
          * Also filters out inputs that the config defines as not editable or not having a menu position.
          * @returns {Object} The inputs object.
          */
         stringTypeInputs () {
-            if (typeof this.processDescription?.inputs !== "object") {
-                return {};
-            }
-
-            return Object.fromEntries(Object.entries(this.processDescription?.inputs).filter(
+            return Object.fromEntries(Object.entries(this.combinedInputs).filter(
                 ([inputKey, input]) => input.schema?.type === "string"
                     && this.simulation?.inputs?.[inputKey]?.menu !== "nowhere"
                     && !this.simulation?.inputs?.[inputKey]?.editable
@@ -193,16 +197,18 @@ export default {
          * @param {Object[]} val the selected outputs.
          */
         selectedOutputOptions (val) {
-            this.requestBody.outputs = {};
-            val.forEach(elem => {
-                this.requestBody.outputs[elem.code] = {};
+            this.requestBodies.forEach(requestBody => {
+                requestBody.outputs = {};
+                val.forEach(elem => {
+                    requestBody.outputs[elem.code] = {};
+                });
             });
         },
 
         currentSimulationId: {
             async handler () {
                 if (this.simulation) {
-                    await this.prepareRequestBody();
+                    await this.prepareRequestBodies();
                     this.primaryTypeInputs = this.getPrimaryTypeInputs();
                     this.selectedOutputOptions = this.outputOptions;
                 }
@@ -222,12 +228,12 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Modules/SimulationTool", ["addFile", "updateFeatures", "zoomToFeature"]),
+        ...mapActions("Modules/SimulationTool", ["addFile", "jobStatusChanged", "updateFeatures", "zoomToFeature"]),
         ...mapMutations("Modules/SimulationTool", [
-            "setCurrentJobID",
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
-            "setMode"
+            "setMode",
+            "setSimulationIdForResults"
         ]),
 
         /**
@@ -272,12 +278,14 @@ export default {
                 return val;
             }
 
-            if (typeof this?.requestBody?.inputs?.[inputKey]?.[propertyKey] !== "undefined") {
-                return this.requestBody.inputs[inputKey][propertyKey];
+            const requestBody = this.requestBodies.find(body => body.inputs?.[inputKey]);
+
+            if (typeof requestBody?.inputs?.[inputKey]?.[propertyKey] !== "undefined") {
+                return requestBody.inputs[inputKey][propertyKey];
             }
 
             if (propertyKey === "") {
-                return this?.requestBody?.inputs?.[inputKey];
+                return requestBody?.inputs?.[inputKey];
             }
 
             return val;
@@ -314,10 +322,7 @@ export default {
         getPrimaryTypeInputs () {
             const propertiesToExtract = {};
 
-            if (!isObject(this.processDescription?.inputs)) {
-                return propertiesToExtract;
-            }
-            Object.entries(this.processDescription?.inputs).forEach(([inputKey, input]) => {
+            Object.entries(this.combinedInputs).forEach(([inputKey, input]) => {
                 if (this.simulation?.inputs?.[inputKey]?.menu !== "primary") {
                     return;
                 }
@@ -348,13 +353,10 @@ export default {
          * @returns {Object} The optional BBOX URL inputs.
          */
         getOptionalBBOXUrlInputs () {
-            if (!isObject(this.processDescription?.inputs)) {
-                return {};
-            }
             const result = {};
 
-            Object.keys(this.processDescription.inputs).forEach(inputKey => {
-                const input = this.processDescription.inputs[inputKey];
+            Object.keys(this.combinedInputs).forEach(inputKey => {
+                const input = this.combinedInputs[inputKey];
 
                 if (input.schema?.type === "string"
                     && input.schema?.format === "uri"
@@ -395,7 +397,7 @@ export default {
             this.oafLoadingStates[inputKey] = true;
 
             const source = this.simulation.inputs[inputKey].source,
-                crs = this.requestBody.inputs.crs,
+                crs = this.currentPlanningScenario.inputs.crs,
                 filter = getOAFFeature.getOAFGeometryFilter(this.getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects"),
                 featureCollection = {
                     type: "FeatureCollection",
@@ -423,12 +425,12 @@ export default {
         /**
          * Event handler for progress update of the simulation.
          * @param {Object} jobStatus The job status object.
+         * @param {Object} job The job object.
          * @returns {void}
          */
-        onProgressUpdate (jobStatus) {
-            const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId);
-
-            Object.assign(scenario.jobs[this.jobID], {jobStatus: typeof jobStatus !== "undefined" ? JSON.parse(JSON.stringify(jobStatus)) : jobStatus});
+        onProgressUpdate (jobStatus, job) {
+            job.jobStatus = jobStatus;
+            this.jobStatusChanged();
         },
 
         /**
@@ -465,45 +467,51 @@ export default {
 
         /**
          * Opens simulation results component.
-         * @param {String} jobID - ID of the job to open.
+         * @param {String} simulationId - Id of the simulation to open.
          * @returns {void}
          */
-        openJob (jobID) {
+        openSimulation (simulationId) {
             this.setMode("simulationResults");
-            this.setCurrentJobID(jobID);
+            this.setSimulationIdForResults(simulationId);
         },
 
         /** Prepares the request body for the simulation.
          * @returns {void}
          */
-        async prepareRequestBody () {
-            this.processHandler = new OgcApiProcess(this.simulation.url, this.simulation.id);
-            this.processDescription = await this.processHandler.getDescription();
-            this.requestBody.inputs = {
-                ...OgcApiProcess.getInputDefaultsFromDescription(this.processDescription),
-                ...this.currentPlanningScenario.inputs
-            };
-
-            this.requestBody.outputs = {};
+        async prepareRequestBodies () {
+            this.processHandlers = this.simulation.processes.map(
+                process => new OgcApiProcess(process.url, process.id)
+            );
+            this.processDescriptions = await Promise.all(
+                this.processHandlers.map(handler => handler.getDescription())
+            );
+            this.requestBodies = this.processDescriptions.map(description => ({
+                inputs: {
+                    ...OgcApiProcess.getInputDefaultsFromDescription(description),
+                    ...this.currentPlanningScenario.inputs
+                },
+                outputs: {}
+            }));
         },
 
         /**
-         * Removes all inputs of type "FeatureCollection" from the request body that have no features.
-         * @param {Object} requestBody - The original request body. Is modified in place.
-         * @returns {Object} The modified request body.
+         * Removes all inputs of type "FeatureCollection" from the request bodies that have no features.
+         * @param {Object[]} requestBodies - The original request bodies. Modified in place.
+         * @returns {Object[]} The modified request bodies.
          */
-        removeEmptyCollections (requestBody) {
-            if (!isObject(requestBody?.inputs)) {
-                return requestBody;
-            }
+        removeEmptyCollections (requestBodies) {
+            requestBodies.forEach(requestBody => {
+                if (!isObject(requestBody?.inputs)) {
+                    return;
+                }
+                requestBody.inputs = Object.fromEntries(
+                    Object.entries(requestBody.inputs).filter(
+                        ([, input]) => input?.type !== "FeatureCollection" || input?.features?.length > 0
+                    )
+                );
+            });
 
-            requestBody.inputs = Object.fromEntries(
-                Object.entries(requestBody.inputs).filter(
-                    ([, input]) => input.type !== "FeatureCollection" || input.features?.length > 0
-                )
-            );
-
-            return requestBody;
+            return requestBodies;
         },
 
         /**
@@ -520,32 +528,41 @@ export default {
          * @returns {void}
          */
         async startSimulation () {
-            this.removeEmptyCollections(this.requestBody);
+            this.removeEmptyCollections(this.requestBodies);
 
             const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
-                executeResponse = await this.processHandler.execute(this.requestBody),
-                jobID = executeResponse.jobID;
+                executeResponses = await Promise.all(
+                    this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index]))
+                ),
+                jobIDs = executeResponses.map(response => response.jobID),
+                initialStatuses = executeResponses.map(response => response.status),
+                newSimulationId = jobIDs.join("_"),
+                newSimulation = {
+                    name: this.simulationName || this.simulation.title,
+                    configId: this.currentSimulationId};
 
-            if (!jobID) {
-                console.warn("No job ID returned from process execution.");
+            if (jobIDs.some(ID => !ID)) {
+                console.warn("Not all job IDs returned from process execution.");
                 return;
             }
 
-            this.jobID = jobID;
-            scenario.jobs ??= {};
-            scenario.jobs[jobID] = {requestBody: JSON.parse(JSON.stringify(this.requestBody))}; // Deep copy to avoid reference issues.
+            scenario.simulations ??= {};
+            scenario.simulations[newSimulationId] = newSimulation;
+            this.openSimulation(newSimulationId);
 
-            Object.assign(scenario.jobs[jobID], {simulationName: this.simulationName !== "" ? this.simulationName : this.simulation.title});
-            this.openJob(jobID);
+            newSimulation.jobs = Object.fromEntries(jobIDs.map(ID => [ID, {}]));
 
-            this.jobResults = await this.processHandler.pollJobStatusAndGetResults( // Das soll später auch im szenario gespeichert werden
-                jobID,
-                this.simulation.pollingInterval,
-                this.onProgressUpdate
-            );
-
-            Object.assign(scenario.jobs[jobID], {jobResult: typeof this.jobResults !== "undefined" ? JSON.parse(JSON.stringify(this.jobResults)) : this.jobResults});
-            Object.assign(scenario.jobs[jobID], {simulation: JSON.parse(JSON.stringify(this.simulation))}); // Vorläufige Lösung, muss ggf. geändert werden
+            Object.values(newSimulation.jobs).forEach(async (job, index) => {
+                job.requestBody = JSON.parse(JSON.stringify(this.requestBodies[index]));
+                job.jobStatus = {status: initialStatuses[index]};
+                job.jobResults = await this.processHandlers[index].pollJobStatusAndGetResults(
+                    jobIDs[index],
+                    this.simulation.processes[index].pollingInterval,
+                    jobStatus => this.onProgressUpdate(jobStatus, job)
+                );
+                job.resultStyle = this.simulation.processes[index].resultStyle;
+                this.jobStatusChanged();
+            });
         },
 
         /**
@@ -560,15 +577,20 @@ export default {
                 return;
             }
 
-            if (propertyKey === "") {
-                this.requestBody.inputs[inputKey] = val;
-                return;
-            }
+            this.processDescriptions.forEach((description, index) => {
+                if (!description.inputs?.[inputKey]) {
+                    return;
+                }
+                if (propertyKey === "") {
+                    this.requestBodies[index].inputs[inputKey] = val;
+                    return;
+                }
 
-            if (typeof this.requestBody.inputs[inputKey] === "undefined") {
-                this.requestBody.inputs[inputKey] = {};
-            }
-            this.requestBody.inputs[inputKey][propertyKey] = val;
+                if (typeof this.requestBodies[index].inputs[inputKey] === "undefined") {
+                    this.requestBodies[index].inputs[inputKey] = {};
+                }
+                this.requestBodies[index].inputs[inputKey][propertyKey] = val;
+            });
         },
 
         /**
