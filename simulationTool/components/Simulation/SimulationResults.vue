@@ -26,8 +26,7 @@ export default {
             jobStatus: {},
             layers: [],
             started: "",
-            status: "",
-            simulationName: "Simulation name placeholder"
+            status: ""
         };
     },
     computed: {
@@ -75,6 +74,14 @@ export default {
          */
         currentPlanningScenario () {
             return this.planningScenarios?.find(scenario => scenario?.jobs?.[this.currentJobID]);
+        },
+
+        /**
+         * Get the current simulation name based on the current job.
+         * @returns {Object} The current job simulation name.
+         */
+        currentSimulationName () {
+            return this.currentJob?.simulationName;
         },
 
         /**
@@ -271,7 +278,7 @@ export default {
                     <div
                         class="me-2 font-bold"
                     >
-                        {{ simulationName }}
+                        {{ currentSimulationName }}
                     </div>
                 </div>
                 <div

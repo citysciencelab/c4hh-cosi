@@ -40,7 +40,8 @@ export default {
             processDescription: undefined,
             processHandler: undefined,
             requestBody: {},
-            selectedOutputOptions: []
+            selectedOutputOptions: [],
+            simulationName: ""
         };
     },
     computed: {
@@ -506,6 +507,15 @@ export default {
         },
 
         /**
+         * Sets the current simulation name.
+         * @param {String} evt - The input text as simulation name.
+         * @returns {void}
+         */
+        setSimulationName (evt) {
+            this.simulationName = evt;
+        },
+
+        /**
          * Starts the simulation.
          * @returns {void}
          */
@@ -525,6 +535,7 @@ export default {
             scenario.jobs ??= {};
             scenario.jobs[jobID] = {requestBody: JSON.parse(JSON.stringify(this.requestBody))}; // Deep copy to avoid reference issues.
 
+            Object.assign(scenario.jobs[jobID], {simulationName: this.simulationName !== "" ? this.simulationName : this.simulation.title});
             this.openJob(jobID);
 
             this.jobResults = await this.processHandler.pollJobStatusAndGetResults( // Das soll später auch im szenario gespeichert werden
@@ -651,6 +662,7 @@ export default {
                 id="simulation-name"
                 :label="$t('additional:modules.tools.simulationTool.simulationName')"
                 :placeholder="$t('additional:modules.tools.simulationTool.simulationName')"
+                :input="setSimulationName"
             />
             <div class="form-floating mb-3">
                 <select
