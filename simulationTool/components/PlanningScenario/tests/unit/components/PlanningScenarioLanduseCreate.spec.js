@@ -10,7 +10,8 @@ import sinon from "sinon";
 config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLanduseCreate.vue", () => {
-    let selectedDrawType,
+    let getCollectionSchemaStub,
+        selectedDrawType,
         selectedDrawTypeMain,
         store;
 
@@ -171,7 +172,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
     beforeEach(() => {
         sinon.stub(PlanningScenarioLanduseCreate.methods, "getLayerSource").returns(layer.getLayerSource());
-        // sinon.stub(getOAFFeature, "getCollectionSchema").returns([]);
+        getCollectionSchemaStub = sinon.stub(getOAFFeature, "getCollectionSchema").resolves([]);
         selectedDrawType = "";
         selectedDrawTypeMain = "";
 
@@ -251,8 +252,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
 
     describe("Hooks", () => {
         it("should call 'getCollectionSchema' when component is mounted", async function () {
-            const getCollectionSchemaStub = sinon.stub(getOAFFeature, "getCollectionSchema");
-
             factory.getShallowMount();
             expect(getCollectionSchemaStub.calledOnce).to.be.true;
         });
