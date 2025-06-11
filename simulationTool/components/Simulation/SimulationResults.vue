@@ -4,6 +4,7 @@ import ConvertFeature from "../../js/convertFeatures";
 import ConvertStyle from "../../js/convertStyle";
 import dayjs from "dayjs";
 import {getMappedProperty} from "../shared/js/getMappedProperty";
+import FeaturesHandler from "../../../../src/modules/statisticDashboard/js/handleFeatures.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
@@ -25,6 +26,7 @@ export default {
             jobResult: {},
             jobStatus: {},
             layers: [],
+            legendValue: [],
             started: "",
             status: ""
         };
@@ -167,6 +169,36 @@ export default {
             "setMode"
         ]),
 
+        /**
+         * Gets the legend value of style.
+         * @param {Object} val The current style object.
+         * @returns {Object[]} the legend value in array.
+         */
+        getLegendValue (val) {
+            if (!isObject(val)) {
+                return [];
+            }
+
+            const legendValue = [];
+
+            if (val?.type === "polygon") {
+                val.styles?.forEach((data, index) => {
+                    const legendObj = {
+                            "name": data.value
+                        },
+                        style = {
+                            "polygonFillColor": data.style?.fillColor,
+                            "polygonStrokeColor": data.style?.strokeColor,
+                            "polygonStrokeWidth": data.style?.strokeWidth
+                        };
+
+                    legendValue[index] = FeaturesHandler.prepareLegendForPolygon(legendObj, style);
+                });
+            }
+
+            return legendValue;
+        },
+
         getMappedProperty,
 
         /**
@@ -198,6 +230,14 @@ export default {
          */
         setCurrentOutput (output) {
             this.currentOutput = output;
+        },
+
+        /**
+         * Sets the legend value.
+         * @returns {void}
+         */
+        setLegendValue () {
+            this.legendValue = this.getLegendValue(this.currentStyle);
         },
 
         /**
@@ -246,6 +286,7 @@ export default {
                 this.layers.push(layer);
             });
             this.setCurrentOutput(outputs[0]);
+            this.setLegendValue();
         }
     }
 };
@@ -413,13 +454,39 @@ export default {
                     </div>
                 </div>
             </div>
-            <div v-if="status === 'successful'">
+            <div v-if="status === 'successful' && legendValue.length">
                 <hr>
                 <AccordionItem
                     id="simulation-results-accordion-legend"
                     class="mt-4"
                     :title="$t('additional:modules.tools.simulationTool.legend')"
-                />
+                >
+                    <h6
+                        class="mb-3"
+                    >
+                        {{ currentStyle?.property }}
+                    </h6>
+                    <div class="row">
+                        <div
+                            v-for="legendObj in legendValue"
+                            :key="legendObj.name"
+                            class="row legend"
+                        >
+                            <div>
+                                <img
+                                    :alt="legendObj.name"
+                                    :src="legendObj.graphic"
+                                    class="col-3 col-xs px-0 left"
+                                >
+                                <span
+                                    class="col col-xs legend-names px-0 ms-1"
+                                >
+                                    {{ legendObj.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </AccordionItem>
             </div>
         </div>
         <div
@@ -511,5 +578,13 @@ export default {
     background-color: #3C5F94;
     border-color: #3C5F94;
 }
-
+.legend {
+    img {
+        width: 30px;
+    }
+    .legend-names {
+        font-size: $font_size_sm;
+        align-content: center;
+    }
+}
 </style>

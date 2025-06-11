@@ -226,5 +226,52 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                 expect(feature.getStyle().stroke_.color_).to.deep.equal([187, 201, 204, 1]);
             });
         });
+
+        describe("getLegendValue", () => {
+            it("should return an empty array if the parameter is not an object", async () => {
+                const wrapper = factory.getMount();
+
+                expect(wrapper.vm.getLegendValue(null)).to.deep.equal([]);
+                expect(wrapper.vm.getLegendValue(0)).to.deep.equal([]);
+                expect(wrapper.vm.getLegendValue("")).to.deep.equal([]);
+                expect(wrapper.vm.getLegendValue(undefined)).to.deep.equal([]);
+                expect(wrapper.vm.getLegendValue([])).to.deep.equal([]);
+                expect(wrapper.vm.getLegendValue(false)).to.deep.equal([]);
+            });
+
+            it("should return an empty array if the parameter does not contain a key 'type' or the 'type' is not 'polygon'", async () => {
+                const wrapper = factory.getMount();
+
+                expect(wrapper.vm.getLegendValue({})).to.deep.equal([]);
+                expect(wrapper.vm.getLegendValue({"type": "point"})).to.deep.equal([]);
+            });
+
+            it("should return an empty array if the parameter does not contain a key 'styles'", async () => {
+                const wrapper = factory.getMount();
+
+                expect(wrapper.vm.getLegendValue({"type": "polygon"})).to.deep.equal([]);
+            });
+
+            it("should return an legend object in array", async () => {
+                const wrapper = factory.getMount(),
+                    resultStyle = {
+                        "type": "polygon",
+                        "styles": [{
+                            "value": "< 35",
+                            "style": {
+                                "fillColor": [187, 201, 204, 1],
+                                "strokeColor": [187, 201, 204, 1],
+                                "strokeWidth": 1
+                            }
+                        }
+                        ]},
+                    expectedLegendValue = [{
+                        "graphic": "data:image/svg+xml;charset=utf-8,<svg height='35' width='35' version='1.1' xmlns='http://www.w3.org/2000/svg'><polygon points='5,5 30,5 30,30 5,30' style='fill:rgb(187, 201, 204);fill-opacity:1;stroke:rgb(187, 201, 204);stroke-opacity:1;stroke-width:1;stroke-linecap:round;stroke-dasharray:;'/></svg>",
+                        "name": "< 35"
+                    }];
+
+                expect(wrapper.vm.getLegendValue(resultStyle)).to.deep.equal(expectedLegendValue);
+            });
+        });
     });
 });
