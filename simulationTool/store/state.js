@@ -9,6 +9,7 @@
  * @property {Object[]} drawTypeLabels - the array of type and labels.
  * @property {Array.<Object>} ensembles a list of ensembles
  * @property {boolean} ensemblesLoading flag indicating if ensembles are loading
+ * @property {String[]} hiddenSideMenus the side menu which should be hidden.
  * @property {string} id the ID of the simulation tool
  * @property {string} type the type of the simulation tool
  * @property {Object} img object containing keys and links to images
@@ -56,6 +57,7 @@ const state = {
     currentInputName: "",
     dataSources: [],
     description: "additional:modules.tools.simulationTool.toolDescription",
+    hiddenSideMenus: [],
     icon: "bi-sliders2",
     img: {},
     jobResultData: {},

@@ -5,7 +5,8 @@ export default {
     name: "SideMenu",
     computed: {
         ...mapGetters("Modules/SimulationTool", [
-            "mode"
+            "mode",
+            "hiddenSideMenus"
         ]),
         ...mapGetters("Modules/Login", [
             "loggedIn"
@@ -63,6 +64,7 @@ export default {
             <i class="bi bi-x-lg" />
         </button>
         <button
+            v-if="!hiddenSideMenus.includes('home-panel')"
             class="btn btn-link"
             :class="{ active: mode === 'home-panel' }"
             :title="$t('additional:modules.tools.simulationTool.home')"
@@ -71,6 +73,7 @@ export default {
             <i class="bi bi-house-fill" />
         </button>
         <button
+            v-if="!hiddenSideMenus.includes('planningScenario')"
             class="btn btn-link"
             :class="{ active: mode.includes('planningScenario') }"
             :title="$t('additional:modules.tools.simulationTool.planningScenario')"
@@ -79,6 +82,7 @@ export default {
             <i class="bi bi-bounding-box-circles" />
         </button>
         <button
+            v-if="!hiddenSideMenus.includes('simulationParameter')"
             class="btn btn-link"
             :class="{ active: mode.includes('simulationParameter') }"
             :title="$t('additional:modules.tools.simulationTool.simulationSetParams')"
@@ -87,6 +91,7 @@ export default {
             <i class="bi bi-pencil-square" />
         </button>
         <button
+            v-if="!hiddenSideMenus.includes('simulationList')"
             class="btn btn-link"
             :class="{ active: mode.includes('simulationList') }"
             :title="$t('additional:modules.tools.simulationTool.simulationList')"
@@ -95,6 +100,7 @@ export default {
             <i class="bi bi-list-check" />
         </button>
         <button
+            v-if="!hiddenSideMenus.includes('simulationResults')"
             class="btn btn-link"
             :class="{ active: mode.includes('simulationResults') }"
             :title="$t('additional:modules.tools.simulationTool.simulationResults')"
@@ -103,6 +109,7 @@ export default {
             <i class="bi bi-stickies" />
         </button>
         <button
+            v-if="!hiddenSideMenus.includes('process')"
             class="btn btn-link"
             :class="{ active: mode.includes('process') }"
             :title="$t('additional:modules.tools.simulationTool.models')"
@@ -111,6 +118,7 @@ export default {
             <i class="bi bi-motherboard-fill" />
         </button>
         <button
+            v-if="!hiddenSideMenus.includes('job')"
             class="btn btn-link"
             :class="{ active: mode.includes('job')}"
             :title="$t('additional:modules.tools.simulationTool.scenarios')"
@@ -119,7 +127,7 @@ export default {
             <i class="bi bi-clipboard-data-fill" />
         </button>
         <button
-            v-if="loggedIn"
+            v-if="loggedIn && !hiddenSideMenus.includes('ensemble')"
             class="btn btn-link"
             :class="{ active: mode.includes('ensemble')}"
             :title="$t('additional:modules.tools.simulationTool.ensembles')"
@@ -128,6 +136,7 @@ export default {
             <i class="bi bi-boxes" />
         </button>
         <button
+            v-if="!hiddenSideMenus.includes('help-panel')"
             class="btn btn-link"
             :class="{ active: mode === 'help-panel' || mode.includes('tutorial') }"
             :title="$t('additional:modules.tools.simulationTool.help')"
