@@ -1,4 +1,5 @@
 import {config, shallowMount} from "@vue/test-utils";
+import crs from "@masterportal/masterportalapi/src/crs";
 import {expect} from "chai";
 import WaterRiskCheck from "../../components/WaterRiskCheck.vue";
 import MapfishDialog from "../../../shared/js/mapfishUtils/mapfishDialog";
@@ -25,60 +26,68 @@ function addSecondaryMenuElement () {
 
 describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
     const factory = {
-        createVuexStore: (initialState) => {
-            return createStore({
-                namespaced: true,
-                modules: {
-                    Modules: {
-                        namespaced: true,
-                        modules: {
+            createVuexStore: (initialState) => {
+                return createStore({
+                    namespaced: true,
+                    modules: {
+                        Modules: {
                             namespaced: true,
-                            WaterRiskCheck: {
+                            modules: {
                                 namespaced: true,
-                                state: {
-                                    address: "",
-                                    configuredQuestions: [],
-                                    pdfPages: [],
-                                    answersLogic: [],
-                                    alwaysShow: [],
-                                    settings: {},
-                                    addressCoordinates: undefined,
-                                    ...initialState
+                                WaterRiskCheck: {
+                                    namespaced: true,
+                                    state: {
+                                        address: "",
+                                        configuredQuestions: [],
+                                        pdfPages: [],
+                                        answersLogic: [],
+                                        alwaysShow: [],
+                                        settings: {},
+                                        addressCoordinates: undefined,
+                                        ...initialState
+                                    },
+                                    getters: {
+                                        address: (state) => state.address,
+                                        addressCoordinates: (state) => state.addressCoordinates,
+                                        configuredQuestions: (state) => state.configuredQuestions,
+                                        answersLogic: (state) => state.answersLogic,
+                                        pdfPages: (state) => state.pdfPages,
+                                        alwaysShow: (state) => state.alwaysShow,
+                                        settings: (state) => state.settings
+                                    }
                                 },
-                                getters: {
-                                    address: (state) => state.address,
-                                    addressCoordinates: (state) => state.addressCoordinates,
-                                    configuredQuestions: (state) => state.configuredQuestions,
-                                    answersLogic: (state) => state.answersLogic,
-                                    pdfPages: (state) => state.pdfPages,
-                                    alwaysShow: (state) => state.alwaysShow,
-                                    settings: (state) => state.settings
-                                }
-                            },
-                            SearchBar: {
-                                namespaced: true,
-                                getters: {
-                                    searchResults: () => [{
-                                        category: "Adresse",
-                                        name: "Test Address 1"
-                                    }]
+                                SearchBar: {
+                                    namespaced: true,
+                                    getters: {
+                                        searchResults: () => [{
+                                            category: "Adresse",
+                                            name: "Test Address 1"
+                                        }]
+                                    }
                                 }
                             }
                         }
-                    }
-                },
-                getters: {
-                    restServiceById: () => {
-                        return {
-                            url: "https://this.could.be.your.url/examplePortal"
-                        };
                     },
-                    isMobile: () => false
-                }
-            });
-        }
-    };
+                    getters: {
+                        restServiceById: () => {
+                            return {
+                                url: "https://this.could.be.your.url/examplePortal"
+                            };
+                        },
+                        isMobile: () => false
+                    }
+                });
+            }
+        },
+        namedProjections = [
+            ["EPSG:25832", "+title=ETRS89/UTM 32N +proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"],
+            ["EPSG:4326", "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"]
+        ];
     let stubSetConfig;
+
+    before(() => {
+        crs.registerProjections(namedProjections);
+    });
 
     beforeEach(() => {
         addSecondaryMenuElement();
