@@ -17,12 +17,16 @@ description:
       - Adminfreundlich
       - Modular
       - Metadatenintegration
+    screenshots: https://www.masterportal.org/fileadmin/user_upload/mockup_laptop_tablet_geoportal_erreichbarkeit.png
     genericName: 'Masterportal Addons'
     localisedName: Masterportal Addons
     longDescription: |3
        Die Masterportal Addons beinhalten spezielle Anwendungen, die individuell in die Open Source Software Masterportal per Konfiguration integriert werden können. Das Masterportal ist ein flexibler Baukasten für Geoportale im Web. In Hamburg kommt das Masterportal immer dann zum Einsatz, wenn webbasierte Kartenanwendungen benötigt werden – als eigenständige Anwendung oder als Teil einer E-Government-Lösung. Auch in anderen Städten und Kreisen wird das [++Masterportal++] eingesetzt und in einer Kooperation von mehr als 30 Partnern aus der Verwaltung weiterentwickelt. Die Masterportal Addons sind Open-Source-Software. Es ist unter der [++MIT-Lizenz++](https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/License.txt) veröffentlicht.
     shortDescription: ' Addons beinhalten spezielle Anwendungen für die Software Masterportal, das ein flexibler Baukasten für Geoportale im Web ist.'
 developmentStatus: stable
+platforms:
+  - web
+softwareType: addon
 intendedAudience:
   countries:
     - de
@@ -81,6 +85,7 @@ logo: |-
 maintenance:
   contacts:
     - name: Betrieb Webanwendungen
+      email: geodatenanwendungen@gv.hamburg.de
       affiliation:  Freie und Hansestadt Hamburg, Landesbetrieb Geoinformation und Vermessung
   contractors:
     - name: Landesbetrieb Geoinformation und Vermessung
@@ -88,10 +93,7 @@ maintenance:
       website: 'https://www.hamburg.de/bsw/landesbetrieb-geoinformation-und-vermessung/'
   type: community
 name: Masterportal Addons
-platforms:
-  - web
 releaseDate: '2025-05-07'
 roadmap: 'https://bitbucket.org/geowerkstatt-hamburg/masterportal/src/dev/'
-softwareType: standalone/web
 softwareVersion: 3.10.0
 url: 'https://bitbucket.org/geowerkstatt-hamburg/addons.git'
