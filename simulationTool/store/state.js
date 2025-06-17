@@ -8,6 +8,7 @@
  * @property {Object[]} drawTypeLabels - the array of type and labels.
  * @property {Array.<Object>} ensembles a list of ensembles
  * @property {boolean} ensemblesLoading flag indicating if ensembles are loading
+ * @property {Boolean} [hasMouseMapInteractions=true] If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
  * @property {String[]} hiddenSideMenus the side menu which should be hidden.
  * @property {string} id the ID of the simulation tool
  * @property {string} type the type of the simulation tool
@@ -57,6 +58,7 @@ const state = {
     currentInputName: "",
     dataSources: [],
     description: "additional:modules.tools.simulationTool.toolDescription",
+    hasMouseMapInteractions: true,
     hiddenSideMenus: [],
     icon: "bi-sliders2",
     img: {},
