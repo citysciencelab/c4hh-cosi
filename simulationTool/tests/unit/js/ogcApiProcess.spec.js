@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import OgcApiProcess from "../ogcApiProcess.js";
+import OgcApiProcess from "../../../js/ogcApiProcess";
 import sinon from "sinon";
 import axios from "axios";
 

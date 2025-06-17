@@ -1,9 +1,9 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
-import PlanningScenarioOverviewList from "../../../PlanningScenarioOverviewList.vue";
+import PlanningScenarioOverviewList from "../../../../components/PlanningScenario/PlanningScenarioOverviewList.vue";
 import sinon from "sinon";
-import layerCollection from "../../../../../../../src/core/layers/js/layerCollection.js";
+import layerCollection from "../../../../../../src/core/layers/js/layerCollection.js";
 
 config.global.mocks.$t = key => key;
 

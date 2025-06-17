@@ -3,9 +3,9 @@ import {config, mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
-import layerCollection from "../../../../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../../../src/core/layers/js/layerCollection";
 import {Polygon} from "ol/geom";
-import SimulationResults from "../../../SimulationResults.vue";
+import SimulationResults from "../../../../components/Simulation/SimulationResults.vue";
 import sinon from "sinon";
 import VectorSource from "ol/source/Vector.js";
 

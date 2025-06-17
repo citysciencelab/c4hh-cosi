@@ -1,7 +1,7 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
-import SimulationList from "../../../SimulationList.vue";
+import SimulationList from "../../../../components/Simulation/SimulationList.vue";
 import sinon from "sinon";
 
 config.global.mocks.$t = key => key;

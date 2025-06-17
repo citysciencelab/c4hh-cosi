@@ -2,9 +2,9 @@ import {config, mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
-import getFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
-import layerCollection from "../../../../../../../src/core/layers/js/layerCollection.js";
-import PlanningScenarioLanduse from "../../../PlanningScenarioLanduse.vue";
+import getFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
+import layerCollection from "../../../../../../src/core/layers/js/layerCollection.js";
+import PlanningScenarioLanduse from "../../../../components/PlanningScenario/PlanningScenarioLanduse.vue";
 import sinon from "sinon";
 import VectorSource from "ol/source/Vector.js";
 

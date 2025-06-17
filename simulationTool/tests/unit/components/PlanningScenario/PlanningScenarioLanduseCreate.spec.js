@@ -2,9 +2,8 @@ import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature";
-import getOAFFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
-import layerFactory from "../../../../../../../src/core/layers/js/layerFactory";
-import PlanningScenarioLanduseCreate from "../../../PlanningScenarioLanduseCreate.vue";
+import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
+import PlanningScenarioLanduseCreate from "../../../../components/PlanningScenario/PlanningScenarioLanduseCreate.vue";
 import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
@@ -24,12 +23,10 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 });
             }
         },
-        layer = layerFactory.createLayer({
-            typ: "VECTORBASE",
-            id: "planning-scenario",
-            name: "planning-scenario",
-            alwaysOnTop: true
-        }),
+        layer = {
+            getLayerSource: () => ({
+                getFeatures: () => []
+            })},
         dataSources = [
             {
                 "id": "default",

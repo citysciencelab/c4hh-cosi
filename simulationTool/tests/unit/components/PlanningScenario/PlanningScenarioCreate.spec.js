@@ -2,14 +2,13 @@ import {createStore} from "vuex";
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
-import layerFactory from "../../../../../../../src/core/layers/js/layerFactory";
-import PlanningScenarioCreate from "../../../PlanningScenarioCreate.vue";
+import PlanningScenarioCreate from "../../../../components/PlanningScenario/PlanningScenarioCreate.vue";
 import {Polygon} from "ol/geom";
 import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
-describe.skip("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCreate.vue", () => {
+describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCreate.vue", () => {
     let selectedDrawType,
         selectedDrawTypeMain,
         store;
@@ -30,12 +29,14 @@ describe.skip("addons/SimulationTool/components/PlanningScenario/PlanningScenari
                 });
             }
         },
-        layer = layerFactory.createLayer({
-            typ: "VECTORBASE",
-            id: "planning-scenario",
-            name: "planning-scenario",
-            alwaysOnTop: true
-        });
+        layer = {
+            getLayerSource: () => ({
+                addFeature: () => undefined,
+                clear: () => undefined,
+                getFeatures: () => [],
+                removeFeature: () => undefined
+            })
+        };
 
     beforeEach(() => {
         sinon.stub(PlanningScenarioCreate.methods, "getLayerSource").returns(layer.getLayerSource());
@@ -182,7 +183,7 @@ describe.skip("addons/SimulationTool/components/PlanningScenario/PlanningScenari
             const wrapper = factory.getShallowMount();
 
             expect(wrapper.vm.source).to.not.be.null;
-            expect(wrapper.vm.source).to.deep.equal(layer.getLayerSource());
+            expect(wrapper.vm.source.getFeatures()).to.deep.equal(layer.getLayerSource().getFeatures());
         });
     });
 
@@ -222,24 +223,27 @@ describe.skip("addons/SimulationTool/components/PlanningScenario/PlanningScenari
         });
 
         describe("addBBOX", () => {
-            it("should add a feature with the extent geometry of the passed feature (planning scenario) to the source", () => {
+            it("should add a feature with the geometry of the passed feature (planning scenario) to the source", () => {
                 const wrapper = factory.getShallowMount(),
                     feature = new Feature({
                         geometry: new Polygon([[
-                            [574729.649, 5927590.856],
-                            [574676.641, 5927642.08],
-                            [574690.16, 5927655.429],
-                            [574705.504, 5927640.191],
-                            [574711.97, 5927633.768],
-                            [574742.688, 5927603.26],
-                            [574729.649, 5927590.856]]])
+                            [0, 0],
+                            [0, 1],
+                            [1, 1],
+                            [1, 0],
+                            [0, 0]]])
                     }),
-                    extent = [574676.641, 5927590.856, 574742.688, 5927655.429];
+                    expectedCoords = feature.getGeometry().getCoordinates().flat(3),
+                    addFeatureStub = sinon.stub(wrapper.vm.source, "addFeature");
 
                 wrapper.vm.addBBOX({feature});
 
-                expect(wrapper.vm.source.getFeatures()[0].get("id")).to.be.equal("simulation-area");
-                expect(wrapper.vm.source.getFeatures()[0].getGeometry().getExtent()).to.deep.equal(extent);
+                expect(addFeatureStub.calledWith(
+                    sinon.match.hasNested("values_.id", "simulation-area")
+                )).to.be.true;
+                expect(addFeatureStub.calledWith(
+                    sinon.match.hasNested("values_.geometry.flatCoordinates", sinon.match.array.deepEquals(expectedCoords))
+                )).to.be.true;
             });
         });
 

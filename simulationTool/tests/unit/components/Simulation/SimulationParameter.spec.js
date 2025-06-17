@@ -1,10 +1,10 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
-import SimulationParameter from "../../../SimulationParameter.vue";
+import SimulationParameter from "../../../../components/Simulation/SimulationParameter.vue";
 import sinon from "sinon";
 import axios from "axios";
-import getOAFFeature from "../../../../../../../src/shared/js/api/oaf/getOAFFeature";
+import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature";
 
 config.global.mocks.$t = key => key;
 

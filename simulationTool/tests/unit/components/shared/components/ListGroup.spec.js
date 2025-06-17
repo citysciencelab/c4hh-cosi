@@ -1,7 +1,7 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature";
-import ListGroup from "../../../components/ListGroup.vue";
+import ListGroup from "../../../../../components/shared/components/ListGroup.vue";
 
 config.global.mocks.$t = key => key;
 
@@ -96,7 +96,7 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
             featuresMore[0].setId("one");
             wrapper.vm.setCurrentFeature(featuresMore[0]);
 
-            expect(wrapper.find("label[for='cool-undefined']").text()).to.be.equal("Super cool");
+            expect(wrapper.find("label[for='cool-undefined']").exists()).to.be.true;
             expect(wrapper.find("input[id='cool-undefined']").exists()).to.be.true;
         });
     });

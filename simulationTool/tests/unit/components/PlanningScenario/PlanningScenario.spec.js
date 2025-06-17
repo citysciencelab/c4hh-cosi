@@ -1,8 +1,8 @@
 import {config, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
-import PlanningScenario from "../../../PlanningScenario.vue";
-import SimulationToolModule from "../../../../../store/index";
+import PlanningScenario from "../../../../components/PlanningScenario/PlanningScenario.vue";
+import SimulationToolModule from "../../../../store/index";
 
 config.global.mocks.$t = key => key;
 

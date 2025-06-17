@@ -1,5 +1,6 @@
 import {expect} from "chai";
-import {getMappedProperty} from "../../../js/getMappedProperty";
+import {getMappedProperty} from "../../../../../components/shared/js/getMappedProperty";
+import sinon from "sinon";
 
 describe("addons/SimulationTool/components/shared/js/getMappedProperty.js", () => {
     it("should return empty string if the key is not string.", function () {
@@ -33,6 +34,8 @@ describe("addons/SimulationTool/components/shared/js/getMappedProperty.js", () =
             "building_height": "Höhe"
         };
 
+        sinon.stub(i18next, "t").callsFake(key => key);
         expect(getMappedProperty("building_height", propertiesMapping)).to.be.equal("Höhe");
+        sinon.restore();
     });
 });
