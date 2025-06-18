@@ -1,7 +1,7 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
-import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
+
 import {Polygon} from "ol/geom";
 import Feature from "ol/Feature.js";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
@@ -15,14 +15,21 @@ import OverlayOp from "jsts/org/locationtech/jts/operation/overlay/OverlayOp";
 import {isUrl} from "../../../../src/shared/js/utils/urlHelper";
 import ElevatedButton from "../../../../src/shared/modules/buttons/components/ElevatedButton.vue";
 import PaginationControl from "../../../../src/shared/modules/pagination/components/PaginationControl.vue";
+import AttributeTable from "./AttributeTable.vue";
+import AdditionalRequestsAccordion from "./AdditionalRequestsAccordion.vue";
+import PrintAccordion from "./PrintAccordion.vue";
+import ExportAccordion from "./ExportAccordion.vue";
 
 export default {
     name: "CombinedGfi",
     components: {
         SpinnerItem,
-        AccordionItem,
         ElevatedButton,
-        PaginationControl
+        PaginationControl,
+        AttributeTable,
+        AdditionalRequestsAccordion,
+        PrintAccordion,
+        ExportAccordion
     },
     props: {
         feature: {
@@ -34,8 +41,7 @@ export default {
         return {
             bufferDistance: null,
             isPrintLoading: false,
-            printUtils: null,
-            infoHoverIndex: null
+            printUtils: null
         };
     },
     computed: {
@@ -610,30 +616,10 @@ export default {
                         </div>
                         <!-- Direct display when only one feature exists -->
                         <div v-if="layerResult.rows.length === 1">
-                            <table class="custom-table">
-                                <tbody>
-                                    <tr
-                                        v-for="(value, key) in layerResult.rows[0]"
-                                        v-show="!getLayerConfig(layerResult.layerId)?.hideEmptyAttributeValues || (value !== null && value !== undefined && value !== '')"
-                                        :key="key"
-                                    >
-                                        <td class="attribute-name">
-                                            {{ key }}
-                                        </td>
-                                        <td class="attribute-value">
-                                            <a
-                                                v-if="value && isUrl(value)"
-                                                :href="value"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >{{ value }}</a>
-                                            <template v-else>
-                                                {{ value }}
-                                            </template>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <AttributeTable
+                                :data="layerResult.rows[0]"
+                                :layer-config="getLayerConfig(layerResult.layerId)"
+                            />
                         </div>
                         <!-- Accordion for multiple features -->
                         <div
@@ -646,30 +632,10 @@ export default {
                                 <summary class="feature-summary">
                                     {{ translate('additional:modules.combinedGfi.feature') }} {{ rowIndex + 1 + (layerResult.page - 1) * itemsPerPage }}
                                 </summary>
-                                <table class="custom-table">
-                                    <tbody>
-                                        <tr
-                                            v-for="(value, key) in row"
-                                            v-show="!getLayerConfig(layerResult.layerId)?.hideEmptyAttributeValues || (value !== null && value !== undefined && value !== '')"
-                                            :key="key"
-                                        >
-                                            <td class="attribute-name">
-                                                {{ key }}
-                                            </td>
-                                            <td class="attribute-value">
-                                                <a
-                                                    v-if="value && isUrl(value)"
-                                                    :href="value"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >{{ value }}</a>
-                                                <template v-else>
-                                                    {{ value }}
-                                                </template>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <AttributeTable
+                                    :data="row"
+                                    :layer-config="getLayerConfig(layerResult.layerId)"
+                                />
                             </details>
                         </div>
                     </div>
@@ -713,132 +679,31 @@ export default {
                 />
             </div>
 
-            <div
-                v-if="additionalRequestResults.length"
-                class="additional-requests"
-            >
-                <AccordionItem
-                    id="additional-requests-section"
-                    :title="translate('additional:modules.combinedGfi.additionalRequests')"
-                    :icon="'bi bi-clipboard-data'"
-                    :is-open="false"
-                    font-size="font-size-base"
-                    :coloured-header="true"
-                >
-                    <div
-                        v-for="(result, index) in additionalRequestResults"
-                        :key="index"
-                        class="additional-request"
-                    >
-                        <div class="result-container">
-                            <div class="result-text">
-                                {{ result.text }}
-                            </div>
-                            <hr>
-                            <div class="source-container">
-                                <strong>{{ translate('additional:modules.combinedGfi.source') }}:</strong> {{ result.url }}
-                                <span
-                                    v-if="result.infoText"
-                                    class="info-text-container"
-                                    tabindex="0"
-                                    role="button"
-                                    @mouseenter="infoHoverIndex = index"
-                                    @mouseleave="infoHoverIndex = null"
-                                    @focusin="infoHoverIndex = index"
-                                    @focusout="infoHoverIndex = null"
-                                >
-                                    <span
-                                        class="info-icon"
-                                        :title="translate('additional:modules.combinedGfi.infoHint')"
-                                    >i</span>
-                                </span>
-                                <span
-                                    v-if="infoHoverIndex === index"
-                                    class="info-inline"
-                                >
-                                    {{ result.infoText }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </AccordionItem>
-            </div>
+            <AdditionalRequestsAccordion
+                :additional-request-results="additionalRequestResults"
+                :translate="translate"
+            />
 
             <!-- Print section -->
-            <AccordionItem
-                v-if="printConfigPath"
-                id="print-section"
-                :title="translate('additional:modules.combinedGfi.printSection')"
-                :icon="'bi bi-printer'"
-                :is-open="false"
-                font-size="font-size-base"
-                :coloured-header="true"
-            >
-                <p class="print-description">
-                    {{ translate('additional:modules.combinedGfi.printDescription') }}
-                </p>
-                <div class="button-group">
-                    <ElevatedButton
-                        :text="$t('additional:modules.combinedGfi.printButton')"
-                        :icon="isPrintLoading ? null : 'bi-file-pdf'"
-                        :disabled="!hasSelectedFeature || isLoading || isPrintLoading"
-                        :interaction="sendPrintRequest"
-                        additional-css="print-btn"
-                    >
-                        <span
-                            v-if="isPrintLoading"
-                            class="spinner-border spinner-border-sm me-1"
-                            role="status"
-                        />
-                    </ElevatedButton>
-                </div>
-            </AccordionItem>
+            <PrintAccordion
+                :print-config-path="printConfigPath"
+                :has-selected-feature="hasSelectedFeature"
+                :is-loading="isLoading"
+                :is-print-loading="isPrintLoading"
+                :send-print-request="sendPrintRequest"
+                :translate="translate"
+            />
 
             <!-- Standard export section -->
-            <AccordionItem
-                id="export-section"
-                :title="translate('additional:modules.combinedGfi.standardExport') || 'Standard Export'"
-                :icon="'bi bi-file-earmark-arrow-down'"
-                :is-open="false"
-                font-size="font-size-base"
-                :coloured-header="true"
-            >
-                <div class="form-floating mb-3 export-dropdown">
-                    <input
-                        v-model="fileName"
-                        type="text"
-                        class="form-control"
-                        :aria-label="translate('additional:modules.combinedGfi.fileName')"
-                    >
-                    <label for="fileName">{{ translate("additional:modules.combinedGfi.fileName") }}</label>
-                </div>
-                <div class="form-floating mb-3 export-dropdown">
-                    <select
-                        id="printFormat"
-                        class="form-select"
-                        @change="setCurrentFormat($event.target.value)"
-                    >
-                        <option
-                            v-for="(format, i) in shownFormatList"
-                            :key="i"
-                            :value="format"
-                            :selected="format === currentFormat"
-                        >
-                            {{ format }}
-                        </option>
-                    </select>
-                    <label for="printFormat">{{ translate("additional:modules.combinedGfi.exportFormat") }}</label>
-                </div>
-
-                <div class="button-group">
-                    <ElevatedButton
-                        :text="translate('additional:modules.combinedGfi.export')"
-                        :icon="'bi-download'"
-                        :interaction="exportData"
-                        additional-css="export-btn"
-                    />
-                </div>
-            </AccordionItem>
+            <ExportAccordion
+                :file-name="fileName"
+                :current-format="currentFormat"
+                :shown-format-list="shownFormatList"
+                :set-current-format="setCurrentFormat"
+                :export-data="exportData"
+                :translate="translate"
+                @update:file-name="value => $store.commit('Modules/CombinedGfi/setFileName', value)"
+            />
         </div>
     </div>
 </template>
@@ -851,26 +716,7 @@ export default {
     justify-content: flex-start;
     gap: 10px;
     margin-top: 10px;
-}
-
-.export-btn {
-    background-color: $light_blue;
-    border-color: $light_blue;
-    color: $white;
-}
-.export-btn:hover {
-    background-color: $dark_blue;
-    border-color: $dark_blue;
-}
-
-.print-btn {
-    background-color: $dark_blue;
-    border-color: $dark_blue;
-    color: $white;
-}
-.print-btn:hover {
-    background-color: $light_blue;
-    border-color: $light_blue;
+    flex-wrap: wrap;
 }
 
 .spinner {
@@ -912,31 +758,6 @@ details[open] summary {
 
 .feature-container {
     margin-bottom: 4px;
-}
-
-.custom-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 10px 0;
-    background-color: $white;
-    border: 1px solid $light_grey;
-}
-.custom-table td {
-    padding: 8px;
-    border: 1px solid $light_grey;
-    color: $dark_grey;
-}
-
-.attribute-name {
-    font-weight: bold;
-    width: 40%;
-    background-color: $light_grey;
-    color: $dark_grey;
-}
-
-.attribute-value {
-    width: 60%;
-    color: $dark_grey;
 }
 
 .feature-count {
