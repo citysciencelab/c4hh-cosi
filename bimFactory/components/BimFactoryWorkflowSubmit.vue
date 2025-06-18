@@ -186,7 +186,7 @@ export default {
         <FlatButton
             v-if="bimViewerConfigured && ifcUrl && !isMobile"
             :text="$t('additional:modules.bimfactory.workflow.components.submit.openIfcInBimViewer')"
-            icon="bi-file-earmark-plus"
+            icon="bi-file-earmark-plus-fill"
             :secondary="true"
             :interaction="() => openIFC()"
         />
