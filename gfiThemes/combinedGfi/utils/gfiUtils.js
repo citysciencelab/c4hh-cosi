@@ -300,6 +300,38 @@ export function shrinkPolygonGeoJson (polygonGeoJson, shrinkValue) {
 }
 
 /**
+ * Helper function to determine buffer value based on area
+ * @param {number} areaValue - The area to calculate buffer for
+ * @returns {number} The buffer value
+ */
+export function getBufferValue (areaValue) {
+    if (areaValue < 1000) {
+        return -6;
+    }
+    if (areaValue < 10000) {
+        return -8;
+    }
+    if (areaValue < 20000) {
+        return -10;
+    }
+    return -15;
+}
+
+/**
+ * Converts an EPSG code to a full CRS URL format
+ * @param {string} epsgCode - The EPSG code (e.g. "EPSG:4326")
+ * @returns {string} The full CRS URL
+ */
+export function getCrsUrl (epsgCode) {
+    if (!epsgCode || !epsgCode.startsWith("EPSG:")) {
+        return "http://www.opengis.net/def/crs/OGC/1.3/CRS84";
+    }
+    const code = epsgCode.split(":")[1];
+
+    return `http://www.opengis.net/def/crs/EPSG/0/${code}`;
+}
+
+/**
  * Extracts features from an OAF JSON response.
  *
  * @param {Object} data - The JSON data from the OAF response.
@@ -336,36 +368,4 @@ export function extractFeaturesFromOafJson (data, attributes) {
         console.error("Error extracting features from OAF response:", error);
         return [];
     }
-}
-
-/**
- * Helper function to determine buffer value based on area
- * @param {number} areaValue - The area to calculate buffer for
- * @returns {number} The buffer value
- */
-export function getBufferValue (areaValue) {
-    if (areaValue < 1000) {
-        return -6;
-    }
-    if (areaValue < 10000) {
-        return -8;
-    }
-    if (areaValue < 20000) {
-        return -10;
-    }
-    return -15;
-}
-
-/**
- * Converts an EPSG code to a full CRS URL format
- * @param {string} epsgCode - The EPSG code (e.g. "EPSG:4326")
- * @returns {string} The full CRS URL
- */
-export function getCrsUrl (epsgCode) {
-    if (!epsgCode || !epsgCode.startsWith("EPSG:")) {
-        return "http://www.opengis.net/def/crs/OGC/1.3/CRS84";
-    }
-    const code = epsgCode.split(":")[1];
-
-    return `http://www.opengis.net/def/crs/EPSG/0/${code}`;
 }

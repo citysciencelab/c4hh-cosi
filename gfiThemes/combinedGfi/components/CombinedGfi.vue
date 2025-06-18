@@ -382,14 +382,15 @@ export default {
                     throw new Error("Failed to load print utils");
                 }
 
-                // eslint-disable-next-line one-var
-                const printResponse = await this.sendPrintRequestToServer(
-                    this.printUtils.preparePrintRequest,
-                    olFeature,
-                    printConfigPath
-                );
+                if (printConfigPath) {
+                    const printResponse = await this.sendPrintRequestToServer(
+                        this.printUtils.preparePrintRequest,
+                        olFeature,
+                        printConfigPath
+                    );
 
-                await this.processPrintResponse(printResponse);
+                    await this.processPrintResponse(printResponse);
+                }
             }
             catch (error) {
                 console.error("Error sending print request:", error);

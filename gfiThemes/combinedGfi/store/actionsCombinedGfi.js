@@ -10,7 +10,8 @@ import {
     getCoordinateFromGeometry,
     shrinkPolygonGeoJson,
     getBufferValue,
-    getCrsUrl
+    getCrsUrl,
+    extractFeaturesFromOafJson
 } from "../utils/gfiUtils";
 import {GeoJSON} from "ol/format";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
@@ -22,6 +23,8 @@ import OverlayOp from "jsts/org/locationtech/jts/operation/overlay/OverlayOp";
 import {Fill, Stroke, Style} from "ol/style";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
+import {addExtentCoordinates, processPointResults} from "../utils/geometryUtils";
+import mapCollection from "@core/maps/js/mapCollection";
 
 const actions = {
     /**
@@ -585,40 +588,43 @@ const actions = {
             shrunkenGeometry = geojsonGeometry;
         }
 
-        // eslint-disable-next-line one-var
-        const requestGeometry = shrunkenGeometry,
-            coords = requestGeometry.coordinates[0],
-            filter = `
-            <fes:Filter xmlns:fes="http://www.opengis.net/fes/2.0">
-                <fes:Intersects>
-                    <fes:ValueReference>${layerConfig.geometryAttribute}</fes:ValueReference>
-                    <gml:Polygon xmlns:gml="http://www.opengis.net/gml/3.2" srsName="${mapProjection}">
-                        <gml:exterior>
-                            <gml:LinearRing>
-                                <gml:posList>${coords.map(coord => coord.join(" ")).join(" ")}</gml:posList>
-                            </gml:LinearRing>
-                        </gml:exterior>
-                    </gml:Polygon>
-                </fes:Intersects>
-            </fes:Filter>
-        `,
-            wfsUrl = `${serviceUrl}?service=WFS&version=${version}&request=GetFeature&${typeNameParam}=${typeName}&filter=${encodeURIComponent(filter)}&outputFormat=text/xml; subtype=gml/3.2.1`;
+        if (shrunkenGeometry) {
+            const requestGeometry = shrunkenGeometry,
+                coords = requestGeometry.coordinates[0],
+                filter = `
+                        <fes:Filter xmlns:fes="http://www.opengis.net/fes/2.0">
+                            <fes:Intersects>
+                                <fes:ValueReference>${layerConfig.geometryAttribute}</fes:ValueReference>
+                                <gml:Polygon xmlns:gml="http://www.opengis.net/gml/3.2" srsName="${mapProjection}">
+                                    <gml:exterior>
+                                        <gml:LinearRing>
+                                            <gml:posList>${coords.map(coord => coord.join(" ")).join(" ")}</gml:posList>
+                                        </gml:LinearRing>
+                                    </gml:exterior>
+                                </gml:Polygon>
+                            </fes:Intersects>
+                        </fes:Filter>
+                    `,
+                wfsUrl = `${serviceUrl}?service=WFS&version=${version}&request=GetFeature&${typeNameParam}=${typeName}&filter=${encodeURIComponent(filter)}&outputFormat=text/xml; subtype=gml/3.2.1`;
 
-        try {
-            const response = await fetch(wfsUrl),
-                text = await response.text(),
-                parsedResponse = new DOMParser().parseFromString(text, "application/xml");
+            try {
+                const response = await fetch(wfsUrl),
+                    text = await response.text(),
+                    parsedResponse = new DOMParser().parseFromString(text, "application/xml");
 
-            if (!response.ok) {
-                console.error(`Failed to fetch features: ${response.status} ${response.statusText}`);
+                if (!response.ok) {
+                    console.error(`Failed to fetch features: ${response.status} ${response.statusText}`);
+                    return null;
+                }
+                return extractFeaturesFromWfsGml(parsedResponse, attributes);
+            }
+            catch (error) {
+                console.error("Error fetching features:", error);
                 return null;
             }
-            return extractFeaturesFromWfsGml(parsedResponse, attributes);
         }
-        catch (error) {
-            console.error("Error fetching features:", error);
-            return null;
-        }
+
+        return null;
     },
 
     /**
@@ -750,7 +756,7 @@ const actions = {
                             attributes: layerConfig.attributes || []
                         });
 
-                        dispatch("processPointResults", {pointResults, allResults});
+                        processPointResults(pointResults, allResults);
                     }
 
                     if (allResults.length > 0) {
@@ -873,7 +879,7 @@ const actions = {
      * @param {Array} payload.attributes - Attributes to request and extract from the response.
      * @returns {Promise<Array|null>} - Returns an array of feature objects or null if an error occurs.
      */
-    async fetchOafData ({dispatch}, {layer, geometry, attributes}) {
+    async fetchOafData (_, {layer, geometry, attributes}) {
         if (!layer?.url) {
             console.error("No valid URL for OAF service:", layer);
             return null;
@@ -919,95 +925,26 @@ const actions = {
                 itemsUrl.searchParams.set("access_token", layer.accessToken);
             }
 
-            // eslint-disable-next-line one-var
-            const response = await fetch(itemsUrl, {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json"
-                    }
-                }),
-                data = await response.json();
+            if (itemsUrl.searchParams.size > 0) {
+                const response = await fetch(itemsUrl, {
+                        method: "GET",
+                        headers: {
+                            "Accept": "application/json"
+                        }
+                    }),
+                    data = await response.json();
 
-            if (!response.ok) {
-                console.error(`Failed to fetch features: ${response.status} ${response.statusText}`);
-                return null;
+                if (!response.ok) {
+                    console.error(`Failed to fetch features: ${response.status} ${response.statusText}`);
+                    return null;
+                }
+                return extractFeaturesFromOafJson(data, attributes);
             }
-            return dispatch("extractFeaturesFromOafJson", {data, attributes});
+            return null;
         }
         catch (error) {
             console.error("Error during OAF query:", error);
             return null;
-        }
-    },
-    /**
-     * Extracts features from an OAF JSON response.
-     *
-     * @param {Object} context - The Vuex action context.
-     * @param {Object} payload - The payload object.
-     * @param {Object} payload.data - The JSON data from the OAF response.
-     * @param {Array} payload.attributes - The attributes to extract.
-     * @returns {Array} An array of feature objects.
-     */
-    extractFeaturesFromOafJson (_, {data, attributes}) {
-        try {
-            if (!data || !data.features || !Array.isArray(data.features)) {
-                console.error("Invalid OAF response format:", data);
-                return [];
-            }
-
-            return data.features.map(feature => {
-                const properties = feature.properties || {},
-                    result = {};
-
-                if (!attributes || attributes.length === 0) {
-                    return {...properties};
-                }
-
-                attributes.forEach(attr => {
-                    const originalName = typeof attr === "object" ? attr.name : attr,
-                        displayName = typeof attr === "object" && attr.alias ? attr.alias : originalName;
-
-                    result[displayName] = properties[originalName] !== undefined ?
-                        properties[originalName] : "";
-                });
-
-                return result;
-            });
-        }
-        catch (error) {
-            console.error("Error extracting features from OAF response:", error);
-            return [];
-        }
-    },
-    /**
-     * Adds extent coordinates to the coordinates array
-     * @param {Object} context - The Vuex action context
-     * @param {Object} payload - The payload object
-     * @param {Array} payload.coordinates - The array to add coordinates to
-     * @param {Array} payload.extent - The extent array [minX, minY, maxX, maxY]
-     */
-    addExtentCoordinates (_, {coordinates, extent}) {
-        const coords = Array.isArray(coordinates) ? coordinates : [];
-
-        coords.push([extent[0], extent[1]]);
-        coords.push([extent[2], extent[1]]);
-        coords.push([extent[0], extent[3]]);
-        coords.push([extent[2], extent[3]]);
-
-        return coords;
-    },
-    /**
-     * Processes point results and adds unique results to allResults
-     * @param {Array} pointResults - The results to process
-     * @param {Array} allResults - The array to add unique results to
-     */
-    processPointResults (_, pointResults, allResults) {
-        if (pointResults && pointResults.length > 0) {
-            pointResults.forEach(result => {
-                if (!allResults.some(existing => JSON.stringify(existing) === JSON.stringify(result))) {
-                    allResults.push(result);
-                }
-            });
         }
     },
     /**
@@ -1017,7 +954,7 @@ const actions = {
      * @param {Array} payload.coordinates - The array to add coordinates to
      * @param {Object} payload.geometry - The geometry object
      */
-    handlePolygonCoordinates ({dispatch}, {coordinates, geometry}) {
+    handlePolygonCoordinates (_, {coordinates, geometry}) {
         const coords = Array.isArray(coordinates) ? coordinates : [],
             center = getCoordinateFromGeometry(geometry),
             extent = geometry.getExtent();
@@ -1025,7 +962,7 @@ const actions = {
         coords.push(center);
 
         if (extent[2] - extent[0] > 0.001 || extent[3] - extent[1] > 0.001) {
-            dispatch("addExtentCoordinates", {coordinates: coords, extent});
+            addExtentCoordinates(coords, extent);
         }
     },
     /**

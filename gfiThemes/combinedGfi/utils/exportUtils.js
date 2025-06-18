@@ -196,20 +196,21 @@ export function exportToDOC ({layerResults, fileName, setIsLoading}) {
                     value = row[headerName.alias];
                 }
 
-                // eslint-disable-next-line one-var
-                const displayValue = value !== undefined && value !== ""
-                    ? String(value).replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/\n/g, "<br>")
-                    : "<span class=\"empty-value\">Keine Angabe</span>";
+                if (value) {
+                    const displayValue = value !== undefined && value !== ""
+                        ? String(value).replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/\n/g, "<br>")
+                        : "<span class=\"empty-value\">Keine Angabe</span>";
 
-                htmlContent += `
-                    <tr>
-                        <td class="attribute-name">${displayName}</td>
-                        <td class="attribute-value">${displayValue}</td>
-                    </tr>
-                `;
+                    htmlContent += `
+                        <tr>
+                            <td class="attribute-name">${displayName}</td>
+                            <td class="attribute-value">${displayValue}</td>
+                        </tr>
+                    `;
+                }
             });
 
             htmlContent += `
