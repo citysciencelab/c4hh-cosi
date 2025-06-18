@@ -262,6 +262,12 @@ export default {
 
             return layerResult.layerName || "Unknown Layer";
         },
+        /**
+         * Exports the current layer results using the selected export format.
+         * Logs an error if no export format is selected.
+         *
+         * @returns {void}
+         */
         exportData () {
             const exportFormat = this.currentFormat;
 
@@ -272,11 +278,21 @@ export default {
 
             this.exportTo(exportFormat);
         },
+        /**
+         * Retrieves the layer configuration for a given layer ID.
+         *
+         * @param {string|number} layerId - The ID of the layer to find the configuration for.
+         * @returns {Object|undefined} The layer configuration object or undefined if not found.
+         */
         getLayerConfig (layerId) {
             return this.layersToRequest.find(layer => layer.layerId === layerId);
         },
         /**
-         * Wrapper for queryBufferedFeatures that manages buffer loading state
+         * Wrapper for queryBufferedFeatures that manages buffer loading state.
+         * Sets loading state to true before querying and ensures it's reset to false afterwards.
+         *
+         * @async
+         * @returns {Promise<void>} A promise that resolves when the buffered features query is complete.
          */
         async handleQueryBufferedFeatures () {
             this.isBufferLoading = true;
