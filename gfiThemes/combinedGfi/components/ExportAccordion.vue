@@ -66,16 +66,6 @@ export default {
         :coloured-header="true"
     >
         <div class="form-floating mb-3 export-dropdown">
-            <input
-                :value="fileName"
-                type="text"
-                class="form-control"
-                :aria-label="translate('additional:modules.combinedGfi.fileName')"
-                @input="$emit('update:fileName', $event.target.value)"
-            >
-            <label for="fileName">{{ translate("additional:modules.combinedGfi.fileName") }}</label>
-        </div>
-        <div class="form-floating mb-3 export-dropdown">
             <select
                 id="printFormat"
                 class="form-select"
@@ -91,6 +81,16 @@ export default {
                 </option>
             </select>
             <label for="printFormat">{{ translate("additional:modules.combinedGfi.exportFormat") }}</label>
+        </div>
+        <div class="form-floating mb-3 export-dropdown">
+            <input
+                :value="fileName"
+                type="text"
+                class="form-control"
+                :aria-label="translate('additional:modules.combinedGfi.fileName')"
+                @input="$emit('update:fileName', $event.target.value)"
+            >
+            <label for="fileName">{{ translate("additional:modules.combinedGfi.fileName") }}</label>
         </div>
 
         <div class="button-group">
@@ -109,7 +109,7 @@ export default {
 
 .button-group {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 10px;
     margin-top: 10px;
 }
