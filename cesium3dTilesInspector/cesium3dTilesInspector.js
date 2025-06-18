@@ -96,8 +96,3 @@ function checkCesiumAndCreateInspector () {
 }
 
 checkCesiumAndCreateInspector();
-
-export {
-    createCesium3dTilesInspector
-};
-
