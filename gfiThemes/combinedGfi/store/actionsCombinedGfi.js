@@ -188,7 +188,7 @@ const actions = {
             geometryProviderLayerId = geometryProviderLayerFromConfig.layerId,
             geometryProviderAttribute = geometryProviderLayerFromConfig.geometryProvider.geometryAttribute,
             geometryProvider = rawLayerList.getLayerWhere({id: geometryProviderLayerId}),
-            resolution = await dispatch("getResolutionFromView"),
+            resolution = mapCollection.getMapView("2D").getResolution(),
             result = await dispatch("fetchDataForLayer", {
                 layer: geometryProvider,
                 geometry: null,
@@ -289,21 +289,6 @@ const actions = {
     },
 
     /**
-     * Retrieves the current resolution from the 2D map view.
-     *
-     * @returns {number|undefined} The current resolution of the map view, or undefined if the map is not available.
-     */
-    getResolutionFromView () {
-        const map = mapCollection.getMap("2D");
-
-        if (!map) {
-            console.error("Map not available.");
-            return undefined;
-        }
-        return map.getView().getResolution();
-    },
-
-    /**
      * Fetches data for a layer using the appropriate service type (WMS, WFS, or OAF).
      *
      * @param {Object} context - The Vuex action context.
@@ -351,7 +336,7 @@ const actions = {
         }
         else if (layer.typ === "WMS") {
             const queryCoordinate = coordinate || rootGetters["Modules/GetFeatureInfo/clickCoordinates"],
-                mapResolution = resolution || await dispatch("getResolutionFromView");
+                mapResolution = resolution || mapCollection.getMapView("2D").getResolution();
 
             if (queryCoordinate) {
                 return dispatch("fetchGfiForWmsLayer", {
@@ -707,7 +692,7 @@ const actions = {
         for (const layerConfig of state.layersToRequest) {
             try {
                 const layer = rawLayerList.getLayerWhere({id: layerConfig.layerId}),
-                    resolution = await dispatch("getResolutionFromView");
+                    resolution = mapCollection.getMapView("2D").getResolution();
 
                 if (!layer) {
                     console.error(`Layer with ID ${layerConfig.layerId} not found`);
