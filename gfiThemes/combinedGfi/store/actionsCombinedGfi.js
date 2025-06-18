@@ -14,6 +14,12 @@ import {GeoJSON} from "ol/format";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
 import {exportToCSV, exportToDOC, exportToPDF, exportToJSON} from "../utils/exportUtils";
 import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses";
+import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
+import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
+import OverlayOp from "jsts/org/locationtech/jts/operation/overlay/OverlayOp";
+import {Fill, Stroke, Style} from "ol/style";
+import VectorLayer from "ol/layer/Vector.js";
+import VectorSource from "ol/source/Vector.js";
 
 const actions = {
     /**
@@ -1018,6 +1024,126 @@ const actions = {
 
         if (extent[2] - extent[0] > 0.001 || extent[3] - extent[1] > 0.001) {
             dispatch("addExtentCoordinates", {coordinates: coords, extent});
+        }
+    },
+    /**
+     * Enlarges a polygon by a specified buffer distance.
+     *
+     * @param {Object} context - The Vuex action context.
+     * @param {Function} context.commit - Vuex commit function.
+     * @param {Function} context.dispatch - Vuex dispatch function.
+     * @param {Object} context.state - Vuex state object.
+     * @param {Object} context.rootGetters - Vuex root getters.
+     * @param {number} bufferDistance - The distance by which to enlarge the polygon.
+     * @returns {Promise<void>} - A promise that resolves when the polygon has been enlarged.
+     */
+    async enlargePolygon ({commit, dispatch, state}, bufferDistance) {
+        await dispatch("resetBufferLayer");
+
+        if (bufferDistance === null) {
+            return;
+        }
+
+        const olFeature = state.alternativeGeometry ? state.alternativePolygonFeature : state.feature?.getOlFeature(),
+            geometry = olFeature?.getGeometry();
+
+        if (!olFeature) {
+            console.error("No feature available for buffering");
+            return;
+        }
+
+        if (!geometry) {
+            console.error("No geometry available on feature for buffering");
+            return;
+        }
+
+        try {
+            const geojsonFormat = new GeoJSON(),
+                geojson = geojsonFormat.writeGeometry(geometry),
+                reader = new GeoJSONReader(),
+                jstsGeom = reader.read(geojson),
+                buffered = BufferOp.bufferOp(jstsGeom, bufferDistance),
+                donutGeom = OverlayOp.difference(buffered, jstsGeom),
+                writer = new GeoJSONWriter(),
+                bufferedGeojson = writer.write(donutGeom);
+
+            let coordinates;
+
+            if (bufferedGeojson.type === "MultiPolygon") {
+                const outerRing = bufferedGeojson.coordinates[0][0],
+                    innerRings = [];
+
+                bufferedGeojson.coordinates.forEach((poly, index) => {
+                    if (index === 0) {
+                        innerRings.push(...poly.slice(1));
+                    }
+                    else {
+                        innerRings.push(...poly);
+                    }
+                });
+
+                coordinates = [outerRing, ...innerRings];
+            }
+            else if (bufferedGeojson.type === "Polygon") {
+                coordinates = bufferedGeojson.coordinates;
+            }
+            else {
+                throw new Error(`Unexpected geometry type: ${bufferedGeojson.type}`);
+            }
+
+            if (coordinates) {
+                const polygonFeature = new Feature({
+                        geometry: new Polygon(coordinates)
+                    }),
+                    vectorSource = new VectorSource({
+                        features: [polygonFeature]
+                    }),
+                    vectorLayer = new VectorLayer({
+                        alwaysOnTop: true,
+                        id: "bufferedLayer",
+                        source: vectorSource,
+                        style: new Style({
+                            fill: new Fill({
+                                color: "rgba(255, 0, 0, 0.3)"
+                            }),
+                            stroke: new Stroke({
+                                color: "red",
+                                width: 2
+                            })
+                        })
+                    }),
+                    map = mapCollection.getMap("2D"),
+                    existingLayer = map.getLayers().getArray().find(layer => layer.get("id") === "bufferedLayer"),
+                    extent = polygonFeature.getGeometry().getExtent();
+
+                if (!map) {
+                    console.error("Map not found!");
+                    return;
+                }
+
+                commit("setBufferedFeature", polygonFeature);
+
+                if (existingLayer) {
+                    map.removeLayer(existingLayer);
+                }
+                map.addLayer(vectorLayer);
+
+                if (extent.some(coord => isNaN(coord))) {
+                    console.error("Invalid extent:", extent);
+                    return;
+                }
+
+                map.getView().fit(extent, {
+                    duration: 1000,
+                    maxZoom: 16,
+                    padding: [50, 50, 50, 50]
+                });
+            }
+
+
+        }
+        catch (error) {
+            console.error("Error creating buffered polygon:", error);
         }
     }
 };

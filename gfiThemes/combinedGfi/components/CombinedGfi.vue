@@ -2,16 +2,6 @@
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 
-import {Polygon} from "ol/geom";
-import Feature from "ol/Feature.js";
-import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
-import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
-import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
-import {GeoJSON} from "ol/format";
-import {Fill, Stroke, Style} from "ol/style";
-import VectorLayer from "ol/layer/Vector.js";
-import VectorSource from "ol/source/Vector.js";
-import OverlayOp from "jsts/org/locationtech/jts/operation/overlay/OverlayOp";
 import {isUrl} from "../../../../src/shared/js/utils/urlHelper";
 import ElevatedButton from "../../../../src/shared/modules/buttons/components/ElevatedButton.vue";
 import PaginationControl from "../../../../src/shared/modules/pagination/components/PaginationControl.vue";
@@ -132,7 +122,8 @@ export default {
             "resetBufferLayer",
             "exportTo",
             "queryBufferedFeatures",
-            "cleanup"
+            "cleanup",
+            "enlargePolygon"
         ]),
         ...mapMutations("Modules/CombinedGfi", [
             "setCurrentFormat",
@@ -206,9 +197,6 @@ export default {
             this.layerResults[layerIndex].page = this.layerResults[layerIndex].tempPage;
         },
         /**
-         * Diese Methoden wurden in die Shared Pagination Komponente verschoben
-         */
-        /**
          * translates the given key, checkes if the key exists and throws a console warning if not
          * @param {String} key the key to translate
          * @param {Object} [options=null] for interpolation, formating and plurals
@@ -219,115 +207,6 @@ export default {
                 console.warn("the key " + JSON.stringify(key) + " is unknown to the additional translation");
             }
             return this.$t(key, options);
-        },
-        /**
-         * Enlarges a polygon by a specified buffer distance.
-         *
-         * @param {number} bufferDistance - The distance by which to enlarge the polygon.
-         */
-        enlargePolygon (bufferDistance) {
-            this.resetBufferLayer();
-            if (bufferDistance === null) {
-                return;
-            }
-
-            const olFeature = this.alternativeGeometry ? this.alternativePolygonFeature : this.feature.getOlFeature(),
-                geometry = olFeature.getGeometry();
-
-            if (!olFeature) {
-                console.error("No feature available for buffering");
-                return;
-            }
-
-            if (!geometry) {
-                console.error("No geometry available on feature for buffering");
-                return;
-            }
-
-            try {
-                const geojsonFormat = new GeoJSON(),
-                    geojson = geojsonFormat.writeGeometry(geometry),
-                    reader = new GeoJSONReader(),
-                    jstsGeom = reader.read(geojson),
-                    buffered = BufferOp.bufferOp(jstsGeom, bufferDistance),
-                    donutGeom = OverlayOp.difference(buffered, jstsGeom),
-                    writer = new GeoJSONWriter(),
-                    bufferedGeojson = writer.write(donutGeom);
-
-                let coordinates;
-
-                if (bufferedGeojson.type === "MultiPolygon") {
-                    const outerRing = bufferedGeojson.coordinates[0][0],
-                        innerRings = [];
-
-                    bufferedGeojson.coordinates.forEach((poly, index) => {
-                        if (index === 0) {
-                            innerRings.push(...poly.slice(1));
-                        }
-                        else {
-                            innerRings.push(...poly);
-                        }
-                    });
-
-                    coordinates = [outerRing, ...innerRings];
-                }
-                else if (bufferedGeojson.type === "Polygon") {
-                    coordinates = bufferedGeojson.coordinates;
-                }
-                else {
-                    throw new Error(`Unexpected geometry type: ${bufferedGeojson.type}`);
-                }
-
-                // eslint-disable-next-line one-var
-                const polygonFeature = new Feature({
-                        geometry: new Polygon(coordinates)
-                    }),
-                    vectorSource = new VectorSource({
-                        features: [polygonFeature]
-                    }),
-                    vectorLayer = new VectorLayer({
-                        alwaysOnTop: true,
-                        id: "bufferedLayer",
-                        source: vectorSource,
-                        zIndex: 999,
-                        style: new Style({
-                            fill: new Fill({
-                                color: "rgba(255, 0, 0, 0.3)"
-                            }),
-                            stroke: new Stroke({
-                                color: "red",
-                                width: 2
-                            })
-                        })
-                    }),
-                    map = mapCollection.getMap("2D"),
-                    existingLayer = map.getLayers().getArray().find(layer => layer.get("id") === "bufferedLayer"),
-                    extent = polygonFeature.getGeometry().getExtent();
-
-                if (!map) {
-                    console.error("Map not found!");
-                    return;
-                }
-                this.setBufferedFeature(polygonFeature);
-                if (existingLayer) {
-                    map.removeLayer(existingLayer);
-                }
-                map.addLayer(vectorLayer);
-
-                if (extent.some(coord => isNaN(coord))) {
-                    console.error("Invalid extent:", extent);
-                    return;
-                }
-
-                map.getView().fit(extent, {
-                    duration: 1000,
-                    maxZoom: 16,
-                    padding: [50, 50, 50, 50]
-                });
-            }
-            catch (error) {
-                console.error("Error creating buffered polygon:", error);
-            }
         },
         /**
          * Loads and executes the print utils module
