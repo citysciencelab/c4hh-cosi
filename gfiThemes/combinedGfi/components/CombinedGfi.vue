@@ -9,6 +9,7 @@ import AttributeTable from "./AttributeTable.vue";
 import AdditionalRequestsAccordion from "./AdditionalRequestsAccordion.vue";
 import PrintAccordion from "./PrintAccordion.vue";
 import ExportAccordion from "./ExportAccordion.vue";
+import {sendPrintRequest} from "../utils/printService.js";
 
 export default {
     name: "CombinedGfi",
@@ -30,8 +31,7 @@ export default {
     data () {
         return {
             bufferDistance: null,
-            isPrintLoading: false,
-            printUtils: null
+            isPrintLoading: false
         };
     },
     computed: {
@@ -209,199 +209,32 @@ export default {
             return this.$t(key, options);
         },
         /**
-         * Loads and executes the print utils module
-         *
-         * @param {string} utilsPath - The path to the print utils module
-         * @param {Response|null} existingResponse - An existing response if already fetched
-         * @returns {Object} The prepared module and the preparePrintRequest function
-         * @throws {Error} If the module could not be loaded or the function not found
-         */
-        async loadPrintUtilsModule (utilsPath, existingResponse) {
-            const response = existingResponse,
-                printUtilsPath = utilsPath,
-                contentType = response.headers.get("content-type"),
-                text = await response.text();
-
-            if (!response || !response.ok) {
-                console.error("Failed to load printUtils.js");
-                this.printUtils = null;
-                return;
-            }
-
-            if (contentType?.includes("text/html") ||
-                text.trim().startsWith("<!DOCTYPE") ||
-                text.trim().startsWith("<html")) {
-                throw new Error(`Received HTML instead of JavaScript from ${printUtilsPath}`);
-            }
-
-            if (!text.trim()) {
-                throw new Error(`Empty content received from ${printUtilsPath}`);
-            }
-
-            try {
-                let preparePrintRequest;
-
-                // First try dynamic import
-                try {
-                    const printModule = await import(/* webpackIgnore: true */ printUtilsPath);
-
-                    preparePrintRequest = printModule.preparePrintRequest || null;
-                }
-                catch (importError) {
-                    console.error("Dynamic import failed, trying CommonJS style:", importError);
-
-                    // Fallback to CommonJS style loading
-                    const module = {exports: {}},
-                        exports = module.exports;
-
-                    // eslint-disable-next-line no-new-func
-                    new Function("module", "exports", text)(module, exports);
-
-                    if (typeof module.exports.preparePrintRequest === "function") {
-                        preparePrintRequest = module.exports.preparePrintRequest;
-                    }
-                    else if (typeof exports.preparePrintRequest === "function") {
-                        preparePrintRequest = exports.preparePrintRequest;
-                    }
-                    else if (typeof module.exports === "function") {
-                        preparePrintRequest = module.exports;
-                    }
-                }
-
-                if (!preparePrintRequest || typeof preparePrintRequest !== "function") {
-                    throw new Error(`preparePrintRequest function not found in ${printUtilsPath}`);
-                }
-
-                this.printUtils = {
-                    preparePrintRequest,
-                    printUtilsPath
-                };
-            }
-            catch (error) {
-                console.error("Error loading printUtils module:", error);
-                this.printUtils = null;
-                throw new Error(`Failed to load printUtils module: ${error.message}`);
-            }
-        },
-
-        /**
-         * Sends the print request to the server
-         * @param {Function} preparePrintRequest - The function to prepare the print request
-         * @param {Object} olFeature - The OpenLayers feature
-         * @param {string} printConfigPath - The path to the print configuration
-         * @returns {Promise} The print response
-         */
-        async sendPrintRequestToServer (preparePrintRequest, olFeature, printConfigPath) {
-            const printRequest = await preparePrintRequest(
-                    olFeature,
-                    this.layerResults,
-                    this.alternativePolygonFeature,
-                    printConfigPath,
-                    this.additionalRequestResults
-                ),
-                response = await fetch(this.printServerUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(printRequest)
-                });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-
-                console.error("Print server error response:", {
-                    status: response.status,
-                    statusText: response.statusText,
-                    error: errorText
-                });
-                throw new Error(`Print server responded with status: ${response.status} - ${errorText}`);
-            }
-
-            return response;
-        },
-
-        /**
-         * Processes the print response and downloads the PDF
-         *
-         * @param {Response} printResponse - The response from the print server
-         */
-        async processPrintResponse (printResponse) {
-            try {
-                const pdfBlob = await printResponse.blob(),
-                    url = URL.createObjectURL(pdfBlob),
-                    link = document.createElement("a"),
-                    contentDisposition = printResponse.headers.get("Content-Disposition"),
-                    filenameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/),
-                    filename = filenameMatch ? filenameMatch[1] : "flaechenbericht.pdf";
-
-                link.href = url;
-                link.target = "_blank";
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }
-            catch (error) {
-                console.error("Error processing print response:", error);
-                throw new Error("Failed to process print response");
-            }
-        },
-
-        /**
          * Sends a direct POST request to the MapFish print service and opens or downloads the resulting PDF.
-         * to the print server instead of saving it as a JSON file.
+         * Uses the extracted print service module.
          *
          * @async
          * @throws {Error} If there's an error generating or sending the print request
          * @fires addSingleAlert When an error occurs during the print request or response
          */
-        async sendPrintRequest () {
-            this.isPrintLoading = true;
-            try {
-                const olFeature = this.feature.getOlFeature(),
-                    printConfigPath = this.printConfigPath,
-                    printUtilsPath = this.printUtilsPath;
-
-                let response;
-
-                try {
-                    const {path, response: utilsResponse} = await this.tryFetchPrintUtils([printUtilsPath, "./resources/printUtils.js"]);
-
-                    response = utilsResponse;
-                    await this.loadPrintUtilsModule(path, response);
+        async handlePrintRequest () {
+            await sendPrintRequest({
+                feature: this.feature,
+                printConfigPath: this.printConfigPath,
+                printUtilsPath: this.printUtilsPath,
+                layerResults: this.layerResults,
+                alternativePolygonFeature: this.alternativePolygonFeature,
+                printServerUrl: this.printServerUrl,
+                additionalRequestResults: this.additionalRequestResults,
+                onLoadingChange: (loading) => {
+                    this.isPrintLoading = loading;
+                },
+                onError: () => {
+                    this.addSingleAlert({
+                        category: "error",
+                        content: this.$t("common:modules.combinedGfi.printError")
+                    });
                 }
-                catch (err) {
-                    console.error(`Failed to load from ${printUtilsPath}`);
-                    this.printUtils = null;
-                    return;
-                }
-
-                if (!this.printUtils) {
-                    throw new Error("Failed to load print utils");
-                }
-
-                if (printConfigPath) {
-                    const printResponse = await this.sendPrintRequestToServer(
-                        this.printUtils.preparePrintRequest,
-                        olFeature,
-                        printConfigPath
-                    );
-
-                    await this.processPrintResponse(printResponse);
-                }
-            }
-            catch (error) {
-                console.error("Error sending print request:", error);
-                this.addSingleAlert({
-                    category: "error",
-                    content: this.$t("common:modules.combinedGfi.printError")
-                });
-            }
-            finally {
-                this.isPrintLoading = false;
-            }
+            });
         },
         /**
          * Gets the display name for a layer, preferring the name from layersToRequest if available.
@@ -438,21 +271,6 @@ export default {
             }
 
             this.exportTo(exportFormat);
-        },
-        async tryFetchPrintUtils (paths) {
-            for (const path of paths) {
-                try {
-                    const resp = await fetch(path);
-
-                    if (resp.ok) {
-                        return {path, response: resp};
-                    }
-                }
-                catch (err) {
-                    console.error(`Failed to load from ${path}`);
-                }
-            }
-            return {path: null, response: null};
         },
         getLayerConfig (layerId) {
             return this.layersToRequest.find(layer => layer.layerId === layerId);
@@ -570,7 +388,7 @@ export default {
                 :has-selected-feature="hasSelectedFeature"
                 :is-loading="isLoading"
                 :is-print-loading="isPrintLoading"
-                :send-print-request="sendPrintRequest"
+                :send-print-request="handlePrintRequest"
                 :translate="translate"
             />
 
