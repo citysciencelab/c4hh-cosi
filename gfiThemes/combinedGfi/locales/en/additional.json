@@ -19,7 +19,17 @@
         "infoHint": "Information about the data source",
         "standardExport": "Export Data",
         "printSection": "Area Report",
-        "printDescription": "Create a detailed report for the selected geometry."
+        "printDescription": "Create a detailed report for the selected geometry.",
+        "errors": {
+          "ogcApiProcessError": "Error executing OGC API process. Please try again.",
+          "gfiRequestError": "Error during data query. Please try again.",
+          "wmsQueryError": "Error during WMS query. Please try again.",
+          "wfsQueryError": "Error during WFS query. Please try again.",
+          "oafQueryError": "Error during OAF query. Please try again.",
+          "noValidCoordinates": "No valid coordinates available for query.",
+          "layerNotFound": "Layer not found.",
+          "fetchError": "Error loading data."
+        }
       }
   }
 }

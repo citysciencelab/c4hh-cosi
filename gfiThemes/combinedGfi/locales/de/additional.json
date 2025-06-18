@@ -19,7 +19,17 @@
         "infoHint": "Hinweis zur Datenquelle",
         "standardExport": "Daten exportieren",
         "printSection": "Flächenbericht",
-        "printDescription": "Erstellen Sie einen Flächenbericht für die ausgewählte Geometrie."
+        "printDescription": "Erstellen Sie einen Flächenbericht für die ausgewählte Geometrie.",
+        "errors": {
+          "ogcApiProcessError": "Fehler beim Ausführen des OGC API-Prozesses. Bitte versuchen Sie es erneut.",
+          "gfiRequestError": "Fehler bei der Datenabfrage. Bitte versuchen Sie es erneut.",
+          "wmsQueryError": "Fehler bei der WMS-Abfrage. Bitte versuchen Sie es erneut.",
+          "wfsQueryError": "Fehler bei der WFS-Abfrage. Bitte versuchen Sie es erneut.",
+          "oafQueryError": "Fehler bei der OAF-Abfrage. Bitte versuchen Sie es erneut.",
+          "noValidCoordinates": "Keine gültigen Koordinaten für die Abfrage verfügbar.",
+          "layerNotFound": "Layer nicht gefunden.",
+          "fetchError": "Fehler beim Laden der Daten."
+        }
       }
   }
 }

@@ -165,6 +165,10 @@ const actions = {
         }
         catch (error) {
             console.error("Error during GFI request:", error);
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("common:modules.combinedGfi.errors.gfiRequestError")
+            }, {root: true});
         }
         finally {
             commit("setIsLoading", false);
@@ -233,7 +237,7 @@ const actions = {
      * @param {string} [trigger="init"] - The trigger that initiated this request.
      * @returns {Promise<void>}
      */
-    async fetchAdditionalRequests ({commit, state}, trigger = "init") {
+    async fetchAdditionalRequests ({commit, dispatch, state}, trigger = "init") {
         const additionalResults = await Promise.all(state.additionalRequests
             .filter(request => !request.triggerRequestOn || request.triggerRequestOn === trigger)
             .map(async request => {
@@ -255,14 +259,20 @@ const actions = {
                     }
                     catch (error) {
                         console.error("Error executing OGC API Process:", error);
+
+                        dispatch("Alerting/addSingleAlert", {
+                            category: "error",
+                            content: i18next.t("common:modules.combinedGfi.errors.ogcApiProcessError")
+                        }, {root: true});
+
                         return {
                             url: request.url,
-                            text: "Fehler bei der Ausführung des Prozesses",
+                            text: i18next.t("common:modules.combinedGfi.errors.ogcApiProcessError"),
                             infoText: request.infoText || ""
                         };
                     }
                 }
-                throw new Error(`Der Anfragetyp "${request.type}" wird nicht unterstützt. Bitte überprüfen Sie die Konfiguration.`);
+                throw new Error(i18next.t("common:modules.combinedGfi.errors.unsupportedRequestType") + `: "${request.type}"`);
             }));
 
         commit("setAdditionalRequestResults", additionalResults);
