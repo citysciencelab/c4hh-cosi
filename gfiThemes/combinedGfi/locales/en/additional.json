@@ -13,6 +13,7 @@
         "selectBufferDistance": "Select buffer distance",
         "queryArea": "Query area",
         "queryingArea": "Querying area...",
+        "loading": "Loading...",
         "removeBuffer": "Remove buffer",
         "additionalRequests": "Additional Requests",
         "source": "Source",

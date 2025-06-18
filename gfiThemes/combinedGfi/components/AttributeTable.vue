@@ -1,8 +1,12 @@
 <script>
 import {isUrl} from "../../../../src/shared/js/utils/urlHelper";
+import TableComponent from "../../../../src/shared/modules/table/components/TableComponent.vue";
 
 export default {
     name: "AttributeTable",
+    components: {
+        TableComponent
+    },
     props: {
         /**
          * The data object containing key-value pairs to display in the table
@@ -19,6 +23,32 @@ export default {
             default: () => ({})
         }
     },
+    computed: {
+        /**
+         * Transforms the key-value data into table format for TableComponent
+         */
+        tableData () {
+            const items = [],
+                headers = [
+                    {name: "attribute", displayName: "Attribut", visible: true},
+                    {name: "value", displayName: "Wert", visible: true}
+                ];
+
+            Object.entries(this.data).forEach(([key, value]) => {
+                if (!this.layerConfig?.hideEmptyAttributeValues || (value !== null && value !== undefined && value !== "")) {
+                    items.push({
+                        attribute: key,
+                        value: value
+                    });
+                }
+            });
+
+            return {
+                headers,
+                items
+            };
+        }
+    },
     methods: {
         /**
          * Tests if the given string is a URL.
@@ -31,58 +61,14 @@ export default {
 </script>
 
 <template>
-    <table class="custom-table">
-        <tbody>
-            <tr
-                v-for="(value, key) in data"
-                v-show="!layerConfig?.hideEmptyAttributeValues || (value !== null && value !== undefined && value !== '')"
-                :key="key"
-            >
-                <td class="attribute-name">
-                    {{ key }}
-                </td>
-                <td class="attribute-value">
-                    <a
-                        v-if="value && isUrl(value)"
-                        :href="value"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >{{ value }}</a>
-                    <template v-else>
-                        {{ value }}
-                    </template>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <TableComponent
+        :data="tableData"
+        :show-header="false"
+        table-class="attribute-table"
+        font-size="medium"
+    />
 </template>
 
 <style scoped lang="scss">
-@import 'variables';
-
-.custom-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 10px 0;
-    background-color: $white;
-    border: 1px solid $light_grey;
-}
-
-.custom-table td {
-    padding: 8px;
-    border: 1px solid $light_grey;
-    color: $dark_grey;
-}
-
-.attribute-name {
-    font-weight: bold;
-    width: 40%;
-    background-color: $light_grey;
-    color: $dark_grey;
-}
-
-.attribute-value {
-    width: 60%;
-    color: $dark_grey;
-}
+// Custom styling for attribute table can be added here if needed
 </style>

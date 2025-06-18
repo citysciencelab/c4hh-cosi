@@ -35,7 +35,6 @@ export async function loadPrintUtilsModule (utilsPath, existingResponse) {
     try {
         let preparePrintRequest;
 
-        // First try dynamic import
         try {
             const printModule = await import(/* webpackIgnore: true */ printUtilsPath);
 
@@ -44,7 +43,6 @@ export async function loadPrintUtilsModule (utilsPath, existingResponse) {
         catch (importError) {
             console.error("Dynamic import failed, trying CommonJS style:", importError);
 
-            // Fallback to CommonJS style loading
             const module = {exports: {}},
                 exports = module.exports;
 

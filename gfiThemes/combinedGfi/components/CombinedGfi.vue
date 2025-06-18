@@ -1,6 +1,7 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
+import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 
 import {isUrl} from "../../../../src/shared/js/utils/urlHelper";
 import ElevatedButton from "../../../../src/shared/modules/buttons/components/ElevatedButton.vue";
@@ -20,7 +21,8 @@ export default {
         AttributeTable,
         AdditionalRequestsAccordion,
         PrintAccordion,
-        ExportAccordion
+        ExportAccordion,
+        AccordionItem
     },
     props: {
         feature: {
@@ -31,7 +33,8 @@ export default {
     data () {
         return {
             bufferDistance: null,
-            isPrintLoading: false
+            isPrintLoading: false,
+            isBufferLoading: false
         };
     },
     computed: {
@@ -271,6 +274,18 @@ export default {
         },
         getLayerConfig (layerId) {
             return this.layersToRequest.find(layer => layer.layerId === layerId);
+        },
+        /**
+         * Wrapper for queryBufferedFeatures that manages buffer loading state
+         */
+        async handleQueryBufferedFeatures () {
+            this.isBufferLoading = true;
+            try {
+                await this.queryBufferedFeatures();
+            }
+            finally {
+                this.isBufferLoading = false;
+            }
         }
     }
 };
@@ -282,8 +297,17 @@ export default {
         <div v-if="isLoading">
             <div class="loading-container">
                 <SpinnerItem custom-class="spinner" />
-                <div class="loading-text">
+                <div
+                    v-if="isBufferLoading"
+                    class="loading-text"
+                >
                     {{ translate('additional:modules.combinedGfi.queryingArea') }}
+                </div>
+                <div
+                    v-else
+                    class="loading-text"
+                >
+                    {{ translate('additional:modules.combinedGfi.loading') }}
                 </div>
             </div>
         </div>
@@ -293,15 +317,13 @@ export default {
                 :key="index"
                 class="layer-result-container"
             >
-                <details>
-                    <summary class="layer-name">
-                        {{ getLayerDisplayName(layerResult) }}
-                        <span class="feature-count">
-                            ({{ layerResult.rows.length }} {{ layerResult.rows.length === 1 ?
-                                translate('additional:modules.combinedGfi.feature') :
-                                translate('additional:modules.combinedGfi.features') }})
-                        </span>
-                    </summary>
+                <AccordionItem
+                    :id="`layer-${index}`"
+                    :title="`${getLayerDisplayName(layerResult)} (${layerResult.rows.length} ${layerResult.rows.length === 1 ? translate('additional:modules.combinedGfi.feature') : translate('additional:modules.combinedGfi.features')})`"
+                    :is-open="false"
+                    :coloured-header="true"
+                    font-size="font-size-big"
+                >
                     <div v-if="layerResult.rows.length > 0">
                         <div
                             v-if="totalPages(layerResult.rows) > 1"
@@ -328,18 +350,21 @@ export default {
                             :key="rowIndex"
                             class="feature-container"
                         >
-                            <details>
-                                <summary class="feature-summary">
-                                    {{ translate('additional:modules.combinedGfi.feature') }} {{ rowIndex + 1 + (layerResult.page - 1) * itemsPerPage }}
-                                </summary>
+                            <AccordionItem
+                                :id="`feature-${index}-${rowIndex}`"
+                                :title="`${translate('additional:modules.combinedGfi.feature')} ${rowIndex + 1 + (layerResult.page - 1) * itemsPerPage}`"
+                                :is-open="false"
+                                :coloured-header="true"
+                                font-size="font-size-base"
+                            >
                                 <AttributeTable
                                     :data="row"
                                     :layer-config="getLayerConfig(layerResult.layerId)"
                                 />
-                            </details>
+                            </AccordionItem>
                         </div>
                     </div>
-                </details>
+                </AccordionItem>
             </div>
             <div
                 v-if="showBuffer"
@@ -366,9 +391,9 @@ export default {
             </div>
             <div class="button-group">
                 <ElevatedButton
-                    :text="translate(isLoading ? 'additional:modules.combinedGfi.queryingArea' : 'additional:modules.combinedGfi.queryArea')"
-                    :disabled="!bufferedFeature || isLoading"
-                    :interaction="queryBufferedFeatures"
+                    :text="translate(isBufferLoading ? 'additional:modules.combinedGfi.queryingArea' : 'additional:modules.combinedGfi.queryArea')"
+                    :disabled="!bufferedFeature || isLoading || isBufferLoading"
+                    :interaction="handleQueryBufferedFeatures"
                     additional-css="btn-primary"
                 />
                 <ElevatedButton
@@ -417,6 +442,8 @@ export default {
     gap: 10px;
     margin-top: 10px;
     flex-wrap: wrap;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .loading-container {
@@ -443,44 +470,21 @@ export default {
 #gfi-table-container {
     margin: 10px;
     background: $white;
+    max-width: 100%;
+    overflow-x: hidden;
+    word-wrap: break-word;
 }
 
 .layer-result-container {
     margin-bottom: 5px;
-}
-
-.layer-name {
-    font-weight: bold;
-    color: $dark_blue;
-    cursor: pointer;
-}
-
-details summary {
-    font-size: 1.1em;
-    padding: 8px;
-    border: 1px solid $light_grey;
-    background-color: $white;
-    color: $dark_blue;
-    border-radius: 4px 4px 0 0;
-    cursor: pointer;
-    margin: 0;
-}
-details summary:hover {
-    background-color: $light_grey;
-}
-details[open] summary {
-    border-bottom: 1px solid $light_grey;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .feature-container {
     margin-bottom: 4px;
-}
-
-.feature-count {
-    float: right;
-    font-size: 0.9em;
-    color: $dark_grey;
-    margin-left: 10px;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .analysis-result-item {
@@ -553,7 +557,9 @@ details[open] summary {
     margin-top: 20px;
 }
 
-.pagination-wrapper {    margin: 10px 0;}
+.pagination-wrapper {
+    margin: 10px 0;
+}
 
 .print-description {
     margin-bottom: 15px;

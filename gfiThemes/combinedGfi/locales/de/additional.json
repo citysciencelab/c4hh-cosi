@@ -13,6 +13,7 @@
         "selectBufferDistance": "Puffer-Abstand wählen",
         "queryArea": "Umgebung abfragen",
         "queryingArea": "Umgebung wird abgefragt...",
+        "loading": "Lädt...",
         "removeBuffer": "Puffer entfernen",
         "additionalRequests": "Zusätzliche Anfragen",
         "source": "Quelle",
