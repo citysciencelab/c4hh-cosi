@@ -12,6 +12,7 @@
         "bufferDistanceUnit": "m around the area",
         "selectBufferDistance": "Select buffer distance",
         "queryArea": "Query area",
+        "queryingArea": "Querying area...",
         "removeBuffer": "Remove buffer",
         "additionalRequests": "Additional Requests",
         "source": "Source",

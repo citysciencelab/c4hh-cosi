@@ -262,17 +262,17 @@ const actions = {
 
                         dispatch("Alerting/addSingleAlert", {
                             category: "error",
-                            content: i18next.t("common:modules.combinedGfi.errors.ogcApiProcessError")
+                            content: i18next.t("additional:modules.combinedGfi.errors.ogcApiProcessError")
                         }, {root: true});
 
                         return {
                             url: request.url,
-                            text: i18next.t("common:modules.combinedGfi.errors.ogcApiProcessError"),
+                            text: i18next.t("additional:modules.combinedGfi.errors.ogcApiProcessError"),
                             infoText: request.infoText || ""
                         };
                     }
                 }
-                throw new Error(i18next.t("common:modules.combinedGfi.errors.unsupportedRequestType") + `: "${request.type}"`);
+                throw new Error(i18next.t("additional:modules.combinedGfi.errors.unsupportedRequestType") + `: "${request.type}"`);
             }));
 
         commit("setAdditionalRequestResults", additionalResults);
@@ -679,12 +679,77 @@ const actions = {
     },
 
     /**
-     * Queries features using the buffered feature geometry.
+     * Processes a single layer for buffered feature queries.
      *
-     * This function processes all configured layers and executes appropriate
-     * queries based on the layer type (WFS or WMS). For WFS layers, it uses
-     * the full geometry for spatial filtering. For WMS layers, it uses the
-     * center coordinate with the current resolution.
+     * @param {Object} context - The Vuex action context.
+     * @param {Function} context.dispatch - The Vuex dispatch function.
+     * @param {Object} layerConfig - The layer configuration object.
+     * @param {Object} geometry - The buffered geometry.
+     * @param {Object} bufferedResults - The results object to populate.
+     * @returns {Promise<void>} A promise that resolves when the layer is processed.
+     */
+    async processLayerForBufferedQuery ({dispatch}, {layerConfig, geometry, bufferedResults}) {
+        const layer = rawLayerList.getLayerWhere({id: layerConfig.layerId}),
+            resolution = mapCollection.getMapView("2D").getResolution();
+
+        if (!layer) {
+            console.error(`Layer with ID ${layerConfig.layerId} not found`);
+            return;
+        }
+
+        if (layer.typ === "WFS") {
+            const results = await dispatch("fetchWfsData", {
+                layer,
+                geometry,
+                attributes: layerConfig.attributes || []
+            });
+
+            if (results && results.length > 0) {
+                bufferedResults[layer.name] = results;
+            }
+        }
+        else if (layer.typ === "OAF") {
+            const results = await dispatch("fetchOafData", {
+                layer,
+                geometry,
+                attributes: layerConfig.attributes || []
+            });
+
+            if (results && results.length > 0) {
+                bufferedResults[layer.name] = results;
+            }
+        }
+        else if (layer.typ === "WMS") {
+            const geometryType = geometry.getType(),
+                coordinates = [],
+                allResults = [];
+
+            if (geometryType === "Polygon" || geometryType === "MultiPolygon") {
+                dispatch("handlePolygonCoordinates", {coordinates, geometry});
+            }
+            else {
+                coordinates.push(getCoordinateFromGeometry(geometry));
+            }
+
+            for (const coordinate of coordinates) {
+                const pointResults = await dispatch("fetchGfiForWmsLayer", {
+                    layer,
+                    coordinate,
+                    resolution,
+                    attributes: layerConfig.attributes || []
+                });
+
+                processPointResults(pointResults, allResults);
+            }
+
+            if (allResults.length > 0) {
+                bufferedResults[layer.name] = allResults;
+            }
+        }
+    },
+
+    /**
+     * Queries features from all configured layers using the buffered geometry.
      *
      * @param {Object} context - The Vuex action context.
      * @param {Function} context.dispatch - The Vuex dispatch function.
@@ -696,76 +761,31 @@ const actions = {
             return;
         }
 
-        const bufferedResults = {},
-            geometry = state.bufferedFeature.getGeometry();
+        commit("setIsLoading", true);
 
-        for (const layerConfig of state.layersToRequest) {
-            try {
-                const layer = rawLayerList.getLayerWhere({id: layerConfig.layerId}),
-                    resolution = mapCollection.getMapView("2D").getResolution();
+        try {
+            const bufferedResults = {},
+                geometry = state.bufferedFeature.getGeometry();
 
-                if (!layer) {
-                    console.error(`Layer with ID ${layerConfig.layerId} not found`);
-                    continue;
-                }
-
-                if (layer.typ === "WFS") {
-                    const results = await dispatch("fetchWfsData", {
-                        layer,
+            for (const layerConfig of state.layersToRequest) {
+                try {
+                    await dispatch("processLayerForBufferedQuery", {
+                        layerConfig,
                         geometry,
-                        attributes: layerConfig.attributes || []
+                        bufferedResults
                     });
-
-                    if (results && results.length > 0) {
-                        bufferedResults[layer.name] = results;
-                    }
                 }
-                else if (layer.typ === "OAF") {
-                    const results = await dispatch("fetchOafData", {
-                        layer,
-                        geometry,
-                        attributes: layerConfig.attributes || []
-                    });
-
-                    if (results && results.length > 0) {
-                        bufferedResults[layer.name] = results;
-                    }
-                }
-                else if (layer.typ === "WMS") {
-                    const geometryType = geometry.getType(),
-                        coordinates = [],
-                        allResults = [];
-
-                    if (geometryType === "Polygon" || geometryType === "MultiPolygon") {
-                        dispatch("handlePolygonCoordinates", {coordinates, geometry});
-                    }
-                    else {
-                        coordinates.push(getCoordinateFromGeometry(geometry));
-                    }
-
-                    for (const coordinate of coordinates) {
-                        const pointResults = await dispatch("fetchGfiForWmsLayer", {
-                            layer,
-                            coordinate,
-                            resolution,
-                            attributes: layerConfig.attributes || []
-                        });
-
-                        processPointResults(pointResults, allResults);
-                    }
-
-                    if (allResults.length > 0) {
-                        bufferedResults[layer.name] = allResults;
-                    }
+                catch (error) {
+                    console.error(`Error querying features for layer ${layerConfig.layerId}:`, error);
                 }
             }
-            catch (error) {
-                console.error(`Error querying features for layer ${layerConfig.layerId}:`, error);
-            }
+
+            commit("setBufferedLayerResults", bufferedResults);
+            await dispatch("fetchAdditionalRequests", "queryBuffer");
         }
-
-        commit("setBufferedLayerResults", bufferedResults);
-        await dispatch("fetchAdditionalRequests", "queryBuffer");
+        finally {
+            commit("setIsLoading", false);
+        }
     },
 
     /**

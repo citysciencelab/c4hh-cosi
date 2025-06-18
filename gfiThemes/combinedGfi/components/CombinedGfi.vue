@@ -75,7 +75,6 @@ export default {
                 const newGeometry = newFeature.getOlFeature()?.getGeometry(),
                     newCoordinates = newGeometry ? JSON.stringify(newGeometry.getCoordinates()) : null;
 
-                // Only proceed if the geometry has actually changed
                 if (this.previousGeometry === newCoordinates) {
                     return;
                 }
@@ -248,7 +247,6 @@ export default {
                 return "Unknown Layer";
             }
 
-            // Find the matching layer configuration using layerId
             if (layerResult.layerId) {
                 const configLayer = this.layersToRequest.find(
                     layer => String(layer.layerId) === String(layerResult.layerId)
@@ -259,7 +257,6 @@ export default {
                 }
             }
 
-            // Fall back to the original layer name
             return layerResult.layerName || "Unknown Layer";
         },
         exportData () {
@@ -283,7 +280,12 @@ export default {
 <template>
     <div id="gfi-table-container">
         <div v-if="isLoading">
-            <SpinnerItem custom-class="spinner" />
+            <div class="loading-container">
+                <SpinnerItem custom-class="spinner" />
+                <div class="loading-text">
+                    {{ translate('additional:modules.combinedGfi.queryingArea') }}
+                </div>
+            </div>
         </div>
         <div v-else>
             <div
@@ -364,8 +366,8 @@ export default {
             </div>
             <div class="button-group">
                 <ElevatedButton
-                    :text="translate('additional:modules.combinedGfi.queryArea')"
-                    :disabled="!bufferedFeature"
+                    :text="translate(isLoading ? 'additional:modules.combinedGfi.queryingArea' : 'additional:modules.combinedGfi.queryArea')"
+                    :disabled="!bufferedFeature || isLoading"
                     :interaction="queryBufferedFeatures"
                     additional-css="btn-primary"
                 />
@@ -417,9 +419,25 @@ export default {
     flex-wrap: wrap;
 }
 
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    padding: 20px;
+}
+
 .spinner {
-    margin: 20px auto;
+    margin: 10px auto;
     display: block;
+}
+
+.loading-text {
+    margin-top: 15px;
+    font-size: 0.95em;
+    color: $dark_grey;
+    text-align: center;
 }
 
 #gfi-table-container {
