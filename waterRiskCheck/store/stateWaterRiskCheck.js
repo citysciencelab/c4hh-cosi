@@ -8,6 +8,7 @@
  * @property {Object} answersLogic - Defines which pdfs are displayed for which answer.
  * @property {Object} alwaysShow - Pdfs that are always show regardless of questions and data.
  * @property {String} reportPath - File name for configuration of the report.
+ * @property {String} feedbackUrl - The url of feedback.
  */
 const state = {
     id: "waterRiskCheck",
@@ -25,7 +26,8 @@ const state = {
     answersLogic: [],
     alwaysShow: [],
     alkisBaseUrl: "https://api.hamburg.de/datasets/v1/alkis_vereinfacht",
-    reportPath: "config.valuation.json"
+    reportPath: "config.valuation.json",
+    feedbackUrl: "https://forms.office.com/e/NxRfFHzj9S"
 };
 
 export default state;

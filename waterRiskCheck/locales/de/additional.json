@@ -3,9 +3,9 @@
     "waterRiskCheck": {
       "description": "Erhalte Informationen und Handlungsempfehlungen zu deiner Adresse",
       "title": "Wegweiser Überflutungsvorsorge",
-      "generelExplenationText": "Mit dem Wegweiser Überflutungsvorsorge erhalten Sie Hinweise darüber, ob Ihr Grundstück von Überflutungen betroffen sein könnte und welche Maßnahmen Sie ergreifen können.<br><br>Für Ihren persönlichen Wegweiser beantworten Sie bitte die vier Fragen des hinterlegten Fragebogens (Adresseingabe im linken Menüfeld). Ihre Antworten werden anschließend automatisch ausgewertet und Sie erhalten umgehend auf Ihr Grundstück zugeschnittene Informationen und Empfehlungen zum Thema der Überflutungsvorsorge. Außerdem erfahren Sie, wie Sie sich im Notfall richtig verhalten.<br><br>Schützen Sie sich frühzeitig &ndash; nutzen Sie den Wegweiser Überflutungsvorsorge!<br><br>Datenschutzhinweis: Die vorübergehende Speicherung von Daten ist für den Ablauf des Websitebesuchs und der Erstellung eines Berichtes erforderlich. Diese Daten und der Bericht werden nach der Schließung der Website gelöscht. Eine Datenschutzerklärung ist dem Bericht beigefügt.",
+      "generelExplenationText": "Mit dem Wegweiser Überflutungsvorsorge erhalten Sie Hinweise darüber, ob Ihr Grundstück von Überflutungen betroffen sein könnte und welche Maßnahmen Sie ergreifen können.<br><br>Für Ihren persönlichen Wegweiser beantworten Sie bitte die vier Fragen des hinterlegten Fragebogens (Adresseingabe im linken Menüfeld). Ihre Antworten werden anschließend automatisch ausgewertet und Sie erhalten umgehend auf Ihr Grundstück zugeschnittene Informationen und Empfehlungen zum Thema der Überflutungsvorsorge. Außerdem erfahren Sie, wie Sie sich im Notfall richtig verhalten.<br><br>Schützen Sie sich frühzeitig &ndash; nutzen Sie den Wegweiser Überflutungsvorsorge!",
       "informationTextIconLabel": "Hinweis",
-      "informationText": "Der Fragebogen steht ausschließlich berechtigten Personen zur Verfügung. Berechtigt sind Sie, wenn Sie an der angegebenen Adresse wohnen oder Eigentümer:in des betroffenden Grundstücks sind.<br><br>Mit Klick auf \"Fragebogen starten\" bestätigen Sie, dass Sie zur Nutzung des Fragebogens für die oben angegebene Adresse berechtigt sind.",
+      "informationText": "Der Fragebogen steht ausschließlich berechtigten Personen zur Verfügung. Berechtigt sind Sie, wenn Sie an der angegebenen Adresse wohnen oder Eigentümer:in des betroffenden Grundstücks sind.<br><br>Mit Klick auf „Fragebogen starten“ bestätigen Sie, dass Sie zur Nutzung des Fragebogens für die oben angegebene Adresse berechtigt sind.",
       "formStartButton": "Fragebogen starten",
       "forwardPage": "weiter",
       "backPage": "zurück",
@@ -27,7 +27,10 @@
       "reset": "Der Fragebogen wird einschließlich aller Antworten zurückgesetzt. Sie können den Fragebogen mit einer anderen Adresse neu starten.",
       "resetButton": "Fragebogen neu starten",
       "hamburgIconText": "Hamburg Klimaplanförderung Logo",
-      "waitingLabel": "Bitte warten!"
+      "waitingLabel": "Bitte warten!",
+      "feedback": "Feedback",
+      "sendFeedback": "Senden Sie uns gerne Feedback",
+      "logoText": "Der Wegweiser Überflutungsvorsorge wird unterstützt durch die Klimaplan-Förderung."
     }
   }
 }

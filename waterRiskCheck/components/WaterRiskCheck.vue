@@ -138,7 +138,8 @@ export default {
             "answersLogic",
             "alwaysShow",
             "alkisBaseUrl",
-            "reportPath"
+            "reportPath",
+            "feedbackUrl"
         ]),
         ...mapGetters(["restServiceById", "isMobile"]),
         ...mapGetters("Modules/SearchBar", [
@@ -936,13 +937,6 @@ export default {
         startPrint (url, format, appId, mapfishDialog, onstart, onerror, onfinish) {
             startPrintProcess(url, format, appId, mapfishDialog, onstart, undefined, onerror, onfinish);
         },
-        /**
-         * Opens the url in window for downloading
-         * @returns {void}
-         */
-        startDownload () {
-            window.open(this.downloadLink, "_blank");
-        },
 
         /**
          * Gets the deepest flood depth according to the flood type
@@ -977,6 +971,14 @@ export default {
             }
 
             return deepestFloodDepth;
+        },
+
+        /**
+         * Opens the url in window.
+         * @returns {void}
+         */
+        openWindow (val) {
+            window.open(val, "_blank");
         }
     }
 
@@ -1292,7 +1294,7 @@ export default {
                                         :text="$t('additional:modules.waterRiskCheck.download')"
                                         icon="bi-download"
                                         class="mb-1"
-                                        :interaction="() => startDownload()"
+                                        :interaction="() => openWindow(downloadLink)"
                                     />
                                 </div>
                                 <p class="download-text ps-0 pb-3">
@@ -1310,6 +1312,21 @@ export default {
                                         :interaction="() => resetAll()"
                                     />
                                 </div>
+                                <p class="download-text ps-0 pb-3">
+                                    {{ $t('additional:modules.waterRiskCheck.sendFeedback') }}
+                                </p>
+                                <div
+                                    class="d-flex justify-content-center pt-1 pb-3"
+                                >
+                                    <FlatButton
+                                        id="reset"
+                                        aria-label="$t('additional:modules.waterRiskCheck.feedback')"
+                                        type="button"
+                                        :text="$t('additional:modules.waterRiskCheck.feedback')"
+                                        icon="bi bi-chat-right-text"
+                                        :interaction="() => openWindow(feedbackUrl)"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1319,9 +1336,14 @@ export default {
         <div v-if="!formStarted || formFinished">
             <div class="row">
                 <div class="d-flex justify-content-center pt-4">
+                    <p class="hint-text">
+                        {{ $t('additional:modules.waterRiskCheck.logoText') }}
+                    </p>
+                </div>
+                <div class="d-flex justify-content-center">
                     <img
                         class="hamburg-logo img-fluid"
-                        :src="'./assets/Foerderlogo_LSK_neg_RGB.png'"
+                        :src="'./assets/BUKEA_deu_RGB.png'"
                         :alt="$t('additional:modules.waterRiskCheck.hamburgIconAltText')"
                     >
                 </div>
