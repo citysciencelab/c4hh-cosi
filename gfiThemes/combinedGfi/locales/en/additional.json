@@ -1,0 +1,25 @@
+{
+  "modules": {
+      "combinedGfi": {
+        "fileName": "File Name",
+        "export": "Export",
+        "exportFormat": "Export Format",
+        "printButton": "Create Report",
+        "printError": "Error creating print request. Please check the selected data and try again.",
+        "feature": "Feature",
+        "features": "Features",
+        "noBufferSelected": "No buffer selected",
+        "bufferDistanceUnit": "m around the area",
+        "selectBufferDistance": "Select buffer distance",
+        "queryArea": "Query area",
+        "removeBuffer": "Remove buffer",
+        "additionalRequests": "Additional Requests",
+        "source": "Source",
+        "goToPage": "Go",
+        "infoHint": "Information about the data source",
+        "standardExport": "Export Data",
+        "printSection": "Area Report",
+        "printDescription": "Create a detailed report for the selected geometry."
+      }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "modules": {
+      "combinedGfi": {
+        "fileName": "Dateiname",
+        "export": "Export",
+        "exportFormat": "Exportformat",
+        "printButton": "Bericht erstellen",
+        "printError": "Fehler beim Erstellen der Druckanfrage. Bitte überprüfen Sie die ausgewählten Daten und versuchen Sie es erneut.",
+        "feature": "Feature",
+        "features": "Features",
+        "noBufferSelected": "Kein Puffer gewählt",
+        "bufferDistanceUnit": "m um das Gebiet",
+        "selectBufferDistance": "Puffer-Abstand wählen",
+        "queryArea": "Umgebung abfragen",
+        "removeBuffer": "Puffer entfernen",
+        "additionalRequests": "Zusätzliche Anfragen",
+        "source": "Quelle",
+        "goToPage": "Go",
+        "infoHint": "Hinweis zur Datenquelle",
+        "standardExport": "Daten exportieren",
+        "printSection": "Flächenbericht",
+        "printDescription": "Erstellen Sie einen Flächenbericht für die ausgewählte Geometrie."
+      }
+  }
+}
