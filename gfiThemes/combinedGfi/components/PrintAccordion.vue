@@ -47,7 +47,7 @@ export default {
         /**
          * Translation function
          */
-        translate: {
+        translateFunction: {
             type: Function,
             required: true
         }
@@ -59,18 +59,18 @@ export default {
     <AccordionItem
         v-if="printConfigPath"
         id="print-section"
-        :title="translate('additional:modules.combinedGfi.printSection')"
+        :title="translateFunction('additional:modules.combinedGfi.printSection')"
         :icon="'bi bi-printer'"
         :is-open="false"
         font-size="font-size-base"
         :coloured-header="true"
     >
         <p class="print-description">
-            {{ translate('additional:modules.combinedGfi.printDescription') }}
+            {{ translateFunction('additional:modules.combinedGfi.printDescription') }}
         </p>
         <div class="button-group">
             <ElevatedButton
-                :text="translate('additional:modules.combinedGfi.printButton')"
+                :text="translateFunction('additional:modules.combinedGfi.printButton')"
                 :icon="isPrintLoading ? null : 'bi-file-pdf'"
                 :disabled="!hasSelectedFeature || isLoading || isPrintLoading"
                 :interaction="sendPrintRequest"

@@ -422,7 +422,7 @@ export default {
 
             <AdditionalRequestsAccordion
                 :additional-request-results="additionalRequestResults"
-                :translate="translate"
+                :translate-function="translate"
             />
 
             <!-- Print section -->
@@ -432,7 +432,7 @@ export default {
                 :is-loading="isLoading"
                 :is-print-loading="isPrintLoading"
                 :send-print-request="handlePrintRequest"
-                :translate="translate"
+                :translate-function="translate"
             />
 
             <!-- Standard export section -->
@@ -442,7 +442,7 @@ export default {
                 :shown-format-list="shownFormatList"
                 :set-current-format="setCurrentFormat"
                 :export-data="exportData"
-                :translate="translate"
+                :translate-function="translate"
                 @update:file-name="value => $store.commit('Modules/CombinedGfi/setFileName', value)"
             />
         </div>

@@ -17,7 +17,7 @@ export default {
         /**
          * Translation function
          */
-        translate: {
+        translateFunction: {
             type: Function,
             required: true
         }
@@ -37,7 +37,7 @@ export default {
     >
         <AccordionItem
             id="additional-requests-section"
-            :title="translate('additional:modules.combinedGfi.additionalRequests')"
+            :title="translateFunction('additional:modules.combinedGfi.additionalRequests')"
             :icon="'bi bi-clipboard-data'"
             :is-open="false"
             font-size="font-size-base"
@@ -55,7 +55,7 @@ export default {
                     <hr>
                     <div class="source-container">
                         <div class="source-line">
-                            <strong>{{ translate('additional:modules.combinedGfi.source') }}:</strong> {{ result.url }}
+                            <strong>{{ translateFunction('additional:modules.combinedGfi.source') }}:</strong> {{ result.url }}
                             <span
                                 v-if="result.infoText"
                                 class="info-text-container"
@@ -68,7 +68,7 @@ export default {
                             >
                                 <span
                                     class="info-icon"
-                                    :title="translate('additional:modules.combinedGfi.infoHint')"
+                                    :title="translateFunction('additional:modules.combinedGfi.infoHint')"
                                 >i</span>
                             </span>
                         </div>

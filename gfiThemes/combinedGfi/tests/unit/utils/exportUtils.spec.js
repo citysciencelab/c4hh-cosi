@@ -8,23 +8,18 @@ import {
 } from "../../../utils/exportUtils.js";
 
 describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
-    // Define variables for use across tests
     let setIsLoadingSpy, createElementStub, appendChildStub, clickStub, removeChildStub, fakeLinkElement,
         originalDocument, originalURL, originalBlob, originalWindow;
 
     beforeEach(() => {
-        // Store original global objects
         originalDocument = global.document;
         originalURL = global.URL;
         originalBlob = global.Blob;
         originalWindow = global.window;
-
         setIsLoadingSpy = sinon.spy();
         clickStub = sinon.spy();
         appendChildStub = sinon.spy();
         removeChildStub = sinon.spy();
-
-        // Create a fake link element
         fakeLinkElement = {
             setAttribute: sinon.spy(),
             href: "",
@@ -32,7 +27,6 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
             click: clickStub
         };
 
-        // Set up the global document object with required methods
         global.document = {
             createElement: createElementStub = sinon.stub().returns(fakeLinkElement),
             body: {
@@ -41,20 +35,17 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
             }
         };
 
-        // Mock URL.createObjectURL and revokeObjectURL
         global.URL = {
             createObjectURL: sinon.stub().returns("blob:url"),
             revokeObjectURL: sinon.spy()
         };
 
-        // Mock Blob
         global.Blob = function () {
             return {};
         };
     });
 
     afterEach(() => {
-        // Restore original global objects
         global.document = originalDocument;
         global.URL = originalURL;
         global.Blob = originalBlob;
@@ -154,7 +145,6 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
     });
 
     describe("exportToPDF", () => {
-        // Define variables for PDF-specific tests
         let windowOpenStub, writeStub, closeStub, focusStub, printStub, fakeWindow;
 
         beforeEach(() => {
@@ -162,8 +152,6 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
             closeStub = sinon.spy();
             focusStub = sinon.spy();
             printStub = sinon.spy();
-
-            // Create a fake window with the required methods
             fakeWindow = {
                 document: {
                     write: writeStub,
@@ -173,15 +161,12 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
                 print: printStub,
                 close: closeStub
             };
-
-            // Mock the window.open method
             global.window = {
                 open: windowOpenStub = sinon.stub().returns(fakeWindow)
             };
         });
 
         afterEach(() => {
-            // Clean up the window mock
             delete global.window;
         });
 

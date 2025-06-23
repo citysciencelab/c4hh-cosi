@@ -47,7 +47,7 @@ export default {
         /**
          * Translation function
          */
-        translate: {
+        translateFunction: {
             type: Function,
             required: true
         }
@@ -59,7 +59,7 @@ export default {
 <template>
     <AccordionItem
         id="export-section"
-        :title="translate('additional:modules.combinedGfi.standardExport') || 'Standard Export'"
+        :title="translateFunction('additional:modules.combinedGfi.standardExport') || 'Standard Export'"
         :icon="'bi bi-file-earmark-arrow-down'"
         :is-open="false"
         font-size="font-size-base"
@@ -80,22 +80,22 @@ export default {
                     {{ format }}
                 </option>
             </select>
-            <label for="printFormat">{{ translate("additional:modules.combinedGfi.exportFormat") }}</label>
+            <label for="printFormat">{{ translateFunction("additional:modules.combinedGfi.exportFormat") }}</label>
         </div>
         <div class="form-floating mb-3 export-dropdown">
             <input
                 :value="fileName"
                 type="text"
                 class="form-control"
-                :aria-label="translate('additional:modules.combinedGfi.fileName')"
+                :aria-label="translateFunction('additional:modules.combinedGfi.fileName')"
                 @input="$emit('update:fileName', $event.target.value)"
             >
-            <label for="fileName">{{ translate("additional:modules.combinedGfi.fileName") }}</label>
+            <label for="fileName">{{ translateFunction("additional:modules.combinedGfi.fileName") }}</label>
         </div>
 
         <div class="button-group">
             <ElevatedButton
-                :text="translate('additional:modules.combinedGfi.export')"
+                :text="translateFunction('additional:modules.combinedGfi.export')"
                 :icon="'bi-download'"
                 :interaction="exportData"
                 additional-css="export-btn"

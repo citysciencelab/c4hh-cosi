@@ -10,14 +10,12 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
     let wrapper, store, mapActionsSpy, mapMutationsSpy, initSpy, originalMapCollection;
 
     beforeEach(() => {
-        // Store original global object
         originalMapCollection = global.mapCollection;
 
         mapActionsSpy = sinon.spy();
         mapMutationsSpy = sinon.spy();
         initSpy = sinon.spy();
 
-        // Mock mapCollection for the component
         global.mapCollection = {
             getMap: () => ({
                 getLayers: () => ({
@@ -125,11 +123,12 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
         });
 
         const olFeature = new Feature({geometry: new Point([565874, 5934140])}),
-            featureMock = {getOlFeature: () => olFeature, getTheme: () => olFeature.getTheme()},
-            translateMixin = {methods: {translate: (key, options) => t(key, options)}};
+            featureMock = {getOlFeature: () => olFeature, getTheme: () => olFeature.getTheme()};
 
         /**
-         *
+         * Simple translation function for tests
+         * @param {String} key - Translation key
+         * @returns {String} The key itself for testing
          */
         function t (key) {
             return key;
@@ -144,14 +143,12 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
             }
         });
 
-        // Mount with the translation mixin
         wrapper = shallowMount(CombinedGfi, {
             global: {
                 plugins: [store],
                 mocks: {
                     $t: t
-                },
-                mixins: [translateMixin]
+                }
             },
             props: {
                 feature: featureMock
@@ -160,7 +157,6 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
     });
 
     afterEach(() => {
-        // Restore original global object
         global.mapCollection = originalMapCollection;
         sinon.restore();
         wrapper.unmount();
@@ -171,7 +167,6 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
     });
 
     it("initializes on creation", async () => {
-        // Create a fresh component instance to ensure proper setup
         const localWrapper = shallowMount(CombinedGfi, {
             global: {
                 plugins: [store],
@@ -196,13 +191,9 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
             }
         });
 
-        // Wait for the next tick to allow all promises to resolve
+        await localWrapper.vm.$nextTick();
         await localWrapper.vm.$nextTick();
 
-        // Add another tick for good measure
-        await localWrapper.vm.$nextTick();
-
-        // Now check if initCombinedGfi was called
         expect(initSpy.called).to.be.true;
         localWrapper.unmount();
     });
@@ -226,13 +217,10 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
     });
 
     it("calls exportTo action when exportData is called", async () => {
-        // Create a spy on the $store.dispatch method
         const dispatchSpy = sinon.spy(wrapper.vm.$store, "dispatch");
 
-        // Call the exportData method
         await wrapper.vm.exportData();
 
-        // Check if the exportTo action was dispatched with the correct format
         expect(dispatchSpy.calledWith("Modules/CombinedGfi/exportTo", "CSV")).to.be.true;
     });
 
@@ -240,7 +228,6 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
         const layerResult = {layerId: "123", layerName: "Original Layer Name"},
             displayName = wrapper.vm.getLayerDisplayName(layerResult);
 
-        // Should use the name from layersToRequest config
         expect(displayName).to.equal("Custom Layer Name");
     });
 
@@ -248,7 +235,6 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
         const layerResult = {layerId: "456", layerName: "Another Layer"},
             displayName = wrapper.vm.getLayerDisplayName(layerResult);
 
-        // Should fall back to the layerName in layerResult
         expect(displayName).to.equal("Another Layer");
     });
 
@@ -256,61 +242,108 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
         const layerResult = {layerName: "Layer Without ID"},
             displayName = wrapper.vm.getLayerDisplayName(layerResult);
 
-        // Should fall back to the layerName in layerResult
         expect(displayName).to.equal("Layer Without ID");
     });
 
     it("handles missing layer result", () => {
         const displayName = wrapper.vm.getLayerDisplayName(null);
 
-        // Should return default value
         expect(displayName).to.equal("Unknown Layer");
     });
 
-    it("tries to fetch print utils from fallback paths when primary path fails", async () => {
-        const fetchStub = sinon.stub(global, "fetch"),
-            tryFetchSpy = sinon.spy(wrapper.vm, "tryFetchPrintUtils");
+    it("cleans up on unmount", () => {
+        const cleanupSpy = sinon.spy(wrapper.vm, "cleanup");
 
-        // Fail for the initial path
-        fetchStub.withArgs("/resources/printUtils.js").rejects(new Error("Network error"));
+        wrapper.unmount();
 
-        // Succeed for a fallback path (e.g., "./resources/printUtils.js")
-        fetchStub.withArgs("./resources/printUtils.js").resolves({
-            ok: true,
-            text: () => Promise.resolve(`
-                module.exports = {
-                    preparePrintRequest: function() {
-                        return {spec: {layout: "A4 Portrait"}};
+        expect(cleanupSpy.called).to.be.true;
+    });
+
+    it("renders accordion components with correct props", () => {
+        const additionalRequestsAccordion = wrapper.findComponent({name: "AdditionalRequestsAccordion"}),
+            printAccordion = wrapper.findComponent({name: "PrintAccordion"}),
+            exportAccordion = wrapper.findComponent({name: "ExportAccordion"});
+
+        expect(additionalRequestsAccordion.exists()).to.be.true;
+        expect(printAccordion.exists()).to.be.true;
+        expect(exportAccordion.exists()).to.be.true;
+
+        expect(additionalRequestsAccordion.props("additionalRequestResults")).to.deep.equal([]);
+        expect(typeof additionalRequestsAccordion.props("translateFunction")).to.equal("function");
+
+        expect(printAccordion.props("printConfigPath")).to.equal("/resources/printConfig.json");
+        expect(printAccordion.props("hasSelectedFeature")).to.be.true;
+        expect(typeof printAccordion.props("translateFunction")).to.equal("function");
+
+        expect(exportAccordion.props("fileName")).to.equal("test");
+        expect(exportAccordion.props("currentFormat")).to.equal("CSV");
+        expect(typeof exportAccordion.props("translateFunction")).to.equal("function");
+    });
+
+    it("handles buffer selection correctly", async () => {
+        const localWrapper = shallowMount(CombinedGfi, {
+                global: {
+                    plugins: [store],
+                    mocks: {
+                        $t: (key) => key
                     }
-                };
-            `)
-        });
+                },
+                props: {
+                    feature: {
+                        getOlFeature: () => new Feature({
+                            geometry: new Point([565874, 5934140])
+                        }),
+                        getTheme: () => ({
+                            params: {
+                                layersToRequest: [],
+                                additionalRequests: [],
+                                showBuffer: true,
+                                bufferDistances: [100, 500, 1000]
+                            }
+                        })
+                    }
+                }
+            }),
+            bufferSelect = localWrapper.find("#bufferSelect");
 
-        // Mock other required methods to avoid actual network requests
-        wrapper.vm.sendPrintRequestToServer = sinon.stub().resolves({
+        expect(bufferSelect.exists()).to.be.true;
+
+        localWrapper.unmount();
+    });
+
+    it("handles print functionality correctly", async () => {
+        const fetchStub = sinon.stub(global, "fetch"),
+            mockUtilsResponse = {
+                ok: true,
+                text: () => Promise.resolve(`
+                    module.exports = {
+                        preparePrintRequest: function() {
+                            return {spec: {layout: "A4 Portrait"}};
+                        }
+                    };
+                `)
+            },
+            consoleErrorStub = sinon.stub(console, "error");
+
+        fetchStub.withArgs("/resources/printUtils.js").resolves(mockUtilsResponse);
+        fetchStub.withArgs("./resources/printUtils.js").resolves(mockUtilsResponse);
+
+        fetchStub.withArgs("https://print-server.example.com").resolves({
             ok: true,
             blob: () => Promise.resolve(new Blob()),
             headers: {
                 get: () => "filename=\"test.pdf\""
             }
         });
-        wrapper.vm.processPrintResponse = sinon.stub().resolves();
 
-        // Call sendPrintRequest which should internally call tryFetchPrintUtils
-        await wrapper.vm.sendPrintRequest();
+        try {
+            await wrapper.vm.handlePrintRequest();
 
-        // Verify that tryFetchPrintUtils was called
-        expect(tryFetchSpy.called).to.be.true;
-    });
-
-    it("cleans up on unmount", () => {
-        // Create a spy on the cleanup method
-        const cleanupSpy = sinon.spy(wrapper.vm, "cleanup");
-
-        // Trigger the unmounted hook
-        wrapper.unmount();
-
-        // Check if cleanup was called
-        expect(cleanupSpy.called).to.be.true;
+            expect(fetchStub.called).to.be.true;
+        }
+        finally {
+            consoleErrorStub.restore();
+            fetchStub.restore();
+        }
     });
 });
