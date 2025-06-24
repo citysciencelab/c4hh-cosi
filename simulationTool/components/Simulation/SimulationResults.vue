@@ -51,6 +51,19 @@ export default {
             "simulationResultStyle",
             "simulations"
         ]),
+        ...mapGetters("Menu", [
+            "mainMenu",
+            "secondaryMenu",
+            "mainExpanded"
+        ]),
+
+        /**
+         * Checks if the Print module is available/configured in the main menu only
+         * @returns {Boolean} True if print module is available in main menu
+         */
+        isPrintModuleAvailable () {
+            return this.isModuleInSections(this.mainMenu?.sections, "print");
+        },
 
         /**
          * Get the planning scenario containing the current simulation.
@@ -218,6 +231,7 @@ export default {
     methods: {
         ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
+        ...mapActions("Menu", ["changeCurrentComponent", "toggleMenu"]),
         ...mapMutations("Modules/SimulationTool", [
             "setMode"
         ]),
@@ -281,6 +295,68 @@ export default {
                 });
 
             return allZValues;
+        },
+
+        /**
+         * Recursively searches for a module type in menu sections
+         * @param {Array} sections - The menu sections to search in
+         * @param {String} moduleType - The module type to search for
+         * @returns {Boolean} True if module is found
+         */
+        isModuleInSections (sections, moduleType) {
+            if (!Array.isArray(sections)) {
+                return false;
+            }
+
+            for (const section of sections) {
+                if (Array.isArray(section)) {
+                    // Handle array of sections
+                    if (this.isModuleInSections(section, moduleType)) {
+                        return true;
+                    }
+                }
+                else if (section && typeof section === "object") {
+                    // Check if this section has the module type
+                    if (section.type === moduleType) {
+                        return true;
+                    }
+                    // Check if this is a folder with elements
+                    if (section.type === "folder" && section.elements) {
+                        if (this.isModuleInSections(section.elements, moduleType)) {
+                            return true;
+                        }
+                    }
+                    // Check if this section has elements
+                    if (section.elements && this.isModuleInSections(section.elements, moduleType)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+
+        /**
+         * Opens the print module in the main menu while preserving simulation state
+         * @returns {void}
+         */
+        openPrintModule () {
+            if (!this.isPrintModuleAvailable) {
+                return;
+            }
+
+            // Ensure main menu is open
+            if (!this.mainExpanded) {
+                this.toggleMenu("mainMenu");
+            }
+
+            // Change to print component in main menu
+            this.changeCurrentComponent({
+                type: "print",
+                side: "mainMenu",
+                props: {
+                    name: "common:modules.print.name"
+                }
+            });
         },
 
         /**
@@ -811,6 +887,15 @@ export default {
                         :aria-label="$t('additional:modules.tools.simulationTool.showProperties')"
                         :text="$t('additional:modules.tools.simulationTool.showProperties')"
                         @click="() => setMode('simulationParameter')"
+                    />
+                    <FlatButton
+                        v-if="isPrintModuleAvailable"
+                        id="print-results-bottom"
+                        class="mx-2"
+                        :icon="'bi bi-printer'"
+                        :aria-label="'Simulationsergebnisse drucken'"
+                        :text="'Drucken'"
+                        @click="openPrintModule"
                     />
                     <FlatButton
                         id="start"
