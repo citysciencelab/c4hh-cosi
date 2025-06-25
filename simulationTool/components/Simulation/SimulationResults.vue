@@ -173,6 +173,19 @@ export default {
         */
         simulationConfig () {
             return this.simulations.find(simulation => simulation.id === this.currentSimulation.configId);
+        },
+
+        /**
+         * Get the current style for features (from job results)
+         * @returns {Object} The current style object
+         */
+        currentStyle () {
+            if (!this.jobs || Object.keys(this.jobs).length === 0) {
+                return null;
+            }
+            const firstJob = Object.values(this.jobs)[0];
+
+            return firstJob?.resultStyle || null;
         }
     },
     watch: {
@@ -215,9 +228,27 @@ export default {
         }
     },
     mounted () {
-        if (typeof this.currentPlanningScenario !== "undefined") {
+        if (typeof this.currentPlanningScenario !== "undefined" && this.currentPlanningScenario?.scenarioFeature) {
             this.updateFeatures();
             this.zoomToFeature();
+        }
+        // Handle mock data - if we have simulation results but no scenario features
+        else if (this.simulationIdForResults && this.jobs && Object.keys(this.jobs).length > 0) {
+            // Trigger the watcher to display mock simulation features
+            this.$nextTick(() => {
+                this.jobStatusTags = Object.values(this.jobs).map(job => job.jobStatus?.status);
+                this.startTimes = Object.values(this.jobs).map(job => job.jobStatus?.started).filter(time => time);
+                this.finishedTimes = Object.values(this.jobs).map(job => job.jobStatus?.finished).filter(time => time);
+                this.progressValues = Object.values(this.jobs).map(job => job.jobStatus?.progress).filter(progress => Number.isFinite(progress));
+                this.outputs = Object.keys(Object.values(this.jobs)[0]?.jobResults || {});
+                this.showFeatures(this.simulationIdForResults, this.jobs, this.outputs);
+
+                // Zoom to Hamburg area for mock data
+                this.$store.dispatch("Maps/zoomToExtent", {
+                    extent: [564500, 5933500, 567000, 5935500],
+                    options: {maxZoom: 15}
+                }, {root: true});
+            });
         }
     },
     unmounted () {

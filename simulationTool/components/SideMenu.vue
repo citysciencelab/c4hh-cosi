@@ -106,7 +106,14 @@ export default {
             :title="$t('additional:modules.tools.simulationTool.simulationResults')"
             @click="() => setMode('simulationResults')"
         >
-            <i class="bi bi-stickies" />
+            <i class="bi bi-bar-chart-line" />
+        </button>
+        <button
+            class="btn btn-link"
+            :title="'Mock Data für Tests'"
+            @click="() => setMode('mockData')"
+        >
+            <i class="bi bi-database" />
         </button>
         <button
             v-if="!hiddenSideMenus.includes('process')"
