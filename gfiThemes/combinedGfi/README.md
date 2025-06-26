@@ -22,6 +22,51 @@ The Combined GFI addon provides the following key features:
 
 The Combined GFI addon can be configured with the following parameters:
 
+### Complete Configuration Example
+
+Here's a complete example using the recommended nested format:
+
+```json
+{
+  "gfiTheme": {
+    "name": "combinedGfi",
+    "params": {
+      "showBuffer": true,
+      "bufferDistances": [100, 500, 1000],
+      "export": {
+        "fileName": "Naturschutzgebiete",
+        "shownFormatList": ["CSV", "PDF", "DOC", "JSON"]
+      },
+      "printServerUrl": "https://example.com/mapfish/print/report/buildreport.pdf",
+      "layersToRequest": [
+        {
+          "layerId": "naturschutzgebiete",
+          "attributes": [
+            {"name": "gebietsname", "alias": "Gebietsname"},
+            {"name": "schutzstatus", "alias": "Schutzstatus"},
+            "flaeche_ha"
+          ],
+          "wfsQueryBufferSize": 0.00005
+        },
+        {
+          "layerId": "landschaftsschutzgebiete",
+          "attributes": ["name", "typ", "groesse"]
+        }
+      ],
+      "additionalRequests": [
+        {
+          "url": "https://api.example.com/additional-data",
+          "method": "GET",
+          "params": {
+            "format": "json"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
 ### Layer Configuration
 
 Each layer in the `layersToRequest` array can have the following properties:
@@ -100,10 +145,21 @@ Example:
 
 ### Export Configuration
 
-The addon supports exporting query results in various formats:
+The addon supports exporting query results in various formats using the nested `export` object:
 
-- `fileName`: The default file name for exports.
-- `shownFormatList`: An array of export formats to display in the UI. Supported formats: "CSV", "PDF", "DOC", "JSON".
+```json
+{
+  "export": {
+    "fileName": "MyExportFile",
+    "shownFormatList": ["CSV", "PDF", "DOC", "JSON"]
+  }
+}
+```
+
+#### Properties
+
+- `export.fileName`: The default file name for exports.
+- `export.shownFormatList`: An array of export formats to display in the UI. Supported formats: "CSV", "PDF", "DOC", "JSON".
 
 ### Print Configuration
 

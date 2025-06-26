@@ -333,7 +333,6 @@ export default {
                     }
                 }),
                 getMimeType: () => null,
-                // Additional methods required by child components like CompareFeatureIcon
                 getId: () => `combined-gfi-${Math.random().toString(36).substr(2, 9)}`,
                 getLayerId: () => layerConfig?.layerId || "unknown",
                 getTitle: () => layerConfig?.name || "Feature",

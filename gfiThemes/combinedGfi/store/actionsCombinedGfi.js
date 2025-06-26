@@ -41,7 +41,10 @@ const actions = {
     async initCombinedGfi ({dispatch, commit}, {feature, clickCoordinates}) {
         const themeParams = feature?.getTheme()?.params || {},
             geometry = feature.getOlFeature().getGeometry(),
-            alternativeGeometryAvailable = themeParams.layersToRequest.find(layer => layer.geometryProvider);
+            alternativeGeometryAvailable = themeParams.layersToRequest.find(layer => layer.geometryProvider),
+            exportConfig = themeParams.export || {},
+            fileName = exportConfig.fileName || i18next.t("additional:modules.combinedGfi.defaultFileName"),
+            shownFormatList = exportConfig.shownFormatList || ["CSV", "PDF", "DOC", "JSON"];
 
         commit("setLayersToRequest", themeParams.layersToRequest || []);
         commit("setAdditionalRequests", themeParams.additionalRequests || []);
@@ -54,8 +57,8 @@ const actions = {
         }
         commit("setFeature", feature);
 
-        // Set translated fileName
-        commit("setFileName", i18next.t("additional:modules.combinedGfi.defaultFileName"));
+        commit("setFileName", fileName);
+        commit("setShownFormatList", shownFormatList);
 
         if (geometry) {
             await dispatch("fetchGfiData", {geometry});
