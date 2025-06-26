@@ -82,7 +82,7 @@ export default {
                     return;
                 }
 
-                this.$store.commit("Modules/CombinedGfi/setPreviousGeometry", newCoordinates);
+                this.setPreviousGeometry(newCoordinates);
 
                 if (newGeometry) {
                     this.fetchGfiData({geometry: newGeometry, clickCoordinates: this.clickCoordinates});
@@ -129,7 +129,8 @@ export default {
         ]),
         ...mapMutations("Modules/CombinedGfi", [
             "setCurrentFormat",
-            "setBufferedFeature"
+            "setBufferedFeature",
+            "setPreviousGeometry"
         ]),
         /**
          * Tests if the given string is a URL.
@@ -230,7 +231,8 @@ export default {
                 onLoadingChange: (loading) => {
                     this.isPrintLoading = loading;
                 },
-                onError: () => {
+                onError: (error) => {
+                    console.error("Print request error:", error);
                     this.addSingleAlert({
                         category: "error",
                         content: this.$t("common:modules.combinedGfi.printError")

@@ -54,6 +54,9 @@ const actions = {
         }
         commit("setFeature", feature);
 
+        // Set translated fileName
+        commit("setFileName", i18next.t("additional:modules.combinedGfi.defaultFileName"));
+
         if (geometry) {
             await dispatch("fetchGfiData", {geometry});
         }

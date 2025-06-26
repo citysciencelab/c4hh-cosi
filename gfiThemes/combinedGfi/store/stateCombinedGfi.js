@@ -1,15 +1,7 @@
 /**
  * User type definition
  * @typedef {Object} state
- * @property {Boolean} hasMouseMapInteractions Tool interacts with the map
- * @property {String} type Type of PopulationRequest Components
- * @property {String[]} supportedDevices List of supported devices
- * @property {String[]} supportedMapModes List of supported map modes
- * @property {String} description Description displayed in the menu button
- * @property {String} name Header (config-param)
- * @property {String} icon Icon next to the title (config-param)
- *
- * Additional state properties for the CombinedGfi logic:
+ * State properties for the CombinedGfi logic:
  * @property {Boolean} alternativeGeometry Indicates if alternative geometry is used
  * @property {Object|null} alternativePolygonFeature Alternative polygon feature
  * @property {Number[]} bufferDistances Distances for buffering
@@ -36,14 +28,6 @@
  * @property {String} printUtilsPath Path to the printUtils.js file
  */
 const state = {
-    // Configuration values
-    hasMouseMapInteractions: true,
-    type: "populationRequest",
-    supportedDevices: ["Desktop", "Mobile", "Table"],
-    supportedMapModes: ["2D"],
-    description: "additional:modules.populationRequest.description",
-    name: "additional:modules.populationRequest.name",
-    icon: "bi-person-bounding-box",
     // Additional state for the CombinedGfi logic
     alternativeGeometry: false,
     alternativePolygonFeature: null,
