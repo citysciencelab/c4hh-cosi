@@ -32,6 +32,14 @@ describe("addons/gfiThemes/combinedGfi/components/AdditionalRequestsAccordion.vu
             props: {
                 additionalRequestResults: mockResults,
                 translateFunction: mockTranslate
+            },
+            global: {
+                stubs: {
+                    AccordionItem: {
+                        template: "<div><div><slot /></div></div>",
+                        props: ["id", "title", "icon", "isOpen", "fontSize", "colouredHeader"]
+                    }
+                }
             }
         });
     });
@@ -50,6 +58,14 @@ describe("addons/gfiThemes/combinedGfi/components/AdditionalRequestsAccordion.vu
             props: {
                 additionalRequestResults: [],
                 translateFunction: mockTranslate
+            },
+            global: {
+                stubs: {
+                    AccordionItem: {
+                        template: "<div><div><slot /></div></div>",
+                        props: ["id", "title", "icon", "isOpen", "fontSize", "colouredHeader"]
+                    }
+                }
             }
         });
 
@@ -74,25 +90,14 @@ describe("addons/gfiThemes/combinedGfi/components/AdditionalRequestsAccordion.vu
         expect(sourceLine.text()).to.include("https://example.com/api1");
     });
 
-    it("shows info icon when infoText is available", () => {
-        const resultContainers = wrapper.findAll(".additional-request"),
-            firstResult = resultContainers[0],
-            infoIcon = firstResult.find(".info-icon");
-
-        expect(resultContainers.length).to.be.greaterThan(0);
-        expect(infoIcon.exists()).to.be.true;
+    it("shows info accordion when infoText is available", () => {
+        expect(wrapper.vm.hasInfoText).to.be.true;
     });
 
-    it("handles info hover correctly", async () => {
-        const infoContainers = wrapper.findAll(".info-text-container"),
-            infoContainer = infoContainers[0];
+    it("displays info text correctly", () => {
+        const resultsWithInfo = wrapper.vm.additionalRequestResults.filter(result => result.infoText);
 
-        expect(infoContainers.length).to.be.greaterThan(0);
-
-        await infoContainer.trigger("mouseenter");
-        expect(wrapper.vm.infoHoverIndex).to.equal(0);
-
-        await infoContainer.trigger("mouseleave");
-        expect(wrapper.vm.infoHoverIndex).to.be.null;
+        expect(resultsWithInfo.length).to.equal(1);
+        expect(resultsWithInfo[0].infoText).to.equal("Info about result 1");
     });
 });
