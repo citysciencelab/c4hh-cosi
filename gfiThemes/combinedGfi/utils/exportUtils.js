@@ -90,7 +90,7 @@ export function exportToDOC ({layerResults, fileName, setIsLoading}) {
                   }
                   body {
                       font-family: Arial, sans-serif;
-                      margin: 20px;
+                      margin: 1.25rem;
                       line-height: 1.6;
                       font-size: 11pt;
                       width: 100%;
@@ -100,30 +100,30 @@ export function exportToDOC ({layerResults, fileName, setIsLoading}) {
                       font-size: 14pt;
                       font-weight: bold;
                       color: #003366;
-                      margin: 20px 0 10px 0;
-                      padding: 5px 0;
-                      border-bottom: 2px solid #003366;
+                      margin: 1.25rem 0 0.625rem 0;
+                      padding: 0.3125rem 0;
+                      border-bottom: 0.125rem solid #003366;
                       page-break-after: avoid;
                   }
                   .feature-title {
                       font-size: 12pt;
                       font-weight: bold;
                       color: #666;
-                      margin: 15px 0 5px 0;
-                      padding: 3px 0;
-                      border-bottom: 1px solid #ccc;
+                      margin: 0.9375rem 0 0.3125rem 0;
+                      padding: 0.1875rem 0;
+                      border-bottom: 0.0625rem solid #ccc;
                       page-break-after: avoid;
                   }
                   .attribute-table {
                       width: 100%;
                       table-layout: fixed; /* Wichtig für feste Spaltenbreiten */
                       border-collapse: collapse;
-                      margin: 5px 0 15px 0;
+                      margin: 0.3125rem 0 0.9375rem 0;
                       page-break-inside: avoid;
                   }
                   .attribute-table td {
-                      padding: 4px 8px;
-                      border: 1px solid #e0e0e0;
+                      padding: 0.25rem 0.5rem;
+                      border: 0.0625rem solid #e0e0e0;
                       vertical-align: top;
                       word-wrap: break-word; /* Wichtig für Zeilenumbruch */
                       overflow-wrap: break-word; /* Zusätzliche Unterstützung */
@@ -140,13 +140,13 @@ export function exportToDOC ({layerResults, fileName, setIsLoading}) {
                       background-color: #ffffff;
                   }
                   .section-break {
-                      height: 1px;
+                      height: 0.0625rem;
                       background-color: #e0e0e0;
-                      margin: 20px 0;
+                      margin: 1.25rem 0;
                       page-break-after: always;
                   }
                   .feature-container {
-                      margin-bottom: 15px;
+                      margin-bottom: 0.9375rem;
                       page-break-inside: avoid;
                       width: 100%;
                   }
@@ -263,31 +263,31 @@ export function exportToPDF ({layerResults, fileName, setIsLoading}) {
                   }
                   body {
                       font-family: Arial, sans-serif;
-                      margin: 20px;
+                      margin: 1.25rem;
                       line-height: 1.4;
                       font-size: 10pt;
                   }
                   h2 {
                       font-size: 14pt;
                       font-weight: bold;
-                      margin-bottom: 10px;
-                      border-bottom: 2px solid #000;
-                      padding-bottom: 5px;
+                      margin-bottom: 0.625rem;
+                      border-bottom: 0.125rem solid #000;
+                      padding-bottom: 0.3125rem;
                       color: #333;
                   }
                   table {
                       width: 100%;
-                      margin-bottom: 20px;
+                      margin-bottom: 1.25rem;
                       border-collapse: collapse;
                       table-layout: fixed;
                   }
                   th, td {
-                      border: 1px solid #ddd;
-                      padding: 6px;
+                      border: 0.0625rem solid #ddd;
+                      padding: 0.375rem;
                       text-align: left;
                       word-wrap: break-word;
                       overflow-wrap: break-word;
-                      max-width: 150px;
+                      max-width: 9.375rem;
                       font-size: 9pt;
                   }
                   th {
@@ -298,16 +298,16 @@ export function exportToPDF ({layerResults, fileName, setIsLoading}) {
                       background-color: #fff;
                   }
                   .section-break {
-                      margin-top: 20px;
-                      margin-bottom: 20px;
-                      height: 2px;
+                      margin-top: 1.25rem;
+                      margin-bottom: 1.25rem;
+                      height: 0.125rem;
                       background-color: #ccc;
                   }
                   /* Für Tabellen mit vielen Spalten */
                   @media print {
                       .many-columns th, .many-columns td {
                           font-size: 8pt;
-                          padding: 4px;
+                          padding: 0.25rem;
                       }
                   }
               </style>

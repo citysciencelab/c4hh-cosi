@@ -92,8 +92,8 @@ export default {
 .button-group {
     display: flex;
     justify-content: flex-start;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 0.625rem;
+    margin-top: 0.625rem;
 }
 
 .print-btn {

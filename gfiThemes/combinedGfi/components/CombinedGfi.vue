@@ -455,8 +455,8 @@ export default {
 .button-group {
     display: flex;
     justify-content: flex-start;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 0.625rem;
+    margin-top: 0.625rem;
     flex-wrap: wrap;
     max-width: 100%;
     overflow: hidden;
@@ -467,24 +467,24 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100px;
-    padding: 20px;
+    min-height: 6.25rem;
+    padding: 1.25rem;
 }
 
 .spinner {
-    margin: 10px auto;
+    margin: 0.625rem auto;
     display: block;
 }
 
 .loading-text {
-    margin-top: 15px;
+    margin-top: 0.9375rem;
     font-size: 0.95em;
     color: $dark_grey;
     text-align: center;
 }
 
 #gfi-table-container {
-    margin: 10px;
+    margin: 0.625rem;
     background: $white;
     max-width: 100%;
     overflow-x: hidden;
@@ -492,26 +492,26 @@ export default {
 }
 
 .layer-result-container {
-    margin-bottom: 5px;
+    margin-bottom: 0.3125rem;
     max-width: 100%;
     overflow: hidden;
 }
 
 .feature-container {
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
     max-width: 100%;
     overflow: hidden;
 }
 
 .analysis-result-item {
-    margin-bottom: 15px;
+    margin-bottom: 0.9375rem;
     word-break: break-word;
 }
 
 .result-container {
     position: relative;
     display: block;
-    padding-top: 6px;
+    padding-top: 0.375rem;
 }
 
 .result-text {
@@ -519,7 +519,7 @@ export default {
     align-items: flex-start;
     line-height: 1.5;
     flex-wrap: wrap;
-    margin-top: 8px;
+    margin-top: 0.5rem;
     color: $dark_grey;
 }
 
@@ -538,24 +538,24 @@ export default {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+    width: 1.125rem;
+    height: 1.125rem;
     border-radius: 50%;
     background-color: $light_blue;
     color: $white;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: bold;
     cursor: help;
 }
 
 .info-inline {
     display: block;
-    margin-top: 4px;
+    margin-top: 0.25rem;
     background: $light_grey;
     color: $dark_grey;
-    border: 1px solid $light_grey;
-    border-radius: 4px;
-    padding: 6px 10px;
+    border: 0.0625rem solid $light_grey;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.625rem;
     max-width: 100%;
     word-break: break-word;
     font-size: 0.95em;
@@ -563,22 +563,22 @@ export default {
 
 .tooltip-header {
     font-weight: bold;
-    margin-bottom: 6px;
-    border-bottom: 1px solid $light_grey;
-    padding-bottom: 4px;
+    margin-bottom: 0.375rem;
+    border-bottom: 0.0625rem solid $light_grey;
+    padding-bottom: 0.25rem;
     color: $light_blue;
 }
 
 .export-dropdown {
-    margin-top: 20px;
+    margin-top: 1.25rem;
 }
 
 .pagination-wrapper {
-    margin: 10px 0;
+    margin: 0.625rem 0;
 }
 
 .print-description {
-    margin-bottom: 15px;
+    margin-bottom: 0.9375rem;
     color: $dark_grey;
     font-size: 0.9em;
 }
@@ -586,9 +586,9 @@ export default {
 .error-message {
     color: $light_red;
     background: lighten($light_red, 45%);
-    border: 1px solid $light_red;
-    padding: 8px 12px;
-    border-radius: 4px;
-    margin-top: 8px;
+    border: 0.0625rem solid $light_red;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
 }
 </style>
