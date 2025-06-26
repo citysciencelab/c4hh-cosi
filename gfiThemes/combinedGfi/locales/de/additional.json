@@ -19,6 +19,7 @@
         "source": "Quelle",
         "goToPage": "Go",
         "infoHint": "Hinweis zur Datenquelle",
+        "information": "Informationen",
         "standardExport": "Daten exportieren",
         "printSection": "Flächenbericht",
         "printDescription": "Erstellen Sie einen Flächenbericht für die ausgewählte Geometrie.",

@@ -19,6 +19,7 @@
         "source": "Source",
         "goToPage": "Go",
         "infoHint": "Information about the data source",
+        "information": "Information",
         "standardExport": "Export Data",
         "printSection": "Area Report",
         "printDescription": "Create a detailed report for the selected geometry.",

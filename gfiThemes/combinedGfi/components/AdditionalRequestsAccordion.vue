@@ -23,9 +23,16 @@ export default {
         }
     },
     data () {
-        return {
-            infoHoverIndex: null
-        };
+        return {};
+    },
+    computed: {
+        /**
+         * Check if any result has info text to show the info accordion
+         * @returns {Boolean} true if any result has infoText
+         */
+        hasInfoText () {
+            return this.additionalRequestResults.some(result => result.infoText);
+        }
     }
 };
 </script>
@@ -56,31 +63,34 @@ export default {
                     <div class="source-container">
                         <div class="source-line">
                             <strong>{{ translateFunction('additional:modules.combinedGfi.source') }}:</strong> {{ result.url }}
-                            <span
-                                v-if="result.infoText"
-                                class="info-text-container"
-                                tabindex="0"
-                                role="button"
-                                @mouseenter="infoHoverIndex = index"
-                                @mouseleave="infoHoverIndex = null"
-                                @focusin="infoHoverIndex = index"
-                                @focusout="infoHoverIndex = null"
-                            >
-                                <span
-                                    class="info-icon"
-                                    :title="translateFunction('additional:modules.combinedGfi.infoHint')"
-                                >i</span>
-                            </span>
-                        </div>
-                        <div
-                            v-if="infoHoverIndex === index && result.infoText"
-                            class="info-inline"
-                        >
-                            {{ result.infoText }}
                         </div>
                     </div>
                 </div>
             </div>
+            <AccordionItem
+                v-if="hasInfoText"
+                id="additional-requests-info-section"
+                :title="translateFunction('additional:modules.combinedGfi.information')"
+                :icon="'bi bi-info-circle-fill'"
+                :is-open="false"
+                font-size="font-size-base"
+                :coloured-header="true"
+            >
+                <div
+                    v-for="(result, index) in additionalRequestResults"
+                    :key="'info-' + index"
+                    class="info-item"
+                >
+                    <div
+                        v-if="result.infoText"
+                        class="info-content"
+                    >
+                        <p class="info-text">
+                            {{ result.infoText }}
+                        </p>
+                    </div>
+                </div>
+            </AccordionItem>
         </AccordionItem>
     </div>
 </template>
@@ -117,40 +127,22 @@ export default {
     flex-wrap: wrap;
 }
 
-.info-text-container {
-    display: inline-flex;
-    align-items: center;
+.info-item {
+    margin-bottom: 1rem;
 }
 
-.info-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.2rem;
-    height: 1.2rem;
-    background-color: $light_blue;
-    color: $white;
-    border-radius: 50%;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+.info-item:last-child {
+    margin-bottom: 0;
 }
 
-.info-icon:hover {
-    background-color: $dark_blue;
+.info-content {
+    padding: 0.5rem 0;
 }
 
-.info-inline {
-    display: block;
-    width: 100%;
-    margin-top: 0.5rem;
-    background-color: $light_grey;
+.info-text {
+    margin: 0;
     color: $dark_grey;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
     font-size: 0.875rem;
-    border: 1px solid $dark_grey;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.4;
 }
 </style>
