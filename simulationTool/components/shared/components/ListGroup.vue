@@ -271,7 +271,7 @@ export default {
                 <IconButton
                     v-if="hideable"
                     :icon="getIcon(feature)"
-                    class="me-3"
+                    :class-array="['me-3']"
                     :aria="$t('additional:modules.tools.simulationTool.toggleVisibility')"
                     @click.stop="toggleStyle(feature)"
                 />

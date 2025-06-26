@@ -1103,15 +1103,14 @@ export default {
                             {{ address }}
                         </p>
                     </div>
-                    <div class="col-md-1 p-0">
-                        <IconButton
-                            id="reset-button"
-                            :aria="$t('additional:modules.waterRiskCheck.reset')"
-                            :interaction="() => resetAll()"
-                            class="remove btn-light col col-md-1 p-0 fs-5"
-                            icon="bi bi-pencil-fill"
-                        />
-                    </div>
+                    <IconButton
+                        id="reset-button"
+                        :aria="$t('additional:modules.waterRiskCheck.reset')"
+                        :interaction="() => resetAll()"
+                        :class-array="['remove', 'btn-light', 'col', 'col-md-1', 'p-0', 'fs-5']"
+                        icon="bi bi-pencil-fill"
+                        class="col-md-1 p-0"
+                    />
                     <div
                         class="col pe-0"
                     >

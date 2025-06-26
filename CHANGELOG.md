@@ -12,6 +12,7 @@
 - Added The new tool [simulationTool](https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/simulationTool/) enables wind and noise simulations. Further details: [simulationTool documentation](https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/simulationTool/doc/config.json.md)
 
 ### Changed
+- Refactored Icon Buttons after structure change.
 
 ### Deprecated
 
