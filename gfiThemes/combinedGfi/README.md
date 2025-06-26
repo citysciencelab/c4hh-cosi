@@ -28,7 +28,7 @@ Each layer in the `layersToRequest` array can have the following properties:
 
 - `layerId`: The ID of the layer to request.
 - `attributes`: An array of attributes to display. Each attribute can be a string or an object with `name` and `alias` properties.
-- `wfsQueryBufferSize`: (Optional) The buffer size to use for WFS queries. Default is 0.0001 (in map units). Use a smaller value to get fewer features in the result.
+- `wfsQueryBufferSize`: (Optional) The buffer size to use for WFS queries. Default is 0.0001 (in map units). Map units are the units used by the map’s coordinate reference system (CRS)—for example, degrees in EPSG:4326 or meters in EPSG:3857. [Learn more about map units, display units, and location units](https://pro.arcgis.com/en/pro-app/latest/help/mapping/navigation/map-units-location-units-and-display-units.htm)
 - `geometryProvider`: (Optional) Configuration for using this layer as a geometry provider for other layers.
 
 Example:
