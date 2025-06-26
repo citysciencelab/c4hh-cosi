@@ -6,7 +6,7 @@ import AccordionItem from "../../../../src/shared/modules/accordion/components/A
 import {isUrl} from "../../../../src/shared/js/utils/urlHelper";
 import ElevatedButton from "../../../../src/shared/modules/buttons/components/ElevatedButton.vue";
 import PaginationControl from "../../../../src/shared/modules/pagination/components/PaginationControl.vue";
-import AttributeTable from "./AttributeTable.vue";
+import DefaultTheme from "../../../../src/modules/getFeatureInfo/themes/default/components/DefaultTheme.vue";
 import AdditionalRequestsAccordion from "./AdditionalRequestsAccordion.vue";
 import PrintAccordion from "./PrintAccordion.vue";
 import ExportAccordion from "./ExportAccordion.vue";
@@ -18,7 +18,7 @@ export default {
         SpinnerItem,
         ElevatedButton,
         PaginationControl,
-        AttributeTable,
+        DefaultTheme,
         AdditionalRequestsAccordion,
         PrintAccordion,
         ExportAccordion,
@@ -304,6 +304,41 @@ export default {
             finally {
                 this.isBufferLoading = false;
             }
+        },
+        /**
+         * Creates a feature-like object compatible with DefaultTheme from raw data.
+         * This adapts the data structure to match what DefaultTheme expects.
+         *
+         * @param {Object} data - The raw feature data.
+         * @param {Object} layerConfig - The layer configuration.
+         * @returns {Object} A feature-like object with getMappedProperties method.
+         */
+        createFeatureForDefaultTheme (data, layerConfig) {
+            const filteredData = {};
+
+            // Filter out empty values if configured to do so
+            Object.entries(data).forEach(([key, value]) => {
+                if (!layerConfig?.hideEmptyAttributeValues || (value !== null && value !== undefined && value !== "")) {
+                    filteredData[key] = value;
+                }
+            });
+
+            return {
+                getMappedProperties: () => filteredData,
+                getTheme: () => ({
+                    params: {
+                        beautifyKeys: true,
+                        showObjectKeys: false,
+                        showFavoriteIcons: false
+                    }
+                }),
+                getMimeType: () => null,
+                // Additional methods required by child components like CompareFeatureIcon
+                getId: () => `combined-gfi-${Math.random().toString(36).substr(2, 9)}`,
+                getLayerId: () => layerConfig?.layerId || "unknown",
+                getTitle: () => layerConfig?.name || "Feature",
+                getAttributesToShow: () => Object.keys(filteredData)
+            };
         }
     }
 };
@@ -356,9 +391,8 @@ export default {
                         </div>
                         <!-- Direct display when only one feature exists -->
                         <div v-if="layerResult.rows.length === 1">
-                            <AttributeTable
-                                :data="layerResult.rows[0]"
-                                :layer-config="getLayerConfig(layerResult.layerId)"
+                            <DefaultTheme
+                                :feature="createFeatureForDefaultTheme(layerResult.rows[0], getLayerConfig(layerResult.layerId))"
                             />
                         </div>
                         <!-- Accordion for multiple features -->
@@ -375,9 +409,8 @@ export default {
                                 :coloured-header="true"
                                 font-size="font-size-base"
                             >
-                                <AttributeTable
-                                    :data="row"
-                                    :layer-config="getLayerConfig(layerResult.layerId)"
+                                <DefaultTheme
+                                    :feature="createFeatureForDefaultTheme(row, getLayerConfig(layerResult.layerId))"
                                 />
                             </AccordionItem>
                         </div>
