@@ -227,7 +227,7 @@ Here's a simplified example of a print request structure:
   "layout": "A4 Hochformat",
   "outputFormat": "pdf",
   "attributes": {
-    "title": "FlÃ¤chenbericht",
+            "title": "Flächenbericht",
     "map": {
       "center": [561210, 5932600],
       "dpi": 72,
@@ -257,7 +257,7 @@ Here's a simplified example of a print request structure:
         {
           "layerName": "WFS_HH_ALKIS_vereinfacht",
           "values": [
-            { "key": "StraÃŸenname", "value": "MusterstraÃŸe 123" },
+            { "key": "Straßenname", "value": "Musterstraße 123" },
             { "key": "Gemarkung", "value": "Hamburg-Altstadt" },
             { "key": "Flurstücksnummer", "value": "12345" }
           ]
@@ -311,7 +311,7 @@ export function preparePrintRequest(olFeature, layerResults, alternativePolygonF
     layout: baseConfig.layout || "A4 Hochformat",
     outputFormat: "pdf",
     attributes: {
-      title: "FlÃ¤chenbericht",
+      title: "Flächenbericht",
       map: {
         center: calculateMapCenter(geometry),
         dpi: 150,
@@ -490,7 +490,7 @@ Das Addon wird über die `config.json` konfiguriert. Hier ein Beispiel für die 
           "attributes": [
             {
               "name": "lagebeztxt",
-              "alias": "StraÃŸenname(n) und Hausnummer(n)"
+              "alias": "Straßenname(n) und Hausnummer(n)"
             }
           ]
         }
@@ -534,7 +534,7 @@ Jedes Attribut in der `attributes`-Liste hat folgende Parameter:
 | `name` | String | Name des Attributs im Feature |
 | `alias` | String | Anzeigename des Attributs |
 
-### Beispiel für eine vollstÃ¤ndige Layer-Konfiguration
+### Beispiel für eine vollständige Layer-Konfiguration
 
 ```json
 {
@@ -558,26 +558,26 @@ Jedes Attribut in der `attributes`-Liste hat folgende Parameter:
 
 ### Puffer-Funktion
 
-Die Puffer-Funktion ermÃ¶glicht es, einen Puffer um die ausgewÃ¤hlte Geometrie zu erstellen. Die Puffer-Distanzen kÃ¶nnen in der Konfiguration angepasst werden.
+Die Puffer-Funktion ermöglicht es, einen Puffer um die ausgewählte Geometrie zu erstellen. Die Puffer-Distanzen können in der Konfiguration angepasst werden.
 
 ### Print-Funktion
 
-Das Addon unterstützt das Drucken der Feature-Informationen. Dafür werden folgende Dateien benÃ¶tigt:
-- `printUtils.js`: EnthÃ¤lt die Logik für die Print-Request-Erstellung
-- `combinedGfiPrintConfig.json`: EnthÃ¤lt die Print-Konfiguration
+Das Addon unterstützt das Drucken der Feature-Informationen. Dafür werden folgende Dateien benötigt:
+- `printUtils.js`: Enthält die Logik für die Print-Request-Erstellung
+- `combinedGfiPrintConfig.json`: Enthält die Print-Konfiguration
 
 ### Attribut-Anzeige
 
-- Leere Attributwerte kÃ¶nnen ausgeblendet werden (`hideEmptyAttributeValues: true`)
+- Leere Attributwerte können ausgeblendet werden (`hideEmptyAttributeValues: true`)
 - URLs werden automatisch als klickbare Links dargestellt
-- Attribute kÃ¶nnen mit benutzerfreundlichen Alias-Namen angezeigt werden
+- Attribute können mit benutzerfreundlichen Alias-Namen angezeigt werden
 
 ## Best Practices
 
 1. **Attribut-Gruppierung**: Gruppieren Sie verwandte Attribute logisch zusammen
-2. **Leere Werte**: Nutzen Sie `hideEmptyAttributeValues` für bessere Ãœbersichtlichkeit
+2. **Leere Werte**: Nutzen Sie `hideEmptyAttributeValues` für bessere Übersichtlichkeit
 3. **Print-Konfiguration**: Stellen Sie sicher, dass die Print-Pfade korrekt konfiguriert sind
-4. **Layer-Namen**: Verwenden Sie aussagekrÃ¤ftige Namen für die Layer
+4. **Layer-Namen**: Verwenden Sie aussagekräftige Namen für die Layer
 
 ## Fehlerbehandlung
 
