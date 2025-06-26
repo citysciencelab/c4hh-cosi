@@ -23,6 +23,12 @@
         "standardExport": "Export Data",
         "printSection": "Area Report",
         "printDescription": "Create a detailed report for the selected geometry.",
+        "noExportFormatSelected": "No export format selected",
+        "unknownLayer": "Unknown Layer",
+        "defaultFileName": "Export-File",
+        "exportAsDoc": "Export as DOC",
+        "exportAsPdf": "Export as PDF",
+        "noData": "No data",
         "errors": {
           "ogcApiProcessError": "Error executing OGC API process. Please try again.",
           "gfiRequestError": "Error during data query. Please try again.",
@@ -31,7 +37,8 @@
           "oafQueryError": "Error during OAF query. Please try again.",
           "noValidCoordinates": "No valid coordinates available for query.",
           "layerNotFound": "Layer not found.",
-          "fetchError": "Error loading data."
+          "fetchError": "Error loading data.",
+          "unsupportedRequestType": "Unsupported request type"
         }
       }
   }

@@ -9,7 +9,7 @@
  * @param {String} options.fileName - The file name
  * @param {Function} options.setIsLoading - Callback function to set the loading state
  */
-export function exportToCSV ({layerResults, fileName, setIsLoading}) {
+export function exportToCSV ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
     let csvContent = "\uFEFF";
 
@@ -62,7 +62,7 @@ export function exportToCSV ({layerResults, fileName, setIsLoading}) {
         url = URL.createObjectURL(blob);
 
     link.setAttribute("href", url);
-    link.setAttribute("download", `${fileName || "Export-Datei"}.csv`);
+    link.setAttribute("download", `${fileName || translations?.defaultFileName || "Export-File"}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -76,13 +76,13 @@ export function exportToCSV ({layerResults, fileName, setIsLoading}) {
  * @param {String} options.fileName - The file name
  * @param {Function} options.setIsLoading - Callback function to set the loading state
  */
-export function exportToDOC ({layerResults, fileName, setIsLoading}) {
+export function exportToDOC ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
     let htmlContent = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
           <head>
               <meta charset="utf-8">
-              <title>${fileName || "Export als DOC"}</title>
+              <title>${fileName || translations?.exportAsDoc || "Export as DOC"}</title>
               <style>
                   @page {
                       size: A4;
@@ -202,7 +202,7 @@ export function exportToDOC ({layerResults, fileName, setIsLoading}) {
                             .replace(/</g, "&lt;")
                             .replace(/>/g, "&gt;")
                             .replace(/\n/g, "<br>")
-                        : "<span class=\"empty-value\">Keine Angabe</span>";
+                        : `<span class="empty-value">${translations?.noData || "No data"}</span>`;
 
                     htmlContent += `
                         <tr>
@@ -233,7 +233,7 @@ export function exportToDOC ({layerResults, fileName, setIsLoading}) {
         link = document.createElement("a");
 
     link.href = URL.createObjectURL(blob);
-    link.download = `${fileName || "Export-Datei"}.doc`;
+    link.download = `${fileName || translations?.defaultFileName || "Export-File"}.doc`;
 
     document.body.appendChild(link);
     link.click();
@@ -249,13 +249,13 @@ export function exportToDOC ({layerResults, fileName, setIsLoading}) {
  * @param {String} options.fileName - The file name
  * @param {Function} options.setIsLoading - Callback function to set the loading state
  */
-export function exportToPDF ({layerResults, fileName, setIsLoading}) {
+export function exportToPDF ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
     const printWindow = window.open("", "PRINT", "height=600,width=800");
     let htmlContent = `
       <html>
           <head>
-              <title>${fileName || "Export als PDF"}</title>
+              <title>${fileName || translations?.exportAsPdf || "Export as PDF"}</title>
               <style>
                   @page {
                       size: landscape;
@@ -380,7 +380,7 @@ export function exportToPDF ({layerResults, fileName, setIsLoading}) {
  * @param {String} options.fileName - The file name
  * @param {Function} options.setIsLoading - Callback function to set the loading state
  */
-export function exportToJSON ({layerResults, fileName, setIsLoading}) {
+export function exportToJSON ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
     const jsonData = layerResults.map(layer => {
             return {
@@ -425,7 +425,7 @@ export function exportToJSON ({layerResults, fileName, setIsLoading}) {
         url = URL.createObjectURL(blob);
 
     link.setAttribute("href", url);
-    link.setAttribute("download", `${fileName || "Export-Datei"}.json`);
+    link.setAttribute("download", `${fileName || translations?.defaultFileName || "Export-File"}.json`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -260,7 +260,7 @@ export default {
                 }
             }
 
-            return layerResult.layerName || "Unknown Layer";
+            return layerResult.layerName || this.translate("additional:modules.combinedGfi.unknownLayer");
         },
         /**
          * Exports the current layer results using the selected export format.
@@ -272,7 +272,7 @@ export default {
             const exportFormat = this.currentFormat;
 
             if (!exportFormat) {
-                console.error("Kein Export-Format ausgewählt");
+                console.error(this.translate("additional:modules.combinedGfi.noExportFormatSelected"));
                 return;
             }
 

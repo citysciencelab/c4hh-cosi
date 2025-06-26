@@ -854,28 +854,43 @@ const actions = {
                 exportToCSV({
                     layerResults: state.layerResults,
                     fileName: state.fileName,
-                    setIsLoading
+                    setIsLoading,
+                    translations: {
+                        defaultFileName: i18next.t("additional:modules.combinedGfi.defaultFileName")
+                    }
                 });
                 break;
             case "PDF":
                 exportToPDF({
                     layerResults: state.layerResults,
                     fileName: state.fileName,
-                    setIsLoading
+                    setIsLoading,
+                    translations: {
+                        defaultFileName: i18next.t("additional:modules.combinedGfi.defaultFileName"),
+                        exportAsPdf: i18next.t("additional:modules.combinedGfi.exportAsPdf")
+                    }
                 });
                 break;
             case "DOC":
                 exportToDOC({
                     layerResults: state.layerResults,
                     fileName: state.fileName,
-                    setIsLoading
+                    setIsLoading,
+                    translations: {
+                        defaultFileName: i18next.t("additional:modules.combinedGfi.defaultFileName"),
+                        exportAsDoc: i18next.t("additional:modules.combinedGfi.exportAsDoc"),
+                        noData: i18next.t("additional:modules.combinedGfi.noData")
+                    }
                 });
                 break;
             case "JSON":
                 exportToJSON({
                     layerResults: state.layerResults,
                     fileName: state.fileName,
-                    setIsLoading
+                    setIsLoading,
+                    translations: {
+                        defaultFileName: i18next.t("additional:modules.combinedGfi.defaultFileName")
+                    }
                 });
                 break;
             default:

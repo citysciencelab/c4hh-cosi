@@ -23,6 +23,12 @@
         "standardExport": "Daten exportieren",
         "printSection": "Flächenbericht",
         "printDescription": "Erstellen Sie einen Flächenbericht für die ausgewählte Geometrie.",
+        "noExportFormatSelected": "Kein Export-Format ausgewählt",
+        "unknownLayer": "Unbekannter Layer",
+        "defaultFileName": "Export-Datei",
+        "exportAsDoc": "Export als DOC",
+        "exportAsPdf": "Export als PDF",
+        "noData": "Keine Angabe",
         "errors": {
           "ogcApiProcessError": "Fehler beim Ausführen des OGC API-Prozesses. Bitte versuchen Sie es erneut.",
           "gfiRequestError": "Fehler bei der Datenabfrage. Bitte versuchen Sie es erneut.",
@@ -31,7 +37,8 @@
           "oafQueryError": "Fehler bei der OAF-Abfrage. Bitte versuchen Sie es erneut.",
           "noValidCoordinates": "Keine gültigen Koordinaten für die Abfrage verfügbar.",
           "layerNotFound": "Layer nicht gefunden.",
-          "fetchError": "Fehler beim Laden der Daten."
+          "fetchError": "Fehler beim Laden der Daten.",
+          "unsupportedRequestType": "Nicht unterstützter Anfragetyp"
         }
       }
   }
