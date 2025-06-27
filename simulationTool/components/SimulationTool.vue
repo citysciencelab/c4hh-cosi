@@ -19,7 +19,7 @@ import SideMenu from "./SideMenu.vue";
 import SimulationList from "./Simulation/SimulationList.vue";
 import SimulationParameter from "./Simulation/SimulationParameter.vue";
 import simulationResults from "./Simulation/SimulationResults.vue";
-import SimulationMockData from "./Simulation/SimulationMockData.vue";
+
 import TutorialPanel from "./HelpSection/TutorialPanel.vue";
 
 const MIN_WIDTH_PERCENT = 40;
@@ -42,7 +42,6 @@ export default {
         SimulationList,
         SimulationParameter,
         simulationResults,
-        SimulationMockData,
         TutorialPanel
     },
     computed: {
@@ -123,9 +122,6 @@ export default {
             />
             <simulationResults
                 v-if="mode === 'simulationResults'"
-            />
-            <SimulationMockData
-                v-if="mode === 'mockData'"
             />
             <ProcessList
                 v-if="mode === 'process-list'"
