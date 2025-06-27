@@ -127,9 +127,6 @@ export default {
             <simulationResults
                 v-if="mode === 'simulationResults'"
             />
-            <SimulationMockData
-                v-if="mode === 'mockData'"
-            />
             <ProcessList
                 v-if="mode === 'process-list'"
                 @selected="selectProcess"
