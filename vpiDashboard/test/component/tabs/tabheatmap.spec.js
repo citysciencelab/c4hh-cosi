@@ -1,4 +1,4 @@
-import TabHeatmap from "../../../components/Tabs/TabHeatmap.vue";
+import TabHeatmap from "../../../components/Tabs/TabHeatMap.vue";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Vuex from "vuex";
