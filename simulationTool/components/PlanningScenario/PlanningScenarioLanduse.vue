@@ -238,6 +238,7 @@ export default {
         if (this.currentPlanningComponent !== "newLanduse") {
             this.clearFeatures();
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+            layerCollection.getLayerById("buildings-and-roads-features")?.getLayerSource().clear();
             this.removeInteraction(this.planningScenarioSelectInteraction);
         }
     },
@@ -277,6 +278,7 @@ export default {
 
             this.setPlanningScenarios(filteredScenarios);
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+            layerCollection.getLayerById("buildings-and-roads-features")?.getLayerSource().clear();
             this.removeInteraction(this.planningScenarioSelectInteraction);
             this.clearFeatures();
             this.setCurrentPlanningComponent("create");
@@ -374,6 +376,7 @@ export default {
          * @returns {void}
          */
         parseAndAddFeatures (features) {
+            // layerCollection.getLayerById("buildings-and-roads-features")?.getLayerSource().clear();
             const olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
 
             if (this.isShowToggleChecked) {
@@ -484,7 +487,7 @@ export default {
             }
         },
 
-        /*
+        /**
          * Toggles the visibility of the planning scenario layer.
          * @param {Event} event - The event object.
          * @returns {void}

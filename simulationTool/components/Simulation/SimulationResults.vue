@@ -258,6 +258,9 @@ export default {
             });
         }
         Object.values(this.outputSelectInteraction).forEach(interactionsOnLayer => Object.values(interactionsOnLayer).forEach(interaction => this.removeInteraction(interaction)));
+        if (layerCollection.getLayerById("buildings-and-roads-features")) {
+            layerCollection.getLayerById("buildings-and-roads-features").getLayerSource().clear();
+        }
     },
     methods: {
         ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),

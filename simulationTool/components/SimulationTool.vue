@@ -59,6 +59,9 @@ export default {
         if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
         }
+        if (typeof layerCollection.getLayerById("buildings-and-roads-features") !== "undefined") {
+            layerCollection.getLayerById("buildings-and-roads-features").getLayerSource().clear();
+        }
     },
     /**
      * Put initialize here if mounting occurs after config parsing

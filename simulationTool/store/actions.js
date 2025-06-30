@@ -3,6 +3,7 @@ import isObject from "../../../src/shared/js/utils/isObject";
 import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEventCoordinates";
 import layerCollection from "../../../src/core/layers/js/layerCollection";
 import ConvertStyle from "../js/convertStyle";
+import layerFactory from "../../../src/core/layers/js/layerFactory";
 
 export default {
     /**
@@ -303,15 +304,41 @@ export default {
     updateFeatures ({getters}) {
         const currentPlanningScenario = getters.planningScenarios.find(scenario => scenario.id === getters.currentPlanningScenarioId),
             geoJsonParser = new GeoJSON(),
-            layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource();
+            layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource(),
+            layerIdForScenarioFeatures = "buildings-and-roads-features";
+
+        let layerSourceForObjects = null;
+
+        if (!layerCollection.getLayerById(layerIdForScenarioFeatures)) {
+            const layer = layerFactory.createLayer({
+                typ: "VECTORBASE",
+                id: layerIdForScenarioFeatures,
+                name: layerIdForScenarioFeatures,
+                alwaysOnTop: true
+            });
+
+            layerCollection.addLayer(layer);
+        }
+        layerSourceForObjects = layerCollection.getLayerById(layerIdForScenarioFeatures).getLayerSource();
 
         layerSource.clear();
+        layerSourceForObjects.clear(true);
 
         currentPlanningScenario.scenarioFeature.features.forEach(feat => {
             const olFeature = geoJsonParser.readFeature(feat);
 
             olFeature.setStyle(ConvertStyle.geoJsonToOpenlayers(feat.style));
             layerSource.addFeature(olFeature);
+        });
+        currentPlanningScenario.inputs.buildings.features.forEach(building => {
+            const olFeature = geoJsonParser.readFeature(building);
+
+            layerSourceForObjects.addFeature(olFeature);
+        });
+        currentPlanningScenario.inputs.roads.features.forEach(road => {
+            const olFeature = geoJsonParser.readFeature(road);
+
+            layerSourceForObjects.addFeature(olFeature);
         });
     },
 
