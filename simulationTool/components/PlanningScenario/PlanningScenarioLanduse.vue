@@ -462,7 +462,8 @@ export default {
                     return layer.get("id") === this.featureLayerId;
                 },
                 style: ConvertStyle.geoJsonToOpenlayers(this.planningScenarioHighlightFeatureStyle),
-                addCondition: singleClick
+                addCondition: singleClick,
+                hitTolerance: 5
             }));
 
             if (typeof this.planningScenarioSelectInteraction !== "undefined") {
