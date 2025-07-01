@@ -63,7 +63,6 @@ export default {
         ...mapGetters("Modules/SimulationTool", {
             highlightStyle: "planningScenarioHighlightFeatureStyle"
         }),
-
         /**
          * Determines if the `propertiesMapping` object contains more than two properties.
          * @returns {boolean} `true` if the number of keys in `propertiesMapping` exceeds 2, otherwise `false`.
@@ -210,6 +209,18 @@ export default {
             else {
                 this.$emit("setFeatureStyle", feature);
             }
+        },
+        /**
+         * Checks if a feature has any properties that are undefined.
+         * @param {Object} feature
+         */
+        hasUndefinedProperty (feature) {
+            if (!feature || !this.propertiesMapping) {
+                return false;
+            }
+            return Object.keys(this.propertiesMapping).some(
+                key => feature.get(key) === undefined
+            );
         }
     }
 };
@@ -256,6 +267,11 @@ export default {
                     v-if="hasMultipleProperties"
                     :class="typeof getShownProperties(feature, shownProperties) === 'undefined' ? 'flex-grow-1' : ''"
                 >
+                    <i
+                        v-if="hasUndefinedProperty(feature)"
+                        class="bi-exclamation-triangle-fill text-warning"
+                        role="img"
+                    />
                     <button
                         type="button"
                         class="btn btn-link"
