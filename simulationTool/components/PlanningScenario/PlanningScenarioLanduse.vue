@@ -477,6 +477,15 @@ export default {
 
                     this.highlightFeatureId = currentFeature.getId();
 
+                    this.$nextTick(() => {
+                        const el = document.getElementById(this.highlightFeatureId);
+
+                        if (el) {
+                            el.focus();
+                            el.scrollIntoView({behavior: "smooth", block: "center"});
+                        }
+                    });
+
                     if (currentFeature.get("created")) {
                         this.setLanduseActiveTab("created");
                     }
