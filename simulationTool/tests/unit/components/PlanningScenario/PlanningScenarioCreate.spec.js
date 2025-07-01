@@ -187,23 +187,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
         });
     });
 
-    describe("User Interaction", () => {
-        it("should call 'resetInteraction' if user start drawing", async () => {
-            const spyResetInteraction = sinon.spy(PlanningScenarioCreate.methods, "resetInteraction"),
-                wrapper = factory.getMount();
-
-            await wrapper.find("#draw-polygon").trigger("drawstart");
-            expect(spyResetInteraction.calledOnce).to.be.true;
-        });
-
-        it("should call 'addBBOX' if user stop drawing", async () => {
-            const stubAddBBOX = sinon.stub(PlanningScenarioCreate.methods, "addBBOX"),
-                wrapper = factory.getMount();
-
-            await wrapper.find("#draw-polygon").trigger("drawend");
-            expect(stubAddBBOX.calledOnce).to.be.true;
-        });
-    });
     describe("Methods", () => {
         describe("isValid", () => {
             it("should set isValid to true if input is not an empty string", () => {

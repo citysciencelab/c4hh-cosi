@@ -352,7 +352,7 @@ export default {
                     class="row"
                 >
                     <div
-                        class="col col-3"
+                        class="col col-3 d-flex"
                     >
                         <DrawTypes
                             :current-layout="planningScenarioCurrentLayout"
