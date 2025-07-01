@@ -376,7 +376,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
+
 
 /* Fixed header layout (when stickyHeader is true) */
 .gfi-detached-container {

@@ -3,7 +3,7 @@ import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import removeHtmlTags from "@shared/js/utils/removeHtmlTags.js";
 
-import actionsLayerConfig from "./actionsLayerConfig.js";
+import getActionsLayerConfig from "./actionsLayerConfig.js";
 import {fetchFirstModuleConfig} from "@shared/js/utils/fetchFirstModuleConfig.js";
 import {portalConfigKey, treeTopicConfigKey} from "@shared/js/utils/constants.js";
 import {updateProxyUrl} from "./js/getProxyUrl.js";
@@ -15,7 +15,7 @@ import globalUrlParams from "@core/urlParams/js/globalUrlParams.js";
  * @module app-store/actions
  */
 export default {
-    ...actionsLayerConfig,
+    ...getActionsLayerConfig(),
 
     /**
      * Check/adapt for proxy configs and commit the loaded config.js to the state.
