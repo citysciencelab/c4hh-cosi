@@ -3,8 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2025-07-02 v3.12.0
 
 ### Added
 - Added 'BIMFabrikHH' to version 3.x
@@ -13,12 +12,6 @@
 
 ### Changed
 - Refactored Icon Buttons after structure change.
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ---
 
