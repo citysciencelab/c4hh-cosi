@@ -33,7 +33,7 @@ const state = {
     alternativePolygonFeature: null,
     bufferDistances: [500, 1000, 1500],
     showBuffer: false,
-    fileName: "Export-Datei",
+    fileName: "additional:modules.combinedGfi.defaultFileName",
     columns: [],
     rows: [],
     gfiResults: [],
