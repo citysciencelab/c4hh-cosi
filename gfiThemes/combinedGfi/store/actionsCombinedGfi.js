@@ -93,7 +93,7 @@ const actions = {
                 ? getCoordinateFromGeometry(geometry)
                 : clickCoordinates,
             filteredLayers = state.layersToRequest
-                .map(layerConfig => rawLayerList.getLayerWhere({id: layerConfig.layerId}))
+                .map(layerConfig => rawLayerList.getLayerWhere({id: layerConfig.id}))
                 .filter(layer => layer);
 
         if (!coordinate) {
@@ -143,7 +143,7 @@ const actions = {
 
         const filteredLayers = state.layersToRequest
             .map(layerConfig => {
-                const layer = rawLayerList.getLayerWhere({id: layerConfig.layerId});
+                const layer = rawLayerList.getLayerWhere({id: layerConfig.id});
 
                 return layer;
             })
@@ -195,7 +195,7 @@ const actions = {
      */
     async handleAlternativeGeometry ({commit, dispatch, state}, {clickCoordinates}) {
         const geometryProviderLayerFromConfig = state.layersToRequest.find(layer => layer.geometryProvider),
-            geometryProviderLayerId = geometryProviderLayerFromConfig.layerId,
+            geometryProviderLayerId = geometryProviderLayerFromConfig.id,
             geometryProviderAttribute = geometryProviderLayerFromConfig.geometryProvider.geometryAttribute,
             geometryProvider = rawLayerList.getLayerWhere({id: geometryProviderLayerId}),
             resolution = mapCollection.getMapView("2D").getResolution(),
@@ -320,9 +320,9 @@ const actions = {
      */
     async fetchDataForLayer ({dispatch, state, rootGetters}, {layer, coordinate, geometry, resolution}) {
         const layerConfig = state.layersToRequest.find(
-                config => config.layerId === layer.id
+                config => config.id === layer.id
             ),
-            attributes = layerConfig?.attributes || [],
+            attributes = layerConfig?.gfiAttributes || [],
             geometryProvider = layerConfig?.geometryProvider,
             layerWithConfig = {
                 ...layer,
@@ -647,10 +647,10 @@ const actions = {
                 state.layersToRequest.map(async (layerConfig, index) => {
                     const result = normalizedResults[index],
                         features = Array.isArray(result) ? result : [result],
-                        rawLayer = rawLayerList.getLayerWhere({id: layerConfig.layerId}),
+                        rawLayer = rawLayerList.getLayerWhere({id: layerConfig.id}),
                         layerName = rawLayer?.name || `Layer ${index + 1}`,
-                        headers = extractColumnsFromResults(features, layerConfig.attributes),
-                        rows = extractRowsFromResults(features, layerConfig.attributes);
+                        headers = extractColumnsFromResults(features, layerConfig.gfiAttributes),
+                        rows = extractRowsFromResults(features, layerConfig.gfiAttributes);
 
                     if (!result || typeof result !== "object") {
                         return null;
@@ -659,7 +659,7 @@ const actions = {
                         return null;
                     }
                     return {
-                        layerId: layerConfig.layerId,
+                        layerId: layerConfig.id,
                         layerName,
                         headers,
                         rows,
@@ -695,7 +695,7 @@ const actions = {
      * @returns {Promise<void>} A promise that resolves when the layer is processed.
      */
     async processLayerForBufferedQuery ({dispatch}, {layerConfig, geometry, bufferedResults}) {
-        const layer = rawLayerList.getLayerWhere({id: layerConfig.layerId}),
+        const layer = rawLayerList.getLayerWhere({id: layerConfig.id}),
             resolution = mapCollection.getMapView("2D").getResolution();
 
         if (!layer) {
@@ -707,7 +707,7 @@ const actions = {
             const results = await dispatch("fetchWfsData", {
                 layer,
                 geometry,
-                attributes: layerConfig.attributes || []
+                attributes: layerConfig.gfiAttributes || []
             });
 
             if (results && results.length > 0) {
@@ -718,7 +718,7 @@ const actions = {
             const results = await dispatch("fetchOafData", {
                 layer,
                 geometry,
-                attributes: layerConfig.attributes || []
+                attributes: layerConfig.gfiAttributes || []
             });
 
             if (results && results.length > 0) {
@@ -742,7 +742,7 @@ const actions = {
                     layer,
                     coordinate,
                     resolution,
-                    attributes: layerConfig.attributes || []
+                    attributes: layerConfig.gfiAttributes || []
                 });
 
                 processPointResults(pointResults, allResults);
@@ -782,7 +782,7 @@ const actions = {
                     });
                 }
                 catch (error) {
-                    console.error(`Error querying features for layer ${layerConfig.layerId}:`, error);
+                    console.error(`Error querying features for layer ${layerConfig.id}:`, error);
                 }
             }
 

@@ -24,9 +24,9 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
         dispatch = sinon.stub();
         state = {
             layersToRequest: [
-                {layerId: "layer1", name: "Custom Layer 1", attributes: ["attr1", "attr2"]},
-                {layerId: "layer2", name: "Custom Layer 2", attributes: ["attr3", {name: "attr4", alias: "Attribute 4"}]},
-                {layerId: "oaf_layer", name: "OAF Layer", attributes: ["prop1", "prop2"]}
+                {id: "layer1", name: "Custom Layer 1", gfiAttributes: ["attr1", "attr2"]},
+                {id: "layer2", name: "Custom Layer 2", gfiAttributes: ["attr3", {name: "attr4", alias: "Attribute 4"}]},
+                {id: "oaf_layer", name: "OAF Layer", gfiAttributes: ["prop1", "prop2"]}
             ],
             additionalRequests: [{url: "https://example.com/api"}],
             alternativeGeometry: false,
@@ -148,7 +148,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
         const feature = {
             getTheme: () => ({
                 params: {
-                    layersToRequest: [{layerId: "layer1"}],
+                    layersToRequest: [{id: "layer1"}],
                     additionalRequests: [],
                     showBuffer: true,
                     bufferDistances: [100, 500],
@@ -166,7 +166,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
 
         await actions.initCombinedGfi({dispatch, commit}, {feature, clickCoordinates: [1, 2]});
 
-        expect(commit.calledWith("setLayersToRequest", [{layerId: "layer1"}])).to.be.true;
+        expect(commit.calledWith("setLayersToRequest", [{id: "layer1"}])).to.be.true;
         expect(commit.calledWith("setAdditionalRequests", [])).to.be.true;
         expect(commit.calledWith("setShowBuffer", true)).to.be.true;
         expect(commit.calledWith("setBufferDistances", [100, 500])).to.be.true;

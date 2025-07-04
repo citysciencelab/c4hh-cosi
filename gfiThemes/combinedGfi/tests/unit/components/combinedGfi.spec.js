@@ -74,8 +74,8 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
                                 isLoading: () => false,
                                 initialized: () => true,
                                 layersToRequest: () => [
-                                    {layerId: "123", name: "Custom Layer Name"},
-                                    {layerId: "456"}
+                                    {id: "123", name: "Custom Layer Name"},
+                                    {id: "456"}
                                 ],
                                 layerResults: () => [
                                     {layerId: "123", layerName: "Original Layer Name", rows: []},

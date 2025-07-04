@@ -254,7 +254,7 @@ export default {
 
             if (layerResult.layerId) {
                 const configLayer = this.layersToRequest.find(
-                    layer => String(layer.layerId) === String(layerResult.layerId)
+                    layer => String(layer.id) === String(layerResult.layerId)
                 );
 
                 if (configLayer && configLayer.name) {
@@ -287,7 +287,7 @@ export default {
          * @returns {Object|undefined} The layer configuration object or undefined if not found.
          */
         getLayerConfig (layerId) {
-            return this.layersToRequest.find(layer => layer.layerId === layerId);
+            return this.layersToRequest.find(layer => layer.id === layerId);
         },
         /**
          * Wrapper for queryBufferedFeatures that manages buffer loading state.
@@ -334,7 +334,7 @@ export default {
                 }),
                 getMimeType: () => null,
                 getId: () => `combined-gfi-${Math.random().toString(36).substr(2, 9)}`,
-                getLayerId: () => layerConfig?.layerId || "unknown",
+                getLayerId: () => layerConfig?.id || "unknown",
                 getTitle: () => layerConfig?.name || "Feature",
                 getAttributesToShow: () => Object.keys(filteredData)
             };

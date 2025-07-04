@@ -40,8 +40,8 @@ Here's a complete example using the recommended nested format:
       "printServerUrl": "https://example.com/mapfish/print/report/buildreport.pdf",
       "layersToRequest": [
         {
-          "layerId": "naturschutzgebiete",
-          "attributes": [
+          "id": "naturschutzgebiete",
+          "gfiAttributes": [
             {"name": "gebietsname", "alias": "Gebietsname"},
             {"name": "schutzstatus", "alias": "Schutzstatus"},
             "flaeche_ha"
@@ -49,8 +49,8 @@ Here's a complete example using the recommended nested format:
           "wfsQueryBufferSize": 0.00005
         },
         {
-          "layerId": "landschaftsschutzgebiete",
-          "attributes": ["name", "typ", "groesse"]
+          "id": "landschaftsschutzgebiete",
+          "gfiAttributes": ["name", "typ", "groesse"]
         }
       ],
       "additionalRequests": [
@@ -71,8 +71,8 @@ Here's a complete example using the recommended nested format:
 
 Each layer in the `layersToRequest` array can have the following properties:
 
-- `layerId`: The ID of the layer to request.
-- `attributes`: An array of attributes to display. Each attribute can be a string or an object with `name` and `alias` properties.
+- `id`: The ID of the layer to request.
+- `gfiAttributes`: An array of attributes to display. Each attribute can be a string or an object with `name` and `alias` properties.
 - `wfsQueryBufferSize`: (Optional) The buffer size to use for WFS queries. Default is 0.0001 (in map units). Map units are the units used by the map’s coordinate reference system (CRS)—for example, degrees in EPSG:4326 or meters in EPSG:3857. [Learn more about map units, display units, and location units](https://pro.arcgis.com/en/pro-app/latest/help/mapping/navigation/map-units-location-units-and-display-units.htm)
 - `geometryProvider`: (Optional) Configuration for using this layer as a geometry provider for other layers.
 
@@ -82,21 +82,21 @@ Example:
 {
   "layersToRequest": [
     {
-      "layerId": "layer1",
-      "attributes": ["attr1", "attr2"],
+      "id": "layer1",
+      "gfiAttributes": ["attr1", "attr2"],
       "wfsQueryBufferSize": 0.00005
     },
     {
-      "layerId": "layer2",
-      "attributes": [
+      "id": "layer2",
+      "gfiAttributes": [
         {"name": "attr3", "alias": "Attribute 3"},
         "attr4"
       ],
       "wfsQueryBufferSize": 0.0001
     },
     {
-      "layerId": "geometryLayer",
-      "attributes": ["geom_attr"],
+      "id": "geometryLayer",
+      "gfiAttributes": ["geom_attr"],
       "geometryProvider": {
         "geometryAttribute": "geom_attr"
       }
@@ -191,7 +191,7 @@ Aliases allow you to display user-friendly attribute names instead of technical 
 
 ```json
 {
-  "attributes": [
+  "gfiAttributes": [
     {"name": "gebietsname", "alias": "Gebietsname"},
     {"name": "schutzstatus", "alias": "Schutzstatus"}
   ]
@@ -204,7 +204,7 @@ You can also use translation keys as aliases. The addon will automatically trans
 
 ```json
 {
-  "attributes": [
+  "gfiAttributes": [
     {"name": "gebietsname", "alias": "additional:modules.combinedGfi.attributes.gebietsname"},
     {"name": "schutzstatus", "alias": "additional:modules.combinedGfi.attributes.schutzstatus"}
   ]
@@ -548,7 +548,7 @@ Das Addon wird über die `config.json` konfiguriert. Hier ein Beispiel für die 
       "bufferDistances": [100, 500, 1000],
       "layersToRequest": [
         {
-          "layerId": "6076",
+          "id": "6076",
           "name": "Flurstück",
           "hideEmptyAttributeValues": true,
           "geometryProvider": {
@@ -556,7 +556,7 @@ Das Addon wird über die `config.json` konfiguriert. Hier ein Beispiel für die 
           },
           "geometryAttribute": "geometrie",
           "featureType": "ave:Flurstueck",
-          "attributes": [
+          "gfiAttributes": [
             {
               "name": "lagebeztxt",
               "alias": "Straßenname(n) und Hausnummer(n)"
@@ -586,13 +586,13 @@ Jeder Layer in `layersToRequest` kann folgende Parameter haben:
 
 | Parameter | Typ | Beschreibung |
 |-----------|-----|--------------|
-| `layerId` | String | ID des Layers |
+| `id` | String | ID des Layers |
 | `name` | String | Anzeigename des Layers |
 | `hideEmptyAttributeValues` | Boolean | Wenn true, werden leere Attributwerte nicht angezeigt |
 | `geometryProvider` | Object | Konfiguration für die Geometrie-Bereitstellung |
 | `geometryAttribute` | String | Name des Geometrie-Attributs |
 | `featureType` | String | Feature-Typ des Layers |
-| `attributes` | Array | Liste der anzuzeigenden Attribute |
+| `gfiAttributes` | Array | Liste der anzuzeigenden Attribute |
 
 ### Attribut-Konfiguration
 
@@ -607,10 +607,10 @@ Jedes Attribut in der `attributes`-Liste hat folgende Parameter:
 
 ```json
 {
-  "layerId": "32744",
+  "id": "32744",
   "name": "Planungsrechtliche Situation",
   "hideEmptyAttributeValues": true,
-  "attributes": [
+  "gfiAttributes": [
     {
       "name": "xpPlanName",
       "alias": "Bebauungsplan"
