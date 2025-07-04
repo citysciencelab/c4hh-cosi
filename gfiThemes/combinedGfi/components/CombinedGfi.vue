@@ -439,7 +439,10 @@ export default {
                 </select>
                 <label for="bufferSelect">{{ translate('additional:modules.combinedGfi.selectBufferDistance') }}</label>
             </div>
-            <div class="button-group">
+            <div
+                v-if="showBuffer"
+                class="button-group"
+            >
                 <ElevatedButton
                     :text="translate(isBufferLoading ? 'additional:modules.combinedGfi.queryingArea' : 'additional:modules.combinedGfi.queryArea')"
                     :disabled="!bufferedFeature || isLoading || isBufferLoading"
