@@ -173,7 +173,7 @@ const actions = {
             console.error("Error during GFI request:", error);
             dispatch("Alerting/addSingleAlert", {
                 category: "error",
-                content: i18next.t("common:modules.combinedGfi.errors.gfiRequestError")
+                content: i18next.t("additional:modules.combinedGfi.errors.gfiRequestError")
             }, {root: true});
         }
         finally {
