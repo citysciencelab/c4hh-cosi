@@ -200,6 +200,19 @@ Aliases allow you to display user-friendly attribute names instead of technical 
 
 This will display "Gebietsname" and "Schutzstatus" in the UI instead of "gebietsname" and "schutzstatus".
 
+You can also use translation keys as aliases. The addon will automatically translate these keys using the current language:
+
+```json
+{
+  "attributes": [
+    {"name": "gebietsname", "alias": "additional:modules.combinedGfi.attributes.gebietsname"},
+    {"name": "schutzstatus", "alias": "additional:modules.combinedGfi.attributes.schutzstatus"}
+  ]
+}
+```
+
+In this case, the addon will look up the translation keys in the current language's translation files and display the translated text.
+
 ### Using Geometry Providers
 
 A geometry provider layer can provide geometries to query other layers:

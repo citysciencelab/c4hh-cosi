@@ -2,6 +2,7 @@ import {getCenter} from "ol/extent";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
 import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
 import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
+import {translateKeyIfPossible} from "./translationUtils.js";
 
 /**
  * Retrieves a coordinate from a given geometry object based on its type.
@@ -98,7 +99,7 @@ export function extractRowsFromResults (results, attributes) {
 
             attributes.forEach(attr => {
                 const originalName = typeof attr === "object" ? attr.name : attr,
-                    displayName = typeof attr === "object" && attr.alias ? attr.alias : originalName;
+                    displayName = typeof attr === "object" && attr.alias ? translateKeyIfPossible(attr.alias) : originalName;
 
                 let value = "";
 
@@ -150,7 +151,7 @@ export function extractFeaturesFromWmsGml (parsedResponse, attributes) {
             attributes.forEach(attrDef => {
                 if (typeof attrDef === "object" && attrDef.name && attrDef.alias) {
                     if (feature[attrDef.name] !== undefined) {
-                        featureWithAliases[attrDef.alias] = feature[attrDef.name];
+                        featureWithAliases[translateKeyIfPossible(attrDef.alias)] = feature[attrDef.name];
                     }
                 }
                 else if (typeof attrDef === "string") {
@@ -201,7 +202,7 @@ export function extractFeaturesFromEsriWms (parsedResponse, attributes) {
             attributes.forEach(attrDef => {
                 if (typeof attrDef === "object" && attrDef.name && attrDef.alias) {
                     if (feature[attrDef.name] !== undefined) {
-                        featureWithAliases[attrDef.alias] = feature[attrDef.name];
+                        featureWithAliases[translateKeyIfPossible(attrDef.alias)] = feature[attrDef.name];
                     }
                 }
                 else if (typeof attrDef === "string") {
@@ -257,7 +258,7 @@ export function extractFeaturesFromWfsGml (parsedResponse, attributes) {
             attributes.forEach(attr => {
                 if (typeof attr === "object" && attr.name && attr.alias) {
                     if (feature[attr.name] !== undefined) {
-                        featureWithAliases[attr.alias] = feature[attr.name];
+                        featureWithAliases[translateKeyIfPossible(attr.alias)] = feature[attr.name];
                     }
                 }
                 else if (typeof attr === "string") {
@@ -355,7 +356,7 @@ export function extractFeaturesFromOafJson (data, attributes) {
 
             attributes.forEach(attr => {
                 const originalName = typeof attr === "object" ? attr.name : attr,
-                    displayName = typeof attr === "object" && attr.alias ? attr.alias : originalName;
+                    displayName = typeof attr === "object" && attr.alias ? translateKeyIfPossible(attr.alias) : originalName;
 
                 result[displayName] = properties[originalName] !== undefined ?
                     properties[originalName] : "";

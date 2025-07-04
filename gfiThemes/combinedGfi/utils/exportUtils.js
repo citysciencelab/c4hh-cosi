@@ -2,6 +2,8 @@
  * Utility functions for exporting GFI data in various formats
  */
 
+import {translateKeyIfPossible} from "./translationUtils.js";
+
 /**
  * Exports the data as a CSV file
  * @param {Object} options - The export options
@@ -21,7 +23,7 @@ export function exportToCSV ({layerResults, fileName, setIsLoading, translations
                 .map(header => {
                     const headerName = header.name?.target || header.name;
 
-                    return typeof headerName === "object" ? headerName.alias || headerName.name : headerName;
+                    return typeof headerName === "object" ? translateKeyIfPossible(headerName.alias) || headerName.name : headerName;
                 })
                 .join(";");
 
@@ -183,7 +185,7 @@ export function exportToDOC ({layerResults, fileName, setIsLoading, translations
                 let displayName, key, value;
 
                 if (typeof headerName === "object") {
-                    displayName = headerName.alias || headerName.name;
+                    displayName = translateKeyIfPossible(headerName.alias) || headerName.name;
                     key = headerName.name;
                 }
                 else {
@@ -326,7 +328,7 @@ export function exportToPDF ({layerResults, fileName, setIsLoading, translations
             htmlContent += "<tr>";
             layer.headers.forEach(header => {
                 const headerName = header.name?.target || header.name,
-                    displayName = typeof headerName === "object" ? headerName.alias || headerName.name : headerName;
+                    displayName = typeof headerName === "object" ? translateKeyIfPossible(headerName.alias) || headerName.name : headerName;
 
                 htmlContent += `<th>${displayName}</th>`;
             });
@@ -388,7 +390,7 @@ export function exportToJSON ({layerResults, fileName, setIsLoading, translation
                 headers: layer.headers.map(header => {
                     const headerName = header.name?.target || header.name;
 
-                    return typeof headerName === "object" ? headerName.alias || headerName.name : headerName;
+                    return typeof headerName === "object" ? translateKeyIfPossible(headerName.alias) || headerName.name : headerName;
                 }),
                 rows: layer.rows.map(row => {
                     const newRow = {};
@@ -400,7 +402,7 @@ export function exportToJSON ({layerResults, fileName, setIsLoading, translation
 
                         if (typeof headerName === "object") {
                             key = headerName.name;
-                            displayKey = headerName.alias || headerName.name;
+                            displayKey = translateKeyIfPossible(headerName.alias) || headerName.name;
                         }
                         else {
                             key = headerName;
