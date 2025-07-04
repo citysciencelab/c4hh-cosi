@@ -235,7 +235,7 @@ export default {
                     console.error("Print request error:", error);
                     this.addSingleAlert({
                         category: "error",
-                        content: this.$t("common:modules.combinedGfi.printError")
+                        content: this.$t("additional:modules.combinedGfi.printError")
                     });
                 }
             });
