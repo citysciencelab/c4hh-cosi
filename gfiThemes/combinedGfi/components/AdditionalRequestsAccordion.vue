@@ -74,7 +74,6 @@ export default {
                 :icon="'bi bi-info-circle-fill'"
                 :is-open="false"
                 font-size="font-size-base"
-                :coloured-header="true"
             >
                 <div
                     v-for="(result, index) in additionalRequestResults"
