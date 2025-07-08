@@ -324,6 +324,10 @@ export default {
         layerSource.clear();
         layerSourceForObjects.clear(true);
 
+        if (!currentPlanningScenario || !currentPlanningScenario.scenarioFeature || !currentPlanningScenario.scenarioFeature.features) {
+            return;
+        }
+
         currentPlanningScenario.scenarioFeature.features.forEach(feat => {
             const olFeature = geoJsonParser.readFeature(feat);
 
@@ -350,9 +354,11 @@ export default {
      */
     zoomToFeature ({dispatch, getters}) {
         const currentPlanningScenario = getters.planningScenarios.find(scenario => scenario.id === getters.currentPlanningScenarioId),
-            olFeatures = new GeoJSON().readFeatures(currentPlanningScenario?.scenarioFeature),
-            coordinate = extractEventCoordinates(olFeatures[0].getGeometry().getExtent());
+            olFeatures = currentPlanningScenario ? new GeoJSON().readFeatures(currentPlanningScenario?.scenarioFeature) : [],
+            coordinate = olFeatures.length > 0 ? extractEventCoordinates(olFeatures[0].getGeometry().getExtent()) : null;
 
-        dispatch("Maps/zoomToExtent", {extent: coordinate, options: {maxZoom: 7}}, {root: true});
+        if (coordinate) {
+            dispatch("Maps/zoomToExtent", {extent: coordinate, options: {maxZoom: 7}}, {root: true});
+        }
     }
 };
