@@ -14,6 +14,7 @@ import {Select} from "ol/interaction";
 import {singleClick} from "ol/events/condition";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
+import {infrastructureLayerId} from "../shared/js/layerIds.js";
 
 export default {
     name: "PlanningScenarioLanduse",
@@ -238,7 +239,7 @@ export default {
         if (this.currentPlanningComponent !== "newLanduse") {
             this.clearFeatures();
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
-            layerCollection.getLayerById("buildings-and-roads-features")?.getLayerSource().clear();
+            layerCollection.getLayerById(infrastructureLayerId)?.getLayerSource().clear();
             this.removeInteraction(this.planningScenarioSelectInteraction);
         }
     },
@@ -278,7 +279,7 @@ export default {
 
             this.setPlanningScenarios(filteredScenarios);
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
-            layerCollection.getLayerById("buildings-and-roads-features")?.getLayerSource().clear();
+            layerCollection.getLayerById(infrastructureLayerId)?.getLayerSource().clear();
             this.removeInteraction(this.planningScenarioSelectInteraction);
             this.clearFeatures();
             this.setCurrentPlanningComponent("create");
@@ -376,7 +377,7 @@ export default {
          * @returns {void}
          */
         parseAndAddFeatures (features) {
-            // layerCollection.getLayerById("buildings-and-roads-features")?.getLayerSource().clear();
+            layerCollection.getLayerById(infrastructureLayerId)?.getLayerSource().clear();
             const olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
 
             if (this.isShowToggleChecked) {

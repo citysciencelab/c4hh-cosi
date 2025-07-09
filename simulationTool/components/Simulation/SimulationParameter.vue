@@ -16,6 +16,7 @@ import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
+import {infrastructureLayerId} from "../shared/js/layerIds.js";
 
 export default {
     name: "SimulationParameter",
@@ -226,8 +227,8 @@ export default {
         if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
         }
-        if (typeof layerCollection.getLayerById("buildings-and-roads-features") !== "undefined") {
-            layerCollection.getLayerById("buildings-and-roads-features").getLayerSource().clear();
+        if (typeof layerCollection.getLayerById(infrastructureLayerId) !== "undefined") {
+            layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
         }
     },
     methods: {

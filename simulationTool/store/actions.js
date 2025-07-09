@@ -4,6 +4,7 @@ import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEvent
 import layerCollection from "../../../src/core/layers/js/layerCollection";
 import ConvertStyle from "../js/convertStyle";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
+import {infrastructureLayerId} from "../components/shared/js/layerIds.js";
 
 export default {
     /**
@@ -304,22 +305,21 @@ export default {
     updateFeatures ({getters}) {
         const currentPlanningScenario = getters.planningScenarios.find(scenario => scenario.id === getters.currentPlanningScenarioId),
             geoJsonParser = new GeoJSON(),
-            layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource(),
-            layerIdForScenarioFeatures = "buildings-and-roads-features";
+            layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource();
 
         let layerSourceForObjects = null;
 
-        if (!layerCollection.getLayerById(layerIdForScenarioFeatures)) {
+        if (!layerCollection.getLayerById(infrastructureLayerId)) {
             const layer = layerFactory.createLayer({
                 typ: "VECTORBASE",
-                id: layerIdForScenarioFeatures,
-                name: layerIdForScenarioFeatures,
+                id: infrastructureLayerId,
+                name: infrastructureLayerId,
                 alwaysOnTop: true
             });
 
             layerCollection.addLayer(layer);
         }
-        layerSourceForObjects = layerCollection.getLayerById(layerIdForScenarioFeatures).getLayerSource();
+        layerSourceForObjects = layerCollection.getLayerById(infrastructureLayerId).getLayerSource();
 
         layerSource.clear();
         layerSourceForObjects.clear(true);

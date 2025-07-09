@@ -4,6 +4,7 @@ import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import {mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
+import {infrastructureLayerId} from "../shared/js/layerIds.js";
 
 export default {
     name: "SimulationList",
@@ -47,8 +48,8 @@ export default {
         if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
         }
-        if (typeof layerCollection.getLayerById("buildings-and-roads-features") !== "undefined") {
-            layerCollection.getLayerById("buildings-and-roads-features").getLayerSource().clear();
+        if (typeof layerCollection.getLayerById(infrastructureLayerId) !== "undefined") {
+            layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
         }
     },
     methods: {

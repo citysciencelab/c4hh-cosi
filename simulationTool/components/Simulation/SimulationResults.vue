@@ -19,6 +19,7 @@ import {singleClick} from "ol/events/condition";
 import Stroke from "ol/style/Stroke";
 import Style from "ol/style/Style";
 import Text from "ol/style/Text";
+import {infrastructureLayerId} from "../shared/js/layerIds.js";
 
 export default {
     name: "SimulationResults",
@@ -258,8 +259,8 @@ export default {
             });
         }
         Object.values(this.outputSelectInteraction).forEach(interactionsOnLayer => Object.values(interactionsOnLayer).forEach(interaction => this.removeInteraction(interaction)));
-        if (layerCollection.getLayerById("buildings-and-roads-features")) {
-            layerCollection.getLayerById("buildings-and-roads-features").getLayerSource().clear();
+        if (layerCollection.getLayerById(infrastructureLayerId)) {
+            layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
         }
     },
     methods: {

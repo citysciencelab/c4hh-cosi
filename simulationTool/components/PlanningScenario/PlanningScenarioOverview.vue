@@ -5,6 +5,7 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import {mapActions, mapGetters} from "vuex";
 import PlanningScenarioOverviewList from "./PlanningScenarioOverviewList.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import {infrastructureLayerId} from "../shared/js/layerIds.js";
 
 export default {
     name: "PlanningScenarioOverview",
@@ -21,8 +22,8 @@ export default {
         if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
         }
-        if (typeof layerCollection.getLayerById("buildings-and-roads-features") !== "undefined") {
-            layerCollection.getLayerById("buildings-and-roads-features").getLayerSource().clear();
+        if (typeof layerCollection.getLayerById(infrastructureLayerId) !== "undefined") {
+            layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
         }
     },
     methods: {
