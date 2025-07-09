@@ -19,6 +19,7 @@ import SideMenu from "./SideMenu.vue";
 import SimulationList from "./Simulation/SimulationList.vue";
 import SimulationParameter from "./Simulation/SimulationParameter.vue";
 import simulationResults from "./Simulation/SimulationResults.vue";
+import {infrastructureLayerId} from "../layerIds.js";
 
 import TutorialPanel from "./HelpSection/TutorialPanel.vue";
 
@@ -59,8 +60,8 @@ export default {
         if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
             layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
         }
-        if (typeof layerCollection.getLayerById("buildings-and-roads-features") !== "undefined") {
-            layerCollection.getLayerById("buildings-and-roads-features").getLayerSource().clear();
+        if (typeof layerCollection.getLayerById(infrastructureLayerId) !== "undefined") {
+            layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
         }
     },
     /**

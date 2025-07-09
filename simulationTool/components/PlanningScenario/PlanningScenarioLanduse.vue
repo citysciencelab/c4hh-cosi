@@ -14,7 +14,7 @@ import {Select} from "ol/interaction";
 import {singleClick} from "ol/events/condition";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import {infrastructureLayerId} from "../shared/js/layerIds.js";
+import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {
     name: "PlanningScenarioLanduse",

@@ -19,7 +19,7 @@ import {singleClick} from "ol/events/condition";
 import Stroke from "ol/style/Stroke";
 import Style from "ol/style/Style";
 import Text from "ol/style/Text";
-import {infrastructureLayerId} from "../shared/js/layerIds.js";
+import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {
     name: "SimulationResults",

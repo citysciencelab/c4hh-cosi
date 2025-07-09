@@ -5,7 +5,7 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import {mapActions, mapGetters} from "vuex";
 import PlanningScenarioOverviewList from "./PlanningScenarioOverviewList.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
-import {infrastructureLayerId} from "../shared/js/layerIds.js";
+import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {
     name: "PlanningScenarioOverview",

@@ -4,7 +4,7 @@ import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import {mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
-import {infrastructureLayerId} from "../shared/js/layerIds.js";
+import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {
     name: "SimulationList",

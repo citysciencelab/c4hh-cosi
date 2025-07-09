@@ -4,7 +4,7 @@ import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEvent
 import layerCollection from "../../../src/core/layers/js/layerCollection";
 import ConvertStyle from "../js/convertStyle";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
-import {infrastructureLayerId} from "../components/shared/js/layerIds.js";
+import {infrastructureLayerId} from "../layerIds.js";
 
 export default {
     /**

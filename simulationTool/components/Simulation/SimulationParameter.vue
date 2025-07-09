@@ -16,7 +16,7 @@ import OgcApiProcess from "../../js/ogcApiProcess";
 import SectionHeader from "../SectionHeader.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import {infrastructureLayerId} from "../shared/js/layerIds.js";
+import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {
     name: "SimulationParameter",
