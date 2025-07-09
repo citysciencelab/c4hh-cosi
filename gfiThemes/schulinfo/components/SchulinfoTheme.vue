@@ -227,7 +227,6 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "~variables";
 
 $color_2: #fec44f;
 $background_color_1: rgba(227, 227, 227, 0.5);

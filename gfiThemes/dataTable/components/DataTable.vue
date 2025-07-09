@@ -382,7 +382,7 @@ export default {
 </template>
 
 <style lang="scss">
-@import "~variables";
+
 #table-data-container {
     margin:6px 15px 0 12px;
     }

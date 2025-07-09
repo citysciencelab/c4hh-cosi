@@ -622,7 +622,6 @@ export default {
 </style>
 
 <style lang="scss">
-@import "~variables";
 
 #tooltip-overlay {
     position: relative;
