@@ -166,9 +166,15 @@ export default {
          * @returns {String} The worst job status tag.
          */
         worstJobStatusTag () {
-            return ["failed", "accepted", "running", "successful"].find(
-                status => this.jobStatusTags.includes(status)
+            const status = ["failed", "accepted", "running", "successful"].find(
+                statusByPriority => this.jobStatusTags.includes(statusByPriority)
             );
+
+            if (status) {
+                return status;
+            }
+            console.warn(`No valid job status found: [${this.jobStatusTags.join(", ")}]`);
+            return "unknown";
         },
 
         /**
@@ -801,28 +807,28 @@ export default {
                         class="me-2 ps-label"
                     >
                         <span
-                            v-if="worstJobStatusTag === 'accepted' || typeof worstJobStatusTag === 'undefined'"
-                            class="status running"
-                        >
-                            {{ $t('additional:modules.tools.simulationTool.progress') }}: {{ meanProgress }}%
-                        </span>
-                        <span
-                            v-else-if="worstJobStatusTag === 'successful'"
+                            v-if="worstJobStatusTag === 'successful'"
                             class="status success"
                         >
-                            {{ $t('additional:modules.tools.simulationTool.successfull') }}
+                            {{ $t('additional:modules.tools.simulationTool.successful') }}
                         </span>
                         <span
-                            v-else-if="worstJobStatusTag === 'unsuccessfull'"
-                            class="status unsuccessfull"
+                            v-else-if="worstJobStatusTag === 'failed'"
+                            class="status failed"
                         >
-                            {{ $t('additional:modules.tools.simulationTool.unsuccessfull') }}
+                            {{ $t('additional:modules.tools.simulationTool.failed') }}
+                        </span>
+                        <span
+                            v-else-if="worstJobStatusTag === 'unknown'"
+                            class="status unknown"
+                        >
+                            {{ $t('additional:modules.tools.simulationTool.unknown') }}
                         </span>
                         <span
                             v-else
-                            class="status error"
+                            class="status running"
                         >
-                            {{ $t('additional:modules.tools.simulationTool.unsuccessfull') }}
+                            {{ $t('additional:modules.tools.simulationTool.progress') }}: {{ meanProgress }}%
                         </span>
                     </div>
                 </div>
@@ -1022,17 +1028,21 @@ export default {
     vertical-align: middle;
     border-radius: 0.938rem;
 }
-.error {
-    background-color: #e10019;
-    border-color: #e10019;
+.running {
+    background-color: #3C5F94;
+    border-color: #3C5F94;
 }
 .success {
     background-color: #198754;
     border-color: #198754;
 }
-.running {
-    background-color: #3C5F94;
-    border-color: #3C5F94;
+.unknown {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.failed {
+    background-color: #e10019;
+    border-color: #e10019;
 }
 .legend {
     img {
