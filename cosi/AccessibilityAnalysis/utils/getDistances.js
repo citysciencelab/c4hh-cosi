@@ -8,8 +8,6 @@ import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
  * @returns {Object|Boolean} The distance, max distance and the steps. False if something fails.
  */
 function getDistances (originDistance, useTravelTimeIndex, time) {
-    console.log(time);
-
     if (typeof originDistance !== "number") {
         console.error(`addons/cosi/Accessibility/utils/getDistances: The first parameter must be a number, but got ${typeof originDistance}`);
         return false;
