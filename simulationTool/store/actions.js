@@ -313,9 +313,10 @@ export default {
             const layer = layerFactory.createLayer({
                 typ: "VECTORBASE",
                 id: infrastructureLayerId,
-                name: infrastructureLayerId,
-                alwaysOnTop: true
+                name: infrastructureLayerId
             });
+
+            layer.layer.setZIndex(9999997);
 
             layerCollection.addLayer(layer);
         }

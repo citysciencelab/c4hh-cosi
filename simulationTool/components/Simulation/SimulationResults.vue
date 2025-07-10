@@ -307,8 +307,7 @@ export default {
             const layer = layerFactory.createLayer({
                 typ: "VECTORBASE",
                 id: layerId,
-                name: layerId,
-                alwaysOnTop: true
+                name: layerId
             });
 
             layer.layer.setZIndex(9999998);
