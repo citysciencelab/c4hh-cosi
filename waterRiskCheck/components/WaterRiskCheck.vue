@@ -657,7 +657,12 @@ export default {
         async fetchFeatures (geometry, collection, url, geom, flag = false) {
             try {
                 const filter = getOAFFeature.getOAFGeometryFilter(geometry, geom, "intersects"),
-                    geoJson = await getOAFFeature.getOAFFeatureGet(url, collection, 100, filter, "http://www.opengis.net/def/crs/OGC/1.3/CRS84", "http://www.opengis.net/def/crs/OGC/1.3/CRS84");
+                    geoJson = await getOAFFeature.getOAFFeatureGet(url, collection, {
+                        limit: 100,
+                        filter,
+                        filterCrs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
+                        crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+                    });
 
                 if (flag) {
                     const features = getOAFFeature.readAllOAFToGeoJSON(geoJson, {dataProjection: "EPSG:4326", featureProjection: "EPSG:25832"});

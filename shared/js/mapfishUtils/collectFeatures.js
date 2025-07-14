@@ -44,7 +44,7 @@ export async function collectFeaturesByCoordinates (parcel, {coordinate, filter,
         const usedGeometry = radius ? bufferGeometry(parcel.geometry, radius) : parcel.geometry,
             geometryFilter = getOAFFeature.getOAFGeometryFilter(usedGeometry, geometryName, filter);
 
-        getOAFFeature.getOAFFeatureGet(layer.url, layer.collection, 10000, geometryFilter, oafCRSURI)
+        getOAFFeature.getOAFFeatureGet(layer.url, layer.collection, {limit: 10000, filter: geometryFilter, filterCrs: oafCRSURI})
             .then(plainOAFFeatures => {
                 if (Array.isArray(plainOAFFeatures)) {
                     onsuccess(getOAFFeature.readAllOAFToGeoJSON(plainOAFFeatures, {

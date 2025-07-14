@@ -402,7 +402,7 @@ export default {
                 featureCollection = {
                     type: "FeatureCollection",
                     features: await getOAFFeature.getOAFFeatureGet(
-                        source.url, source.collection, 100, filter, crs, crs
+                        source.url, source.collection, {limit: 100, filter, filterCrs: crs, crs}
                     )
                 };
 
