@@ -895,8 +895,8 @@ export default {
                     <SwitchInput
                         id="showTextFeatures"
                         :checked="showTextFeatures"
-                        label="Messwerte einblenden"
-                        aria="Messwerte einblenden"
+                        :label="$t('additional:modules.tools.simulationTool.showMeasuredValues')"
+                        :aria="$t('additional:modules.tools.simulationTool.showMeasuredValues')"
                         @change="toggleTextFeaturesVisibility($event.target.checked)"
                     />
                 </div>

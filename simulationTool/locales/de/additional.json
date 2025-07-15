@@ -173,6 +173,7 @@
           "simulationSetParams": "Parameter für Simulation einstellen",
           "simulationStart": "Simulation starten",
           "simulationResults": "Ergebnis der Simulation",
+          "showMeasuredValues": "Messwerte anzeigen",
           "started": "Gestartet",
           "status": "Status",
           "successfull": "Erfolgreich",
