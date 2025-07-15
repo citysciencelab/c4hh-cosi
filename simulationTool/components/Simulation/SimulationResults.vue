@@ -1,5 +1,6 @@
 <script>
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
+import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 import ConvertFeature from "../../js/convertFeatures";
 import ConvertStyle from "../../js/convertStyle";
 import CircleStyle from "ol/style/Circle";
@@ -25,6 +26,7 @@ export default {
     name: "SimulationResults",
     components: {
         AccordionItem,
+        SwitchInput,
         SectionHeader,
         FlatButton
     },
@@ -40,7 +42,8 @@ export default {
             startTimes: [],
             outputSelectInteraction: {},
             tableFeaturesCollection: {},
-            lineFeaturesCollection: {}
+            lineFeaturesCollection: {},
+            showTextFeatures: true
         };
     },
     computed: {
@@ -700,6 +703,28 @@ export default {
                 });
                 hideFeatures ? layerSource.removeFeatures(bulkUpdate) : layerSource.addFeatures(bulkUpdate);
             }
+        },
+        toggleTextFeaturesVisibility (show) {
+            const customZKey = "custom-z-";
+
+            this.layers.forEach(layer => {
+                const layerId = layer.layer?.get("id"),
+                    tableFeatures = this.tableFeaturesCollection[layerId] || {},
+                    lineFeatures = this.lineFeaturesCollection[layerId] || {},
+                    bulkUpdate = Object.values(lineFeatures),
+                    layerSource = layer.getLayerSource();
+
+                Object.values(tableFeatures).forEach(feature => {
+                    if (show) {
+                        feature.setStyle(this.getFeatureStyleTable(this.formatKeyValuePairs(this.getAllZValuesFromTableFeature(feature), customZKey)));
+                    }
+                    else {
+                        feature.setStyle(new Style(null));
+                    }
+                });
+
+                show ? layerSource.addFeatures(bulkUpdate) : layerSource.removeFeatures(bulkUpdate);
+            });
         }
     }
 };
@@ -865,6 +890,15 @@ export default {
                             {{ getMappedProperty(output, simulationConfig?.outputs?.propertiesMapping) }}
                         </label>
                     </div>
+                </div>
+                <div class="mt-4">
+                    <SwitchInput
+                        id="showTextFeatures"
+                        :checked="showTextFeatures"
+                        label="Messwerte einblenden"
+                        aria="Messwerte einblenden"
+                        @change="toggleTextFeaturesVisibility($event.target.checked)"
+                    />
                 </div>
             </div>
             <div v-if="worstJobStatusTag === 'successful' && legendValue.length">
