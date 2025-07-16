@@ -102,5 +102,13 @@
   },
   "vpiDashboard": {
     "type": "tool"
+  },
+  "snippetFeatureInfo": {
+    "path": "filterSnippets/snippetFeatureInfo",
+    "type": "filterSnippet"
+  },
+  "snippetChart": {
+    "path": "filterSnippets/snippetChart",
+    "type": "filterSnippet"
   }
 }
