@@ -122,8 +122,3 @@ function createCesium3dTilesInspector () {
 }
 
 waitForCesium().then(createCesium3dTilesInspector);
-
-export {
-
-    createCesium3dTilesInspector
-};
