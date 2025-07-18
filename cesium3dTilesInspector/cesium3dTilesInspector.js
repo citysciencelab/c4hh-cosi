@@ -1,49 +1,7 @@
 import store from "../../src/app-store";
 
-/**
- * Creates an inspector for tiles as shown in the example https://sandcastle.cesium.com/?src=3D%20Tiles%20Inspector.html
- * This function checks the state of the menu and the map mode every second and creates or removes the inspector accordingly.
- * It also adds drag-and-drop functionality to the inspector.
- * @returns {void}
- */
-function createCesium3dTilesInspector () {
-    const head = document.getElementsByTagName("head")[0],
-        link = document.createElement("link"),
-        map3D = mapCollection.getMap("3D");
-    let insp = null,
-        lastRightPos = null;
-
-    link.rel = "stylesheet";
-    link.type = "text/css";
-    link.href = "https://geofos.fhhnet.stadt.hamburg.de/mastercode/cesium/latest/Widgets/widgets.css";
-    link.media = "all";
-    head.appendChild(link);
-
-    setInterval(() => {
-        const isExpanded = store.getters["Menu/secondaryMenu"].expanded,
-            mapMode = store.getters["Maps/mode"];
-
-        if (mapMode === "3D") {
-            if (!insp) {
-                insp = new Cesium.Cesium3DTilesInspector(document.getElementById("map"), map3D.getCesiumScene());
-                insp._element.style.position = "fixed";
-                insp._element.style.top = "90px";
-                addDragFunctionality(insp._element);
-            }
-            const newRight = isExpanded ? "600px" : "150px";
-
-            if (lastRightPos !== newRight) {
-                insp._element.style.right = newRight;
-                lastRightPos = newRight;
-            }
-        }
-        else if (insp) {
-            insp.destroy();
-            insp = null;
-            lastRightPos = null;
-        }
-    }, 1000);
-}
+let insp = null,
+    lastRightPos = null;
 
 /**
  * Adds drag-and-drop functionality to the inspector element.
@@ -82,17 +40,90 @@ function addDragFunctionality (element) {
 }
 
 /**
- * Checks if Cesium is defined and starts the function to create the 3D Tiles Inspector once Cesium is available.
- * If Cesium is not defined, it checks every second until it is defined.
+ * Updates the inspector's position based on the secondary menu state.
  * @returns {void}
  */
-function checkCesiumAndCreateInspector () {
-    const checkCesiumInterval = setInterval(function () {
-        if (typeof Cesium !== "undefined") {
-            clearInterval(checkCesiumInterval);
-            createCesium3dTilesInspector();
+function updateInspectorPosition () {
+    if (insp) {
+        const isExpanded = store.getters["Menu/secondaryMenu"].expanded,
+            newRight = isExpanded ? "600px" : "150px";
+
+        if (lastRightPos !== newRight) {
+            insp._element.style.right = newRight;
+            lastRightPos = newRight;
         }
-    }, 1000);
+    }
 }
 
-checkCesiumAndCreateInspector();
+/**
+ * Waits for Cesium to be available on the global scope.
+ * @returns {Promise<void>}
+ */
+function waitForCesium () {
+    return new Promise(resolve => {
+        if (typeof Cesium !== "undefined") {
+            resolve();
+        }
+        else {
+            const check = setInterval(() => {
+                if (typeof Cesium !== "undefined") {
+                    clearInterval(check);
+                    resolve();
+                }
+            }, 200);
+        }
+    });
+}
+
+/**
+ * Initializes the 3D Tiles Inspector.
+ * @returns {void}
+ */
+function createCesium3dTilesInspector () {
+    const head = document.getElementsByTagName("head")[0],
+        link = document.createElement("link");
+
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.href = "https://geofos.fhhnet.stadt.hamburg.de/mastercode/cesium/latest/Widgets/widgets.css";
+    link.media = "all";
+    head.appendChild(link);
+
+    store.watch(
+        () => store.getters["Maps/mode"],
+        (mode) => {
+            if (mode === "3D" && !insp) {
+                const map3D = mapCollection.getMap("3D");
+
+                if (!map3D || typeof map3D.getCesiumScene !== "function") {
+                    console.warn("3D map is not ready yet. Inspector not created.");
+                    return;
+                }
+
+                insp = new Cesium.Cesium3DTilesInspector(document.getElementById("map"), map3D.getCesiumScene());
+                insp._element.style.position = "fixed";
+                insp._element.style.top = "90px";
+                addDragFunctionality(insp._element);
+                updateInspectorPosition();
+            }
+            else if (mode !== "3D" && insp) {
+                insp.destroy();
+                insp = null;
+                lastRightPos = null;
+            }
+        },
+        {immediate: true}
+    );
+
+    store.watch(
+        () => store.getters["Menu/secondaryMenu"].expanded,
+        () => updateInspectorPosition()
+    );
+}
+
+waitForCesium().then(createCesium3dTilesInspector);
+
+export {
+
+    createCesium3dTilesInspector
+};
