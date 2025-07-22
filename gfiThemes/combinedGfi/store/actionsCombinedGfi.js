@@ -635,11 +635,13 @@ const actions = {
      * @param {Function} context.commit - The Vuex commit function.
      * @param {Object} context.state - The Vuex state object.
      * @param {Function} context.dispatch - The Vuex dispatch function.
+     * @param {Object} context.rootGetters - Vuex root getters.
      * @param {Array|Object} results - The GFI results to process. Can be an array or a single object.
      * @returns {Promise<void>} - A promise that resolves when the processing is complete.
      */
-    async processGfiResults ({commit, state}, results) {
-        const normalizedResults = Array.isArray(results)
+    async processGfiResults ({commit, state, rootGetters}, results) {
+        const ignoredKeys = rootGetters.ignoredKeys,
+            normalizedResults = Array.isArray(results)
                 ? results.map(result => JSON.parse(JSON.stringify(result)))
                 : JSON.parse(JSON.stringify(results)),
 
@@ -649,8 +651,8 @@ const actions = {
                         features = Array.isArray(result) ? result : [result],
                         rawLayer = rawLayerList.getLayerWhere({id: layerConfig.id}),
                         layerName = rawLayer?.name || `Layer ${index + 1}`,
-                        headers = extractColumnsFromResults(features, layerConfig.gfiAttributes),
-                        rows = extractRowsFromResults(features, layerConfig.gfiAttributes);
+                        headers = extractColumnsFromResults(features, layerConfig.gfiAttributes, ignoredKeys),
+                        rows = extractRowsFromResults(features, layerConfig.gfiAttributes, ignoredKeys);
 
                     if (!result || typeof result !== "object") {
                         return null;

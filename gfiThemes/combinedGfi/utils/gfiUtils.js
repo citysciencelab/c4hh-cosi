@@ -59,13 +59,14 @@ export function getCoordinateFromGeometry (geometry) {
 }
 
 /**
- * Extracts all unique keys from an array of result objects.
+ * Extracts all unique keys from an array of result objects, excluding ignored keys.
  *
  * @param {Array<Object>} results - An array of result objects.
- * @param {Array<string>} attributes - The list of attributes to include.
+ * @param {Array<string>} attributes - The list of attributes to include. If empty, all keys except ignoredKeys are used.
+ * @param {Array<string>} ignoredKeys - Keys to be ignored (excluded from output).
  * @returns {Array<Object>} An array of column objects with name and index.
  */
-export function extractColumnsFromResults (results, attributes) {
+export function extractColumnsFromResults (results, attributes, ignoredKeys) {
     const allKeys = results
             .filter(result => result)
             .reduce((acc, result) => {
@@ -76,23 +77,37 @@ export function extractColumnsFromResults (results, attributes) {
                 });
                 return acc;
             }, []),
-        keysToInclude = attributes && attributes.length ? attributes : allKeys;
+        filteredKeys = Array.isArray(ignoredKeys) && ignoredKeys.length > 0
+            ? allKeys.filter(key => !ignoredKeys.includes(key))
+            : allKeys,
+        keysToInclude = attributes && attributes.length ? attributes : filteredKeys;
 
     return keysToInclude.map((key, index) => ({name: key, index}));
 }
 
 /**
- * Extracts and filters rows from the given results based on specified attributes.
+ * Extracts and filters rows from the given results based on specified attributes, excluding ignored keys.
  *
- * @param {Array} results - The array of result objects to be filtered.
- * @param {Array} attributes - The array of attribute specifications (either strings or {name, alias} objects).
- * @returns {Array} - The filtered array of result objects.
+ * @param {Array<Object>} results - The array of result objects to be filtered.
+ * @param {Array<string|Object>} attributes - The array of attribute specifications (either strings or {name, alias} objects). If empty, all keys except ignoredKeys are used.
+ * @param {Array<string>} ignoredKeys - Keys to be ignored (excluded from output).
+ * @returns {Array<Object>} - The filtered array of result objects.
  */
-export function extractRowsFromResults (results, attributes) {
+export function extractRowsFromResults (results, attributes, ignoredKeys) {
     return results
         .filter(result => result)
         .map(feature => {
             if (!attributes || attributes.length === 0) {
+                if (Array.isArray(ignoredKeys) && ignoredKeys.length > 0) {
+                    const filtered = {};
+
+                    Object.keys(feature).forEach(key => {
+                        if (!ignoredKeys.includes(key)) {
+                            filtered[key] = feature[key];
+                        }
+                    });
+                    return filtered;
+                }
                 return {...feature};
             }
             const filteredFeature = {};
@@ -110,7 +125,9 @@ export function extractRowsFromResults (results, attributes) {
                     value = feature[displayName];
                 }
 
-                filteredFeature[displayName] = value;
+                if (!Array.isArray(ignoredKeys) || !ignoredKeys.includes(originalName)) {
+                    filteredFeature[displayName] = value;
+                }
             });
 
             return filteredFeature;

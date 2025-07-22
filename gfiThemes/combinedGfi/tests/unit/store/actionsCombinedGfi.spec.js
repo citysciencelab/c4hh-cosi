@@ -10,7 +10,7 @@ const mockExecuteProcess = sinon.stub();
 OGCAPIProcesses.executeProcess = mockExecuteProcess;
 
 describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
-    let commit, dispatch, state, originalMapCollection, originalRawLayerList, originalDocument, originalWindow, originalURL, originalBlob;
+    let commit, dispatch, state, rootGetters, originalMapCollection, originalRawLayerList, originalDocument, originalWindow, originalURL, originalBlob;
 
     beforeEach(() => {
         originalMapCollection = global.mapCollection;
@@ -22,6 +22,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
 
         commit = sinon.spy();
         dispatch = sinon.stub();
+        rootGetters = sinon.stub();
         state = {
             layersToRequest: [
                 {id: "layer1", name: "Custom Layer 1", gfiAttributes: ["attr1", "attr2"]},
@@ -187,7 +188,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
 
         dispatch.resolves();
 
-        await actions.processGfiResults({commit, state}, results);
+        await actions.processGfiResults({commit, state, rootGetters}, results);
 
         if (commit.called) {
             const setLayerResultsCall = commit.args.find(args => args[0] === "setLayerResults");
