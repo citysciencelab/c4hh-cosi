@@ -220,7 +220,7 @@ const actions = {
             const polygonFeature = new Feature({geometry: new Polygon([coordinates])}),
                 highlightObject = {
                     feature: polygonFeature,
-                    layer: {id: geometryProvider.layerId},
+                    layer: {id: geometryProvider.id},
                     styleId: geometryProvider.styleId,
                     type: "highlightPolygon",
                     highlightStyle: {}
@@ -534,7 +534,7 @@ const actions = {
         const mapProjection = mapCollection.getMapView("2D").getProjection().getCode(),
             serviceUrl = layer?.url,
             version = layer?.version || "1.1.0",
-            layerConfig = state.layersToRequest.find(config => config.layerId === layer.id),
+            layerConfig = state.layersToRequest.find(config => config.id === layer.id),
             typeName = layerConfig?.featureType || layer?.featureType || "default_layer",
             typeNameParam = version === "2.0.0" ? "typeNames" : "typeName",
             reader = new GeoJSONReader(),
@@ -560,7 +560,6 @@ const actions = {
                 break;
             }
         }
-
         if (!serviceUrl) {
             console.error("No valid URL for WFS:", layer);
             return null;
@@ -584,7 +583,6 @@ const actions = {
                 return null;
             }
         }
-
         if (!shrunkenGeometry) {
             shrunkenGeometry = geojsonGeometry;
         }
@@ -701,7 +699,7 @@ const actions = {
             resolution = mapCollection.getMapView("2D").getResolution();
 
         if (!layer) {
-            console.error(`Layer with ID ${layerConfig.layerId} not found`);
+            console.error(`Layer with ID ${layerConfig.id} not found`);
             return;
         }
 

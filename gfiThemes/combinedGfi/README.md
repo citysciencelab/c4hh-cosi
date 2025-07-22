@@ -219,7 +219,7 @@ A geometry provider layer can provide geometries to query other layers:
 
 ```json
 {
-  "layerId": "administrativeAreas",
+  "id": "administrativeAreas",
   "geometryProvider": {
     "geometryAttribute": "geometry"
   }
@@ -500,7 +500,7 @@ Example:
 
 ```json
 {
-  "layerId": "oaf_layer",
+  "id": "oaf_layer",
   "attributes": ["attr1", "attr2"],
   "oafQueryBufferSize": 0.0001
 }
@@ -526,7 +526,7 @@ By default, the addon displays layer names as they are defined in the layer sour
 
 ```json
 {
-  "layerId": "layer1",
+  "id": "layer1",
   "name": "Custom Display Name",
   "attributes": ["attr1", "attr2"]
 }
