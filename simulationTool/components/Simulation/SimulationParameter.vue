@@ -565,7 +565,7 @@ export default {
 
 
         /**
-         * Starts the simulation.
+         * Prepares the request bodies for the execution and starts the simulation.
          * @returns {void}
          */
         async startSimulation () {

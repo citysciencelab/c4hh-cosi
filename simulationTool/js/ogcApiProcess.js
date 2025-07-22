@@ -71,7 +71,9 @@ export default class OgcApiProcess {
         return defaultsObject;
     }
     /**
-     *
+     * Static method to get the default value from an object with an enum. The enum is necessary to create a dropdown in the UI.
+     * @param {Object} obj - The object containing the default value and enum.
+     * @returns {Object|undefined} An object containing the default value and the enum array, or undefined if no default is found.
      */
     static getDefaultWithEnum (obj) {
         if (Object.hasOwn(obj, "default")) {
