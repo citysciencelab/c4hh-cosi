@@ -273,6 +273,9 @@ export default {
 
             Object.entries(properties || {}).forEach(([propertyKey, property]) => {
                 if (!this.primaryTypeInputsKeys.includes(propertyKey)) {
+                    if (property.enum) {
+                        property.type = "enum";
+                    }
                     result[propertyKey] = property;
                 }
             });
@@ -296,6 +299,9 @@ export default {
             const requestBody = this.requestBodies.find(body => body.inputs?.[inputKey]);
 
             if (typeof requestBody?.inputs?.[inputKey]?.[propertyKey] !== "undefined") {
+                if (requestBody.inputs[inputKey][propertyKey].enum) {
+                    return requestBody.inputs[inputKey][propertyKey].enum;
+                }
                 return requestBody.inputs[inputKey][propertyKey];
             }
 
@@ -536,6 +542,26 @@ export default {
 
             return requestBodies;
         },
+        /**
+         * Replaces all objects with {enum: ..., value: ...} in a deeply nested object with the value of 'value'.
+         * @param {Object|Array} obj - The object or array to process.
+         * @returns {Object|Array} The processed object or array.
+         */
+        replaceEnumValueObjects (obj) {
+            if (Array.isArray(obj)) {
+                return obj.map(item => this.replaceEnumValueObjects(item));
+            }
+            else if (obj && typeof obj === "object") {
+                if (Object.prototype.hasOwnProperty.call(obj, "enum") && Object.prototype.hasOwnProperty.call(obj, "value")) {
+
+                    return obj.value;
+                }
+                return Object.fromEntries(
+                    Object.entries(obj).map(([key, value]) => [key, this.replaceEnumValueObjects(value)])
+                );
+            }
+            return obj;
+        },
 
 
         /**
@@ -548,6 +574,7 @@ export default {
                 return;
             }
             this.removeEmptyCollections(this.requestBodies);
+            this.requestBodies = this.replaceEnumValueObjects(this.requestBodies);
 
             const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
                 executeResponses = await Promise.all(
@@ -592,7 +619,7 @@ export default {
          * @param {String} val the value.
          * @returns {void}
          */
-        setRequestBodyInput (inputKey, propertyKey, val) {
+        setRequestBodyInput (inputKey, propertyKey, val, isEnum = false) {
             if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
                 return;
             }
@@ -608,6 +635,10 @@ export default {
 
                 if (typeof this.requestBodies[index].inputs[inputKey] === "undefined") {
                     this.requestBodies[index].inputs[inputKey] = {};
+                }
+                if (isEnum && this.requestBodies[index].inputs[inputKey][propertyKey].value) {
+                    this.requestBodies[index].inputs[inputKey][propertyKey].value = val;
+                    return;
                 }
                 this.requestBodies[index].inputs[inputKey][propertyKey] = val;
             });
@@ -858,8 +889,8 @@ export default {
                                 :value="getRequestBodyInputByKey(inputKey, propertyKey, property?.default)"
                                 :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                 :checked="typeof property.default === 'boolean' ? property.default : false"
-                                @update:value="setRequestBodyInput(inputKey, propertyKey, $event)"
-                                @update:checked="setRequestBodyInput(inputKey, propertyKey, $event)"
+                                @update:value="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(property.enum))"
+                                @update:checked="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(property.enum))"
                             />
                         </div>
                     </AccordionItem>

@@ -55,24 +55,43 @@ export default class OgcApiProcess {
         for (const inputKey in description.inputs) {
             const input = description.inputs[inputKey];
 
-            if (Object.hasOwn(input, "default")) {
-                defaultsObject[inputKey] = input.default;
-            }
+            defaultsObject[inputKey] = OgcApiProcess.getDefaultWithEnum(input);
+
 
             if (input.schema?.type === "object") {
+                defaultsObject[inputKey] ??= {};
                 for (const propertyKey in input.schema.properties) {
                     const property = input.schema.properties[propertyKey];
 
-                    if (Object.hasOwn(property, "default")) {
-                        defaultsObject[inputKey] ??= {};
-                        defaultsObject[inputKey][propertyKey] = property.default;
-                    }
+                    defaultsObject[inputKey][propertyKey] = OgcApiProcess.getDefaultWithEnum(property);
                 }
             }
         }
 
         return defaultsObject;
     }
+    /**
+     *
+     */
+    static getDefaultWithEnum (obj) {
+        if (Object.hasOwn(obj, "default")) {
+            if (Object.hasOwn(obj, "enum") && Array.isArray(obj.enum)) {
+                const enumArr = [...obj.enum],
+                    defaultIndex = enumArr.indexOf(obj.default);
+
+                if (defaultIndex !== 0) {
+                    if (defaultIndex > -1) {
+                        enumArr.splice(defaultIndex, 1);
+                    }
+                    enumArr.unshift(obj.default);
+                }
+                return {value: obj.default, enum: enumArr};
+            }
+            return obj.default;
+        }
+        return undefined;
+    }
+
 
     /**
      * Executes the process with the given request body.

@@ -48,7 +48,7 @@ export default {
             default: 1
         },
         value: {
-            type: [String, Number, Boolean],
+            type: [String, Number, Boolean, Array],
             default: undefined,
             required: false
         }
@@ -68,6 +68,23 @@ export default {
                 :model-value="value"
                 @update:modelValue="$emit('update:value', $event)"
             />
+        </template>
+        <template v-if="inputType === 'enum'">
+            <select
+                :id="id"
+                class="form-control mb-3"
+                :label="label"
+                :value="value[0]"
+                @change="$emit('update:value', $event.target.value)"
+            >
+                <option
+                    v-for="(val, index) in value"
+                    :key="index"
+                    :value="val"
+                >
+                    {{ val }}
+                </option>
+            </select>
         </template>
         <template v-else-if="inputType === 'boolean'">
             <div class="form-switch">
