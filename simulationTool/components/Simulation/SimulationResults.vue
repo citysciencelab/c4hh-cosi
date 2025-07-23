@@ -891,7 +891,7 @@ export default {
                         </label>
                     </div>
                 </div>
-                <div class="mt-4">
+                <div class="form-check form-switch mt-4">
                     <SwitchInput
                         id="showTextFeatures"
                         :checked="showTextFeatures"
