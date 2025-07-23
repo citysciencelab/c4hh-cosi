@@ -58,7 +58,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div v-if="label !== 'dontUse'">
         <template v-if="inputType === 'string'">
             <InputText
                 :id="id"
