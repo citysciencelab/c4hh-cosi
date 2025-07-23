@@ -1,5 +1,5 @@
 import {collectFeaturesByCoordinates as collectFeatures} from "./collectFeatures.js";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import nextFeatureByDistance from "./precompiler.nextFeatureByDistance.js";
 import allFeaturesByDuration from "./precompiler.allFeaturesByDuration.js";
 import {nextGroupedFeaturesByDistance} from "./precompiler.nextGroupedFeaturesByDistance.js";

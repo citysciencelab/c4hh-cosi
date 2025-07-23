@@ -1,6 +1,6 @@
 import {toRaw} from "vue";
 import SearchInterface from "../../../../src/modules/searchBar/searchInterfaces/searchInterface";
-import store from "../../../../src/app-store";
+import store from "../../../../src/app-store/index.js";
 import {search, setGazetteerUrl, setShowGeographicIdentifier} from "@masterportal/masterportalapi/src/searchAddress";
 
 /**

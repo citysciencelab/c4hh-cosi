@@ -1,5 +1,5 @@
 import isObject from "../../../../src/shared/js/utils/isObject.js";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 
 /**

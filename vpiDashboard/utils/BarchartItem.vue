@@ -1,7 +1,7 @@
 <script>
 import ChartJs from "chart.js/auto";
 import deepAssign from "../../../src/shared/js/utils/deepAssign";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 
 export default {
     name: "BarchartItem",

@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {CommuterApi} from "../../../utils/commuterApi.js";
-import crs from "@masterportal/masterportalapi/src/crs";
+import crs from "@masterportal/masterportalapi/src/crs.js";
 
 describe("addons/commuterFlows/utils/commuterApi.js", () => {
     const namedProjections = [

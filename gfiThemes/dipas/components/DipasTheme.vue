@@ -1,5 +1,5 @@
 <script>
-import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList";
+import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import {mapGetters} from "vuex";
 
 export default {

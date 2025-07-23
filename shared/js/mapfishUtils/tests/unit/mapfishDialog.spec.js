@@ -1,7 +1,7 @@
 import createVectorLayer from "../../createVectorLayer.js";
 import {expect} from "chai";
 import MapfishDialog from "../../mapfishDialog.js";
-import {rawLayerList} from "@masterportal/masterportalapi";
+import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import sinon from "sinon";
 
 describe("addons/shared/js/mapfishUtils/mapfishDialog.js", () => {

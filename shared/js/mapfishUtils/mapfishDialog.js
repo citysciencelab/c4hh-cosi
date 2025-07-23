@@ -1,4 +1,4 @@
-import {rawLayerList} from "@masterportal/masterportalapi";
+import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import {concatStringByDatakey} from "./translator.concatStringByDatakey";
 import {mergeObjectsByDatakey} from "./translator.mergeObjectsByDatakey";
 import createVectorLayer from "./createVectorLayer";

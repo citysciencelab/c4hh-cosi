@@ -14,10 +14,10 @@ import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.
 import axios from "axios";
 import isObject from "../../../src/shared/js/utils/isObject";
 import dayjs from "dayjs";
-import {upperFirst} from "../../../src/shared/js/utils/changeCase";
+import {upperFirst} from "../../../src/shared/js/utils/changeCase.js";
 import {collectFeaturesByCoordinates as collectFeatures} from "../../shared/js/mapfishUtils/collectFeatures.js";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
-import layerCollection from "../../../src/core/layers/js/layerCollection";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
+import layerCollection from "../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../src/core/layers/js/layerFactory";
 import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";

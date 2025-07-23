@@ -1,7 +1,7 @@
 <script>
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator";
+import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(advancedFormat);

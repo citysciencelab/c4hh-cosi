@@ -1,10 +1,10 @@
 
 import {GeoJSON} from "ol/format";
-import {getFeatureIds, returnGeoJSONLayerObject, transformFeature} from "../js/addGeoJsonRemotely";
-import importLayers from "../js/addWMSRemotely";
-import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList";
-import store from "../../../src/app-store";
-import {treeSubjectsKey} from "../../../src/shared/js/utils/constants";
+import {getFeatureIds, returnGeoJSONLayerObject, transformFeature} from "../js/addGeoJsonRemotely.js";
+import importLayers from "../js/addWMSRemotely.js";
+import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
+import store from "../../../src/app-store/index.js";
+import {treeSubjectsKey} from "../../../src/shared/js/utils/constants.js";
 
 export default {
     /**

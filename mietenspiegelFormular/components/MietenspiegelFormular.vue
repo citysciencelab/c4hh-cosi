@@ -4,7 +4,7 @@ import getters from "../store/gettersMietenspiegelFormular";
 import isObject from "../../../src/shared/js/utils/isObject";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import mutations from "../store/mutationsMietenspiegelFormular";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {requestGfi} from "../../../src/shared/js/api/wmsGetFeatureInfo";
 import wfsRequest from "../../../src/shared/js/api/wfs/getFeature";
 import {WFS} from "ol/format.js";

@@ -2,7 +2,7 @@ import {Group as LayerGroup} from "ol/layer.js";
 import layerProvider from "../../../js/getVisibleLayer";
 import {expect} from "chai";
 import sinon from "sinon";
-import store from "../../../../../src/app-store";
+import store from "../../../../../src/app-store/index.js";
 
 describe("addons/floodRiskManagement/js/getVisibleLayer", function () {
     let layers,

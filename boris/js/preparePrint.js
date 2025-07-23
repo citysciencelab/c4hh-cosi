@@ -1,5 +1,5 @@
 import borisState from "../store/stateBoris.js";
-import store from "../../../src/app-store/index";
+import store from "../../../src/app-store/index.js";
 import SpecModel from "../../../src/modules/print/js/buildSpec.js";
 import layerProvider from "../../../src/modules/print/js/getVisibleLayer.js";
 

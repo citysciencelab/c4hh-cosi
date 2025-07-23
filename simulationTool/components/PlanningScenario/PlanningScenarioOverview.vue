@@ -4,7 +4,7 @@ import FileUpload from "../../../../src/shared/modules/inputs/components/FileUpl
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import {mapActions, mapGetters} from "vuex";
 import PlanningScenarioOverviewList from "./PlanningScenarioOverviewList.vue";
-import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {

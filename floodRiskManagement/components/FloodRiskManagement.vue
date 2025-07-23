@@ -4,11 +4,11 @@ import axios from "axios";
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import FloodRiskManagementCard from "../components/FloodRiskManagementCard.vue";
 import FloodRiskManagementSwitcher from "../components/FloodRiskManagementSwitcher.vue";
-import layerCollection from "../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../src/core/layers/js/layerCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 import layerProvider from "../js/getVisibleLayer";
 
 export default {

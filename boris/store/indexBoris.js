@@ -1,7 +1,7 @@
-import mutations from "./mutationsBoris";
-import actions from "./actionsBoris";
-import getters from "./gettersBoris";
-import state from "./stateBoris";
+import mutations from "./mutationsBoris.js";
+import actions from "./actionsBoris.js";
+import getters from "./gettersBoris.js";
+import state from "./stateBoris.js";
 
 export default {
     namespaced: true,

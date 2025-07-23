@@ -3,7 +3,7 @@ import {expect} from "chai";
 import {createStore} from "vuex";
 import MietenspiegelFormular from "../../components/MietenspiegelFormular.vue";
 import MietenspiegelFormularStore from "../../store/indexMietenspiegelFormular";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import sinon from "sinon";
 import wfsRequest from "../../../../src/shared/js/api/wfs/getFeature";
 

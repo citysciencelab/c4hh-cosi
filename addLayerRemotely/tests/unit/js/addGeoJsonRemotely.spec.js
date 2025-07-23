@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {getFeatureIds, returnGeoJSONLayerObject} from "../../../js/addGeoJsonRemotely";
+import {getFeatureIds, returnGeoJSONLayerObject} from "../../../js/addGeoJsonRemotely.js";
 import sinon from "sinon";
 
 const geojson = {

@@ -5,7 +5,7 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import getBBOXGeometry from "../shared/js/getBBoxGeometry";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import isObject from "../../../../src/shared/js/utils/isObject";
-import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import ListGroup from "../shared/components/ListGroup.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";

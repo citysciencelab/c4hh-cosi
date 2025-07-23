@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import layerCollection from "../../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../../src/core/layers/js/layerCollection.js";
 import sinon from "sinon";
 import {
     getCurrentLayerList,

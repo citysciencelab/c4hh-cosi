@@ -1,4 +1,4 @@
-import crs from "@masterportal/masterportalapi/src/crs";
+import crs from "@masterportal/masterportalapi/src/crs.js";
 import mapMarker from "../../../src/core/maps/js/mapMarker";
 
 /**

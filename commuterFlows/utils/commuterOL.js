@@ -4,7 +4,7 @@ import VectorLayer from "ol/layer/Vector";
 import {Point} from "ol/geom.js";
 import Feature from "ol/Feature.js";
 import {uniqueId} from "../../../src/shared/js/utils/uniqueId.js";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 import {CommuterAnimation} from "./commuterAnimation.js";
 import store from "../../../src/app-store/index.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection.js";

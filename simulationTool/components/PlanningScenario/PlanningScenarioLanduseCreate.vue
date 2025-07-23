@@ -6,7 +6,7 @@ import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
-import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import ListGroup from "../shared/components/ListGroup.vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";

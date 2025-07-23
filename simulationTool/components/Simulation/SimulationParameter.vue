@@ -8,7 +8,7 @@ import {getMappedProperty} from "../shared/js/getMappedProperty";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
 import isObject from "../../../../src/shared/js/utils/isObject";
-import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";

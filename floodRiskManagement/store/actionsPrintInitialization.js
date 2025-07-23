@@ -1,9 +1,10 @@
 import {apply as applyTransform} from "ol/transform.js";
 import {createEmpty, extendCoordinate} from "ol/extent.js";
 import {DEVICE_PIXEL_RATIO} from "ol/has.js";
-import Canvas from "../../../src/modules/print/js/buildCanvas";
-import layerProvider from "../js/getVisibleLayer";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
+import Canvas from "../../../src/modules/print/js/buildCanvas.js";
+import layerProvider from "../js/getVisibleLayer.js";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
+import i18next from "i18next";
 
 let lastPrintedExtent;
 

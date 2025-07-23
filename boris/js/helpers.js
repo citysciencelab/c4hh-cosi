@@ -1,4 +1,4 @@
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 
 const helpers = {
     /**

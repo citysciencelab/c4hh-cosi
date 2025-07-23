@@ -11,7 +11,7 @@ import mutations from "../store/mutations";
 import JobDetails from "./Job/JobDetails.vue";
 import JobExecution from "./Job/JobExecution.vue";
 import JobList from "./Job/JobList.vue";
-import layerCollection from "../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../src/core/layers/js/layerCollection.js";
 import PlanningScenario from "./PlanningScenario/PlanningScenario.vue";
 import ProcessDetails from "./Process/ProcessDetails.vue";
 import ProcessList from "./Process/ProcessList.vue";

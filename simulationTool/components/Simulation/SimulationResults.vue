@@ -10,7 +10,7 @@ import FeaturesHandler from "../../../../src/modules/statisticDashboard/js/handl
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import Fill from "ol/style/Fill";
 import isObject from "../../../../src/shared/js/utils/isObject";
-import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {LineString} from "ol/geom";
 import {mapActions, mapGetters, mapMutations} from "vuex";

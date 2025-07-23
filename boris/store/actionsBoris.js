@@ -1,9 +1,9 @@
 import axios from "axios";
-import helpers from "../js/helpers";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
+import helpers from "../js/helpers.js";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 import {WFS, WMSGetFeatureInfo} from "ol/format.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection";
-import WPS from "../../../src/shared/js/api/wps";
+import WPS from "../../../src/shared/js/api/wps.js";
 import mapCollection from "../../../src/core/maps/js/mapCollection";
 
 const actions = {

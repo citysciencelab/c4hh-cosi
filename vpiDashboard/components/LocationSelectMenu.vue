@@ -1,7 +1,7 @@
 <script>
 import {mapState, mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
-import layerCollection from "../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../src/core/layers/js/layerCollection.js";
 import axios from "axios";
 import {Config} from "../config";
 

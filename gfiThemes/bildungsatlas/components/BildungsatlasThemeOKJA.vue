@@ -1,7 +1,7 @@
 <script>
 import PiechartItem from "../../../../src/shared/modules/charts/components/PiechartItem.vue";
-import {convertColor} from "../../../../src/shared/js/utils/convertColor";
-import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator";
+import {convertColor} from "../../../../src/shared/js/utils/convertColor.js";
+import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 
 export default {
     name: "BildungsatlasThemeOKJA",

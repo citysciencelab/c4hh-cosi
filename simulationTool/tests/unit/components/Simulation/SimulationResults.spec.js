@@ -3,7 +3,7 @@ import {config, mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
-import layerCollection from "../../../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../../../src/core/layers/js/layerCollection.js";
 import {Point, Polygon} from "ol/geom";
 import {Select} from "ol/interaction";
 import SimulationResults from "../../../../components/Simulation/SimulationResults.vue";

@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import store from "../../../../../../src/app-store";
+import store from "../../../../../../src/app-store/index.js";
 import SearchInterface from "../../../../../../src/modules/searchBar/searchInterfaces/searchInterface.js";
 import SearchInterfaceGfiOnAddressGaz from "../../../js/searchInterfaceGfiOnAddressGaz.js";
 

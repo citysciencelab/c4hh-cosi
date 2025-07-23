@@ -1,12 +1,12 @@
 import {config, shallowMount} from "@vue/test-utils";
-import crs from "@masterportal/masterportalapi/src/crs";
+import crs from "@masterportal/masterportalapi/src/crs.js";
 import {expect} from "chai";
 import WaterRiskCheck from "../../components/WaterRiskCheck.vue";
 import MapfishDialog from "../../../shared/js/mapfishUtils/mapfishDialog";
 import createVectorLayer from "../../../shared/js/mapfishUtils/createVectorLayer";
 import {createStore} from "vuex";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
-import layerCollection from "../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import sinon from "sinon";
 import VectorLayer from "ol/layer/Vector.js";
 import spatialOperations from "../../js/spatialOperations";

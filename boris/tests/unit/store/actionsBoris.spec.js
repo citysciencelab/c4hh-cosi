@@ -5,7 +5,7 @@ import stateBoris from "../../../store/stateBoris";
 import axios from "axios";
 import mapCollection from "../../../../../src/core/maps/js/mapCollection";
 import rawSources from "../../resources/rawSources";
-import layerCollection from "../../../../../src/core/layers/js/layerCollection";
+import layerCollection from "../../../../../src/core/layers/js/layerCollection.js";
 
 import {addProjection} from "ol/proj.js";
 import Projection from "ol/proj/Projection.js";

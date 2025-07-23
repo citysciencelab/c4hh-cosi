@@ -2,9 +2,9 @@
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import GraphicalSelect from "../../../src/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import SwitchInput from "../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
-import WPS from "../../../src/shared/js/api/wps";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
+import WPS from "../../../src/shared/js/api/wps.js";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 
 export default {
     name: "PopulationRequest",

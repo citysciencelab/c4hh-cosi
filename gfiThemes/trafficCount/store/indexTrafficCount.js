@@ -1,6 +1,6 @@
-import getters from "./gettersTrafficCount";
-import mutations from "./mutationsTrafficCount";
-import state from "./stateTrafficCount";
+import getters from "./gettersTrafficCount.js";
+import mutations from "./mutationsTrafficCount.js";
+import state from "./stateTrafficCount.js";
 
 export default {
     namespaced: true,
