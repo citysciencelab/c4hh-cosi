@@ -40,7 +40,8 @@ export default {
             processHandlers: [],
             requestBodies: [],
             selectedOutputOptions: [],
-            simulationName: ""
+            simulationName: "",
+            ignoreProperties: []
         };
     },
     computed: {
@@ -272,7 +273,7 @@ export default {
             const result = {};
 
             Object.entries(properties || {}).forEach(([propertyKey, property]) => {
-                if (!this.primaryTypeInputsKeys.includes(propertyKey)) {
+                if (!this.primaryTypeInputsKeys.includes(propertyKey) && !this.ignoreProperties.includes(propertyKey)) {
                     if (property.enum) {
                         property.type = "enum";
                     }
@@ -292,6 +293,9 @@ export default {
          * @returns {String} the parameter value. It could be the rendered value or default value.
          */
         getRequestBodyInputByKey (inputKey, propertyKey, val) {
+            if (this.ignoreProperties.includes(propertyKey)) {
+                return undefined;
+            }
             if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
                 return val;
             }
@@ -514,13 +518,35 @@ export default {
             this.processDescriptions = await Promise.all(
                 this.processHandlers.map(handler => handler.getDescription(this.accessToken))
             );
-            this.requestBodies = this.processDescriptions.map(description => ({
+            this.ignoreProperties = Object.keys(this.simulation.inputs)
+                .filter(inputKey => this.simulation.inputs[inputKey].ignoreProperties)
+                .flatMap(inputKey => this.simulation.inputs[inputKey].ignoreProperties);
+            const filteredProcessDescriptions = [];
+
+            this.processDescriptions.forEach(description => filteredProcessDescriptions.push(this.removeUnwantedProperty(description, this.ignoreProperties)));
+
+            this.requestBodies = filteredProcessDescriptions.map(description => ({
                 inputs: {
                     ...OgcApiProcess.getInputDefaultsFromDescription(description),
                     ...this.currentPlanningScenario.inputs
                 },
                 outputs: {}
             }));
+        },
+        removeUnwantedProperty (obj, ignoreProperties = []) {
+            if (!obj || typeof obj !== "object") {
+                return obj;
+            }
+
+            if (Array.isArray(obj)) {
+                return obj.map(item => this.removeUnwantedProperty(item, ignoreProperties));
+            }
+
+            return Object.fromEntries(
+                Object.entries(obj)
+                    .filter(([key]) => !ignoreProperties.includes(key))
+                    .map(([key, value]) => [key, this.removeUnwantedProperty(value, ignoreProperties)])
+            );
         },
 
         /**
