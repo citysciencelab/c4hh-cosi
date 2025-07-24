@@ -494,8 +494,8 @@ export default {
          * @returns {void}
          */
         openSimulation (simulationId) {
-            this.setMode("simulationResults");
             this.setSimulationIdForResults(simulationId);
+            this.setMode("simulationList");
         },
 
         /** Prepares the request body for the simulation.
@@ -582,13 +582,13 @@ export default {
             Object.values(newSimulation.jobs).forEach(async (job, index) => {
                 job.requestBody = JSON.parse(JSON.stringify(this.requestBodies[index]));
                 job.jobStatus = {status: initialStatuses[index]};
+                job.resultStyle = this.simulation.processes[index].resultStyle;
                 job.jobResults = await this.processHandlers[index].pollJobStatusAndGetResults(
                     this.accessToken,
                     jobIDs[index],
                     this.simulation.processes[index].pollingInterval,
                     jobStatus => this.onProgressUpdate(jobStatus, job)
                 );
-                job.resultStyle = this.simulation.processes[index].resultStyle;
                 this.jobStatusChanged();
             });
         },

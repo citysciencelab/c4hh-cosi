@@ -14,7 +14,6 @@ import layerCollection from "../../../../src/core/layers/js/layerCollection";
 import layerFactory from "../../../../src/core/layers/js/layerFactory";
 import {LineString} from "ol/geom";
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import SectionHeader from "../SectionHeader.vue";
 import {Select, Translate} from "ol/interaction";
 import {singleClick} from "ol/events/condition";
 import Stroke from "ol/style/Stroke";
@@ -27,7 +26,6 @@ export default {
     components: {
         AccordionItem,
         SwitchInput,
-        SectionHeader,
         FlatButton
     },
     data () {
@@ -36,7 +34,6 @@ export default {
             finishedTimes: [],
             jobStatusTags: [],
             layers: [],
-            legendValue: [],
             outputs: [],
             progressValues: [],
             startTimes: [],
@@ -52,8 +49,7 @@ export default {
             "planningScenarios",
             "simulations",
             "simulationIdForResults",
-            "simulationResultStyle",
-            "simulations"
+            "simulationResultStyle"
         ]),
         ...mapGetters("Menu", [
             "mainMenu",
@@ -190,12 +186,25 @@ export default {
          * @returns {Object} The current style object
          */
         currentStyle () {
-            if (!this.jobs || Object.keys(this.jobs).length === 0) {
-                return null;
+            if (this.jobs) {
+                for (const job of Object.values(this.jobs)) {
+                    if (job.resultStyle && job.resultStyle !== undefined) {
+                        return job.resultStyle;
+                    }
+                }
             }
-            const firstJob = Object.values(this.jobs)[0];
+            return null;
+        },
 
-            return firstJob?.resultStyle || null;
+        /**
+         * Get the legend value for the current style.
+         * @returns {Object[]} The legend value in array.
+         */
+        legendValue () {
+            if (this.worstJobStatusTag !== "successful") {
+                return [];
+            }
+            return this.getLegendValue(this.currentStyle);
         }
     },
     watch: {
@@ -412,7 +421,7 @@ export default {
                 return [];
             }
 
-            const legendValue = [];
+            const extractedValue = [];
 
             if (val?.type === "polygon") {
                 val.styles?.forEach((data, index) => {
@@ -425,11 +434,11 @@ export default {
                             "polygonStrokeWidth": data.style?.strokeWidth
                         };
 
-                    legendValue[index] = FeaturesHandler.prepareLegendForPolygon(legendObj, style);
+                    extractedValue[index] = FeaturesHandler.prepareLegendForPolygon(legendObj, style);
                 });
             }
 
-            return legendValue;
+            return extractedValue;
         },
 
         /**
@@ -517,14 +526,6 @@ export default {
         },
 
         /**
-         * Sets the legend value.
-         * @returns {void}
-         */
-        setLegendValue () {
-            this.legendValue = this.getLegendValue(this.currentStyle);
-        },
-
-        /**
          * Shows features in map.
          * @param {String} simulationId the simulation id.
          * @param {Object} jobs - The jobs.
@@ -565,7 +566,6 @@ export default {
                 }
             });
             this.setCurrentOutput(outputs[0]);
-            this.setLegendValue();
         },
 
         /**
@@ -738,34 +738,8 @@ export default {
 
 <template>
     <div class="vh-100 overflow-y-auto">
-        <SectionHeader
-            :title="$t('additional:modules.tools.simulationTool.simulationResults')"
-        />
         <div v-if="simulationIdForResults">
-            <div
-                class="d-flex flex-column"
-            >
-                <h5
-                    class="mb-3"
-                >
-                    {{ currentPlanningScenario?.name }}
-                </h5>
-            </div>
             <div class="result-container">
-                <div
-                    class="d-flex flex-column"
-                >
-                    <div
-                        class="me-2 ps-label"
-                    >
-                        {{ $t('additional:modules.tools.simulationTool.name') }}
-                    </div>
-                    <div
-                        class="me-2 font-bold"
-                    >
-                        {{ currentSimulation?.name }}
-                    </div>
-                </div>
                 <div
                     class="d-flex flex-column"
                 >
@@ -907,7 +881,7 @@ export default {
                     />
                 </div>
             </div>
-            <div v-if="worstJobStatusTag === 'successful' && legendValue.length">
+            <div v-if="legendValue.length">
                 <hr>
                 <AccordionItem
                     id="simulation-results-accordion-legend"
@@ -970,13 +944,6 @@ export default {
                         :aria-label="'Simulationsergebnisse drucken'"
                         :text="'Drucken'"
                         @click="openPrintModule"
-                    />
-                    <FlatButton
-                        id="start"
-                        :icon="'bi bi-list-task'"
-                        :aria-label="$t('additional:modules.tools.simulationTool.toSimulations')"
-                        :text="$t('additional:modules.tools.simulationTool.toSimulations')"
-                        @click="() => setMode('simulationList')"
                     />
                 </div>
             </form>

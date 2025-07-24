@@ -100,16 +100,6 @@ export default {
             <i class="bi bi-list-check" />
         </button>
         <button
-            v-if="!hiddenSideMenus.includes('simulationResults')"
-            class="btn btn-link"
-            :class="{ active: mode.includes('simulationResults') }"
-            :title="$t('additional:modules.tools.simulationTool.simulationResults')"
-            @click="() => setMode('simulationResults')"
-        >
-            <i class="bi bi-bar-chart-line" />
-        </button>
-
-        <button
             v-if="!hiddenSideMenus.includes('process')"
             class="btn btn-link"
             :class="{ active: mode.includes('process') }"

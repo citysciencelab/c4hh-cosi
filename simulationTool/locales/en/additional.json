@@ -113,6 +113,8 @@
           "noJobsSelected": "No simulation is selected.",
           "notes": "Notes",
           "notLoggedIn": "You are not logged in!",
+          "openResults": "Open results",
+          "openSimulation": "Open simulation",
           "parameters": "Parameters",
           "planingAreaDraw": "Draw planning area",
           "planningScenario": "Planning scenario",

@@ -115,6 +115,8 @@
           "newScenario": "Neues Szenario",
           "notes": "Notizen",
           "notLoggedIn": "Sie sind nicht angemeldet!",
+          "openResults": "Ergebnisse öffnen",
+          "openSimulation": "Simulation öffnen",
           "parameters": "Parameter",
           "planingAreaDraw": "Planungsgebiet einzeichnen",
           "planningScenario": "Planungsszenario",
