@@ -58,7 +58,7 @@ export default {
 </script>
 
 <template>
-    <div v-if="label !== 'dontUse'">
+    <div>
         <template v-if="inputType === 'string'">
             <InputText
                 :id="id"
@@ -74,7 +74,7 @@ export default {
                 :id="id"
                 class="form-control mb-3"
                 :label="label"
-                :value="value[0]"
+                :value="Array.isArray(value) ? value[0] : value"
                 @change="$emit('update:value', $event.target.value)"
             >
                 <option
