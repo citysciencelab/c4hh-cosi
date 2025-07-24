@@ -1,5 +1,5 @@
-import isObject from "../../../../src/shared/js/utils/isObject";
-import {formatValue} from "./translator.concatStringByDatakey";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
+import {formatValue} from "./translator.concatStringByDatakey.js";
 
 /**
  * Translator to merge multiple arrays of objects from the knowledge base in one array.

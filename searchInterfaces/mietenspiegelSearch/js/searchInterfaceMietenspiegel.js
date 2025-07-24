@@ -1,5 +1,5 @@
 import crs from "@masterportal/masterportalapi/src/crs.js";
-import SearchInterfaceElasticSearch from "../../../../src/modules/searchBar/searchInterfaces/searchInterfaceElasticSearch";
+import SearchInterfaceElasticSearch from "../../../../src/modules/searchBar/searchInterfaces/searchInterfaceElasticSearch.js";
 
 /**
  * The search interface to the mietenspiegel.

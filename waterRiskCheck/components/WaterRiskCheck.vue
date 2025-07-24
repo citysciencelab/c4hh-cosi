@@ -10,7 +10,7 @@ import layerFactory from "../../../src/core/layers/js/layerFactory.js";
 import {Fill, Stroke, Style} from "ol/style.js";
 import getWCSFeatures from "../js/getWCSFeatures.js";
 import spatialOperations from "../js/spatialOperations";
-import isObject from "../../../src/shared/js/utils/isObject";
+import isObject from "../../../src/shared/js/utils/isObject.js";
 import bbox from "@turf/bbox";
 import {GeoJSON} from "ol/format";
 import axios from "axios";

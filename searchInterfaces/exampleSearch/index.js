@@ -1,4 +1,4 @@
-import exampleSearch from "./js/searchInterfaceExampleSearch";
+import exampleSearch from "./js/searchInterfaceExampleSearch.js";
 
 export default {
     exampleSearch

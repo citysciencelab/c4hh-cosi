@@ -10,7 +10,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 import {addMissingDataWeek} from "../utils/addMissingData.js";
 import {getPublicHoliday} from "../../../../src/shared/js/utils/calendar.js";
 import TrafficCountDatePicker from "./TrafficCountDatePicker.vue";
-import isObject from "../../../../src/shared/js/utils/isObject";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
 import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(weekOfYear);

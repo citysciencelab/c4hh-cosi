@@ -1,6 +1,6 @@
 <script>
 import {downloadBlobPerHTML5, downloadBlobPerNavigator} from "../../../src/shared/modules/buttons/js/exportButtonUtils.js";
-import isObject from "../../../src/shared/js/utils/isObject";
+import isObject from "../../../src/shared/js/utils/isObject.js";
 import {mapGetters, mapMutations} from "vuex";
 import {register as registerMap} from "../js/observer/MapObserver";
 import {register as registerLayers} from "../js/observer/LayerObserver";

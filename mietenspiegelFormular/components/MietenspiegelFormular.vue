@@ -1,7 +1,7 @@
 <script>
 import dayjs from "dayjs";
 import getters from "../store/gettersMietenspiegelFormular";
-import isObject from "../../../src/shared/js/utils/isObject";
+import isObject from "../../../src/shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import mutations from "../store/mutationsMietenspiegelFormular";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";

@@ -3,7 +3,7 @@ import crs from "@masterportal/masterportalapi/src/crs.js";
 import {expect} from "chai";
 import WaterRiskCheck from "../../components/WaterRiskCheck.vue";
 import MapfishDialog from "../../../shared/js/mapfishUtils/mapfishDialog";
-import createVectorLayer from "../../../shared/js/mapfishUtils/createVectorLayer";
+import createVectorLayer from "../../../shared/js/mapfishUtils/createVectorLayer.js";
 import {createStore} from "vuex";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";

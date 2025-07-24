@@ -1,5 +1,5 @@
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
-import store from "../../../../src/app-store/";
+import store from "../../../../src/app-store/index.js";
 
 /**
  * Registers the Observer.

@@ -7,7 +7,7 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
-import layerFactory from "../../../../src/core/layers/js/layerFactory";
+import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 import ListGroup from "../shared/components/ListGroup.vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import {mapActions, mapGetters, mapMutations} from "vuex";

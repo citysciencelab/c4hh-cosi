@@ -1,4 +1,4 @@
-import waterRiskCheckSearch from "./js/searchInterfaceWaterRiskCheck";
+import waterRiskCheckSearch from "./js/searchInterfaceWaterRiskCheck.js";
 
 export default {
     waterRiskCheckSearch

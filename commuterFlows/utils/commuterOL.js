@@ -8,7 +8,7 @@ import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.
 import {CommuterAnimation} from "./commuterAnimation.js";
 import store from "../../../src/app-store/index.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection.js";
-import layerFactory from "../../../src/core/layers/js/layerFactory";
+import layerFactory from "../../../src/core/layers/js/layerFactory.js";
 
 /**
  * CommuterOL is the OpenLayers api for the Tool "CommuterFlows"

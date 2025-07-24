@@ -1,7 +1,7 @@
 <script>
 import {Fill, Stroke, Style} from "ol/style";
 import {getCenter as getCenterOfExtent} from "ol/extent";
-import getters from "../store/gettersValuationPrint";
+import getters from "../store/gettersValuationPrint.js";
 import Feature from "ol/Feature";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import mutations from "../store/mutationsValuationPrint";
@@ -12,13 +12,13 @@ import {unionFeatures} from "../js/unionFeatures";
 import {createKnowledgeBase} from "../../shared/js/mapfishUtils/createKnowledgeBase.js";
 import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
 import axios from "axios";
-import isObject from "../../../src/shared/js/utils/isObject";
+import isObject from "../../../src/shared/js/utils/isObject.js";
 import dayjs from "dayjs";
 import {upperFirst} from "../../../src/shared/js/utils/changeCase.js";
 import {collectFeaturesByCoordinates as collectFeatures} from "../../shared/js/mapfishUtils/collectFeatures.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection.js";
-import layerFactory from "../../../src/core/layers/js/layerFactory";
+import layerFactory from "../../../src/core/layers/js/layerFactory.js";
 import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import WfsSearch from "../../../src/modules/wfsSearch/components/WfsSearch.vue";

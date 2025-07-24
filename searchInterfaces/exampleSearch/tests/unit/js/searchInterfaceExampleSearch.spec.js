@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import SearchInterface from "../../../../../../src/modules/searchBar/searchInterfaces/searchInterface";
+import SearchInterface from "../../../../../../src/modules/searchBar/searchInterfaces/searchInterface.js";
 import searchInterfaceExampleSearch from "../../../js/searchInterfaceExampleSearch.js";
 
 describe("addons/searchInterfaces/exampleSearch/searchInterfaceExampleSearch.js", () => {

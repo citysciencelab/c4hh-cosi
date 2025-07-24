@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import {mergeObjectsByDatakey} from "../../translator.mergeObjectsByDatakey";
+import {mergeObjectsByDatakey} from "../../translator.mergeObjectsByDatakey.js";
 
 describe("addons/shared/js/mapfishUtils/translator.mergeObjectsByDatakey.js", () => {
     beforeEach(function () {

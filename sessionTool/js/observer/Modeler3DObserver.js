@@ -1,6 +1,6 @@
-import isObject from "../../../../src/shared/js/utils/isObject";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
 import {nextTick} from "vue";
-import store from "../../../../src/app-store/";
+import store from "../../../../src/app-store/index.js";
 
 /**
  * Registers the Observer.

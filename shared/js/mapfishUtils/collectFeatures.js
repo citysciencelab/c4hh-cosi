@@ -3,7 +3,7 @@ import getFeaturePOST from "../../../../src/shared/js/api/wfs/getFeature";
 import {intersects, within} from "ol/format/filter";
 import Point from "ol/geom/Point";
 import {WFS} from "ol/format";
-import isObject from "../../../../src/shared/js/utils/isObject";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
 import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
 import {bufferGeometry} from "./bufferGeometry";
 

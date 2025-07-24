@@ -1,7 +1,7 @@
 <script>
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
-import layerFactory from "../../../../src/core/layers/js/layerFactory";
+import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 
 export default {

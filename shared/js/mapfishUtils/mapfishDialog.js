@@ -1,12 +1,12 @@
 import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
-import {concatStringByDatakey} from "./translator.concatStringByDatakey";
-import {mergeObjectsByDatakey} from "./translator.mergeObjectsByDatakey";
-import createVectorLayer from "./createVectorLayer";
+import {concatStringByDatakey} from "./translator.concatStringByDatakey.js";
+import {mergeObjectsByDatakey} from "./translator.mergeObjectsByDatakey.js";
+import createVectorLayer from "./createVectorLayer.js";
 import Feature from "ol/Feature";
 import {Point} from "ol/geom";
-import isObject from "../../../../src/shared/js/utils/isObject";
-import BuildSpec from "../../../../src/modules/print/js/buildSpec";
-import layerFactory from "../../../../src/core/layers/js/layerFactory";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
+import BuildSpec from "../../../../src/modules/print/js/buildSpec.js";
+import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 
 /**
  * Mapfish is a class for communicating with mapfish.

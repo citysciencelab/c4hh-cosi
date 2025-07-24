@@ -1,6 +1,6 @@
 import actionsPrintInitialization from "./actionsPrintInitialization";
 import axios from "axios";
-import BuildSpec from "../../../src/modules/print/js/buildSpec";
+import BuildSpec from "../../../src/modules/print/js/buildSpec.js";
 import omit from "../../../src/shared/js/utils/omit";
 import layerProvider from "../js/getVisibleLayer";
 

@@ -1,5 +1,5 @@
-import isObject from "../../../../src/shared/js/utils/isObject";
-import store from "../../../../src/app-store/";
+import isObject from "../../../../src/shared/js/utils/isObject.js";
+import store from "../../../../src/app-store/index.js";
 
 /**
  * Registers the Observer.

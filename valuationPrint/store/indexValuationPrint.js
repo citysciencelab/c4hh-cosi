@@ -1,5 +1,5 @@
 import mutations from "./mutationsValuationPrint";
-import getters from "./gettersValuationPrint";
+import getters from "./gettersValuationPrint.js";
 import state from "./stateValuationPrint";
 
 export default {

@@ -1,4 +1,4 @@
-import mietenspiegelSearch from "./js/searchInterfaceMietenspiegel";
+import mietenspiegelSearch from "./js/searchInterfaceMietenspiegel.js";
 
 export default {
     mietenspiegelSearch

@@ -1,5 +1,5 @@
 import {GeoJSON} from "ol/format.js";
-import isObject from "../../../src/shared/js/utils/isObject";
+import isObject from "../../../src/shared/js/utils/isObject.js";
 import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEventCoordinates";
 import layerCollection from "../../../src/core/layers/js/layerCollection.js";
 import ConvertStyle from "../js/convertStyle";

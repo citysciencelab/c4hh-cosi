@@ -1,4 +1,4 @@
-import SearchInterface from "../../../../src/modules/searchBar/searchInterfaces/searchInterface";
+import SearchInterface from "../../../../src/modules/searchBar/searchInterfaces/searchInterface.js";
 
 /**
  * The example search interface as addon.

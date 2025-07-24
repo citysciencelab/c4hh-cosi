@@ -9,7 +9,7 @@ import {Select} from "ol/interaction";
 import SimulationResults from "../../../../components/Simulation/SimulationResults.vue";
 import sinon from "sinon";
 import VectorSource from "ol/source/Vector.js";
-import layerFactory from "@core/layers/js/layerFactory";
+import layerFactory from "@core/layers/js/layerFactory.js";
 import {Style} from "ol/style";
 
 config.global.mocks.$t = key => key;
