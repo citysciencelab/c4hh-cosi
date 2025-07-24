@@ -33,7 +33,7 @@ Tool to simulate wind and noise.
 |----|-------------|---|-------|------------|------|
 |id|ja|String||The id of simulation.|true|
 |title|ja|String| |The titel of simulation.|true|
-|inputs|yes|Object|Object|An object to set input parameter for simulation.|true|
+|inputs|yes|Object|Object|An object to set input parameter for simulation. Parameters that should be ignored can be configured as "ignoreProperties" (Array of property names) |true|
 |outputs|yes|Object|Object|An object to set output parameter for simulation.|true|
 |processes|yes|**[processes](#markdown-header-portalconfigmenutoolsimulationtoolsimulationsprocesses)**| |The settings for processes.|true|
 
@@ -139,7 +139,8 @@ Tool to simulate wind and noise.
 		"building_grid_settings": {
 		  "menu": "primary",
 		  "primaryProperties": ["height_between_levels_3d", "receiver_distance", "receiver_height_2d"],
-		  "propertiesMapping": {}
+		  "propertiesMapping": {},
+      "ignoreProperties": ["join_receivers_by_xy_location_3d"]
 		},
 		"dem_url": {
 		  "source": {
