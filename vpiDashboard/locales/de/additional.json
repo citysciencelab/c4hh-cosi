@@ -54,7 +54,7 @@
           "numberVisitorsDay": "Anzahl Besucher pro Tag",
           "chartTitleDay": "Daten von {{dayName}}, den {{dateValue}}",
           "chartTitleDayRange": "Daten vom {{dateValueFrom}} bis zum {{dateValueTo}}",
-          "avgVisitorsYear": "Besucher pro Jahr",
+          "avgVisitorsYear": "Anzahl der Besucher pro Jahr",
           "avgVisitorsDay": "Ø Besucher im {{ month }} {{ year }} an einem",
           "avgVisitorsMonth": "Anzahl der Besucher pro Monat im Jahr {{ year }}",
           "selectDataBase": "Datengrundlage für Grafik auswählen:",
@@ -97,12 +97,11 @@
               "touristsPerWeek": "Ø Touristen pro Woche"
             },
             "footnote": {
-              "plz": "(*) Postleitzahlengebiete entsprechen nicht den Stadtteilgrenzen und können sich aus einem oder mehreren Stadtteilen zusammensetzen.",
-              "plz2": "Hinweis: \"Übernachtungsorte: Hamburger und Übernachtungsgäste in Hamburg\"",
+              "plz": "(*) Inkl. Übernachtungsgäste am Herkunftsort, Postleitzahlengebiete entsprechen nicht den Stadtteilgrenzen und können sich aus mehreren Stadtteilen zusammensetzen.",
               "overnight": "Hinweis: \"Übernachtungsorte: Hamburger und Übernachtungsgäste in Hamburg sowie Tagesbesucher und Pendler außerhalb Hamburgs.\"",
-              "hamburger": "Hinweis: inkl. Übernachtungsgäste in Hamburg",
-              "pendler": "Hinweis: Besucher aus der Metropolregion Hamburg",
-              "touristen": "Hinweis: Besucher aus Deutschland"
+              "hamburger": "Übernachtungsgäste in Hamburg",
+              "pendler": "Besucher aus der Metropolregion",
+              "touristen": "Besucher aus Deutschland"
             },
             "highestValue": "höchster Wert",
             "otherValues": "sonstige Werte"
@@ -124,7 +123,7 @@
             "hourly": "Stündlich",
             "daily": "Täglich",
             "footnote": [
-              "In der Karte werden die Besucher eines Tages oder einer Stunde für alle 31 Gitterzellen der Innenstadt als Heatmap angezeigt.",
+              "In der Karte werden die Besucher eines Tages oder einer Stunde für alle 124 Gitterzellen der Innenstadt als Heatmap angezeigt.",
               "rote Gitterzelle = Besucheraufkommen hoch,",
               "weiße Gitterzelle = Besucheraufkommen niedrig.",
               "Über die Bedienkonsole auf der Karte lassen sich mit den Pfeiltasten oder dem Schieberegler Werte für einen beliebigen Zeitpunkte auswählen.",

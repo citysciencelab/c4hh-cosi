@@ -44,7 +44,7 @@ export default {
                     Das Frequenzdaten-Dashboard dient zur Analyse der Besucherfrequenzen in der Hamburger Innenstadt. Das Dashboard ist über das Werkzeug Icon auf der rechten Seite und dem Menüeintrag VPI Dashboard aufrufbar.
                 </p>
                 <p>
-                    Mit dem VPI Dashboard können Aufenthalts-Frequenzdaten aus 31 Gitterzellen
+                    Mit dem VPI Dashboard können Aufenthalts-Frequenzdaten aus 124 Gitterzellen
                     <sup id="fnref:1">
                         <a
                             href="#fn:1"
@@ -59,7 +59,7 @@ export default {
                     Über das Dashboard sind Besucherzahlen sowie Altersklassen, Geschlecht und Herkunft der Besucher für die Flächen in den Gitterzellen analysierbar. Auch der Vergleich von Gitterzellen ist über Standorte vergleichen oder die Heatmap möglich. Die Bezeichnungen der Gitterzellen (Straßennamen) beschreibt nicht den Standort der angezeigten Werte, sondern dient im Wesentlichen der besseren Orientierung in der Kartenansicht.
                 </p>
                 <p>
-                    Die für jede Gitterzelle errechneten Daten ermöglichen eine flächendeckende Betrachtung des Besucheraufkommens in der Innenstadt. Die größe der Gitterzellen beträgt 500m x 500m und Bereich des Hafens 1km x 1Km. Alle Daten werden in der Regel mit einer Latenz von 48 Stunden ab dem aktuellen Datum bereitgestellt.
+                    Die für jede Gitterzelle errechneten Daten ermöglichen eine flächendeckende Betrachtung des Besucheraufkommens in der Innenstadt. Die Größe der Gitterzellen beträgt 250m x 250m und Bereich des Hafens 500m x 500m. Alle Daten werden in der Regel mit einer Latenz von 48 Stunden ab dem aktuellen Datum bereitgestellt.
                 </p>
             </div>
         </div>
@@ -69,7 +69,7 @@ export default {
 
             <div class="listBlock">
                 <p>
-                    Beim Öffnen des VPI-Dashboards werden zunächst die Besucher für den Standort Jungfernstieg/Ballindamm sowie die Werte für den aktuellen Monat im aktuellen Jahr vorausgewählt angezeigt. Die Werte in den drei Kacheln für Jahr, Monat und Wochentag sind über Pfeiltasten änderbar.
+                    Beim Öffnen des VPI-Dashboards werden zunächst die Besucher für den Standort Rathausmarkt / Kleine Alster sowie die Werte für den aktuellen Monat im aktuellen Jahr vorausgewählt angezeigt. Die Werte in den drei Kacheln für Jahr, Monat und Wochentag sind über Pfeiltasten änderbar.
                 </p>
                 <p>
                     Der Standort lässt sich sowohl durch Auswahl einer Gitterzelle in der Karte als auch dem Dropdown-Menü im Dashboard ändern.
@@ -442,7 +442,7 @@ export default {
                         >
                             Geographische Gitter
                         </a>
-                        . Das im VPI Dashboard genutzte Gitter hat, in Abhängigkeit von der Netzverfügbarkeit der jeweiligen Betreiber quadratische Zellgrößen von 500 m bis 1 km.
+                        . Das im VPI Dashboard genutzte Gitter hat, in Abhängigkeit von der Netzverfügbarkeit der jeweiligen Betreiber quadratische Zellgrößen von 250 m bis 500 m.
                         <a
                             href="#fnref:1"
                             rev="footnote"
@@ -478,6 +478,10 @@ export default {
         margin: 0 0 1.5rem 0;
         padding: 0 1rem 1rem 1rem;
         border-bottom: solid 1px var(--bs-gray-300);
+    }
+
+    h2 {
+        font-weight: bold;
     }
 
     h3,

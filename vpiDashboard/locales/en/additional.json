@@ -97,12 +97,11 @@
               "touristsPerWeek": "Ø Tourists per week"
             },
             "footnote": {
-              "plz": "(*) Postal code areas do not correspond to district boundaries and may consist of one or more districts.",
-              "plz2": "Note: \"Overnight locations: Hamburg residents and overnight guests in Hamburg\"",
+              "plz": "(*) Incl. overnight guests at the place of origin, postcode areas do not correspond to the district boundaries and may consist of several districts.",
               "overnight": "Overnight locations: Hamburg residents and overnight guests in Hamburg, as well as day visitors and commuters outside Hamburg.",
-              "hamburger": "Note: Includes overnight guests in Hamburg.",
-              "pendler": "Note: Visitors from the Hamburg metropolitan region.",
-              "touristen": "Note: Visitors from Germany."
+              "hamburger": "Includes overnight guests in Hamburg.",
+              "pendler": "Visitors from the metropolitan region.",
+              "touristen": "Visitors from Germany."
             },
             "highestValue": "highest value",
             "otherValues": "other values"
@@ -124,7 +123,7 @@
             "hourly": "Hourly",
             "daily": "Daily",
             "footnote": [
-              "In the map, the visitors of a day or an hour are displayed as a heatmap for all 31 grid cells of the city center.",
+              "In the map, the visitors of a day or an hour are displayed as a heatmap for all 124 grid cells of the city center.",
               "red grid cell = high visitor volume,",
               "white grid cell = low visitor volume.",
               "Using the control console on the map, values for any given time can be selected with the arrow keys or the slider.",

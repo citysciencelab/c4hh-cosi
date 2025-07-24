@@ -501,7 +501,6 @@ export default {
                 </div>
                 <div v-if="selectedChartData === 'postalCode' && showChart">
                     {{ $t("additional:modules.tools.vpidashboard.tab.origins.footnote.plz") }}
-                    {{ $t("additional:modules.tools.vpidashboard.tab.origins.footnote.plz2") }}
                 </div>
                 <div v-if="selectedChartData === 'overnight' && showChart">
                     {{ $t("additional:modules.tools.vpidashboard.tab.origins.footnote.overnight") }}

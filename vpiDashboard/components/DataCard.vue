@@ -229,9 +229,9 @@ export default {
             </button>
         </div>
         <div v-if="!navigation">
-            <h5>
+            <h4>
                 {{ subtitle }}
-            </h5>
+            </h4>
         </div>
     </div>
 </template>
