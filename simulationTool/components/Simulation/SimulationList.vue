@@ -26,17 +26,27 @@ export default {
         ]),
 
         /**
+         * Returns the list of planning scenarios sorted by name.
+         * @returns {Object[]} Sorted list of planning scenarios.
+         */
+        sortedPlanningScenarios () {
+            return this.planningScenarios ? [...this.planningScenarios].sort((a, b) => a.name.localeCompare(b.name)) : [];
+        },
+
+        /**
          * Returns a list of all conducted simulations in all planning scenarios.
          * @returns {Object[]} - List of simulations with simulation name and scenario name.
          */
         simulationList () {
             const list = [];
 
-            this.planningScenarios?.forEach(scenario => {
+            this.sortedPlanningScenarios?.forEach(scenario => {
                 if (!isObject(scenario.simulations)) {
                     return;
                 }
-                Object.entries(scenario.simulations).forEach(([simulationId, simulation]) => {
+                const sortedSimulations = Object.entries(scenario.simulations).sort(([, a], [, b]) => a.name.localeCompare(b.name));
+
+                sortedSimulations.forEach(([simulationId, simulation]) => {
                     const listEntry = {
                         scenarioName: scenario.name,
                         scenarioId: scenario.id,

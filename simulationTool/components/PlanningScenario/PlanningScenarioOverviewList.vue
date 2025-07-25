@@ -13,6 +13,14 @@ export default {
     computed: {
         ...mapGetters("Modules/SimulationTool", ["currentPlanningScenarioId", "planningScenarios"]),
         /**
+         * Returns the list of planning scenarios sorted by name.
+         * @returns {Object[]} Sorted list of planning scenarios.
+         */
+        sortedPlanningScenarios () {
+            return this.planningScenarios ? [...this.planningScenarios].sort((a, b) => a.name.localeCompare(b.name)) : [];
+        },
+
+        /**
          * Gets the currently selected planning scenario.
          * @return {Object} The current planning scenario.
          */
@@ -109,7 +117,7 @@ export default {
 <template>
     <div class="list-group list-group-flush mt-4">
         <div
-            v-for="scenario in planningScenarios"
+            v-for="scenario in sortedPlanningScenarios"
             :key="scenario.id"
             role="button"
             tabindex="0"
