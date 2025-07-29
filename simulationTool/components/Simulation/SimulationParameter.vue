@@ -50,6 +50,7 @@ export default {
             "previousComponentOfSimulation",
             "simulations"
         ]),
+        ...mapGetters("Modules/Login", ["accessToken"]),
 
         /**
          * Gets the current planning scenario.
@@ -487,7 +488,7 @@ export default {
                 process => new OgcApiProcess(process.url, process.id)
             );
             this.processDescriptions = await Promise.all(
-                this.processHandlers.map(handler => handler.getDescription())
+                this.processHandlers.map(handler => handler.getDescription(this.accessToken))
             );
             this.requestBodies = this.processDescriptions.map(description => ({
                 inputs: {
@@ -528,7 +529,7 @@ export default {
 
             const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
                 executeResponses = await Promise.all(
-                    this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index]))
+                    this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index], this.accessToken))
                 ),
                 jobIDs = executeResponses.map(response => response.jobID),
                 initialStatuses = executeResponses.map(response => response.status),
@@ -552,6 +553,7 @@ export default {
                 job.requestBody = JSON.parse(JSON.stringify(this.requestBodies[index]));
                 job.jobStatus = {status: initialStatuses[index]};
                 job.jobResults = await this.processHandlers[index].pollJobStatusAndGetResults(
+                    this.accessToken,
                     jobIDs[index],
                     this.simulation.processes[index].pollingInterval,
                     jobStatus => this.onProgressUpdate(jobStatus, job)

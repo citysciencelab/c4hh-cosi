@@ -22,10 +22,15 @@ export default class OgcApiProcess {
     * @throws {Error} If an error occurs while fetching the process description.
     * @returns {Promise<Object|undefined>} The process description or undefined if an error occurs.
     */
-    async getDescription () {
+    async getDescription (accessToken) {
         try {
             const url = new URL(`processes/${this.processId}`, this.baseUrl),
-                response = await axios.get(url);
+                response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json"
+                    }
+                });
 
             return response.data;
         }
@@ -75,9 +80,13 @@ export default class OgcApiProcess {
      * @param {Object} requestBody - The request body for the process execution.
      * @returns {Promise<Object>} The response data from the process execution. Normally a job status object with job ID.
      */
-    async execute (requestBody) {
+    async execute (requestBody, accessToken) {
         const url = new URL(`processes/${this.processId}/execution`, this.baseUrl),
-            response = await axios.post(url, requestBody);
+            response = await axios.post(url, requestBody, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
 
         return response.data;
     }
@@ -87,9 +96,14 @@ export default class OgcApiProcess {
      * @param {string} jobID - The ID of the job.
      * @returns {Promise<Object>} The job status object.
      */
-    async getJobStatus (jobID) {
+    async getJobStatus (jobID, accessToken) {
         const url = new URL(`jobs/${jobID}`, this.baseUrl),
-            response = await axios.get(url);
+            response = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "application/json"
+                }
+            });
 
         return response.data;
     }
@@ -99,9 +113,11 @@ export default class OgcApiProcess {
      * @param {string} jobID - The ID of the job.
      * @returns {Promise<Object>} The job results object.
      */
-    async getJobResults (jobID) {
+    async getJobResults (jobID, accessToken) {
         const url = new URL(`jobs/${jobID}/results`, this.baseUrl),
-            response = await axios.get(url);
+            response = await axios.get(url, {headers: {
+                Authorization: `Bearer ${accessToken}`
+            }});
 
         return response.data;
     }
@@ -114,15 +130,15 @@ export default class OgcApiProcess {
      * @returns {Promise<Object>} The job results object.
      * @throws {Error} If an error occurs during execution or if the job fails.
     */
-    async pollJobStatusAndGetResults (jobID, pollingInterval = 1000, onProgressUpdate = null) {
+    async pollJobStatusAndGetResults (accessToken, jobID, pollingInterval = 1000, onProgressUpdate = null) {
         try {
-            let jobStatus = await this.getJobStatus(jobID);
+            let jobStatus = await this.getJobStatus(jobID, accessToken);
 
             onProgressUpdate?.({...jobStatus});
 
             while (jobStatus?.status === "running" || jobStatus?.status === "accepted") {
                 await new Promise(resolve => setTimeout(resolve, pollingInterval));
-                jobStatus = await this.getJobStatus(jobID);
+                jobStatus = await this.getJobStatus(jobID, accessToken);
                 onProgressUpdate?.({...jobStatus});
             }
 
@@ -130,7 +146,7 @@ export default class OgcApiProcess {
                 console.warn(`Job failed with status: ${jobStatus?.status}`);
             }
 
-            return await this.getJobResults(jobID);
+            return await this.getJobResults(jobID, accessToken);
         }
         catch (error) {
             console.warn("Error polling job status and getting results:", error);
