@@ -171,6 +171,8 @@
           "simulationSetParams": "Set parameters for simulation",
           "simulationStart": "Start Simulation",
           "simulationResults": "Simulation results",
+          "simulationLoginRequired": "Login required",
+          "simulationLoginRequiredText": "To start a simulation, you must be logged in",
           "showMeasuredValues": "Show measured values",
           "started": "Started",
           "status": "Status",

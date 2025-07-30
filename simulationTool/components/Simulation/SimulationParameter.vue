@@ -233,6 +233,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions("Alerting", ["addSingleAlert"]),
         ...mapActions("Modules/SimulationTool", ["addFile", "jobStatusChanged", "updateFeatures", "zoomToFeature"]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
@@ -484,6 +485,14 @@ export default {
          * @returns {void}
          */
         async prepareRequestBodies () {
+            if (!this.accessToken) {
+                this.addSingleAlert({
+                    content: this.$t("additional:modules.tools.simulationTool.simulationLoginRequiredText"),
+                    category: "warning",
+                    title: this.$t("additional:modules.tools.simulationTool.simulationLoginRequired")
+                });
+                return;
+            }
             this.processHandlers = this.simulation.processes.map(
                 process => new OgcApiProcess(process.url, process.id)
             );
@@ -525,6 +534,10 @@ export default {
          * @returns {void}
          */
         async startSimulation () {
+            if (!this.accessToken) {
+                console.warn("No access token available for simulation execution.");
+                return;
+            }
             this.removeEmptyCollections(this.requestBodies);
 
             const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
