@@ -186,14 +186,7 @@ export default {
          * @returns {Object} The current style object
          */
         currentStyle () {
-            if (this.jobs) {
-                for (const job of Object.values(this.jobs)) {
-                    if (job.resultStyle && job.resultStyle !== undefined) {
-                        return job.resultStyle;
-                    }
-                }
-            }
-            return null;
+            return this.jobs ? Object.values(this.jobs).find(job => job.resultStyle)?.resultStyle || null : null;
         },
 
         /**

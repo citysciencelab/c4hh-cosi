@@ -232,14 +232,6 @@ export default {
             this.updateFeatures();
             this.zoomToFeature();
         }
-        // TODO: Remove this when done with testing
-        const randomID = Math.floor(Math.random() * 252);
-
-        fetch(`https://pokeapi.co/api/v2/pokemon/${randomID}`)
-            .then(response => response.json())
-            .then(data => {
-                this.simulationName = data.name;
-            });
     },
     unmounted () {
         if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
