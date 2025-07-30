@@ -1,10 +1,10 @@
 import {Group as LayerGroup} from "ol/layer.js";
-import layerProvider from "../../../js/getVisibleLayer";
+import layerProvider from "../../../js/getVisibleLayer.js";
 import {expect} from "chai";
 import sinon from "sinon";
 import store from "../../../../../src/app-store/index.js";
 
-describe("addons/floodRiskManagement/js/getVisibleLayer", function () {
+describe("addons/floodRiskManagement/js/getVisibleLayer.js", function () {
     let layers,
         layer1,
         layer2,
@@ -66,7 +66,7 @@ describe("addons/floodRiskManagement/js/getVisibleLayer", function () {
         store.commit = origCommit;
     });
 
-    describe("getVisibleLayer", function () {
+    describe("getVisibleLayer.js", function () {
         it("getVisibleLayer return visible layer - no groups, no invisible layers", function () {
             layers.push(layer1);
             layers.push(layer2);

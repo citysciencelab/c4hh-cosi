@@ -54,7 +54,7 @@ export default {
                     class="page-item previous-paginator-button"
                     role="button"
                     tabindex="0"
-                    @click="previous"
+                    @click.prevent="previous"
                     @keydown="previous"
                 >
                     <a
@@ -72,7 +72,7 @@ export default {
                     class="page-item next-paginator-button"
                     role="button"
                     tabindex="0"
-                    @click="next"
+                    @click.prevent="next"
                     @keydown="next"
                 >
                     <a

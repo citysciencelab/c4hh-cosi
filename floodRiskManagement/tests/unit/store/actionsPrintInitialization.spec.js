@@ -2,9 +2,9 @@ import {expect} from "chai";
 import VectorLayer from "ol/layer/Vector.js";
 import sinon from "sinon";
 import store from "../../../../../src/app-store/index.js";
-import testAction from "../../../../../devtools/tests/VueTestUtils";
-import actions from "../../../store/actionsPrintInitialization";
-import Canvas from "../../../../../src/modules/print/js/buildCanvas";
+import testAction from "../../../../../devtools/tests/VueTestUtils.js";
+import actions from "../../../store/actionsPrintInitialization.js";
+import Canvas from "../../../../../src/modules/print/js/buildCanvas.js";
 
 const {
     chooseCurrentLayout,

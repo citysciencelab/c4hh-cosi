@@ -69,7 +69,7 @@ export default {
                 <a
                     href="#"
                     class="stretched-link text-reset"
-                    @click="$emit('setSelected', title)"
+                    @click.prevent="$emit('setSelected', title)"
                 >
                     <h5
                         v-if="title"

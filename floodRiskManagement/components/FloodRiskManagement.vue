@@ -9,7 +9,7 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
-import layerProvider from "../js/getVisibleLayer";
+import layerProvider from "../js/getVisibleLayer.js";
 
 export default {
     name: "FloodRiskManagement",

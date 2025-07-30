@@ -1,8 +1,8 @@
-import actionsPrintInitialization from "./actionsPrintInitialization";
+import actionsPrintInitialization from "./actionsPrintInitialization.js";
 import axios from "axios";
 import BuildSpec from "../../../src/modules/print/js/buildSpec.js";
-import omit from "../../../src/shared/js/utils/omit";
-import layerProvider from "../js/getVisibleLayer";
+import omit from "../../../src/shared/js/utils/omit.js";
+import layerProvider from "../js/getVisibleLayer.js";
 
 export default {
     ...actionsPrintInitialization,

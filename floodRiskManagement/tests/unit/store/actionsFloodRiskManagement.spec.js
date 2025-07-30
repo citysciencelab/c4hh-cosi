@@ -1,4 +1,4 @@
-import testAction from "../../../../../devtools/tests/VueTestUtils";
+import testAction from "../../../../../devtools/tests/VueTestUtils.js";
 import actions from "../../../store/actionsFloodRiskManagement";
 import sinon from "sinon";
 

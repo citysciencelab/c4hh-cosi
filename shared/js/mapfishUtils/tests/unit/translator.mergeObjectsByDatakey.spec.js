@@ -177,7 +177,7 @@ describe("addons/shared/js/mapfishUtils/translator.mergeObjectsByDatakey.js", ()
                         "type": "Number",
                         "postfix": " m²",
                         "decimals": 2,
-                        "thousandsSeparator": {
+                        "thousandsSeparator.js": {
                             "delimAbs": ".",
                             "delimDec": ","
                         }
