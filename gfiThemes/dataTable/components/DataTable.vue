@@ -69,7 +69,7 @@ export default {
          * Returns whether the full View is enabled for the current table
          * @returns {Boolean} True if the table is sortable otherwise false.
          */
-        isFullViewEnabled: function () {
+        fullViewEnabled: function () {
             return this.feature.getTheme()?.params?.fullViewEnabled || false;
         },
 
@@ -370,7 +370,7 @@ export default {
         <TableComponent
             :data="data"
             :sortable="true"
-            :full-view-enabled="true"
+            :full-view-enabled="fullViewEnabled"
             :filterable="true"
             :enable-settings="true"
             :hits="showCount"
