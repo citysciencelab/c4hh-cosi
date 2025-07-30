@@ -730,9 +730,9 @@ export default {
 </script>
 
 <template>
-    <div class="vh-100 overflow-y-auto">
+    <div>
         <div v-if="simulationIdForResults">
-            <div class="result-container">
+            <div>
                 <div
                     class="d-flex flex-column"
                 >
@@ -803,27 +803,29 @@ export default {
             <AccordionItem
                 v-if="currentSimulation?.jobs"
                 id="simulation-results-accordion-inputs"
-                class="ms-2 my-2"
+                class="ms-1 my-1"
                 :title="$t('additional:modules.tools.simulationTool.inputParameters')"
             >
-                <div
-                    v-for="(input, inputKey) in inputsToShow"
-                    :key="inputKey"
-                >
+                <div class="overflow-x-auto">
                     <div
-                        v-if="typeof input === 'object' && input?.type !== 'FeatureCollection'"
-                        class="container"
+                        v-for="(input, inputKey) in inputsToShow"
+                        :key="inputKey"
                     >
                         <div
-                            v-for="(property, propertyKey) in input"
-                            :key="`${inputKey}-${propertyKey}`"
-                            class="py-1 row"
+                            v-if="typeof input === 'object' && input?.type !== 'FeatureCollection'"
+                            class="container"
                         >
-                            <div class="col col-md-5">
-                                {{ getMappedProperty(propertyKey, simulationConfig?.inputs?.[inputKey]?.propertiesMapping) + ":" }}
-                            </div>
-                            <div class="col col-md-7 font-bold align-self-center">
-                                {{ property }}
+                            <div
+                                v-for="(property, propertyKey) in input"
+                                :key="`${inputKey}-${propertyKey}`"
+                                class="py-1 row"
+                            >
+                                <div class="col col-md-5">
+                                    {{ getMappedProperty(propertyKey, simulationConfig?.inputs?.[inputKey]?.propertiesMapping) + ":" }}
+                                </div>
+                                <div class="col col-md-7 font-bold align-self-center">
+                                    {{ property }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -835,7 +837,7 @@ export default {
                 class="result-output-container"
             >
                 <h5
-                    class="mb-3"
+                    class="mb-2"
                 >
                     {{ $t('additional:modules.tools.simulationTool.showResults') }}
                 </h5>
@@ -864,7 +866,7 @@ export default {
                         </label>
                     </div>
                 </div>
-                <div class="form-check form-switch mt-4">
+                <div class="form-check form-switch mt-2">
                     <SwitchInput
                         id="showTextFeatures"
                         :checked="showTextFeatures"
@@ -878,11 +880,11 @@ export default {
                 <hr>
                 <AccordionItem
                     id="simulation-results-accordion-legend"
-                    class="mt-4"
+                    class="mt-2"
                     :title="$t('additional:modules.tools.simulationTool.legend')"
                 >
                     <h6
-                        class="mb-3"
+                        class="mb-2"
                     >
                         {{ currentStyle?.property }}
                     </h6>
@@ -916,7 +918,7 @@ export default {
             {{ $t('additional:modules.tools.simulationTool.noJobsSelected') }}
         </div>
         <div
-            class="my-5"
+            class="my-1"
         >
             <form>
                 <div
@@ -966,9 +968,6 @@ export default {
 }
 .result-output-container .list-group-item-action:active {
     background-color: $light_blue;
-}
-.result-container {
-    margin-left: 0.625rem;
 }
 .ps-label {
     font-size: $font_size_sm;

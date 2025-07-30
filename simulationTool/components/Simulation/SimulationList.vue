@@ -243,7 +243,7 @@ export default {
 }
 
 .simulation-details {
-    padding: 1rem;
+    padding: 0.5rem;
     background-color: #fff;
     border-top: 1px solid #dee2e6;
 }
