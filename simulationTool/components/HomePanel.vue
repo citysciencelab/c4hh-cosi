@@ -11,7 +11,10 @@ export default {
         // ProcessList
     },
     computed: {
-        ...mapGetters("Modules/Login", ["username", "loggedIn"])
+        ...mapGetters("Modules/Login", ["username", "loggedIn"]),
+        ...mapGetters("Modules/SimulationTool", [
+            "hiddenSideMenus"
+        ])
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
@@ -46,7 +49,10 @@ export default {
             <div class="not-authenticated">{{ $t("additional:modules.tools.simulationTool.authRequest") }}</div>
         </span>
 
-        <div class="card border-dark text-bg-light rounded element-wrapper">
+        <div
+            v-if="!hiddenSideMenus.includes('help-panel')"
+            class="card border-dark text-bg-light rounded element-wrapper"
+        >
             <div
                 class="card-body p-4"
                 tabindex="0"
