@@ -66,6 +66,14 @@ export default {
         },
 
         /**
+         * Returns whether the full View is enabled for the current table
+         * @returns {Boolean} True if the table is sortable otherwise false.
+         */
+        isFullViewEnabled: function () {
+            return this.feature.getTheme()?.params?.fullViewEnabled || false;
+        },
+
+        /**
          * Returns whether the table is filterable.
          * @returns {Boolean} True if the table is filterable otherwise false.
          */
@@ -362,6 +370,7 @@ export default {
         <TableComponent
             :data="data"
             :sortable="true"
+            :full-view-enabled="true"
             :filterable="true"
             :enable-settings="true"
             :hits="showCount"
