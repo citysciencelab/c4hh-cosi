@@ -27,8 +27,7 @@ export default class OgcApiProcess {
             const url = new URL(`processes/${this.processId}`, this.baseUrl),
                 response = await axios.get(url, {
                     headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        "Content-Type": "application/json"
+                        Authorization: `Bearer ${accessToken}`
                     }
                 });
 
@@ -100,8 +99,7 @@ export default class OgcApiProcess {
         const url = new URL(`jobs/${jobID}`, this.baseUrl),
             response = await axios.get(url, {
                 headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    "Content-Type": "application/json"
+                    Authorization: `Bearer ${accessToken}`
                 }
             });
 
