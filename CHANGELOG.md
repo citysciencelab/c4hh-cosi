@@ -8,6 +8,7 @@
 
 ### Added
 - Cesium 3D Tiles Inspector: The Popup Cesium 3D Tiles Inspector, which allows controlling the maximumScreenSpaceError and other parameters in 3D-Mode, has been added as an javascript addon.
+- gfiThemes: new Fullscreen Button for dataTables can be configured in now, default is disabled.
 
 ### Changed
 
