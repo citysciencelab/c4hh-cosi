@@ -305,7 +305,7 @@ export default {
     updateFeatures ({getters}) {
         const currentPlanningScenario = getters.planningScenarios.find(scenario => scenario.id === getters.currentPlanningScenarioId),
             geoJsonParser = new GeoJSON(),
-            layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource();
+            layerSource = layerCollection.getLayerById("planning-scenario") ? layerCollection.getLayerById("planning-scenario").getLayerSource() : null;
 
         let layerSourceForObjects = null;
 
@@ -322,7 +322,9 @@ export default {
         }
         layerSourceForObjects = layerCollection.getLayerById(infrastructureLayerId).getLayerSource();
 
-        layerSource.clear();
+        if (layerSource) {
+            layerSource.clear();
+        }
         layerSourceForObjects.clear(true);
 
         if (!currentPlanningScenario || !currentPlanningScenario.scenarioFeature || !currentPlanningScenario.scenarioFeature.features) {

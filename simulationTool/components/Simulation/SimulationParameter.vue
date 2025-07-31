@@ -55,10 +55,18 @@ export default {
 
         /**
          * Gets the current planning scenario.
+         * If no scenario is selected, it defaults to the first scenario.
          * @returns {Object} The current planning scenario.
          */
         currentPlanningScenario () {
-            return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+            if (this.planningScenarios && this.planningScenarios.length > 0) {
+                if (!this.currentPlanningScenarioId) {
+                    this.setCurrentPlanningScenarioId(this.planningScenarios[0]?.id);
+                    return this.planningScenarios[0];
+                }
+                return this.planningScenarios.find(scenario => scenario.id === this.currentPlanningScenarioId);
+            }
+            return null;
         },
 
         /**
@@ -210,7 +218,7 @@ export default {
 
         currentSimulationId: {
             async handler () {
-                if (this.simulation) {
+                if (this.currentPlanningScenario && this.simulation) {
                     await this.prepareRequestBodies();
                     this.primaryTypeInputs = this.getPrimaryTypeInputs();
                     this.selectedOutputOptions = this.outputOptions;
