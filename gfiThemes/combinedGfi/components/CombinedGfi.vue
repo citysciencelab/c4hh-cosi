@@ -63,6 +63,9 @@ export default {
         ]),
         hasSelectedFeature () {
             return this.feature !== null;
+        },
+        filteredLayerResults () {
+            return this.layerResults.filter(layerResult => layerResult.error || layerResult.rows.length > 0);
         }
     },
     watch: {
@@ -76,7 +79,10 @@ export default {
                 this.bufferDistance = null;
 
                 const newGeometry = newFeature.getOlFeature()?.getGeometry(),
-                    newCoordinates = newGeometry ? JSON.stringify(newGeometry.getCoordinates()) : null;
+                    newCoordinates = newGeometry ? JSON.stringify(newGeometry.getCoordinates()) : null,
+                    geometryProviderLayer = this.layersToRequest.find(layer => {
+                        return layer.geometryProvider;
+                    });
 
                 if (this.previousGeometry === newCoordinates) {
                     return;
@@ -84,22 +90,17 @@ export default {
 
                 this.setPreviousGeometry(newCoordinates);
 
-                if (newGeometry) {
+                if (geometryProviderLayer) {
+                    this.$nextTick(() => {
+                        this.handleAlternativeGeometry({feature: newFeature, clickCoordinates: this.clickCoordinates});
+                    });
+                }
+                else if (newGeometry) {
                     this.fetchGfiData({geometry: newGeometry, clickCoordinates: this.clickCoordinates});
                 }
                 else if (this.clickCoordinates) {
                     this.fetchGfiDataFromClickCoordinates({clickCoordinates: this.clickCoordinates});
                 }
-
-                this.$nextTick(() => {
-                    const geometryProviderLayer = this.layersToRequest.find(layer => {
-                        return layer.geometryProvider;
-                    });
-
-                    if (geometryProviderLayer) {
-                        this.handleAlternativeGeometry({feature: newFeature, clickCoordinates: this.clickCoordinates});
-                    }
-                });
             },
             deep: true
         }
@@ -365,18 +366,25 @@ export default {
         </div>
         <div v-else>
             <div
-                v-for="(layerResult, index) in layerResults"
+                v-for="(layerResult, index) in filteredLayerResults"
                 :key="index"
                 class="layer-result-container"
             >
                 <AccordionItem
                     :id="`layer-${index}`"
-                    :title="`${getLayerDisplayName(layerResult)} (${layerResult.rows.length} ${layerResult.rows.length === 1 ? translate('additional:modules.combinedGfi.feature') : translate('additional:modules.combinedGfi.features')})`"
+                    :title="layerResult.error
+                        ? `${getLayerDisplayName(layerResult)} — ${layerResult.error}`
+                        : `${getLayerDisplayName(layerResult)} (${layerResult.rows.length} ${layerResult.rows.length === 1 ? translate('additional:modules.combinedGfi.feature') : translate('additional:modules.combinedGfi.features')})`"
                     :is-open="false"
                     :coloured-header="true"
                     font-size="font-size-big"
                 >
-                    <div v-if="layerResult.rows.length > 0">
+                    <div v-if="layerResult.error">
+                        <div class="error-message">
+                            {{ layerResult.error }}
+                        </div>
+                    </div>
+                    <div v-else-if="layerResult.rows.length > 0">
                         <div
                             v-if="totalPages(layerResult.rows) > 1"
                             class="pagination-wrapper"

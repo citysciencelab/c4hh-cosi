@@ -454,9 +454,16 @@ const actions = {
             const response = await fetch(url),
                 text = await response.text(),
                 parsedResponse = new DOMParser().parseFromString(text, "application/xml"),
-                isEsriResponse =
-                    parsedResponse.documentElement.namespaceURI === "http://www.esri.com/wms" ||
-                    parsedResponse.querySelector("FeatureInfoResponse")?.namespaceURI === "http://www.esri.com/wms";
+                isEsriResponse = parsedResponse.documentElement.namespaceURI === "http://www.esri.com/wms" ||
+                parsedResponse.querySelector("FeatureInfoResponse")?.namespaceURI === "http://www.esri.com/wms";
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    return {error: i18next.t("additional:modules.combinedGfi.errors.serviceUnavailable")};
+                }
+                console.error(`Failed to fetch WMS features: ${response.status} ${response.statusText}`);
+                return {error: `Dienstfehler (${response.status})`};
+            }
 
             return isEsriResponse
                 ? extractFeaturesFromEsriWms(parsedResponse, attributes)
@@ -464,7 +471,7 @@ const actions = {
         }
         catch (error) {
             console.error("Error during WMS query:", error);
-            return null;
+            return {error: i18next.t("additional:modules.combinedGfi.errors.serviceUnavailable")};
         }
     },
 
@@ -576,11 +583,19 @@ const actions = {
                     parsedResponse = new DOMParser().parseFromString(text, "application/xml"),
                     features = extractFeaturesFromWfsGml(parsedResponse, attributes);
 
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        return {error: i18next.t("additional:modules.combinedGfi.errors.serviceUnavailable")};
+                    }
+                    console.error(`Failed to fetch features: ${response.status} ${response.statusText}`);
+                    return {error: `Dienstfehler (${response.status})`};
+                }
+
                 return features;
             }
             catch (error) {
                 console.error("Error during WFS query:", error);
-                return null;
+                return {error: i18next.t("additional:modules.combinedGfi.errors.serviceUnavailable")};
             }
         }
         if (!shrunkenGeometry) {
@@ -612,14 +627,18 @@ const actions = {
                     parsedResponse = new DOMParser().parseFromString(text, "application/xml");
 
                 if (!response.ok) {
+                    if (response.status === 404) {
+                        return {error: i18next.t("additional:modules.combinedGfi.errors.serviceUnavailable")};
+                    }
                     console.error(`Failed to fetch features: ${response.status} ${response.statusText}`);
-                    return null;
+                    return {error: `Dienstfehler (${response.status})`};
                 }
+
                 return extractFeaturesFromWfsGml(parsedResponse, attributes);
             }
             catch (error) {
                 console.error("Error fetching features:", error);
-                return null;
+                return {error: i18next.t("additional:modules.combinedGfi.errors.serviceUnavailable")};
             }
         }
 
@@ -646,16 +665,23 @@ const actions = {
             layerResults = await Promise.all(
                 state.layersToRequest.map(async (layerConfig, index) => {
                     const result = normalizedResults[index],
-                        features = Array.isArray(result) ? result : [result],
                         rawLayer = rawLayerList.getLayerWhere({id: layerConfig.id}),
                         layerName = rawLayer?.name || `Layer ${index + 1}`,
+                        features = Array.isArray(result) ? result : [result],
                         headers = extractColumnsFromResults(features, layerConfig.gfiAttributes, ignoredKeys),
                         rows = extractRowsFromResults(features, layerConfig.gfiAttributes, ignoredKeys);
 
-                    if (!result || typeof result !== "object") {
-                        return null;
+                    if (result.error) {
+                        return {
+                            layerId: layerConfig.id,
+                            layerName,
+                            headers: [],
+                            rows: [],
+                            error: result.error
+                        };
                     }
-                    if (!rows || rows.length === 0) {
+
+                    if (!result || typeof result !== "object") {
                         return null;
                     }
                     return {
@@ -971,16 +997,20 @@ const actions = {
                     data = await response.json();
 
                 if (!response.ok) {
-                    console.error(`Failed to fetch features: ${response.status} ${response.statusText}`);
-                    return null;
+                    if (response.status === 404) {
+                        return {error: i18next.t("additional:modules.combinedGfi.errors.serviceUnavailable")};
+                    }
+                    console.error(`Failed to fetch OAF features: ${response.status} ${response.statusText}`);
+                    return {error: `Dienstfehler (${response.status})`};
                 }
+
                 return extractFeaturesFromOafJson(data, attributes);
             }
             return null;
         }
         catch (error) {
             console.error("Error during OAF query:", error);
-            return null;
+            return {error: i18next.t("additional:modules.combinedGfi.errors.serviceUnavailable")};
         }
     },
     /**

@@ -38,7 +38,8 @@
           "noValidCoordinates": "No valid coordinates available for query.",
           "layerNotFound": "Layer not found.",
           "fetchError": "Error loading data.",
-          "unsupportedRequestType": "Unsupported request type"
+          "unsupportedRequestType": "Unsupported request type",
+          "serviceUnavailable": "Service currently unavailable"
         }
       }
   }
