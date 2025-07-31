@@ -66,8 +66,8 @@ export default {
         },
 
         /**
-         * Returns whether the full View is enabled for the current table
-         * @returns {Boolean} True if the table is sortable otherwise false.
+         * Returns whether the full View table is enabled for the current layer.
+         * @returns {Boolean} True if full View table is enabled for the current layer.
          */
         fullViewEnabled: function () {
             return this.feature.getTheme()?.params?.fullViewEnabled || false;
