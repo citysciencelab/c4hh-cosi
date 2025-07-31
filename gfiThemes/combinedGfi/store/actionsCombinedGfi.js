@@ -1107,6 +1107,7 @@ const actions = {
                         alwaysOnTop: true,
                         id: "bufferedLayer",
                         source: vectorSource,
+                        zIndex: 1000,
                         style: new Style({
                             fill: new Fill({
                                 color: "rgba(255, 0, 0, 0.3)"
