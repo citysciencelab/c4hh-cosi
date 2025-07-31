@@ -2,7 +2,7 @@
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import isObject from "../../../../src/shared/js/utils/isObject";
 import layerCollection from "../../../../src/core/layers/js/layerCollection";
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 import {infrastructureLayerId} from "../../layerIds.js";
 import SimulationResults from "./SimulationResults.vue";
@@ -80,6 +80,9 @@ export default {
             "setMode",
             "setSimulationIdForResults"
         ]),
+        ...mapActions("Modules/SimulationTool", [
+            "updateFeatures"
+        ]),
 
         /**
          * Opens create planning scenario component.
@@ -102,13 +105,25 @@ export default {
         },
 
         /**
+         * Closes the currently opened simulation.
+         * Resets the simulation ID and scenario ID.
+         * @returns {void}
+         */
+        closeSimulation () {
+            this.setSimulationIdForResults(null);
+            this.setCurrentPlanningScenarioId(null);
+            this.expandedSimulationId = null;
+            this.updateFeatures();
+        },
+
+        /**
          * Toggles the expansion state of a simulation entry.
          * Only one simulation can be expanded at a time.
          * @param {String} simulationId - ID of the simulation to toggle.
          */
         toggleSimulationExpansion (simulationId) {
             if (this.expandedSimulationId === simulationId) {
-                this.expandedSimulationId = null;
+                this.closeSimulation();
             }
             else {
                 this.expandedSimulationId = simulationId;
