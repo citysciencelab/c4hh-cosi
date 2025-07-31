@@ -1,12 +1,14 @@
 <script>
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import ElevatedButton from "../../../../src/shared/modules/buttons/components/ElevatedButton.vue";
+import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 
 export default {
     name: "PrintAccordion",
     components: {
         AccordionItem,
-        ElevatedButton
+        ElevatedButton,
+        SpinnerItem
     },
     props: {
         /**
@@ -65,29 +67,55 @@ export default {
         font-size="font-size-base"
         :coloured-header="true"
     >
-        <p class="print-description">
-            {{ translateFunction('additional:modules.combinedGfi.printDescription') }}
-        </p>
-        <div class="button-group">
-            <ElevatedButton
-                :text="translateFunction('additional:modules.combinedGfi.printButton')"
-                :icon="isPrintLoading ? null : 'bi-file-pdf'"
-                :disabled="!hasSelectedFeature || isLoading || isPrintLoading"
-                :interaction="sendPrintRequest"
-                additional-css="print-btn"
-            >
-                <span
-                    v-if="isPrintLoading"
-                    class="spinner-border spinner-border-sm me-1"
-                    role="status"
+        <div
+            v-if="isPrintLoading"
+            class="loading-container"
+        >
+            <SpinnerItem custom-class="spinner" />
+            <div class="loading-text">
+                {{ translateFunction('additional:modules.combinedGfi.printLoading') }}
+            </div>
+        </div>
+        <div v-else>
+            <p class="print-description">
+                {{ translateFunction('additional:modules.combinedGfi.printDescription') }}
+            </p>
+            <div class="button-group">
+                <ElevatedButton
+                    :text="translateFunction('additional:modules.combinedGfi.printButton')"
+                    :icon="'bi-file-pdf'"
+                    :disabled="!hasSelectedFeature || isLoading"
+                    :interaction="sendPrintRequest"
+                    additional-css="print-btn"
                 />
-            </ElevatedButton>
+            </div>
         </div>
     </AccordionItem>
 </template>
 
 <style scoped lang="scss">
 @import 'variables';
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 6.25rem;
+    padding: 1.25rem;
+}
+
+.spinner {
+    margin: 0.625rem auto;
+    display: block;
+}
+
+.loading-text {
+    margin-top: 0.9375rem;
+    font-size: 0.95em;
+    color: $dark_grey;
+    text-align: center;
+}
 
 .button-group {
     display: flex;

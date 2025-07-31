@@ -23,6 +23,7 @@
         "standardExport": "Daten exportieren",
         "printSection": "Flächenbericht",
         "printDescription": "Erstellen Sie einen Flächenbericht für die ausgewählte Geometrie.",
+        "printLoading": "PDF wird erstellt...",
         "noExportFormatSelected": "Kein Export-Format ausgewählt",
         "unknownLayer": "Unbekannter Layer",
         "defaultFileName": "Export-Datei",

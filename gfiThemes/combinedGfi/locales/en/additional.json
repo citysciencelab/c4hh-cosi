@@ -23,6 +23,7 @@
         "standardExport": "Export Data",
         "printSection": "Area Report",
         "printDescription": "Create a detailed report for the selected geometry.",
+        "printLoading": "PDF is being created...",
         "noExportFormatSelected": "No export format selected",
         "unknownLayer": "Unknown Layer",
         "defaultFileName": "Export-File",
