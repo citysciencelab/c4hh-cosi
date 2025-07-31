@@ -254,6 +254,12 @@ export function exportToDOC ({layerResults, fileName, setIsLoading, translations
 export function exportToPDF ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
     const printWindow = window.open("", "PRINT", "height=600,width=800");
+
+    if (!printWindow) {
+        console.warn("PDF export failed: Popup blocked or window.open returned null");
+        setIsLoading(false);
+        return;
+    }
     let htmlContent = `
       <html>
           <head>
