@@ -69,11 +69,14 @@ export default {
                 @update:modelValue="$emit('update:value', $event)"
             />
         </template>
-        <template v-if="inputType === 'enum'">
+        <template v-else-if="inputType === 'enum'">
+            <label :for="id">
+                {{ label }}
+            </label>
             <select
                 :id="id"
-                class="form-control mb-3"
-                :label="label"
+                class="form-select m-2"
+                :aria-label="label"
                 :value="Array.isArray(value) ? value[0] : value"
                 @change="$emit('update:value', $event.target.value)"
             >
