@@ -70,7 +70,7 @@ export default {
         }
 
         if (this.simulationIdForResults) {
-            this.expandedSimulationId = this.simulationIdForResults;
+            this.toggleSimulationExpansion(this.simulationIdForResults);
         }
     },
     methods: {
@@ -102,6 +102,7 @@ export default {
         openSimulation (simulationId, scenarioId) {
             this.setSimulationIdForResults(simulationId);
             this.setCurrentPlanningScenarioId(scenarioId);
+            this.scrollIntoView(simulationId, false, -1);
         },
 
         /**
@@ -109,11 +110,49 @@ export default {
          * Resets the simulation ID and scenario ID.
          * @returns {void}
          */
-        closeSimulation () {
+        closeSimulation (simulationId) {
             this.setSimulationIdForResults(null);
             this.setCurrentPlanningScenarioId(null);
             this.expandedSimulationId = null;
             this.updateFeatures();
+            this.scrollIntoView(simulationId);
+        },
+
+        /**
+         * Scrolls a simulation entry into view with optional offset and positioning.
+         * @param {String} simulationId - ID of the simulation to use as reference point for scrolling.
+         * @param {Boolean} shouldCenter - Whether to center the element (true) or position it at the top (false).
+         * @param {Number} offset - List element offset relative to the reference simulation.
+         * @returns {void}
+         */
+        scrollIntoView (simulationId, shouldCenter = true, offset = 0) {
+            this.$nextTick(() => {
+                let focusElement;
+
+                if (!offset) {
+                    focusElement = document.getElementById(`simulation-element-${simulationId}`);
+                }
+                else {
+                    const listIndex = this.simulationList.findIndex(entry => entry.simulationId === simulationId);
+                    let focusIndex = listIndex + offset;
+
+                    focusIndex = Math.max(0, focusIndex);
+                    focusIndex = Math.min(this.simulationList.length - 1, focusIndex);
+
+                    if (this.simulationList[focusIndex]?.simulationId) {
+                        focusElement = document.getElementById(`simulation-element-${this.simulationList[focusIndex]?.simulationId}`);
+                    }
+                }
+
+                if (focusElement) {
+                    if (shouldCenter) {
+                        focusElement.scrollIntoView({behavior: "smooth", block: "center"});
+                    }
+                    else {
+                        focusElement.scrollIntoView({behavior: "smooth", block: "start"});
+                    }
+                }
+            });
         },
 
         /**
@@ -123,7 +162,7 @@ export default {
          */
         toggleSimulationExpansion (simulationId) {
             if (this.expandedSimulationId === simulationId) {
-                this.closeSimulation();
+                this.closeSimulation(simulationId);
             }
             else {
                 this.expandedSimulationId = simulationId;
@@ -151,6 +190,7 @@ export default {
         <div v-if="simulationList.length">
             <div
                 v-for="simulationEntry in simulationList"
+                :id="`simulation-element-${simulationEntry.simulationId}`"
                 :key="simulationEntry.simulationId"
                 class="simulation-entry"
             >
