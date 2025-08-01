@@ -62,16 +62,14 @@ export default {
         }
     },
     mounted () {
-        if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
-            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
-        }
-        if (typeof layerCollection.getLayerById(infrastructureLayerId) !== "undefined") {
-            layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
-        }
+        this.clearLayers();
 
         if (this.simulationIdForResults) {
             this.toggleSimulationExpansion(this.simulationIdForResults);
         }
+    },
+    unmounted () {
+        this.clearLayers();
     },
     methods: {
         ...mapMutations("Modules/SimulationTool", [
@@ -83,6 +81,15 @@ export default {
         ...mapActions("Modules/SimulationTool", [
             "updateFeatures"
         ]),
+
+        clearLayers () {
+            if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+                layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+            }
+            if (typeof layerCollection.getLayerById(infrastructureLayerId) !== "undefined") {
+                layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
+            }
+        },
 
         /**
          * Opens create planning scenario component.
@@ -145,12 +152,9 @@ export default {
                 }
 
                 if (focusElement) {
-                    if (shouldCenter) {
-                        focusElement.scrollIntoView({behavior: "smooth", block: "center"});
-                    }
-                    else {
-                        focusElement.scrollIntoView({behavior: "smooth", block: "start"});
-                    }
+                    const focusMode = shouldCenter ? "center" : "start";
+
+                    focusElement.scrollIntoView({behavior: "smooth", block: focusMode});
                 }
             });
         },
