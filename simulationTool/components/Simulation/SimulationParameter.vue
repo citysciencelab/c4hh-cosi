@@ -254,7 +254,12 @@ export default {
     },
     methods: {
         ...mapActions("Alerting", ["addSingleAlert"]),
-        ...mapActions("Modules/SimulationTool", ["addFile", "jobStatusChanged", "updateFeatures", "zoomToFeature"]),
+        ...mapActions("Modules/SimulationTool", [
+            "addFile",
+            "jobStatusChanged",
+            "updateFeatures",
+            "zoomToFeature"
+        ]),
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",

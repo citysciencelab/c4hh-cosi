@@ -48,12 +48,10 @@ export default {
             "onJobStatusChange",
             "planningScenarios",
             "simulations",
-            "simulationIdForResults",
-            "simulationResultStyle"
+            "simulationIdForResults"
         ]),
         ...mapGetters("Menu", [
             "mainMenu",
-            "secondaryMenu",
             "mainExpanded"
         ]),
 

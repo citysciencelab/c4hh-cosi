@@ -58,6 +58,8 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                         SimulationTool: {
                             namespaced: true,
                             actions: {
+                                addFile: () => sinon.stub(),
+                                jobStatusChanged: () => sinon.stub(),
                                 updateFeatures: () => sinon.stub(),
                                 zoomToFeature: () => sinon.stub()
                             },
@@ -87,7 +89,9 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                             },
                             mutations: {
                                 setCurrentPlanningComponent: sinon.stub(),
-                                setMode: sinon.stub()
+                                setMode: sinon.stub(),
+                                setCurrentPlanningScenarioId: sinon.stub(),
+                                setSimulationIdForResults: sinon.stub()
                             }
                         },
                         ResizeHandle: {
@@ -95,6 +99,18 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                             getters: {
                                 mainMenuWidth: () => 800,
                                 secondaryMenuWidth: () => 800
+                            }
+                        },
+                        Login: {
+                            namespaced: true,
+                            getters: {
+                                accessToken: () => "accessToken"
+                            }
+                        },
+                        Alerting: {
+                            namespaced: true,
+                            actions: {
+                                addSingleAlert: () => sinon.stub()
                             }
                         }
                     }

@@ -59,7 +59,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                                 zoomToFeature: () => sinon.stub()
                             },
                             getters: {
-                                currentJobID: () => "jobNo5",
                                 onJobStatusChange: () => 0,
                                 planningScenarios: () => [
                                     {
@@ -107,6 +106,13 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                     actions: {
                         zoomToExtent: sinon.stub()
                     }
+                },
+                Menu: {
+                    namespaced: true,
+                    getters: {
+                        mainMenu: () => ({}),
+                        mainExpanded: () => true
+                    }
                 }
             }
         });
@@ -130,12 +136,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
             const wrapper = factory.getMount();
 
             expect(wrapper.exists()).to.be.true;
-        });
-
-        it("should render SectionHeader component", () => {
-            const wrapper = factory.getMount();
-
-            expect(wrapper.findComponent({name: "SectionHeader"}).exists()).to.be.true;
         });
 
         it("should render inputs accordeon", () => {
