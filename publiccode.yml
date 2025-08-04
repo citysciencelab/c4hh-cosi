@@ -4,11 +4,11 @@
 
 publiccodeYmlVersion: '0.3'
 categories:
-  - geographic-information-systems, addons, map-application
+  - geographic-information-systems
 description:
   de:
     apiDocumentation: 'https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/readme.txt'
-    documentation: 'https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/'
+    documentation: 'https://www.masterportal.org/features/features'
     features:
       - OGC-konform
       - Konfigurierbar
@@ -17,16 +17,15 @@ description:
       - Adminfreundlich
       - Modular
       - Metadatenintegration
-    screenshots: https://www.masterportal.org/fileadmin/user_upload/mockup_laptop_tablet_geoportal_erreichbarkeit.png
     genericName: 'Masterportal Addons'
     localisedName: Masterportal Addons
-    longDescription: |3
-       Die Masterportal Addons beinhalten spezielle Anwendungen, die individuell in die Open Source Software Masterportal per Konfiguration integriert werden können. Das Masterportal ist ein flexibler Baukasten für Geoportale im Web. In Hamburg kommt das Masterportal immer dann zum Einsatz, wenn webbasierte Kartenanwendungen benötigt werden – als eigenständige Anwendung oder als Teil einer E-Government-Lösung. Auch in anderen Städten und Kreisen wird das [++Masterportal++] eingesetzt und in einer Kooperation von mehr als 30 Partnern aus der Verwaltung weiterentwickelt. Die Masterportal Addons sind Open-Source-Software. Es ist unter der [++MIT-Lizenz++](https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/License.txt) veröffentlicht.
-    shortDescription: ' Addons beinhalten spezielle Anwendungen für die Software Masterportal, das ein flexibler Baukasten für Geoportale im Web ist.'
+    longDescription: |2
+       Die Masterportal Addons beinhalten spezielle Anwendungen, die individuell in die Open Source Software Masterportal per Konfiguration integriert werden können. Das Masterportal ist ein flexibler Baukasten für Geoportale im Web. In Hamburg kommt das Masterportal immer dann zum Einsatz, wenn webbasierte Kartenanwendungen benötigt werden – als eigenständige Anwendung oder als Teil einer E-Government-Lösung. Auch in anderen Städten und Kreisen wird das Masterportal eingesetzt und in einer Kooperation von mehr als 30 Partnern aus der Verwaltung weiterentwickelt. Die Masterportal Addons sind Open-Source-Software. Es ist unter der MIT-Lizenz veröffentlicht.
+    shortDescription: Addons beinhalten spezielle Anwendungen für die Software Masterportal, das ein flexibler Baukasten für Geoportale im Web ist.
 developmentStatus: stable
 platforms:
   - web
-softwareType: addon
+softwareType: standalone/web
 intendedAudience:
   countries:
     - de
@@ -81,7 +80,7 @@ localisation:
     - nl
   localisationReady: true
 logo: |-
-  https://www.masterportal.org/fileadmin/_processed_/7/d/csm_news_masterportal_ce24f3cc3d.jpg
+  https://www.masterportal.org/_assets/6020ad64298e304d8b844c8dc69c472e/Images/Frontend/1-ogimage.png
 maintenance:
   contacts:
     - name: Betrieb Webanwendungen
