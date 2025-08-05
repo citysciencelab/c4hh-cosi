@@ -111,6 +111,7 @@
           "newScenario": "New scenario",
           "noJobs": "There are no simulations available to display. You can either conduct new simulations or import existing ones.",
           "noJobsSelected": "No simulation is selected.",
+          "noteNoLiability" : "Note: The road data is based on model calculations and does not represent official measurements. No liability is assumed for the technical accuracy and use of the data.",
           "notes": "Notes",
           "notLoggedIn": "You are not logged in!",
           "openResults": "Open results",

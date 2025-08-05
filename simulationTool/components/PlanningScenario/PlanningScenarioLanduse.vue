@@ -601,6 +601,14 @@ export default {
                     aria-labelledby="existing-tab"
                     tabindex="0"
                 >
+                    <div
+                        class="alert alert-warning mb-3"
+                        role="alert"
+                    >
+                        <span class="text-muted">
+                            {{ $t("additional:modules.tools.simulationTool.noteNoLiability") }}
+                        </span>
+                    </div>
                     <ListGroup
                         :highlight-feature-id="highlightFeatureId"
                         :item-list="existingFeaturesByInput"
