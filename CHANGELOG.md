@@ -3,20 +3,11 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2020-08-05 v3.13.0
 
 ### Added
 - Cesium 3D Tiles Inspector: The Popup Cesium 3D Tiles Inspector, which allows controlling the maximumScreenSpaceError and other parameters in 3D-Mode, has been added as an javascript addon.
 - gfiThemes: new Fullscreen Button for dataTables can be configured in now, default is disabled.
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ---
 
