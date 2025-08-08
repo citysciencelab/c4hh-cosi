@@ -245,6 +245,27 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
         expect(displayName).to.equal("Layer Without ID");
     });
 
+    it("changes page correctly and updates Vuex store", () => {
+        const commitSpy = sinon.spy(wrapper.vm.$store, "commit");
+
+        wrapper.vm.$store.state.Modules.CombinedGfi.layerResults = [
+            {
+                layerId: "123",
+                layerName: "Test Layer",
+                rows: new Array(25).fill().map((_, i) => ({id: i})),
+                page: 1,
+                tempPage: 1
+            }
+        ];
+
+        wrapper.vm.changePage(0, 2);
+
+        expect(commitSpy.calledWith("Modules/CombinedGfi/setLayerResults")).to.be.true;
+        expect(commitSpy.getCall(0)).to.not.be.null;
+        expect(commitSpy.getCall(0).args[1][0].page).to.equal(2);
+        expect(commitSpy.getCall(0).args[1][0].tempPage).to.equal(2);
+    });
+
     it("handles missing layer result", () => {
         const displayName = wrapper.vm.getLayerDisplayName(null);
 

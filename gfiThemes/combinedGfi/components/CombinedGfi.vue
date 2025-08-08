@@ -65,7 +65,9 @@ export default {
             return this.feature !== null;
         },
         filteredLayerResults () {
-            return this.layerResults.filter(layerResult => layerResult.error || layerResult.rows.length > 0);
+            return this.layerResults
+                .map((layerResult, originalIndex) => ({...layerResult, originalIndex}))
+                .filter(layerResult => layerResult.error || layerResult.rows.length > 0);
         }
     },
     watch: {
@@ -168,7 +170,8 @@ export default {
          * @param {number} newPage - The new page number to set for the specified layer.
          */
         changePage (layerIndex, newPage) {
-            const maxPage = this.totalPages(this.layerResults[layerIndex].rows);
+            const maxPage = this.totalPages(this.layerResults[layerIndex].rows),
+                updatedLayerResults = [...this.layerResults];
 
             let page = newPage;
 
@@ -179,8 +182,12 @@ export default {
                 page = maxPage;
             }
 
-            this.layerResults[layerIndex].page = newPage;
-            this.layerResults[layerIndex].tempPage = newPage;
+            updatedLayerResults[layerIndex] = {
+                ...updatedLayerResults[layerIndex],
+                page: newPage,
+                tempPage: newPage
+            };
+            this.$store.commit("Modules/CombinedGfi/setLayerResults", updatedLayerResults);
         },
         /**
          * Validates the given layer index and changes the page accordingly.
@@ -189,16 +196,26 @@ export default {
          */
         validateAndChangePage (layerIndex) {
             const maxPage = this.totalPages(this.layerResults[layerIndex].rows),
-                tempPage = this.layerResults[layerIndex].tempPage;
+                tempPage = this.layerResults[layerIndex].tempPage,
+                updatedLayerResults = [...this.layerResults];
+
+            let validatedPage = tempPage;
 
             if (tempPage < 1) {
-                this.layerResults[layerIndex].tempPage = 1;
+                validatedPage = 1;
             }
             else if (tempPage > maxPage) {
-                this.layerResults[layerIndex].tempPage = maxPage;
+                validatedPage = maxPage;
             }
 
-            this.layerResults[layerIndex].page = this.layerResults[layerIndex].tempPage;
+            updatedLayerResults[layerIndex] = {
+                ...updatedLayerResults[layerIndex],
+                page: validatedPage,
+                tempPage: validatedPage
+            };
+
+            // Update the Vuex store with the new array
+            this.$store.commit("Modules/CombinedGfi/setLayerResults", updatedLayerResults);
         },
         /**
          * translates the given key, checkes if the key exists and throws a console warning if not
@@ -367,11 +384,11 @@ export default {
         <div v-else>
             <div
                 v-for="(layerResult, index) in filteredLayerResults"
-                :key="index"
+                :key="`layer-${layerResult.layerId || layerResult.originalIndex || index}`"
                 class="layer-result-container"
             >
                 <AccordionItem
-                    :id="`layer-${index}`"
+                    :id="`layer-${layerResult.originalIndex}`"
                     :title="layerResult.error
                         ? `${getLayerDisplayName(layerResult)} — ${layerResult.error}`
                         : `${getLayerDisplayName(layerResult)} (${layerResult.rows.length} ${layerResult.rows.length === 1 ? translate('additional:modules.combinedGfi.feature') : translate('additional:modules.combinedGfi.features')})`"
@@ -392,8 +409,7 @@ export default {
                             <PaginationControl
                                 :current-page="layerResult.page"
                                 :total-pages="totalPages(layerResult.rows)"
-                                :go-to-page-text="translate('additional:modules.combinedGfi.goToPage')"
-                                @page-change="newPage => changePage(index, newPage)"
+                                @page-change="newPage => changePage(layerResult.originalIndex, newPage)"
                             />
                         </div>
                         <!-- Direct display when only one feature exists -->
@@ -406,11 +422,11 @@ export default {
                         <div
                             v-for="(row, rowIndex) in paginatedFeatures(layerResult.rows, layerResult.page)"
                             v-else
-                            :key="rowIndex"
+                            :key="`feature-${layerResult.originalIndex}-${layerResult.page}-${rowIndex}`"
                             class="feature-container"
                         >
                             <AccordionItem
-                                :id="`feature-${index}-${rowIndex}`"
+                                :id="`feature-${layerResult.originalIndex}-${rowIndex}`"
                                 :title="`${translate('additional:modules.combinedGfi.feature')} ${rowIndex + 1 + (layerResult.page - 1) * itemsPerPage}`"
                                 :is-open="false"
                                 :coloured-header="true"
