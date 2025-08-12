@@ -188,7 +188,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 }]
             });
 
-            expect(wrapper.vm.objectTypeInputs).to.deep.equal({
+            expect(wrapper.vm.nestedInputs).to.deep.equal({
                 objectType: {schema: {type: "object"}}
             });
         });
@@ -207,7 +207,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 }]
             });
 
-            expect(wrapper.vm.stringTypeInputs).to.deep.equal({
+            expect(wrapper.vm.flatInputs).to.deep.equal({
                 stringType: {schema: {type: "string"}}
             });
         });

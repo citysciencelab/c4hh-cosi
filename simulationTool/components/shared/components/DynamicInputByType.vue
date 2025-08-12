@@ -48,12 +48,38 @@ export default {
             default: 1
         },
         value: {
-            type: [String, Number, Boolean, Array],
+            type: [String, Number, Boolean, Object],
             default: undefined,
             required: false
         }
     },
-    emits: ["update:value", "update:checked"]
+    emits: ["update:value", "update:checked"],
+    computed: {
+        enumValues () {
+            if (this.inputType !== "enum") {
+                return [];
+            }
+            if (this.value && typeof this.value === "object" && Array.isArray(this.value.enum)) {
+                return this.value.enum;
+            }
+            if (Array.isArray(this.value)) {
+                return this.value;
+            }
+            return [];
+        },
+        selectedEnumValue () {
+            if (this.inputType !== "enum") {
+                return this.value;
+            }
+            if (this.value && typeof this.value === "object" && Object.prototype.hasOwnProperty.call(this.value, "value")) {
+                return this.value.value;
+            }
+            if (Array.isArray(this.value)) {
+                return this.value[0];
+            }
+            return this.value;
+        }
+    }
 };
 </script>
 
@@ -77,11 +103,11 @@ export default {
                 :id="id"
                 class="form-select m-2"
                 :aria-label="label"
-                :value="Array.isArray(value) ? value[0] : value"
+                :value="selectedEnumValue"
                 @change="$emit('update:value', $event.target.value)"
             >
                 <option
-                    v-for="(val, index) in value"
+                    v-for="(val, index) in enumValues"
                     :key="index"
                     :value="val"
                 >

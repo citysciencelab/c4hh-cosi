@@ -57,7 +57,6 @@ export default class OgcApiProcess {
 
             defaultsObject[inputKey] = OgcApiProcess.getDefaultWithEnum(input);
 
-
             if (input.schema?.type === "object") {
                 defaultsObject[inputKey] ??= {};
                 for (const propertyKey in input.schema.properties) {
@@ -90,6 +89,11 @@ export default class OgcApiProcess {
                 return {value: obj.default, enum: enumArr};
             }
             return obj.default;
+        }
+        else if (Object.hasOwn(obj, "schema") && Object.hasOwn(obj.schema, "enum") && Array.isArray(obj.schema.enum) && obj.schema.enum.length > 0) {
+            const defaultValue = obj.schema.default ? obj.schema.default : obj.schema.enum[0];
+
+            return {value: defaultValue, enum: obj.schema.enum, type: "enum"};
         }
         return undefined;
     }

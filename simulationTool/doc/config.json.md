@@ -33,10 +33,9 @@ Tool to simulate wind and noise.
 |----|-------------|---|-------|------------|------|
 |id|ja|String||The id of simulation.|true|
 |title|ja|String| |The titel of simulation.|true|
-|inputs|yes|Object|Object|An object to set input parameter for simulation. Parameters that should be ignored can be configured as "ignoreProperties" (Array of property names) |true|
+|inputs|yes|Object|Object|An object to set input parameter for simulation. Parent parameters that should be ignored can be configured as "menu": "nowhere". Nested parameters to be ignored should be listed in the "ignoreProperties" array inside their parent input config object. |true|
 |outputs|yes|Object|Object|An object to set output parameter for simulation.|true|
 |processes|yes|**[processes](#markdown-header-portalconfigmenutoolsimulationtoolsimulationsprocesses)**| |The settings for processes.|true|
-
 |resultStyle|yes|Object|Object|An object to set style for simulation result.|true|
 
 #### Portalconfig.menu.tool.simulationTool.simulations.processes

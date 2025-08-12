@@ -41,7 +41,9 @@ export default {
             requestBodies: [],
             selectedOutputOptions: [],
             simulationName: "",
-            ignoreProperties: []
+            ignoreProperties: [],
+            flatInputs: {},
+            nestedInputs: {}
         };
     },
     computed: {
@@ -153,19 +155,6 @@ export default {
         },
 
         /**
-         * Gets an inputs object from the process description containing only the inputs of type "object".
-         * Also filters out inputs that the config defines as not editable or not having a menu position.
-         * @returns {Object} The inputs object.
-         */
-        objectTypeInputs () {
-            return Object.fromEntries(Object.entries(this.combinedInputs).filter(
-                ([inputKey, input]) => input.schema?.type === "object"
-                    && this.simulation?.inputs?.[inputKey]?.menu !== "nowhere"
-                    && !this.simulation?.inputs?.[inputKey]?.editable
-            ));
-        },
-
-        /**
          * Gets the keys of the primaryTypeInputs object.
          * @returns {String[]} The keys of the primaryTypeInputs object.
          */
@@ -179,19 +168,6 @@ export default {
          */
         simulation () {
             return this.simulations.find(simulation => simulation.id === this.currentSimulationId);
-        },
-
-        /**
-         * Gets an inputs object from the process description containing only the inputs of type "string".
-         * Also filters out inputs that the config defines as not editable or not having a menu position.
-         * @returns {Object} The inputs object.
-         */
-        stringTypeInputs () {
-            return Object.fromEntries(Object.entries(this.combinedInputs).filter(
-                ([inputKey, input]) => input.schema?.type === "string"
-                    && this.simulation?.inputs?.[inputKey]?.menu !== "nowhere"
-                    && !this.simulation?.inputs?.[inputKey]?.editable
-            ));
         }
     },
     watch: {
@@ -201,6 +177,29 @@ export default {
         currentPlanningScenario () {
             this.updateFeatures();
             this.zoomToFeature();
+        },
+
+        combinedInputs () {
+            this.nestedInputs = {};
+            this.flatInputs = {};
+
+            Object.entries(this.combinedInputs).forEach(([inputKey, input]) => {
+                if (this.simulation?.inputs?.[inputKey]?.menu !== "nowhere" //
+                    && !this.simulation?.inputs?.[inputKey]?.editable) {
+                    switch (input.schema?.type) {
+                        case "object":
+                            this.nestedInputs[inputKey] = input;
+                            break;
+                        case "string":
+                            // for some reason not nested inputs always have the type "string"
+                            this.flatInputs[inputKey] = input;
+                            break;
+                        default:
+                            console.warn(`Unsupported input type for ${inputKey}: ${input.schema?.type}`);
+                            break;
+                    }
+                }
+            });
         },
 
         /**
@@ -273,25 +272,41 @@ export default {
         },
 
         /**
-         * Excludes the primary type keys from the given object.
-         * @param {Object} properties The properties object.
+         * Gets non-primary properties from an object input.
+         * @param {Object} input - The input object.
+         * @param {String} inputKey - The input key.
          * @returns {Object} The filtered properties object.
          */
-        excludePrimaryTypeKeys (properties) {
-            const result = {};
+        getNonPrimaryProperties (input, inputKey) {
+            if (!input?.schema?.properties) {
+                return {};
+            }
 
-            Object.entries(properties || {}).forEach(([propertyKey, property]) => {
-                if (!this.primaryTypeInputsKeys.includes(propertyKey) && !this.ignoreProperties.includes(propertyKey)) {
-                    if (property.enum) {
-                        property.type = "enum";
-                    }
-                    result[propertyKey] = property;
+            const primaryProperties = this.simulation?.inputs?.[inputKey]?.primaryProperties || [],
+                result = {};
+
+            Object.entries(input.schema.properties).forEach(([propertyKey, property]) => {
+                if (!primaryProperties.includes(propertyKey) && !this.ignoreProperties.includes(propertyKey)) {
+                    result[propertyKey] = this.processInputProperty(property, inputKey, propertyKey);
                 }
             });
             return result;
         },
 
-        getBBOXGeometry,
+        /**
+         * Gets non-primary string inputs.
+         * @returns {Object} The filtered string inputs.
+         */
+        getNonPrimaryStringInputs () {
+            const result = {};
+
+            Object.entries(this.flatInputs).forEach(([inputKey, input]) => {
+                if (this.simulation?.inputs?.[inputKey]?.menu !== "primary") {
+                    result[inputKey] = this.processInputProperty(input, inputKey);
+                }
+            });
+            return result;
+        },
 
         /**
          * Gets the requestBody inputs value according to input and property as key.
@@ -312,12 +327,21 @@ export default {
 
             if (typeof requestBody?.inputs?.[inputKey]?.[propertyKey] !== "undefined") {
                 if (requestBody.inputs[inputKey][propertyKey].enum) {
-                    return requestBody.inputs[inputKey][propertyKey].enum;
+                    return {
+                        enum: requestBody.inputs[inputKey][propertyKey].enum,
+                        value: requestBody.inputs[inputKey][propertyKey].value
+                    };
                 }
                 return requestBody.inputs[inputKey][propertyKey];
             }
 
             if (propertyKey === "") {
+                if (requestBody?.inputs?.[inputKey]?.enum) {
+                    return {
+                        enum: requestBody.inputs[inputKey].enum,
+                        value: requestBody.inputs[inputKey].value
+                    };
+                }
                 return requestBody?.inputs?.[inputKey];
             }
 
@@ -349,35 +373,117 @@ export default {
         getMappedProperty,
 
         /**
-         * Gets the inputs of the primary type from the process description.
+         * Processes an input property to extract type information and handle enums.
+         * @param {Object} property - The property object from the schema.
+         * @param {String} inputKey - The input key this property belongs to.
+         * @param {String} propertyKey - The property key (for nested properties) or input key (for top-level).
+         * @returns {Object} Processed property with consistent structure.
+         */
+        processInputProperty (property, inputKey, propertyKey = null) {
+            const processed = {...property};
+
+            // Handle enum detection consistently
+            if (property.schema?.enum?.length) {
+                processed.type = "enum";
+                processed.enum = [...property.schema.enum];
+                processed.default = property.schema.default ?? property.schema.enum[0];
+            }
+            else if (property.enum?.length) {
+                processed.type = "enum";
+                processed.enum = [...property.enum];
+                processed.default = property.default ?? property.enum[0];
+            }
+            else if (property.schema?.type) {
+                processed.type = property.schema.type;
+                processed.default = property.schema.default ?? property.default;
+                processed.minimum = property.schema.minimum ?? property.minimum;
+                processed.maximum = property.schema.maximum ?? property.maximum;
+            }
+            else {
+                processed.type = property.type || "string";
+            }
+
+            processed.inputKey = inputKey;
+            processed.propertyKey = propertyKey;
+
+            // Clean up schema references for consistency
+            delete processed.schema;
+            delete processed.title;
+            delete processed.description;
+
+            return processed;
+        },
+
+        /**
+         * Gets inputs based on menu type and filters.
+         * @param {String} menuType - The menu type to filter by ("primary", "advanced", etc.).
+         * @param {Boolean} includeObjectProperties - Whether to include object properties.
+         * @returns {Object} Filtered inputs based on criteria.
+         */
+        getInputsByMenuType (menuType = null, includeObjectProperties = true) {
+            const result = {};
+
+            Object.entries(this.combinedInputs).forEach(([inputKey, input]) => {
+                const inputConfig = this.simulation?.inputs?.[inputKey];
+
+                // Skip if menu type doesn't match (null means all types)
+                if (menuType && inputConfig?.menu !== menuType) {
+                    return;
+                }
+
+                // Skip editable inputs (handled elsewhere)
+                if (inputConfig?.editable) {
+                    return;
+                }
+
+                // Skip inputs marked as "nowhere"
+                if (inputConfig?.menu === "nowhere") {
+                    return;
+                }
+
+                if (input.schema?.type === "object" && includeObjectProperties) {
+                    // Handle object properties
+                    const properties = input.schema.properties || {},
+                        primaryProperties = inputConfig?.primaryProperties || [];
+
+                    Object.entries(properties).forEach(([propertyKey, property]) => {
+                        // For primary menu, only include properties marked as primary
+                        if (menuType === "primary" && !primaryProperties.includes(propertyKey)) {
+                            return;
+                        }
+
+                        // For non-primary menus, exclude primary properties to avoid duplication
+                        if (menuType !== "primary" && primaryProperties.includes(propertyKey)) {
+                            return;
+                        }
+
+                        result[propertyKey] = this.processInputProperty(property, inputKey, propertyKey);
+                    });
+                }
+                else if (input.schema?.type !== "object") {
+                    // Handle non-object inputs (string, number, etc.)
+                    result[inputKey] = this.processInputProperty(input, inputKey);
+                }
+            });
+
+            return result;
+        },
+
+        /**
+         * Gets the primary inputs without oaf types from the process description.
          * @returns {Object} The inputs of the primary type.
          */
         getPrimaryTypeInputs () {
-            const propertiesToExtract = {};
+            const primaryInputs = this.getInputsByMenuType("primary");
 
-            Object.entries(this.combinedInputs).forEach(([inputKey, input]) => {
-                if (this.simulation?.inputs?.[inputKey]?.menu !== "primary") {
-                    return;
-                }
-                if (input.schema?.type === "object") {
-                    const foundProperties = Object.entries(input.schema.properties || {}).filter(([propertyKey]) => {
-                        return this.simulation?.inputs?.[inputKey]?.primaryProperties?.includes(propertyKey);
-                    });
+            return Object.fromEntries(
+                Object.entries(primaryInputs).filter(([inputKey]) => {
+                    const input = this.combinedInputs[inputKey];
 
-                    foundProperties.forEach(([foundPropKey, foundPropVal]) => {
-                        propertiesToExtract[foundPropKey] = {...foundPropVal};
-                        propertiesToExtract[foundPropKey].inputKey = inputKey;
-                    });
-                }
-                else if (input.schema?.type === "string") {
-                    propertiesToExtract[inputKey] = {...input};
-                    propertiesToExtract[inputKey].type = "string";
-                    propertiesToExtract[inputKey].inputKey = inputKey;
-                    delete propertiesToExtract[inputKey].schema;
-                    delete propertiesToExtract[inputKey].title;
-                }
-            });
-            return propertiesToExtract;
+                    return !(input?.minOccurs === 0
+                && input?.schema?.allOf?.some(schema => schema.format === "geojson-feature-collection"));
+                })
+            );
         },
 
         /**
@@ -431,7 +537,7 @@ export default {
 
             const source = this.simulation.inputs[inputKey].source,
                 crs = this.currentPlanningScenario.inputs.crs,
-                filter = getOAFFeature.getOAFGeometryFilter(this.getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects"),
+                filter = getOAFFeature.getOAFGeometryFilter(getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects"),
                 featureCollection = {
                     type: "FeatureCollection",
                     features: await getOAFFeature.getOAFFeatureGet(
@@ -508,31 +614,63 @@ export default {
             this.setMode("simulationList");
         },
 
-        /** Prepares the request body for the simulation.
-         * @returns {void}
+        /**
+         * Checks if an access token is present.
+         * Sends an alert if not.
+         * @returns {boolean} True if an access token is present, false otherwise.
          */
-        async prepareRequestBodies () {
+        isLoggedIn () {
             if (!this.accessToken) {
                 this.addSingleAlert({
                     content: this.$t("additional:modules.tools.simulationTool.simulationLoginRequiredText"),
                     category: "warning",
                     title: this.$t("additional:modules.tools.simulationTool.simulationLoginRequired")
                 });
-                return;
+                return false;
             }
+            return true;
+        },
+
+        /**
+         * Initializes the process handlers for the simulation.
+         * @returns {void}
+         */
+        initializeProcessHandlers () {
             this.processHandlers = this.simulation.processes.map(
                 process => new OgcApiProcess(process.url, process.id)
             );
+        },
+
+        /**
+         * Fetches the process descriptions for the simulation.
+         * @returns {Promise<void>}
+         */
+        async fetchProcessDescriptions () {
             this.processDescriptions = await Promise.all(
                 this.processHandlers.map(handler => handler.getDescription(this.accessToken))
             );
+        },
+
+        /**
+         * Sets up the ignore properties for the simulation.
+         * @returns {void}
+         */
+        setupIgnoreProperties () {
             this.ignoreProperties = Object.keys(this.simulation.inputs)
                 .filter(inputKey => this.simulation.inputs[inputKey].ignoreProperties)
                 .flatMap(inputKey => this.simulation.inputs[inputKey].ignoreProperties);
+
+        },
+
+        /**
+         * Creates the request bodies for the simulation.
+         * @returns {void}
+         */
+        createRequestBodies () {
             const filteredProcessDescriptions = [];
 
-            this.processDescriptions.forEach(description => filteredProcessDescriptions.push(this.removeUnwantedProperty(description, this.ignoreProperties)));
-
+            this.processDescriptions.forEach(
+                description => filteredProcessDescriptions.push(this.removeUnwantedProperty(description, this.ignoreProperties)));
             this.requestBodies = filteredProcessDescriptions.map(description => ({
                 inputs: {
                     ...OgcApiProcess.getInputDefaultsFromDescription(description),
@@ -541,6 +679,23 @@ export default {
                 outputs: {}
             }));
         },
+
+        /** Prepares the request body for the simulation.
+         * @returns {void}
+         */
+        async prepareRequestBodies () {
+            if (!this.isLoggedIn()) {
+                return;
+            }
+
+            this.initializeProcessHandlers();
+            await this.fetchProcessDescriptions();
+            this.setupIgnoreProperties();
+            this.createRequestBodies();
+            console.log("nestedInputs", this.nestedInputs);
+            console.log("flatInputs", this.flatInputs);
+        },
+
         removeUnwantedProperty (obj, ignoreProperties = []) {
             if (!obj || typeof obj !== "object") {
                 return obj;
@@ -603,8 +758,7 @@ export default {
          * @returns {void}
          */
         async startSimulation () {
-            if (!this.accessToken) {
-                console.warn("No access token available for simulation execution.");
+            if (!this.isLoggedIn()) {
                 return;
             }
             this.removeEmptyCollections(this.requestBodies);
@@ -655,6 +809,7 @@ export default {
          */
         setRequestBodyInput (inputKey, propertyKey, val, isEnum = false) {
             if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
+                console.warn(`Invalid parameters: inputKey=${inputKey}, propertyKey=${propertyKey}`);
                 return;
             }
 
@@ -663,6 +818,12 @@ export default {
                     return;
                 }
                 if (propertyKey === "") {
+                    // top-level input
+                    if (isEnum && this.requestBodies[index]?.inputs?.[inputKey]?.value !== undefined) {
+                        // Only update value part of enum object
+                        this.requestBodies[index].inputs[inputKey].value = val;
+                        return;
+                    }
                     this.requestBodies[index].inputs[inputKey] = val;
                     return;
                 }
@@ -670,7 +831,7 @@ export default {
                 if (typeof this.requestBodies[index].inputs[inputKey] === "undefined") {
                     this.requestBodies[index].inputs[inputKey] = {};
                 }
-                if (isEnum && this.requestBodies[index].inputs[inputKey][propertyKey].value) {
+                if (isEnum && this.requestBodies[index].inputs[inputKey][propertyKey]?.value !== undefined) {
                     this.requestBodies[index].inputs[inputKey][propertyKey].value = val;
                     return;
                 }
@@ -688,7 +849,7 @@ export default {
                 this.setRequestBodyInput(inputKey, "", undefined);
                 return;
             }
-            const completedURI = `${this.getOptionalBBOXUrlInputs()[inputKey]}/${this.getBBOXGeometry(this.currentPlanningScenario)?.getExtent()}/500x500.tif?coord_crs=epsg:25832`;
+            const completedURI = `${this.getOptionalBBOXUrlInputs()[inputKey]}/${getBBOXGeometry(this.currentPlanningScenario)?.getExtent()}/500x500.tif?coord_crs=epsg:25832`;
 
             this.setRequestBodyInput(inputKey, "", completedURI);
         },
@@ -808,8 +969,8 @@ export default {
                             :min="input.minimum"
                             :max="input.maximum"
                             :aria="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
-                            @update:value="setRequestBodyInput(input.inputKey, propertyKey, $event)"
-                            @update:checked="setRequestBodyInput(input.inputKey, propertyKey, $event)"
+                            @update:value="setRequestBodyInput(input.inputKey, propertyKey, $event, Boolean(input.enum))"
+                            @update:checked="setRequestBodyInput(input.inputKey, propertyKey, $event, Boolean(input.enum))"
                         />
                     </div>
                 </div>
@@ -841,7 +1002,7 @@ export default {
                     />
                 </div>
             </div>
-            <div v-if="Object.keys(stringTypeInputs).length || Object.keys(objectTypeInputs).length">
+            <div v-if="Object.keys(flatInputs).length || Object.keys(nestedInputs).length">
                 <hr>
                 <AccordionItem
                     id="advanced-simulation-parameters"
@@ -875,7 +1036,7 @@ export default {
                         </div>
                     </div>
                     <div
-                        v-for="(input, inputKey) in excludePrimaryTypeKeys(stringTypeInputs)"
+                        v-for="(input, inputKey) in getNonPrimaryStringInputs()"
                         :key="inputKey"
                     >
                         <div
@@ -894,22 +1055,25 @@ export default {
                         <DynamicInputByType
                             v-else
                             :id="inputKey"
-                            input-type="string"
+                            :input-type="input.type"
                             :label="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :placeholder="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :value="getRequestBodyInputByKey(inputKey, '', input.default)"
-                            @update:value="setRequestBodyInput(inputKey, '', $event)"
+                            :min="input.minimum"
+                            :max="input.maximum"
+                            @update:value="setRequestBodyInput(inputKey, '', $event, Boolean(input?.enum))"
+                            @update:checked="setRequestBodyInput(inputKey, '', $event, Boolean(input?.enum))"
                         />
                     </div>
                     <AccordionItem
-                        v-for="(input, inputKey) in objectTypeInputs"
+                        v-for="(input, inputKey) in nestedInputs"
                         :id="inputKey"
                         :key="inputKey"
                         :title="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                         font-size="font-size-small"
                     >
                         <div
-                            v-for="(property, propertyKey) in excludePrimaryTypeKeys(input.schema.properties)"
+                            v-for="(property, propertyKey) in getNonPrimaryProperties(input, inputKey)"
                             :key="propertyKey"
                         >
                             <DynamicInputByType
