@@ -3,6 +3,8 @@
       "tools": {
         "simulationTool": {
           "additionalInfo": "More information",
+          "maxSideLengthExceeded": "The current bounding box exceeds the maximum side length of {{maxSideLength}} m for the selected data source.",
+          "bufferDisabledDueToSideLength": "Buffer disabled - Planning area exceeds maximum side length of {{maxSideLength}} m",
           "addSimulation": "Add Simulation",
           "chooseOutputParam": "Choose output parameter",
           "outputParam": "Output parameter",
@@ -93,7 +95,6 @@
           "loadingEnsembles": "Loading ensembles",
           "loadingModels": "Loading models",
           "loadingScenarios": "Loading scenarios",
-          "maxAreaExceeded": "The current bounding box exceeds the maximum area of {{maxArea}} ha for the selected data source.",
           "model": "Model",
           "modelDetails": "Model details",
           "modelInformation": "Model information",

@@ -53,7 +53,14 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                             namespaced: true,
                             actions: {},
                             getters: {
-                                dataSources: () => [],
+                                dataSources: () => [
+                                    {
+                                        id: "default",
+                                        title: "Test Data Source",
+                                        maxSizeArea: 500000,
+                                        maxSideLength: 1000
+                                    }
+                                ],
                                 drawTypeLabels: () => {
                                     return [];
                                 },
@@ -188,6 +195,125 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
     });
 
     describe("Methods", () => {
+        describe("Side Length Validation", () => {
+            describe("currentMaxSideLength", () => {
+                it("should return maxSideLength from current data source", () => {
+                    const wrapper = factory.getMount();
+
+                    expect(wrapper.vm.currentMaxSideLength).to.equal(1000);
+                });
+
+                it("should return fallback value of 1000 if no maxSideLength in data source", () => {
+                    const wrapper = factory.getMount();
+
+                    sinon.stub(wrapper.vm, "currentDataSource").get(() => ({
+                        id: "default",
+                        title: "Test Data Source",
+                        maxSizeArea: 500000
+                    }));
+
+                    expect(wrapper.vm.currentMaxSideLength).to.equal(1000);
+                });
+            });
+
+            describe("isOriginalFeatureExceedingSideLength", () => {
+                it("should return false if no features in source", () => {
+                    const wrapper = factory.getMount();
+
+                    expect(wrapper.vm.isOriginalFeatureExceedingSideLength).to.be.false;
+                });
+
+                it("should return false if only simulation-area feature exists", () => {
+                    const wrapper = factory.getMount();
+
+                    sinon.stub(wrapper.vm.source, "getFeatures").returns([
+                        {get: () => "simulation-area"}
+                    ]);
+
+                    expect(wrapper.vm.isOriginalFeatureExceedingSideLength).to.be.false;
+                });
+
+                it("should return false if original feature side length is within limits", () => {
+                    const wrapper = factory.getMount();
+
+                    sinon.stub(wrapper.vm.source, "getFeatures").returns([
+                        {
+                            get: () => null,
+                            getGeometry: () => ({
+                                getType: () => "Polygon",
+                                getCoordinates: () => [[[0, 0], [100, 0], [100, 100], [0, 100], [0, 0]]]
+                            })
+                        }
+                    ]);
+
+                    expect(wrapper.vm.isOriginalFeatureExceedingSideLength).to.be.false;
+                });
+            });
+
+            describe("checkBboxSideLengthConstraint", () => {
+                it("should return false if no bboxFeature provided", () => {
+                    const wrapper = factory.getMount();
+
+                    expect(wrapper.vm.checkBboxSideLengthConstraint(null, true)).to.be.false;
+                });
+
+                it("should return false if bbox side length is within limits", () => {
+                    const wrapper = factory.getMount(),
+                        bboxFeature = {
+                            getGeometry: () => ({
+                                getType: () => "Polygon",
+                                getCoordinates: () => [[[0, 0], [500, 0], [500, 500], [0, 500], [0, 0]]]
+                            })
+                        };
+
+                    expect(wrapper.vm.checkBboxSideLengthConstraint(bboxFeature, true)).to.be.false;
+                });
+
+                it("should return true if bbox side length exceeds limits", () => {
+                    const wrapper = factory.getMount(),
+                        bboxFeature = {
+                            getGeometry: () => ({
+                                getType: () => "Polygon",
+                                getCoordinates: () => [[[0, 0], [1500, 0], [1500, 1500], [0, 1500], [0, 0]]]
+                            })
+                        };
+
+                    expect(wrapper.vm.checkBboxSideLengthConstraint(bboxFeature, true)).to.be.true;
+                });
+            });
+
+            describe("bufferConstraintStatus", () => {
+                it("should return sideLengthExceeded false if no features", () => {
+                    const wrapper = factory.getMount();
+
+                    expect(wrapper.vm.bufferConstraintStatus.sideLengthExceeded).to.be.false;
+                });
+            });
+
+            describe("modifyBBoxByBuffer with side length validation", () => {
+                it("should reset buffer to 0 if original feature exceeds side length", () => {
+                    const wrapper = factory.getMount();
+
+                    sinon.stub(wrapper.vm, "isOriginalFeatureExceedingSideLength").get(() => true);
+
+                    wrapper.vm.bufferVal = "50";
+                    wrapper.vm.modifyBBoxByBuffer("100");
+
+                    expect(wrapper.vm.bufferVal).to.equal("0");
+                });
+
+                it("should allow buffer modification if within limits", () => {
+                    const wrapper = factory.getMount();
+
+                    sinon.stub(wrapper.vm, "isOriginalFeatureExceedingSideLength").get(() => false);
+
+                    wrapper.vm.modifyBBoxByBuffer("50");
+
+                    expect(wrapper.vm.bufferVal).to.equal("50");
+                });
+            });
+        });
+
         describe("isValid", () => {
             it("should set isValid to true if input is not an empty string", () => {
                 const wrapper = factory.getMount();

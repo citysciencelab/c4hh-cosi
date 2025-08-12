@@ -4,6 +4,8 @@
       "tools": {
         "simulationTool": {
           "additionalInfo": "Mehr Informationen",
+          "maxSideLengthExceeded": "Die aktuelle Bounding Box überschreitet die maximale Seitenlänge von {{maxSideLength}} m für die gewählte Datenquelle.",
+          "bufferDisabledDueToSideLength": "Puffer deaktiviert - Planungsgebiet überschreitet maximale Seitenlänge von {{maxSideLength}} m",
           "addSimulation": "Simulation hinzufügen",
           "chooseOutputParam": "Ausgabeparameter auswählen",
           "outputParam": "Ausgabeparameter",
@@ -95,7 +97,6 @@
           "loadingEnsembles": "Lade Ensembles",
           "loadingModels": "Lade Modelle",
           "loadingScenarios": "Lade Szenarien",
-          "maxAreaExceeded": "Die aktuelle Bounding Box überschreitet die maximale Fläche von {{maxArea}} ha für die gewählte Datenquelle.",
           "model": "Modell",
           "modelDetails": "Modell Details",
           "modelInformation": "Modellinformationen",

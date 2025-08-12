@@ -14,6 +14,7 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import SectionHeader from "../SectionHeader.vue";
 import convertFeatures from "../../js/convertFeatures";
+import {getArea, getDistance} from "ol/sphere";
 
 export default {
     name: "PlanningScenarioCreate",
@@ -59,32 +60,123 @@ export default {
         ]),
 
         /**
+         * Gets the current data source configuration.
+         * @returns {Object} The current data source configuration.
+         */
+        currentDataSource () {
+            return this.dataSources.find(
+                ds => ds.id === this.currentScenarioData.dataSourceId
+            ) || {};
+        },
+
+        /**
          * Gets the maximum area that is configured in the currently selected data source.
          * @returns {Number} The maximum area of the current data source.
          */
         currentMaxArea () {
-            return this.dataSources.find(
-                ds => ds.id === this.currentScenarioData.dataSourceId
-            )?.maxSizeArea;
+            return this.currentDataSource?.maxSizeArea;
         },
 
         /**
-         * Checks if the current maximum area is exceeded.
-         * @returns {Boolean} True if the maximum area is exceeded, false otherwise.
+         * Gets the maximum side length that is configured in the currently selected data source.
+         * @returns {Number} The maximum side length of the current data source.
          */
-        isMaxAreaExceeded () {
-            return this.source?.getFeatures()?.some(
-                feature => feature.getGeometry()?.getArea() > this.currentMaxArea
-            ) ?? false;
+        currentMaxSideLength () {
+            return this.currentDataSource?.maxSideLength;
+        },
+
+        /**
+         * Checks if the original drawn features exceed the maximum side length.
+         * If true, no buffer should be allowed.
+         * @returns {Boolean} True if the original features exceed max side length.
+         */
+        isOriginalFeatureExceedingSideLength () {
+            if (!this.currentMaxSideLength) {
+                return false;
+            }
+
+            if (!this.source?.getFeatures()?.length) {
+                return false;
+            }
+
+            try {
+                const originalFeatures = this.source.getFeatures().filter(feature => feature.get("id") !== "simulation-area");
+
+                if (!originalFeatures.length) {
+                    return false;
+                }
+
+                return originalFeatures.some(feature => {
+                    const geometry = feature.getGeometry();
+
+                    if (geometry?.getType() === "Polygon") {
+                        const coordinates = geometry.getCoordinates()[0];
+
+                        for (let i = 0; i < coordinates.length - 1; i++) {
+                            const [x1, y1] = coordinates[i],
+                                [x2, y2] = coordinates[i + 1],
+                                sideLength = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+
+                            if (sideLength > this.currentMaxSideLength) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                });
+            }
+            catch (error) {
+                return false;
+            }
+        },
+
+        /**
+         * Checks constraints for the buffered simulation area (BBox).
+         * @returns {Object} Object with constraint status.
+         */
+        bufferConstraintStatus () {
+            if (!this.source?.getFeatures()?.length) {
+                return {sideLengthExceeded: false};
+            }
+
+            try {
+                const projection = mapCollection.getMapView("2D").getProjection(),
+                    isMetric = projection.getUnits() === "m",
+                    bboxFeature = this.source.getFeatures().find(feature => feature.get("id") === "simulation-area"),
+                    sideLengthExceeded = this.checkBboxSideLengthConstraint(bboxFeature, isMetric);
+
+                return {sideLengthExceeded};
+            }
+            catch (error) {
+                return {sideLengthExceeded: false};
+            }
+        },
+
+        /**
+         * Checks if any constraint is exceeded on the buffered area.
+         * @returns {Boolean} True if any constraint is exceeded.
+         */
+        isMaxConstraintExceeded () {
+            const {sideLengthExceeded} = this.bufferConstraintStatus;
+
+            return sideLengthExceeded;
+        },
+
+        /**
+         * Returns whether buffering should be disabled due to original feature exceeding limits.
+         * @returns {Boolean} True if buffer should be disabled.
+         */
+        isBufferDisabled () {
+            return this.isOriginalFeatureExceedingSideLength;
         }
     },
     watch: {
         /**
-         * Is called when the current max area is exceeded or no longer exceeded.
+         * Is called when the current max constraint is exceeded or no longer exceeded.
          * Changes the style of the simulation area.
-         * @param {Boolean} val value if the max area is exceeded.
+         * @param {Boolean} val value if the max constraint is exceeded.
          */
-        isMaxAreaExceeded (val) {
+        isMaxConstraintExceeded (val) {
             const bboxFeature = this.source?.getFeatures().find(feature => feature.get("id") === "simulation-area");
 
             bboxFeature?.setStyle(ConvertStyle.geoJsonToOpenlayers(
@@ -153,7 +245,7 @@ export default {
 
             this.source.addFeature(featureBBOX);
             featureBBOX.setStyle(ConvertStyle.geoJsonToOpenlayers(
-                this.isMaxAreaExceeded ? this.simulationAreaStyleInvalid : this.simulationAreaStyle
+                this.isMaxConstraintExceeded ? this.simulationAreaStyleInvalid : this.simulationAreaStyle
             ));
         },
 
@@ -274,22 +366,33 @@ export default {
 
         /**
          * Modifies the BBox when buffer is changed.
+         * Prevents buffer creation if original feature exceeds side length limits.
          * @param {Number} val The buffer value.
          * @return {void}
          */
         modifyBBoxByBuffer (val) {
-            this.bufferVal = parseFloat(val) >= 0 ? val : "0";
+            const newBufferVal = parseFloat(val) >= 0 ? val : "0",
+                hasFeatures = this.source.getFeatures().length > 0,
+                scenarioFeature = this.source.getFeatures().filter(feature => feature.get("id") !== "simulation-area")[0];
 
-            if (!this.source.getFeatures().length) {
+            if (this.isOriginalFeatureExceedingSideLength && parseFloat(newBufferVal) > 0) {
+                this.bufferVal = "0";
                 return;
             }
 
-            const scenarioFeature = this.source.getFeatures().filter(feature => feature.get("id") !== "simulation-area")[0],
-                extent = scenarioFeature?.getGeometry()?.getExtent();
+            this.bufferVal = newBufferVal;
 
-            if (extent) {
-                this.removeBBoxFeature();
-                this.addBBoxFeature(buffer(extent, parseFloat(this.bufferVal)));
+            if (!hasFeatures) {
+                return;
+            }
+
+            if (scenarioFeature) {
+                const extent = scenarioFeature.getGeometry()?.getExtent();
+
+                if (extent) {
+                    this.removeBBoxFeature();
+                    this.addBBoxFeature(buffer(extent, parseFloat(this.bufferVal)));
+                }
             }
         },
 
@@ -325,6 +428,83 @@ export default {
 
             this.setPlanningScenarios([...this.planningScenarios, this.currentScenarioData]);
             this.setCurrentPlanningScenarioId(this.currentScenarioData.id);
+        },
+
+        /**
+         * Checks if bbox feature exceeds area constraint.
+         * @param {ol/Feature} bboxFeature The bbox feature to check.
+         * @param {Boolean} isMetric Whether the projection is metric.
+         * @returns {Boolean} True if area constraint is exceeded.
+         */
+        checkBboxAreaConstraint (bboxFeature, isMetric) {
+            if (!bboxFeature || !this.currentMaxArea) {
+                return false;
+            }
+
+            const area = isMetric
+                ? bboxFeature.getGeometry()?.getArea()
+                : getArea(bboxFeature.getGeometry(), {projection: mapCollection.getMapView("2D").getProjection()});
+
+            return area > this.currentMaxArea;
+        },
+
+        /**
+         * Checks if bbox feature exceeds side length constraint.
+         * @param {ol/Feature} bboxFeature The bbox feature to check.
+         * @param {Boolean} isMetric Whether the projection is metric.
+         * @returns {Boolean} True if side length constraint is exceeded.
+         */
+        checkBboxSideLengthConstraint (bboxFeature, isMetric) {
+            if (!bboxFeature || !this.currentMaxSideLength) {
+                return false;
+            }
+
+            const geometry = bboxFeature.getGeometry();
+
+            if (geometry?.getType() === "Polygon") {
+                const coordinates = geometry.getCoordinates()[0];
+
+                for (let i = 0; i < coordinates.length - 1; i++) {
+                    const [x1, y1] = coordinates[i],
+                        [x2, y2] = coordinates[i + 1],
+                        sideLength = isMetric
+                            ? Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+                            : getDistance([x1, y1], [x2, y2]);
+
+                    if (sideLength > this.currentMaxSideLength) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+
+        /**
+         * Returns the info text for the exceeded constraint, if any.
+         * @returns {String} The constraint violation message.
+         */
+        constraintExceededInfoText () {
+            const {sideLengthExceeded} = this.bufferConstraintStatus;
+
+            if (sideLengthExceeded && this.currentMaxSideLength) {
+                return this.$t("additional:modules.tools.simulationTool.maxSideLengthExceeded", {
+                    maxSideLength: this.currentMaxSideLength
+                });
+            }
+            return "";
+        },
+
+        /**
+         * Returns the info text when buffer is disabled due to original feature constraints.
+         * @returns {String} The buffer disabled message.
+         */
+        bufferDisabledInfoText () {
+            if (this.isOriginalFeatureExceedingSideLength) {
+                return this.$t("additional:modules.tools.simulationTool.bufferDisabledDueToSideLength", {
+                    maxSideLength: this.currentMaxSideLength
+                });
+            }
+            return "";
         }
     }
 };
@@ -460,11 +640,11 @@ export default {
                     @update:modelValue="modifyBBoxByBuffer"
                 />
                 <div
-                    v-if="isMaxAreaExceeded"
+                    v-if="isMaxConstraintExceeded"
                     class="alert alert-danger"
                     role="alert"
                 >
-                    {{ $t('additional:modules.tools.simulationTool.maxAreaExceeded', {maxArea: currentMaxArea * 0.0001}) }}
+                    {{ constraintExceededInfoText() }}
                 </div>
                 <div
                     class="d-flex justify-content-between"
@@ -480,7 +660,7 @@ export default {
                         :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
                         :interaction="() => create()"
                         :text="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-                        :disabled="!isValid || !source?.getFeatures().length > 0 || isMaxAreaExceeded"
+                        :disabled="!isValid || !source?.getFeatures().length > 0 || isMaxConstraintExceeded"
                     />
                 </div>
             </form>
