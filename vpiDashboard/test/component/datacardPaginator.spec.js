@@ -19,14 +19,14 @@ describe("addons/vpiDashboard/test/ paginator component", () => {
         expect(wrapper.find("#paginator").exists()).to.be.true;
     });
     it("should have a button to roll backward", () => {
-        expect(wrapper.find("#paginator > nav > ul > li:nth-child(1)").exists()).to.be.true;
+        expect(wrapper.find(".previous-paginator-button").exists()).to.be.true;
     });
     it("should have a index displaying data", () => {
         expect(wrapper.find(".paginator-index").exists()).to.be.true;
         expect(wrapper.find(".paginator-index").text()).to.equal("5");
     });
     it("should have a button to roll forward", () => {
-        expect(wrapper.find("#paginator > nav > ul > li:nth-child(3)").exists()).to.be.true;
+        expect(wrapper.find(".next-paginator-button").exists()).to.be.true;
     });
     it("should switch to correct index", async () =>{
         expect(wrapper.vm.currentIndex).to.equal(4);

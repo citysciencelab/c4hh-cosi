@@ -253,8 +253,8 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
         it("should add two urls to the list entry if two urls are added", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.addUrl({url: "url", name: "name"});
-            wrapper.vm.addUrl({url: "url2", name: "name2"});
+            wrapper.vm.addUrl("url", "name");
+            wrapper.vm.addUrl("url2", "name2");
 
             await wrapper.vm.$forceUpdate();
 
@@ -270,7 +270,7 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
         it("should render pdf icon if only one url in url list is present", async () => {
             const wrapper = factory.getShallowMount({}, true, true);
 
-            wrapper.vm.addUrl({url: "url", name: "name"});
+            wrapper.vm.addUrl("url", "name");
             await wrapper.vm.$forceUpdate();
 
             expect(wrapper.findAll(".pdf-icon").length).to.be.equals(1);
@@ -279,8 +279,8 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
         it("should not render pdf icon if more than one url are present", async () => {
             const wrapper = factory.getShallowMount({});
 
-            wrapper.vm.addUrl({url: "url", name: "name"});
-            wrapper.vm.addUrl({url: "url2", name: "name2"});
+            wrapper.vm.addUrl("url", "name");
+            wrapper.vm.addUrl("url2", "name2");
             await wrapper.vm.$forceUpdate();
 
             expect(wrapper.find(".pdf-icon").exists()).to.be.false;
