@@ -18,7 +18,7 @@
 
 ---
 
-## 2020-08-05 v3.13.0
+## 2025-08-06 v3.13.0
 
 ### Added
 - Cesium 3D Tiles Inspector: The Popup Cesium 3D Tiles Inspector, which allows controlling the maximumScreenSpaceError and other parameters in 3D-Mode, has been added as an javascript addon.
