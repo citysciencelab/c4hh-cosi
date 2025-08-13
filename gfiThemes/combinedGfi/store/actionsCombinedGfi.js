@@ -500,10 +500,17 @@ const actions = {
             version = layer?.version || "1.1.0",
             typeName = layer?.featureType || "default_layer",
             typeNameParam = version === "2.0.0" ? "typeNames" : "typeName",
-            url = `${serviceUrl}?service=WFS&version=${version}&request=GetFeature&${typeNameParam}=${typeName}&bbox=${bbox},${mapProjection}&outputFormat=text/xml; subtype=gml/3.2.1`;
+            url = new URL(serviceUrl);
+
+        url.searchParams.set("service", "WFS");
+        url.searchParams.set("version", version);
+        url.searchParams.set("request", "GetFeature");
+        url.searchParams.set(typeNameParam, typeName);
+        url.searchParams.set("bbox", `${bbox},${mapProjection}`);
+        url.searchParams.set("outputFormat", "text/xml; subtype=gml/3.2.1");
 
         try {
-            const response = await fetch(url),
+            const response = await fetch(url.toString()),
                 text = await response.text(),
                 parsedResponse = new DOMParser().parseFromString(text, "application/xml"),
                 features = extractFeaturesFromWfsGml(parsedResponse, attributes);
@@ -575,10 +582,17 @@ const actions = {
         if (!layerConfig?.geometryAttribute || !layerConfig?.featureType) {
             const extent = geometry.getExtent(),
                 bbox = extent.join(","),
-                url = `${serviceUrl}?service=WFS&version=${version}&request=GetFeature&${typeNameParam}=${typeName}&bbox=${bbox},${mapProjection}&outputFormat=text/xml; subtype=gml/3.2.1`;
+                url = new URL(serviceUrl);
+
+            url.searchParams.set("service", "WFS");
+            url.searchParams.set("version", version);
+            url.searchParams.set("request", "GetFeature");
+            url.searchParams.set(typeNameParam, typeName);
+            url.searchParams.set("bbox", `${bbox},${mapProjection}`);
+            url.searchParams.set("outputFormat", "text/xml; subtype=gml/3.2.1");
 
             try {
-                const response = await fetch(url),
+                const response = await fetch(url.toString()),
                     text = await response.text(),
                     parsedResponse = new DOMParser().parseFromString(text, "application/xml"),
                     features = extractFeaturesFromWfsGml(parsedResponse, attributes);
@@ -619,10 +633,17 @@ const actions = {
                             </fes:Intersects>
                         </fes:Filter>
                     `,
-                wfsUrl = `${serviceUrl}?service=WFS&version=${version}&request=GetFeature&${typeNameParam}=${typeName}&filter=${encodeURIComponent(filter)}&outputFormat=text/xml; subtype=gml/3.2.1`;
+                wfsUrl = new URL(serviceUrl);
+
+            wfsUrl.searchParams.set("service", "WFS");
+            wfsUrl.searchParams.set("version", version);
+            wfsUrl.searchParams.set("request", "GetFeature");
+            wfsUrl.searchParams.set(typeNameParam, typeName);
+            wfsUrl.searchParams.set("filter", filter);
+            wfsUrl.searchParams.set("outputFormat", "text/xml; subtype=gml/3.2.1");
 
             try {
-                const response = await fetch(wfsUrl),
+                const response = await fetch(wfsUrl.toString()),
                     text = await response.text(),
                     parsedResponse = new DOMParser().parseFromString(text, "application/xml");
 
