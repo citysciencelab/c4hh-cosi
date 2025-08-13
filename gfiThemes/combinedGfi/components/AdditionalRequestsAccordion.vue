@@ -22,9 +22,6 @@ export default {
             required: true
         }
     },
-    data () {
-        return {};
-    },
     computed: {
         /**
          * Check if any result has info text to show the info accordion
