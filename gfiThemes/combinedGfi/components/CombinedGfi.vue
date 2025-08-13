@@ -133,7 +133,9 @@ export default {
         ...mapMutations("Modules/CombinedGfi", [
             "setCurrentFormat",
             "setBufferedFeature",
-            "setPreviousGeometry"
+            "setPreviousGeometry",
+            "setLayerResults",
+            "setFileName"
         ]),
         /**
          * Tests if the given string is a URL.
@@ -187,7 +189,7 @@ export default {
                 page: newPage,
                 tempPage: newPage
             };
-            this.$store.commit("Modules/CombinedGfi/setLayerResults", updatedLayerResults);
+            this.setLayerResults(updatedLayerResults);
         },
         /**
          * Validates the given layer index and changes the page accordingly.
@@ -215,7 +217,7 @@ export default {
             };
 
             // Update the Vuex store with the new array
-            this.$store.commit("Modules/CombinedGfi/setLayerResults", updatedLayerResults);
+            this.setLayerResults(updatedLayerResults);
         },
         /**
          * translates the given key, checkes if the key exists and throws a console warning if not
@@ -504,7 +506,7 @@ export default {
                 :set-current-format="setCurrentFormat"
                 :export-data="exportData"
                 :translate-function="translate"
-                @update:file-name="value => $store.commit('Modules/CombinedGfi/setFileName', value)"
+                @update:file-name="setFileName"
             />
         </div>
     </div>
