@@ -269,7 +269,7 @@ export default {
          */
         getLayerDisplayName (layerResult) {
             if (!layerResult) {
-                return "Unknown Layer";
+                return this.$t("additional:modules.combinedGfi.unknownLayer");
             }
 
             if (layerResult.layerId) {

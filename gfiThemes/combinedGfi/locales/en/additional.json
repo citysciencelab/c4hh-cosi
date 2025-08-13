@@ -2,8 +2,8 @@
   "modules": {
       "combinedGfi": {
         "fileName": "File Name",
-        "export": "Export",
-        "exportFormat": "Export Format",
+        "export": "Save Export",
+        "exportFormat": "Format",
         "printButton": "Create Report",
         "printError": "Error creating print request. Please check the selected data and try again.",
         "feature": "Feature",

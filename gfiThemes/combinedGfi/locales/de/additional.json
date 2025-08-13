@@ -2,8 +2,8 @@
   "modules": {
       "combinedGfi": {
         "fileName": "Dateiname",
-        "export": "Export",
-        "exportFormat": "Exportformat",
+        "export": "Export speichern",
+        "exportFormat": "Format",
         "printButton": "Bericht erstellen",
         "printError": "Fehler beim Erstellen der Druckanfrage. Bitte überprüfen Sie die ausgewählten Daten und versuchen Sie es erneut.",
         "feature": "Feature",
