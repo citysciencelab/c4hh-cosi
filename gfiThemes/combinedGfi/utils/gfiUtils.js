@@ -5,6 +5,22 @@ import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
 import {translateKeyIfPossible} from "./translationUtils.js";
 
 /**
+ * Checks if a key should be ignored, using case-insensitive comparison.
+ *
+ * @param {string} key - The key to check.
+ * @param {Array<string>} ignoredKeys - Array of keys to ignore.
+ * @returns {boolean} True if the key should be ignored.
+ */
+function isKeyIgnored (key, ignoredKeys) {
+    if (!Array.isArray(ignoredKeys) || ignoredKeys.length === 0) {
+        return false;
+    }
+    const lowerKey = key.toLowerCase();
+
+    return ignoredKeys.some(ignoredKey => ignoredKey.toLowerCase() === lowerKey);
+}
+
+/**
  * Retrieves a coordinate from a given geometry object based on its type.
  *
  * @param {Object} geometry - The geometry object from which to extract the coordinate.
@@ -78,7 +94,7 @@ export function extractColumnsFromResults (results, attributes, ignoredKeys) {
                 return acc;
             }, []),
         filteredKeys = Array.isArray(ignoredKeys) && ignoredKeys.length > 0
-            ? allKeys.filter(key => !ignoredKeys.includes(key))
+            ? allKeys.filter(key => !isKeyIgnored(key, ignoredKeys))
             : allKeys,
         keysToInclude = attributes && attributes.length ? attributes : filteredKeys;
 
@@ -102,7 +118,7 @@ export function extractRowsFromResults (results, attributes, ignoredKeys) {
                     const filtered = {};
 
                     Object.keys(feature).forEach(key => {
-                        if (!ignoredKeys.includes(key)) {
+                        if (!isKeyIgnored(key, ignoredKeys)) {
                             filtered[key] = feature[key];
                         }
                     });
@@ -125,7 +141,7 @@ export function extractRowsFromResults (results, attributes, ignoredKeys) {
                     value = feature[displayName];
                 }
 
-                if (!Array.isArray(ignoredKeys) || !ignoredKeys.includes(originalName)) {
+                if (!Array.isArray(ignoredKeys) || !isKeyIgnored(originalName, ignoredKeys)) {
                     filteredFeature[displayName] = value;
                 }
             });
