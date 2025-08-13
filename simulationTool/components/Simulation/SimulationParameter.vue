@@ -692,8 +692,6 @@ export default {
             await this.fetchProcessDescriptions();
             this.setupIgnoreProperties();
             this.createRequestBodies();
-            console.log("nestedInputs", this.nestedInputs);
-            console.log("flatInputs", this.flatInputs);
         },
 
         removeUnwantedProperty (obj, ignoreProperties = []) {
