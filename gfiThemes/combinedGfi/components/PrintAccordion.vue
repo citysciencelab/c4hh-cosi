@@ -86,7 +86,6 @@ export default {
                     :icon="'bi-file-pdf'"
                     :disabled="!hasSelectedFeature || isLoading"
                     :interaction="sendPrintRequest"
-                    additional-css="print-btn"
                 />
             </div>
         </div>

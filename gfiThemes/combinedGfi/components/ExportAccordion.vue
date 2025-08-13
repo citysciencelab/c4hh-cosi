@@ -98,7 +98,6 @@ export default {
                 :text="translateFunction('additional:modules.combinedGfi.export')"
                 :icon="'bi-download'"
                 :interaction="exportData"
-                additional-css="export-btn"
             />
         </div>
     </AccordionItem>
