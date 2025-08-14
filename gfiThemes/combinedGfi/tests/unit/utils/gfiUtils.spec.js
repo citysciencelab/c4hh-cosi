@@ -63,20 +63,30 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
             expect(columns.length).to.equal(0);
         });
 
-        it("handles object attributes with name and alias in array", () => {
+        it("ignores object attributes with name and alias in array", () => {
             const features = [
                     {attr1: "value1", attr2: "value2"}
                 ],
                 gfiAttributes = [
-                    {name: "attr1", alias: "Attribute 1"},
+                    {name: "attr1", alias: "Attribute 1"}, // This should be ignored
                     "attr2"
                 ],
                 columns = extractColumnsFromResults(features, gfiAttributes);
 
             expect(columns).to.be.an("array");
-            expect(columns.length).to.equal(2);
-            expect(columns[0].name).to.equal("attr1");
-            expect(columns[1].name).to.equal("attr2");
+            expect(columns.length).to.equal(1); // Only attr2 should be included
+            expect(columns[0].name).to.equal("attr2");
+        });
+
+        it("handles empty array as normal array, not as showAll", () => {
+            const features = [
+                    {attr1: "value1", attr2: "value2", attr3: "value3"}
+                ],
+                gfiAttributes = [],
+                columns = extractColumnsFromResults(features, gfiAttributes);
+
+            expect(columns).to.be.an("array");
+            expect(columns.length).to.equal(0); // Empty array should return no columns
         });
     });
 
@@ -137,20 +147,34 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
             expect(rows.length).to.equal(0);
         });
 
-        it("handles object attributes with name and alias in array", () => {
+        it("ignores object attributes with name and alias in array", () => {
             const features = [
                     {attr1: "value1", attr2: "value2"}
                 ],
                 gfiAttributes = [
-                    {name: "attr1", alias: "Attribute 1"},
+                    {name: "attr1", alias: "Attribute 1"}, // This should be ignored
                     "attr2"
                 ],
                 rows = extractRowsFromResults(features, gfiAttributes);
 
             expect(rows).to.be.an("array");
             expect(rows.length).to.equal(1);
-            expect(rows[0]["Attribute 1"]).to.equal("value1");
-            expect(rows[0].attr2).to.equal("value2");
+            expect(rows[0]["Attribute 1"]).to.be.undefined; // Alias should not work
+            expect(rows[0].attr1).to.be.undefined; // attr1 should not be included
+            expect(rows[0].attr2).to.equal("value2"); // Only attr2 should be included
+        });
+
+        it("handles empty array as normal array, not as showAll", () => {
+            const features = [
+                    {attr1: "value1", attr2: "value2", attr3: "value3"}
+                ],
+                gfiAttributes = [],
+                rows = extractRowsFromResults(features, gfiAttributes);
+
+            expect(rows).to.be.an("array");
+            expect(rows.length).to.equal(1);
+            // With empty array, no attributes should be included
+            expect(Object.keys(rows[0]).length).to.equal(0);
         });
     });
 
@@ -220,7 +244,7 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
             expect(result[0].name).to.equal("");
         });
 
-        it("extracts all properties if no attributes are specified", () => {
+        it("applies ignoredKeys when no attributes are specified", () => {
             const data = {
                     features: [
                         {
@@ -228,18 +252,45 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
                             properties: {
                                 name: "Feature 1",
                                 type: "Point",
-                                area: 100
+                                area: 100,
+                                geometry: "POINT(0 0)"
                             }
                         }
                     ]
                 },
-                result = extractFeaturesFromOafJson(data, null);
+                ignoredKeys = ["geometry"],
+                result = extractFeaturesFromOafJson(data, null, ignoredKeys);
 
             expect(result).to.be.an("array");
             expect(result.length).to.equal(1);
             expect(result[0].name).to.equal("Feature 1");
             expect(result[0].type).to.equal("Point");
             expect(result[0].area).to.equal(100);
+            expect(result[0].geometry).to.be.undefined;
+        });
+
+        it("ignores object attributes with name and alias in array", () => {
+            const data = {
+                    features: [
+                        {
+                            properties: {
+                                name: "Feature 1",
+                                type: "Point"
+                            }
+                        }
+                    ]
+                },
+                attributes = [
+                    {name: "name", alias: "Display Name"}, // Should be ignored
+                    "type"
+                ],
+                result = extractFeaturesFromOafJson(data, attributes);
+
+            expect(result).to.be.an("array");
+            expect(result.length).to.equal(1);
+            expect(result[0].name).to.be.undefined; // name should not be included
+            expect(result[0]["Display Name"]).to.be.undefined; // alias should not work
+            expect(result[0].type).to.equal("Point"); // Only type should be included
         });
     });
 
@@ -280,6 +331,19 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
             expect(result[0].area).to.equal("100");
         });
 
+        it("applies ignoredKeys with showAll", () => {
+            const mockData = [{name: "Test Feature", type: "Point", geometry: "POINT(0 0)"}],
+                mockXml = createMockXmlDocument(mockData),
+                ignoredKeys = ["geometry"],
+                result = extractFeaturesFromWfsGml(mockXml, "showAll", ignoredKeys);
+
+            expect(result).to.be.an("array");
+            expect(result.length).to.equal(1);
+            expect(result[0].name).to.equal("Test Feature");
+            expect(result[0].type).to.equal("Point");
+            expect(result[0].geometry).to.be.undefined;
+        });
+
         it("filters features when gfiAttributes is an array", () => {
             const mockData = [{name: "Test Feature", type: "Point", area: "100", hidden: "secret"}],
                 mockXml = createMockXmlDocument(mockData),
@@ -310,21 +374,30 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
             expect(result[0].status_code).to.be.undefined;
         });
 
-        it("handles mixed array with strings and objects", () => {
+        it("ignores objects with name and alias in array", () => {
             const mockData = [{name: "Test", type: "Point", technical_code: "TC001"}],
                 mockXml = createMockXmlDocument(mockData),
                 gfiAttributes = [
                     "name",
-                    {name: "technical_code", alias: "Code"}
+                    {name: "technical_code", alias: "Code"} // Should be ignored
                 ],
                 result = extractFeaturesFromWfsGml(mockXml, gfiAttributes);
 
             expect(result).to.be.an("array");
             expect(result.length).to.equal(1);
             expect(result[0].name).to.equal("Test");
-            expect(result[0].Code).to.equal("TC001");
+            expect(result[0].Code).to.be.undefined; // Alias should not work
+            expect(result[0].technical_code).to.be.undefined; // technical_code should not be included
             expect(result[0].type).to.be.undefined;
-            expect(result[0].technical_code).to.be.undefined;
+        });
+
+        it("handles empty array as normal array, not as showAll", () => {
+            const mockData = [{name: "Test Feature", type: "Point", area: "100"}],
+                mockXml = createMockXmlDocument(mockData),
+                result = extractFeaturesFromWfsGml(mockXml, []);
+
+            expect(result).to.be.an("array");
+            expect(result.length).to.equal(0); // Empty array should return no features
         });
 
         it("handles empty or null attributes", () => {
