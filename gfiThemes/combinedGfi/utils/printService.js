@@ -33,31 +33,23 @@ export async function loadPrintUtilsModule (utilsPath, existingResponse) {
     }
 
     try {
+
+        // Nur CommonJS-Variante verwenden
         let preparePrintRequest;
+        const module = {exports: {}},
+            exports = module.exports;
 
-        try {
-            const printModule = await import(/* webpackIgnore: true */ printUtilsPath);
+        // eslint-disable-next-line no-new-func
+        new Function("module", "exports", text)(module, exports);
 
-            preparePrintRequest = printModule.preparePrintRequest || null;
+        if (typeof module.exports.preparePrintRequest === "function") {
+            preparePrintRequest = module.exports.preparePrintRequest;
         }
-        catch (importError) {
-            console.error("Dynamic import failed, trying CommonJS style:", importError);
-
-            const module = {exports: {}},
-                exports = module.exports;
-
-            // eslint-disable-next-line no-new-func
-            new Function("module", "exports", text)(module, exports);
-
-            if (typeof module.exports.preparePrintRequest === "function") {
-                preparePrintRequest = module.exports.preparePrintRequest;
-            }
-            else if (typeof exports.preparePrintRequest === "function") {
-                preparePrintRequest = exports.preparePrintRequest;
-            }
-            else if (typeof module.exports === "function") {
-                preparePrintRequest = module.exports;
-            }
+        else if (typeof exports.preparePrintRequest === "function") {
+            preparePrintRequest = exports.preparePrintRequest;
+        }
+        else if (typeof module.exports === "function") {
+            preparePrintRequest = module.exports;
         }
 
         if (!preparePrintRequest || typeof preparePrintRequest !== "function") {
