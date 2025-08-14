@@ -179,6 +179,9 @@ export default {
             this.zoomToFeature();
         },
 
+        /**
+         * Split input mapping into nested and flat inputs by looking at their schema type.
+         */
         combinedInputs () {
             this.nestedInputs = {};
             this.flatInputs = {};
