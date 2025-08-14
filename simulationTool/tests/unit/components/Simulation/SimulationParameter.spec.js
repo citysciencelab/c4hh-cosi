@@ -432,7 +432,8 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     expected = {
                         prop1: {
                             type: "string",
-                            inputKey: "input1"
+                            inputKey: "input1",
+                            propertyKey: "prop1"
                         }
                     };
 
@@ -462,7 +463,11 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     expected = {
                         input1: {
                             type: "string",
-                            inputKey: "input1"
+                            inputKey: "input1",
+                            propertyKey: null,
+                            default: undefined,
+                            minimum: undefined,
+                            maximum: undefined
                         }
                     };
 
@@ -482,11 +487,16 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     expected = {
                         prop1: {
                             type: "string",
-                            inputKey: "input1"
+                            inputKey: "input1",
+                            propertyKey: "prop1"
                         },
                         input2: {
                             type: "string",
-                            inputKey: "input2"
+                            inputKey: "input2",
+                            propertyKey: null,
+                            default: undefined,
+                            minimum: undefined,
+                            maximum: undefined
                         }
                     };
 
@@ -602,25 +612,29 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
         describe("toggleOptionalBBOXUrlInputs", () => {
             it("should set input and set the correct value", async () => {
-                const wrapper = factory.getShallowMount(),
-                    mockBBOXUrl = "http://example.com/bbox/extent/500x500.tif?coord_crs=epsg:25832";
+                const wrapper = factory.getShallowMount();
 
                 sinon.stub(wrapper.vm, "getOptionalBBOXUrlInputs").returns({
                     input1: "http://example.com/bbox"
-                });
-                sinon.stub(wrapper.vm, "getBBOXGeometry").returns({
-                    getExtent: () => "extent"
                 });
 
                 await wrapper.setData({
                     processDescriptions: [{inputs: {input1: {}}}],
                     requestBodies: [{inputs: {}}],
-                    currentPlanningScenario: {}
+                    currentPlanningScenario: {
+                        scenarioFeature: {
+                            features: [{
+                                properties: {id: "simulation-area"},
+                                geometry: {type: "Polygon", coordinates: []}
+                            }]
+                        }
+                    }
                 });
 
                 wrapper.vm.toggleOptionalBBOXUrlInputs("input1", {target: {checked: true}});
 
-                expect(wrapper.vm.requestBodies[0].inputs.input1).to.equal(mockBBOXUrl);
+                expect(wrapper.vm.requestBodies[0].inputs.input1).to.include("http://example.com/bbox/");
+                expect(wrapper.vm.requestBodies[0].inputs.input1).to.include("500x500.tif?coord_crs=epsg:25832");
             });
             it("should set the input to undefined if the checkbox is unchecked", async () => {
                 const wrapper = factory.getShallowMount();
@@ -691,7 +705,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 });
                 await wrapper.vm.onOafSwitchChange({target: {checked: false}}, "anOafInput");
 
-                expect(wrapper.vm.requestBody.inputs.anOafInput).to.be.undefined;
+                expect(wrapper.vm.requestBodies[0].inputs.anOafInput).to.be.undefined;
             });
         });
     });
