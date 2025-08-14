@@ -108,7 +108,10 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
                             },
                             mutations: {
                                 setCurrentFormat: mapMutationsSpy,
-                                setBufferedFeature: mapMutationsSpy
+                                setBufferedFeature: mapMutationsSpy,
+                                setLayerResults: mapMutationsSpy,
+                                setPreviousGeometry: mapMutationsSpy,
+                                setFileName: mapMutationsSpy
                             }
                         }
                     }
@@ -269,7 +272,7 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
     it("handles missing layer result", () => {
         const displayName = wrapper.vm.getLayerDisplayName(null);
 
-        expect(displayName).to.equal("Unknown Layer");
+        expect(displayName).to.equal("additional:modules.combinedGfi.unknownLayer");
     });
 
     it("cleans up on unmount", () => {
