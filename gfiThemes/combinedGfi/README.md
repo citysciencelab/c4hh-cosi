@@ -351,15 +351,22 @@ Here's a simplified example of a print request structure:
 
 ### The printUtils.js File
 
-The addon requires a `printUtils.js` file that contains functions for building the print request. This file must export a `preparePrintRequest` function that handles the conversion of feature data to MapFish print format.
+**Hinweis:** Die Datei `printUtils.js` muss als CommonJS-Modul exportiert werden, da dynamisches `import()` im Browser nicht unterstützt wird. Verwende daher folgende Export-Syntax:
 
-The file path is specified in the configuration via the `printUtilsPath` parameter:
-
-```json
-{
-  "printUtilsPath": "./resources/printUtils.js"
-}
+```javascript
+function preparePrintRequest(...) { /* ... */ }
+module.exports = { preparePrintRequest };
 ```
+
+Die Datei wird im Addon per CommonJS-Mechanismus geladen. Ein ES-Module-Export (`export function ...`) funktioniert nicht!
+
+**Pfad-Konfiguration nach Build:**
+Nach dem Build müssen die Pfade zu `printUtils.js` und `combinedGfiPrintConfig.json` in der Konfiguration absolut und portal-spezifisch gesetzt werden, z.B.:
+```json
+"printUtilsPath": "/test/gewerbeflaechen_internetV12/resources/printUtils.js",
+"printConfigPath": "/test/gewerbeflaechen_internetV12/resources/combinedGfiPrintConfig.json"
+```
+Relative Pfade wie `./resources/printUtils.js` funktionieren im Build nicht zuverlässig.
 
 ### Sample printUtils.js Implementation
 
@@ -375,7 +382,7 @@ Here's a basic example of what the `printUtils.js` file might contain:
  * @param {String} printConfigPath - Path to additional print configuration
  * @returns {Object} - The formatted print request
  */
-export function preparePrintRequest(olFeature, layerResults, alternativePolygonFeature, printConfigPath) {
+function preparePrintRequest(olFeature, layerResults, alternativePolygonFeature, printConfigPath) {
   // Load base configuration
   const baseConfig = loadPrintConfig(printConfigPath);
   
