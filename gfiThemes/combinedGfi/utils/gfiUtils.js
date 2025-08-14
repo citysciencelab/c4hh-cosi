@@ -75,45 +75,71 @@ export function getCoordinateFromGeometry (geometry) {
 }
 
 /**
- * Extracts all unique keys from an array of result objects, excluding ignored keys.
+ * Extracts all unique keys from an array of result objects, excluding ignored keys based on gfiAttributes configuration.
  *
  * @param {Array<Object>} results - An array of result objects.
- * @param {Array<string>} attributes - The list of attributes to include. If empty, all keys except ignoredKeys are used.
- * @param {Array<string>} ignoredKeys - Keys to be ignored (excluded from output).
+ * @param {string|Object|Array} gfiAttributes - The gfiAttributes configuration like in layer configuration.
+ * @param {Array<string>} ignoredKeys - Keys to be ignored (excluded from output) - only used when gfiAttributes is "showAll".
  * @returns {Array<Object>} An array of column objects with name and index.
  */
-export function extractColumnsFromResults (results, attributes, ignoredKeys) {
+export function extractColumnsFromResults (results, gfiAttributes, ignoredKeys) {
+    if (gfiAttributes === "ignore") {
+        return [];
+    }
+
     const allKeys = results
-            .filter(result => result)
-            .reduce((acc, result) => {
-                Object.keys(result || {}).forEach(key => {
-                    if (!acc.includes(key)) {
-                        acc.push(key);
-                    }
-                });
-                return acc;
-            }, []),
-        filteredKeys = Array.isArray(ignoredKeys) && ignoredKeys.length > 0
+        .filter(result => result)
+        .reduce((acc, result) => {
+            Object.keys(result || {}).forEach(key => {
+                if (!acc.includes(key)) {
+                    acc.push(key);
+                }
+            });
+            return acc;
+        }, []);
+
+    let keysToInclude;
+
+    if (gfiAttributes === "showAll" || (Array.isArray(gfiAttributes) && gfiAttributes.length === 0)) {
+        // For "showAll" or empty array, use all keys but filter out ignoredKeys if provided
+        keysToInclude = Array.isArray(ignoredKeys) && ignoredKeys.length > 0
             ? allKeys.filter(key => !isKeyIgnored(key, ignoredKeys))
-            : allKeys,
-        keysToInclude = attributes && attributes.length ? attributes : filteredKeys;
+            : allKeys;
+    }
+    else if (typeof gfiAttributes === "object" && !Array.isArray(gfiAttributes)) {
+        // For object configuration, use the configured keys
+        keysToInclude = Object.keys(gfiAttributes);
+    }
+    else if (Array.isArray(gfiAttributes) && gfiAttributes.length > 0) {
+        // For array configuration, extract the attribute names
+        keysToInclude = gfiAttributes.map(attr => typeof attr === "object" ? attr.name : attr);
+    }
+    else {
+        // Fallback: use all keys (ignore ignoredKeys in this case)
+        keysToInclude = allKeys;
+    }
 
     return keysToInclude.map((key, index) => ({name: key, index}));
 }
 
 /**
- * Extracts and filters rows from the given results based on specified attributes, excluding ignored keys.
+ * Extracts and filters rows from the given results based on gfiAttributes configuration.
  *
  * @param {Array<Object>} results - The array of result objects to be filtered.
- * @param {Array<string|Object>} attributes - The array of attribute specifications (either strings or {name, alias} objects). If empty, all keys except ignoredKeys are used.
- * @param {Array<string>} ignoredKeys - Keys to be ignored (excluded from output).
+ * @param {string|Object|Array} gfiAttributes - The gfiAttributes configuration like in layer configuration.
+ * @param {Array<string>} ignoredKeys - Keys to be ignored (excluded from output) - only used when gfiAttributes is "showAll".
  * @returns {Array<Object>} - The filtered array of result objects.
  */
-export function extractRowsFromResults (results, attributes, ignoredKeys) {
+export function extractRowsFromResults (results, gfiAttributes, ignoredKeys) {
+    if (gfiAttributes === "ignore") {
+        return [];
+    }
+
     return results
         .filter(result => result)
         .map(feature => {
-            if (!attributes || attributes.length === 0) {
+            if (gfiAttributes === "showAll" || (Array.isArray(gfiAttributes) && gfiAttributes.length === 0)) {
+                // For "showAll" or empty array, use all properties but filter out ignoredKeys if provided
                 if (Array.isArray(ignoredKeys) && ignoredKeys.length > 0) {
                     const filtered = {};
 
@@ -126,27 +152,39 @@ export function extractRowsFromResults (results, attributes, ignoredKeys) {
                 }
                 return {...feature};
             }
-            const filteredFeature = {};
+            else if (typeof gfiAttributes === "object" && !Array.isArray(gfiAttributes)) {
+                const filteredFeature = {};
 
-            attributes.forEach(attr => {
-                const originalName = typeof attr === "object" ? attr.name : attr,
-                    displayName = typeof attr === "object" && attr.alias ? translateKeyIfPossible(attr.alias) : originalName;
+                Object.keys(gfiAttributes).forEach(key => {
+                    const displayName = gfiAttributes[key];
 
-                let value = "";
+                    if (feature[key] !== undefined) {
+                        filteredFeature[displayName] = feature[key];
+                    }
+                });
+                return filteredFeature;
+            }
+            else if (Array.isArray(gfiAttributes) && gfiAttributes.length > 0) {
+                const filteredFeature = {};
 
-                if (feature[originalName] !== undefined) {
-                    value = feature[originalName];
-                }
-                else if (feature[displayName] !== undefined) {
-                    value = feature[displayName];
-                }
+                gfiAttributes.forEach(attr => {
+                    const originalName = typeof attr === "object" ? attr.name : attr,
+                        displayName = typeof attr === "object" && attr.alias ? translateKeyIfPossible(attr.alias) : originalName;
 
-                if (!Array.isArray(ignoredKeys) || !isKeyIgnored(originalName, ignoredKeys)) {
+                    let value = "";
+
+                    if (feature[originalName] !== undefined) {
+                        value = feature[originalName];
+                    }
+                    else if (feature[displayName] !== undefined) {
+                        value = feature[displayName];
+                    }
                     filteredFeature[displayName] = value;
-                }
-            });
+                });
 
-            return filteredFeature;
+                return filteredFeature;
+            }
+            return {...feature};
         });
 }
 
@@ -260,13 +298,57 @@ export function extractFeaturesFromEsriWms (parsedResponse, attributes) {
  * Extracts features from a WFS GML response.
  *
  * @param {Document} parsedResponse - The parsed XML response from the WFS request.
- * @param {Array<string>} attributes - The list of attributes to extract from the features.
+ * @param {string|Array<string|Object>|Object} attributes - The gfiAttributes configuration.
+ *                                                           Can be "ignore", "showAll", Array or Object.
  * @returns {Array<Object>} An array of extracted features.
  */
 export function extractFeaturesFromWfsGml (parsedResponse, attributes) {
-    const featureMembers = parsedResponse.querySelectorAll("[gml\\:featureMember], member, wfs\\:member"),
-        features = [],
+    if (attributes === "ignore") {
+        return [];
+    }
+
+    let attributeList = [],
+        shouldShowAll = false,
+        featureMembers;
+
+    if (attributes === "showAll" || !attributes) {
+        shouldShowAll = true;
+    }
+    else if (Array.isArray(attributes)) {
+        attributeList = attributes;
+        // Treat empty array same as "showAll"
+        if (attributeList.length === 0) {
+            shouldShowAll = true;
+        }
+    }
+    else if (typeof attributes === "object" && attributes !== null) {
+        attributeList = Object.keys(attributes).map(key => ({
+            name: key,
+            alias: attributes[key]
+        }));
+    }
+    featureMembers = parsedResponse.querySelectorAll("featureMember");
+
+    const features = [],
         namespaceRegex = /(?:[a-zA-Z]+:)?(.+)/;
+
+    if (featureMembers.length === 0) {
+        featureMembers = parsedResponse.getElementsByTagName("featureMember");
+    }
+    if (featureMembers.length === 0) {
+        featureMembers = parsedResponse.querySelectorAll("member");
+    }
+    if (featureMembers.length === 0) {
+        featureMembers = parsedResponse.getElementsByTagName("member");
+    }
+    if (featureMembers.length === 0) {
+        featureMembers = Array.from(parsedResponse.getElementsByTagName("*")).filter(el => el.localName === "featureMember" || el.tagName.endsWith(":featureMember") ||
+            el.tagName === "gml:featureMember" || el.localName === "member" || el.tagName.endsWith(":member"));
+    }
+
+    if (featureMembers.length === 0) {
+        return [];
+    }
 
     featureMembers.forEach(member => {
         const featureNode = member.firstElementChild,
@@ -279,16 +361,16 @@ export function extractFeaturesFromWfsGml (parsedResponse, attributes) {
         featureNode.querySelectorAll("*").forEach(attribute => {
             const localName = attribute.localName || attribute.tagName.match(namespaceRegex)?.[1];
 
-            if (!attributes || attributes.length === 0 || attributes.some(attr => typeof attr === "string" ? attr === localName : attr.name === localName
-            )) {
+            if (shouldShowAll || attributeList.length === 0 ||
+                attributeList.some(attr => typeof attr === "string" ? attr === localName : attr.name === localName)) {
                 feature[localName] = attribute.textContent;
             }
         });
 
-        if (attributes && attributes.length > 0) {
+        if (!shouldShowAll && attributeList.length > 0) {
             const featureWithAliases = {};
 
-            attributes.forEach(attr => {
+            attributeList.forEach(attr => {
                 if (typeof attr === "object" && attr.name && attr.alias) {
                     if (feature[attr.name] !== undefined) {
                         featureWithAliases[translateKeyIfPossible(attr.alias)] = feature[attr.name];

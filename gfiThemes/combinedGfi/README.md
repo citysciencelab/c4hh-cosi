@@ -72,7 +72,11 @@ Here's a complete example using the recommended nested format:
 Each layer in the `layersToRequest` array can have the following properties:
 
 - `id`: The ID of the layer to request.
-- `gfiAttributes`: An array of attributes to display. Each attribute can be a string or an object with `name` and `alias` properties.
+- `gfiAttributes`: GFI attributes configuration. Supports the same options as layer configuration:
+  - `"ignore"`: GFI requests disabled for this layer
+  - `"showAll"`: All GFI attributes are requested and shown (ignoredKeys will be applied)
+  - Object: Key-value pairs for attribute mapping (e.g., `{"key1": "Display Name 1"}`)
+  - Array: List of attributes to display (strings or objects with `name` and `alias` properties)
 - `wfsQueryBufferSize`: (Optional) The buffer size to use for WFS queries. Default is 0.0001 (in map units). Map units are the units used by the map’s coordinate reference system (CRS)—for example, degrees in EPSG:4326 or meters in EPSG:3857. [Learn more about map units, display units, and location units](https://pro.arcgis.com/en/pro-app/latest/help/mapping/navigation/map-units-location-units-and-display-units.htm)
 - `geometryProvider`: (Optional) Configuration for using this layer as a geometry provider for other layers.
 
@@ -88,11 +92,19 @@ Example:
     },
     {
       "id": "layer2",
-      "gfiAttributes": [
-        {"name": "attr3", "alias": "Attribute 3"},
-        "attr4"
-      ],
+      "gfiAttributes": {
+        "technical_name": "Display Name",
+        "code": "Status Code"
+      },
       "wfsQueryBufferSize": 0.0001
+    },
+    {
+      "id": "layer3",
+      "gfiAttributes": "showAll"
+    },
+    {
+      "id": "layer4",
+      "gfiAttributes": "ignore"
     },
     {
       "id": "geometryLayer",
@@ -592,7 +604,7 @@ Jeder Layer in `layersToRequest` kann folgende Parameter haben:
 | `geometryProvider` | Object | Konfiguration für die Geometrie-Bereitstellung |
 | `geometryAttribute` | String | Name des Geometrie-Attributs |
 | `featureType` | String | Feature-Typ des Layers |
-| `gfiAttributes` | Array | Liste der anzuzeigenden Attribute |
+| `gfiAttributes` | String/Object/Array | GFI-Attribut-Konfiguration (wie bei Layer-Konfiguration): `"ignore"`, `"showAll"`, Objekt mit Schlüssel-Wert-Paaren, oder Array mit Attributen |
 
 ### Attribut-Konfiguration
 
