@@ -20,7 +20,7 @@ Tool to simulate wind and noise.
 |----|-------------|---|-------|------------|------|
 |id|ja|String||The id of datasource.|true|
 |title|ja|String||The titel of datasource.|true|
-|maxSizeArea|ja|Number||the maximum size of selected area.|true|
+|maxSizeArea|ja|Number|450|the maximum size of selected area in meters.|true|
 |inputs|yes|Object|Object|An object to set input parameter for datasources.|true|
 
 #### Portalconfig.menu.tool.simulationTool.simulations

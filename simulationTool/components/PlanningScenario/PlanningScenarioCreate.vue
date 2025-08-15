@@ -14,7 +14,8 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import SectionHeader from "../SectionHeader.vue";
 import convertFeatures from "../../js/convertFeatures";
-import {getArea, getDistance} from "ol/sphere";
+import {getDistance} from "ol/sphere";
+import {Alert} from "bootstrap";
 
 export default {
     name: "PlanningScenarioCreate",
@@ -38,7 +39,8 @@ export default {
             },
             isValid: true,
             selectedTags: [],
-            source: null
+            source: null,
+            currentSideLength: [0, 0]
         };
     },
     computed: {
@@ -70,64 +72,11 @@ export default {
         },
 
         /**
-         * Gets the maximum area that is configured in the currently selected data source.
-         * @returns {Number} The maximum area of the current data source.
-         */
-        currentMaxArea () {
-            return this.currentDataSource?.maxSizeArea;
-        },
-
-        /**
          * Gets the maximum side length that is configured in the currently selected data source.
          * @returns {Number} The maximum side length of the current data source.
          */
-        currentMaxSideLength () {
-            return this.currentDataSource?.maxSideLength;
-        },
-
-        /**
-         * Checks if the original drawn features exceed the maximum side length.
-         * If true, no buffer should be allowed.
-         * @returns {Boolean} True if the original features exceed max side length.
-         */
-        isOriginalFeatureExceedingSideLength () {
-            if (!this.currentMaxSideLength) {
-                return false;
-            }
-
-            if (!this.source?.getFeatures()?.length) {
-                return false;
-            }
-
-            try {
-                const originalFeatures = this.source.getFeatures().filter(feature => feature.get("id") !== "simulation-area");
-
-                if (!originalFeatures.length) {
-                    return false;
-                }
-
-                return originalFeatures.some(feature => {
-                    const geometry = feature.getGeometry();
-
-                    if (geometry?.getType() === "Polygon") {
-                        const coordinates = geometry.getCoordinates()[0];
-
-                        for (let i = 0; i < coordinates.length - 1; i++) {
-                            const [x1, y1] = coordinates[i],
-                                [x2, y2] = coordinates[i + 1],
-                                sideLength = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-
-                            if (sideLength > this.currentMaxSideLength) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                });
-            }
-            catch (error) {
-                return false;
-            }
+        maxSideLengthFromConfig () {
+            return this.currentDataSource?.maxSideLength ? this.currentDataSource.maxSideLength : 450;
         },
 
         /**
@@ -160,14 +109,6 @@ export default {
             const {sideLengthExceeded} = this.bufferConstraintStatus;
 
             return sideLengthExceeded;
-        },
-
-        /**
-         * Returns whether buffering should be disabled due to original feature exceeding limits.
-         * @returns {Boolean} True if buffer should be disabled.
-         */
-        isBufferDisabled () {
-            return this.isOriginalFeatureExceedingSideLength;
         }
     },
     watch: {
@@ -371,16 +312,10 @@ export default {
          * @return {void}
          */
         modifyBBoxByBuffer (val) {
-            const newBufferVal = parseFloat(val) >= 0 ? val : "0",
-                hasFeatures = this.source.getFeatures().length > 0,
+            const hasFeatures = this.source.getFeatures().length > 0,
                 scenarioFeature = this.source.getFeatures().filter(feature => feature.get("id") !== "simulation-area")[0];
 
-            if (this.isOriginalFeatureExceedingSideLength && parseFloat(newBufferVal) > 0) {
-                this.bufferVal = "0";
-                return;
-            }
-
-            this.bufferVal = newBufferVal;
+            this.bufferVal = parseFloat(val) >= 0 ? val : "0";
 
             if (!hasFeatures) {
                 return;
@@ -430,24 +365,12 @@ export default {
             this.setCurrentPlanningScenarioId(this.currentScenarioData.id);
         },
 
-        /**
-         * Checks if bbox feature exceeds area constraint.
-         * @param {ol/Feature} bboxFeature The bbox feature to check.
-         * @param {Boolean} isMetric Whether the projection is metric.
-         * @returns {Boolean} True if area constraint is exceeded.
-         */
-        checkBboxAreaConstraint (bboxFeature, isMetric) {
-            if (!bboxFeature || !this.currentMaxArea) {
-                return false;
-            }
 
-            const area = isMetric
-                ? bboxFeature.getGeometry()?.getArea()
-                : getArea(bboxFeature.getGeometry(), {projection: mapCollection.getMapView("2D").getProjection()});
-
-            return area > this.currentMaxArea;
+        getDistanceBetweenPoints (point1, point2, isMetric) {
+            return isMetric
+                ? Math.sqrt(Math.pow(point2[0] - point1[0], 2) + Math.pow(point2[1] - point1[1], 2))
+                : getDistance(point1, point2);
         },
-
         /**
          * Checks if bbox feature exceeds side length constraint.
          * @param {ol/Feature} bboxFeature The bbox feature to check.
@@ -455,25 +378,25 @@ export default {
          * @returns {Boolean} True if side length constraint is exceeded.
          */
         checkBboxSideLengthConstraint (bboxFeature, isMetric) {
-            if (!bboxFeature || !this.currentMaxSideLength) {
+            if (!bboxFeature || !this.maxSideLengthFromConfig) {
                 return false;
             }
-
+            this.currentSideLength = [0, 0];
             const geometry = bboxFeature.getGeometry();
 
             if (geometry?.getType() === "Polygon") {
-                const coordinates = geometry.getCoordinates()[0];
+                const coordinates = geometry.getCoordinates()[0],
+                    height = this.getDistanceBetweenPoints(coordinates[0], coordinates[1], isMetric),
+                    width = this.getDistanceBetweenPoints(coordinates[1], coordinates[2], isMetric);
 
-                for (let i = 0; i < coordinates.length - 1; i++) {
-                    const [x1, y1] = coordinates[i],
-                        [x2, y2] = coordinates[i + 1],
-                        sideLength = isMetric
-                            ? Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
-                            : getDistance([x1, y1], [x2, y2]);
+                if (coordinates.length !== 5) {
+                    console.warn("Expected 5 coordinates for a rectangle, but got:", coordinates.length);
+                }
 
-                    if (sideLength > this.currentMaxSideLength) {
-                        return true;
-                    }
+                this.currentSideLength = [height, width];
+
+                if (Math.max(...this.currentSideLength) > this.maxSideLengthFromConfig) {
+                    return true;
                 }
             }
             return false;
@@ -486,22 +409,11 @@ export default {
         constraintExceededInfoText () {
             const {sideLengthExceeded} = this.bufferConstraintStatus;
 
-            if (sideLengthExceeded && this.currentMaxSideLength) {
+            if (sideLengthExceeded && this.maxSideLengthFromConfig) {
                 return this.$t("additional:modules.tools.simulationTool.maxSideLengthExceeded", {
-                    maxSideLength: this.currentMaxSideLength
-                });
-            }
-            return "";
-        },
-
-        /**
-         * Returns the info text when buffer is disabled due to original feature constraints.
-         * @returns {String} The buffer disabled message.
-         */
-        bufferDisabledInfoText () {
-            if (this.isOriginalFeatureExceedingSideLength) {
-                return this.$t("additional:modules.tools.simulationTool.bufferDisabledDueToSideLength", {
-                    maxSideLength: this.currentMaxSideLength
+                    maxSideLengthAllowed: this.maxSideLengthFromConfig,
+                    height: Math.ceil(this.currentSideLength[0] * 100) / 100,
+                    width: Math.ceil(this.currentSideLength[1] * 100) / 100
                 });
             }
             return "";
@@ -660,7 +572,7 @@ export default {
                         :aria-label="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
                         :interaction="() => create()"
                         :text="$t('additional:modules.tools.simulationTool.createUrbanPlanning')"
-                        :disabled="!isValid || !source?.getFeatures().length > 0 || isMaxConstraintExceeded"
+                        :disabled="!isValid || source?.getFeatures().length === 0 || isMaxConstraintExceeded"
                     />
                 </div>
             </form>

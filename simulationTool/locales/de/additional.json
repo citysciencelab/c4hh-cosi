@@ -4,8 +4,7 @@
       "tools": {
         "simulationTool": {
           "additionalInfo": "Mehr Informationen",
-          "maxSideLengthExceeded": "Die aktuelle Bounding Box überschreitet die maximale Seitenlänge von {{maxSideLength}} m für die gewählte Datenquelle.",
-          "bufferDisabledDueToSideLength": "Puffer deaktiviert - Planungsgebiet überschreitet maximale Seitenlänge von {{maxSideLength}} m",
+          "maxSideLengthExceeded": "Die aktuelle Bounding Box (Breite: {{width}} m; Höhe: {{height}} m) überschreitet die maximale Seitenlänge von {{maxSideLengthAllowed}} m für die gewählte Datenquelle.",
           "addSimulation": "Simulation hinzufügen",
           "chooseOutputParam": "Ausgabeparameter auswählen",
           "outputParam": "Ausgabeparameter",
