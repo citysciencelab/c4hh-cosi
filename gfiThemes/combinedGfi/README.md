@@ -41,11 +41,11 @@ Here's a complete example using the recommended nested format:
       "layersToRequest": [
         {
           "id": "naturschutzgebiete",
-          "gfiAttributes": [
-            {"name": "gebietsname", "alias": "Gebietsname"},
-            {"name": "schutzstatus", "alias": "Schutzstatus"},
-            "flaeche_ha"
-          ],
+          "gfiAttributes": {
+            "gebietsname": "Gebietsname",
+            "schutzstatus": "Schutzstatus",
+            "flaeche_ha": "Fläche (ha)"
+          },
           "wfsQueryBufferSize": 0.00005
         },
         {
@@ -75,8 +75,8 @@ Each layer in the `layersToRequest` array can have the following properties:
 - `gfiAttributes`: GFI attributes configuration. Supports the same options as layer configuration:
   - `"ignore"`: GFI requests disabled for this layer
   - `"showAll"`: All GFI attributes are requested and shown (ignoredKeys will be applied)
-  - Object: Key-value pairs for attribute mapping (e.g., `{"key1": "Display Name 1"}`)
-  - Array: List of attributes to display (strings or objects with `name` and `alias` properties)
+  - Object: Key-value pairs for attribute mapping (e.g., `{ "key1": "Display Name 1" }`)
+  - Array: List of attribute names to display (e.g., `["attr1", "attr2"]`)
 - `wfsQueryBufferSize`: (Optional) The buffer size to use for WFS queries. Default is 0.0001 (in map units). Map units are the units used by the map’s coordinate reference system (CRS)—for example, degrees in EPSG:4326 or meters in EPSG:3857. [Learn more about map units, display units, and location units](https://pro.arcgis.com/en/pro-app/latest/help/mapping/navigation/map-units-location-units-and-display-units.htm)
 - `geometryProvider`: (Optional) Configuration for using this layer as a geometry provider for other layers.
 
@@ -203,10 +203,10 @@ Aliases allow you to display user-friendly attribute names instead of technical 
 
 ```json
 {
-  "gfiAttributes": [
-    {"name": "gebietsname", "alias": "Gebietsname"},
-    {"name": "schutzstatus", "alias": "Schutzstatus"}
-  ]
+  "gfiAttributes": {
+    "gebietsname": "Gebietsname",
+    "schutzstatus": "Schutzstatus"
+  }
 }
 ```
 
@@ -216,10 +216,10 @@ You can also use translation keys as aliases. The addon will automatically trans
 
 ```json
 {
-  "gfiAttributes": [
-    {"name": "gebietsname", "alias": "additional:modules.combinedGfi.attributes.gebietsname"},
-    {"name": "schutzstatus", "alias": "additional:modules.combinedGfi.attributes.schutzstatus"}
-  ]
+  "gfiAttributes": {
+    "gebietsname": "additional:modules.combinedGfi.attributes.gebietsname",
+    "schutzstatus": "additional:modules.combinedGfi.attributes.schutzstatus"
+  }
 }
 ```
 
@@ -629,16 +629,10 @@ Jedes Attribut in der `attributes`-Liste hat folgende Parameter:
   "id": "32744",
   "name": "Planungsrechtliche Situation",
   "hideEmptyAttributeValues": true,
-  "gfiAttributes": [
-    {
-      "name": "xpPlanName",
-      "alias": "Bebauungsplan"
-    },
-    {
-      "name": "text",
-      "alias": "Textteil B"
-    }
-  ]
+  "gfiAttributes": {
+    "xpPlanName": "Bebauungsplan",
+    "text": "Textteil B"
+  }
 }
 ```
 
