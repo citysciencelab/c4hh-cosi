@@ -15,7 +15,6 @@ import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactio
 import SectionHeader from "../SectionHeader.vue";
 import convertFeatures from "../../js/convertFeatures";
 import {getDistance} from "ol/sphere";
-import {Alert} from "bootstrap";
 
 export default {
     name: "PlanningScenarioCreate",
