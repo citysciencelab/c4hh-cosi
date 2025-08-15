@@ -5,6 +5,32 @@ import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
 import {translateKeyIfPossible} from "./translationUtils.js";
 
 /**
+ * Normalizes attributes configuration to a consistent format for extraction functions.
+ *
+ * @param {string|Array|Object} attributes - The attributes configuration from layer config.
+ * @returns {string|Array} - Normalized attributes format.
+ */
+export function normalizeAttributes (attributes) {
+    if (!attributes) {
+        return "showAll";
+    }
+
+    if (typeof attributes === "string") {
+        return attributes;
+    }
+
+    if (Array.isArray(attributes)) {
+        return attributes;
+    }
+
+    if (typeof attributes === "object") {
+        return Object.keys(attributes);
+    }
+
+    return "showAll";
+}
+
+/**
  * Checks if a key should be ignored, using case-insensitive comparison.
  *
  * @param {string} key - The key to check.
@@ -186,15 +212,21 @@ export function extractRowsFromResults (results, gfiAttributes, ignoredKeys) {
  * Extracts features from a WMS GML response.
  *
  * @param {Document} parsedResponse - The parsed XML response from the WMS request.
- * @param {Array} attributes - The list of attributes to extract from the features.
- *                            Each attribute should be a string.
- * @param {Array<string>} ignoredKeys - Keys to be ignored when no specific attributes are defined.
+ * @param {string|Array} attributes - The attributes configuration.
+ *                                    Can be "ignore", "showAll", or Array of strings.
+ * @param {Array<string>} ignoredKeys - Keys to be ignored when attributes is "showAll".
  * @returns {Array<Object>} An array of extracted features.
  */
 export function extractFeaturesFromWmsGml (parsedResponse, attributes, ignoredKeys) {
+    if (attributes === "ignore") {
+        return [];
+    }
+
     const featureMembers = parsedResponse.querySelectorAll("gml\\:featureMember, featureMember"),
         features = [],
-        namespaceRegex = /(?:[a-zA-Z]+:)?(.+)/;
+        namespaceRegex = /(?:[a-zA-Z]+:)?(.+)/,
+        shouldShowAll = attributes === "showAll" || !attributes,
+        attributeList = Array.isArray(attributes) ? attributes.filter(attr => typeof attr === "string") : [];
 
     featureMembers.forEach(member => {
         const featureNode = member.firstElementChild,
@@ -203,26 +235,26 @@ export function extractFeaturesFromWmsGml (parsedResponse, attributes, ignoredKe
         if (!featureNode) {
             return;
         }
+
         featureNode.querySelectorAll("*").forEach(attribute => {
             const localName = attribute.localName || attribute.tagName.match(namespaceRegex)?.[1];
 
-            if (!attributes || attributes.length === 0) {
-                // When no attributes specified, include all except ignoredKeys
+            if (shouldShowAll) {
                 if (!isKeyIgnored(localName, ignoredKeys)) {
                     feature[localName] = attribute.textContent;
                 }
             }
-            else if (attributes.some(attrDef => typeof attrDef === "string" && attrDef === localName)) {
+            else if (attributeList.length > 0 && attributeList.includes(localName)) {
                 feature[localName] = attribute.textContent;
             }
         });
 
-        if (attributes && attributes.length > 0) {
+        if (!shouldShowAll && attributeList.length > 0) {
             const filteredFeature = {};
 
-            attributes.forEach(attrDef => {
-                if (typeof attrDef === "string" && feature[attrDef] !== undefined) {
-                    filteredFeature[attrDef] = feature[attrDef];
+            attributeList.forEach(attrName => {
+                if (feature[attrName] !== undefined) {
+                    filteredFeature[attrName] = feature[attrName];
                 }
             });
 
@@ -230,10 +262,11 @@ export function extractFeaturesFromWmsGml (parsedResponse, attributes, ignoredKe
                 features.push(filteredFeature);
             }
         }
-        else {
+        else if (Object.keys(feature).length > 0) {
             features.push(feature);
         }
     });
+
     return features;
 }
 
@@ -241,14 +274,20 @@ export function extractFeaturesFromWmsGml (parsedResponse, attributes, ignoredKe
  * Extracts features from an ESRI WMS response.
  *
  * @param {Document} parsedResponse - The parsed XML response from the ESRI WMS.
- * @param {Array} attributes - The list of attributes to extract from the response.
- *                            Each attribute should be a string.
- * @param {Array<string>} ignoredKeys - Keys to be ignored when no specific attributes are defined.
+ * @param {string|Array} attributes - The attributes configuration.
+ *                                    Can be "ignore", "showAll", or Array of strings.
+ * @param {Array<string>} ignoredKeys - Keys to be ignored when attributes is "showAll".
  * @returns {Array<Object>} An array of feature objects extracted from the response.
  */
 export function extractFeaturesFromEsriWms (parsedResponse, attributes, ignoredKeys) {
+    if (attributes === "ignore") {
+        return [];
+    }
+
     const features = [],
-        fieldElements = parsedResponse.querySelectorAll("FIELDS");
+        fieldElements = parsedResponse.querySelectorAll("FIELDS"),
+        shouldShowAll = attributes === "showAll" || !attributes,
+        attributeList = Array.isArray(attributes) ? attributes.filter(attr => typeof attr === "string") : [];
 
     fieldElements.forEach(fieldElement => {
         const feature = {};
@@ -257,23 +296,22 @@ export function extractFeaturesFromEsriWms (parsedResponse, attributes, ignoredK
             const attrName = attr.name,
                 attrValue = attr.value;
 
-            if (!attributes || attributes.length === 0) {
-                // When no attributes specified, include all except ignoredKeys
+            if (shouldShowAll) {
                 if (!isKeyIgnored(attrName, ignoredKeys)) {
                     feature[attrName] = attrValue;
                 }
             }
-            else if (attributes.some(attrDef => typeof attrDef === "string" && attrDef === attrName)) {
+            else if (attributeList.length > 0 && attributeList.includes(attrName)) {
                 feature[attrName] = attrValue;
             }
         });
 
-        if (attributes && attributes.length > 0) {
+        if (!shouldShowAll && attributeList.length > 0) {
             const filteredFeature = {};
 
-            attributes.forEach(attrDef => {
-                if (typeof attrDef === "string" && feature[attrDef] !== undefined) {
-                    filteredFeature[attrDef] = feature[attrDef];
+            attributeList.forEach(attrName => {
+                if (feature[attrName] !== undefined) {
+                    filteredFeature[attrName] = feature[attrName];
                 }
             });
 
@@ -281,10 +319,11 @@ export function extractFeaturesFromEsriWms (parsedResponse, attributes, ignoredK
                 features.push(filteredFeature);
             }
         }
-        else {
+        else if (Object.keys(feature).length > 0) {
             features.push(feature);
         }
     });
+
     return features;
 }
 
@@ -364,7 +403,7 @@ export function extractFeaturesFromWfsGml (parsedResponse, attributes, ignoredKe
                 }
             }
             else if ((isObjectConfig && attributeList.some(attr => attr.name === localName)) ||
-                     (!isObjectConfig && attributeList.includes(localName))) {
+                    (!isObjectConfig && attributeList.includes(localName))) {
                 feature[localName] = attribute.textContent;
             }
         });
@@ -467,38 +506,46 @@ export function getCrsUrl (epsgCode) {
  * Extracts features from an OAF JSON response.
  *
  * @param {Object} data - The JSON data from the OAF response.
- * @param {Array} attributes - The attributes to extract (strings only).
- * @param {Array<string>} ignoredKeys - Keys to be ignored when no specific attributes are defined.
+ * @param {string|Array} attributes - The attributes configuration.
+ *                                    Can be "ignore", "showAll", or Array of strings.
+ * @param {Array<string>} ignoredKeys - Keys to be ignored when attributes is "showAll".
  * @returns {Array} An array of feature objects.
  */
 export function extractFeaturesFromOafJson (data, attributes, ignoredKeys) {
     try {
+        if (attributes === "ignore") {
+            return [];
+        }
+
         if (!data || !data.features || !Array.isArray(data.features)) {
             console.error("Invalid OAF response format:", data);
             return [];
         }
 
+        const shouldShowAll = attributes === "showAll" || !attributes,
+            attributeList = Array.isArray(attributes) ? attributes.filter(attr => typeof attr === "string") : [];
+
         return data.features.map(feature => {
             const properties = feature.properties || {},
                 result = {};
 
-            if (!attributes || attributes.length === 0) {
-                // When no attributes specified, include all except ignoredKeys
+            if (shouldShowAll) {
                 Object.keys(properties).forEach(key => {
                     if (!isKeyIgnored(key, ignoredKeys)) {
                         result[key] = properties[key];
                     }
                 });
+            }
+            else if (attributeList.length > 0) {
+                attributeList.forEach(attrName => {
+                    result[attrName] = properties[attrName] !== undefined
+                        ? properties[attrName]
+                        : "";
+                });
+            }
+            else {
                 return result;
             }
-
-            attributes.forEach(attr => {
-                // Only process string attributes
-                if (typeof attr === "string") {
-                    result[attr] = properties[attr] !== undefined ?
-                        properties[attr] : "";
-                }
-            });
 
             return result;
         });

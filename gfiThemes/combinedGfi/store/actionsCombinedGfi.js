@@ -11,14 +11,15 @@ import {
     shrinkPolygonGeoJson,
     getBufferValue,
     getCrsUrl,
-    extractFeaturesFromOafJson
+    extractFeaturesFromOafJson,
+    normalizeAttributes
 } from "../utils/gfiUtils";
-import {GeoJSON} from "ol/format";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
-import {exportToCSV, exportToDOC, exportToPDF, exportToJSON} from "../utils/exportUtils";
-import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses";
 import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
 import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
+import {GeoJSON} from "ol/format";
+import {exportToCSV, exportToDOC, exportToPDF, exportToJSON} from "../utils/exportUtils";
+import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses";
 import OverlayOp from "jsts/org/locationtech/jts/operation/overlay/OverlayOp";
 import {Fill, Stroke, Style} from "ol/style";
 import VectorLayer from "ol/layer/Vector.js";
@@ -322,12 +323,14 @@ const actions = {
         const layerConfig = state.layersToRequest.find(
                 config => config.id === layer.id
             ),
-            attributes = layerConfig?.gfiAttributes || [],
             geometryProvider = layerConfig?.geometryProvider,
             layerWithConfig = {
                 ...layer,
                 wfsQueryBufferSize: layerConfig?.wfsQueryBufferSize || 0.0001
-            };
+            },
+            attributes = layerConfig?.gfiAttributes || "showAll",
+            attributesForRequest = attributes,
+            ignoredKeys = rootGetters?.ignoredKeys || state?.ignoredKeys || [];
 
         if (!layerConfig) {
             return null;
@@ -335,17 +338,44 @@ const actions = {
 
         if (layer.typ === "WFS") {
             if (geometry) {
-                return dispatch("fetchWfsData", {layer: layerWithConfig, geometry, attributes});
+                return dispatch("fetchWfsData", {layer: layerWithConfig, geometry, attributes: attributesForRequest, ignoredKeys});
             }
             else if (geometryProvider) {
+                let geometryProviderAttributes = [];
+
+                if (attributes === "showAll") {
+                    geometryProviderAttributes = "showAll";
+                }
+                else if (attributes === "ignore") {
+                    geometryProviderAttributes = [geometryProvider.geometryAttribute];
+                }
+                else if (typeof attributes === "object" && !Array.isArray(attributes)) {
+                    geometryProviderAttributes = [
+                        ...Object.keys(attributes),
+                        geometryProvider.geometryAttribute
+                    ];
+                }
+                else if (Array.isArray(attributes)) {
+                    geometryProviderAttributes = [
+                        ...attributes.filter(attr => typeof attr === "string"),
+                        geometryProvider.geometryAttribute
+                    ];
+                }
+
                 return dispatch("fetchWfsDataWithPoint", {
                     layer: layerWithConfig,
                     coordinates: coordinate,
-                    attributes: [...attributes, geometryProvider.geometryAttribute]
+                    attributes: geometryProviderAttributes,
+                    ignoredKeys
                 });
             }
             else if (coordinate) {
-                return dispatch("fetchWfsDataWithPoint", {layer: layerWithConfig, coordinates: coordinate, attributes});
+                return dispatch("fetchWfsDataWithPoint", {
+                    layer: layerWithConfig,
+                    coordinates: coordinate,
+                    attributes: attributesForRequest,
+                    ignoredKeys
+                });
             }
             console.error("WFS request requires either geometry or click coordinates.");
             return null;
@@ -359,16 +389,17 @@ const actions = {
                     layer,
                     coordinate: queryCoordinate,
                     resolution: mapResolution,
-                    attributes
+                    attributes: attributesForRequest,
+                    ignoredKeys
                 });
             }
             console.error("WMS request requires either coordinate or click coordinates.");
             return null;
         }
-
         else if (layer.typ === "OAF") {
-            return dispatch("fetchOafData", {layer, geometry, attributes});
+            return dispatch("fetchOafData", {layer, geometry, attributes: attributesForRequest, ignoredKeys});
         }
+
         console.error(`Unknown layer type for layer ${layer.id}.`);
         return null;
     },
@@ -376,20 +407,23 @@ const actions = {
     /**
      * Fetches GetFeatureInfo (GFI) data for a given WMS layer.
      *
+     * @param {Object} context - The Vuex action context.
      * @param {Object} layer - The WMS layer object.
      * @param {string} layer.url - The URL of the WMS service.
      * @param {string} layer.layers - The layers to query.
      * @param {Array<number>} coordinate - The coordinate to query [x, y].
      * @param {number} resolution - The map resolution.
-     * @param {Object} attributes - Additional attributes for the query.
+     * @param {string|Array|Object} attributes - Additional attributes for the query.
+     * @param {Array<string>} [ignoredKeys=[]] - Keys to ignore during feature extraction.
      * @returns {Promise<null|Object>} The result of the feature extraction or null if an error occurs.
      */
-    async fetchGfiForWmsLayer (_, {layer, coordinate, resolution, attributes}) {
+    async fetchGfiForWmsLayer (_, {layer, coordinate, resolution, attributes, ignoredKeys = []}) {
         const serviceUrl = layer?.url,
             mapProjection = mapCollection.getMapView("2D").getProjection().getCode(),
             version = layer.version || "1.1.1",
             infoFormat = "text/xml; subtype=gml/3.2.1",
             bboxSize = 256 * resolution,
+            normalizedAttributes = normalizeAttributes(attributes),
             config = {
                 "1.1.1": {
                     srsParam: "srs",
@@ -423,7 +457,6 @@ const actions = {
             versionConfig = config[version],
             bbox = versionConfig.getBbox(coordinate, bboxSize).join(","),
             {x, y, i, j} = versionConfig.xyParams,
-
             url = new URL(serviceUrl);
 
         url.searchParams.set("service", "WMS");
@@ -466,8 +499,8 @@ const actions = {
             }
 
             return isEsriResponse
-                ? extractFeaturesFromEsriWms(parsedResponse, attributes)
-                : extractFeaturesFromWmsGml(parsedResponse, attributes);
+                ? extractFeaturesFromEsriWms(parsedResponse, normalizedAttributes, ignoredKeys)
+                : extractFeaturesFromWmsGml(parsedResponse, normalizedAttributes, ignoredKeys);
         }
         catch (error) {
             console.error("Error during WMS query:", error);
@@ -478,16 +511,18 @@ const actions = {
     /**
      * Fetches WFS data using point coordinates and dispatches the extracted features.
      *
+     * @param {Object} context - The Vuex action context.
      * @param {Object} payload - The payload object.
      * @param {Object} payload.layer - The layer object containing WFS service details.
      * @param {string} payload.layer.url - The URL of the WFS service.
      * @param {string} [payload.layer.version="1.1.0"] - The version of the WFS service.
      * @param {string} [payload.layer.featureType="default_layer"] - The feature type name.
      * @param {Array<number>} payload.coordinates - The coordinates [longitude, latitude] to use for the WFS request.
-     * @param {Object} payload.attributes - Additional attributes to pass to the feature extraction.
+     * @param {string|Array|Object} payload.attributes - Additional attributes to pass to the feature extraction.
+     * @param {Array<string>} [ignoredKeys=[]] - Keys to ignore during feature extraction.
      * @returns {Promise<null|*>} - Returns the result of extracting features or null in case of an error.
      */
-    async fetchWfsDataWithPoint (_, {layer, coordinates, attributes}) {
+    async fetchWfsDataWithPoint (_, {layer, coordinates, attributes, ignoredKeys = []}) {
         const mapProjection = mapCollection.getMapView("2D").getProjection().getCode(),
             bufferSize = layer.wfsQueryBufferSize || 0.0001,
             bbox = [
@@ -500,7 +535,8 @@ const actions = {
             version = layer?.version || "1.1.0",
             typeName = layer?.featureType || "default_layer",
             typeNameParam = version === "2.0.0" ? "typeNames" : "typeName",
-            url = new URL(serviceUrl);
+            url = new URL(serviceUrl),
+            normalizedAttributes = normalizeAttributes(attributes);
 
         url.searchParams.set("service", "WFS");
         url.searchParams.set("version", version);
@@ -513,7 +549,7 @@ const actions = {
             const response = await fetch(url.toString()),
                 text = await response.text(),
                 parsedResponse = new DOMParser().parseFromString(text, "application/xml"),
-                features = extractFeaturesFromWfsGml(parsedResponse, attributes);
+                features = extractFeaturesFromWfsGml(parsedResponse, normalizedAttributes, ignoredKeys);
 
             return features;
         }
@@ -536,15 +572,15 @@ const actions = {
      * - featureType: The feature type name including namespace (e.g. "ave:Flurstueck")
      *
      * @param {Object} context - The Vuex action context.
-     * @param {Function} context.dispatch - The Vuex dispatch function.
      * @param {Object} context.state - The Vuex state object.
      * @param {Object} payload - The payload object.
      * @param {Object} payload.layer - The layer object containing WFS service details.
      * @param {Object} payload.geometry - The geometry object to query.
-     * @param {Array} payload.attributes - Additional attributes for the WFS request.
+     * @param {string|Array|Object} payload.attributes - Additional attributes for the WFS request.
+     * @param {Array<string>} [ignoredKeys=[]] - Keys to ignore during feature extraction.
      * @returns {Promise<null|Object>} - Returns null if an error occurs or the result of extracting features from WFS GML.
      */
-    async fetchWfsData ({state}, {layer, geometry, attributes}) {
+    async fetchWfsData ({state}, {layer, geometry, attributes, ignoredKeys = []}) {
         const mapProjection = mapCollection.getMapView("2D").getProjection().getCode(),
             serviceUrl = layer?.url,
             version = layer?.version || "1.1.0",
@@ -556,7 +592,8 @@ const actions = {
             jstsGeom = reader.read(geojsonGeometry),
             area = jstsGeom.getArea(),
             initialBufferValue = getBufferValue(area),
-            bufferCandidates = [initialBufferValue, -4, -2, -1, 0];
+            bufferCandidates = [initialBufferValue, -4, -2, -1, 0],
+            normalizedAttributes = normalizeAttributes(attributes);
 
         let shrunkenGeometry = null;
 
@@ -595,7 +632,7 @@ const actions = {
                 const response = await fetch(url.toString()),
                     text = await response.text(),
                     parsedResponse = new DOMParser().parseFromString(text, "application/xml"),
-                    features = extractFeaturesFromWfsGml(parsedResponse, attributes);
+                    features = extractFeaturesFromWfsGml(parsedResponse, normalizedAttributes, ignoredKeys);
 
                 if (!response.ok) {
                     if (response.status === 404) {
@@ -655,7 +692,7 @@ const actions = {
                     return {error: `Dienstfehler (${response.status})`};
                 }
 
-                return extractFeaturesFromWfsGml(parsedResponse, attributes);
+                return extractFeaturesFromWfsGml(parsedResponse, normalizedAttributes, ignoredKeys);
             }
             catch (error) {
                 console.error("Error fetching features:", error);
@@ -955,14 +992,14 @@ const actions = {
      * Fetches data from an OAF (Open API Feature) service for a given layer and geometry.
      *
      * @param {Object} context - The Vuex action context.
-     * @param {Function} context.dispatch - The Vuex dispatch function.
      * @param {Object} payload - The payload object.
      * @param {Object} payload.layer - The layer object containing OAF service details.
      * @param {Object} payload.geometry - The geometry object to query.
-     * @param {Array} payload.attributes - Attributes to request and extract from the response.
+     * @param {string|Array|Object} payload.attributes - Attributes to request and extract from the response.
+     * @param {Array<string>} [ignoredKeys=[]] - Keys to ignore during feature extraction.
      * @returns {Promise<Array|null>} - Returns an array of feature objects or null if an error occurs.
      */
-    async fetchOafData (_, {layer, geometry, attributes}) {
+    async fetchOafData (_, {layer, geometry, attributes, ignoredKeys = []}) {
         if (!layer?.url) {
             console.error("No valid URL for OAF service:", layer);
             return null;
@@ -970,7 +1007,8 @@ const actions = {
 
         const baseUrl = layer.url,
             collectionId = layer.collection,
-            mapProjection = mapCollection.getMapView("2D").getProjection().getCode();
+            mapProjection = mapCollection.getMapView("2D").getProjection().getCode(),
+            normalizedAttributes = normalizeAttributes(attributes);
 
         try {
             const itemsUrl = new URL(`${baseUrl.replace(/\/$/, "")}/collections/${collectionId}/items`);
@@ -1025,7 +1063,7 @@ const actions = {
                     return {error: `Dienstfehler (${response.status})`};
                 }
 
-                return extractFeaturesFromOafJson(data, attributes);
+                return extractFeaturesFromOafJson(data, normalizedAttributes, ignoredKeys);
             }
             return null;
         }
@@ -1166,7 +1204,6 @@ const actions = {
                     padding: [50, 50, 50, 50]
                 });
             }
-
 
         }
         catch (error) {
