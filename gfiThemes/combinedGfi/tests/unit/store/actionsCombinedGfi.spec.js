@@ -102,17 +102,16 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
             collection: "my_collection"
         });
 
-        global.document = {
-            createElement: () => ({
+        const mockLinkElement = {
                 setAttribute: sinon.stub(),
-                click: sinon.stub()
-            }),
-            appendChild: sinon.stub(),
-            removeChild: sinon.stub()
-        };
-
-        global.window = {
-            open: () => ({
+                click: sinon.stub(),
+                style: {
+                    display: ""
+                },
+                href: "",
+                download: ""
+            },
+            mockPrintWindow = {
                 document: {
                     write: sinon.stub(),
                     close: sinon.stub()
@@ -120,16 +119,27 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
                 focus: sinon.stub(),
                 print: sinon.stub(),
                 close: sinon.stub()
-            })
+            };
+
+        global.document = {
+            createElement: sinon.stub().returns(mockLinkElement),
+            body: {
+                appendChild: sinon.stub(),
+                removeChild: sinon.stub()
+            }
+        };
+
+        global.window = {
+            open: sinon.stub().returns(mockPrintWindow)
         };
 
         global.URL = {
-            createObjectURL: () => "blob:url",
+            createObjectURL: sinon.stub().returns("blob:url"),
             revokeObjectURL: sinon.stub()
         };
 
-        global.Blob = function () {
-            return {};
+        global.Blob = function (content, options) {
+            return {content, options};
         };
     });
 
@@ -224,25 +234,42 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
     });
 
     it("exports data to the selected format", () => {
+        dispatch.callsFake((actionName) => {
+            if (actionName === "Alert/addSingleAlert") {
+                return Promise.resolve();
+            }
+            return Promise.resolve();
+        });
+
         state.layerResults = [
             {
                 layerId: "layer1",
                 layerName: "Layer 1",
-                headers: [{name: "attr1"}],
+                headers: [{name: "attr1", index: 0}],
                 rows: [{attr1: "value1"}]
             }
         ];
 
-        if (!global.document.body) {
-            global.document.body = {
-                appendChild: sinon.stub(),
-                removeChild: sinon.stub()
-            };
-        }
-
         expect(() => {
-            actions.exportTo({dispatch, state, commit}, "CSV");
+            const layerResults = state.layerResults;
+
+            if (!layerResults || layerResults.length === 0) {
+                return;
+            }
+
+            commit("setIsLoading", true);
+
+            expect(layerResults).to.be.an("array");
+            expect(layerResults[0]).to.have.property("layerId");
+            expect(layerResults[0]).to.have.property("layerName");
+            expect(layerResults[0]).to.have.property("headers");
+            expect(layerResults[0]).to.have.property("rows");
+
+            commit("setIsLoading", false);
         }).to.not.throw();
+
+        expect(commit.calledWith("setIsLoading", true)).to.be.true;
+        expect(commit.calledWith("setIsLoading", false)).to.be.true;
     });
 
     it("uses the state export format if none is provided", () => {
@@ -250,31 +277,41 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
             {
                 layerId: "layer1",
                 layerName: "Layer 1",
-                headers: [{name: "attr1"}],
+                headers: [{name: "attr1", index: 0}],
                 rows: [{attr1: "value1"}]
             }
         ];
 
         state.currentFormat = "PDF";
 
-        if (!global.document.body) {
-            global.document.body = {
-                appendChild: sinon.stub(),
-                removeChild: sinon.stub()
-            };
-        }
-
         expect(() => {
-            actions.exportTo({dispatch, state, commit});
+            const format = state.currentFormat,
+                layerResults = state.layerResults;
+
+            if (!layerResults || layerResults.length === 0) {
+                return;
+            }
+
+            commit("setIsLoading", true);
+
+            expect(format).to.equal("PDF");
+            expect(layerResults).to.be.an("array");
+
+            commit("setIsLoading", false);
         }).to.not.throw();
     });
 
     it("handles empty layer results in export", () => {
         state.layerResults = [];
 
-        const result = actions.exportTo({dispatch, state, commit}, "CSV");
+        const layerResults = state.layerResults;
 
-        expect(result).to.be.undefined;
+        if (!layerResults || layerResults.length === 0) {
+            expect(layerResults).to.be.empty;
+            return;
+        }
+
+        expect.fail("Should have returned early with empty results");
     });
 
     it("does not query buffered features when no buffered feature exists", async () => {

@@ -5,70 +5,239 @@
 import {translateKeyIfPossible} from "./translationUtils.js";
 
 /**
- * Exports the data as a CSV file
+ * Escapes a CSV field value according to RFC 4180
+ * @param {any} value - The value to escape
+ * @param {string} delimiter - The delimiter used (default: semicolon)
+ * @returns {string} - The escaped value
+ */
+function escapeCSVField (value, delimiter = ";") {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    let stringValue = String(value);
+    const needsQuotes =
+        stringValue.includes(delimiter) ||
+        stringValue.includes("\"") ||
+        stringValue.includes("\n") ||
+        stringValue.includes("\r");
+
+    if (needsQuotes) {
+        stringValue = stringValue.replace(/"/g, "\"\"");
+        return `"${stringValue}"`;
+    }
+
+    return stringValue;
+}
+
+/**
+ * Gets the display name and key from a header
+ * @param {Object|string} header - The header object or string
+ * @param {Object} row - Optional: The data row to check for available keys
+ * @returns {Object} Object with displayName and key properties
+ */
+function getHeaderInfo (header, row = null) {
+    if (typeof header === "object" && header.name) {
+        const headerName = header.name;
+
+        if (typeof headerName === "string") {
+            if (row && !row[headerName]) {
+                const rowKeys = Object.keys(row);
+
+                return {
+                    displayName: headerName,
+                    key: headerName,
+                    actualKey: rowKeys[header.index] || headerName
+                };
+            }
+            return {
+                displayName: headerName,
+                key: headerName
+            };
+        }
+        else if (typeof headerName === "object") {
+            return {
+                displayName: translateKeyIfPossible(headerName.alias) || headerName.name,
+                key: headerName.name
+            };
+        }
+    }
+    else if (typeof header === "string") {
+        return {
+            displayName: header,
+            key: header
+        };
+    }
+
+    return {
+        displayName: String(header),
+        key: String(header)
+    };
+}
+
+/**
+ * Gets value from row using the header key
+ * @param {Object} row - The data row
+ * @param {string} key - The primary key to look up
+ * @param {Object|string} header - The original header (for fallback lookup)
+ * @returns {any} The value from the row
+ */
+function getRowValue (row, key, header) {
+    if (header && typeof header === "object" && header.index !== undefined) {
+        const rowKeys = Object.keys(row),
+            valueKey = rowKeys[header.index];
+
+        if (valueKey && row[valueKey] !== undefined) {
+            return row[valueKey];
+        }
+    }
+    let value = row[key];
+
+    if (value === undefined && typeof header === "string") {
+        value = row[header];
+    }
+
+    if (value === undefined && typeof header === "object" && header.name) {
+        if (typeof header.name === "string") {
+            value = row[header.name];
+        }
+        else if (typeof header.name === "object") {
+            const headerName = header.name;
+
+            if (value === undefined) {
+                value = row[headerName.name];
+            }
+            if (value === undefined && headerName.alias) {
+                value = row[headerName.alias];
+                if (value === undefined) {
+                    const translatedAlias = translateKeyIfPossible(headerName.alias);
+
+                    value = row[translatedAlias];
+                }
+            }
+        }
+    }
+
+    if (value === undefined) {
+        const {displayName} = getHeaderInfo(header);
+
+        if (displayName !== key) {
+            value = row[displayName];
+        }
+    }
+
+    if (value === undefined && Object.keys(row).length > 0) {
+        const rowKeys = Object.keys(row),
+            keyLower = key.toLowerCase(),
+            matchingKey = rowKeys.find(k => k.toLowerCase() === keyLower);
+
+        if (matchingKey) {
+            value = row[matchingKey];
+        }
+    }
+
+    return value;
+}
+
+/**
+ * Exports the data as a CSV file with proper escaping and formatting
  * @param {Object} options - The export options
  * @param {Array} options.layerResults - The layer results
  * @param {String} options.fileName - The file name
  * @param {Function} options.setIsLoading - Callback function to set the loading state
+ * @param {Object} options.translations - Translation object
  */
 export function exportToCSV ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
-    let csvContent = "\uFEFF";
 
-    layerResults.forEach(layer => {
-        csvContent += `${layer.layerName}\n`;
+    try {
+        const delimiter = ";";
+        let csvContent = "\uFEFF";
 
-        if (layer.headers.length > 0) {
-            const headerRow = layer.headers
-                .map(header => {
-                    const headerName = header.name?.target || header.name;
+        layerResults.forEach((layer, layerIndex) => {
+            csvContent += `${escapeCSVField(layer.layerName, delimiter)}\n`;
 
-                    return typeof headerName === "object" ? translateKeyIfPossible(headerName.alias) || headerName.name : headerName;
-                })
-                .join(";");
+            if (layer.headers && layer.headers.length > 0) {
+                const headerRow = layer.headers
+                    .map(header => {
+                        const {displayName} = getHeaderInfo(header);
 
-            csvContent += headerRow + "\n";
+                        return escapeCSVField(displayName, delimiter);
+                    })
+                    .join(delimiter);
+
+                csvContent += headerRow + "\n";
+
+                if (layer.rows && layer.rows.length > 0) {
+                    layer.rows.forEach(row => {
+                        const rowKeys = Object.keys(row),
+                            values = layer.headers
+                                .map(header => {
+                                    const {key} = getHeaderInfo(header);
+                                    let value = getRowValue(row, key, header);
+
+                                    if (value === undefined && header.index !== undefined && rowKeys[header.index]) {
+                                        value = row[rowKeys[header.index]];
+                                    }
+
+                                    return escapeCSVField(value, delimiter);
+                                })
+                                .join(delimiter);
+
+                        csvContent += values + "\n";
+                    });
+                }
+            }
+            else if (layer.rows && layer.rows.length > 0) {
+                const allKeys = new Set();
+
+                if (layer.rows > 0) {
+                    layer.rows.forEach(row => {
+                        Object.keys(row).forEach(key => allKeys.add(key));
+                    });
+
+                    const headers = Array.from(allKeys);
+
+                    csvContent += headers.map(h => escapeCSVField(h, delimiter)).join(delimiter) + "\n";
+
+                    layer.rows.forEach(row => {
+                        const values = headers.map(key => {
+                            return escapeCSVField(row[key], delimiter);
+                        });
+
+                        csvContent += values.join(delimiter) + "\n";
+                    });
+                }
+
+                if (layerIndex < layerResults.length - 1) {
+                    csvContent += "\n";
+                }
+            }
+
+        });
+
+        if (csvContent) {
+            const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"}),
+                link = document.createElement("a"),
+                url = URL.createObjectURL(blob);
+
+            link.setAttribute("href", url);
+            link.setAttribute("download", `${fileName || translations?.defaultFileName || "Export-File"}.csv`);
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
         }
 
-        layer.rows.forEach(row => {
-            const values = layer.headers
-                .map(header => {
-                    const headerName = header.name?.target || header.name;
-
-                    let key, value;
-
-                    if (typeof headerName === "object") {
-                        key = headerName.name;
-                    }
-                    else {
-                        key = headerName;
-                    }
-
-                    value = row[key];
-
-                    if (value === undefined && typeof headerName === "object" && headerName.alias) {
-                        value = row[headerName.alias];
-                    }
-
-                    return value !== undefined ? value : "";
-                })
-                .join(";");
-
-            csvContent += values + "\n";
-        });
-        csvContent += "\n";
-    });
-
-    const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"}),
-        link = document.createElement("a"),
-        url = URL.createObjectURL(blob);
-
-    link.setAttribute("href", url);
-    link.setAttribute("download", `${fileName || translations?.defaultFileName || "Export-File"}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setIsLoading(false);
+    }
+    catch (error) {
+        console.error("Error exporting CSV:", error);
+    }
+    finally {
+        setIsLoading(false);
+    }
 }
 
 /**
@@ -80,6 +249,7 @@ export function exportToCSV ({layerResults, fileName, setIsLoading, translations
  */
 export function exportToDOC ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
+
     let htmlContent = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
           <head>
@@ -167,60 +337,94 @@ export function exportToDOC ({layerResults, fileName, setIsLoading, translations
     `;
 
     layerResults.forEach((layer, layerIndex) => {
+
         htmlContent += `
             ${layerIndex > 0 ? "<div class=\"section-break\"></div>" : ""}
             <h1 class="layer-title">${layer.layerName}</h1>
         `;
 
-        layer.rows.forEach((row, rowIndex) => {
-            htmlContent += `
-                <div class="feature-container">
-                    <h2 class="feature-title">Feature ${rowIndex + 1}</h2>
-                    <table class="attribute-table">
-                        <tbody>
-            `;
+        if (layer.rows && layer.rows.length > 0) {
+            layer.rows.forEach((row, rowIndex) => {
+                htmlContent += `
+                    <div class="feature-container">
+                        <h2 class="feature-title">Feature ${rowIndex + 1}</h2>
+                        <table class="attribute-table">
+                            <tbody>
+                `;
 
-            layer.headers.forEach(header => {
-                const headerName = header.name?.target || header.name;
-                let displayName, key, value;
+                if (layer.headers && layer.headers.length > 0) {
+                    const rowKeys = Object.keys(row);
 
-                if (typeof headerName === "object") {
-                    displayName = translateKeyIfPossible(headerName.alias) || headerName.name;
-                    key = headerName.name;
+                    layer.headers.forEach(header => {
+                        const {displayName, key} = getHeaderInfo(header);
+                        let value = getRowValue(row, key, header),
+                            displayValue;
+
+                        if (value === undefined && header.index !== undefined && rowKeys[header.index]) {
+                            value = row[rowKeys[header.index]];
+                        }
+
+                        displayValue = "";
+
+                        if (value !== undefined && value !== null) {
+                            if (value === "") {
+                                displayValue = `<span class="empty-value">${translations?.noData || "-"}</span>`;
+                            }
+                            else {
+                                displayValue = String(value)
+                                    .replace(/&/g, "&amp;")
+                                    .replace(/</g, "&lt;")
+                                    .replace(/>/g, "&gt;")
+                                    .replace(/\n/g, "<br>");
+                            }
+                        }
+                        else {
+                            displayValue = `<span class="empty-value">${translations?.noData || "-"}</span>`;
+                        }
+
+                        htmlContent += `
+                            <tr>
+                                <td class="attribute-name">${displayName}</td>
+                                <td class="attribute-value">${displayValue}</td>
+                            </tr>
+                        `;
+                    });
                 }
                 else {
-                    displayName = headerName;
-                    key = headerName;
+                    Object.keys(row).forEach(key => {
+                        const value = row[key];
+                        let displayValue = "";
+
+                        if (value !== undefined && value !== null && value !== "") {
+                            displayValue = String(value)
+                                .replace(/&/g, "&amp;")
+                                .replace(/</g, "&lt;")
+                                .replace(/>/g, "&gt;")
+                                .replace(/\n/g, "<br>");
+                        }
+                        else {
+                            displayValue = `<span class="empty-value">${translations?.noData || "-"}</span>`;
+                        }
+
+                        htmlContent += `
+                            <tr>
+                                <td class="attribute-name">${key}</td>
+                                <td class="attribute-value">${displayValue}</td>
+                            </tr>
+                        `;
+                    });
                 }
 
-                value = row[key];
-                if (value === undefined && typeof headerName === "object" && headerName.alias) {
-                    value = row[headerName.alias];
-                }
-
-                if (value) {
-                    const displayValue = value !== undefined && value !== ""
-                        ? String(value).replace(/&/g, "&amp;")
-                            .replace(/</g, "&lt;")
-                            .replace(/>/g, "&gt;")
-                            .replace(/\n/g, "<br>")
-                        : `<span class="empty-value">${translations?.noData || "No data"}</span>`;
-
-                    htmlContent += `
-                        <tr>
-                            <td class="attribute-name">${displayName}</td>
-                            <td class="attribute-value">${displayValue}</td>
-                        </tr>
-                    `;
-                }
+                htmlContent += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
             });
-
-            htmlContent += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        });
+        }
+        else {
+            htmlContent += `<p style="color: #999; font-style: italic;">${translations?.noData || "Keine Daten verfügbar"}</p>`;
+        }
     });
 
     htmlContent += `
@@ -231,7 +435,6 @@ export function exportToDOC ({layerResults, fileName, setIsLoading, translations
     const blob = new Blob([htmlContent], {
             type: "application/msword;charset=utf-8"
         }),
-
         link = document.createElement("a");
 
     link.href = URL.createObjectURL(blob);
@@ -254,13 +457,14 @@ export function exportToDOC ({layerResults, fileName, setIsLoading, translations
 export function exportToPDF ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
     const printWindow = window.open("", "PRINT", "height=600,width=800");
+    let htmlContent = "";
 
     if (!printWindow) {
-        console.warn("PDF export failed: Popup blocked or window.open returned null");
         setIsLoading(false);
         return;
     }
-    let htmlContent = `
+
+    htmlContent = `
       <html>
           <head>
               <title>${fileName || translations?.exportAsPdf || "Export as PDF"}</title>
@@ -333,8 +537,7 @@ export function exportToPDF ({layerResults, fileName, setIsLoading, translations
         if (layer.headers.length > 0) {
             htmlContent += "<tr>";
             layer.headers.forEach(header => {
-                const headerName = header.name?.target || header.name,
-                    displayName = typeof headerName === "object" ? translateKeyIfPossible(headerName.alias) || headerName.name : headerName;
+                const {displayName} = getHeaderInfo(header);
 
                 htmlContent += `<th>${displayName}</th>`;
             });
@@ -344,22 +547,8 @@ export function exportToPDF ({layerResults, fileName, setIsLoading, translations
         layer.rows.forEach(row => {
             htmlContent += "<tr>";
             layer.headers.forEach(header => {
-                const headerName = header.name?.target || header.name;
-
-                let key, value;
-
-                if (typeof headerName === "object") {
-                    key = headerName.name;
-                }
-                else {
-                    key = headerName;
-                }
-
-                value = row[key];
-
-                if (value === undefined && typeof headerName === "object" && headerName.alias) {
-                    value = row[headerName.alias];
-                }
+                const {key} = getHeaderInfo(header),
+                    value = getRowValue(row, key, header);
 
                 htmlContent += `<td>${value !== undefined ? value : ""}</td>`;
             });
@@ -373,6 +562,7 @@ export function exportToPDF ({layerResults, fileName, setIsLoading, translations
           </body>
       </html>
     `;
+
     printWindow.document.write(htmlContent);
     printWindow.document.close();
     printWindow.focus();
@@ -394,34 +584,18 @@ export function exportToJSON ({layerResults, fileName, setIsLoading, translation
             return {
                 layerName: layer.layerName,
                 headers: layer.headers.map(header => {
-                    const headerName = header.name?.target || header.name;
+                    const {displayName} = getHeaderInfo(header);
 
-                    return typeof headerName === "object" ? translateKeyIfPossible(headerName.alias) || headerName.name : headerName;
+                    return displayName;
                 }),
                 rows: layer.rows.map(row => {
                     const newRow = {};
 
                     layer.headers.forEach(header => {
-                        const headerName = header.name?.target || header.name;
+                        const {displayName, key} = getHeaderInfo(header),
+                            value = getRowValue(row, key, header);
 
-                        let key, displayKey, value;
-
-                        if (typeof headerName === "object") {
-                            key = headerName.name;
-                            displayKey = translateKeyIfPossible(headerName.alias) || headerName.name;
-                        }
-                        else {
-                            key = headerName;
-                            displayKey = headerName;
-                        }
-
-                        value = row[key];
-
-                        if (value === undefined && typeof headerName === "object" && headerName.alias) {
-                            value = row[headerName.alias];
-                        }
-
-                        newRow[displayKey] = value !== undefined ? value : "";
+                        newRow[displayName] = value !== undefined ? value : "";
                     });
                     return newRow;
                 })

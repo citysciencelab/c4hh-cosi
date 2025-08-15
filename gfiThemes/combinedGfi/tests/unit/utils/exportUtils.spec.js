@@ -29,7 +29,10 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
             setAttribute: sinon.spy(),
             href: "",
             download: "",
-            click: clickStub
+            click: clickStub,
+            style: {
+                display: ""
+            }
         };
 
         global.document = {
@@ -45,8 +48,8 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
             revokeObjectURL: sinon.spy()
         };
 
-        global.Blob = function () {
-            return {};
+        global.Blob = function (content, options) {
+            return {content, options};
         };
     });
 
@@ -63,30 +66,59 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
     describe("exportToCSV", () => {
         it("exports data to CSV format", function (done) {
             const layerResults = [
-                {
-                    layerName: "Layer 1",
-                    headers: [
-                        {name: "attr1"},
-                        {name: {name: "attr2", alias: "Attribute 2"}}
-                    ],
-                    rows: [
-                        {attr1: "value1", attr2: "value2"}
-                    ]
-                }
-            ];
+                    {
+                        layerName: "Layer 1",
+                        headers: [
+                            {name: "attr1", index: 0},
+                            {name: {name: "attr2", alias: "Attribute 2"}, index: 1}
+                        ],
+                        rows: [
+                            {attr1: "value1", attr2: "value2"}
+                        ]
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File",
+                    noData: "Keine Daten"
+                };
 
             try {
                 exportToCSV({
                     layerResults,
                     fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy
+                    setIsLoading: setIsLoadingSpy,
+                    translations
                 });
 
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
+                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
                 expect(createElementStub.calledWith("a")).to.be.true;
                 expect(appendChildStub.called).to.be.true;
                 expect(clickStub.called).to.be.true;
                 expect(removeChildStub.called).to.be.true;
+                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
+                expect(global.URL.revokeObjectURL.called).to.be.true;
+                done();
+            }
+            catch (error) {
+                done(error);
+            }
+        });
+
+        it("handles empty layer results gracefully", function (done) {
+            const translations = {
+                defaultFileName: "Export-File"
+            };
+
+            try {
+                exportToCSV({
+                    layerResults: [],
+                    fileName: "test-export",
+                    setIsLoading: setIsLoadingSpy,
+                    translations
+                });
+
+                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
                 expect(setIsLoadingSpy.calledWith(false)).to.be.true;
 
                 done();
@@ -96,12 +128,28 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
             }
         });
 
-        it("handles empty layer results gracefully", function (done) {
+        it("handles layers without headers", function (done) {
+            const layerResults = [
+                    {
+                        layerName: "Layer 1",
+                        headers: [],
+                        rows: [
+                            {attr1: "value1", attr2: "value2"},
+                            {attr1: "value3", attr2: "value4"}
+                        ]
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File"
+                };
+
             try {
                 exportToCSV({
-                    layerResults: [],
+                    layerResults,
                     fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy
+                    setIsLoading: setIsLoadingSpy,
+                    translations
                 });
 
                 expect(setIsLoadingSpy.calledWith(true)).to.be.true;
@@ -118,30 +166,73 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
     describe("exportToDOC", () => {
         it("exports data to DOC format", function (done) {
             const layerResults = [
-                {
-                    layerName: "Layer 1",
-                    headers: [
-                        {name: "attr1"},
-                        {name: {name: "attr2", alias: "Attribute 2"}}
-                    ],
-                    rows: [
-                        {attr1: "value1", attr2: "value2"}
-                    ]
-                }
-            ];
+                    {
+                        layerName: "Layer 1",
+                        headers: [
+                            {name: "attr1", index: 0},
+                            {name: {name: "attr2", alias: "Attribute 2"}, index: 1}
+                        ],
+                        rows: [
+                            {attr1: "value1", attr2: "value2"}
+                        ]
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File",
+                    exportAsDoc: "Export as DOC",
+                    noData: "Keine Daten verfügbar"
+                };
 
             try {
                 exportToDOC({
                     layerResults,
                     fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy
+                    setIsLoading: setIsLoadingSpy,
+                    translations
                 });
 
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
+                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
                 expect(createElementStub.calledWith("a")).to.be.true;
                 expect(appendChildStub.called).to.be.true;
                 expect(clickStub.called).to.be.true;
                 expect(removeChildStub.called).to.be.true;
+                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
+                expect(global.URL.revokeObjectURL.called).to.be.true;
+
+                done();
+            }
+            catch (error) {
+                done(error);
+            }
+        });
+
+        it("handles empty rows gracefully", function (done) {
+            const layerResults = [
+                    {
+                        layerName: "Layer 1",
+                        headers: [
+                            {name: "attr1"}
+                        ],
+                        rows: []
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File",
+                    exportAsDoc: "Export as DOC",
+                    noData: "Keine Daten verfügbar"
+                };
+
+            try {
+                exportToDOC({
+                    layerResults,
+                    fileName: "test-export",
+                    setIsLoading: setIsLoadingSpy,
+                    translations
+                });
+
+                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
                 expect(setIsLoadingSpy.calledWith(false)).to.be.true;
 
                 done();
@@ -155,30 +246,71 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
     describe("exportToJSON", () => {
         it("exports data to JSON format", function (done) {
             const layerResults = [
-                {
-                    layerName: "Layer 1",
-                    headers: [
-                        {name: "attr1"},
-                        {name: {name: "attr2", alias: "Attribute 2"}}
-                    ],
-                    rows: [
-                        {attr1: "value1", attr2: "value2"}
-                    ]
-                }
-            ];
+                    {
+                        layerName: "Layer 1",
+                        headers: [
+                            {name: "attr1", index: 0},
+                            {name: {name: "attr2", alias: "Attribute 2"}, index: 1}
+                        ],
+                        rows: [
+                            {attr1: "value1", attr2: "value2"}
+                        ]
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File"
+                };
 
             try {
                 exportToJSON({
                     layerResults,
                     fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy
+                    setIsLoading: setIsLoadingSpy,
+                    translations
                 });
 
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
+                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
                 expect(createElementStub.calledWith("a")).to.be.true;
                 expect(appendChildStub.called).to.be.true;
                 expect(clickStub.called).to.be.true;
                 expect(removeChildStub.called).to.be.true;
+                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
+
+                done();
+            }
+            catch (error) {
+                done(error);
+            }
+        });
+
+        it("handles complex header structures", function (done) {
+            const layerResults = [
+                    {
+                        layerName: "Layer 1",
+                        headers: [
+                            {name: "simple", index: 0},
+                            {name: {name: "complex", alias: "Complex Field"}, index: 1}
+                        ],
+                        rows: [
+                            {simple: "test", complex: "value"}
+                        ]
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File"
+                };
+
+            try {
+                exportToJSON({
+                    layerResults,
+                    fileName: "test-export",
+                    setIsLoading: setIsLoadingSpy,
+                    translations
+                });
+
+                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
                 expect(setIsLoadingSpy.calledWith(false)).to.be.true;
 
                 done();
@@ -217,32 +349,38 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
 
         it("exports data to PDF format", function (done) {
             const layerResults = [
-                {
-                    layerName: "Layer 1",
-                    headers: [
-                        {name: "attr1"},
-                        {name: {name: "attr2", alias: "Attribute 2"}}
-                    ],
-                    rows: [
-                        {attr1: "value1", attr2: "value2"}
-                    ]
-                }
-            ];
+                    {
+                        layerName: "Layer 1",
+                        headers: [
+                            {name: "attr1", index: 0},
+                            {name: {name: "attr2", alias: "Attribute 2"}, index: 1}
+                        ],
+                        rows: [
+                            {attr1: "value1", attr2: "value2"}
+                        ]
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File",
+                    exportAsPdf: "Export as PDF"
+                };
 
             try {
                 exportToPDF({
                     layerResults,
                     fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy
+                    setIsLoading: setIsLoadingSpy,
+                    translations
                 });
 
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
+                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
                 expect(windowOpenStub.called).to.be.true;
                 expect(writeStub.called).to.be.true;
                 expect(closeStub.called).to.be.true;
                 expect(focusStub.called).to.be.true;
                 expect(printStub.called).to.be.true;
-                expect(setIsLoadingSpy.calledWith(false)).to.be.true;
+                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
 
                 done();
             }
@@ -255,22 +393,75 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
             windowOpenStub.returns(null);
 
             const layerResults = [
-                {
-                    layerName: "Layer 1",
-                    headers: [{name: "attr1"}],
-                    rows: [{attr1: "value1"}]
-                }
-            ];
+                    {
+                        layerName: "Layer 1",
+                        headers: [{name: "attr1", index: 0}],
+                        rows: [{attr1: "value1"}]
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File",
+                    exportAsPdf: "Export as PDF"
+                };
 
             try {
                 exportToPDF({
                     layerResults,
                     fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy
+                    setIsLoading: setIsLoadingSpy,
+                    translations
+                });
+
+                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
+                expect(windowOpenStub.called).to.be.true;
+                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
+                expect(writeStub.called).to.be.false;
+                expect(focusStub.called).to.be.false;
+                expect(printStub.called).to.be.false;
+
+                done();
+            }
+            catch (error) {
+                done(error);
+            }
+        });
+
+        it("handles layers with many columns", function (done) {
+            const headers = [],
+                row = {},
+                layerResults = [
+                    {
+                        layerName: "Layer with many columns",
+                        headers: headers,
+                        rows: [row]
+                    }
+                ],
+
+                translations = {
+                    defaultFileName: "Export-File",
+                    exportAsPdf: "Export as PDF"
+                };
+
+            for (let i = 0; i < 10; i++) {
+                headers.push({name: `attr${i}`, index: i});
+                row[`attr${i}`] = `value${i}`;
+            }
+
+            try {
+                exportToPDF({
+                    layerResults,
+                    fileName: "test-export",
+                    setIsLoading: setIsLoadingSpy,
+                    translations
                 });
 
                 expect(setIsLoadingSpy.calledWith(true)).to.be.true;
                 expect(windowOpenStub.called).to.be.true;
+                expect(writeStub.called).to.be.true;
+                const htmlContent = writeStub.firstCall.args[0];
+
+                expect(htmlContent).to.include("many-columns");
                 expect(setIsLoadingSpy.calledWith(false)).to.be.true;
 
                 done();
