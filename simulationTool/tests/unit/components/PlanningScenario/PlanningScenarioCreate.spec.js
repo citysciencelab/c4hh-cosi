@@ -29,16 +29,26 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                 });
             }
         },
+        mockFeatures = [],
         layer = {
             getLayerSource: () => ({
-                addFeature: () => undefined,
-                clear: () => undefined,
-                getFeatures: () => [],
-                removeFeature: () => undefined
+                addFeature: (feature) => mockFeatures.push(feature),
+                clear: () => {
+                    mockFeatures.length = 0;
+                },
+                getFeatures: () => mockFeatures,
+                removeFeature: (feature) => {
+                    const index = mockFeatures.indexOf(feature);
+
+                    if (index > -1) {
+                        mockFeatures.splice(index, 1);
+                    }
+                }
             })
         };
 
     beforeEach(() => {
+        mockFeatures.length = 0;
         sinon.stub(PlanningScenarioCreate.methods, "getLayerSource").returns(layer.getLayerSource());
         selectedDrawType = "";
         selectedDrawTypeMain = "";
@@ -53,6 +63,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                             namespaced: true,
                             actions: {},
                             getters: {
+                                currentPlanningScenarioId: () => null,
                                 dataSources: () => [
                                     {
                                         id: "default",
@@ -79,12 +90,14 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                                     };
                                 },
                                 planningScenarioDrawTypesMain: () => ["polygon", "box"],
+                                planningScenarios: () => [],
                                 planningScenarioSelectedDrawType: () => selectedDrawType,
                                 planningScenarioSelectedDrawTypeMain: () => selectedDrawTypeMain,
                                 selectedInteraction: () => "draw",
                                 planningScenarioStrokeRange: () => [1, 16],
                                 planningScenarioSelectedInteraction: () => null,
                                 simulationAreaStyle: () => "",
+                                simulationAreaStyleInvalid: () => "",
                                 simulations: () => []
                             }
                         }
@@ -196,14 +209,14 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
 
     describe("Methods", () => {
         describe("Side Length Validation", () => {
-            describe("currentMaxSideLength", () => {
+            describe("maxSideLengthFromConfig", () => {
                 it("should return maxSideLength from current data source", () => {
                     const wrapper = factory.getMount();
 
-                    expect(wrapper.vm.currentMaxSideLength).to.equal(1000);
+                    expect(wrapper.vm.maxSideLengthFromConfig).to.equal(1000);
                 });
 
-                it("should return fallback value of 1000 if no maxSideLength in data source", () => {
+                it("should return fallback value of 450 if no maxSideLength in data source", () => {
                     const wrapper = factory.getMount();
 
                     sinon.stub(wrapper.vm, "currentDataSource").get(() => ({
@@ -212,41 +225,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                         maxSizeArea: 500000
                     }));
 
-                    expect(wrapper.vm.currentMaxSideLength).to.equal(1000);
-                });
-            });
-
-            describe("isOriginalFeatureExceedingSideLength", () => {
-                it("should return false if no features in source", () => {
-                    const wrapper = factory.getMount();
-
-                    expect(wrapper.vm.isOriginalFeatureExceedingSideLength).to.be.false;
-                });
-
-                it("should return false if only simulation-area feature exists", () => {
-                    const wrapper = factory.getMount();
-
-                    sinon.stub(wrapper.vm.source, "getFeatures").returns([
-                        {get: () => "simulation-area"}
-                    ]);
-
-                    expect(wrapper.vm.isOriginalFeatureExceedingSideLength).to.be.false;
-                });
-
-                it("should return false if original feature side length is within limits", () => {
-                    const wrapper = factory.getMount();
-
-                    sinon.stub(wrapper.vm.source, "getFeatures").returns([
-                        {
-                            get: () => null,
-                            getGeometry: () => ({
-                                getType: () => "Polygon",
-                                getCoordinates: () => [[[0, 0], [100, 0], [100, 100], [0, 100], [0, 0]]]
-                            })
-                        }
-                    ]);
-
-                    expect(wrapper.vm.isOriginalFeatureExceedingSideLength).to.be.false;
+                    expect(wrapper.vm.maxSideLengthFromConfig).to.equal(450);
                 });
             });
 
@@ -290,26 +269,48 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                 });
             });
 
-            describe("modifyBBoxByBuffer with side length validation", () => {
-                it("should reset buffer to 0 if original feature exceeds side length", () => {
+            describe("isMaxConstraintExceeded", () => {
+                it("should return false if no constraints are exceeded", () => {
                     const wrapper = factory.getMount();
 
-                    sinon.stub(wrapper.vm, "isOriginalFeatureExceedingSideLength").get(() => true);
-
-                    wrapper.vm.bufferVal = "50";
-                    wrapper.vm.modifyBBoxByBuffer("100");
-
-                    expect(wrapper.vm.bufferVal).to.equal("0");
+                    expect(wrapper.vm.isMaxConstraintExceeded).to.be.false;
                 });
 
-                it("should allow buffer modification if within limits", () => {
+                it("should return true if side length constraint is exceeded", () => {
+                    const wrapper = factory.getMount(),
+                        bboxFeature = {
+                            get: (key) => key === "id" ? "simulation-area" : null,
+                            getGeometry: () => ({
+                                getType: () => "Polygon",
+                                getCoordinates: () => [[[0, 0], [1500, 0], [1500, 1500], [0, 1500], [0, 0]]]
+                            })
+                        },
+                        constraintExceeded = wrapper.vm.checkBboxSideLengthConstraint(bboxFeature, true);
+
+                    expect(constraintExceeded).to.be.true;
+                });
+            });
+
+            describe("constraintExceededInfoText", () => {
+                it("should return empty string if no constraints exceeded", () => {
                     const wrapper = factory.getMount();
 
-                    sinon.stub(wrapper.vm, "isOriginalFeatureExceedingSideLength").get(() => false);
+                    sinon.stub(wrapper.vm, "bufferConstraintStatus").get(() => ({
+                        sideLengthExceeded: false
+                    }));
 
-                    wrapper.vm.modifyBBoxByBuffer("50");
+                    expect(wrapper.vm.constraintExceededInfoText()).to.equal("");
+                });
 
-                    expect(wrapper.vm.bufferVal).to.equal("50");
+                it("should return info text if side length exceeded", () => {
+                    const wrapper = factory.getMount();
+
+                    sinon.stub(wrapper.vm, "bufferConstraintStatus").get(() => ({
+                        sideLengthExceeded: true
+                    }));
+                    wrapper.vm.currentSideLength = [1500, 1200];
+
+                    expect(wrapper.vm.constraintExceededInfoText()).to.include("additional:modules.tools.simulationTool.maxSideLengthExceeded");
                 });
             });
         });
