@@ -929,7 +929,8 @@ export default {
                         :text="$t('additional:modules.tools.simulationTool.showProperties')"
                         @click="() => setMode('simulationParameter')"
                     />
-                    <FlatButton
+                    <!-- If print module is available, show print button -->
+                    <!--<FlatButton
                         v-if="isPrintModuleAvailable"
                         id="print-results-bottom"
                         class="mx-2"
@@ -937,7 +938,7 @@ export default {
                         :aria-label="'Simulationsergebnisse drucken'"
                         :text="'Drucken'"
                         @click="openPrintModule"
-                    />
+                    /> -->
                 </div>
             </form>
         </div>

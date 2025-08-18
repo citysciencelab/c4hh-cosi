@@ -15,6 +15,7 @@ import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactio
 import SectionHeader from "../SectionHeader.vue";
 import convertFeatures from "../../js/convertFeatures";
 import {getDistance} from "ol/sphere";
+import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {
     name: "PlanningScenarioCreate",
@@ -140,6 +141,12 @@ export default {
     },
     mounted () {
         this.deleteSource();
+        if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
+            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
+        }
+        if (typeof layerCollection.getLayerById(infrastructureLayerId) !== "undefined") {
+            layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
+        }
     },
     unmounted () {
         this.removeInteraction(this.currentModifyInteraction);
