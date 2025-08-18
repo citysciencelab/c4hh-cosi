@@ -314,12 +314,14 @@ export default {
 
                     scenario.inputs[inputKey] = {
                         type: "FeatureCollection",
-                        features: await getOAFFeature.getOAFFeatureGet(input.source.url, input.source.collection, {
-                            limit: 100,
+                        features: await getOAFFeature.getOAFFeatureGet(
+                            input.source.url,
+                            input.source.collection,
+                            100,
                             filter,
-                            filterCrs: crs,
+                            crs,
                             crs
-                        })
+                        )
                     };
                 }
             }
