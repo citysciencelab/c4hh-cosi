@@ -15,7 +15,7 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
                     {attr1: "value1", attr2: "value2"},
                     {attr1: "value3", attr2: "value4", attr3: "value5"}
                 ],
-                gfiAttributes = ["attr1", "attr2"],
+                gfiAttributes = {attr1: "attr1", attr2: "attr2"},
                 columns = extractColumnsFromResults(features, gfiAttributes);
 
             expect(columns).to.be.an("array");
@@ -62,32 +62,6 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
             expect(columns).to.be.an("array");
             expect(columns.length).to.equal(0);
         });
-
-        it("ignores object attributes with name and alias in array", () => {
-            const features = [
-                    {attr1: "value1", attr2: "value2"}
-                ],
-                gfiAttributes = [
-                    {name: "attr1", alias: "Attribute 1"}, // This should be ignored
-                    "attr2"
-                ],
-                columns = extractColumnsFromResults(features, gfiAttributes);
-
-            expect(columns).to.be.an("array");
-            expect(columns.length).to.equal(1); // Only attr2 should be included
-            expect(columns[0].name).to.equal("attr2");
-        });
-
-        it("handles empty array as normal array, not as showAll", () => {
-            const features = [
-                    {attr1: "value1", attr2: "value2", attr3: "value3"}
-                ],
-                gfiAttributes = [],
-                columns = extractColumnsFromResults(features, gfiAttributes);
-
-            expect(columns).to.be.an("array");
-            expect(columns.length).to.equal(0); // Empty array should return no columns
-        });
     });
 
     describe("extractRowsFromResults", () => {
@@ -96,7 +70,7 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
                     {attr1: "value1", attr2: "value2"},
                     {attr1: "value3", attr2: "value4"}
                 ],
-                gfiAttributes = ["attr1", "attr2"],
+                gfiAttributes = {attr1: "attr1", attr2: "attr2"},
                 rows = extractRowsFromResults(features, gfiAttributes);
 
             expect(rows).to.be.an("array");
@@ -145,36 +119,6 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
 
             expect(rows).to.be.an("array");
             expect(rows.length).to.equal(0);
-        });
-
-        it("ignores object attributes with name and alias in array", () => {
-            const features = [
-                    {attr1: "value1", attr2: "value2"}
-                ],
-                gfiAttributes = [
-                    {name: "attr1", alias: "Attribute 1"}, // This should be ignored
-                    "attr2"
-                ],
-                rows = extractRowsFromResults(features, gfiAttributes);
-
-            expect(rows).to.be.an("array");
-            expect(rows.length).to.equal(1);
-            expect(rows[0]["Attribute 1"]).to.be.undefined; // Alias should not work
-            expect(rows[0].attr1).to.be.undefined; // attr1 should not be included
-            expect(rows[0].attr2).to.equal("value2"); // Only attr2 should be included
-        });
-
-        it("handles empty array as normal array, not as showAll", () => {
-            const features = [
-                    {attr1: "value1", attr2: "value2", attr3: "value3"}
-                ],
-                gfiAttributes = [],
-                rows = extractRowsFromResults(features, gfiAttributes);
-
-            expect(rows).to.be.an("array");
-            expect(rows.length).to.equal(1);
-            // With empty array, no attributes should be included
-            expect(Object.keys(rows[0]).length).to.equal(0);
         });
     });
 

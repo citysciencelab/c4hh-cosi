@@ -355,17 +355,11 @@ const actions = {
                         geometryProvider.geometryAttribute
                     ];
                 }
-                else if (Array.isArray(attributes)) {
-                    geometryProviderAttributes = [
-                        ...attributes.filter(attr => typeof attr === "string"),
-                        geometryProvider.geometryAttribute
-                    ];
-                }
 
                 return dispatch("fetchWfsDataWithPoint", {
                     layer: layerWithConfig,
                     coordinates: coordinate,
-                    attributes: geometryProviderAttributes,
+                    attributes: Object.fromEntries(geometryProviderAttributes.map(key => [key, key])),
                     ignoredKeys
                 });
             }

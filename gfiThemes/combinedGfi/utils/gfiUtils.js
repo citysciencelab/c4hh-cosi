@@ -7,7 +7,7 @@ import {translateKeyIfPossible} from "./translationUtils.js";
 /**
  * Normalizes attributes configuration to a consistent format for extraction functions.
  *
- * @param {string|Array|Object} attributes - The attributes configuration from layer config.
+ * @param {string|Object} attributes - The attributes configuration from layer config.
  * @returns {string|Array} - Normalized attributes format.
  */
 export function normalizeAttributes (attributes) {
@@ -16,10 +16,6 @@ export function normalizeAttributes (attributes) {
     }
 
     if (typeof attributes === "string") {
-        return attributes;
-    }
-
-    if (Array.isArray(attributes)) {
         return attributes;
     }
 
@@ -104,7 +100,7 @@ export function getCoordinateFromGeometry (geometry) {
  * Extracts all unique keys from an array of result objects, excluding ignored keys based on gfiAttributes configuration.
  *
  * @param {Array<Object>} results - An array of result objects.
- * @param {string|Object|Array} gfiAttributes - The gfiAttributes configuration like in layer configuration.
+ * @param {string|Object} gfiAttributes - The gfiAttributes configuration like in layer configuration.
  * @param {Array<string>} ignoredKeys - Keys to be ignored (excluded from output) - only used when gfiAttributes is "showAll".
  * @returns {Array<Object>} An array of column objects with name and index.
  */
@@ -135,10 +131,6 @@ export function extractColumnsFromResults (results, gfiAttributes, ignoredKeys) 
     else if (typeof gfiAttributes === "object" && !Array.isArray(gfiAttributes)) {
         // For object configuration, use the configured keys
         keysToInclude = Object.keys(gfiAttributes);
-    }
-    else if (Array.isArray(gfiAttributes)) {
-        // For array configuration (including empty arrays), use only string attributes
-        keysToInclude = gfiAttributes.filter(attr => typeof attr === "string");
     }
     else {
         // Fallback: use all keys (for null/undefined)
@@ -188,20 +180,6 @@ export function extractRowsFromResults (results, gfiAttributes, ignoredKeys) {
                         filteredFeature[displayName] = feature[key];
                     }
                 });
-                return filteredFeature;
-            }
-            else if (Array.isArray(gfiAttributes)) {
-                const filteredFeature = {};
-
-                gfiAttributes.forEach(attr => {
-                    // Only process string attributes, ignore objects with alias
-                    if (typeof attr === "string") {
-                        if (feature[attr] !== undefined) {
-                            filteredFeature[attr] = feature[attr];
-                        }
-                    }
-                });
-
                 return filteredFeature;
             }
             return {...feature};

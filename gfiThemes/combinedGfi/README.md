@@ -50,7 +50,11 @@ Here's a complete example using the recommended nested format:
         },
         {
           "id": "landschaftsschutzgebiete",
-          "gfiAttributes": ["name", "typ", "groesse"]
+          "gfiAttributes": {
+            "name": "Name",
+            "typ": "Typ",
+            "groesse": "Größe"
+          }
         }
       ],
       "additionalRequests": [
@@ -76,7 +80,6 @@ Each layer in the `layersToRequest` array can have the following properties:
   - `"ignore"`: GFI requests disabled for this layer
   - `"showAll"`: All GFI attributes are requested and shown (ignoredKeys will be applied)
   - Object: Key-value pairs for attribute mapping (e.g., `{ "key1": "Display Name 1" }`)
-  - Array: List of attribute names to display (e.g., `["attr1", "attr2"]`)
 - `wfsQueryBufferSize`: (Optional) The buffer size to use for WFS queries. Default is 0.0001 (in map units). Map units are the units used by the map’s coordinate reference system (CRS)—for example, degrees in EPSG:4326 or meters in EPSG:3857. [Learn more about map units, display units, and location units](https://pro.arcgis.com/en/pro-app/latest/help/mapping/navigation/map-units-location-units-and-display-units.htm)
 - `geometryProvider`: (Optional) Configuration for using this layer as a geometry provider for other layers.
 
@@ -87,7 +90,10 @@ Example:
   "layersToRequest": [
     {
       "id": "layer1",
-      "gfiAttributes": ["attr1", "attr2"],
+      "gfiAttributes": {
+        "attr1": "attr1",
+        "attr2": "attr2"
+      },
       "wfsQueryBufferSize": 0.00005
     },
     {
@@ -108,7 +114,9 @@ Example:
     },
     {
       "id": "geometryLayer",
-      "gfiAttributes": ["geom_attr"],
+      "gfiAttributes": {
+        "geom_attr": "Geometry"
+      },
       "geometryProvider": {
         "geometryAttribute": "geom_attr"
       }
@@ -575,12 +583,9 @@ Das Addon wird über die `config.json` konfiguriert. Hier ein Beispiel für die 
           },
           "geometryAttribute": "geometrie",
           "featureType": "ave:Flurstueck",
-          "gfiAttributes": [
-            {
-              "name": "lagebeztxt",
-              "alias": "Straßenname(n) und Hausnummer(n)"
-            }
-          ]
+          "gfiAttributes": {
+            "lagebeztxt": "Straßenname(n) und Hausnummer(n)"
+          }
         }
       ]
     }
@@ -611,7 +616,7 @@ Jeder Layer in `layersToRequest` kann folgende Parameter haben:
 | `geometryProvider` | Object | Konfiguration für die Geometrie-Bereitstellung |
 | `geometryAttribute` | String | Name des Geometrie-Attributs |
 | `featureType` | String | Feature-Typ des Layers |
-| `gfiAttributes` | String/Object/Array | GFI-Attribut-Konfiguration (wie bei Layer-Konfiguration): `"ignore"`, `"showAll"`, Objekt mit Schlüssel-Wert-Paaren, oder Array mit Attributen |
+| `gfiAttributes` | String/Object | GFI-Attribut-Konfiguration (wie bei Layer-Konfiguration): `"ignore"`, `"showAll"`, Objekt mit Schlüssel-Wert-Paaren |
 
 ### Attribut-Konfiguration
 
