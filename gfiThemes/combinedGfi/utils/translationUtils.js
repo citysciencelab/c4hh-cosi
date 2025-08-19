@@ -17,8 +17,8 @@ export function translateKeyIfPossible (key) {
     try {
         const translation = i18next.t(key);
 
-        if (translation === key) {
-            return key;
+        if (translation === key || typeof translation === "undefined") {
+            return key.split(":", 2)[1];
         }
 
         return translation;
