@@ -113,5 +113,9 @@
   },
   "cesium3dTilesInspector": {
     "type": "javascript"
+  },
+  "exampleControl": {
+    "path": "controls/exampleControl",
+    "type": "control"
   }
 }
