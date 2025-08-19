@@ -31,7 +31,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
             ],
             additionalRequests: [{url: "https://example.com/api"}],
             alternativeGeometry: false,
-            currentFormat: "CSV",
+            currentFormat: "PDF",
             fileName: "test-export",
             layerResults: [
                 {

@@ -86,8 +86,8 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
                                 previousGeometry: () => null,
                                 additionalRequests: () => [],
                                 additionalRequestResults: () => [],
-                                currentFormat: () => "CSV",
-                                shownFormatList: () => ["CSV", "PDF", "DOC", "JSON"],
+                                currentFormat: () => "PDF",
+                                shownFormatList: () => ["PDF", "PDF", "DOC", "JSON"],
                                 bufferedFeature: () => null,
                                 showBuffer: () => true,
                                 tableData: () => ({}),
@@ -224,7 +224,7 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
 
         await wrapper.vm.exportData();
 
-        expect(dispatchSpy.calledWith("Modules/CombinedGfi/exportTo", "CSV")).to.be.true;
+        expect(dispatchSpy.calledWith("Modules/CombinedGfi/exportTo", "PDF")).to.be.true;
     });
 
     it("gets the correct layer display name from config", () => {
@@ -300,7 +300,7 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
         expect(typeof printAccordion.props("translateFunction")).to.equal("function");
 
         expect(exportAccordion.props("fileName")).to.equal("test");
-        expect(exportAccordion.props("currentFormat")).to.equal("CSV");
+        expect(exportAccordion.props("currentFormat")).to.equal("PDF");
         expect(typeof exportAccordion.props("translateFunction")).to.equal("function");
     });
 

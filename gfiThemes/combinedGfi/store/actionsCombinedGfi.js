@@ -18,7 +18,7 @@ import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
 import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
 import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
 import {GeoJSON} from "ol/format";
-import {exportToCSV, exportToDOC, exportToPDF, exportToJSON} from "../utils/exportUtils";
+import {exportToDOC, exportToPDF, exportToJSON} from "../utils/exportUtils";
 import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses";
 import OverlayOp from "jsts/org/locationtech/jts/operation/overlay/OverlayOp";
 import {Fill, Stroke, Style} from "ol/style";
@@ -45,7 +45,7 @@ const actions = {
             alternativeGeometryAvailable = themeParams.layersToRequest.find(layer => layer.geometryProvider),
             exportConfig = themeParams.export || {},
             fileName = exportConfig.fileName || i18next.t("additional:modules.combinedGfi.defaultFileName"),
-            shownFormatList = exportConfig.shownFormatList || ["CSV", "PDF", "DOC", "JSON"];
+            shownFormatList = exportConfig.shownFormatList || ["PDF", "DOC", "JSON"];
 
         commit("setLayersToRequest", themeParams.layersToRequest || []);
         commit("setAdditionalRequests", themeParams.additionalRequests || []);
@@ -915,7 +915,7 @@ const actions = {
      * @param {Function} context.dispatch - The Vuex dispatch function.
      * @param {Object} context.state - The Vuex state object.
      * @param {Function} context.commit - The Vuex commit function.
-     * @param {String} format - The format to export to (CSV, PDF, DOC, JSON).
+     * @param {String} format - The format to export to (PDF, DOC, JSON).
      * @returns {Promise<void>} A promise that resolves when the export is complete.
      */
     exportTo ({state, commit}, format) {
@@ -931,19 +931,9 @@ const actions = {
             commit("setIsLoading", isLoading);
         }
 
-        const exportFormat = format || state.currentFormat || "CSV";
+        const exportFormat = format || state.currentFormat || "PDF";
 
         switch (exportFormat.toUpperCase()) {
-            case "CSV":
-                exportToCSV({
-                    layerResults: state.layerResults,
-                    fileName: state.fileName,
-                    setIsLoading,
-                    translations: {
-                        defaultFileName: i18next.t("additional:modules.combinedGfi.defaultFileName")
-                    }
-                });
-                break;
             case "PDF":
                 exportToPDF({
                     layerResults: state.layerResults,

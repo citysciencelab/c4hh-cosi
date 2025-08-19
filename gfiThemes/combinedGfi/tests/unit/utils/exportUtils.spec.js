@@ -1,7 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
 import {
-    exportToCSV,
     exportToDOC,
     exportToPDF,
     exportToJSON
@@ -61,106 +60,6 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
         global.i18next = originalI18next;
 
         sinon.restore();
-    });
-
-    describe("exportToCSV", () => {
-        it("exports data to CSV format", function (done) {
-            const layerResults = [
-                    {
-                        layerName: "Layer 1",
-                        headers: [
-                            {name: "attr1", index: 0},
-                            {name: {name: "attr2", alias: "Attribute 2"}, index: 1}
-                        ],
-                        rows: [
-                            {attr1: "value1", attr2: "value2"}
-                        ]
-                    }
-                ],
-
-                translations = {
-                    defaultFileName: "Export-File",
-                    noData: "Keine Daten"
-                };
-
-            try {
-                exportToCSV({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
-
-                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
-                expect(createElementStub.calledWith("a")).to.be.true;
-                expect(appendChildStub.called).to.be.true;
-                expect(clickStub.called).to.be.true;
-                expect(removeChildStub.called).to.be.true;
-                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
-                expect(global.URL.revokeObjectURL.called).to.be.true;
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
-        });
-
-        it("handles empty layer results gracefully", function (done) {
-            const translations = {
-                defaultFileName: "Export-File"
-            };
-
-            try {
-                exportToCSV({
-                    layerResults: [],
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
-
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
-                expect(setIsLoadingSpy.calledWith(false)).to.be.true;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
-        });
-
-        it("handles layers without headers", function (done) {
-            const layerResults = [
-                    {
-                        layerName: "Layer 1",
-                        headers: [],
-                        rows: [
-                            {attr1: "value1", attr2: "value2"},
-                            {attr1: "value3", attr2: "value4"}
-                        ]
-                    }
-                ],
-
-                translations = {
-                    defaultFileName: "Export-File"
-                };
-
-            try {
-                exportToCSV({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
-
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
-                expect(setIsLoadingSpy.calledWith(false)).to.be.true;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
-        });
     });
 
     describe("exportToDOC", () => {

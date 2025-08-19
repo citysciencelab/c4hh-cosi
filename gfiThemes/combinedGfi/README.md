@@ -10,7 +10,7 @@ The Combined GFI addon provides the following key features:
 - **Attribute Aliasing**: Display user-friendly attribute names instead of technical field names
 - **Spatial Buffering**: Apply distance buffers to expand the query area
 - **Alternative Geometries**: Use geometries from one layer to query features in other layers
-- **Export Capabilities**: Export query results to CSV, PDF, DOC, and JSON formats
+- **Export Capabilities**: Export query results to PDF, DOC, and JSON formats
 - **Tabular Display**: View results in a paginated table format
 
 ## Installation
@@ -35,7 +35,7 @@ Here's a complete example using the recommended nested format:
       "bufferDistances": [100, 500, 1000],
       "export": {
         "fileName": "Naturschutzgebiete",
-        "shownFormatList": ["CSV", "PDF", "DOC", "JSON"]
+        "shownFormatList": ["PDF", "DOC", "JSON"]
       },
       "printServerUrl": "https://example.com/mapfish/print/report/buildreport.pdf",
       "layersToRequest": [
@@ -171,7 +171,7 @@ The addon supports exporting query results in various formats using the nested `
 {
   "export": {
     "fileName": "MyExportFile",
-    "shownFormatList": ["CSV", "PDF", "DOC", "JSON"]
+    "shownFormatList": ["PDF", "DOC", "JSON"]
   }
 }
 ```
@@ -179,7 +179,7 @@ The addon supports exporting query results in various formats using the nested `
 #### Properties
 
 - `export.fileName`: The default file name for exports.
-- `export.shownFormatList`: An array of export formats to display in the UI. Supported formats: "CSV", "PDF", "DOC", "JSON".
+- `export.shownFormatList`: An array of export formats to display in the UI. Supported formats: "PDF", "DOC", "JSON".
 
 ### Print Configuration
 
@@ -276,7 +276,6 @@ The addon supports the following layer types:
 
 ### Export Formats
 
-- **CSV**: Comma-separated values for spreadsheet applications
 - **PDF**: Portable Document Format for printing
 - **DOC**: Microsoft Word compatible format
 - **JSON**: JavaScript Object Notation for data interchange
