@@ -148,7 +148,7 @@ export function createKnowledgeBase (parcelData, services, {mapProjection, oafCR
  * @param {Function} onerror A function to call on error as function(error) with error an instance of Error.
  * @returns {void}
  */
-function sumNumbers (features, knowledgeBaseKey, knowledgeBaseSum, propertyName, onsuccess, onerror) {
+export function sumNumbers (features, knowledgeBaseKey, knowledgeBaseSum, propertyName, onsuccess, onerror) {
     if (!Array.isArray(features)) {
         if (typeof onerror === "function") {
             onerror(new Error("sumNumbers: features is not an array"));
