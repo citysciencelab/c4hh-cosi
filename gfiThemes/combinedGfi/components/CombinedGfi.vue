@@ -654,4 +654,8 @@ export default {
     border-radius: 0.25rem;
     margin-top: 0.5rem;
 }
+
+:deep(.table) {
+    max-width: none;
+}
 </style>
