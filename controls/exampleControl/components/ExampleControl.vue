@@ -3,8 +3,7 @@ import {mapGetters, mapActions} from "vuex";
 import ControlIcon from "../../../../src/modules/controls/components/ControlIcon.vue";
 
 /**
- * The BackForward control element allows stepping back
- * and forth through view states regarding zoom and center.
+ * The ExampleControl simply shows an alert.
  * @module modules/controls/ExampleControl
  */
 export default {
