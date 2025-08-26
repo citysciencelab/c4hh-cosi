@@ -7,7 +7,7 @@
 ### __Breaking Changes__
 
 ### Added
-- Added an example for an addons of type `control`: addons\controls\exampleControl.
+- Added an example for an addon of type `control`: addons\controls\exampleControl.
 
 ### Changed
 - Modifying the InputText component to work according to the changes in Masterportal.
