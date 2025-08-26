@@ -13,8 +13,7 @@ export default {
     },
     computed: {
         ...mapGetters("Controls/ExampleControl", [
-            "icon",
-            "supportedDevices"
+            "icon"
         ])
     },
     methods: {
