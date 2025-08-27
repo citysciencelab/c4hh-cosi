@@ -1,0 +1,47 @@
+{
+  "modules": {
+      "combinedGfi": {
+        "fileName": "File Name",
+        "export": "Save Export",
+        "exportFormat": "Format",
+        "printButton": "Create Report",
+        "printError": "Error creating print request. Please check the selected data and try again.",
+        "feature": "Feature",
+        "features": "Features",
+        "noBufferSelected": "No buffer selected",
+        "bufferDistanceUnit": "m around the area",
+        "selectBufferDistance": "Select buffer distance",
+        "queryArea": "Query area",
+        "queryingArea": "Querying area...",
+        "loading": "Loading...",
+        "removeBuffer": "Remove buffer",
+        "additionalRequests": "Additional Requests",
+        "source": "Source",
+        "goToPage": "Go",
+        "infoHint": "Information about the data source",
+        "information": "Information",
+        "standardExport": "Export Data",
+        "printSection": "Area Report",
+        "printDescription": "Create a detailed report for the selected geometry.",
+        "printLoading": "PDF is being created...",
+        "noExportFormatSelected": "No export format selected",
+        "unknownLayer": "Unknown Layer",
+        "defaultFileName": "Export-File",
+        "exportAsDoc": "Export as DOC",
+        "exportAsPdf": "Export as PDF",
+        "noData": "No data",
+        "errors": {
+          "ogcApiProcessError": "Error executing OGC API process. Please try again.",
+          "gfiRequestError": "Error during data query. Please try again.",
+          "wmsQueryError": "Error during WMS query. Please try again.",
+          "wfsQueryError": "Error during WFS query. Please try again.",
+          "oafQueryError": "Error during OAF query. Please try again.",
+          "noValidCoordinates": "No valid coordinates available for query.",
+          "layerNotFound": "Layer not found.",
+          "fetchError": "Error loading data.",
+          "unsupportedRequestType": "Unsupported request type",
+          "serviceUnavailable": "Service currently unavailable"
+        }
+      }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "modules": {
+      "combinedGfi": {
+        "fileName": "Dateiname",
+        "export": "Export speichern",
+        "exportFormat": "Format",
+        "printButton": "Bericht erstellen",
+        "printError": "Fehler beim Erstellen der Druckanfrage. Bitte überprüfen Sie die ausgewählten Daten und versuchen Sie es erneut.",
+        "feature": "Feature",
+        "features": "Features",
+        "noBufferSelected": "Kein Puffer gewählt",
+        "bufferDistanceUnit": "m um das Gebiet",
+        "selectBufferDistance": "Puffer-Abstand wählen",
+        "queryArea": "Umgebung abfragen",
+        "queryingArea": "Umgebung wird abgefragt...",
+        "loading": "Lädt...",
+        "removeBuffer": "Puffer entfernen",
+        "additionalRequests": "Zusätzliche Anfragen",
+        "source": "Quelle",
+        "goToPage": "Go",
+        "infoHint": "Hinweis zur Datenquelle",
+        "information": "Informationen",
+        "standardExport": "Daten exportieren",
+        "printSection": "Flächenbericht",
+        "printDescription": "Erstellen Sie einen Flächenbericht für die ausgewählte Geometrie.",
+        "printLoading": "PDF wird erstellt...",
+        "noExportFormatSelected": "Kein Export-Format ausgewählt",
+        "unknownLayer": "Unbekannter Layer",
+        "defaultFileName": "Export-Datei",
+        "exportAsDoc": "Export als DOC",
+        "exportAsPdf": "Export als PDF",
+        "noData": "Keine Angabe",
+        "errors": {
+          "ogcApiProcessError": "Fehler beim Ausführen des OGC API-Prozesses. Bitte versuchen Sie es erneut.",
+          "gfiRequestError": "Fehler bei der Datenabfrage. Bitte versuchen Sie es erneut.",
+          "wmsQueryError": "Fehler bei der WMS-Abfrage. Bitte versuchen Sie es erneut.",
+          "wfsQueryError": "Fehler bei der WFS-Abfrage. Bitte versuchen Sie es erneut.",
+          "oafQueryError": "Fehler bei der OAF-Abfrage. Bitte versuchen Sie es erneut.",
+          "noValidCoordinates": "Keine gültigen Koordinaten für die Abfrage verfügbar.",
+          "layerNotFound": "Layer nicht gefunden.",
+          "fetchError": "Fehler beim Laden der Daten.",
+          "unsupportedRequestType": "Nicht unterstützter Anfragetyp",
+          "serviceUnavailable": "Dienst momentan nicht erreichbar"
+        }
+      }
+  }
+}

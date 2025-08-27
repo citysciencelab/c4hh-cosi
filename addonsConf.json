@@ -37,6 +37,10 @@
     "type": "tool",
     "path": "boris"
   },
+  "combinedGfi": {
+    "path":"gfiThemes/combinedGfi",
+    "type": "gfiTheme"
+  },
   "dataTable": {
     "path":"gfiThemes/dataTable",
     "type": "gfiTheme"
