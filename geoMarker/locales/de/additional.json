@@ -1,0 +1,8 @@
+{
+    "modules": {
+        "geoMarker": {
+            "name": "GeoMarker",
+            "description": "Anwendung zur Verwaltung von Geomarkern beteiligter Fachabteilungen."
+        }
+    }
+}

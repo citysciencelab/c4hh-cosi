@@ -107,6 +107,9 @@
   "vpiDashboard": {
     "type": "tool"
   },
+  "geoMarker": {
+    "type": "tool"
+  },
   "snippetFeatureInfo": {
     "path": "filterSnippets/snippetFeatureInfo",
     "type": "filterSnippet"
