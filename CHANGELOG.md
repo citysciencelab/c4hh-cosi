@@ -7,6 +7,8 @@
 ### __Breaking Changes__
 
 ### Added
+- Added an example for an addon of type `control`: addons\controls\exampleControl.
+- Added README.md for the Addon Cesium 3D Tiles Inspector.
 
 ### Changed
 
