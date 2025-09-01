@@ -2,7 +2,7 @@
     "modules": {
         "geoMarker": {
             "name": "GeoMarker",
-            "description": "Anwendung zur Verwaltung von Geomarkern beteiligter Fachabteilungen."
+            "description": "Anwendung für Informationen, die der Laufendhaltung der Geobasisdaten dienen."
         }
     }
 }

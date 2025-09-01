@@ -2,7 +2,7 @@
     "modules": {
         "geoMarker": {
             "name": "GeoMarker",
-            "description": "Application for managing Geomarkers of participating departments."
+            "description": "Application for information used to maintain geospatial base data."
         }
     }
 }
