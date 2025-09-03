@@ -1,13 +1,15 @@
 <script>
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 import TabListContent from "./tabs/TabListContent.vue";
+import TabFilterContent from "./tabs/TabFilterContent.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 
 export default {
     name: "GeoMarker",
     components: {
         NavTab,
-        TabListContent
+        TabListContent,
+        TabFilterContent
     },
     data () {
         return {
@@ -137,7 +139,9 @@ export default {
                 aria-labelledby="tabFilter"
                 tabindex="0"
             >
-                <p>Filter GeoMarker</p>
+                <TabFilterContent
+                    :fully-loaded="fullyLoaded"
+                />
             </div>
 
             <div
@@ -161,6 +165,11 @@ export default {
 
 <style lang="scss">
 div#geoMarker {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+
     ul#geoMarkerTabs {
         button.nav-link {
             padding: 0.5rem;
@@ -168,7 +177,18 @@ div#geoMarker {
     }
 
     div#geomarkerTabContent {
+        height: 100%;
+        overflow: hidden;
         padding-top: 1rem;
+
+        div#tabFilterContent.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+            overflow: hidden;
+            height: 100%;
+        }
     }
 }
 </style>

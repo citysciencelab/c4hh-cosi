@@ -33,6 +33,57 @@
                     "aktion": "Show",
                     "aktionButtonLabel": "GeoMarker details"
                 }
+            },
+            "filter": {
+                "countGeoMarker": "GeoMarker",
+                "departments": {
+                  "label": "Department(s)",
+                  "placeholder": "Select department(s)"
+                },
+                "status": {
+                  "label": "Status",
+                  "placeholder": "Select status"
+                },
+                "categories": {
+                  "label": "Category",
+                  "placeholder": "Select one or more categories"
+                },
+                "description": {
+                  "label": "Description",
+                  "placeholder": "Description"
+                },
+                "comment": {
+                  "label": "Comment of the department(s)",
+                  "placeholder": "Comment of the department(s)"
+                },
+                "source": {
+                  "label": "Source",
+                  "placeholder": "Source"
+                },
+                "geoMarkerID": {
+                  "label": "GeoMarker ID",
+                  "placeholder": "GeoMarker ID"
+                },
+                "dates": {
+                  "from": {
+                    "label": "From",
+                    "placeholder": "From"
+                  },
+                  "to": {
+                    "label": "To",
+                    "placeholder": "To"
+                  },
+                  "labels": {
+                    "created": "Date range of creation",
+                    "closed": "Date range of closed by department(s)",
+                    "review": "Date range of review by department(s)"
+                  }
+                },
+                "buttons": {
+                  "filter": "filter",
+                  "list": "in list",
+                  "restore": "restore"
+                }
             }
         }
     }

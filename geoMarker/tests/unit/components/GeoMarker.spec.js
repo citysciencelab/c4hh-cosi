@@ -37,6 +37,12 @@ describe("addons/geoMarker/components/GeoMarker.vue", () => {
                 allLayerConfigs: () => []
             }
         });
+
+        wrapper = shallowMount(GeoMarker, {
+            global: {
+                plugins: [store]
+            }
+        });
     });
 
     afterEach(() => {
@@ -46,12 +52,6 @@ describe("addons/geoMarker/components/GeoMarker.vue", () => {
     });
 
     it("should exist and have the correct id", () => {
-        wrapper = wrapper = shallowMount(GeoMarker, {
-            global: {
-                plugins: [store]
-            }
-        });
-
         expect(wrapper.exists()).to.be.true;
         expect(wrapper.attributes("id")).to.be.equal("geoMarker");
     });

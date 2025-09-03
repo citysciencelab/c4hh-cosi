@@ -33,6 +33,57 @@
                     "aktion": "Zeigen",
                     "aktionButtonLabel": "Details zum GeoMarker"
                 }
+            },
+            "filter": {
+                "countGeoMarker": "GeoMarker",
+                "departments": {
+                  "label": "Abteilung(en)",
+                  "placeholder": "Abteilung(en) wählen"
+                },
+                "status": {
+                  "label": "Status",
+                  "placeholder": "Status wählen"
+                },
+                "categories": {
+                  "label": "Kategorie(n)",
+                  "placeholder": "Kategorie(n) wählen"
+                },
+                "description": {
+                  "label": "Beschreibung",
+                  "placeholder": "Beschreibung"
+                },
+                "comment": {
+                  "label": "Bemerkung der Abteilung(en)",
+                  "placeholder": "Bemerkung der Abteilung(en)"
+                },
+                "source": {
+                  "label": "Quelle",
+                  "placeholder": "Quelle"
+                },
+                "geoMarkerID": {
+                  "label": "GeoMarker ID",
+                  "placeholder": "GeoMarker ID"
+                },
+                "dates": {
+                  "from": {
+                    "label": "Von",
+                    "placeholder": "Von"
+                  },
+                  "to": {
+                    "label": "Bis",
+                    "placeholder": "Bis"
+                  },
+                  "labels": {
+                    "created": "Erfassungszeitraum",
+                    "closed": "GeoMarker geschlossen der Abteilung(en)",
+                    "review": "Wiedervorlagedatum der Abteilung(en)"
+                  }
+                },
+                "buttons": {
+                  "filter": "filtern",
+                  "list": "in Liste",
+                  "restore": "zurücksetzen"
+                }
             }
         }
     }

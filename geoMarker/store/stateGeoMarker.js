@@ -24,6 +24,9 @@
  * @property {Feature} newGeoMarkerFeature The newly created GeoMarker feature
  * @property {String} geoMarkerEditLayerId The id of the layer where the drawn features are stored
  * @property {String} selectedInteraction Which map interaction is currently active, if any.
+ * @property {String[]} statusOptions - List of possible selections for 'status'
+ * @property {Object} filterSelections - settings the user chose for the filter
+ * @property {Boolean} initialLoading - only true for initial loading to indicate whether the filter needs to wait for all features loaded
  */
 
 const state = {
@@ -45,13 +48,36 @@ const state = {
     geoMarkerWfsFeatureIdPrefix: "DE.HH.UP_GEOMARKER_",
     geoMarkerFeatureList: [],
     geoMarkerFeatureSelected: null,
-    geoMarkerActiveTab: "tabList",
+    geoMarkerActiveTab: "tabFilter",
     // map interactions
     layerInformation: [],
     newGeoMarkerFeature: null,
     geoMarkerEditLayerId: "geomarker_edit",
-    selectedInteraction: null
-
+    selectedInteraction: null,
+    // filter settings
+    statusOptions: ["offen", "geschlossen", "inaktiv"],
+    filterSelections: {
+        departmentsSelected: [],
+        statusSelected: ["offen"],
+        filterValueSource: "",
+        filterValueDescr: "",
+        filterValueComment: "",
+        filterValueId: "",
+        categorySelected: [],
+        creationDate: {
+            from: "",
+            to: ""
+        },
+        closedDate: {
+            from: "",
+            to: ""
+        },
+        reminderDate: {
+            from: "",
+            to: ""
+        }
+    },
+    initialLoading: true
 };
 
 export default state;
