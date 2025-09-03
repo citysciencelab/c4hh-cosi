@@ -3,20 +3,27 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
 ### __Breaking Changes__
 
 ### Added
-- Added an example for an addon of type `control`: addons\controls\exampleControl.
 
 ### Changed
-- Modifying the InputText component to work according to the changes in Masterportal.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+---
+
+## 2025-09-03 v3.14.0
+
+### Added
+- Added an example for an addon of type `control`: addons\controls\exampleControl.
+
+### Changed
+- Modifying the InputText component to work according to the changes in Masterportal.
 
 ---
 
