@@ -92,9 +92,9 @@ describe("addons/SimulationTool/components/shared/components/DynamicInputByType.
                     inputType: "string",
                     value: "Test Value"
                 }),
-                input = wrapper.find("input");
+                inputText = wrapper.findComponent({name: "InputText"});
 
-            await input.setValue("New Value");
+            await inputText.setValue("New Value");
 
             expect(wrapper.emitted("update:value")).to.exist;
             expect(wrapper.emitted("update:value")[0]).to.deep.equal(["New Value"]);
