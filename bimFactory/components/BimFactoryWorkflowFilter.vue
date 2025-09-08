@@ -170,7 +170,7 @@ export default {
                 :data="displayData"
                 :max-attributes-to-show="1000"
                 :dynamic-column-table="true"
-                :fixed-data="{items: []}"
+                :fixed-bottom-data="{items: []}"
                 table-class="filteredResultsTable"
             />
 
