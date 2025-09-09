@@ -2,7 +2,8 @@
     "modules": {
         "geoMarker": {
             "name": "GeoMarker",
-            "description": "Application for information used to maintain geospatial base data."
+            "description": "Application for information used to maintain geospatial base data.",
+            "screenshotImage": "Screenshot"
         }
     }
 }
