@@ -1,4 +1,5 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
+import {nextTick} from "vue";
 import {expect} from "chai";
 import Feature from "ol/Feature";
 import ListGroup from "../../../../../components/shared/components/ListGroup.vue";
@@ -70,55 +71,59 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
             expect(wrapper.exists()).to.be.true;
         });
 
-        it("should render four input elements", function () {
+        it("should render four input elements", async function () {
             const wrapper = factory.getShallowMount({
-                    itemList: features,
-                    shownProperties: ["height", "id"],
-                    propertiesMapping: {height: "Höhe"},
-                    itemSchema: {properties: {id: {type: "string"}, height: {type: "string"}}}
-                }),
-                inputWrapperArray = wrapper.findAll("input");
+                itemList: features,
+                shownProperties: ["height", "id"],
+                propertiesMapping: {height: "Höhe"},
+                itemSchema: {properties: {id: {type: "string"}, height: {type: "string"}}}
+            });
 
-            expect(inputWrapperArray).to.be.lengthOf(4);
+            await nextTick();
+
+            expect(wrapper.findAll("input")).to.be.lengthOf(4);
         });
 
-        it("should render input elements with shownProperties", function () {
+        it("should render input elements with shownProperties", async function () {
             const wrapper = factory.getShallowMount({
-                    itemList: featuresMore,
-                    shownProperties: ["width"],
-                    propertiesMapping: {width: "Höhe"},
-                    itemSchema: {properties: {width: {type: "string"}}}
-                }),
-                inputWrapperArray = wrapper.findAll("input");
+                itemList: featuresMore,
+                shownProperties: ["width"],
+                propertiesMapping: {width: "Höhe"},
+                itemSchema: {properties: {width: {type: "string"}}}
+            });
 
-            expect(inputWrapperArray).to.be.lengthOf(2);
+            await nextTick();
+
+            expect(wrapper.findAll("input")).to.be.lengthOf(2);
         });
 
-        it("should render two button elements", function () {
+        it("should render two button elements", async function () {
             const wrapper = factory.getShallowMount({
-                    itemList: featuresMore,
-                    shownProperties: ["width"],
-                    itemSchema: {properties: {width: {type: "string"}}},
-                    propertiesMapping: {height: "Höhe", width: "Breite", id: "Id"}
-                }),
-                inputWrapperArray = wrapper.findAll("button");
+                itemList: featuresMore,
+                shownProperties: ["width"],
+                itemSchema: {properties: {width: {type: "string"}}},
+                propertiesMapping: {height: "Höhe", width: "Breite", id: "Id"}
+            });
 
-            expect(inputWrapperArray).to.be.lengthOf(2);
+            await nextTick();
+
+            expect(wrapper.findAll("button")).to.be.lengthOf(2);
         });
 
-        it("should render four icon button components", function () {
+        it("should render four icon button components", async function () {
             const wrapper = factory.getShallowMount({
-                    itemList: features,
-                    shownProperties: ["height", "id"],
-                    propertiesMapping: {height: "Höhe"},
-                    itemSchema: {properties: {id: {type: "string"}, height: {type: "string"}}}
-                }),
-                iconButtonWrapperArray = wrapper.findAllComponents({name: "IconButton"});
+                itemList: features,
+                shownProperties: ["height", "id"],
+                propertiesMapping: {height: "Höhe"},
+                itemSchema: {properties: {id: {type: "string"}, height: {type: "string"}}}
+            });
 
-            expect(iconButtonWrapperArray).to.be.lengthOf(4);
+            await nextTick();
+
+            expect(wrapper.findAllComponents({name: "IconButton"})).to.be.lengthOf(4);
         });
 
-        it("should render label and input for attribute 'cool'", function () {
+        it("should render label and input for attribute 'cool'", async function () {
             const wrapper = factory.getShallowMount({
                 itemList: featuresMore,
                 shownProperties: ["cool", "width"],
@@ -126,6 +131,7 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
                 itemSchema: {properties: {cool: {type: "string"}}}
             });
 
+            await nextTick();
             expect(wrapper.find("label[for='property--cool-0']").exists()).to.be.true;
             expect(wrapper.find("input[id='property--cool-0']").exists()).to.be.true;
         });
@@ -184,16 +190,39 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
     });
 
     describe("User Intactions", () => {
-        it("should emit 'setFeatureAttribute' with the right values", async function () {
+        it("should emit 'setFeatureAttribute' with the right values on blur", async function () {
             const wrapper = factory.getMount({
-                    itemList: features,
-                    propertiesMapping: {id: "Id"},
-                    shownProperties: ["id"],
-                    itemSchema: {properties: {id: {type: "string"}}}
-                }),
-                inputWrapper = wrapper.find("input");
+                itemList: features,
+                propertiesMapping: {id: "Id"},
+                shownProperties: ["id"],
+                itemSchema: {properties: {id: {type: "string"}}}
+            });
 
-            await inputWrapper.setValue("1000");
+            await nextTick();
+
+            await wrapper.find("input").setValue("1000");
+            // Commit the buffered edit via blur (or alternatively trigger Enter key)
+            await wrapper.find("input").trigger("blur");
+            await nextTick();
+
+            expect(wrapper.emitted()).to.have.property("setFeatureAttribute");
+            expect(wrapper.emitted().setFeatureAttribute[0]).to.deep.equal(["1000", "id", "one"]);
+        });
+
+        it("should emit 'setFeatureAttribute' with the right values on Enter", async function () {
+            const wrapper = factory.getMount({
+                itemList: features,
+                propertiesMapping: {id: "Id"},
+                shownProperties: ["id"],
+                itemSchema: {properties: {id: {type: "string"}}}
+            });
+
+            await nextTick();
+
+            await wrapper.find("input").setValue("1000");
+            // Commit the buffered edit via Enter key
+            await wrapper.find("input").trigger("keydown.enter");
+            await nextTick();
 
             expect(wrapper.emitted()).to.have.property("setFeatureAttribute");
             expect(wrapper.emitted().setFeatureAttribute[0]).to.deep.equal(["1000", "id", "one"]);
@@ -202,14 +231,15 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
 
         it("should emit 'removeFeature' with the right values", async function () {
             const wrapper = factory.getMount({
-                    itemList: features,
-                    propertiesMapping: {id: "Id"},
-                    shownProperties: ["id"],
-                    itemSchema: {properties: {id: {type: "string"}}}
-                }),
-                buttonWrapper = wrapper.find(".bi-trash");
+                itemList: features,
+                propertiesMapping: {id: "Id"},
+                shownProperties: ["id"],
+                itemSchema: {properties: {id: {type: "string"}}}
+            });
 
-            await buttonWrapper.trigger("click");
+            await nextTick();
+
+            await wrapper.find(".bi-trash").trigger("click");
 
             expect(wrapper.emitted()).to.have.property("removeFeature");
             expect(wrapper.emitted().removeFeature[0]).to.deep.equal(["one"]);

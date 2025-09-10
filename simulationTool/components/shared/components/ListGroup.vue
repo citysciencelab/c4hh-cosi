@@ -56,7 +56,13 @@ export default {
     data () {
         return {
             currentHightlightFeatureId: "",
-            currentFeature: undefined
+            currentFeature: undefined,
+            /** Local sorted copy of itemList */
+            sortedItemList: [],
+            /** Local edit buffer to avoid emitting on every keystroke */
+            editBuffer: {},
+            /** Guard to avoid double-commit when 'Enter' key event triggers blur as well */
+            skipNextBlur: new Set()
         };
     },
     computed: {
@@ -69,41 +75,100 @@ export default {
          */
         hasMultipleProperties () {
             return Object.keys(this.propertiesMapping).length > 2;
+        }
+    },
+    watch: {
+    /**
+     * Sets the current highlight feature id according to the props.
+     * @param {(String|Number)} val - The highlight feature id from props.
+     */
+        highlightFeatureId (val) {
+            this.currentHightlightFeatureId = val;
+            this.scrollToHighlightFeature(val);
         },
-
         /**
-         * Returns the sorted item list according to configured property.
-         * @returns {Object[]} the sorted item list.
+         * Resort when the sort key changes.
          */
-        sortedItemList () {
-            const list = this.itemList;
+        sortBy () {
+            this.sortItemList();
+        },
+        /**
+         * Resort when the items array reference changes.
+         */
+        itemList () {
+            this.sortItemList();
+        }
+    },
+    mounted () {
+        // Initialize the sorted list once the component is mounted
+        this.sortItemList();
+    },
+    methods: {
+        /**
+         * Populates sortedItemList with items from itemList sorted by the configured sortBy key.
+         * Does not mutate the original itemList.
+         * @returns {void}
+         */
+        sortItemList () {
+            const base = Array.isArray(this.itemList) ? [...this.itemList] : [];
 
-            if (typeof this.sortBy === "string" && this.sortBy !== "" && list.length) {
-                list.sort((a, b) => {
-                    if (a.get(this.sortBy) > b.get(this.sortBy)) {
+            if (typeof this.sortBy === "string" && this.sortBy !== "" && base.length) {
+                const declaredType = this.itemSchema?.properties?.[this.sortBy]?.type;
+
+                base.sort((a, b) => {
+                    const rawA = a?.get?.(this.sortBy),
+                        rawB = b?.get?.(this.sortBy),
+
+                        // check for undefined/null first so they sort to the end
+                        isAUndefined = rawA === undefined || rawA === null,
+                        isBUndefined = rawB === undefined || rawB === null,
+                        stringA = String(rawA).toLowerCase(),
+                        stringB = String(rawB).toLowerCase();
+
+                    if (isAUndefined && !isBUndefined) {
                         return 1;
                     }
-                    else if (a.get(this.sortBy) < b.get(this.sortBy)) {
+                    if (!isAUndefined && isBUndefined) {
+                        return -1;
+                    }
+                    if (isAUndefined && isBUndefined) {
+                        return 0;
+                    }
+
+                    if (declaredType === "number") {
+                        const numA = typeof rawA === "number" ? rawA : Number(String(rawA).replace(",", ".")),
+                            numB = typeof rawB === "number" ? rawB : Number(String(rawB).replace(",", ".")),
+                            isANaN = Number.isNaN(numA),
+                            isBNaN = Number.isNaN(numB);
+
+                        if (isANaN && !isBNaN) {
+                            return 1;
+                        }
+                        if (!isANaN && isBNaN) {
+                            return -1;
+                        }
+                        if (numA > numB) {
+                            return 1;
+                        }
+                        if (numA < numB) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+
+                    // Default string comparison, case-insensitive
+                    if (stringA > stringB) {
+                        return 1;
+                    }
+                    if (stringA < stringB) {
                         return -1;
                     }
                     return 0;
                 });
             }
 
-            return list;
-        }
-    },
-    watch: {
-        /**
-         * Sets the current highlight feature id according to the props.
-         * @param {String} val the highlight feature id from props.
-         */
-        highlightFeatureId (val) {
-            this.currentHightlightFeatureId = val;
-            this.scrollToHighlightFeature(val);
-        }
-    },
-    methods: {
+            this.sortedItemList = base;
+        },
 
         /**
          * Determines the appropriate icon class based on the style of the given feature.
@@ -179,6 +244,102 @@ export default {
         },
 
         /**
+         * Returns input value prioritizing buffered edits first, then the given fallback.
+         * @param {ol/Feature} feature - The feature being edited.
+         * @param {String} key - The feature property key.
+         * @param {*} fallback - Value to use when there's no buffered edit.
+         * @returns {*} The buffered value if present; otherwise the fallback.
+         */
+        getInputValue (feature, key, fallback) {
+            const fid = feature?.getId?.(),
+                buffered = this.editBuffer[fid]?.[key];
+
+            return buffered !== undefined ? buffered : fallback;
+        },
+
+        /**
+         * Buffers input locally to emit to parent later.
+         * @param {InputEvent} event - The input event containing the new value.
+         * @param {String} key - The feature property key.
+         * @param {ol/Feature} feature - The feature being edited.
+         * @returns {void}
+         */
+        handleInput (event, key, feature) {
+            const fid = feature?.getId?.();
+
+            if (!fid) {
+                return;
+            }
+
+            if (!this.editBuffer[fid]) {
+                this.editBuffer[fid] = {};
+            }
+
+            this.editBuffer[fid][key] = event?.target?.value ?? "";
+        },
+
+        /**
+         * Updates the feature, emits the change, and clears the buffer.
+         * @param {ol/Feature} feature - The feature being edited.
+         * @param {String} key - The feature property key.
+         * @returns {void}
+         */
+        commitEdit (feature, key) {
+            const fid = feature?.getId?.(),
+                buffer = fid ? this.editBuffer[fid] : undefined,
+                hasKey = Boolean(buffer) && Object.prototype.hasOwnProperty.call(buffer, key),
+                raw = hasKey ? buffer[key] : undefined,
+                type = this.itemSchema?.properties?.[key]?.type === "number" ? "number" : "string",
+                value = type === "number" ? Number(raw) : raw;
+
+            if (!fid || !hasKey) {
+                return;
+            }
+
+            feature.set(key, value);
+            this.$emit("setFeatureAttribute", value, key, feature.getId());
+
+            delete buffer[key];
+            if (Object.keys(buffer).length === 0) {
+                delete this.editBuffer[fid];
+            }
+        },
+
+        /**
+         * Commit on Enter: writes buffered value, emits to parent, then blurs input.
+         * Guards against double-commit when blur follows Enter.
+         * @param {KeyboardEvent} event - The keyboard event.
+         * @param {String} key - The feature property key.
+         * @param {ol/Feature} feature - The feature being edited.
+         * @returns {void}
+         */
+        onEnterCommit (event, key, feature) {
+            const guardKey = `${feature.getId?.()}::${key}`;
+
+            this.commitEdit(feature, key);
+            this.skipNextBlur.add(guardKey);
+            event?.target?.blur?.();
+        },
+
+        /**
+         * Commit on blur, unless the change is already committed via 'Enter' key event.
+         * @param {FocusEvent} event - The focus event.
+         * @param {String} key - The feature property key.
+         * @param {ol/Feature} feature - The feature being edited.
+         * @returns {void}
+         */
+        onBlurCommit (event, key, feature) {
+            const guardKey = `${feature.getId?.()}::${key}`;
+
+            if (this.skipNextBlur.has(guardKey)) {
+                this.skipNextBlur.delete(guardKey);
+                return;
+            }
+
+            this.commitEdit(feature, key);
+        },
+
+        /**
          * Scrolls to the highlight feature list.
          * @param {String} val - The feature id as list div id.
          * @returns {void}
@@ -229,9 +390,9 @@ export default {
 <template>
     <div class="list-group list-group-flush">
         <div
-            v-for="(feature, index) in sortedItemList"
+            v-for="(feature) in sortedItemList"
             :id="feature.getId()"
-            :key="index"
+            :key="feature.getId()"
             class="list-group-item list-group-item-action p-0"
             role="button"
             tabindex="0"
@@ -258,9 +419,11 @@ export default {
                         :id="'property-' + listKey + '-' + key + '-' + idx"
                         :type="typeof value === 'number' ? 'number' : 'text'"
                         class="form-control text-end w-50"
-                        :value="value"
+                        :value="getInputValue(feature, key, value)"
                         :inputmode="typeof value === 'number' ? 'decimal' : 'text'"
-                        @input="event => setFeatureAttribute(event, key, feature, itemSchema.properties[key].type)"
+                        @input="handleInput($event, key, feature)"
+                        @blur="onBlurCommit($event, key, feature)"
+                        @keydown.enter.prevent="onEnterCommit($event, key, feature)"
                     >
                 </div>
                 <div
@@ -322,9 +485,11 @@ export default {
                             :id="`${key}-${feature.getId()}`"
                             :type="itemSchema.properties[key].type === 'number' ? 'number' : 'text'"
                             class="form-control text-end w-50"
-                            :value="feature.get(key)"
+                            :value="getInputValue(feature, key, feature.get(key))"
                             :inputmode="itemSchema.properties[key].type === 'number' ? 'decimal' : 'text'"
-                            @input="event => setFeatureAttribute(event, key, feature, itemSchema.properties[key].type)"
+                            @input="handleInput($event, key, feature)"
+                            @blur="onBlurCommit($event, key, feature)"
+                            @keydown.enter.prevent="onEnterCommit($event, key, feature)"
                         >
                     </template>
                 </div>
