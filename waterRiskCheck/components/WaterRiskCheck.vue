@@ -68,8 +68,8 @@ export default {
                     values: undefined
                 },
                 groundWaterMin: {
-                    url: "https://api.hamburg.de/datasets/v1/grundwasserflurabstand_min_2008",
-                    collection: "u12_f_gw_flurabstand_min",
+                    url: "https://api.hamburg.de/datasets/v1/grundwasserflurabstand",
+                    collection: "grundwasserflurabstand_min",
                     geometryName: "geom",
                     propertyToUse: "klasse_in_m_unter_gok",
                     geoJsonFeatures: [],
