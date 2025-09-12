@@ -21,7 +21,11 @@ const state = {
     isVisibleInMenu: true,
     deactivateGFI: true,
     supportedDevices: ["Desktop", "Mobile", "Table"],
-    supportedMapModes: ["2D"]
+    supportedMapModes: ["2D"],
+    categoriesUrl: "",
+    departmentsUrl: "",
+    categories: [],
+    departments: []
 };
 
 export default state;
