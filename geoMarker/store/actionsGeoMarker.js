@@ -3,6 +3,10 @@ import {buildEndpointUrl} from "../utils/buildEndpointUrl";
 import {Draw, Modify, Translate} from "ol/interaction";
 import {Style, Stroke, Fill, Circle as CircleStyle} from "ol/style";
 import wfs from "@masterportal/masterportalapi/src/layer/wfs";
+import createTransactionFeature from "../utils/createTransactionFeature";
+import prepareFeatureProperties from "../utils/prepareFeatureProperties";
+import mergeFormValuesWithProperties from "../utils/mergeFormValuesWithProperties";
+import layerCollection from "@core/layers/js/layerCollection";
 
 let drawInteraction,
     drawLayer,
@@ -149,6 +153,116 @@ const actions = {
         });
 
         dispatch("Maps/addInteraction", drawInteraction, {root: true});
+    },
+    /**
+     * Simplified save function for Point geometry only
+     * @param {Function} context.dispatch - The dispatch function
+     * @param {Function} context.getters - The getters function
+     * @param {Function} context.commit - The commit function
+     * @param {Object} payload.newGeoMarkerFormValues - Form values for the new GeoMarker.
+     * @param {Array<String>} payload.updatedLayerIds - Array of layer IDs to refresh after saving.
+     * @returns {Promise<{transactionFeature: Object, transactionResponse: Object}>} - feature that we save and response of the request. (Both is actually almost the same and will be changed later.)
+    */
+    async savePoint ({dispatch, commit, getters}, {newGeoMarkerFormValues, updatedLayerIds}) {
+        const {newGeoMarkerFeature, layerInformation} = getters,
+            layer = layerInformation[0],
+            preparedFeatureProperties = await prepareFeatureProperties(layer),
+            featurePropertiesWithFormValues = await mergeFormValuesWithProperties(preparedFeatureProperties, newGeoMarkerFormValues),
+            geometryProperty = featurePropertiesWithFormValues.find(({type}) => type === "geometry");
+
+        let transactionResponse,
+            transactionFeature = null;
+
+        try {
+            transactionFeature = await createTransactionFeature(
+                {
+                    geometry: newGeoMarkerFeature.get("geom"),
+                    geometryName: geometryProperty.key
+                },
+                featurePropertiesWithFormValues,
+                false,
+                layer.featurePrefix
+            );
+
+            transactionResponse = await dispatch("sendTransaction", {feature: transactionFeature, selectedInteraction: "insert"});
+        }
+        catch (error) {
+            console.error("Point save error:", error);
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("common:modules.wfst.error.saveFailed") + ": " + error.message,
+                mustBeConfirmed: false
+            }, {root: true});
+        }
+        finally {
+            updatedLayerIds.forEach(layerId => {
+                dispatch("refreshLayer", layerId);
+                commit("setNewGeoMarkerFeature", null);
+            });
+        }
+
+        return {transactionFeature, transactionResponse};
+    },
+
+    /**
+     * Handles WFS transaction communication with the server for point features.
+     * Prepares the transaction request by cleaning layer configuration, sends the
+     * feature data to the WFS endpoint, processes the server response, and updates
+     * the map layer accordingly. Shows appropriate success or error notifications
+     * based on the transaction outcome.
+     * @param {Object} context - Vuex context
+     * @param {Function} context.dispatch - The dispatch function
+     * @param {Function} context.rootGetters - The root getters function
+     * @param {Object} payload.feature - Feature to save
+     * @param {String} payload.selectedInteraction - Type of transaction (e.g. insert, update)
+     * @returns {Promise<Object|null>} - The server response, or null if an error occurred.
+     */
+    async sendTransaction ({dispatch, rootGetters, getters}, {feature, selectedInteraction}) {
+        const {layerInformation} = getters,
+            layer = layerInformation[0];
+
+        let response = null;
+
+        try {
+            response = await wfs.sendTransaction(
+                rootGetters["Maps/projectionCode"],
+                feature,
+                layer.url,
+                layer,
+                selectedInteraction
+            );
+
+            if (response !== null) {
+                dispatch("Alerting/addSingleAlert", {
+                    category: "success",
+                    content: i18next.t("common:modules.wfst.transaction.success.baseSuccess", {
+                        transaction: i18next.t("common:modules.wfst.transaction.success." + selectedInteraction)
+                    })
+                }, {root: true});
+            }
+        }
+        catch (e) {
+            await dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                displayClass: "error",
+                content: `Error: ${e.message}`,
+                mustBeConfirmed: false
+            }, {root: true});
+            response = null;
+        }
+        return response;
+    },
+
+    /**
+     * Refreshes the source of the map layer with the given layerId.
+     * This triggers a reload of the layer's data from its source.
+     *
+     * @param {Object} _ - Vuex action context (unused).
+     * @param {String} layerId - The ID of the layer to refresh.
+     * @returns {void}
+     */
+    refreshLayer (_, layerId) {
+        layerCollection.getLayerById(layerId)?.getLayerSource()?.refresh();
     }
 };
 

@@ -11,7 +11,7 @@ export default {
         screenshotImage: {
             type: String,
             required: false,
-            default: undefined
+            default: null
         }
     },
     emits: ["onScreenshotCreated", "onScreenshotDeleted"],

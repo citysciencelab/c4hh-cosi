@@ -1,5 +1,6 @@
 <script>
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
+import TabNewContent from "./tabs/TabNewContent.vue";
 import TabListContent from "./tabs/TabListContent.vue";
 import TabFilterContent from "./tabs/TabFilterContent.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
@@ -9,6 +10,7 @@ export default {
     components: {
         NavTab,
         TabListContent,
+        TabNewContent,
         TabFilterContent
     },
     data () {
@@ -29,6 +31,7 @@ export default {
         geoMarkerActiveTab (newValue) {
             switch (newValue) {
                 case "tabNew":
+                    this.setNewGeoMarkerFeature(null);
                     this.setMapInteraction("Point");
                     break;
                 case "tabFilter":
@@ -54,7 +57,8 @@ export default {
     methods: {
         ...mapMutations("Modules/GeoMarker", [
             "setGeoMarkerActiveTab",
-            "setLayerInformation"
+            "setLayerInformation",
+            "setNewGeoMarkerFeature"
         ]),
         ...mapActions("Modules/GeoMarker", [
             "loadCategories",
@@ -105,6 +109,7 @@ export default {
             class="tab-content"
         >
             <div
+                v-if="fullyLoaded"
                 id="tabNewContent"
                 :class="[
                     'tab-pane',
@@ -115,17 +120,7 @@ export default {
                 aria-labelledby="tabNew"
                 tabindex="0"
             >
-                <p>Neuen GeoMarker anlegen</p>
-
-                <!-- As an example, will be deleted. -->
-                <!-- <p v-if="fullyLoaded">
-                    {{ categories }}
-                </p> -->
-
-                <!-- As an example, will be deleted. -->
-                <!-- <p v-if="fullyLoaded">
-                    {{ departments }}
-                </p> -->
+                <TabNewContent />
             </div>
 
             <div
@@ -179,6 +174,10 @@ div#geoMarker {
         height: 100%;
         overflow: hidden;
         padding-top: 1rem;
+
+        div#tabNewContent {
+            height: 100%;
+        }
 
         div#tabFilterContent.active {
             display: flex;

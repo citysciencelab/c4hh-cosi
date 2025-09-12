@@ -2,12 +2,27 @@
     "modules": {
         "geoMarker": {
             "name": "GeoMarker",
-            "description": "Application for information used to maintain geospatial base data.",
+            "description": "Anwendung für Informationen, die der Laufendhaltung der Geobasisdaten dienen.",
             "screenshot": {
               "altImage": "Screenshot",
               "buttonCreate": "Create screenshot",
               "buttonPreview": "Show screenshot preview",
               "buttonDelete": "Delete screenshot"
+            },
+            "tabNewContent": {
+                "removeAttachment": "Remove file",
+                "attachmentWarning": "Only PDF, PNG, JPEG and ZIP files are allowed.",
+                "attachmentWarningTitle": "Unsupported File Type",
+                "category": "Category",
+                "reminderDate": "Enable notification on",
+                "infoTitle": "Info",
+                "descriptionLabel": "Description:",
+                "attachmentTitle": "Additional documents",
+                "departmentsTitle": "Departments",
+                "selectedDepartmentsTitle": "Selected departments",
+                "save": "Save",
+                "cancel": "Cancel",
+                "createAnotherGeoMarker": "Create another GeoMarker"
             },
             "status": {
                 "offen": "open",

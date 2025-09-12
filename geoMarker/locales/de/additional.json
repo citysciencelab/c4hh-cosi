@@ -9,6 +9,21 @@
               "buttonPreview": "Vorschau des Screenshots ansehen",
               "buttonDelete": "Screenshot löschen"
             },
+            "tabNewContent": {
+                "removeAttachment": "Datei entfernen",
+                "attachmentWarning": "Nur PDF-, PNG-, JPEG- und ZIP-Dateien sind erlaubt.",
+                "attachmentWarningTitle": "Nicht unterstützter Dateityp",
+                "category": "Kategorie",
+                "reminderDate": "Aktiviere Meldung am",
+                "infoTitle": "Info",
+                "descriptionLabel": "Beschreibung:",
+                "attachmentTitle": "Zusätzliche Dokumente",
+                "departmentsTitle": "Abteilungen",
+                "selectedDepartmentsTitle": "Ausgewählte Abteilungen",
+                "save": "Speichern",
+                "cancel": "Abbrechen",
+                "createAnotherGeoMarker": "Weiteren GeoMarker anlegen"
+            },
             "status": {
                 "offen": "offen",
                 "inaktiv": "inaktiv",

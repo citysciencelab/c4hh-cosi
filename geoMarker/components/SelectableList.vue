@@ -173,6 +173,7 @@ export default {
         table-layout: inherit;
         border-collapse: separate;
         border-spacing: 0;
+        width: 100%;
 
         th {
             position: sticky;
