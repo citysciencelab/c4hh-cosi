@@ -41,6 +41,7 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
         spyReplaceByIdInLayerConfig = sinon.spy();
         spySetRasterActive = sinon.spy();
         spySetAlkisAdressesActive = sinon.spy();
+        PopulationRequest.state.serviceId = "foo";
         PopulationRequest.mutations.setRasterActive = spySetRasterActive;
         PopulationRequest.mutations.setAlkisAdressesActive = spySetAlkisAdressesActive;
         store = createStore({
@@ -87,7 +88,7 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
             getters: {
                 isDefaultStyle: () => true,
                 uiStyle: () => true,
-                restServiceById: () => () => true,
+                restServiceById: () => sinon.stub().returns({id: "foo", typ: "wps", url: "bar"}),
                 visibleLayerConfigs: sinon.stub(),
                 layerConfigById: () => sinon.stub().returns(layerConfigById),
                 determineZIndex: () => sinon.stub().returns(2)

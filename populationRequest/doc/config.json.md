@@ -18,12 +18,35 @@ Einwohnerabfrage für Hamburg und die MRH (Metropolregion Hamburg).
 
 **Es wird über einen WPS eine FME-Workbench angesprochen, welche die Anzahl der Einwohner berechnet, unter Beachtung des Datenschutzes.**
 
+Weitere WPS sowie OGC API Processes können mittlerweile ebenfalls verwendet werden.
+
+**Verwendung weiterer WPS Dienste**
+
+Weitere WPS Dienste können verwendet werden, sofern sich diese hinsichtlich der
+Prozesssignatur identisch zum Default-Dienst verhalten. WPS Dienste können über
+die Optionen `serviceId`, `mrhId` und `fhhId` konfiguriert werden.
+
+**Verwendung OGC API Processes Dienste**
+
+OGC API Processes Dienste können über die Optionen `serviceId` und `processName`
+Konfiguriert werden. Es werden alle Werte aus der Antwort des Dienstes in der
+Tabelle dargestellt. Übersetzungen der Attributnamen können in den Masterportal
+Übersetzungsdateien unter "modules.PopulationRequest.result.ATTRIBUTNAME" hinzugefügt werden.
+
+Siehe Details zur Konfiguration mit OGC API Processes Dienst im Beispiel unten.
+
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
 |name|ja|String||Name des Werkzeuges im Menu.|false|
 |icon|nein|String||CSS Klasse des Bootstrap Icon, das vor dem Toolnamen im Menu angezeigt wird. |false|
 |type|ja|String||ID des Addons: populationRequest|false|
-|populationReqServiceId|nein|String|"2"|In rest-services.[...].js konfigurierte Service-ID|false|
+|populationReqServiceId|nein|String|"2"|In rest-services.[...].json konfigurierte Service-ID|false|
+|serviceId|nein|String|"1001"|In rest-services.[...].json konfigurierte Service-ID. |false|
+|processName|nein|String|"einwohner_ermitteln.fmw"|Name des zu verwendenden Processes. Ausschließlich für Dienste vom Typ "oap". |false|
+|mrhId|nein|String|"46969C7D-FAA8-420A-81A0-8352ECCFF526"|Id des mrh Prozesses. Ausschließlich für Dienste vom Typ "wfs". Für Rückwärtskompatibilität beibehalten. |false|
+|fhhId|nein|String|"B3FD9BD5-F614-433F-A762-E14003C300BF"|Id des fhh Prozesses. Ausschließlich für Dienste vom Typ "wfs". Für Rückwärtskompatibilität beibehalten. |false|
+|rasterLayerId|nein|String|"13023"|Id des Rasterlayers für Einwohnerzahlen, der bei Bedarf über die UI eingeblendet werden kann. |false|
+|alkisAdressLayerId|nein|String|"9726"|Id des Alkis Adresslayers, der bei Bedarf über die UI eingeblendet werden kann. |false|
 
 **Beispiel Einwohnerabfrage**
 ```
@@ -31,6 +54,28 @@ Einwohnerabfrage für Hamburg und die MRH (Metropolregion Hamburg).
 {
     "type": "populationRequest"
 }
+```
+
+**Beispiel Einwohnerabfrage OGC API Processes**
+
+_config.json_
+```json
+{
+    "type": "populationRequest",
+    "serviceId": "1234",
+    "processName": "einwohner_polygon"
+
+}
+```
+
+_rest-services.internet.json_
+```json
+{
+    "id": "1234",
+    "name": "Einwohner OAP",
+    "url": "https://gisdemo2.dp.dsecurecloud.de/pygeo",
+    "typ": "oap"
+},
 ```
 
 ***

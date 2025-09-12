@@ -12,8 +12,13 @@
  * @property {Boolean} rasterActive is the rasterLayer active
  * @property {Boolean} alkisAdressesActive is the alkisAdressesLayer active
  * @property {Number} populationReqServiceId id of the population Request
- * @property {String} wpsId The id of the used web processing service.
- * @property {String} fmwProcess FME process triggered via the WPS.
+ * @property {String} serviceId The id of the used processing service.
+ * @property {String} processName Name of the process triggered via the service.
+ * @property {Object} processData Data returned from the process.
+ * @property {String} mrhId The id of the MRH process. Kept for backward compatibility.
+ * @property {String} fhhId The id of the FHH process. Kept for backward compatibility.
+ * @property {String} rasterLayerId The id of the raster layer.
+ * @property {String} alkisAdressLayerId The id of the alkis adress layer.
  */
 const state = {
     hasMouseMapInteractions: true,
@@ -27,8 +32,13 @@ const state = {
     rasterActive: undefined,
     alkisAdressesActive: undefined,
     populationReqServiceId: "2",
-    wpsId: "1001",
-    fmwProcess: "einwohner_ermitteln.fmw"
+    serviceId: "1001",
+    processName: "einwohner_ermitteln.fmw",
+    processData: undefined,
+    mrhId: "46969C7D-FAA8-420A-81A0-8352ECCFF526",
+    fhhId: "B3FD9BD5-F614-433F-A762-E14003C300BF",
+    rasterLayerId: "13023",
+    alkisAdressLayerId: "9726"
 };
 
 export default state;

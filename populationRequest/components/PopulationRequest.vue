@@ -12,22 +12,6 @@ export default {
         GraphicalSelect,
         SwitchInput
     },
-    data () {
-        return {
-            metaDataLink: undefined,
-            mrhId: "46969C7D-FAA8-420A-81A0-8352ECCFF526",
-            fhhId: "B3FD9BD5-F614-433F-A762-E14003C300BF",
-            rasterLayerId: "13023",
-            alkisAdressLayerId: "9726",
-            sourceFHH: "nein",
-            sourceMRH: "nein",
-            inhabitantsFHH: "-1",
-            inhabitantsFHHNum: -1,
-            inhabitantsMRH: "-1",
-            inhabitantsMRHNum: -1,
-            searchArea: 0
-        };
-    },
     computed: {
         ...mapGetters("Modules/PopulationRequest", [
             "name",
@@ -37,9 +21,14 @@ export default {
             "rasterActive",
             "alkisAdressesActive",
             "populationReqServiceId",
-            "wpsId",
-            "fmwProcess",
-            "geometry"
+            "serviceId",
+            "processName",
+            "processData",
+            "geometry",
+            "mrhId",
+            "fhhId",
+            "rasterLayerId",
+            "alkisAdressLayerId"
         ]),
         ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
@@ -58,21 +47,59 @@ export default {
          * @returns {Boolean} shall Text be shown
          */
         showFHHHintAndLinktext: function () {
-            return this.inhabitantsFHHNum > -1 && (this.sourceFHH === "ja" || this.sourceFHH === "tlw");
+            return this.processData?.inhabitantsFHHNum > -1 && (this.processData?.sourceFHH === "ja" || this.processData?.sourceFHH === "tlw");
         },
         /**
          * returns if the Hint and Linktext should be shown
          * @returns {Boolean} shall Text be shown
          */
         showMRHHintAndLinktext: function () {
-            return this.inhabitantsMRHNum > -1 && (this.sourceMRH === "ja" || this.sourceMRH === "tlw");
+            return this.processData?.inhabitantsMRHNum > -1 && (this.processData?.sourceMRH === "ja" || this.processData?.sourceMRH === "tlw");
         },
         /**
          * returns if the SourceAreaOutsideHint should be shown
          * @returns {Boolean} shall Hint be shown
          */
         showMRHSourceAreaOutsideHint: function () {
-            return this.sourceMRH === "tlw" && this.sourceFHH === "nein";
+            return this.processData?.sourceMRH === "tlw" && this.processData?.sourceFHH === "nein";
+        },
+        /**
+         * returns if the Hint and Linktext should be shown
+         * @returns {Boolean} shall Text be shown
+         */
+        showHintAndLinktext () {
+            return this.processData;
+        },
+        /**
+         * The service object from rest-services.json
+         * @returns {Object} service
+         */
+        service () {
+            return this.restServiceById(this.serviceId);
+        },
+        /**
+         * Whether the service is an OAP service
+         * @returns {Boolean} true if OAP service, false otherwise
+         */
+        isOAPService () {
+            return this.service?.typ.toUpperCase() === "OAP";
+        },
+        /**
+         * The metadata link for the service
+         * @returns {String|undefined} metadata link or undefined if service is not defined
+         */
+        metaDataLink () {
+            if (!this.service) {
+                return undefined;
+            }
+
+            if (this.isOAPService) {
+                return `${this.service.url}/processes/${this.processName}?f=html`;
+            }
+
+            const metadataService = this.restServiceById(this.populationReqServiceId);
+
+            return metadataService?.url;
         }
     },
     watch: {
@@ -102,9 +129,6 @@ export default {
 
         if (service === undefined) {
             console.error("PopulationRequest - Rest Service with the ID " + this.populationReqServiceId + " is not configured in rest-services.json!");
-        }
-        else {
-            this.metaDataLink = service.url;
         }
         if (!rawLayerList.getLayerWhere({id: this.alkisAdressLayerId})) {
             console.warn("PopulationRequest - Layer ALKIS Adresses with id ", this.alkisAdressLayerId, " is not avilable. Check your services.json!");
@@ -157,10 +181,12 @@ export default {
     methods: {
         ...mapMutations("Modules/PopulationRequest", [
             "setAlkisAdressesActive",
-            "setRasterActive"
+            "setRasterActive",
+            "setProcessData"
         ]),
         ...mapActions(["addLayerToLayerConfig", "replaceByIdInLayerConfig", "addOrReplaceLayer"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
+        ...mapActions("Modules/PopulationRequest", ["fetchOAP"]),
 
         /**
          * Resets internal data and triggers the wps request "einwohner_ermitteln.fmw" for the selected area.
@@ -168,19 +194,22 @@ export default {
          * @returns {void}
          */
         makeRequest: function (geoJson) {
-            this.inhabitantsFHHNum = -1;
-            this.inhabitantsMRHNum = -1;
-            this.sourceFHH = "nein";
-            this.sourceMRH = "nein";
-            this.searcharea = 0;
+            this.setProcessData(undefined);
 
-            const service = this.restServiceById(this.wpsId);
+            const service = this.service;
 
             if (service === undefined) {
-                console.warn("Rest Service with the ID " + this.wpsId + " is not configured in rest-services.json!");
+                console.warn("Rest Service with the ID " + this.serviceId + " is not configured in rest-services.json!");
+            }
+            else if (this.isOAPService) {
+                this.fetchOAP({feature: geoJson, service}).catch((e) => {
+                    console.error(e);
+                    this.handleServiceError();
+                    this.resetView();
+                });
             }
             else {
-                WPS.wpsRequest(this.wpsId, service.url, this.fmwProcess, {
+                WPS.wpsRequest(this.serviceId, service.url, this.processName, {
                     "such_flaeche": JSON.stringify(geoJson)
                 }, this.handleResponse.bind(this));
             }
@@ -204,7 +233,7 @@ export default {
             parsedData = response.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData.einwohner;
             if (status === 200) {
                 if (parsedData.ErrorOccured === "yes") {
-                    this.handleWPSError(parsedData);
+                    this.handleServiceError(parsedData);
                 }
                 else {
                     this.handleSuccess(parsedData);
@@ -215,13 +244,19 @@ export default {
             }
         },
         /**
-         * Displays Errortext if the WPS returns an Error
-         * @param  {String} response received by wps
+         * Displays Errortext if the service returns an Error
+         * @param  {String} response received by service
          * @returns {void}
          */
-        handleWPSError: function (response) {
+        handleServiceError: function (response) {
+            let content = this.translate("additional:modules.populationRequest.errors.requestException");
+
+            if (response?.ergebnis) {
+                content += JSON.stringify(response.ergebnis);
+            }
+
             this.addSingleAlert({
-                content: this.translate("additional:modules.populationRequest.errors.requestException") + JSON.stringify(response.ergebnis),
+                content,
                 category: "error",
                 title: this.translate("additional:modules.populationRequest.errors.errorTitle")
             });
@@ -233,41 +268,43 @@ export default {
          */
         handleSuccess: function (response) {
             let responseResult = null;
+            const processData = {};
 
             try {
                 responseResult = JSON.parse(response?.ergebnis);
                 if (responseResult?.einwohner_fhh) {
-                    this.inhabitantsFHHNum = responseResult.einwohner_fhh;
-                    this.inhabitantsFHH = thousandsSeparator(responseResult.einwohner_fhh);
+                    processData.inhabitantsFHHNum = responseResult.einwohner_fhh;
+                    processData.inhabitantsFHH = thousandsSeparator(responseResult.einwohner_fhh);
                 }
                 else {
-                    this.inhabitantsFHHNum = -1;
+                    processData.inhabitantsFHHNum = -1;
                 }
                 if (responseResult?.einwohner_mrh) {
-                    this.inhabitantsMRHNum = responseResult.einwohner_mrh;
-                    this.inhabitantsMRH = thousandsSeparator(responseResult.einwohner_mrh);
+                    processData.inhabitantsMRHNum = responseResult.einwohner_mrh;
+                    processData.inhabitantsMRH = thousandsSeparator(responseResult.einwohner_mrh);
                 }
                 else {
-                    this.inhabitantsMRHNum = -1;
+                    processData.inhabitantsMRHNum = -1;
                 }
                 if (responseResult?.quelle_fhh) {
-                    this.sourceFHH = responseResult.quelle_fhh;
+                    processData.sourceFHH = responseResult.quelle_fhh;
                 }
                 else {
-                    this.sourceFHH = "nein";
+                    processData.sourceFHH = "nein";
                 }
                 if (responseResult?.quelle_mrh) {
-                    this.sourceMRH = responseResult.quelle_mrh;
+                    processData.sourceMRH = responseResult.quelle_mrh;
                 }
                 else {
-                    this.sourceMRH = "nein";
+                    processData.sourceMRH = "nein";
                 }
                 if (responseResult?.suchflaeche) {
-                    this.searchArea = this.chooseUnitAndThousandsSeparator(responseResult.suchflaeche);
+                    processData.searchArea = this.chooseUnitAndThousandsSeparator(responseResult.suchflaeche);
                 }
                 else {
-                    this.searchArea = 0;
+                    processData.searchArea = 0;
                 }
+                this.setProcessData(processData);
             }
             catch (e) {
                 this.addSingleAlert({
@@ -375,7 +412,7 @@ export default {
             </div>
             <div>
                 <div
-                    v-if="inhabitantsFHHNum > -1 || inhabitantsMRHNum > -1"
+                    v-if="isOAPService && processData"
                     class="result"
                 >
                     <div class="heading additional-text">
@@ -383,33 +420,63 @@ export default {
                     </div>
                     <table class="table">
                         <tr
-                            v-if="sourceFHH !== 'nein'"
+                            v-for="(value, key) in processData"
+                            :key="key"
+                        >
+                            <td>{{ translate(`additional:modules.populationRequest.result.${key}`) }}</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                    </table>
+                    <div v-if="showHintAndLinktext">
+                        <div class="hinweis additional-text">
+                            <span>{{ translate("additional:modules.populationRequest.result.hint") }}:</span>&nbsp;{{ translate("additional:modules.populationRequest.result.confidentialityHintSmallValues") }}
+                        </div>
+                        <div>
+                            <a
+                                target="_blank"
+                                :href="metaDataLink"
+                            >
+                                {{ translate("additional:modules.populationRequest.result.dataSourceLinktext") }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    v-if="!isOAPService && processData"
+                    class="result"
+                >
+                    <div class="heading additional-text">
+                        {{ translate("additional:modules.populationRequest.result.confidentialityHint") }}:
+                    </div>
+                    <table class="table">
+                        <tr
+                            v-if="processData.sourceFHH !== 'nein'"
                         >
                             <td>{{ translate("additional:modules.populationRequest.result.populationFHH") }}:</td>
                             <td
                                 class="inhabitantsFHH"
                             >
-                                {{ inhabitantsFHH }}
+                                {{ processData.inhabitantsFHH }}
                             </td>
                         </tr>
                         <tr
-                            v-if="sourceMRH !== 'nein'"
+                            v-if="processData.sourceMRH !== 'nein'"
                         >
                             <td>{{ translate("additional:modules.populationRequest.result.populationMRH") }}:</td>
                             <td
                                 class="inhabitantsMRH"
                             >
-                                {{ inhabitantsMRH }}
+                                {{ processData.inhabitantsMRH }}
                             </td>
                         </tr>
                         <tr
-                            v-if="searchArea"
+                            v-if="processData.searchArea"
                         >
                             <td>{{ translate("additional:modules.populationRequest.result.areaSize") }}:</td>
                             <td
                                 class="searchArea"
                             >
-                                {{ searchArea }}
+                                {{ processData.searchArea }}
                             </td>
                         </tr>
                     </table>
