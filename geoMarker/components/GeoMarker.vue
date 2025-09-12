@@ -1,11 +1,13 @@
 <script>
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
-import {mapGetters, mapActions} from "vuex";
+import TabListContent from "./tabs/TabListContent.vue";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 
 export default {
     name: "GeoMarker",
     components: {
-        NavTab
+        NavTab,
+        TabListContent
     },
     data () {
         return {
@@ -15,7 +17,8 @@ export default {
     computed: {
         ...mapGetters("Modules/GeoMarker", [
             "categories",
-            "departments"
+            "departments",
+            "geoMarkerActiveTab"
         ])
     },
     async mounted () {
@@ -25,10 +28,16 @@ export default {
         this.fullyLoaded = true;
     },
     methods: {
+        ...mapMutations("Modules/GeoMarker", [
+            "setGeoMarkerActiveTab"
+        ]),
         ...mapActions("Modules/GeoMarker", [
             "loadCategories",
             "loadDepartments"
-        ])
+        ]),
+        setCurrentTab (tab) {
+            this.setGeoMarkerActiveTab(tab);
+        }
     }
 };
 </script>
@@ -41,24 +50,27 @@ export default {
             role="tablist"
         >
             <NavTab
-                id="newTab"
-                :active="false"
-                target="#newTabPane"
-                label="Neu"
+                id="tabNew"
+                :active="geoMarkerActiveTab === 'tabNew'"
+                target="#tabNewContent"
+                :label="$t('additional:modules.geoMarker.tabs.tabNew.label')"
+                @click="setCurrentTab('tabNew')"
             />
 
             <NavTab
-                id="filterTab"
-                :active="true"
-                target="#filterTabPane"
-                label="Filter"
+                id="tabFilter"
+                :active="geoMarkerActiveTab === 'tabFilter'"
+                target="#tabFilterContent"
+                :label="$t('additional:modules.geoMarker.tabs.tabFilter.label')"
+                @click="setCurrentTab('tabFilter')"
             />
 
             <NavTab
-                id="listTab"
-                :active="false"
-                target="#listTabPane"
-                label="Liste"
+                id="tabList"
+                :active="geoMarkerActiveTab === 'tabList'"
+                target="#tabListContent"
+                :label="$t('additional:modules.geoMarker.tabs.tabList.label')"
+                @click="setCurrentTab('tabList')"
             />
         </ul>
 
@@ -67,10 +79,14 @@ export default {
             class="tab-content"
         >
             <div
-                id="newTabPane"
-                class="tab-pane fade"
+                id="tabNewContent"
+                :class="[
+                    'tab-pane',
+                    'fade',
+                    geoMarkerActiveTab === 'tabNew' ? 'show active' : ''
+                ]"
                 role="tabpanel"
-                aria-labelledby="new-tab"
+                aria-labelledby="tabNew"
                 tabindex="0"
             >
                 <p>Neuen GeoMarker anlegen</p>
@@ -87,23 +103,33 @@ export default {
             </div>
 
             <div
-                id="filterTabPane"
-                class="tab-pane fade show active"
+                id="tabFilterContent"
+                :class="[
+                    'tab-pane',
+                    'fade',
+                    geoMarkerActiveTab === 'tabFilter' ? 'show active' : ''
+                ]"
                 role="tabpanel"
-                aria-labelledby="filter-tab"
+                aria-labelledby="tabFilter"
                 tabindex="0"
             >
                 <p>Filter GeoMarker</p>
             </div>
 
             <div
-                id="listTabPane"
-                class="tab-pane fade"
+                id="tabListContent"
+                :class="[
+                    'tab-pane',
+                    'fade',
+                    geoMarkerActiveTab === 'tabList' ? 'show active' : ''
+                ]"
                 role="tabpanel"
-                aria-labelledby="list-tab"
+                aria-labelledby="tabList"
                 tabindex="0"
             >
-                <p>gefilterte GeoMarker auflisten</p>
+                <TabListContent
+                    :tab-active="geoMarkerActiveTab === 'tabList'"
+                />
             </div>
         </div>
     </div>

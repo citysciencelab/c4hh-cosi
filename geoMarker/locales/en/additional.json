@@ -3,7 +3,37 @@
         "geoMarker": {
             "name": "GeoMarker",
             "description": "Application for information used to maintain geospatial base data.",
-            "screenshotImage": "Screenshot"
+            "screenshotImage": "Screenshot",
+            "status": {
+                "offen": "open",
+                "inaktiv": "inactiv",
+                "geschlossen": "closed"
+            },
+            "tabs": {
+                "tabNew": {
+                    "label": "New"
+                },
+                "tabFilter": {
+                    "label": "Filter"
+                },
+                "tabList": {
+                    "label": "List"
+                }
+            },
+            "GeoMakerList": {
+                "tableNoData": "No GeoMarkers selected for display.",
+                "graphicalSelectTitle": "Select GeoMarker on map using",
+                "table": {
+                    "id": "ID",
+                    "quelle": "Source",
+                    "kategorie": "Category",
+                    "status": "State",
+                    "beschreibung": "Description",
+                    "zeitstempel": "Created",
+                    "aktion": "Show",
+                    "aktionButtonLabel": "GeoMarker details"
+                }
+            }
         }
     }
 }

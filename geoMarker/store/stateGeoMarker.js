@@ -10,6 +10,16 @@
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * @property {String[]} supportedDevices list of devices supported
  * @property {String[]} supportedMapModes list of map modes supported
+ * @property {Boolean} hasMouseMapInteractions If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
+ * @property {String} categoriesUrl URL pointing to the categories json
+ * @property {String} departmentsUrl URL pointing to the departments json
+ * @property {Object[]} categories List of category objects
+ * @property {Object[]} departments List of department objects
+ * @property {Object[]} geoMarkerFeatureList List of selected feature objects
+ * @property {String} geoMarkerWfsFeatureType Feature type of the corresponding WFS layers
+ * @property {String} geoMarkerWfsFeatureIdPrefix Feature IDs may contain a prefix, e.g. PREFIX_123.
+ * @property {null|Object} geoMarkerFeatureSelected Selected GeoMarker feature
+ * @property {String} geoMarkerActiveTab - Id of the current tab to be activated
  */
 
 const state = {
@@ -22,10 +32,16 @@ const state = {
     deactivateGFI: true,
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D"],
+    hasMouseMapInteractions: true,
     categoriesUrl: "",
     departmentsUrl: "",
     categories: [],
-    departments: []
+    departments: [],
+    geoMarkerWfsFeatureType: "geomarker",
+    geoMarkerWfsFeatureIdPrefix: "DE.HH.UP_GEOMARKER_",
+    geoMarkerFeatureList: [],
+    geoMarkerFeatureSelected: null,
+    geoMarkerActiveTab: "tabList"
 };
 
 export default state;

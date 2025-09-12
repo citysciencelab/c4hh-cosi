@@ -3,7 +3,37 @@
         "geoMarker": {
             "name": "GeoMarker",
             "description": "Anwendung für Informationen, die der Laufendhaltung der Geobasisdaten dienen.",
-            "screenshotImage": "Screenshot"
+            "screenshotImage": "Screenshot",
+            "status": {
+                "offen": "offen",
+                "inaktiv": "inaktiv",
+                "geschlossen": "geschlossen"
+            },
+            "tabs": {
+                "tabNew": {
+                    "label": "Neu"
+                },
+                "tabFilter": {
+                    "label": "Filter"
+                },
+                "tabList": {
+                    "label": "Liste"
+                }
+            },
+            "GeoMakerList": {
+                "tableNoData": "Keine GeoMarker zum Anzeigen ausgewählt.",
+                "graphicalSelectTitle": "Auswahl der GeoMarker in der Karte durch",
+                "table": {
+                    "id": "ID",
+                    "quelle": "Quelle",
+                    "kategorie": "Kategorie",
+                    "status": "Status",
+                    "beschreibung": "Beschreibung",
+                    "zeitstempel": "Erstellt",
+                    "aktion": "Zeigen",
+                    "aktionButtonLabel": "Details zum GeoMarker"
+                }
+            }
         }
     }
 }
