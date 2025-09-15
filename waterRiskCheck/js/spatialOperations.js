@@ -35,6 +35,10 @@ function intersect (features, feature2) {
     const intersected = [];
 
     features.forEach(feature => {
+        if (feature2 === null) {
+            return;
+        }
+
         const isIntersected = turfIntersect(turfFeatureCollection([feature, feature2]), {properties: feature.properties});
 
         if (isIntersected) {
@@ -54,6 +58,12 @@ function intersect (features, feature2) {
  * @returns {Object} The grouped features with the calculated values.
  */
 function calcArea (features, feature, property) {
+    if (feature === null) {
+        return Object.groupBy(features, (gFeature) => {
+            return gFeature.properties[property];
+        });
+    }
+
     const totalArea = turfArea(feature),
         groupedFeatures = Object.groupBy(features, (gFeature) => {
             return gFeature.properties[property];
