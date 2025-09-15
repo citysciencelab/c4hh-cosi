@@ -31,9 +31,23 @@ export default {
             else if (name === "Schwerverkehrsanteil am DTVw") {
                 return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek");
             }
+            else if (name === "Anmerkung") {
+                return "Anmerkung";
+            }
+            else if (name === "Erhebungsmethode") {
+                return "Erhebungsmethode";
+            }
 
             return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.constructionSiteInfluence");
 
+        },
+        /**
+         * Checks if the input string only contains numbers.
+         * @param {String} str input to inspect.
+         * @returns {Boolean} true if input only consists of numbers.
+         */
+        isAllNumbers (str) {
+            return (/^\d+$/).test(str);
         },
         /**
          * Returns the data in this. dataset for the given year.
@@ -48,7 +62,10 @@ export default {
                 contained = yearData[rowName] !== undefined;
 
             if (contained) {
-                return yearData[rowName].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                if (this.isAllNumbers(yearData[rowName])) {
+                    return yearData[rowName].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                }
+                return yearData[rowName].toString();
             }
             return "-";
         }
@@ -94,7 +111,7 @@ export default {
 <style lang="scss" scoped>
 .verkehrsstaerken-table {
         margin: 6px 15px 10px 12px;
-        overflow: auto;
+        overflow: visible;
         table {
             margin: 0;
             td,
@@ -110,5 +127,8 @@ export default {
              }
         }
 }
+.fixed-columns td {
+        max-width: 0;
+    }
 </style>
 

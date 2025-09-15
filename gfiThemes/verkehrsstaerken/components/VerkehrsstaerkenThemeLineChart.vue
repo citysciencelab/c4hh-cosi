@@ -116,7 +116,7 @@ export default {
          */
         createChartData: function (dataset, category) {
             const preparedDataset = this.prepareDataset(dataset, category),
-                hasConstructionSiteInfluence = dataset.filter(data => Object.prototype.hasOwnProperty.call(data, "Baustelleneinfluss")).length > 0,
+                hasConstructionSiteInfluence = dataset.some(data => data.Anmerkung),
                 chartData = {
                     labels: preparedDataset.labels,
                     datasets: [{

@@ -17,7 +17,7 @@
                         "HGVsPerWeek": "SV-Anteil am DTVw (%)",
                         "HGVsPerWeekTitle": "Schwerverkehrsanteil am DTVw",
                         "constructionSiteInfluence": "Baustelleneinfluss",
-                        "withConstructionSiteInfluence": "mit Baustelleneinfluss",
+                        "withConstructionSiteInfluence": "mit Anmerkung",
                         "category": "Kategorie",
                         "year": "Jahr"
                     }

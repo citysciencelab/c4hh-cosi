@@ -1,6 +1,6 @@
 <script>
 
-import {mapGetters} from "vuex";
+import {mapGetters, mapActions} from "vuex";
 import {createNewRowName, combineYearsData} from "../utils/helpers";
 import VerkehrsstaerkenThemeTable from "./VerkehrsstaerkenThemeTable.vue";
 import VerkehrsstaerkenThemeLineChart from "./VerkehrsstaerkenThemeLineChart.vue";
@@ -24,11 +24,14 @@ export default {
             activeTab: "table",
             years: [],
             rowNames: [],
-            dataset: []
+            dataset: [],
+            fullViewActivated: false
         };
     },
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
+        ...mapGetters(["isMobile"]),
+        ...mapGetters("Menu", ["currentSecondaryMenuWidth", "mainExpanded"]),
         gfiParams: function () {
             return this.feature.getTheme()?.params;
         },
@@ -51,12 +54,25 @@ export default {
                 this.dataset = [];
                 this.filterProperties();
             }
+        },
+        currentSecondaryMenuWidth: {
+            handler () {
+                if (this.fullViewActivated && this.currentSecondaryMenuWidth < 0.55) {
+                    this.fullView();
+                }
+            }
         }
     },
     mounted () {
         this.setContentStyle();
     },
+    unmounted () {
+        if (this.fullViewActivated) {
+            this.fullView(true);
+        }
+    },
     methods: {
+        ...mapActions("Menu", ["toggleMenu", "setCurrentMenuWidth"]),
         /**
          * Parses the mapped properties of gfi into several variables for the graphics and for the info tab.
          * @returns {void}
@@ -65,15 +81,17 @@ export default {
             const allProperties = this.feature.getMappedProperties(),
                 dataPerYear = [],
                 newRowNames = [],
-                parsedYears = [];
-
+                parsedYears = [],
+                Erhebungsmethode = [],
+                surveyMethodLabel = "Erhebungsmethode",
+                yearThreshold = new Date().getFullYear() - 10;
 
             Object.keys(allProperties).forEach(rowName => {
                 const year = parseInt(rowName.slice(-4), 10);
                 let newRowName,
                     yearData;
 
-                if (!isNaN(year)) {
+                if (!isNaN(year) && year >= yearThreshold) {
                     newRowName = createNewRowName(rowName, year);
                     yearData = {
                         year: year,
@@ -81,10 +99,18 @@ export default {
                         value: allProperties[rowName]
                     };
                     dataPerYear.push(yearData);
-                    newRowNames.push(newRowName);
+                    if (newRowName === surveyMethodLabel) {
+                        Erhebungsmethode.push(newRowName);
+                    }
+                    else {
+                        newRowNames.push(newRowName);
+                    }
                     parsedYears.push(year);
                 }
             });
+            if (Erhebungsmethode.length) {
+                newRowNames.push(surveyMethodLabel);
+            }
             this.years = [...new Set(parsedYears)].length > 10 ? [...new Set(parsedYears)].slice(Math.max([...new Set(parsedYears)].length - 10, 1)) : [...new Set(parsedYears)];
             this.rowNames = [...new Set(newRowNames)];
             this.dataset = combineYearsData(dataPerYear, this.years);
@@ -126,6 +152,48 @@ export default {
         onClick (evt) {
             evt.stopPropagation();
             window.open(this.downloadLink);
+        },
+        /**
+         * Expands table to fullscreen view, hides sorting elements, footer and layerPills to make space. Also enlarges the header row of the table on smaller screens.
+         * @param {boolean} unmounted True if leaving the gfiComponent by navigating back to menu or closing the secondary Menu
+         * @returns {void}
+         */
+        fullView (unmounted = false) {
+            const footer = document.getElementById("module-portal-footer"),
+                layerPills = document.getElementById("layer-pills");
+
+            if (this.fullViewActivated) {
+                if (!this.mainExpanded) {
+                    this.toggleMenu("mainMenu");
+                }
+                this.setCurrentMenuWidth({type: "secondaryMenu", attributes: {width: 25}});
+                if (!unmounted) {
+                    this.$refs["card-header"].classList.remove("text-center");
+                    this.$refs["card-header"].classList.add("mx-4");
+                }
+                if (layerPills) {
+                    layerPills.style.display = "";
+                }
+                if (footer) {
+                    footer.style.display = "";
+                }
+                this.fullViewActivated = false;
+            }
+            else if (!unmounted) {
+                if (this.mainExpanded) {
+                    this.toggleMenu("mainMenu");
+                }
+                if (layerPills) {
+                    layerPills.style.display = "none";
+                }
+                if (footer) {
+                    footer.style.display = "none";
+                }
+                this.setCurrentMenuWidth({type: "secondaryMenu", attributes: {width: 95}});
+                this.$refs["card-header"].classList.add("text-center");
+                this.$refs["card-header"].classList.remove("mx-4");
+                this.fullViewActivated = true;
+            }
         }
     }
 };
@@ -133,10 +201,13 @@ export default {
 
 <template>
     <div class="verkehrsstaerken">
-        <div class="card header">
-            <strong>{{ feature.getMappedProperties().Zählstelle +": "+feature.getMappedProperties().Bezeichnung }}</strong>
+        <div
+            ref="card-header"
+            class="card header mx-4"
+        >
+            <strong>{{ "Zählstelle: " + feature.getMappedProperties().Zählstelle }}</strong>
             <br>
-            <small>{{ $t("additional:modules.tools.gfi.themes.verkehrsstaerken.kind", {kind: feature.getMappedProperties().Art}) }}</small>
+            <strong>{{ "Bezeichnung: " + feature.getMappedProperties().Bezeichnung }}</strong>
         </div>
         <ul class="nav nav-pills">
             <li
@@ -169,6 +240,7 @@ export default {
         <div
             id="verkehrsstaerken-tab-content"
             class="tab-content"
+            :class="{ 'fixed-columns': fullViewActivated }"
         >
             <VerkehrsstaerkenThemeTable
                 v-if="isActiveTab('table')"
@@ -187,8 +259,18 @@ export default {
         </div>
         <div
             v-if="!isActiveTab('info')"
-            class="tab-pane downloadButton active"
+            class="tab-pane extraButtons active"
         >
+            <FlatButton
+                v-if="!isMobile"
+                id="gfi-view-full"
+                aria-label="$t('common:shared.modules.table.reset')"
+                :text="fullViewActivated ? $t('common:shared.modules.table.fullscreenViewActive') : $t('common:shared.modules.table.fullscreenView')"
+                :title="fullViewActivated ? $t('common:shared.modules.table.fullscreenViewActiveToolTip') : $t('common:shared.modules.table.fullscreenViewToolTip') "
+                :icon="'bi-fullscreen'"
+                :class="fullViewActivated ? 'active-Fullview me-3 rounded-pill' : 'me-3 rounded-pill'"
+                :interaction="() => fullView()"
+            />
             <FlatButton
                 id="download-btn"
                 aria-label="$t('additional:modules.tools.gfi.themes.verkehrsstaerken.download')"
@@ -201,10 +283,9 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+@import "~variables";
 
 .verkehrsstaerken {
-    overflow-x: auto;
-
     box-sizing: border-box;
     padding: 5px 20px 5px 20px;
     @media (max-width: 767px) {
@@ -219,15 +300,14 @@ export default {
         }
     }
     @media (min-width: 768px) {
-        width: 80vw;
+        min-width: 50vw;
         height: 60vh;
     }
     @media (min-width: 1024px) {
-        width: 50vw;
+        min-width: 50vw;
         height: 60vh;
     }
     .header{
-        text-align: center;
         margin-bottom: 20px;
     }
     .nav-pills {
@@ -239,8 +319,9 @@ export default {
         width: 100%;
         padding: 0 5px 5px 5px;
     }
-    .downloadButton{
+    .extraButtons{
          padding: 6px;
+         display: flex;
          button{
             outline: none;
          }
@@ -248,6 +329,11 @@ export default {
     .bootstrap-icon {
         padding-right: 5px;
     }
-
+    .active-Fullview {
+        background-color: $dark_blue;
+    }
+    .active-Fullview:hover {
+        background-color: $light_blue;
+    }
 }
 </style>

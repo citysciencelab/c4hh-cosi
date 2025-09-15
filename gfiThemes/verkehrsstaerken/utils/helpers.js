@@ -69,7 +69,7 @@ function parseData (data) {
                 parsedDataVal = parsedDataValue(dataVal),
                 parsedFloatVal = parseFloat(parsedDataVal);
 
-            if (dataAttr === "Baustelleneinfluss") {
+            if (dataAttr === "Anmerkung") {
                 parsedDataObj.class = "dot_visible";
                 parsedDataObj.style = "rect";
             }
