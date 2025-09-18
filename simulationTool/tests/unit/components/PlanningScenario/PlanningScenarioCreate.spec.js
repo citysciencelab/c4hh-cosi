@@ -68,7 +68,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                                     {
                                         id: "default",
                                         title: "Test Data Source",
-                                        maxSizeArea: 500000,
                                         maxSideLength: 1000
                                     }
                                 ],
@@ -221,8 +220,7 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
 
                     sinon.stub(wrapper.vm, "currentDataSource").get(() => ({
                         id: "default",
-                        title: "Test Data Source",
-                        maxSizeArea: 500000
+                        title: "Test Data Source"
                     }));
 
                     expect(wrapper.vm.maxSideLengthFromConfig).to.equal(450);

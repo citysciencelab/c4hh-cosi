@@ -57,11 +57,8 @@ export default {
         return {
             currentHightlightFeatureId: "",
             currentFeature: undefined,
-            /** Local sorted copy of itemList */
             sortedItemList: [],
-            /** Local edit buffer to avoid emitting on every keystroke */
             editBuffer: {},
-            /** Guard to avoid double-commit when 'Enter' key event triggers blur as well */
             skipNextBlur: new Set()
         };
     },
@@ -78,10 +75,10 @@ export default {
         }
     },
     watch: {
-    /**
-     * Sets the current highlight feature id according to the props.
-     * @param {(String|Number)} val - The highlight feature id from props.
-     */
+        /**
+         * Sets the current highlight feature id according to the props.
+         * @param {(String|Number)} val - The highlight feature id from props.
+         */
         highlightFeatureId (val) {
             this.currentHightlightFeatureId = val;
             this.scrollToHighlightFeature(val);

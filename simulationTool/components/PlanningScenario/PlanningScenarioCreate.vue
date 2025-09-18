@@ -371,12 +371,19 @@ export default {
             this.setCurrentPlanningScenarioId(this.currentScenarioData.id);
         },
 
-
+        /**
+         * Calculates the distance between two points.
+         * @param {Number[]} point1 The first point [x, y].
+         * @param {Number[]} point2 The second point [x, y].
+         * @param {Boolean} isMetric Whether the projection is metric.
+         * @returns {Number} The distance between the two points in meters.
+         */
         getDistanceBetweenPoints (point1, point2, isMetric) {
             return isMetric
                 ? Math.sqrt(Math.pow(point2[0] - point1[0], 2) + Math.pow(point2[1] - point1[1], 2))
                 : getDistance(point1, point2);
         },
+
         /**
          * Checks if bbox feature exceeds side length constraint.
          * @param {ol/Feature} bboxFeature The bbox feature to check.

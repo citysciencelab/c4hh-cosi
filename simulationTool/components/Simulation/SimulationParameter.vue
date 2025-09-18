@@ -423,11 +423,11 @@ export default {
         },
 
         /**
-         * Gets inputs based on menu type and filters.
-         * @param {String} menuType - The menu type to filter by ("primary", "advanced", etc.).
-         * @param {Boolean} includeObjectProperties - Whether to include object properties.
-         * @returns {Object} Filtered inputs based on criteria.
-         */
+     * Gets inputs based on menu type and filters.
+     * @param {String|null} [menuType=null] - The menu type to filter by ("primary", "advanced", etc.).
+     * @param {Boolean} [includeObjectProperties=true] - Whether to include object properties.
+     * @returns {Object} Filtered inputs based on criteria.
+     */
         getInputsByMenuType (menuType = null, includeObjectProperties = true) {
             const result = {};
 
@@ -702,6 +702,12 @@ export default {
             this.createRequestBodies();
         },
 
+        /**
+         * Recursively removes unwanted properties from an object.
+         * @param {Object|Array} obj - The object or array to process.
+         * @param {String[]} ignoreProperties - The properties to remove.
+         * @returns {Object|Array} The processed object or array.
+         */
         removeUnwantedProperty (obj, ignoreProperties = []) {
             if (!obj || typeof obj !== "object") {
                 return obj;
@@ -811,6 +817,7 @@ export default {
          * @param {String} inputKey the input key.
          * @param {String} propertyKey the property key.
          * @param {String} val the value.
+         * @param {Boolean} isEnum whether the input is an enum or not.
          * @returns {void}
          */
         setRequestBodyInput (inputKey, propertyKey, val, isEnum = false) {

@@ -20,7 +20,7 @@ Tool to simulate wind and noise.
 |----|-------------|---|-------|------------|------|
 |id|ja|String||The id of datasource.|true|
 |title|ja|String||The titel of datasource.|true|
-|maxSizeArea|ja|Number|450|the maximum size of selected area in meters.|true|
+|maxSideLength|ja|Number|450|The maximum allowed side lenght for the selected area in meters.|true|
 |inputs|yes|Object|Object|An object to set input parameter for datasources.|true|
 
 #### Portalconfig.menu.tool.simulationTool.simulations
@@ -65,7 +65,7 @@ Tool to simulate wind and noise.
 	{
 	  "id": "default",
 	  "title": "Gebäude und Straßen (für Lärm- und Windsimulation)",
-	  "maxSizeArea": 500000,
+	  "maxSideLength": 500,
 	  "inputs": {
 		"buildings": {
 		  "editable": true,
@@ -137,9 +137,9 @@ Tool to simulate wind and noise.
 		},
 		"building_grid_settings": {
 		  "menu": "primary",
-		  "primaryProperties": ["height_between_levels_3d", "receiver_distance", "receiver_height_2d"],
+	      "primaryProperties": ["height_between_levels_3d", "receiver_distance", "receiver_height_2d"],
 		  "propertiesMapping": {},
-      "ignoreProperties": ["join_receivers_by_xy_location_3d"]
+          "ignoreProperties": ["join_receivers_by_xy_location_3d"]
 		},
 		"dem_url": {
 		  "source": {

@@ -82,6 +82,10 @@ export default {
             "updateFeatures"
         ]),
 
+        /**
+         * Clears the planning scenario and infrastructure layers from the map.
+         * @returns {void}
+         */
         clearLayers () {
             if (typeof layerCollection.getLayerById("planning-scenario") !== "undefined") {
                 layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
@@ -115,6 +119,7 @@ export default {
         /**
          * Closes the currently opened simulation.
          * Resets the simulation ID and scenario ID.
+         * @param {String} simulationId - ID of the simulation to close.
          * @returns {void}
          */
         closeSimulation (simulationId) {
@@ -128,8 +133,8 @@ export default {
         /**
          * Scrolls a simulation entry into view with optional offset and positioning.
          * @param {String} simulationId - ID of the simulation to use as reference point for scrolling.
-         * @param {Boolean} shouldCenter - Whether to center the element (true) or position it at the top (false).
-         * @param {Number} offset - List element offset relative to the reference simulation.
+         * @param {Boolean} [shouldCenter=true] - Whether to center the element (true) or position it at the top (false).
+         * @param {Number} [offset=0] - List element offset relative to the reference simulation.
          * @returns {void}
          */
         scrollIntoView (simulationId, shouldCenter = true, offset = 0) {

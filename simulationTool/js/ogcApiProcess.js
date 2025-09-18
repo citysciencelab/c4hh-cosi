@@ -19,6 +19,7 @@ export default class OgcApiProcess {
 
     /**
     * Fetches the process description.
+    * @param {string} accessToken - The access token for authorization.
     * @throws {Error} If an error occurs while fetching the process description.
     * @returns {Promise<Object|undefined>} The process description or undefined if an error occurs.
     */
