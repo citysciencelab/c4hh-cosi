@@ -407,13 +407,14 @@ export default {
                     :class="idx === 0 ? 'flex-grow-1' : ''"
                 >
                     <label
-                        :for="'property-' + listKey + '-' + key + '-' + idx"
+                        :for="'property-' + listKey + '-' + key + '-' + idx + '-' + feature.getId()"
                         class="col-form-label me-3"
+                        @click.prevent
                     >
                         {{ getMappedProperty(key, propertiesMapping) }}
                     </label>
                     <input
-                        :id="'property-' + listKey + '-' + key + '-' + idx"
+                        :id="'property-' + listKey + '-' + key + '-' + idx + '-' + feature.getId()"
                         :type="typeof value === 'number' ? 'number' : 'text'"
                         class="form-control text-end w-50"
                         :value="getInputValue(feature, key, value)"
@@ -470,6 +471,7 @@ export default {
                         <label
                             :for="`${key}-${feature.getId()}`"
                             class="col-form-label"
+                            @click.prevent
                         >
                             <i
                                 v-if="feature.get(key) === undefined"
