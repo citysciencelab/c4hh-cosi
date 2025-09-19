@@ -297,7 +297,7 @@ export default {
             };
 
             responseData.forEach((element) => {
-                const date = dayjs(element.properties.datum).utc().locale(this.currentLocale),
+                const date = dayjs(element.properties.datum).utc(true).locale(this.currentLocale),
                     labelXAxis = this.selectedChartData === "hourly"
                         ? date.format("dd, DD.MM.YYYY") + ` ${element.properties.startuhrzeit}:00`
                         : date.format("dd, DD.MM.YYYY"),
