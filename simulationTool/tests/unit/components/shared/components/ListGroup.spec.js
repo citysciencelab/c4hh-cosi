@@ -132,8 +132,8 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
             });
 
             await nextTick();
-            expect(wrapper.find("label[for='property--cool-0']").exists()).to.be.true;
-            expect(wrapper.find("input[id='property--cool-0']").exists()).to.be.true;
+            expect(wrapper.find("label[for='property--cool-0-one']").exists()).to.be.true;
+            expect(wrapper.find("input[id='property--cool-0-one']").exists()).to.be.true;
         });
     });
 
