@@ -26,15 +26,10 @@ const state = {
     isochroneColors: undefined,
     mode: "point",
     coordinate: [],
-    clickCoordinate: null,
     selectedFacilityNames: [],
     selectedFacilities: [],
-    pointFacilityOrRoute: "point",
-    cardinality: "some",
-    selectedDirections: null,
     setByFeature: false,
     setBySearch: false,
-    useTravelTimeIndex: false,
     transportType: "driving-car",
     scaleUnit: "time",
     distance: 5,
@@ -47,8 +42,6 @@ const state = {
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/003accessibilityanalysis.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/003erreichbarkeitsanalyse.md"
     },
-    reportTemplateMode: null, // is tool open to edit a report template? null if not, integer with chapter index if yes
-    // these two variables are required to make this addon compatible with the toolBridge addon (for details see toolBridge documentation)
     progress: 0,
     batchSize: 50,
     serviceId: "bkg_ors",

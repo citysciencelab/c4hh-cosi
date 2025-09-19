@@ -9,8 +9,6 @@ import {
 import {default as turfBuffer} from "@turf/buffer";
 import GeoJSON from "ol/format/GeoJSON";
 import {transformFeatures} from "../../utils/features/transform";
-// import {getModelByAttributes} from "../../utils/radioBridge.js";
-// import {getRecordById} from "../../../../src/api/csw/getRecordById";
 import {filterAllFeatures} from "../../utils/layer/filterAllFeatures";
 import {styleIsochroneFeatures} from "../utils/styleIsochroneFeatures.js";
 import {simplify} from "../../utils/geometry/simplify";
@@ -26,7 +24,8 @@ export default {
      * @returns {void}
      */
     createIsochrones: async function () {
-        this.clear();
+        this.setSteps([0, 0, 0]);
+        this.setIsochroneFeatures([]);
 
 console.log(this.mode);
 
@@ -71,9 +70,9 @@ console.log(err);
      * @returns {void}
      */
     createIsochronesRegion: async function () {
-        const allActiveFeatures = filterAllFeatures.filterAllFeatures(this.selectedFacilityLayer, this.isFeatureActive),
+        const allActiveFeatures = filterAllFeatures(this.selectedLayer, this.isFeatureActive),
             coordinates = this.getCoordinates(allActiveFeatures, this.setByFeature),
-            {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this._useTravelTimeIndex, this.time);
+            {distance, maxDistance, steps} = getDistances(parseFloat(this.scaleUnitValue), this.useTravelTimeIndex, this.time);
 
         if (
             coordinates !== null &&
@@ -95,7 +94,6 @@ console.log(err);
             // TODO: get locale from store
             this.setSteps(steps);
             this.setIsochroneFeatures(features);
-            this.currentCoordinates = coordinates;
         }
         else {
             this.inputReminder();
@@ -108,7 +106,7 @@ console.log(err);
      */
     createIsochronesPoint: async function () {
         const
-            {distance, maxDistance, steps} = getDistances(parseFloat(this.distance), this._useTravelTimeIndex, this.time);
+            {distance, maxDistance, steps} = getDistances(parseFloat(this.scaleUnitValue), this.useTravelTimeIndex, this.time);
 
         if (
             this.coordinate.length > 0 &&
@@ -138,6 +136,9 @@ console.log(err);
         this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
 
         if (newFeatures.length === 0) {
+            this.allLayerConfigs.forEach(configg => {
+                configg.bboxGeometry = this.areaSelectorGeom || this.boundingGeometry;
+            });
             setBBoxToGeom(this, this.areaSelectorGeom || this.boundingGeometry, layerCollection.getLayers());
             return;
         }
@@ -153,9 +154,9 @@ console.log(err);
         let bufferFeatures;
         const
             featureType = "Erreichbarkeit entlang einer Route",
-            distance = parseFloat(this.distance) / 1000,
+            distance = parseFloat(this.scaleUnitValue) / 1000,
             steps = [distance, distance * 2 / 3, distance / 3],
-            coords = this.selectedDirections?.lineString
+            coords = this.routingDirections?.lineString
                 .map(pt => transformCoordinate(pt, this.projectionCode, "EPSG:4326")),
             lineString = turfLineString(coords),
             buffer = turfFeatureCollection(steps.map(dist => {
@@ -171,7 +172,7 @@ console.log(err);
             feature.set("unit", this.scaleUnit);
         });
 
-        this.setSteps(getSteps(parseFloat(this.distance)));
+        this.setSteps(getSteps(parseFloat(this.scaleUnitValue)));
         this.setIsochroneFeatures(bufferFeatures);
     },
 
@@ -225,6 +226,9 @@ console.log(err);
         const polygonGeometry = this.isochroneFeatures[this.isochroneFeatures.length === 4 ? 1 : 0].getGeometry(),
             geometryCollection = new GeometryCollection([polygonGeometry]);
 
+        this.allLayerConfigs.forEach(configg => {
+            configg.bboxGeometry = this.areaSelectorGeom || geometryCollection;
+        });
         setBBoxToGeom(this, geometryCollection, layerCollection.getLayers());
     },
 
@@ -233,51 +237,11 @@ console.log(err);
     * @returns {void}
     */
     resetIsochroneBBox () {
+        this.allLayerConfigs.forEach(configg => {
+            configg.bboxGeometry = this.areaSelectorGeom || this.boundingGeometry;
+        });
         setBBoxToGeom(this, this.areaSelectorGeom || this.boundingGeometry, layerCollection.getLayers());
     },
-    /**
-     * clears the component
-     * @returns {void}
-     */
-    clear: function () {
-        this.setSteps([0, 0, 0]);
-        this.setIsochroneFeatures([]);
-    },
-
-
-    /**
-     * Hides the current result without destroying it
-     * @param {Boolean} v - the current val of "hide"
-     * @returns {void}
-     */
-    hideResults (v) {
-        if (v) {
-            this.renderIsochrones([]);
-            if (this.mode === "point") {
-                this.removePointMarker();
-            }
-        }
-        else {
-            this.renderIsochrones(this._isochroneFeatures);
-            if (this.mode === "point") {
-                this.placingPointMarker(transformCoordinate(this.coordinate[0], "EPSG:4326", this.projectionCode));
-            }
-        }
-    },
-
-    // pull meta data for the dataset used for the analysis
-    // getMetadataSelectedData: async function () {
-    //     // first find out what layer we are working with
-    //     const selectedLayerModel = getModelByAttributes({
-    //             name: this.selectedFacilityNames[0],
-    //             type: "layer"
-    //         }),
-    //         // then get the matching metadata as promise
-    //         metadata = await getRecordById(selectedLayerModel.get("datasets")[0].csw_url, selectedLayerModel.get("datasets")[0].md_id);
-
-    //     return metadata;
-
-    // },
 
     getCoordinates: function (features, setByFeature) {
         if (Array.isArray(features) && features.length > 0) {

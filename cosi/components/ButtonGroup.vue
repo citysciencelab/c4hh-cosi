@@ -29,7 +29,6 @@ export default {
     },
     mounted () {
         this.precheckedIndex = this.getPrecheckedIndex(this.buttons, this.preCheckedValue);
-        console.log(this.group);
 
     },
     methods: {
@@ -44,7 +43,7 @@ export default {
                 return 0;
             }
 
-            const index = buttons.findIndex((button) => button?.name === precheckedValue);
+            const index = buttons.findIndex((button) => button?.value === precheckedValue);
 
             return index !== -1 ? index : 0;
         }

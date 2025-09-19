@@ -13,10 +13,9 @@ import mutations from "../store/mutationsAccessibilityAnalysis";
 import {downloadGeoJson, exportAsGeoJson} from "../utils/exportResults";
 import {Select} from "ol/interaction";
 import ToolInfo from "../../components/ToolInfo.vue";
-import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
-import {transformCoordinate} from "../utils/transformCoordinates";
+import {transformCoordinate, transformCoordinates} from "../utils/transformCoordinates";
 import TabBar from "../../components/TabBar.vue";
 import {simplify} from "../../utils/geometry/simplify";
 import {getFlatCoordinates} from "../../utils/geometry/getFlatCoordinates";
@@ -26,8 +25,10 @@ import SliderItem from "@shared/modules/slider/components/SliderItem.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
-import VectorLayer from "ol/layer/Vector.js";
+import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import {VAutocomplete} from "vuetify/components/VAutocomplete";
+import VectorLayer from "ol/layer/Vector.js";
+import WPS from "@shared/js/api/wps.js";
 
 export default {
     name: "AccessibilityAnalysis",
@@ -46,16 +47,35 @@ export default {
     },
     data () {
         return {
-            visibleVectorLayers: [],
-            supportedLayerTypes: ["WFS", "OAF", "GeoJSON"],
+            abortController: null,
+            activeMode: null,
+            availableModes: [
+                {
+                    type: "point",
+                    text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.points"),
+                    icon: "bi bi-geo-alt", title: "Erreichbarkeit ab einem Referenzpunkt",
+                    description: "Zeigt ein Gebiet an, welches von einem ausgewählten Punkt auf der Karte innerhalb einer festgelegten Entfernung erreichbar ist.",
+                    info: "Noch kein Punkt ausgewählt. Um einen Punkt zu setzen, bitte auf die Karte klicken!"
+                },
+                {
+                    type: "facility",
+                    text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.facilities"),
+                    icon: "bi bi-building",
+                    title: "Erreichbarkeit ab einer ausgewählten Einrichtung",
+                    description: "Zeigt ein Gebiet an, welches von einer ausgewählten Einrichtung auf der Karte  innerhalb einer festgelegten Entfernung erreichbar ist.",
+                    info: "Noch keine Einrichtung ausgewählt. Um eine Einrichtung zu wählen, bitte auf eine oder mehrere Einrichtungen in der Karte klicken!"
+                },
+                {
+                    type: "path",
+                    text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.referToPath"),
+                    icon: "bi bi-map",
+                    title: "Erreichbarkeit entlang einer Route",
+                    description: "Wenn Sie im Routing-Tool eine Route berechnet haben, können Sie hier die Erreichbarkeit entlang dieser Route analysieren.",
+                    info: "Noch keine Route berechnet. Um eine Route zu berechnen, bitte das Routing-Tool öffnen, Start- und Zielpunkt wählen und eine Route berechnen."
+                }
+            ],
             facilityNames: [],
             directionsLayer: null,
-            availableReferenceObjects: [
-                {type: "point", text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.points"), icon: "bi bi-geo-alt", title: "Erreichbarkeit ab einem Referenzpunkt", description: "Zeigt ein Gebiet an, welches von einem ausgewählten Punkt auf der Karte innerhalb einer festgelegten Entfernung erreichbar ist."},
-                {type: "facility", text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.facilities"), icon: "bi bi-building", title: "Erreichbarkeit ab einer ausgewählten Einrichtung", description: "Zeigt ein Gebiet an, welches von einer ausgewählten Einrichtung auf der Karte  innerhalb einer festgelegten Entfernung erreichbar ist."},
-                {type: "path", text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.referToPath"), icon: "bi bi-map", title: "Erreichbarkeit entlang einer Route", description: "Wenn Sie im Routing-Tool eine Route berechnet haben, können Sie hier die Erreichbarkeit entlang dieser Route analysieren."}
-            ],
-            activeReferenceObject: null,
             transportTypes: [
                 {
                     type: "driving-car",
@@ -80,20 +100,22 @@ export default {
             ],
             scaleUnits: [
                 {
-                    type: "time",
-                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits.time"),
-                    unit: "min",
+                    default: 20,
                     max: 180,
                     maxLabel: "180 min",
-                    minLabel: "0 min"
+                    minLabel: "0 min",
+                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits.time"),
+                    type: "time",
+                    unit: "min"
                 },
                 {
-                    type: "distance",
-                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits.distance"),
-                    unit: "m",
+                    default: 1000,
                     max: 10000,
                     maxLabel: "10.000 m",
-                    minLabel: "0 m"
+                    minLabel: "0 m",
+                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits.distance"),
+                    type: "distance",
+                    unit: "m"
                 }
             ],
             legendColors: [
@@ -102,228 +124,98 @@ export default {
                 "rgba(240, 0, 3, 0.6)",
                 "rgba(180, 165, 165, 0.8)"
             ],
-            abortController: null,
-            currentCoordinates: null,
-            hide: false,
-            facilityFeature: null,
             isAllFacilitiesChecked: false,
-            selectionCards: []
+            selectionCards: [],
+            useTravelTimeIndex: false,
+            mappedRoutingProfiles: {
+                "CAR": "Auto",
+                "HGV": "LKW",
+                "CYCLING": "Fahrrad",
+                "FOOT": "Fußweg",
+                "WHEELCHAIR": "Rollstuhl"
+            },
+            visibleVectorLayers: []
         };
     },
     computed: {
-        ...mapGetters(["restServiceById", "visibleSubjectDataLayerConfigs"]),
+        ...mapGetters(["allLayerConfigs", "restServiceById", "visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Language", ["currentLocale"]),
+        ...mapGetters("Maps", ["clickCoordinate", "getVisibleLayerList", "projectionCode"]),
         ...mapGetters("Modules/AccessibilityAnalysis", Object.keys(getters)),
-        ...mapGetters("Maps", ["projectionCode", "clickCoordinate", "getVisibleLayerList"]),
         ...mapGetters("Modules/DistrictSelector", ["boundingGeometry"]),
-        // ...mapGetters("Tools/FeaturesList", ["activeVectorLayerList", "isFeatureActive", "layerMapById"]),
-        // ...mapGetters("Tools/AreaSelector", {areaSelectorGeom: "geometry"}),
-        // ...mapGetters("Tools/SelectionManager", ["activeSelection"]),
-        // ...mapGetters("Tools/ScenarioBuilder", ["scenarioUpdated"]),
-        ...mapGetters("Modules/Routing/Directions", ["directionsRouteSource", "directionsRouteLayer", "routingDirections"]),
+        ...mapGetters("Modules/Routing/Directions", ["directionsRouteSource", "directionsRouteLayer", "routingDirections", "settings"]),
+        // ...mapGetters("Modules/FeaturesList", ["activeVectorLayerList", "isFeatureActive", "layerMapById"]),
+        // ...mapGetters("Modules/AreaSelector", {areaSelectorGeom: "geometry"}),
+        // ...mapGetters("Modules/SelectionManager", ["activeSelection"]),
+        // ...mapGetters("Modules/ScenarioBuilder", ["scenarioUpdated"]),
 
-        _mode: {
-            get () {
-                return this.mode;
-            },
-            set (v) {
-                this.setMode(v);
-            }
+        /**
+         * Checks if an analysis set is active.
+         * @returns {Boolean} True if an analysis set is active, false otherwise.
+         */
+        hasActiveSet () {
+            return this.activeSet !== null;
         },
-        _coordinate: {
-            get () {
-                return this.coordinate;
-            },
-            set (v) {
-                this.setCoordinate(v);
-            }
+
+        /**
+         * Returns the value of distance or time based on the selected scale unit.
+         * @returns {Number} The value of distance or time.
+         */
+        scaleUnitValue () {
+            return this.scaleUnit === "time" ? this.time : this.distance;
         },
-        _selectedFacilities: {
-            get () {
-                return this.selectedFacilities;
-            },
-            set (v) {
-                this.setSelectedFacilities(v);
-            }
-        },
-        _pointFacilityOrRoute: {
-            get () {
-                return this.pointFacilityOrRoute;
-            },
-            set (v) {
-                this.setPointFacilityOrRoute(v);
-            }
-        },
-        _cardinality: {
-            get () {
-                return this.cardinality;
-            },
-            set (v) {
-                this.setCardinality(v);
-            }
-        },
-        _setByFeature: {
-            get () {
-                return this.setByFeature;
-            },
-            set (v) {
-                this.setSetByFeature(v);
-            }
-        },
-        _transportType: {
-            get () {
-                return this.transportType;
-            },
-            set (v) {
-                this.setTransportType(v);
-            }
-        },
-        _scaleUnit: {
-            get () {
-                return this.scaleUnit;
-            },
-            set (v) {
-                this.setScaleUnit(v);
-            }
-        },
-        _selectedDirections: {
-            get () {
-                return this.selectedDirections;
-            },
-            set (v) {
-                this.setSelectedDirections(v);
-            }
-        },
-        _time: {
-            get () {
-                return this.time;
-            },
-            set (v) {
-                this.setTime(v);
-            }
-        },
-        _isochroneFeatures: {
-            get () {
-                return this.isochroneFeatures;
-            },
-            set (v) {
-                this.setIsochroneFeatures(v);
-            }
-        },
-        _useTravelTimeIndex: {
-            get () {
-                return this.transportType === "driving-car" && this.scaleUnit === "time" ? this.useTravelTimeIndex : false;
-            },
-            set (v) {
-                this.setUseTravelTimeIndex(v);
-            }
-        },
-        selectedFacilityLayer () {
-            return this.visibleVectorLayers.filter(layer => this.selectedFacilityNames.includes(layer.getLayer().get("name")));
+
+
+        /**
+         * Returns the selected layers based on the visible vector layers
+         * and the selected facility names.
+         * @returns {Array} - An array of layers that match the selected facility names.
+         */
+        selectedLayer () {
+            return this.visibleVectorLayers.filter(layer => {
+                return this.selectedFacilityNames.includes(layer.getLayer().get("name"));
+            });
         }
     },
     watch: {
-        // clickCoordinate () {
-        //     if (this.mode === "point") {
-        //         this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode);
-        //     }
-        // },
-        active () {
-            if (this.active) {
-                // onSearchbar(this.setSearchResultToOrigin);
-
-                if (this.mode === "path") {
-                    this.addLayer(this.directionsLayer);
-                }
-            }
-            else {
-                // offSearchbar(this.setSearchResultToOrigin);
-                this.removePointMarker();
-                this.select.getFeatures().clear();
-                this.facilityFeature = null;
-            }
-        },
-        activeSet (newValue, oldValue) {
-            console.log(newValue, oldValue);
-
-            if (!this.dataSets[newValue]) {
-                // this.removeAll();
-                // this.selectionCards = [];
+        /**
+         * Watches changes on the active set index. If the new index is valid, it updates the component's state.
+         * @param {Number} index - The new active set index.
+         * @returns {void}
+         */
+        activeSet (index) {
+            if (!this.dataSets[index]) {
                 return;
             }
-            this.facilityFeature = null;
 
-            for (const key in this.dataSets[newValue].inputs) {
-                this[key] = this.dataSets[newValue].inputs[key];
-            }
-            this.removePointMarker();
-            this.$nextTick(() => {
-                if (this.dataSets[newValue].inputs._mode === "point" || this.dataSets[newValue].inputs._mode === "facility") {
-                    for (const coordinate of this.dataSets[newValue].inputs._coordinate) {
-                        const icoord = transformCoordinate(coordinate, "EPSG:4326", this.projectionCode);
+            for (const key in this.dataSets[index].inputs) {
+                const computedProperty = this.$options.computed[key];
 
-                        icoord.keepPreviousMarker = true;
-                        this.placingPointMarker(icoord);
+                if (typeof computedProperty === "function") {
+                    const capName = key.charAt(0).toUpperCase() + key.slice(1);
+
+                    if (this.dataSets[index].inputs[key]) {
+                        this["set" + capName](this.dataSets[index].inputs[key]);
                     }
                 }
-            });
+                else {
+                    this[key] = this.dataSets[index].inputs[key];
+                }
+            }
 
-            this.selectionCards = this.dataSets[newValue].inputs.selectionCards;
+            if (this.dataSets[index].inputs.mode === "point" || this.dataSets[index].inputs.mode === "facility") {
+                this.setMarkerByCoordinates(this.selectionCards.map(card => card.coord25832));
+            }
 
-            this._isochroneFeatures = this.dataSets[newValue].results;
-            this.renderIsochrones(this._isochroneFeatures);
-            this.hide = false;
+            this.setIsochroneFeatures(this.dataSets[index].results);
+            this.renderIsochrones(this.isochroneFeatures);
         },
 
         // async scenarioUpdated () {
         //     await this.$nextTick();
         //     this.tryUpdateIsochrones();
         // },
-        pointFacilityOrRoute (value) {
-            console.log(value);
-
-            this.setMode(value);
-            if (value === "point") {
-                this.setCardinality("one");
-                this.updateUseTravelTimeIndex(true);
-            }
-            else if (value === "facility") {
-                this.setCardinality("one");
-                this.updateUseTravelTimeIndex(false);
-            }
-            else if (value === "path") {
-                this.setCardinality(null);
-                this.updateUseTravelTimeIndex(false);
-            }
-        },
-        cardinality (value) {
-            if (value === null) {
-                return;
-            }
-            if (value === "one") {
-                this.setCoordinate([]);
-                this.setSelectedFacilities([]);
-                this.removePointMarker();
-            }
-            if (this.pointFacilityOrRoute === "facility") {
-                if (value === "one") {
-                    this.setMode("facility");
-                }
-                else if (value === "some") {
-                    this.setMode("facility");
-                }
-                else if (value === "all") {
-                    this.setMode("region");
-                }
-            }
-        },
         mode () {
-            console.log(this.mode);
-
-            this.setCoordinate([]);
-            this.setSelectedFacilities([]);
-            this.removePointMarker();
-
             if (this.mode === "facility") {
                 this.addInteraction(this.select);
             }
@@ -336,49 +228,30 @@ export default {
             }
 
             if (this.mode === "path") {
-                this._scaleUnit = "distance";
-                this._transportType = "foot-walking";
-                layerCollection.addLayer(this.getDirectionLayer());
-                this._selectedDirections = this.routingDirections;
+                if (this.routingDirections === null) {
+                    return;
+                }
 
-                // this.addLayer(this.directionsLayer);
-                 const newCard = {
-                    coord25832: "clickCoordinate",
-                    coord4326: "transformCoordinate(clickCoordinate, mapProjectionCode)",
-                    icon: this.activeReferenceObject.icon,
-                    id: "lickCoordinate.toString()",
-                    text: this.activeReferenceObject.text,
-                    name: "featureName",
+                this.setScaleUnit("distance");
+                this.setTransportType("foot-walking");
+                layerCollection.addLayer(this.directionsLayer);
+
+                const newCard = {
+                    coord25832: "",
+                    coord4326: "",
+                    icon: this.activeMode.icon,
+                    id: this.routingDirections.bbox.toString(),
+                    text: "Berechnete Route",
+                    name: `Entfernung: ${this.routingDirections.distance} m | Zeit: ${this.routingDirections.duration} min | Verkehrsmittel: ${this.mappedRoutingProfiles[this.settings.speedProfile]}`,
                     layerName: "layerName"
                 };
 
-                this.selectionCards.push(newCard);
-                // this.addLayer(this.directionsLayer);
-            }
-            else {
-                // layerCollection.removeLayer(this.directionsLayer);
-                // this.removeLayerFromMap(this.directionsLayer);
+                this.selectionCards = [newCard];
             }
         },
-        setByFeature (val) {
-            this.setCoordinate([]);
-            this.setSelectedFacilities([]);
-            this.removePointMarker();
-            if (!this.facilityFeature) {
-                return;
-            }
-            if (val || this.facilityFeature.getGeometry().getType() === "Point") {
-                this.setCoordinateFromFeature(this.facilityFeature, this.projectionCode);
-            }
-            else {
-                this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode);
-            }
-        },
+
         visibleVectorLayers (newValues) {
             this.setFacilityNames(newValues);
-        },
-        routingDirections () {
-            this._selectedDirections = this.routingDirections;
         },
         selectedFacilityNames (newValue, oldValue) {
             if (this.mode !== "facility") {
@@ -387,24 +260,18 @@ export default {
             const difference = differenceJs(newValue, oldValue),
                 diff = differenceJs(oldValue, newValue);
 
-            // console.log(newValue);
-            // console.log(oldValue);
-            // console.log(difference);
-            // console.log(diff);
             if (diff.length) {
                 this.removeCardsByLayerName(diff[0]);
             }
             if (difference.length) {
                 const layer = this.visibleVectorLayers.find(layerr => layerr.getLayer().get("name") === difference[0]);
-               this.addCardsByLayerName(layer);
+
+                this.addCardsByLayer(layer);
             }
-              // if (Array.isArray(newValue) && newValue.length > 0) {
-            //     this.updateCurrentMetaData();
-            // }
         },
-        hide: "hideResults",
         /**
-         * Detects changes in visible Layers
+         * Detects changes in visible Layers.
+         *
          * @returns {void}
          */
         visibleSubjectDataLayerConfigs: {
@@ -420,7 +287,12 @@ export default {
     created () {
         this.visibleVectorLayers = this.getVisibleVectorLayers();
 
-        this.activeReferenceObject = this.availableReferenceObjects[0];
+        if (this.routingDirections) {
+            this.setActiveMode(this.getModeByType("path"));
+        }
+        else {
+            this.setActiveMode(this.availableModes[0]);
+        }
         this.setNonReactiveData();
     },
 
@@ -431,24 +303,29 @@ export default {
     mounted () {
         this.baseUrl = this.restServiceById(this.serviceId || this.fallbackServiceId).url + "/v2/";
 
-        this.applyTranslationKey(this.name);
-
         this.getLayerById("accessibility-analysis").getLayer().setVisible(true);
         this.getLayerById("accessibility-analysis").getLayer().setZIndex(10);
 
         this.directionsLayer = this.getLayerById("accessibility-directions");
-        // this.directionsLayer.setZIndex(10);
         this.directionsLayer.getLayer().setStyle(this.directionsRouteLayer.getStyleFunction());
         this.directionsLayer.getLayer().setSource(this.directionsRouteSource);
-        // this.removeLayerFromMap(this.directionsLayer);
 
         // onSearchbar(this.setSearchResultToOrigin);
         // onShowFeaturesById(this.tryUpdateIsochrones);
         // onShowAllFeatures(this.tryUpdateIsochrones);
         // onFeaturesLoaded(this.tryUpdateIsochrones);
 
+
+    },
+    unmounted () {
+        this.setMode(this.availableModes[0].type);
+        this.removeInteraction(this.select);
+        mapCollection.getMap("2D").removeEventListener("click", this.onMapClick);
+        this.removeAll();
+        this.setDefaults();
     },
     methods: {
+        ...mapActions("Maps", ["setCenter", "removeInteraction", "addInteraction"]),
         ...mapMutations("Modules/PopulationRequest", {
             setPopulationRequestGeometry: "setGeometry",
             setPopulationRequestActive: "setActive"
@@ -456,11 +333,10 @@ export default {
         ...mapMutations("Modules/AccessibilityAnalysis", Object.keys(mutations)),
         ...mapActions("Modules/AccessibilityAnalysis", ["getIsochrones"]),
         // ...mapActions("Tools/SelectionManager", ["addNewSelection"]),
-        ...mapActions("Maps", ["setCenter", "removeInteraction", "addInteraction", "addLayer", "registerListener", "unregisterListener"]),
         // ...mapMutations("Maps", ["removeLayerFromMap"]),
-        ...mapMutations("Tools/ReportTemplates", ["finishEditingToolSettings", "abortEditingToolSettings"]),
         ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "removePointMarkerFeature"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
+        ...mapActions("Modules/Routing/Directions", ["reset", "setRoutingDirections"]),
         ...methods,
 
         /**
@@ -485,8 +361,17 @@ export default {
             return layer;
         },
 
+        /**
+         * Returns all visible vector layers from the layer collection that are of supported types.
+         * Supported types include "WFS", "OAF", and "GeoJSON".
+         * @returns {Array} An array of visible vector layer objects.
+         */
         getVisibleVectorLayers () {
-            return layerCollection.getLayers().filter(layer => layer.getLayer() instanceof VectorLayer && layer?.attributes?.isNeverVisibleInTree !== true && this.supportedLayerTypes.includes(layer.get("typ")));
+            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON"];
+
+            return layerCollection.getLayers().filter(layer => {
+                return layer.getLayer() instanceof VectorLayer && layer?.attributes.visibility === true && layer?.attributes?.isNeverVisibleInTree !== true && supportedLayerTypes.includes(layer.get("typ"));
+            });
         },
 
         /**
@@ -500,19 +385,17 @@ export default {
             });
 
             this.registerSelectListener(this.select);
-            this.registerClickListener();
+            mapCollection.getMap("2D").addEventListener("click", this.onMapClick);
         },
 
         /**
          * Registers the listeners to keyboard events onkeydown and onkeyup
          * @returns {void}
          */
-        registerClickListener () {
-            mapCollection.getMap("2D").addEventListener("click", evt => {
-                if (this.mode === "point") {
-                    this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode, evt.originalEvent.shiftKey);
-                }
-            });
+        onMapClick (evt) {
+            if (this.mode === "point") {
+                this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode, evt.originalEvent.shiftKey);
+            }
         },
 
         /**
@@ -529,28 +412,31 @@ export default {
 
                 const selectedFeature = evt.selected[0],
                     layer = evt.target.getLayer(selectedFeature),
-                    // layerMap = this.layerMapById(layer.get("id")),
-                    unpackedFeature = unpackCluster(selectedFeature)[0];
-
-                const nut = layerCollection.getLayerById(layer.get("id"));
-
-                this.facilityFeature = unpackedFeature;
+                    unpackedFeature = unpackCluster(selectedFeature)[0],
+                    nut = layerCollection.getLayerById(layer.get("id"));
 
                 this.selectedFacilities.push(unpackedFeature);
 
+                let featName = layer.get("name");
 
-                if (this.mode === "facility") {
-                    let featName = layer.get("name");
-
-                    if (nut.attributes?.searchField?.length > 0) {
-                        featName = unpackedFeature.get(nut.attributes?.searchField[0]);
-                    }
-                    this.setCoordinateFromFeature(unpackedFeature, this.projectionCode, unpackedFeature.get(nut.attributes.searchField[0]), featName);
+                if (nut.attributes?.searchField?.length > 0) {
+                    featName = unpackedFeature.get(nut.attributes?.searchField[0]);
                 }
-                else {
-                    this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode, evt.mapBrowserEvent.originalEvent.shiftKey);
-                }
+                this.setCoordinateFromFeature(unpackedFeature, this.projectionCode, unpackedFeature.get(nut.attributes.searchField[0]), featName);
             });
+        },
+
+        /**
+         * Resets all options to default values.
+         * @returns {void}
+         */
+        setDefaults () {
+            this.useTravelTimeIndex = false;
+            this.isAllFacilitiesChecked = false;
+            this.setTransportType("driving-car");
+            this.setScaleUnit("time");
+            this.setTime(this.scaleUnits[0].default);
+            this.setDistance(this.scaleUnits[1].default);
         },
 
         /**
@@ -560,34 +446,34 @@ export default {
          * @returns {void}
          */
         setCoordinateFromClick: function (clickCoordinate, mapProjectionCode, featureName, layerName) {
-            // if (this.activeSet)
-            if (this.activeSet !== null) {
+            if (this.hasActiveSet) {
                 this.setActiveSet(null);
+                this.setDefaults();
                 this.removeAll();
                 this.selectionCards = [];
+            }
+            let coords;
+
+            if (this.setByFeature) {
+                coords = transformCoordinates(clickCoordinate, mapProjectionCode);
+                this.setMarkerByCoordinates(clickCoordinate);
+            }
+            else {
+                coords = transformCoordinate(clickCoordinate, mapProjectionCode);
+                this.setMarkerByCoordinates([clickCoordinate]);
             }
 
             const newCard = {
                 coord25832: clickCoordinate,
-                coord4326: transformCoordinate(clickCoordinate, mapProjectionCode),
-                icon: this.activeReferenceObject.icon,
+                coord4326: coords,
+                icon: this.activeMode.icon,
                 id: clickCoordinate.toString(),
-                text: this.activeReferenceObject.text,
+                text: this.activeMode.text,
                 name: featureName,
                 layerName: layerName
             };
 
             this.selectionCards.push(newCard);
-
-            // const coordinate = transformCoordinate(clickCoordinate, mapProjectionCode);
-
-            // this.setSetBySearch(false);
-
-                const markerCoord = [...clickCoordinate];
-
-                markerCoord.keepPreviousMarker = true;
-            this.placingPointMarker(markerCoord);
-            // }
         },
 
         /**
@@ -597,34 +483,39 @@ export default {
          * @returns {void}
          */
         setCoordinateFromFeature: function (feature, mapProjectionCode, featureName, layerName) {
-            const simplifiedGeom = simplify(feature.getGeometry()),
-                flatCoordinates = getFlatCoordinates(simplifiedGeom);
-                // transformedCoordinates = transformCoordinates(flatCoordinates, mapProjectionCode);
+            let simplifiedGeom;
 
-            // if (this.setByFeature || feature.getGeometry().getType() === "Point") {
-                flatCoordinates.forEach((coordinate, index) => {
+            if (feature.getGeometry().getType() === "Polygon" && !this.setByFeature) {
+                simplifiedGeom = simplify(feature.getGeometry().getInteriorPoint());
+            }
+            else {
+                simplifiedGeom = simplify(feature.getGeometry());
+            }
+
+            if (this.setByFeature) {
+                this.setCoordinateFromClick(getFlatCoordinates(simplifiedGeom), mapProjectionCode, featureName, layerName);
+            }
+            else {
+
+                getFlatCoordinates(simplifiedGeom).forEach((coordinate) => {
                     this.setCoordinateFromClick(coordinate, mapProjectionCode, featureName, layerName);
-                    // this.placingPointMarker(coordinate);
                 });
-            // }
-            // else {
-            // }
+            }
         },
 
-        downloadMap () {
-            exportMapView("Erreichbarkeitsanalyse_CoSI");
+        /**
+         * Sets a marker for each coordinate in the coordinates array.
+         * @param {Array} coordinates - Array of coordinates where markers should be placed.
+         * @returns {void}
+         */
+        setMarkerByCoordinates (coordinates) {
+            coordinates.forEach(coordinate => {
+                const markerCoord = [...coordinate];
+
+                markerCoord.keepPreviousMarker = true;
+                this.placingPointMarker(markerCoord);
+            });
         },
-
-        // tryUpdateIsochrones () {
-        //     if (this.mode === "region" && this.currentCoordinates && this.dataSets.length > 0) {
-        //         const allActiveFeatures = filterAllFeatures(this.selectedFacilityLayer.map(layer => layer.getLayer()), this.isFeatureActive),
-        //             newCoordinates = this.getCoordinates(allActiveFeatures, this.setByFeature);
-
-        //         if (!deepEqual(this.currentCoordinates.map(e=>[e[0], e[1]]), newCoordinates)) {
-        //             this.askUpdate = true;
-        //         }
-        //     }
-        // },
 
         /**
         * set facilityNames in model, trigger renderDropDownView
@@ -638,26 +529,23 @@ export default {
                 this.facilityNames.push(layer.getLayer().get("name"));
                 if (getLayerSource(layer.getLayer()).getFeatures().length > 0) {
                     if (this.isAllFacilitiesChecked) {
-                        this.addCardsByLayerName(layer);
+                        this.addCardsByLayer(layer);
                     }
                 }
                 else {
                     getLayerSource(layer.getLayer()).on("featuresloadend", () => {
                         if (layer.getLayer().getSource().getFeatures().length > 0) {
                             if (this.isAllFacilitiesChecked) {
-                                this.addCardsByLayerName(layer);
-                                console.log(123);
+                                this.addCardsByLayer(layer);
                             }
                         }
                     });
                 }
             });
+
             this.setSelectedFacilityNames(this.facilityNames);
         },
 
-        getDirectionsText: function (routingDirections) {
-            return `Route - ${routingDirections.distance} m, ${(routingDirections.duration / 60).toFixed(1)} min`;
-        },
         /**
         * closes this component and opens requestInhabitants component and executes makeRequest with the calculated geoJSON of this component
         * @returns {void}
@@ -670,8 +558,14 @@ export default {
             this.setPopulationRequestActive(true);
             this.setPopulationRequestGeometry(outerPolygon);
         },
+
+        getArrayDepth (array) {
+            if (!Array.isArray(array)) {
+                return 0; // Kein Array, also Tiefe 0
+            }
+            return 1 + Math.max(0, ...array.map(this.getArrayDepth));
+        },
         createAnalysisSet: async function () {
-            this.hide = false;
 
             const analysisSet = {
                 inputs: {},
@@ -681,48 +575,69 @@ export default {
 
             this.setCoordinate(this.selectionCards.map(card => card.coord4326));
 
+            if (this.getArrayDepth(this.coordinate) === 3) {
+                this.setCoordinate(this.coordinate.flat());
+            }
+
 
             await this.createIsochrones();
 
-            analysisSet.results = this._isochroneFeatures;
+            analysisSet.results = this.isochroneFeatures;
             analysisSet.inputs = {
                 // These lines have been changed back and forth so arguing my case for checking first if the value is undefined
                 // JSON.parse throws error on undefined
                 // So if the original variable is undefined, we don't copy undefined, but instead cause an error
-                _mode: this._mode ? JSON.parse(JSON.stringify(this._mode)) : undefined,
-                _coordinate: this._coordinate ? JSON.parse(JSON.stringify(this._coordinate)) : undefined,
+                mode: this.mode ? JSON.parse(JSON.stringify(this.mode)) : undefined,
+                coordinate: this.coordinate ? JSON.parse(JSON.stringify(this.coordinate)) : undefined,
                 selectedFacilityNames: this.selectedFacilityNames ? JSON.parse(JSON.stringify(this.selectedFacilityNames)) : undefined,
-                _selectedDirections: this._selectedDirections ? JSON.parse(JSON.stringify(this._selectedDirections)) : undefined,
-                _transportType: this._transportType ? JSON.parse(JSON.stringify(this._transportType)) : undefined,
-                _scaleUnit: this._scaleUnit ? JSON.parse(JSON.stringify(this._scaleUnit)) : undefined,
+                routingDirections: this.routingDirections ? JSON.parse(JSON.stringify(this.routingDirections)) : undefined,
+                transportType: this.transportType ? JSON.parse(JSON.stringify(this.transportType)) : undefined,
+                scaleUnit: this.scaleUnit ? JSON.parse(JSON.stringify(this.scaleUnit)) : undefined,
                 distance: this.distance ? JSON.parse(JSON.stringify(this.distance)) : undefined,
-                _time: this._time ? JSON.parse(JSON.stringify(this._time)) : undefined,
-                _useTravelTimeIndex: this._useTravelTimeIndex !== undefined ? JSON.parse(JSON.stringify(this._useTravelTimeIndex)) : undefined,
-                _setByFeature: this._setByFeature ? JSON.parse(JSON.stringify(this._setByFeature)) : undefined,
-                _steps: this._steps ? JSON.parse(JSON.stringify(this._steps)) : [],
-                _selectedFacility: this._selectedFacility ? this._selectedFacility : undefined,
-                _selectedFacilities: this._selectedFacilities ? this._selectedFacilities : undefined,
-                _pointFacilityOrRoute: this._pointFacilityOrRoute ? this._pointFacilityOrRoute : undefined,
-                _cardinality: this._cardinality ? this._cardinality : undefined,
-                selectionCards: this.selectionCards
+                time: this.time ? JSON.parse(JSON.stringify(this.time)) : undefined,
+                useTravelTimeIndex: this.useTravelTimeIndex !== undefined ? JSON.parse(JSON.stringify(this.useTravelTimeIndex)) : undefined,
+                setByFeature: this.setByFeature ? JSON.parse(JSON.stringify(this.setByFeature)) : undefined,
+                steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
+                selectedFacility: this.selectedFacility ? this.selectedFacility : undefined,
+                selectedFacilities: this.selectedFacilities ? this.selectedFacilities : undefined,
+                selectionCards: this.selectionCards,
+                isAllFacilitiesChecked: this.isAllFacilitiesChecked
             };
             this.dataSets.push(analysisSet);
-            // console.log(analysisSet);
-console.log(this.dataSets);
 
             this.setActiveSet(this.dataSets.length - 1);
 
             if (this.dataSets.length === 1) {
-                this.renderIsochrones(this._isochroneFeatures);
+                this.renderIsochrones(this.isochroneFeatures);
             }
             this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
-            this.setCoordinate([]);
-            // console.log(this.coordinate);
 
+            // console.log(this.coordinate);
+            const service = this.restServiceById("1001");
+
+            if (service === undefined) {
+                console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");
+            }
+            else {
+                // Beispiel: Transformiere die Koordinaten
+                const outerPolygon = geometryToGeoJson(this.isochroneFeatures[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
+
+                WPS.wpsRequest("1001", service.url, "einwohner_ermitteln.fmw", {
+                    "such_flaeche": JSON.stringify(outerPolygon)
+                }, this.handleResponsee.bind(this));
+            }
+            this.setCoordinate([]);
 
             // this line adds the accessibility analysis data selection to the selection manger
             // this does not seem to make much sense: the only reason to reproduce this would be to reproduce the accessibility analysis. However, since the accessibility analysis creates this selection on the fly, we need the previous selection for reproduction, not this one. this one is then recreated on the fly everytime the analysis is run. Leaving this in in case we want this for some reason down the line.
-            // this.addNewSelection({selection: analysisSet.results, source: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.title"), id: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes." + this._transportType) + ", " + this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits." + this._scaleUnit) + ", [...]"});
+            // this.addNewSelection({selection: analysisSet.results, source: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.title"), id: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes." + this._transportType) + ", " + this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits." + this.scaleUnit) + ", [...]"});
+        },
+        handleResponsee (resp) {
+            const parsedData = resp.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData.einwohner,
+                responseResult = JSON.parse(parsedData.ergebnis);
+
+            this.dataSets[this.activeSet].inputs.einwohner = responseResult.einwohner_fhh;
+
         },
         exportAsGeoJson,
         // pagination features
@@ -739,10 +654,10 @@ console.log(this.dataSets);
 
         },
         removeAll () {
-            // this.setDataSets([]);
             this.setCoordinate([]);
             this.setSelectedFacilities([]);
-            this.clear();
+            this.setSteps([0, 0, 0]);
+            this.setIsochroneFeatures([]);
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
             this.resetIsochroneBBox();
             this.removePointMarker();
@@ -760,43 +675,64 @@ console.log(this.dataSets);
         async updateAnalysisSet () {
             await this.createIsochrones();
 
-            this.dataSets[this.activeSet].results = this._isochroneFeatures;
+            this.dataSets[this.activeSet].results = this.isochroneFeatures;
             this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
 
-            this.renderIsochrones(this._isochroneFeatures);
+            this.renderIsochrones(this.isochroneFeatures);
         },
-        updateUseTravelTimeIndex (value) {
-            this.setUseTravelTimeIndex(value);
+
+        /**
+         * Sets the value of `useTravelTimeIndex`.
+         * @param {Boolean} value - True if travel time index should be used
+         * @returns {void}
+         */
+        setUseTravelTimeIndex (value) {
+            this.useTravelTimeIndex = value;
         },
+
         updateTime (value) {
-            this._time = value;
+            this.setTime(parseInt(value, 10));
         },
 
-        setActiveReferenceObject (obj) {
-            this.activeReferenceObject = obj;
-            this.setPointFacilityOrRoute(this.activeReferenceObject.type);
+        setActiveMode (obj) {
             this.selectionCards = [];
-            // console.log(this.activeReferenceObject);
-
+            this.activeMode = obj;
+            this.setMode(this.activeMode.type);
+            this.removeAll();
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+            }
         },
         toggleLevel (evt) {
-            this._scaleUnit = evt;
+            this.setActiveSet(null);
+            this.removeAll();
+            this.setScaleUnit(evt);
         },
         test (val) {
-            this._transportType = val;
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.removeAll();
+                this.selectionCards = [];
+            }
+            this.setTransportType(val);
         },
-        test2 (evt) {
-            this.setDistance(evt.target.value);
-        },
-
-        settSetByFeature (value) {
-
-            this._setByFeature = value;
+        updateDistance (distance) {
+            if (this.scaleUnit === "time") {
+                this.setTime(parseInt(distance, 10));
+            }
+            else {
+                this.setDistance(parseInt(distance, 10));
+            }
         },
 
         removeSelectionCard (cardToRemove) {
+            this.setActiveSet(null);
             this.removePointMarkerFeature(cardToRemove.coord25832);
             this.selectionCards = this.selectionCards.filter(card => !deepEqual(card, cardToRemove));
+            this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
+            if (this.mode === "path") {
+                this.reset();
+            }
         },
 
         getIconByTransportType (type) {
@@ -807,6 +743,12 @@ console.log(this.dataSets);
             return this.scaleUnits.find(s => s.type === type);
         },
 
+        /**
+         *
+         *
+         * @param set - analysis set
+         * @returns {Boolean} True if the given set is the active set, false otherwise.
+         */
         isSetActive (set) {
             return this.activeSet === this.dataSets.indexOf(set);
         },
@@ -822,30 +764,33 @@ console.log(this.dataSets);
 
             if (this.isAllFacilitiesChecked) {
                 this.setSelectedFacilityNames(this.facilityNames);
-                this.selectedFacilityLayer.forEach(layer => {
-                    this.addCardsByLayerName(layer);
+                this.selectedLayer.forEach(layer => {
+                    this.addCardsByLayer(layer);
                 });
             }
             else {
                 this.removeAllMarkerCards();
-                // this.setSelectedFacilityNames([]);
             }
         },
 
         updateActiveSet (set) {
-            this.setActiveReferenceObject(this.getAvaibleReferenceObjectByType(set.inputs._pointFacilityOrRoute));
-
             if (this.dataSets[this.dataSets.indexOf(set)] !== this.dataSets[this.activeSet]) {
+                this.setActiveMode(this.getModeByType(set.inputs.mode));
                 this.setActiveSet(this.dataSets.indexOf(set));
+                if (set.inputs.isAllFacilitiesChecked) {
+                    this.isAllFacilitiesChecked = true;
+                }
                 return;
             }
             this.setActiveSet(null);
+            this.setDefaults();
             this.removeAll();
             this.selectionCards = [];
+
         },
 
-        getAvaibleReferenceObjectByType (type) {
-            return this.availableReferenceObjects.find(obj => obj.type === type);
+        getModeByType (type) {
+            return this.availableModes.find(obj => obj.type === type);
         },
 
         removeCardsByLayerName (name) {
@@ -858,24 +803,19 @@ console.log(this.dataSets);
             this.selectionCards = this.selectionCards.filter(card => card.layerName !== name);
         },
 
-        addCardsByLayerName (layer) {
-            // const layer = this.visibleVectorLayers.find(layerr => layerr.getLayer().get("name") === name);
+        addCardsByLayer (layer) {
+            layer.getLayer().getSource().getFeatures().forEach(feature => {
+                const unpackedFeature = unpackCluster(feature);
 
-            if (layer) {
-                layer.getLayer().getSource().getFeatures().forEach(feature => {
-                    const unpackedFeature = unpackCluster(feature);
+                unpackedFeature.forEach(unfeat => {
+                    let featName = layer.getLayer().get("name");
 
-                    unpackedFeature.forEach(unfeat => {
-                        let featName = layer.getLayer().get("name");
-
-                        if (layer.attributes?.searchField?.length > 0) {
-                            featName = unfeat.get(layer.attributes?.searchField[0]);
-                        }
-                        this.setCoordinateFromFeature(unfeat, this.projectionCode, featName, layer.getLayer().get("name"));
-                    });
-
+                    if (layer.attributes?.searchField?.length > 0) {
+                        featName = unfeat.get(layer.attributes?.searchField[0]);
+                    }
+                    this.setCoordinateFromFeature(unfeat, this.projectionCode, featName, layer.getLayer().get("name"));
                 });
-            }
+            });
         }
     }
 };
@@ -896,18 +836,18 @@ console.log(this.dataSets);
         <hr class="mt-0">
         <TabBar
             class="mb-4"
-            :items="availableReferenceObjects"
-            :active-item="activeReferenceObject"
-            @change="setActiveReferenceObject"
+            :items="availableModes"
+            :active-item="activeMode"
+            @change="setActiveMode"
         />
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">
-                    Ausgewählte {{ activeReferenceObject.text }}
+                    Ausgewählte {{ activeMode.text }}
                 </h5>
             </div>
             <SwitchInput
-                v-if="mode === 'facility' && pointFacilityOrRoute === 'facility'"
+                v-if="mode === 'facility'"
                 :aria="'Alle Einrichtungen auswählen'"
                 :checked="isAllFacilitiesChecked"
                 :interaction="toggleAllFacilitiesChecked"
@@ -934,35 +874,52 @@ console.log(this.dataSets);
                 role="alert"
             >
                 <i class="bi bi-slash-circle me-4 fs-4" />
-                Noch kein Punkt ausgewählt. Um einen Punkt zu setzen, bitte auf die Karte klicken!
+                {{ activeMode.info }}
             </div>
-            <div v-for="card in selectionCards" class="card mb-3">
+            <div
+                v-for="card in selectionCards"
+                :key="card.id"
+                class="card mb-3"
+            >
                 <div class="card-body d-flex p-2 description">
-                    <div class="me-2 fs-3"><i :class="card.icon"></i></div>
-                    <div class="flex-grow-1">{{card.text}} <br>{{ card.name || card.coord25832.toString() }}</div>
-                    <button type="button" class="btn-close" aria-label="Close"
+                    <div class="me-2 fs-3">
+                        <i :class="card.icon" />
+                    </div>
+                    <div class="flex-grow-1">
+                        {{ card.text }}
+                        <br>
+                        {{ card.name || card.coord25832.toString() }}
+                    </div>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        aria-label="Close"
                         @click="removeSelectionCard(card)"
-                    ></button>
+                    />
                 </div>
             </div>
         </div>
-        <h5 class="mb-3">
-            Verkehrsmittel
-        </h5>
         <div
-            class="d-flex flex-row mb-4"
+            v-if="mode !== 'path'"
         >
-            <IconButton
-                v-for="type in transportTypes"
-                :key="type.type"
-                class="me-5"
-                :aria="'test'"
-                :icon="type.icon"
-                :title="type.name"
-                :interaction="() => test(type.type)"
-                :class-array="['btn-light', 'mb-0', type.type === _transportType ? 'active': '']"
-                :label="type.name"
-            />
+            <h5 class="mb-3">
+                Verkehrsmittel
+            </h5>
+            <div
+                class="d-flex flex-row mb-4"
+            >
+                <IconButton
+                    v-for="type in transportTypes"
+                    :key="type.type"
+                    class="me-5"
+                    :aria="'test'"
+                    :icon="type.icon"
+                    :title="type.name"
+                    :interaction="() => test(type.type)"
+                    :class-array="['btn-light', 'mb-0', type.type === transportType ? 'active': '']"
+                    :label="type.name"
+                />
+            </div>
         </div>
         <h5 class="mb-3">
             Berechnungsmethode
@@ -971,7 +928,7 @@ console.log(this.dataSets);
             v-if="mode !== 'path'"
             class="mb-3"
             :buttons="scaleUnits.map(card => ({name: card.name, value: card.type}))"
-            :pre-checked-value="_scaleUnit"
+            :pre-checked-value="scaleUnit"
             group="scaleUnits"
             @show-view="toggleLevel"
         />
@@ -980,46 +937,47 @@ console.log(this.dataSets);
                 <input
                     class="form-control form-control-sm fs-5"
                     id="exampleFormControlInput1"
-                    :value="distance"
-                    @input="setDistance($event)"
+                    :value="scaleUnit === 'time' ? time : distance"
+                    @input="updateDistance($event.target.value)"
                 >
             </div>
             <SliderItem
                 :id="'routing-slider-input'"
                 aria="test"
                 class="mb-1"
-                :value="distance"
+                :value="scaleUnit === 'time' ? time : distance"
                 :min="0"
-                :max="getScaleUnitByType(_scaleUnit).max"
-                :interaction="setDistance($event)"
+                :max="getScaleUnitByType(scaleUnit).max"
+                :interaction="event => updateDistance(event.target.value)"
             />
             <div class="d-flex justify-content-between value">
-                <span>0 {{ getScaleUnitByType(_scaleUnit).unit }}</span>
-                <span>{{ getScaleUnitByType(_scaleUnit).max }} {{ getScaleUnitByType(_scaleUnit).unit }}</span>
+                <span>0 {{ getScaleUnitByType(scaleUnit).unit }}</span>
+                <span>{{ getScaleUnitByType(scaleUnit).max }} {{ getScaleUnitByType(scaleUnit).unit }}</span>
             </div>
         </div>
         <SwitchInput
             v-if="mode === 'facility'"
+            :id="'featureOutline'"
             :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
-            :checked="_setByFeature"
-            :interaction="() => settSetByFeature(!_setByFeature)"
+            :checked="setByFeature"
+            :interaction="() => setSetByFeature(!setByFeature)"
             :label="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
             class="mb-3"
         />
         <div
-            v-if="_transportType === 'driving-car' && scaleUnit === 'time' && pointFacilityOrRoute === 'point'"
+            v-if="transportType === 'driving-car' && scaleUnit === 'time' && mode === 'point'"
             class="mb-3"
         >
             <SwitchInput
                 :id="'autoTrafficFlow'"
                 :aria="'Verkehrsfluss berücksichtigen'"
                 :checked="useTravelTimeIndex"
-                :interaction="() => updateUseTravelTimeIndex(!useTravelTimeIndex)"
+                :interaction="() => setUseTravelTimeIndex(!useTravelTimeIndex)"
                 :label="'Verkehrsfluss berücksichtigen'"
             />
             <AccessibilityAnalysisTrafficFlow
                 v-if="useTravelTimeIndex"
-                :time="_time"
+                :time="time"
                 @update:time="updateTime"
             />
         </div>
@@ -1041,15 +999,19 @@ console.log(this.dataSets);
             />
             <div v-for="set in dataSets" class="card mb-3 card-hover shadow-sm" :class="isSetActive(set) ? 'card-active' : ''" :key="set">
                 <div class="card-body d-flex p-0 description align-items-center" @click="updateActiveSet(set)">
-                    <div class="p-2 fs-1"><i :class="getIconByTransportType(set.inputs._transportType)"></i></div>
-                    <div class="p-2  flex-grow-1">{{ getScaleUnitByType(set.inputs._scaleUnit).name}} <br>
-                         <span class="fs-5 title">{{set.inputs._time}} {{getScaleUnitByType(set.inputs._scaleUnit).name === 'Zeit' ? 'Minuten' : 'Meter'}}</span>
+                    <div class="p-2 fs-1"><i :class="getIconByTransportType(set.inputs.transportType)"></i></div>
+                    <div class="p-2  flex-grow-1">{{ getScaleUnitByType(set.inputs.scaleUnit).name}} <br>
+                         <span class="fs-5 title">{{getScaleUnitByType(set.inputs.scaleUnit).name === 'Zeit' ? set.inputs.time : set.inputs.distance}} {{getScaleUnitByType(set.inputs.scaleUnit).name === 'Zeit' ? 'Minuten' : 'Meter'}}</span>
                            <br>
                         <span v-if="set.inputs.selectionCards.length === 1">
-                            <i :class="set.inputs.selectionCards[0].icon" class="me-2"></i>{{ set.inputs.selectionCards[0].text }} <span class="title">{{ set.inputs._coordinate[0].toString() }}</span>
+                            <i :class="set.inputs.selectionCards[0].icon" class="me-2"></i>{{ set.inputs.selectionCards[0].text }} <span class="title">{{ set.inputs.coordinate[0].toString() }}</span>
                         </span>
                         <span v-else>
                             <i :class="set.inputs.selectionCards[0].icon" class="me-2"></i>Mehrere {{ set.inputs.selectionCards[0].text }}
+                        </span>
+                        <br>
+                        <span>
+                            Einwohner: {{ set.inputs.einwohner }}
                         </span>
                         <br>
                     </div>

@@ -25,7 +25,7 @@ function updateSource (model, bboxGeometry, app) {
         delete source.listeners_.featuresloadend;
     }
 
-    source.refresh();
+
     if (bboxGeometry) {
         source.on("featuresloadend", function (evt) {
             if (model.attributes.renderer === "webgl") {
@@ -47,6 +47,7 @@ function updateSource (model, bboxGeometry, app) {
             }
         });
     }
+    source.refresh();
 }
 
 /**
