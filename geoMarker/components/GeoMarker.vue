@@ -18,22 +18,46 @@ export default {
         ...mapGetters("Modules/GeoMarker", [
             "categories",
             "departments",
-            "geoMarkerActiveTab"
-        ])
+            "geoMarkerActiveTab",
+            "geoMarkerEditLayerId"
+        ]),
+        ...mapGetters(["allLayerConfigs"])
+    },
+    watch: {
+        geoMarkerActiveTab (newValue) {
+            switch (newValue) {
+                case "tabNew":
+                    this.setMapInteraction("Point");
+                    break;
+                case "tabFilter":
+                    this.setMapInteraction(null);
+                    break;
+                case "tabList":
+                    this.setMapInteraction("update");
+                    break;
+                default:
+                    this.setMapInteraction(null);
+            }
+        }
     },
     async mounted () {
         await this.loadCategories();
         await this.loadDepartments();
 
+        const editLayerInformation = this.allLayerConfigs.filter(item => item.id === this.geoMarkerEditLayerId);
+
+        this.setLayerInformation(editLayerInformation);
         this.fullyLoaded = true;
     },
     methods: {
         ...mapMutations("Modules/GeoMarker", [
-            "setGeoMarkerActiveTab"
+            "setGeoMarkerActiveTab",
+            "setLayerInformation"
         ]),
         ...mapActions("Modules/GeoMarker", [
             "loadCategories",
-            "loadDepartments"
+            "loadDepartments",
+            "setMapInteraction"
         ]),
         setCurrentTab (tab) {
             this.setGeoMarkerActiveTab(tab);

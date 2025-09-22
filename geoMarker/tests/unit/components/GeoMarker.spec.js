@@ -1,7 +1,9 @@
 import {config, shallowMount} from "@vue/test-utils";
+import sinon from "sinon";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import GeoMarker from "../../../components/GeoMarker.vue";
+
 
 config.global.mocks.$t = key => key;
 
@@ -23,10 +25,16 @@ describe("addons/geoMarker/components/GeoMarker.vue", () => {
                             actions: {
                                 loadCategories: () => [],
                                 loadDepartments: () => []
+                            },
+                            mutations: {
+                                setLayerInformation: sinon.stub()
                             }
                         }
                     }
                 }
+            },
+            getters: {
+                allLayerConfigs: () => []
             }
         });
     });

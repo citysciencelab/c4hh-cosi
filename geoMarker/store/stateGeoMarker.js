@@ -20,6 +20,10 @@
  * @property {String} geoMarkerWfsFeatureIdPrefix Feature IDs may contain a prefix, e.g. PREFIX_123.
  * @property {null|Object} geoMarkerFeatureSelected Selected GeoMarker feature
  * @property {String} geoMarkerActiveTab - Id of the current tab to be activated
+ * @property {TransactionLayer[]} layerInformation Information about the WFS-T layer used for editing configured for the tool.
+ * @property {Feature} newGeoMarkerFeature The newly created GeoMarker feature
+ * @property {String} geoMarkerEditLayerId The id of the layer where the drawn features are stored
+ * @property {String} selectedInteraction Which map interaction is currently active, if any.
  */
 
 const state = {
@@ -41,7 +45,13 @@ const state = {
     geoMarkerWfsFeatureIdPrefix: "DE.HH.UP_GEOMARKER_",
     geoMarkerFeatureList: [],
     geoMarkerFeatureSelected: null,
-    geoMarkerActiveTab: "tabList"
+    geoMarkerActiveTab: "tabList",
+    // map interactions
+    layerInformation: [],
+    newGeoMarkerFeature: null,
+    geoMarkerEditLayerId: "geomarker_edit",
+    selectedInteraction: null
+
 };
 
 export default state;
