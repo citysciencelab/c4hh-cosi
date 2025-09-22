@@ -31,6 +31,12 @@
                     "zeitstempel": "Erstellt",
                     "aktion": "Zeigen",
                     "aktionButtonLabel": "Details zum GeoMarker"
+                },
+                "button": {
+                    "openVcOblique": "Schrägluftbilder öffnen",
+                    "openPanorama": " 360° Panorama öffnen",
+                    "centerMapOnGeoMarker": "Karte auf GeoMarker zentrieren",
+                    "zoomToGeoMarker": "Auf GeoMarker zoomen"
                 }
             },
             "filter": {

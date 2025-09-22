@@ -1,5 +1,5 @@
 <script>
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {formatDateTime} from "../../utils/dateHelpers";
 import SelectableList from "../SelectableList.vue";
@@ -23,6 +23,11 @@ export default {
             "geoMarkerFeatureSelected",
             "geoMarkerWfsFeatureType"
         ]),
+        ...mapGetters("Menu", [
+            "currentMenuWidth",
+            "expanded"
+        ]),
+        ...mapGetters(["restServiceById"]),
         tableData () {
             return {
                 headers: [
@@ -76,6 +81,21 @@ export default {
                     };
                 })
             };
+        },
+        countGeoMarker () {
+            return this.geoMarkerFeatureList?.length + " " + this.$t("additional:modules.geoMarker.filter.countGeoMarker");
+        }
+    },
+    watch: {
+        geoMarkerFeatureSelected (feature) {
+            if (feature) {
+                this.removePointMarker();
+            }
+
+            this.placingPointMarker(feature?.getGeometry().getCoordinates());
+        },
+        geoMarkerFeatureList () {
+            this.removePointMarker();
         }
     },
     methods: {
@@ -83,6 +103,9 @@ export default {
             "setGeoMarkerFeatureList",
             "setGeoMarkerFeatureSelected"
         ]),
+        ...mapMutations("Menu", ["setExpandedBySide"]),
+        ...mapActions("Menu", ["changeCurrentComponent"]),
+        ...mapActions("Maps", ["setCenter", "setZoom", "placingPointMarker", "removePointMarker"]),
         setSelectedFeature (item) {
             this.setGeoMarkerFeatureSelected(
                 this.geoMarkerFeatureList.find(feature => feature.getId() === item.featureId)
@@ -94,6 +117,57 @@ export default {
             this.setGeoMarkerFeatureSelected(null);
 
             this.selectedListItemId = null;
+        },
+        openVcOblique () {
+            const vcObliqueLink = this.restServiceById("oblique").url,
+                geometry = this.geoMarkerFeatureSelected
+                    ? this.geoMarkerFeatureSelected.getGeometry().clone()
+                    : null,
+                referenceSystem = mapCollection.getMapView("2D").getProjection().getCode(),
+                transformedCoordinates = geometry?.transform(referenceSystem, "EPSG:4326").getCoordinates(),
+                useUrl = geometry
+                    ? `${vcObliqueLink}?lang=de&groundPosition=${transformedCoordinates[0]},${transformedCoordinates[1]}&distance=250#`
+                    : vcObliqueLink;
+
+            window.open(useUrl, "_blank");
+        },
+        centerVisibleMap () {
+            if (this.geoMarkerFeatureSelected) {
+                const coordinates = this.geoMarkerFeatureSelected.getGeometry().getCoordinates(),
+                    map = mapCollection.getMap("2D"),
+                    pixelAtCoordinates = map?.getPixelFromCoordinate(coordinates),
+                    rightPadding = this.expanded("secondaryMenu")
+                        ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
+                        : 20,
+                    leftPadding = this.expanded("mainMenu")
+                        ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
+                        : 20,
+                    offset = (rightPadding - leftPadding) / 2,
+                    shiftedPixelX = [pixelAtCoordinates[0] + offset, pixelAtCoordinates[1]],
+                    shiftedCoordinate = map.getCoordinateFromPixel(shiftedPixelX);
+
+                this.setCenter(shiftedCoordinate);
+            }
+        },
+        zoomToGeoMarker () {
+            if (this.geoMarkerFeatureSelected) {
+                const map = mapCollection.getMap("2D"),
+                    view = map.getView(),
+                    setZoom = 8;
+
+                if (view.getZoom() === setZoom) {
+                    this.centerVisibleMap();
+                }
+                else {
+                    const onMoveEnd = () => {
+                        this.centerVisibleMap();
+                        map.un("moveend", onMoveEnd);
+                    };
+
+                    map.on("moveend", onMoveEnd);
+                    view.setZoom(setZoom);
+                }
+            }
         }
     }
 };
@@ -104,6 +178,10 @@ export default {
         id="tabListContent"
         class="tabListContent"
     >
+        <p v-if="geoMarkerFeatureList.length">
+            {{ countGeoMarker }}
+        </p>
+
         <template v-if="tableData.items?.length">
             <SelectableList
                 :selected-item-id="selectedListItemId"
@@ -118,28 +196,46 @@ export default {
                     />
                 </template>
             </SelectableList>
-
-            <!-- START DEMO ONLY -->
-            <div v-if="geoMarkerFeatureSelected">
-                <p>
-                    Selected GeoMarker: {{ geoMarkerFeatureSelected.getId() }}
-                </p>
-
-                <button @click="resetSelectedFeature">
-                    (DEMO) Selektion in Liste zurücksetzen
-                </button>
-            </div>
-            <!-- END DEMO ONLY -->
         </template>
 
         <div v-else>
             {{ $t("additional:modules.geoMarker.GeoMakerList.tableNoData") }}
+        </div>
+
+        <div class="listActionButtons">
+            <IconButton
+                :class-array="['btn-light', 'me-2', 'listAction']"
+                :aria="$t('additional:modules.geoMarker.GeoMakerList.button.zoomToGeoMarker')"
+                icon="bi-zoom-in"
+                :disabled="!geoMarkerFeatureSelected"
+                @click="zoomToGeoMarker()"
+            />
+
+            <IconButton
+                :class-array="['btn-light', 'me-2', 'listAction']"
+                :aria="$t('additional:modules.geoMarker.GeoMakerList.button.centerMapOnGeoMarker')"
+                icon="bi-crosshair"
+                :disabled="!geoMarkerFeatureSelected"
+                @click="centerVisibleMap()"
+            />
+
+            <IconButton
+                :class-array="['btn-light', 'me-2', 'listAction']"
+                :aria="$t('additional:modules.geoMarker.GeoMakerList.button.openVcOblique')"
+                icon="bi-image"
+                @click="openVcOblique()"
+            />
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .tabListContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: auto;
+
     :deep(div.selectableList) {
         max-height: 25rem;
         min-height: auto;
@@ -149,6 +245,13 @@ export default {
         z-index: initial;
         outline: revert;
         margin: 0 auto;
+    }
+
+    div.listActionButtons {
+        display: flex;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
     }
 }
 </style>

@@ -188,6 +188,15 @@ div#geoMarker {
             overflow: hidden;
             height: 100%;
         }
+
+        div#tabListContent.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+            overflow: hidden;
+            height: 100%;
+        }
     }
 }
 </style>
