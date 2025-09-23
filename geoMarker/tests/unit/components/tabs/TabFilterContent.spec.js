@@ -27,7 +27,8 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                 from: "",
                 to: ""
             }
-        };
+        },
+        origWindow;
 
     const mockFeatureA = {
             get: (key) => {
@@ -135,6 +136,17 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                             }
                         }
                     }
+                },
+                Menu: {
+                    namespaced: true,
+                    getters: {
+                        expanded: () => (side) => {
+                            return side === "secondaryMenu";
+                        },
+                        currentMenuWidth: () => (side) => {
+                            return side === "secondaryMenu" ? "40%" : "25%";
+                        }
+                    }
                 }
             },
             actions: {
@@ -145,6 +157,8 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
         });
 
     beforeEach(() => {
+        origWindow = global.window;
+
         wrapper = shallowMount(TabFilterContent, {
             global: {
                 plugins: [store]
@@ -158,11 +172,12 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
     });
 
     afterEach(() => {
+        global.window = origWindow;
+
         if (wrapper) {
             wrapper.unmount();
         }
     });
-
 
     it("should exist and have the correct id", () => {
         expect(wrapper.exists()).to.be.true;
@@ -176,6 +191,8 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
     });
 
     it("should compute options correctly", () => {
+        global.window = {innerWidth: 1920};
+
         expect(wrapper.vm.categoryOptions).to.be.an("array");
         expect(wrapper.vm.categoryOptions).to.have.lengthOf(3);
         expect(wrapper.vm.categoryOptions[0].key).to.be.equal("allgemeines");
@@ -190,6 +207,8 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
         expect(wrapper.vm.statusAllOrOpen).to.be.true;
         expect(wrapper.vm.statusAllOrInactive).to.be.false;
         expect(wrapper.vm.statusAllOrClosed).to.be.false;
+
+        expect(wrapper.vm.mapZoomToExtentPadding).to.deep.equal([20, 768, 20, 20]);
     });
 
     it("should filter dates correctly", () => {

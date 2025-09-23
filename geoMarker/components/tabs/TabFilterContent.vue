@@ -47,6 +47,10 @@ export default {
             "departments",
             "initialLoading"
         ]),
+        ...mapGetters("Menu", [
+            "currentMenuWidth",
+            "expanded"
+        ]),
         /**
          * Returns the category options for the filter dropdown.
          * Converts the categories object into an array of objects with key and label.
@@ -98,6 +102,22 @@ export default {
         statusAllOrClosed () {
             return this.filterSelections.statusSelected.length === 0 ||
                    this.filterSelections.statusSelected.includes("geschlossen");
+        },
+        /**
+         * Checks if the menu sides are open or closed and
+         * calculates the padding for the zoomToExtent function, depending on the opening state
+         * @returns {Number[]} Padding values for an extent, fitting inbetween the menu sides.
+         */
+        mapZoomToExtentPadding () {
+            const
+                rightPadding = this.expanded("secondaryMenu")
+                    ? window.innerWidth * Number.parseInt(this.currentMenuWidth("secondaryMenu"), 10) / 100
+                    : 20,
+                leftPadding = this.expanded("mainMenu")
+                    ? window.innerWidth * Number.parseInt(this.currentMenuWidth("mainMenu"), 10) / 100
+                    : 20;
+
+            return [20, rightPadding, 20, leftPadding];
         }
     },
     watch: {
@@ -164,7 +184,7 @@ export default {
                 store.dispatch("Maps/zoomToExtent", {
                     extent: bbox,
                     options: {
-                        padding: [20, 20, 20, 20]
+                        padding: this.mapZoomToExtentPadding
                     }
                 });
             }
