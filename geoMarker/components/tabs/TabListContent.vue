@@ -1,17 +1,17 @@
 <script>
 import {mapGetters, mapMutations} from "vuex";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-import GraphicalSelect from "@shared/modules/graphicalSelect/components/GraphicalSelect.vue";
+// import GraphicalSelect from "@shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import {formatDateTime} from "../../utils/dateHelpers";
 import SelectableList from "../SelectableList.vue";
-import {GeoJSON} from "ol/format";
+// import {GeoJSON} from "ol/format";
 
 export default {
     name: "TabListContent",
     components: {
         IconButton,
-        SelectableList,
-        GraphicalSelect
+        SelectableList
+        // GraphicalSelect
     },
     props: {
         tabActive: {
@@ -22,11 +22,11 @@ export default {
     },
     data () {
         return {
-            selectedListItemId: null,
-            drawOptions: {
+            selectedListItemId: null
+            /* drawOptions: {
                 "Box": this.$t("common:shared.modules.graphicalSelect.selectBySquare"),
                 "Polygon": this.$t("common:shared.modules.graphicalSelect.selectByPolygon")
-            }
+            }*/
         };
     },
     computed: {
@@ -37,9 +37,9 @@ export default {
             "geoMarkerFeatureSelected",
             "geoMarkerWfsFeatureType"
         ]),
-        ...mapGetters("Modules/GraphicalSelect", [
+        /* ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
-        ]),
+        ]),*/
         tableData () {
             return {
                 headers: [
@@ -95,7 +95,7 @@ export default {
             };
         }
     },
-    watch: {
+    /* watch: {
         tabActive: {
             immediate: true,
             handler (state) {
@@ -136,7 +136,7 @@ export default {
 
             this.setGeoMarkerFeatureList(Array.from(featureMap.values()));
         }
-    },
+    },*/
     methods: {
         ...mapMutations("Modules/GeoMarker", [
             "setGeoMarkerFeatureList",
@@ -163,12 +163,12 @@ export default {
         id="tabListContent"
         class="tabListContent"
     >
-        <GraphicalSelect
+        <!--GraphicalSelect
             v-if="tabActive"
             ref="graphicalSelection"
             :options="drawOptions"
             :label="'additional:modules.geoMarker.GeoMakerList.graphicalSelectTitle'"
-        />
+        /-->
 
         <template v-if="tableData.items?.length">
             <SelectableList

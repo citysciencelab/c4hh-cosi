@@ -41,13 +41,13 @@ describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
                                 geoMarkerFeatureSelected: () => mockFeature,
                                 geoMarkerShortFeatureId: () => () => "feature-1"
                             }
-                        },
+                        } /* ,
                         GraphicalSelect: {
                             namespaced: true,
                             getters: {
                                 selectedAreaGeoJson: () => null
                             }
-                        }
+                        }*/
                     }
                 }
             }
@@ -78,7 +78,7 @@ describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
             }
         });
 
-        expect(wrapper.find("graphical-select-stub").exists()).to.true;
+        // expect(wrapper.find("graphical-select-stub").exists()).to.true;
         expect(wrapper.find("selectable-list-stub").exists()).to.true;
     });
 
