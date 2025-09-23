@@ -22,7 +22,6 @@
             },
             "GeoMakerList": {
                 "tableNoData": "No GeoMarkers selected for display.",
-                "graphicalSelectTitle": "Select GeoMarker on map using",
                 "table": {
                     "id": "ID",
                     "quelle": "Source",
@@ -36,6 +35,12 @@
             },
             "filter": {
                 "countGeoMarker": "GeoMarker",
+                "graphicalSelect": {
+                  "title": "Select GeoMarker on map using",
+                  "filterButtonTitle": "Spatial filter",
+                  "filterButtonActiveTitle": "Spatial filter active",
+                  "filterButtonResetTitle": "Reset spatial filter"
+                },
                 "departments": {
                   "label": "Department(s)",
                   "placeholder": "Select department(s)"

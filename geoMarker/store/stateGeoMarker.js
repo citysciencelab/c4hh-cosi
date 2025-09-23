@@ -75,7 +75,8 @@ const state = {
         reminderDate: {
             from: "",
             to: ""
-        }
+        },
+        geom: null
     },
     initialLoading: true
 };

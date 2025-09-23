@@ -1,5 +1,4 @@
 import {config, shallowMount} from "@vue/test-utils";
-import {Polygon} from "ol/geom";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import TabListContent from "../../../../components/tabs/TabListContent.vue";
@@ -12,7 +11,6 @@ describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
 
     const mockFeature = {
         getProperties: () => ({
-            geom: new Polygon([[[0, 0], [1, 0], [1, 1], [0, 0]]]),
             quelle: "source",
             kategorie: "category",
             beschreibung: "description",
@@ -41,13 +39,7 @@ describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
                                 geoMarkerFeatureSelected: () => mockFeature,
                                 geoMarkerShortFeatureId: () => () => "feature-1"
                             }
-                        } /* ,
-                        GraphicalSelect: {
-                            namespaced: true,
-                            getters: {
-                                selectedAreaGeoJson: () => null
-                            }
-                        }*/
+                        }
                     }
                 }
             }
@@ -78,7 +70,6 @@ describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
             }
         });
 
-        // expect(wrapper.find("graphical-select-stub").exists()).to.true;
         expect(wrapper.find("selectable-list-stub").exists()).to.true;
     });
 

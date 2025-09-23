@@ -1,32 +1,18 @@
 <script>
 import {mapGetters, mapMutations} from "vuex";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-// import GraphicalSelect from "@shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import {formatDateTime} from "../../utils/dateHelpers";
 import SelectableList from "../SelectableList.vue";
-// import {GeoJSON} from "ol/format";
 
 export default {
     name: "TabListContent",
     components: {
         IconButton,
         SelectableList
-        // GraphicalSelect
-    },
-    props: {
-        tabActive: {
-            type: Boolean,
-            required: true,
-            default: false
-        }
     },
     data () {
         return {
             selectedListItemId: null
-            /* drawOptions: {
-                "Box": this.$t("common:shared.modules.graphicalSelect.selectBySquare"),
-                "Polygon": this.$t("common:shared.modules.graphicalSelect.selectByPolygon")
-            }*/
         };
     },
     computed: {
@@ -37,9 +23,6 @@ export default {
             "geoMarkerFeatureSelected",
             "geoMarkerWfsFeatureType"
         ]),
-        /* ...mapGetters("Modules/GraphicalSelect", [
-            "selectedAreaGeoJson"
-        ]),*/
         tableData () {
             return {
                 headers: [
@@ -95,48 +78,6 @@ export default {
             };
         }
     },
-    /* watch: {
-        tabActive: {
-            immediate: true,
-            handler (state) {
-                if (!this.$refs?.graphicalSelection) {
-                    return;
-                }
-
-                if (state === true) {
-                    this.$refs.graphicalSelection.setStatus(true);
-                    this.$refs.graphicalSelection.createDrawInteraction();
-                }
-                else {
-                    this.$refs.graphicalSelection.setStatus(false);
-                    this.$refs.graphicalSelection.resetView();
-                }
-            }
-        },
-        selectedAreaGeoJson (geoJson) {
-            const geometry = new GeoJSON().readGeometry(geoJson),
-                featureMap = new Map(),
-                allGeoMarkerLayers = mapCollection.getMap("2D")?.getLayers().getArray()?.filter(
-                    layer => layer.getSource()?.format_?.featureType === this.geoMarkerWfsFeatureType
-                );
-
-            allGeoMarkerLayers.forEach(layer => {
-                layer.getSource().getFeatures().forEach(feature => {
-                    const geom = feature.getGeometry();
-
-                    if (geom && geometry.intersectsCoordinate(geom.getCoordinates())) {
-                        const id = feature.getId();
-
-                        if (id && !featureMap.has(id)) {
-                            featureMap.set(id, feature);
-                        }
-                    }
-                });
-            });
-
-            this.setGeoMarkerFeatureList(Array.from(featureMap.values()));
-        }
-    },*/
     methods: {
         ...mapMutations("Modules/GeoMarker", [
             "setGeoMarkerFeatureList",
@@ -163,13 +104,6 @@ export default {
         id="tabListContent"
         class="tabListContent"
     >
-        <!--GraphicalSelect
-            v-if="tabActive"
-            ref="graphicalSelection"
-            :options="drawOptions"
-            :label="'additional:modules.geoMarker.GeoMakerList.graphicalSelectTitle'"
-        /-->
-
         <template v-if="tableData.items?.length">
             <SelectableList
                 :selected-item-id="selectedListItemId"

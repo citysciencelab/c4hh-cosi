@@ -1,6 +1,7 @@
 import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
+import {Point, Polygon} from "ol/geom";
 import TabFilterContent from "../../../../components/tabs/TabFilterContent.vue";
 
 config.global.mocks.$t = key => key;
@@ -26,7 +27,8 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
             reminderDate: {
                 from: "",
                 to: ""
-            }
+            },
+            geom: null
         },
         origWindow;
 
@@ -44,6 +46,9 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
 
                 return "";
             },
+            getGeometry: () => {
+                return new Point([1, 1]);
+            },
             getId: () => "feature-A"
         },
         mockFeatureB = {
@@ -59,6 +64,9 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                 }
 
                 return "";
+            },
+            getGeometry: () => {
+                return new Point([3, 3]);
             },
             getId: () => "feature-B"
         },
@@ -132,6 +140,14 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                                 },
                                 setGeoMarkerFeatureList: (feat) => {
                                     return feat;
+                                }
+                            }
+                        },
+                        GraphicalSelect: {
+                            namespaced: true,
+                            getters: {
+                                selectedAreaGeoJson: () => {
+                                    return new Polygon([[[0, 0], [2, 0], [2, 2], [0, 0]]]);
                                 }
                             }
                         }
@@ -336,6 +352,27 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
         mockedFilterSelections.filterValueSource = "";
         mockedFilterSelections.categorySelected = [];
         await wrapper.vm.applyAttributeFilters();
+        expect(wrapper.vm.allFilteredFeatures).to.have.lengthOf(2);
+    });
+
+    it("should filter geometry correctly", async () => {
+        wrapper.vm.allFilteredFeatures = [mockFeatureA, mockFeatureB];
+        mockedFilterSelections.geom = new Polygon([[[0, 0], [2, 0], [2, 2], [0, 0]]]);
+
+        await wrapper.vm.applyGeomFilter();
+        expect(wrapper.vm.allFilteredFeatures).to.have.lengthOf(1);
+        expect(wrapper.vm.allFilteredFeatures[0].getId()).to.equal(mockFeatureA.getId());
+
+        // Reset
+        wrapper.vm.allFilteredFeatures = [mockFeatureA, mockFeatureB];
+        mockedFilterSelections.geom = new Polygon([[[10, 10], [20, 10], [20, 20], [10, 10]]]);
+        await wrapper.vm.applyGeomFilter();
+        expect(wrapper.vm.allFilteredFeatures).to.have.lengthOf(0);
+
+        // Reset to default value
+        wrapper.vm.allFilteredFeatures = [mockFeatureA, mockFeatureB];
+        mockedFilterSelections.geom = null;
+        await wrapper.vm.applyGeomFilter();
         expect(wrapper.vm.allFilteredFeatures).to.have.lengthOf(2);
     });
 });

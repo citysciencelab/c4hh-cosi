@@ -4,6 +4,7 @@ import Multiselect from "vue-multiselect";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
+import GraphicalSelect from "@shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import store from "@appstore";
 import layerCollection from "@core/layers/js/layerCollection";
 import {createEmpty as createEmptyExtent, extend} from "ol/extent";
@@ -11,6 +12,7 @@ import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isBetween from "dayjs/plugin/isBetween";
+import {GeoJSON} from "ol/format";
 
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrAfter);
@@ -22,7 +24,8 @@ export default {
         Multiselect,
         FlatButton,
         InputText,
-        SpinnerItem
+        SpinnerItem,
+        GraphicalSelect
     },
     props: {
         fullyLoaded: {
@@ -36,7 +39,12 @@ export default {
             allFilteredFeatures: [],
             isFiltering: false,
             filterUpdated: false,
-            map: mapCollection.getMap("2D")
+            map: mapCollection.getMap("2D"),
+            graphicalSelectOpen: false,
+            drawOptions: {
+                "Box": this.$t("common:shared.modules.graphicalSelect.selectBySquare"),
+                "Polygon": this.$t("common:shared.modules.graphicalSelect.selectByPolygon")
+            }
         };
     },
     computed: {
@@ -50,6 +58,9 @@ export default {
         ...mapGetters("Menu", [
             "currentMenuWidth",
             "expanded"
+        ]),
+        ...mapGetters("Modules/GraphicalSelect", [
+            "selectedAreaGeoJson"
         ]),
         /**
          * Returns the category options for the filter dropdown.
@@ -127,6 +138,10 @@ export default {
                 this.updateFilterSelection(false);
                 this.setInitialLoading(false);
             }
+        },
+        selectedAreaGeoJson (geoJson) {
+            this.filterSelections.geom = new GeoJSON().readGeometry(geoJson);
+            this.filterUpdated = true;
         }
     },
     methods: {
@@ -150,6 +165,7 @@ export default {
             }
 
             await this.applyDeptAndStatusFilter();
+            await this.applyGeomFilter();
             await this.applyAttributeFilters();
 
             this.handleFilteredFeaturesOnMap(updateExtent);
@@ -286,6 +302,30 @@ export default {
                         }
                     });
                 });
+
+                resolve();
+            });
+        },
+        /**
+         * Filters features by geometry.
+         * @returns {Promise<void>} Resolves when filtering is complete.
+         */
+        applyGeomFilter () {
+            return new Promise(resolve => {
+                if (this.filterSelections.geom) {
+                    const subSetOfFilteredFeatures = [];
+
+                    this.allFilteredFeatures.forEach(feature => {
+                        const geometry = feature.getGeometry();
+
+                        if (geometry && this.filterSelections.geom.intersectsCoordinate(geometry.getCoordinates())) {
+                            subSetOfFilteredFeatures.push(feature);
+                        }
+                    });
+
+                    this.allFilteredFeatures = subSetOfFilteredFeatures;
+                    resolve();
+                }
 
                 resolve();
             });
@@ -478,10 +518,21 @@ export default {
                 reminderDate: {
                     from: "",
                     to: ""
-                }
+                },
+                geom: null
             });
 
+            this.graphicalSelectOpen = false;
+
             this.updateFilterSelection(false, false);
+        },
+        /**
+         * Resets the geom filter selection to default values.
+         */
+        resetGeomFilter () {
+            this.filterSelections.geom = null;
+            this.graphicalSelectOpen = false;
+            this.filterUpdated = true;
         }
     }
 };
@@ -490,7 +541,39 @@ export default {
 <template>
     <div id="geoMarkerFilterContent">
         <div class="headline">
-            <p> {{ countGeoMarker }} </p>
+            <div class="headlineTopPart">
+                <p v-show="!isFiltering">
+                    {{ countGeoMarker }}
+                </p>
+
+                <div class="spacer-div" />
+
+                <div class="geomFilterButtons">
+                    <FlatButton
+                        v-if="filterSelections.geom"
+                        :text="'additional:modules.geoMarker.filter.graphicalSelect.filterButtonResetTitle'"
+                        icon="bi-x-circle"
+                        :secondary="true"
+                        @click="resetGeomFilter"
+                    />
+
+                    <FlatButton
+                        :text="filterSelections.geom ? 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonActiveTitle' : 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonTitle'"
+                        :icon="filterSelections.geom ? 'bi-check-circle' : 'bi-bounding-box-circles'"
+                        :secondary="true"
+                        :customclass="filterSelections.geom ? 'geomFilterActive' : ''"
+                        @click="graphicalSelectOpen = !graphicalSelectOpen"
+                    />
+                </div>
+            </div>
+
+            <GraphicalSelect
+                v-if="graphicalSelectOpen"
+                ref="graphicalSelection"
+                :options="drawOptions"
+                :start-geometry="filterSelections.geom"
+                :label="'additional:modules.geoMarker.filter.graphicalSelect.title'"
+            />
         </div>
 
         <div class="filterSettings">
@@ -731,8 +814,23 @@ div#geoMarkerFilterContent {
 
     div.headline {
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
-        gap: 2rem;
+
+        div.headlineTopPart {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+
+            div.geomFilterButtons {
+                display: flex;
+                gap: 1rem;
+
+                button.geomFilterActive {
+                    background-color: #41b883;
+                }
+            }
+        }
     }
 
     div.filterSettings {
