@@ -141,6 +141,7 @@ export default {
             >
                 <TabFilterContent
                     :fully-loaded="fullyLoaded"
+                    :tab-active="geoMarkerActiveTab === 'tabFilter'"
                 />
             </div>
 

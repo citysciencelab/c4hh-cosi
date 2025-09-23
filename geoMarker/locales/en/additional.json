@@ -37,8 +37,8 @@
                 "countGeoMarker": "GeoMarker",
                 "graphicalSelect": {
                   "title": "Select GeoMarker on map using",
-                  "filterButtonTitle": "Spatial filter",
-                  "filterButtonActiveTitle": "Spatial filter active",
+                  "filterButtonTitle": "Show spatial filter",
+                  "filterButtonActiveTitle": "Hide spatial filter",
                   "filterButtonResetTitle": "Reset spatial filter"
                 },
                 "departments": {

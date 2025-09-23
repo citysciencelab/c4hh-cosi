@@ -30,8 +30,11 @@ export default {
     props: {
         fullyLoaded: {
             type: Boolean,
-            required: true,
-            default: false
+            required: true
+        },
+        tabActive: {
+            type: Boolean,
+            required: true
         }
     },
     data () {
@@ -142,6 +145,11 @@ export default {
         selectedAreaGeoJson (geoJson) {
             this.filterSelections.geom = new GeoJSON().readGeometry(geoJson);
             this.filterUpdated = true;
+        },
+        tabActive (val) {
+            if (!val) {
+                this.graphicalSelectOpen = false;
+            }
         }
     },
     methods: {
@@ -558,7 +566,7 @@ export default {
                     />
 
                     <FlatButton
-                        :text="filterSelections.geom ? 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonActiveTitle' : 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonTitle'"
+                        :text="graphicalSelectOpen ? 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonActiveTitle' : 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonTitle'"
                         :icon="filterSelections.geom ? 'bi-check-circle' : 'bi-bounding-box-circles'"
                         :secondary="true"
                         :customclass="filterSelections.geom ? 'geomFilterActive' : ''"

@@ -37,8 +37,8 @@
                 "countGeoMarker": "GeoMarker",
                 "graphicalSelect": {
                   "title": "Auswahl der GeoMarker in der Karte durch",
-                  "filterButtonTitle": "Räuml. filtern",
-                  "filterButtonActiveTitle": "Räuml. Filter aktiv",
+                  "filterButtonTitle": "Zeige räuml. Filter",
+                  "filterButtonActiveTitle": "Räuml. Filter ausblenden",
                   "filterButtonResetTitle": "Räuml. Filter zurücksetzen"
                 },
                 "departments": {
