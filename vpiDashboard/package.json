@@ -9,7 +9,7 @@
     },
     "scripts": {},
     "dependencies": {
-      "vue-slider-component": "^4.1.0-beta.7"
+      "vue-slider-component": "4.1.0-beta.7"
     }
   }
   
