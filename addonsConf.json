@@ -121,5 +121,9 @@
   "exampleControl": {
     "path": "controls/exampleControl",
     "type": "control"
+  },
+  "oktagonComponent": {
+    "type": "tool",
+    "path": "oktagon"
   }
 }
