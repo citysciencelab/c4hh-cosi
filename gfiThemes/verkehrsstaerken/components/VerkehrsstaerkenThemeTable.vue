@@ -13,6 +13,11 @@ export default {
         dataset: {
             type: Array,
             required: true
+        },
+        contentType: {
+            type: String,
+            required: false,
+            default: "Kfz"
         }
     },
     methods: {
@@ -22,23 +27,40 @@ export default {
          * @returns {String} the row header
          */
         getRowHeader (name) {
-            if (name === "DTV") {
-                return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay");
+            switch (this.contentType) {
+                case "Rad":
+                    if (name === "DTV") {
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerDay");
+                    }
+                    else if (name === "DTVw") {
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerWeekday");
+                    }
+                    else if (name === "Anmerkung") {
+                        return "Anmerkung";
+                    }
+                    else if (name === "Erhebungsmethode") {
+                        return "Erhebungsmethode";
+                    }
+                    break;
+                default:
+                    if (name === "DTV") {
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay");
+                    }
+                    else if (name === "DTVw") {
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerWeekday");
+                    }
+                    else if (name === "Schwerverkehrsanteil am DTVw") {
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek");
+                    }
+                    else if (name === "Anmerkung") {
+                        return "Anmerkung";
+                    }
+                    else if (name === "Erhebungsmethode") {
+                        return "Erhebungsmethode";
+                    }
             }
-            else if (name === "DTVw") {
-                return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDayWeekly");
-            }
-            else if (name === "Schwerverkehrsanteil am DTVw") {
-                return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek");
-            }
-            else if (name === "Anmerkung") {
-                return "Anmerkung";
-            }
-            else if (name === "Erhebungsmethode") {
-                return "Erhebungsmethode";
-            }
-
             return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.constructionSiteInfluence");
+
 
         },
         /**

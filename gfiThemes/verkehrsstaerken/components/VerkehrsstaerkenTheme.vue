@@ -25,7 +25,8 @@ export default {
             years: [],
             rowNames: [],
             dataset: [],
-            fullViewActivated: false
+            fullViewActivated: false,
+            contentType: ""
         };
     },
     computed: {
@@ -45,6 +46,7 @@ export default {
             handler () {
                 this.filterProperties();
                 this.setContentStyle();
+                this.determineContentType();
             },
             immediate: true
         },
@@ -133,6 +135,20 @@ export default {
         setActiveTab (evt) {
             if (evt && evt.target && evt.target.hash) {
                 this.activeTab = evt.target.hash.substring(1);
+            }
+        },
+        /**
+         * checks whether the layer is a bike or car layer.
+         * @returns {void}
+         */
+        determineContentType () {
+            if (this.feature && typeof this.feature.getTitle === "function") {
+                if (this.feature.getTitle().toLowerCase().includes("rad")) {
+                    this.contentType = "Rad";
+                }
+                else {
+                    this.contentType = "Kfz";
+                }
             }
         },
         /**
@@ -248,12 +264,14 @@ export default {
                 :row-names="rowNames"
                 :years="years"
                 :dataset="dataset"
+                :content-type="contentType"
                 :type="String('table')"
             />
             <VerkehrsstaerkenThemeLineChart
                 v-if="isActiveTab('diagram')"
                 :class="{ active: isActiveTab('diagram'), 'tab-pane': true }"
                 :dataset="dataset"
+                :content-type="contentType"
                 :type="String('diagram')"
             />
         </div>

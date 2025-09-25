@@ -2,15 +2,24 @@ import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import VerkehrsstaerkenThemeLineChart from "../../../components/VerkehrsstaerkenThemeLineChart.vue";
 import {nextTick} from "vue";
+import {createStore} from "vuex";
 
 config.global.mocks.$t = key => key;
 
 describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThemeLineChart.vue", () => {
 
-    const dataset = [{"class": "dot", "style": "circle", "year": 2008, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2009, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 6}, {"class": "dot", "style": "circle", "year": 2010, "DTV": 17000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 6}, {"class": "dot", "style": "circle", "year": 2011, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2012, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2013, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2014, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2015, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot_visible", "style": "rect", "year": 2016, "DTV": 18000, "DTVw": 20000, "Schwerverkehrsanteil am DTVw": 6, "Anmerkung": "Baustelleneinfluss"}, {"class": "dot", "style": "circle", "year": 2017, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2018, "DTV": 16000, "DTVw": 17000, "Schwerverkehrsanteil am DTVw": 5}];
+    const dataset = [{"class": "dot", "style": "circle", "year": 2008, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2009, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 6}, {"class": "dot", "style": "circle", "year": 2010, "DTV": 17000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 6}, {"class": "dot", "style": "circle", "year": 2011, "DTV": 17000, "DTVw": 19000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2012, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2013, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2014, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2015, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot_visible", "style": "rect", "year": 2016, "DTV": 18000, "DTVw": 20000, "Schwerverkehrsanteil am DTVw": 6, "Anmerkung": "Baustelleneinfluss"}, {"class": "dot", "style": "circle", "year": 2017, "DTV": 16000, "DTVw": 18000, "Schwerverkehrsanteil am DTVw": 5}, {"class": "dot", "style": "circle", "year": 2018, "DTV": 16000, "DTVw": 17000, "Schwerverkehrsanteil am DTVw": 5}],
+        store = createStore({
+            modules: {
+            },
+            getters: {
+                isMobile: () => false
+            }
+        });
     let wrapper;
 
     beforeEach(() => {
+
         wrapper = shallowMount(VerkehrsstaerkenThemeLineChart, {
             propsData: {
                 dataset: dataset
@@ -19,6 +28,9 @@ describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThemeLine
                 return {
                     category: "DTV"
                 };
+            },
+            global: {
+                plugins: [store]
             }
         });
     });
@@ -97,7 +109,7 @@ describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThemeLine
 
     it("should returns the label for a category", () => {
         expect(wrapper.vm.createDatasetLabel("DTV")).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay");
-        expect(wrapper.vm.createDatasetLabel("DTVw")).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDayWeekly");
+        expect(wrapper.vm.createDatasetLabel("DTVw")).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerWeekday");
         expect(wrapper.vm.createDatasetLabel("Schwerverkehrsanteil am DTVw")).to.equals("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek");
     });
 

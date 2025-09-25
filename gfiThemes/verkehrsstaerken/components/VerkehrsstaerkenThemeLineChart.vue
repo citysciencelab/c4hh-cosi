@@ -9,6 +9,11 @@ export default {
         dataset: {
             type: Array,
             required: true
+        },
+        contentType: {
+            type: String,
+            required: false,
+            default: "Kfz"
         }
     },
     data () {
@@ -33,6 +38,9 @@ export default {
     },
     computed: {
         hasHGVsPerWeek: function () {
+            if (this.contentType === "Rad") {
+                return false;
+            }
             return this.dataset.filter(data => Object.prototype.hasOwnProperty.call(data, "Schwerverkehrsanteil am DTVw")).length > 0;
         }
     },
@@ -200,8 +208,8 @@ export default {
          */
         createDatasetLabel: function (category) {
             const categories = {
-                "DTV": this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay"),
-                "DTVw": this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDayWeekly"),
+                "DTV": this.contentType === "Rad" ? this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerDay") : this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay"),
+                "DTVw": this.contentType === "Rad" ? this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerDay") : this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerWeekday"),
                 "Schwerverkehrsanteil am DTVw": this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek")
             };
 

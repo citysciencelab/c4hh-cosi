@@ -37,6 +37,7 @@ describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenTheme.vue
                 }
             },
             computed: {
+                isMobile: () => false,
                 currentLocale: () => "de"
             },
             global: {
