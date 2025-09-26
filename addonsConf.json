@@ -152,5 +152,13 @@
   "accessibilityAnalysis": {
     "path": "cosi/AccessibilityAnalysis",
     "type": "tool"
+  },
+  "dashboard": {
+    "path":"cosi/Dashboard",
+    "type": "tool"
+  },
+  "colorCodeMap": {
+    "path":"cosi/ColorCodeMap",
+    "type": "tool"
   }
 }

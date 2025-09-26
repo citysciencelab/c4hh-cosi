@@ -1,0 +1,30 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "chartGenerator": {
+                    "title": "Graphenvisualisierung",
+                    "description": "Erzeugt dynamisch unterschiedliche Graphen zum Zwecke der Visualisierung von Daten.",
+                    "infoTooltip": "Werkzeuginformationen",
+                    "LineChart": "Liniendiagramm",
+                    "BarChart": "Balkendiagramm",
+                    "PieChart": "Tortendiagramm",
+                    "ScatterChart": "Streuungsdiagramm",
+                    "RadarChart": "Spinnendiagramm",
+                    "switchChartType": " für diesen Datensatz auswählen",
+                    "removeChart": "Diesen Graphen entfernen.",
+                    "deleteAll": "Alle Graphen im Werkzeug löschen",
+                    "downloadChart": "Diesen Graphen herunterladen",
+                    "downloadAll": "Alle Graphen als PNG herunterladen",
+                    "selectChartIndex": "Graph mit dem jeweiligen Index auswählen",
+                    "nextChart": "Nächsten Graphen auswählen",
+                    "prevChart": "Vorherigen Graphen auswählen",
+                    "yToZero": "Y-Achse skalieren",
+                    "yToZeroTooltip": "Y-Achse bei 0 oder beim niedrigstem Wert des Datensatzes starten.",
+                    "yStacked": "Y-Achse stapeln",
+                    "noData": "Das Graphenvisualisierungswerkzeug erstellt Graphen aus Datensätzen und verwaltet diese. Darüber hinaus ermöglicht es Ihnen den Export dieser Graphen als PNG oder ZIP. Zuvor erstellte Graphen können Sie hier im Lauf Ihrer Session jederzeit wieder aufrufen, anpassen und exportieren."
+                }
+            }
+        }
+    }
+}

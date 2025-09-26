@@ -48,12 +48,12 @@ const actions = {
                         const response = await oafRequest.getOAFFeatureGet(
                             districtLevel.stats.layers[j].url,
                             districtLevel.stats.layers[j].collection,
-                            400,
-                            districtLevel.stats.keyOfAttrName[j] + "='" + districtName + "'",
-                            "http://www.opengis.net/def/crs/EPSG/0/25832",
-                            "http://www.opengis.net/def/crs/EPSG/0/25832",
-                            undefined,
-                            true
+                            {
+                                skipGeometry: true,
+                                filter: districtLevel.stats.keyOfAttrName[j] + "='" + districtName + "'",
+                                crs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                                filterCrs: "http://www.opengis.net/def/crs/EPSG/0/25832"
+                            }
                         );
 
                         olFeatures = oafRequest.readAllOAFToGeoJSON(response);
@@ -139,10 +139,12 @@ const actions = {
      * @param {Function} store.commit - Function to dispatch an action.
      * @returns {void}
      */
-    async updateDistricts ({commit}) {
+    async updateDistricts ({commit, getters}) {
         commit("setLoadend", false);
         await nextTick();
         commit("setLoadend", true);
+        console.log(getters.loadend);
+
     },
 
     /**

@@ -1,0 +1,51 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "dashboard": {
+                    "title": "Statistische Datenübersicht",
+                    "avgCol": "Durchschnitt",
+                    "totalCol": "Gesamt",
+                    "groupCol": "Gruppe",
+                    "categoryCol": "Kategorie",
+                    "timestampCol": "Jahr",
+                    "search": "Tabelle durchsuchen",
+                    "exportTable": "Tabelle exportieren",
+                    "exportTableTimeline": "alle Jahre exportieren",
+                    "exportFilename": "{{prefix}}_Dashboard-Tabelle",
+                    "modifiedTooltip": "Dieses Datum wurde durch Simulationsfunktionen verändert.",
+                    "moveColLeft": "Spalte nach links verschieben",
+                    "moveColRight": "Spalte nach rechts verschieben",
+                    "minimizeCol": "Spalte aus-/einblenden",
+                    "nameCalc": "Berechnung benennen",
+                    "titleForCalculatedStatistic": "Die mit rot gekennzeichneten Werte sind automatisch berechnet",
+                    "tableDataParsingError": "Beim lesen der Daten ist ein Fehler aufgetreten",
+                    "calculationHint": "Das Ergebnis finden Sie unten in der Tabelle in der Kategoriengruppe Berechnungen",
+                    "tableRowMenu": {
+                        "expandTooltip": "Alle Jahre ein-/ausblenden",
+                        "visualize": "In der Karte visualisieren",
+                        "visualizeTooltip": "In der Karte ein-/ausblenden",
+                        "animate": "Zeitreihe animieren",
+                        "districtName": "Gebietsnamen ein- / ausblenden",
+                        "selection": "Auswahl",
+                        "selectA": "Für Feld 'A' setzen",
+                        "selectB": "Für Feld 'B' setzen",
+                        "cancelSelection": "Auswahl aufheben",
+                        "calculate": "Berechnen",
+                        "add": "Addieren (A + B)",
+                        "subtract": "Substrahieren (A - B)",
+                        "multiply": "Multiplizieren (A x B)",
+                        "divide": "Dividieren (A / B)",
+                        "dividePercent": "Anteil A in Prozent von B (A * 100 / B)",
+                        "sumUpSelected": "Ausgewählte Aufsummieren",
+                        "divideSelected": "Ausgewählte Dividieren (jeweils / B)",
+                        "charts": "Diagramme",
+                        "standardCharts": "Balken- / Linien- / Tortendiagramme erstellen",
+                        "chartForMultipleRows": "Diagramm für ausgewählte Zeilen",
+                        "correlationChart": "Korrelation / Streuungsdiagramm erstellen"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,1274 @@
+<script>
+import {mapGetters, mapActions, mapMutations} from "vuex";
+import getters from "../store/gettersDashboard.js";
+import mutations from "../store/mutationsDashboard.js";
+import actions from "../store/actionsDashboard.js";
+import {getTimestamps} from "../../utils/timeline";
+import beautifyKey from "@shared/js/utils/beautifyKey.js";
+import TableRowMenu from "./TableRowMenu.vue";
+import {
+    addCalculation,
+    addDivideSelectedCalculations,
+    calculateAll,
+    calculateStats,
+    calculateCorrelation,
+    getTotal,
+    getAverage,
+    getCulmulativeTotal,
+    sumUpSelected,
+    divideSelected,
+    deleteStats,
+    getCalculationId
+} from "../utils/operations";
+import {generateChartForDistricts, generateChartForCorrelation, generateChartsForItems} from "../utils/chart";
+import {prepareTableExport, prepareTableExportWithTimeline} from "../utils/export";
+import composeFilename from "../../utils/composeFilename";
+import exportXlsx from "../../utils/exportXlsx";
+import DashboardToolbar from "./DashboardToolbar.vue";
+import ToolInfo from "../../components/ToolInfo.vue";
+import TableCell from "./TableCell.vue";
+import isObject from "@shared/js/utils/isObject.js";
+import utils from "../../utils";
+import {VApp} from "vuetify/components/VApp";
+import {VBtn} from "vuetify/components/VBtn";
+import {VCheckbox} from "vuetify/components/VCheckbox";
+import {VContainer, VRow} from "vuetify/components/VGrid";
+import {VDataTable} from "vuetify/components/VDataTable";
+import {VIcon} from "vuetify/components/VIcon";
+import {VMain} from "vuetify/components/VMain";
+import {VSelect} from "vuetify/components/VSelect";
+import {VSnackbar} from "vuetify/components/VSnackbar";
+import {VTextField} from "vuetify/components/VTextField";
+import {VTooltip} from "vuetify/components/VTooltip";
+
+
+export default {
+    name: "Dashboard",
+    components: {
+        ToolInfo,
+        TableRowMenu,
+        DashboardToolbar,
+        TableCell,
+        VApp,
+        VBtn,
+        VCheckbox,
+        VContainer,
+        VDataTable,
+        VIcon,
+        VMain,
+        VRow,
+        VSelect,
+        VSnackbar,
+        VTextField,
+        VTooltip
+    },
+    data () {
+        return {
+            dashboardOpen: false,
+            rows: [],
+            baseColumns: [
+                {
+                    value: "category",
+                    text: this.$t("additional:modules.tools.cosi.dashboard.categoryCol"),
+                    sortable: false,
+                    groupable: false,
+                    filter: this.filterTable
+                },
+                {
+                    value: "menu",
+                    filterable: false,
+                    sortable: false,
+                    groupable: false
+                },
+                {
+                    value: "years",
+                    text: this.$t("additional:modules.tools.cosi.dashboard.timestampCol"),
+                    filterable: false,
+                    sortable: false,
+                    divider: true,
+                    groupable: false
+                }
+            ],
+            aggregateColumns: [
+                {
+                    text: this.$t("additional:modules.tools.cosi.dashboard.totalCol"),
+                    value: "total",
+                    align: "end",
+                    sortable: false,
+                    groupable: false,
+                    selected: false,
+                    isAggregation: true
+                },
+                {
+                    text: this.$t("additional:modules.tools.cosi.dashboard.avgCol"),
+                    value: "average",
+                    align: "end",
+                    sortable: false,
+                    groupable: false,
+                    selected: false,
+                    isAggregation: true
+                }
+            ],
+            districtColumns: [],
+            currentItems: [], // all current (visible) items in the table
+            selectedItems: [], // selected items in the table
+            timestampPrefix: "jahr_",
+            timestamps: [],
+            search: "",
+            fields: {
+                A: null,
+                B: null
+            },
+            toolOffset: 0,
+            calculationData: {
+                id: "",
+                operation: "",
+                category_A: "",
+                category_B: "",
+                selectedCategories: "",
+                field_A: null,
+                field_B: null,
+                selectedItems: []
+            },
+            calculationDialog: false,
+            yearSelector: "jahr_"
+        };
+    },
+    computed: {
+        ...mapGetters("Modules/Dashboard", Object.keys(getters)),
+        ...mapGetters("Modules/DistrictSelector", [
+            "selectedDistrictLevel",
+            "selectedDistrictNames",
+            "mapping",
+            "loadend"
+        ]),
+        ...mapGetters("Modules/Language", ["currentLocale"]),
+        ...mapGetters("Modules/ColorCodeMap", ["selectedYear"]),
+        columns () {
+            return [
+                ...this.baseColumns,
+                ...this.districtColumns,
+                ...this.aggregateColumns
+            ];
+        },
+        valueColumns () {
+            return [...this.districtColumns, ...this.aggregateColumns];
+        },
+        minimizedCols () {
+            return this.districtColumns.filter(col => col.minimized === true);
+        },
+        selectedColumns () {
+            const selectedCols = this.valueColumns.filter(col => col.selected);
+
+            return selectedCols.length > 0
+                ? selectedCols
+                : this.valueColumns;
+        },
+        unselectedColumnLabels () {
+            return this.valueColumns.filter(col => !this.selectedColumns.includes(col)).map(col => col.text);
+        },
+        currentTimeStamp: {
+            get () {
+                return parseInt(this.selectedYear, 10);
+            },
+            set (v) {
+                this.setSelectedYear(v);
+            }
+        },
+
+        /**
+         * Checks whether there is at least one object with an orientation value in the mapping json.
+         * @returns {Boolean} True if there is an orientation value.
+         */
+        hasMappingOrientationValue () {
+            return this.mapping.some(obj => typeof obj.orientationValue !== "undefined");
+        },
+
+        /**
+         * The mapped key from value
+         * @returns {Object} the key map object
+         */
+        keyMap () {
+            return {
+                category: "Kategorie",
+                group: "Gruppe",
+                valueType: "Datentyp",
+                timestamp: "Jahr",
+                hamburg_gesamt: "Hamburg gesamt",
+                total: "Gesamt",
+                average: "Durchschnitt",
+                orientationValue: this.getColumnHeader("orientationValue")
+            };
+        }
+    },
+
+    watch: {
+        calculations: "calculateAll",
+        loadend () {
+            if (this.loadend && this.selectedDistrictNames.length > 0) {
+                this.generateTable();
+            }
+        }
+    },
+    created () {
+        const selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
+
+        this.selectedStatFeatures = selectedDistricts.map(district => district.statFeatures).flat();
+        this.setSelectedYear(utils.getAvailableYears([this.selectedStatFeatures[0]], this.yearSelector)[0]);
+
+        this.calculateAll();
+        if (this.selectedDistrictNames.length > 0) {
+            this.generateTable();
+        }
+        /**
+         * If the tool is used from the menu,
+         * toggles the menu item inactive if closed
+         * @param {boolean} newActive - Defines if the tool is active.
+         * @returns {void}
+         */
+        // this.$on("close", () => {
+        //     this.setActive(false);
+        // });
+    },
+
+    methods: {
+        ...mapMutations("Modules/Dashboard", Object.keys(mutations)),
+        ...mapActions("Modules/Dashboard", Object.keys(actions)),
+        ...mapMutations("Modules/DistrictSelector", ["addCategoryToMapping", "removeCategoryFromMapping"]),
+        ...mapMutations("Modules/ColorCodeMap", ["setSelectedYear"]),
+        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
+        ...mapActions("Modules/DistrictSelector", ["updateDistricts"]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
+
+        /**
+         * Returns the labels of the selected districts.
+         * @param {Object[]} districts - The districts of the selected district level.
+         * @returns {String[]} The labels.
+         */
+        getSelectedDistrictsLabels (districts) {
+            const selectedDistricts = districts.filter(district => district.isSelected === true);
+
+            return selectedDistricts.map(district => district.getLabel());
+        },
+
+        /**
+         * Generates the table data for the v-data-table (headers/columns, items/rows)
+         * @listens #Change:DistrictSelector/loadend on DistrictSelector/loadend
+         * @returns {void}
+         */
+        generateTable () {
+            this.timestamps = [];
+            this.handleOrientationColumn(this.hasMappingOrientationValue, this.aggregateColumns);
+            this.districtColumns = this.getColumns(this.selectedDistrictLevel, this.selectedDistrictNames, []);
+            this.rows = this.getRows();
+            this.setItems(this.getData());
+            this.currentTimeStamp = this.selectedYear;
+        },
+        /**
+         * Generates empty rows for all data categories
+         * taken from the mapping.json in /portal/cosi/config/ and set in config.json
+         * @returns {void}
+         */
+        getRows () {
+            let counter = 0;
+
+            return this.mapping.reduce((rows, category, index, array) => {
+                return [
+                    ...rows,
+                    {
+                        visualized: false, // is the data visualized in the map
+                        expanded: false, // is the timeline expanded
+                        category: category.value,
+                        group: category.group,
+                        valueType: category.valueType,
+                        isTemp: category.isTemp,
+                        calculation: category.calculation,
+                        groupIndex: array[index].group !== array[index + 1]?.group ? counter++ : counter,
+                        orientationValue: category.orientationValue
+                    }
+                ];
+            }, []);
+        },
+        getData () {
+            return this.rows.map(row => this.getDistrictStatsByCategory(row), []);
+        },
+        getDistrictStatsByCategory (row) {
+            const districtStats = {
+                ...row
+            };
+
+            for (const col of this.districtColumns) {
+                const statFeature = col.district.statFeatures
+                    .find(feature => feature.get("kategorie") === row.category);
+
+                if (statFeature) {
+                    districtStats[col.value] = statFeature.getProperties();
+                }
+            }
+
+            districtStats.years = [...getTimestamps(districtStats, this.timestampPrefix)];
+            districtStats.id = districtStats.category + districtStats.groupIndex;
+            this.timestamps = districtStats.years.reduce((timestamps, timestamp) => {
+                return timestamps.includes(timestamp) ? timestamps : [timestamp, ...timestamps].sort().reverse();
+            }, this.timestamps);
+
+            return districtStats;
+        },
+        getColumns (districtLevel, districtNames, colList) {
+            const districts = districtLevel.displayAll
+                    ? districtLevel.districts
+                    : districtLevel.districts.filter(dist => districtNames.includes(dist.getName())),
+                refDistrictNames = [];
+            let district, refDistrictName;
+
+            for (district of districts) {
+                colList.push({
+                    text: beautifyKey(district.getLabel()),
+                    value: district.getLabel(),
+                    align: "end",
+                    district,
+                    districtLevel: districtLevel.label,
+                    sortable: false,
+                    groupable: false,
+                    selected: false,
+                    minimized: false
+                });
+
+                refDistrictName = district.getReferencDistrictName();
+
+                if (refDistrictName) {
+                    refDistrictNames.push(refDistrictName);
+                }
+            }
+
+            colList[colList.length - 1].divider = true;
+
+            if (districtLevel.referenceLevel) {
+                // add columns for reference areas
+                this.getColumns(districtLevel.referenceLevel, refDistrictNames, colList);
+            }
+
+            return colList;
+        },
+
+        setColDividers () {
+            for (let i = 0; i < this.districtColumns.length; i++) {
+                if (this.districtColumns[i].districtLevel !== this.districtColumns[i + 1]?.districtLevel) {
+                    this.districtColumns[i].divider = true;
+                }
+                else {
+                    this.districtColumns[i].divider = false;
+                }
+            }
+        },
+
+        /**
+         * Moves a district column left/right
+         * @param {Object} col - the column to move
+         * @param {0 | 1} [dir=0] - the direction to move, 0 = left, 1 = right
+         * @returns {void}
+         */
+        moveCol (col, dir = 0) {
+            // dont move left if index is 0
+            if (this.districtColumns.findIndex(_col => _col === col) === 0 && dir === 0) {
+                return;
+            }
+
+            const i = this.districtColumns.findIndex(_col => _col === col),
+                c0 = this.districtColumns.slice(0, i - 1 + dir),
+                c1 = this.districtColumns.slice(i + 1 + dir),
+                cSwap = this.districtColumns.slice(i - 1 + dir, i + 1 + dir).reverse(),
+                cols = [...c0, ...cSwap, ...c1];
+
+            this.districtColumns = cols;
+            this.setColDividers();
+        },
+
+        minimizeCol (col) {
+            col.minimized = !col.minimized;
+            col.class = col.minimized ? "minimized" : "";
+        },
+
+        getAverageAsString (item, timestamp) {
+            const average = this.getAverage(item, this.getSelectedDistrictsLabels(this.selectedDistrictLevel.districts), timestamp, this.timestampPrefix);
+
+            return average.toLocaleString("de-DE", {maximumFractionDigits: 1});
+        },
+
+        getAverageForAllTimestamps (item) {
+            return Object.fromEntries(
+                item.years.map(timestamp => [
+                    this.timestampPrefix + timestamp,
+                    this.getAverage(item, this.getSelectedDistrictsLabels(this.selectedDistrictLevel.districts), timestamp, this.timestampPrefix)
+                ])
+            );
+        },
+
+        getTotalAsString (item, timestamp) {
+            const total = this.getTotal(item, this.getSelectedDistrictsLabels(this.selectedDistrictLevel.districts), timestamp, this.timestampPrefix);
+
+            return total.toLocaleString("de-DE", {maximumFractionDigits: 1});
+        },
+
+        getTotalForAllTimestamps (item) {
+            return Object.fromEntries(
+                item.years.map(timestamp => [
+                    this.timestampPrefix + timestamp,
+                    this.getTotal(item, this.getSelectedDistrictsLabels(this.selectedDistrictLevel.districts), timestamp, this.timestampPrefix)
+                ])
+            );
+        },
+
+        setField (field, item) {
+            this.fields[field] = item;
+        },
+
+        resetFields () {
+            for (const field in this.fields) {
+                this.fields[field] = null;
+            }
+        },
+
+        renderCharts (item) {
+            const
+                total = this.getTotalForAllTimestamps(item),
+                average = this.getAverageForAllTimestamps(item),
+                data = {
+                    ...item,
+                    total,
+                    average
+                },
+                chart = generateChartForDistricts(
+                    data,
+                    this.selectedColumns,
+                    this.selectedDistrictLevel.label,
+                    this.timestampPrefix
+                );
+
+            this.channelGraphData(chart);
+        },
+
+        renderGroupedCharts () {
+            if (this.selectedItems.length === 0) {
+                return;
+            }
+
+            const
+                datasets = this.selectedItems.map(item => ({
+                    ...item,
+                    total: this.getTotalForAllTimestamps(item),
+                    average: this.getAverageForAllTimestamps(item)
+                })),
+                charts = generateChartsForItems(
+                    datasets,
+                    this.selectedColumns,
+                    this.selectedDistrictLevel.label,
+                    this.timestampPrefix
+                );
+
+            this.channelGraphData(charts);
+        },
+
+        renderScatterplot () {
+            if (!(this.fields.B && this.fields.A)) {
+                return;
+            }
+
+            const correlation = this.calculateCorrelation(),
+                chart = generateChartForCorrelation(correlation, this.fields.B.category, this.fields.A.category);
+
+            this.channelGraphData(chart);
+        },
+
+        onVisualizationChanged () {
+            let item;
+
+            for (item of this.items) {
+                item.visualized = false;
+            }
+        },
+
+        /**
+         * Returns the items that are not minimized
+         * @param {Object[]}  items to be prepared
+         * @returns {Object[]} prepared items
+         */
+        getPreparedItems (items) {
+            if (!Array.isArray(items) || items.length === 0) {
+                return [];
+            }
+            const clonedItems = JSON.parse(JSON.stringify(items));
+
+            clonedItems.forEach(item => {
+                this.minimizedCols.forEach(minCol => {
+                    delete item[minCol.value];
+                });
+            });
+
+            return clonedItems;
+        },
+
+        /**
+         * Export the table as XLSX.
+         * Either the simple view for the selected or all years.
+         * @param {Boolean} exportTimeline - Whether to include all years.
+         * @param {Object[]} selectedItems - Selected items in the table.
+         * @param {Object[]} currentItems - All current (visible) items in the table
+         * @returns {void}
+         */
+        async exportTable (exportTimeline = false) {
+            let exportedData = null,
+                iniHeader = null,
+                fixedHeaderStart = null,
+                fixedHeaderEnd = null,
+                header = null;
+            const items = this.selectedItems.length > 0 ? this.selectedItems : this.currentItems,
+                preparedItems = this.ignoreColumnsByExport && this.minimizedCols.length ? this.getPreparedItems(items) : items,
+                prefix = this.prefixExportFilename,
+                rawData = exportTimeline
+                    ? this.prepareTableExportWithTimeline(preparedItems, this.selectedDistrictNames, this.timestamps, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns)
+                    : this.prepareTableExport(preparedItems, this.selectedDistrictNames, this.selectedYear, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns),
+                filename = composeFilename(this.$t("additional:modules.tools.cosi.dashboard.exportFilename", {prefix})),
+                modifiedKey = [{"oldKey": "isTemp", "newKey": "eigene Berechnungen"}];
+
+console.log(preparedItems);
+
+
+            try {
+                exportedData = this.sanitizeData(JSON.parse(JSON.stringify(rawData)), [...this.excludedPropsForExport, ...this.unselectedColumnLabels]);
+                iniHeader = this.exportGrouped ?
+                    Object.keys(Object.values(exportedData)[0][0]) : Object.keys(exportedData[0]);
+            }
+            catch (error) {
+                this.addSingleAlert({
+                    content: this.$t("additional:modules.tools.cosi.dashboard.tableDataParsingError"),
+                    class: "Info",
+                    displayClass: "info"
+                });
+                return;
+            }
+
+            if (!this.fixedHeader) {
+                fixedHeaderStart = iniHeader.includes("Gruppe") ? ["Kategorie", "Gruppe", "Datentyp"] : ["Kategorie", "Datentyp"];
+                fixedHeaderEnd = iniHeader.includes(this.getColumnHeader("orientationValue")) ? [this.getColumnHeader("orientationValue"), "Gesamt", "Durchschnitt", "Jahr"] : ["Gesamt", "Durchschnitt", "Jahr"];
+                header = fixedHeaderStart.concat(iniHeader.filter((value) => {
+                    return !fixedHeaderStart.includes(value) && !fixedHeaderEnd.includes(value);
+                }), fixedHeaderEnd);
+            }
+            else {
+                header = await this.getFixedHeader(this.selectedDistrictNames, this.selectedColumns);
+                exportedData = this.sanitizeData(JSON.parse(JSON.stringify(exportedData)), ["Datentyp"]);
+            }
+            exportedData = this.getModifiedData(exportedData, modifiedKey);
+            console.log(exportedData);
+
+            exportXlsx(header, exportedData, filename);
+        },
+
+        /**
+         * Returns a fixed order header.
+         * @param {String[]} selectedDistrictNames - Selected district names.
+         * @param {Object[]} selectedColumns - Selected columns.
+         * @returns {Promise<String[]>|String[]} The fixed header.
+         */
+        async getFixedHeader (selectedDistrictNames, selectedColumns) {
+            if (!Array.isArray(selectedDistrictNames) || !Array.isArray(selectedColumns)) {
+                return ["Kategorie", "Jahr", "Gesamt", "Durchschnitt"];
+            }
+
+            return new Promise((resolve, reject) => {
+                const header = ["Kategorie", "Jahr"];
+
+                this.getDistrictNames(selectedDistrictNames).then((districtNames) => {
+                    if (Array.isArray(districtNames) && districtNames.length > 0) {
+
+                        if (districtNames.length > 0) {
+                            for (let i = 0; i < districtNames.length; i++) {
+                                header.push(districtNames[i]);
+                            }
+                        }
+
+                        header.push("Gesamt", "Durchschnitt");
+                    }
+
+                    this.getSelectedColumnTexts(selectedColumns).then((selectedColumnTexts) => {
+                        if (Array.isArray(selectedColumnTexts) && selectedColumnTexts.length > 0) {
+                            for (let i = 0; i < selectedColumnTexts.length; i++) {
+                                if (!header.includes(selectedColumnTexts[i])) {
+                                    header.push(selectedColumnTexts[i]);
+                                }
+                            }
+                        }
+
+                        if (Array.isArray(header)) {
+                            resolve(header);
+                        }
+                        else {
+                            reject("Error during generation of the header for export.");
+                        }
+                    });
+                });
+            });
+        },
+
+        /**
+         * Returns an array of selected district names.
+         * @param {String[]} selectedDistrictNames - Selected district names.
+         * @returns {Promise<String[]>|[]} - Array of district names, or empty array.
+         */
+        getDistrictNames (selectedDistrictNames) {
+            if (!Array.isArray(selectedDistrictNames) || selectedDistrictNames.length === 0) {
+                return [];
+            }
+
+            return new Promise((resolve, reject) => {
+                const header = [];
+
+                if (selectedDistrictNames.length > 0) {
+                    for (let i = 0; i < selectedDistrictNames.length; i++) {
+                        header.push(selectedDistrictNames[i]);
+                    }
+                }
+                if (header.length > 0) {
+                    resolve(header);
+                }
+                else {
+                    reject("Error during generation of the header for export.");
+                }
+            });
+        },
+
+        /**
+         * Returns an array of selected columns texts.
+         * @param {Object[]} selectedColumns - Array of selected columns objects.
+         * @returns {Promise<String[]>|[]} - Array of selected columns, or empty array.
+         */
+        getSelectedColumnTexts (selectedColumns) {
+            if (!Array.isArray(selectedColumns) || selectedColumns.length === 0) {
+                return [];
+            }
+
+            return new Promise((resolve, reject) => {
+                if (Array.isArray(selectedColumns) && selectedColumns.length > 0) {
+                    const columnTexts = [];
+
+                    for (let i = 0; i < selectedColumns.length; i++) {
+                        columnTexts.push(selectedColumns[i].text);
+                    }
+                    resolve(columnTexts);
+                }
+                else {
+                    reject("Error during generation of the header for export.");
+                }
+            });
+        },
+
+        /**
+         * Gets modified data by changing the key
+         * @param {Object[]} data - the original data.
+         * @param {Object[]} modifiedKey - the modified key.
+         * @returns {Object[]} the modified data.
+         */
+        getModifiedData (data, modifiedKey) {
+            if (!Array.isArray(data) || !data.length || !Array.isArray(modifiedKey) || !modifiedKey.length) {
+                return data;
+            }
+
+            modifiedKey.forEach(key => {
+                if (!Object.prototype.hasOwnProperty.call(key, "oldKey") || !Object.prototype.hasOwnProperty.call(key, "newKey")) {
+                    return;
+                }
+
+                for (let i = 0; i < data.length; i++) {
+                    if (Object.prototype.hasOwnProperty.call(data[i], key.oldKey)) {
+                        data[i][key.newKey] = data[i][key.oldKey];
+                        delete data[i][key.oldKey];
+                    }
+                }
+            });
+
+            return data;
+        },
+
+        /**
+         * @description Sanitizes the export data. Removes excluded columns.
+         * @param {Object[]} json - the array of objects
+         * @param {String[]} exclude - the list of keys to exclude
+         * @returns {Object[]} the sanitized data
+         */
+        sanitizeData (json, exclude) {
+            if (!exclude) {
+                return json;
+            }
+            if (isObject(json)) {
+                Object.values(json).forEach(objectsToSanitize => {
+                    this.sanitizeData(objectsToSanitize, exclude);
+                });
+                return json;
+            }
+            json.forEach(column => {
+                exclude.forEach(key => {
+                    delete column[key];
+                });
+            });
+
+            return json;
+        },
+
+        addCalculation,
+        addDivideSelectedCalculations,
+        calculateAll,
+        calculateStats,
+        calculateCorrelation,
+        sumUpSelected,
+        divideSelected,
+        deleteStats,
+        getTotal,
+        getAverage,
+        prepareTableExport,
+        prepareTableExportWithTimeline,
+        getCulmulativeTotal,
+
+        /**
+         * Sets the current (visible) items of the table.
+         * @param {Object[]} items - The of the table.
+         * @returns {void}
+         */
+        setCurrentItems (items) {
+            this.currentItems = items;
+        },
+
+        /**
+         * Sets the offs et of the tool sidebar from left viewport
+         * @param {Event} evt - the resizeing event
+         * @returns {void}
+         */
+        setToolOffset (evt) {
+            if (!this.active) {
+                return;
+            }
+
+            if (evt) {
+                this.toolOffset = window.innerWidth - evt.targetElement.clientWidth;
+            }
+
+            if (typeof this.$el.querySelector === "function") {
+                if (this.$el.querySelector("#dashboard-toolbar").clientHeight > 50) {
+                    this.$el.querySelector(".dashboard-table-wrapper").style.height = "calc(100% - 116px)";
+                }
+                else {
+                    this.$el.querySelector(".dashboard-table-wrapper").style.height = "calc(100% - 80px)";
+                }
+            }
+        },
+
+        /**
+         * Opens the dialog to create a new calculation
+         * @param {"add" | "subtract" | "multiply" | "divide" | "sumUpSelected"} operation - the mathmatical operation to execute
+         * @param {{field_A: Object, field_B: Object, selectedItems: Object[] }} [options={}] - fields and selected items list
+         * @returns {void}
+         */
+        openCalcDialog (operation, options) {
+            this.calculationData.operation = operation;
+            this.calculationData.field_A = options.field_A;
+            this.calculationData.field_B = options.field_B;
+            this.calculationData.selectedItems = options.selectedItems;
+
+            if (operation === "sumUpSelected") {
+                this.calculationData.selectedCategories = this.calculationData.selectedItems.map(item => item.category);
+            }
+            else {
+                this.calculationData.category_A = this.calculationData.field_A.category;
+                this.calculationData.category_B = this.calculationData.field_B.category;
+            }
+
+            this.calculationData.id = getCalculationId(this.calculationData);
+            this.calculationDialog = true;
+        },
+
+        /**
+         * Filters the table by category
+         * @param {String} value - the category mapping
+         * @return {Boolean} should the item be displayed?
+         */
+        filterTable (value) {
+            if (this.statsFeatureFilter.length < 1) {
+                return true;
+            }
+            return this.statsFeatureFilter.map(t => typeof t === "string" ? t : t.value).includes(value);
+        },
+        /** make sure all objects in array include all the same keys
+         * @param {*} arr array of objects
+         * @param {*} missingValues what to set the missing values to
+         * @returns {array} same array but each item has the same keys
+         */
+        fillMissingKeys (arr, missingValues = "NA") {
+            // Create an object with all the keys in it
+            // This will return one object containing all keys the items
+            const obj = arr.reduce((res, item) => ({...res, ...item})),
+
+                // Get those keys as an array
+                keys = Object.keys(obj),
+
+                // Create an object with all keys set to the default value (0)
+                def = keys.reduce((result, key) => {
+                    result[key] = missingValues;
+                    return result;
+                }, {}),
+
+                // Use object destrucuring to replace all default values with the ones we have
+                result = arr.map((item) => ({...def, ...item}));
+
+            return result;
+        },
+
+        /**
+         * Adds a column for the orientations values if it is not yet available and
+         * there is at least one orientation value in the mapping json.
+         * @param {Boolean} hasMappingOrientationValue - True if there is an orientation value.
+         * @param {Object[]} aggregateColumns - Columns for total and average values.
+         * @returns {void}
+         */
+        handleOrientationColumn (hasMappingOrientationValue, aggregateColumns) {
+            const hasOrientationColumn = aggregateColumns.find(col => col.value === "orientationValue");
+
+            if (hasMappingOrientationValue && !hasOrientationColumn) {
+                this.aggregateColumns.splice(0, 0, {
+                    text: this.getColumnHeader("orientationValue"),
+                    value: "orientationValue",
+                    align: "end",
+                    sortable: false,
+                    groupable: false,
+                    selected: false,
+                    isAggregation: true
+                });
+            }
+        },
+
+        /**
+         * Gets the column header from value as key
+         * @param {String} value - the value of the column
+         * @return {String} the column header
+         */
+        getColumnHeader (value) {
+            if (Object.prototype.hasOwnProperty.call(this.columnHeader, value) && typeof this.columnHeader[value] === "string") {
+                return this.columnHeader[value];
+            }
+
+            return value;
+        },
+
+        /**
+         * Collapses all the accordion group after loading.
+         * @returns {void}
+         */
+        collapseAllGroups () {
+            const groupStates = this.$refs["dashboard-table"]?.$vnode?.componentInstance?.openCache;
+
+            if (groupStates) {
+                for (const e in groupStates) {
+                    groupStates[e] = false;
+                }
+            }
+        }
+
+    }
+};
+
+</script>
+
+<template lang="html">
+    <div>
+        <v-app
+            id="dashboard-wrapper"
+            absolute
+        >
+            <v-main>
+                <ToolInfo
+                    :url="readmeUrl"
+                    :locale="currentLocale"
+                />
+                <v-container fluid>
+                    <DashboardToolbar
+                        :stats-feature-filter="statsFeatureFilter"
+                        @setStatsFeatureFilter="setStatsFeatureFilter"
+                        @exportTable="exportTable"
+                    />
+                    <v-row class="dashboard-table-wrapper">
+                        <v-data-table
+                            ref="dashboard-table"
+                            v-model="selectedItems"
+                            :headers="columns"
+                            :items="items"
+                            :group-by="[{key: 'groupIndex', order: 'asc'}]"
+                            :items-per-page="-1"
+                            :search="search"
+                            show-select
+                            hide-default-footer
+                            fixed-header
+                            density="compact"
+                            class="dashboard-table"
+                            @update:current-items="setCurrentItems"
+                            @hook:mounted="collapseAllGroups"
+                        >
+                            <!-- Header for years selector -->
+                            <template #[`header.years`]>
+                                <v-select
+                                    v-model="currentTimeStamp"
+                                    :items="timestamps"
+                                    :height="20"
+                                    :label="$t('additional:modules.tools.cosi.dashboard.timestampCol')"
+                                    density="compact"
+                                    hide-details
+                                />
+                            </template>
+                            <!-- Header for districts -->
+                            <template
+                                v-for="district in valueColumns"
+                                #[`header.${district.value}`]
+                            >
+                                <div
+                                    :key="district.value"
+                                    class="district-header"
+                                >
+                                    <v-checkbox
+                                        v-if="!district.minimized"
+                                        v-model="district.selected"
+                                        :label="district.text"
+                                        density="compact"
+                                        hide-details
+                                    />
+                                    <template v-if="!district.isAggregation">
+                                        <v-btn
+                                            class="move-col left"
+                                            icon="mdi-chevron-left"
+                                            size="small"
+                                            density="compact"
+                                            :title="$t('additional:modules.tools.cosi.dashboard.moveColLeft')"
+                                            @click="moveCol(district, 0)"
+                                        />
+                                        <v-btn
+                                            class="move-col right ml-3"
+                                            icon="mdi-chevron-right"
+                                            size="small"
+                                            density="compact"
+                                            :title="$t('additional:modules.tools.cosi.dashboard.moveColRight')"
+                                            @click="moveCol(district, 1)"
+                                        />
+                                        <v-btn
+                                            class="move-col minimize"
+                                            :icon="district.minimized ? 'mdi-eye-off' : 'mdi-eye'"
+                                            size="small"
+                                            density="compact"
+                                            :title="$t('additional:modules.tools.cosi.dashboard.minimizeCol')"
+                                            @click="minimizeCol(district)"
+                                        />
+                                    </template>
+                                </div>
+                            </template>
+                            <!-- Column Group -->
+                            <template #[`group-header`]="{ item, columns, toggleGroup, isGroupOpen }">
+                                <tr>
+                                    <th
+                                        :colspan="columns.length"
+                                        class="text-start"
+                                    >
+                                        <v-icon @click="toggleGroup(item)">
+                                            {{ isGroupOpen(item) ? 'mdi-minus' : 'mdi-plus' }}
+                                        </v-icon>
+                                        {{ item.items[0].columns[districtColumns[0].text].group }}
+                                    </th>
+                                </tr>
+                            </template>
+                            <!-- Column Menu -->
+                            <template #[`item.menu`]="{ item }">
+                                <TableRowMenu
+                                    :item="item"
+                                    :fields="fields"
+                                    :selected-items="selectedItems"
+                                    @setField="setField"
+                                    @resetFields="resetFields"
+                                    @add="openCalcDialog('add', {field_A: fields.A, field_B: fields.B})"
+                                    @subtract="openCalcDialog('subtract', {field_A: fields.A, field_B: fields.B})"
+                                    @multiply="openCalcDialog('multiply', {field_A: fields.A, field_B: fields.B})"
+                                    @divide="openCalcDialog('divide', {field_A: fields.A, field_B: fields.B})"
+                                    @dividePercent="openCalcDialog('dividePercent', {field_A: fields.A, field_B: fields.B})"
+                                    @sum="openCalcDialog('sumUpSelected', {selectedItems})"
+                                    @divideSelected="addDivideSelectedCalculations"
+                                    @correlate="renderScatterplot"
+                                    @visualizationChanged="onVisualizationChanged"
+                                    @renderCharts="renderCharts"
+                                    @renderGroupedChart="renderGroupedCharts"
+                                    @delete="deleteStats"
+                                />
+                            </template>
+                            <!-- Column Year-->
+                            <template #[`item.years`]="{ item }">
+                                <div class="text-end">
+                                    <template v-if="item.expanded">
+                                        <ul class="timeline">
+                                            <li
+                                                v-for="year in item.years"
+                                                :key="year"
+                                            >
+                                                <small class="timestamp">{{ year }}</small>
+                                            </li>
+                                        </ul>
+                                    </template>
+                                    <template v-else>
+                                        <span><small class="timestamp">{{ currentTimeStamp }}</small></span>
+                                    </template>
+                                </div>
+                            </template>
+                            <!-- Columns of all Districts -->
+                            <template
+                                v-for="district in districtColumns"
+                                #[`item.${district.value}`]="{ item }"
+                            >
+                                <TableCell
+                                    :key="district.value"
+                                    :item="item"
+                                    :header="district"
+                                    :current-timestamp="currentTimeStamp"
+                                    :timestamp-prefix="timestampPrefix"
+                                    :current-locale="'de-DE'"
+                                    :tooltip-offset="toolOffset"
+                                    :trend-colors="trendColors"
+                                />
+                            </template>
+                            <!-- Columns for total data -->
+                            <template #[`item.total`]="{ item, header }">
+                                <TableCell
+                                    v-if="item.total"
+                                    :item="item"
+                                    :header="header"
+                                    :current-timestamp="currentTimeStamp"
+                                    :timestamp-prefix="timestampPrefix"
+                                    :current-locale="'de-DE'"
+                                    :tooltip-offset="toolOffset"
+                                    :trend-colors="trendColors"
+                                />
+                                <v-tooltip
+                                    v-else
+                                    bottom
+                                    :nudge-top="60"
+                                >
+                                    <template #activator="{ props }">
+                                        <div
+                                            class="text-end"
+                                            v-bind="props"
+                                        >
+                                            <template v-if="item.expanded">
+                                                <ul class="timeline">
+                                                    <li
+                                                        v-for="year in item.years"
+                                                        :key="year"
+                                                    >
+                                                        {{ getTotalAsString(item, year) }}
+                                                    </li>
+                                                </ul>
+                                            </template>
+                                            <template v-else>
+                                                <span>{{ getTotalAsString(item, currentTimeStamp) }}</span>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <span>{{ $t('additional:modules.tools.cosi.dashboard.totalCol') }} {{ item.expanded ? '' : `(${currentTimeStamp})` }}</span>
+                                </v-tooltip>
+                            </template>
+                            <!-- Columns for aggregated data -->
+                            <template #[`item.average`]="{ item, header }">
+                                <TableCell
+                                    v-if="item.average"
+                                    :item="item"
+                                    :header="header"
+                                    :current-timestamp="currentTimeStamp"
+                                    :timestamp-prefix="timestampPrefix"
+                                    :current-locale="'de-DE'"
+                                    :tooltip-offset="toolOffset"
+                                    :trend-colors="trendColors"
+                                />
+                                <v-tooltip
+                                    v-else
+                                    bottom
+                                    :nudge-top="60"
+                                >
+                                    <template #activator="{ props }">
+                                        <div
+                                            class="text-end"
+                                            v-bind="props"
+                                        >
+                                            <template v-if="item.expanded">
+                                                <ul class="timeline">
+                                                    <li
+                                                        v-for="year in item.years"
+                                                        :key="year"
+                                                    >
+                                                        {{ getAverageAsString(item, year) }}
+                                                    </li>
+                                                </ul>
+                                            </template>
+                                            <template v-else>
+                                                {{ getAverageAsString(item, currentTimeStamp) }}
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <span>{{ $t('additional:modules.tools.cosi.dashboard.avgCol') }} {{ item.expanded ? '' : `(${currentTimeStamp})` }}</span>
+                                </v-tooltip>
+                            </template>
+                        </v-data-table>
+                    </v-row>
+                </v-container>
+            </v-main>
+            <v-snackbar
+                v-model="calculationDialog"
+                :timeout="-1"
+                color="primary"
+                class="name-input"
+            >
+                {{ $t('additional:modules.tools.cosi.dashboard.nameCalc') }}
+                <v-text-field
+                    id="title-field"
+                    v-model="calculationData.id"
+                    name="session-title"
+                />
+
+                <template #actions="{ props }">
+                    <v-btn
+                        id="confirm-calc"
+                        v-bind="props"
+                        text
+                        :title="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
+                        @click="addCalculation(
+                            calculationData.operation,
+                            {field_A: calculationData.field_A, field_B: calculationData.field_B, selectedItems: calculationData.selectedItems},
+                            calculationData.id
+                        ); calculationDialog = false;"
+                    >
+                        <v-icon>mdi-calculator-variant</v-icon>
+                    </v-btn>
+                    <v-btn
+                        id="cancel-calc"
+                        v-bind="props"
+                        text
+                        @click="calculationDialog = false"
+                    >
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                </template>
+            </v-snackbar>
+        </v-app>
+    </div>
+</template>
+
+<style lang="scss">
+
+#dashboard-wrapper {
+    height: 100%;
+    .v-main {
+        height: 100%;
+        .v-container {
+            height: 100%;
+            .dashboard-table-wrapper {
+                height: calc(100% - 80px);
+            }
+        }
+    }
+
+    .name-input {
+        .v-snack__wrapper {
+            min-width: 40vw;
+        }
+    }
+
+
+    .dashboard-table {
+        height: 100%;
+        .v-table__wrapper {
+            overflow-x: auto;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        thead {
+            .district-header {
+                position: relative;
+                margin-top: 10px;
+                .move-col {
+                    position: absolute;
+                    top: -10px;
+                    font-size: 12px;
+                    &.left {
+                        left: 0px;
+                    }
+                    &.right {
+                        left: 10px;
+                    }
+                    &.minimize {
+                        right: 0px;
+                    }
+                }
+            }
+            .v-input {
+                font-size: unset;
+                label {
+                    font-size: 12px;
+                    font-weight: 700;
+                    i {
+                        font-size: 20px;
+                    }
+                }
+            }
+        }
+
+        th.minimized {
+            width: 20px;
+            max-width:20px;
+
+            .v-input {
+                display: none;
+            }
+            .move-col {
+                &.left {
+                    display: none;
+                }
+                &.right {
+                    display: none;
+                }
+                &.minimize {
+                    left: -10px;
+                    right: unset;
+                }
+            }
+        }
+
+        td {
+            vertical-align: top;
+
+            div.text-end {
+                text-align: right;
+            }
+            ul.timeline {
+                list-style: none;
+                li {
+                    text-align: right;
+                }
+            }
+            .timestamp {
+                color: $dark_blue;
+            }
+            .no-wrap {
+                white-space: nowrap;
+            }
+            .modified {
+                color: red;
+            }
+            .minimized {
+                overflow: hidden;
+                width: 20px;
+                display: none;
+            }
+        }
+    }
+}
+</style>

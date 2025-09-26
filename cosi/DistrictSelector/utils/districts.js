@@ -1,4 +1,4 @@
-import isObject from "../../../../src/utils/isObject";
+import isObject from "@shared/js/utils/isObject.js";
 
 /**
  * Finds a district by the given name.
@@ -43,7 +43,7 @@ function getStatisticByCategory (district, category) {
     return district.statFeatures.find(stat => stat.get("kategorie") === category);
 }
 
-export default {
+export {
     getDistrictByName,
     getStatisticByCategory
 };

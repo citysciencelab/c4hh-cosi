@@ -6,7 +6,7 @@ import {downloadBlobToFile} from "./downloadBlobToFile";
  * @param {String} filename - the filename of the file
  * @returns {void}
  */
-function download (dataUrl, filename) {
+export function download (dataUrl, filename) {
     const link = document.createElement("a");
 
     link.setAttribute("href", dataUrl);
@@ -23,7 +23,7 @@ function download (dataUrl, filename) {
  * @param {String} filename - the filename of the file
  * @returns {void}
 */
-function downloadJsonToFile (json, filename) {
+export function downloadJsonToFile (json, filename) {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
 
     download(dataStr, filename);
@@ -35,7 +35,7 @@ function downloadJsonToFile (json, filename) {
  * @param {String} filename - the filename of the file
  * @returns {void}
 */
-function downloadTextToFile (string, filename) {
+export function downloadTextToFile (string, filename) {
     const dataStr = "data:text/plain;charset=utf-8," + encodeURI(string);
 
     download(dataStr, filename);
@@ -47,13 +47,13 @@ function downloadTextToFile (string, filename) {
  * @param {String} filename - the filename of the file
  * @returns {void}
 */
-function downloadCsvToFile (string, filename) {
+export function downloadCsvToFile (string, filename) {
     const dataStr = "data:text/csv;charset=utf-8," + encodeURI(string);
 
     download(dataStr, filename);
 }
 
-export {
+export default {
     download,
     downloadCsvToFile,
     downloadJsonToFile,
