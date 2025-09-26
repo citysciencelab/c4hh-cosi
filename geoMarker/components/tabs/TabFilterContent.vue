@@ -13,6 +13,7 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isBetween from "dayjs/plugin/isBetween";
 import {GeoJSON} from "ol/format";
+import Style from "ol/style/Style";
 
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrAfter);
@@ -191,7 +192,25 @@ export default {
                 Object.values(department.layerIds).forEach(layerId => {
                     const layer = layerCollection.getLayerById(layerId);
 
-                    layer?.showFeaturesByIds(this.allFilteredFeatures.map(feat => feat.getId()));
+                    if (layer) {
+                        // This could have been done by function layer.showFeaturesByIds(idList) as well
+                        // but it is not working well together with geoMarker addon.
+                        // Opening a GFI for one feature and calling the above mentioned function afterwards
+                        // will make the feature vanish from the layer.
+                        const layerSource = layer.getLayerSource(),
+                            style = layer.getStyleAsFunction(layer.get("style")),
+                            allFeaturesOnLayer = layerSource.getFeatures(),
+                            filteredFeaturesIdList = this.allFilteredFeatures.map(feat => feat.getId());
+
+                        allFeaturesOnLayer.forEach(feature => {
+                            if (filteredFeaturesIdList.includes(feature.getId())) {
+                                feature.setStyle(style(feature));
+                            }
+                            else {
+                                feature.setStyle(new Style()); // empty style = invisible
+                            }
+                        });
+                    }
                 });
             });
 
