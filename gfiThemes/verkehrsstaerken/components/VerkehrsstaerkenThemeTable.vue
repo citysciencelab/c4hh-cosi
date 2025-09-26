@@ -17,7 +17,7 @@ export default {
         contentType: {
             type: String,
             required: false,
-            default: "Kfz"
+            default: "car"
         }
     },
     methods: {
