@@ -17,7 +17,7 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "husky": "9.1.7"
+    "husky": "^9.1.7"
   },
   "engines": {
     "node": "^22.19.0",

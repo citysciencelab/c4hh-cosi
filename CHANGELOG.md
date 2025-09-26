@@ -14,7 +14,6 @@
 - Added 'oktagon' to version 3.x
 
 ### Changed
-- packages: To avoid security issues, all packages have been fixed in package.json. No versions of patch releases will be accepted.
 - Verkehrsstärken gfiTheme: only shows data for the last 10 years.
 
 ### Deprecated

@@ -9,6 +9,6 @@
   },
   "scripts": {},
   "dependencies": {
-    "iframe-resizer": "4.3.7"
+    "iframe-resizer": "^4.3.7"
   }
 }
