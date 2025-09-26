@@ -28,7 +28,7 @@ export default {
          */
         getRowHeader (name) {
             switch (this.contentType) {
-                case "Rad":
+                case "bike":
                     if (name === "DTV") {
                         return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerDay");
                     }
@@ -36,10 +36,10 @@ export default {
                         return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerWeekday");
                     }
                     else if (name === "Anmerkung") {
-                        return "Anmerkung";
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.note");
                     }
                     else if (name === "Erhebungsmethode") {
-                        return "Erhebungsmethode";
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.method");
                     }
                     break;
                 default:
@@ -53,10 +53,10 @@ export default {
                         return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek");
                     }
                     else if (name === "Anmerkung") {
-                        return "Anmerkung";
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.note");
                     }
                     else if (name === "Erhebungsmethode") {
-                        return "Erhebungsmethode";
+                        return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.method");
                     }
             }
             return this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.constructionSiteInfluence");

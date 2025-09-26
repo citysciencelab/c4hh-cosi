@@ -19,9 +19,11 @@
                         "HGVsPerWeek": "SOHF share in ADTVw (%)",
                         "HGVsPerWeekTitle": "Share of heavy traffic in ADTVw",
                         "constructionSiteInfluence": "Construction site influence",
-                        "withConstructionSiteInfluence": "with construction site influence",
+                        "withConstructionSiteInfluence": "with note",
                         "category": "Category",
-                        "year": "Year"
+                        "year": "Year",
+                        "note": "Note",
+                        "method": "Survey method"
                     }
                 }
             }

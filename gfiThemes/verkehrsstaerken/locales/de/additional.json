@@ -21,7 +21,9 @@
                         "constructionSiteInfluence": "Baustelleneinfluss",
                         "withConstructionSiteInfluence": "mit Anmerkung",
                         "category": "Kategorie",
-                        "year": "Jahr"
+                        "year": "Jahr",
+                        "note": "Anmerkung",
+                        "method": "Erhebungsmethode"
                     }
                 }
             }

@@ -144,10 +144,10 @@ export default {
         determineContentType () {
             if (this.feature && typeof this.feature.getTitle === "function") {
                 if (this.feature.getTitle().toLowerCase().includes("rad")) {
-                    this.contentType = "Rad";
+                    this.contentType = "bike";
                 }
                 else {
-                    this.contentType = "Kfz";
+                    this.contentType = "car";
                 }
             }
         },

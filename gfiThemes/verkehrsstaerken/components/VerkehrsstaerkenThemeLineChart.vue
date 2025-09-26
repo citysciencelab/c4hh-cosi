@@ -38,7 +38,7 @@ export default {
     },
     computed: {
         hasHGVsPerWeek: function () {
-            if (this.contentType === "Rad") {
+            if (this.contentType === "bike") {
                 return false;
             }
             return this.dataset.filter(data => Object.prototype.hasOwnProperty.call(data, "Schwerverkehrsanteil am DTVw")).length > 0;
@@ -208,8 +208,8 @@ export default {
          */
         createDatasetLabel: function (category) {
             const categories = {
-                "DTV": this.contentType === "Rad" ? this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerDay") : this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay"),
-                "DTVw": this.contentType === "Rad" ? this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerDay") : this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerWeekday"),
+                "DTV": this.contentType === "bike" ? this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerDay") : this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerDay"),
+                "DTVw": this.contentType === "bike" ? this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.bikesPerDay") : this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.carsPerWeekday"),
                 "Schwerverkehrsanteil am DTVw": this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.HGVsPerWeek")
             };
 
@@ -389,10 +389,12 @@ export default {
         @media (min-width: 768px) {
             width: 80%;
             height: 80%;
+            max-height: 50vh;
         }
         @media (min-width: 1024px) {
             width: 70%;
             height: 70%;
+            max-height: 54vh;
         }
     }
 }
