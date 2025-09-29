@@ -3,7 +3,12 @@
         "geoMarker": {
             "name": "GeoMarker",
             "description": "Anwendung für Informationen, die der Laufendhaltung der Geobasisdaten dienen.",
-            "screenshotImage": "Screenshot",
+            "screenshot": {
+              "altImage": "Screenshot",
+              "buttonCreate": "Screenshot erzeugen",
+              "buttonPreview": "Vorschau des Screenshots ansehen",
+              "buttonDelete": "Screenshot löschen"
+            },
             "status": {
                 "offen": "offen",
                 "inaktiv": "inaktiv",

@@ -180,7 +180,8 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                 plugins: [store]
             },
             props: {
-                fullyLoaded: true
+                fullyLoaded: true,
+                tabActive: true
             }
         });
 
