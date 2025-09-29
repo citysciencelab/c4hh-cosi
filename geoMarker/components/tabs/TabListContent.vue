@@ -12,7 +12,9 @@ export default {
     },
     data () {
         return {
-            selectedListItemId: null
+            selectedListItemId: null,
+            geoMarkerUpdateMode: false,
+            showUpdateMessage: false
         };
     },
     computed: {
@@ -21,7 +23,9 @@ export default {
             "geoMarkerShortFeatureId",
             "geoMarkerState",
             "geoMarkerFeatureSelected",
-            "geoMarkerWfsFeatureType"
+            "geoMarkerWfsFeatureType",
+            "departments",
+            "geoMarkerUpdateFeature"
         ]),
         ...mapGetters("Menu", [
             "currentMenuWidth",
@@ -98,22 +102,34 @@ export default {
         geoMarkerFeatureSelected (feature) {
             if (feature) {
                 this.removePointMarker();
+                this.placingPointMarker(feature?.getGeometry().getCoordinates());
             }
 
-            this.placingPointMarker(feature?.getGeometry().getCoordinates());
+            this.defineUpdateLayers();
         },
         geoMarkerFeatureList () {
             this.removePointMarker();
+        },
+        geoMarkerUpdateFeature (newValue) {
+            if (newValue) {
+                this.showUpdateMessage = true;
+            }
+            else {
+                this.showUpdateMessage = false;
+            }
         }
     },
     methods: {
         ...mapMutations("Modules/GeoMarker", [
             "setGeoMarkerFeatureList",
-            "setGeoMarkerFeatureSelected"
+            "setGeoMarkerFeatureSelected",
+            "setGeoMarkerUpdateLayerIds"
         ]),
-        ...mapMutations("Menu", ["setExpandedBySide"]),
-        ...mapActions("Menu", ["changeCurrentComponent"]),
         ...mapActions("Maps", ["setCenter", "setZoom", "placingPointMarker", "removePointMarker"]),
+        ...mapActions("Modules/GeoMarker", [
+            "setMapInteraction",
+            "rollbackGeoMarkerUpdateFeature"
+        ]),
         setSelectedFeature (item) {
             this.setGeoMarkerFeatureSelected(
                 this.geoMarkerFeatureList.find(feature => feature.getId() === item.featureId)
@@ -176,6 +192,42 @@ export default {
                     view.setZoom(setZoom);
                 }
             }
+        },
+        defineUpdateLayers () {
+            if (this.geoMarkerFeatureSelected) {
+                if (this.geoMarkerUpdateMode) {
+                    const updateProperties = this.geoMarkerFeatureSelected.getProperties(),
+                        departmentKeys = Object.keys(this.departments),
+                        updateLayers = Object.entries(updateProperties)
+                            // eslint-disable-next-line no-unused-vars
+                            .filter(([key, value]) => ["offen", "inaktiv", "geschlossen"].includes(value)),
+                        allUpdateLayers = updateLayers.map(layer => {
+                            const department = departmentKeys.find(key => {
+                                return layer[0].includes(key) ? this.departments[key].layerIds[layer[1]] : null;
+                            });
+
+                            return this.departments[department].layerIds[layer[1]];
+                        });
+
+                    this.setGeoMarkerUpdateLayerIds(allUpdateLayers);
+                    this.setMapInteraction("update");
+                }
+                else {
+                    this.setGeoMarkerUpdateLayerIds([]);
+                    this.setMapInteraction(null);
+                }
+            }
+        },
+        toggleUpdateMode () {
+            this.geoMarkerUpdateMode = !this.geoMarkerUpdateMode;
+
+            if (this.geoMarkerUpdateMode) {
+                this.defineUpdateLayers();
+            }
+            else {
+                this.rollbackGeoMarkerUpdateFeature();
+                this.setMapInteraction(null);
+            }
         }
     }
 };
@@ -191,19 +243,26 @@ export default {
         </p>
 
         <template v-if="tableData.items?.length">
-            <SelectableList
-                :selected-item-id="selectedListItemId"
-                :table-data="tableData"
-                @item-selected="setSelectedFeature"
-            >
-                <template #cell-aktion>
-                    <IconButton
-                        :class="'cellActionIconButton'"
-                        :aria="$t('additional:modules.geoMarker.GeoMakerList.table.aktionButtonLabel')"
-                        :icon="'bi-eye'"
-                    />
-                </template>
-            </SelectableList>
+            <div class="geoMarkerListContainer">
+                <SelectableList
+                    :selected-item-id="selectedListItemId"
+                    :table-data="tableData"
+                    @item-selected="setSelectedFeature"
+                >
+                    <template #cell-aktion>
+                        <IconButton
+                            class="cellActionIconButton"
+                            :aria="$t('additional:modules.geoMarker.GeoMakerList.table.aktionButtonLabel')"
+                            icon="bi-eye"
+                        />
+                    </template>
+                </SelectableList>
+
+                <div
+                    v-if="geoMarkerUpdateMode"
+                    class="geoMarkerUpdateOverlay"
+                />
+            </div>
         </template>
 
         <div v-else>
@@ -228,16 +287,30 @@ export default {
             />
 
             <IconButton
+                :class-array="['btn-light', 'me-2', 'listAction', geoMarkerUpdateMode ? 'geoMarkerUpdateMode' : '']"
+                :aria="$t('additional:modules.geoMarker.GeoMakerList.button.moveGeoMarker')"
+                icon="bi-arrows-move"
+                :disabled="!geoMarkerFeatureSelected"
+                @click="toggleUpdateMode()"
+            />
+
+            <IconButton
                 :class-array="['btn-light', 'me-2', 'listAction']"
                 :aria="$t('additional:modules.geoMarker.GeoMakerList.button.openVcOblique')"
                 icon="bi-image"
                 @click="openVcOblique()"
             />
+
+            <p v-if="showUpdateMessage">
+                {{ $t('additional:modules.geoMarker.GeoMakerList.updateMessage') }}
+            </p>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
+@import "~variables";
+
 .tabListContent {
     display: flex;
     flex-direction: column;
@@ -260,6 +333,28 @@ export default {
         justify-content: flex-start;
         gap: 0.5rem;
         margin-top: 0.5rem;
+
+        :deep(button.geoMarkerUpdateMode) {
+            background-color: $dark_blue;
+            border-color: #fdfdff;
+            color: white
+        }
+    }
+
+    div.geoMarkerListContainer {
+        position: relative;
+
+        div.geoMarkerUpdateOverlay {
+            background: rgba(255,255,255,0.5);
+            z-index: 10;
+            cursor: not-allowed;
+            pointer-events: all;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
     }
 }
 </style>

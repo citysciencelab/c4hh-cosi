@@ -23,7 +23,15 @@
  * @property {TransactionLayer[]} layerInformation Information about the WFS-T layer used for editing configured for the tool.
  * @property {Feature} newGeoMarkerFeature The newly created GeoMarker feature
  * @property {String} geoMarkerEditLayerId The id of the layer where the drawn features are stored
- * @property {String} selectedInteraction Which map interaction is currently active, if any.
+ * @property {String|null} geoMarkerUpdateLayerIds - The id(s) of the layer(s) which contain the selected GeoMarker feature
+ * @property {Object|null} updateGeoMarkerFeature - The GeoMarker feature being updated
+ * @property {Object|null} rollbackGeoMarkerFeature - The feature to roll back to
+ * @property {String|null} selectedInteraction - Which map interaction is currently active, if any.
+ * @property {Object|null} drawInteraction - The current draw interaction object
+ * @property {Object|null} drawLayer - Temporary layer used for drawing features
+ * @property {Object|null} modifyInteraction - The current modify interaction object
+ * @property {Object|null} selectInteraction - The current select interaction object
+ * @property {Object|null} translateInteraction - The current translate interaction object
  * @property {String[]} statusOptions - List of possible selections for 'status'
  * @property {Object} filterSelections - settings the user chose for the filter
  * @property {Boolean} initialLoading - only true for initial loading to indicate whether the filter needs to wait for all features loaded
@@ -53,7 +61,15 @@ const state = {
     layerInformation: [],
     newGeoMarkerFeature: null,
     geoMarkerEditLayerId: "geomarker_edit",
+    geoMarkerUpdateLayerIds: null,
+    geoMarkerUpdateFeature: null,
+    rollbackGeoMarkerFeature: null,
     selectedInteraction: null,
+    drawInteraction: null,
+    drawLayer: null,
+    modifyInteraction: null,
+    selectInteraction: null,
+    translateInteraction: null,
     // filter settings
     statusOptions: ["offen", "geschlossen", "inaktiv"],
     filterSelections: {

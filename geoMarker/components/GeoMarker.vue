@@ -23,22 +23,39 @@ export default {
             "categories",
             "departments",
             "geoMarkerActiveTab",
-            "geoMarkerEditLayerId"
+            "geoMarkerEditLayerId",
+            "rollbackGeoMarkerFeature",
+            "geoMarkerFeatureList"
         ]),
         ...mapGetters(["allLayerConfigs"])
     },
     watch: {
-        geoMarkerActiveTab (newValue) {
+        geoMarkerActiveTab (newValue, oldValue) {
             switch (newValue) {
                 case "tabNew":
                     this.setNewGeoMarkerFeature(null);
+                    this.setGeoMarkerUpdateFeature(null);
                     this.setMapInteraction("Point");
+
+                    if (this.rollbackGeoMarkerFeature && oldValue === "tabList") {
+                        this.rollbackGeoMarkerUpdateFeature();
+                        this.$refs.tabList && (this.$refs.tabList.geoMarkerUpdateMode = false);
+                    }
                     break;
                 case "tabFilter":
                     this.setMapInteraction(null);
+                    this.setGeoMarkerUpdateFeature(null);
+
+                    if (this.rollbackGeoMarkerFeature && oldValue === "tabList") {
+                        this.rollbackGeoMarkerUpdateFeature();
+                        this.$refs.tabList && (this.$refs.tabList.geoMarkerUpdateMode = false);
+                    }
                     break;
                 case "tabList":
-                    this.setMapInteraction("update");
+                    this.setMapInteraction(null);
+                    this.setGeoMarkerUpdateFeature(null);
+                    this.setGeoMarkerFeatureSelected(null);
+                    this.setNewGeoMarkerFeature(null);
                     break;
                 default:
                     this.setMapInteraction(null);
@@ -63,12 +80,17 @@ export default {
         ...mapMutations("Modules/GeoMarker", [
             "setGeoMarkerActiveTab",
             "setLayerInformation",
-            "setNewGeoMarkerFeature"
+            "setNewGeoMarkerFeature",
+            "setGeoMarkerUpdateFeature",
+            "setGeoMarkerFeatureSelected",
+            "setGeoMarkerFeatureList",
+            "setLockListSelection"
         ]),
         ...mapActions("Modules/GeoMarker", [
             "loadCategories",
             "loadDepartments",
-            "setMapInteraction"
+            "setMapInteraction",
+            "rollbackGeoMarkerUpdateFeature"
         ]),
         setCurrentTab (tab) {
             this.setGeoMarkerActiveTab(tab);
@@ -79,6 +101,7 @@ export default {
          */
         resetGeomarkerFeature () {
             this.setNewGeoMarkerFeature(null);
+            this.setGeoMarkerUpdateFeature(null);
             this.setMapInteraction(null);
         }
     }
@@ -113,6 +136,7 @@ export default {
                 :active="geoMarkerActiveTab === 'tabList'"
                 target="#tabListContent"
                 :label="$t('additional:modules.geoMarker.tabs.tabList.label')"
+                :active-tab="geoMarkerActiveTab === 'tabList'"
                 @click="setCurrentTab('tabList')"
             />
         </ul>
@@ -163,7 +187,7 @@ export default {
                 aria-labelledby="tabList"
                 tabindex="0"
             >
-                <TabListContent />
+                <TabListContent ref="tabList" />
             </div>
         </div>
     </div>

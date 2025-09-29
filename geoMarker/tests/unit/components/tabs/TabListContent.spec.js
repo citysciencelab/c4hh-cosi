@@ -85,7 +85,7 @@ describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
 
         const buttons = wrapper.findAll(".listAction");
 
-        expect(buttons.length).to.equal(3);
+        expect(buttons.length).to.equal(4);
     });
 
     it("all buttons are not disabled when geoMarkerFeatureSelected is a feature", async () => {

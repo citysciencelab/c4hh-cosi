@@ -56,8 +56,10 @@
                     "openVcOblique": "Schrägluftbilder öffnen",
                     "openPanorama": " 360° Panorama öffnen",
                     "centerMapOnGeoMarker": "Karte auf GeoMarker zentrieren",
-                    "zoomToGeoMarker": "Auf GeoMarker zoomen"
-                }
+                    "zoomToGeoMarker": "Auf GeoMarker zoomen",
+                    "moveGeoMarker": "GeoMarker verschieben"
+                },
+                "updateMessage": "Der GeoMarker wurde verschoben. Bitte speichern Sie den GeoMarker, um die Änderung zu übernehmen."
             },
             "filter": {
                 "isFiltering": "Bitte etwas Geduld, die GeoMarker werden gerade gefiltert ...",
