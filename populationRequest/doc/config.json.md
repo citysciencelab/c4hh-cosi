@@ -41,8 +41,10 @@ Siehe Details zur Konfiguration mit OGC API Processes Dienst im Beispiel unten.
 |icon|nein|String||CSS Klasse des Bootstrap Icon, das vor dem Toolnamen im Menu angezeigt wird. |false|
 |type|ja|String||ID des Addons: populationRequest|false|
 |populationReqServiceId|nein|String|"2"|In rest-services.[...].json konfigurierte Service-ID|false|
-|serviceId|nein|String|"1001"|In rest-services.[...].json konfigurierte Service-ID. |false|
-|processName|nein|String|"einwohner_ermitteln.fmw"|Name des zu verwendenden Processes. Ausschließlich für Dienste vom Typ "oap". |false|
+|wpsId|nein|String|"1001"|In rest-services.[...].json konfigurierte Service-ID. Für Rückwärtskompatibilität beibehalten. Wird von `serviceId` überschrieben. |false|
+|serviceId|nein|String|null|In rest-services.[...].json konfigurierte Service-ID. Überschreibt `wpsId`. |false|
+|fmwProcess|nein|String|"einwohner_ermitteln.fmw"|Name des zu verwendenden Processes. Für Rückwärtskompatibilität beibehalten. Wird von `processName` überschrieben. |false|
+|processName|nein|String|null|Name des zu verwendenden Processes. Überschreibt `fmwProcess`. |false|
 |mrhId|nein|String|"46969C7D-FAA8-420A-81A0-8352ECCFF526"|Id des mrh Prozesses. Ausschließlich für Dienste vom Typ "wfs". Für Rückwärtskompatibilität beibehalten. |false|
 |fhhId|nein|String|"B3FD9BD5-F614-433F-A762-E14003C300BF"|Id des fhh Prozesses. Ausschließlich für Dienste vom Typ "wfs". Für Rückwärtskompatibilität beibehalten. |false|
 |rasterLayerId|nein|String|"13023"|Id des Rasterlayers für Einwohnerzahlen, der bei Bedarf über die UI eingeblendet werden kann. |false|

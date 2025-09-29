@@ -38,7 +38,7 @@
 - Added README.md for the Addon Cesium 3D Tiles Inspector.
 - Verkehrsstärken gfiTheme: Added Fullscreenview-button.
 - Added 'oktagon' to version 3.x
-- Added support for OGC API Processes in PopulationRequest addon.
+- PopulationRequest: Added support for OGC API Processes.
 
 ### Changed
 - Verkehrsstärken gfiTheme: only shows data for the last 10 years.

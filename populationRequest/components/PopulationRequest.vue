@@ -21,7 +21,9 @@ export default {
             "rasterActive",
             "alkisAdressesActive",
             "populationReqServiceId",
+            "wpsId",
             "serviceId",
+            "fmwProcess",
             "processName",
             "processData",
             "geometry",
@@ -75,7 +77,7 @@ export default {
          * @returns {Object} service
          */
         service () {
-            return this.restServiceById(this.serviceId);
+            return this.restServiceById(this.serviceId ?? this.wpsId);
         },
         /**
          * Whether the service is an OAP service
@@ -94,7 +96,7 @@ export default {
             }
 
             if (this.isOAPService) {
-                return `${this.service.url}/processes/${this.processName}?f=html`;
+                return `${this.service.url}/processes/${this.processName ?? this.fmwProcess}?f=html`;
             }
 
             const metadataService = this.restServiceById(this.populationReqServiceId);
@@ -199,7 +201,7 @@ export default {
             const service = this.service;
 
             if (service === undefined) {
-                console.warn("Rest Service with the ID " + this.serviceId + " is not configured in rest-services.json!");
+                console.warn("Rest Service with the ID " + (this.serviceId ?? this.wpsId) + " is not configured in rest-services.json!");
             }
             else if (this.isOAPService) {
                 this.fetchOAP({feature: geoJson, service}).catch((e) => {
@@ -209,7 +211,7 @@ export default {
                 });
             }
             else {
-                WPS.wpsRequest(this.serviceId, service.url, this.processName, {
+                WPS.wpsRequest(this.serviceId ?? this.wpsId, service.url, this.processName ?? this.fmwProcess, {
                     "such_flaeche": JSON.stringify(geoJson)
                 }, this.handleResponse.bind(this));
             }

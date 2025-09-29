@@ -12,8 +12,10 @@
  * @property {Boolean} rasterActive is the rasterLayer active
  * @property {Boolean} alkisAdressesActive is the alkisAdressesLayer active
  * @property {Number} populationReqServiceId id of the population Request
- * @property {String} serviceId The id of the used processing service.
- * @property {String} processName Name of the process triggered via the service.
+ * @property {String} wpsId The id of the used web processing service.
+ * @property {String} serviceId The id of the used processing service. Overwrites `wpsId`.
+ * @property {String} fmwProcess FME process triggered via the WPS.
+ * @property {String} processName Name of the process triggered via the service. Overwrites `fmwProcess`.
  * @property {Object} processData Data returned from the process.
  * @property {String} mrhId The id of the MRH process. Kept for backward compatibility.
  * @property {String} fhhId The id of the FHH process. Kept for backward compatibility.
@@ -32,8 +34,10 @@ const state = {
     rasterActive: undefined,
     alkisAdressesActive: undefined,
     populationReqServiceId: "2",
-    serviceId: "1001",
-    processName: "einwohner_ermitteln.fmw",
+    wpsId: "1001",
+    serviceId: null,
+    fmwProcess: "einwohner_ermitteln.fmw",
+    processName: null,
     processData: undefined,
     mrhId: "46969C7D-FAA8-420A-81A0-8352ECCFF526",
     fhhId: "B3FD9BD5-F614-433F-A762-E14003C300BF",
