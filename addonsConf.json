@@ -149,6 +149,10 @@
     "path": "cosi/DistrictSelector",
     "type": "tool"
   },
+  "districtFinder": {
+    "path": "cosi/DistrictFinder",
+    "type": "tool"
+  },
   "accessibilityAnalysis": {
     "path": "cosi/AccessibilityAnalysis",
     "type": "tool"

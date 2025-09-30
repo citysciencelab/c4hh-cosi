@@ -1,5 +1,4 @@
-
-import {generateSimpleGetters} from "../../../../src/shared/js/utils/generators";
+import {generateSimpleGetters} from "@shared/js/utils/generators.js";
 import districtSelectorState from "./stateDistrictSelector";
 
 const getters = {
