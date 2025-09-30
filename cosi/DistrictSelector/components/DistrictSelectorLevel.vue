@@ -1,6 +1,6 @@
 <script>
 import {VChip} from "vuetify/components/VChip";
-import {VChipGroup} from "vuetify/components";
+import {VChipGroup} from "vuetify/components/VChipGroup";
 
 export default {
     name: "DistrictSelectorLevel",
@@ -31,8 +31,7 @@ export default {
 
 <template lang="html">
     <div
-        class="district-selector-level
-        mb-4"
+        class="district-selector-level mb-4"
     >
         <label
             class="text-black-50"

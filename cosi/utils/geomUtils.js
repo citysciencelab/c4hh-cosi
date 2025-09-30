@@ -46,6 +46,9 @@ export function getAllContainingDistricts (districtLevels, feature, multiple = f
 export function getContainingDistrictForFeature (districtLevel, feature, returnsFeature = true, multiple = false) {
     const containingDistricts = [];
 
+    if (!districtLevel) {
+        return [];
+    }
     for (const district of districtLevel.districts) {
         const geom = district.adminFeature.getGeometry(),
             featureExtent = feature.getGeometry().getExtent(),

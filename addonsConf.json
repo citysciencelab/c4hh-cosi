@@ -160,5 +160,9 @@
   "colorCodeMap": {
     "path":"cosi/ColorCodeMap",
     "type": "tool"
+  },
+  "featuresList": {
+    "path":"cosi/FeaturesList",
+    "type": "tool"
   }
 }

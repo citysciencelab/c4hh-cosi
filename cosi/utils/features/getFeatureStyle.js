@@ -7,7 +7,7 @@ import {Fill, Stroke, Style, Icon} from "ol/style.js";
  * @param {function} layerStyleFunction - the style function of the layer
  * @returns {module:ol/Style} the feature style
  */
-export function getFeatureStyle (feature, layerStyleFunction) {
+export default function getFeatureStyle (feature, layerStyleFunction) {
     // return the feature's style if exists
     if (feature.getStyle()) {
         return feature.getStyle();

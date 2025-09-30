@@ -4,7 +4,7 @@
  * @param {{area: {key: string, factorToSqm: number}[], lineString: {key: string, factorToM: number}[]}} geomAttributes -the area related attributes to set
  * @returns {void}
  */
-export function setGeomAttributes (feature, geomAttributes) {
+export default function setGeomAttributes (feature, geomAttributes) {
     const geometry = feature.getGeometry(),
         type = geometry?.getType();
 

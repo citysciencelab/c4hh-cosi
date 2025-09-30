@@ -49,7 +49,7 @@ const state = {
     remoteMetadata: {}, // after data is loaded, we also pull metadata remotely and store it here.
     renderToWindow: true,
     resizableWindow: false,
-    selectedDistrictLevel: {},
+    selectedDistrictLevel: undefined,
     selectedDistrictLevelId: undefined,
     selectedDistrictsCollection: null,
     selectedDistrictNames: [],
