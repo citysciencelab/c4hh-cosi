@@ -172,5 +172,9 @@
   "areaSelector": {
     "path":"cosi/AreaSelector",
     "type": "tool"
+  },
+  "templateAdmin": {
+    "path": "cosi/TemplateAdmin",
+    "type": "tool"
   }
 }
