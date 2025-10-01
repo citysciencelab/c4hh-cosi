@@ -240,19 +240,19 @@ export default {
             const promises = [];
 
             this.departmentsToFilter.forEach(async options => {
-                // if status is empty or status contains 'offen', set layerIds.open to visible
+                // if status is empty or status contains 'offen', set layerIds.offen to visible
                 if (this.statusAllOrOpen) {
-                    promises.push(this.setLayerVisible(options.layerIds.open));
+                    promises.push(this.setLayerVisible(options.layerIds.offen));
                 }
 
-                // if status is empty or status contains 'inaktiv', set layerIds.inactive to visible
+                // if status is empty or status contains 'inaktiv', set layerIds.inaktiv to visible
                 if (this.statusAllOrInactive) {
-                    promises.push(this.setLayerVisible(options.layerIds.inactive));
+                    promises.push(this.setLayerVisible(options.layerIds.inaktiv));
                 }
 
-                // if status is empty or status contains 'geschlossen', set layerIds.closed to visible
+                // if status is empty or status contains 'geschlossen', set layerIds.geschlossen to visible
                 if (this.statusAllOrClosed) {
-                    promises.push(this.setLayerVisible(options.layerIds.closed));
+                    promises.push(this.setLayerVisible(options.layerIds.geschlossen));
                 }
             });
 
@@ -299,19 +299,19 @@ export default {
                     let layer;
                     const layerIdsToCheck = [];
 
-                    // if status is empty or status contains 'offen', check layerIds.open for departments
+                    // if status is empty or status contains 'offen', check layerIds.offen for departments
                     if (this.statusAllOrOpen) {
-                        layerIdsToCheck.push(options.layerIds.open);
+                        layerIdsToCheck.push(options.layerIds.offen);
                     }
 
-                    // if status is empty or status contains 'inaktiv', check layerIds.inactive for departments
+                    // if status is empty or status contains 'inaktiv', check layerIds.inaktiv for departments
                     if (this.statusAllOrInactive) {
-                        layerIdsToCheck.push(options.layerIds.inactive);
+                        layerIdsToCheck.push(options.layerIds.inaktiv);
                     }
 
-                    // if status is empty or status contains 'geschlossen', check layerIds.closed for departments
+                    // if status is empty or status contains 'geschlossen', check layerIds.geschlossen for departments
                     if (this.statusAllOrClosed) {
-                        layerIdsToCheck.push(options.layerIds.closed);
+                        layerIdsToCheck.push(options.layerIds.geschlossen);
                     }
 
                     layerIdsToCheck.forEach(layerId => {
