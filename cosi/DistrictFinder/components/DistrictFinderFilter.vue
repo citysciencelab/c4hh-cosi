@@ -29,7 +29,6 @@ export default {
             activeCardId: "",
             copyValue: false,
             isFieldValidated: true,
-            keyOfAttrNameForSelectedLayer: "",
             loader: null,
             numberOfLimitedAreas: 20,
             olFeatures: [],
@@ -123,10 +122,10 @@ export default {
         this.resetFilteredLayer();
     },
     methods: {
-        ...mapActions("Modules/DistrictSelector", ["setDistrictsByName"]),
+        ...mapActions("Modules/DistrictSelector", ["loadStatFeatures"]),
         ...mapActions("Maps", ["addNewLayerIfNotExists"]),
         ...mapMutations("Modules/DistrictFinder", ["setCardList", "setConditionDate", "setConditionTitle", "setFilteredLayer", "setMapping"]),
-        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevel", "setSelectedDistrictLevelId"]),
+        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictNames", "setSelectedDistrictLevel", "setSelectedDistrictLevelId"]),
 
         /**
          * Adds a new card to the list of cards.
@@ -440,15 +439,18 @@ export default {
          * @returns {void}
          */
         async setDistricts () {
-            const districtsToSet = this.selectedDistrictLevel?.districtNamesMap
-                ? this.resolveByMapping(this.resultList, this.reverseDistrictNamesMap(this.selectedDistrictLevel.districtNamesMap))
-                : this.resultList;
+            const districtNamesToSet = this.selectedDistrictLevel?.districtNamesMap
+                    ? this.resolveByMapping(this.resultList, this.reverseDistrictNamesMap(this.selectedDistrictLevel.districtNamesMap))
+                    : this.resultList,
+                districtsToSet = this.selectedDistrictLevel.districts.filter(d => districtNamesToSet.includes(d.getName()));
 
+            districtsToSet.forEach(d => {
+                d.isSelected = true;
+            });
             this.setSelectedDistrictLevelId(this.selectedLevelId);
             this.setSelectedDistrictLevel(this.selectedDistrictLevel);
-            await this.$nextTick();
-            this.setDistrictsByName({districtNames: districtsToSet});
-            this.resetFilteredLayer();
+            this.setSelectedDistrictNames(districtNamesToSet);
+            this.loadStatFeatures({districtLevel: this.selectedDistrictLevel, districts: districtsToSet});
         },
 
         /**
