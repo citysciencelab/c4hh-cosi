@@ -48,7 +48,7 @@ export default {
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Modules/DistrictSelector", Object.keys(getters)),
         ...mapGetters(["visibleSubjectDataLayerConfigs", "allLayerConfigs", "visibleLayerConfigs"]),
-        // ...mapGetters("Modules/AreaSelector", {areaSelectorGeom: "geometry"}),
+        ...mapGetters("Modules/AreaSelector", {areaSelectorGeom: "geometry"}),
 
         layerList () {
             return mapCollection.getMap("2D").getLayers().getArray();
@@ -485,99 +485,102 @@ export default {
             :summary="$t('additional:modules.cosi.districtSelector.description')"
         />
         <hr class="my-4 mx-0 text-black-50">
-        <DistrictSelectorLevel
-            :district-levels="districtLevels"
-            :selected-level-id="selectedDistrictLevelId"
-            @setSelectedDistrictLevelId="setSelectedDistrictLevelId"
-        />
-        <DistrictSelectorFilter
-            :district-levels="districtLevels"
-            :selected-level-id="selectedDistrictLevelId"
-            :selected-district-names-by-map="selectedDistrictNames"
-            @updateSelectedDistricts="updateSelectedFeatures"
-        />
-        <hr class="my-4 mx-0 text-black-50">
-        <AccordionItem
-            id="hidden-objects"
-            :title="$t('additional:modules.cosi.districtSelector.drawLabel')"
-            icon="bi bi-plus-square-dotted"
-        >
-            <div class="d-flex align-items-center">
-                <IconButton
-                    :id="'drawButton'"
-                    :aria="'Rechteck zeichnen'"
-                    :class-array="['btn-primary', 'me-3', dragBox.getActive() ? 'active': '']"
-                    :icon="'bi bi-square'"
-                    :interaction="() => toggleDragBox()"
-                />
-            </div>
-        </AccordionItem>
-        <div v-if="Object.keys(additionalInfoLayers).length">
+        <template v-if="districtLevels.length && selectedDistrictLevelId">
+            <DistrictSelectorLevel
+                :district-levels="districtLevels"
+                :selected-level-id="selectedDistrictLevelId"
+                @setSelectedDistrictLevelId="setSelectedDistrictLevelId"
+            />
+            <DistrictSelectorFilter
+                :district-levels="districtLevels"
+                :selected-level-id="selectedDistrictLevelId"
+                :selected-district-names-by-map="selectedDistrictNames"
+                @updateSelectedDistricts="updateSelectedFeatures"
+            />
+
+            <hr class="my-4 mx-0 text-black-50">
             <AccordionItem
-                id="hidden-objects2"
-                :title="$t('additional:modules.cosi.districtSelector.additionalLayer')"
-                icon="bi bi-layers-half"
+                id="hidden-objects"
+                :title="$t('additional:modules.cosi.districtSelector.drawLabel')"
+                icon="bi bi-plus-square-dotted"
             >
-                <div class="mb-2">
-                    {{ $t('additional:modules.cosi.districtSelector.additionalInfoLayersHelp') }}
-                </div>
-                <div
-                    v-for="(ids, key) in additionalInfoLayers"
-                    :key="key"
-                    class="form-check form-switch me-3"
-                >
-                    <input
-                        id="layerSwitcher"
-                        v-model="visibleAdditionalLayers"
-                        class="form-check-input rounded-pill me-1"
-                        type="checkbox"
-                        :value="key"
-                        role="switch"
-                        aria-checked="false"
-                        @change="switchAdditionalLayers"
-                    >
-                    <label
-                        class="form-check-label"
-                        for="layerSwitcher"
-                    >
-                        {{ key }}
-                    </label>
+                <div class="d-flex align-items-center">
+                    <IconButton
+                        :id="'drawButton'"
+                        :aria="'Rechteck zeichnen'"
+                        :class-array="['btn-primary', 'me-3', dragBox.getActive() ? 'active': '']"
+                        :icon="'bi bi-square'"
+                        :interaction="() => toggleDragBox()"
+                    />
                 </div>
             </AccordionItem>
-        </div>
-        <AccordionItem
-            id="hidden-objects3"
-            :title="$t('additional:modules.cosi.districtSelector.inputLabel')"
-            icon="bi bi-record-circle"
-        >
-            <input
-                v-if="enableBuffer"
-                id="input-buffer"
-                v-model="bufferVal"
-                class="form-control w-25"
-                type="number"
-                step="250"
-                min="0"
+            <div v-if="Object.keys(additionalInfoLayers).length">
+                <AccordionItem
+                    id="hidden-objects2"
+                    :title="$t('additional:modules.cosi.districtSelector.additionalLayer')"
+                    icon="bi bi-layers-half"
+                >
+                    <div class="mb-2">
+                        {{ $t('additional:modules.cosi.districtSelector.additionalInfoLayersHelp') }}
+                    </div>
+                    <div
+                        v-for="(ids, key) in additionalInfoLayers"
+                        :key="key"
+                        class="form-check form-switch me-3"
+                    >
+                        <input
+                            id="layerSwitcher"
+                            v-model="visibleAdditionalLayers"
+                            class="form-check-input rounded-pill me-1"
+                            type="checkbox"
+                            :value="key"
+                            role="switch"
+                            aria-checked="false"
+                            @change="switchAdditionalLayers"
+                        >
+                        <label
+                            class="form-check-label"
+                            for="layerSwitcher"
+                        >
+                            {{ key }}
+                        </label>
+                    </div>
+                </AccordionItem>
+            </div>
+            <AccordionItem
+                id="hidden-objects3"
+                :title="$t('additional:modules.cosi.districtSelector.inputLabel')"
+                icon="bi bi-record-circle"
             >
-        </AccordionItem>
-        <div class="d-grid d-flex justify-content-between mt-5">
-            <FlatButton
-                id="confirmButton"
-                icon="bi-check"
-                type="button"
-                :aria-label="$t('additional:modules.cosi.districtSelector.buttonConfirm')"
-                :text="$t('additional:modules.cosi.districtSelector.buttonConfirm')"
-                :interaction="updateExtent"
-            />
-            <FlatButton
-                id="resetButton"
-                icon="bi-arrow-counterclockwise"
-                type="button"
-                :aria-label="$t('additional:modules.cosi.districtSelector.buttonReset')"
-                :text="$t('additional:modules.cosi.districtSelector.buttonReset')"
-                :interaction="clearFeatures"
-            />
-        </div>
+                <input
+                    v-if="enableBuffer"
+                    id="input-buffer"
+                    v-model="bufferVal"
+                    class="form-control w-25"
+                    type="number"
+                    step="250"
+                    min="0"
+                >
+            </AccordionItem>
+            <div class="d-grid d-flex justify-content-between mt-5">
+                <FlatButton
+                    id="confirmButton"
+                    icon="bi-check"
+                    type="button"
+                    :aria-label="$t('additional:modules.cosi.districtSelector.buttonConfirm')"
+                    :text="$t('additional:modules.cosi.districtSelector.buttonConfirm')"
+                    :interaction="updateExtent"
+                />
+                <FlatButton
+                    id="resetButton"
+                    icon="bi-arrow-counterclockwise"
+                    type="button"
+                    :aria-label="$t('additional:modules.cosi.districtSelector.buttonReset')"
+                    :text="$t('additional:modules.cosi.districtSelector.buttonReset')"
+                    :interaction="clearFeatures"
+                />
+            </div>
+        </template>
     </div>
 </template>
 

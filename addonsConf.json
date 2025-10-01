@@ -164,5 +164,9 @@
   "featuresList": {
     "path":"cosi/FeaturesList",
     "type": "tool"
+  },
+  "areaSelector": {
+    "path":"cosi/AreaSelector",
+    "type": "tool"
   }
 }

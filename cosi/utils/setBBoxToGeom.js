@@ -38,6 +38,9 @@ function updateSource (model, bboxGeometry, app) {
                 );
             }
             const filteredFeatures = model.featuresFilter(model.attributes, source.getFeatures());
+console.log("filteredFeatures", filteredFeatures);
+console.log(model.attributes);
+
 
             source.addFeatures(filteredFeatures);
             if (app) {
@@ -71,6 +74,10 @@ function setBBoxToGeom (app, bboxGeometry, layerlist) {
  * @returns {void}
  */
 function setBboxGeometryToLayer (itemList, bboxGeometry, app) {
+    console.log(itemList);
+    console.log(bboxGeometry);
+
+
     itemList.forEach(function (item) {
         updateSource(item, bboxGeometry, app);
     });

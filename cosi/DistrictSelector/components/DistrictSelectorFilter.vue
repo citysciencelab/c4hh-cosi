@@ -221,8 +221,6 @@ export default {
          * @returns {void}
          */
         forceRerender () {
-            console.log(34);
-
             this.keyCount += 1;
         }
     }
