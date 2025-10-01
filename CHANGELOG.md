@@ -3,7 +3,8 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
+## 2025-10-01 v3.15.0
+
 ### __Breaking Changes__
 - Dropped support for **Node.js 18.x**, **20.x** and **npm 9**. Minimum required is now **Node.js 22.19.0 (LTS)** with **npm 10.x**.
 
@@ -15,10 +16,6 @@
 
 ### Changed
 - Verkehrsstärken gfiTheme: only shows data for the last 10 years.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - Verkehrsstärken gfiTheme: Fixed Anmerkung und Erhebungsmethode in tableview, fixed Baustelleneinfluss visibility in diagram, fixed layout.
