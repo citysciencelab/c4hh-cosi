@@ -121,7 +121,6 @@ export default {
 
     /**
      * Adds a WMS through the remote interface
-     * Note: Only works with treeType Custom
      * @param {Object} context The vuex context.
      * @param {String} url Url of the WMS
      * @param {Array} layersToLoad Array of Objects containing the name, title, style, layerOn information of the layers to be added from the WMS capabilities

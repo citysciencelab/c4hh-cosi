@@ -7,7 +7,6 @@ import {treeSubjectsKey} from "../../../src/shared/js/utils/constants";
 
 /**
  * Adds a WMS through the remote interface
- * Note: Only works with treeType Custom
  *
  * @param {String} url Url of the WMS
  * @param {Array} layersToLoad Array of Objects containing the name, title, style, layerOn information of the layers to be added from the WMS capabilities
