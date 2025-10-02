@@ -29,10 +29,6 @@ export default {
         GraphicalSelect
     },
     props: {
-        fullyLoaded: {
-            type: Boolean,
-            required: true
-        },
         tabActive: {
             type: Boolean,
             required: true
@@ -56,13 +52,9 @@ export default {
             "filterSelections",
             "statusOptions",
             "categories",
-            "departments",
-            "initialLoading"
+            "departments"
         ]),
-        ...mapGetters("Menu", [
-            "currentMenuWidth",
-            "expanded"
-        ]),
+        ...mapGetters("Menu", ["expanded"]),
         ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
         ]),
@@ -119,6 +111,32 @@ export default {
                    this.filterSelections.statusSelected.includes("geschlossen");
         },
         /**
+         * Returns all relevant layer IDs, corresponding to selected department and status in the filter settings
+         * @returns {String[]} Array of layer IDs for the filter selection
+         */
+        relevantLayerIdsForFilterSelection () {
+            const layerIdsForFilterSelection = [];
+
+            this.departmentsToFilter.forEach(async options => {
+                // if status is empty or status contains 'offen', return layerIds.offen
+                if (this.statusAllOrOpen) {
+                    layerIdsForFilterSelection.push(options.layerIds.offen);
+                }
+
+                // if status is empty or status contains 'inaktiv', return layerIds.inaktiv
+                if (this.statusAllOrInactive) {
+                    layerIdsForFilterSelection.push(options.layerIds.inaktiv);
+                }
+
+                // if status is empty or status contains 'geschlossen', set layerIds.geschlossen to visible
+                if (this.statusAllOrClosed) {
+                    layerIdsForFilterSelection.push(options.layerIds.geschlossen);
+                }
+            });
+
+            return layerIdsForFilterSelection;
+        },
+        /**
          * Checks if the menu sides are open or closed and
          * calculates the padding for the zoomToExtent function, depending on the opening state
          * @returns {Number[]} Padding values for an extent, fitting inbetween the menu sides.
@@ -126,23 +144,16 @@ export default {
         mapZoomToExtentPadding () {
             const
                 rightPadding = this.expanded("secondaryMenu")
-                    ? window.innerWidth * Number.parseInt(this.currentMenuWidth("secondaryMenu"), 10) / 100
+                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
                     : 20,
                 leftPadding = this.expanded("mainMenu")
-                    ? window.innerWidth * Number.parseInt(this.currentMenuWidth("mainMenu"), 10) / 100
+                    ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
                     : 20;
 
             return [20, rightPadding, 20, leftPadding];
         }
     },
     watch: {
-        fullyLoaded (val) {
-            if (val) {
-                // applying filter settings without changing the map extent
-                this.updateFilterSelection(false);
-                this.setInitialLoading(false);
-            }
-        },
         selectedAreaGeoJson (geoJson) {
             this.filterSelections.geom = new GeoJSON().readGeometry(geoJson);
             this.filterUpdated = true;
@@ -157,8 +168,7 @@ export default {
         ...mapMutations("Modules/GeoMarker", [
             "setFilterSelections",
             "setGeoMarkerFeatureList",
-            "setGeoMarkerActiveTab",
-            "setInitialLoading"
+            "setGeoMarkerActiveTab"
         ]),
         /**
          * Applies the filter settings, checks the layer visibility and updates the filtered features.
@@ -168,6 +178,7 @@ export default {
         async updateFilterSelection (updateExtent = true, checkLayerVisibility = true) {
             this.isFiltering = true;
             this.allFilteredFeatures = [];
+            await new Promise(resolve => setTimeout(resolve, 0)); // force UI-Update to show the spinner
 
             if (checkLayerVisibility) {
                 await this.checkLayerVisibility();
@@ -239,21 +250,8 @@ export default {
         async checkLayerVisibility () {
             const promises = [];
 
-            this.departmentsToFilter.forEach(async options => {
-                // if status is empty or status contains 'offen', set layerIds.offen to visible
-                if (this.statusAllOrOpen) {
-                    promises.push(this.setLayerVisible(options.layerIds.offen));
-                }
-
-                // if status is empty or status contains 'inaktiv', set layerIds.inaktiv to visible
-                if (this.statusAllOrInactive) {
-                    promises.push(this.setLayerVisible(options.layerIds.inaktiv));
-                }
-
-                // if status is empty or status contains 'geschlossen', set layerIds.geschlossen to visible
-                if (this.statusAllOrClosed) {
-                    promises.push(this.setLayerVisible(options.layerIds.geschlossen));
-                }
+            this.relevantLayerIdsForFilterSelection.forEach(async layerId => {
+                promises.push(this.setLayerVisible(layerId));
             });
 
             await Promise.all(promises);
@@ -267,7 +265,7 @@ export default {
             return new Promise(resolve => {
                 const layer = this.map ? this.map.getLayers().getArray()?.find(l => l.get("id") === layerId) : undefined;
 
-                if (layer && layer.isVisible() && !this.initialLoading) {
+                if (layer && layer.isVisible()) {
                     resolve();
                 }
                 else {
@@ -295,40 +293,29 @@ export default {
          */
         applyDeptAndStatusFilter () {
             return new Promise(resolve => {
-                this.departmentsToFilter.forEach(options => {
-                    let layer;
-                    const layerIdsToCheck = [];
+                this.relevantLayerIdsForFilterSelection.forEach(layerId => {
+                    const layer = this.map ? this.map.getLayers().getArray().find(l => {
+                        return l.get("id") === layerId;
+                    }) : undefined;
 
-                    // if status is empty or status contains 'offen', check layerIds.offen for departments
-                    if (this.statusAllOrOpen) {
-                        layerIdsToCheck.push(options.layerIds.offen);
+                    if (layer) {
+                        this.allFilteredFeatures = this.allFilteredFeatures.concat(layer.getSource().getFeatures());
                     }
-
-                    // if status is empty or status contains 'inaktiv', check layerIds.inaktiv for departments
-                    if (this.statusAllOrInactive) {
-                        layerIdsToCheck.push(options.layerIds.inaktiv);
-                    }
-
-                    // if status is empty or status contains 'geschlossen', check layerIds.geschlossen for departments
-                    if (this.statusAllOrClosed) {
-                        layerIdsToCheck.push(options.layerIds.geschlossen);
-                    }
-
-                    layerIdsToCheck.forEach(layerId => {
-                        layer = this.map ? this.map.getLayers().getArray().find(l => {
-                            return l.get("id") === layerId;
-                        }) : undefined;
-
-                        if (layer) {
-                            // make the allFilteredFeatures array unique so that each GeoMarker is included only once
-                            layer.getSource().getFeatures().forEach(feat => {
-                                if (!this.allFilteredFeatures.some(obj => obj.getId() === feat.getId())) {
-                                    this.allFilteredFeatures.push(feat);
-                                }
-                            });
-                        }
-                    });
                 });
+
+                // make the allFilteredFeatures array unique so that each GeoMarker is included only once
+                const uniqueFeatures = [],
+                    seenIds = new Set();
+
+                this.allFilteredFeatures.forEach(feat => {
+                    const id = feat.getId();
+
+                    if (!seenIds.has(id)) {
+                        seenIds.add(id);
+                        uniqueFeatures.push(feat);
+                    }
+                });
+                this.allFilteredFeatures = uniqueFeatures;
 
                 resolve();
             });
@@ -567,339 +554,377 @@ export default {
 
 <template>
     <div id="geoMarkerFilterContent">
-        <div class="headline">
-            <div class="headlineTopPart">
-                <p v-show="!isFiltering">
-                    {{ countGeoMarker }}
-                </p>
+        <div class="geoMarkerFilterContentContainer">
+            <div class="headline">
+                <div class="headlineTopPart">
+                    <p v-show="!isFiltering">
+                        {{ countGeoMarker }}
+                    </p>
 
-                <div class="spacer-div" />
+                    <div class="spacer-div" />
 
-                <div class="geomFilterButtons">
-                    <FlatButton
-                        v-if="filterSelections.geom"
-                        :text="'additional:modules.geoMarker.filter.graphicalSelect.filterButtonResetTitle'"
-                        icon="bi-x-circle"
-                        :secondary="true"
-                        @click="resetGeomFilter"
+                    <div class="geomFilterButtons">
+                        <FlatButton
+                            v-if="filterSelections.geom"
+                            :text="'additional:modules.geoMarker.filter.graphicalSelect.filterButtonResetTitle'"
+                            icon="bi-x-circle"
+                            :secondary="true"
+                            @click="resetGeomFilter"
+                        />
+
+                        <FlatButton
+                            :text="graphicalSelectOpen ? 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonActiveTitle' : 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonTitle'"
+                            :icon="filterSelections.geom ? 'bi-check-circle' : 'bi-bounding-box-circles'"
+                            :secondary="true"
+                            :customclass="filterSelections.geom ? 'geomFilterActive' : ''"
+                            @click="graphicalSelectOpen = !graphicalSelectOpen"
+                        />
+                    </div>
+                </div>
+
+                <GraphicalSelect
+                    v-if="graphicalSelectOpen"
+                    ref="graphicalSelection"
+                    :options="drawOptions"
+                    :start-geometry="filterSelections.geom"
+                    :label="'additional:modules.geoMarker.filter.graphicalSelect.title'"
+                />
+            </div>
+
+            <div class="filterSettings">
+                <label
+                    class="input-label"
+                    for="deptsSelect"
+                >
+                    {{ $t("additional:modules.geoMarker.filter.departments.label") }}
+                </label>
+
+                <Multiselect
+                    id="deptsSelect"
+                    v-model="filterSelections.departmentsSelected"
+                    label="name"
+                    track-by="name"
+                    :options="Object.values(departments)"
+                    name="select-box"
+                    :multiple="true"
+                    :placeholder="$t('additional:modules.geoMarker.filter.departments.placeholder')"
+                    :show-labels="false"
+                    open-direction="bottom"
+                    :hide-selected="false"
+                    :allow-empty="true"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :internal-search="false"
+                    @remove="filterUpdated = true"
+                    @select="filterUpdated = true"
+                />
+
+                <div class="labelSelectContainer">
+                    <label
+                        class="input-label"
+                        for="statusSelect"
+                    >
+                        {{ $t("additional:modules.geoMarker.filter.status.label") }}
+                    </label>
+
+                    <Multiselect
+                        id="statusSelect"
+                        v-model="filterSelections.statusSelected"
+                        :options="statusOptions"
+                        name="select-box"
+                        :multiple="true"
+                        :placeholder="$t('additional:modules.geoMarker.filter.status.placeholder')"
+                        :show-labels="false"
+                        open-direction="bottom"
+                        :hide-selected="false"
+                        :allow-empty="true"
+                        :close-on-select="true"
+                        :clear-on-select="false"
+                        :internal-search="false"
+                        @remove="filterUpdated = true"
+                        @select="filterUpdated = true"
+                    />
+                </div>
+
+                <div class="labelSelectContainer">
+                    <label
+                        class="input-label"
+                        for="categorySelect"
+                    >
+                        {{ $t("additional:modules.geoMarker.filter.categories.label") }}
+                    </label>
+
+                    <Multiselect
+                        id="categorySelect"
+                        v-model="filterSelections.categorySelected"
+                        :options="categoryOptions"
+                        label="label"
+                        track-by="key"
+                        name="select-box"
+                        :multiple="true"
+                        :placeholder="$t('additional:modules.geoMarker.filter.categories.placeholder')"
+                        :show-labels="false"
+                        open-direction="bottom"
+                        :hide-selected="false"
+                        :allow-empty="true"
+                        :close-on-select="true"
+                        :clear-on-select="false"
+                        :internal-search="false"
+                        @remove="filterUpdated = true"
+                        @select="filterUpdated = true"
+                    />
+                </div>
+
+                <InputText
+                    id="descrFilter"
+                    v-model="filterSelections.filterValueDescr"
+                    :label="$t('additional:modules.geoMarker.filter.description.label')"
+                    :placeholder="$t('additional:modules.geoMarker.filter.description.placeholder')"
+                    @update:modelValue="filterUpdated = true"
+                />
+
+                <InputText
+                    id="commentFilter"
+                    v-model="filterSelections.filterValueComment"
+                    :label="$t('additional:modules.geoMarker.filter.comment.label')"
+                    :placeholder="$t('additional:modules.geoMarker.filter.comment.placeholder')"
+                    @update:modelValue="filterUpdated = true"
+                />
+
+                <div class="multiFieldLine">
+                    <InputText
+                        id="sourceFilter"
+                        v-model="filterSelections.filterValueSource"
+                        :label="$t('additional:modules.geoMarker.filter.source.label')"
+                        :placeholder="$t('additional:modules.geoMarker.filter.source.placeholder')"
+                        @update:modelValue="filterUpdated = true"
                     />
 
-                    <FlatButton
-                        :text="graphicalSelectOpen ? 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonActiveTitle' : 'additional:modules.geoMarker.filter.graphicalSelect.filterButtonTitle'"
-                        :icon="filterSelections.geom ? 'bi-check-circle' : 'bi-bounding-box-circles'"
-                        :secondary="true"
-                        :customclass="filterSelections.geom ? 'geomFilterActive' : ''"
-                        @click="graphicalSelectOpen = !graphicalSelectOpen"
+                    <InputText
+                        id="geomarkerIDFilter"
+                        v-model="filterSelections.filterValueId"
+                        :label="$t('additional:modules.geoMarker.filter.geoMarkerID.label')"
+                        :placeholder="$t('additional:modules.geoMarker.filter.geoMarkerID.placeholder')"
+                        @update:modelValue="filterUpdated = true"
+                    />
+                </div>
+
+                <p class="multiFieldLineLabel">
+                    {{ $t("additional:modules.geoMarker.filter.dates.labels.created") }}
+                </p>
+
+                <div class="multiFieldLine">
+                    <InputText
+                        id="creationDateRangeFrom"
+                        v-model="filterSelections.creationDate.from"
+                        :label="$t('additional:modules.geoMarker.filter.dates.from.label')"
+                        type="date"
+                        :placeholder="$t('additional:modules.geoMarker.filter.dates.from.placeholder')"
+                        @update:modelValue="filterUpdated = true"
+                    />
+
+                    <InputText
+                        id="creationDateRangeTo"
+                        v-model="filterSelections.creationDate.to"
+                        :label="$t('additional:modules.geoMarker.filter.dates.to.label')"
+                        type="date"
+                        :placeholder="$t('additional:modules.geoMarker.filter.dates.to.placeholder')"
+                        @update:modelValue="filterUpdated = true"
+                    />
+                </div>
+
+                <p class="multiFieldLineLabel">
+                    {{ $t("additional:modules.geoMarker.filter.dates.labels.closed") }}
+                </p>
+
+                <div class="multiFieldLine">
+                    <InputText
+                        id="closedDateRangeFrom"
+                        v-model="filterSelections.closedDate.from"
+                        :label="$t('additional:modules.geoMarker.filter.dates.from.label')"
+                        type="date"
+                        :placeholder="$t('additional:modules.geoMarker.filter.dates.from.placeholder')"
+                        @update:modelValue="filterUpdated = true"
+                    />
+
+                    <InputText
+                        id="closedDateRangeTo"
+                        v-model="filterSelections.closedDate.to"
+                        :label="$t('additional:modules.geoMarker.filter.dates.to.label')"
+                        type="date"
+                        :placeholder="$t('additional:modules.geoMarker.filter.dates.to.placeholder')"
+                        @update:modelValue="filterUpdated = true"
+                    />
+                </div>
+
+                <p class="multiFieldLineLabel">
+                    {{ $t("additional:modules.geoMarker.filter.dates.labels.review") }}
+                </p>
+
+                <div class="multiFieldLine">
+                    <InputText
+                        id="reminderDateRangeFrom"
+                        v-model="filterSelections.reminderDate.from"
+                        :label="$t('additional:modules.geoMarker.filter.dates.from.label')"
+                        type="date"
+                        :placeholder="$t('additional:modules.geoMarker.filter.dates.from.placeholder')"
+                        @update:modelValue="filterUpdated = true"
+                    />
+
+                    <InputText
+                        id="reminderDateRangeTo"
+                        v-model="filterSelections.reminderDate.to"
+                        :label="$t('additional:modules.geoMarker.filter.dates.to.label')"
+                        type="date"
+                        :placeholder="$t('additional:modules.geoMarker.filter.dates.to.placeholder')"
+                        @update:modelValue="filterUpdated = true"
                     />
                 </div>
             </div>
 
-            <GraphicalSelect
-                v-if="graphicalSelectOpen"
-                ref="graphicalSelection"
-                :options="drawOptions"
-                :start-geometry="filterSelections.geom"
-                :label="'additional:modules.geoMarker.filter.graphicalSelect.title'"
-            />
-        </div>
+            <div class="geomarkerFilterbuttons">
+                <div class="filterAndListButton">
+                    <FlatButton
+                        :text="$t('additional:modules.geoMarker.filter.buttons.filter')"
+                        icon="bi-funnel-fill"
+                        :disabled="!filterUpdated"
+                        @click="updateFilterSelection()"
+                    />
 
-        <div class="filterSettings">
-            <label
-                class="input-label"
-                for="deptsSelect"
-            >
-                {{ $t("additional:modules.geoMarker.filter.departments.label") }}
-            </label>
+                    <FlatButton
+                        v-if="allFilteredFeatures.length !== 0"
+                        :text="$t('additional:modules.geoMarker.filter.buttons.list')"
+                        icon="bi-card-list"
+                        :secondary="true"
+                        @click="setGeoMarkerActiveTab('tabList')"
+                    />
+                </div>
 
-            <Multiselect
-                id="deptsSelect"
-                v-model="filterSelections.departmentsSelected"
-                label="name"
-                track-by="name"
-                :options="Object.values(departments)"
-                name="select-box"
-                :multiple="true"
-                :placeholder="$t('additional:modules.geoMarker.filter.departments.placeholder')"
-                :show-labels="false"
-                open-direction="bottom"
-                :hide-selected="false"
-                :allow-empty="true"
-                :close-on-select="true"
-                :clear-on-select="false"
-                :internal-search="false"
-                @remove="filterUpdated = true"
-                @select="filterUpdated = true"
-            />
-
-            <div class="labelSelectContainer">
-                <label
-                    class="input-label"
-                    for="statusSelect"
-                >
-                    {{ $t("additional:modules.geoMarker.filter.status.label") }}
-                </label>
-
-                <Multiselect
-                    id="statusSelect"
-                    v-model="filterSelections.statusSelected"
-                    :options="statusOptions"
-                    name="select-box"
-                    :multiple="true"
-                    :placeholder="$t('additional:modules.geoMarker.filter.status.placeholder')"
-                    :show-labels="false"
-                    open-direction="bottom"
-                    :hide-selected="false"
-                    :allow-empty="true"
-                    :close-on-select="true"
-                    :clear-on-select="false"
-                    :internal-search="false"
-                    @remove="filterUpdated = true"
-                    @select="filterUpdated = true"
-                />
-            </div>
-
-            <div class="labelSelectContainer">
-                <label
-                    class="input-label"
-                    for="categorySelect"
-                >
-                    {{ $t("additional:modules.geoMarker.filter.categories.label") }}
-                </label>
-
-                <Multiselect
-                    id="categorySelect"
-                    v-model="filterSelections.categorySelected"
-                    :options="categoryOptions"
-                    label="label"
-                    track-by="key"
-                    name="select-box"
-                    :multiple="true"
-                    :placeholder="$t('additional:modules.geoMarker.filter.categories.placeholder')"
-                    :show-labels="false"
-                    open-direction="bottom"
-                    :hide-selected="false"
-                    :allow-empty="true"
-                    :close-on-select="true"
-                    :clear-on-select="false"
-                    :internal-search="false"
-                    @remove="filterUpdated = true"
-                    @select="filterUpdated = true"
-                />
-            </div>
-
-            <InputText
-                id="descrFilter"
-                v-model="filterSelections.filterValueDescr"
-                :label="$t('additional:modules.geoMarker.filter.description.label')"
-                :placeholder="$t('additional:modules.geoMarker.filter.description.placeholder')"
-                @update:modelValue="filterUpdated = true"
-            />
-
-            <InputText
-                id="commentFilter"
-                v-model="filterSelections.filterValueComment"
-                :label="$t('additional:modules.geoMarker.filter.comment.label')"
-                :placeholder="$t('additional:modules.geoMarker.filter.comment.placeholder')"
-                @update:modelValue="filterUpdated = true"
-            />
-
-            <div class="multiFieldLine">
-                <InputText
-                    id="sourceFilter"
-                    v-model="filterSelections.filterValueSource"
-                    :label="$t('additional:modules.geoMarker.filter.source.label')"
-                    :placeholder="$t('additional:modules.geoMarker.filter.source.placeholder')"
-                    @update:modelValue="filterUpdated = true"
-                />
-
-                <InputText
-                    id="geomarkerIDFilter"
-                    v-model="filterSelections.filterValueId"
-                    :label="$t('additional:modules.geoMarker.filter.geoMarkerID.label')"
-                    :placeholder="$t('additional:modules.geoMarker.filter.geoMarkerID.placeholder')"
-                    @update:modelValue="filterUpdated = true"
-                />
-            </div>
-
-            <p class="multiFieldLineLabel">
-                {{ $t("additional:modules.geoMarker.filter.dates.labels.created") }}
-            </p>
-
-            <div class="multiFieldLine">
-                <InputText
-                    id="creationDateRangeFrom"
-                    v-model="filterSelections.creationDate.from"
-                    :label="$t('additional:modules.geoMarker.filter.dates.from.label')"
-                    type="date"
-                    :placeholder="$t('additional:modules.geoMarker.filter.dates.from.placeholder')"
-                    @update:modelValue="filterUpdated = true"
-                />
-
-                <InputText
-                    id="creationDateRangeTo"
-                    v-model="filterSelections.creationDate.to"
-                    :label="$t('additional:modules.geoMarker.filter.dates.to.label')"
-                    type="date"
-                    :placeholder="$t('additional:modules.geoMarker.filter.dates.to.placeholder')"
-                    @update:modelValue="filterUpdated = true"
-                />
-            </div>
-
-            <p class="multiFieldLineLabel">
-                {{ $t("additional:modules.geoMarker.filter.dates.labels.closed") }}
-            </p>
-
-            <div class="multiFieldLine">
-                <InputText
-                    id="closedDateRangeFrom"
-                    v-model="filterSelections.closedDate.from"
-                    :label="$t('additional:modules.geoMarker.filter.dates.from.label')"
-                    type="date"
-                    :placeholder="$t('additional:modules.geoMarker.filter.dates.from.placeholder')"
-                    @update:modelValue="filterUpdated = true"
-                />
-
-                <InputText
-                    id="closedDateRangeTo"
-                    v-model="filterSelections.closedDate.to"
-                    :label="$t('additional:modules.geoMarker.filter.dates.to.label')"
-                    type="date"
-                    :placeholder="$t('additional:modules.geoMarker.filter.dates.to.placeholder')"
-                    @update:modelValue="filterUpdated = true"
-                />
-            </div>
-
-            <p class="multiFieldLineLabel">
-                {{ $t("additional:modules.geoMarker.filter.dates.labels.review") }}
-            </p>
-
-            <div class="multiFieldLine">
-                <InputText
-                    id="reminderDateRangeFrom"
-                    v-model="filterSelections.reminderDate.from"
-                    :label="$t('additional:modules.geoMarker.filter.dates.from.label')"
-                    type="date"
-                    :placeholder="$t('additional:modules.geoMarker.filter.dates.from.placeholder')"
-                    @update:modelValue="filterUpdated = true"
-                />
-
-                <InputText
-                    id="reminderDateRangeTo"
-                    v-model="filterSelections.reminderDate.to"
-                    :label="$t('additional:modules.geoMarker.filter.dates.to.label')"
-                    type="date"
-                    :placeholder="$t('additional:modules.geoMarker.filter.dates.to.placeholder')"
-                    @update:modelValue="filterUpdated = true"
+                <FlatButton
+                    :text="$t('additional:modules.geoMarker.filter.buttons.restore')"
+                    icon="bi-x-circle"
+                    @click="resetFilterSelection()"
                 />
             </div>
         </div>
 
-        <div class="geomarkerFilterbuttons">
-            <div class="filterAndListButton">
-                <FlatButton
-                    :text="$t('additional:modules.geoMarker.filter.buttons.filter')"
-                    icon="bi-funnel-fill"
-                    :disabled="!filterUpdated"
-                    @click="updateFilterSelection()"
-                />
-
-                <FlatButton
-                    v-if="allFilteredFeatures.length !== 0"
-                    :text="$t('additional:modules.geoMarker.filter.buttons.list')"
-                    icon="bi-card-list"
-                    :secondary="true"
-                    @click="setGeoMarkerActiveTab('tabList')"
-                />
-            </div>
-
+        <div
+            v-if="isFiltering"
+            class="filterSpinner"
+        >
             <SpinnerItem
-                v-if="isFiltering"
                 custom-class="spinner"
                 class="ms-3"
             />
 
-            <FlatButton
-                :text="$t('additional:modules.geoMarker.filter.buttons.restore')"
-                icon="bi-x-circle"
-                @click="resetFilterSelection()"
-            />
+            <p> {{ $t("additional:modules.geoMarker.filter.isFiltering") }}</p>
         </div>
     </div>
 </template>
 
 <style lang="scss">
 div#geoMarkerFilterContent {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex: 1;
-    overflow: hidden;
+    height: 100%;
+    position: relative;
 
-    div.form-floating:has(input#descrFilter) {
-        margin-top: 1rem;
-    }
-
-    div.headline {
+    div.geoMarkerFilterContentContainer {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        flex: 1;
+        overflow: hidden;
+        height: 100%;
 
-        div.headlineTopPart {
+        div.form-floating:has(input#descrFilter) {
+            margin-top: 1rem;
+        }
+
+        div.headline {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            div.headlineTopPart {
+                display: flex;
+                justify-content: space-between;
+                gap: 2rem;
+
+                div.geomFilterButtons {
+                    display: flex;
+                    gap: 1rem;
+
+                    button.geomFilterActive {
+                        background-color: #41b883;
+                    }
+                }
+            }
+        }
+
+        div.filterSettings {
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            flex: 1;
+            overflow: auto;
+            padding-right: 1rem;
+        }
+
+        p.multiFieldLineLabel {
+            margin-bottom: 0;
+        }
+
+        div.multiFieldLine {
             display: flex;
             justify-content: space-between;
             gap: 2rem;
 
-            div.geomFilterButtons {
-                display: flex;
-                gap: 1rem;
+            div.form-floating,
+            div.labelSelectContainer {
+                flex: 1;
+            }
+        }
 
-                button.geomFilterActive {
-                    background-color: #41b883;
-                }
+        div.geomarkerFilterbuttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-top: 0.5rem;
+
+            button {
+                // !important here necessary, because of "margin-bottom: 1rem !important" in .mb-3 class
+                margin-bottom: 0px !important;
+            }
+
+            div.filterAndListButton {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 1rem;
             }
         }
     }
 
-    div.filterSettings {
+    div.filterSpinner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: left;
-        flex: 1;
-        overflow: auto;
-        padding-right: 1rem;
-    }
-
-    p.multiFieldLineLabel {
-        margin-bottom: 0;
-    }
-
-    div.multiFieldLine {
-        display: flex;
-        justify-content: space-between;
         gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.7);
+        z-index: 2;
 
-        div.form-floating,
-        div.labelSelectContainer {
-            flex: 1;
-        }
-    }
-
-    div.geomarkerFilterbuttons {
-        display: flex;
-        justify-content: space-between;
-        gap: 2rem;
-        margin-top: 0.5rem;
-
-        button {
-            // !important here necessary, because of "margin-bottom: 1rem !important" in .mb-3 class
-            margin-bottom: 0px !important;
+        div.spinner {
+            width: 4rem;
+            height: 4rem;
         }
 
-        div.filterAndListButton {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            gap: 1rem;
+        p {
+            background-color: white;
         }
     }
 }

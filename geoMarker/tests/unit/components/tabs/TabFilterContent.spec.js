@@ -29,8 +29,7 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                 to: ""
             },
             geom: null
-        },
-        origWindow;
+        };
 
     const mockFeatureA = {
             get: (key) => {
@@ -112,9 +111,9 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                                                 "geschlossen": "ges_gemis"
                                             },
                                             "layerIds": {
-                                                "open": "geomarker_gemis",
-                                                "closed": "geomarker_gemis2",
-                                                "inactive": "geomarker_gemis3"
+                                                "offen": "geomarker_gemis",
+                                                "geschlossen": "geomarker_gemis2",
+                                                "inaktiv": "geomarker_gemis3"
                                             }
                                         },
                                         "hh_sib": {
@@ -126,9 +125,9 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                                                 "geschlossen": "ges_hh_sib"
                                             },
                                             "layerIds": {
-                                                "open": "geomarker_hh_sib",
-                                                "closed": "geomarker_hh_sib2",
-                                                "inactive": "geomarker_hh_sib3"
+                                                "offen": "geomarker_hh_sib",
+                                                "geschlossen": "geomarker_hh_sib2",
+                                                "inaktiv": "geomarker_hh_sib3"
                                             }
                                         }
                                     };
@@ -158,9 +157,6 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                     getters: {
                         expanded: () => (side) => {
                             return side === "secondaryMenu";
-                        },
-                        currentMenuWidth: () => (side) => {
-                            return side === "secondaryMenu" ? "40%" : "25%";
                         }
                     }
                 }
@@ -173,14 +169,11 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
         });
 
     beforeEach(() => {
-        origWindow = global.window;
-
         wrapper = shallowMount(TabFilterContent, {
             global: {
                 plugins: [store]
             },
             props: {
-                fullyLoaded: true,
                 tabActive: true
             }
         });
@@ -189,8 +182,6 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
     });
 
     afterEach(() => {
-        global.window = origWindow;
-
         if (wrapper) {
             wrapper.unmount();
         }
@@ -208,8 +199,6 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
     });
 
     it("should compute options correctly", () => {
-        global.window = {innerWidth: 1920};
-
         expect(wrapper.vm.categoryOptions).to.be.an("array");
         expect(wrapper.vm.categoryOptions).to.have.lengthOf(3);
         expect(wrapper.vm.categoryOptions[0].key).to.be.equal("allgemeines");
@@ -219,13 +208,15 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
         expect(wrapper.vm.departmentsToFilter).to.have.lengthOf(2);
         expect(wrapper.vm.departmentsToFilter[0].name).to.be.equal("Gemis");
         expect(wrapper.vm.departmentsToFilter[0].fields.status).to.be.equal("sta_gemis");
-        expect(wrapper.vm.departmentsToFilter[0].layerIds.open).to.be.equal("geomarker_gemis");
+        expect(wrapper.vm.departmentsToFilter[0].layerIds.offen).to.be.equal("geomarker_gemis");
 
         expect(wrapper.vm.statusAllOrOpen).to.be.true;
         expect(wrapper.vm.statusAllOrInactive).to.be.false;
         expect(wrapper.vm.statusAllOrClosed).to.be.false;
 
-        expect(wrapper.vm.mapZoomToExtentPadding).to.deep.equal([20, 768, 20, 20]);
+        expect(wrapper.vm.relevantLayerIdsForFilterSelection).to.be.an("array");
+        expect(wrapper.vm.relevantLayerIdsForFilterSelection).to.have.lengthOf(2);
+        expect(wrapper.vm.relevantLayerIdsForFilterSelection).to.deep.equal(["geomarker_gemis", "geomarker_hh_sib"]);
     });
 
     it("should filter dates correctly", () => {

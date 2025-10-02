@@ -60,6 +60,7 @@
                 }
             },
             "filter": {
+                "isFiltering": "Bitte etwas Geduld, die GeoMarker werden gerade gefiltert ...",
                 "countGeoMarker": "GeoMarker",
                 "graphicalSelect": {
                   "title": "Auswahl der GeoMarker in der Karte durch",
