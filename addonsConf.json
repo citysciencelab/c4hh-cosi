@@ -169,6 +169,10 @@
     "path":"cosi/FeaturesList",
     "type": "tool"
   },
+  "polygonStyler": {
+    "path":"cosi/PolygonStyler",
+    "type": "tool"
+  },
   "areaSelector": {
     "path":"cosi/AreaSelector",
     "type": "tool"

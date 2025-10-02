@@ -1,0 +1,26 @@
+{
+  "modules": {
+    "tools": {
+      "cosi": {
+        "polygonStyler": {
+          "columnTopic": "Topic",
+          "columnAttribute": "Attribute",
+          "columnEdit": "Edit",
+          "labelTopicSelection": "Selection of topics",
+          "editButton": "Edit",
+          "removeButton": "Reset",
+          "noData": "Data not available",
+          "settings": {
+            "title": "Color settings",
+            "applyButton": "Apply",
+            "abortButton": "Abort",
+            "columnValue": "Value",
+            "columnFill": "Fill color",
+            "columnStroke": "Stroke color"
+          },
+          "description": "Mit Hilfe dieser Funktion können Sie Flächen, z.B. Gebäudegrundrisse, auf der Karte datenabhängig einfärben. Aktuell geht dies mit den Datensätzen Flurstücke, Nutzung, Gebäude und Wärmebedarf. Sie finden sich unter Fachdaten-Analyse/Simulation, Umwelt."
+        }
+      }
+    }
+  }
+}
