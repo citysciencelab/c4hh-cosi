@@ -598,8 +598,7 @@ export default {
                     track-by="layerId"
                 >
                     <template
-                        slot="selection"
-                        slot-scope="{ values, isOpen }"
+                        #selection="{ values, isOpen }"
                     >
                         <span
                             v-if="values.length"
@@ -655,8 +654,7 @@ export default {
                     @input="setIsStatDataValidating(false)"
                 >
                     <template
-                        slot="selection"
-                        slot-scope="{ values, isOpen }"
+                        #selection="{ values, isOpen }"
                     >
                         <span
                             v-if="values.length"
@@ -736,8 +734,7 @@ export default {
                     label="label"
                 >
                     <template
-                        slot="selection"
-                        slot-scope="{ values, isOpen }"
+                        #selection="{ values, isOpen }"
                     >
                         <span
                             v-if="values.length"
@@ -828,17 +825,13 @@ export default {
 <style lang="scss">
 @import "/src/assets/css/mixins.scss";
 @import "/src/assets/css/variables";
+@import "vue-multiselect/dist/vue-multiselect.min.css";
 
 #template-admin-form {
 
     .multiselect {
-        min-height: 40px;
-        display: block;
-        padding: 8px 40px 0 8px;
-        border-radius: 5px;
-        border: 1px solid #e8e8e8;
-        background: #fff;
-        border-radius: 0;
+        padding-left: 0;
+        padding-right: 0;
     }
 
     .multiselect, .multiselect__input, .multiselect__single {
