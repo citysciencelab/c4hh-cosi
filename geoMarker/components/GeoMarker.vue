@@ -46,6 +46,8 @@ export default {
         }
     },
     async mounted () {
+        this.setCurrentTab("tabFilter");
+
         await this.loadCategories();
         await this.loadDepartments();
 
@@ -53,6 +55,9 @@ export default {
 
         this.setLayerInformation(editLayerInformation);
         this.fullyLoaded = true;
+    },
+    unmounted () {
+        this.resetGeomarkerFeature();
     },
     methods: {
         ...mapMutations("Modules/GeoMarker", [
@@ -67,6 +72,14 @@ export default {
         ]),
         setCurrentTab (tab) {
             this.setGeoMarkerActiveTab(tab);
+        },
+        /**
+         * It resets the selected GeoMarker feature on the map
+         * when switching the tab or leaving the addon.
+         */
+        resetGeomarkerFeature () {
+            this.setNewGeoMarkerFeature(null);
+            this.setMapInteraction(null);
         }
     }
 };
