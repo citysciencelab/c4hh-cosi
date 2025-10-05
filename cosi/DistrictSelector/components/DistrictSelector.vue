@@ -314,6 +314,7 @@ export default {
             this.select = mapCollection.getMap("2D").getInteractions().getArray().find(interaction => {
                 return interaction.get("id") === "district-selector-select";
             });
+
             if (typeof this.select === "undefined") {
                 this.select = new Select({
                     // select only features of the selected district level

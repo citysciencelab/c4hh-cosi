@@ -1,0 +1,39 @@
+[
+  {
+    "category": "bev_insgesamt",
+    "value": "Bevölkerung insgesamt",
+    "group": "Bevölkerung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_weiblich",
+    "value": "Bevölkerung weiblich",
+    "group": "Bevölkerung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_maennlich",
+    "value": "Bevölkerung männlich",
+    "group": "Bevölkerung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_ab65",
+    "value": "Bevölkerung ab 65 Jahren",
+    "group": "Bevölkerung ab x Jahren",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "absolute"
+  }
+]

@@ -98,8 +98,6 @@ export default {
          * @returns {void}
          */
         addSelectedValues (districtNames, level) {
-            console.log(districtNames);
-
             level.selectedValues = districtNames;
             this.checkSublevels(level);
         },

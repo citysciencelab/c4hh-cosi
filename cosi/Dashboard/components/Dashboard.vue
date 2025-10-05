@@ -41,7 +41,6 @@ import {VSnackbar} from "vuetify/components/VSnackbar";
 import {VTextField} from "vuetify/components/VTextField";
 import {VTooltip} from "vuetify/components/VTooltip";
 
-
 export default {
     name: "Dashboard",
     components: {
@@ -262,6 +261,7 @@ export default {
             this.districtColumns = this.getColumns(this.selectedDistrictLevel, this.selectedDistrictNames, []);
             this.rows = this.getRows();
             this.setItems(this.getData());
+
             this.currentTimeStamp = this.selectedYear;
         },
         /**
@@ -531,9 +531,6 @@ export default {
                 filename = composeFilename(this.$t("additional:modules.tools.cosi.dashboard.exportFilename", {prefix})),
                 modifiedKey = [{"oldKey": "isTemp", "newKey": "eigene Berechnungen"}];
 
-console.log(preparedItems);
-
-
             try {
                 exportedData = this.sanitizeData(JSON.parse(JSON.stringify(rawData)), [...this.excludedPropsForExport, ...this.unselectedColumnLabels]);
                 iniHeader = this.exportGrouped ?
@@ -560,7 +557,6 @@ console.log(preparedItems);
                 exportedData = this.sanitizeData(JSON.parse(JSON.stringify(exportedData)), ["Datentyp"]);
             }
             exportedData = this.getModifiedData(exportedData, modifiedKey);
-            console.log(exportedData);
 
             exportXlsx(header, exportedData, filename);
         },

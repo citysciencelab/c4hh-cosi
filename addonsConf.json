@@ -176,5 +176,13 @@
   "templateAdmin": {
     "path": "cosi/TemplateAdmin",
     "type": "tool"
+  },
+  "templateManager": {
+    "path": "cosi/TemplateManager",
+    "type": "tool"
+  },
+  "saveSession": {
+    "path": "cosi/SaveSession",
+    "type": "tool"
   }
 }
