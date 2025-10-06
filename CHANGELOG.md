@@ -15,6 +15,10 @@
 ### Removed
 
 ### Fixed
+- Compatibility fixes after the Masterportal core upgrade to **Vue 3.5** (esm-bundler / stricter template checks). No functional changes intended.
+  - trafficCount: `TrafficCountDatePickerCalendar.vue` 
+  - fileImport : `FileImport.vue`
+  - valuationPrint: `ValuationPrint.vue`
 
 ---
 

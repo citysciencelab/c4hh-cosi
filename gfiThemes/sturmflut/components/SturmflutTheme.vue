@@ -31,43 +31,45 @@ export default {
                         {{ attributes.strasse }}
                     </td>
                 </tr>
-                <td v-if="attributes.bild_link">
-                    <a
-                        id="sturmflut-theme-table-image"
-                        :href="attributes.bild_link"
-                        target="_blank"
-                    >
-                        <img
-                            :id="attributes.bildformat === 'quer' ? 'sturmflut-theme-table-image-landscape' : 'sturmflut-theme-table-image-portrait'"
-                            :alt="$t('modules.tools.gfi.themes.default.imgAlt')"
-                            :src="attributes.bild_link"
+                <tr>
+                    <td v-if="attributes.bild_link">
+                        <a
+                            id="sturmflut-theme-table-image"
+                            :href="attributes.bild_link"
+                            target="_blank"
                         >
-                    </a>
-                    <p
-                        id="sturmflut-theme-table-image-zoom"
-                    >
-                        Zum Vergrößern auf das Bild klicken
-                    </p>
-                    <p
-                        id="sturmflut-theme-table-image-copyright"
-                    >
-                        Bild: {{ attributes.bild_copyright }}
-                    </p>
-                </td>
-                <td>
-                    <p
-                        id="sturmflut-theme-table-description"
-                        v-html="attributes.beschreibung"
-                    />
-                    <a
-                        v-if="attributes.audio_link"
-                        id="sturmflut-theme-table-audio"
-                        :href="attributes.audio_link"
-                        target="_blank"
-                    >
-                        Audiobeitrag anhören
-                    </a>
-                </td>
+                            <img
+                                :id="attributes.bildformat === 'quer' ? 'sturmflut-theme-table-image-landscape' : 'sturmflut-theme-table-image-portrait'"
+                                :alt="$t('modules.tools.gfi.themes.default.imgAlt')"
+                                :src="attributes.bild_link"
+                            >
+                        </a>
+                        <p
+                            id="sturmflut-theme-table-image-zoom"
+                        >
+                            Zum Vergrößern auf das Bild klicken
+                        </p>
+                        <p
+                            id="sturmflut-theme-table-image-copyright"
+                        >
+                            Bild: {{ attributes.bild_copyright }}
+                        </p>
+                    </td>
+                    <td>
+                        <p
+                            id="sturmflut-theme-table-description"
+                            v-html="attributes.beschreibung"
+                        />
+                        <a
+                            v-if="attributes.audio_link"
+                            id="sturmflut-theme-table-audio"
+                            :href="attributes.audio_link"
+                            target="_blank"
+                        >
+                            Audiobeitrag anhören
+                        </a>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>

@@ -103,14 +103,16 @@ export default {
             </div>
             <div class="gbf-content">
                 <table>
-                    <tr>
-                        <td>{{ translate("additional:addons.gfiThemes.bildungsatlas.fluechtlinge.capacity") }}</td>
-                        <td>{{ platzzahl + " " + translate("additional:addons.gfiThemes.bildungsatlas.fluechtlinge.place") }}</td>
-                    </tr>
-                    <tr v-if="bemerkung !== ''">
-                        <td>{{ translate("additional:addons.gfiThemes.bildungsatlas.fluechtlinge.remark") }}</td>
-                        <td>{{ bemerkung }}</td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td>{{ translate("additional:addons.gfiThemes.bildungsatlas.fluechtlinge.capacity") }}</td>
+                            <td>{{ platzzahl + " " + translate("additional:addons.gfiThemes.bildungsatlas.fluechtlinge.place") }}</td>
+                        </tr>
+                        <tr v-if="bemerkung !== ''">
+                            <td>{{ translate("additional:addons.gfiThemes.bildungsatlas.fluechtlinge.remark") }}</td>
+                            <td>{{ bemerkung }}</td>
+                        </tr>
+                    </tbody>
                 </table>
                 <span>
                     {{ platzzahl_hinweis }}

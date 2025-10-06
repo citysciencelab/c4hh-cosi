@@ -142,55 +142,59 @@ export default {
 <template lang="html">
     <div class="datePickerCalendarContainer">
         <table>
-            <tr>
-                <th v-if="showWeekNumber" />
-                <th
-                    v-for="(weekdayName, index) in namesOfWeekdaysComputed"
-                    :key="'weekdayName-' + index"
-                    class="weekdayName"
-                >
-                    <slot
-                        name="weekdayName"
-                        :weekday-name="weekdayName"
+            <thead>
+                <tr>
+                    <th v-if="showWeekNumber" />
+                    <th
+                        v-for="(weekdayName, index) in namesOfWeekdaysComputed"
+                        :key="'weekdayName-' + index"
+                        class="weekdayName"
                     >
-                        {{ weekdayName }}
-                    </slot>
-                </th>
-            </tr>
-            <tr
-                v-for="dateRow in currentDates"
-                :key="'dateRow-' + dateRow.weekNumber"
-            >
-                <td
-                    v-if="showWeekNumber"
-                    class="weekNumber"
+                        <slot
+                            name="weekdayName"
+                            :weekday-name="weekdayName"
+                        >
+                            {{ weekdayName }}
+                        </slot>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    v-for="dateRow in currentDates"
+                    :key="'dateRow-' + dateRow.weekNumber"
                 >
-                    <slot
-                        name="weekNumber"
-                        :week-number="dateRow.weekNumber"
+                    <td
+                        v-if="showWeekNumber"
+                        class="weekNumber"
                     >
-                        {{ dateRow.weekNumber }}
-                    </slot>
-                </td>
-                <td
-                    v-for="dateObj in dateRow.days"
-                    :key="'dateObj-' + dateObj.day"
-                    :class="{dateField: true, outOfMonth: !dateObj.inCurrentMonth, selected: dateObj.selected, disabled: dateObj.disabled}"
-                    @click="onClick(dateObj.momentDate, dateObj.disabled)"
-                    @keypress.enter="onClick(dateObj.momentDate, dateObj.disabled)"
-                >
-                    <slot
-                        name="dateField"
-                        :day="dateObj.day"
-                        :moment-date="dateObj.momentDate"
-                        :selected="dateObj.selected"
-                        :in-current-month="dateObj.inCurrentMonth"
-                        :disabled="dateObj.disabled"
+                        <slot
+                            name="weekNumber"
+                            :week-number="dateRow.weekNumber"
+                        >
+                            {{ dateRow.weekNumber }}
+                        </slot>
+                    </td>
+                    <td
+                        v-for="dateObj in dateRow.days"
+                        :key="'dateObj-' + dateObj.day"
+                        :class="{dateField: true, outOfMonth: !dateObj.inCurrentMonth, selected: dateObj.selected, disabled: dateObj.disabled}"
+                        @click="onClick(dateObj.momentDate, dateObj.disabled)"
+                        @keypress.enter="onClick(dateObj.momentDate, dateObj.disabled)"
                     >
-                        {{ dateObj.day }}
-                    </slot>
-                </td>
-            </tr>
+                        <slot
+                            name="dateField"
+                            :day="dateObj.day"
+                            :moment-date="dateObj.momentDate"
+                            :selected="dateObj.selected"
+                            :in-current-month="dateObj.inCurrentMonth"
+                            :disabled="dateObj.disabled"
+                        >
+                            {{ dateObj.day }}
+                        </slot>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </template>
