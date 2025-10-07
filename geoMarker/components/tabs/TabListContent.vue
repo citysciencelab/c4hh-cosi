@@ -33,32 +33,39 @@ export default {
                 headers: [
                     {
                         itemProperty: "id",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.id")
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.id"),
+                        sortable: "numeric"
                     },
                     {
                         itemProperty: "quelle",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.quelle")
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.quelle"),
+                        sortable: "string"
                     },
                     {
                         itemProperty: "kategorie",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.kategorie")
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.kategorie"),
+                        sortable: "string"
                     },
                     {
                         itemProperty: "status",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.status")
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.status"),
+                        sortable: "string"
                     },
                     {
                         itemProperty: "beschreibung",
                         displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.beschreibung"),
-                        cssClass: "clamp"
+                        cssClass: "clamp",
+                        sortable: "string"
                     },
                     {
                         itemProperty: "zeitstempel",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.zeitstempel")
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.zeitstempel"),
+                        sortable: "date"
                     },
                     {
                         itemProperty: "aktion",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.aktion")
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.aktion"),
+                        sortable: false
                     }
                 ],
                 items: this.geoMarkerFeatureList?.map(item => {

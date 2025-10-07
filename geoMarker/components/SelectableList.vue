@@ -1,4 +1,10 @@
 <script>
+import {mapGetters} from "vuex";
+import localeCompare from "@shared/js/utils/localeCompare";
+import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(isSameOrBefore);
 
 export default {
     name: "SelectableList",
@@ -20,6 +26,7 @@ export default {
          * headers:
          * - itemProperty (required), e.g. "description" - Name of the item's object property (see items)
          * - displayName (required), e.g. "Description" - The visible label
+         * - sortable (required), e.g. "string" or "false" - indicator, if the column shall be sortable and by which type (string, numeric, date)
          * - cssClass (optional), e.g. "clamp" - CSS class applied to all table data cells for this property
          *
          * items
@@ -29,11 +36,13 @@ export default {
          *   headers: [
          *     {
          *       itemProperty: "id",
-         *       displayName: "ID"
+         *       displayName: "ID",
+         *       sortable: "numeric"
          *     },
          *     {
          *       itemProperty: "description",
          *       displayName: "Description",
+         *       sortable: "string",
          *       cssClass: "clamp"
          *     }
          *   ],
@@ -73,8 +82,23 @@ export default {
     emits: ["itemSelected"],
     data () {
         return {
-            selectedItem: null
+            selectedItem: null,
+            currentSorting: {
+                columnName: "",
+                order: "origin"
+            }
         };
+    },
+    computed: {
+        ...mapGetters("Modules/Language", ["currentLocale"]),
+        sortedTable () {
+            const table = {
+                headers: this.tableData.headers,
+                items: this.getSortedItems(this.tableData.items, this.currentSorting.columnName, this.currentSorting.order)
+            };
+
+            return table;
+        }
     },
     watch: {
         selectedItemId (id) {
@@ -96,6 +120,103 @@ export default {
             this.selectedItem = item;
 
             this.$emit("itemSelected", item);
+        },
+        /**
+         * Gets a specific icon class to the passed order.
+         * @param {String} column - The column in which the table is sorted.
+         * @returns {String} The icon css class for the given order.
+         */
+        getIconClassByOrder (column) {
+            if (this.currentSorting?.columnName !== column) {
+                return "bi-arrow-down-up origin-order";
+            }
+            if (this.currentSorting.order === "asc") {
+                return "bi-arrow-up";
+            }
+            if (this.currentSorting.order === "desc") {
+                return "bi-arrow-down";
+            }
+            return "bi-arrow-down-up origin-order";
+        },
+        /**
+         * Gets the next sort order.
+         * @param {String} order - The order in which the table is sorted.
+         * @returns {String} The sort order. Can be origin, desc, asc.
+         */
+        getNextSortOrder (order) {
+            if (order === "origin") {
+                return "desc";
+            }
+            if (order === "desc") {
+                return "asc";
+            }
+            return "origin";
+        },
+        /**
+         * Sets the order and sorts the table by the given column.
+         * Sorting by a new column resets the order of the old column.
+         * @param {String} columnName - The column to sort by.
+         * @returns {void}
+         */
+        runSorting (columnName) {
+            const newSorting = {
+                columnName: columnName,
+                order: null
+            };
+
+            if (newSorting.columnName === this.currentSorting.columnName) {
+                newSorting.order = this.getNextSortOrder(this.currentSorting.order);
+            }
+            else {
+                newSorting.order = this.getNextSortOrder("origin");
+            }
+
+            this.currentSorting = newSorting;
+        },
+        /**
+         * Gets the items sorted by column and order.
+         * @param {Object[]} items - The items to sort.
+         * @param {String} columnToSort - The column name which is sorted.
+         * @param {String} order - The order to sort by. Can be origin, desc, asc.
+         * @returns {Object[]} the sorted items.
+         */
+        getSortedItems (items, columnToSort, order) {
+            if (!Array.isArray(items)) {
+                return [];
+            }
+            if (order === "origin") {
+                return items;
+            }
+            const sortType = this.tableData.headers.find(item => item.itemProperty === columnToSort)?.sortable,
+                sorted = [...items].sort((a, b) => {
+                    if (typeof a[columnToSort] === "undefined") {
+                        return -1;
+                    }
+                    if (typeof b[columnToSort] === "undefined") {
+                        return 1;
+                    }
+                    if (sortType) {
+                        if (sortType === "numeric") {
+                            if (!isNaN(parseFloat(a[columnToSort])) && isNaN(parseFloat(b[columnToSort]))) {
+                                return 1;
+                            }
+                            if (isNaN(parseFloat(a[columnToSort])) && !isNaN(parseFloat(b[columnToSort]))) {
+                                return -1;
+                            }
+                            return parseFloat(a[columnToSort]) - parseFloat(b[columnToSort]);
+                        }
+                        else if (sortType === "string") {
+                            return localeCompare(a[columnToSort], b[columnToSort], this.currentLocale, {ignorePunctuation: true});
+                        }
+                        else if (sortType === "date") {
+  // ToDo: das Format sollte nicht fest vorgegeben sein!
+                            return dayjs(a[columnToSort], "DD.MM.YYYY HH:mm").isSameOrBefore(dayjs(b[columnToSort], "DD.MM.YYYY HH:mm")) ? 1 : -1;
+                        }
+                    }
+                    return 1;
+                });
+
+            return order === "asc" ? sorted : sorted.reverse();
         }
     }
 };
@@ -119,13 +240,53 @@ export default {
                             `th-item-${item.itemProperty}`
                         ]"
                     >
-                        {{ item.displayName }}
+                        <span> {{ item.displayName }} </span>
+                        <span
+                            v-if="item.sortable"
+                            class="sortable-icon mt-1"
+                            role="button"
+                            tabindex="0"
+                            :class="getIconClassByOrder(item.itemProperty)"
+                            @click.stop="runSorting(item.itemProperty)"
+                            @keypress.stop="runSorting(item.itemProperty)"
+                        />
                     </th>
                 </tr>
             </thead>
 
             <tbody>
                 <tr
+                    v-for="(trItem, trIndex) in sortedTable.items"
+                    :key="`th_${trIndex}`"
+                    :class="[
+                        JSON.stringify(selectedItem) === JSON.stringify(trItem) ? 'rowSelected' : ''
+                    ]"
+                    @click="selectItem(trItem)"
+                >
+                    <td
+                        v-for="(tdHeaderItem, tdIndex) in sortedTable.headers"
+                        :key="`td_${trIndex}_${tdIndex}`"
+                        :class="[
+                            'cellPadding',
+                            `td-item-${tdHeaderItem.itemProperty}`,
+                            tdHeaderItem.cssClass ?? null
+                        ]"
+                    >
+                        <template v-if="$slots['cell-' + tdHeaderItem.itemProperty]">
+                            <slot
+                                :name="'cell-' + tdHeaderItem.itemProperty"
+                                :cell-data="sortedTable.items[trIndex]"
+                            />
+                        </template>
+
+                        <template v-else>
+                            <p :title="sortedTable.items[trIndex][tdHeaderItem.itemProperty]">
+                                {{ sortedTable.items[trIndex][tdHeaderItem.itemProperty] }}
+                            </p>
+                        </template>
+                    </td>
+                </tr>
+                <!--tr
                     v-for="(trItem, trIndex) in tableData.items"
                     :key="`th_${trIndex}`"
                     :class="[
@@ -156,7 +317,7 @@ export default {
                             </p>
                         </template>
                     </td>
-                </tr>
+                </tr-->
             </tbody>
         </table>
     </div>
@@ -191,6 +352,10 @@ export default {
             font-family: $font_family_accent;
             z-index: 2;
             width: fit-content;
+
+            span.sortable-icon {
+                cursor: pointer;
+            }
 
             &.cellPadding {
                 padding: 0.5rem;
