@@ -208,5 +208,9 @@
   "toolBridge": {
     "path":"cosi/ToolBridge",
     "type": "tool"
+  },
+  "cosiFileImport": {
+    "path": "cosi/cosiFileImport",
+    "type": "tool"
   }
 }
