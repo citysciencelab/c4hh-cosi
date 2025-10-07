@@ -2,7 +2,6 @@
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import {calculateExtent} from "../../utils/features/calculateExtent.js";
 import DistrictSelectorFilter from "./DistrictSelectorFilter.vue";
-import DistrictSelectorLevel from "./DistrictSelectorLevel.vue";
 import {DragBox, Select} from "ol/interaction";
 import Feature from "ol/Feature";
 import {Fill, Stroke, Style, Text} from "ol/style.js";
@@ -21,15 +20,16 @@ import {singleClick} from "ol/events/condition";
 import {styleSelectedDistrictLevels} from "../utils/styleSelectedDistrictLevels.js";
 import ToolInfo from "../../components/ToolInfo.vue";
 import {union} from "../../utils/geomUtils.js";
+import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 
 export default {
     name: "DistrictSelector",
     components: {
         AccordionItem,
         DistrictSelectorFilter,
-        DistrictSelectorLevel,
         FlatButton,
         IconButton,
+        TagGroup,
         ToolInfo
     },
     data () {
@@ -39,9 +39,7 @@ export default {
             // color for the drag box button
             dragBoxButtonColor: "grey lighten-1",
             // display additional info layers by key true/false
-            visibleAdditionalLayers: [],
-            // shows whether the features for all districts have been loaded
-            districtLevelLayersLoaded: false
+            visibleAdditionalLayers: []
         };
     },
     computed: {
@@ -49,6 +47,22 @@ export default {
         ...mapGetters("Modules/DistrictSelector", Object.keys(getters)),
         ...mapGetters(["visibleSubjectDataLayerConfigs", "allLayerConfigs", "visibleLayerConfigs"]),
         ...mapGetters("Modules/AreaSelector", {areaSelectorGeom: "geometry"}),
+
+        /**
+         * Gets an array of district level labels with their corresponding values and selection status.
+         * Each object in the returned array contains:
+         * - `label`: The label of the district level.
+         * - `value`: The layer ID of the district level.
+         * - `selected`: A boolean indicating whether the district level is currently selected.
+         * @returns {Array<Object>} An array of objects representing district level labels.
+         */
+        districtLevelLabels () {
+            return this.districtLevels.map(level => ({
+                label: level.label,
+                value: level.layerId,
+                selected: level.layerId === this.selectedDistrictLevelId
+            }));
+        },
 
         layerList () {
             return mapCollection.getMap("2D").getLayers().getArray();
@@ -113,10 +127,6 @@ export default {
         }
 
     },
-    // mounted () {
-    //     this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
-    //     document.getElementById("mp-menu-secondaryMenu").style.width = "35vw";
-    // },
     beforeUnmount () {
         this.select.setActive(false);
         // this.removeInteraction(this.select);
@@ -473,6 +483,18 @@ export default {
                     }
                 });
             }
+        },
+
+        /**
+         * Updates the selected district level based on the provided district level label.
+         * @param {Object} districtLevelLabel - The labels object containing information about the district level.
+         * @returns {void}
+         */
+        updateSelectedDistrictLevel (districtLevelLabel) {
+            if (typeof districtLevelLabel === "undefined") {
+                return;
+            }
+            this.setSelectedDistrictLevelId(districtLevelLabel.value);
         }
     }
 };
@@ -487,10 +509,11 @@ export default {
         />
         <hr class="my-4 mx-0 text-black-50">
         <template v-if="districtLevels.length && selectedDistrictLevelId">
-            <DistrictSelectorLevel
-                :district-levels="districtLevels"
-                :selected-level-id="selectedDistrictLevelId"
-                @setSelectedDistrictLevelId="setSelectedDistrictLevelId"
+            <TagGroup
+                class="mb-3"
+                :items="districtLevelLabels"
+                :label="$t('additional:modules.cosi.districtSelector.districtLevel')"
+                @update:selected-items="updateSelectedDistrictLevel"
             />
             <DistrictSelectorFilter
                 :district-levels="districtLevels"
