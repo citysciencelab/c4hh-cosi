@@ -29,6 +29,7 @@ import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import {VAutocomplete} from "vuetify/components/VAutocomplete";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
+import EditForReportTemplate from "../../components/EditForReportTemplate.vue";
 
 export default {
     name: "AccessibilityAnalysis",
@@ -43,7 +44,8 @@ export default {
         SwitchInput,
         TabBar,
         ToolInfo,
-        VAutocomplete
+        VAutocomplete,
+        EditForReportTemplate
     },
     data () {
         return {
@@ -833,6 +835,10 @@ export default {
                 :summary="$t('additional:modules.tools.cosi.accessibilityAnalysis.description')"
             />
         </AccordionItem>
+        <EditForReportTemplate
+            :report-template-mode="reportTemplateMode"
+            tool-name="accessibilityAnalysis"
+        />
         <hr class="mt-0">
         <TabBar
             class="mb-4"

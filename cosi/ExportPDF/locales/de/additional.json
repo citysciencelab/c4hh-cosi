@@ -1,0 +1,14 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "exportPDF": {
+                    "captions": {
+                        "title": "Als PDF exportieren"
+                    }
+                }
+            }
+
+        }
+    }
+}

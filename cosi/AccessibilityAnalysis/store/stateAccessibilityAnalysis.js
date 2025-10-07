@@ -45,7 +45,9 @@ const state = {
     progress: 0,
     batchSize: 50,
     serviceId: "bkg_ors",
-    fallbackServiceId: "csl_ors"
+    fallbackServiceId: "csl_ors",
+    reportTemplateMode: null,
+    toolBridgeIn: {settings: {}, type: "", outputCallback: null}, // accepts settings from toolBridge - must have a *watcher*
 };
 
 export default state;

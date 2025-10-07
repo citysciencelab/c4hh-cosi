@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "selectionManager": {
+            "title": "Selection Manager",
+            "infoTooltip": "Tool Info",
+            "noData": "No data available",
+            "mergedSelections": "Merged Selections"
+        }
+    }
+}

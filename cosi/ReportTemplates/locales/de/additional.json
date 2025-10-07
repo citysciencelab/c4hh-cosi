@@ -1,0 +1,10 @@
+{
+    "modules": {
+      "cosi": {
+        "reportTemplates": {
+          "title": "Report Template",
+          "chooseTemplate": "Template wählen"
+        }
+      }
+    }
+}
