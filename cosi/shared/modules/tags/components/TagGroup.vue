@@ -86,10 +86,7 @@ export default {
 <template lang="html">
     <div class="tag-group">
         <template v-if="loading">
-            <v-skeleton-loader
-                :type="skeletonType"
-                class=""
-            />
+            <v-skeleton-loader :type="skeletonType" />
         </template>
         <template v-else>
             <h6
@@ -137,6 +134,12 @@ export default {
         }
         .v-chip__overlay {
             background-color: unset;
+        }
+        .v-skeleton-loader__heading {
+            margin: 0 0 10px 0;
+        }
+        .v-skeleton-loader__chip {
+            margin: 0 10px 5px 0;
         }
     }
 </style>

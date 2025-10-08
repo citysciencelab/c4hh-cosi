@@ -41,7 +41,8 @@ export default {
             // color for the drag box button
             dragBoxButtonColor: "grey lighten-1",
             // display additional info layers by key true/false
-            visibleAdditionalLayers: []
+            visibleAdditionalLayers: [],
+            loading: true
         };
     },
     computed: {
@@ -114,6 +115,9 @@ export default {
         }
     },
     async created () {
+        mapCollection.getMap("2D").once("rendercomplete", () => {
+            this.loading = false;
+        });
         this.setNonReactiveData();
         if (typeof this.selectedDistrictLevelId === "undefined") {
             this.setInitMapping(await getMappingJson());
@@ -519,10 +523,12 @@ export default {
                 class="mb-3"
                 :items="districtLevelLabels"
                 :label="$t('additional:modules.cosi.districtSelector.districtLevel')"
+                :loading="loading"
                 @update:selected-items="updateSelectedDistrictLevel"
             />
             <DistrictSelectorFilter
                 :district-levels="districtLevels"
+                :loading="loading"
                 :selected-level-id="selectedDistrictLevelId"
                 :selected-district-names-by-map="selectedDistrictNames"
                 @updateSelectedDistricts="updateSelectedFeatures"

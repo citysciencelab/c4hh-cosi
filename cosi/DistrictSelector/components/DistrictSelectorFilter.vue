@@ -1,21 +1,20 @@
 <script>
-import {VAutocomplete} from "vuetify/components/VAutocomplete";
-import {VChip} from "vuetify/components/VChip";
-import {VListItem, VListItemAction, VListItemTitle} from "vuetify/components/VList";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 
 export default {
     name: "DistrictSelectorFilter",
     components: {
-        VAutocomplete,
-        VChip,
-        VListItem,
-        VListItemAction,
-        VListItemTitle
+        DropdownAutocomplete
     },
     props: {
         districtLevels: {
             type: Array,
             required: true
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+            required: false
         },
         selectedLevelId: {
             type: String,
@@ -74,20 +73,10 @@ export default {
 
     mounted () {
         if (this.selectedDistrictNamesByMap.length) {
-            this.districtLevels.forEach(level => {
-                level.selectedValues = [];
-            });
             this.addSelectedValues(this.selectedDistrictNamesByMap,
                 this.levelsForFilter.find(level => level.layerId === this.selectedLevelId));
             this.forceRerender();
         }
-        /**
-         * A small hack to make sure that all features of the lowest level
-         * are loaded and processed so that the filter can be set up correctly.
-         */
-        // this.districtLevels[0].layer.getSource().once("featuresloadend", () => {
-        //     this.forceRerender();
-        // });
     },
 
     methods: {
@@ -100,22 +89,6 @@ export default {
         addSelectedValues (districtNames, level) {
             level.selectedValues = districtNames;
             this.checkSublevels(level);
-        },
-
-        /**
-         * Removes the given district from the selected values of the level.
-         * @param {String} districtName - The name to remove.
-         * @param {Object} level - The level whose values are set.
-         * @returns {void}
-         */
-        removeSelectedValues (districtName, level) {
-            const index = level.selectedValues.indexOf(districtName);
-
-            if (index > -1) {
-                level.selectedValues.splice(index, 1);
-                this.checkSublevels(level);
-                this.forceRerender();
-            }
         },
 
         /**
@@ -162,62 +135,6 @@ export default {
             }
         },
 
-        /**
-         * Selects all values or none.
-         * @param {Object} evt - Click event.
-         * @param {Object} level - The level whose values are set.
-         * @return {void}
-         */
-        toggleSelectAll (evt, level) {
-            this.$nextTick(() => {
-                if (this.areAllValuesSelected(level)) {
-                    level.selectedValues = [];
-                }
-                else {
-                    level.selectedValues = level.filterableValues.slice();
-                }
-                this.$emit("updateSelectedDistricts", level.selectedValues);
-                this.forceRerender();
-            });
-        },
-
-        /**
-         * Gets the icon for the "select all" item.
-         * @param {Object} level - A district level.
-         * @returns {String} The icon string.
-         */
-        getIconSelectAll (level) {
-            if (this.areAllValuesSelected(level)) {
-                return "mdi-close-box";
-            }
-            if (this.areSomeValuesSelected(level)) {
-                return "mdi-minus-box";
-            }
-            return "mdi-checkbox-blank-outline";
-        },
-
-        /**
-         * Checks whether all values are selected at the level.
-         * @param {Object} level - A district level.
-         * @returns {Boolean} True if all values are selected.
-         */
-        areAllValuesSelected (level) {
-            return level.selectedValues.length === level.filterableValues?.length;
-        },
-
-        /**
-         * Checks whether some values are selected at the level.
-         * @param {Object} level - A district level.
-         * @returns {Boolean} True if more than one value is selected, but not all.
-         */
-        areSomeValuesSelected (level) {
-            return level.selectedValues.length > 0 && !this.areAllValuesSelected(level);
-        },
-
-        /**
-         * Changes the keys of the loop to trigger a rendering.
-         * @returns {void}
-         */
         forceRerender () {
             this.keyCount += 1;
         }
@@ -226,61 +143,21 @@ export default {
 </script>
 
 <template lang="html">
-    <div>
+    <div v-if="selectedLevelId">
         <div
             v-for="(level, idx) in levelsForFilter"
             :key="level.label + keyCount"
             class="mb-3"
         >
-            <v-autocomplete
-                :items="level.filterableValues"
-                :model-value="level.selectedValues"
+            <Dropdown-Autocomplete
+                :items="level.filterableValues ? level.filterableValues : []"
+                :selected-items="level.selectedValues ? level.selectedValues : []"
                 :label="level.label"
-                chips
-                closable-chips
-                hide-details
-                multiple
-                variant="outlined"
-                desensity="comfortable"
-                @update:modelValue="addSelectedValues($event, level)"
-                @blur="forceRerender"
-            >
-                <template
-                    v-if="idx === levelsForFilter.length - 1"
-                    #prepend-item
-                >
-                    <v-list-item
-                        ripple
-                        @mousedown.prevent
-                        @click="toggleSelectAll($event, level)"
-                    >
-                        <v-list-item-action>
-                            <v-icon :color="'indigo darken-4'">
-                                {{ getIconSelectAll(level) }}
-                            </v-icon>
-                        </v-list-item-action>
-                        <v-list-item-title>
-                            Alle auswählen
-                        </v-list-item-title>
-                    </v-list-item>
-                    <v-divider class="mt-2" />
-                </template>
-                <template #selection="{ item, index }">
-                    <v-chip
-                        v-if="index <= 2"
-                        closeable
-                        @click:close="removeSelectedValues(item, level)"
-                    >
-                        <span>{{ item }}</span>
-                    </v-chip>
-                    <span
-                        v-if="index === 3"
-                        class="grey--text text-caption"
-                    >
-                        (+{{ level.selectedValues.length - 3 }} weitere)
-                    </span>
-                </template>
-            </v-autocomplete>
+                :loading="loading"
+                :max-chip-count="5"
+                :select-all="idx === levelsForFilter.length - 1"
+                @update:selected-items="addSelectedValues($event, level)"
+            />
         </div>
     </div>
 </template>

@@ -26,7 +26,7 @@ import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster.js";
-import {VAutocomplete} from "vuetify/components/VAutocomplete";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
 
@@ -37,13 +37,13 @@ export default {
         AccessibilityAnalysisTrafficFlow,
         AccordionItem,
         ButtonGroup,
+        DropdownAutocomplete,
         FlatButton,
         IconButton,
         SliderItem,
         SwitchInput,
         TabBar,
-        ToolInfo,
-        VAutocomplete
+        ToolInfo
     },
     data () {
         return {
@@ -854,19 +854,12 @@ export default {
                 :label="'Alle Einrichtungen auswählen'"
                 class="mb-3"
             />
-            <v-autocomplete
+            <Dropdown-Autocomplete
                 v-if="isAllFacilitiesChecked && mode === 'facility'"
-                :model-value="selectedFacilityNames"
-                :items="facilityNames"
-                class="mb-3"
+                :items="facilityNames ? facilityNames : []"
+                :selected-items="selectedFacilityNames ? selectedFacilityNames : []"
                 label="Themen"
-                chips
-                closable-chips
-                hide-details
-                multiple
-                variant="outlined"
-                density="compact"
-                @update:model-value="setSelectedFacilityNames($event)"
+                @update:selected-items="setSelectedFacilityNames($event)"
             />
             <div
                 v-if="selectionCards.length === 0"
