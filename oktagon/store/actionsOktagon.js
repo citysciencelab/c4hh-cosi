@@ -1,5 +1,5 @@
-import {search} from "@masterportal/masterportalapi/src/searchAddress";
-import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator";
+import {search} from "@masterportal/masterportalapi/src/searchAddress/index.js";
+import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 import axios from "axios";
 
 export default {

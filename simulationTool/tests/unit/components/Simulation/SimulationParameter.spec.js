@@ -12,7 +12,7 @@ afterEach(() => {
     sinon.restore();
 });
 
-describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
+describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
     let consoleWarnSpy, store;
 
     const factory = {

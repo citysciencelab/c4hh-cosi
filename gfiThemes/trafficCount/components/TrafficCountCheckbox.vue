@@ -83,7 +83,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
+;
 
 .form-check-input:checked {
     // color: $secondary_focus_contrast;

@@ -1,7 +1,7 @@
 import {toRaw} from "vue";
 import SearchInterface from "../../../../src/modules/searchBar/searchInterfaces/searchInterface.js";
 import store from "../../../../src/app-store/index.js";
-import {search, setGazetteerUrl, setShowGeographicIdentifier} from "@masterportal/masterportalapi/src/searchAddress";
+import {search, setGazetteerUrl, setShowGeographicIdentifier} from "@masterportal/masterportalapi/src/searchAddress/index.js";
 
 /**
  * The search interface to the gazetteer.

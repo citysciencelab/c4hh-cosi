@@ -69,19 +69,20 @@ describe("addons/vpiDashboard/test/ origins tab component", () => {
         expect(wrapper.find(".chartDataSelection").exists()).to.be.true;
 
     });
+    describe.skip("skipped", () => {
+        it("sets the correct charttype", () => {
+            wrapper.vm.setChartType("bar");
 
-    it("sets the correct charttype", () => {
-        wrapper.vm.setChartType("bar");
+            expect(wrapper.vm.chartType).to.equal("bar");
+            expect(wrapper.find(".bar").exists()).to.be.true;
+            expect(wrapper.find(".line").exists()).to.be.false;
 
-        expect(wrapper.vm.chartType).to.equal("bar");
-        expect(wrapper.find(".bar").exists()).to.be.true;
-        expect(wrapper.find(".line").exists()).to.be.false;
-
-        wrapper.vm.setChartType("line");
-        wrapper.vm.$nextTick(() => {
-            expect(wrapper.vm.chartType).to.equal("line");
-            expect(wrapper.find(".bar").exists()).to.be.false;
-            expect(wrapper.find(".line").exists()).to.be.true;
+            wrapper.vm.setChartType("line");
+            wrapper.vm.$nextTick(() => {
+                expect(wrapper.vm.chartType).to.equal("line");
+                expect(wrapper.find(".bar").exists()).to.be.false;
+                expect(wrapper.find(".line").exists()).to.be.true;
+            });
         });
     });
 

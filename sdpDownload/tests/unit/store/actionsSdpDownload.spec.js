@@ -21,7 +21,9 @@ describe("addons/sdpDownload/store/actionsSdpDownload", () => {
         getters = sinon.spy();
     });
 
-    afterEach(sinon.restore);
+    afterEach(() => {
+        sinon.restore();
+    });
 
 
     it("toggleRasterLayer dispatch add layer, if active is true", () => {

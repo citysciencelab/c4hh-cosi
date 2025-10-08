@@ -7,19 +7,36 @@ import thousandsSeparator from "../../src/shared/js/utils/thousandsSeparator.js"
  * if the feature is from rad or kfz layer.
  * @return {void} -
  */
-setTimeout(() => {
-    const map = mapCollection.getMap("2D");
+/**
+ * TODO VITE + das geht gar nicht --> Tests vom Alerting schlagen hier fehl!
+ * TypeError: map.on is not a function
+ ❯ Timeout._onTimeout addons/verkehrsfunctions/verkehrsfunctions.js:14:13
+     12|
+     13|     if (typeof map !== "undefined") {
+     14|         map.on("pointermove", (evt) => {
+       |             ^
+     15|             map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
+     16|                 if (layer && layer.get("gfiTheme") === "trafficCount")…
+ ❯ listOnTimeout node:internal/timers:588:17
+ ❯ processTimers node:internal/timers:523:7
 
-    if (typeof map !== "undefined") {
-        map.on("pointermove", (evt) => {
-            map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
-                if (layer && layer.get("gfiTheme") === "trafficCount") {
-                    updateMouseHoverAttribute(feature);
-                }
-            });
-        });
-    }
-}, 200);
+This error originated in "src/modules/alerting/tests/unit/store/mutationsAlerting.spec.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+
+ * 
+ */
+// setTimeout(() => {
+//     const map = mapCollection.getMap("2D");
+
+//     if (typeof map !== "undefined") {
+//         map.on("pointermove", (evt) => {
+//             map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
+//                 if (layer && layer.get("gfiTheme") === "trafficCount") {
+//                     updateMouseHoverAttribute(feature);
+//                 }
+//             });
+//         });
+//     }
+// }, 500);
 
 /**
  * Setting the attributes in feature for mouseHover

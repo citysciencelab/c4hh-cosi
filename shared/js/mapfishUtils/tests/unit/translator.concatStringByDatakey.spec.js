@@ -15,7 +15,9 @@ import {
 } from "../../translator.concatStringByDatakey.js";
 
 describe("addons/valuationPrint/js/translator.concatStringByDatakey.js", () => {
-    afterEach(sinon.restore);
+    afterEach(() => {
+        sinon.restore();
+    });
 
     describe("formatValueNumber", () => {
         it("should return string 0 if anything but an interpretable number is given", () => {

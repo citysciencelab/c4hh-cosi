@@ -223,9 +223,9 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
                 }
             }
         });
-        afterEach(() => {
-            sinon.restore();
-        });
+    });
+    afterEach(() => {
+        sinon.restore();
     });
     describe("Component DOM", () => {
         it("should exist", async function () {

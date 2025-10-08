@@ -188,7 +188,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    @import "~variables";
+    ;
 
     .tableIndication, .trucksStatusIndication, .indication {
         font-size: 10px;

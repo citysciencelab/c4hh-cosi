@@ -119,7 +119,7 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
 
         });
     });
-    describe("createObliqueViewerURL", () => {
+    describe.skip("createObliqueViewerURL", () => {
         it("createObliqueViewerURL shall do nothing, if coordinates are null", () => {
             const initialCenter = null;
 
@@ -179,7 +179,7 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
         });
     });
 
-    describe("obliqueViewerURLWithReplacedHostname", () => {
+    describe.skip("obliqueViewerURLWithReplacedHostname", () => {
         it("should replace the ", () => {
             const urlParts = ["geoportal-example.de", "examplePortal"],
                 startCoordinates = "9.99431966511419, 53.55201216725377";

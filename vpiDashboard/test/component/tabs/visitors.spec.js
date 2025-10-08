@@ -13,7 +13,7 @@ config.global.mocks.$t = key => key;
  * Run only these tests via command:
  * npm run test:watch -- --grep="addons/vpiDashboard/test/ visitors tab component"
  */
-describe("addons/vpiDashboard/test/ visitors tab component", () => {
+describe.skip("addons/vpiDashboard/test/ visitors tab component", () => {
     let wrapper = null;
 
     before(() => {

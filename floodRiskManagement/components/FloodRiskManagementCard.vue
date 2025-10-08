@@ -90,7 +90,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
+;
 .card {
     width: 19rem;
     border-radius: 10px;

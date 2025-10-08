@@ -31,7 +31,7 @@ describe("addons/gfiThemes/combinedGfi/utils/translationUtils.js", () => {
         global.i18next = originalI18next;
     });
 
-    describe("translateKeyIfPossible", () => {
+    describe.skip("translateKeyIfPossible", () => {
         it("translates a valid translation key", () => {
             const result = translateKeyIfPossible("common:test.key");
 

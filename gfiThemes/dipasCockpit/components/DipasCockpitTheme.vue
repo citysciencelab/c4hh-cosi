@@ -118,7 +118,7 @@ export default {
 
 
 <style lang="scss">
-@import "~variables";
+;
 
 .vue-tool-content-body {
     border-radius: 15px;

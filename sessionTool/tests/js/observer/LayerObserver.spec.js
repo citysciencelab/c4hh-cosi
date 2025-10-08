@@ -10,7 +10,9 @@ import {
 
 
 describe("addons/sessionTool/js/observer/LayerObserver.js", () => {
-    afterEach(sinon.restore);
+    afterEach(() => {
+        sinon.restore();
+    });
 
     describe("getCurrentLayerList", () => {
         it("should return the current selected layers", () => {

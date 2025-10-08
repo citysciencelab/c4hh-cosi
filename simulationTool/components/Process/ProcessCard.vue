@@ -90,8 +90,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
-@import "~bootstrap/scss/card";
 
 .process-card {
   width: 100% !important;

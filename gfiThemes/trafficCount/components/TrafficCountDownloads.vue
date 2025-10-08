@@ -341,7 +341,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
+;
 .download-container {
     float: left;
     padding-top: 10px;

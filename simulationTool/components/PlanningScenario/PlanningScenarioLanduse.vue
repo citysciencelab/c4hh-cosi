@@ -680,8 +680,8 @@ export default {
 </template>
 
 <style scoped lang="scss">
-@import "~mixins";
-@import "~variables";
+;
+;
 
 .height-input {
     width: 6em;

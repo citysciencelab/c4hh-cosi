@@ -189,8 +189,8 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  @import "~variables";
-  @import "~mixins";
+  ;
+  ;
 
 /*sdp download*/
     #button-selectedDownload{
@@ -201,7 +201,7 @@ export default {
 
 // Only works unscoped
 <style lang="scss">
- @import "~variables";
+ ;
 
     #sdp-circle-overlay {
         position: absolute;

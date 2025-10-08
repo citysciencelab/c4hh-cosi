@@ -321,7 +321,7 @@ export default {
 </template>
 
 <style lang="scss">
-    @import "~variables";
+    ;
 
     #bim-factory {
         div.bimFactoryWorkflow {

@@ -1163,7 +1163,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
+;
 
 .d-flex {
     .select-scenario {
@@ -1191,7 +1191,7 @@ h6 {
 </style>
 
 <style lang="scss">
-@import "~variables";
+;
 
 .multiselect__tag {
         background: $secondary;

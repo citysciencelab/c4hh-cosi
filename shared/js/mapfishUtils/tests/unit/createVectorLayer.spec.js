@@ -13,7 +13,9 @@ describe("addons/shared/js/mapfishUtils/createVectorLayer.js", () => {
             }
         };
     });
-    afterEach(sinon.restore);
+    afterEach(() => {
+        sinon.restore();
+    });
 
     describe("getPointStyle", () => {
         it("should return the default point style", () => {

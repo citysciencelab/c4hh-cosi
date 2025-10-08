@@ -1360,7 +1360,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "~mixins";
+;
 
 #collapseHiddenButton {
     display: none;

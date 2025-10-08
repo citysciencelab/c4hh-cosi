@@ -253,7 +253,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
+;
 
 .simulation-entry {
     border: 1px solid #dee2e6;

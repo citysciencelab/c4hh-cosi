@@ -156,8 +156,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-@import "~variables";
-@import "~bootstrap/scss/card";
 
 .process-list {
     height: 100%;

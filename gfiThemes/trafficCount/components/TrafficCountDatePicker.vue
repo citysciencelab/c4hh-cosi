@@ -241,12 +241,12 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    @import "~variables";
+    ;
 
 </style>
 
 <style lang="scss">
-@import "~variables";
+;
 
 .mx-datepicker-main {
     color: $black;

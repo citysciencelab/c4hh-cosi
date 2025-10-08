@@ -196,7 +196,7 @@ describe("addons/trafficCount/utils/dauerzaehlstellenRadApi.js", () => {
             expect(api.waitingListForCallLinkDownload).to.be.an("array").and.to.have.lengthOf(1);
         });
     });
-    describe("updateWorkingDayAverage", () => {
+    it("updateWorkingDayAverage", () => {
         const api = new DauerzaehlstellenRadApi({
                 getProperties: () => false,
                 getId: () => false

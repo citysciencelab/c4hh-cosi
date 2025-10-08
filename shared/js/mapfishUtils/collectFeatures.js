@@ -1,5 +1,5 @@
 import Feature from "ol/Feature";
-import getFeaturePOST from "../../../../src/shared/js/api/wfs/getFeature";
+import getFeature from "../../../../src/shared/js/api/wfs/getFeature";
 import {intersects, within} from "ol/format/filter";
 import Point from "ol/geom/Point";
 import {WFS} from "ol/format";
@@ -64,7 +64,7 @@ export async function collectFeaturesByCoordinates (parcel, {coordinate, filter,
         propertyNames: getPropertyNames(propertyName, geometryName, precompiler)
     };
 
-    getFeaturePOST(layer.url, payload, onerror).then(response => {
+    getFeature.getFeaturePOST(layer.url, payload, onerror).then(response => {
         if (response) {
             const parserWFS = new WFS(),
                 features = parserWFS.readFeatures(response);

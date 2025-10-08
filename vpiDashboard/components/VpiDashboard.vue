@@ -110,8 +110,8 @@ export default {
         }
     },
     async mounted () {
-        await this.changeCurrentMouseMapInteractionsComponent({type: this.type, side: this.$parent.side});
-        this.setCurrentMenuWidth({side: this.$parent.side, width: "40%"});
+        await this.changeCurrentMouseMapInteractionsComponent({type: this.type, side: this.$attrs.side});
+        this.setCurrentMenuWidth({side: this.$attrs.side, width: "40%"});
         this.initCurrentLocale();
         this.map = mapCollection.getMap("2D");
         this.createYearList();
@@ -128,7 +128,7 @@ export default {
             }
         }]});
 
-        this.setCurrentMenuWidth({side: this.$parent.side, width: "25%"});
+        this.setCurrentMenuWidth({side: this.$attrs.side, width: "25%"});
     },
     methods: {
         ...mapMutations("Modules/VpiDashboard", Object.keys(mutations)),
@@ -252,10 +252,6 @@ export default {
 </template>
 
 <style lang="scss">
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/mixins";
-@import "~bootstrap/scss/pagination";
 </style>
 <style scoped>
 .vpidashboardbasic.dashboardActive {
