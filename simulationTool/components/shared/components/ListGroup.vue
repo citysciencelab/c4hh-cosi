@@ -498,6 +498,7 @@ export default {
 </template>
 
 <style scoped lang="scss">
+;
 
 .no-stepper-arrows {
     input::-webkit-outer-spin-button,

@@ -246,6 +246,7 @@ export default {
 </style>
 
 <style lang="scss">
+;
 
 .mx-datepicker-main {
     color: $black;

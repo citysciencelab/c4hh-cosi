@@ -9,7 +9,9 @@ import weekOfYear from "dayjs/plugin/weekOfYear";
 dayjs.extend(isoWeek);
 dayjs.extend(weekOfYear);
 // change language from day.js to german
-dayjs.locale(de);
+// todo vite: ohne das require wird die Sprache nicht auf de gewechselt. Warum soll das überhaupt sein?
+// require("dayjs/locale/de.js");
+// dayjs.locale("de");
 
 /**
  * TrafficCountApi is the api for the TrafficCount GFI Theme

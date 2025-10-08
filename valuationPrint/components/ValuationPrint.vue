@@ -1164,6 +1164,8 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+@import "/src/assets/css/mixins.scss";
+;
 
 .selected-parcels, .accordion-button {
     font-family: "MasterPortalFont Bold";

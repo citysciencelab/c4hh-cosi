@@ -83,6 +83,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+;
 
 .form-check-input:checked {
     // color: $secondary_focus_contrast;

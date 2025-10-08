@@ -680,6 +680,8 @@ export default {
 </template>
 
 <style scoped lang="scss">
+;
+;
 
 .height-input {
     width: 6em;

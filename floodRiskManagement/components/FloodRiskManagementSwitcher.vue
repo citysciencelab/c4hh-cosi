@@ -95,7 +95,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
+;
 .btn {
     border-radius: 0px;
     background-color: $light_grey;

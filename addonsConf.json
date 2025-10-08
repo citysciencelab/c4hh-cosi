@@ -3,6 +3,18 @@
     "type": "searchInterface",
     "path": "searchInterfaces/exampleSearch"
   },
+  "gfiOnAddressGaz": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/gfiOnAddressGaz"
+  },
+  "waterRiskCheckSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/waterRiskCheckSearch"
+  },
+  "mietenspiegelSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/mietenspiegelSearch"
+  },
   "populationRequest": {
     "type": "tool"
   },

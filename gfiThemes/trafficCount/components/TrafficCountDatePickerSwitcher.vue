@@ -97,6 +97,7 @@ export default {
 </template>
 
 <style scoped lang="scss">
+    ;
 
     #date-picker-switcher {
         button {

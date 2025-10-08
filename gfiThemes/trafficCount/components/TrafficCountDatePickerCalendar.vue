@@ -200,6 +200,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+    ;
 
     .datePickerCalendarContainer {
         td, th {

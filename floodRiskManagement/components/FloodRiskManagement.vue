@@ -507,6 +507,7 @@ export default {
 
 
 <style lang="scss" scoped>
+;
     .info {
         max-width: fit-content;
         .info-icon {

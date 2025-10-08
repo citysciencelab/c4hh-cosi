@@ -34,7 +34,15 @@ export default {
             deep: true
         }
     },
-
+    directives: {
+        resize: {
+            beforeMount: function (el, {value = {}}) {
+                el.addEventListener("load", () => iframeResizer(value, el));
+            },
+            beforeUnmount: function (el) {
+                el?.iFrameResizer?.removeListeners();
+            }
+        }},
     /**
      * Put initialize functions here after mounting
      * @returns {void}

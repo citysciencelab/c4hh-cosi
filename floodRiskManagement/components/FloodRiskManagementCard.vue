@@ -90,6 +90,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+;
 .card {
     width: 19rem;
     border-radius: 10px;

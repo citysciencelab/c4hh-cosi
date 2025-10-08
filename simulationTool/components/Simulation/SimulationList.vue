@@ -253,6 +253,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+;
 
 .simulation-entry {
     border: 1px solid #dee2e6;

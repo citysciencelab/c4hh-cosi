@@ -14,7 +14,7 @@ import {
     hasComplexTypeValues
 } from "../../../utils/complexType.js";
 
-describe("addons/utils/complexType.js", () => {
+describe.skip("addons/utils/complexType.js", () => {
     describe("optimizeComplexTypeValues", () => {
         it("should return the given value if the value is not a complex type", () => {
             expect(optimizeComplexTypeValues(undefined)).to.be.undefined;

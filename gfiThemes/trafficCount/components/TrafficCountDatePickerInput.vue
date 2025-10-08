@@ -83,6 +83,7 @@ export default {
 </template>
 
 <style scoped lang="scss">
+;
 
 .input-wrapper {
     position: relative;
