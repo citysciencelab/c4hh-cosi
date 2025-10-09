@@ -21,11 +21,12 @@ const actions = {
     finishEditingToolSettings (context) {
         // get current settings via toolbridge
         const currentSettings = context.rootGetters["Modules/ToolBridge/currentSettings"],
-            settings = currentSettings(context.state.editingTool.toolName),
+            toolName = String(context.state.editingTool.toolName).charAt(0).toUpperCase() + String(context.state.editingTool.toolName).slice(1),
+            settings = currentSettings(toolName),
             //      console.log("SETTINGS ", settings);
             // check if settings are valid
             //       console.log(currentSettings(state.editingTool.toolName));
-            validation = validateToolSettings(context.state.editingTool.toolName, settings);
+            validation = validateToolSettings(toolName, settings);
 
         // if no success, let caller know and stop:
         if (!validation.success) {

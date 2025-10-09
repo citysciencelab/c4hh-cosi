@@ -48,6 +48,7 @@ const state = {
     fallbackServiceId: "csl_ors",
     reportTemplateMode: null,
     toolBridgeIn: {settings: {}, type: "", outputCallback: null}, // accepts settings from toolBridge - must have a *watcher*
+    toolBridgeOut: {}, // pass current settings to toolBridge - must have a *getter
 };
 
 export default state;
