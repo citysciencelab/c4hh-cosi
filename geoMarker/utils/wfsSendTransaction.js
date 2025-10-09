@@ -46,7 +46,7 @@ export default async function wfsSendTransaction (srsName, feature, url, layer, 
 
         // NOTE: WFS-T services respond errors with the transaction as an XML response, even though it's the http code indicates different...
         if (transactionSummary.length === 0) {
-            exception = wfs.getExceptionFromTransactionResponse(xmlDocument);
+            exception = getExceptionFromTransactionResponse(xmlDocument);
             throw new Error(exception.code ? exception.code + ": " + exception.message : exception.message);
         }
 
@@ -78,4 +78,33 @@ export default async function wfsSendTransaction (srsName, feature, url, layer, 
         console.error(e);
         throw e;
     }
+}
+
+/**
+ * Copy of MasterportalAPI's getExceptionFromTransactionResponse method.
+ * Required because original is not exported.
+ *
+ * Checks if it is an unknown or special error and returns the code and the error message
+ *
+ * @param {Object} xmlDocument with the error
+ * @returns {Object} the code and the specific or unknown error looking like this {code, message}
+ */
+function getExceptionFromTransactionResponse (xmlDocument) {
+    const response = {code: null, message: "genericFailedTransaction"},
+        exception = xmlDocument.getElementsByTagName(`${xmlDocument.getElementsByTagName("Exception").length === 0 ? "ows:" : ""}Exception`)[0],
+        exceptionText = exception.getElementsByTagName(`${xmlDocument.getElementsByTagName("ExceptionText").length === 0 ? "ows:" : ""}ExceptionText`)[0];
+
+    if (exceptionText !== undefined) {
+        response.message = exceptionText.textContent;
+        console.error("WfsTransaction: An error occurred when sending the transaction to the service.", exceptionText.textContent);
+    }
+    else {
+        response.message = "WfsTransaction: An unkown error occurred when sending the transaction to the service.";
+        console.error(response.message);
+    }
+    if (exception?.attributes.getNamedItem("code") || exception?.attributes.getNamedItem("exceptionCode")) {
+        response.code = exception.attributes.getNamedItem(`${exception?.attributes.getNamedItem("code") ? "c" : "exceptionC"}ode`).textContent;
+    }
+
+    return response;
 }
