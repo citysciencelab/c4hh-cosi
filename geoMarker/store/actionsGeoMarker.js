@@ -7,6 +7,7 @@ import createTransactionFeature from "../utils/createTransactionFeature";
 import prepareFeatureProperties from "../utils/prepareFeatureProperties";
 import mergeFormValuesWithProperties from "../utils/mergeFormValuesWithProperties";
 import layerCollection from "@core/layers/js/layerCollection";
+import wfsSendTransaction from "../utils/wfsSendTransaction";
 
 let drawInteraction,
     drawLayer,
@@ -224,7 +225,7 @@ const actions = {
         let response = null;
 
         try {
-            response = await wfs.sendTransaction(
+            response = await wfsSendTransaction(
                 rootGetters["Maps/projectionCode"],
                 feature,
                 layer.url,
