@@ -18,7 +18,7 @@ import {prepareDistrictLevels} from "../utils/prepareDistrictLevels.js";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
 import {singleClick} from "ol/events/condition";
 import {styleSelectedDistrictLevels} from "../utils/styleSelectedDistrictLevels.js";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {union} from "../../utils/geomUtils.js";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 

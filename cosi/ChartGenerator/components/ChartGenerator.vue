@@ -11,7 +11,7 @@ import BarChart from "./charts/BarChart.vue";
 import PieChart from "./charts/PieChart.vue";
 import ScatterChart from "./charts/ScatterChart.vue";
 import RadarChart from "./charts/RadarChart.vue";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import JSZip from "jszip";
 import {saveAs} from "file-saver";
 import {getModelByAttributes} from "../../utils/radioBridge.js";

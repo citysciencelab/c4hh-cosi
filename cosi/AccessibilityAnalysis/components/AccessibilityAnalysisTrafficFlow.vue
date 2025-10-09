@@ -2,7 +2,7 @@
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import {mapActions} from "vuex";
 import SliderItem from "../../../../src/shared/modules/slider/components/SliderItem.vue";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
 
 export default {

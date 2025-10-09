@@ -1,5 +1,5 @@
 <script>
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import getters from "../store/gettersAreaSelector";
 import mutations from "../store/mutationsAreaSelector";

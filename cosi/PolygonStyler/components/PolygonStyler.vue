@@ -8,7 +8,7 @@ import {VIcon} from "vuetify/components/VIcon";
 import mutations from "../store/mutationsPolygonStyler";
 import getters from "../store/gettersPolygonStyler";
 import PolygonStylerSettings from "./PolygonStylerSettings.vue";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 
 export default {

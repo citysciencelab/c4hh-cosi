@@ -1,6 +1,6 @@
 <script>
 // Documentation in ./doc/ReportTemplates.md
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersReportTemplates";
 import mutations from "../store/mutationsReportTemplates";

@@ -4,7 +4,7 @@ import getMappingJson from "../../utils/getMappingJson";
 import getters from "../store/gettersTemplateManager";
 import mutations from "../store/mutationsTemplateManager";
 import actions from "../store/actionsTemplateManager";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import TemplateManagerImport from "./TemplateManagerImport.vue";
 import TemplateManagerExport from "./TemplateManagerExport.vue";
 import axios from "axios";

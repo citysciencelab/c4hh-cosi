@@ -10,7 +10,7 @@ import exportXlsx from "../../utils/";
 import DataTable from "./DataTable.vue";
 import {exportAsGeoJson} from "../utils/exportResults.js";
 import getMappingJson from "../../utils/getMappingJson";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {getCenter} from "ol/extent";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import {VAutocomplete} from "vuetify/components/VAutocomplete";

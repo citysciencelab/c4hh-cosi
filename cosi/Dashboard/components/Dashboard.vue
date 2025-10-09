@@ -25,7 +25,7 @@ import {prepareTableExport, prepareTableExportWithTimeline} from "../utils/expor
 import composeFilename from "../../utils/composeFilename";
 import exportXlsx from "../../utils/exportXlsx";
 import DashboardToolbar from "./DashboardToolbar.vue";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import TableCell from "./TableCell.vue";
 import isObject from "@shared/js/utils/isObject.js";
 import utils from "../../utils";

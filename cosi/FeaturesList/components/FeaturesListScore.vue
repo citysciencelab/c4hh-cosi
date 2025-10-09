@@ -1,5 +1,5 @@
 <script>
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import Weights from "./FeaturesListScoreWeights.vue";
 import {mapActions} from "vuex";
 import deepEqual from "deep-equal";

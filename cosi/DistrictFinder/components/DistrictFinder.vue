@@ -1,5 +1,5 @@
 <script>
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import DistrictFinderFilter from "./DistrictFinderFilter.vue";
 import DistrictFinderSelector from "./DistrictFinderSelector.vue";

@@ -1,20 +1,27 @@
 <script>
-import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {mapGetters} from "vuex";
+import {uniqueId} from "@shared/js/utils/uniqueId";
 
 export default {
     name: "ToolInfo",
     components: {
+        AccordionItem,
         FlatButton
     },
     props: {
+        isOpen: {
+            type: Boolean,
+            default: true
+        },
         summary: {
             type: String,
             default: null
         },
         title: {
             type: String,
-            default: "Werkzeuginformationen (Link öffnen)"
+            default: "Information"
         },
         url: {
             type: [String, Object],
@@ -25,6 +32,8 @@ export default {
         ...mapGetters("Language", ["currentLocale"])
     },
     methods: {
+        uniqueId,
+
         /**
          * Gets the right url by the current local.
          * @returns {String} The url.
@@ -58,25 +67,33 @@ export default {
 
 <template>
     <div class="tool-info-container">
-        <p
-            v-if="summary"
-            class="mb-1"
+        <AccordionItem
+            v-if="summary || url"
+            :id="uniqueId()"
+            icon="bi bi-info-circle"
+            :title="title"
+            :is-open="isOpen"
         >
-            {{ summary }}
-        </p>
-        <div
-            v-if="url"
-            class="d-flex justify-content-end"
-        >
-            <FlatButton
-                id="info-button"
-                aria="Informationen öffnen"
-                customclass="btn-sm rounded-pill fs-6 tool-info-button"
-                icon="bi bi-info-circle"
-                :interaction="() => openLink()"
-                :text="'Mehr Infos'"
-            />
-        </div>
+            <p
+                v-if="summary"
+                class="mb-1"
+            >
+                {{ summary }}
+            </p>
+            <div
+                v-if="url"
+                class="d-flex justify-content-end"
+            >
+                <FlatButton
+                    id="info-button"
+                    aria="Informationen öffnen"
+                    customclass="btn-sm rounded-pill fs-6 tool-info-button"
+                    icon="bi bi-info-circle"
+                    :interaction="() => openLink()"
+                    :text="'Mehr Infos'"
+                />
+            </div>
+        </AccordionItem>
     </div>
 </template>
 

@@ -7,7 +7,7 @@ import {downloadJsonToFile} from "../../utils/download";
 import {Point, Polygon, MultiPoint, MultiPolygon} from "ol/geom";
 import {serializeState} from "../utils/serializeState.js";
 import parseState from "../utils/parseState";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import openDB from "../utils/indexedDb";
 // import {addModelsByAttributes, getModelByAttributes} from "../../utils/radioBridge.js";
 import layerCollection from "@core/layers/js/layerCollection";

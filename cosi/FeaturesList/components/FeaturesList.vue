@@ -29,7 +29,7 @@ import
     Circle
 } from "ol/style.js";
 import Feature from "ol/Feature";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {VApp} from "vuetify/components/VApp";
 import {VDataTable} from "vuetify/components/VDataTable";
 import {VChip} from "vuetify/components/VChip";

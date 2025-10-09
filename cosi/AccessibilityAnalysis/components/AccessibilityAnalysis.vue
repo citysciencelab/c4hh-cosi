@@ -12,7 +12,7 @@ import methods from "./methodsAnalysis";
 import mutations from "../store/mutationsAccessibilityAnalysis";
 import {downloadGeoJson, exportAsGeoJson} from "../utils/exportResults";
 import {Select} from "ol/interaction";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import {transformCoordinate, transformCoordinates} from "../utils/transformCoordinates";
