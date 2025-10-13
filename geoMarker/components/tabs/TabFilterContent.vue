@@ -52,7 +52,8 @@ export default {
             "filterSelections",
             "statusOptions",
             "categories",
-            "departments"
+            "departments",
+            "geoMarkerShortFeatureId"
         ]),
         ...mapGetters("Menu", ["expanded"]),
         ...mapGetters("Modules/GraphicalSelect", [
@@ -405,7 +406,7 @@ export default {
 
                     if (filterValueIDTrimLC && filterValueIDTrimLC !== "") {
                         // GeomarkerID filter does not apply to this feature = check next feature
-                        if (!feat.getId().toLowerCase().includes(filterValueIDTrimLC)) {
+                        if (this.geoMarkerShortFeatureId(feat.getId()) !== Number(filterValueIDTrimLC)) {
                             continue;
                         }
                     }
