@@ -1,10 +1,5 @@
 <script>
-import {mapGetters} from "vuex";
-import localeCompare from "@shared/js/utils/localeCompare";
 import dayjs from "dayjs";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-
-dayjs.extend(isSameOrBefore);
 
 export default {
     name: "SelectableList",
@@ -27,6 +22,7 @@ export default {
          * - itemProperty (required), e.g. "description" - Name of the item's object property (see items)
          * - displayName (required), e.g. "Description" - The visible label
          * - sortable (required), e.g. "string" or "false" - indicator, if the column shall be sortable and by which type (string, numeric, date)
+         * - sortableDateFormat (optional, only needed for sortable: "date") - Format for date sorting (Default YYYY-MM-DD HH:mm)
          * - cssClass (optional), e.g. "clamp" - CSS class applied to all table data cells for this property
          *
          * items
@@ -44,16 +40,24 @@ export default {
          *       displayName: "Description",
          *       sortable: "string",
          *       cssClass: "clamp"
+         *     },
+         *     {
+         *       itemProperty: "date",
+         *       displayName: "Date",
+         *       sortable: "date",
+         *       sortableDateFormat: "DD.MM.YYYY HH:mm"
          *     }
          *   ],
          *   items: [
          *     {
          *       id: 123,
-         *       description: "A description"
+         *       description: "A description",
+         *       date: "2023-01-01 12:00"
          *     },
          *     {
          *       id: 456,
-         *       description: "Another text"
+         *       description: "Another text",
+         *       date: "2023-01-02 12:00"
          *     },
          *   ],
          * }
@@ -90,7 +94,6 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/Language", ["currentLocale"]),
         sortedTable () {
             const table = {
                 headers: this.tableData.headers,
@@ -130,12 +133,15 @@ export default {
             if (this.currentSorting?.columnName !== column) {
                 return "bi-arrow-down-up origin-order";
             }
+
             if (this.currentSorting.order === "asc") {
                 return "bi-arrow-up";
             }
+
             if (this.currentSorting.order === "desc") {
                 return "bi-arrow-down";
             }
+
             return "bi-arrow-down-up origin-order";
         },
         /**
@@ -145,11 +151,13 @@ export default {
          */
         getNextSortOrder (order) {
             if (order === "origin") {
-                return "desc";
-            }
-            if (order === "desc") {
                 return "asc";
             }
+
+            if (order === "asc") {
+                return "desc";
+            }
+
             return "origin";
         },
         /**
@@ -184,39 +192,76 @@ export default {
             if (!Array.isArray(items)) {
                 return [];
             }
+
             if (order === "origin") {
                 return items;
             }
-            const sortType = this.tableData.headers.find(item => item.itemProperty === columnToSort)?.sortable,
+
+            const columnSettings = this.tableData.headers.find(item => item.itemProperty === columnToSort),
                 sorted = [...items].sort((a, b) => {
-                    if (typeof a[columnToSort] === "undefined") {
-                        return -1;
+                    const valueA = a[columnToSort],
+                        valueB = b[columnToSort];
+
+                    if ((valueA === undefined || valueA === null) && (valueB === undefined || valueB === null)) {
+                        return 0;
                     }
-                    if (typeof b[columnToSort] === "undefined") {
+
+                    if (valueA === undefined || valueA === null) {
                         return 1;
                     }
-                    if (sortType) {
-                        if (sortType === "numeric") {
-                            if (!isNaN(parseFloat(a[columnToSort])) && isNaN(parseFloat(b[columnToSort]))) {
+
+                    if (valueB === undefined || valueB === null) {
+                        return -1;
+                    }
+
+                    if (columnSettings?.sortable) {
+                        if (columnSettings.sortable === "numeric") {
+                            const numA = parseFloat(valueA),
+                                numB = parseFloat(valueB);
+
+                            if (isNaN(numA) && isNaN(numB)) {
+                                return 0;
+                            }
+
+                            if (isNaN(numA)) {
                                 return 1;
                             }
-                            if (isNaN(parseFloat(a[columnToSort])) && !isNaN(parseFloat(b[columnToSort]))) {
+
+                            if (isNaN(numB)) {
                                 return -1;
                             }
-                            return parseFloat(a[columnToSort]) - parseFloat(b[columnToSort]);
+
+                            return numA - numB;
                         }
-                        else if (sortType === "string") {
-                            return localeCompare(a[columnToSort], b[columnToSort], this.currentLocale, {ignorePunctuation: true});
+                        else if (columnSettings.sortable === "string") {
+                            // Set locales parameter to undefined in order to use the current browser locale.
+                            return valueA.localeCompare(valueB, undefined, {ignorePunctuation: true});
                         }
-                        else if (sortType === "date") {
-  // ToDo: das Format sollte nicht fest vorgegeben sein!
-                            return dayjs(a[columnToSort], "DD.MM.YYYY HH:mm").isSameOrBefore(dayjs(b[columnToSort], "DD.MM.YYYY HH:mm")) ? 1 : -1;
+                        else if (columnSettings.sortable === "date") {
+                            const format = columnSettings.sortableDateFormat || "YYYY-MM-DD HH:mm",
+                                dateA = dayjs(valueA, format),
+                                dateB = dayjs(valueB, format);
+
+                            if (!dateA.isValid() && !dateB.isValid()) {
+                                return 0;
+                            }
+
+                            if (!dateA.isValid()) {
+                                return 1;
+                            }
+
+                            if (!dateB.isValid()) {
+                                return -1;
+                            }
+
+                            return dateA.diff(dateB);
                         }
                     }
-                    return 1;
+
+                    return 0;
                 });
 
-            return order === "asc" ? sorted : sorted.reverse();
+            return order === "desc" ? sorted.reverse() : sorted;
         }
     }
 };
@@ -240,7 +285,10 @@ export default {
                             `th-item-${item.itemProperty}`
                         ]"
                     >
-                        <span> {{ item.displayName }} </span>
+                        <span>
+                            {{ item.displayName }}
+                        </span>
+
                         <span
                             v-if="item.sortable"
                             class="sortable-icon mt-1"
@@ -259,7 +307,8 @@ export default {
                     v-for="(trItem, trIndex) in sortedTable.items"
                     :key="`th_${trIndex}`"
                     :class="[
-                        JSON.stringify(selectedItem) === JSON.stringify(trItem) ? 'rowSelected' : ''
+                        JSON.stringify(selectedItem) === JSON.stringify(trItem) ? 'rowSelected' : '',
+                        highlightSelection ? 'highlightSelection' : ''
                     ]"
                     @click="selectItem(trItem)"
                 >
@@ -286,38 +335,6 @@ export default {
                         </template>
                     </td>
                 </tr>
-                <!--tr
-                    v-for="(trItem, trIndex) in tableData.items"
-                    :key="`th_${trIndex}`"
-                    :class="[
-                        JSON.stringify(selectedItem) === JSON.stringify(trItem) ? 'rowSelected' : '',
-                        highlightSelection ? 'highlightSelection' : ''
-                    ]"
-                    @click="selectItem(trItem)"
-                >
-                    <td
-                        v-for="(tdHeaderItem, tdIndex) in tableData.headers"
-                        :key="`td_${trIndex}_${tdIndex}`"
-                        :class="[
-                            'cellPadding',
-                            `td-item-${tdHeaderItem.itemProperty}`,
-                            tdHeaderItem.cssClass ?? null
-                        ]"
-                    >
-                        <template v-if="$slots['cell-' + tdHeaderItem.itemProperty]">
-                            <slot
-                                :name="'cell-' + tdHeaderItem.itemProperty"
-                                :cell-data="tableData.items[trIndex]"
-                            />
-                        </template>
-
-                        <template v-else>
-                            <p :title="tableData.items[trIndex][tdHeaderItem.itemProperty]">
-                                {{ tableData.items[trIndex][tdHeaderItem.itemProperty] }}
-                            </p>
-                        </template>
-                    </td>
-                </tr-->
             </tbody>
         </table>
     </div>
@@ -355,10 +372,16 @@ export default {
 
             span.sortable-icon {
                 cursor: pointer;
+                margin: 0 0 0 0.5rem;
+
+                &:hover {
+                    background-color: $light_grey_hover;
+                }
             }
 
             &.cellPadding {
                 padding: 0.5rem;
+                text-wrap: nowrap;
             }
         }
 

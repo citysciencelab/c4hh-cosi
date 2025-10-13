@@ -60,7 +60,8 @@ export default {
                     {
                         itemProperty: "zeitstempel",
                         displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.zeitstempel"),
-                        sortable: "date"
+                        sortable: "date",
+                        sortableDateFormat: "DD.MM.YYYY HH:mm"
                     },
                     {
                         itemProperty: "aktion",
@@ -74,15 +75,15 @@ export default {
 
                     return {
                         id: this.geoMarkerShortFeatureId(item.getId()),
-                        quelle: featureProperties.quelle ?? "--",
-                        kategorie: featureProperties.kategorie ?? "--",
+                        quelle: featureProperties.quelle ?? null,
+                        kategorie: featureProperties.kategorie ?? null,
                         status: geoMarkerState
                             ? this.$t("additional:modules.geoMarker.status." + geoMarkerState)
-                            : "--",
-                        beschreibung: featureProperties.beschreibung ?? "--",
+                            : null,
+                        beschreibung: featureProperties.beschreibung ?? null,
                         zeitstempel: featureProperties.zeitstempel
                             ? formatDateTime(featureProperties.zeitstempel)
-                            : "--",
+                            : null,
                         // Feature id, not visible in table, but required to access the feature later.
                         featureId: item.getId()
                     };
