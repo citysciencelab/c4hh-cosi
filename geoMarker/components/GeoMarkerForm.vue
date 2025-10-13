@@ -1,0 +1,1008 @@
+<script>
+import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
+import GeoMarkerFormBox from "./GeoMarkerFormBox.vue";
+import SelectableList from "./SelectableList.vue";
+import CreateScreenshot from "./CreateScreenshot.vue";
+import {mapGetters, mapActions, mapMutations} from "vuex";
+import Multiselect from "vue-multiselect";
+import dayjs from "dayjs";
+
+export default {
+    name: "GeoMarkerForm",
+    components: {
+        GeoMarkerFormBox,
+        SwitchInput,
+        CreateScreenshot,
+        IconButton,
+        SelectableList,
+        Multiselect,
+        InputText,
+        FileUpload,
+        FlatButton
+    },
+    props: {
+        mode: {
+            type: String,
+            default: "create",
+            validator: (value) => ["create", "edit"].includes(value)
+        },
+        selectedFeature: {
+            type: Object,
+            default: null
+        },
+        showCreateAnotherSwitch: {
+            type: Boolean,
+            default: false
+        }
+    },
+    emits: ["cancel-edit", "update-successfull"],
+    data () {
+        return {
+            selectedCategoryId: null,
+            categories: {},
+            departments: {},
+            departmentData: {},
+            statusForSelectedDepartments: "offen",
+            reminderDate: null,
+            geomarkerDescription: "",
+            screenshotImage: "",
+            attachment: null,
+            createAnotherGeoMarker: false,
+            savingInProgress: false
+        };
+    },
+    computed: {
+        ...mapGetters("Modules/GeoMarker", [
+            "statusOptions",
+            "newGeoMarkerFeature",
+            "geoMarkerFeatureList",
+            "geoMarkerUpdateFeature"
+        ]),
+        tableDataConfig () {
+            const departmentIds = Object.keys(this.departmentData || {}),
+                headers = [
+                    {itemProperty: "Abteilung", displayName: "Abteilung"},
+                    {itemProperty: "Status", displayName: "Status"}
+                ];
+
+            if (this.mode === "edit") {
+                headers.push({itemProperty: "ReminderDate", displayName: "WiedervorlageDatum"});
+            }
+
+            headers.push({itemProperty: "Bemerkung", displayName: "Bemerkung"});
+
+            return {
+                headers: headers,
+                items: departmentIds.map(departmentId => {
+                    return {
+                        departmentId: departmentId,
+                        Abteilung: this.departments[departmentId]?.name || "",
+                        Status: this.departmentData[departmentId]?.status || "offen"
+                    };
+                })
+            };
+        },
+        formValidation () {
+            const validations = [
+                Object.keys(this.departmentData).length === 0,
+                this.mode === "create" ? this.newGeoMarkerFeature === null : !this.selectedFeature
+            ];
+
+            return validations.some(Boolean);
+        },
+        newGeoMarker () {
+            if (this.mode !== "create") {
+                return null;
+            }
+
+            return {
+                kategorie: this.categories[this.selectedCategoryId]?.name,
+                anhang_name: this.attachment ? this.attachment.name : null,
+                anhang_base_64: this.attachment ? this.attachment.base64 : null,
+                screenshot_base_64: this.screenshotImage,
+                ...this.departmentValuesForGeomarker,
+                beschreibung: this.geomarkerDescription,
+                zeitstempel: dayjs().toISOString(),
+                quelle: window.activeDirectoryUser ? window.activeDirectoryUser.username : "geomarker"
+            };
+        },
+        updatedGeoMarker () {
+            if (!this.selectedFeature || this.mode !== "edit") {
+                return null;
+            }
+
+            return {
+                id: this.selectedFeature.getId(),
+                kategorie: this.categories[this.selectedCategoryId]?.name,
+                anhang_name: this.attachment ? this.attachment.name : null,
+                anhang_base_64: this.attachment ? this.attachment.base64 : null,
+                screenshot_base_64: this.screenshotImage,
+                ...this.departmentValuesForGeomarker,
+                beschreibung: this.geomarkerDescription,
+                zeitstempel: dayjs().toISOString(),
+                quelle: window.activeDirectoryUser ? window.activeDirectoryUser.username : "geomarker",
+                geom: this.geoMarkerUpdateFeature?.getGeometry()
+            };
+        },
+        /**
+         * Maps department form data to WFS field names
+         */
+        departmentValuesForGeomarker () {
+            const departmentValues = {};
+
+            Object.keys(this.departmentData || {}).forEach(departmentId => {
+                const department = this.departments?.[departmentId],
+                    departmentFormData = this.departmentData[departmentId] || {},
+                    currentStatus = departmentFormData.status;
+
+                if (department?.fields) {
+                    Object.entries(department.fields).forEach(([fieldKey, fieldValue]) => {
+                        if (fieldKey === "wiedervorlage" && currentStatus !== "offen") {
+                            if (currentStatus !== "offen") {
+                                departmentValues[fieldValue] = this.mode === "create"
+                                    ? dayjs(this.reminderDate).toISOString()
+                                    : dayjs(departmentFormData[fieldKey]).toISOString();
+                            }
+                            else {
+                                departmentValues[fieldValue] = "";
+                            }
+                        }
+
+                        if (departmentFormData[fieldKey] !== null && departmentFormData[fieldKey] !== undefined) {
+                            departmentValues[fieldValue] = departmentFormData[fieldKey];
+                        }
+                    });
+                }
+            });
+
+            return departmentValues;
+        },
+        /**
+         * Returns layer IDs for selected departments
+         */
+        layerIdsForSelectedDepartments () {
+            const departmentIds = Object.keys(this.departmentData || {}),
+                layerIdsArray = [];
+
+            departmentIds.forEach(departmentId => {
+                if (this.departments[departmentId]?.layerIds) {
+                    layerIdsArray.push(...Object.values(this.departments[departmentId].layerIds));
+                }
+            });
+
+            return layerIdsArray;
+        }
+    },
+    watch: {
+        reminderDate (newDate) {
+            if (!newDate || this.mode === "edit") {
+                return;
+            }
+
+            const today = new Date(),
+                selected = new Date(newDate);
+
+            this.statusForSelectedDepartments = selected <= today ? "offen" : "inaktiv";
+
+            Object.keys(this.departmentData).forEach(departmentId => {
+                if (this.departmentData[departmentId]) {
+                    this.departmentData[departmentId].status = this.statusForSelectedDepartments;
+                }
+            });
+        },
+        selectedFeature: {
+            handler (newFeature) {
+                if (newFeature && this.mode === "edit") {
+                    this.loadFeatureData(newFeature);
+                }
+            },
+            immediate: true
+        }
+    },
+    mounted () {
+        this.getDepartmentsAndCategoriesFromState();
+
+        if (this.mode === "create") {
+            this.initializeForCreate();
+        }
+        else if (this.mode === "edit" && this.selectedFeature) {
+            this.loadFeatureData(this.selectedFeature);
+        }
+    },
+    methods: {
+        ...mapActions("Alerting", ["addSingleAlert"]),
+        ...mapActions("Modules/GeoMarker", [
+            "upsertPoint",
+            "setMapInteraction",
+            "updateGeoMarker",
+            "loadPropertyOfFeatureById"
+        ]),
+        ...mapMutations("Modules/GeoMarker", [
+            "setGeoMarkerActiveTab",
+            "setNewGeoMarkerFeature",
+            "setGeoMarkerFeatureList",
+            "setTriggerFilter"
+        ]),
+        /**
+         * Initialize form for create mode
+         */
+        initializeForCreate () {
+            this.setInitiallySelectedCategoryId();
+            this.updateDepartmentsFromCategory();
+        },
+        /**
+         * Load data from feature for edit mode
+         */
+        async loadFeatureData (feature) {
+            if (!feature) {
+                return;
+            }
+
+            const featureProps = feature.getProperties();
+
+            this.selectedCategoryId = Object.keys(this.categories).find(
+                categoryId => this.categories[categoryId].name === featureProps.kategorie
+            );
+
+            this.departmentData = this.extractDepartmentData(featureProps);
+            this.geomarkerDescription = featureProps.beschreibung || "";
+            this.reminderDate = this.extractReminderDate(featureProps);
+            this.screenshotImage = await this.loadPropertyOfFeatureById({
+                geomarkerId: feature.getId(),
+                propertyName: "screenshot_base_64"
+            });
+
+            if (featureProps.anhang_name) {
+                this.attachment = {
+                    name: featureProps.anhang_name
+                };
+            }
+            else {
+                this.attachment = null;
+            }
+        },
+        /**
+         * Extract department data from feature properties
+         */
+        extractDepartmentData (featureProps) {
+            const departmentData = {};
+
+            Object.keys(this.departments).forEach(departmentId => {
+                const department = this.departments[departmentId],
+                    hasData = Object.values(department?.fields || {}).some(fieldKey => {
+                        return featureProps[fieldKey] !== undefined && featureProps[fieldKey] !== null;
+                    });
+
+                if (!department?.fields) {
+                    return;
+                }
+
+                if (hasData) {
+                    departmentData[departmentId] = {};
+
+                    Object.entries(department.fields).forEach(([fieldKey, fieldValue]) => {
+                        if (featureProps[fieldValue] !== undefined && featureProps[fieldValue] !== null) {
+                            if (fieldKey === "wiedervorlage") {
+                                departmentData[departmentId][fieldKey] = dayjs(featureProps[fieldValue]).format("YYYY-MM-DD");
+                            }
+                            else {
+                                departmentData[departmentId][fieldKey] = featureProps[fieldValue];
+                            }
+                        }
+                    });
+                }
+            });
+
+            return departmentData;
+        },
+        /**
+         * Extract reminder date from feature properties
+         */
+        extractReminderDate (featureProps) {
+            for (const department of Object.values(this.departments)) {
+                if (department?.fields?.wiedervorlage) {
+                    const dateValue = featureProps[department.fields.wiedervorlage];
+
+                    if (dateValue) {
+                        return dayjs(dateValue).format("YYYY-MM-DD");
+                    }
+                }
+            }
+            return null;
+        },
+        /**
+         * Get file type from base64 string
+         * @param {String} base64String - The base64 encoded string
+         * @returns {String|null} The MIME type of the file or null if not recognized
+         */
+        getFileTypeFromBase64 (base64String) {
+            if (!base64String) {
+                return null;
+            }
+
+            if (base64String.startsWith("data:application/pdf")) {
+                return "application/pdf";
+            }
+            if (base64String.startsWith("data:image/png")) {
+                return "image/png";
+            }
+            if (base64String.startsWith("data:image/jpeg")) {
+                return "image/jpeg";
+            }
+            if (base64String.startsWith("data:application/zip")) {
+                return "application/zip";
+            }
+
+            return null;
+        },
+        /**
+         * Sets the initially selected category ID to the first available category
+         * @returns {void}
+         */
+        setInitiallySelectedCategoryId () {
+            this.selectedCategoryId = Object.keys(this.categories || {})[0];
+        },
+        /**
+         * Handles category selection change
+         * @param {String} categoryId - The ID of the selected category
+         * @returns {void}
+         */
+        onCategorySelect (categoryId) {
+            this.selectedCategoryId = categoryId;
+
+            if (this.mode === "create") {
+                this.updateDepartmentsFromCategory();
+            }
+        },
+        /**
+         * Updates department data based on the selected category
+         * @returns {void}
+         */
+        updateDepartmentsFromCategory () {
+            const category = this.categories[this.selectedCategoryId];
+
+            if (category && category.departments) {
+                const newDepartmentData = {};
+
+                category.departments.forEach(departmentId => {
+                    newDepartmentData[departmentId] = {
+                        status: this.statusForSelectedDepartments,
+                        bemerkung: ""
+                    };
+                });
+
+                this.departmentData = newDepartmentData;
+            }
+            else {
+                this.departmentData = {};
+            }
+
+            if (this.selectedCategoryId && this.categories[this.selectedCategoryId]) {
+                this.categories[this.selectedCategoryId].departments = Object.keys(this.departmentData);
+            }
+        },
+        /**
+         * Toggles department selection on/off and updated departmentData property
+         * @param {String} departmentId - The ID of the department to toggle
+         * @returns {void}
+         */
+        toggleDepartment (departmentId) {
+            if (this.departmentData[departmentId]) {
+                delete this.departmentData[departmentId];
+            }
+            else {
+                this.departmentData[departmentId] = {
+                    status: this.statusForSelectedDepartments,
+                    bemerkung: ""
+                };
+            }
+
+            if (this.selectedCategoryId && this.categories?.[this.selectedCategoryId]) {
+                this.categories[this.selectedCategoryId].departments = Object.keys(this.departmentData);
+            }
+        },
+        /**
+         * Handles screenshot creation event
+         * @param {String} screenshotImage - The base64 encoded screenshot image
+         * @returns {void}
+         */
+        onScreenshotCreated (screenshotImage) {
+            this.screenshotImage = screenshotImage;
+        },
+        /**
+         * Handles screenshot deletion event
+         * @returns {void}
+         */
+        onScreenshotDeleted () {
+            this.screenshotImage = "";
+        },
+        /**
+         * Handles attachment file change event (file input or drag & drop)
+         * @param {Event} e - The change or drop event
+         * @returns {void}
+         */
+        onAttachmentChange (e) {
+            const reader = new FileReader(),
+                allowedTypes = [
+                    "application/pdf",
+                    "image/png",
+                    "image/jpeg",
+                    "application/zip",
+                    "application/x-zip-compressed"
+                ];
+
+            let file = null;
+
+            switch (e.type) {
+                case "change":
+                    file = e.target.files?.[0] || null;
+                    break;
+                case "drop":
+                    file = e.dataTransfer?.files?.[0] || null;
+                    break;
+                default:
+                    console.warn("Unsupported event type:", e.type);
+            }
+
+            if (!file) {
+                return;
+            }
+
+            if (!allowedTypes.includes(file.type)) {
+                this.addSingleAlert({
+                    content: this.$t("additional:modules.geoMarker.geoMarkerForm.attachmentWarning"),
+                    category: "warn",
+                    title: this.$t("additional:modules.geoMarker.geoMarkerForm.attachmentWarningTitle")
+                });
+                return;
+            }
+
+            reader.onload = () => {
+                this.attachment = {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    base64: reader.result
+                };
+            };
+
+            reader.readAsDataURL(file);
+            e.target.value = null;
+        },
+        /**
+         * Triggers file upload click on keyboard interaction (Space or Enter key)
+         * @param {KeyboardEvent} e - The keyboard event
+         * @returns {void}
+         */
+        triggerClickOnFileUploadKeyDown (e) {
+            if (e.code === "Space" || e.code === "Enter") {
+                this.$refs.fileUpload.click();
+            }
+        },
+        /**
+         * Removes the attached file
+         * @returns {void}
+         */
+        removeAttachment () {
+            this.attachment = null;
+        },
+        /**
+         * Gets departments and categories from the store and creates deep copies
+         * @returns {void}
+         */
+        getDepartmentsAndCategoriesFromState () {
+            this.categories = JSON.parse(JSON.stringify(this.$store.getters["Modules/GeoMarker/categories"]));
+            this.departments = JSON.parse(JSON.stringify(this.$store.getters["Modules/GeoMarker/departments"]));
+        },
+        /**
+         * Resets the form to its initial state
+         * @returns {void}
+         */
+        resetForm () {
+            this.getDepartmentsAndCategoriesFromState();
+            this.setInitiallySelectedCategoryId();
+            this.updateDepartmentsFromCategory();
+            this.removeAttachment();
+            this.statusForSelectedDepartments = "offen";
+            this.reminderDate = null;
+            this.geomarkerDescription = "";
+            this.$refs.screenshotComponent.deleteScreenshot();
+        },
+        /**
+         * Creates a new geomarker and saves it to the database
+         * @returns {Promise<void>}
+         */
+        async createNewGeomarker () {
+            if (!this.newGeoMarker) {
+                return;
+            }
+
+            this.savingInProgress = true;
+
+            const {transactionResponse} = await this.upsertPoint({
+                geoMarkerFormValues: this.newGeoMarker,
+                updatedLayerIds: this.layerIdsForSelectedDepartments,
+                selectedTransaction: "insert"
+            });
+
+
+            if (!transactionResponse) {
+                this.savingInProgress = false;
+                return;
+            }
+
+            this.resetForm();
+            this.refreshNewFeaturePointOnMap();
+            this.savingInProgress = false;
+
+            if (!this.createAnotherGeoMarker) {
+                this.setGeoMarkerActiveTab("tabList");
+            }
+        },
+        /**
+         * Updates an existing geomarker and saves changes to the database
+         * @returns {Promise<void>}
+         */
+        async updateExistingGeomarker () {
+            if (!this.selectedFeature || !this.updatedGeoMarker) {
+                return;
+            }
+
+            this.savingInProgress = true;
+
+            try {
+                const {transactionResponse} = await this.upsertPoint({
+                    geoMarkerFormValues: this.updatedGeoMarker,
+                    updatedLayerIds: this.layerIdsForSelectedDepartments,
+                    selectedTransaction: "selectedUpdate"
+                });
+
+                if (transactionResponse) {
+                    this.addSingleAlert({
+                        content: this.$t("additional:modules.geoMarker.geoMarkerForm.successMessage"),
+                        category: "success"
+                    });
+
+                    await this.updateGeoMarkerFeatureListAfterEdit();
+                }
+            }
+            catch (error) {
+                console.error("Error updating GeoMarker:", error);
+                this.addSingleAlert({
+                    content: this.$t("additional:modules.geoMarker.edit.errorMessage"),
+                    category: "error"
+                });
+            }
+            finally {
+                this.$emit("update-successfull");
+                this.savingInProgress = false;
+            }
+        },
+        /**
+         * Handles form cancellation
+         * @returns {void}
+         */
+        cancelForm () {
+            if (this.mode === "create") {
+                this.resetForm();
+                this.refreshNewFeaturePointOnMap();
+            }
+            else {
+                this.$emit("cancel-edit");
+            }
+        },
+        /**
+         * Refreshes the new feature point on the map and resets draw interaction
+         * @returns {void}
+         */
+        refreshNewFeaturePointOnMap () {
+            this.setMapInteraction(null);
+            this.setMapInteraction("Point");
+            this.setNewGeoMarkerFeature(null);
+        },
+        /**
+         * Handles the save action based on the current mode (create or edit)
+         * @returns {void}
+         */
+        handleSave () {
+            if (this.mode === "create") {
+                this.createNewGeomarker();
+            }
+            else {
+                this.updateExistingGeomarker();
+            }
+        },
+        /**
+         * Updates the geoMarkerFeatureList in the store after editing a geomarker.
+         * Updates both general geomarker properties and department-specific fields.
+         * For departments that are removed, sets their fields to null.
+         * @returns {Promise<void>}
+         */
+        async updateGeoMarkerFeatureListAfterEdit () {
+            const updatedList = this.geoMarkerFeatureList.map(feature => {
+                if (feature.getId() === this.selectedFeature.getId()) {
+                    Object.keys(this.updatedGeoMarker).forEach(key => {
+                        if (key !== "id" && this.updatedGeoMarker[key] !== undefined) {
+                            feature.set(key, this.updatedGeoMarker[key]);
+                        }
+                    });
+
+                    const allDepartmentIds = Object.keys(this.departments);
+
+                    allDepartmentIds.forEach(departmentId => {
+                        const department = this.departments[departmentId];
+
+                        if (department?.fields) {
+                            if (this.departmentData[departmentId]) {
+                                Object.entries(department.fields).forEach(([fieldKey, fieldValue]) => {
+                                    const departmentFormData = this.departmentData[departmentId];
+
+                                    if (departmentFormData[fieldKey] !== undefined && departmentFormData[fieldKey] !== null) {
+                                        if (fieldKey === "wiedervorlage" && departmentFormData[fieldKey]) {
+                                            feature.set(fieldValue, dayjs(departmentFormData[fieldKey]).toISOString());
+                                        }
+                                        else {
+                                            feature.set(fieldValue, departmentFormData[fieldKey]);
+                                        }
+                                    }
+                                });
+                            }
+                            else {
+                                Object.values(department.fields).forEach(fieldValue => {
+                                    feature.set(fieldValue, null);
+                                });
+                            }
+                        }
+                    });
+
+                    return feature;
+                }
+                return feature;
+            });
+
+            this.setGeoMarkerFeatureList(updatedList);
+        },
+        /**
+         * Downloads the attachment file associated with the selected geomarker
+         * @returns {Promise<void>}
+         */
+        async downloadAttachment () {
+            const base64Data = await this.loadPropertyOfFeatureById({
+                    geomarkerId: this.selectedFeature.getId(),
+                    propertyName: "anhang_base_64"
+                }),
+                fileType = this.getFileTypeFromBase64(base64Data),
+                link = document.createElement("a");
+
+            if (!base64Data) {
+                return;
+            }
+
+            this.attachment.base64 = base64Data;
+
+            link.href = base64Data;
+            link.download = this.attachment.name;
+            link.click();
+
+            if (fileType) {
+                this.attachment.type = fileType;
+            }
+        }
+    }
+};
+</script>
+
+<template>
+    <div class="GeoMarkerForm">
+        <div class="formElements">
+            <div class="firstRow">
+                <GeoMarkerFormBox
+                    :title="$t('additional:modules.geoMarker.geoMarkerForm.infoTitle')"
+                    class="infoSection"
+                >
+                    <div class="categoriesSelectBox">
+                        <label for="categories">
+                            {{ $t("additional:modules.geoMarker.geoMarkerForm.category") }}
+                        </label>
+
+                        <select
+                            id="categories"
+                            class="form-select"
+                            :value="selectedCategoryId"
+                            @change="onCategorySelect($event.target.value)"
+                        >
+                            <option
+                                v-for="categoryId in Object.keys(categories)"
+                                :key="categoryId"
+                                :value="categoryId"
+                                :title="categories[categoryId].description"
+                            >
+                                {{ categories[categoryId].name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <label for="geomarkerDescription">
+                        {{ $t('additional:modules.geoMarker.geoMarkerForm.descriptionLabel') }}
+                    </label>
+
+                    <textarea
+                        id="geomarkerDescription"
+                        v-model="geomarkerDescription"
+                        class="form-control"
+                        :rows="mode === 'create' ? '8' : '12'"
+                    />
+
+                    <InputText
+                        v-if="mode === 'create'"
+                        id="reminderDate"
+                        v-model="reminderDate"
+                        :label="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
+                        type="date"
+                        :placeholder="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
+                    />
+                </GeoMarkerFormBox>
+
+                <GeoMarkerFormBox
+                    :title="$t('additional:modules.geoMarker.geoMarkerForm.attachmentTitle')"
+                    class="attachmentSection"
+                >
+                    <div class="attachment">
+                        <FileUpload
+                            id="attachmentUpload"
+                            ref="fileUpload"
+                            :change="onAttachmentChange"
+                            :keydown="triggerClickOnFileUploadKeyDown"
+                            :drop="onAttachmentChange"
+                        >
+                            <span v-if="!attachment">
+                                {{ $t("additional:modules.geoMarker.geoMarkerForm.attachmentWarning") }}
+                            </span>
+
+                            <div
+                                v-if="attachment"
+                                class="fileUploadSlotContent"
+                            >
+                                <span>
+                                    {{ attachment.name }}
+                                </span>
+
+                                <IconButton
+                                    class="removeAttachmentButton"
+                                    :aria="$t('additional:modules.geoMarker.geoMarkerForm.removeAttachment')"
+                                    icon="bi-trash3"
+                                    :interaction="removeAttachment"
+                                />
+                            </div>
+                        </FileUpload>
+                        <div
+                            v-if="mode==='edit' && attachment"
+                            class="editMode"
+                        >
+                            <FlatButton
+                                :aria-label="$t('additional:modules.geoMarker.geoMarkerForm.downloadAttachment')"
+                                :text="$t('additional:modules.geoMarker.geoMarkerForm.downloadAttachment')"
+                                @click="downloadAttachment"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="screenshot">
+                        <p>
+                            {{ $t("additional:modules.geoMarker.screenshot.altImage") }}:
+                        </p>
+
+                        <CreateScreenshot
+                            ref="screenshotComponent"
+                            :screenshot-image="screenshotImage"
+                            @onScreenshotCreated="onScreenshotCreated"
+                            @onScreenshotDeleted="onScreenshotDeleted"
+                        />
+                    </div>
+                </GeoMarkerFormBox>
+
+                <GeoMarkerFormBox
+                    :title="$t('additional:modules.geoMarker.geoMarkerForm.departmentsTitle')"
+                    class="departmentsCheckboxSection"
+                >
+                    <div class="departments">
+                        <template
+                            v-for="(department, departmentId) in departments"
+                            :key="departmentId"
+                        >
+                            <SwitchInput
+                                :id="departmentId"
+                                :label="department.name"
+                                :aria="department.name"
+                                :checked="Boolean(departmentData[departmentId])"
+                                :disabled="false"
+                                :interaction="() => toggleDepartment(departmentId)"
+                            />
+                        </template>
+                    </div>
+                </GeoMarkerFormBox>
+            </div>
+
+            <div class="selectedDepartments">
+                <GeoMarkerFormBox
+                    class="selectedDepartmentsTableSection"
+                    :title="$t('additional:modules.geoMarker.geoMarkerForm.selectedDepartmentsTitle')"
+                >
+                    <SelectableList
+                        v-if="Object.keys(departmentData).length > 0"
+                        :table-data="tableDataConfig"
+                        :highlight-selection="false"
+                        :show-header="true"
+                    >
+                        <template #cell-Status="{ cellData }">
+                            <Multiselect
+                                :id="`statusSelect-${cellData.departmentId}`"
+                                v-model="departmentData[cellData.departmentId].status"
+                                class="departmentStatusSelect"
+                                :options="statusOptions"
+                                name="select-box"
+                                :multiple="false"
+                                :placeholder="$t('additional:modules.geoMarker.filter.status.placeholder')"
+                                :show-labels="false"
+                                open-direction="bottom"
+                                :hide-selected="false"
+                                :allow-empty="false"
+                                :close-on-select="true"
+                                :clear-on-select="false"
+                                :internal-search="false"
+                                :aria-expanded="true"
+                            />
+                        </template>
+
+                        <template #cell-ReminderDate="{ cellData }">
+                            <InputText
+                                :id="`wiedervorlageDatum-${cellData.departmentId}`"
+                                v-model="departmentData[cellData.departmentId].wiedervorlage"
+                                :label="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
+                                type="date"
+                                :disabled="departmentData[cellData.departmentId].status === 'offen'"
+                                :placeholder="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
+                            />
+                        </template>
+
+                        <template #cell-Bemerkung="{ cellData }">
+                            <textarea
+                                :id="`departmentDescription-${cellData.departmentId}`"
+                                v-model="departmentData[cellData.departmentId].bemerkung"
+                                class="categoryDescriptionInput form-control"
+                                rows="3"
+                            />
+                        </template>
+                    </SelectableList>
+                </GeoMarkerFormBox>
+            </div>
+        </div>
+
+        <div class="footer">
+            <SwitchInput
+                v-if="showCreateAnotherSwitch && mode === 'create'"
+                id="createAnotherGeoMarker"
+                :label="$t('additional:modules.geoMarker.geoMarkerForm.createAnotherGeoMarker')"
+                :aria="$t('additional:modules.geoMarker.geoMarkerForm.createAnotherGeoMarker')"
+                :checked="createAnotherGeoMarker"
+                :interaction="() => { createAnotherGeoMarker = !createAnotherGeoMarker; }"
+            />
+
+            <div class="buttons">
+                <FlatButton
+                    :aria-label="mode === 'create' ? $t('additional:modules.geoMarker.geoMarkerForm.save') : $t('additional:modules.geoMarker.geoMarkerForm.update')"
+                    :text="mode === 'create' ? $t('additional:modules.geoMarker.geoMarkerForm.save') : $t('additional:modules.geoMarker.geoMarkerForm.update')"
+                    :disabled="formValidation || savingInProgress"
+                    @click="handleSave"
+                />
+
+                <FlatButton
+                    :aria-label="$t('additional:modules.geoMarker.geoMarkerForm.cancel')"
+                    :text="$t('additional:modules.geoMarker.geoMarkerForm.cancel')"
+                    :disabled="savingInProgress"
+                    @click="cancelForm"
+                />
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+@import "~variables";
+
+div.GeoMarkerForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+
+    div.formElements {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        overflow: auto;
+        padding-top: 1rem;
+        flex: 1;
+
+        div.firstRow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            width: 100%;
+
+            div.infoSection {
+                :deep(div.formBoxContent) {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+            }
+
+            div.attachmentSection {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+
+                div.attachment {
+                    div.editMode {
+                        display: flex;
+                        justify-content: center;
+                    }
+                }
+                div.screenshot {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                }
+            }
+        }
+
+        div.firstRow > * {
+            flex: 1 1 15rem;
+            min-width: 0;
+        }
+
+        div.fileUploadSlotContent {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            gap: 0.5rem;
+
+            div.removeAttachmentButton {
+                position: relative;
+                z-index: 20;
+            }
+
+            span {
+                overflow-wrap: anywhere;
+            }
+        }
+
+        div.selectedDepartmentsTableSection {
+            width: 100%;
+
+            .departmentStatusSelect {
+                width: 12rem;
+            }
+        }
+    }
+
+    div.footer {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 1rem;
+
+        div.buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+    }
+}
+</style>

@@ -23,6 +23,7 @@
  * @property {TransactionLayer[]} layerInformation Information about the WFS-T layer used for editing configured for the tool.
  * @property {Feature} newGeoMarkerFeature The newly created GeoMarker feature
  * @property {String} geoMarkerEditLayerId The id of the layer where the drawn features are stored
+ * @property {String} geomarkerEditLayerUrl The source Url for Layer to update and get
  * @property {String|null} geoMarkerUpdateLayerIds - The id(s) of the layer(s) which contain the selected GeoMarker feature
  * @property {Object|null} updateGeoMarkerFeature - The GeoMarker feature being updated
  * @property {Object|null} rollbackGeoMarkerFeature - The feature to roll back to
@@ -61,8 +62,10 @@ const state = {
     layerInformation: [],
     newGeoMarkerFeature: null,
     geoMarkerEditLayerId: "geomarker_edit",
+    geomarkerEditLayerUrl: "",
     geoMarkerUpdateLayerIds: null,
     geoMarkerUpdateFeature: null,
+    triggerFilter: false,
     rollbackGeoMarkerFeature: null,
     selectedInteraction: null,
     drawInteraction: null,

@@ -1,18 +1,22 @@
 <script>
-import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapGetters, mapMutations, mapActions} from "vuex";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {formatDateTime} from "../../utils/dateHelpers";
 import SelectableList from "../SelectableList.vue";
+import GeoMarkerForm from "../GeoMarkerForm.vue";
 
 export default {
     name: "TabListContent",
     components: {
         IconButton,
-        SelectableList
+        SelectableList,
+        GeoMarkerForm
     },
     data () {
         return {
             selectedListItemId: null,
+            savingInProgress: false,
+            showList: true,
             geoMarkerUpdateMode: false,
             showUpdateMessage: false
         };
@@ -24,6 +28,7 @@ export default {
             "geoMarkerState",
             "geoMarkerFeatureSelected",
             "geoMarkerWfsFeatureType",
+            "categories",
             "departments",
             "geoMarkerUpdateFeature"
         ]),
@@ -125,10 +130,13 @@ export default {
             "setGeoMarkerFeatureSelected",
             "setGeoMarkerUpdateLayerIds"
         ]),
+
         ...mapActions("Maps", ["setCenter", "setZoom", "placingPointMarker", "removePointMarker"]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
         ...mapActions("Modules/GeoMarker", [
             "setMapInteraction",
-            "rollbackGeoMarkerUpdateFeature"
+            "rollbackGeoMarkerUpdateFeature",
+            "loadFeaturesForEditLayer"
         ]),
         setSelectedFeature (item) {
             this.setGeoMarkerFeatureSelected(
@@ -193,6 +201,17 @@ export default {
                 }
             }
         },
+        onCancelEdit () {
+            this.rollbackGeoMarkerUpdateFeature();
+            this.showUpdateMessage = false;
+            this.toggleUpdateMode();
+            this.resetSelectedFeature();
+        },
+        onSuccess () {
+            this.showUpdateMessage = false;
+            this.toggleUpdateMode();
+            this.setGeoMarkerFeatureSelected(null);
+        },
         defineUpdateLayers () {
             if (this.geoMarkerFeatureSelected) {
                 if (this.geoMarkerUpdateMode) {
@@ -219,15 +238,20 @@ export default {
             }
         },
         toggleUpdateMode () {
-            this.geoMarkerUpdateMode = !this.geoMarkerUpdateMode;
+            if (this.geoMarkerFeatureSelected) {
+                this.geoMarkerUpdateMode = !this.geoMarkerUpdateMode;
 
-            if (this.geoMarkerUpdateMode) {
-                this.defineUpdateLayers();
+                if (this.geoMarkerUpdateMode) {
+                    this.defineUpdateLayers();
+                }
+                else {
+                    this.rollbackGeoMarkerUpdateFeature();
+                    this.setMapInteraction(null);
+                }
             }
-            else {
-                this.rollbackGeoMarkerUpdateFeature();
-                this.setMapInteraction(null);
-            }
+        },
+        resetGeoMarkerForm () {
+            this.$refs.geoMarkerForm?.resetForm();
         }
     }
 };
@@ -238,13 +262,32 @@ export default {
         id="tabListContent"
         class="tabListContent"
     >
-        <p v-if="geoMarkerFeatureList.length">
-            {{ countGeoMarker }}
-        </p>
+        <div
+            v-if="geoMarkerFeatureList.length"
+            class="tabListInfo"
+        >
+            <p>
+                {{ countGeoMarker }}
+            </p>
+
+            <p v-if="geoMarkerFeatureSelected">
+                {{ $t('additional:modules.geoMarker.GeoMakerList.selectedGeoMarkerWithId',
+                      { id: geoMarkerShortFeatureId(geoMarkerFeatureSelected.getId()) })
+                }}
+            </p>
+
+            <IconButton
+                :class-array="['btn-light', 'me-2', 'listAction']"
+                :aria="$t('additional:modules.geoMarker.GeoMakerList.button.hideList')"
+                :icon="showList ? 'bi-dash-square' : 'bi-plus-square'"
+                @click="showList = !showList"
+            />
+        </div>
 
         <template v-if="tableData.items?.length">
             <div class="geoMarkerListContainer">
                 <SelectableList
+                    v-if="showList"
                     :selected-item-id="selectedListItemId"
                     :table-data="tableData"
                     @item-selected="setSelectedFeature"
@@ -287,7 +330,9 @@ export default {
             />
 
             <IconButton
-                :class-array="['btn-light', 'me-2', 'listAction', geoMarkerUpdateMode ? 'geoMarkerUpdateMode' : '']"
+                :class-array="[
+                    'btn-light', 'me-2', 'listAction',
+                    geoMarkerUpdateMode ? 'geoMarkerUpdateMode' : '']"
                 :aria="$t('additional:modules.geoMarker.GeoMakerList.button.moveGeoMarker')"
                 icon="bi-arrows-move"
                 :disabled="!geoMarkerFeatureSelected"
@@ -305,6 +350,18 @@ export default {
                 {{ $t('additional:modules.geoMarker.GeoMakerList.updateMessage') }}
             </p>
         </div>
+        <div
+            v-if="geoMarkerFeatureSelected"
+            class="geoMarkerEdit"
+        >
+            <GeoMarkerForm
+                ref="geoMarkerForm"
+                mode="edit"
+                :selected-feature="geoMarkerFeatureSelected"
+                @cancel-edit="onCancelEdit"
+                @update-successfull="onSuccess()"
+            />
+        </div>
     </div>
 </template>
 
@@ -317,15 +374,27 @@ export default {
     flex: 1;
     overflow: auto;
 
+    div.tabListInfo {
+        display: flex;
+        justify-content: space-between;
+    }
+
     :deep(div.selectableList) {
         max-height: 25rem;
         min-height: auto;
+        flex-shrink: 0;
     }
 
     :deep(div.selectableList table td.td-item-aktion button) {
         z-index: initial;
         outline: revert;
         margin: 0 auto;
+    }
+
+    div.geoMarkerEdit {
+        overflow-y: auto;
+        flex: 1;
+        margin-top: 1rem;
     }
 
     div.listActionButtons {

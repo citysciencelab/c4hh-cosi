@@ -45,6 +45,7 @@ export default {
                 case "tabFilter":
                     this.setMapInteraction(null);
                     this.setGeoMarkerUpdateFeature(null);
+                    this.$refs.tabList.resetGeoMarkerForm();
 
                     if (this.rollbackGeoMarkerFeature && oldValue === "tabList") {
                         this.rollbackGeoMarkerUpdateFeature();
@@ -71,6 +72,7 @@ export default {
         const editLayerInformation = this.allLayerConfigs.filter(item => item.id === this.geoMarkerEditLayerId);
 
         this.setLayerInformation(editLayerInformation);
+        await this.getGeoMarkerEditLayerUrl();
         this.fullyLoaded = true;
     },
     unmounted () {
@@ -90,6 +92,7 @@ export default {
             "loadCategories",
             "loadDepartments",
             "setMapInteraction",
+            "getGeoMarkerEditLayerUrl",
             "rollbackGeoMarkerUpdateFeature"
         ]),
         setCurrentTab (tab) {

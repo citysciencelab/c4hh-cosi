@@ -9,7 +9,7 @@
               "buttonPreview": "Vorschau des Screenshots ansehen",
               "buttonDelete": "Screenshot löschen"
             },
-            "tabNewContent": {
+            "geoMarkerForm": {
                 "removeAttachment": "Datei entfernen",
                 "attachmentWarning": "Nur PDF-, PNG-, JPEG- und ZIP-Dateien sind erlaubt.",
                 "attachmentWarningTitle": "Nicht unterstützter Dateityp",
@@ -22,7 +22,10 @@
                 "selectedDepartmentsTitle": "Ausgewählte Abteilungen",
                 "save": "Speichern",
                 "cancel": "Abbrechen",
-                "createAnotherGeoMarker": "Weiteren GeoMarker anlegen"
+                "createAnotherGeoMarker": "Weiteren GeoMarker anlegen",
+                "update": "Aktualisieren",
+                "downloadAttachment": "Download Attachment",
+                "successMessage": "Geomarker ist erfolgreich aktualisiert"
             },
             "status": {
                 "offen": "offen",
@@ -42,6 +45,7 @@
             },
             "GeoMakerList": {
                 "tableNoData": "Keine GeoMarker zum Anzeigen ausgewählt.",
+                "selectedGeoMarkerWithId": "GeoMarker mit der Id {{id}} ausgewählt",
                 "table": {
                     "id": "ID",
                     "quelle": "Quelle",
@@ -57,6 +61,7 @@
                     "openPanorama": " 360° Panorama öffnen",
                     "centerMapOnGeoMarker": "Karte auf GeoMarker zentrieren",
                     "zoomToGeoMarker": "Auf GeoMarker zoomen",
+                    "hideList": "GeoMarker-Liste umschalten",
                     "moveGeoMarker": "GeoMarker verschieben"
                 },
                 "updateMessage": "Der GeoMarker wurde verschoben. Bitte speichern Sie den GeoMarker, um die Änderung zu übernehmen."

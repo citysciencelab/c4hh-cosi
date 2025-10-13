@@ -2,6 +2,8 @@ import axios from "axios";
 import {buildEndpointUrl} from "../utils/buildEndpointUrl";
 import {Draw, Modify, Select, Translate} from "ol/interaction";
 import {Style, Stroke, Fill, Circle as CircleStyle} from "ol/style";
+import {resourceId} from "ol/format/filter";
+import WFS from "ol/format/WFS";
 import wfs from "@masterportal/masterportalapi/src/layer/wfs";
 import createTransactionFeature from "../utils/createTransactionFeature";
 import prepareFeatureProperties from "../utils/prepareFeatureProperties";
@@ -252,20 +254,22 @@ const actions = {
         dispatch("Maps/addInteraction", translateInteraction, {root: true});
     },
     /**
-     * Simplified save function for Point geometry only
+     * Saves a new geoMarker or updates an existing geoMarker
      * @param {Function} context.dispatch - The dispatch function
      * @param {Function} context.getters - The getters function
      * @param {Function} context.commit - The commit function
-     * @param {Object} payload.newGeoMarkerFormValues - Form values for the new GeoMarker.
+     * @param {Object} payload.geoMarkerFormValues - Form values of the GeoMarker to update or save.
      * @param {Array<String>} payload.updatedLayerIds - Array of layer IDs to refresh after saving.
+     * @param {String} payload.selectedTransaction - Insert or update, to decide if geomarker is saved or updated.
      * @returns {Promise<{transactionFeature: Object, transactionResponse: Object}>} - feature that we save and response of the request. (Both is actually almost the same and will be changed later.)
     */
-    async savePoint ({dispatch, commit, getters}, {newGeoMarkerFormValues, updatedLayerIds}) {
-        const {newGeoMarkerFeature, layerInformation} = getters,
+    async upsertPoint ({dispatch, commit, getters}, {geoMarkerFormValues, updatedLayerIds, selectedTransaction}) {
+        const {newGeoMarkerFeature, layerInformation, geoMarkerFeatureSelected, geoMarkerUpdateFeature, geoMarkerFeatureList} = getters,
             layer = layerInformation[0],
             preparedFeatureProperties = await prepareFeatureProperties(layer),
-            featurePropertiesWithFormValues = await mergeFormValuesWithProperties(preparedFeatureProperties, newGeoMarkerFormValues),
-            geometryProperty = featurePropertiesWithFormValues.find(({type}) => type === "geometry");
+            featurePropertiesWithFormValues = await mergeFormValuesWithProperties(preparedFeatureProperties, geoMarkerFormValues),
+            geometryProperty = featurePropertiesWithFormValues.find(({type}) => type === "geometry"),
+            isUpdate = selectedTransaction === "selectedUpdate";
 
         let transactionResponse,
             transactionFeature = null;
@@ -273,15 +277,19 @@ const actions = {
         try {
             transactionFeature = await createTransactionFeature(
                 {
-                    geometry: newGeoMarkerFeature.get("geom"),
+                    ...isUpdate ? {id: geoMarkerFeatureSelected.getId()} : {},
+                    geometry: isUpdate
+                        ? geoMarkerUpdateFeature.get("geom")
+                        : newGeoMarkerFeature.get("geom"),
                     geometryName: geometryProperty.key
                 },
                 featurePropertiesWithFormValues,
-                false,
+                geoMarkerUpdateFeature,
+                isUpdate,
                 layer.featurePrefix
             );
 
-            transactionResponse = await dispatch("sendTransaction", {feature: transactionFeature, selectedInteraction: "insert"});
+            transactionResponse = await dispatch("sendTransaction", {feature: transactionFeature, selectedInteraction: selectedTransaction});
         }
         catch (error) {
             console.error("Point save error:", error);
@@ -292,15 +300,15 @@ const actions = {
             }, {root: true});
         }
         finally {
-            updatedLayerIds.forEach(layerId => {
-                dispatch("refreshLayer", layerId);
-                commit("setNewGeoMarkerFeature", null);
+            updatedLayerIds.forEach(async layerId => {
+                await dispatch("refreshLayerAndReapplyFilter", {layerId, geoMarkerFeatureList});
             });
+
+            commit("setNewGeoMarkerFeature", null);
         }
 
         return {transactionFeature, transactionResponse};
     },
-
     /**
      * Handles WFS transaction communication with the server for point features.
      * Prepares the transaction request by cleaning layer configuration, sends the
@@ -349,17 +357,177 @@ const actions = {
         }
         return response;
     },
-
     /**
-     * Refreshes the source of the map layer with the given layerId.
-     * This triggers a reload of the layer's data from its source.
+     * Refreshes the layer and reapplies the filter to maintain filtered features visibility.
+     * This method ensures that after layer refresh, only the features that were visible
+     * before the refresh remain visible on the map.
      *
-     * @param {Object} _ - Vuex action context (unused).
-     * @param {String} layerId - The ID of the layer to refresh.
+     * @param {Object} context - Vuex action context.
+     * @param {Object} payload - The payload object.
+     * @param {String} payload.layerId - The ID of the layer to refresh.
+     * @param {Array} payload.geoMarkerFeatureList - List of filtered features that should remain visible.
+     * @returns {Promise<void>}
+     */
+    async refreshLayerAndReapplyFilter (_, {layerId, geoMarkerFeatureList}) {
+        const layer = layerCollection.getLayerById(layerId),
+            layerSource = layer?.getLayerSource();
+
+        if (!layer || !layerSource) {
+            return;
+        }
+
+        await new Promise((resolve) => {
+            /**
+             * Handles the featuresloadend event to reapply the filter after layer refresh.
+             * @returns {void}
+             */
+            function onFeaturesLoadEnd () {
+                const style = layer.getStyleAsFunction(layer.get("style")),
+                    allFeaturesOnLayer = layerSource.getFeatures(),
+                    geoMarkerFeatureListIds = geoMarkerFeatureList.map(feature => feature.getId());
+
+                allFeaturesOnLayer.forEach(feature => {
+                    if (geoMarkerFeatureListIds.includes(feature.getId())) {
+                        feature.setStyle(style(feature));
+                    }
+                    else {
+                        feature.setStyle(new Style());
+                    }
+                });
+
+                layerSource.un("featuresloadend", onFeaturesLoadEnd);
+                resolve();
+            }
+
+            layerSource.once("featuresloadend", onFeaturesLoadEnd);
+            layerSource.refresh();
+        });
+    },
+    setGeoMarkerFeatureList ({getters, commit}) {
+        const {geoMarkerUpdateLayerIds, geoMarkerUpdateFeature, geoMarkerFeatureList} = getters,
+            updatedLayer = mapCollection.getMap("2D").getLayers().getArray().find(layer => geoMarkerUpdateLayerIds.includes(layer.get("id"))),
+            updatedFeature = updatedLayer.getSource().getFeatureById(geoMarkerUpdateFeature.getId()),
+            updateFeatureGeometry = updatedFeature?.getGeometry().clone();
+
+        if (updatedFeature) {
+            geoMarkerFeatureList.map(feature => {
+                if (feature.getId() === this.geoMarkerUpdateFeature.getId()) {
+                    feature.setGeometry(updateFeatureGeometry);
+                }
+
+                return feature;
+            });
+
+            commit("setGeoMarkerFeatureList", geoMarkerFeatureList);
+        }
+    },
+    /**
+     * Laods a property of a feature using its featureId.
+     * @param {*} context Vuex action context.
+     * @param {*} context.dispatch The dispatch function
+     * @param {*} payload.geomarkerId Geomarker id
+     * @param {*} payload.propertyName Name of the property that will be loaded
+     * @returns {*} - property
+     */
+    async loadPropertyOfFeatureById ({dispatch, getters}, payload) {
+        const featureRequest = new WFS({version: "2.0.0"}).writeGetFeature({
+                srsName: mapCollection.getMapView("2D").getProjection().getCode(),
+                featureTypes: ["geomarker"],
+                filter: resourceId(payload.geomarkerId)
+            }),
+            {geomarkerEditLayerUrl} = getters;
+
+        let property = "";
+
+        try {
+            const response = await fetch(geomarkerEditLayerUrl,
+                    {
+                        headers: {
+                            "Content-Type": "text/xml"
+                        },
+                        method: "POST",
+                        body: new XMLSerializer().serializeToString(featureRequest)
+                    }
+                ),
+                xmlString = await response.text(),
+                xmlDoc = new DOMParser().parseFromString(xmlString, "text/xml");
+
+            property = xmlDoc.getElementsByTagName(`de.hh.up:${payload.propertyName}`)[0]?.textContent;
+
+            if (payload.propertyName && payload.propertyName.toLowerCase().includes("base_64")) {
+                property = await dispatch("addBase64FilePrefix", property);
+            }
+        }
+        catch (error) {
+            console.error("Error loading features:", error);
+        }
+
+        return property;
+    },
+    /**
+     * Converts a base64 string and adds the appropriate MIME type prefix
+     * @param {*} _ Vuex action context (unused).
+     * @param {String} base64String The base64 string to convert
+     * @returns {String} - base64 string with MIME type prefix
+     */
+    async addBase64FilePrefix (_, base64String) {
+        if (!base64String || typeof base64String !== "string" || base64String.trim() === "") {
+            return base64String;
+        }
+
+        if (base64String.startsWith("data:")) {
+            return base64String;
+        }
+
+        const signatures = {
+            JVBERi0: "application/pdf",
+            iVBORw0KGgo: "image/png",
+            "/9j/": "image/jpeg",
+            UEsDB: "application/zip"
+        };
+
+        let mimeType = null;
+
+        for (const signature in signatures) {
+            if (base64String.indexOf(signature) === 0) {
+                mimeType = signatures[signature];
+                break;
+            }
+        }
+
+        if (!mimeType) {
+            console.warn("Unable to detect MIME type for base64 string");
+            return base64String;
+        }
+
+        return `data:${mimeType};base64,${base64String}`;
+    },
+    /**
+     * Retrieves the URL of the GeoMarker edit layer from the layer configuration and commits it to the store.
+     * Searches for the layer with the specified GeoMarker edit layer ID within the subjectlayer elements.
+     * If found, commits the URL using the "setGeomarkerEditLayerUrl" mutation.
+     *
+     * @param {Object} context - Vuex action context.
+     * @param {Object} context.rootGetters - Root getters to access global state.
+     * @param {Function} context.commit - Commit function to trigger mutations.
+     * @param {Object} context.getters - Getters to access local state.
      * @returns {void}
      */
-    refreshLayer (_, layerId) {
-        layerCollection.getLayerById(layerId)?.getLayerSource()?.refresh();
+    async getGeoMarkerEditLayerUrl ({rootGetters, commit, getters}) {
+        const {layerConfig} = rootGetters,
+            {geoMarkerEditLayerId} = getters,
+            elements = layerConfig.subjectlayer?.elements;
+        let url = "";
+
+        if (elements && Array.isArray(elements)) {
+            const geomarkerLayer = elements.find(element => element.id === geoMarkerEditLayerId);
+
+            if (geomarkerLayer) {
+                url = geomarkerLayer.url;
+            }
+        }
+
+        commit("setGeomarkerEditLayerUrl", url);
     },
 
     /**
@@ -392,7 +560,6 @@ const actions = {
                 if (feature?.getGeometry()) {
                     feature.setGeometry(getters.rollbackGeoMarkerFeature.getGeometry().clone());
                 }
-                source.refresh();
             });
         }
 

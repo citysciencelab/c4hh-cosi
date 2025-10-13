@@ -20,6 +20,7 @@ import Feature from "ol/Feature";
 export default function createTransactionFeature (
     {id, geometry, geometryName},
     featureProperties,
+    geoMarkerUpdateFeature,
     updateFeature = false,
     featurePrefix = "feature",
     LayerConfigAttributes = []) {
@@ -31,17 +32,30 @@ export default function createTransactionFeature (
             ? `${featurePrefixWithoutColon}:${property.key}`
             : property.key;
 
-
         if (property.label && !LayerConfigAttributes.includes(property.label.toLowerCase())) {
+            if (updateFeature && property.label === "anhang_base_64") {
+                const hasAttachment = featureProperties.some(
+                    featureProperty => featureProperty.label === "anhang_name" && !["", null, undefined].includes(featureProperty.value)
+                );
 
-            if (["", null, undefined].includes(property.value) && updateFeature) {
+                if (hasAttachment) {
+                    return;
+                }
+            }
+            if (["", null, undefined].includes(property.value) && updateFeature && property.type !== "geometry") {
                 transactionFeature.set(key, null);
             }
             else if (property.type === "geometry") {
                 transactionFeature.setGeometryName(updateFeature
                     ? `${featurePrefixWithoutColon}:${geometryName}`
                     : geometryName);
-                transactionFeature.setGeometry(geometry);
+                if (geoMarkerUpdateFeature) {
+                    transactionFeature.setGeometry(geoMarkerUpdateFeature.getGeometry());
+                }
+                else {
+                    transactionFeature.setGeometry(geometry);
+
+                }
             }
             else if (["integer", "int", "decimal", "short", "float"].includes(property.type)) {
                 if (!Number.isFinite(parseFloat(property.value))) {

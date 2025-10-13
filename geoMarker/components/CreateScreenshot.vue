@@ -26,6 +26,11 @@ export default {
             return this.base64Image ? this.base64Image : false;
         }
     },
+    watch: {
+        screenshotImage (newValue) {
+            this.base64Image = newValue;
+        }
+    },
     methods: {
         createScreenshot () {
             const map = mapCollection.getMap("2D"),

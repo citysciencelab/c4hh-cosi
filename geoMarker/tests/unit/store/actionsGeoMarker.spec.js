@@ -124,7 +124,6 @@ describe("src/modules/wfst/store/actionsGeoMarker.js", () => {
             actionsGeoMarker.rollbackGeoMarkerUpdateFeature({commit, getters});
             expect(featureStub.setGeometry.calledWith("clonedGeometry")).to.be.true;
             expect(sourceStub.getFeatureById.calledWith("feature1")).to.be.true;
-            expect(sourceStub.refresh.called).to.be.true;
             expect(commit.calledWith("setRollbackGeoMarkerFeature", null)).to.be.true;
         });
 
