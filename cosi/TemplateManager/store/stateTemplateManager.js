@@ -16,6 +16,9 @@
  * @property {Object} templateContents - The selected data from templates.
  * @property {String[]} defaultActiveLayerIds - the default active layer Ids in COSI.
  * @property {Boolean} [multiTemplate=false] - If true, multiple templates are allowed to be active.
+ * @property {String} reportName - The report name for reporting tool.
+ * @property {String[]} reportLayerIds - the report layer ids for reporting tool.
+ * @property {String[]} reportCategories - the report categories for reporting tool.
  */
 const state = {
     active: false,
@@ -42,7 +45,10 @@ const state = {
     ],
     toolToOpen: undefined,
     useImport: false,
-    useTemplatesForMapping: false
+    useTemplatesForMapping: false,
+    reportName: "",
+    reportLayerIds: [],
+    reportCategories: []
 };
 
 export default state;

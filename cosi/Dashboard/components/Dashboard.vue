@@ -40,12 +40,10 @@ import {VSelect} from "vuetify/components/VSelect";
 import {VSnackbar} from "vuetify/components/VSnackbar";
 import {VTextField} from "vuetify/components/VTextField";
 import {VTooltip} from "vuetify/components/VTooltip";
-import EditForReportTemplate from "../../components/EditForReportTemplate.vue";
 
 export default {
     name: "Dashboard",
     components: {
-        EditForReportTemplate,
         ToolInfo,
         TableRowMenu,
         DashboardToolbar,
@@ -885,11 +883,6 @@ export default {
                 <ToolInfo
                     :url="readmeUrl"
                     :locale="currentLocale"
-                />
-                <EditForReportTemplate
-                    :report-template-mode="reportTemplateMode"
-                    tool-name="dashboard"
-                    instructions="Wählen sie mindestens ein Gebiet in der Gebietsauswahl aus. Stellen Sie dann hier ein, welche Themen und Daten übernommen werden sollen. Drücken Sie dann auf übernehmen, um die Einstellungen in das Report Template zu übernehmen."
                 />
                 <v-container fluid>
                     <DashboardToolbar

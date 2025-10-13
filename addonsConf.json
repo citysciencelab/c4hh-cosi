@@ -193,20 +193,8 @@
     "path": "cosi/CalculateRatio",
     "type": "tool"
   },
-  "reportTemplates": {
-    "path": "cosi/ReportTemplates",
-    "type": "tool"
-  },
-  "exportPDF": {
-    "path":"cosi/ExportPDF",
-    "type": "tool"
-  },
-  "selectionManager": {
-    "path":"cosi/SelectionManager",
-    "type": "tool"
-  },
-  "toolBridge": {
-    "path":"cosi/ToolBridge",
+  "reportingTool": {
+    "path": "cosi/ReportingTool",
     "type": "tool"
   },
   "cosiFileImport": {

@@ -1,0 +1,26 @@
+{
+  "modules": {
+    "cosi": {
+        "reportingTool": {
+          "creatingReport": "Report is being created. Please wait.",
+          "reportSuccess": "The report has been successfully generated. The download will start automatically.",
+          "title": "Reporting Tool",
+          "generateReport": "Generate Report",
+          "optionalComponents": "Optional components of the report to be exported",
+          "infrastructureData": "Infrastructure Data:",
+          "backToTemplate": "Back to reporting tool",
+          "infrastructureHint": "Note: If there are more than 10 institutions, no infrastructure data table is displayed.",
+          "label": {
+            "selectedAreas": "Name of the selected areas",
+            "selectedDistricts": "Selected Districts",
+            "title": "Title",
+            "author": "Author"
+          },
+          "errors": {
+            "invalidReportTitle": "A maximum of {{reportTitleMaxLength}} characters are allowed",
+            "invalidSelectedAreasName": "A maximum of {{selectedAreasNameMaxLength}} characters are allowed"
+          }
+        }
+    }
+  }
+}

@@ -6,7 +6,6 @@ import mutations from "../store/mutationsTemplateManager";
 import actions from "../store/actionsTemplateManager";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import TemplateManagerImport from "./TemplateManagerImport.vue";
-import TemplateManagerExport from "./TemplateManagerExport.vue";
 import axios from "axios";
 import TemplateManagerCard from "./TemplateManagerCard.vue";
 import {VChip} from "vuetify/components/VChip";
@@ -18,7 +17,6 @@ export default {
     components: {
         ToolInfo,
         TemplateManagerImport,
-        TemplateManagerExport,
         TemplateManagerCard,
         VChip,
         VChipGroup
@@ -30,7 +28,6 @@ export default {
             isTemplateActive: false,
             saveTemplate: [],
             selectedTemplateName: false,
-            showExportWindow: false,
             showImportSection: true,
             templates: []
         };
@@ -569,15 +566,6 @@ export default {
         },
 
         /**
-         * Gets the orientation value for a statistic.
-         * @param {Boolean} val - if to show the export window.
-         * @returns {void}
-         */
-        openExportWindow (val) {
-            this.showExportWindow = !val;
-        },
-
-        /**
          * Show import section.
          * @param {Boolean} val - true if show import section.
          * @returns {void}
@@ -592,10 +580,6 @@ export default {
          */
         selectCard (name) {
             this.selectedTemplateName = name;
-
-            if (!this.selectedTemplate.meta?.isActive && this.showExportWindow) {
-                this.openExportWindow(true);
-            }
 
             this.isTemplateActive = this.activeTemplates.includes(name);
         },
@@ -629,6 +613,10 @@ export default {
                     this.setMapping(await getMappingJson());
                 }
             }
+
+            this.setReportName(this.activeTemplate?.meta?.title);
+            this.setReportLayerIds(this.selectedLayerIdsInTemplate);
+            this.setReportCategories(this.selectedCategoriesInTemplate);
         },
 
         /**
@@ -739,23 +727,13 @@ export default {
             <hr>
             <div class="button-bar mb-3">
                 <button
-                    class="btn lh-1 fs-5"
-                    :class="showExportWindow === true ? 'btn-outline' : 'btn-primary'"
-                    @click="openExportWindow(true)"
+                    class="btn btn-primary lh-1 fs-5"
                 >
                     <i class="bi bi-file-text pe-2" />{{ $t("additional:modules.tools.cosi.templateManager.overview") }}
                 </button>
-                <button
-                    class="btn lh-1 fs-5"
-                    :class="showExportWindow === true ? 'btn-primary' : 'btn-outline'"
-                    :disabled="!isTemplateActive"
-                    @click="openExportWindow(false)"
-                >
-                    <i class="bi bi-download pe-2" />{{ $t("additional:modules.tools.cosi.templateManager.export") }}
-                </button>
             </div>
         </div>
-        <div v-if="!showExportWindow">
+        <div>
             <div
                 v-if="selectedTemplate?.meta?.isActive"
                 class="template-note pt-1 pb-3"
@@ -1031,13 +1009,6 @@ export default {
             </div>
         </div>
     </div>
-    <TemplateManagerExport
-        v-if="showExportWindow && isTemplateActive"
-        :template-name="selectedTemplate?.meta?.title"
-        :template-stats-categories="selectedCategoriesInTemplate"
-        :template-layer-ids="selectedLayerIdsInTemplate"
-        @toggleTemplateImport="showTemplateImport"
-    />
 </template>
 
 <style lang="scss" scoped>
