@@ -60,6 +60,14 @@ export default {
             type: [Number, String],
             required: false,
             default: null
+        },
+        /**
+         * Highlight selections and add hover + cursor?
+         */
+        highlightSelection: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     },
     emits: ["itemSelected"],
@@ -121,7 +129,8 @@ export default {
                     v-for="(trItem, trIndex) in tableData.items"
                     :key="`th_${trIndex}`"
                     :class="[
-                        JSON.stringify(selectedItem) === JSON.stringify(trItem) ? 'rowSelected' : ''
+                        JSON.stringify(selectedItem) === JSON.stringify(trItem) ? 'rowSelected' : '',
+                        highlightSelection ? 'highlightSelection' : ''
                     ]"
                     @click="selectItem(trItem)"
                 >
@@ -189,10 +198,17 @@ export default {
         }
 
         tr {
-            cursor: pointer;
+            &.highlightSelection {
+                cursor: pointer;
 
-            &:hover {
-                background-color: $light_blue;
+                &:hover {
+                    background-color: $light_blue;
+                }
+
+                &.rowSelected td {
+                    background-color: $primary;
+                    border-bottom: .0625rem solid $light_grey_hover;
+                }
             }
 
             td {
@@ -223,11 +239,6 @@ export default {
                         line-clamp: 2;
                     }
                 }
-            }
-
-            &.rowSelected td {
-                background-color: $primary;
-                border-bottom: .0625rem solid $light_grey_hover;
             }
         }
     }

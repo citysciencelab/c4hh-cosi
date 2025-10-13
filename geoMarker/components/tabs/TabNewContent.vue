@@ -523,6 +523,7 @@ export default {
                 >
                     <SelectableList
                         v-if="Object.keys(departmentData).length > 0"
+                        :highlight-selection="false"
                         :table-data="tableDataConfig"
                         :show-header="true"
                     >

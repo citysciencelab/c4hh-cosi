@@ -68,4 +68,19 @@ describe("addons/geoMarker/components/SelectableList.vue", () => {
 
         expect(wrapper.vm.selectedItem).to.be.null;
     });
+
+    it("handles highlightSelection property correctly", async () => {
+        const wrapper = shallowMount(SelectableList, {
+            propsData: {
+                tableData,
+                highlightSelection: true
+            }
+        });
+
+        expect(wrapper.find("tr.highlightSelection").exists()).to.be.true;
+
+        await wrapper.setProps({highlightSelection: false});
+
+        expect(wrapper.find("tr.highlightSelection").exists()).to.be.false;
+    });
 });
