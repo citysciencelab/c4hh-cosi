@@ -2,7 +2,7 @@
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersCosiFileImport";
 import mutations from "../store/mutationsCosiFileImport";
-import ToolInfo from "../../components/ToolInfo.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {VSelect} from "vuetify/components/VSelect";
 import {VCol, VRow} from "vuetify/components/VGrid";
 import {VTextField} from "vuetify/components/VTextField";
