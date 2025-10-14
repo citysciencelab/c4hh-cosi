@@ -27,7 +27,7 @@
     "file-saver": "^2.0.5",
     "jszip": "^3.7.1",
     "object-hash": "^2.1.1",
-    "pdfmake": "^0.2.6",
+    "pdfmake": "^0.2.20",
     "tableify": "^1.1.1",
     "turf-featurecollection": "^1.0.1",
     "vue-chartjs": "^5.3.1",

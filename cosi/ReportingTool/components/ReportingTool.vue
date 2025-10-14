@@ -17,6 +17,8 @@ import getBasicInfo from "../js/getBasicInfo";
 import MapfishDialog from "../../../shared/js/mapfishUtils/mapfishDialog";
 import {VChip} from "vuetify/components/VChip";
 import {VChipGroup} from "vuetify/components/VChipGroup";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import getCswRecordById from "@shared/js/api/getCswRecordById.js";
 
 export default {
     name: "ReportingTool",
@@ -29,7 +31,8 @@ export default {
         tagsOptionalComponents: [
             "Titelblatt inkl. Kartenausschnitt",
             "statistische Datenübersicht",
-            "Datenvisualisierung"
+            "Datenvisualisierung",
+            "Quellenangaben"
         ],
         tagsInfrastructureData: [
             "Auflistung",
@@ -132,6 +135,7 @@ export default {
                 {func: () => this.pdf.setAuthor(this.author.trim())},
                 {func: async () => this.addOverViewPageToReport(), handleProgressByThemSelves: true},
                 {func: () => this.addStatsToReport(this.items)},
+                {func: () => this.addReferencesToReport(this.items)},
                 {func: () => this.addTopicsToReport(this.featuresListItems)},
                 {func: async () => this.addDiagram()},
                 {func: async () => this.addInfrastructureMapPageToReport(), handleProgressByThemSelves: true}
@@ -228,12 +232,7 @@ export default {
 
                         if (index === 0) {
                             alignment = "left";
-                            if (idx === 8) {
-                                value = statFeature.category.slice(0, 24);
-                            }
-                            else {
-                                value = statFeature.category;
-                            }
+                            value = statFeature.category;
                         }
                         else if (index === 1) {
                             value = this.getTotal(statFeature, this.selectedDistrictLabels, lastYear, "jahr_");
@@ -245,10 +244,119 @@ export default {
                     });
                     body.push(row);
                 });
-                this.pdf.addTable(body, 120);
+                this.pdf.addTable(body, 150);
             });
         },
+        /**
+         * Builds and adds the "Quellenangaben" (data sources) section to the PDF report.
+         * @param {Object[]} items - A list of report items, each expected to contain a `layerId` and optional `category`.
+         * @returns {Promise<void>} Resolves once the section has been added to the PDF.
+         */
+        async addReferencesToReport (items) {
+            if (!this.controlsReportComponent("Quellenangaben")) {
+                return;
+            }
 
+            const rows = [],
+                headers = ["Datebsatz", "datenverantwortliche Stelle", "Datenstand"],
+                list = Array.isArray(items) ? items : [],
+                unified = [],
+                seenCategories = new Set(),
+                body = [],
+                bodyWithHeader = [],
+                limited = [];
+
+            for (const item of list) {
+                const layerId = item?.layerId,
+                    meta = layerId ? await this.getMetaForLayerId(layerId) : undefined;
+
+                if (!meta) {
+                    continue;
+                }
+
+                rows.push({
+                    category: item?.category || "-",
+                    providerName: meta?.providerName || "-",
+                    date: meta?.date || "-"
+                });
+            }
+
+            for (const row of rows) {
+                if (!seenCategories.has(row.category)) {
+                    seenCategories.add(row.category);
+                    unified.push(row);
+                }
+            }
+
+            this.pdf.addChapter("Quellenangaben");
+
+            if (!unified.length) {
+                this.pdf.addParagraph("Keine Quellenangaben verfügbar.");
+                return;
+            }
+
+            body.push(...unified.map(r => [r.category, r.providerName, r.date]));
+            bodyWithHeader.push(headers, ...body);
+
+            this.pdf.addTable(bodyWithHeader, 180);
+        },
+        /**
+         * Retrieves and normalizes metadata for a specific layer ID.
+         * @param {string} layerId - The ID of the layer whose metadata should be retrieved.
+         * @returns {Promise<{providerName: string, date: string}>}
+         * Returns an object containing the provider’s name and the formatted date (MM/YYYY).
+         * If metadata cannot be retrieved, returns placeholders with "-".
+         */
+        async getMetaForLayerId (layerId) {
+            if (!layerId) {
+                return {providerName: "-", date: "-"};
+            }
+
+            const raw = rawLayerList?.getLayerWhere?.({id: layerId}),
+                dataset = raw?.datasets?.[0],
+                cswUrl = dataset?.csw_url,
+                mdId = dataset?.md_id;
+
+            if (cswUrl && mdId) {
+                try {
+                    const metadata = await getCswRecordById.getRecordById(cswUrl, mdId),
+                        provider = metadata?.getPublisher() || metadata?.getOwner(),
+                        providerName = provider?.name || "-",
+                        date = this.formatAsOf(metadata?.getRevisionDate());
+
+                    return {providerName, date};
+                }
+                catch (err) {
+                    return {providerName: "-", date: "-"};
+                }
+            }
+
+            return {providerName: "-", date: "-"};
+        },
+        /**
+         * Formats a date value into "MM/YYYY".
+         * Accepts various input formats such as "YYYY-MM-DD", "DD.MM.YYYY", or Date objects.
+         * If the date cannot be parsed, returns "-".
+         * @param {string|Date} value - The input date value to format.
+         * @returns {string} The formatted month/year string (e.g., "02/2024") or "-" if invalid.
+         */
+        formatAsOf (value) {
+            if (!value) {
+                return "-";
+            }
+
+            let d = dayjs(value, ["YYYY-MM-DD", "DD.MM.YYYY", "YYYY/MM/DD"], true);
+
+            if (!d.isValid()) {
+                d = dayjs(value);
+            }
+
+            if (!d.isValid()) {
+                return "-";
+            }
+
+            return d.format("MM/YYYY");
+        },
         /**
          * Adds the overview page to the report.
          * @returns {void}
@@ -440,6 +548,7 @@ export default {
                 geometry: feature?.getGeometry()
             } : undefined).then(mapfishDialog => {
                 mapfishDialog.attributes.map = mapfishDialog.attributes[`${baseLayerName}.map`];
+
                 delete mapfishDialog.attributes[`${baseLayerName}.map`];
                 delete mapfishDialog.attributes.legend;
 

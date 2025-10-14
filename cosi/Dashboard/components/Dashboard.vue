@@ -267,7 +267,19 @@ export default {
             let counter = 0;
 
             return this.mapping.reduce((rows, category, index, array) => {
-                return [
+                const level = this.selectedDistrictLevel?.label?.toLowerCase() || "";
+                let layerId;
+
+                if (level.includes("stat") || level.includes("gebiet")) {
+                    layerId = category.stat_gebiet;
+                }
+                else if (level.includes("stadt")) {
+                    layerId = category.stadtteil;
+                }
+                else if (level.includes("bezirk")) {
+                    layerId = category.bezirk;
+                }
+            return [
                     ...rows,
                     {
                         visualized: false, // is the data visualized in the map
@@ -278,7 +290,8 @@ export default {
                         isTemp: category.isTemp,
                         calculation: category.calculation,
                         groupIndex: array[index].group !== array[index + 1]?.group ? counter++ : counter,
-                        orientationValue: category.orientationValue
+                        orientationValue: category.orientationValue,
+                        layerId: layerId ? String(layerId) : undefined
                     }
                 ];
             }, []);
