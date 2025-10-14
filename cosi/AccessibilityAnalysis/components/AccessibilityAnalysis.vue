@@ -29,6 +29,7 @@ import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
+import SimpleCard from "../../shared/modules/simpleCard/components/SimpleCard.vue";
 
 export default {
     name: "AccessibilityAnalysis",
@@ -40,6 +41,7 @@ export default {
         DropdownAutocomplete,
         FlatButton,
         IconButton,
+        SimpleCard,
         SliderItem,
         SwitchInput,
         TabBar,
@@ -872,24 +874,14 @@ export default {
             <div
                 v-for="card in selectionCards"
                 :key="card.id"
-                class="card mb-3"
+                class="mb-3"
             >
-                <div class="card-body d-flex p-2 description">
-                    <div class="me-2 fs-3">
-                        <i :class="card.icon" />
-                    </div>
-                    <div class="flex-grow-1">
-                        {{ card.text }}
-                        <br>
-                        {{ card.name || card.coord25832.toString() }}
-                    </div>
-                    <button
-                        type="button"
-                        class="btn-close"
-                        aria-label="Close"
-                        @click="removeSelectionCard(card)"
-                    />
-                </div>
+                <SimpleCard
+                    :icon="card.icon"
+                    :label="card.text"
+                    :text="card.name || card.coord25832.toString()"
+                    @click:close="removeSelectionCard(card)"
+                />
             </div>
         </div>
         <div
