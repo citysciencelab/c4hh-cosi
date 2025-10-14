@@ -79,7 +79,7 @@ const state = {
     statusOptions: ["offen", "geschlossen", "inaktiv"],
     filterSelections: {
         departmentsSelected: [],
-        statusSelected: ["offen"],
+        statusSelected: [],
         filterValueSource: "",
         filterValueDescr: "",
         filterValueComment: "",

@@ -530,12 +530,30 @@ export default {
             return false;
         },
         /**
-         * Resets the filter selection to default values.
+         * Resets the filter selection to default values and makes all features on visible layers visible
          */
         resetFilterSelection () {
+            Object.values(this.departments).forEach(dept => {
+                const layersToCheck = [dept.layerIds.offen, dept.layerIds.inaktiv, dept.layerIds.geschlossen];
+
+                layersToCheck.forEach(layerId => {
+                    const layer = layerCollection.getLayerById(layerId);
+
+                    if (layer && layer.layer && layer.layer.isVisible()) {
+                        const layerSource = layer.getLayerSource(),
+                            style = layer.getStyleAsFunction(layer.get("style")),
+                            allFeaturesOnLayer = layerSource.getFeatures();
+
+                        allFeaturesOnLayer.forEach(feature => {
+                            feature.setStyle(style(feature));
+                        });
+                    }
+                });
+            });
+
             this.setFilterSelections({
                 departmentsSelected: [],
-                statusSelected: ["offen"],
+                statusSelected: [],
                 filterValueSource: "",
                 filterValueDescr: "",
                 filterValueComment: "",
@@ -557,9 +575,9 @@ export default {
             });
 
             this.graphicalSelectOpen = false;
+            this.allFilteredFeatures = [];
             this.setIsFilterApplied(false);
-
-            this.updateFilterSelection(false, false);
+            this.setGeoMarkerFeatureList(this.allFilteredFeatures);
         },
         /**
          * Resets the geom filter selection to default values.
