@@ -3,6 +3,7 @@ import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
+import Card from "../../shared/modules/cards/components/Card.vue";
 import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
@@ -38,6 +39,7 @@ export default {
         AccessibilityAnalysisTrafficFlow,
         AccordionItem,
         ButtonGroup,
+        Card,
         DropdownAutocomplete,
         FlatButton,
         IconButton,
@@ -643,7 +645,9 @@ export default {
         },
         exportAsGeoJson,
         // pagination features
-        removeSet (index) {
+        removeSet (set) {
+            const index = this.dataSets.indexOf(set);
+
             if (this.activeSet === this.dataSets.length - 1) {
                 this.setActiveSet(this.activeSet - 1);
             }
@@ -665,7 +669,9 @@ export default {
             this.removePointMarker();
             // this.removeLayerFromMap(this.directionsLayer);
         },
-        downloadSet (index) {
+        downloadSet (set) {
+            const index = this.dataSets.indexOf(set);
+
             downloadGeoJson(this.dataSets[index].geojson);
         },
         downloadAll () {
@@ -776,7 +782,7 @@ export default {
         },
 
         updateActiveSet (set) {
-            if (this.dataSets[this.dataSets.indexOf(set)] !== this.dataSets[this.activeSet]) {
+            if (this.dataSets.indexOf(set) !== this.activeSet) {
                 this.setActiveMode(this.getModeByType(set.inputs.mode));
                 this.setActiveSet(this.dataSets.indexOf(set));
                 if (set.inputs.isAllFacilitiesChecked) {
@@ -788,7 +794,6 @@ export default {
             this.setDefaults();
             this.removeAll();
             this.selectionCards = [];
-
         },
 
         getModeByType (type) {
@@ -818,6 +823,27 @@ export default {
                     this.setCoordinateFromFeature(unfeat, this.projectionCode, featName, layer.getLayer().get("name"));
                 });
             });
+        },
+
+        /**
+         * Gets the data for component card.
+         * @param {Object} data - one data set.
+         * @returns {Object[]} the rendered data.
+         */
+        getData (data) {
+            const result = [],
+                name = this.getScaleUnitByType(data.inputs?.scaleUnit)?.name,
+                title = name === "Zeit" ? data.inputs?.time + " Minuten" : data.inputs?.distance + " Meter",
+                pointDes = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0]?.text : "Mehrere " + data.inputs.selectionCards[0]?.text,
+                coordinate = data.inputs.selectionCards.length === 1 ? "" : data.inputs.coordinate[0].toString(),
+                icon = data.inputs.selectionCards[0]?.icon,
+                population = data.inputs.einwohner;
+
+            result.push({label: name, value: title});
+            result.push({icon: icon, label: pointDes, value: coordinate});
+            result.push({label: "Einwohner: ", value: population});
+
+            return result;
         }
     }
 };
@@ -982,39 +1008,23 @@ export default {
                 :steps="steps"
                 :colors="legendColors"
             />
-            <div v-for="set in dataSets" class="card mb-3 card-hover shadow-sm" :class="isSetActive(set) ? 'card-active' : ''" :key="set">
-                <div class="card-body d-flex p-0 description align-items-center" @click="updateActiveSet(set)">
-                    <div class="p-2 fs-1"><i :class="getIconByTransportType(set.inputs.transportType)"></i></div>
-                    <div class="p-2  flex-grow-1">{{ getScaleUnitByType(set.inputs.scaleUnit).name}} <br>
-                         <span class="fs-5 title">{{getScaleUnitByType(set.inputs.scaleUnit).name === 'Zeit' ? set.inputs.time : set.inputs.distance}} {{getScaleUnitByType(set.inputs.scaleUnit).name === 'Zeit' ? 'Minuten' : 'Meter'}}</span>
-                           <br>
-                        <span v-if="set.inputs.selectionCards.length === 1">
-                            <i :class="set.inputs.selectionCards[0].icon" class="me-2"></i>{{ set.inputs.selectionCards[0].text }} <span class="title">{{ set.inputs.coordinate[0].toString() }}</span>
-                        </span>
-                        <span v-else>
-                            <i :class="set.inputs.selectionCards[0].icon" class="me-2"></i>Mehrere {{ set.inputs.selectionCards[0].text }}
-                        </span>
-                        <br>
-                        <span>
-                            Einwohner: {{ set.inputs.einwohner }}
-                        </span>
-                        <br>
-                    </div>
-                    <div class="d-flex align-self-start">
-                        <IconButton
-                            class="p-1"
-                            :aria="'Download'"
-                            icon="bi bi-download"
-                            :interaction="() => downloadSet(dataSets.indexOf(set))"
-                        />
-                        <IconButton
-                            class="p-1"
-                            :aria="'Löschen'"
-                            icon="bi bi-trash"
-                            :interaction="() => removeSet(dataSets.indexOf(set))"
-                        />
-                    </div>
-                </div>
+            <div
+                v-for="set in dataSets"
+                :key="set"
+            >
+                <Card
+                    :data="getData(set)"
+                    :downloadable="true"
+                    :icon="getIconByTransportType(set.inputs.transportType)"
+                    layout-style="list"
+                    :removable="true"
+                    :status="dataSets.indexOf(set) === activeSet ? 'active' : ''"
+                    :visible="true"
+                    @click="updateActiveSet(set)"
+                    @downloadSet="downloadSet(set)"
+                    @hideSet="updateActiveSet(set)"
+                    @removeSet="removeSet(set)"
+                />
             </div>
         </div>
     </div>
@@ -1037,24 +1047,6 @@ export default {
             text-align: center;
             color: $secondary;
             font-family: $font_family_accent;
-        }
-
-        .card-hover:hover {
-            cursor: pointer;
-            border-color: $secondary;
-            border-width: 2px;
-            background-color: $light_blue;
-            i {
-                color: $secondary;
-            }
-        }
-
-        .card-active {
-            border-color: $secondary;
-            border-width: 2px;
-            i {
-                color: $secondary;
-            }
         }
     }
 
