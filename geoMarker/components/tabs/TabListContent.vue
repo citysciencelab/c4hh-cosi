@@ -18,7 +18,8 @@ export default {
             savingInProgress: false,
             showList: true,
             geoMarkerUpdateMode: false,
-            showUpdateMessage: false
+            showUpdateMessage: false,
+            originalCoordinates: null
         };
     },
     computed: {
@@ -101,6 +102,11 @@ export default {
         },
         countGeoMarker () {
             return this.geoMarkerFeatureList?.length + " " + this.$t("additional:modules.geoMarker.filter.countGeoMarker");
+        },
+        geoMarkerUpdateFeatureCoordinates () {
+            return this.geoMarkerUpdateFeature
+                ? this.geoMarkerUpdateFeature.getGeometry().getCoordinates()
+                : null;
         }
     },
     watch: {
@@ -115,13 +121,16 @@ export default {
         geoMarkerFeatureList () {
             this.removePointMarker();
         },
-        geoMarkerUpdateFeature (newValue) {
-            if (newValue) {
-                this.showUpdateMessage = true;
-            }
-            else {
-                this.showUpdateMessage = false;
-            }
+        geoMarkerUpdateFeatureCoordinates: {
+            handler (newValue) {
+                if (this.originalCoordinates && newValue) {
+                    this.showUpdateMessage = JSON.stringify(newValue) !== JSON.stringify(this.originalCoordinates);
+                }
+                else {
+                    this.showUpdateMessage = false;
+                }
+            },
+            deep: true
         }
     },
     methods: {
@@ -204,7 +213,11 @@ export default {
         onCancelEdit () {
             this.rollbackGeoMarkerUpdateFeature();
             this.showUpdateMessage = false;
-            this.toggleUpdateMode();
+
+            if (this.geoMarkerUpdateMode) {
+                this.toggleUpdateMode();
+            }
+
             this.resetSelectedFeature();
         },
         onSuccess () {
@@ -243,10 +256,20 @@ export default {
 
                 if (this.geoMarkerUpdateMode) {
                     this.defineUpdateLayers();
+
+                    if (!this.originalCoordinates) {
+                        this.originalCoordinates = this.geoMarkerFeatureList
+                            .find(feature => feature.getId() === this.geoMarkerFeatureSelected.getId())
+                            .getGeometry()
+                            .getCoordinates();
+                    }
+                    this.showUpdateMessage = false;
                 }
                 else {
                     this.rollbackGeoMarkerUpdateFeature();
                     this.setMapInteraction(null);
+                    this.showUpdateMessage = false;
+                    this.originalCoordinates = null;
                 }
             }
         },

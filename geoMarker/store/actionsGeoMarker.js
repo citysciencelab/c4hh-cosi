@@ -368,7 +368,7 @@ const actions = {
      * @param {Array} payload.geoMarkerFeatureList - List of filtered features that should remain visible.
      * @returns {Promise<void>}
      */
-    async refreshLayerAndReapplyFilter (_, {layerId, geoMarkerFeatureList}) {
+    async refreshLayerAndReapplyFilter ({dispatch}, {layerId, geoMarkerFeatureList}) {
         const layer = layerCollection.getLayerById(layerId),
             layerSource = layer?.getLayerSource();
 
@@ -395,6 +395,7 @@ const actions = {
                     }
                 });
 
+                dispatch("setGeoMarkerFeatureList");
                 layerSource.un("featuresloadend", onFeaturesLoadEnd);
                 resolve();
             }
@@ -403,16 +404,25 @@ const actions = {
             layerSource.refresh();
         });
     },
+    /**
+     * Updates the geometry of the geoMarker feature in the feature list after a modification.
+     * Finds the updated feature in the corresponding layer and clones its geometry to the feature list.
+     * Commits the updated feature list to the store.
+     *
+     * @param {Object} context - Vuex action context.
+     * @param {Object} context.getters - The getters function to access state values.
+     * @param {Function} context.commit - The commit function to trigger mutations.
+     * @returns {void}
+     */
     setGeoMarkerFeatureList ({getters, commit}) {
         const {geoMarkerUpdateLayerIds, geoMarkerUpdateFeature, geoMarkerFeatureList} = getters,
             updatedLayer = mapCollection.getMap("2D").getLayers().getArray().find(layer => geoMarkerUpdateLayerIds.includes(layer.get("id"))),
-            updatedFeature = updatedLayer.getSource().getFeatureById(geoMarkerUpdateFeature.getId()),
-            updateFeatureGeometry = updatedFeature?.getGeometry().clone();
+            updatedFeature = updatedLayer.getSource().getFeatureById(geoMarkerUpdateFeature.getId());
 
         if (updatedFeature) {
             geoMarkerFeatureList.map(feature => {
-                if (feature.getId() === this.geoMarkerUpdateFeature.getId()) {
-                    feature.setGeometry(updateFeatureGeometry);
+                if (feature.getId() === geoMarkerUpdateFeature.getId()) {
+                    feature.setGeometry(updatedFeature?.getGeometry().clone());
                 }
 
                 return feature;
