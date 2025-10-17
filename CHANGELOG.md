@@ -16,10 +16,10 @@
 
 ### Fixed
 - Compatibility fixes after the Masterportal core upgrade to **Vue 3.5** (esm-bundler / stricter template checks). No functional changes intended.
-  - trafficCount: `TrafficCountDatePickerCalendar.vue` 
-  - fileImport : `FileImport.vue`
-  - valuationPrint: `ValuationPrint.vue`
-
+- trafficCount: `TrafficCountDatePickerCalendar.vue` 
+- fileImport : `FileImport.vue`
+- valuationPrint: `ValuationPrint.vue`
+- gfiTheme/Verkehrsstärken: Fixed download link.
 ---
 
 ## 2025-10-01 v3.15.0 (LTS)

@@ -37,7 +37,7 @@ export default {
             return this.feature.getTheme()?.params;
         },
         downloadLink: function () {
-            return this.gfiParams?.downloadLink ? this.gfiParams.downloadLink : "https://daten-hamburg.de/transport_verkehr/verkehrsstaerken/DTV_DTVw_Download.xlsx";
+            return this.gfiParams?.downloadurl ? this.gfiParams.downloadurl : "https://daten-hamburg.de/transport_verkehr/verkehrsstaerken/DTV_DTVw_Download.xlsx";
         }
     },
     watch: {
