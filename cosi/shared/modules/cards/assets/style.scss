@@ -1,0 +1,19 @@
+.card {
+    border-radius: $badge-border-radius;
+    .card-body {
+        .label {
+            color: adjust-color($dark_grey, $lightness: 15%);
+            font-size: $font-size-base * 0.9;
+        }
+        .text {
+            font-size: $font-size-base;
+        }
+    }
+    &.hoverable :hover {
+        background-color: $light_blue;
+    }
+    .btn-close {
+        width: 0.4em;
+        height: 0.4em;
+    }
+}

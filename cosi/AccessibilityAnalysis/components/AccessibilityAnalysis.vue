@@ -5,6 +5,7 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import ButtonGroup from "../../components/ButtonGroup.vue";
 import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import getters from "../store/gettersAccessibilityAnalysis";
 import {mapActions, mapGetters, mapMutations} from "vuex";
@@ -26,10 +27,9 @@ import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster.js";
-import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
-import SimpleCard from "../../shared/modules/simpleCard/components/SimpleCard.vue";
 
 export default {
     name: "AccessibilityAnalysis",
