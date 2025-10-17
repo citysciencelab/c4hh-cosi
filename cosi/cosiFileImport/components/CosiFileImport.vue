@@ -438,7 +438,7 @@ export default {
 
         <div v-if="importedFileNames.length > 0">
             <div class="h-seperator" />
-            <p class="cta">
+            <div class="cta">
                 <label
                     for="list"
                     class="successfullyImportedLabel"
@@ -459,7 +459,7 @@ export default {
                         </v-btn>
                     </li>
                 </ul>
-            </p>
+            </div>
         </div>
     </div>
     <div
@@ -1056,7 +1056,7 @@ export default {
                     margin-top:0;
                     padding:0;
 
-                    ::v-deep .v-label--active {
+                    :v-deep(.v-label--active) {
                         left:1px !important;
                         font-size:80%;
                         color:$secondary;
@@ -1149,11 +1149,11 @@ export default {
                             }
 
                             .v-color-picker {
-                                ::v-deep .v-color-picker__hue {
+                                :v-deep(.v-color-picker__hue) {
                                     background: linear-gradient(90deg,red,#ff0 16.66%,#0f0 33.33%,#0ff 50%,#00f 66.66%,#f0f 83.33%,red);
                                 }
 
-                                ::v-deep .v-color-picker__dot {
+                                :v-deep(.v-color-picker__dot) {
                                     width:50px;
                                     height:50px;
                                     border-radius:0px;
@@ -1166,7 +1166,7 @@ export default {
                                     height:30px;
                                     margin:3px 0px;
 
-                                    ::v-deep label {
+                                    :v-deep(label) {
                                         margin:0px 10px;
                                     }
                                 }
@@ -1255,7 +1255,7 @@ export default {
                                     margin:0;
                                     border-bottom:1px solid #ccc;
 
-                                    ::v-deep label {
+                                    :v-deep(label) {
                                         margin:0;
                                         margin-left:10px;
                                         margin-top:4px;
@@ -1391,14 +1391,14 @@ export default {
                                             padding-top:5px;
                                             color:#000;
 
-                                            ::v-deep .v-label--active {
+                                            :v-deep(.v-label--active) {
                                                 display:none;
                                                 left:1px !important;
                                                 color:$secondary;
                                                 transform-origin:center left;
                                             }
 
-                                            ::v-deep .v-input__slot {
+                                            :v-deep(.v-input__slot) {
                                                 margin:0;
 
                                                 input {
@@ -1425,7 +1425,7 @@ export default {
                             }
 
                             .v-text-field {
-                                ::v-deep .v-label--active {
+                                :v-deep(.v-label--active) {
                                     transform-origin:top left;
                                 }
                             }
@@ -1575,20 +1575,20 @@ export default {
                 .v-color-picker {
                     flex:1 0 100%;
 
-                    ::v-deep .v-color-picker__hue {
+                    :v-deep(.v-color-picker__hue) {
                         border-radius:0px;
                         margin-bottom:0px;
                         background: linear-gradient(90deg,red,#ff0 16.66%,#0f0 33.33%,#0ff 50%,#00f 66.66%,#f0f 83.33%,red);
                     }
 
-                    ::v-deep .v-color-picker__dot {
+                    :v-deep(.v-color-picker__dot) {
                         width:10px;
                         height:10px;
                         border-radius:0px;
                         margin-right:10px;
                     }
 
-                    ::v-deep .v-color-picker__alpha {
+                    :v-deep(.v-color-picker__alpha) {
                         display:none;
                     }
                 }
