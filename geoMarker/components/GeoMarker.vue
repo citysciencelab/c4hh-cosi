@@ -25,7 +25,8 @@ export default {
             "geoMarkerActiveTab",
             "geoMarkerEditLayerId",
             "rollbackGeoMarkerFeature",
-            "geoMarkerFeatureList"
+            "geoMarkerFeatureList",
+            "newGeoMarkerCreated"
         ]),
         ...mapGetters(["allLayerConfigs"])
     },
@@ -36,6 +37,8 @@ export default {
                     this.setNewGeoMarkerFeature(null);
                     this.setGeoMarkerUpdateFeature(null);
                     this.setMapInteraction("Point");
+                    this.setNewGeoMarkerCreated(false);
+                    this.removePointMarker();
 
                     if (this.rollbackGeoMarkerFeature && oldValue === "tabList") {
                         this.rollbackGeoMarkerUpdateFeature();
@@ -46,6 +49,7 @@ export default {
                     this.setMapInteraction(null);
                     this.setGeoMarkerUpdateFeature(null);
                     this.$refs.tabList.resetGeoMarkerForm();
+                    this.removePointMarker();
 
                     if (this.rollbackGeoMarkerFeature && oldValue === "tabList") {
                         this.rollbackGeoMarkerUpdateFeature();
@@ -55,8 +59,11 @@ export default {
                 case "tabList":
                     this.setMapInteraction(null);
                     this.setGeoMarkerUpdateFeature(null);
-                    this.setGeoMarkerFeatureSelected(null);
                     this.setNewGeoMarkerFeature(null);
+
+                    if (!this.newGeoMarkerCreated) {
+                        this.setGeoMarkerFeatureSelected(null);
+                    }
                     break;
                 default:
                     this.setMapInteraction(null);
@@ -86,7 +93,8 @@ export default {
             "setGeoMarkerUpdateFeature",
             "setGeoMarkerFeatureSelected",
             "setGeoMarkerFeatureList",
-            "setLockListSelection"
+            "setLockListSelection",
+            "setNewGeoMarkerCreated"
         ]),
         ...mapActions("Modules/GeoMarker", [
             "loadCategories",
@@ -95,6 +103,7 @@ export default {
             "getGeoMarkerEditLayerUrl",
             "rollbackGeoMarkerUpdateFeature"
         ]),
+        ...mapActions("Maps", ["removePointMarker"]),
         setCurrentTab (tab) {
             this.setGeoMarkerActiveTab(tab);
         },

@@ -2,7 +2,6 @@ import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import TabListContent from "../../../../components/tabs/TabListContent.vue";
-import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
@@ -38,14 +37,25 @@ describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
                                 geoMarkerFeatureList: () => [mockFeature],
                                 geoMarkerState: () => () => "offen",
                                 geoMarkerFeatureSelected: () => mockFeature,
-                                geoMarkerShortFeatureId: () => () => "feature-1"
-                            },
-                            actions: {
-                                loadPropertyOfFeatureById: sinon.stub().resolves()
+                                geoMarkerShortFeatureId: () => () => "1",
+                                geoMarkerWfsFeatureType: () => "geomarker",
+                                categories: () => [],
+                                departments: () => [],
+                                geoMarkerUpdateFeature: () => null
                             }
                         }
                     }
+                },
+                Menu: {
+                    namespaced: true,
+                    getters: {
+                        currentMenuWidth: () => 500,
+                        expanded: () => true
+                    }
                 }
+            },
+            getters: {
+                restServiceById: () => () => ({})
             }
         });
     });

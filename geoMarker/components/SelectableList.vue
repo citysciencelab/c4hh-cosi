@@ -1,5 +1,6 @@
 <script>
 import dayjs from "dayjs";
+import {mapGetters} from "vuex";
 
 export default {
     name: "SelectableList",
@@ -94,6 +95,10 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("Modules/GeoMarker", [
+            "geoMarkerFeatureSelected",
+            "geoMarkerShortFeatureId"
+        ]),
         sortedTable () {
             const table = {
                 headers: this.tableData.headers,
@@ -101,6 +106,17 @@ export default {
             };
 
             return table;
+        },
+        selectedFeatureId () {
+            let selectedItemId = null;
+
+            if (this.geoMarkerFeatureSelected) {
+                selectedItemId = this.geoMarkerShortFeatureId(this.geoMarkerFeatureSelected.getId());
+            }
+            else {
+                selectedItemId = null;
+            }
+            return selectedItemId;
         }
     },
     watch: {
@@ -307,7 +323,7 @@ export default {
                     v-for="(trItem, trIndex) in sortedTable.items"
                     :key="`th_${trIndex}`"
                     :class="[
-                        JSON.stringify(selectedItem) === JSON.stringify(trItem) ? 'rowSelected' : '',
+                        selectedFeatureId === trItem.id ? 'rowSelected' : '',
                         highlightSelection ? 'highlightSelection' : ''
                     ]"
                     @click="selectItem(trItem)"

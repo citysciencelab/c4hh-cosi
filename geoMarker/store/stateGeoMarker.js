@@ -36,6 +36,8 @@
  * @property {String[]} statusOptions - List of possible selections for 'status'
  * @property {Object} filterSelections - settings the user chose for the filter
  * @property {Boolean} initialLoading - only true for initial loading to indicate whether the filter needs to wait for all features loaded
+ * @property {Boolean} newGeoMarkerCreated - after a geomarker created, it is true, and used in tablistContent to show the geomarker as selected.
+ * @property {Boolean} isFilterApplied - after filter is applied it becomes true. It is used in geoMarkerForm to set the filter again after a new geomarker created.
  */
 
 const state = {
@@ -97,7 +99,9 @@ const state = {
         },
         geom: null
     },
-    initialLoading: true
+    isFilterApplied: false,
+    initialLoading: true,
+    newGeoMarkerCreated: false
 };
 
 export default state;

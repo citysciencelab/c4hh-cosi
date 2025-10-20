@@ -10,6 +10,8 @@ import CreateScreenshot from "./CreateScreenshot.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import dayjs from "dayjs";
+import layerCollection from "@core/layers/js/layerCollection";
+import {Style} from "ol/style";
 
 export default {
     name: "GeoMarkerForm",
@@ -25,6 +27,12 @@ export default {
         FlatButton
     },
     props: {
+        /**
+         * The mode for geomarker form.
+         * It can be used for a new geomarker create or update.
+         * For Create mode should be create
+         * For Update mode should be edit
+         */
         mode: {
             type: String,
             default: "create",
@@ -39,7 +47,7 @@ export default {
             default: false
         }
     },
-    emits: ["cancel-edit", "update-successfull"],
+    emits: ["cancel-edit", "update-successfull", "geomarker-created"],
     data () {
         return {
             selectedCategoryId: null,
@@ -60,8 +68,15 @@ export default {
             "statusOptions",
             "newGeoMarkerFeature",
             "geoMarkerFeatureList",
-            "geoMarkerUpdateFeature"
+            "geoMarkerUpdateFeature",
+            "isFilterApplied",
+            "geoMarkerShortFeatureId"
         ]),
+        ...mapGetters(["visibleLayerConfigs"]),
+        /**
+         * Provides table configuration with headers and items for department selection display
+         * @returns {Object} Configuration object with headers array and items array
+         */
         tableDataConfig () {
             const departmentIds = Object.keys(this.departmentData || {}),
                 headers = [
@@ -86,6 +101,11 @@ export default {
                 })
             };
         },
+        /**
+         * Validates whether the form can be submitted
+         * Checks if at least one department is selected and feature exists for create/edit modes
+         * @returns {Boolean} True if form is invalid, false if valid
+         */
         formValidation () {
             const validations = [
                 Object.keys(this.departmentData).length === 0,
@@ -94,6 +114,10 @@ export default {
 
             return validations.some(Boolean);
         },
+        /**
+         * Creates a new geomarker object for creation mode with all form data
+         * @returns {Object|null} Object with geomarker properties or null if not in create mode
+         */
         newGeoMarker () {
             if (this.mode !== "create") {
                 return null;
@@ -110,6 +134,10 @@ export default {
                 quelle: window.activeDirectoryUser ? window.activeDirectoryUser.username : "geomarker"
             };
         },
+        /**
+         * Creates an updated geomarker object for edit mode with all form data including geometry
+         * @returns {Object|null} Object with updated geomarker properties or null if not in edit mode or no feature selected
+         */
         updatedGeoMarker () {
             if (!this.selectedFeature || this.mode !== "edit") {
                 return null;
@@ -170,7 +198,9 @@ export default {
 
             departmentIds.forEach(departmentId => {
                 if (this.departments[departmentId]?.layerIds) {
-                    layerIdsArray.push(...Object.values(this.departments[departmentId].layerIds));
+                    const status = this.departmentData[departmentId].status;
+
+                    layerIdsArray.push(this.departments[departmentId].layerIds[status]);
                 }
             });
 
@@ -205,13 +235,7 @@ export default {
     },
     mounted () {
         this.getDepartmentsAndCategoriesFromState();
-
-        if (this.mode === "create") {
-            this.initializeForCreate();
-        }
-        else if (this.mode === "edit" && this.selectedFeature) {
-            this.loadFeatureData(this.selectedFeature);
-        }
+        this.initializeComponent();
     },
     methods: {
         ...mapActions("Alerting", ["addSingleAlert"]),
@@ -219,14 +243,34 @@ export default {
             "upsertPoint",
             "setMapInteraction",
             "updateGeoMarker",
-            "loadPropertyOfFeatureById"
+            "loadPropertyOfFeatureById",
+            "refreshLayer",
+            "refreshLayerAndReapplyFilter",
+            "setGeoMarkerFeatureListAction"
         ]),
         ...mapMutations("Modules/GeoMarker", [
             "setGeoMarkerActiveTab",
             "setNewGeoMarkerFeature",
             "setGeoMarkerFeatureList",
-            "setTriggerFilter"
+            "setTriggerFilter",
+            "setGeoMarkerFeatureSelected",
+            "setNewGeoMarkerCreated"
         ]),
+        /**
+         * Initializes the component after mounting.
+         * Sets up the form state depending on the mode:
+         * - In 'create' mode, prepares the form for a new GeoMarker.
+         * - In 'edit' mode, loads data from the selected feature into the form.
+         * Called automatically in mounted().
+         */
+        initializeComponent () {
+            if (this.mode === "create") {
+                this.initializeForCreate();
+            }
+            else if (this.mode === "edit" && this.selectedFeature) {
+                this.loadFeatureData(this.selectedFeature);
+            }
+        },
         /**
          * Initialize form for create mode
          */
@@ -354,9 +398,7 @@ export default {
         onCategorySelect (categoryId) {
             this.selectedCategoryId = categoryId;
 
-            if (this.mode === "create") {
-                this.updateDepartmentsFromCategory();
-            }
+            this.updateDepartmentsFromCategory();
         },
         /**
          * Updates department data based on the selected category
@@ -369,6 +411,15 @@ export default {
                 const newDepartmentData = {};
 
                 category.departments.forEach(departmentId => {
+                    if (this.mode === "edit") {
+                        const initialDepartmentsData = this.extractDepartmentData(this.selectedFeature.getProperties());
+
+                        if (Object.keys(initialDepartmentsData).includes(departmentId)) {
+                            newDepartmentData[departmentId] = initialDepartmentsData[departmentId];
+                            return;
+                        }
+                    }
+
                     newDepartmentData[departmentId] = {
                         status: this.statusForSelectedDepartments,
                         bemerkung: ""
@@ -523,9 +574,8 @@ export default {
 
             this.savingInProgress = true;
 
-            const {transactionResponse} = await this.upsertPoint({
+            const {transactionResponse, transactionFeature} = await this.upsertPoint({
                 geoMarkerFormValues: this.newGeoMarker,
-                updatedLayerIds: this.layerIdsForSelectedDepartments,
                 selectedTransaction: "insert"
             });
 
@@ -535,13 +585,29 @@ export default {
                 return;
             }
 
+            if (transactionFeature && transactionResponse) {
+                this.addSingleAlert({
+                    content: this.$t("additional:modules.geoMarker.geoMarkerForm.successMessageAfterSave",
+                        {id: this.geoMarkerShortFeatureId(transactionResponse.featureIds[0])}),
+                    category: "success"
+                });
+
+                await this.loadNewlyCreatedGeoMarker(transactionFeature, transactionResponse);
+            }
+
             this.resetForm();
-            this.refreshNewFeaturePointOnMap();
+            this.setNewGeoMarkerFeature(null);
             this.savingInProgress = false;
+            this.setNewGeoMarkerCreated(true);
 
             if (!this.createAnotherGeoMarker) {
                 this.setGeoMarkerActiveTab("tabList");
             }
+            else {
+                this.refreshNewFeaturePointOnMap();
+            }
+
+            this.moveUpdatedFeatureToTop(transactionResponse.featureIds[0]);
         },
         /**
          * Updates an existing geomarker and saves changes to the database
@@ -557,17 +623,20 @@ export default {
             try {
                 const {transactionResponse} = await this.upsertPoint({
                     geoMarkerFormValues: this.updatedGeoMarker,
-                    updatedLayerIds: this.layerIdsForSelectedDepartments,
                     selectedTransaction: "selectedUpdate"
                 });
 
                 if (transactionResponse) {
                     this.addSingleAlert({
-                        content: this.$t("additional:modules.geoMarker.geoMarkerForm.successMessage"),
+                        content: this.$t("additional:modules.geoMarker.geoMarkerForm.successMessageAfterUpdate"),
                         category: "success"
                     });
 
                     await this.updateGeoMarkerFeatureListAfterEdit();
+                    await this.moveUpdatedFeatureToTop(this.selectedFeature.getId());
+                    this.layerIdsForSelectedDepartments.forEach(async layerId => {
+                        await this.setFilterAgain(layerId);
+                    });
                 }
             }
             catch (error) {
@@ -597,7 +666,7 @@ export default {
         },
         /**
          * Refreshes the new feature point on the map and resets draw interaction
-         * @returns {void}
+         * @returns {Promise<void>}
          */
         refreshNewFeaturePointOnMap () {
             this.setMapInteraction(null);
@@ -665,6 +734,109 @@ export default {
             });
 
             this.setGeoMarkerFeatureList(updatedList);
+        },
+        /**
+         * Moves the updated feature to the top of the list
+         * @returns {void}
+         */
+        moveUpdatedFeatureToTop (featureId) {
+            const updatedList = [...this.geoMarkerFeatureList],
+                updatedFeatureIndex = updatedList.findIndex(
+                    feature => feature.getId() === featureId
+                );
+
+            if (updatedFeatureIndex > -1) {
+                const updatedFeature = updatedList.splice(updatedFeatureIndex, 1)[0];
+
+                updatedList.unshift(updatedFeature);
+                this.setGeoMarkerFeatureList(updatedList);
+            }
+        },
+        /**
+         * Loads the newly created GeoMarker and displays it in the list
+         * @param {Object} transactionFeature - The feature that was just created
+         * @returns {Promise<void>}
+         */
+        async loadNewlyCreatedGeoMarker (transactionFeature, transactionResponse) {
+            const relevantLayerIds = this.layerIdsForSelectedDepartments,
+                loadPromises = relevantLayerIds.map(layerId => {
+                    return new Promise(resolve => {
+                        const layer = layerCollection.getLayerById(layerId);
+
+                        if (layer) {
+                            const layerSource = layer.getLayerSource();
+
+                            layerSource.once("featuresloadend", () => {
+                                setTimeout(() => resolve(), 100);
+                            });
+
+                            layerSource.refresh();
+                        }
+                        else {
+                            resolve();
+                        }
+                    });
+                });
+
+            await Promise.all(loadPromises);
+
+            await this.findAndDisplayNewFeature(transactionResponse, relevantLayerIds);
+
+            if (this.isFilterApplied) {
+                relevantLayerIds.forEach(layerId => {
+                    this.setFilterAgain(layerId);
+                });
+            }
+        },
+        /**
+         * Filter should be reapplied after geomarker is saved or updated if the filter is already applied.
+         * @param {String} layerId The layer id which geomarker is added to.
+         */
+        setFilterAgain (layerId) {
+            const layer = layerCollection.getLayerById(layerId);
+
+            if (layer) {
+                const layerSource = layer?.getLayerSource();
+
+                layerSource.once("featuresloadend", () => {
+                    const style = layer.getStyleAsFunction(layer.get("style")),
+                        allFeaturesOnLayer = layerSource.getFeatures(),
+                        geoMarkerFeatureListIds = this.geoMarkerFeatureList.map(feature => feature.getId());
+
+                    allFeaturesOnLayer.forEach(feature => {
+                        if (geoMarkerFeatureListIds.includes(feature.getId())) {
+
+                            feature.setStyle(style(feature));
+                        }
+                        else {
+                            feature.setStyle(new Style());
+                        }
+                    });
+                    // this will only work if feature updated, not when there is a new geomarker erstellt
+                    if (this.mode === "edit" && this.geoMarkerUpdateFeature?.getId()) {
+                        this.setGeoMarkerFeatureListAction();
+                    }
+                });
+                return layerSource.refresh();
+            }
+            return "";
+        },
+        /**
+         * Finds the newly created feature and displays it in the list
+         * @param {Object} transactionResponse - The newly created feature response from transaction
+         * @param {Array<String>} relevantLayerIds - Array of layer IDs to search
+         * @returns {void}
+         */
+        findAndDisplayNewFeature (transactionResponse, relevantLayerIds) {
+            const list = this.geoMarkerFeatureList,
+                feature = layerCollection.getLayerById(relevantLayerIds[0])?.getLayerSource()?.getFeatureById(transactionResponse.featureIds[0]);
+
+            if (feature) {
+                list.push(feature);
+                this.setGeoMarkerFeatureSelected(feature);
+            }
+
+            this.setGeoMarkerFeatureList(list);
         },
         /**
          * Downloads the attachment file associated with the selected geomarker

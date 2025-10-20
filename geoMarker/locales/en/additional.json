@@ -25,7 +25,8 @@
                 "createAnotherGeoMarker": "Create another GeoMarker",
                 "update": "Update",
                 "downloadAttachment": "Download Attachment",
-                "successMessage": "Geomarker is successfully updated"
+                "successMessageAfterUpdate": "Geomarker is successfully updated",
+                "successMessageAfterSave": "Geomarker with Id {{id}} is successfully created."
             },
             "status": {
                 "offen": "open",

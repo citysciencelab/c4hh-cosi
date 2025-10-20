@@ -118,9 +118,6 @@ export default {
 
             this.defineUpdateLayers();
         },
-        geoMarkerFeatureList () {
-            this.removePointMarker();
-        },
         geoMarkerUpdateFeatureCoordinates: {
             handler (newValue) {
                 if (this.originalCoordinates && newValue) {
@@ -215,15 +212,16 @@ export default {
             this.showUpdateMessage = false;
 
             if (this.geoMarkerUpdateMode) {
-                this.toggleUpdateMode();
+                this.setUpdateModeParameters();
+                this.geoMarkerUpdateMode = false;
             }
 
             this.resetSelectedFeature();
         },
         onSuccess () {
             this.showUpdateMessage = false;
-            this.toggleUpdateMode();
-            this.setGeoMarkerFeatureSelected(null);
+            this.setUpdateModeParameters();
+            this.geoMarkerUpdateMode = false;
         },
         defineUpdateLayers () {
             if (this.geoMarkerFeatureSelected) {
@@ -250,10 +248,8 @@ export default {
                 }
             }
         },
-        toggleUpdateMode () {
+        setUpdateModeParameters () {
             if (this.geoMarkerFeatureSelected) {
-                this.geoMarkerUpdateMode = !this.geoMarkerUpdateMode;
-
                 if (this.geoMarkerUpdateMode) {
                     this.defineUpdateLayers();
 
@@ -272,6 +268,15 @@ export default {
                     this.originalCoordinates = null;
                 }
             }
+        },
+        toggleUpdateMode () {
+            if (this.geoMarkerFeatureSelected) {
+                this.geoMarkerUpdateMode = !this.geoMarkerUpdateMode;
+            }
+        },
+        onClickMoveButton () {
+            this.toggleUpdateMode();
+            this.setUpdateModeParameters();
         },
         resetGeoMarkerForm () {
             this.$refs.geoMarkerForm?.resetForm();
@@ -310,7 +315,7 @@ export default {
         <template v-if="tableData.items?.length">
             <div class="geoMarkerListContainer">
                 <SelectableList
-                    v-if="showList"
+                    v-show="showList"
                     :selected-item-id="selectedListItemId"
                     :table-data="tableData"
                     @item-selected="setSelectedFeature"
@@ -359,7 +364,7 @@ export default {
                 :aria="$t('additional:modules.geoMarker.GeoMakerList.button.moveGeoMarker')"
                 icon="bi-arrows-move"
                 :disabled="!geoMarkerFeatureSelected"
-                @click="toggleUpdateMode()"
+                @click="onClickMoveButton()"
             />
 
             <IconButton

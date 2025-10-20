@@ -8,16 +8,29 @@ import wfs from "@masterportal/masterportalapi/src/layer/wfs";
 import createTransactionFeature from "../utils/createTransactionFeature";
 import prepareFeatureProperties from "../utils/prepareFeatureProperties";
 import mergeFormValuesWithProperties from "../utils/mergeFormValuesWithProperties";
-import layerCollection from "@core/layers/js/layerCollection";
 import wfsSendTransaction from "../utils/wfsSendTransaction";
 
 const actions = {
+    /**
+     * Loads categories from the json file and commits them to the store.
+     * @async
+     * @param {Function} context.commit - Vuex commit function.
+     * @param {Object} context.getters - Vuex getters object.
+     * @returns {Promise<void>} Resolves when categories are loaded and committed.
+     */
     async loadCategories ({commit, getters}) {
         const url = buildEndpointUrl(getters.categoriesUrl, {t: Date.now()}),
             response = await axios.get(url);
 
         commit("setCategories", response.data.categories);
     },
+    /**
+     * Loads departments from the json file and commits them to the store.
+     * @async
+     * @param {Function} context.commit - Vuex commit function.
+     * @param {Object} context.getters - Vuex getters object.
+     * @returns {Promise<void>} Resolves when departments are loaded and committed.
+     */
     async loadDepartments ({commit, getters}) {
         const url = buildEndpointUrl(getters.departmentsUrl, {t: Date.now()}),
             response = await axios.get(url);
@@ -263,8 +276,8 @@ const actions = {
      * @param {String} payload.selectedTransaction - Insert or update, to decide if geomarker is saved or updated.
      * @returns {Promise<{transactionFeature: Object, transactionResponse: Object}>} - feature that we save and response of the request. (Both is actually almost the same and will be changed later.)
     */
-    async upsertPoint ({dispatch, commit, getters}, {geoMarkerFormValues, updatedLayerIds, selectedTransaction}) {
-        const {newGeoMarkerFeature, layerInformation, geoMarkerFeatureSelected, geoMarkerUpdateFeature, geoMarkerFeatureList} = getters,
+    async upsertPoint ({dispatch, commit, getters}, {geoMarkerFormValues, selectedTransaction}) {
+        const {newGeoMarkerFeature, layerInformation, geoMarkerFeatureSelected, geoMarkerUpdateFeature} = getters,
             layer = layerInformation[0],
             preparedFeatureProperties = await prepareFeatureProperties(layer),
             featurePropertiesWithFormValues = await mergeFormValuesWithProperties(preparedFeatureProperties, geoMarkerFormValues),
@@ -272,19 +285,34 @@ const actions = {
             isUpdate = selectedTransaction === "selectedUpdate";
 
         let transactionResponse,
-            transactionFeature = null;
+            transactionFeature = null,
+            geometry = null,
+            feature = null;
+
+        if (isUpdate) {
+            if (geoMarkerUpdateFeature) {
+                geometry = geoMarkerUpdateFeature.get("geom");
+                feature = geoMarkerUpdateFeature;
+            }
+            else {
+                geometry = geoMarkerFeatureSelected.get("geom");
+                feature = geoMarkerFeatureSelected;
+            }
+        }
+        else {
+            geometry = newGeoMarkerFeature.get("geom");
+            feature = newGeoMarkerFeature;
+        }
 
         try {
             transactionFeature = await createTransactionFeature(
                 {
                     ...isUpdate ? {id: geoMarkerFeatureSelected.getId()} : {},
-                    geometry: isUpdate
-                        ? geoMarkerUpdateFeature.get("geom")
-                        : newGeoMarkerFeature.get("geom"),
+                    geometry: geometry,
                     geometryName: geometryProperty.key
                 },
                 featurePropertiesWithFormValues,
-                geoMarkerUpdateFeature,
+                feature,
                 isUpdate,
                 layer.featurePrefix
             );
@@ -300,11 +328,8 @@ const actions = {
             }, {root: true});
         }
         finally {
-            updatedLayerIds.forEach(async layerId => {
-                await dispatch("refreshLayerAndReapplyFilter", {layerId, geoMarkerFeatureList});
-            });
-
             commit("setNewGeoMarkerFeature", null);
+            commit("setGeoMarkerUpdateFeature", null);
         }
 
         return {transactionFeature, transactionResponse};
@@ -358,53 +383,6 @@ const actions = {
         return response;
     },
     /**
-     * Refreshes the layer and reapplies the filter to maintain filtered features visibility.
-     * This method ensures that after layer refresh, only the features that were visible
-     * before the refresh remain visible on the map.
-     *
-     * @param {Object} context - Vuex action context.
-     * @param {Object} payload - The payload object.
-     * @param {String} payload.layerId - The ID of the layer to refresh.
-     * @param {Array} payload.geoMarkerFeatureList - List of filtered features that should remain visible.
-     * @returns {Promise<void>}
-     */
-    async refreshLayerAndReapplyFilter ({dispatch}, {layerId, geoMarkerFeatureList}) {
-        const layer = layerCollection.getLayerById(layerId),
-            layerSource = layer?.getLayerSource();
-
-        if (!layer || !layerSource) {
-            return;
-        }
-
-        await new Promise((resolve) => {
-            /**
-             * Handles the featuresloadend event to reapply the filter after layer refresh.
-             * @returns {void}
-             */
-            function onFeaturesLoadEnd () {
-                const style = layer.getStyleAsFunction(layer.get("style")),
-                    allFeaturesOnLayer = layerSource.getFeatures(),
-                    geoMarkerFeatureListIds = geoMarkerFeatureList.map(feature => feature.getId());
-
-                allFeaturesOnLayer.forEach(feature => {
-                    if (geoMarkerFeatureListIds.includes(feature.getId())) {
-                        feature.setStyle(style(feature));
-                    }
-                    else {
-                        feature.setStyle(new Style());
-                    }
-                });
-
-                dispatch("setGeoMarkerFeatureList");
-                layerSource.un("featuresloadend", onFeaturesLoadEnd);
-                resolve();
-            }
-
-            layerSource.once("featuresloadend", onFeaturesLoadEnd);
-            layerSource.refresh();
-        });
-    },
-    /**
      * Updates the geometry of the geoMarker feature in the feature list after a modification.
      * Finds the updated feature in the corresponding layer and clones its geometry to the feature list.
      * Commits the updated feature list to the store.
@@ -414,12 +392,13 @@ const actions = {
      * @param {Function} context.commit - The commit function to trigger mutations.
      * @returns {void}
      */
-    setGeoMarkerFeatureList ({getters, commit}) {
+    setGeoMarkerFeatureListAction ({getters, commit}) {
         const {geoMarkerUpdateLayerIds, geoMarkerUpdateFeature, geoMarkerFeatureList} = getters,
-            updatedLayer = mapCollection.getMap("2D").getLayers().getArray().find(layer => geoMarkerUpdateLayerIds.includes(layer.get("id"))),
-            updatedFeature = updatedLayer.getSource().getFeatureById(geoMarkerUpdateFeature.getId());
+            updatedLayer = mapCollection.getMap("2D").getLayers().getArray().find(layer => geoMarkerUpdateLayerIds.includes(layer.get("id")));
 
-        if (updatedFeature) {
+        if (geoMarkerUpdateFeature) {
+            const updatedFeature = updatedLayer.getSource().getFeatureById(geoMarkerUpdateFeature.getId());
+
             geoMarkerFeatureList.map(feature => {
                 if (feature.getId() === geoMarkerUpdateFeature.getId()) {
                     feature.setGeometry(updatedFeature?.getGeometry().clone());
@@ -539,7 +518,6 @@ const actions = {
 
         commit("setGeomarkerEditLayerUrl", url);
     },
-
     /**
      * Rolls back the geometry of the selected GeoMarker feature to its previous state.
      * This action restores the geometry of the feature in both the feature list and all relevant layers,

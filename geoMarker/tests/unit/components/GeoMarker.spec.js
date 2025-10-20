@@ -4,7 +4,6 @@ import {expect} from "chai";
 import {createStore} from "vuex";
 import GeoMarker from "../../../components/GeoMarker.vue";
 
-
 config.global.mocks.$t = key => key;
 
 describe("addons/geoMarker/components/GeoMarker.vue", () => {
@@ -20,16 +19,36 @@ describe("addons/geoMarker/components/GeoMarker.vue", () => {
                         GeoMarker: {
                             namespaced: true,
                             getters: {
-                                geoMarkerActiveTab: () => "tabFilter"
+                                geoMarkerActiveTab: () => "tabFilter",
+                                categories: () => [],
+                                departments: () => [],
+                                geoMarkerEditLayerId: () => "geomarker_edit",
+                                rollbackGeoMarkerFeature: () => null,
+                                geoMarkerFeatureList: () => [],
+                                newGeoMarkerCreated: () => false,
+                                geoMarkerUpdateFeature: () => null
                             },
                             actions: {
                                 loadCategories: () => [],
-                                loadDepartments: () => []
+                                loadDepartments: () => [],
+                                setMapInteraction: sinon.stub(),
+                                getGeoMarkerEditLayerUrl: sinon.stub(),
+                                rollbackGeoMarkerUpdateFeature: sinon.stub()
                             },
                             mutations: {
-                                setLayerInformation: sinon.stub()
+                                setLayerInformation: sinon.stub(),
+                                setGeoMarkerActiveTab: sinon.stub(),
+                                setNewGeoMarkerFeature: sinon.stub(),
+                                setGeoMarkerUpdateFeature: sinon.stub(),
+                                setGeoMarkerFeatureSelected: sinon.stub()
                             }
                         }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        removePointMarker: sinon.stub()
                     }
                 }
             },

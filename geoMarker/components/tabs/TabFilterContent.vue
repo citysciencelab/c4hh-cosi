@@ -169,7 +169,8 @@ export default {
         ...mapMutations("Modules/GeoMarker", [
             "setFilterSelections",
             "setGeoMarkerFeatureList",
-            "setGeoMarkerActiveTab"
+            "setGeoMarkerActiveTab",
+            "setIsFilterApplied"
         ]),
         /**
          * Applies the filter settings, checks the layer visibility and updates the filtered features.
@@ -193,6 +194,7 @@ export default {
             this.setGeoMarkerFeatureList(this.allFilteredFeatures);
 
             this.filterUpdated = false;
+            this.setIsFilterApplied(true);
             this.isFiltering = false;
         },
         /**
@@ -538,6 +540,7 @@ export default {
             });
 
             this.graphicalSelectOpen = false;
+            this.setIsFilterApplied(false);
 
             this.updateFilterSelection(false, false);
         },
@@ -548,6 +551,7 @@ export default {
             this.filterSelections.geom = null;
             this.graphicalSelectOpen = false;
             this.filterUpdated = true;
+            this.setIsFilterApplied(false);
         }
     }
 };
