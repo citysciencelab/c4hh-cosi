@@ -21,13 +21,11 @@ import {styleSelectedDistrictLevels} from "../utils/styleSelectedDistrictLevels.
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {union} from "../../utils/geomUtils.js";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
-import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 
 export default {
     name: "DistrictSelector",
     components: {
         AccordionItem,
-        AlertMessage,
         DistrictSelectorFilter,
         FlatButton,
         IconButton,
@@ -514,10 +512,6 @@ export default {
             :summary="$t('additional:modules.cosi.districtSelector.description')"
         />
         <hr class="my-4 mx-0 text-black-50">
-        <AlertMessage
-            text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-            type="success"
-        />
         <template v-if="districtLevels.length && selectedDistrictLevelId">
             <TagGroup
                 class="mb-3"

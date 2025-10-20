@@ -49,6 +49,8 @@ const state = {
     reportTemplateMode: null,
     toolBridgeIn: {settings: {}, type: "", outputCallback: null}, // accepts settings from toolBridge - must have a *watcher*
     toolBridgeOut: {}, // pass current settings to toolBridge - must have a *getter
+    wpsServiceId: "1001",
+    wpsProcess: "einwohner_ermitteln.fmw"
 };
 
 export default state;

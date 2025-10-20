@@ -19,3 +19,19 @@
         margin-right: 4px;
     }
 }
+
+.card-active {
+    border-color: $secondary;
+    border-width: 2px;
+    i {
+        color: $secondary;
+    }
+}
+
+.card-hover:hover {
+    cursor: pointer;
+    background-color: $light_blue;
+    i {
+        color: $secondary;
+    }
+}

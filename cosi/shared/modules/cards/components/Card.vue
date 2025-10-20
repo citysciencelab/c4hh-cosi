@@ -17,113 +17,120 @@ export default {
             default: true
         },
         icon: {
-            type: String,
+            type: [Boolean, String],
             required: false,
-            default: ""
+            default: false
         },
         layoutStyle: {
             type: String,
             required: false,
             default: "list"
         },
-        removable  : {
+        removable: {
             type: Boolean,
             required: false,
             default: true
         },
-        status : {
+        status: {
             type: String,
             required: false,
             default: ""
         },
-        visible  : {
+        visible: {
             type: Boolean,
             required: false,
-            default: true
+            default: false
         }
     }
 };
 </script>
 
 <template lang="html">
-    <div class="card mb-3 card-hover shadow" :class="status === 'active' ? 'card-active' : ''">
-        <div class="card-body d-flex p-0 description align-items-center">
-        <div class="p-3 fs-1"><i :class="icon"></i></div>
-        <div
-            v-if="layoutStyle === 'grid'"
-            class="p-2 row grid"
-        >
+    <div
+        class="card card-hover shadow mb-3"
+        :class="status === 'active' ? 'card-active' : ''"
+    >
+        <div class="card-body d-flex align-items-center p-3">
             <div
-                v-for="(element, index) in data"
-                :key="index"
-                class="col-6"
+                v-if="icon"
+                class="ps-3 pe-5 fs-1"
             >
-                <div>
-                    <i v-if="element?.icon" :class="element?.icon" class="me-2" />
-                    <span class="title">{{ element.label}}</span>
-                </div>
-                <div class="value">{{ element.value }}</div>
+                <i :class="icon" />
             </div>
-        </div>
-        <div
-            v-else
-            class="p-2 flex-grow-1 list"
-        >
             <div
-                v-for="(element, index) in data"
-                :key="index"
-                class="list-element"
+                v-if="layoutStyle === 'grid'"
+                class="p-2 row grid"
             >
-                <div>
-                    <i v-if="element?.icon" :class="element?.icon" class="me-2" />
-                    <span class="title">{{ element.label}}</span>
+                <div
+                    v-for="(element, index) in data"
+                    :key="index"
+                    class="col-6"
+                >
+                    <div>
+                        <i v-if="element?.icon" :class="element?.icon" class="me-2" />
+                        <span>{{ element.label}}</span>
+                    </div>
+                    <div class="value">{{ element.value }}</div>
                 </div>
-                <div class="value"> {{ element.value }}</div>
             </div>
-        </div>
-        <div class="d-flex align-self-start buttons">
-            <IconButton
-                v-if="downloadable"
-                class="p-1"
-                :aria="'Download'"
-                icon="bi bi-download"
-                :interaction="() => $emit('downloadSet')"
-            />
-            <IconButton
-                v-if="visible"
-                class="p-1"
-                :aria="'visible'"
-                :icon="status === 'active' ? 'bi bi-eye' : 'bi bi-eye-slash'"
-                :interaction="() => $emit('hideSet')"
-            />
-            <IconButton
-                v-if="removable"
-                class="p-1"
-                :aria="'Löschen'"
-                icon="bi bi-trash"
-                :interaction="() => $emit('removeSet')"
-            />
+            <div
+                v-else
+                class="flex-grow-1 list"
+            >
+                <div
+                    v-for="(element, index) in data"
+                    :key="index"
+                    class="list-element lh-1 mb-3"
+                >
+                    <div class="mb-1">
+                        <i
+                            v-if="element?.icon"
+                            :class="element.icon"
+                            class="me-2"
+                        />
+                        <span>
+                            {{ element.label }}
+                        </span>
+                    </div>
+                    <div class="value">
+                        {{ element.value }}
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-self-center">
+                <div class="dropdown">
+                    <IconButton
+                        v-if="downloadable"
+                        class="dropdown-toggle p-1"
+                        :aria="'Download'"
+                        icon="bi bi-download"
+                        :interaction="() => $emit('downloadSet')"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside"
+                    />
+                    <slot name="download-menu" />
+                </div>
+                <IconButton
+                    v-if="visible"
+                    class="p-1"
+                    :aria="'visible'"
+                    :icon="status === 'active' ? 'bi bi-eye' : 'bi bi-eye-slash'"
+                    :interaction="() => $emit('hideSet')"
+                />
+                <IconButton
+                    v-if="removable"
+                    class="p-1"
+                    :aria="'Löschen'"
+                    icon="bi bi-trash"
+                    :interaction="() => $emit('removeSet')"
+                />
+            </div>
         </div>
     </div>
-</div>
 </template>
 
 <style scoped lang="scss">
-    .card-hover:hover {
-        cursor: pointer;
-        background-color: $light_blue;
-        i {
-            color: $secondary;
-        }
-    }
-
-    .card-active {
-        border-color: $secondary;
-        border-width: 2px;
-        i {
-            color: $secondary;
-        }
-    }
+    @import "../assets/style.scss";
 
     .grid {
         margin-right: 126px;
@@ -133,28 +140,22 @@ export default {
     }
 
     .list {
-        margin-right: 126px;
         .list-element {
-            margin-bottom: 3px;
+            .value {
+                color: $secondary;
+            }
             &:first-child {
                 .value {
                     font-family: "MasterPortalFont Bold";
                     font-size: $font_size_big;
-                    color: $secondary;
                 }
             }
             &:last-child {
-                display: flex;
+                margin-bottom: 0 !important;
                 > div {
                     margin-right: 5px;
                 }
             }
         }
-    }
-
-    .buttons {
-        position: absolute;
-        right: 0;
-        top: calc(50% - 20px);
     }
 </style>

@@ -1,4 +1,5 @@
 <script>
+import AccessibilityAnalysisExport from "./AccessibilityAnalysisExport.vue";
 import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
@@ -29,12 +30,14 @@ import layerFactory from "@core/layers/js/layerFactory";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
+import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
 
 export default {
     name: "AccessibilityAnalysis",
     components: {
+        AccessibilityAnalysisExport,
         AccessibilityAnalysisLegend,
         AccessibilityAnalysisTrafficFlow,
         AccordionItem,
@@ -586,6 +589,12 @@ export default {
 
             await this.createIsochrones();
 
+            mapCollection.getMap("2D").once("rendercomplete", (evt) => {
+                const canvas = evt.target.getViewport().querySelector("canvas");
+
+                analysisSet.inputs.screenshot = canvas.toDataURL("image/png");
+            });
+
             analysisSet.results = this.isochroneFeatures;
             analysisSet.inputs = {
                 // These lines have been changed back and forth so arguing my case for checking first if the value is undefined
@@ -615,32 +624,34 @@ export default {
                 this.renderIsochrones(this.isochroneFeatures);
             }
             this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
-
-            // console.log(this.coordinate);
-            const service = this.restServiceById("1001");
-
-            if (service === undefined) {
-                console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");
-            }
-            else {
-                // Beispiel: Transformiere die Koordinaten
-                const outerPolygon = geometryToGeoJson(this.isochroneFeatures[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
-
-                WPS.wpsRequest("1001", service.url, "einwohner_ermitteln.fmw", {
-                    "such_flaeche": JSON.stringify(outerPolygon)
-                }, this.handleResponsee.bind(this));
-            }
+            this.setPopulationSize();
             this.setCoordinate([]);
 
             // this line adds the accessibility analysis data selection to the selection manger
             // this does not seem to make much sense: the only reason to reproduce this would be to reproduce the accessibility analysis. However, since the accessibility analysis creates this selection on the fly, we need the previous selection for reproduction, not this one. this one is then recreated on the fly everytime the analysis is run. Leaving this in in case we want this for some reason down the line.
             // this.addNewSelection({selection: analysisSet.results, source: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.title"), id: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes." + this._transportType) + ", " + this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits." + this.scaleUnit) + ", [...]"});
         },
-        handleResponsee (resp) {
+
+        setPopulationSize () {
+            const service = this.restServiceById(this.wpsServiceId);
+
+            if (service === undefined) {
+                console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");
+            }
+            else {
+                const outerPolygon = geometryToGeoJson(this.isochroneFeatures[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
+
+                WPS.wpsRequest(service.id, service.url, this.wpsProcess, {
+                    "such_flaeche": JSON.stringify(outerPolygon)
+                }, this.handlePopulationResponsee.bind(this));
+            }
+        },
+
+        handlePopulationResponsee (resp) {
             const parsedData = resp.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData.einwohner,
                 responseResult = JSON.parse(parsedData.ergebnis);
 
-            this.dataSets[this.activeSet].inputs.einwohner = responseResult.einwohner_fhh;
+            this.dataSets[this.activeSet].inputs.einwohner = thousandsSeparator(responseResult.einwohner_fhh);
 
         },
         exportAsGeoJson,
@@ -678,6 +689,21 @@ export default {
             this.dataSets.forEach(set => {
                 downloadGeoJson(set.geojson);
             });
+        },
+
+
+        /**
+         * Downloads the screenshot of the given set.
+         * @param {Object} set - The set containing the screenshot.
+         * @returns {void}
+         */
+        downloadScreenshot (set) {
+            const link = document.createElement("a");
+
+            link.href = set.inputs.screenshot;
+            link.download = "Erreichbarkeitsanalyse.png";
+
+            link.click();
         },
 
         async updateAnalysisSet () {
@@ -835,13 +861,13 @@ export default {
                 name = this.getScaleUnitByType(data.inputs?.scaleUnit)?.name,
                 title = name === "Zeit" ? data.inputs?.time + " Minuten" : data.inputs?.distance + " Meter",
                 pointDes = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0]?.text : "Mehrere " + data.inputs.selectionCards[0]?.text,
-                coordinate = data.inputs.selectionCards.length === 1 ? "" : data.inputs.coordinate[0].toString(),
+                coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.coordinate[0].toString() : "",
                 icon = data.inputs.selectionCards[0]?.icon,
                 population = data.inputs.einwohner;
 
             result.push({label: name, value: title});
             result.push({icon: icon, label: pointDes, value: coordinate});
-            result.push({label: "Einwohner: ", value: population});
+            result.push({icon: "bi bi-people", label: "Einwohner: " + population});
 
             return result;
         }
@@ -1016,15 +1042,19 @@ export default {
                     :data="getData(set)"
                     :downloadable="true"
                     :icon="getIconByTransportType(set.inputs.transportType)"
-                    layout-style="list"
                     :removable="true"
                     :status="dataSets.indexOf(set) === activeSet ? 'active' : ''"
-                    :visible="true"
                     @click="updateActiveSet(set)"
-                    @downloadSet="downloadSet(set)"
                     @hideSet="updateActiveSet(set)"
                     @removeSet="removeSet(set)"
-                />
+                >
+                    <template #download-menu>
+                        <AccessibilityAnalysisExport
+                            @export-geojson="downloadSet(set)"
+                            @export-png="downloadScreenshot(set)"
+                        />
+                    </template>
+                </Card>
             </div>
         </div>
     </div>
