@@ -3,6 +3,7 @@
         "tools": {
             "cosi": {
                 "dashboard": {
+                    "alertMessageNoData": "No areas have been selected yet. To display statistical data, please select at least one area. To do so, use the ‘Select area’ function.",
                     "title": "Statistical Dashboard",
                     "avgCol": "Average",
                     "totalCol": "Total",

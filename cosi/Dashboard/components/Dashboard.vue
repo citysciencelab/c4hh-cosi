@@ -1,4 +1,5 @@
 <script>
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersDashboard.js";
 import mutations from "../store/mutationsDashboard.js";
@@ -44,10 +45,11 @@ import {VTooltip} from "vuetify/components/VTooltip";
 export default {
     name: "Dashboard",
     components: {
-        ToolInfo,
-        TableRowMenu,
+        AlertMessage,
         DashboardToolbar,
         TableCell,
+        TableRowMenu,
+        ToolInfo,
         VApp,
         VBtn,
         VCheckbox,
@@ -212,22 +214,14 @@ export default {
     created () {
         const selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
 
-        this.selectedStatFeatures = selectedDistricts.map(district => district.statFeatures).flat();
-        this.setSelectedYear(utils.getAvailableYears([this.selectedStatFeatures[0]], this.yearSelector)[0]);
-
-        this.calculateAll();
-        if (this.selectedDistrictNames.length > 0) {
-            this.generateTable();
+        if (selectedDistricts.length) {
+            this.selectedStatFeatures = selectedDistricts.map(district => district.statFeatures).flat();
+            this.setSelectedYear(utils.getAvailableYears([this.selectedStatFeatures[0]], this.yearSelector)[0]);
+            this.calculateAll();
+            if (this.selectedDistrictNames.length > 0) {
+                this.generateTable();
+            }
         }
-        /**
-         * If the tool is used from the menu,
-         * toggles the menu item inactive if closed
-         * @param {boolean} newActive - Defines if the tool is active.
-         * @returns {void}
-         */
-        // this.$on("close", () => {
-        //     this.setActive(false);
-        // });
     },
 
     methods: {
@@ -884,7 +878,15 @@ export default {
                     :url="readmeUrl"
                     :locale="currentLocale"
                 />
-                <v-container fluid>
+                <AlertMessage
+                    v-if="selectedDistrictNames.length === 0"
+                    :text="$t('additional:modules.tools.cosi.dashboard.alertMessageNoData')"
+                    type="noData"
+                />
+                <v-container
+                    v-if="selectedDistrictNames.length"
+                    fluid
+                >
                     <DashboardToolbar
                         :stats-feature-filter="statsFeatureFilter"
                         @setStatsFeatureFilter="setStatsFeatureFilter"

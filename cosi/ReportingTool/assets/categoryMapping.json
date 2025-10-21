@@ -1,0 +1,99 @@
+{
+  "statData": [
+    {
+      "expandable": false,
+      "icon": "bi bi-pencil",
+      "key": "textArea",
+      "multiple": true,
+      "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": true,
+      "icon": "bi bi-table",
+      "key": "statDataOverview",
+      "multiple": false,
+      "name": "Statistische Datenübersicht",
+      "tag": "Statistische Daten"
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-bar-chart",
+      "key": "statDataOverview",
+      "multiple": false,
+      "name": "Datenvisualisierung",
+      "tag": "Statistische Daten"
+    }
+  ],
+  "subjectData": [
+    {
+      "expandable": false,
+      "icon": "bi bi-pencil",
+      "key": "textArea",
+      "multiple": true,
+      "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": true,
+      "icon": "bi bi-table",
+      "key": "subjectDataTable",
+      "multiple": false,
+      "name": "Auflistung",
+      "tag": "Fachdaten"
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-map",
+      "key": "subjectDataMap",
+      "multiple": false,
+      "name": "Kartendarstellung",
+      "tag": "Fachdaten"
+    }
+  ],
+  "analyses": [
+    {
+      "expandable": false,
+      "icon": "bi bi-pencil",
+      "key": "textArea",
+      "multiple": true,
+      "name": "Freitext",
+      "tag": null
+    },
+    {
+      "items": [],
+      "expandable": false,
+      "icon": "bi bi-geo",
+      "key": "accessibilityAnalysis",
+      "multiple": true,
+      "name": "Erreichbarkeitsanalyse",
+      "tag": "Erreichbarkeitsanalyse"
+    }
+  ],
+  "attachment": [
+    {
+      "expandable": false,
+      "icon": "bi bi-pencil",
+      "key": "textArea",
+      "multiple": true,
+      "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-list-stars",
+      "key": "legend",
+      "multiple": false,
+      "name": "Legende",
+      "tag": "Fachdaten"
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-journals",
+      "key": "sources",
+      "multiple": false,
+      "name": "Quellenangaben",
+      "tag": null
+    }
+  ]
+}
