@@ -1,3 +1,5 @@
+
+/* eslint-disable */
 import dayjs from "dayjs";
 import mapCollection from "../../src/core/maps/js/mapCollection";
 import thousandsSeparator from "../../src/shared/js/utils/thousandsSeparator.js";
