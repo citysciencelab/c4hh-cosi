@@ -2,7 +2,7 @@
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 import {infrastructureLayerId} from "../../layerIds.js";
 import SimulationResults from "./SimulationResults.vue";

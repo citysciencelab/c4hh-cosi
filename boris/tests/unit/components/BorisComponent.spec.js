@@ -30,7 +30,7 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
         originalSendWpsConvertRequest,
         originalUpdateSelectedBrwFeature;
 
-     before(() => {
+    before(() => {
         mapCollection.clear();
         const map = {
             id: "ol",
