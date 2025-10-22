@@ -1,6 +1,7 @@
 <script>
 import dayjs from "dayjs";
 import {mapGetters} from "vuex";
+import ReportingToolProgressBarProgressBar from "./ReportingToolProgressBar.vue";
 import PDFMaker from "../js/createPdf";
 import {getTotal, getCulmulativeTotal} from "../../Dashboard/utils/operations";
 import {getCenter as getCenterOfExtent} from "ol/extent";
@@ -14,38 +15,29 @@ import {fromExtent} from "ol/geom/Polygon";
 import Feature from "ol/Feature.js";
 import getBasicInfo from "../js/getBasicInfo";
 import MapfishDialog from "../../../shared/js/mapfishUtils/mapfishDialog";
+import {VChip} from "vuetify/components/VChip";
+import {VChipGroup} from "vuetify/components/VChipGroup";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 import getCswRecordById from "@shared/js/api/getCswRecordById.js";
-import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
-import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
-import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
-import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
-import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
-import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
-import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
-import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import {VStepper, VStepperActions, VStepperItem, VStepperHeader, VStepperWindow, VStepperWindowItem} from "vuetify/components/VStepper";
-
 
 export default {
     name: "ReportingTool",
     components: {
-        AccordionItem,
-        AlertMessage,
-        DropdownAutocomplete,
-        FlatButton,
-        InputText,
-        TagGroup,
-        ToolInfo,
-        SwitchInput,
-        VStepper,
-        VStepperActions,
-        VStepperItem,
-        VStepperHeader,
-        VStepperWindow,
-        VStepperWindowItem
+        ReportingToolProgressBarProgressBar,
+        VChip,
+        VChipGroup
     },
     data: () => ({
+        tagsOptionalComponents: [
+            "Titelblatt inkl. Kartenausschnitt",
+            "statistische Datenübersicht",
+            "Datenvisualisierung",
+            "Quellenangaben"
+        ],
+        tagsInfrastructureData: [
+            "Auflistung",
+            "Kartendarstellung der Infrastrukturdaten"
+        ],
         showProgressBar: false,
         percentage: 50,
         reportTitle: "",
@@ -64,24 +56,7 @@ export default {
         ],
         progressValue: 0,
         selectedReportComponents: [],
-        selectedCategoryInChart: [],
-        page: 1,
-        isAllAreasSummariseChecked: false,
-        frontPageContent: [
-            "Titelseite mit Kartenausschnitt",
-            "Titelseite mit Kartenausschnitt inkl. Neuwerk",
-            "Keine Titelseite"
-        ],
-        years: [
-            "2024",
-            "2023",
-            "2022",
-            "2021"
-        ],
-        selectedYear: [],
-        printReportView: false,
-        higherDistrictLevel: [],
-        selectedStatisticalAreas: []
+        selectedCategoryInChart: []
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
@@ -89,7 +64,6 @@ export default {
         ...mapGetters("Modules/FeaturesList", ["featuresListItems"]),
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevel", "selectedDistrictNames", "selectedFeatures", "initMapping"]),
         ...mapGetters("Modules/TemplateManager", ["reportName", "reportLayerIds", "reportCategories"]),
-        ...mapGetters("Modules/ReportingTool", ["readmeUrl"]),
         ...mapGetters(["restServiceById"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
 
@@ -144,54 +118,10 @@ export default {
             return this.selectedDistrictLevel.districts
                 .filter(dist => this.selectedDistrictNames.includes(dist.getName()))
                 .map(dist => dist.getLabel());
-        },
-        /**
-         * Gets an array of front page labels with their corresponding selection status.
-         * Each object in the returned array contains:
-         * - `label`: The label of the district level.
-         * - `selected`: A boolean indicating whether the district level is currently selected.
-         * @returns {Object[]} An array of objects representing front page item labels.
-         */
-        frontPageItems () {
-            return this.frontPageContent.map(label => ({
-                label: label,
-                selected: this.selectedReportComponents.includes(label)
-            }));
-        },
-        /**
-         * Gets an array of higher district levels with their corresponding selection status.
-         * Each object in the returned array contains:
-         * - `label`: The label of the district level.
-         * - `selected`: A boolean indicating whether the district level is currently selected.
-         * @returns {Object[]} An array of objects representing higher district level labels.
-         */
-        higherDistrictLevelLabels () {
-            let level = this.districtLevels.map(lev => ({
-                label: lev.label,
-                selected: this.higherDistrictLevel.length ? this.higherDistrictLevel.includes(lev.label) : false
-            }));
-            const districtLevel = [];
-
-            if (this.selectedDistrictLevel.label === "Hamburg") {
-                level = [];
-            }
-            else {
-                this.districtLevels.forEach(v => {
-                    if (v.label === this.selectedDistrictLevel.label) {
-                        districtLevel.push(v.label);
-                    }
-                    if (v.label === this.selectedDistrictLevel.subLevel?.label || v.label === "Statistische Gebiete") {
-                        districtLevel.push(v.label);
-                    }
-                });
-            }
-
-            return level?.filter(object => !districtLevel.includes(object.label));
         }
     },
     mounted () {
-        this.selectedReportComponents = [this.frontPageContent[0]];
-        this.selectedStatisticalAreas = this.selectedDistrictNames;
+        this.selectedReportComponents = [...this.tagsOptionalComponents, ...this.tagsInfrastructureData];
     },
     methods: {
         /**
@@ -280,7 +210,7 @@ export default {
 
             this.pdf.addChapter("Statistische Datenübersicht");
 
-            Object.keys(groupedMapping).forEach((group) => {
+            Object.keys(groupedMapping).forEach((group, idx) => {
                 const columns = this.pdf.getColumns(["", this.areaColumnName, ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
                     body = [columns];
 
@@ -333,7 +263,8 @@ export default {
                 unified = [],
                 seenCategories = new Set(),
                 body = [],
-                bodyWithHeader = [];
+                bodyWithHeader = [],
+                limited = [];
 
             for (const item of list) {
                 const layerId = item?.layerId,
@@ -431,7 +362,7 @@ export default {
          * @returns {void}
          */
         async addOverViewPageToReport () {
-            if (!this.controlsReportComponent("Titelseite mit Kartenausschnitt")) {
+            if (!this.controlsReportComponent("Titelblatt inkl. Kartenausschnitt")) {
                 return;
             }
             const imageName = "overviewMap",
@@ -867,79 +798,6 @@ export default {
          */
         getObjectCopyWithoutReference (obj) {
             return JSON.parse(JSON.stringify(obj));
-        },
-
-        /**
-        * Goes back to the previous step
-        * @returns {void}
-        */
-        stepperPrev () {
-            this.$refs.stepperActions.prev();
-        },
-
-        /**
-        * Goes to the next step
-        * @returns {void}
-        */
-        stepperNext () {
-            this.$refs.stepperActions.next();
-        },
-
-        /**
-        * Updates the page number during the steps.
-        * @param {Object} event The event.
-        * @returns {void}
-        */
-        valueChanged (event) {
-            this.page = event;
-        },
-
-        /**
-         * Updates the selected report components with the selected front page items.
-         * @param {Object} frontPagelabel - The labels object containing information about front page items.
-         * @returns {void}
-         */
-        updateFrontPageItems (frontPagelabel) {
-            if (typeof frontPagelabel === "undefined") {
-                return;
-            }
-
-            this.selectedReportComponents.forEach(v => {
-                this.frontPageContent.forEach(content => {
-                    if (v === content) {
-                        const index = this.selectedReportComponents.indexOf(v);
-
-                        this.selectedReportComponents.splice(index, 1);
-                    }
-                });
-            });
-
-            this.selectedReportComponents.push(frontPagelabel.label);
-        },
-
-        /**
-         * Updates the selected higher district level for multiselect tags.
-         * @param {Object[]} selectedDistricts - The labels object containing information about the higher district level.
-         * @returns {void}
-         */
-        updateSelectedDistricts (selectedDistricts) {
-            if (typeof selectedDistricts === "undefined") {
-                return;
-            }
-            this.higherDistrictLevel = [];
-
-            selectedDistricts.forEach(v => {
-                this.higherDistrictLevel.push(v.label);
-            });
-        },
-
-        /**
-         * Updates the selected statistical areas.
-         * @param {String[]} areas - The selected areas.
-         * @returns {void}
-         */
-        updateSelectedStatisticalAreas (areas) {
-            this.selectedStatisticalAreas = areas;
         }
     }
 };
@@ -947,236 +805,141 @@ export default {
 
 <template lang="html">
     <div class="container">
-        <ToolInfo
-            :url="readmeUrl"
-            :locale="currentLocale"
-            summary="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum."
-        />
-        <div v-if="!printReportView">
-            <h5>
-                {{ $t("additional:modules.cosi.reportingTool.createReport") }}
+        <div class="row">
+            <h5 class="text-primary col col-md-12 pt-1">
+                {{ reportName }}
             </h5>
-            <v-stepper
-                ref="stepperActions"
-                class="mt-3"
-                color="#3C5F94"
-                non-linear
-                alt-labels
-                @update:modelValue="valueChanged($event)"
+            <form
+                v-if="!showProgressBar"
+                class="col col-md-12 mb-3 mt-0"
             >
-                <v-stepper-header>
-                    <v-stepper-item
-                        value="1"
-                        editable
+                <div class="export-title mb-3">
+                    <label
+                        for="form-title"
+                        class="form-label mb-0"
                     >
-                        {{ $t("additional:modules.cosi.reportingTool.generalSettings") }}
-                    </v-stepper-item>
-
-                    <v-divider />
-
-                    <v-stepper-item
-                        value="2"
-                        editable
+                        {{ $t("additional:modules.cosi.reportingTool.label.title") }}
+                    </label>
+                    <input
+                        id="form-title"
+                        v-model="reportTitle"
+                        type="text"
+                        class="form-control"
+                        maxlength="50"
                     >
-                        {{ $t("additional:modules.cosi.reportingTool.statisticalData") }}
-                    </v-stepper-item>
-
-                    <v-divider />
-
-                    <v-stepper-item
-                        value="3"
-                        editable
+                    <span
+                        v-if="!isReportTitleValid"
+                        class="hint"
                     >
-                        {{ $t("additional:modules.cosi.reportingTool.infrastructureData") }}
-                    </v-stepper-item>
-
-                    <v-divider />
-
-                    <v-stepper-item
-                        value="4"
-                        editable
+                        {{ `${$t("additional:modules.cosi.reportingTool.errors.invalidReportTitle", {reportTitleMaxLength})}` }}
+                    </span>
+                </div>
+                <div class="export-areas mb-3">
+                    <label
+                        for="form-selected-areas"
+                        class="form-label mb-0"
                     >
-                        {{ $t("additional:modules.cosi.reportingTool.analyses") }}
-                    </v-stepper-item>
-
-                    <v-divider />
-
-                    <v-stepper-item
-                        value="5"
-                        editable
+                        {{ $t("additional:modules.cosi.reportingTool.label.selectedAreas") }}
+                    </label>
+                    <input
+                        id="form-selected-areas"
+                        v-model="selectedAreasName"
+                        type="text"
+                        class="form-control"
+                        :maxlength="selectedAreasNameMaxLength"
                     >
-                        {{ $t("additional:modules.cosi.reportingTool.annex") }}
-                    </v-stepper-item>
-                </v-stepper-header>
-                <v-stepper-window>
-                    <v-stepper-window-item
-                        value="1"
+                    <span
+                        v-if="!isSelectedAreasNameValid"
+                        class="hint"
                     >
-                        <h5>
-                            {{ "1. " + $t("additional:modules.cosi.reportingTool.generalReportInformation") }}
-                        </h5>
-                        <form>
-                            <InputText
-                                id="report-title"
-                                :model-value="reportTitle"
-                                :label="$t('additional:modules.cosi.reportingTool.label.title')"
-                                :placeholder="$t('additional:modules.cosi.reportingTool.label.title')"
-                                max-length="50"
-                            />
-                            <InputText
-                                id="report-author"
-                                :model-value="author"
-                                :label="$t('additional:modules.cosi.reportingTool.label.author')"
-                                :placeholder="$t('additional:modules.cosi.reportingTool.label.author')"
-                                max-length="35"
-                            />
-                            <TagGroup
-                                class="mb-3"
-                                :items="frontPageItems"
-                                :label="$t('additional:modules.cosi.reportingTool.label.frontPage')"
-                                @update:selected-items="updateFrontPageItems"
-                            />
-                            <AlertMessage
-                                v-if="selectedReportComponents.includes('Titelseite mit Kartenausschnitt inkl. Neuwerk')"
-                                :text="$t('additional:modules.cosi.reportingTool.alert.infoFrontPage')"
-                                type="info"
-                            />
-                        </form>
-                    </v-stepper-window-item>
-                    <v-stepper-window-item
-                        value="2"
+                        {{ `${$t("additional:modules.cosi.reportingTool.errors.invalidSelectedAreasName", {selectedAreasNameMaxLength})}` }}
+                    </span>
+                </div>
+                <div class="export-author mb-3">
+                    <label
+                        for="form-author"
+                        class="form-label mb-0"
                     >
-                        <h5>
-                            {{ "2. " + $t("additional:modules.cosi.reportingTool.statisticalData") }}
-                        </h5>
-                        <AccordionItem
-                            id="data-settings"
-                            :is-open="true"
-                            :title="$t('additional:modules.cosi.reportingTool.settings')"
-                            icon="bi bi bi-gear"
+                        {{ $t("additional:modules.cosi.reportingTool.label.author") }}
+                    </label>
+                    <input
+                        id="form-author"
+                        v-model="author"
+                        type="text"
+                        class="form-control"
+                        maxlength="35"
+                    >
+                    <span
+                        v-if="!isAuthorValid"
+                        class="hint"
+                    >
+                        {{ `${$t("additional:modules.tools.cosi.reportingTool.errors.invalidAuthor", {authorMaxLength})}` }}
+                    </span>
+                </div>
+                <fieldset>
+                    <h5 class="bold-headline">
+                        {{ $t("additional:modules.cosi.reportingTool.optionalComponents") }}
+                    </h5>
+                    <v-chip-group
+                        v-model="selectedReportComponents"
+                        column
+                        multiple
+                    >
+                        <v-chip
+                            v-for="tag in tagsOptionalComponents"
+                            :key="tag"
+                            :value="tag"
+                            variant="outlined"
+                            filter
                         >
-                            <form>
-                                <SwitchInput
-                                    id="summarise-areas"
-                                    :aria="$t('additional:modules.cosi.reportingTool.label.summariseStatisticalAreas')"
-                                    :checked="isAllAreasSummariseChecked"
-                                    :interaction="() => isAllAreasSummariseChecked = !isAllAreasSummariseChecked"
-                                    :label="$t('additional:modules.cosi.reportingTool.label.summariseStatisticalAreas')"
-                                    class="mb-3"
-                                />
-                                <InputText
-                                    v-if="isAllAreasSummariseChecked"
-                                    id="summed-columns"
-                                    :model-value="selectedAreasName"
-                                    :label="$t('additional:modules.cosi.reportingTool.label.summedColumns')"
-                                    :placeholder="$t('additional:modules.cosi.reportingTool.label.summedColumns')"
-                                    :max-length="selectedAreasNameMaxLength.toString()"
-                                />
-                                <TagGroup
-                                    v-if="higherDistrictLevelLabels.length"
-                                    class="mb-3 mt-5"
-                                    :items="higherDistrictLevelLabels"
-                                    :multiple="true"
-                                    :label="$t('additional:modules.cosi.reportingTool.label.higherDistrictLevel')"
-                                    @update:selected-items="updateSelectedDistricts"
-                                />
-                                <Dropdown-Autocomplete
-                                    :items="selectedDistrictNames"
-                                    :multiple="true"
-                                    :selected-items="selectedStatisticalAreas"
-                                    :label="$t('additional:modules.cosi.reportingTool.label.statisticalAreas')"
-                                    @update:selected-items="updateSelectedStatisticalAreas"
-                                />
-                                <Dropdown-Autocomplete
-                                    :items="years"
-                                    :multiple="false"
-                                    :selected-items="selectedYear"
-                                    :label="$t('additional:modules.cosi.reportingTool.label.referenceYear')"
-                                />
-                            </form>
-                        </AccordionItem>
-                    </v-stepper-window-item>
-                    <v-stepper-window-item
-                        value="3"
+                            {{ tag }}
+                        </v-chip>
+                    </v-chip-group>
+                    <h6 class="bold-headline mt-3">
+                        {{ $t("additional:modules.cosi.reportingTool.infrastructureData") }}
+                    </h6>
+                    <v-chip-group
+                        v-model="selectedReportComponents"
+                        column
+                        multiple
                     >
-                        <h5>
-                            {{ "3. " + $t("additional:modules.cosi.reportingTool.infrastructureData") }}
-                        </h5>
-                    </v-stepper-window-item>
-                    <v-stepper-window-item
-                        value="4"
-                    >
-                        <h5>
-                            {{ "4. " + $t("additional:modules.cosi.reportingTool.analyses") }}
-                        </h5>
-                    </v-stepper-window-item>
-                    <v-stepper-window-item
-                        value="5"
-                    >
-                        <h5>
-                            {{ "5. " + $t("additional:modules.cosi.reportingTool.annex") }}
-                        </h5>
-                    </v-stepper-window-item>
-                </v-stepper-window>
-                <v-stepper-actions
-                    :class="page == 1 ? 'd-flex flex-column-reverse align-items-center justify-content-center' : ''"
-                    @click:next="stepperNext"
-                    @click:prev="stepperPrev"
+                        <v-chip
+                            v-for="feature in tagsInfrastructureData"
+                            :key="feature"
+                            :value="feature"
+                            variant="outlined"
+                            filter
+                        >
+                            {{ feature }}
+                        </v-chip>
+                    </v-chip-group>
+                </fieldset>
+                <div
+                    class="row mt-3"
                 >
-                    <template #prev="{ props }">
-                        <FlatButton
-                            id="confirmButtonFirst"
-                            :icon="page != 1 ? 'bi-arrow-left' : 'bi bi-printer'"
-                            type="button"
-                            :aria-label="page != 1 ? $t('additional:modules.cosi.reportingTool.button.back') : $t('additional:modules.cosi.reportingTool.button.printNow')"
-                            :text="page != 1 ? $t('additional:modules.cosi.reportingTool.button.back') : $t('additional:modules.cosi.reportingTool.button.printNow')"
-                            :interaction="() => page != 1 ? props.onClick() : []"
-                        />
-                    </template>
-                    <template #next="{ props }">
-                        <FlatButton
-                            id="confirmButton"
-                            :icon="page != 5 ? 'bi-arrow-right' : 'bi bi-play'"
-                            type="button"
-                            :aria-label="page != 5 ? $t('additional:modules.cosi.reportingTool.button.confirmAndNext') : $t('additional:modules.cosi.reportingTool.button.generateReport')"
-                            :text="page != 5 ? $t('additional:modules.cosi.reportingTool.button.confirmAndNext') : $t('additional:modules.cosi.reportingTool.button.generateReport')"
-                            :interaction="() => page != 5 ? props.onClick() : printReportView = true"
-                        />
-                    </template>
-                </v-stepper-actions>
-            </v-stepper>
-        </div>
-        <div v-else>
-            <h5>
-                {{ $t("additional:modules.cosi.reportingTool.createReport") }}
-            </h5>
-            <p>
-                {{ $t("additional:modules.cosi.reportingTool.infoText") }}
-            </p>
-            <div class="mt-5 d-flex flex-column align-items-center justify-content-center">
-                <FlatButton
-                    id="download-report"
-                    icon="bi bi-cloud-arrow-down"
-                    type="button"
-                    :aria-label="$t('additional:modules.cosi.reportingTool.button.downloadReport')"
-                    :text="$t('additional:modules.cosi.reportingTool.button.downloadReport')"
-                />
-                <FlatButton
-                    id="back-report"
-                    icon="bi bi-pencil"
-                    type="button"
-                    :aria-label="$t('additional:modules.cosi.reportingTool.button.backToEditView')"
-                    :text="$t('additional:modules.cosi.reportingTool.button.backToEditView')"
-                />
-                <FlatButton
-                    id="new-report"
-                    icon="bi bi-arrow-clockwise"
-                    type="button"
-                    :aria-label="$t('additional:modules.cosi.reportingTool.button.createNewReport')"
-                    :text="$t('additional:modules.cosi.reportingTool.button.createNewReport')"
-                    :interaction="() => printReportView = false"
-                />
-            </div>
+                    <i
+                        class="pe-0 bi bi-info-circle"
+                    />
+                    <p>
+                        {{ $t("additional:modules.cosi.reportingTool.infrastructureHint") }}
+                    </p>
+                </div>
+                <button
+                    class="btn btn-outline lh-1 fs-5 mt-5"
+                    @click.prevent="manageProgressBarView(true)"
+                >
+                    <i
+                        class="bi bi-play-circle pe-2"
+                    />
+                    {{ $t("additional:modules.cosi.reportingTool.generateReport") }}
+                </button>
+            </form>
+            <ReportingToolProgressBarProgressBar
+                v-else
+                :download-name="downloadName"
+                :progress="progressValue"
+                @closeProgressBar="manageProgressBarView(false)"
+            />
         </div>
     </div>
 </template>
@@ -1184,22 +947,6 @@ export default {
 <style scoped lang="scss">
     .v-chip--active {
         background-color: #DCE2F3;
-    }
-    .v-stepper-header, .v-sheet {
-    box-shadow: none;
-    }
-    .v-stepper-header {
-        --stepper-item-avatar-background: $secondary;
-    }
-    .v-stepper-item--selected .v-stepper-item__avatar.v-avatar, .v-stepper-item--complete .v-stepper-item__avatar.v-avatar {
-        background: $secondary;
-    }
-    .v-stepper-item--selected {
-        color: $secondary;
-        font-family: $font_family_accent;
-    }
-    .v-stepper--alt-labels .v-stepper-item {
-        flex-basis: 150px;
     }
     .bold-headline {
         color: $dark_blue;

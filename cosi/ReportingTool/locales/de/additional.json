@@ -2,19 +2,46 @@
     "modules": {
       "cosi": {
           "reportingTool": {
+            "createReport": "Bericht erstellen",
             "creatingReport": "Bericht wird erstellt. Bitte warten.",
             "reportSuccess": "Der Bericht wurde erfolgreich generiert. Der Download startet automatisch.",
             "title": "Reporting Tool",
             "generateReport": "Bericht generieren",
+            "printReport": "Bericht herunterladen",
+            "infoText": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
             "optionalComponents": "Optionale Bestandteile des auszugebenen Berichts:",
-            "infrastructureData": "Infrastrukturdaten:",
+            "infrastructureData": "Fachdaten",
             "backToTemplate": "Zurück zum ReportingTool",
             "infrastructureHint": "Hinweis: Bei mehr als 10 Einrichtungen wird keine Infrastrukturdaten-Tabelle dargestellt.",
+            "generalSettings": "Allgemein",
+            "statisticalData": "Statistische Daten",
+            "analyses": "Analysen",
+            "settings": "Einstellungen",
+            "annex": "Anhang und Drucken",
+            "generalReportInformation": "Allgemeine Berichtsangaben",
             "label": {
               "selectedAreas": "Name der ausgewählten Gebiete",
               "selectedDistricts": "Ausgewählte Gebiete",
               "title": "Titel",
-              "author": "Ersteller:in"
+              "author": "Ersteller:in",
+              "frontPage": "Titelseite",
+              "summedColumns": "Spaltenname der summierten Gebiete",
+              "summariseStatisticalAreas": "Statistische Gebiete summieren",
+              "higherDistrictLevel": "übergeordnete Bezigsebene miteinbeziehen",
+              "statisticalAreas":"Statistische Gebiete auswählen",
+              "referenceYear": "Bezugsjahr"
+            },
+            "alert": {
+              "infoFrontPage": "Neuwerk und Scharhörn werden als separate Karten dargestellt."
+            },
+            "button": {
+              "confirmAndNext": "Bestätigen und weiter",
+              "back": "zurück",
+              "printNow": "Alle Schritte überspringen und sofort drucken",
+              "generateReport": "Bericht erstellen",
+              "downloadReport": "Bericht herunterladen",
+              "backToEditView": "Zurück zur Bearbeitungsansicht",
+              "createNewReport": "Neuen Bericht erstellen"
             },
             "errors": {
               "invalidReportTitle": "Es sind maximal {{reportTitleMaxLength}} Zeichen erlaubt",
