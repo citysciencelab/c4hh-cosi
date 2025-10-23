@@ -1,6 +1,13 @@
 <script>
+import {VCol} from "vuetify/components/VGrid";
+import {VIcon} from "vuetify/components/VIcon";
+
 export default {
     name: "AccessibilityAnalysisLegend",
+    components: {
+        VCol,
+        VIcon
+    },
     props: {
         steps: {
             type: Array,

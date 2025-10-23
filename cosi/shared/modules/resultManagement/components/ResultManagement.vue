@@ -1,0 +1,109 @@
+<script>
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
+import Card from "../../cards/components/Card.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import {uniqueId} from "@shared/js/utils/uniqueId";
+
+export default {
+    name: "ResultManagement",
+    components: {
+        AccordionItem,
+        Card,
+        IconButton
+    },
+    props: {
+        dataSets: {
+            type: Array,
+            required: true,
+            default: () => []
+        },
+        icon: {
+            type: [Boolean, String],
+            default: true
+        },
+        isAccordion: {
+            type: Boolean,
+            default: true
+        },
+        isDownloadAll: {
+            type: Boolean,
+            default: true
+        },
+        isRemoveAll: {
+            type: Boolean,
+            default: true
+        },
+        title: {
+            type: String,
+            default: "additional:modules.tools.cosi.accessibilityAnalysis.resultManagement.title"
+        }
+    },
+    methods: {
+        uniqueId
+    }
+};
+</script>
+
+<template>
+    <component
+        :is="isAccordion ? 'AccordionItem' : 'div'"
+        :id="uniqueId()"
+        :icon="icon"
+        :title="title"
+        :is-open="true"
+    >
+        <h5
+            v-if="!isAccordion"
+            class="mb-3"
+        >
+            <i
+                v-if="icon"
+                :class="`${icon} mt-1 me-3`"
+            />
+            {{ $t(title) }}
+        </h5>
+        <div class="col-12 d-flex">
+            <slot name="top" />
+            <div class="d-flex align-self-center float-right">
+                <IconButton
+                    v-if="isDownloadAll"
+                    class="p-1 btn-light mb-0"
+                    :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.resultManagement.downloadAll')"
+                    icon="bi bi-download"
+                    :interaction="() => $emit('downloadAll')"
+                />
+                <IconButton
+                    v-if="isRemoveAll"
+                    class="p-1 btn-light mb-0"
+                    :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.resultManagement.removeAll')"
+                    icon="bi bi-trash"
+                    :interaction="() => $emit('removeAllData')"
+                />
+            </div>
+        </div>
+        <div class="col-12">
+            <div
+                v-for="(set, index) in dataSets"
+                :key="set"
+            >
+                <Card
+                    :data="set.data"
+                    :downloadable="set.downloadable"
+                    :icon="set.icon"
+                    :removable="set.removable"
+                    :status="set.status"
+                    :visible="set.visible"
+                    :data-index="index"
+                    class="col-12"
+                    @click="$emit('updateActiveSet', index)"
+                    @hide-set="$emit('updateActiveSet', index)"
+                    @remove-set="$emit('removeSet', index)"
+                >
+                    <template #download-menu>
+                        <slot name="card" />
+                    </template>
+                </Card>
+            </div>
+        </div>
+    </component>
+</template>

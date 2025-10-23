@@ -61,7 +61,13 @@
                     "paginationRemoveAll": "Remove all results in this tool",
                     "paginationDownloadAll": "Download all results as GeoJSON",
                     "paginationPrev": "Select previous result",
-                    "paginationNext": "Select next result"
+                    "paginationNext": "Select next result",
+                    "calculatedaVailability": "Calculated availability",
+                    "resultManagement": {
+                      "title": "Result mangement",
+                      "downloadAll": "Download all",
+                      "removeAll": "Remove all"
+                    }
                 }
             }
         }

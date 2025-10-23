@@ -16,7 +16,7 @@ export default {
         <li class="ps-4">
             <button
                 class="dropdown-item"
-                @click.stop="$emit('export-geojson')"
+                @click.stop="$emit('export-geojson', $event)"
             >
                 GeoJSON
             </button>
@@ -24,7 +24,7 @@ export default {
         <li class="ps-4">
             <button
                 class="dropdown-item"
-                @click.stop="$emit('export-png')"
+                @click.stop="$emit('export-png', $event)"
             >
                 PNG
             </button>

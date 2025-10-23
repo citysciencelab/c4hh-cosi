@@ -4,7 +4,6 @@ import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
-import Card from "../../shared/modules/cards/components/Card.vue";
 import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
@@ -22,11 +21,11 @@ import {transformCoordinate, transformCoordinates} from "../utils/transformCoord
 import TabBar from "../../components/TabBar.vue";
 import {simplify} from "../../utils/geometry/simplify";
 import {getFlatCoordinates} from "../../utils/geometry/getFlatCoordinates";
-import {filterAllFeatures} from "../../utils/layer/filterAllFeatures";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import LabeledSlider from "../../shared/modules/slider/components/LabeledSlider.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
+import ResultManagement from "../../shared/modules/resultManagement/components/ResultManagement.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
@@ -42,11 +41,11 @@ export default {
         AccessibilityAnalysisTrafficFlow,
         AccordionItem,
         ButtonGroup,
-        Card,
         DropdownAutocomplete,
         FlatButton,
         IconButton,
         LabeledSlider,
+        ResultManagement,
         SimpleCard,
         SwitchInput,
         TabBar,
@@ -155,6 +154,29 @@ export default {
         // ...mapGetters("Modules/AreaSelector", {areaSelectorGeom: "geometry"}),
         // ...mapGetters("Modules/SelectionManager", ["activeSelection"]),
         // ...mapGetters("Modules/ScenarioBuilder", ["scenarioUpdated"]),
+
+        /**
+         * Gets the datasets for card in shared component resultManagement.
+         * @returns {Object[]} the datasets for card.
+         */
+        cardDatasets () {
+            const cardData = [];
+
+            this.dataSets.forEach(set => {
+                cardData.push(
+                    {
+                        data: this.getData(set),
+                        downloadable: true,
+                        icon: this.getIconByTransportType(set?.inputs?.transportType),
+                        removable: true,
+                        status: this.dataSets.indexOf(set) === this.activeSet ? "active" : "",
+                        visible: true
+                    }
+                );
+            });
+
+            return cardData;
+        },
 
         /**
          * Checks if an analysis set is active.
@@ -655,10 +677,12 @@ export default {
 
         },
         exportAsGeoJson,
-        // pagination features
-        removeSet (set) {
-            const index = this.dataSets.indexOf(set);
-
+        /**
+         * Removes the set from data sets.
+         * @param {index} Number - The index of data.
+         * @returns {void}
+         */
+        removeSet (index) {
             if (this.activeSet === this.dataSets.length - 1) {
                 this.setActiveSet(this.activeSet - 1);
             }
@@ -680,8 +704,21 @@ export default {
             this.removePointMarker();
             // this.removeLayerFromMap(this.directionsLayer);
         },
-        downloadSet (set) {
-            const index = this.dataSets.indexOf(set);
+        /**
+         * Removes all the data.
+         * @returns {void}
+         */
+        removeAllData () {
+            this.removeAll();
+            this.setDataSets([]);
+        },
+        /**
+         * Downloads the dataset in geojson format.
+         * @param {Event} evt - The click event.
+         * @returns {void}
+         */
+        downloadSet (evt) {
+            const index = evt.target.closest(".card").getAttribute("data-index");
 
             downloadGeoJson(this.dataSets[index].geojson);
         },
@@ -694,13 +731,14 @@ export default {
 
         /**
          * Downloads the screenshot of the given set.
-         * @param {Object} set - The set containing the screenshot.
+         * @param {Event} evt - The click event.
          * @returns {void}
          */
-        downloadScreenshot (set) {
-            const link = document.createElement("a");
+        downloadScreenshot (evt) {
+            const index = evt.target.closest(".card").getAttribute("data-index"),
+                link = document.createElement("a");
 
-            link.href = set.inputs.screenshot;
+            link.href = this.dataSets[index].inputs.screenshot;
             link.download = "Erreichbarkeitsanalyse.png";
 
             link.click();
@@ -780,7 +818,7 @@ export default {
         /**
          *
          *
-         * @param set - analysis set
+         * @param {Object} set - analysis set
          * @returns {Boolean} True if the given set is the active set, false otherwise.
          */
         isSetActive (set) {
@@ -807,11 +845,16 @@ export default {
             }
         },
 
-        updateActiveSet (set) {
-            if (this.dataSets.indexOf(set) !== this.activeSet) {
-                this.setActiveMode(this.getModeByType(set.inputs.mode));
-                this.setActiveSet(this.dataSets.indexOf(set));
-                if (set.inputs.isAllFacilitiesChecked) {
+        /**
+         * Updates the active data set.
+         * @param {index} Number - The index of data set.
+         * @returns {void}
+         */
+        updateActiveSet (index) {
+            if (index !== this.activeSet) {
+                this.setActiveMode(this.getModeByType(this.dataSets[index].inputs.mode));
+                this.setActiveSet(index);
+                if (this.dataSets[index].inputs.isAllFacilitiesChecked) {
                     this.isAllFacilitiesChecked = true;
                 }
                 return;
@@ -1011,36 +1054,29 @@ export default {
         />
         <div v-if="dataSets.length > 0">
             <hr>
-            <h5 class="mb-3">
-                Berechnete Erreichbarkeiten
-            </h5>
-            <AccessibilityAnalysisLegend
-                v-if="dataSets.length > 0"
-                :steps="steps"
-                :colors="legendColors"
-            />
-            <div
-                v-for="set in dataSets"
-                :key="set"
+            <ResultManagement
+                :data-sets="cardDatasets"
+                :title="$t('additional:modules.tools.cosi.accessibilityAnalysis.calculatedaVailability')"
+                :is-accordion="true"
+                icon="bi bi-card-text"
+                @download-all="downloadAll"
+                @remove-all-data="removeAllData"
+                @remove-set="removeSet"
+                @update-active-set="updateActiveSet"
             >
-                <Card
-                    :data="getData(set)"
-                    :downloadable="true"
-                    :icon="getIconByTransportType(set.inputs.transportType)"
-                    :removable="true"
-                    :status="dataSets.indexOf(set) === activeSet ? 'active' : ''"
-                    @click="updateActiveSet(set)"
-                    @hideSet="updateActiveSet(set)"
-                    @removeSet="removeSet(set)"
-                >
-                    <template #download-menu>
-                        <AccessibilityAnalysisExport
-                            @export-geojson="downloadSet(set)"
-                            @export-png="downloadScreenshot(set)"
-                        />
-                    </template>
-                </Card>
-            </div>
+                <template #top>
+                    <AccessibilityAnalysisLegend
+                        :steps="steps"
+                        :colors="legendColors"
+                    />
+                </template>
+                <template #card>
+                    <AccessibilityAnalysisExport
+                        @export-geojson="downloadSet($event)"
+                        @export-png="downloadScreenshot($event)"
+                    />
+                </template>
+            </ResultManagement>
         </div>
     </div>
 </template>
