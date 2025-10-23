@@ -42,19 +42,10 @@ export default {
             return {
                 headers: [
                     {
-                        itemProperty: "id",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.id"),
-                        sortable: "numeric"
-                    },
-                    {
-                        itemProperty: "quelle",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.quelle"),
-                        sortable: "string"
-                    },
-                    {
-                        itemProperty: "kategorie",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.kategorie"),
-                        sortable: "string"
+                        itemProperty: "zeitstempel",
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.zeitstempel"),
+                        sortable: "date",
+                        sortableDateFormat: "DD.MM.YYYY HH:mm"
                     },
                     {
                         itemProperty: "status",
@@ -68,10 +59,19 @@ export default {
                         sortable: "string"
                     },
                     {
-                        itemProperty: "zeitstempel",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.zeitstempel"),
-                        sortable: "date",
-                        sortableDateFormat: "DD.MM.YYYY HH:mm"
+                        itemProperty: "kategorie",
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.kategorie"),
+                        sortable: "string"
+                    },
+                    {
+                        itemProperty: "quelle",
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.quelle"),
+                        sortable: "string"
+                    },
+                    {
+                        itemProperty: "id",
+                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.id"),
+                        sortable: "numeric"
                     },
                     {
                         itemProperty: "aktion",
@@ -84,16 +84,16 @@ export default {
                         geoMarkerState = this.geoMarkerState(featureProperties);
 
                     return {
-                        id: this.geoMarkerShortFeatureId(item.getId()),
-                        quelle: featureProperties.quelle ?? null,
-                        kategorie: featureProperties.kategorie ?? null,
+                        zeitstempel: featureProperties.zeitstempel
+                            ? formatDateTime(featureProperties.zeitstempel)
+                            : null,
                         status: geoMarkerState
                             ? this.$t("additional:modules.geoMarker.status." + geoMarkerState)
                             : null,
                         beschreibung: featureProperties.beschreibung ?? null,
-                        zeitstempel: featureProperties.zeitstempel
-                            ? formatDateTime(featureProperties.zeitstempel)
-                            : null,
+                        kategorie: featureProperties.kategorie ?? null,
+                        quelle: featureProperties.quelle ?? null,
+                        id: this.geoMarkerShortFeatureId(item.getId()),
                         // Feature id, not visible in table, but required to access the feature later.
                         featureId: item.getId()
                     };
