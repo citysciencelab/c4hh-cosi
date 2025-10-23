@@ -24,7 +24,7 @@ import {simplify} from "../../utils/geometry/simplify";
 import {getFlatCoordinates} from "../../utils/geometry/getFlatCoordinates";
 import {filterAllFeatures} from "../../utils/layer/filterAllFeatures";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-import SliderItem from "@shared/modules/slider/components/SliderItem.vue";
+import LabeledSlider from "../../shared/modules/slider/components/LabeledSlider.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
@@ -46,8 +46,8 @@ export default {
         DropdownAutocomplete,
         FlatButton,
         IconButton,
+        LabeledSlider,
         SimpleCard,
-        SliderItem,
         SwitchInput,
         TabBar,
         ToolInfo
@@ -969,29 +969,14 @@ export default {
             group="scaleUnits"
             @show-view="toggleLevel"
         />
-        <div class="mb-3">
-            <div class="d-flex justify-content-center mb-1">
-                <input
-                    class="form-control form-control-sm fs-5"
-                    id="exampleFormControlInput1"
-                    :value="scaleUnit === 'time' ? time : distance"
-                    @input="updateDistance($event.target.value)"
-                >
-            </div>
-            <SliderItem
-                :id="'routing-slider-input'"
-                aria="test"
-                class="mb-1"
-                :value="scaleUnit === 'time' ? time : distance"
-                :min="0"
-                :max="getScaleUnitByType(scaleUnit).max"
-                :interaction="event => updateDistance(event.target.value)"
-            />
-            <div class="d-flex justify-content-between value">
-                <span>0 {{ getScaleUnitByType(scaleUnit).unit }}</span>
-                <span>{{ getScaleUnitByType(scaleUnit).max }} {{ getScaleUnitByType(scaleUnit).unit }}</span>
-            </div>
-        </div>
+        <LabeledSlider
+            class="mb-3"
+            :min="0"
+            :max="getScaleUnitByType(scaleUnit).max"
+            :unit="getScaleUnitByType(scaleUnit).unit"
+            :model-value="scaleUnit === 'time' ? time : distance"
+            @update:model-value="updateDistance"
+        />
         <SwitchInput
             v-if="mode === 'facility'"
             :id="'featureOutline'"
@@ -1071,13 +1056,6 @@ export default {
         }
 
         font-family: $font_family_default;
-
-        #exampleFormControlInput1 {
-            width: 8ch;
-            text-align: center;
-            color: $secondary;
-            font-family: $font_family_accent;
-        }
     }
 
 </style>
