@@ -52,6 +52,17 @@ describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
                         currentMenuWidth: () => 500,
                         expanded: () => true
                     }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        registerListener: () => {
+                            return null;
+                        },
+                        unregisterListener: () => {
+                            return null;
+                        }
+                    }
                 }
             },
             getters: {

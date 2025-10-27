@@ -12,6 +12,12 @@ export default {
         SelectableList,
         GeoMarkerForm
     },
+    props: {
+        tabActive: {
+            type: Boolean,
+            required: true
+        }
+    },
     data () {
         return {
             selectedListItemId: null,
@@ -128,6 +134,15 @@ export default {
                 }
             },
             deep: true
+        },
+        async tabActive (val) {
+            this.unregisterListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
+
+            if (val) {
+                await this.$nextTick();
+
+                this.registerListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
+            }
         }
     },
     methods: {
@@ -136,13 +151,20 @@ export default {
             "setGeoMarkerFeatureSelected",
             "setGeoMarkerUpdateLayerIds"
         ]),
-
-        ...mapActions("Maps", ["setCenter", "setZoom", "placingPointMarker", "removePointMarker"]),
+        ...mapActions("Maps", [
+            "setCenter",
+            "setZoom",
+            "placingPointMarker",
+            "removePointMarker",
+            "registerListener",
+            "unregisterListener"
+        ]),
         ...mapActions("Alerting", ["addSingleAlert"]),
         ...mapActions("Modules/GeoMarker", [
             "setMapInteraction",
             "rollbackGeoMarkerUpdateFeature",
-            "loadFeaturesForEditLayer"
+            "loadFeaturesForEditLayer",
+            "requestGFI"
         ]),
         setSelectedFeature (item) {
             this.setGeoMarkerFeatureSelected(

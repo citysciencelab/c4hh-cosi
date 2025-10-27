@@ -1,5 +1,5 @@
 <script>
-import {mapGetters, mapMutations} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
@@ -159,11 +159,21 @@ export default {
             this.filterSelections.geom = new GeoJSON().readGeometry(geoJson);
             this.filterUpdated = true;
         },
-        tabActive (val) {
+        async tabActive (val) {
+            this.unregisterListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
+
             if (!val) {
                 this.graphicalSelectOpen = false;
             }
+            else {
+                await this.$nextTick();
+
+                this.registerListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
+            }
         }
+    },
+    mounted () {
+        this.registerListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
     },
     methods: {
         ...mapMutations("Modules/GeoMarker", [
@@ -171,6 +181,13 @@ export default {
             "setGeoMarkerFeatureList",
             "setGeoMarkerActiveTab",
             "setIsFilterApplied"
+        ]),
+        ...mapActions("Modules/GeoMarker", [
+            "requestGFI"
+        ]),
+        ...mapActions("Maps", [
+            "registerListener",
+            "unregisterListener"
         ]),
         /**
          * Applies the filter settings, checks the layer visibility and updates the filtered features.

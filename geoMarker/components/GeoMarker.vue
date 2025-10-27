@@ -199,7 +199,10 @@ export default {
                 aria-labelledby="tabList"
                 tabindex="0"
             >
-                <TabListContent ref="tabList" />
+                <TabListContent
+                    ref="tabList"
+                    :tab-active="geoMarkerActiveTab === 'tabList'"
+                />
             </div>
         </div>
     </div>

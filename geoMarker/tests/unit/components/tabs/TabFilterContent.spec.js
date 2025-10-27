@@ -159,6 +159,17 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                             return side === "secondaryMenu";
                         }
                     }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        registerListener: () => {
+                            return null;
+                        },
+                        unregisterListener: () => {
+                            return null;
+                        }
+                    }
                 }
             },
             actions: {

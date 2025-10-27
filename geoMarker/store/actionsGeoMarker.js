@@ -9,6 +9,7 @@ import createTransactionFeature from "../utils/createTransactionFeature";
 import prepareFeatureProperties from "../utils/prepareFeatureProperties";
 import mergeFormValuesWithProperties from "../utils/mergeFormValuesWithProperties";
 import wfsSendTransaction from "../utils/wfsSendTransaction";
+import {nextTick} from "vue";
 
 const actions = {
     /**
@@ -552,6 +553,57 @@ const actions = {
         }
 
         commit("setRollbackGeoMarkerFeature", null);
+    },
+    /**
+     * Detects if one or more GeoMarkers are located at the clicked position (buffer 20 meters) and opens the list, if GeoMarkers are found
+     * @param {Object} filterinputValue - The event, initiated by the click in the map, contains the clicked coordinates
+     * @returns {void}
+     */
+    async requestGFI ({commit, getters}, input) {
+        let allFeaturesToCheck = [];
+
+        Object.values(getters.departments).forEach(dept => {
+            const layersToCheck = [dept.layerIds.offen, dept.layerIds.inaktiv, dept.layerIds.geschlossen],
+                map = mapCollection.getMap("2D");
+
+            layersToCheck.forEach(layerId => {
+                const layer = map ? map.getLayers().getArray()?.find(l => l.get("id") === layerId) : undefined;
+
+                if (layer && layer.isVisible()) {
+                    allFeaturesToCheck = allFeaturesToCheck.concat(layer.getSource().getFeatures());
+                }
+            });
+        });
+
+        const subSetOfUniqueFeatures = [],
+            seenIds = new Set();
+
+        allFeaturesToCheck.forEach(feat => {
+            const id = feat.getId();
+
+            if (!seenIds.has(id)) {
+                const geometry = feat.getGeometry();
+
+                if (geometry) {
+                    const diffX = geometry.getCoordinates()[0] - input.coordinate[0],
+                        diffY = geometry.getCoordinates()[1] - input.coordinate[1];
+
+                    if (Math.sqrt((diffX * diffX) + (diffY * diffY)) <= 20) {
+                        subSetOfUniqueFeatures.push(feat);
+                    }
+                }
+
+                seenIds.add(id);
+            }
+        });
+
+        // if one more more GeoMarkers have been found, open the list to show all of them (select the first one)
+        if (subSetOfUniqueFeatures.length > 0) {
+            commit("setGeoMarkerFeatureList", subSetOfUniqueFeatures);
+            commit("setGeoMarkerActiveTab", "tabList");
+            await nextTick();
+            commit("setGeoMarkerFeatureSelected", subSetOfUniqueFeatures[0]);
+        }
     }
 };
 
