@@ -109,7 +109,6 @@ export default {
             chips
             closable-chips
             hide-details
-            desensity="comfortable"
             @update:modelValue="(value) => $emit('update:selected-items', value)"
         >
             <template

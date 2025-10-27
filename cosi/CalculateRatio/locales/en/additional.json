@@ -5,9 +5,9 @@
                 "calculateRatio": {
                     "title": "Supply Analysis",
                     "description": "With the coverage analysis you can determine the coverage of an area with a certain type of facility / infrastructure (see 'Topics').",
-                    "dataA": "Facilities",
-                    "dataB": "Statistical Data",
-                    "warningNoData": "Neither statistical data, nor facility data are loaded. Please select some areas first with the area selection tool or load topics from the main menu.",
+                    "subjectData": "Subject Data",
+                    "statData": "Statistical Data",
+                    "warningNoData": "No areas or subject data have been selected yet. Please select at least one area and/or subject data set. To select areas, use the 'Select area' function. You can select subject data on the left-hand side under 'Add topics'.",
                     "noFeaturesWarning": "You have not selected any areas as a basis for statistical data. Please load some areas first via the area selection.",
                     "noFacilitiesWarning": "Sie haben keine Themengebiete als Grundlage für Einrichtungsdaten ausgewählt. Bitte wählen Sie zuerst die gewünschten Themengebiete über das Hauptmenü aus.",
                     "placeholderA": "Select (counter) parameter",

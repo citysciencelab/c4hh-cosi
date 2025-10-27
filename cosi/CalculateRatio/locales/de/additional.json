@@ -6,9 +6,9 @@
                 "calculateRatio": {
                     "title": "Versorgungsanalyse",
                     "description": "Mit der Versorgungsanalyse können Sie die Abdeckung eines Gebietes mit einem bestimmten Einrichtungstyp / Infrastruktur ermitteln (s. 'Themen'). Sie können durch einen Klick auf 'Einrichtungen' auch mehrere statistische Werte verrechnen.",
-                    "dataA": "Einrichtungen",
-                    "dataB": "Statistische Daten",
-                    "warningNoData": "Es sind weder statistische Daten, noch Themendaten geladen. Bitte wählen Sie mit der Gebietsauswahl zuerst einige Gebiete aus oder Laden Sie Themen aus dem Hauptmenü.",
+                    "subjectData": "Fachdaten",
+                    "statData": "Statistische Daten",
+                    "warningNoData": "Bisher wurden weder Gebiete noch Fachdaten ausgewählt. Wählen Sie bitte mindestens ein Gebiet und/oder Fachdatensatz aus. Um Gebiete auszuwählen, verwenden Sie die Funktion 'Gebiet auswählen'. Fachdaten können Sie auf der linken Seite unter 'Themen hinzufügen' auswählen.",
                     "noFeaturesWarning": "Sie haben keine Gebiete als Grundlage für statistische Daten ausgewählt. Bitte laden Sie zuerst einige Gebiete über die Gebietsauswahl.",
                     "noFacilitiesWarning": "Sie haben keine Themengebiete als Grundlage für Einrichtungsdaten ausgewählt. Bitte wählen Sie zuerst die gewünschten Themengebiete über das Hauptmenü aus.",
                     "placeholderA": "Paramenter (Zähler) auswählen",

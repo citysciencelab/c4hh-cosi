@@ -76,7 +76,7 @@ export default {
         >
             <p
                 v-if="summary"
-                class="mb-1"
+                class="mb-2"
             >
                 {{ summary }}
             </p>

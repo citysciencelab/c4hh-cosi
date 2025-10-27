@@ -26,7 +26,7 @@ export default {
             >
                 <i :class="icon" />
             </div>
-            <div class="ps-4 py-1 flex-grow-1">
+            <div class="ps-4 flex-grow-1">
                 <slot />
             </div>
             <button
