@@ -9,7 +9,8 @@
       "wrongAddressParameter": "Der parametrisierte Aufruf des Portals ist leider fehlgeschlagen!",
       "wrongAddressParameterMessage": "Es konnte keine Adresse gefunden werde. Bitte prüfen Sie die Eingabeparameter.",
       "send": "Senden",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "noParcelSelected": "Bitte wählen Sie einen Ort in der Karte aus."
     }
   }
 }

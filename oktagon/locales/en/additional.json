@@ -9,7 +9,8 @@
       "wrongAddressParameter": "The parameterized call of the portal has unfortunately failed!",
       "wrongAddressParameterMessage": "No address could be found. Please check the input parameters.",
       "send": "Send",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "noParcelSelected": "Please select a location in the map."
     }
   }
 }

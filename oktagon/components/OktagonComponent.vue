@@ -1,5 +1,5 @@
 <script>
-import {mapGetters, mapActions} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEventCoordinates";
 import findWhereJs from "../../../src/shared/js/utils/findWhereJs";
 import layerCollection from "@core/layers/js/layerCollection";
@@ -17,27 +17,29 @@ export default {
         ])
     },
     mounted () {
-        this.registerListener({type: "click", listener: this.onMapClick,
-            keyForBoundFunctions: "onMapClick"});
+        this.registerListener({type: "click", listener: this.onMapClickOktagon,
+            keyForBoundFunctions: "onMapClickOktagon"});
         this.$nextTick(() => {
             this.initURLParameter();
         });
     },
     unmounted () {
-        this.unregisterListener({type: "click", listener: this.onMapClick,
-            keyForBoundFunctions: "onMapClick"});
+        this.unregisterListener({type: "click", listener: this.onMapClickOktagon,
+            keyForBoundFunctions: "onMapClickOktagon"});
+        this.removePointMarker();
     },
     methods: {
-        ...mapActions("Maps", ["zoomToCoordinates", "registerListener", "unregisterListener", "placingPointMarker"]),
+        ...mapActions("Maps", ["zoomToCoordinates", "registerListener", "unregisterListener", "placingPointMarker", "removePointMarker"]),
         ...mapActions("Modules/OktagonComponent", ["requestALKISWMS", "initURLParameter", "addCoordinatesToSubmitObject"]),
         ...mapActions("Menu", ["toggleMenu"]),
+        ...mapMutations("Modules/OktagonComponent", ["setSubmitObject"]),
 
         /**
-        * OnMapClick Shows the sidebar with it parameters
+        * onMapClickOktagon Shows the sidebar with it parameters
         * @param {Event} evt the click event
         * @returns {void}
         */
-        async onMapClick (evt) {
+        async onMapClickOktagon (evt) {
             if (!this.expanded("secondaryMenu")) {
                 this.toggleMenu("secondaryMenu");
             }
@@ -67,6 +69,18 @@ export default {
         */
         async onSubmit () {
             window.open(await this.submitURL, "_self");
+        },
+
+        /**
+        * Cancels the current selection and resets everything
+        * @returns {void}
+        */
+        close () {
+            this.setSubmitObject({});
+            this.removePointMarker();
+            if (this.expanded("secondaryMenu")) {
+                this.toggleMenu("secondaryMenu");
+            }
         },
         /**
         * Sets the focus to the close.
@@ -106,8 +120,17 @@ export default {
                     </tr>
                 </tbody>
             </table>
+            <div
+                v-else
+                class="alert alert-warning text-center p-3"
+            >
+                {{ $t("additional:modules.oktagon.noParcelSelected") }}
+            </div>
         </div>
-        <div class="form-group form-group-sm row">
+        <div
+            v-if="Object.keys(submitObject).length > 0"
+            class="form-group form-group-sm row"
+        >
             <div class="col-md-6">
                 <button
                     id="oktagonCloseButton"

@@ -7,8 +7,7 @@ import OktagonComponent from "../../../components/OktagonComponent.vue";
 config.global.mocks.$t = key => key;
 
 describe("OktagonComponent.vue", () => {
-    let store,
-        wrapper;
+    let store, wrapper;
 
     const mockConfigJson = {
         Portalconfig: {
@@ -26,7 +25,7 @@ describe("OktagonComponent.vue", () => {
      * Creates a mock Vuex store for Oktagon tests
      * @param {Object} [submitObject={}] - Initial submitObject state
      * @returns {import('vuex').Store} Vuex store instance
-     */
+    */
     function createMockStore (submitObject = {}) {
         return createStore({
             modules: {
@@ -54,7 +53,11 @@ describe("OktagonComponent.vue", () => {
                                 addCoordinatesToSubmitObject: sinon.stub(),
                                 parseXML: sinon.stub()
                             },
-                            mutations: {}
+                            mutations: {
+                                setSubmitObject: sinon.spy((state, payload) => {
+                                    state.submitObject = payload;
+                                })
+                            }
                         }
                     }
                 },
@@ -64,18 +67,27 @@ describe("OktagonComponent.vue", () => {
                     actions: {
                         setCenter: sinon.stub(),
                         setZoomLevel: sinon.stub(),
-                        registerListener: sinon.stub()
+                        registerListener: sinon.stub(),
+                        removePointMarker: sinon.stub(),
+                        placingPointMarker: sinon.stub()
                     }
                 },
-                MapMarker: {namespaced: true, actions: {placingPointMarker: sinon.stub()}},
-                Alerting: {namespaced: true, actions: {addSingleAlert: sinon.stub()}},
-                Menu: {namespaced: true, getters: {expanded: () => () => false}, actions: {toggleMenu: sinon.stub()}}
+                Menu: {
+                    namespaced: true,
+                    getters: {
+                        expanded: () => key => key === "secondaryMenu"
+                    },
+                    actions: {
+                        toggleMenu: sinon.stub()
+                    }
+                }
             },
             state: {configJson: mockConfigJson}
         });
     }
+
     beforeEach(() => {
-        store = createMockStore();
+        store = createMockStore({foo: "bar"});
         wrapper = shallowMount(OktagonComponent, {global: {plugins: [store]}});
     });
 
@@ -89,7 +101,8 @@ describe("OktagonComponent.vue", () => {
         expect(focusSpy.calledOnce).to.be.true;
     });
 
-    it("shows sidebar and buttons on map click", () => {
+    it("shows sidebar and buttons on map click", async () => {
+        await wrapper.vm.$nextTick();
         expect(wrapper.find("#oktagon").exists()).to.be.true;
         expect(wrapper.find("#oktagonSubmitButton").exists()).to.be.true;
         expect(wrapper.find("#oktagonCloseButton").exists()).to.be.true;
@@ -104,5 +117,19 @@ describe("OktagonComponent.vue", () => {
         expect(rows.length).to.equal(2);
         expect(rows[0].text()).to.include("foo").and.to.include("bar");
         expect(rows[1].text()).to.include("baz").and.to.include("qux");
+    });
+
+    it("calls close() correctly when Close button is clicked", async () => {
+        const removePointMarkerSpy = sinon.spy(wrapper.vm, "removePointMarker"),
+            toggleMenuSpy = sinon.spy(wrapper.vm, "toggleMenu"),
+            setSubmitObjectSpy = sinon.spy(wrapper.vm, "setSubmitObject"),
+
+            closeButton = wrapper.find("#oktagonCloseButton");
+
+        await closeButton.trigger("click");
+
+        expect(setSubmitObjectSpy.calledOnceWith({})).to.be.true;
+        expect(removePointMarkerSpy.calledOnce).to.be.true;
+        expect(toggleMenuSpy.calledOnceWith("secondaryMenu")).to.be.true;
     });
 });
