@@ -3,6 +3,7 @@ import {mount} from "@vue/test-utils";
 import GeoMarkerForm from "../../../components/GeoMarkerForm.vue";
 import {createStore} from "vuex";
 import sinon from "sinon";
+import dayjs from "dayjs";
 import departments from "../../../../../portalconfigs/geomarker/resources/departments.json";
 import categories from "../../../../../portalconfigs/geomarker/resources/categories.json";
 
@@ -182,5 +183,12 @@ describe("addons/geoMarker/components/GeoMarkerForm.vue", () => {
         };
 
         expect(wrapper.vm.formValidation).to.be.false;
+    });
+
+    it("sets the wiedervorlage field correctly with the reminderDate, if status is inactive", () => {
+        wrapper.vm.reminderDate = dayjs("2023-01-10T00:00:00.000Z").toISOString();
+        wrapper.vm.departmentData.steuerungsstelle.status = "inaktiv";
+
+        expect(wrapper.vm.newGeoMarker.wie_steuerungsstelle).to.equal(wrapper.vm.reminderDate);
     });
 });

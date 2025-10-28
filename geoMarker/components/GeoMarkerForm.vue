@@ -170,17 +170,15 @@ export default {
                 if (department?.fields) {
                     Object.entries(department.fields).forEach(([fieldKey, fieldValue]) => {
                         if (fieldKey === "wiedervorlage" && currentStatus !== "offen") {
-                            if (currentStatus !== "offen") {
-                                departmentValues[fieldValue] = this.mode === "create"
-                                    ? dayjs(this.reminderDate).toISOString()
-                                    : dayjs(departmentFormData[fieldKey]).toISOString();
-                            }
-                            else {
-                                departmentValues[fieldValue] = "";
-                            }
-                        }
+                            const dateValue = this.mode === "create"
+                                ? this.reminderDate
+                                : departmentFormData[fieldKey];
 
-                        if (departmentFormData[fieldKey] !== null && departmentFormData[fieldKey] !== undefined) {
+                            departmentValues[fieldValue] = dateValue
+                                ? dayjs(dateValue).toISOString()
+                                : null;
+                        }
+                        else if (departmentFormData[fieldKey] !== null) {
                             departmentValues[fieldValue] = departmentFormData[fieldKey];
                         }
                     });
