@@ -70,7 +70,8 @@ export default {
             "geoMarkerFeatureList",
             "geoMarkerUpdateFeature",
             "isFilterApplied",
-            "geoMarkerShortFeatureId"
+            "geoMarkerShortFeatureId",
+            "isGemisFeature"
         ]),
         ...mapGetters(["visibleLayerConfigs"]),
         /**
@@ -203,6 +204,9 @@ export default {
             });
 
             return layerIdsArray;
+        },
+        isGemisFeatureEditNotAllowed () {
+            return this.isGemisFeature(this.selectedFeature);
         }
     },
     watch: {
@@ -312,6 +316,10 @@ export default {
          */
         extractDepartmentData (featureProps) {
             const departmentData = {};
+
+            if (this.isGemisFeatureEditNotAllowed) {
+                return departmentData;
+            }
 
             Object.keys(this.departments).forEach(departmentId => {
                 const department = this.departments[departmentId],
@@ -545,7 +553,7 @@ export default {
          */
         getDepartmentsAndCategoriesFromState () {
             this.categories = JSON.parse(JSON.stringify(this.$store.getters["Modules/GeoMarker/categories"]));
-            this.departments = JSON.parse(JSON.stringify(this.$store.getters["Modules/GeoMarker/departments"]));
+            this.departments = JSON.parse(JSON.stringify(this.$store.getters["Modules/GeoMarker/departmentsAllowNewEdit"]));
         },
         /**
          * Resets the form to its initial state
@@ -880,6 +888,7 @@ export default {
                         </label>
 
                         <select
+                            v-if="!isGemisFeatureEditNotAllowed"
                             id="categories"
                             class="form-select"
                             :value="selectedCategoryId"
@@ -894,6 +903,13 @@ export default {
                                 {{ categories[categoryId].name }}
                             </option>
                         </select>
+
+                        <p
+                            v-else
+                            class="infoFeatureEditNotAllowed"
+                        >
+                            {{ $t("additional:modules.geoMarker.geoMarkerForm.gemisNoEditInfo") }}
+                        </p>
                     </div>
 
                     <label for="geomarkerDescription">
@@ -903,7 +919,11 @@ export default {
                     <textarea
                         id="geomarkerDescription"
                         v-model="geomarkerDescription"
-                        class="form-control"
+                        :class="[
+                            'form-control',
+                            isGemisFeatureEditNotAllowed ? 'no-edit-cursor' : ''
+                        ]"
+                        :readOnly="isGemisFeatureEditNotAllowed"
                         :rows="mode === 'create' ? '8' : '12'"
                     />
 
@@ -913,6 +933,7 @@ export default {
                         v-model="reminderDate"
                         :label="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
                         type="date"
+                        :disabled="isGemisFeatureEditNotAllowed"
                         :placeholder="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
                     />
                 </GeoMarkerFormBox>
@@ -973,6 +994,12 @@ export default {
                             @onScreenshotDeleted="onScreenshotDeleted"
                         />
                     </div>
+
+                    <!-- Overlay for Edit-Not-Allowed -->
+                    <div
+                        v-if="isGemisFeatureEditNotAllowed"
+                        class="attachmentSectionOverlay"
+                    />
                 </GeoMarkerFormBox>
 
                 <GeoMarkerFormBox
@@ -989,7 +1016,7 @@ export default {
                                 :label="department.name"
                                 :aria="department.name"
                                 :checked="Boolean(departmentData[departmentId])"
-                                :disabled="false"
+                                :disabled="isGemisFeatureEditNotAllowed"
                                 :interaction="() => toggleDepartment(departmentId)"
                             />
                         </template>
@@ -997,7 +1024,10 @@ export default {
                 </GeoMarkerFormBox>
             </div>
 
-            <div class="selectedDepartments">
+            <div
+                v-if="!isGemisFeatureEditNotAllowed"
+                class="selectedDepartments"
+            >
                 <GeoMarkerFormBox
                     class="selectedDepartmentsTableSection"
                     :title="$t('additional:modules.geoMarker.geoMarkerForm.selectedDepartmentsTitle')"
@@ -1052,7 +1082,10 @@ export default {
             </div>
         </div>
 
-        <div class="footer">
+        <div
+            v-if="!isGemisFeatureEditNotAllowed"
+            class="footer"
+        >
             <SwitchInput
                 v-if="showCreateAnotherSwitch && mode === 'create'"
                 id="createAnotherGeoMarker"
@@ -1110,12 +1143,24 @@ div.GeoMarkerForm {
                     flex-direction: column;
                     gap: 0.5rem;
                 }
+
+                textarea.no-edit-cursor {
+                    cursor: default;
+                }
+
+                p.infoFeatureEditNotAllowed {
+                    margin: 0.25rem 0;
+                    font-weight: bold;
+                    font-style: italic;
+                    cursor: default;
+                }
             }
 
             div.attachmentSection {
                 display: flex;
                 flex-direction: column;
                 gap: 1rem;
+                position: relative;
 
                 div.attachment {
                     div.editMode {
@@ -1128,6 +1173,18 @@ div.GeoMarkerForm {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
+                }
+
+                .attachmentSectionOverlay {
+                    position: absolute;
+                    top: 0.4rem;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(255,255,255,0.6);
+                    z-index: 21;
+                    pointer-events: all;
+                    border-radius: 0.5rem;
                 }
             }
         }

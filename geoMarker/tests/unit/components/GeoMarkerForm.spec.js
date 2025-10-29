@@ -1,6 +1,7 @@
 import {expect} from "chai";
 import {mount} from "@vue/test-utils";
 import GeoMarkerForm from "../../../components/GeoMarkerForm.vue";
+import GeoMarkerFormBox from "../../../components/GeoMarkerFormBox.vue";
 import {createStore} from "vuex";
 import sinon from "sinon";
 import dayjs from "dayjs";
@@ -10,7 +11,8 @@ import categories from "../../../../../portalconfigs/geomarker/resources/categor
 describe("addons/geoMarker/components/GeoMarkerForm.vue", () => {
     let wrapper,
         store,
-        stubs;
+        stubs,
+        mockGemisFeature = false;
 
     beforeEach(() => {
         window.activeDirectoryUser = {username: "testuser"};
@@ -25,11 +27,13 @@ describe("addons/geoMarker/components/GeoMarkerForm.vue", () => {
                             getters: {
                                 categories: state => state.categories,
                                 departments: state => state.departments,
+                                departmentsAllowNewEdit: state => state.departments,
                                 statusOptions: state => state.statusOptions,
                                 newGeoMarkerFeature: state => state.newGeoMarkerFeature,
                                 geoMarkerFeatureList: state => state.geoMarkerFeatureList,
                                 geoMarkerUpdateFeature: state => state.geoMarkerUpdateFeature,
-                                isFilterApplied: state => state.isFilterApplied
+                                isFilterApplied: state => state.isFilterApplied,
+                                isGemisFeature: () => () => mockGemisFeature
                             },
                             state: () => ({
                                 categories: categories.categories,
@@ -190,5 +194,32 @@ describe("addons/geoMarker/components/GeoMarkerForm.vue", () => {
         wrapper.vm.departmentData.steuerungsstelle.status = "inaktiv";
 
         expect(wrapper.vm.newGeoMarker.wie_steuerungsstelle).to.equal(wrapper.vm.reminderDate);
+    });
+
+    it("should disable elements if it is a GEMIS feature", async () => {
+        wrapper.unmount();
+
+        mockGemisFeature = true;
+
+        wrapper = mount(GeoMarkerForm, {
+            props: {
+                mode: "create",
+                selectedFeature: null,
+                showCreateAnotherSwitch: true
+            },
+            global: {
+                mocks: {
+                    $t: key => key
+                },
+                plugins: [store],
+                stubs: stubs
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.isGemisFeatureEditNotAllowed).to.be.true;
+        expect(wrapper.vm.extractDepartmentData()).to.deep.equal({});
+        expect(wrapper.findAllComponents(GeoMarkerFormBox)).to.have.lengthOf(3);
     });
 });

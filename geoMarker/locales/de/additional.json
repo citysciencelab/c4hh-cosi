@@ -19,6 +19,7 @@
                 "descriptionLabel": "Beschreibung:",
                 "attachmentTitle": "Zusätzliche Dokumente",
                 "departmentsTitle": "Abteilungen",
+                "gemisNoEditInfo": "GEMIS-Datensatz, keine Bearbeitung möglich",
                 "selectedDepartmentsTitle": "Ausgewählte Abteilungen",
                 "save": "Speichern",
                 "cancel": "Abbrechen",

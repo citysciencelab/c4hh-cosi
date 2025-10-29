@@ -18,6 +18,7 @@
                 "infoTitle": "Info",
                 "descriptionLabel": "Description:",
                 "attachmentTitle": "Additional documents",
+                "gemisNoEditInfo": "GEMIS-Datensatz, keine Bearbeitung möglich",
                 "departmentsTitle": "Departments",
                 "selectedDepartmentsTitle": "Selected departments",
                 "save": "Save",
@@ -55,9 +56,9 @@
                     "beschreibung": "Description",
                     "zeitstempel": "Created",
                     "aktion": "Show",
-                    "aktionButtonLabel": "GeoMarker details" 
+                    "aktionButtonLabel": "GeoMarker details"
                 },
-                 "button": {
+                "button": {
                     "openVcOblique": "Open oblique aerial images",
                     "openPanorama": " Open 360° panorama",
                     "centerMapOnGeoMarker": "Center map on GeoMarker",

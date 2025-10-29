@@ -25,7 +25,8 @@ export default {
             showList: true,
             geoMarkerUpdateMode: false,
             showUpdateMessage: false,
-            originalCoordinates: null
+            originalCoordinates: null,
+            selectedFeatureIsGemisEditNotAllowed: false
         };
     },
     computed: {
@@ -37,7 +38,8 @@ export default {
             "geoMarkerWfsFeatureType",
             "categories",
             "departments",
-            "geoMarkerUpdateFeature"
+            "geoMarkerUpdateFeature",
+            "isGemisFeature"
         ]),
         ...mapGetters("Menu", [
             "currentMenuWidth",
@@ -167,15 +169,15 @@ export default {
             "requestGFI"
         ]),
         setSelectedFeature (item) {
-            this.setGeoMarkerFeatureSelected(
-                this.geoMarkerFeatureList.find(feature => feature.getId() === item.featureId)
-            );
+            const selectedFeature = this.geoMarkerFeatureList.find(feature => feature.getId() === item.featureId);
 
+            this.selectedFeatureIsGemisEditNotAllowed = this.isGemisFeature(selectedFeature);
+            this.setGeoMarkerFeatureSelected(selectedFeature);
             this.selectedListItemId = item.id;
         },
         resetSelectedFeature () {
             this.setGeoMarkerFeatureSelected(null);
-
+            this.selectedFeatureIsGemisEditNotAllowed = false;
             this.selectedListItemId = null;
         },
         openVcOblique () {
@@ -380,6 +382,7 @@ export default {
             />
 
             <IconButton
+                v-if="!selectedFeatureIsGemisEditNotAllowed"
                 :class-array="[
                     'btn-light', 'me-2', 'listAction',
                     geoMarkerUpdateMode ? 'geoMarkerUpdateMode' : '']"
