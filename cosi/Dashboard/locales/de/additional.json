@@ -9,6 +9,7 @@
                     "totalCol": "Gesamt",
                     "groupCol": "Gruppe",
                     "categoryCol": "Kategorie",
+                    "dietailView": "Detailansicht",
                     "timestampCol": "Jahr",
                     "search": "Tabelle durchsuchen",
                     "exportTable": "Tabelle exportieren",

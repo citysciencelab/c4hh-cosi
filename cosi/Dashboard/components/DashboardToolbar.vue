@@ -9,10 +9,12 @@ import {VCheckbox} from "vuetify/components/VCheckbox";
 import {VBtn} from "vuetify/components/VBtn";
 import {VListSubheader} from "vuetify/components/VList";
 import {VDivider} from "vuetify/components/VDivider";
+import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
 
 export default {
     name: "DashboardToolbar",
     components: {
+        ToolBar,
         VCol,
         VRow,
         VAutocomplete,
@@ -29,6 +31,7 @@ export default {
             required: true
         }
     },
+    emits: ["exportTable"],
     data: () => ({
         exportTimeline: false
     }),
@@ -56,14 +59,35 @@ export default {
             });
         },
 
-        exportTable () {
-            this.$emit("exportTable", this.exportTimeline);
+        exportTable (val) {
+            this.$emit("exportTable", this.exportTimeline || val);
         }
     }
 };
 </script>
 
 <template>
+    <ToolBar
+        :show-detail="{'visibility': true}"
+        :is-accordion="false"
+        :optional-button="{'text': 'Filter hinzufügen', 'icon': 'bi-funnel-fill', 'event': () => {}}"
+        @exportTable="exportTable"
+    >
+        <template #optionalDropdown>
+            <div
+                class="dropdown-menu p-0 border-0 mt-1"
+            >
+                <ul>
+                    <li>
+                        Test1
+                    </li>
+                    <li>
+                        Test2
+                    </li>
+                </ul>
+            </div>
+        </template>
+    </ToolBar>
     <v-row
         id="dashboard-toolbar"
         dense
@@ -99,7 +123,9 @@ export default {
                 <template #subheader="{ props }">
                     <div class="d-flex ga-4 align-center">
                         {{ props }}
-                        <v-list-subheader class="font-weight-bold bg-primary">{{ props }}</v-list-subheader>
+                        <v-list-subheader class="font-weight-bold bg-primary">
+                            {{ props }}
+                        </v-list-subheader>
                     </div>
                 </template>
                 <template #divider>
