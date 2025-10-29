@@ -51,6 +51,7 @@ export default {
             required: false
         }
     },
+    emits: ["update:selected-items"],
     computed: {
         /**
          * Gets the selected items from the items prop.

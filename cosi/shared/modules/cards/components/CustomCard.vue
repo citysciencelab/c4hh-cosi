@@ -18,11 +18,11 @@ export default {
 </script>
 
 <template lang="html">
-    <div class="card shadow">
+    <div class="card shadow-sm">
         <div class="card-body p-2 d-flex flex-row align-center">
             <div
                 v-if="icon"
-                class="p-1 fs-3"
+                class="p-1 fs-3 ms-3"
             >
                 <i :class="icon" />
             </div>
@@ -32,7 +32,7 @@ export default {
             <button
                 v-if="closeable"
                 type="button"
-                class="btn-close align-self-start"
+                class="btn-close align-self-start ms-3"
                 aria-label="Close"
                 @click="$emit('click:close')"
             />

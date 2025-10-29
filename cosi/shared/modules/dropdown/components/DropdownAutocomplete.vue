@@ -49,6 +49,7 @@ export default {
             default: () => []
         }
     },
+    emits: ["update:selected-items"],
     computed: {
         /**
          * Checks whether all items are selected.
@@ -66,7 +67,6 @@ export default {
             return this.selectedItems.length > 0;
         }
     },
-
     methods: {
         /**
          * Toggles the selection of all items in the dropdown.

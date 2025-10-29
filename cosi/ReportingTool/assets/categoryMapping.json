@@ -10,11 +10,13 @@
     },
     {
       "expandable": true,
-      "icon": "bi bi-table",
+      "expandableLabel": "additional:modules.cosi.reportingTool.showStatisticalData",
+      "icon": "bi bi-bar-chart",
       "key": "statDataOverview",
       "multiple": false,
       "name": "Statistische Datenübersicht",
-      "tag": "Statistische Daten"
+      "tag": "Statistische Daten",
+      "tagColor": "#FFEAC3"
     },
     {
       "expandable": false,
@@ -22,7 +24,8 @@
       "key": "statDataOverview",
       "multiple": false,
       "name": "Datenvisualisierung",
-      "tag": "Statistische Daten"
+      "tag": "Statistische Daten",
+      "tagColor": "#FFEAC3"
     }
   ],
   "subjectData": [
@@ -36,6 +39,7 @@
     },
     {
       "expandable": true,
+      "expandableLabel": "additional:modules.cosi.reportingTool.showSubjectData",
       "icon": "bi bi-table",
       "key": "subjectDataTable",
       "multiple": false,
@@ -70,7 +74,7 @@
       "tag": "Erreichbarkeitsanalyse"
     }
   ],
-  "attachment": [
+  "annex": [
     {
       "expandable": false,
       "icon": "bi bi-pencil",
@@ -85,7 +89,7 @@
       "key": "legend",
       "multiple": false,
       "name": "Legende",
-      "tag": "Fachdaten"
+      "tag": null
     },
     {
       "expandable": false,
