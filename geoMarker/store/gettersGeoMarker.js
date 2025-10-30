@@ -7,18 +7,12 @@ const getters = {
         return Number(featureId.replace(state.geoMarkerWfsFeatureIdPrefix, ""));
     },
     geoMarkerState: (state) => (geoMarker) => {
-        const category = Object.values(state.categories).find(item => item.name === geoMarker.kategorie);
+        // Collect current status fields for all departments, excluding null values.
+        const departmentStatus = Object.keys(state.departments).map(departmentId => {
+            const departmentStateField = state.departments[departmentId].fields.status;
 
-        if (!category) {
-            return null;
-        }
-
-        // eslint-disable-next-line one-var
-        const departmentStatus = category.departments.map(department => {
-            const departmentStateField = state.departments[department].fields.status;
-
-            return geoMarker[departmentStateField] ?? "offen";
-        });
+            return geoMarker[departmentStateField] ?? null;
+        }).filter(value => value !== null);
 
         // open
         if (departmentStatus.includes("offen")) {

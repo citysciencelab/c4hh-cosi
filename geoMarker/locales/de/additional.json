@@ -19,6 +19,7 @@
                 "descriptionLabel": "Beschreibung:",
                 "attachmentTitle": "Zusätzliche Dokumente",
                 "departmentsTitle": "Abteilungen",
+                "departmentClosedLabel": "Geschlossen",
                 "gemisNoEditInfo": "GEMIS-Datensatz, keine Bearbeitung möglich",
                 "selectedDepartmentsTitle": "Ausgewählte Abteilungen",
                 "save": "Speichern",
@@ -27,7 +28,8 @@
                 "update": "Aktualisieren",
                 "downloadAttachment": "Download Attachment",
                 "successMessageAfterUpdate": "Geomarker ist erfolgreich aktualisiert",
-                "successMessageAfterSave": "Geomarker mit Id {{id}} ist erfolgreich erstellt."
+                "successMessageAfterSave": "Geomarker mit Id {{id}} ist erfolgreich erstellt.",
+                "geoMarkerClosedAt": "GeoMarker geschlossen am"
             },
             "status": {
                 "offen": "offen",

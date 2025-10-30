@@ -58,6 +58,7 @@ export default {
             statusForSelectedDepartments: "offen",
             reminderDate: null,
             geomarkerDescription: "",
+            geomarkerClosedDate: null,
             geomarkerDescriptionInitial: "",
             screenshotImage: "",
             attachment: null,
@@ -73,6 +74,7 @@ export default {
             "geoMarkerUpdateFeature",
             "isFilterApplied",
             "geoMarkerShortFeatureId",
+            "geoMarkerState",
             "isGemisFeature"
         ]),
         ...mapGetters(["visibleLayerConfigs"]),
@@ -134,7 +136,8 @@ export default {
                 ...this.departmentValuesForGeomarker,
                 beschreibung: this.appendUserToDescription(this.geomarkerDescription),
                 zeitstempel: dayjs().toISOString(),
-                quelle: this.currentUsername
+                zeitstempel_geschlossen: this.closedDateIfEveryDepartmentIsClosed(),
+                quelle: window.activeDirectoryUser ? window.activeDirectoryUser.username : "geomarker"
             };
         },
         /**
@@ -157,7 +160,8 @@ export default {
                     ? this.appendUserToDescription(this.geomarkerDescription)
                     : this.geomarkerDescription,
                 zeitstempel: dayjs().toISOString(),
-                quelle: this.currentUsername,
+                zeitstempel_geschlossen: this.closedDateIfEveryDepartmentIsClosed(),
+                quelle: window.activeDirectoryUser ? window.activeDirectoryUser.username : "geomarker",
                 geom: this.geoMarkerUpdateFeature?.getGeometry()
             };
         },
@@ -239,6 +243,7 @@ export default {
             Object.keys(this.departmentData).forEach(departmentId => {
                 if (this.departmentData[departmentId]) {
                     this.departmentData[departmentId].status = this.statusForSelectedDepartments;
+                    this.departmentData[departmentId].geschlossen = null;
                 }
             });
         },
@@ -274,6 +279,10 @@ export default {
             "setGeoMarkerFeatureSelected",
             "setNewGeoMarkerCreated"
         ]),
+        /**
+         * Register dayjs in order to use it in the template
+         */
+        dayjs,
         /**
          * Initializes the component after mounting.
          * Sets up the form state depending on the mode:
@@ -316,6 +325,7 @@ export default {
             this.geomarkerDescription = featureProps.beschreibung || "";
             this.geomarkerDescriptionInitial = JSON.parse(JSON.stringify(this.geomarkerDescription));
 
+            this.geomarkerClosedDate = featureProps.zeitstempel_geschlossen || null;
             this.reminderDate = this.extractReminderDate(featureProps);
             this.screenshotImage = await this.loadPropertyOfFeatureById({
                 geomarkerId: feature.getId(),
@@ -425,6 +435,14 @@ export default {
             this.selectedCategoryId = categoryId;
 
             this.updateDepartmentsFromCategory();
+        },
+        /**
+         * Handle selection of the status select
+         */
+        handleDepartmentStateSelection (department) {
+            department.geschlossen = department.status === "geschlossen"
+                ? dayjs().toISOString()
+                : null;
         },
         /**
          * Updates department data based on the selected category
@@ -587,6 +605,7 @@ export default {
             this.statusForSelectedDepartments = "offen";
             this.reminderDate = null;
             this.geomarkerDescription = "";
+            this.geomarkerClosedDate = null;
             this.$refs.screenshotComponent.deleteScreenshot();
         },
         /**
@@ -920,6 +939,29 @@ export default {
             }
 
             return newDescription;
+        },
+        /**
+         * If all departments are closed, return the latest date.
+         */
+        closedDateIfEveryDepartmentIsClosed () {
+            const departmentStatus = Object.keys(this.departmentData).map(departmentId => {
+                return this.departmentData[departmentId].status;
+            });
+
+            if (!departmentStatus.every(value => value === "geschlossen")) {
+                return null;
+            }
+
+            // eslint-disable-next-line one-var
+            const newestDate = Object.keys(this.departmentData).map(departmentId => {
+                return this.departmentData[departmentId].geschlossen;
+            })
+                .map(date => dayjs(date))
+                .sort((a, b) => b.valueOf() - a.valueOf())[0];
+
+            return newestDate
+                ? newestDate.toISOString()
+                : null;
         }
     }
 };
@@ -1076,6 +1118,13 @@ export default {
             </div>
 
             <div
+                v-if="geomarkerClosedDate"
+                class="geoMarkerClosed"
+            >
+                {{ $t('additional:modules.geoMarker.geoMarkerForm.geoMarkerClosedAt') }} <strong>{{ dayjs(geomarkerClosedDate).format("DD.MM.YYYY H:mm") }}</strong>
+            </div>
+
+            <div
                 v-if="!isGemisFeatureEditNotAllowed"
                 class="selectedDepartments"
             >
@@ -1106,7 +1155,15 @@ export default {
                                 :clear-on-select="false"
                                 :internal-search="false"
                                 :aria-expanded="true"
+                                @select="handleDepartmentStateSelection(departmentData[cellData.departmentId])"
                             />
+
+                            <div
+                                v-if="departmentData[cellData.departmentId].status === 'geschlossen'"
+                                class="departmentStatusClosed"
+                            >
+                                {{ $t("additional:modules.geoMarker.geoMarkerForm.departmentClosedLabel") }}: {{ dayjs(departmentData[cellData.departmentId].geschlossen).format("DD.MM.YYYY H:mm") }}
+                            </div>
                         </template>
 
                         <template #cell-ReminderDate="{ cellData }">
@@ -1181,6 +1238,12 @@ div.GeoMarkerForm {
         overflow: auto;
         padding-top: 1rem;
         flex: 1;
+
+        div.geoMarkerClosed {
+            color: #FF0000;
+            margin-bottom: 0.25rem 0;
+            text-align: center;
+        }
 
         div.firstRow {
             display: flex;
@@ -1267,6 +1330,10 @@ div.GeoMarkerForm {
 
             .departmentStatusSelect {
                 width: 12rem;
+            }
+
+            .departmentStatusClosed {
+                padding: 0.75rem 0 0 0;
             }
         }
     }
