@@ -13,10 +13,15 @@ Liste aller konfigurierbaren Werkzeuge. Jedes Werkzeug erbt von **[tool](#markdo
 Werkzeug zum einbinden der Schrägluftbildanwendung von vcs in der Sidebar.
 Die Schrägluftbildanwendung muss auf dem gleichen Server liegen, damit sie im iFrame eingebunden werden kann.
 Der Pfad zur Schrägluftbildanwendung wird in der rest-services.json angegeben.
+
+Es werden die VCS-Versionen 4 und 6 unterstützt.
+
+> ⚠️ Bitte beachten Sie, dass die Masterportalinstanz und der Schrägluftbilderdienst eine Origin in Übersteinimmung mit der [Same-Origin Policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy#definition_of_an_origin) teilen müssen. Ansonsten funktionieren instanzübergreifende Interaktionen nicht.
+
 **Beispiel**
 ```
 #!json
-    {
+  {
     "id": "oblique",
     "name": "vcsOblique",
     "url": "https://localhost:9001/Schraegluftbilder/",
@@ -29,11 +34,9 @@ Der mapMarker kann über die styleId in der config.json konfiguriert werden und 
 #!json
 {
     "styleId": "obliqueViewer",
-    "rules":
-    [
+    "rules": [
       {
-        "style":
-          {
+        "style": {
           "type": "icon",
           "imageName": "wifi.svg",
           "imageScale": 5,
@@ -43,7 +46,7 @@ Der mapMarker kann über die styleId in der config.json konfiguriert werden und 
           "imageOffsetY": 13,
           "imageOffsetXUnit": "pixels",
           "imageOffsetYUnit": "pixels"
-          }
+        }
       }
     ]
   }

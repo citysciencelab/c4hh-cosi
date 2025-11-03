@@ -1,6 +1,59 @@
 import crs from "@masterportal/masterportalapi/src/crs";
 import mapMarker from "../../../src/core/maps/js/mapMarker";
 
+/**
+ * Retrieves the vcs active map independent of VCMap version.
+ * @param {@vcmap/core} vcs - vcs window element
+ * @returns {@vcmap/core#map?} activeMap object
+ */
+function getActiveMap (vcs) {
+    if (vcs?.vcm) {
+        // vcm key only present in VCMap@4
+        return vcs.vcm.Framework?.getInstance?.()?.getActiveMap?.();
+    }
+    return vcs?.getFirstApp?.()?.maps?.activeMap;
+}
+
+/**
+ * Retrieves the Viewpoint constructor independent auf VCMap version.
+ * @param {@vcmap/core} vcs - vcs window element
+ * @returns {constructor?} Viewpoint constructor
+ */
+function getViewpointConstructor (vcs) {
+    // Constructor is exposed in VCMap@4 and has to be inferred from an instance in VCMap@6.
+    if (vcs?.vcm) {
+        // vcm key only present in VCMap@4
+        return vcs?.vcm?.util?.ViewPoint;
+    }
+    return getActiveMap(vcs).getViewpointSync?.()?.constructor;
+}
+
+/**
+ * There's a spelling difference between VCMap versions 4 and 6 regarding
+ * viewpoints. While 4 spells them "ViewPoint", 6 spells them "Viewpoint".
+ * @param {@vcmap/core#map} map vcs map object
+ * @returns {Promise<Viewpoint>} ViewPoint resp. Viewpoint
+ */
+function getViewpointSync (map) {
+    return map.getViewPointSync ? map.getViewPointSync() : map.getViewpointSync();
+}
+
+/**
+ * There's a spelling difference between VCMap versions 4 and 6 regarding
+ * viewpoints. While 4 spells them "ViewPoint", 6 spells them "Viewpoint".
+ * @param {@vcmap/core#map} map vcs map object
+ * @param {@vcmap/core#ViewPoint} viewpoint or viewPoint
+ * @returns {void}
+ */
+function gotoViewpoint (map, viewpoint) {
+    if (typeof viewpoint.groundPosition === "undefined") {
+        console.warn("VCMap is not initialized. Please click the VCMap's home button or change the VCMap's configuration to have an initial view.");
+
+        return undefined;
+    }
+    return map.gotoViewPoint ? map.gotoViewPoint(viewpoint) : map.gotoViewpoint(viewpoint);
+}
+
 const actions = {
     /**
     * InitObliqueView creates a click listener at the map. Creates a listener at the olMap in the oblique application when the oblique aerial images have been moved in the sidebar.
@@ -19,19 +72,19 @@ const actions = {
         iframe?.addEventListener("load", () => {
             const observer = new MutationObserver(() => {
                 const header = iframe.contentWindow.document.getElementById("header"),
+                    vc6Header = iframe.contentWindow.document.getElementsByTagName("header")[0],
                     mapMenu = iframe.contentWindow.document.getElementsByClassName("vcm-btn-icon single-first maptool-btn vcm-btn-base-default vcm-btn-base-splash-hover vcm-border vcm-border-dye03 vcm-btn-icon-font-default vcm-btn-icon-font-dye01-hover vcm-no-select vcm-btn-map-Oblique")[0],
                     overviewMap = iframe.contentWindow.document.getElementsByClassName("overview-map-wrap")[0],
                     vcs = document.getElementById("obliqueIframe").contentWindow.vcs,
-                    map = vcs.vcm.Framework.getInstance().getActiveMap(),
+                    map = getActiveMap(vcs),
                     pixelCoordinate = mapCollection.getMap("2D").getPixelFromCoordinate(rootGetters["Maps/initialCenter"]),
                     mapElements = iframe.contentWindow.document.getElementsByClassName("mapElement vcm-map-top");
-
 
                 commit("Maps/setClickPixel", pixelCoordinate, {root: true});
 
                 if (map) {
                     map.olMap.on("moveend", () => {
-                        const transformedCooridnates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), map.getViewPointSync().groundPosition);
+                        const transformedCooridnates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
 
                         transformedCooridnates.every((coordinate, index) => {
                             if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
@@ -42,9 +95,8 @@ const actions = {
                         });
                     });
 
-                    map.imageChanged.addEventListener(async () => {
-                        const viewPoint = await map.getViewPoint(),
-                            heading = viewPoint.heading,
+                    map.imageChanged.addEventListener(() => {
+                        const heading = getViewpointSync(map).heading,
                             coordinates = rootGetters["Maps/clickCoordinate"] ? rootGetters["Maps/clickCoordinate"] : rootGetters["Maps/initialCenter"];
 
                         if (heading !== getters.heading) {
@@ -61,13 +113,16 @@ const actions = {
                     for (const element of mapElements) {
                         element.style.top = 0;
                     }
+
+                    dispatch("obliqueView", rootGetters["Maps/center"]);
+                    observer.disconnect();
+                }
+                if (header || vc6Header) {
                     mapMarker.getMapmarkerLayerById("marker_point_layer").get("styleId");
                     commit("setDefaultMapMarkerStyleId", mapMarker.getMapmarkerLayerById("marker_point_layer").get("styleId"));
                     if (getters.styleId) {
                         mapMarker.getMapmarkerLayerById("marker_point_layer").set("styleId", getters.styleId);
                     }
-                    dispatch("obliqueView", rootGetters["Maps/center"]);
-                    observer.disconnect();
                 }
                 if (mapMenu) {
                     mapMenu.style.display = "none";
@@ -109,21 +164,23 @@ const actions = {
     */
     async obliqueView ({commit, dispatch, getters}, coordinates = []) {
         const vcs = document.getElementById("obliqueIframe")?.contentWindow?.vcs,
-            framework = vcs?.vcm?.Framework?.getInstance(),
-            map = framework?.getActiveMap();
+            map = getActiveMap(vcs);
         let viewPoint = {};
 
-        if (framework && coordinates && Array.isArray(coordinates) && coordinates.length > 1) {
+        if (map && coordinates && Array.isArray(coordinates) && coordinates.length > 1) {
             commit("setLastCoordinates", coordinates);
-            if (vcs?.vcm?.util) {
-                viewPoint = new vcs.vcm.util.ViewPoint({
+
+            const Viewpoint = getViewpointConstructor(vcs);
+
+            if (Viewpoint) {
+                viewPoint = new Viewpoint({
                     groundPosition: crs.transform(mapCollection.getMapView("2D").getProjection().getCode(), "EPSG:4326", coordinates),
                     heading: getters.heading,
-                    distance: map.getViewPointSync().distance
+                    distance: getViewpointSync(map).distance
                 });
             }
 
-            await framework?.getActiveMap().gotoViewPoint(viewPoint);
+            await gotoViewpoint(map, viewPoint);
             commit("Maps/setClickCoordinate", coordinates, {root: true});
             dispatch("Maps/placingPointMarker", {rotation: getters.heading, coordinates}, {root: true});
         }

@@ -13,13 +13,18 @@ List of all configurable tools. Each tool inherits from **[tool](#markdown-heade
 Tool to include the oblique aerial view application from vcs in the sidebar.
 The oblique aerial view application must be on the same server to be included in the iFrame.
 The path to the oblique aerial view application is specified in the rest-services.json.
+
+The VCS versions 4 and 6 are supported.
+
+> ⚠️ Please mind that the Masterportal instance and the oblique service must share an origin according to the [Same-Origin Policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy#definition_of_an_origin). Else, actions across the instances will not work.
+
 **Example
 ```
 #!json
-    {
-    }, "id": "oblique",
-    }, "name": "vcsOblique",
-    }, "url": "https://localhost:9001/Schraegluftbilder/",
+  {
+    "id": "oblique",
+    "name": "vcsOblique",
+    "url": "https://localhost:9001/Schraegluftbilder/",
     "type": "url"
   }
 ```
@@ -29,13 +34,11 @@ The mapMarker can be configured via the styleId in config.json and must be defin
 #!json
 {
     "styleId": "obliqueViewer",
-    "``rules'':
-    [
+    "rules": [
       {
-        }, "style":
-          {
-          }, "type": { "icon",
-          "imageName": { "wifi.svg",
+        "style": {
+          "type": "icon",
+          "imageName": "wifi.svg",
           "imageScale": 5,
           "imageWidth": 32,
           "imageHeight": 32,
@@ -43,7 +46,7 @@ The mapMarker can be configured via the styleId in config.json and must be defin
           "imageOffsetY": 13,
           "imageOffsetXUnit": "pixels",
           "imageOffsetYUnit": "pixels"
-          }
+        }
       }
     ]
   }
