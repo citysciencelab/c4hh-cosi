@@ -604,6 +604,30 @@ const actions = {
             await nextTick();
             commit("setGeoMarkerFeatureSelected", subSetOfUniqueFeatures[0]);
         }
+    },
+    /**
+     * Show or hide layers in the main layer list of the Masterportal
+     * @param {Array} payload.layerIds - List of layer IDs
+     * @param {bool} payload.layerVisibility - Activate or deactivate the layer entry in the list
+     * @param {bool} payload.layerShowInLayerTree - Show or hide layers in the list.
+     * @returns {void}
+     */
+    updateMasterportalLayerListVisibility ({dispatch}, payload) {
+        const layerIds = payload.layerIds ?? [],
+            layerVisibility = payload.layerVisibility ?? true,
+            layerShowInLayerTree = payload.layerShowInLayerTree ?? layerVisibility;
+
+        layerIds.forEach(layerId => {
+            dispatch("replaceByIdInLayerConfig", {
+                layerConfigs: [{
+                    id: layerId,
+                    layer: {
+                        visibility: layerVisibility,
+                        showInLayerTree: layerShowInLayerTree
+                    }
+                }]
+            }, {root: true});
+        });
     }
 };
 

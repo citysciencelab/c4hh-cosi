@@ -41,6 +41,10 @@ export default {
             filterUpdated: false,
             map: mapCollection.getMap("2D"),
             graphicalSelectOpen: false,
+            urlFilter: {
+                departments: [],
+                status: []
+            },
             drawOptions: {
                 "Box": this.$t("common:shared.modules.graphicalSelect.selectBySquare"),
                 "Polygon": this.$t("common:shared.modules.graphicalSelect.selectByPolygon")
@@ -59,6 +63,23 @@ export default {
         ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
         ]),
+        /**
+         * Creates a permalink for the current filter settings
+         * @returns {string} Permalink URL
+         */
+        urlFilterPermalink () {
+            const departmentIds = [];
+
+            this.filterSelections.departmentsSelected.forEach(departmentSelected => {
+                const matchedDepartmentId = Object.keys(this.departments).find(
+                    departmentId => this.departments[departmentId] === departmentSelected
+                );
+
+                departmentIds.push(matchedDepartmentId);
+            });
+
+            return `${window.location.pathname}?filterGeoMarkerAbteilung=${departmentIds.join(",")}&filterGeoMarkerStatus=${this.filterSelections.statusSelected.join(",")}`;
+        },
         /**
          * Returns the category options for the filter dropdown.
          * Converts the categories object into an array of objects with key and label.
@@ -155,6 +176,9 @@ export default {
         }
     },
     watch: {
+        async departments () {
+            this.handleUrlFilter();
+        },
         selectedAreaGeoJson (geoJson) {
             this.filterSelections.geom = new GeoJSON().readGeometry(geoJson);
             this.filterUpdated = true;
@@ -183,12 +207,52 @@ export default {
             "setIsFilterApplied"
         ]),
         ...mapActions("Modules/GeoMarker", [
-            "requestGFI"
+            "requestGFI",
+            "updateMasterportalLayerListVisibility"
         ]),
         ...mapActions("Maps", [
             "registerListener",
             "unregisterListener"
         ]),
+        /**
+         * If a URL filter is set via GET parameter, automatically execute the filter.
+         *
+         * Available filters:
+         * - filterGeoMarkerAbteilung - Value is a list of comma separated department IDs, e.g. atkis,gemis
+         * - filterGeoMarkerStatus - Value is a list comma separated status names. Allowed values: offen,geschlossen,inaktiv
+         */
+        async handleUrlFilter () {
+            const parameterDepartments = new URLSearchParams(document.location.search).get("filterGeoMarkerAbteilung")?.split(",") ?? [],
+                parameterStatus = new URLSearchParams(document.location.search).get("filterGeoMarkerStatus")?.split(",") ?? [];
+
+            this.urlFilter = {
+                departments: parameterDepartments.map(departmentId => this.departments[departmentId] ?? null).filter(value => value !== null),
+                status: parameterStatus.filter(status => ["offen", "geschlossen", "inaktiv"].includes(status))
+            };
+
+            if (this.urlFilter?.departments?.length || this.urlFilter?.status?.length) {
+                const htmlTitleDepartments = this.urlFilter?.departments
+                        ? this.urlFilter.departments.map(department => department.name).join(", ")
+                        : "",
+                    htmlTitleCategories = this.urlFilter?.status?.length
+                        ? `[${this.urlFilter.status.join("|")}]`
+                        : "";
+
+                if (htmlTitleDepartments || htmlTitleCategories) {
+                    document.title = `${document.title} - ${this.$t("additional:modules.geoMarker.filter.urlFilterPrefix")}: ${htmlTitleDepartments} ${htmlTitleCategories}`.trim();
+                }
+
+                this.filterSelections.departmentsSelected = this.urlFilter.departments;
+                this.filterSelections.statusSelected = this.urlFilter.status;
+
+                this.updateMasterportalLayerListVisibility({
+                    layerIds: Object.keys(this.departments).flatMap(department => Object.values(this.departments[department].layerIds)),
+                    layerVisibility: false
+                });
+
+                await this.updateFilterSelection(true, true, true);
+            }
+        },
         /**
          * Applies the filter settings, checks the layer visibility and updates the filtered features.
          * @param {boolean} [updateExtent=true] - Indicates whether the map extent should be adjusted.
@@ -286,7 +350,15 @@ export default {
                 const layer = this.map ? this.map.getLayers().getArray()?.find(l => l.get("id") === layerId) : undefined;
 
                 if (layer && layer.isVisible()) {
-                    resolve();
+                    const source = layer.getSource();
+
+                    // Info: This workaround does not work, if a layer has no features at all.
+                    if (!source.getFeatures().length) {
+                        source.once("featuresloadend", resolve);
+                    }
+                    else {
+                        resolve();
+                    }
                 }
                 else {
                     store.dispatch("replaceByIdInLayerConfig", {
@@ -298,9 +370,15 @@ export default {
                             }
                         }]
                     }, {root: true}).then(() => {
-                        this.map.getLayers().getArray().find(l => l.get("id") === layerId).getSource().once("featuresloadend", () => {
+                        const source = this.map.getLayers().getArray().find(l => l.get("id") === layerId).getSource();
+
+                        // Info: This workaround does not work, if a layer has no features at all.
+                        if (!source.getFeatures().length) {
+                            source.once("featuresloadend", resolve);
+                        }
+                        else {
                             resolve();
-                        });
+                        }
                     }).catch(() => {
                         resolve();
                     });
@@ -335,6 +413,7 @@ export default {
                         uniqueFeatures.push(feat);
                     }
                 });
+
                 this.allFilteredFeatures = uniqueFeatures;
 
                 resolve();
@@ -552,8 +631,12 @@ export default {
             });
 
             this.setFilterSelections({
-                departmentsSelected: [],
-                statusSelected: [],
+                departmentsSelected: this.urlFilter?.departments?.length
+                    ? this.urlFilter?.departments
+                    : [],
+                statusSelected: this.urlFilter?.status?.length
+                    ? this.urlFilter?.status
+                    : [],
                 filterValueSource: "",
                 filterValueDescr: "",
                 filterValueComment: "",
@@ -820,6 +903,14 @@ export default {
                         @update:modelValue="filterUpdated = true"
                     />
                 </div>
+
+                <a
+                    class="permalink"
+                    :href="urlFilterPermalink"
+                    target="_blank"
+                >
+                    {{ $t("additional:modules.geoMarker.filter.permalink") }}
+                </a>
             </div>
 
             <div class="geomarkerFilterbuttons">
@@ -922,6 +1013,11 @@ div#geoMarkerFilterContent {
             div.labelSelectContainer {
                 flex: 1;
             }
+        }
+
+        a.permalink {
+            text-align: right;
+            margin: 1rem;
         }
 
         div.geomarkerFilterbuttons {

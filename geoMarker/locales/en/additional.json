@@ -74,6 +74,8 @@
             "filter": {
                 "isFiltering": "Please be patient, the GeoMarkers are beeing filtered right now ...",
                 "countGeoMarker": "GeoMarker",
+                "urlFilterPrefix": "Filter",
+                "permalink": "Permalink",
                 "graphicalSelect": {
                   "title": "Select GeoMarker on map using",
                   "filterButtonTitle": "Show spatial filter",

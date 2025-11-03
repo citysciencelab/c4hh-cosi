@@ -73,6 +73,8 @@
             "filter": {
                 "isFiltering": "Bitte etwas Geduld, die GeoMarker werden gerade gefiltert ...",
                 "countGeoMarker": "GeoMarker",
+                "urlFilterPrefix": "Filter",
+                "permalink": "Permalink",
                 "graphicalSelect": {
                   "title": "Auswahl der GeoMarker in der Karte durch",
                   "filterButtonTitle": "Zeige räuml. Filter",
