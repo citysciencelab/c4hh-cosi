@@ -35,7 +35,8 @@
                     "switchFieldType": "Switch between statistical and facility data",
                     "calcPer": "calculate per",
                     "ofData": "of data",
-                    "infoTooltip": "Tool information"
+                    "infoTooltip": "Tool information",
+                    "yearsForStatisticalData": "Years for statistical data"
                 }
             }
         }

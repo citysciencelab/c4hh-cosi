@@ -101,6 +101,14 @@ export default {
          */
         layerNameList () {
             return this.layerList.map(layer => layer.getLayer().get("name"));
+        },
+
+        /**
+         * Checks if statistical data is selected in any of the cards.
+         * @returns {Boolean} True if statistical data is selected in either card.
+         */
+        statisticalDataInCardTypes () {
+            return this.cardOneType === "statisticalData" || this.cardTwoType === "statisticalData";
         }
     },
     created () {
@@ -222,7 +230,7 @@ export default {
             <i class="bi bi-arrow-down-up fs-4" />
         </button>
     </div>
-    <div class="d-flex justify-content-start">
+    <div class="d-flex justify-content-start mb-5">
         <h4 class="align-self-center me-3">
             2.
         </h4>
@@ -244,11 +252,12 @@ export default {
         />
     </div>
     <Dropdown-Autocomplete
+        v-if="statisticalDataInCardTypes"
         :items="yearItemList"
         :selected-items="yearSelectedItemList"
         :multiple="false"
-        label="Jahre"
-        class="mb-5 mt-5"
+        :label="$t('additional:modules.tools.cosi.calculateRatio.yearsForStatisticalData')"
+        class="mb-5"
         @update:selected-items="setSelectedYears"
     />
     <FlatButton

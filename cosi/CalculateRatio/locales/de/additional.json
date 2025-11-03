@@ -36,7 +36,8 @@
                     "switchFieldType": "Statistische Daten / Einrichtungsdaten wechseln",
                     "calcPer": "berechnen pro",
                     "ofData": "der Datengrundlage",
-                    "infoTooltip": "Werkzeuginformationen"
+                    "infoTooltip": "Werkzeuginformationen",
+                    "yearsForStatisticalData": "Jahre für statistische Daten"
                 }
             }
         }
