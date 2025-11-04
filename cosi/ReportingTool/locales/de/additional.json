@@ -22,6 +22,8 @@
             "annex": "Anhang und Drucken",
             "generalReportInformation": "Allgemeine Berichtsangaben",
             "label": {
+              "infrastructureTableLimitEnabled": "Sollen Tabellen ab einer bestimmten Anzahl von Einrichtungen vom Bericht ausgenommen werden?",
+              "infrastructureTableLimit": "Maximale Anzahl an auszugebenen Einrichtungen",
               "selectedAreas": "Name der ausgewählten Gebiete",
               "selectedDistricts": "Ausgewählte Gebiete",
               "title": "Titel",

@@ -24,6 +24,7 @@ import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vu
 import categoryMapping from "../assets/categoryMapping.json";
 import ReportingToolStepItem from "./ReportingToolStepItem.vue";
 import {VStepper, VStepperActions, VStepperItem, VStepperHeader, VStepperWindow, VStepperWindowItem} from "vuetify/components/VStepper";
+import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
     name: "ReportingTool",
@@ -32,6 +33,7 @@ export default {
         FlatButton,
         InputText,
         ReportingToolStepItem,
+        SwitchInput,
         TagGroup,
         ToolInfo,
         VStepper,
@@ -42,6 +44,8 @@ export default {
         VStepperWindowItem
     },
     data: () => ({
+        infrastructureTableLimit: 10,
+        infrastructureTableLimitEnabled: false,
         showProgressBar: false,
         percentage: 50,
         reportTitle: "",
@@ -640,13 +644,13 @@ export default {
             Object.keys(groupedTopics).forEach(group => {
                 const topicLength = groupedTopics[group].length,
                     columns = this.pdf.getColumns(["Typ der Einrichtung", "Name", "Adresse"], []),
-                    body = topicLength <= 10 ? [columns] : [],
+                    body = [columns],
                     columnAttirbutes = ["type", "name", "address"];
 
                 this.pdf.addHeadline(group);
                 this.pdf.addParagraph(`Anzahl der ${group} im ausgewählten Gebiet: ${groupedTopics[group].length}`);
 
-                if (topicLength <= 10) {
+                if (topicLength <= this.infrastructureTableLimit || !this.infrastructureTableLimitEnabled) {
                     groupedTopics[group].forEach(topic => {
                         const row = [];
 
@@ -982,6 +986,23 @@ export default {
                     <v-stepper-window-item
                         value="3"
                     >
+                        <SwitchInput
+                            id="reporting-tool-infrastructure-limit-switch"
+                            class="mb-3"
+                            :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
+                            :aria="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
+                            :checked="infrastructureTableLimitEnabled"
+                            :interaction="evt => infrastructureTableLimitEnabled = evt.target.checked"
+                        />
+                        <InputText
+                            v-if="infrastructureTableLimitEnabled"
+                            id="infrastructure-table-limit-input"
+                            v-model="infrastructureTableLimit"
+                            type="number"
+                            class="mb-3"
+                            :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
+                            :placeholder="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
+                        />
                         <ReportingToolStepItem
                             :card-mapping="categoryMapping?.subjectData"
                             :title="'3. ' + $t('additional:modules.cosi.reportingTool.subjectData')"

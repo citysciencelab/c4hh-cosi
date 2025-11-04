@@ -22,6 +22,8 @@
           "annex": "Annex and print",
           "generalReportInformation": "General report information",
           "label": {
+            "infrastructureTableLimitEnabled": "Should tables be excluded from the report if there are more than a certain number of institutions?",
+            "infrastructureTableLimit": "Maximum number of institutions to be included",
             "selectedAreas": "Name of the selected areas",
             "selectedDistricts": "Selected Districts",
             "title": "Title",
