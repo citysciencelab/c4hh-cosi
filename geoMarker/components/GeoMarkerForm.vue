@@ -63,7 +63,8 @@ export default {
             screenshotImage: "",
             attachment: null,
             createAnotherGeoMarker: false,
-            savingInProgress: false
+            savingInProgress: false,
+            map: mapCollection.getMap("2D")
         };
     },
     computed: {
@@ -812,7 +813,7 @@ export default {
             }
         },
         /**
-         * Loads the newly created GeoMarker and displays it in the list
+         * Loads the newly created GeoMarker and displays it in the list, makes relevant layer(s) visible, if necessary
          * @param {Object} transactionFeature - The feature that was just created
          * @returns {Promise<void>}
          */
@@ -822,24 +823,51 @@ export default {
                     return new Promise(resolve => {
                         const layer = layerCollection.getLayerById(layerId);
 
-                        if (layer) {
+                        // the layer is currently visible
+                        if (layer && layer.layer && layer.layer.isVisible()) {
                             const layerSource = layer.getLayerSource();
 
                             layerSource.once("featuresloadend", () => {
-                                setTimeout(() => resolve(), 100);
+                                resolve();
                             });
 
                             layerSource.refresh();
                         }
+                        // the layer is currently not visible
                         else {
-                            resolve();
+                            this.$store.dispatch("replaceByIdInLayerConfig", {
+                                layerConfigs: [{
+                                    id: layerId,
+                                    layer: {
+                                        visibility: true,
+                                        showInLayerTree: true
+                                    }
+                                }]
+                            }, {root: true}).then(() => {
+                                const layerSource = this.map?.getLayers().getArray().find(l => l.get("id") === layerId).getSource();
+
+                                // the layer has been visible before = all features are already loaded
+                                // Info: This workaround does not work, if a layer has no features at all
+                                if (layerSource.getFeatures().length) {
+                                    layerSource.refresh();
+                                    layerSource.once("featuresloadend", () => {
+                                        resolve();
+                                    });
+                                }
+                                // the layer has never been visible before = no features have been loaded yet
+                                else {
+                                    layerSource.once("featuresloadend", () => {
+                                        resolve();
+                                    });
+                                }
+                            });
                         }
                     });
                 });
 
             await Promise.all(loadPromises);
 
-            await this.findAndDisplayNewFeature(transactionResponse, relevantLayerIds);
+            this.findAndDisplayNewFeature(transactionResponse, relevantLayerIds);
 
             if (this.isFilterApplied) {
                 relevantLayerIds.forEach(layerId => {
@@ -892,10 +920,9 @@ export default {
 
             if (feature) {
                 list.push(feature);
+                this.setGeoMarkerFeatureList(list);
                 this.setGeoMarkerFeatureSelected(feature);
             }
-
-            this.setGeoMarkerFeatureList(list);
         },
         /**
          * Downloads the attachment file associated with the selected geomarker
