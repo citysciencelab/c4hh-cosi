@@ -555,12 +555,19 @@ const actions = {
         commit("setRollbackGeoMarkerFeature", null);
     },
     /**
-     * Detects if one or more GeoMarkers are located at the clicked position (buffer 20 meters) and opens the list, if GeoMarkers are found
+     * Detects if one or more GeoMarkers are located at the clicked position and opens the list, if GeoMarkers are found.
+     * The click radius is dynamically set in relation to the selected map scale. (Default 20 meters at 1:5000)
      * @param {Object} filterinputValue - The event, initiated by the click in the map, contains the clicked coordinates
      * @returns {void}
      */
-    async requestGFI ({commit, getters}, input) {
+    async requestGFI ({commit, getters, rootGetters}, input) {
         let allFeaturesToCheck = [];
+
+        const scaleBaseClickRadius = 20,
+            scaleBase = 5000,
+            scaleClickRadius = scaleBaseClickRadius * (rootGetters["Maps/scale"] / scaleBase),
+            subSetOfUniqueFeatures = [],
+            seenIds = new Set();
 
         Object.values(getters.departments).forEach(dept => {
             const layersToCheck = [dept.layerIds.offen, dept.layerIds.inaktiv, dept.layerIds.geschlossen],
@@ -575,9 +582,6 @@ const actions = {
             });
         });
 
-        const subSetOfUniqueFeatures = [],
-            seenIds = new Set();
-
         allFeaturesToCheck.forEach(feat => {
             const id = feat.getId();
 
@@ -588,7 +592,7 @@ const actions = {
                     const diffX = geometry.getCoordinates()[0] - input.coordinate[0],
                         diffY = geometry.getCoordinates()[1] - input.coordinate[1];
 
-                    if (Math.sqrt((diffX * diffX) + (diffY * diffY)) <= 20) {
+                    if (Math.sqrt((diffX * diffX) + (diffY * diffY)) <= scaleClickRadius) {
                         subSetOfUniqueFeatures.push(feat);
                     }
                 }
