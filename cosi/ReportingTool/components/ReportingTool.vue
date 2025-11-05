@@ -19,7 +19,7 @@ import getCswRecordById from "@shared/js/api/getCswRecordById.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
-import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import categoryMapping from "../assets/categoryMapping.json";
 import ReportingToolStepItem from "./ReportingToolStepItem.vue";
@@ -53,6 +53,8 @@ export default {
         selectedAreasName: "",
         author: "",
         authorMaxLength: 35,
+        freeHeadline: "",
+        freeText: "",
         pdf: null,
         categoryInChart: [
             {"Bevölkerung": "Bevölkerung insgesamt"},
@@ -952,14 +954,14 @@ export default {
                         <form>
                             <InputText
                                 id="report-title"
-                                :model-value="reportTitle"
+                                v-model="reportTitle"
                                 :label="$t('additional:modules.cosi.reportingTool.label.title')"
                                 :placeholder="$t('additional:modules.cosi.reportingTool.label.title')"
                                 max-length="50"
                             />
                             <InputText
                                 id="report-author"
-                                :model-value="author"
+                                v-model="author"
                                 :label="$t('additional:modules.cosi.reportingTool.label.author')"
                                 :placeholder="$t('additional:modules.cosi.reportingTool.label.author')"
                                 max-length="35"
@@ -974,6 +976,24 @@ export default {
                                 v-if="selectedReportComponents.includes('Titelseite mit Kartenausschnitt inkl. Neuwerk')"
                                 :text="$t('additional:modules.cosi.reportingTool.alert.infoFrontPage')"
                                 type="info"
+                            />
+                            <h6 class="mt-4 mb-3">
+                                {{ $t("additional:modules.cosi.reportingTool.addAdditionalInformation") }}
+                            </h6>
+                            <InputText
+                                id="freetext-headline"
+                                v-model="freeHeadline"
+                                :label="$t('additional:modules.cosi.reportingTool.label.headline')"
+                                :placeholder="$t('additional:modules.cosi.reportingTool.label.headline')"
+                                max-length="50"
+                            />
+                            <InputText
+                                id="freetext-text"
+                                v-model="freeText"
+                                :label="$t('additional:modules.cosi.reportingTool.label.freetext')"
+                                :placeholder="$t('additional:modules.cosi.reportingTool.label.freetext')"
+                                html-type="textarea"
+                                max-length="1000"
                             />
                         </form>
                     </v-stepper-window-item>
