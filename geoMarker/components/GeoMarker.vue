@@ -82,8 +82,11 @@ export default {
         await this.getGeoMarkerEditLayerUrl();
         this.fullyLoaded = true;
     },
-    unmounted () {
-        this.resetGeomarkerFeature();
+    activated () {
+        // keep alive lifecycle hook for module caching
+    },
+    deactivated () {
+        // keep alive lifecycle hook for module caching
     },
     methods: {
         ...mapMutations("Modules/GeoMarker", [
@@ -106,15 +109,6 @@ export default {
         ...mapActions("Maps", ["removePointMarker"]),
         setCurrentTab (tab) {
             this.setGeoMarkerActiveTab(tab);
-        },
-        /**
-         * It resets the selected GeoMarker feature on the map
-         * when switching the tab or leaving the addon.
-         */
-        resetGeomarkerFeature () {
-            this.setNewGeoMarkerFeature(null);
-            this.setGeoMarkerUpdateFeature(null);
-            this.setMapInteraction(null);
         }
     }
 };
