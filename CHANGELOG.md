@@ -3,16 +3,8 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
 
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
+## 2025-11-05 v3.16.0
 
 ### Fixed
 - Compatibility fixes after the Masterportal core upgrade to **Vue 3.5** (esm-bundler / stricter template checks). No functional changes intended.
