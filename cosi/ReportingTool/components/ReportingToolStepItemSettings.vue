@@ -6,6 +6,7 @@ import {mapGetters} from "vuex";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import {uniqueId} from "@shared/js/utils/uniqueId";
+import utils from "../../utils/index.js";
 
 export default {
     name: "ReportingToolStepItemSettings",
@@ -19,22 +20,30 @@ export default {
     data () {
         return {
             higherDistrictLevel: [],
-            isAllAreasSummariseChecked: false,
+            isAllAreasSummariseChecked: true,
             selectedAreasName: "",
             selectedAreasNameMaxLength: 50,
             selectedStatisticalAreas: [],
             selectedDistricts: [],
-            years: [
-                "2020",
-                "2021",
-                "2022",
-                "2023"
-            ],
-            selectedYear: []
+            selectedYear: null
         };
     },
     computed: {
-        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictNames", "selectedDistrictLevel"]),
+        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictNames", "selectedDistrictLevel", "selectedStatFeatures"]),
+
+        /**
+         * Gets the selectable years based on the selected statistical features.
+         * @returns {Object[]} An array of items for the year dropdown.
+         */
+        years () {
+            const availableYears = utils.getAvailableYears(this.selectedStatFeatures),
+                items = availableYears.map(year => ({title: year, value: year}));
+
+            if (items.length) {
+                items.unshift({title: this.$t("additional:modules.cosi.reportingTool.useMostRecentDataset"), value: "mostRecent"});
+            }
+            return items;
+        },
 
         /**
          * Gets an array of higher district levels with their corresponding selection status.
@@ -46,7 +55,7 @@ export default {
         higherDistrictLevelLabels () {
             let level = this.districtLevels.map(lev => ({
                 label: lev.label,
-                selected: this.higherDistrictLevel.length ? this.higherDistrictLevel.includes(lev.label) : false
+                selected: this.higherDistrictLevel.length ? this.higherDistrictLevel.includes(lev.label) : true
             }));
             const districtLevel = [];
 
@@ -86,15 +95,6 @@ export default {
             selectedDistricts.forEach(v => {
                 this.higherDistrictLevel.push(v.label);
             });
-        },
-
-        /**
-         * Updates the selected statistical areas.
-         * @param {String[]} areas - The selected areas.
-         * @returns {void}
-         */
-        updateSelectedStatisticalAreas (areas) {
-            this.selectedStatisticalAreas = areas;
         }
     }
 };
@@ -134,16 +134,14 @@ export default {
                 @update:selected-items="updateSelectedDistricts"
             />
             <Dropdown-Autocomplete
+                v-model="selectedStatisticalAreas"
                 :items="selectedDistrictNames"
-                :multiple="true"
-                :selected-items="selectedStatisticalAreas"
+                multiple
                 :label="$t('additional:modules.cosi.reportingTool.label.statisticalAreas')"
-                @update:selected-items="updateSelectedStatisticalAreas"
             />
             <Dropdown-Autocomplete
+                v-model="selectedYear"
                 :items="years"
-                :multiple="false"
-                :selected-items="selectedYear"
                 :label="$t('additional:modules.cosi.reportingTool.label.referenceYear')"
             />
         </form>

@@ -151,12 +151,13 @@ export default {
         >
             <Dropdown-Autocomplete
                 :items="level.filterableValues ? level.filterableValues : []"
-                :selected-items="level.selectedValues ? level.selectedValues : []"
+                :model-value="level.selectedValues ? level.selectedValues : []"
+                multiple
                 :label="level.label"
                 :loading="loading"
                 :max-chip-count="5"
                 :select-all="idx === levelsForFilter.length - 1"
-                @update:selected-items="addSelectedValues($event, level)"
+                @update:model-value="addSelectedValues($event, level)"
             />
         </div>
     </div>

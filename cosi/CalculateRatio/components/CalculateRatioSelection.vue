@@ -43,8 +43,8 @@ export default {
             cardTwoSelectedItemList: [],
             cardTwoSelectedNumericalValueList: [],
             cardTwoType: "subjectData",
-            yearItemList: [],
-            yearSelectedItemList: []
+            selectedYear: null,
+            yearItemList: []
         };
     },
     computed: {
@@ -92,7 +92,7 @@ export default {
          * @returns {Boolean} True if the button should be disabled.
          */
         disabled () {
-            return this.cardOneSelectedItemList.length === 0 || this.cardTwoSelectedItemList.length === 0 || this.yearSelectedItemList.length === 0;
+            return this.cardOneSelectedItemList.length === 0 || this.cardTwoSelectedItemList.length === 0 || !this.selectedYear;
         },
 
         /**
@@ -166,7 +166,7 @@ export default {
             };
             obj.facilityPropertyList_A = this.cardOneSelectedNumericalValueList;
             obj.facilityPropertyList_B = this.cardTwoSelectedNumericalValueList;
-            obj.year = this.yearSelectedItemList[0];
+            obj.year = this.selectedYear;
             this.$emit("set-params", obj);
         },
 
@@ -184,15 +184,6 @@ export default {
             if (key === "cardTwoType") {
                 this.cardTwoSelectedItemList = [];
             }
-        },
-
-        /**
-         * Sets the selected years.
-         * @param {String[]} years - Years to select.
-         * @returns {void}
-         */
-        setSelectedYears (years) {
-            this.yearSelectedItemList = [years];
         }
     }
 
@@ -253,12 +244,10 @@ export default {
     </div>
     <Dropdown-Autocomplete
         v-if="statisticalDataInCardTypes"
+        v-model="selectedYear"
         :items="yearItemList"
-        :selected-items="yearSelectedItemList"
-        :multiple="false"
         :label="$t('additional:modules.tools.cosi.calculateRatio.yearsForStatisticalData')"
         class="mb-5"
-        @update:selected-items="setSelectedYears"
     />
     <FlatButton
         class="mx-auto mb-4"

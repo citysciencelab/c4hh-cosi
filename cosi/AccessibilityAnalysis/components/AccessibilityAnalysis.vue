@@ -954,9 +954,10 @@ export default {
             <Dropdown-Autocomplete
                 v-if="isAllFacilitiesChecked && mode === 'facility'"
                 :items="facilityNames ? facilityNames : []"
-                :selected-items="selectedFacilityNames ? selectedFacilityNames : []"
+                :model-value="selectedFacilityNames ? selectedFacilityNames : []"
+                multiple
                 label="Themen"
-                @update:selected-items="setSelectedFacilityNames($event)"
+                @update:model-value="setSelectedFacilityNames($event)"
             />
             <div
                 v-if="selectionCards.length === 0"

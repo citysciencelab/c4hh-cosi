@@ -22,6 +22,7 @@
             "annex": "Anhang und Drucken",
             "generalReportInformation": "Allgemeine Berichtsangaben",
             "addAdditionalInformation": "Freitextfeld hinzufügen",
+            "useMostRecentDataset": "Aktuellsten Datensatz verwenden",
             "label": {
               "infrastructureTableLimitEnabled": "Sollen Tabellen ab einer bestimmten Anzahl von Einrichtungen vom Bericht ausgenommen werden?",
               "infrastructureTableLimit": "Maximale Anzahl an auszugebenen Einrichtungen",

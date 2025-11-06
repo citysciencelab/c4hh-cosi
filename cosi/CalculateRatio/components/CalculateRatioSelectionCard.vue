@@ -51,6 +51,7 @@ export default {
             default: () => []
         }
     },
+    emits: ["set-selected-items", "set-divisor", "set-factor", "set-numerical-values"],
     data () {
         return {
             isCollapsed: true
@@ -118,10 +119,9 @@ export default {
                     <Dropdown-Autocomplete
                         class="flex-grow-1"
                         :items="itemList"
-                        :multiple="false"
-                        :selected-items="itemListSelected"
+                        :model-value="itemListSelected"
                         :label="$t('additional:modules.tools.cosi.calculateRatio.statData')"
-                        @update:selected-items="$emit('set-selected-items', [$event])"
+                        @update:model-value="$emit('set-selected-items', [$event])"
                     />
                     <a
                         data-bs-toggle="collapse"
@@ -163,10 +163,9 @@ export default {
                     <Dropdown-Autocomplete
                         class="flex-grow-1"
                         :items="itemList"
-                        :multiple="false"
-                        :selected-items="itemListSelected"
+                        :model-value="itemListSelected"
                         :label="$t('additional:modules.tools.cosi.calculateRatio.subjectData')"
-                        @update:selected-items="$emit('set-selected-items', [$event])"
+                        @update:model-value="$emit('set-selected-items', [$event])"
                     />
                     <a
                         data-bs-toggle="collapse"
@@ -202,10 +201,9 @@ export default {
                             <Dropdown-Autocomplete
                                 class="w-50"
                                 :items="numericalValues"
-                                :multiple="false"
-                                :selected-items="numericalValuesSelected"
+                                :model-value="numericalValuesSelected"
                                 label="Parameter"
-                                @update:selected-items="$emit('set-numerical-values', [$event])"
+                                @update:model-value="$emit('set-numerical-values', [$event])"
                             />
                         </div>
                     </div>

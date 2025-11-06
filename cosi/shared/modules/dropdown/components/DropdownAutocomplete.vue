@@ -33,62 +33,71 @@ export default {
             default: 3,
             required: false
         },
+        modelValue: {
+            type: null,
+            required: false,
+            default: undefined
+        },
         multiple: {
             type: Boolean,
-            default: true,
+            default: false,
             required: false
         },
         selectAll: {
             type: Boolean,
             default: false,
             required: false
-        },
-        selectedItems: {
-            type: Array,
-            required: false,
-            default: () => []
         }
     },
-    emits: ["update:selected-items"],
+    emits: ["update:modelValue"],
     computed: {
         /**
          * Checks whether all items are selected.
          * @returns {Boolean} True if all items are selected.
          */
         allSelectedItems () {
-            return this.selectedItems.length === this.items.length;
+            return this.modelValue?.length === this.items.length;
         },
 
         /**
          * Checks whether some items are selected.
-         * @returns {Boolean} True if more than one value is selected, but not all.
+         * @returns {Boolean} True if more than one value is selected, or all values.
          */
         someSelectedItems () {
-            return this.selectedItems.length > 0;
+            if (!this.multiple) {
+                return this.modelValue !== null && this.modelValue !== undefined;
+            }
+            return this.modelValue?.length > 0;
         }
     },
     methods: {
         /**
-         * Toggles the selection of all items in the dropdown.
+         * Toggles the selection of all items in the dropdown. Only for multiple selection.
          * @returns {void}
          */
         toggleSelectAll () {
+            if (!this.multiple) {
+                return;
+            }
             if (this.allSelectedItems) {
-                this.$emit("update:selected-items", []);
+                this.$emit("update:modelValue", []);
             }
             else {
-                this.$emit("update:selected-items", this.items.slice());
+                this.$emit("update:modelValue", this.items.slice());
             }
         },
         /**
-         * Removes a specific item from the selected items.
+         * Removes a specific item from the selected items. Only for multiple selection.
          * @param {String} itemToRemove - The item to be removed.
          * @returns {void}
          */
         removeItem (itemToRemove) {
-            const items = this.selectedItems.filter(item => item !== itemToRemove);
+            if (!this.multiple) {
+                return;
+            }
+            const items = this.modelValue.filter(item => item !== itemToRemove);
 
-            this.$emit("update:selected-items", items);
+            this.$emit("update:modelValue", items);
         }
     }
 };
@@ -101,7 +110,7 @@ export default {
         </template>
         <v-autocomplete
             v-else
-            :model-value="selectedItems"
+            :model-value="modelValue"
             :items="items"
             :label="label"
             :multiple="multiple"
@@ -109,7 +118,7 @@ export default {
             chips
             closable-chips
             hide-details
-            @update:modelValue="(value) => $emit('update:selected-items', value)"
+            @update:modelValue="(value) => $emit('update:modelValue', value)"
         >
             <template
                 v-if="selectAll"
@@ -141,10 +150,10 @@ export default {
                     </template>
                 </v-chip>
                 <span
-                    v-if="index === maxChipCount"
+                    v-if="multiple && index === maxChipCount"
                     class="grey--text text-caption"
                 >
-                    (+{{ selectedItems.length - maxChipCount }} weitere)
+                    (+{{ modelValue.length - maxChipCount }} weitere)
                 </span>
             </template>
         </v-autocomplete>

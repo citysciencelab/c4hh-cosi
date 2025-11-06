@@ -144,9 +144,8 @@ export default {
         <DropdownAutocomplete
             :items="getDropdownItems()"
             :label="'Inhalt'"
-            :multiple="false"
-            :selected-items="[card.name]"
-            @update:selected-items="mergeCardAttributes(index, $event)"
+            :model-value="[card.name]"
+            @update:model-value="mergeCardAttributes(index, $event)"
         />
         <div v-if="card.expandable">
             <a
