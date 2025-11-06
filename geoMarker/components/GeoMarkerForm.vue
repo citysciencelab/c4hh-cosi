@@ -60,7 +60,7 @@ export default {
             geomarkerDescription: "",
             geomarkerClosedDate: null,
             geomarkerDescriptionInitial: "",
-            screenshotImage: "",
+            screenshotImage: null,
             attachment: null,
             createAnotherGeoMarker: false,
             savingInProgress: false,
@@ -514,7 +514,7 @@ export default {
          * @returns {void}
          */
         onScreenshotDeleted () {
-            this.screenshotImage = "";
+            this.screenshotImage = null;
         },
         /**
          * Handles attachment file change event (file input or drag & drop)

@@ -101,6 +101,7 @@ export default {
         >
             <template #default>
                 <img
+                    v-if="imgSource"
                     class="screenshotPreviewArea"
                     :src="imgSource"
                     :alt="$t('additional:modules.geoMarker.screenshot.altImage')"
