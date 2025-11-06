@@ -445,6 +445,35 @@ export function exportToPDF ({layerResults, fileName, setIsLoading, translations
 }
 
 /**
+ * Return value formatter.
+ * @param {Array} layerResults - The layer results
+ * @returns {object} json format usable for export and getter
+ */
+export function formatJsonData (layerResults) {
+    return layerResults.map(layer => {
+        return {
+            layerName: layer.layerName,
+            headers: layer.headers.map(header => {
+                const {displayName} = getHeaderInfo(header);
+
+                return displayName;
+            }),
+            rows: layer.rows.map(row => {
+                const newRow = {};
+
+                layer.headers.forEach(header => {
+                    const {displayName, key} = getHeaderInfo(header),
+                        value = getRowValue(row, key, header);
+
+                    newRow[displayName] = value !== undefined ? value : "";
+                });
+                return newRow;
+            })
+        };
+    });
+}
+
+/**
  * Exports the data as a JSON file
  * @param {Object} options - The export options
  * @param {Array} options.layerResults - The layer results
@@ -453,28 +482,7 @@ export function exportToPDF ({layerResults, fileName, setIsLoading, translations
  */
 export function exportToJSON ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
-    const jsonData = layerResults.map(layer => {
-            return {
-                layerName: layer.layerName,
-                headers: layer.headers.map(header => {
-                    const {displayName} = getHeaderInfo(header);
-
-                    return displayName;
-                }),
-                rows: layer.rows.map(row => {
-                    const newRow = {};
-
-                    layer.headers.forEach(header => {
-                        const {displayName, key} = getHeaderInfo(header),
-                            value = getRowValue(row, key, header);
-
-                        newRow[displayName] = value !== undefined ? value : "";
-                    });
-                    return newRow;
-                })
-            };
-        }),
-
+    const jsonData = formatJsonData(layerResults),
         blob = new Blob([JSON.stringify(jsonData, null, 2)], {type: "application/json"}),
         link = document.createElement("a"),
         url = URL.createObjectURL(blob);

@@ -26,6 +26,8 @@ import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
 import {addExtentCoordinates, processPointResults} from "../utils/geometryUtils";
 import mapCollection from "@core/maps/js/mapCollection";
+import {loadModule} from "../utils/loadModule";
+import "./pollJobResultsPolyfill";
 
 const actions = {
     /**
@@ -239,48 +241,63 @@ const actions = {
      * Fetches additional requests and commits the aggregated results.
      *
      * @param {Object} context - The Vuex action context.
-     * @param {Function} context.commit - The Vuex commit function.
-     * @param {Object} context.state - The Vuex state object.
      * @param {string} [trigger="init"] - The trigger that initiated this request.
      * @returns {Promise<void>}
      */
-    async fetchAdditionalRequests ({commit, dispatch, state}, trigger = "init") {
-        const additionalResults = await Promise.all(state.additionalRequests
-            .filter(request => !request.triggerRequestOn || request.triggerRequestOn === trigger)
-            .map(async request => {
-                if (request.type === "ogcApiProcesses") {
-                    try {
-                        const inputs = {
-                                ...request.inputs,
-                                area: state.bufferedFeature ?
-                                    new GeoJSON().writeGeometry(state.bufferedFeature.getGeometry()) :
-                                    null
-                            },
-                            result = await OGCAPIProcesses.executeProcess(request.url, request.processId, inputs);
+    async fetchAdditionalRequests (context, trigger = "init") {
+        const {commit, dispatch, state, rootGetters} = context,
+            additionalResults = await Promise.all(state.additionalRequests
+                .filter(request => !request.triggerRequestOn || request.triggerRequestOn === trigger)
+                .map(async request => {
+                    if (request.type === "ogcApiProcesses") {
+                        try {
+                            const inputs = {
+                                    ...request.staticInputs ?? {},
+                                    ...(request.dynamicInputs?.getters ?? []).reduce((accumulator, current) => {
+                                        accumulator[current.key] = rootGetters[current.path];
+                                        return accumulator;
+                                    }, {}),
+                                    ...await (request.dynamicInputs?.parsers ?? []).reduce(async (accumulator, current) => {
+                                        const resolvedAccumulator = await accumulator;
 
-                        return {
-                            url: request.url,
-                            text: result.outputs.result.value,
-                            infoText: request.infoText || ""
-                        };
+                                        resolvedAccumulator[current.key] = (await loadModule(current.path))(context);
+                                        return resolvedAccumulator;
+                                    }, Promise.resolve({}))
+                                },
+                                executeResponse = await OGCAPIProcesses.executeProcess(request.url, request.processId, inputs),
+                                jobID = executeResponse.jobID,
+                                jobResults = await OGCAPIProcesses.pollJobResults(request.url, jobID, {
+                                    timeout: request.timeout,
+                                    stallFor: request.stallFor
+                                });
+
+                            return {
+                                url: request.url,
+                                text: JSON.stringify(
+                                    request.resultText
+                                        ? request.resultText.reduce((stepper, key) => stepper[key], jobResults)
+                                        : jobResults.outputs, null, 2
+                                ),
+                                infoText: request.infoText || ""
+                            };
+                        }
+                        catch (error) {
+                            console.error("Error executing OGC API Process:", error);
+
+                            dispatch("Alerting/addSingleAlert", {
+                                category: "error",
+                                content: i18next.t("additional:modules.combinedGfi.errors.ogcApiProcessError")
+                            }, {root: true});
+
+                            return {
+                                url: request.url,
+                                text: i18next.t("additional:modules.combinedGfi.errors.ogcApiProcessError"),
+                                infoText: request.infoText || ""
+                            };
+                        }
                     }
-                    catch (error) {
-                        console.error("Error executing OGC API Process:", error);
-
-                        dispatch("Alerting/addSingleAlert", {
-                            category: "error",
-                            content: i18next.t("additional:modules.combinedGfi.errors.ogcApiProcessError")
-                        }, {root: true});
-
-                        return {
-                            url: request.url,
-                            text: i18next.t("additional:modules.combinedGfi.errors.ogcApiProcessError"),
-                            infoText: request.infoText || ""
-                        };
-                    }
-                }
-                throw new Error(i18next.t("additional:modules.combinedGfi.errors.unsupportedRequestType") + `: "${request.type}"`);
-            }));
+                    throw new Error(i18next.t("additional:modules.combinedGfi.errors.unsupportedRequestType") + `: "${request.type}"`);
+                }));
 
         commit("setAdditionalRequestResults", additionalResults);
     },

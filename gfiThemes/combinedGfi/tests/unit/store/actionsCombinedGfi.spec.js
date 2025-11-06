@@ -1,16 +1,13 @@
 import sinon from "sinon";
 import {expect} from "chai";
-import actions from "../../../store/actionsCombinedGfi.js";
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
 import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses";
-
-const mockExecuteProcess = sinon.stub();
-
-OGCAPIProcesses.executeProcess = mockExecuteProcess;
+import actions from "../../../store/actionsCombinedGfi.js";
+import {loadModule} from "../../../utils/loadModule.js";
 
 describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
-    let commit, dispatch, state, rootGetters, originalMapCollection, originalRawLayerList, originalDocument, originalWindow, originalURL, originalBlob;
+    let commit, dispatch, state, rootGetters, originalMapCollection, originalRawLayerList, originalDocument, originalWindow, originalURL, originalBlob, mockExecuteProcess, mockPollJobResults;
 
     beforeEach(() => {
         originalMapCollection = global.mapCollection;
@@ -141,6 +138,9 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
         global.Blob = function (content, options) {
             return {content, options};
         };
+
+        mockExecuteProcess = sinon.stub(OGCAPIProcesses, "executeProcess");
+        mockPollJobResults = sinon.stub(OGCAPIProcesses, "pollJobResults");
     });
 
     afterEach(() => {
@@ -153,6 +153,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
 
         sinon.restore();
         mockExecuteProcess.reset();
+        mockPollJobResults.reset();
     });
 
     it("sets layers to request during initialization", async () => {
@@ -356,20 +357,17 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
 
         it("should execute OGC API Process request when type is ogcApiProcesses", async () => {
             const mockResult = {
-                outputs: {
-                    result: {
-                        value: "Test Result"
-                    }
-                }
+                outputs: "Test Result"
             };
 
-            mockExecuteProcess.resolves(mockResult);
+            mockExecuteProcess.resolves({jobID: "1337"});
+            mockPollJobResults.resolves(mockResult);
 
             testState.additionalRequests = [{
                 url: "https://example.com",
                 type: "ogcApiProcesses",
                 processId: "testProcess",
-                inputs: {
+                staticInputs: {
                     area: {
                         type: "geometry",
                         format: "application/geo+json"
@@ -377,7 +375,6 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
                 }
             }];
             testState.bufferedFeature = mockFeature;
-
             await actions.fetchAdditionalRequests({commit: testCommit, state: testState}, "init");
 
             expect(mockExecuteProcess.calledWith(
@@ -389,7 +386,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
             )).to.be.true;
             expect(testCommit.calledWith("setAdditionalRequestResults", [{
                 url: "https://example.com",
-                text: "Test Result",
+                text: "\"Test Result\"",
                 infoText: ""
             }])).to.be.true;
         });
@@ -401,20 +398,20 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
                     type: "ogcApiProcesses",
                     processId: "testProcess1",
                     triggerRequestOn: "init",
-                    inputs: {}
+                    staticInputs: {}
                 },
                 {
                     url: "https://example2.com",
                     type: "ogcApiProcesses",
                     processId: "testProcess2",
                     triggerRequestOn: "queryBuffer",
-                    inputs: {}
+                    staticInputs: {}
                 }
             ];
 
-            mockExecuteProcess.resolves({
-                outputs: {result: {value: "Test Result"}}
-            });
+            mockExecuteProcess.resolves({jobID: "1337"});
+            mockPollJobResults.resolves({outputs: "Test Result"});
+            loadModule;
 
             await actions.fetchAdditionalRequests({commit: testCommit, state: testState}, "init");
 
@@ -424,6 +421,46 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
                 "testProcess1",
                 sinon.match.any
             )).to.be.true;
+        });
+
+        it("should consider all OGC API Process input sources for its request", async () => {
+            const mockResult = {
+                    outputs: "Test Result"
+                },
+                fetchStub = sinon.stub(global, "fetch");
+
+            mockExecuteProcess.resolves({jobID: "1337"});
+            mockPollJobResults.resolves(mockResult);
+            rootGetters.seven = 7;
+            fetchStub.resolves(new Response(
+                "module.exports = () => 5;",
+                {status: 200, headers: {"content-type": "application/javascript"}}
+            ));
+
+            testState.additionalRequests = [{
+                url: "https://example.com",
+                type: "ogcApiProcesses",
+                processId: "testProcess",
+                staticInputs: {
+                    "car": "pet"
+                },
+                dynamicInputs: {
+                    parsers: [{path: "/js/returnFive.js", key: "five"}],
+                    getters: [{path: "seven", key: "seven"}]
+                }
+            }];
+
+            await actions.fetchAdditionalRequests({commit: testCommit, state: testState, rootGetters}, "init");
+
+            expect(mockExecuteProcess.firstCall.args).to.deep.equal([
+                "https://example.com",
+                "testProcess",
+                {
+                    "car": "pet",
+                    "seven": 7,
+                    "five": 5
+                }
+            ]);
         });
 
         it("should throw error for unsupported request type", async () => {

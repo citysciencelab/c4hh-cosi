@@ -57,15 +57,7 @@ Here's a complete example using the recommended nested format:
           }
         }
       ],
-      "additionalRequests": [
-        {
-          "url": "https://api.example.com/additional-data",
-          "method": "GET",
-          "params": {
-            "format": "json"
-          }
-        }
-      ]
+      "additionalRequests": []
     }
   }
 }
@@ -145,7 +137,22 @@ Example:
 
 You can configure additional requests to be made alongside the layer queries:
 
-- `additionalRequests`: An array of additional request configurations.
+- `additionalRequests`: An array of additional request configurations:
+
+| Parameter | Typ | Beschreibung |
+|-----------|-----|--------------|
+| `url` | string | Service URL. |
+| `infoText` | string? | If given, this text is additionally shown beneath the service return value. |
+| `triggerRequestOn` | enum["init", "queryBuffer"] | The additional request will either fire on every request or only on queryBuffer requests, where an additional area around the target can be defined. |
+| `type` | enum["ogcApiProcesses"] | Service type. Currently, only "ogcApiProcesses" are supported. |
+| `resultText` | string[]? | If defined, it is assumed that the service return value is json, and that it can be stepped into. For each string in this array, the return object will be stepped into, and the final step should return a displayable string. If not defined in `type` `"ogcApiProcesses"`, it defaults to `["outputs"]`. |
+| `processId` | string? | If `type` is `ogcApiProcesses`, this will be used as process id. |
+| `staticInputs` | object | If `type` is `ogcApiProcesses`, this will be spread into the request's `inputs` initially. |
+| `dynamicInputs` | object | If `type` is `ogcApiProcesses`, this will be used to spread dynamic data into the request's `inputs` initially. |
+| `dynamicInputs.getters` | {path: string, key: string}[]? | An optional array of getters. If given, the getter at `path` (as seen from root) will be used as input with name `key`. |
+| `dynamicInputs.parsers` | {path: string, key: string}[]? | An optional array of parsers that can be provided via configuration. If given, the javascript file at `path` must direct to a `.js` that has the parser as `module.exports`. The method will be called with the `context` action and may therefore be written like a payloadless action. The response will be used as input with name `key`. |
+| `timeout` | number? | If `type` is `ogcApiProcesses`, this many miliseconds will be waited until the service is considered timeouted. |
+| `stallFor` | number? | If `type` is `ogcApiProcesses`, this many miliseconds will be waited before a new request. |
 
 Example:
 
@@ -153,11 +160,21 @@ Example:
 {
   "additionalRequests": [
     {
-      "url": "https://example.com/api/data",
-      "method": "GET",
-      "params": {
-        "format": "json"
-      }
+      "url": "https://gwbfp-text-generation.dsc.dataport.de",
+      "infoText": "Die Textgenerierung wird mithilfe von KI erstellt und dient zur schnellen Informationsgewinnung. Bitte prüfen Sie alle automatisch generierten Inhalte sorgfältig, bevor Sie diese weiterverwenden.",
+      "resultText": ["outputs", "text"],
+      "type": "ogcApiProcesses",
+      "processId": "gewerbeflaechenportal.generate_description",
+      "triggerRequestOn": "queryBuffer",
+      "staticInputs": {
+        "kiss me baby": "one more time"
+      },
+      "dynamicInputs": {
+        "getters": [{"path": "Modules/CombinedGfi/jsonData", "key": "getter"}],
+        "parsers": [{"path": "./resources/inputsFormatter.js", "key": "parser"}]
+      },
+      "timeout": 20000,
+      "stallFor": 2000
     }
   ]
 }

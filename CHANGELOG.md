@@ -7,6 +7,8 @@
 ### __Breaking Changes__
 
 ### Added
+- PopulationRequest: Added support for OGC API Processes.
+- gfiThemes: The GFI theme `combinedGfi` has been extended with more powerful configuration values to use OGC API processes with dynamic data. Please refer to the provided `README.md` file.
 
 ### Changed
 

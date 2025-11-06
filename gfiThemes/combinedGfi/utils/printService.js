@@ -3,69 +3,7 @@
  * Contains functions for loading print utils, sending print requests, and processing responses
  */
 
-/**
- * Loads and executes the print utils module
- *
- * @param {string} utilsPath - The path to the print utils module
- * @param {Response} existingResponse - An existing response if already fetched
- * @returns {Promise<Object>} The prepared module and the preparePrintRequest function
- * @throws {Error} If the module could not be loaded or the function not found
- */
-export async function loadPrintUtilsModule (utilsPath, existingResponse) {
-    const response = existingResponse,
-        printUtilsPath = utilsPath,
-        contentType = response.headers.get("content-type"),
-        text = await response.text();
-
-    if (!response || !response.ok) {
-        console.error("Failed to load printUtils.js");
-        return null;
-    }
-
-    if (contentType?.includes("text/html") ||
-        text.trim().startsWith("<!DOCTYPE") ||
-        text.trim().startsWith("<html")) {
-        throw new Error(`Received HTML instead of JavaScript from ${printUtilsPath}`);
-    }
-
-    if (!text.trim()) {
-        throw new Error(`Empty content received from ${printUtilsPath}`);
-    }
-
-    try {
-
-        // Nur CommonJS-Variante verwenden
-        let preparePrintRequest;
-        const module = {exports: {}},
-            exports = module.exports;
-
-        // eslint-disable-next-line no-new-func
-        new Function("module", "exports", text)(module, exports);
-
-        if (typeof module.exports.preparePrintRequest === "function") {
-            preparePrintRequest = module.exports.preparePrintRequest;
-        }
-        else if (typeof exports.preparePrintRequest === "function") {
-            preparePrintRequest = exports.preparePrintRequest;
-        }
-        else if (typeof module.exports === "function") {
-            preparePrintRequest = module.exports;
-        }
-
-        if (!preparePrintRequest || typeof preparePrintRequest !== "function") {
-            throw new Error(`preparePrintRequest function not found in ${printUtilsPath}`);
-        }
-
-        return {
-            preparePrintRequest,
-            printUtilsPath
-        };
-    }
-    catch (error) {
-        console.error("Error loading printUtils module:", error);
-        throw new Error(`Failed to load printUtils module: ${error.message}`);
-    }
-}
+import {loadModule} from "./loadModule";
 
 /**
  * Sends the print request to the server
@@ -137,27 +75,6 @@ export async function processPrintResponse (printResponse) {
 }
 
 /**
- * Tries to fetch print utils from multiple paths
- * @param {Array<string>} paths - Array of paths to try
- * @returns {Promise<Object>} Object with path and response
- */
-export async function tryFetchPrintUtils (paths) {
-    for (const path of paths) {
-        try {
-            const resp = await fetch(path);
-
-            if (resp.ok) {
-                return {path, response: resp};
-            }
-        }
-        catch (err) {
-            console.error(`Failed to load from ${path}`);
-        }
-    }
-    return {path: null, response: null};
-}
-
-/**
  * Main function to send a print request using the print service
  * @param {Object} options - Configuration options
  * @param {Object} options.feature - The feature to print
@@ -191,11 +108,7 @@ export async function sendPrintRequest ({
         let printUtils;
 
         try {
-            const {path, response: utilsResponse} = await tryFetchPrintUtils([printUtilsPath, "./resources/printUtils.js"]);
-
-            if (path && utilsResponse) {
-                printUtils = await loadPrintUtilsModule(path, utilsResponse);
-            }
+            printUtils = await loadModule(printUtilsPath);
         }
         catch (err) {
             console.error(`Failed to load from ${printUtilsPath}`);

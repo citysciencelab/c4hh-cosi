@@ -1,5 +1,6 @@
 import state from "./stateCombinedGfi";
 import {generateSimpleGetters} from "../../../../src/shared/js/utils/generators";
+import {formatJsonData} from "../utils/exportUtils";
 
 
 const getters = {
@@ -23,7 +24,15 @@ const getters = {
     tableData: CombinedGfiState => ({
         headers: CombinedGfiState.columns,
         items: CombinedGfiState.rows
-    })
+    }),
+    /**
+     * Getter for json data. Can be used for `dynamicImports` in case the OGC API relies on other service's data.
+     *
+     * @function
+     * @param {Object} CombinedGfiState - The state object for combinedGfi.
+     * @returns {object} json of retrieved information as it would appear in a json export
+     */
+    jsonData: CombinedGfiState => formatJsonData(CombinedGfiState.layerResults)
 };
 
 export default getters;
