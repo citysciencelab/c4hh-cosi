@@ -39,7 +39,14 @@
             "referenceYear": "Reference year"
           },
           "alert": {
-              "infoFrontPage": "Neuwerk and Scharhörn are shown as separate maps."
+            "infoFrontPage": "Neuwerk and Scharhörn are shown as separate maps.",
+            "noDataAlert": "There is no data available to create a report.",
+            "noStatisticalData": "There is no statistical data available for selection.",
+            "noStatisticalDataSelected": "No content has been selected. The report contains no statistical data.",
+            "noSubjectData": "There is no subject data available for selection.",
+            "noSubjectDataSelected": "No content has been selected. The report contains no subject data.",
+            "noAnalyses": "There are no analyses available for selection.",
+            "noAnalysesSelected": "No content has been selected. The report contains no analyses."
           },
            "button": {
               "confirmAndNext": "Confirm and next",

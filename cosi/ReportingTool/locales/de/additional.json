@@ -39,7 +39,14 @@
               "referenceYear": "Bezugsjahr"
             },
             "alert": {
-              "infoFrontPage": "Neuwerk und Scharhörn werden als separate Karten dargestellt."
+              "infoFrontPage": "Neuwerk und Scharhörn werden als separate Karten dargestellt.",
+              "noDataAlert": "Es sind keine Daten zum Erstellen eines Berichts vorhanden.",
+              "noStatisticalData": "Es sind keine statistischen Daten zum Auswählen vorhanden.",
+              "noStatisticalDataSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine statistischen Daten.",
+              "noSubjectData": "Es sind keine Fachdaten zum Auswählen vorhanden.",
+              "noSubjectDataSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Fachdaten.",
+              "noAnalyses": "Es sind keine Analysen zum Auswählen vorhanden.",
+              "noAnalysesSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Analysen."
             },
             "button": {
               "confirmAndNext": "Bestätigen und weiter",

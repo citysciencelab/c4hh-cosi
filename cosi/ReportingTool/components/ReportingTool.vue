@@ -85,6 +85,7 @@ export default {
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
+        ...mapGetters("Modules/AccessibilityAnalysis", ["dataSets"]),
         ...mapGetters("Modules/Dashboard", ["items"]),
         ...mapGetters("Modules/FeaturesList", ["featuresListItems"]),
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevel", "selectedDistrictNames", "selectedFeatures", "initMapping"]),
@@ -126,6 +127,15 @@ export default {
          */
         isAuthorValid () {
             return this.author.length < this.authorMaxLength;
+        },
+        /**
+         * Checks if there is no selectable data to be included in the report.
+         * @returns {Boolean} True if there is no selectable data.
+         */
+        noDataView () {
+            return !this.selectedDistrictNames?.length
+                && !this.dataSets?.length
+                && !this.featuresListItems?.length;
         },
         /**
          * Gets the labels of the selected districts.
@@ -888,7 +898,7 @@ export default {
             :locale="currentLocale"
             summary="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum."
         />
-        <div v-if="!printReportView">
+        <div v-if="!printReportView && !noDataView">
             <h5>
                 {{ $t("additional:modules.cosi.reportingTool.createReport") }}
             </h5>
@@ -999,41 +1009,65 @@ export default {
                     </v-stepper-window-item>
                     <v-stepper-window-item value="2">
                         <ReportingToolStepItem
+                            v-if="selectedDistrictNames?.length"
                             :card-mapping="categoryMapping?.statData"
                             :title="'2. ' + $t('additional:modules.cosi.reportingTool.statisticalData')"
+                            :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noStatisticalDataSelected')"
+                        />
+                        <AlertMessage
+                            v-else
+                            :text="$t('additional:modules.cosi.reportingTool.alert.noStatisticalData')"
+                            type="noData"
                         />
                     </v-stepper-window-item>
                     <v-stepper-window-item
                         value="3"
                     >
-                        <SwitchInput
-                            id="reporting-tool-infrastructure-limit-switch"
-                            class="mb-3"
-                            :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
-                            :aria="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
-                            :checked="infrastructureTableLimitEnabled"
-                            :interaction="evt => infrastructureTableLimitEnabled = evt.target.checked"
-                        />
-                        <InputText
-                            v-if="infrastructureTableLimitEnabled"
-                            id="infrastructure-table-limit-input"
-                            v-model="infrastructureTableLimit"
-                            type="number"
-                            class="mb-3"
-                            :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
-                            :placeholder="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
-                        />
-                        <ReportingToolStepItem
-                            :card-mapping="categoryMapping?.subjectData"
-                            :title="'3. ' + $t('additional:modules.cosi.reportingTool.subjectData')"
+                        <template
+                            v-if="featuresListItems?.length"
+                        >
+                            <SwitchInput
+                                id="reporting-tool-infrastructure-limit-switch"
+                                class="mb-3"
+                                :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
+                                :aria="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
+                                :checked="infrastructureTableLimitEnabled"
+                                :interaction="evt => infrastructureTableLimitEnabled = evt.target.checked"
+                            />
+                            <InputText
+                                v-if="infrastructureTableLimitEnabled"
+                                id="infrastructure-table-limit-input"
+                                v-model="infrastructureTableLimit"
+                                type="number"
+                                class="mb-3"
+                                :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
+                                :placeholder="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
+                            />
+                            <ReportingToolStepItem
+                                :card-mapping="categoryMapping?.subjectData"
+                                :title="'3. ' + $t('additional:modules.cosi.reportingTool.subjectData')"
+                                :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noSubjectDataSelected')"
+                            />
+                        </template>
+                        <AlertMessage
+                            v-else
+                            :text="$t('additional:modules.cosi.reportingTool.alert.noSubjectData')"
+                            type="noData"
                         />
                     </v-stepper-window-item>
                     <v-stepper-window-item
                         value="4"
                     >
                         <ReportingToolStepItem
+                            v-if="dataSets?.length"
                             :card-mapping="categoryMapping?.analyses"
                             :title="'4. ' + $t('additional:modules.cosi.reportingTool.analyses')"
+                            :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noAnalysesSelected')"
+                        />
+                        <AlertMessage
+                            v-else
+                            :text="$t('additional:modules.cosi.reportingTool.alert.noAnalyses')"
+                            type="noData"
                         />
                     </v-stepper-window-item>
                     <v-stepper-window-item
@@ -1073,6 +1107,11 @@ export default {
                 </v-stepper-actions>
             </v-stepper>
         </div>
+        <AlertMessage
+            v-else-if="noDataView"
+            :text="$t('additional:modules.cosi.reportingTool.alert.noDataAlert')"
+            type="noData"
+        />
         <div v-else>
             <h5>
                 {{ $t("additional:modules.cosi.reportingTool.createReport") }}

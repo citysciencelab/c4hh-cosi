@@ -1,4 +1,5 @@
 <script>
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import Badges from "../../shared/modules/badges/components/Badges.vue";
 import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
@@ -9,6 +10,7 @@ import {uniqueId} from "@shared/js/utils/uniqueId";
 export default {
     name: "ReportingToolStepItem",
     components: {
+        AlertMessage,
         Badges,
         CustomCard,
         DropdownAutocomplete,
@@ -19,6 +21,11 @@ export default {
         cardMapping: {
             type: Array,
             required: true
+        },
+        nothingSelectedText: {
+            type: String,
+            required: false,
+            default: null
         },
         title: {
             type: String,
@@ -113,7 +120,12 @@ export default {
         {{ title }}
     </h5>
     <ReportingToolStepItemSettings
-        v-if="title === '2. Statistische Daten'"
+        v-if="title.startsWith('2. ')"
+    />
+    <AlertMessage
+        v-if="cards.length === 0 && nothingSelectedText"
+        :text="nothingSelectedText"
+        type="info"
     />
     <CustomCard
         v-for="(card, index) in cards"
