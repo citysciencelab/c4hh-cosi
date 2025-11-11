@@ -39,10 +39,7 @@ export default {
         };
     },
     mounted () {
-        this.cards = this.cardMapping.map(item => ({
-            id: uniqueId("reporting-tool-card-"),
-            name: item.name
-        }));
+        this.cards = this.cardMapping.map(item => ({...item, id: uniqueId("reporting-tool-card-")}));
     },
 
     methods: {
