@@ -118,11 +118,8 @@ export function union (features, resetProperties = false, returnsFeature = false
 
     // join features
     for (let i = 1; i < geojson.features.length; i++) {
-        console.log(geojson.features[i]);
-         // Überprüfe jeden LinearRing im Polygon
+        // Überprüfe jeden LinearRing im Polygon
         for (const ring of geojson.features[i].geometry.coordinates) {
-            console.log(ring);
-
             if (ring.length < 4) {
                 return false;
             }

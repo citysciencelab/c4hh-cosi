@@ -45,9 +45,9 @@ const state = {
     selectedDistrictLevelId: undefined,
     selectedDistrictsCollection: null,
     selectedDistrictNames: [],
+    selectedTabItem: undefined,
     selectionCardsSubjectData: [],
     selectionCardsStatisticalData: [],
-    selectionMode: undefined,
     toolToOpen: undefined,
     wpsServiceId: "1001",
     wpsProcess: "einwohner_ermitteln.fmw"

@@ -75,7 +75,7 @@ export default {
             if (foundEqualObject) {
                 return;
             }
-            this.addCard(feature, this.buffer, card.selectedDistricts, card.status, card.districtLevelId);
+            this.addCard(feature, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel);
         });
 
         if (this.activeCard) {
@@ -92,13 +92,15 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId"]),
-
-        addCard (feature, buffer, districtNames, status, districtLevelId) {
+        // {value: "Bezugsebene: " + this.selectedDistrictLevel.label},
+        // {icon: "bi-map", label: "Gebiete: " + selectedDistricts.map(district => district.getName())},
+        addCard (feature, buffer, districtNames, status, districtLevelId, districtLevelLabel) {
             this.cards.push({
                 badgeList: this.getBadges(),
                 buffer,
                 data: [
-                    {value: this.$t("additional:modules.cosi.districtSelector.area") + " " + (this.cardCounter += 1)},
+                    {value: "Bezugsebene: " + districtLevelLabel},
+                    {icon: "bi-map", label: "Gebiete: " + districtNames},
                     {icon: "bi-people", label: "Einwohner: Berechnung läuft..."},
                     {icon: "bi-record-circle", label: "Puffer " + buffer + " m"}
                 ],
@@ -330,7 +332,7 @@ export default {
             const parsedData = resp.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData.einwohner,
                 responseResult = JSON.parse(parsedData.ergebnis);
 
-            card.data[1].label = `Einwohner: ${thousandsSeparator(responseResult.einwohner_fhh)}`;
+            card.data[2].label = `Einwohner: ${thousandsSeparator(responseResult.einwohner_fhh)}`;
         }
     }
 };

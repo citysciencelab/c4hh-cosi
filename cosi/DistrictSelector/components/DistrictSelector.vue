@@ -15,7 +15,7 @@ export default {
     },
     data () {
         return {
-            availableModes: [
+            tabItems: [
                 {
                     type: "statistic",
                     text: this.$t("additional:modules.cosi.districtSelector.tabLabelOne"),
@@ -33,7 +33,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/DistrictSelector", ["selectionMode"]),
+        ...mapGetters("Modules/DistrictSelector", ["selectedTabItem"]),
         ...mapGetters("Modules/DistrictSelector", {
             cards: "selectionCardsStatisticalData"
         }),
@@ -43,10 +43,10 @@ export default {
         cards: {
             handler () {
                 if (this.cards.length > 0) {
-                    this.availableModes[1].disabled = false;
+                    this.tabItems[1].disabled = false;
                 }
                 else {
-                    this.availableModes[1].disabled = true;
+                    this.tabItems[1].disabled = true;
                 }
             },
             deep: true
@@ -56,12 +56,15 @@ export default {
         mapCollection.getMap("2D").once("rendercomplete", () => {
             this.loading = false;
         });
-        if (!this.selectionMode) {
-            this.setSelectionMode(this.availableModes[0]);
+        if (!this.selectedTabItem) {
+            this.setSelectedTabItem(this.tabItems[0]);
+        }
+        if (this.cards.length > 0) {
+            this.tabItems[1].disabled = false;
         }
     },
     methods: {
-        ...mapMutations("Modules/DistrictSelector", ["setSelectionMode"])
+        ...mapMutations("Modules/DistrictSelector", ["setSelectedTabItem"])
     }
 };
 </script>
@@ -76,19 +79,19 @@ export default {
     <hr class="my-4 mt-0 mx-0 text-black-50">
     <TabBar
         class="mb-4"
-        :active-item="selectionMode"
-        :items="availableModes"
+        :active-item="selectedTabItem"
+        :items="tabItems"
         :loading="loading"
-        @change="setSelectionMode"
+        @change="setSelectedTabItem"
     />
     <keep-alive>
         <DistrictSelectorStatistical
-            v-if="selectionMode.type === 'statistic'"
+            v-if="selectedTabItem.type === 'statistic'"
             :loading="loading"
         />
     </keep-alive>
     <DistrictSelectorSubject
-        v-if="selectionMode.type === 'subject'"
+        v-if="selectedTabItem.type === 'subject'"
         :loading="loading"
     />
 </template>

@@ -151,11 +151,6 @@ export default {
         if (this.selectedDistrictNames.length === 0) {
             styleSelectedDistrictLevels(this.districtLevels);
         }
-        this.cardsSubject.forEach((card, index) => {
-            if (card.status === "active") {
-                this.toggleCardStatus(index);
-            }
-        });
     },
 
     methods: {
@@ -164,14 +159,6 @@ export default {
         ...mapActions("Modules/DistrictSelector", ["loadStatFeatures"]),
         ...mapMutations("Modules/DistrictSelector", Object.keys(mutations)),
         ...mapMutations("Modules/Filter", ["setFilterGeometry"]),
-
-        /**
-         * Remove all features from the features collection of the select interaction.
-         * @returns {void}
-         */
-        clearFeatures () {
-            this.select.getFeatures().clear();
-        },
 
         /**
          * Sets the district level to the given id.
@@ -183,6 +170,14 @@ export default {
 
             this.setSelectedDistrictLevel(districtLevel);
             styleSelectedDistrictLevels(this.districtLevels, id, districtLevel.activeStyle);
+        },
+
+        /**
+         * Remove all features from the features collection of the select interaction.
+         * @returns {void}
+         */
+        clearFeatures () {
+            this.select.getFeatures().clear();
         },
 
         /**
@@ -465,6 +460,7 @@ export default {
             const activeIndex = this.cards.findIndex(card => card.status === "active");
 
             if (activeIndex === index) {
+                this.updateLayerBbox(this.cards[index].geometry);
                 return;
             }
             if (activeIndex !== -1) {
