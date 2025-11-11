@@ -1,12 +1,19 @@
 <script>
+import Badges from "../../badges/components/Badges.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 
 export default {
     name: "Card",
     components: {
+        Badges,
         IconButton
     },
     props: {
+        badgeList: {
+            type: Array,
+            required: false,
+            default: () => []
+        },
         data: {
             type: Array,
             required: true
@@ -78,6 +85,19 @@ export default {
                 class="flex-grow-1 list"
             >
                 <div
+                    v-if="badgeList"
+                    class="d-flex mb-2"
+                >
+                    <Badges
+                        v-for="(badge, idx) in badgeList"
+                        :key="idx"
+                        :background-color="badge.backgroundColor"
+                        :color="badge.color"
+                        :icon="badge.icon"
+                        :text="badge.text"
+                    />
+                </div>
+                <div
                     v-for="(element, index) in data"
                     :key="index"
                     class="list-element lh-1 mb-3"
@@ -88,7 +108,7 @@ export default {
                             :class="element.icon"
                             class="me-2"
                         />
-                        <span>
+                        <span v-if="element?.label">
                             {{ element.label }}
                         </span>
                     </div>

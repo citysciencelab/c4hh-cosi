@@ -19,6 +19,7 @@ export default function getBoundingGeometry (features, bufferValue = 0, portalCr
         console.error(`getBoundingGeometry: ${features} has to be defined and an array. ${bufferValue} has to be defined and a number`);
         return false;
     }
+
     const bufferVal = parseFloat(bufferValue),
         parser = new GeoJSON(),
         geometries = features

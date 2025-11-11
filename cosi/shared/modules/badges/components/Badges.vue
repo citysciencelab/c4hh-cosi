@@ -31,7 +31,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="me-1">
         <span
             class="badge"
             :style="style"

@@ -18,7 +18,7 @@ import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import {transformCoordinate, transformCoordinates} from "../utils/transformCoordinates";
-import TabBar from "../../components/TabBar.vue";
+import TabBar from "../../shared/modules/tabBar/components/TabBar.vue";
 import {simplify} from "../../utils/geometry/simplify";
 import {getFlatCoordinates} from "../../utils/geometry/getFlatCoordinates";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";

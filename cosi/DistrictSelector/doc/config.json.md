@@ -17,9 +17,7 @@ Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwal
 |districtLevels[i].activeStyle|nein|Object| |Benutzerdefinierte Styles für die jeweils ausgewählte Verwaltungsebene. Entspricht der Hierarchie des OpenLayers Style Definition|
 |districtLevels[i].districtNamesMap|nein|Object| |Benutzerdefiniertes dictionary zum bereitstellen von synonymen Gebietsnamen|
 |additionalInfoLayers|nein|Object| |Zusätzliche Info Layer die beim Nutzen des Tools angezeigt werden können. Der Key ist der angezeigte Bezeichner, der Value die Liste an Layer IDs|
-|showSelectedWarning|nein|Boolean| |Legt fest, ob die Warnung anzeigt wird, wenn keine Gebiete ausgewählt werden.|
 |toolToOpen|nein|String| |Das Werkzeug, das nach dem Schließen des DistrictSelector geöffnet wird.|
-|enableBuffer|nein|Boolean|true|Legt fest, ob der Puffer als InputFeld angezeigt wird.|
 
 **Beispiel**
 ```
@@ -27,7 +25,6 @@ Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwal
   "active": true,
   "name": "Gebietsauswahl",
   "toolToOpen": "templateManager",
-  "enableBuffer": true,
   "districtLevels": [
     {
       "layerId": "6071",
@@ -71,8 +68,7 @@ Mit dem DistrictSelector (Gebietsauswahl) wird ein Gebiet auf Basis einer Verwal
   "additionalInfoLayers": {
     "Sozialräume": ["20179"],
     "RISE": ["4411", "13895", "17040", "18712", "4413", "4409", "18713", "4412", "4410", "18714", "10767"]
-  },
-  "showSelectedWarning": true
+  }
 }
 ```
 

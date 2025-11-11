@@ -65,8 +65,7 @@ describe("addons/cosi/DistrictSelector/components/DistrictSelector.vue", () => {
                         icon: () => "bi-image",
                         districtLevels: () => districtLevels,
                         layerList: () => layerList,
-                        additionalInfoLayers: () => additionalInfoLayers,
-                        enableBuffer: () => true
+                        additionalInfoLayers: () => additionalInfoLayers
                     }
                 });
             }
@@ -178,8 +177,7 @@ describe("addons/cosi/DistrictSelector/components/DistrictSelector.vue", () => {
                                 icon: () => "bi-image",
                                 districtLevels: () => districtLevels,
                                 layerList: () => layerList,
-                                additionalInfoLayers: () => additionalInfoLayers,
-                                enableBuffer: () => false
+                                additionalInfoLayers: () => additionalInfoLayers
                             }
                         });
                     }

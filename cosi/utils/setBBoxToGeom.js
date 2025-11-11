@@ -25,7 +25,6 @@ function updateSource (model, bboxGeometry, app) {
         delete source.listeners_.featuresloadend;
     }
 
-
     if (bboxGeometry) {
         source.on("featuresloadend", function (evt) {
             if (model.attributes.renderer === "webgl") {
@@ -38,6 +37,7 @@ function updateSource (model, bboxGeometry, app) {
                 );
             }
             const filteredFeatures = model.featuresFilter(model.attributes, source.getFeatures());
+
 
             source.addFeatures(filteredFeatures);
             if (app) {

@@ -62,13 +62,13 @@ export default {
         },
 
         /**
-         * Determines the skeleton loader type based on the presence of a label and the number of items.
+         * Determines the skeleton loader type based on the number of items.
          * @returns {string} The skeleton loader type string.
          */
         skeletonType () {
             const itemCount = this.items.length;
 
-            return this.label ? `heading, chip@${itemCount}` : `chip@${itemCount}`;
+            return this.label ? `chip@${itemCount}` : `chip@${itemCount}`;
         }
     },
     methods: {
@@ -87,6 +87,7 @@ export default {
 <template lang="html">
     <div class="tag-group">
         <template v-if="loading">
+            <v-skeleton-loader type="subtitle" />
             <v-skeleton-loader :type="skeletonType" />
         </template>
         <template v-else>
@@ -136,8 +137,12 @@ export default {
         .v-chip__overlay {
             background-color: unset;
         }
-        .v-skeleton-loader__heading {
-            margin: 0 0 10px 0;
+
+        .v-skeleton-loader__subtitle {
+            .v-skeleton-loader__text {
+                margin-left: 0;
+                margin-top: 0;
+            }
         }
         .v-skeleton-loader__chip {
             margin: 0 10px 5px 0;

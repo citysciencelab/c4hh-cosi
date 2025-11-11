@@ -72,11 +72,9 @@ export default {
     },
 
     mounted () {
-        if (this.selectedDistrictNamesByMap.length) {
-            this.addSelectedValues(this.selectedDistrictNamesByMap,
-                this.levelsForFilter.find(level => level.layerId === this.selectedLevelId));
-            this.forceRerender();
-        }
+        this.addSelectedValues(this.selectedDistrictNamesByMap,
+            this.levelsForFilter.find(level => level.layerId === this.selectedLevelId));
+        this.forceRerender();
     },
 
     methods: {

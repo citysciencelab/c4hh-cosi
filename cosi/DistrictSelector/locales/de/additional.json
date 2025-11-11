@@ -2,19 +2,25 @@
     "modules": {
           "cosi": {
               "districtSelector": {
-                  "title": "Gebiet auswählen",
-                  "dropdownLabel": "Bitte wählen Sie einen Bezugsrahmen aus",
-                  "districtLevel": "Bezugsrahmen",
-                  "multiDropdownLabel": "Gebiete",
-                  "drawLabel": "Flächenauswahl der Gebiete",
-                  "inputLabel": "Puffer[m] für Infrastrukturdaten",
+                  "additionalInfoLayersHelp": "Mithilfe der Switcher können Sie zusätzliche Layer zur Orientierung einblenden. Die Layer können ebenfalls über den Themenbaum ein- und ausgeschaltet werden.",
                   "additionalLayer": "Hilfsebenen einblenden",
-                  "description": "Klicken Sie in der Karte auf ein oder mehrere Gebiete, um Ihr Planungsgebiet zu bestimmen. Alternativ können Sie die Gebiete über die Auswahlliste festlegen.",
+                  "area": "Gebiet",
+                  "bufferHeader": "Puffer festlegen",
+                  "bufferLabel": "Puffer[m]",
                   "buttonConfirm": "Gebiete bestätigen",
-                  "buttonReset": "Gebiete zurücksetzen",
+                  "deleteButtonArea": "Gebiet löschen",
+                  "description": "Bitte wählen Sie auf der Karte ein oder mehrere Gebiete aus, um Ihr Planungsgebiet festzulegen. Alternativ können Sie auch die Auswahllisten nutzen. Danach haben Sie die Option, das ausgewählte Gebiet für die Fachdaten anzupassen.",
+                  "districtLevel": "Bezugsebene",
+                  "drawHeader": "Gebiete zeichnen",
+                  "drawLabel": "Flächenauswahl der Gebiete",
                   "help": "Vor Beginn der Analyse/Planung können Sie hier ein Planungsgebiet auswählen. Die empirischen Daten werden für diese Gebiete geladen. Alternativ können Sie über das Werkzeug <strong>&quot;Vergleichbare Gebiete ermitteln&quot;</strong> Gebiete nach bestimmten Parametern auswählen. Mit dem <strong>Puffer</strong> können Sie wählen in welchem Radius um das gewählte Gebiet ausgewählte Einrichtungen angezeigt werden. Die Analysefunktionen werden davon nicht beeinflusst.",
-                  "warning": "<strong>Sie haben noch keine Gebiete ausgewählt. Es werden keine Datensätze geladen.</strong> Sie können trotzdem Fachdaten-Ebenen für die gesamte Stadt anzeigen lassen und Gebiete nach Parametern ermitteln.",
-                  "additionalInfoLayersHelp": "Mithilfe der Switcher können Sie zusätzliche Layer zur Orientierung einblenden. Die Layer können ebenfalls über den Themenbaum ein- und ausgeschaltet werden."
+                  "population": "Einwohner",
+                  "selectedAreas": "Ausgewählte Gebiete",
+                  "statisticalData": "Statistische Daten",
+                  "subjectData": "Fachdaten",
+                  "tabLabelOne": "Gebiete für Statistische Daten",
+                  "tabLabelTwo": "Gebiete für Fachdaten bearbeiten",
+                  "title": "Gebiet auswählen"
               }
           }
     }

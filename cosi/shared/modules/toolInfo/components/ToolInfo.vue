@@ -3,17 +3,23 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {mapGetters} from "vuex";
 import {uniqueId} from "@shared/js/utils/uniqueId";
+import {VSkeletonLoader} from "vuetify/components/VSkeletonLoader";
 
 export default {
     name: "ToolInfo",
     components: {
         AccordionItem,
-        FlatButton
+        FlatButton,
+        VSkeletonLoader
     },
     props: {
         isOpen: {
             type: Boolean,
             default: true
+        },
+        loading: {
+            type: Boolean,
+            default: false
         },
         summary: {
             type: String,
@@ -67,8 +73,23 @@ export default {
 
 <template>
     <div class="tool-info-container">
+        <template v-if="loading">
+            <v-skeleton-loader
+                height="40"
+                type="heading"
+            />
+            <v-skeleton-loader
+                height="68"
+                type="paragraph"
+            />
+            <v-skeleton-loader
+                class="justify-content-end"
+                height="60"
+                type="chip"
+            />
+        </template>
         <AccordionItem
-            v-if="summary || url"
+            v-else-if="summary || url"
             :id="uniqueId()"
             icon="bi bi-info-circle"
             :title="title"
@@ -101,9 +122,6 @@ export default {
 
     .tool-info-container {
         font-size: 0.85rem;
-        .tool-info-button {
-            min-height: 1.5rem;
-        }
     }
 
 </style>

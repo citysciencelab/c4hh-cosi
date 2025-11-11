@@ -18,9 +18,7 @@
  * @property {module:ol/Collection} selectedDistrictsCollection - All districts of the current district level.
  * @property {String[]} selectedDistrictNames - All names of the selected districts.
  * @property {Object {String: String[]}} additionalInfoLayers - Additional Layers to display as guidance and information. Set as keys to display with lists of layerIds. (config-param).
- * @property {Number} [bufferValue=0] - A buffer for the extent of the selected district(s).
  * @property {String} toolToOpen - the tool to be open after this tool is closed.
- * @property {Boolean} enableBuffer - to decide if buffer is enabled.
  */
 const state = {
     id: "districtSelector",
@@ -31,11 +29,8 @@ const state = {
     active: false,
     additionalInfoLayers: {},
     boundingGeometry: undefined,
-    bufferValue: 0,
     deactivateGFI: true,
     districtLevels: [],
-    enableBuffer: true,
-    extent: [],
     icon: "bi-image",
     isVisibleInMenu: true,
     loadend: false,
@@ -46,15 +41,16 @@ const state = {
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/018districtselector.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/cosi/manuals/018gebietsauswahl.md"
     },
-    remoteMetadata: {}, // after data is loaded, we also pull metadata remotely and store it here.
-    renderToWindow: true,
-    resizableWindow: false,
     selectedDistrictLevel: undefined,
     selectedDistrictLevelId: undefined,
     selectedDistrictsCollection: null,
     selectedDistrictNames: [],
-    showSelectedWarning: true,
-    toolToOpen: undefined
+    selectionCardsSubjectData: [],
+    selectionCardsStatisticalData: [],
+    selectionMode: undefined,
+    toolToOpen: undefined,
+    wpsServiceId: "1001",
+    wpsProcess: "einwohner_ermitteln.fmw"
 };
 
 export default state;
