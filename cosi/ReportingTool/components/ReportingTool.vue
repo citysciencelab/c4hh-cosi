@@ -164,6 +164,8 @@ export default {
     mounted () {
         this.selectedReportComponents = [this.frontPageContent[0]];
     },
+    activated: () => undefined,
+    deactivated: () => undefined,
     methods: {
         /**
          * Registers the steps for the progress of the export.

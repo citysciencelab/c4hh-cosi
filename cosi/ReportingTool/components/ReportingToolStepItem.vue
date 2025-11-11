@@ -38,6 +38,12 @@ export default {
             isCollapsed: true
         };
     },
+    mounted () {
+        this.cards = this.cardMapping.map(item => ({
+            id: uniqueId("reporting-tool-card-"),
+            name: item.name
+        }));
+    },
 
     methods: {
         /**
