@@ -60,15 +60,15 @@ const state = {
     cycles: {},
     cycleId: "",
     events: {
-        "Flusshochwasser": {
-            "häufig": "10-jährliches Ereignis (H für High)",
-            "mittel": "100-jährliches Ereignis (M für Middle)",
-            "selten": "200-jährliches Ereignis (L für Low)"
+        "Binnenhochwasser": {
+            "Häufig H": "10-jährliches Ereignis",
+            "Mittel M": "100-jährliches Ereignis",
+            "Extrem E": "200-jährliches Ereignis"
         },
         "Küstenhochwasser": {
-            "häufig": "20-jährliches Ereignis (H für High)",
-            "mittel": "100-jährliches Ereignis (M für Middle)",
-            "extremes": "Extremereignis (L für Low)"
+            "Häufig H": "20-jährliches Ereignis",
+            "Mittel M": "100-jährliches Ereignis",
+            "Extrem E": "Extremereignis"
         }
     },
     icon: "bi-water",
@@ -76,63 +76,63 @@ const state = {
     isPrinting: false,
     mappedLayerGroup: {
         "gbh": {
-            "event": "Flusshochwasser",
-            "frequency": "häufig",
+            "event": "Binnenhochwasser",
+            "frequency": "Häufig H",
             "type": "Hochwassergefahrenkarte"
         },
         "gbm": {
-            "event": "Flusshochwasser",
-            "frequency": "mittel",
+            "event": "Binnenhochwasser",
+            "frequency": "Mittel M",
             "type": "Hochwassergefahrenkarte"
         },
         "gbs": {
-            "event": "Flusshochwasser",
-            "frequency": "selten",
+            "event": "Binnenhochwasser",
+            "frequency": "Extrem E",
             "type": "Hochwassergefahrenkarte"
         },
         "gsh": {
             "event": "Küstenhochwasser",
-            "frequency": "häufig",
+            "frequency": "Häufig H",
             "type": "Hochwassergefahrenkarte"
         },
         "gsm": {
             "event": "Küstenhochwasser",
-            "frequency": "mittel",
+            "frequency": "Mittel M",
             "type": "Hochwassergefahrenkarte"
         },
         "gss": {
             "event": "Küstenhochwasser",
-            "frequency": "extremes",
+            "frequency": "Extrem E",
             "type": "Hochwassergefahrenkarte"
         },
         "rbh": {
-            "event": "Flusshochwasser",
-            "frequency": "häufig",
+            "event": "Binnenhochwasser",
+            "frequency": "Häufig H",
             "type": "Hochwasserrisikokarte"
         },
         "rbm": {
-            "event": "Flusshochwasser",
-            "frequency": "mittel",
+            "event": "Binnenhochwasser",
+            "frequency": "Mittel M",
             "type": "Hochwasserrisikokarte"
         },
         "rbs": {
-            "event": "Flusshochwasser",
-            "frequency": "selten",
+            "event": "Binnenhochwasser",
+            "frequency": "Extrem E",
             "type": "Hochwasserrisikokarte"
         },
         "rsh": {
             "event": "Küstenhochwasser",
-            "frequency": "häufig",
+            "frequency": "Häufig H",
             "type": "Hochwasserrisikokarte"
         },
         "rsm": {
             "event": "Küstenhochwasser",
-            "frequency": "mittel",
+            "frequency": "Mittel M",
             "type": "Hochwasserrisikokarte"
         },
         "rss": {
             "event": "Küstenhochwasser",
-            "frequency": "extremes",
+            "frequency": "Extrem E",
             "type": "Hochwasserrisikokarte"
         }
     },

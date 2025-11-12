@@ -117,12 +117,6 @@ export default {
          * @returns {void}
          */
         selectedEvent (val) {
-            if (val === "Flusshochwasser" && this.selectedFrequency === "extremes") {
-                this.setSelectedFrequency("selten");
-            }
-            if (val === "Küstenhochwasser" && this.selectedFrequency === "selten") {
-                this.setSelectedFrequency("extremes");
-            }
             this.setPrintHwsId(this.getPrintHwsId(val, this.selectedFrequency, this.selectedType));
         },
 

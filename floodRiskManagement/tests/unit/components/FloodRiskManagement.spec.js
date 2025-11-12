@@ -249,76 +249,76 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
             }
         },
         events = {
-            "Flusshochwasser": {
-                "häufig": "10-jährliches Ereignis (H für High)",
-                "mittel": "100-jährliches Ereignis (M für Middle)",
-                "selten": "200-jährliches Ereignis (L für Low)"
+            "Binnenhochwasser": {
+                "Häufig H": "10-jährliches Ereignis (H für High)",
+                "Mittel M": "100-jährliches Ereignis (M für Middle)",
+                "Extrem E": "200-jährliches Ereignis (L für Low)"
             },
             "Küstenhochwasser": {
-                "häufig": "20-jährliches Ereignis (H für High)",
-                "mittel": "100-jährliches Ereignis (M für Middle)",
-                "extremes": "Extremereignis (L für Low)"
+                "Häufig H": "20-jährliches Ereignis (H für High)",
+                "Mittel M": "100-jährliches Ereignis (M für Middle)",
+                "Extrem E": "Extremereignis (L für Low)"
             }
         },
         mappedLayerGroup = {
             "gbh": {
-                "event": "Flusshochwasser",
-                "frequency": "häufig",
+                "event": "Binnenhochwasser",
+                "frequency": "Häufig H",
                 "type": "Hochwassergefahrenkarte"
             },
             "gbm": {
-                "event": "Flusshochwasser",
-                "frequency": "mittel",
+                "event": "Binnenhochwasser",
+                "frequency": "Mittel M",
                 "type": "Hochwassergefahrenkarte"
             },
             "gbs": {
-                "event": "Flusshochwasser",
-                "frequency": "selten",
+                "event": "Binnenhochwasser",
+                "frequency": "Extrem E",
                 "type": "Hochwassergefahrenkarte"
             },
             "gsh": {
                 "event": "Küstenhochwasser",
-                "frequency": "häufig",
+                "frequency": "Häufig H",
                 "type": "Hochwassergefahrenkarte"
             },
             "gsm": {
                 "event": "Küstenhochwasser",
-                "frequency": "mittel",
+                "frequency": "Mittel M",
                 "type": "Hochwassergefahrenkarte"
             },
             "gss": {
                 "event": "Küstenhochwasser",
-                "frequency": "extremes",
+                "frequency": "Extrem E",
                 "type": "Hochwassergefahrenkarte"
             },
             "rbh": {
-                "event": "Flusshochwasser",
-                "frequency": "häufig",
+                "event": "Binnenhochwasser",
+                "frequency": "Häufig H",
                 "type": "Hochwasserrisikokarte"
             },
             "rbm": {
-                "event": "Flusshochwasser",
-                "frequency": "mittel",
+                "event": "Binnenhochwasser",
+                "frequency": "Mittel M",
                 "type": "Hochwasserrisikokarte"
             },
             "rbs": {
-                "event": "Flusshochwasser",
-                "frequency": "selten",
+                "event": "Binnenhochwasser",
+                "frequency": "Extrem E",
                 "type": "Hochwasserrisikokarte"
             },
             "rsh": {
                 "event": "Küstenhochwasser",
-                "frequency": "häufig",
+                "frequency": "Häufig H",
                 "type": "Hochwasserrisikokarte"
             },
             "rsm": {
                 "event": "Küstenhochwasser",
-                "frequency": "mittel",
+                "frequency": "Mittel M",
                 "type": "Hochwasserrisikokarte"
             },
             "rss": {
                 "event": "Küstenhochwasser",
-                "frequency": "extremes",
+                "frequency": "Extrem E",
                 "type": "Hochwasserrisikokarte"
             }
         },
@@ -384,7 +384,7 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
                                 printUrl: () => "http://",
                                 selectedCycleName: () => "",
                                 selectedEvent: () => "Küstenhochwasser",
-                                selectedFrequency: () => "extremes",
+                                selectedFrequency: () => "Extrem E",
                                 selectedType: () => "Hochwassergefahrenkarte",
                                 scaleList: () => [],
                                 types: () => types,
@@ -567,7 +567,7 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
                     }
                 });
 
-                expect(wrapper.vm.getPrintHwsId("Flusshochwasser", "mittel", "Hochwassergefahrenkarte")).to.equal("gbm");
+                expect(wrapper.vm.getPrintHwsId("Binnenhochwasser", "Mittel M", "Hochwassergefahrenkarte")).to.equal("gbm");
             });
         });
 
@@ -630,9 +630,9 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
                     plugins: [store]
                 }});
 
-            wrapper.vm.$options.watch.selectedEvent.call(wrapper.vm, "Flusshochwasser");
+            wrapper.vm.$options.watch.selectedEvent.call(wrapper.vm, "Binnenhochwasser");
             await wrapper.vm.$nextTick();
-            expect(store.state.Modules.FloodRiskManagement.selectedFrequency).to.equal("selten");
+            expect(store.state.Modules.FloodRiskManagement.selectedFrequency).to.equal("Mittel M");
         });
 
         it("should set the printHwsId when selectedEvent is changed", async () => {
@@ -652,7 +652,7 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
                     plugins: [store]
                 }});
 
-            wrapper.vm.$options.watch.selectedFrequency.call(wrapper.vm, "häufig");
+            wrapper.vm.$options.watch.selectedFrequency.call(wrapper.vm, "Häufig H");
             await wrapper.vm.$nextTick();
             expect(store.state.Modules.FloodRiskManagement.printHwsId).to.equal("gsh");
         });
