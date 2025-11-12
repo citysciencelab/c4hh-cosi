@@ -12,6 +12,11 @@ export default {
         IconButton
     },
     props: {
+        cardLayoutStyle: {
+            type: String,
+            required: false,
+            default: "list"
+        },
         dataSets: {
             type: Array,
             required: true,
@@ -38,6 +43,7 @@ export default {
             default: "additional:modules.tools.cosi.accessibilityAnalysis.resultManagement.title"
         }
     },
+    emits: ["downloadAll", "removeAllData", "updateActiveSet", "removeSet"],
     methods: {
         uniqueId
     }
@@ -62,9 +68,9 @@ export default {
             />
             {{ $t(title) }}
         </h5>
-        <div class="col-12 d-flex">
+        <div class="col-12 d-flex justify-content-between mb-3">
             <slot name="top" />
-            <div class="d-flex align-self-center float-right">
+            <div class="d-flex align-self-center">
                 <IconButton
                     v-if="isDownloadAll"
                     class="p-1 btn-light mb-0"
@@ -94,6 +100,7 @@ export default {
                     :status="set.status"
                     :visible="set.visible"
                     :data-index="index"
+                    :layout-style="cardLayoutStyle"
                     class="col-12"
                     @click="$emit('updateActiveSet', index)"
                     @hide-set="$emit('updateActiveSet', index)"
@@ -103,6 +110,10 @@ export default {
                         <slot name="card" />
                     </template>
                 </Card>
+                <slot
+                    name="after-card"
+                    :index="index"
+                />
             </div>
         </div>
     </component>

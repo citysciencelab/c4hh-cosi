@@ -1,21 +1,20 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
-import AnalysisPagination from "../../components/AnalysisPagination.vue";
+import ButtonGroup from "../../components/ButtonGroup.vue";
 import CalculateRatioSelection from "./CalculateRatioSelection.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersCalculateRatio";
 import getVectorlayerMapping from "../../FeaturesList/utils/getVectorlayerMapping";
 import mutations from "../store/mutationsCalculateRatio";
+import ResultManagement from "../../shared/modules/resultManagement/components/ResultManagement.vue";
 import utils from "../../utils";
-import exportXlsx from "../../utils/";
 import DataTable from "./DataTable.vue";
 import {exportAsGeoJson} from "../utils/exportResults.js";
 import getMappingJson from "../../utils/getMappingJson";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {getCenter} from "ol/extent";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
-import {VSelect} from "vuetify/components/VSelect";
 import layerCollection from "@core/layers/js/layerCollection";
 import VectorLayer from "ol/layer/Vector.js";
 // import {getModelByAttributes} from "../../utils/radioBridge.js";
@@ -25,11 +24,11 @@ export default {
     components: {
         AccordionItem,
         AlertMessage,
-        AnalysisPagination,
+        ButtonGroup,
         CalculateRatioSelection,
         DataTable,
-        ToolInfo,
-        VSelect
+        ResultManagement,
+        ToolInfo
     },
     data () {
         return {
@@ -87,7 +86,8 @@ export default {
             facilitiesMapping: [],
             visibleLayerListForDropdown: [],
             visibleVectorLayers: [],
-            selectedDistricts: []
+            selectedDistricts: [],
+            tableOrChart: "table"
         };
     },
     computed: {
@@ -124,6 +124,55 @@ export default {
             }
 
             return options;
+        },
+
+        /**
+         * Prepares data for the cards displaying the data sets.
+         * @returns {Object[]} Array of data set objects for the cards.
+         */
+        dataSetsForCards () {
+            return this.dataSets.map((set, index) => ({
+                icon: "bi-sliders",
+                data: [
+                    {
+                        label: (set.inputs.ASwitch ? this.$t("additional:modules.tools.cosi.calculateRatio.subjectData") : this.$t("additional:modules.tools.cosi.calculateRatio.statData"))
+                            + (set.inputs.facilityPropertyList_A.length ? ` | ${this.$t("additional:modules.tools.cosi.calculateRatio.parameter")}` : "")
+                            + (set.inputs.faktorf_A && set.inputs.faktorf_A !== 1 ? ` | ${this.$t("additional:modules.tools.cosi.calculateRatio.factor")}` : "")
+                            + (set.inputs.perCalc_A && set.inputs.perCalc_A !== 1 ? ` | ${this.$t("additional:modules.tools.cosi.calculateRatio.calcPer")}` : ""),
+                        value: set.inputs.selectedFieldA
+                            + (set.inputs.facilityPropertyList_A.length ? ` | ${set.inputs.facilityPropertyList_A.join()}` : "")
+                            + (set.inputs.faktorf_A && set.inputs.faktorf_A !== 1 ? ` | ${set.inputs.faktorf_A}` : "")
+                            + (set.inputs.perCalc_A && set.inputs.perCalc_A !== 1 ? ` | ${set.inputs.perCalc_A}` : "")
+                    },
+                    {
+                        label: (set.inputs.BSwitch ? this.$t("additional:modules.tools.cosi.calculateRatio.subjectData") : this.$t("additional:modules.tools.cosi.calculateRatio.statData"))
+                            + (set.inputs.facilityPropertyList_B.length ? ` | ${this.$t("additional:modules.tools.cosi.calculateRatio.parameter")}` : "")
+                            + (set.inputs.faktorf_B && set.inputs.faktorf_B !== 1 ? ` | ${this.$t("additional:modules.tools.cosi.calculateRatio.factor")}` : "")
+                            + (set.inputs.perCalc_B && set.inputs.perCalc_B !== 1 ? ` | ${this.$t("additional:modules.tools.cosi.calculateRatio.calcPer")}` : ""),
+                        value: set.inputs.selectedFieldB
+                            + (set.inputs.facilityPropertyList_B.length ? ` | ${set.inputs.facilityPropertyList_B.join()}` : "")
+                            + (set.inputs.faktorf_B && set.inputs.faktorf_B !== 1 ? ` | ${set.inputs.faktorf_B}` : "")
+                            + (set.inputs.perCalc_B && set.inputs.perCalc_B !== 1 ? ` | ${set.inputs.perCalc_B}` : "")
+                    },
+                    {
+                        label: this.$t("additional:modules.tools.cosi.calculateRatio.year"),
+                        value: set.inputs.selectedYear
+                    }
+                ],
+                status: index === this.activeSet ? "active" : ""
+            }));
+        },
+
+        /**
+         * Gets the buttons for the result view options (table or chart).
+         * @returns {Object[]} Array describing the two buttons for the view choices.
+         */
+        tableOrChartButtons () {
+            return [
+                {icon: "bi-table", name: this.$t("additional:modules.tools.cosi.calculateRatio.table"), value: "table"},
+                {icon: "bi-bar-chart", name: this.$t("additional:modules.tools.cosi.calculateRatio.chart"), value: "chart"}
+            ];
+
         }
     },
     watch: {
@@ -445,8 +494,8 @@ export default {
 
             this.setResults(utils.calculateRatio(allData, this.selectedYear));
             this.setResultHeaders({
-                typeA: resultHeader_A,
-                typeB: resultHeader_B,
+                typeA: resultHeader_A + (this.facilityPropertyList_A.length ? ` ‒ ${this.facilityPropertyList_A.join()}` : ""),
+                typeB: resultHeader_B + (this.facilityPropertyList_B.length ? ` ‒ ${this.facilityPropertyList_B.join()}` : ""),
                 fActive: this.fActive_A || this.fActive_B,
                 faktorF: `${this.faktorf_B} / ${this.faktorf_A}`
             });
@@ -454,6 +503,7 @@ export default {
             calculationSet.results = this.results;
             calculationSet.resultHeaders = this.resultHeaders;
             calculationSet.inputs = {
+                selectedYear: JSON.parse(JSON.stringify(this.selectedYear)),
                 selectedFieldA: JSON.parse(JSON.stringify(this.selectedFieldA)),
                 selectedFieldB: JSON.parse(JSON.stringify(this.selectedFieldB)),
                 paramFieldA: JSON.parse(JSON.stringify(this.paramFieldA)),
@@ -636,7 +686,7 @@ export default {
             return json;
         },
         exportAsXlsx (index) {
-            exportXlsx([], this.resultData(index), this.selectedYear + "_versorgungsanalyse", {exclude: this.excludedPropsForExport});
+            utils.exportXlsx([], this.resultData(index), this.selectedYear + "_versorgungsanalyse", {exclude: this.excludedPropsForExport});
         },
         /**
          * @description Push data that is to be visualized on the map to ColorCodeMap Component.
@@ -785,83 +835,68 @@ export default {
                 type="noData"
             />
             <CalculateRatioSelection
+                v-else
                 :layer-list="visibleVectorLayers"
                 :district-name-list="selectedDistricts.length ? featuresList : []"
                 @set-params="setCoverageParams"
             />
         </AccordionItem>
-
-        <AnalysisPagination
+        <ResultManagement
             v-if="dataSets.length > 0"
-            :sets="dataSets"
-            :active-set="activeSet"
-            :downloads="['XLS', 'GEOJSON']"
-            :titles="{
-                downloads: [$t('additional:modules.tools.cosi.calculateRatio.downloadXlsxTooltip'), $t('additional:modules.tools.cosi.calculateRatio.downloadGeoJsonTooltip')],
-                downloadAll: $t('additional:modules.tools.cosi.calculateRatio.paginationDownloadAll'),
-                remove: $t('additional:modules.tools.cosi.calculateRatio.paginationRemove'),
-                removeAll: $t('additional:modules.tools.cosi.calculateRatio.paginationRemoveAll')
-            }"
-            @setActiveSet="(n) => setActiveSet(n)"
-
-            @removeSingle="(n) => removeSet(n)"
-            @removeAll="clearAllValues"
-            @downloadXLS="(n) => exportAsXlsx(n)"
-            @downloadGEOJSON="(n) => exportAsGeoJson(n)"
+            :title="$t('additional:modules.tools.cosi.calculateRatio.calculatedAnalyses')"
+            icon="bi-sliders"
+            card-layout-style="grid"
+            :data-sets="dataSetsForCards"
             @downloadAll="downloadAll"
-        />
-        <div
-            v-if="results.length > 0"
-            class="data_table"
+            @remove-all-data="clearAllValues"
+            @remove-set="removeSet"
+            @update-active-set="setActiveSet"
         >
-            <div class="head_wrapper">
-                <button
-                    class="cg"
-                    :title="$t('additional:modules.tools.cosi.calculateRatio.visualizeChart')"
-                    @click="loadToChartGenerator()"
-                >
-                    <v-icon>
-                        mdi-poll
-                    </v-icon>
-                </button>
-                <button
-                    class="ccm"
-                    :class="{ highlight: !dataToColorCodeMap}"
-                    :title="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
-                    @click="loadToColorCodeMap()"
-                >
-                    <v-icon
-                        v-if="!dataToColorCodeMap"
-                    >
-                        mdi-eye
-                    </v-icon>
-                    <v-icon
-                        v-else
-                    >
-                        mdi-eye-off
-                    </v-icon>
-                </button>
-                <v-select
-                    v-model="columnSelector"
-                    dense
-                    outlined
-                    class="column_selection selection"
-                    :items="availableColumns"
-                    item-title="name"
-                    item-value="key"
-                    return-object
+            <template #top>
+                <ButtonGroup
+                    :buttons="tableOrChartButtons"
+                    :group="tableOrChart"
+                    @show-view="value => tableOrChart = value"
                 />
-            </div>
-            <DataTable
-                v-for="(set, i) in dataSets"
-                :key="i"
-                :dataset="set.results"
-                :type-a="set.resultHeaders.typeA"
-                :type-b="set.resultHeaders.typeB"
-                :f-active="set.resultHeaders.fActive"
-                :faktor-f="set.resultHeaders.faktorF"
-                :class="{ active: activeSet === i }"
-            />
-        </div>
+            </template>
+            <template #card>
+                <ul class="dropdown-menu">
+                    <li>
+                        <h6 class="dropdown-header fs-g">
+                            <i class="bi bi-table me-1" />
+                            {{ $t("additional:modules.tools.cosi.calculateRatio.downloadOptions") }}
+                        </h6>
+                    </li>
+                    <li class="ps-4">
+                        <button
+                            class="dropdown-item"
+                            @click.stop="exportAsGeoJson(activeSet)"
+                        >
+                            GeoJSON
+                        </button>
+                    </li>
+                    <li class="ps-4">
+                        <button
+                            class="dropdown-item"
+                            @click.stop="exportAsXlsx(activeSet)"
+                        >
+                            XLS
+                        </button>
+                    </li>
+                </ul>
+            </template>
+            <template #after-card="{index}">
+                <DataTable
+                    v-if="tableOrChart === 'table' && activeSet === index"
+                    class="mb-3"
+                    :dataset="dataSets[index].results"
+                    :type-a="dataSets[index].resultHeaders.typeA"
+                    :type-b="dataSets[index].resultHeaders.typeB"
+                    :f-active="dataSets[index].resultHeaders.fActive"
+                    :faktor-f="dataSets[index].resultHeaders.faktorF"
+                    :class="{ active: activeSet === index }"
+                />
+            </template>
+        </ResultManagement>
     </div>
 </template>

@@ -91,7 +91,7 @@ export default {
          * Checks whether the calculation button should be disabled.
          * @returns {Boolean} True if the button should be disabled.
          */
-        disabled () {
+        calculationDisabled () {
             return this.cardOneSelectedItemList.length === 0 || this.cardTwoSelectedItemList.length === 0 || !this.selectedYear;
         },
 
@@ -253,7 +253,7 @@ export default {
     <FlatButton
         class="mx-auto mb-4"
         icon="bi bi-plus-slash-minus"
-        :disabled="disabled"
+        :disabled="calculationDisabled"
         :text="$t('additional:modules.tools.cosi.calculateRatio.calculate')"
         @click.native="emitParams()"
     />

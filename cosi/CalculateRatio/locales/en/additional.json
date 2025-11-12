@@ -16,6 +16,7 @@
                     "addedSelection": "Sum of selection",
                     "visualizeMap": "Visualize selected dataset in map",
                     "visualizeChart": "generate chart from dataset",
+                    "downloadOptions": "Download: data/table",
                     "downloadGeoJson": "Download GeoJSON",
                     "downloadGeoJsonTooltip": "Download results as geodata (GeoJSON)",
                     "downloadXlsx": "Download XLSX",
@@ -36,6 +37,12 @@
                     "calcPer": "calculate per",
                     "ofData": "of data",
                     "infoTooltip": "Tool information",
+                    "calculatedAnalyses": "Calculated Ratio Analyses",
+                    "chart": "Chart",
+                    "factor": "Factor",
+                    "parameter": "Parameter",
+                    "table": "Table",
+                    "year": "Year",
                     "yearsForStatisticalData": "Years for statistical data"
                 }
             }

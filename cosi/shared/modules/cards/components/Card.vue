@@ -66,7 +66,7 @@ export default {
             </div>
             <div
                 v-if="layoutStyle === 'grid'"
-                class="p-2 row grid"
+                class="p-2 row grid flex-grow-1"
             >
                 <div
                     v-for="(element, index) in data"
@@ -153,8 +153,8 @@ export default {
     @import "../assets/style.scss";
 
     .grid {
-        margin-right: 126px;
         .value {
+            color: $secondary;
             font-family: "MasterPortalFont Bold";
         }
     }

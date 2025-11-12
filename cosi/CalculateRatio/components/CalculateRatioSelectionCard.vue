@@ -51,7 +51,7 @@ export default {
             default: () => []
         }
     },
-    emits: ["set-selected-items", "set-divisor", "set-factor", "set-numerical-values"],
+    emits: ["set-selected-items", "set-divisor", "set-factor", "set-numerical-values", "set-type-card"],
     data () {
         return {
             isCollapsed: true

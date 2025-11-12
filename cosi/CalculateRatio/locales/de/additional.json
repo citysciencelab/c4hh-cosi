@@ -17,6 +17,7 @@
                     "addedSelection": "Aufsummierte Auswahl",
                     "visualizeMap": "Ausgewählten Datensatz auf Karte visualisieren",
                     "visualizeChart": "Graph aus Datensatz erzeugen",
+                    "downloadOptions": "Download: Daten/Tabelle",
                     "downloadGeoJson": "Download GeoJSON",
                     "downloadGeoJsonTooltip": "Ergebnisse als Geodaten (GeoJSON) herunterladen",
                     "downloadXlsx": "Download XLS",
@@ -37,6 +38,12 @@
                     "calcPer": "berechnen pro",
                     "ofData": "der Datengrundlage",
                     "infoTooltip": "Werkzeuginformationen",
+                    "calculatedAnalyses": "Berechnete Versorgungsanalysen",
+                    "chart": "Diagramm",
+                    "factor": "Faktor",
+                    "parameter": "Parameter",
+                    "table": "Tabelle",
+                    "year": "Jahr",
                     "yearsForStatisticalData": "Jahre für statistische Daten"
                 }
             }
