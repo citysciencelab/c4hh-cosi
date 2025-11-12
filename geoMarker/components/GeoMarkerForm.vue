@@ -1189,7 +1189,13 @@ export default {
                                 v-if="departmentData[cellData.departmentId].status === 'geschlossen'"
                                 class="departmentStatusClosed"
                             >
-                                {{ $t("additional:modules.geoMarker.geoMarkerForm.departmentClosedLabel") }}: {{ dayjs(departmentData[cellData.departmentId].geschlossen).format("DD.MM.YYYY H:mm") }}
+                                <span v-if="departmentData[cellData.departmentId].geschlossen">
+                                    {{ $t("additional:modules.geoMarker.geoMarkerForm.departmentClosedLabel") }}: {{ dayjs(departmentData[cellData.departmentId].geschlossen).format("DD.MM.YYYY H:mm") }}
+                                </span>
+
+                                <span v-else>
+                                    {{ $t("additional:modules.geoMarker.geoMarkerForm.departmentClosedNoDateSet") }}
+                                </span>
                             </div>
                         </template>
 

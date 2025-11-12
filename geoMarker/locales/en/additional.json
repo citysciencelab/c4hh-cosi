@@ -21,6 +21,7 @@
                 "gemisNoEditInfo": "GEMIS-Datensatz, keine Bearbeitung möglich",
                 "departmentsTitle": "Departments",
                 "departmentClosedLabel": "Closed",
+                "departmentClosedNoDateSet": "Closed date unknown",
                 "selectedDepartmentsTitle": "Selected departments",
                 "save": "Save",
                 "cancel": "Cancel",
