@@ -2,6 +2,7 @@
 import {VAutocomplete} from "vuetify/components/VAutocomplete";
 import {VCheckboxBtn} from "vuetify/components/VCheckbox";
 import {VChip} from "vuetify/components/VChip";
+import {VCombobox} from "vuetify/components/VCombobox";
 import {VListItem} from "vuetify/components/VList";
 import {VSkeletonLoader} from "vuetify/components/VSkeletonLoader";
 
@@ -11,10 +12,16 @@ export default {
         VAutocomplete,
         VCheckboxBtn,
         VChip,
+        VCombobox,
         VListItem,
         VSkeletonLoader
     },
     props: {
+        clearable: {
+            type: Boolean,
+            default: false,
+            required: false
+        },
         items: {
             type: Array,
             required: true
@@ -109,11 +116,11 @@ export default {
             <v-skeleton-loader type="button" />
         </template>
         <v-autocomplete
-            v-else
+            v-else-if="multiple"
             :model-value="modelValue"
             :items="items"
             :label="label"
-            :multiple="multiple"
+            multiple
             class="mb-3"
             chips
             closable-chips
@@ -157,11 +164,20 @@ export default {
                 </span>
             </template>
         </v-autocomplete>
+        <v-combobox
+            v-else
+            :model-value="modelValue"
+            :items="items"
+            :label="label"
+            class="mb-3"
+            :clearable="clearable"
+            @update:modelValue="(value) => $emit('update:modelValue', value?.value ? value.value : value)"
+        />
     </div>
 </template>
 
 <style lang="scss">
-    .v-autocomplete {
+    .v-autocomplete, .v-combobox {
         .v-field__overlay {
             background-color: unset;
         }
@@ -195,7 +211,7 @@ export default {
             }
         }
     }
-    .v-autocomplete__content {
+    .v-autocomplete__content, .v-combobox__content {
         .v-list-item {
             &:hover {
                 background-color: $secondary;

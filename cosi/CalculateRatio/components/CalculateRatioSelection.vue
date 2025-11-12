@@ -167,6 +167,7 @@ export default {
             obj.facilityPropertyList_A = this.cardOneSelectedNumericalValueList;
             obj.facilityPropertyList_B = this.cardTwoSelectedNumericalValueList;
             obj.year = this.selectedYear;
+
             this.$emit("set-params", obj);
         },
 
