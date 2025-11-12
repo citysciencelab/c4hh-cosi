@@ -32,6 +32,7 @@ const state = {
     alternativeGeometry: false,
     alternativePolygonFeature: null,
     bufferDistances: [500, 1000, 1500],
+    bufferAttributes: {},
     showBuffer: false,
     fileName: "additional:modules.combinedGfi.defaultFileName",
     columns: [],

@@ -58,6 +58,9 @@ const actions = {
         if (themeParams.bufferDistances) {
             commit("setBufferDistances", themeParams.bufferDistances);
         }
+        if (themeParams.bufferAttributes) {
+            commit("setBufferAttributes", themeParams.bufferAttributes);
+        }
         commit("setFeature", feature);
 
         commit("setFileName", fileName);
@@ -789,9 +792,11 @@ const actions = {
      * @param {Object} bufferedResults - The results object to populate.
      * @returns {Promise<void>} A promise that resolves when the layer is processed.
      */
-    async processLayerForBufferedQuery ({dispatch}, {layerConfig, geometry, bufferedResults}) {
+    async processLayerForBufferedQuery ({getters, dispatch}, {layerConfig, geometry, bufferedResults}) {
+        console.error(getters.bufferAttributes, layerConfig.id);
         const layer = rawLayerList.getLayerWhere({id: layerConfig.id}),
-            resolution = mapCollection.getMapView("2D").getResolution();
+            resolution = mapCollection.getMapView("2D").getResolution(),
+            attributes = getters.bufferAttributes?.[layerConfig.id] || layerConfig.gfiAttributes || [];
 
         if (!layer) {
             console.error(`Layer with ID ${layerConfig.id} not found`);
@@ -802,7 +807,7 @@ const actions = {
             const results = await dispatch("fetchWfsData", {
                 layer,
                 geometry,
-                attributes: layerConfig.gfiAttributes || []
+                attributes
             });
 
             if (results && results.length > 0) {
@@ -813,7 +818,7 @@ const actions = {
             const results = await dispatch("fetchOafData", {
                 layer,
                 geometry,
-                attributes: layerConfig.gfiAttributes || []
+                attributes
             });
 
             if (results && results.length > 0) {
@@ -837,7 +842,7 @@ const actions = {
                     layer,
                     coordinate,
                     resolution,
-                    attributes: layerConfig.gfiAttributes || []
+                    attributes
                 });
 
                 processPointResults(pointResults, allResults);
@@ -880,6 +885,8 @@ const actions = {
                     console.error(`Error querying features for layer ${layerConfig.id}:`, error);
                 }
             }
+
+            console.error("bufferedLayerResults", bufferedResults);
 
             commit("setBufferedLayerResults", bufferedResults);
             await dispatch("fetchAdditionalRequests", "queryBuffer");
