@@ -2,10 +2,9 @@
     "modules": {
       "cosi": {
           "reportingTool": {
-            "createReport": "Bericht erstellen",
             "creatingReport": "Bericht wird erstellt. Bitte warten.",
             "reportSuccess": "Der Bericht wurde erfolgreich generiert. Der Download startet automatisch.",
-            "title": "Reporting Tool",
+            "title": "Bericht erstellen",
             "generateReport": "Bericht generieren",
             "printReport": "Bericht herunterladen",
             "infoText": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
@@ -35,7 +34,7 @@
               "frontPage": "Titelseite",
               "summedColumns": "Spaltenname der summierten Gebiete",
               "summariseStatisticalAreas": "Statistische Gebiete summieren",
-              "higherDistrictLevel": "übergeordnete Bezigsebene miteinbeziehen",
+              "higherDistrictLevel": "Übergeordnete Bezugsebene miteinbeziehen",
               "statisticalAreas":"Statistische Gebiete auswählen",
               "referenceYear": "Bezugsjahr"
             },

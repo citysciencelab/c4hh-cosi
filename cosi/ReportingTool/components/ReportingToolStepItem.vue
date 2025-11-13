@@ -39,7 +39,12 @@ export default {
         };
     },
     mounted () {
-        this.cards = this.cardMapping.map(item => ({...item, id: uniqueId("reporting-tool-card-")}));
+        this.cards = this.cardMapping.reduce((cards, item) => {
+            if (item?.key !== "textArea") {
+                cards.push({...item, id: uniqueId("reporting-tool-card-")});
+            }
+            return cards;
+        }, []);
     },
 
     methods: {

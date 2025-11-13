@@ -901,9 +901,6 @@ export default {
             summary="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum."
         />
         <div v-if="!printReportView && !noDataView">
-            <h5>
-                {{ $t("additional:modules.cosi.reportingTool.createReport") }}
-            </h5>
             <v-stepper
                 ref="stepperActions"
                 class="mt-3"
@@ -1115,9 +1112,6 @@ export default {
             type="noData"
         />
         <div v-else>
-            <h5>
-                {{ $t("additional:modules.cosi.reportingTool.createReport") }}
-            </h5>
             <p>
                 {{ $t("additional:modules.cosi.reportingTool.infoText") }}
             </p>
