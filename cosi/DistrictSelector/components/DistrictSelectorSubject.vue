@@ -2,9 +2,10 @@
 import Card from "../../shared/modules/cards/components/Card.vue";
 import Feature from "ol/Feature";
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
-import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
+import {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
+import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
@@ -35,8 +36,8 @@ export default {
                 strokeWidth: 4,
                 polygonDash: [6, 6]
             },
-            drawTypeLabels: [{type: "polygon", label: "Fläche"}, {type: "box", label: "Rechteck"}],
-            drawTypes: ["polygon", "box"],
+            drawTypeLabels: [{type: "polygon", label: "Fläche"}, {type: "box", label: "Rechteck"}, {type: "circle", label: "Kreis"}],
+            drawTypes: ["polygon", "box", "circle"],
             selectedDrawTypeMain: "",
             selectedDrawType: "",
             selectedInteraction: null
@@ -65,12 +66,11 @@ export default {
 
         this.cardsStatistical.forEach(card => {
             const feature = new Feature({
-                geometry: card.geometry
-            });
-
-            const foundEqualObject = this.cards.find(existingCard => {
-                return JSON.stringify(existingCard.statisticalFeature.getGeometry()) === JSON.stringify(feature.getGeometry());
-            });
+                    geometry: card.geometry
+                }),
+                foundEqualObject = this.cards.find(existingCard => {
+                    return JSON.stringify(existingCard.statisticalFeature.getGeometry()) === JSON.stringify(feature.getGeometry());
+                });
 
             if (foundEqualObject) {
                 return;
@@ -92,8 +92,7 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId"]),
-        // {value: "Bezugsebene: " + this.selectedDistrictLevel.label},
-        // {icon: "bi-map", label: "Gebiete: " + selectedDistricts.map(district => district.getName())},
+
         addCard (feature, buffer, districtNames, status, districtLevelId, districtLevelLabel) {
             this.cards.push({
                 badgeList: this.getBadges(),
@@ -192,11 +191,18 @@ export default {
         },
 
         /**
-         * Handles the drawend event by updating the drawnFeature and subjectFeature of the .
+         * Handles the drawend event by updating the drawnFeature and subjectFeature of the activeCard.
+         * If the drawn geometry is a circle, it converts it to a polygon before updating.
          * @param {Object} evt - The drawend event object containing the drawn feature.
          * @return {void}
          */
         onDrawEnd (evt) {
+            if (evt.feature.getGeometry().getType() === "Circle") {
+                const circleGeom = evt.feature.getGeometry(),
+                    polygonGeom = polygonFromCircle(circleGeom, 128);
+
+                evt.feature.setGeometry(polygonGeom);
+            }
             this.activeCard.drawnFeature = evt.feature;
             this.activeCard.subjectFeature = this.getBufferedFeature(this.activeCard.drawnFeature, this.activeCard.buffer);
             this.updateMap();
