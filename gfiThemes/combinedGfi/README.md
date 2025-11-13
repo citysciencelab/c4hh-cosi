@@ -36,6 +36,7 @@ Here's a complete example using the recommended nested format:
       "bufferAttributes": {
         "naturschutzgebiete": "showAll"
       },
+      "bufferHint": "Beispieltext",
       "export": {
         "fileName": "Naturschutzgebiete",
         "shownFormatList": ["PDF", "DOC", "JSON"]
@@ -127,6 +128,7 @@ The addon supports spatial buffering to expand the query area:
 - `showBuffer`: Boolean to enable/disable the buffer option in the UI.
 - `bufferDistances`: An array of buffer distances (in meters) to choose from.
 - `bufferAttributes`: Mapping of layer ids to gfiAttributes. Optional and to be used in case buffered requests are to have diverging attributes from normal requests.
+- `bufferHint`: Hint text shown below the buffer buttons.
 
 Example:
 
@@ -136,7 +138,8 @@ Example:
   "bufferDistances": [100, 500, 1000],
   "bufferAttributes": {
     "1234": "showAll"
-  }
+  },
+  "bufferHint": "Beispieltext",
 }
 ```
 
@@ -599,6 +602,7 @@ Das Addon wird über die `config.json` konfiguriert. Hier ein Beispiel für die 
       "bufferAttributes": {
         "6076": "showAll"
       },
+      "bufferHint": "Beispieltext",
       "layersToRequest": [
         {
           "id": "6076",
@@ -629,6 +633,7 @@ Das Addon wird über die `config.json` konfiguriert. Hier ein Beispiel für die 
 | `showBuffer` | Boolean | Aktiviert/Deaktiviert die Puffer-Funktion |
 | `bufferDistances` | Array | Liste der verfügbaren Puffer-Distanzen in Metern |
 | `bufferAttributes` | Object | Mapping von Layer-IDs zu gfiAttributes, die für Buffer-Requests zu nutzen sind. |
+| `bufferHint` | String? | Optionaler Hinweistext, der unter den Buffer-Elementen angezeigt wird. |
 | `layersToRequest` | Array | Liste der Layer, die abgefragt werden sollen |
 
 ### Layer-Konfiguration

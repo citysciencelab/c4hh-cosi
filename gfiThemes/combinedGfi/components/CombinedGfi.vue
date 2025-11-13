@@ -43,6 +43,7 @@ export default {
             "alternativeGeometry",
             "alternativePolygonFeature",
             "bufferDistances",
+            "bufferHint",
             "fileName",
             "rows",
             "isLoading",
@@ -442,46 +443,45 @@ export default {
                     </div>
                 </AccordionItem>
             </div>
-            <div
-                v-if="showBuffer"
-                class="form-floating mb-3"
-            >
-                <select
-                    id="bufferSelect"
-                    v-model="bufferDistance"
-                    class="form-select"
-                    @change="enlargePolygon(bufferDistance)"
-                >
-                    <option :value="null">
-                        {{ translate('additional:modules.combinedGfi.noBufferSelected') }}
-                    </option>
-                    <option
-                        v-for="distance in bufferDistances"
-                        :key="distance"
-                        :value="distance"
+            <template v-if="showBuffer">
+                <div class="form-floating mb-3">
+                    <select
+                        id="bufferSelect"
+                        v-model="bufferDistance"
+                        class="form-select"
+                        @change="enlargePolygon(bufferDistance)"
                     >
-                        {{ distance }} {{ translate('additional:modules.combinedGfi.bufferDistanceUnit') }}
-                    </option>
-                </select>
-                <label for="bufferSelect">{{ translate('additional:modules.combinedGfi.selectBufferDistance') }}</label>
-            </div>
-            <div
-                v-if="showBuffer"
-                class="button-group"
-            >
-                <ElevatedButton
-                    :text="translate(isBufferLoading ? 'additional:modules.combinedGfi.queryingArea' : 'additional:modules.combinedGfi.queryArea')"
-                    :disabled="!bufferedFeature || isLoading || isBufferLoading"
-                    :interaction="handleQueryBufferedFeatures"
-                    additional-css="btn-primary"
-                />
-                <ElevatedButton
-                    :text="translate('additional:modules.combinedGfi.removeBuffer')"
-                    :disabled="!bufferedFeature"
-                    :interaction="() => { resetBufferLayer(); bufferDistance = null; }"
-                    additional-css="btn-secondary"
-                />
-            </div>
+                        <option :value="null">
+                            {{ translate('additional:modules.combinedGfi.noBufferSelected') }}
+                        </option>
+                        <option
+                            v-for="distance in bufferDistances"
+                            :key="distance"
+                            :value="distance"
+                        >
+                            {{ distance }} {{ translate('additional:modules.combinedGfi.bufferDistanceUnit') }}
+                        </option>
+                    </select>
+                    <label for="bufferSelect">{{ translate('additional:modules.combinedGfi.selectBufferDistance') }}</label>
+                </div>
+                <div class="button-group">
+                    <ElevatedButton
+                        :text="translate(isBufferLoading ? 'additional:modules.combinedGfi.queryingArea' : 'additional:modules.combinedGfi.queryArea')"
+                        :disabled="!bufferedFeature || isLoading || isBufferLoading"
+                        :interaction="handleQueryBufferedFeatures"
+                        additional-css="btn-primary"
+                    />
+                    <ElevatedButton
+                        :text="translate('additional:modules.combinedGfi.removeBuffer')"
+                        :disabled="!bufferedFeature"
+                        :interaction="() => { resetBufferLayer(); bufferDistance = null; }"
+                        additional-css="btn-secondary"
+                    />
+                </div>
+                <div v-if="bufferHint">
+                    {{ $t(bufferHint) }}
+                </div>
+            </template>
 
             <AdditionalRequestsAccordion
                 :additional-request-results="additionalRequestResults"

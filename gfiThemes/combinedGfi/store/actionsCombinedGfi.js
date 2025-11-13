@@ -61,6 +61,9 @@ const actions = {
         if (themeParams.bufferAttributes) {
             commit("setBufferAttributes", themeParams.bufferAttributes);
         }
+        if (themeParams.bufferHint) {
+            commit("setBufferHint", themeParams.bufferHint);
+        }
         commit("setFeature", feature);
 
         commit("setFileName", fileName);
@@ -793,7 +796,6 @@ const actions = {
      * @returns {Promise<void>} A promise that resolves when the layer is processed.
      */
     async processLayerForBufferedQuery ({getters, dispatch}, {layerConfig, geometry, bufferedResults}) {
-        console.error(getters.bufferAttributes, layerConfig.id);
         const layer = rawLayerList.getLayerWhere({id: layerConfig.id}),
             resolution = mapCollection.getMapView("2D").getResolution(),
             attributes = getters.bufferAttributes?.[layerConfig.id] || layerConfig.gfiAttributes || [];
