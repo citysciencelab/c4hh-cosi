@@ -1050,6 +1050,7 @@ export default {
         <FlatButton
             class="mx-auto"
             icon="bi bi-play-circle"
+            :disabled="selectionCards.length === 0"
             :text="'Erreichbarkeit berechnen'"
             @click.native="createAnalysisSet()"
         />
