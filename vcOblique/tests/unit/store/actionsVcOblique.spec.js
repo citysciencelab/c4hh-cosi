@@ -191,4 +191,69 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
             expect(commit.firstCall.args[1]).to.equals("https:///examplePortal?groundPosition=9.99431966511419, 53.55201216725377");
         });
     });
+
+    describe("VCMap version branching", () => {
+        let vcm4Map, vcm4Vcs, vcm6Map, vcm6Vcs;
+
+        beforeEach(() => {
+            const viewpoint = {
+                distance: 100,
+                heading: 50,
+                groundPosition: [10, 20]
+            };
+
+            vcm4Map = {
+                getViewPointSync: sinon.spy(() => viewpoint),
+                gotoViewPoint: sinon.stub().resolves()
+            };
+            vcm4Vcs = {
+                vcs: {
+                    vcm: {
+                        util: {ViewPoint: sinon.stub().callsFake(x => x)},
+                        Framework: {getInstance: () => ({getActiveMap: () => vcm4Map})}
+                    }
+                }
+            };
+
+            vcm6Map = {
+                getViewpointSync: sinon.spy(() => viewpoint),
+                gotoViewpoint: sinon.stub().resolves()
+            };
+            vcm6Vcs = {
+                vcs: {
+                    getFirstApp: () => ({maps: {activeMap: vcm6Map}})
+                }
+            };
+        });
+
+        afterEach(() => {
+            sinon.restore();
+        });
+
+        describe("obliqueView", () => {
+            it("should correctly detect vcm@4 and use its methods", async () => {
+                sinon.stub(document, "getElementById").returns({contentWindow: vcm4Vcs});
+
+                await actions.obliqueView(
+                    {commit: sinon.spy(), dispatch: sinon.spy(), getters: {heading: 50}},
+                    [1, 2]
+                );
+
+                expect(vcm4Map.getViewPointSync.calledOnce).to.be.true;
+                expect(vcm4Map.gotoViewPoint.calledOnce).to.be.true;
+            });
+
+            it("should correctly detect vcm@6 and use its methods", async () => {
+                sinon.stub(document, "getElementById").returns({contentWindow: vcm6Vcs});
+
+                await actions.obliqueView(
+                    {commit: sinon.spy(), dispatch: sinon.spy(), getters: {heading: 50}},
+                    [1, 2]
+                );
+
+                expect(vcm6Map.getViewpointSync.calledTwice).to.be.true;
+                expect(vcm6Map.gotoViewpoint.calledOnce).to.be.true;
+            });
+        });
+    });
 });
