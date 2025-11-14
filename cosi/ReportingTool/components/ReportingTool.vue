@@ -86,7 +86,7 @@ export default {
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Modules/AccessibilityAnalysis", ["dataSets"]),
-        ...mapGetters("Modules/Dashboard", ["items"]),
+        ...mapGetters("Modules/Dashboard", ["items", "statsFeatureFilter"]),
         ...mapGetters("Modules/FeaturesList", ["featuresListItems"]),
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevel", "selectedDistrictNames", "selectedFeatures", "initMapping"]),
         ...mapGetters("Modules/TemplateManager", ["reportName", "reportLayerIds", "reportCategories"]),
@@ -888,6 +888,33 @@ export default {
             });
 
             this.selectedReportComponents.push(frontPagelabel.label);
+        },
+        /**
+         * Gets the statistical data depending on filtered data.
+         * @returns {Object[]} the groups of the statistical data.
+         */
+        getStatGroups () {
+            const allStatGroups = Object.groupBy(this.initMapping, (obj) => obj.group);
+
+            if (this.statsFeatureFilter.length) {
+                const filtered = this.initMapping.filter(obj => {
+                        return this.statsFeatureFilter.includes(obj.value);
+                    }),
+                    groups = Object.groupBy(filtered, (obj) => obj.group);
+
+                return Object.keys(groups);
+            }
+
+            return Object.keys(allStatGroups);
+        },
+        /**
+         * Prepares the geospatial data.
+         * @returns {Object[]} the layer names.
+         */
+        getInfrastructureData () {
+            const topicName = Object.groupBy(this.featuresListItems, (topic) => topic.layerName);
+
+            return Object.keys(topicName);
         }
     }
 };
@@ -1012,6 +1039,7 @@ export default {
                             :card-mapping="categoryMapping?.statData"
                             :title="'2. ' + $t('additional:modules.cosi.reportingTool.statisticalData')"
                             :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noStatisticalDataSelected')"
+                            :groups="getStatGroups()"
                         />
                         <AlertMessage
                             v-else
@@ -1046,6 +1074,7 @@ export default {
                                 :card-mapping="categoryMapping?.subjectData"
                                 :title="'3. ' + $t('additional:modules.cosi.reportingTool.subjectData')"
                                 :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noSubjectDataSelected')"
+                                :groups="getInfrastructureData()"
                             />
                         </template>
                         <AlertMessage

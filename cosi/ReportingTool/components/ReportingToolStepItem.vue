@@ -7,6 +7,7 @@ import ReportingToolStepItemAddCard from "./ReportingToolStepItemAddCard.vue";
 import ReportingToolStepItemSettings from "./ReportingToolStepItemSettings.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {uniqueId} from "@shared/js/utils/uniqueId";
+import {VueDraggableNext} from "vue-draggable-next";
 
 export default {
     name: "ReportingToolStepItem",
@@ -17,7 +18,8 @@ export default {
         DropdownAutocomplete,
         ReportingToolStepItemAddCard,
         ReportingToolStepItemSettings,
-        InputText
+        InputText,
+        Draggable: VueDraggableNext
     },
     props: {
         cardMapping: {
@@ -32,12 +34,17 @@ export default {
         title: {
             type: String,
             required: true
+        },
+        groups: {
+            type: Array,
+            required: false,
+            default: null
         }
     },
     data () {
         return {
             cards: [],
-            isCollapsed: true,
+            isCollapsed: false,
             customText: "",
             customHeading: ""
         };
@@ -173,9 +180,27 @@ export default {
                         class="bi me-2"
                         :class="isCollapsed ? 'bi-chevron-down' : 'bi-chevron-up'"
                     />
-                    {{ $t(card.expandableLabel) }}
+                    {{ isCollapsed ? $t(card.expandableLabelHide) : $t(card.expandableLabelShow) }}
                 </small>
             </a>
+            <div v-if="isCollapsed">
+                <div
+                    v-for="group in groups"
+                    :key="group"
+                    class="mt-2"
+                >
+                    <Draggable>
+                        <div class="card mb-2">
+                            <div class="row card-body py-1">
+                                <i class="col col-1 bi bi-grip-vertical fs-3 ps-0" />
+                                <div class="col-11 mt-2">
+                                    {{ group }}
+                                </div>
+                            </div>
+                        </div>
+                    </Draggable>
+                </div>
+            </div>
         </div>
         <div v-if="card.key === 'textArea'">
             <InputText

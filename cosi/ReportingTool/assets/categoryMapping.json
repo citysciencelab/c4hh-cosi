@@ -18,7 +18,8 @@
     },
     {
       "expandable": true,
-      "expandableLabel": "additional:modules.cosi.reportingTool.showStatisticalData",
+      "expandableLabelShow": "additional:modules.cosi.reportingTool.showStatisticalData",
+      "expandableLabelHide": "additional:modules.cosi.reportingTool.hideStatisticalData",
       "icon": "bi bi-bar-chart",
       "key": "statDataOverview",
       "multiple": false,
@@ -55,7 +56,8 @@
     },
     {
       "expandable": true,
-      "expandableLabel": "additional:modules.cosi.reportingTool.showSubjectData",
+      "expandableLabelShow": "additional:modules.cosi.reportingTool.showSubjectData",
+      "expandableLabelHide": "additional:modules.cosi.reportingTool.hideSubjectData",
       "icon": "bi bi-table",
       "key": "subjectDataTable",
       "multiple": false,
