@@ -5,6 +5,7 @@ import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import ReportingToolStepItemAddCard from "./ReportingToolStepItemAddCard.vue";
 import ReportingToolStepItemSettings from "./ReportingToolStepItemSettings.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {uniqueId} from "@shared/js/utils/uniqueId";
 
 export default {
@@ -15,7 +16,8 @@ export default {
         CustomCard,
         DropdownAutocomplete,
         ReportingToolStepItemAddCard,
-        ReportingToolStepItemSettings
+        ReportingToolStepItemSettings,
+        InputText
     },
     props: {
         cardMapping: {
@@ -35,12 +37,14 @@ export default {
     data () {
         return {
             cards: [],
-            isCollapsed: true
+            isCollapsed: true,
+            customText: "",
+            customHeading: ""
         };
     },
     mounted () {
         this.cards = this.cardMapping.reduce((cards, item) => {
-            if (item?.key !== "textArea") {
+            if (item?.key !== "textArea" && item?.key !== "heading") {
                 cards.push({...item, id: uniqueId("reporting-tool-card-")});
             }
             return cards;
@@ -144,7 +148,7 @@ export default {
     >
         <Badges
             v-if="card.tag"
-            class="mb-2"
+            class="mb-2 mt-1"
             :text="card.tag"
             :background-color="card.tagColor"
             :icon="card.icon"
@@ -172,6 +176,26 @@ export default {
                     {{ $t(card.expandableLabel) }}
                 </small>
             </a>
+        </div>
+        <div v-if="card.key === 'textArea'">
+            <InputText
+                id="customText"
+                v-model="customText"
+                class="pt-0 mt-0"
+                :label="$t('additional:modules.cosi.reportingTool.label.freetext')"
+                :placeholder="$t('additional:modules.cosi.reportingTool.label.freetext')"
+                html-type="textarea"
+                max-length="1000"
+            />
+        </div>
+        <div v-if="card.key === 'heading'">
+            <InputText
+                id="customHeading"
+                v-model="customHeading"
+                class="pt-0"
+                :label="$t('additional:modules.cosi.reportingTool.label.heading')"
+                :placeholder="$t('additional:modules.cosi.reportingTool.label.heading')"
+            />
         </div>
     </CustomCard>
     <ReportingToolStepItemAddCard

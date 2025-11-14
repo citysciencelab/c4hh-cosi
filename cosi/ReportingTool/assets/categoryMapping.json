@@ -9,6 +9,14 @@
       "tag": null
     },
     {
+      "expandable": false,
+      "icon": "bi bi-card-heading",
+      "key": "heading",
+      "multiple": true,
+      "name": "Überschrift",
+      "tag": null
+    },
+    {
       "expandable": true,
       "expandableLabel": "additional:modules.cosi.reportingTool.showStatisticalData",
       "icon": "bi bi-bar-chart",
@@ -35,6 +43,14 @@
       "key": "textArea",
       "multiple": true,
       "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-card-heading",
+      "key": "heading",
+      "multiple": true,
+      "name": "Überschrift",
       "tag": null
     },
     {
@@ -65,6 +81,14 @@
       "tag": null
     },
     {
+      "expandable": false,
+      "icon": "bi bi-card-heading",
+      "key": "heading",
+      "multiple": true,
+      "name": "Überschrift",
+      "tag": null
+    },
+    {
       "items": [],
       "expandable": false,
       "icon": "bi bi-geo",
@@ -81,6 +105,14 @@
       "key": "textArea",
       "multiple": true,
       "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-card-heading",
+      "key": "heading",
+      "multiple": true,
+      "name": "Überschrift",
       "tag": null
     },
     {

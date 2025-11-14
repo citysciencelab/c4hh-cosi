@@ -36,7 +36,8 @@
             "summariseStatisticalAreas": "Summarise statistical areas",
             "higherDistrictLevel": "Include the higher level of reference",
             "statisticalAreas":"Select statistical areas",
-            "referenceYear": "Reference year"
+            "referenceYear": "Reference year",
+            "heading": "Heading"
           },
           "alert": {
             "infoFrontPage": "Neuwerk and Scharhörn are shown as separate maps.",

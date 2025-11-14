@@ -36,7 +36,8 @@
               "summariseStatisticalAreas": "Statistische Gebiete summieren",
               "higherDistrictLevel": "Übergeordnete Bezugsebene miteinbeziehen",
               "statisticalAreas":"Statistische Gebiete auswählen",
-              "referenceYear": "Bezugsjahr"
+              "referenceYear": "Bezugsjahr",
+              "heading": "Überschrift"
             },
             "alert": {
               "infoFrontPage": "Neuwerk und Scharhörn werden als separate Karten dargestellt.",
