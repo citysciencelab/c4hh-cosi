@@ -80,11 +80,6 @@ export default {
                         itemProperty: "id",
                         displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.id"),
                         sortable: "numeric"
-                    },
-                    {
-                        itemProperty: "aktion",
-                        displayName: this.$t("additional:modules.geoMarker.GeoMakerList.table.aktion"),
-                        sortable: false
                     }
                 ],
                 items: this.geoMarkerFeatureList?.map(item => {
@@ -343,15 +338,7 @@ export default {
                     :selected-item-id="selectedListItemId"
                     :table-data="tableData"
                     @item-selected="setSelectedFeature"
-                >
-                    <template #cell-aktion>
-                        <IconButton
-                            class="cellActionIconButton"
-                            :aria="$t('additional:modules.geoMarker.GeoMakerList.table.aktionButtonLabel')"
-                            icon="bi-eye"
-                        />
-                    </template>
-                </SelectableList>
+                />
 
                 <div
                     v-if="geoMarkerUpdateMode"

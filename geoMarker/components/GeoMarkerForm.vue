@@ -162,7 +162,7 @@ export default {
                     : this.geomarkerDescription,
                 zeitstempel: dayjs().toISOString(),
                 zeitstempel_geschlossen: this.closedDateIfEveryDepartmentIsClosed(),
-                quelle: window.activeDirectoryUser ? window.activeDirectoryUser.username : "geomarker",
+                quelle: this.selectedFeature.get("quelle") ?? "geomarker",
                 geom: this.geoMarkerUpdateFeature?.getGeometry()
             };
         },

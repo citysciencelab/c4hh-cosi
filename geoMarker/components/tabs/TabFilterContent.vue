@@ -63,12 +63,15 @@ export default {
         ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
         ]),
+        ...mapGetters(["layerUrlParams"]),
         /**
          * Creates a permalink for the current filter settings
          * @returns {string} Permalink URL
          */
         urlFilterPermalink () {
-            const departmentIds = [];
+            const departmentIds = [],
+                layerParams = this.layerUrlParams,
+                layerSearchParams = JSON.stringify(layerParams);
 
             this.filterSelections.departmentsSelected.forEach(departmentSelected => {
                 const matchedDepartmentId = Object.keys(this.departments).find(
@@ -78,7 +81,7 @@ export default {
                 departmentIds.push(matchedDepartmentId);
             });
 
-            return `${window.location.pathname}?filterGeoMarkerAbteilung=${departmentIds.join(",")}&filterGeoMarkerStatus=${this.filterSelections.statusSelected.join(",")}`;
+            return `${window.location.pathname}?filterGeoMarkerAbteilung=${departmentIds.join(",")}&filterGeoMarkerStatus=${this.filterSelections.statusSelected.join(",")}&LAYERS=${layerSearchParams}`;
         },
         /**
          * Returns the category options for the filter dropdown.
