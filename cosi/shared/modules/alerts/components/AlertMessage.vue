@@ -3,6 +3,10 @@
 export default {
     name: "AlertMessage",
     props: {
+        closeable: {
+            type: Boolean,
+            default: false
+        },
         text: {
             type: String,
             required: true
@@ -20,6 +24,7 @@ export default {
             }
         }
     },
+    emits: ["closed"],
     data () {
         return {
             colorMapping: {
@@ -66,6 +71,14 @@ export default {
                 <br>
                 <span>{{ text }}</span>
             </div>
+            <button
+                v-if="closeable"
+                type="button"
+                class="btn-close align-self-start"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+                @click="$emit('closed')"
+            />
         </div>
     </div>
 </template>
