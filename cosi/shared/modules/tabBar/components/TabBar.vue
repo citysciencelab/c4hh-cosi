@@ -65,7 +65,7 @@ export default {
                         class="mr-1"
                         :class="item.icon"
                     />
-                    {{ item.text }}
+                    {{ $t(item.text) }}
                 </button>
             </li>
         </ul>

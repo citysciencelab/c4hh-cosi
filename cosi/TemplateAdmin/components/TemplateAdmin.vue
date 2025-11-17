@@ -2,23 +2,37 @@
 import getMappingJson from "../../utils/getMappingJson";
 import getters from "../store/gettersTemplateAdmin";
 import isObject from "@shared/js/utils/isObject.js";
-import {mapGetters, mapMutations, mapState} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import mutations from "../store/mutationsTemplateAdmin";
 import {sort} from "@shared/js/utils/sort.js";
-import TemplateAdminForm from "./TemplateAdminForm.vue";
 import store from "@appstore/index.js";
+import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
+import TabBar from "../../shared/modules/tabBar/components/TabBar.vue";
+import TemplateAdminForm from "./TemplateAdminForm.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 
 export default {
     name: "TemplateAdmin",
     components: {
-        TemplateAdminForm
+        SwitchInput,
+        TabBar,
+        TemplateAdminForm,
+        ToolInfo
     },
     data () {
         return {
-            dataOptions: [],
-            statOptions: [],
-            toolOptions: [],
-            currentTab: "#add-template-tab"
+            availableModes: [
+                {
+                    type: "create",
+                    text: this.$t("additional:modules.cosi.templateAdmin.button.addTemplate"),
+                    icon: "bi bi-plus-square"
+                },
+                {
+                    type: "edit",
+                    text: this.$t("additional:modules.cosi.templateAdmin.button.editTemplate"),
+                    icon: "bi bi-pencil-square"
+                }
+            ]
         };
     },
     computed: {
@@ -34,9 +48,9 @@ export default {
                 return value.type;
             }).filter(toolNames => !toIgnoreTools.includes(toolNames));
 
-        this.toolOptions = this.getToolList(configuredModules);
-        this.statOptions = this.getMappedLabelByValue(filteredPropertyNames, mapping),
-        this.dataOptions = this.getLayerNames(this.allLayerConfigs);
+        this.setToolOptions(this.getToolList(configuredModules));
+        this.setStatOptions(this.getMappedLabelByValue(filteredPropertyNames, mapping));
+        this.setDataOptions(this.getLayerNames(this.allLayerConfigs));
     },
     methods: {
         ...mapMutations("Modules/TemplateAdmin", Object.keys(mutations)),
@@ -53,7 +67,7 @@ export default {
             let toolList = [];
 
             configuredModules.forEach(val => {
-                const capModuleName =  val.charAt(0).toUpperCase() + val.slice(1);
+                const capModuleName = val.charAt(0).toUpperCase() + val.slice(1);
 
                 toolList.push({toolId: val, label: i18next.t(store.getters["Modules/" + capModuleName + "/name"])});
             });
@@ -149,6 +163,14 @@ export default {
             layerNames = sort("", layerNames, "label");
 
             return layerNames;
+        },
+
+        /**
+         * Toggles the status of the export button.
+         * @returns {void}
+         */
+        toggleEnableExport () {
+            this.setEnableExport(!this.enableExport);
         }
     }
 };
@@ -156,87 +178,35 @@ export default {
 
 <template lang="html">
     <div class="container">
-        <div
-            class="decription mb-2"
-        >
-            {{ $t("additional:modules.cosi.templateAdmin.description") }}
-        </div>
+        <ToolInfo
+            :summary="$t('additional:modules.cosi.templateAdmin.description')"
+        />
         <!-- Nav tabs -->
-        <ul
-            id="templateTabs"
-            class="nav nav-tabs"
-            role="tablist"
-        >
-            <li
-                class="nav-item"
-                role="presentation"
-            >
-                <button
-                    id="add-template-tab"
-                    :class="currentTab === '#add-template-tab' ? 'active' : ''"
-                    class="nav-link fs-6"
-                    data-bs-toggle="tab"
-                    data-bs-target="#add-template"
-                    type="button"
-                    role="tab"
-                    aria-controls="add-template"
-                    aria-selected="true"
-                    @click="currentTab = '#add-template-tab'"
-                >
-                    <i class="bi bi-plus-square pe-2" />
-                    {{ $t("additional:modules.cosi.templateAdmin.button.addTemplate") }}
-                </button>
-            </li>
-            <li
-                class="nav-item"
-                role="presentation"
-            >
-                <button
-                    id="edit-template-tab"
-                    :class="currentTab === '#edit-template-tab' ? 'active' : ''"
-                    class="nav-link fs-6"
-                    data-bs-toggle="tab"
-                    data-bs-target="#edit-template"
-                    type="button"
-                    role="tab"
-                    aria-controls="edit-template"
-                    aria-selected="false"
-                    @click="currentTab = '#edit-template-tab'"
-                >
-                    <i class="bi bi-pencil-square pe-2" />
-                    {{ $t("additional:modules.cosi.templateAdmin.button.editTemplate") }}
-                </button>
-            </li>
-        </ul>
+        <TabBar
+            class="mb-4"
+            :items="availableModes"
+            :active-item="activeMode"
+            @change="setActiveMode"
+        />
         <!-- Tab panes -->
-        <div class="tab-content">
+        <div>
+            <SwitchInput
+                v-if="activeMode.type === 'create'"
+                id="enable-export"
+                :aria="$t('additional:modules.cosi.templateAdmin.label.enableExport')"
+                :checked="enableExport"
+                :interaction="toggleEnableExport"
+                :label="$t('additional:modules.cosi.templateAdmin.label.enableExport')"
+                class="mb-3"
+            />
             <div
-                id="add-template"
-                :class="currentTab === '#add-template-tab' ? 'active' : ''"
-                class="tab-pane"
-                role="tabpanel"
-                aria-labelledby="add-template-tab"
                 tabindex="0"
             >
                 <TemplateAdminForm
                     :geo-data="dataOptions"
                     :stat-data="statOptions"
                     :tool-data="toolOptions"
-                />
-            </div>
-            <div
-                id="edit-template"
-                :class="currentTab === '#edit-template-tab' ? 'active' : ''"
-                class="tab-pane"
-                role="tabpanel"
-                aria-labelledby="edit-template-tab"
-                tabindex="0"
-            >
-                <TemplateAdminForm
-                    :geo-data="dataOptions"
-                    :stat-data="statOptions"
-                    :tool-data="toolOptions"
-                    :show-edit-template="true"
+                    :show-edit-template="activeMode.type === 'edit'"
                 />
             </div>
         </div>

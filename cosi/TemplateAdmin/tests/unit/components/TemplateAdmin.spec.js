@@ -377,7 +377,7 @@ describe("addons/cosi/TemplateAdmin/components/TemplateAdmin.vue", () => {
             });
             it("should return array of objects if valueType is given", () => {
                 const wrapper = shallowMount(TemplateAdmin, {store, localVue}),
-                    expected =        [
+                    expected = [
                         {
                             "category": "group1",
                             "data": [

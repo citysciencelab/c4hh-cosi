@@ -1,18 +1,28 @@
 <script>
+import Card from "../../shared/modules/cards/components/Card.vue";
+import dayjs from "dayjs";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import getters from "../store/gettersTemplateAdmin";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
+import isObject from "@shared/js/utils/isObject.js";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import TemplateAdminFormCard from "./TemplateAdminFormCard.vue";
-import getters from "../store/gettersTemplateAdmin";
-import dayjs from "dayjs";
-import {VueDraggableNext} from 'vue-draggable-next'
-import {mapActions, mapGetters, mapMutations} from "vuex";
-import isObject from "@shared/js/utils/isObject.js";
+import {VueDraggableNext} from "vue-draggable-next";
 
 export default {
     name: "TemplateAdminForm",
     components: {
+        Card,
+        Draggable: VueDraggableNext,
+        DropdownAutocomplete,
+        FileUpload,
+        FlatButton,
+        InputText,
         Multiselect,
-        TemplateAdminFormCard,
-        Draggable: VueDraggableNext
+        TemplateAdminFormCard
     },
     props: {
         geoData: {
@@ -36,6 +46,7 @@ export default {
     },
     data () {
         return {
+            fileUploaded: false,
             templateName: "",
             templateDes: "",
             selectedGeoData: [],
@@ -46,7 +57,9 @@ export default {
             isValidated: false,
             limitReferenceValues: false,
             referenceValueList: [],
-            importedReferenceValueList: []
+            importedReferenceValueList: [],
+            selectedGeoDataLabel: [],
+            selectedToolLabel: ""
         };
     },
     computed: {
@@ -61,6 +74,12 @@ export default {
         },
         uploadedTemplates () {
             return this.importedTemplateNames;
+        },
+        geoDataList () {
+            return this.geoData.map(data => data?.label);
+        },
+        toolDataList () {
+            return this.toolData.map(data => data?.label);
         }
     },
     watch: {
@@ -73,6 +92,15 @@ export default {
             if (this.showEditTemplate) {
                 this.changeSelectedTemplate(value);
             }
+        },
+        selectedGeoDataLabel: {
+            handler (value) {
+                this.selectedGeoData = this.geoData.filter(data => value.includes(data?.label));
+            },
+            deep: true
+        },
+        selectedToolLabel (value) {
+            this.selectedToolData = this.toolData.find(data => data?.label === value);
         }
     },
     mounted () {
@@ -82,7 +110,14 @@ export default {
     },
     methods: {
         ...mapActions("Alerting", ["addSingleAlert"]),
-        ...mapMutations("Modules/TemplateAdmin", ["setSelectedTemplate"]),
+        ...mapMutations("Modules/TemplateAdmin", ["setEnableExport", "setImportedTemplateNames", "setLoadedTemplates", "setSavedTemplateContents", "setSelectedStatisticCardsCount", "setSelectedTemplate"]),
+
+        /**
+         * Todos.
+         */
+        addStatisticCards () {
+            this.setSelectedStatisticCardsCount(this.selectedStatisticCardsCount + 1);
+        },
 
         /**
          * Changes the selected template.
@@ -246,15 +281,19 @@ export default {
         /**
          * Importing the template from local storage.
          * @param {Event} evt - An input change event
+         * @param {Boolean} drop - the flag to check it is from drop event.
          * @returns {void}
          */
-        importTemplate (evt) {
-            if (!Array.isArray(Object.keys(evt?.target?.files)) || !Object.keys(evt?.target?.files).length) {
+        importTemplate (evt, drop = false) {
+            if (!drop && (!Array.isArray(Object.keys(evt?.target?.files)) || !Object.keys(evt?.target?.files).length)) {
                 return;
             }
 
-            this.prepareTemplate(evt?.target?.files);
-            this.$refs.form.reset();
+            if (drop && (!Array.isArray(Object.keys(evt?.dataTransfer?.files)) || !Object.keys(evt?.dataTransfer?.files).length)) {
+                return;
+            }
+
+            this.prepareTemplate(drop ? evt.dataTransfer.files : evt.target.files);
         },
 
         /**
@@ -343,10 +382,22 @@ export default {
                 this.importedTemplateNames.push(this.getTemplateText(fileContent.meta?.title));
                 this.savedTemplateContents[this.getTemplateText(fileContent.meta?.title)] = fileContent;
                 this.loadingTemplate(fileContent);
+                this.loadedTemplates.push({
+                    data: [
+                        {
+                            "label": fileContent.meta?.title
+                        },
+                        {
+                            "icon": "bi bi-sliders2",
+                            "label": fileContent.meta?.created
+                        }
+                    ],
+                    title: fileContent.meta?.title
+                });
             }
             else {
                 this.addSingleAlert({
-                    content: `${this.$t("additional:modules.cosi.templateAdmin.errors.templateName")} ${fileContent.meta?.title} ${this.$t("additional:modules.cosi.templateAdmin.errors.isLoaded")}`,
+                    content: `${this.$t("additional:modules.cosi.templateAdmin.errors.templateName")}` + fileContent?.meta?.title + `${this.$t("additional:modules.cosi.templateAdmin.errors.isLoaded")}`,
                     category: "Warning",
                     displayClass: "warning"
                 });
@@ -362,12 +413,15 @@ export default {
             if (!isObject(content)) {
                 return;
             }
+
             this.setSelectedTemplate(this.getTemplateText(content.meta?.title));
             this.templateName = this.getTemplateText(content.meta?.title);
             this.templateDes = this.getTemplateText(content.meta?.info);
             this.selectedGeoData = this.getSelectedGeoData(content.state?.Maps?.layerIds);
+            this.selectedGeoDataLabel = this.selectedGeoData.map(data => data?.label);
             this.selectedStatData = this.getSelectedStatData(content.state?.Tools?.Dashboard);
             this.selectedToolData = this.getSelectedToolData(content.state?.Tools?.toolToOpen);
+            this.selectedToolLabel = this.selectedToolData?.label;
             this.importedReferenceValueList = this.getImportedReferenceValueList(content.state?.Tools?.Dashboard?.orientationValues);
             this.referenceValueList = this.importedReferenceValueList;
         },
@@ -455,12 +509,71 @@ export default {
             return referenceValueList.find(data => data?.statisticName === name)?.value;
         },
         /**
+         * Called when user uploads a file to process
+         * @param {HTMLInputEvent} e event with the files
+         * @returns {void}
+         */
+        onInputChange (e) {
+            if (e.target.files !== undefined) {
+                this.importTemplate(e);
+                e.target.value = null;
+            }
+        },
+        /**
+         * Called when user drops a file in the upload container
+         * @param {HTMLInputEvent} e event with the files
+         * @returns {void}
+         */
+        onDrop (e) {
+            if (e.dataTransfer.files !== undefined) {
+                this.importTemplate(e, true);
+            }
+        },
+        /**
+         * Removes the loaded template from the title
+         * @param {String} title the title of the template
+         * @returns {void}
+         */
+        removeLoadedTemplate (title) {
+            if (typeof title !== "string") {
+                return;
+            }
+
+            this.setLoadedTemplates(this.loadedTemplates.filter(template => template.title !== title));
+            this.setImportedTemplateNames(this.importedTemplateNames.filter(name => name !== title));
+            delete this.savedTemplateContents[title];
+        },
+        /**
+         * Reset all the field..
+         * @returns {void}
+         */
+        resetAll () {
+            this.templateName = "";
+            this.templateDes = "";
+            this.selectedGeoData = [];
+            this.selectedStatData = [];
+            this.selectedToolData = [];
+            this.selectedGeoDataLabel = [];
+            this.selectedToolLabel = "";
+            this.setEnableExport(false);
+        },
+        /**
          * Returns the unit or false depending on valueType.
          * @param {String} valueType - the value type ("relative", "absolute" or false) of the selected statistics.
          * @returns {String|Boolean} the unit if the valueType is "relative" otherwise false.
          */
         showUnit (valueType) {
             return valueType === "relative" ? "%" : false;
+        },
+        /**
+         * Called when user clicks to input files
+         * @param {HTMLInputEvent} e event with click.
+         * @returns {void}
+         */
+        triggerClickOnFileInput (event) {
+            if (event.which === 32 || event.which === 13) {
+                this.$refs["upload-input-file"].click();
+            }
         }
     }
 };
@@ -480,70 +593,55 @@ export default {
             v-if="showEditTemplate"
             class="mt-3"
         >
-            <button
-                class="template-upload btn btn-outline-primary fs-5 lh-1"
-                @click.prevent="$refs.templateImport.click()"
+            <FileUpload
+                :id="'templateUpload'"
+                :keydown="(e) => triggerClickOnFileInput(e)"
+                :change="(e) => onInputChange(e)"
+                :drop="(e) => onDrop(e)"
             >
-                <i class="bi bi-upload pe-2" />
-                {{ $t("additional:modules.cosi.templateAdmin.button.uploadTemplate") }}
-            </button>
-            <span
-                class="row form-text pt-3 ps-3"
-            >
-                {{ $t("additional:modules.cosi.templateAdmin.label.supportedFormats") }}
-            </span>
-            <form ref="form">
-                <label for="template-import">
-                    <input
-                        id="template-import"
-                        ref="templateImport"
-                        type="file"
-                        multiple
-                        class="d-none"
-                        @change="importTemplate"
-                    >
-                </label>
-            </form>
+                <span class="row form-text ps-3 align-items-center justify-content-center">
+                    {{ $t("additional:modules.cosi.templateAdmin.label.supportedFormats") }}
+                </span>
+            </FileUpload>
             <div
                 v-if="uploadedTemplates.length !== 0"
             >
                 <label
-                    class="col col-md form-label ps-0 pb-0 pt-3 m-0"
+                    class="form-label mb-3 mt-3"
                     for="select-template"
                 >
+                    <i class="mr-1 bi bi-plus-square" />
                     {{ $t("additional:modules.cosi.templateAdmin.label.selectTemplate") }}
                 </label>
-                <Multiselect
-                    id="select-template"
-                    :value="selectedTemplate"
-                    class="pb-3"
-                    :options="uploadedTemplates"
-                    :close-on-select="true"
-                    :show-labels="false"
-                    :allow-empty="false"
-                    :multiple="false"
-                    :placeholder="$t('additional:modules.cosi.templateAdmin.label.selectTemplate')"
-                    @input="setSelectedTemplate"
-                />
+                <div
+                    v-for="template in loadedTemplates"
+                    :key="template.title"
+                >
+                    <Card
+                        :data="template.data"
+                        :downloadable="false"
+                        icon="bi bi-pencil"
+                        :status="template.title === selectedTemplate ? 'active' : ''"
+                        class="col-12"
+                        @click="setSelectedTemplate(template.title)"
+                        @remove-set="removeLoadedTemplate(template.title)"
+                    />
+                </div>
             </div>
         </div>
         <div
             v-if="!showEditTemplate || showEditTemplate && uploadedTemplates.length !== 0"
         >
             <div class="mb-3 mt-0">
-                <label
-                    for="form-name"
-                    class="form-label mb-0"
-                >
-                    {{ $t("additional:modules.cosi.templateAdmin.label.name") }} *
-                </label>
-                <input
-                    id="form-name"
+                <InputText
+                    :id="'template-name'"
                     v-model.trim="templateName"
-                    type="text"
-                    :class="['form-control', 'rounded-0', isNameValidating && templateName === '' ? 'novalidate' : '', showEditTemplate ? 'no-border' : '']"
+                    :class="[isNameValidating && templateName === '' ? 'novalidate' : '', showEditTemplate ? 'no-border' : '']"
+                    :min="1"
+                    :label="$t('additional:modules.cosi.templateAdmin.label.name')"
+                    :placeholder="$t('additional:modules.cosi.templateAdmin.label.name')"
                     @input="setIsNameValidating(false)"
-                >
+                />
                 <span
                     v-if="isNameValidating && templateName === ''"
                     class="hint"
@@ -552,73 +650,22 @@ export default {
                 </span>
             </div>
             <div class="my-3">
-                <label
-                    for="form-description"
-                    class="form-label mb-0"
-                >
-                    {{ $t("additional:modules.cosi.templateAdmin.label.description") }} (optional)
-                </label>
-                <textarea
-                    id="form-description"
+                <InputText
+                    :id="'template-description'"
                     v-model.trim="templateDes"
-                    class="form-control rounded-0"
                     :class="showEditTemplate ? 'no-border' : ''"
-                    rows="2"
+                    html-type="textarea"
+                    :label="$t('additional:modules.cosi.templateAdmin.label.description') + ' (optional)'"
+                    :placeholder="$t('additional:modules.cosi.templateAdmin.label.description')"
                 />
             </div>
-            <label
-                class="form-label mb-0"
-                for="add-geo-data"
-            >
-                {{ $t("additional:modules.cosi.templateAdmin.label.addGeoData") }} (optional)
-            </label>
             <div class="row no-gutters mb-2">
-                <button
-                    class="col col-md-1 align-items-center justify-content-center search-button"
-                    type="button"
-                    aria-disabled="true"
-                    disabled
-                >
-                    <i class="bi bi-search search-icon" />
-                </button>
-                <Multiselect
-                    id="add-geo-data"
-                    v-model="selectedGeoData"
-                    class="col col-md"
-                    :options="geoData"
-                    :searchable="true"
-                    :close-on-select="false"
-                    :multiple="true"
-                    :show-labels="false"
-                    :clear-on-select="false"
-                    :preserve-search="true"
-                    :allow-empty="false"
-                    :placeholder="$t('additional:modules.cosi.templateAdmin.label.placeholder')"
-                    label="label"
-                    track-by="layerId"
-                >
-                    <template
-                        #selection="{ values, isOpen }"
-                    >
-                        <span
-                            v-if="values.length"
-                            v-show="!isOpen"
-                            class="multiselect__input"
-                        > {{ }} </span>
-                    </template>
-                </Multiselect>
-            </div>
-            <div class="mb-4">
-                <button
-                    v-for="(geoDataObj, idx) in selectedGeoData"
-                    :key="idx"
-                    class="btn btn-sm btn-outline-secondary lh-1 rounded-pill shadow-none mb-1 me-2 btn-pb"
-                    aria-label="Close"
-                    @click.prevent="removeGeoData(geoDataObj.layerId)"
-                >
-                    {{ geoDataObj.label }}
-                    <i class="bi bi-x fs-5 align-middle" />
-                </button>
+                <Dropdown-Autocomplete
+                    v-model="selectedGeoDataLabel"
+                    multiple
+                    :items="geoDataList"
+                    :label="$t('additional:modules.cosi.templateAdmin.label.layer')"
+                />
             </div>
             <label
                 class="form-label mb-0"
@@ -627,14 +674,6 @@ export default {
                 {{ $t("additional:modules.cosi.templateAdmin.label.addStatisticalData") }} *
             </label>
             <div class="row no-gutters mb-2">
-                <button
-                    class="col col-md-1 align-items-center justify-content-center search-button"
-                    type="button"
-                    aria-disabled="true"
-                    disabled
-                >
-                    <i class="bi bi-search search-icon" />
-                </button>
                 <Multiselect
                     id="add-statistic-data"
                     v-model="selectedStatData"
@@ -703,60 +742,50 @@ export default {
                     </button>
                 </div>
             </div>
-            <label
-                class="form-label mb-0"
-                for="add-tools"
-            >
-                {{ $t("additional:modules.cosi.templateAdmin.label.addTools") }} (optional)
-            </label>
-
-            <div class="row no-gutters mb-4">
+            <div class="d-grid add-statistic mb-5 mt-1">
                 <button
-                    class="col col-md-1 align-items-center justify-content-center search-button"
+                    class="btn btn-light p-4 rounded-4 d-flex flex-row align-items-center justify-content-center"
                     type="button"
-                    aria-disabled="true"
-                    disabled
+                    @click="addStatisticCards"
                 >
-                    <i class="bi bi-search search-icon" />
+                    <i class="mr-2 bi bi-plus-circle" />
+                    {{ $t("additional:modules.cosi.templateAdmin.label.addStatisticalData") }}
                 </button>
-                <Multiselect
-                    id="add-tools"
-                    v-model="selectedToolData"
-                    class="col col-md"
-                    :clear-on-select="false"
-                    :options="toolData"
-                    :searchable="true"
-                    :close-on-select="true"
-                    :multiple="false"
-                    :show-labels="false"
-                    :placeholder="$t('additional:modules.cosi.templateAdmin.label.placeholder')"
-                    track-by="toolId"
-                    label="label"
-                >
-                    <template
-                        #selection="{ values, isOpen }"
-                    >
-                        <span
-                            v-if="values.length"
-                            v-show="!isOpen"
-                            class="multiselect__input"
-                        > {{ }} </span>
-                    </template>
-                </Multiselect>
             </div>
-            <button
-                class="export-template btn btn-outline-primary fs-5 lh-1"
-                @click.prevent="validateForm"
-            >
-                <i class="bi bi-download pe-2" />
-                {{ $t("additional:modules.cosi.templateAdmin.button.downloadTemplate") }}
-            </button>
+            <div class="row no-gutters mb-4">
+                <Dropdown-Autocomplete
+                    v-model="selectedToolLabel"
+                    clearable
+                    :items="toolDataList"
+                    :label="$t('additional:modules.cosi.templateAdmin.label.tool')"
+                />
+            </div>
+            <FlatButton
+                v-if="!showEditTemplate"
+                class="mx-auto"
+                icon="bi bi-arrow-counterclockwise"
+                :text="$t('additional:modules.cosi.templateAdmin.button.reset')"
+                @click.native="resetAll"
+            />
+            <FlatButton
+                class="mx-auto"
+                icon="bi bi-download"
+                :disabled="!enableExport && !showEditTemplate"
+                :text="showEditTemplate ? $t('additional:modules.cosi.templateAdmin.button.downloadeditTemplate') : $t('additional:modules.cosi.templateAdmin.button.downloadTemplate')"
+                @click.native="validateForm"
+            />
         </div>
     </form>
 </template>
 
 <style lang="scss" scoped>
 @import "/src/assets/css/variables";
+
+.add-statistic button {
+    color: $secondary;
+    border: 2px dashed $secondary;
+    transition: background 0.25s, border-color 0.25s;
+}
 
 .btn-outline-primary, .btn-outline-primary:focus-visible {
     color: $light_blue;
@@ -819,7 +848,6 @@ export default {
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
      }
 }
-
 </style>
 
 <style lang="scss">
