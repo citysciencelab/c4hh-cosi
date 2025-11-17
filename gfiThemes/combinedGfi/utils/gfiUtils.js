@@ -1,3 +1,4 @@
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 import {getCenter} from "ol/extent";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
 import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
@@ -19,11 +20,34 @@ export function normalizeAttributes (attributes) {
         return attributes;
     }
 
+    if (Array.isArray(attributes)) {
+        return attributes;
+    }
+
     if (typeof attributes === "object") {
         return Object.keys(attributes);
     }
 
     return "showAll";
+}
+
+/**
+ * Merges layersToRequest with layers that are not requested for UI, but
+ * merely for buffer requests, whilst avoiding duplicate entries.
+ * @param {Object[]} layersToRequest layers directly configured for request
+ * @param {Object<string, string[]>} bufferAttributes layerId to bufferAttributes array
+ * @returns {Object[]} extended request layers array
+ */
+export function getAllRequestLayers (layersToRequest = [], bufferAttributes = {}) {
+    return [
+        ...layersToRequest,
+        ...Object.entries(bufferAttributes)
+            .filter(([id]) => layersToRequest.every((entry) => entry.id !== id))
+            .map(([id, attributes]) => ({
+                ...rawLayerList.getLayerWhere({id}),
+                gfiAttributes: attributes
+            }))
+    ];
 }
 
 /**

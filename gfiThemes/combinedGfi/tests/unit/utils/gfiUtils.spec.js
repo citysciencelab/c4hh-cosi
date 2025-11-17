@@ -1,10 +1,13 @@
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
+import sinon from "sinon";
 import {expect} from "chai";
 import {
     extractColumnsFromResults,
     extractRowsFromResults,
     getCoordinateFromGeometry,
     extractFeaturesFromOafJson,
-    extractFeaturesFromWfsGml
+    extractFeaturesFromWfsGml,
+    getAllRequestLayers
 } from "../../../utils/gfiUtils.js";
 import Point from "ol/geom/Point.js";
 
@@ -388,6 +391,54 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
 
             expect(result).to.be.an("array");
             expect(result.length).to.equal(0);
+        });
+    });
+
+    describe("getAllRequestLayers", () => {
+        let getLayerWhereStub;
+
+        beforeEach(() => {
+            getLayerWhereStub = sinon.stub(rawLayerList, "getLayerWhere");
+        });
+
+        afterEach(() => {
+            sinon.restore();
+        });
+
+        it("returns layersToRequest when no bufferAttributes are defined", () => {
+            const layersToRequest = [{id: "a"}, {id: "b"}],
+                bufferAttributes = {},
+                result = getAllRequestLayers(layersToRequest, bufferAttributes);
+
+            expect(result).to.deep.equal(layersToRequest);
+        });
+
+        it("adds missing bufferAttribute layers", () => {
+            getLayerWhereStub.withArgs({id: "b"}).returns({id: "b", layerProp: 123});
+
+            const layersToRequest = [{id: "a"}],
+                bufferAttributes = {b: ["bar"]},
+                result = getAllRequestLayers(layersToRequest, bufferAttributes);
+
+            expect(result).to.have.length(2);
+            expect(result[1]).to.deep.equal({
+                id: "b",
+                layerProp: 123,
+                gfiAttributes: ["bar"]
+            });
+        });
+
+        it("does not duplicate layers already present", () => {
+            getLayerWhereStub.withArgs({id: "b"}).returns({id: "b"});
+
+            const layersToRequest = [{id: "a", gfiAttributes: ["a"]}],
+                bufferAttributes = {
+                    a: ["x"],
+                    b: ["y"]
+                },
+                result = getAllRequestLayers(layersToRequest, bufferAttributes);
+
+            expect(result.map(l => l.gfiAttributes)).to.deep.equal([["a"], ["y"]]);
         });
     });
 });

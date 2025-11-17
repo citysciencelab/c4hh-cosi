@@ -127,7 +127,7 @@ The addon supports spatial buffering to expand the query area:
 
 - `showBuffer`: Boolean to enable/disable the buffer option in the UI.
 - `bufferDistances`: An array of buffer distances (in meters) to choose from.
-- `bufferAttributes`: Mapping of layer ids to gfiAttributes. Optional and to be used in case buffered requests are to have diverging attributes from normal requests.
+- `bufferAttributes`: Mapping of layer ids to gfiAttributes. Optional and to be used in case buffered requests are to have diverging attributes from normal requests, or are to be fetched additionally to the usual layers.
 - `bufferHint`: Hint text shown below the buffer buttons.
 
 Example:
@@ -632,7 +632,7 @@ Das Addon wird über die `config.json` konfiguriert. Hier ein Beispiel für die 
 | `printServerUrl` | String | URL des Print-Servers |
 | `showBuffer` | Boolean | Aktiviert/Deaktiviert die Puffer-Funktion |
 | `bufferDistances` | Array | Liste der verfügbaren Puffer-Distanzen in Metern |
-| `bufferAttributes` | Object | Mapping von Layer-IDs zu gfiAttributes, die für Buffer-Requests zu nutzen sind. |
+| `bufferAttributes` | Object | Mapping von Layer-IDs zu gfiAttributes, die für Buffer-Requests zu nutzen sind. Kann auch für zusätzliche Abfragen, die nur im Buffer-Kontext gebraucht werden, genutzt werden. |
 | `bufferHint` | String? | Optionaler Hinweistext, der unter den Buffer-Elementen angezeigt wird. |
 | `layersToRequest` | Array | Liste der Layer, die abgefragt werden sollen |
 

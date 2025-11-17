@@ -12,7 +12,8 @@ import {
     getBufferValue,
     getCrsUrl,
     extractFeaturesFromOafJson,
-    normalizeAttributes
+    normalizeAttributes,
+    getAllRequestLayers
 } from "../utils/gfiUtils";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
 import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
@@ -27,7 +28,6 @@ import VectorSource from "ol/source/Vector.js";
 import {addExtentCoordinates, processPointResults} from "../utils/geometryUtils";
 import mapCollection from "@core/maps/js/mapCollection";
 import {loadModule} from "../utils/loadModule";
-import "./pollJobResultsPolyfill";
 
 const actions = {
     /**
@@ -873,9 +873,10 @@ const actions = {
 
         try {
             const bufferedResults = {},
-                geometry = state.bufferedFeature.getGeometry();
+                geometry = state.bufferedFeature.getGeometry(),
+                layersToRequest = getAllRequestLayers(state.layersToRequest, state.bufferAttributes);
 
-            for (const layerConfig of state.layersToRequest) {
+            for (const layerConfig of layersToRequest) {
                 try {
                     await dispatch("processLayerForBufferedQuery", {
                         layerConfig,
@@ -887,8 +888,6 @@ const actions = {
                     console.error(`Error querying features for layer ${layerConfig.id}:`, error);
                 }
             }
-
-            console.error("bufferedLayerResults", bufferedResults);
 
             commit("setBufferedLayerResults", bufferedResults);
             await dispatch("fetchAdditionalRequests", "queryBuffer");
