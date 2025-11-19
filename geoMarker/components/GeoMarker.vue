@@ -178,6 +178,7 @@ export default {
                 tabindex="0"
             >
                 <TabFilterContent
+                    ref="tabFilter"
                     :tab-active="geoMarkerActiveTab === 'tabFilter'"
                 />
             </div>
@@ -208,6 +209,7 @@ div#geoMarker {
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+    margin-top: -1.5rem;
 
     ul#geoMarkerTabs {
         button.nav-link {

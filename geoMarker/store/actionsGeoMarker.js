@@ -586,7 +586,7 @@ const actions = {
             const id = feat.getId();
 
             // feature is visible and not yet selected to be checked
-            if (!seenIds.has(id) && feat.getStyle().getImage()) {
+            if (!seenIds.has(id) && feat?.getStyle()?.getImage()) {
                 const geometry = feat.getGeometry();
 
                 if (geometry) {

@@ -27,7 +27,7 @@
                 "cancel": "Abbrechen",
                 "createAnotherGeoMarker": "Weiteren GeoMarker anlegen",
                 "update": "Aktualisieren",
-                "downloadAttachment": "Download Attachment",
+                "downloadAttachment": "Anhang herunterladen",
                 "successMessageAfterUpdate": "Geomarker ist erfolgreich aktualisiert",
                 "successMessageAfterSave": "Geomarker mit Id {{id}} ist erfolgreich erstellt.",
                 "geoMarkerClosedAt": "GeoMarker geschlossen am"

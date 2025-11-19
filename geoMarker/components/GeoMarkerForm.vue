@@ -1355,6 +1355,7 @@ div.GeoMarkerForm {
 
             span {
                 overflow-wrap: anywhere;
+                background-color: rgb(248, 234, 188);
             }
         }
 
