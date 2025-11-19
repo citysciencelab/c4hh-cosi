@@ -20,12 +20,13 @@
           "name": "Name",
           "description": "Beschreibung",
           "addGeoData": "Geodaten hinzufügen",
-          "addStatisticalData": "Statistische Daten hinzufügen",
+          "addStatisticalData": "Statistische Daten",
           "placeholder": "Daten auswählen",
           "existingAreas": "Bestehende Gebiete mit SozErhVO",
           "supportedFormats": "unterstützes Datei-Format: JSON",
           "layer": "Fachdaten (optional)",
-          "tool": "Starter-Werkzeug (optional)"
+          "tool": "Starter-Werkzeug (optional)",
+          "statistic": "Datensatz"
         },
         "errors": {
           "wrongFormat": "Die Datei hat nicht das richtige Format.",

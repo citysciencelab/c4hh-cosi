@@ -21,12 +21,13 @@
             "name": "Name",
             "description": "Description",
             "addGeoData": "Add Geo Data",
-            "addStatisticalData": "Add statistical data",
+            "addStatisticalData": "Statistical data",
             "placeholder": "Select Option",
             "existingAreas": "existing areas with SozErhVO",
             "supportedFormats": "supported Formats: JSON",
             "layer": "Layer (optional)",
-            "tool": "Start tool (optional)"
+            "tool": "Start tool (optional)",
+            "statistic": "Dataset"
           },
           "errors": {
             "wrongFormat": "The file is not in the correct format.",

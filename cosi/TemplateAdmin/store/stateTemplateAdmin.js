@@ -29,7 +29,6 @@ const state = {
     loadedTemplates: [],
     savedTemplateContents: [],
     selectedTemplate: undefined,
-    selectedStatisticCardsCount: 0,
     labelOfOrientationValue: "additional:modules.cosi.templateAdmin.label.existingAreas"
 };
 

@@ -8,8 +8,8 @@ import getters from "../store/gettersTemplateAdmin";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import Multiselect from "vue-multiselect";
 import TemplateAdminFormCard from "./TemplateAdminFormCard.vue";
+import {uniqueId} from "@shared/js/utils/uniqueId.js";
 import {VueDraggableNext} from "vue-draggable-next";
 
 export default {
@@ -21,7 +21,6 @@ export default {
         FileUpload,
         FlatButton,
         InputText,
-        Multiselect,
         TemplateAdminFormCard
     },
     props: {
@@ -110,13 +109,34 @@ export default {
     },
     methods: {
         ...mapActions("Alerting", ["addSingleAlert"]),
-        ...mapMutations("Modules/TemplateAdmin", ["setEnableExport", "setImportedTemplateNames", "setLoadedTemplates", "setSavedTemplateContents", "setSelectedStatisticCardsCount", "setSelectedTemplate"]),
+        ...mapMutations("Modules/TemplateAdmin", ["setEnableExport", "setImportedTemplateNames", "setLoadedTemplates", "setSavedTemplateContents", "setSelectedTemplate"]),
 
         /**
-         * Todos.
+         * Adds or changes the key and value in object.
+         * @param {Object} obj - the current object
+         * @param {Object} newObj - the new object.
+         * @returns {void}
+         */
+        addStatDataObj (obj, newObj) {
+            obj.group = newObj.group;
+            obj.propertyName = newObj.propertyName;
+            obj.label = newObj.label;
+            obj.valueType = newObj.valueType;
+        },
+
+        /**
+         * Adds new empty statistic card.
+         * @returns {void}
          */
         addStatisticCards () {
-            this.setSelectedStatisticCardsCount(this.selectedStatisticCardsCount + 1);
+            this.selectedStatData.push(
+                {
+                    "group": "",
+                    "propertyName": uniqueId("new_"),
+                    "label": "",
+                    "valueType": ""
+                }
+            );
         },
 
         /**
@@ -170,7 +190,7 @@ export default {
                 this.setIsNameValidating(false);
             }
 
-            if (this.selectedStatData.length) {
+            if (this.selectedStatData.some(data => data.label !== "")) {
                 this.setIsStatDataValidating(false);
             }
 
@@ -196,7 +216,12 @@ export default {
                 formatedDate = dayjs(new Date()).format("YYYY-MM-DD, HH:mm:ss").replace(", ", "T") + ".174Z",
                 layerIds = geoData.map(data => data.layerId),
                 toolId = toolData?.toolId,
-                statsFeatureLable = statData.map(data => data.label);
+                statsFeatureLable = statData.reduce((result, data) => {
+                    if (data.label !== "") {
+                        result.push(data.label);
+                    }
+                    return result;
+                }, []);
 
             return {
                 "meta": {
@@ -463,7 +488,7 @@ export default {
             if (Array.isArray(dashboard?.statsFeatureFilter)) {
                 dashboard.statsFeatureFilter.forEach(stat => {
                     this.statData.forEach(stData => {
-                        if (stData?.data.find(data => data?.label === stat)) {
+                        if (stat !== "" && stData?.data.find(data => data?.label === stat)) {
                             statData.push(stData.data.find(data => data?.label === stat));
                         }
                     });
@@ -673,39 +698,9 @@ export default {
             >
                 {{ $t("additional:modules.cosi.templateAdmin.label.addStatisticalData") }} *
             </label>
-            <div class="row no-gutters mb-2">
-                <Multiselect
-                    id="add-statistic-data"
-                    v-model="selectedStatData"
-                    :class="['col', 'col-md', isStatDataValidating && !selectedStatData.length ? 'novalidate' : '']"
-                    :options="statData"
-                    :searchable="true"
-                    :close-on-select="false"
-                    :multiple="true"
-                    :show-labels="false"
-                    :clear-on-select="false"
-                    :allow-empty="false"
-                    :placeholder="$t('additional:modules.cosi.templateAdmin.label.placeholder')"
-                    group-values="data"
-                    group-label="category"
-                    label="label"
-                    track-by="propertyName"
-                    @input="setIsStatDataValidating(false)"
-                >
-                    <template
-                        #selection="{ values, isOpen }"
-                    >
-                        <span
-                            v-if="values.length"
-                            v-show="!isOpen"
-                            class="multiselect__input"
-                        > {{ }} </span>
-                    </template>
-                </Multiselect>
-            </div>
             <div class="mb-4">
                 <span
-                    v-if="isStatDataValidating && !selectedStatData.length"
+                    v-if="isStatDataValidating && !selectedStatData.some(data => data.label !== '')"
                     class="hint"
                 >
                     {{ $t("additional:modules.cosi.templateAdmin.hintStatisticData") }}
@@ -717,8 +712,9 @@ export default {
                 >
                     <TemplateAdminFormCard
                         v-for="(statDataObj, idx) in selectedStatData"
-                        :key="idx"
+                        :key="idx + statDataObj.label"
                         :class="idx > 1 && limitReferenceValues ? 'more-statistics' : ''"
+                        :stat-data="statData"
                         :title="statDataObj.label"
                         :imported-reference-value="getReferenceValue(statDataObj.label, importedReferenceValueList)"
                         :origin-reference-value="getReferenceValue(statDataObj.label, referenceValueList)"
@@ -726,6 +722,7 @@ export default {
                         :unit="showUnit(statDataObj.valueType)"
                         @removeCard="removeStatData(statDataObj.propertyName)"
                         @setReferenceValueList="setReferenceValueList"
+                        @addStatDataObj="addStatDataObj(statDataObj, $event)"
                     />
                 </Draggable>
                 <div
@@ -853,51 +850,5 @@ export default {
 <style lang="scss">
 @import "/src/assets/css/mixins.scss";
 @import "/src/assets/css/variables";
-@import "vue-multiselect/dist/vue-multiselect.min.css";
 
-#template-admin-form {
-
-    .multiselect {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    .multiselect, .multiselect__input, .multiselect__single {
-        font-family: inherit;
-        font-size: 12px;
-    }
-
-    .multiselect__option--selected.multiselect__option--highlight,
-    .multiselect__option--selected.multiselect__option--highlight:after,
-    .multiselect__option:after,
-    .multiselect__option--selected,
-    .multiselect__option--selected:after {
-        background: $light_blue;
-        color: $white;
-        font-weight: normal;
-    }
-
-    .multiselect__option--highlight,
-    .multiselect__option--highlight:after {
-        background: $light_grey;
-        color: $black;
-    }
-
-
-    .multiselect__select {
-        padding: 4px 8px 10px 8px;
-    }
-
-    .multiselect__tags {
-        border-radius: 0;
-    }
-
-    .multiselect__placeholder {
-        margin-bottom: 7px
-    }
-
-    .multiselect__option--selected {
-        font-family: $font_family_accent
-    }
-}
 </style>

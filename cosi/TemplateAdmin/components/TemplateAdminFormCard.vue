@@ -1,12 +1,18 @@
 <script>
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
+
 export default {
     name: "TemplateAdminFormCard",
     components: {
+        DropdownAutocomplete,
+        InputText
     },
     props: {
-        title: {
+        importedReferenceValue: {
             type: String,
-            required: true
+            required: false,
+            default: ""
         },
         label: {
             type: String,
@@ -17,7 +23,12 @@ export default {
             required: false,
             default: ""
         },
-        importedReferenceValue: {
+        statData: {
+            type: Array,
+            required: false,
+            default: () => []
+        },
+        title: {
             type: String,
             required: false,
             default: ""
@@ -30,7 +41,9 @@ export default {
     },
     data () {
         return {
-            referenceValue: ""
+            referenceValue: "",
+            selectedStatData: this.title,
+            statisticDataList: []
         };
     },
     watch: {
@@ -39,10 +52,26 @@ export default {
         },
         originReferenceValue (val) {
             this.referenceValue = val;
+        },
+        selectedStatData (val) {
+            let StatDataObj = [];
+
+            this.statData.forEach(stats => {
+                if (stats?.data.filter(data => data?.label === val).length) {
+                    StatDataObj = stats?.data.filter(data => data?.label === val);
+                }
+            });
+
+            if (StatDataObj.length) {
+                this.$emit("addStatDataObj", StatDataObj[0]);
+            }
         }
     },
     mounted () {
         this.referenceValue = typeof this.importedReferenceValue !== "undefined" ? this.importedReferenceValue : "";
+        this.statData.forEach(stats => {
+            this.statisticDataList.push(...stats.data.map(data => data.label));
+        });
     },
     methods: {
         /**
@@ -50,10 +79,12 @@ export default {
          * @returns {void}
          */
         emitSetReferenceValue () {
-            this.$emit("setReferenceValueList", {
-                statisticName: this.title,
-                value: this.referenceValue
-            });
+            if (this.selectedStatData !== "") {
+                this.$emit("setReferenceValueList", {
+                    statisticName: this.selectedStatData,
+                    value: this.referenceValue
+                });
+            }
         },
 
         /**
@@ -84,9 +115,7 @@ export default {
 </script>
 
 <template lang="html">
-    <div
-        class="card mb-3"
-    >
+    <div class="card shadow mb-3">
         <div class="row g-0">
             <div class="col-md-1 pe-0">
                 <button
@@ -97,7 +126,7 @@ export default {
                     <i class="bi bi-grip-vertical mt-1" />
                 </button>
             </div>
-            <div class="col-md-10">
+            <div class="col-md-11">
                 <button
                     class="close-button shadow-none"
                     aria-label="Close"
@@ -105,58 +134,37 @@ export default {
                 >
                     <i class="bi bi-x align-middle" />
                 </button>
-                <div class="card-body ps-2 pe-2 pb-0 pt-3">
-                    <h5 class="card-title">
-                        {{ title }}
-                    </h5>
-                    <div class="card-text row align-items-center pb-2">
-                        <label
-                            for="referenceValue"
-                            class=""
-                        > {{ label }} </label>
-                        <div
-                            v-if="unit"
-                            class="col-4 input-group input-group-sm pb-0 px-0"
-                        >
-                            <input
-                                id="referenceValue"
+                <div class="card-body ps-2 pe-2 pb-0 pt-3 d-flex">
+                    <div class="card-title col-md-7 pe-2">
+                        <Dropdown-Autocomplete
+                            v-model="selectedStatData"
+                            :items="statisticDataList"
+                            :label="$t('additional:modules.cosi.templateAdmin.label.statistic')"
+                        />
+                    </div>
+                    <div class="card-text align-items-center ps-2 pe-4 pb-2 col-md-5">
+                        <div class="d-flex">
+                            <InputText
+                                :id="'reference'"
                                 v-model.trim="referenceValue"
-                                type="text"
-                                class="form-control border-end-0 pb-0"
-                                maxlength="20"
+                                :label="label"
+                                :placeholder="label"
                                 @change="checkComma"
                                 @keypress="checkNumber($event)"
                             >
-                            <span
-                                class="input-group-text"
-                            >
-                                {{ unit }}
-                            </span>
-                            <span
-                                class="form-text"
-                            >
-                                {{ $t("additional:modules.cosi.templateAdmin.hintNumber") }}
-                            </span>
+                                <span
+                                    v-if="unit"
+                                    class="unit"
+                                >
+                                    {{ unit }}
+                                </span>
+                            </InputText>
                         </div>
-                        <div
-                            v-else
-                            class="col col-md-4 pb-0 px-0"
+                        <span
+                            class="form-text"
                         >
-                            <input
-                                id="referenceValue"
-                                v-model.trim="referenceValue"
-                                type="text"
-                                class="form-control pb-0"
-                                maxlength="20"
-                                @change="checkComma"
-                                @keypress="checkNumber($event)"
-                            >
-                            <span
-                                class="form-text"
-                            >
-                                {{ $t("additional:modules.cosi.templateAdmin.hintNumber") }}
-                            </span>
-                        </div>
+                            {{ $t("additional:modules.cosi.templateAdmin.hintNumber") }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -190,6 +198,11 @@ export default {
     .card-text {
         color: #5A5A5A;
         font-size: 11px;
+        .unit {
+            position: absolute;
+            right: 10px;
+            top: 30%;
+        }
     }
     .input-group-text {
         background-color: $white;
@@ -198,9 +211,9 @@ export default {
 
     .close-button {
         position: absolute;
-        right: 0;
+        right: 5px;
         i {
-            font-size: 14px;
+            font-size: 18px;
         }
         &:hover {
             background-color: $light_blue;
@@ -208,9 +221,7 @@ export default {
         }
     }
     .drag-and-drop {
-        background-color: #F3F3F3;
         height: 100%;
-        border-right: 1px solid rgba(0,0,0,.125);
         i {
             font-size: 30px;
             color: #C2C2C2;
