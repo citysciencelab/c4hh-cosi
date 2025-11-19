@@ -80,6 +80,7 @@ export default {
                     info: "Noch keine Route berechnet. Um eine Route zu berechnen, bitte das Routing-Tool öffnen, Start- und Zielpunkt wählen und eine Route berechnen."
                 }
             ],
+            cardCounter: 1,
             facilityNames: [],
             directionsLayer: null,
             transportTypes: [
@@ -170,6 +171,7 @@ export default {
                         icon: this.getIconByTransportType(set?.inputs?.transportType),
                         removable: true,
                         status: this.dataSets.indexOf(set) === this.activeSet ? "active" : "",
+                        title: set.inputs.title,
                         visible: true
                     }
                 );
@@ -314,6 +316,7 @@ export default {
     * @returns {void}
     */
     created () {
+        this.cardCounter = this.dataSets.length;
         this.visibleVectorLayers = this.getVisibleVectorLayers();
 
         if (this.routingDirections) {
@@ -636,7 +639,8 @@ export default {
                 selectedFacility: this.selectedFacility ? this.selectedFacility : undefined,
                 selectedFacilities: this.selectedFacilities ? this.selectedFacilities : undefined,
                 selectionCards: this.selectionCards,
-                isAllFacilitiesChecked: this.isAllFacilitiesChecked
+                isAllFacilitiesChecked: this.isAllFacilitiesChecked,
+                title: "Erreichbarkeit " + this.cardCounter++
             };
             this.dataSets.push(analysisSet);
 

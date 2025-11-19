@@ -43,6 +43,11 @@ export default {
             required: false,
             default: ""
         },
+        title: {
+            type: String,
+            required: false,
+            default: ""
+        },
         visible: {
             type: Boolean,
             required: false,
@@ -165,7 +170,7 @@ export default {
                 color: $secondary;
             }
             &:first-child {
-                .value {
+                .value:first-child {
                     font-family: "MasterPortalFont Bold";
                     font-size: $font_size_big;
                 }
