@@ -160,7 +160,7 @@ export default {
                 beschreibung: this.geomarkerDescription !== this.geomarkerDescriptionInitial
                     ? this.appendUserToDescription(this.geomarkerDescription)
                     : this.geomarkerDescription,
-                zeitstempel: dayjs().toISOString(),
+                zeitstempel: this.selectedFeature.get("zeitstempel") ?? dayjs().toISOString(),
                 zeitstempel_geschlossen: this.closedDateIfEveryDepartmentIsClosed(),
                 quelle: this.selectedFeature.get("quelle") ?? "geomarker",
                 geom: this.geoMarkerUpdateFeature?.getGeometry()
