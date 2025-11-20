@@ -39,7 +39,9 @@
             "higherDistrictLevel": "Include the higher level of reference",
             "statisticalAreas":"Select statistical areas",
             "referenceYear": "Reference year",
-            "heading": "Heading"
+            "heading": "Heading",
+            "up": "Move up one position",
+            "down": "Move udown one position"
           },
           "alert": {
             "infoFrontPage": "Neuwerk and Scharhörn are shown as separate maps.",

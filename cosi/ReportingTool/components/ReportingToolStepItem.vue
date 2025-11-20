@@ -5,6 +5,7 @@ import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import ReportingToolStepItemAddCard from "./ReportingToolStepItemAddCard.vue";
 import ReportingToolStepItemSettings from "./ReportingToolStepItemSettings.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {uniqueId} from "@shared/js/utils/uniqueId";
 import {VueDraggableNext} from "vue-draggable-next";
@@ -18,6 +19,7 @@ export default {
         DropdownAutocomplete,
         ReportingToolStepItemAddCard,
         ReportingToolStepItemSettings,
+        IconButton,
         InputText,
         Draggable: VueDraggableNext
     },
@@ -129,6 +131,19 @@ export default {
          */
         toggleCollapse () {
             this.isCollapsed = !this.isCollapsed;
+        },
+
+        /**
+         * Updates the order of the cards depending on user input.
+         * @param {String} id - the id of the current card.
+         * @param {String} upOrDown - indicates whether the user clicked up or down.
+         * @returns {void}
+         */
+        updateCardOrder (id, upOrDown) {
+            const indexFrom = this.cards.findIndex(x => x.id === id),
+                indexTo = upOrDown === "down" ? indexFrom + 1 : indexFrom - 1;
+
+            [this.cards[indexFrom], this.cards[indexTo]] = [this.cards[indexTo], this.cards[indexFrom]];
         }
     }
 };
@@ -146,84 +161,114 @@ export default {
         :text="nothingSelectedText"
         type="info"
     />
-    <CustomCard
-        v-for="(card, index) in cards"
-        :key="card.id"
-        class="mb-3"
-        :icon="card.icon"
-        @click:close="removeCard(index)"
-    >
-        <Badges
-            v-if="card.tag"
-            class="mb-2 mt-1"
-            :text="card.tag"
-            :background-color="card.tagColor"
-            :icon="card.icon"
-        />
-        <DropdownAutocomplete
-            :items="getDropdownItems()"
-            :label="'Inhalt'"
-            :model-value="[card.name]"
-            @update:model-value="mergeCardAttributes(index, $event)"
-        />
-        <div v-if="card.expandable">
-            <a
-                data-bs-toggle="collapse"
-                :data-bs-target="'#collapseOptions' + card.id"
-                :href="'#collapseOptions' + card.id"
-                aria-expanded="false"
-                :aria-controls="'collapseOptions' + card.id"
-                @click="toggleCollapse"
+    <div class="container px-4">
+        <div
+            v-for="(card, index) in cards"
+            :key="card.id"
+            class="cards row align-items-center d-flex flex-nowrap"
+            :class="[cards.length > 1 ? 'justify-content-end' : 'justify-content-center']"
+        >
+            <div
+                v-if="cards.length > 1"
+                class="col col-auto d-flex flex-nowrap"
             >
-                <small>
-                    <i
-                        class="bi me-2"
-                        :class="isCollapsed ? 'bi-chevron-down' : 'bi-chevron-up'"
+                <div class="row">
+                    <IconButton
+                        class="order-button-up col col-md-auto col-sm-12 px-1"
+                        :aria="$t('additional:modules.cosi.reportingTool.label.up')"
+                        :icon="'bi bi-arrow-up'"
+                        :interaction="() => updateCardOrder(card.id, 'up')"
+                        :class-array="['btn-light', 'border border-dark-subtle', index == 0 ? 'd-none' : '']"
                     />
-                    {{ isCollapsed ? $t(card.expandableLabelHide) : $t(card.expandableLabelShow) }}
-                </small>
-            </a>
-            <div v-if="isCollapsed">
-                <div
-                    v-for="group in groups"
-                    :key="group"
-                    class="mt-2"
-                >
-                    <Draggable>
-                        <div class="card mb-2">
-                            <div class="row card-body py-1">
-                                <i class="col col-1 bi bi-grip-vertical fs-3 ps-0" />
-                                <div class="col-11 mt-2">
-                                    {{ group }}
-                                </div>
-                            </div>
-                        </div>
-                    </Draggable>
+                    <IconButton
+                        class="order-button-down col col-md-auto col-sm-12 px-2"
+                        :aria="$t('additional:modules.cosi.reportingTool.label.down')"
+                        :icon="'bi bi-arrow-down'"
+                        :interaction="() => updateCardOrder(card.id, 'down')"
+                        :class-array="['btn-light', 'border border-dark-subtle', index == cards.length - 1 ? 'd-none' : '']"
+                    />
                 </div>
             </div>
+            <CustomCard
+                class="mb-3 d-flex flex-nowrap"
+                :class="[cards.length > 1 ? 'col col-10' : 'col col-11']"
+                :icon="card.icon"
+                @click:close="removeCard(index)"
+            >
+                <Badges
+                    v-if="card.tag"
+                    class="mb-2 mt-1"
+                    :text="card.tag"
+                    :background-color="card.tagColor"
+                    :icon="card.icon"
+                />
+                <DropdownAutocomplete
+                    :items="getDropdownItems()"
+                    :label="'Inhalt'"
+                    :model-value="[card.name]"
+                    @update:model-value="mergeCardAttributes(index, $event)"
+                />
+                <div v-if="card.expandable">
+                    <a
+                        data-bs-toggle="collapse"
+                        :data-bs-target="'#collapseOptions' + card.id"
+                        :href="'#collapseOptions' + card.id"
+                        aria-expanded="false"
+                        :aria-controls="'collapseOptions' + card.id"
+                        @click="toggleCollapse"
+                    >
+                        <small>
+                            <i
+                                class="bi me-2"
+                                :class="isCollapsed ? 'bi-chevron-down' : 'bi-chevron-up'"
+                            />
+                            {{ isCollapsed ? $t(card.expandableLabelHide) : $t(card.expandableLabelShow) }}
+                        </small>
+                    </a>
+                    <div v-if="isCollapsed">
+                        <div
+                            v-for="group in groups"
+                            :key="group"
+                            class="mt-2"
+                        >
+                            <Draggable>
+                                <div class="card mb-2">
+                                    <div class="row card-body py-1">
+                                        <i class="col col-1 bi bi-grip-vertical fs-3 ps-0" />
+                                        <div class="col-11 mt-2">
+                                            {{ group }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </Draggable>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="card.key === 'textArea'">
+                    <InputText
+                        id="customText"
+                        v-model="customText"
+                        class="pt-0 mt-0"
+                        :label="$t('additional:modules.cosi.reportingTool.label.freetext')"
+                        :placeholder="$t('additional:modules.cosi.reportingTool.label.freetext')"
+                        html-type="textarea"
+                        max-length="1000"
+                    />
+                </div>
+                <div v-if="card.key === 'heading'">
+                    <InputText
+                        id="customHeading"
+                        v-model="customHeading"
+                        class="pt-0"
+                        :label="$t('additional:modules.cosi.reportingTool.label.heading')"
+                        :placeholder="$t('additional:modules.cosi.reportingTool.label.heading')"
+                    />
+                </div>
+            </CustomCard>
         </div>
-        <div v-if="card.key === 'textArea'">
-            <InputText
-                id="customText"
-                v-model="customText"
-                class="pt-0 mt-0"
-                :label="$t('additional:modules.cosi.reportingTool.label.freetext')"
-                :placeholder="$t('additional:modules.cosi.reportingTool.label.freetext')"
-                html-type="textarea"
-                max-length="1000"
-            />
-        </div>
-        <div v-if="card.key === 'heading'">
-            <InputText
-                id="customHeading"
-                v-model="customHeading"
-                class="pt-0"
-                :label="$t('additional:modules.cosi.reportingTool.label.heading')"
-                :placeholder="$t('additional:modules.cosi.reportingTool.label.heading')"
-            />
-        </div>
-    </CustomCard>
+    </div>
     <ReportingToolStepItemAddCard
+        class="pt-5 ps-5 pe-2"
         @click="addCard"
     />
 </template>

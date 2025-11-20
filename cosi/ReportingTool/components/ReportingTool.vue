@@ -980,7 +980,7 @@ export default {
                         {{ $t("additional:modules.cosi.reportingTool.annex") }}
                     </v-stepper-item>
                 </v-stepper-header>
-                <v-stepper-window>
+                <v-stepper-window class="ms-0 pe-0">
                     <v-stepper-window-item
                         value="1"
                     >

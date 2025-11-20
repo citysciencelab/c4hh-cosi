@@ -169,7 +169,6 @@ export default {
             :model-value="modelValue"
             :items="items"
             :label="label"
-            class="mb-3"
             :clearable="clearable"
             @update:modelValue="(value) => $emit('update:modelValue', value?.value ? value.value : value)"
         />

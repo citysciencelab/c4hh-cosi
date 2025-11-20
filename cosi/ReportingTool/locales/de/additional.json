@@ -39,7 +39,9 @@
               "higherDistrictLevel": "Übergeordnete Bezugsebene miteinbeziehen",
               "statisticalAreas":"Statistische Gebiete auswählen",
               "referenceYear": "Bezugsjahr",
-              "heading": "Überschrift"
+              "heading": "Überschrift",
+              "up": "Eine Position nach oben verschieben",
+              "down": "Eine Position nach unten verschieben"
             },
             "alert": {
               "infoFrontPage": "Neuwerk und Scharhörn werden als separate Karten dargestellt.",
