@@ -1,7 +1,7 @@
 import pdfMake from "pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import {getSvg} from "../js/getSvg";
-
+pdfMake.addVirtualFileSystem(pdfFonts);
 /**
  * Class of PDFMaker. It provides methods to create a PDF with the pdfmake library.
  */
@@ -84,7 +84,7 @@ export default class PDFMaker {
                 widths.push(width);
             }
             else {
-                widths.push("*");
+                widths.push("auto");
             }
         });
         this.content.push({
@@ -137,7 +137,7 @@ export default class PDFMaker {
      * @returns {void}
      */
     download (fileName) {
-        pdfMake.createPdf(this.getDocDefinition(), "", "", pdfFonts.pdfMake.vfs).download(fileName);
+        pdfMake.createPdf(this.getDocDefinition(), "", "").download(fileName);
     }
 
     /**

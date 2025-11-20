@@ -46,7 +46,6 @@ export default {
     data: () => ({
         infrastructureTableLimit: 10,
         infrastructureTableLimitEnabled: false,
-        showProgressBar: false,
         percentage: 50,
         reportTitle: "",
         reportTitleMaxLength: 50,
@@ -63,7 +62,7 @@ export default {
             {"Bevölkerung Migrationshintergrund": "Bevölkerung mit Migrationshintergrund"},
             {"Bevölkerung Migrationshintergrund": "Ausländer insgesamt"}
         ],
-        progressValue: 0,
+        reportLoader: false,
         selectedReportComponents: [],
         selectedCategoryInChart: [],
         page: 1,
@@ -167,73 +166,25 @@ export default {
     activated: () => undefined,
     deactivated: () => undefined,
     methods: {
-        /**
-         * Registers the steps for the progress of the export.
-         * @returns {void}
-         */
-        registerProgressSteps () {
-            this.progressSteps = [
-                {func: () => this.pdf.resetDocContent()},
-                {func: () => this.pdf.addHeader(this.reportTitle.trim())},
-                {func: () => this.pdf.setAuthor(this.author.trim())},
-                {func: async () => this.addOverViewPageToReport(), handleProgressByThemSelves: true},
-                {func: () => this.addStatsToReport(this.items)},
-                {func: () => this.addReferencesToReport(this.items)},
-                {func: () => this.addTopicsToReport(this.featuresListItems)},
-                {func: async () => this.addDiagram()},
-                {func: async () => this.addInfrastructureMapPageToReport(), handleProgressByThemSelves: true}
-            ];
-        },
-        /**
-         * Show the view with the progress bar.
-         * If the progress bar is displayed, the template import should not be shown.
-         * @param {Boolean} val - if the progress bar should be shown.
-         * @returns {void}
-         */
-        manageProgressBarView (val) {
-            this.showProgressBar = val;
-            this.$emit("toggleTemplateImport", !this.showProgressBar);
-            if (val) {
-                this.createReport();
-            }
-        },
-        /**
-         * Returns true or false, depending on whether the component was selected by the user or not.
-         * @param {String} component - The name of the component.
-         * @returns {Boolean} - True if the component was selected.
-         */
-        controlsReportComponent (component) {
-            return this.selectedReportComponents.includes(component);
-        },
-
-        /**
-         * Gets the progress value for each step.
-         * @returns {Number} the progress value.
-         */
-        getProgressValuePerStep () {
-            return Math.round(100 / this.progressSteps.length);
-        },
 
         /**
          * Creates the report and calls the download function.
          * @returns {void}
          */
         async createReport () {
-            this.progressValue = 0;
+            this.reportLoader = true;
             this.pdf = new PDFMaker();
-
             this.pdf.resetDocContent();
-            this.registerProgressSteps();
-            for (let i = 0; i < this.progressSteps.length; i++) {
-                await this.progressSteps[i].func();
-                if (i === this.progressSteps.length - 1) {
-                    this.progressValue = 100;
-                }
-                else if (this.progressSteps[i].handleProgressByThemSelves !== true) {
-                    this.progressValue += this.getProgressValuePerStep();
-                }
-            }
+            this.pdf.addHeader(this.reportTitle.trim());
+            this.pdf.setAuthor(this.author.trim());
+            await this.addOverViewPageToReport();
+            this.addStatsToReport(this.items);
+            await this.addReferencesToReport(this.items);
+            this.addTopicsToReport(this.featuresListItems);
+            await this.addDiagram();
+            await this.addInfrastructureMapPageToReport(this.featuresListItems);
             this.pdf.download(this.downloadName);
+            this.reportLoader = false;
         },
 
         /**
@@ -241,13 +192,10 @@ export default {
          * @param {Object[]} items - Items from dashboard component.
          * @returns {void}
          */
-        async addStatsToReport (items) {
-            if (!this.controlsReportComponent("statistische Datenübersicht")) {
-                return;
-            }
-
-            const filteredMappingByCategories = this.initMapping.filter(obj => {
-                    return this.reportCategories.includes(obj.value);
+        addStatsToReport (items) {
+            const itemGroups = items.map(item => item.category),
+                filteredMappingByCategories = this.initMapping.filter(obj => {
+                    return itemGroups.includes(obj.value);
                 }),
                 groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group);
 
@@ -275,7 +223,7 @@ export default {
 
                         if (index === 0) {
                             alignment = "left";
-                            value = statFeature.category;
+                            value = statFeature.category.slice(0, 70);
                         }
                         else if (index === 1) {
                             value = this.getTotal(statFeature, this.selectedDistrictLabels, lastYear, "jahr_");
@@ -287,7 +235,7 @@ export default {
                     });
                     body.push(row);
                 });
-                this.pdf.addTable(body, 150);
+                this.pdf.addTable(body, "*");
             });
         },
         /**
@@ -296,12 +244,8 @@ export default {
          * @returns {Promise<void>} Resolves once the section has been added to the PDF.
          */
         async addReferencesToReport (items) {
-            if (!this.controlsReportComponent("Quellenangaben")) {
-                return;
-            }
-
             const rows = [],
-                headers = ["Datebsatz", "datenverantwortliche Stelle", "Datenstand"],
+                headers = ["Datensatz", "datenverantwortliche Stelle", "Datenstand"],
                 list = Array.isArray(items) ? items : [],
                 unified = [],
                 seenCategories = new Set(),
@@ -404,21 +348,12 @@ export default {
          * @returns {void}
          */
         async addOverViewPageToReport () {
-            if (!this.controlsReportComponent("Titelseite mit Kartenausschnitt")) {
-                return;
-            }
             const imageName = "overviewMap",
                 feature = this.selectedFeatures.length > 1 ? unionFeatures(this.selectedFeatures) : this.selectedFeatures[0],
                 template = typeof feature !== "undefined" ?
                     this.getObjectCopyWithoutReference(baseProportionTemplate) :
                     this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
-                availableProgressForThisStep = this.getProgressValuePerStep() / 2,
-                initialProgressValue = this.progressValue,
-                {downloadURL: overviewImageUrl, bbox} = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, () => {
-                    if (this.progressValue < (initialProgressValue + availableProgressForThisStep)) {
-                        this.progressValue += 1;
-                    }
-                }, "A4 Hochformat").catch(error => console.error(error)),
+                {downloadURL: overviewImageUrl, bbox} = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, "A4 Hochformat").catch(error => console.error(error)),
                 headline = this.reportTitle ? this.reportTitle.trim() : "Übersichtskarte";
 
             if (typeof overviewImageUrl !== "string") {
@@ -427,43 +362,30 @@ export default {
             this.pdf.addChapterHeadline(headline);
             this.pdf.addImageByUrl(overviewImageUrl, imageName, {fit: [500, 500], alignment: "center"});
             this.pdf.addLineBreak();
-            await this.addDetailViewToOverviewPage(template, bbox, () => {
-                if (this.progressValue < initialProgressValue + (availableProgressForThisStep * 2)) {
-                    this.progressValue += 1;
-                }
-            });
-
-            this.progressValue = initialProgressValue + (availableProgressForThisStep * 2);
+            await this.addDetailViewToOverviewPage(template, bbox);
         },
 
         /**
          * Adds infrastructure map to the page report.
          * @returns {void}
          */
-        async addInfrastructureMapPageToReport () {
-            if (!this.controlsReportComponent("Kartendarstellung der Infrastrukturdaten")) {
-                return;
-            }
+        async addInfrastructureMapPageToReport (items) {
             const imageName = "infrastructureMap",
                 feature = this.selectedFeatures.length > 1 ? unionFeatures(this.selectedFeatures) : this.selectedFeatures[0],
                 template = typeof feature !== "undefined" ?
                     this.getObjectCopyWithoutReference(baseProportionTemplate) :
                     this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
-                initialProgressValue = this.progressValue,
-                availableProgressForThisStep = this.getProgressValuePerStep();
+                reportLayerIds = items.map(item => item.layerId);
+
             let imageOptions = {};
 
-            this.reportLayerIds.forEach(layerId => {
+            reportLayerIds.forEach(layerId => {
                 if (!template.baseLayer.map.layerIds.includes(layerId)) {
                     template.baseLayer.map.layerIds.unshift(layerId);
                 }
             });
             template.baseLayer.map.proportion = 0.99;
-            imageOptions = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, () => {
-                if (this.progressValue < (initialProgressValue + availableProgressForThisStep)) {
-                    this.progressValue += 1;
-                }
-            }, "A4 Hochformat", 1).catch(error => console.error(error));
+            imageOptions = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, "A4 Hochformat", 1).catch(error => console.error(error));
 
             if (typeof imageOptions.downloadURL !== "string") {
                 return;
@@ -477,17 +399,15 @@ export default {
          * Adds a detail box and a detail view for the overview page.
          * @param {Object} template A template for mapfish.
          * @param {Number[]} bbox A bbox to use for the overviewmap as feature coordinates.
-         * @param {Function} progressHandler Function to handle the print progress.
          * @returns {void}
          */
-        async addDetailViewToOverviewPage (template, bbox, progressHandler) {
+        async addDetailViewToOverviewPage (template, bbox) {
             template.baseLayer.map.proportion = 0.25;
             const {downloadURL: minimapImageUrl} = await this.prepareImage(
                     new Feature({geometry: fromExtent(bbox)}),
                     template, this.projection.getCode(),
                     "miniMap",
                     mapfishServerConfig,
-                    progressHandler,
                     "rectangleTemplate"
                 ).catch(error => console.error(error)),
                 text = [],
@@ -547,12 +467,11 @@ export default {
          * @param {Object} serverConfig The config of which mapfish server and template to use.
          * @param {String} serverConfig.template The name of the template.
          * @param {String} serverConfig.name The name of the mapfish server (most of the time mapfish or mapfish_qs).
-         * @param {Function} handleOngoing Function to handle the ongoing process of creating the image.
          * @param {String} layoutName The layout name.
          * @param {Number} mapScaleFactor The scale factor for the map.
          * @returns {Promise<Object>} a promise which resolves an object {downloadURL, bbox}.
          */
-        prepareImage (feature, baseLayer, projectionCode, imageName, serverConfig, handleOngoing, layoutName, mapScaleFactor) {
+        prepareImage (feature, baseLayer, projectionCode, imageName, serverConfig, layoutName, mapScaleFactor) {
             const extent = feature?.getGeometry()?.getExtent(),
                 baseLayerName = Object.keys(baseLayer)[0],
                 // mapfishDialog = createMapfishDialog(
@@ -597,7 +516,7 @@ export default {
                 return new Promise((resolve, reject) => {
                     return startPrintProcess(this.restServiceById(serverConfig.name).url, "png", serverConfig.template, mapfishDialog, (url, payload) => {
                         return axios.post(url, payload);
-                    }, handleOngoing,
+                    }, undefined,
                     error => {
                         reject(error);
                     },
@@ -649,9 +568,6 @@ export default {
          * @returns {void}
          */
         addTopicsToReport (topics) {
-            if (!this.controlsReportComponent("Auflistung")) {
-                return;
-            }
             const groupedTopics = Object.groupBy(topics, (topic) => topic.layerName);
 
             this.pdf.addChapter("Infrastrukturdaten");
@@ -683,10 +599,6 @@ export default {
          * @returns {void}
          */
         async addDiagram () {
-            if (!this.controlsReportComponent("Datenvisualisierung")) {
-                return;
-            }
-
             const data = this.getChartData(this.items, this.reportCategories, this.selectedDistrictNames, this.areaColumnName, this.categoryInChart, this.initMapping),
                 imageArr = [];
 
@@ -1119,7 +1031,8 @@ export default {
                             type="button"
                             :aria-label="page != 1 ? $t('additional:modules.cosi.reportingTool.button.back') : $t('additional:modules.cosi.reportingTool.button.printNow')"
                             :text="page != 1 ? $t('additional:modules.cosi.reportingTool.button.back') : $t('additional:modules.cosi.reportingTool.button.printNow')"
-                            :interaction="() => page != 1 ? props.onClick() : []"
+                            :spinner-trigger="reportLoader"
+                            :interaction="() => page != 1 ? props.onClick() : createReport()"
                         />
                     </template>
                     <template #next="{ props }">
@@ -1150,6 +1063,8 @@ export default {
                     icon="bi bi-cloud-arrow-down"
                     type="button"
                     :aria-label="$t('additional:modules.cosi.reportingTool.button.downloadReport')"
+                    :interaction="() => createReport()"
+                    :spinner-trigger="reportLoader"
                     :text="$t('additional:modules.cosi.reportingTool.button.downloadReport')"
                 />
                 <FlatButton
