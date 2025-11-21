@@ -279,30 +279,42 @@ export default {
          * Returns unique values for drop down.
          * @param {String} attr - The name of the property which is filtering.
          * @param {Array} calculationData - The feature properties.
+         * @param {String|undefined} category - The category.
          * @return {Array|Boolean} - The unique values.
          */
-        getUniqueValuesByAttributes (attr, calculationData) {
+        getUniqueValuesByAttributes (attr, calculationData, category = undefined) {
             if (typeof attr !== "string") {
                 return false;
             }
             const filtered = [];
             let lastElement = "";
 
-            if (Array.isArray(calculationData)) {
-                for (let i = 0; i < calculationData?.length; i++) {
-                    if (filtered.indexOf(calculationData[i][attr]) === -1) {
-                        if (calculationData[i][attr] !== "2016 bis 2022") {
-                            filtered.push(calculationData[i][attr]);
-                        }
-                        else {
-                            lastElement = calculationData[i][attr];
-                        }
-                    }
+            if (!Array.isArray(calculationData)) {
+                return filtered;
+            }
+
+            for (let i = 0; i < calculationData?.length; i++) {
+                if (filtered.indexOf(calculationData[i][attr]) !== -1) {
+                    continue;
                 }
 
-                if (lastElement !== "") {
-                    filtered.push(lastElement);
+                if (calculationData[i][attr] !== "2016 bis 2022") {
+                    if (typeof category === "string") {
+                        if (calculationData[i].Kategorie === category) {
+                            filtered.push(calculationData[i][attr]);
+                        }
+                    }
+                    else {
+                        filtered.push(calculationData[i][attr]);
+                    }
                 }
+                else {
+                    lastElement = calculationData[i][attr];
+                }
+            }
+
+            if (lastElement !== "") {
+                filtered.push(lastElement);
             }
 
             return filtered;
@@ -493,7 +505,7 @@ export default {
                             {{ $t('additional:modules.tools.mietenspiegelFormular.pleaseSelect') }}
                         </option>
                         <option
-                            v-for="(data, key) in getUniqueValuesByAttributes('Wohnfläche', calculationData)"
+                            v-for="(data, key) in getUniqueValuesByAttributes('Wohnfläche', calculationData, residentialInformation.bezeichnung)"
                             :key="key"
                             :value="data"
                         >

@@ -390,6 +390,32 @@ describe("addons/mietenspiegelFormular/components/MietenspiegelFormular.vue", ()
                 expect(wrapper.vm.getUniqueValuesByAttributes(item, 1234)).to.deep.equal(expected);
                 expect(wrapper.vm.getUniqueValuesByAttributes(item, {})).to.deep.equal(expected);
             });
+            it("should return an array with unique values for attribute with category", () => {
+                const wrapper = factory.getShallowMount({}, true),
+                    calc = [
+                        {
+                            "Baualtersklasse/Bezugsfertigkeit": "bis 31.12.1918",
+                            "Kategorie": "Normale Wohnlage"
+                        },
+                        {
+                            "Baualtersklasse/Bezugsfertigkeit": "bis 31.11.1918",
+                            "Kategorie": "Gute Wohnlage"
+                        },
+                        {
+                            "Baualtersklasse/Bezugsfertigkeit": "bis 31.12.1918",
+                            "Kategorie": "Normale Wohnlage"
+                        },
+                        {
+                            "Baualtersklasse/Bezugsfertigkeit": "bis 31.12.1918",
+                            "Kategorie": "Normale Wohnlage"
+                        }
+                    ],
+                    item = "Baualtersklasse/Bezugsfertigkeit",
+                    category = "Normale Wohnlage",
+                    expected = ["bis 31.12.1918"];
+
+                expect(wrapper.vm.getUniqueValuesByAttributes(item, calc, category)).to.deep.equal(expected);
+            });
         });
         describe("convertDateFormat", () => {
             it("should return false if param is not a string", () => {
