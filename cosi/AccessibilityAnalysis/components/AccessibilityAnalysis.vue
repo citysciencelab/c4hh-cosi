@@ -9,6 +9,7 @@ import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {getLayerSource} from "../../utils/layer/getLayerSource";
 import getters from "../store/gettersAccessibilityAnalysis";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import methods from "./methodsAnalysis";
@@ -16,7 +17,6 @@ import mutations from "../store/mutationsAccessibilityAnalysis";
 import {downloadGeoJson, exportAsGeoJson} from "../utils/exportResults";
 import {Select} from "ol/interaction";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
-import {getLayerSource} from "../../utils/layer/getLayerSource";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import {transformCoordinate, transformCoordinates} from "../utils/transformCoordinates";
 import TabBar from "../../shared/modules/tabBar/components/TabBar.vue";
@@ -30,6 +30,7 @@ import ResultManagement from "../../shared/modules/resultManagement/components/R
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
+import {singleClick} from "ol/events/condition";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
 import VectorLayer from "ol/layer/Vector.js";
@@ -199,18 +200,6 @@ export default {
          */
         scaleUnitValue () {
             return this.scaleUnit === "time" ? this.time : this.distance;
-        },
-
-
-        /**
-         * Returns the selected layers based on the visible vector layers
-         * and the selected facility names.
-         * @returns {Array} - An array of layers that match the selected facility names.
-         */
-        selectedLayer () {
-            return this.visibleVectorLayers.filter(layer => {
-                return this.selectedFacilityNames.includes(layer.getLayer().get("name"));
-            });
         }
     },
     watch: {
@@ -289,25 +278,9 @@ export default {
         visibleVectorLayers (newValues) {
             this.setFacilityNames(newValues);
         },
-        selectedFacilityNames (newValue, oldValue) {
-            if (this.mode !== "facility") {
-                return;
-            }
-            const difference = differenceJs(newValue, oldValue),
-                diff = differenceJs(oldValue, newValue);
 
-            if (diff.length) {
-                this.removeCardsByLayerName(diff[0]);
-            }
-            if (difference.length) {
-                const layer = this.visibleVectorLayers.find(layerr => layerr.getLayer().get("name") === difference[0]);
-
-                this.addCardsByLayer(layer);
-            }
-        },
         /**
          * Detects changes in visible Layers.
-         *
          * @returns {void}
          */
         visibleSubjectDataLayerConfigs: {
@@ -330,7 +303,7 @@ export default {
         else {
             this.setActiveMode(this.availableModes[0]);
         }
-        this.setNonReactiveData();
+        this.setSelectInteraction();
     },
 
     /**
@@ -347,6 +320,7 @@ export default {
         this.directionsLayer.getLayer().setStyle(this.directionsRouteLayer.getStyleFunction());
         this.directionsLayer.getLayer().setSource(this.directionsRouteSource);
 
+        mapCollection.getMap("2D").addEventListener("click", this.onMapClick);
         // onSearchbar(this.setSearchResultToOrigin);
         // onShowFeaturesById(this.tryUpdateIsochrones);
         // onShowAllFeatures(this.tryUpdateIsochrones);
@@ -374,6 +348,47 @@ export default {
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapActions("Modules/Routing/Directions", ["reset", "setRoutingDirections"]),
         ...methods,
+
+
+        /**
+         * Adds selection cards for all features in the given layer.
+         * @param {ol/layer/Vector} layer - The layer from which to add cards.
+         * @returns {void}
+         */
+        addCardsByLayer (layer) {
+            layer.getLayer().getSource().getFeatures().forEach(feature => {
+                const unpackedFeature = unpackCluster(feature);
+
+                unpackedFeature.forEach(unfeat => {
+                    let cardName = layer.getLayer().get("name");
+
+                    if (layer.attributes?.searchField?.length > 0) {
+                        cardName = unfeat.get(layer.attributes?.searchField[0]);
+                    }
+                    this.select.getFeatures().push(unfeat);
+                    this.setCoordinateFromFeature(unfeat, cardName, layer.getLayer().get("name"));
+                });
+            });
+        },
+
+        /**
+         * Checks if all features from a layer are present in the given features.
+         * @param {ol/layer/Vector} layer - The layer to check against.
+         * @param {ol/Feature[]} features - The feature collection to check.
+         * @returns {Boolean} True if all features are present, false otherwise.
+         */
+        areAllFeaturesInCollection (layer, features) {
+            const layerFeatures = layer.getLayerSource().getFeatures(),
+                featureIds = features.map(feature => unpackCluster(feature)[0].getId());
+
+            return layerFeatures.every(layerFeature => {
+                const unpackedFeatures = unpackCluster(layerFeature);
+
+                return unpackedFeatures.every(unpackedFeature => {
+                    return featureIds.includes(unpackedFeature.getId());
+                });
+            });
+        },
 
         /**
          * Gets a layer by its ID from the layer collection. If the layer does not exist,
@@ -414,14 +429,16 @@ export default {
          * Sets all needed non reactive data.
          * @returns {void}
          */
-        setNonReactiveData () {
+        setSelectInteraction () {
             this.select = new Select({
-                style: null,
-                filter: (feature, layer) => this.selectedFacilityNames.includes(layer.get("name"))
+                addCondition: singleClick,
+                filter: (feature, layer) => this.facilityNames.includes(layer.get("name")),
+                hitTolerance: 20,
+                removeCondition: singleClick,
+                style: null
             });
 
-            this.registerSelectListener(this.select);
-            mapCollection.getMap("2D").addEventListener("click", this.onMapClick);
+            this.registerSelectListener(this.select.getFeatures());
         },
 
         /**
@@ -435,31 +452,41 @@ export default {
         },
 
         /**
-         * Registers listener for select interaction events.
-         * On "select" the name of the selected feature and the click coordinate is set.
-         * @param {ol/interaction/Select} select - Interaction for selecting features.
+         * Registers listeners for the select interaction's feature collection.
+         * @param {ol/Collection} featureCollection - The feature collection to register listeners on.
          * @returns {void}
          */
-        registerSelectListener (select) {
-            select.on("select", evt => {
-                if (evt.selected.length === 0) {
-                    return;
-                }
-
-                const selectedFeature = evt.selected[0],
-                    layer = evt.target.getLayer(selectedFeature),
-                    unpackedFeature = unpackCluster(selectedFeature)[0],
-                    nut = layerCollection.getLayerById(layer.get("id"));
+        registerSelectListener (featureCollection) {
+            featureCollection.on("add", evt => {
+                const unpackedFeature = unpackCluster(evt.element)[0],
+                    foundLayer = this.visibleVectorLayers.find(layer => {
+                        return getLayerSource(layer.getLayer()).hasFeature(unpackedFeature);
+                    });
 
                 this.selectedFacilities.push(unpackedFeature);
 
-                let featName = layer.get("name");
+                let cardName = foundLayer.get("name");
 
-                if (nut.attributes?.searchField?.length > 0) {
-                    featName = unpackedFeature.get(nut.attributes?.searchField[0]);
+                if (foundLayer.attributes?.searchField?.length > 0) {
+                    cardName = unpackedFeature.get(foundLayer.attributes?.searchField[0]);
                 }
-                this.setCoordinateFromFeature(unpackedFeature, this.projectionCode, unpackedFeature.get(nut.attributes.searchField[0]), featName);
+                this.setCoordinateFromFeature(unpackedFeature, cardName, foundLayer.get("name"));
+
+                if (this.areAllFeaturesInCollection(foundLayer, featureCollection.getArray())) {
+                    this.selectedFacilityNames.push(foundLayer.get("name"));
+                }
             });
+
+            featureCollection.on("remove", evt => {
+                const featureToRemove = unpackCluster(evt.element)[0],
+                    cardToRemove = this.selectionCards.find(card => card.feature.getId() === featureToRemove.getId());
+
+                if (!cardToRemove) {
+                    return;
+                }
+                this.removeSelectionCard(cardToRemove, false);
+            });
+
         },
 
         /**
@@ -481,7 +508,7 @@ export default {
          * @param {String} mapProjectionCode - The code of the current map projection.
          * @returns {void}
          */
-        setCoordinateFromClick: function (clickCoordinate, mapProjectionCode, featureName, layerName) {
+        setCoordinateFromClick: function (clickCoordinate, mapProjectionCode, featureName, layerName, feature) {
             if (this.hasActiveSet) {
                 this.setActiveSet(null);
                 this.setDefaults();
@@ -499,16 +526,20 @@ export default {
             }
 
             const newCard = {
-                coord25832: clickCoordinate,
-                coord4326: coords,
-                icon: this.activeMode.icon,
-                id: clickCoordinate.toString(),
-                text: this.activeMode.text,
-                name: featureName,
-                layerName: layerName
-            };
+                    coord25832: clickCoordinate,
+                    coord4326: coords,
+                    icon: this.activeMode.icon,
+                    id: clickCoordinate.toString(),
+                    text: this.activeMode.text,
+                    name: featureName,
+                    layerName: layerName,
+                    feature
+                },
+                cardExists = this.selectionCards.some(card => card.id === newCard.id);
 
-            this.selectionCards.push(newCard);
+            if (!cardExists) {
+                this.selectionCards.push(newCard);
+            }
         },
 
         /**
@@ -517,7 +548,7 @@ export default {
          * @param {String} mapProjectionCode - The code of the current map projection.
          * @returns {void}
          */
-        setCoordinateFromFeature: function (feature, mapProjectionCode, featureName, layerName) {
+        setCoordinateFromFeature: function (feature, featureName, layerName) {
             let simplifiedGeom;
 
             if (feature.getGeometry().getType() === "Polygon" && !this.setByFeature) {
@@ -528,12 +559,11 @@ export default {
             }
 
             if (this.setByFeature) {
-                this.setCoordinateFromClick(getFlatCoordinates(simplifiedGeom), mapProjectionCode, featureName, layerName);
+                this.setCoordinateFromClick(getFlatCoordinates(simplifiedGeom), this.projectionCode, featureName, layerName, feature);
             }
             else {
-
                 getFlatCoordinates(simplifiedGeom).forEach((coordinate) => {
-                    this.setCoordinateFromClick(coordinate, mapProjectionCode, featureName, layerName);
+                    this.setCoordinateFromClick(coordinate, this.projectionCode, featureName, layerName, feature);
                 });
             }
         },
@@ -577,8 +607,6 @@ export default {
                     });
                 }
             });
-
-            this.setSelectedFacilityNames(this.facilityNames);
         },
 
         /**
@@ -820,10 +848,16 @@ export default {
             }
         },
 
-        removeSelectionCard (cardToRemove) {
+        removeSelectionCard (cardToRemove, removeFromColl = true) {
+            this.setSelectedFacilityNames(this.selectedFacilityNames.filter(name => name !== cardToRemove.layerName));
             this.setActiveSet(null);
             this.removePointMarkerFeature(cardToRemove.coord25832);
             this.selectionCards = this.selectionCards.filter(card => !deepEqual(card, cardToRemove));
+            if (removeFromColl) {
+                const index = this.select.getFeatures().getArray().findIndex(feat => feat.getId() === cardToRemove.feature.getId());
+
+                this.select.getFeatures().removeAt(index);
+            }
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
             if (this.mode === "path") {
                 this.reset();
@@ -854,21 +888,6 @@ export default {
             this.removePointMarker();
         },
 
-        toggleAllFacilitiesChecked () {
-            this.isAllFacilitiesChecked = !this.isAllFacilitiesChecked;
-            this.showErrorAlert = false;
-
-            if (this.isAllFacilitiesChecked) {
-                this.setSelectedFacilityNames(this.facilityNames);
-                this.selectedLayer.forEach(layer => {
-                    this.addCardsByLayer(layer);
-                });
-            }
-            else {
-                this.removeAllMarkerCards();
-            }
-        },
-
         /**
          * Updates the active data set.
          * @param {index} Number - The index of data set.
@@ -896,24 +915,7 @@ export default {
             const cardsToRemove = this.selectionCards.filter(card => card.layerName === name);
 
             cardsToRemove.forEach(card => {
-                this.removePointMarkerFeature(card.coord25832);
-            });
-
-            this.selectionCards = this.selectionCards.filter(card => card.layerName !== name);
-        },
-
-        addCardsByLayer (layer) {
-            layer.getLayer().getSource().getFeatures().forEach(feature => {
-                const unpackedFeature = unpackCluster(feature);
-
-                unpackedFeature.forEach(unfeat => {
-                    let featName = layer.getLayer().get("name");
-
-                    if (layer.attributes?.searchField?.length > 0) {
-                        featName = unfeat.get(layer.attributes?.searchField[0]);
-                    }
-                    this.setCoordinateFromFeature(unfeat, this.projectionCode, featName, layer.getLayer().get("name"));
-                });
+                this.removeSelectionCard(card);
             });
         },
 
@@ -939,6 +941,25 @@ export default {
             }
 
             return result;
+        },
+
+        updateSelectedFacilityNames (newValue) {
+            if (this.mode !== "facility") {
+                return;
+            }
+            const oldValue = this.selectedFacilityNames,
+                difference = differenceJs(newValue, oldValue),
+                diff = differenceJs(oldValue, newValue);
+
+            if (diff.length) {
+                this.removeCardsByLayerName(diff[0]);
+            }
+            if (difference.length) {
+                const layer = this.visibleVectorLayers.find(layerr => layerr.getLayer().get("name") === difference[0]);
+
+                this.addCardsByLayer(layer);
+            }
+            this.setSelectedFacilityNames(newValue);
         }
     }
 };
@@ -969,21 +990,13 @@ export default {
                     Ausgewählte {{ activeMode.text }}
                 </h5>
             </div>
-            <SwitchInput
-                v-if="mode === 'facility'"
-                :aria="'Alle Einrichtungen auswählen'"
-                :checked="isAllFacilitiesChecked"
-                :interaction="toggleAllFacilitiesChecked"
-                :label="'Alle Einrichtungen auswählen'"
-                class="mb-3"
-            />
             <Dropdown-Autocomplete
-                v-if="isAllFacilitiesChecked && mode === 'facility'"
+                v-if="mode === 'facility'"
                 :items="facilityNames ? facilityNames : []"
                 :model-value="selectedFacilityNames ? selectedFacilityNames : []"
                 multiple
-                label="Themen"
-                @update:model-value="setSelectedFacilityNames($event)"
+                label="Alle Fachdaten auswählen"
+                @update:model-value="updateSelectedFacilityNames($event)"
             />
             <div
                 v-if="selectionCards.length === 0"
