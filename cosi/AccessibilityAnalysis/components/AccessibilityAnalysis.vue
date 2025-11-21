@@ -31,6 +31,7 @@ import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
+import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
 
@@ -645,6 +646,8 @@ export default {
                     distance: this.distance ? JSON.parse(JSON.stringify(this.distance)) : undefined,
                     time: this.time ? JSON.parse(JSON.stringify(this.time)) : undefined,
                     useTravelTimeIndex: this.useTravelTimeIndex !== undefined ? JSON.parse(JSON.stringify(this.useTravelTimeIndex)) : undefined,
+                    travelTime: this.useTravelTimeIndex ? this.travelTime : undefined,
+                    travelTimeIndex: this.useTravelTimeIndex ? travelTimeIndex[this.travelTime] : undefined,
                     setByFeature: this.setByFeature ? JSON.parse(JSON.stringify(this.setByFeature)) : undefined,
                     steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
                     selectedFacility: this.selectedFacility ? this.selectedFacility : undefined,
@@ -924,13 +927,16 @@ export default {
                 name = this.getScaleUnitByType(data.inputs?.scaleUnit)?.name,
                 title = name === "Zeit" ? data.inputs?.time + " Minuten" : data.inputs?.distance + " Meter",
                 pointDes = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0]?.text : "Mehrere " + data.inputs.selectionCards[0]?.text,
-                coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.coordinate[0].toString() : "",
+                coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.coordinate[0].map(c => c.toFixed(6)).join(", ") : "",
                 icon = data.inputs.selectionCards[0]?.icon,
                 population = data.inputs.einwohner;
 
             result.push({label: name, value: title});
             result.push({icon: icon, label: pointDes, value: coordinate});
             result.push({icon: "bi bi-people", label: "Einwohner: " + population});
+            if (data.inputs.useTravelTimeIndex) {
+                result.push({icon: "bi bi-sliders", label: `Reisezeitindex: ${data.inputs.travelTimeIndex}, Tageszeit: ${data.inputs.travelTime}:00\u00A0Uhr`});
+            }
 
             return result;
         }
@@ -1063,8 +1069,8 @@ export default {
             />
             <AccessibilityAnalysisTrafficFlow
                 v-if="useTravelTimeIndex"
-                :time="time"
-                @update:time="updateTime"
+                :travel-time="travelTime"
+                @update:travel-time="setTravelTime"
             />
         </div>
         <FlatButton
@@ -1103,6 +1109,13 @@ export default {
                     <AccessibilityAnalysisExport
                         @export-geojson="downloadSet($event)"
                         @export-png="downloadScreenshot($event)"
+                    />
+                </template>
+                <template #after-card="{index}">
+                    <AlertMessage
+                        v-if="index === activeSet && dataSets[index].inputs.useTravelTimeIndex"
+                        :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.warning')"
+                        type="info"
                     />
                 </template>
             </ResultManagement>

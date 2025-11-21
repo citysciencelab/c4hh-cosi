@@ -34,6 +34,7 @@ const state = {
     scaleUnit: "time",
     distance: 5,
     time: 9,
+    travelTime: "9",
     steps: [0, 0, 0],
     dataSets: [],
     activeSet: 0,

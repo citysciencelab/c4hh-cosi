@@ -106,7 +106,7 @@ console.log(err);
      */
     createIsochronesPoint: async function () {
         const
-            {distance, maxDistance, steps} = getDistances(parseFloat(this.scaleUnitValue), this.useTravelTimeIndex, this.time);
+            {distance, maxDistance, steps} = getDistances(parseFloat(this.scaleUnitValue), this.useTravelTimeIndex, parseFloat(this.travelTime));
 
         if (
             this.coordinate.length > 0 &&
