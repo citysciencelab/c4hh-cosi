@@ -22,6 +22,7 @@
                     "topic": "Topic",
                     "directions": "Calculated directions",
                     "transportType": "Type of transportation",
+                    "errorAlert": "The accessibility could not be calculated. Please select different parameters and try again.",
                     "transportTypes": {
                         "clear": "-clear-",
                         "driving-car": "Car",

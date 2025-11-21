@@ -2,6 +2,7 @@
 import AccessibilityAnalysisExport from "./AccessibilityAnalysisExport.vue";
 import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
 import deepEqual from "deep-equal";
@@ -40,6 +41,7 @@ export default {
         AccessibilityAnalysisLegend,
         AccessibilityAnalysisTrafficFlow,
         AccordionItem,
+        AlertMessage,
         ButtonGroup,
         DropdownAutocomplete,
         FlatButton,
@@ -141,7 +143,9 @@ export default {
                 "FOOT": "Fußweg",
                 "WHEELCHAIR": "Rollstuhl"
             },
-            visibleVectorLayers: []
+            visibleVectorLayers: [],
+            showErrorAlert: false,
+            showSpinner: false
         };
     },
     computed: {
@@ -611,47 +615,58 @@ export default {
                 this.setCoordinate(this.coordinate.flat());
             }
 
+            try {
+                this.showSpinner = true;
+                this.showErrorAlert = false;
+                await this.createIsochrones();
+            }
+            catch (error) {
+                this.showSpinner = false;
+                this.showErrorAlert = true;
+            }
 
-            await this.createIsochrones();
+            if (this.isochroneFeatures.length > 0) {
+                this.showErrorAlert = false;
+                mapCollection.getMap("2D").once("rendercomplete", (evt) => {
+                    const canvas = evt.target.getViewport().querySelector("canvas");
 
-            mapCollection.getMap("2D").once("rendercomplete", (evt) => {
-                const canvas = evt.target.getViewport().querySelector("canvas");
+                    analysisSet.inputs.screenshot = canvas.toDataURL("image/png");
+                });
 
-                analysisSet.inputs.screenshot = canvas.toDataURL("image/png");
-            });
-
-            analysisSet.results = this.isochroneFeatures;
-            analysisSet.inputs = {
+                analysisSet.results = this.isochroneFeatures;
+                analysisSet.inputs = {
                 // These lines have been changed back and forth so arguing my case for checking first if the value is undefined
                 // JSON.parse throws error on undefined
                 // So if the original variable is undefined, we don't copy undefined, but instead cause an error
-                mode: this.mode ? JSON.parse(JSON.stringify(this.mode)) : undefined,
-                coordinate: this.coordinate ? JSON.parse(JSON.stringify(this.coordinate)) : undefined,
-                selectedFacilityNames: this.selectedFacilityNames ? JSON.parse(JSON.stringify(this.selectedFacilityNames)) : undefined,
-                routingDirections: this.routingDirections ? JSON.parse(JSON.stringify(this.routingDirections)) : undefined,
-                transportType: this.transportType ? JSON.parse(JSON.stringify(this.transportType)) : undefined,
-                scaleUnit: this.scaleUnit ? JSON.parse(JSON.stringify(this.scaleUnit)) : undefined,
-                distance: this.distance ? JSON.parse(JSON.stringify(this.distance)) : undefined,
-                time: this.time ? JSON.parse(JSON.stringify(this.time)) : undefined,
-                useTravelTimeIndex: this.useTravelTimeIndex !== undefined ? JSON.parse(JSON.stringify(this.useTravelTimeIndex)) : undefined,
-                setByFeature: this.setByFeature ? JSON.parse(JSON.stringify(this.setByFeature)) : undefined,
-                steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
-                selectedFacility: this.selectedFacility ? this.selectedFacility : undefined,
-                selectedFacilities: this.selectedFacilities ? this.selectedFacilities : undefined,
-                selectionCards: this.selectionCards,
-                isAllFacilitiesChecked: this.isAllFacilitiesChecked,
-                title: "Erreichbarkeit " + this.cardCounter++
-            };
-            this.dataSets.push(analysisSet);
+                    mode: this.mode ? JSON.parse(JSON.stringify(this.mode)) : undefined,
+                    coordinate: this.coordinate ? JSON.parse(JSON.stringify(this.coordinate)) : undefined,
+                    selectedFacilityNames: this.selectedFacilityNames ? JSON.parse(JSON.stringify(this.selectedFacilityNames)) : undefined,
+                    routingDirections: this.routingDirections ? JSON.parse(JSON.stringify(this.routingDirections)) : undefined,
+                    transportType: this.transportType ? JSON.parse(JSON.stringify(this.transportType)) : undefined,
+                    scaleUnit: this.scaleUnit ? JSON.parse(JSON.stringify(this.scaleUnit)) : undefined,
+                    distance: this.distance ? JSON.parse(JSON.stringify(this.distance)) : undefined,
+                    time: this.time ? JSON.parse(JSON.stringify(this.time)) : undefined,
+                    useTravelTimeIndex: this.useTravelTimeIndex !== undefined ? JSON.parse(JSON.stringify(this.useTravelTimeIndex)) : undefined,
+                    setByFeature: this.setByFeature ? JSON.parse(JSON.stringify(this.setByFeature)) : undefined,
+                    steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
+                    selectedFacility: this.selectedFacility ? this.selectedFacility : undefined,
+                    selectedFacilities: this.selectedFacilities ? this.selectedFacilities : undefined,
+                    selectionCards: this.selectionCards,
+                    isAllFacilitiesChecked: this.isAllFacilitiesChecked,
+                    title: "Erreichbarkeit " + this.cardCounter++
+                };
+                this.dataSets.push(analysisSet);
 
-            this.setActiveSet(this.dataSets.length - 1);
+                this.setActiveSet(this.dataSets.length - 1);
 
-            if (this.dataSets.length === 1) {
-                this.renderIsochrones(this.isochroneFeatures);
+                if (this.dataSets.length === 1) {
+                    this.renderIsochrones(this.isochroneFeatures);
+                }
+                this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
+                this.setPopulationSize();
+                this.setCoordinate([]);
+                this.showSpinner = false;
             }
-            this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
-            this.setPopulationSize();
-            this.setCoordinate([]);
 
             // this line adds the accessibility analysis data selection to the selection manger
             // this does not seem to make much sense: the only reason to reproduce this would be to reproduce the accessibility analysis. However, since the accessibility analysis creates this selection on the fly, we need the previous selection for reproduction, not this one. this one is then recreated on the fly everytime the analysis is run. Leaving this in in case we want this for some reason down the line.
@@ -706,6 +721,7 @@ export default {
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
             this.resetIsochroneBBox();
             this.removePointMarker();
+            this.showErrorAlert = false;
             // this.removeLayerFromMap(this.directionsLayer);
         },
         /**
@@ -763,10 +779,12 @@ export default {
          * @returns {void}
          */
         setUseTravelTimeIndex (value) {
+            this.showErrorAlert = false;
             this.useTravelTimeIndex = value;
         },
 
         updateTime (value) {
+            this.showErrorAlert = false;
             this.setTime(parseInt(value, 10));
         },
 
@@ -791,8 +809,10 @@ export default {
                 this.selectionCards = [];
             }
             this.setTransportType(val);
+            this.showErrorAlert = false;
         },
         updateDistance (distance) {
+            this.showErrorAlert = false;
             if (this.scaleUnit === "time") {
                 this.setTime(parseInt(distance, 10));
             }
@@ -837,6 +857,7 @@ export default {
 
         toggleAllFacilitiesChecked () {
             this.isAllFacilitiesChecked = !this.isAllFacilitiesChecked;
+            this.showErrorAlert = false;
 
             if (this.isAllFacilitiesChecked) {
                 this.setSelectedFacilityNames(this.facilityNames);
@@ -1056,7 +1077,14 @@ export default {
             icon="bi bi-play-circle"
             :disabled="selectionCards.length === 0"
             :text="'Erreichbarkeit berechnen'"
+            :spinner-trigger="showSpinner"
             @click.native="createAnalysisSet()"
+        />
+        <AlertMessage
+            v-if="showErrorAlert"
+            :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.errorAlert')"
+            type="error"
+            :closeable="true"
         />
         <div v-if="dataSets.length > 0">
             <hr>
