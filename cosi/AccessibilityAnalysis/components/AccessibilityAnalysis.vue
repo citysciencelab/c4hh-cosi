@@ -369,7 +369,6 @@ export default {
         ...mapMutations("Modules/AccessibilityAnalysis", Object.keys(mutations)),
         ...mapActions("Modules/AccessibilityAnalysis", ["getIsochrones"]),
         // ...mapActions("Tools/SelectionManager", ["addNewSelection"]),
-        // ...mapMutations("Maps", ["removeLayerFromMap"]),
         ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "removePointMarkerFeature"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapActions("Modules/Routing/Directions", ["reset", "setRoutingDirections"]),
@@ -486,7 +485,6 @@ export default {
                 this.setActiveSet(null);
                 this.setDefaults();
                 this.removeAll();
-                this.selectionCards = [];
             }
             let coords;
 
@@ -722,7 +720,7 @@ export default {
             this.resetIsochroneBBox();
             this.removePointMarker();
             this.showErrorAlert = false;
-            // this.removeLayerFromMap(this.directionsLayer);
+            this.selectionCards = [];
         },
         /**
          * Removes all the data.
@@ -789,7 +787,6 @@ export default {
         },
 
         setActiveMode (obj) {
-            this.selectionCards = [];
             this.activeMode = obj;
             this.setMode(this.activeMode.type);
             this.removeAll();
@@ -806,7 +803,6 @@ export default {
             if (this.hasActiveSet) {
                 this.setActiveSet(null);
                 this.removeAll();
-                this.selectionCards = [];
             }
             this.setTransportType(val);
             this.showErrorAlert = false;
@@ -887,7 +883,6 @@ export default {
             this.setActiveSet(null);
             this.setDefaults();
             this.removeAll();
-            this.selectionCards = [];
         },
 
         getModeByType (type) {
