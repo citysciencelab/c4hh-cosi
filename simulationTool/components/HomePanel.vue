@@ -33,7 +33,7 @@ export default {
         />
         <img
             width="80"
-            src="resources/img/Logo.jpg"
+            src="portalconfigs/connected_urban_simulations/resources/img/Logo.jpg"
             class="m-4"
             alt=""
         >
