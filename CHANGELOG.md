@@ -7,6 +7,7 @@
 ### __Breaking Changes__
 
 ### Added
+- PopulationRequest: Added support for OGC API Processes.
 
 ### Changed
 
@@ -22,7 +23,7 @@
 
 ### Fixed
 - Compatibility fixes after the Masterportal core upgrade to **Vue 3.5** (esm-bundler / stricter template checks). No functional changes intended.
-- trafficCount: `TrafficCountDatePickerCalendar.vue` 
+- trafficCount: `TrafficCountDatePickerCalendar.vue`
 - fileImport : `FileImport.vue`
 - valuationPrint: `ValuationPrint.vue`
 - gfiTheme/Verkehrsstärken: Fixed download link.
@@ -38,7 +39,6 @@
 - Added README.md for the Addon Cesium 3D Tiles Inspector.
 - Verkehrsstärken gfiTheme: Added Fullscreenview-button.
 - Added 'oktagon' to version 3.x
-- PopulationRequest: Added support for OGC API Processes.
 
 ### Changed
 - Verkehrsstärken gfiTheme: only shows data for the last 10 years.
