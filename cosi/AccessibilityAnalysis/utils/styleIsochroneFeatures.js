@@ -1,9 +1,9 @@
 import {Fill, Stroke, Style} from "ol/style.js";
 
 const defaultIsochroneColors = [
-    "rgba(240, 0, 3, 0.2)",
-    "rgba(200, 200, 3, 0.2)",
-    "rgba(0, 240, 3, 0.2)"
+    "rgba(199, 214, 250, 0.55)",
+    "rgba(47, 135, 245, 0.39)",
+    "rgba(0, 76, 168, 0.40)"
 ];
 
 /**
@@ -31,8 +31,9 @@ function styleIsochroneFeatures (features, colors = defaultIsochroneColors) {
                 }),
                 stroke: new Stroke({
                     color: "white",
-                    width: 1
-                })
+                    width: 2
+                }),
+                zIndex: i
             })
         );
     }
@@ -45,9 +46,9 @@ function styleIsochroneFeatures (features, colors = defaultIsochroneColors) {
                     color: "rgba(255, 255, 255, 0)"
                 }),
                 stroke: new Stroke({
-                    color: "rgba(100, 80, 80, 1)",
-                    width: 2,
-                    lineDash: [10, 8]
+                    color: "rgba(159, 25, 215, 1)",
+                    width: 4,
+                    lineDash: [10, 10]
                 })
             })
         );

@@ -11,6 +11,7 @@ import DropdownAutocomplete from "../../shared/modules/dropdown/components/Dropd
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import getters from "../store/gettersAccessibilityAnalysis";
+import html2canvas from "html2canvas";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import methods from "./methodsAnalysis";
 import mutations from "../store/mutationsAccessibilityAnalysis";
@@ -123,10 +124,10 @@ export default {
             ],
             sliderRerenderKey: 0,
             legendColors: [
-                "rgba(0, 240, 3, 0.6)",
-                "rgba(200, 200, 3, 0.6)",
-                "rgba(240, 0, 3, 0.6)",
-                "rgba(180, 165, 165, 0.8)"
+                "rgba(0, 76, 168, 0.40)",
+                "rgba(47, 135, 245, 0.39)",
+                "rgba(199, 214, 250, 0.55)",
+                "rgba(159, 25, 215, 1)"
             ],
             isAllFacilitiesChecked: false,
             selectionCards: [],
@@ -657,8 +658,12 @@ export default {
             if (this.isochroneFeatures.length > 0) {
                 this.showErrorAlert = false;
                 mapCollection.getMap("2D").once("rendercomplete", (evt) => {
-                    const canvas = evt.target.getViewport().querySelector("canvas");
+                    const canvas = evt.target.getViewport().querySelector("canvas"),
+                        legend = document.getElementById("accessibility-analysis-legend");
 
+                    html2canvas(legend).then(legendCanvas => {
+                        analysisSet.inputs.screenshotLegend = legendCanvas.toDataURL("image/png");
+                    });
                     analysisSet.inputs.screenshot = canvas.toDataURL("image/png");
                 });
 
@@ -1117,8 +1122,10 @@ export default {
             >
                 <template #top>
                     <AccessibilityAnalysisLegend
+                        v-if="hasActiveSet"
                         :steps="steps"
                         :colors="legendColors"
+                        :unit="getScaleUnitByType(scaleUnit).unit"
                     />
                 </template>
                 <template #card>

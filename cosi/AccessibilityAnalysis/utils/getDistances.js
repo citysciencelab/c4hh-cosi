@@ -28,7 +28,7 @@ function getDistances (originDistance, useTravelTimeIndex, time) {
     if (useTravelTimeIndex) {
         distance = getTravelTimeIndexDistance(originDistance, time);
         maxDistance = originDistance;
-        steps = [...steps, "max"];
+        steps = [...steps, steps[2]];
     }
 
     return {distance, maxDistance, steps};

@@ -42,7 +42,7 @@
                     "calculate": "Calculate",
                     "clear": "Hide result",
                     "help": "Help",
-                    "legend": "Legend:",
+                    "legend": "Legend",
                     "requestInhabitants": "Request inhabitants",
                     "inputReminder": "Please fill out all input fields.",
                     "showError": "The request could not be executed correctly. Please verify all inputs.",

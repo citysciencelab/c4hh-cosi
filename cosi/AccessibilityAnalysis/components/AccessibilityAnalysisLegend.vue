@@ -1,11 +1,9 @@
 <script>
-import {VCol} from "vuetify/components/VGrid";
 import {VIcon} from "vuetify/components/VIcon";
 
 export default {
     name: "AccessibilityAnalysisLegend",
     components: {
-        VCol,
         VIcon
     },
     props: {
@@ -16,6 +14,10 @@ export default {
         colors: {
             type: Array,
             required: true
+        },
+        unit: {
+            type: String,
+            required: true
         }
     }
 
@@ -23,25 +25,60 @@ export default {
 </script>
 
 <template lang="html">
-    <v-col
-        class="mb-1"
+    <div
+        id="accessibility-analysis-legend"
+        class="flex-fill"
     >
-        <span class="text-subtitle-2"> {{ $t("additional:modules.tools.cosi.accessibilityAnalysis.legend") }} </span>
+        <h6>
+            {{ $t("additional:modules.tools.cosi.accessibilityAnalysis.legend") }}
+        </h6>
         <template
             v-for="(step, index) in steps"
             :key="index"
         >
-            <v-icon
-                :color="colors[index]"
-                small
-            >
-                mdi-circle
-            </v-icon>
             <span
-                class="steps"
+                v-if="index !== 3"
+                class="me-4"
             >
-                {{ step }}
+                <v-icon
+                    class="me-1"
+                    :color="colors[index]"
+                    small
+                >
+                    mdi-square-rounded
+                </v-icon>
+                <span
+                    class="steps"
+                >
+                    {{ step }} {{ unit }}
+                </span>
+            </span>
+            <span v-else>
+                <v-icon
+                    :color="colors[index]"
+                    x-small
+                >
+                    mdi-minus-thick
+                </v-icon>
+                <v-icon
+                    :color="colors[index]"
+                    x-small
+                >
+                    mdi-minus-thick
+                </v-icon>
+                <v-icon
+                    class="me-1"
+                    :color="colors[index]"
+                    x-small
+                >
+                    mdi-minus-thick
+                </v-icon>
+                <span
+                    class="steps"
+                >
+                    {{ step }} {{ unit }} bei Reisezeitindex 1.0
+                </span>
             </span>
         </template>
-    </v-col>
+    </div>
 </template>
