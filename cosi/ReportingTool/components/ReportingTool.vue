@@ -359,10 +359,14 @@ export default {
             if (typeof overviewImageUrl !== "string") {
                 return;
             }
-            this.pdf.addChapterHeadline(headline);
+            this.pdf.addChapter(headline);
             this.pdf.addImageByUrl(overviewImageUrl, imageName, {fit: [500, 500], alignment: "center"});
             this.pdf.addLineBreak();
             await this.addDetailViewToOverviewPage(template, bbox);
+            this.pdf.addLineBreak();
+            this.pdf.addHeadline(this.freeHeadline);
+            this.pdf.addParagraph(this.freeText);
+            this.pdf.addLineBreak();
         },
 
         /**

@@ -38,16 +38,6 @@ export default class PDFMaker {
      * @returns {void}
      */
     addChapter (text) {
-        this.content.push({...this.chapterHeadlineFormat, text, pageBreak: "before"});
-        this.content.push("\n");
-    }
-
-    /**
-     * Adds a headline in the same format as a chapter headline but without the pagebreak.
-     * @param {String} text - The headline text.
-     * @returns {void}
-     */
-    addChapterHeadline (text) {
         this.content.push({...this.chapterHeadlineFormat, text});
         this.content.push("\n");
     }
