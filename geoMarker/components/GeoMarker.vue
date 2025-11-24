@@ -4,6 +4,7 @@ import TabNewContent from "./tabs/TabNewContent.vue";
 import TabListContent from "./tabs/TabListContent.vue";
 import TabFilterContent from "./tabs/TabFilterContent.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
+import layerCollection from "@core/layers/js/layerCollection";
 
 export default {
     name: "GeoMarker",
@@ -15,7 +16,8 @@ export default {
     },
     data () {
         return {
-            fullyLoaded: false
+            fullyLoaded: false,
+            renderListKey: 0
         };
     },
     computed: {
@@ -26,7 +28,9 @@ export default {
             "geoMarkerEditLayerId",
             "rollbackGeoMarkerFeature",
             "geoMarkerFeatureList",
-            "newGeoMarkerCreated"
+            "newGeoMarkerCreated",
+            "isFilterApplied",
+            "geoMarkerFeatureSelected"
         ]),
         ...mapGetters(["allLayerConfigs"])
     },
@@ -78,6 +82,8 @@ export default {
 
         const editLayerInformation = this.allLayerConfigs.filter(item => item.id === this.geoMarkerEditLayerId);
 
+        this.activateGeoMarkerReloading();
+
         this.setLayerInformation(editLayerInformation);
         await this.getGeoMarkerEditLayerUrl();
         this.fullyLoaded = true;
@@ -109,6 +115,88 @@ export default {
         ...mapActions("Maps", ["removePointMarker"]),
         setCurrentTab (tab) {
             this.setGeoMarkerActiveTab(tab);
+        },
+        activateGeoMarkerReloading () {
+            // Reloading the GeoMarker features every minute to have latest data all the time
+            setInterval(async () => {
+                let allNewFeaturesLoaded = [];
+                // get all possible layerIds
+                const layerIds = Object.values(this.departments).flatMap(options => [
+                        options.layerIds.offen,
+                        options.layerIds.inaktiv,
+                        options.layerIds.geschlossen
+                    ]),
+                    loadPromises = layerIds.map(layerId => {
+                        return new Promise(resolve => {
+                            const layer = layerCollection.getLayerById(layerId);
+
+                            // the layer is currently visible
+                            if (layer && layer.layer && layer.layer.isVisible()) {
+                                const layerSource = layer.getLayerSource();
+
+                                // reload layer features
+                                layerSource?.refresh();
+
+                                // wait until all features are loaded
+                                layerSource?.once("featuresloadend", () => {
+                                    allNewFeaturesLoaded = allNewFeaturesLoaded.concat(layerSource.getFeatures());
+                                    resolve();
+                                });
+                            }
+                            // resolve as long as the layer is not visible
+                            else {
+                                resolve();
+                            }
+                        });
+                    });
+
+                await Promise.all(loadPromises);
+
+                // recreate the addon state after having reloaded all visible layers
+                // if the filter has been applied before, re-filter all features
+                if (this.isFilterApplied) {
+                    await this.$refs.tabFilter?.updateFilterSelection(false, false);
+                }
+                // if the filter has not been applied before but one or more features are visible in the list (e.g. GFI)
+                // refresh the list entries with newly loaded feature parameters
+                else if (this.geoMarkerFeatureList.length > 0) {
+                    const filteredIds = this.geoMarkerFeatureList.map((feat) => feat.getId()),
+                        newFeatureList = allNewFeaturesLoaded.filter((feat) => {
+                            return filteredIds.includes(feat.getId());
+                        }),
+                        uniqueNewFeatures = [],
+                        seenIds = new Set();
+
+                    newFeatureList.forEach(feat => {
+                        const id = feat.getId();
+
+                        if (!seenIds.has(id)) {
+                            seenIds.add(id);
+                            uniqueNewFeatures.push(feat);
+                        }
+                    });
+
+                    this.setGeoMarkerFeatureList(uniqueNewFeatures);
+                }
+
+                // if there are features in the list after having refreshed filtering and / or GFI list entries, refresh the list
+                if (this.geoMarkerFeatureList.length > 0) {
+                    this.renderListKey++;
+
+                    // if a GeoMarker was selected before, search for this GeoMarker in the list and re-select it to update the parameters in the form
+                    if (this.geoMarkerFeatureSelected) {
+                        const selectedID = this.geoMarkerFeatureSelected.getId(),
+                            updatedSelectedFeature = this.geoMarkerFeatureList.filter((feat) => {
+                                return feat.getId() === selectedID;
+                            });
+
+                        if (updatedSelectedFeature && updatedSelectedFeature.length > 0) {
+                            this.setGeoMarkerFeatureSelected(updatedSelectedFeature[0]);
+                        }
+                    }
+                }
+
+            }, 60000);
         }
     }
 };
@@ -196,6 +284,7 @@ export default {
             >
                 <TabListContent
                     ref="tabList"
+                    :key="renderListKey"
                     :tab-active="geoMarkerActiveTab === 'tabList'"
                 />
             </div>

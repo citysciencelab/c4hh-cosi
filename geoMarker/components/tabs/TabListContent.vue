@@ -26,7 +26,8 @@ export default {
             geoMarkerUpdateMode: false,
             showUpdateMessage: false,
             originalCoordinates: null,
-            selectedFeatureIsGemisEditNotAllowed: false
+            selectedFeatureIsGemisEditNotAllowed: false,
+            formRenderKey: 0
         };
     },
     computed: {
@@ -396,6 +397,7 @@ export default {
         >
             <GeoMarkerForm
                 ref="geoMarkerForm"
+                :key="formRenderKey"
                 mode="edit"
                 :selected-feature="geoMarkerFeatureSelected"
                 @cancel-edit="onCancelEdit"
