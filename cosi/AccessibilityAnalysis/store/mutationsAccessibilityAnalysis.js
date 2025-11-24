@@ -9,11 +9,7 @@ const mutations = {
      * {setKey:   (state, payload) => *   state[key] = payload * }
      * will be returned.
      */
-    ...generateSimpleMutations(stateVueAddon),
-
-    setProgress: (moduleState, payload) => {
-        moduleState.progress = payload;
-    }
+    ...generateSimpleMutations(stateVueAddon)
 };
 
 export default mutations;

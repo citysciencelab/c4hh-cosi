@@ -12,19 +12,16 @@ let abortController;
  * create isochrones features
  * @export
  * @param {*} {transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl} parameters
- * @param {*} progress progress callback
  * @return {*} features
  */
-export async function createIsochrones ({transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl, projectionCode}, progress) {
+export async function createIsochrones ({transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl, projectionCode}) {
     let ret;
 
     if (coordinates.length === 1) {
-        progress(50);
         ret = await createIsochronesPoint(transportType, coordinates[0], scaleUnit, distance, maxDistance, baseUrl, projectionCode);
-        progress(100);
         return ret;
     }
-    return createIsochronesPoints({transportType: transportType, coordinates: coordinates, scaleUnit: scaleUnit, distance: distance, maxDistance: maxDistance, selectedFacilityNames: null, batchSize: batchSize || 200, progress: progress, baseUrl: baseUrl, projectionCode: projectionCode});
+    return createIsochronesPoints({transportType: transportType, coordinates: coordinates, scaleUnit: scaleUnit, distance: distance, maxDistance: maxDistance, selectedFacilityNames: null, batchSize: batchSize || 200, baseUrl: baseUrl, projectionCode: projectionCode});
 }
 
 /**
@@ -79,21 +76,18 @@ async function createIsochronesPoint (transportType, coordinate, scaleUnit, dist
 
 /**
  * create isochrones features for selected several coordiantes
- * @param {Object} args {transportType, coordinates, scaleUnit, distance, maxDistance, selectedFacilityNames, batchSize, progress, baseUrl, projectionCode}
+ * @param {Object} args {transportType, coordinates, scaleUnit, distance, maxDistance, selectedFacilityNames, batchSize, baseUrl, projectionCode}
  * @param {*} args.coordinates coordinates
  * @param {*} args.scaleUnit scaleUnit
  * @param {*} args.distance distance
  * @param {*} args.maxDistance maxDistance
  * @param {*} args.selectedFacilityNames selectedFacilityNames
  * @param {*} args.batchSize batchSize
- * @param {*} args.progress progress callback
  * @param {*} args.baseUrl baseUrl
  * @param {*} args.projectionCode projectionCode
  * @return {*} features
  */
 async function createIsochronesPoints (args) {
-    args.progress(1);
-
     if (abortController) {
         abortController.cancel();
     }
@@ -112,7 +106,6 @@ async function createIsochronesPoints (args) {
         // filteredCoordinates = filterPoly === undefined ? args.coordinates :
         //     args.coordinates.filter(c => turfBooleanPointInPolygon(c, filterPoly));
         filteredCoordinates = args.coordinates;
-console.log(filteredCoordinates);
 
     for (let i = 0; i < filteredCoordinates.length; i += args.batchSize) {
         const arrayItem = filteredCoordinates.slice(i, i + args.batchSize);
@@ -120,9 +113,7 @@ console.log(filteredCoordinates);
         coordinatesList.push(arrayItem);
     }
 
-    let k = 0,
-        features = [];
-console.log(coordinatesList);
+    let features = [];
 
     for (const coords of coordinatesList) {
         try {
@@ -159,8 +150,6 @@ console.log(coordinatesList);
                 throw e;
             }
         }
-        args.progress(((k + 1) / coordinatesList.length) * 90);
-        k++;
     }
 
     if (groupedFeaturesList.length) {
@@ -202,7 +191,6 @@ console.log(coordinatesList);
             features = features.concat(layerUnionFeatures);
         }
     }
-    args.progress(100);
     return features;
 }
 

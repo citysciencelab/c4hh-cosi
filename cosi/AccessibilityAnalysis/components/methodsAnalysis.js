@@ -27,8 +27,6 @@ export default {
         this.setSteps([0, 0, 0]);
         this.setIsochroneFeatures([]);
 
-console.log(this.mode);
-
         try {
             if (this.mode === "point" || this.mode === "facility") {
                 await this.createIsochronesPoint();
@@ -44,7 +42,6 @@ console.log(this.mode);
             if (err.request_canceled) {
                 return;
             }
-console.log(err);
 
             // try {
                 const code = (err.error || err).response.data.error.code;
@@ -71,7 +68,7 @@ console.log(err);
      */
     createIsochronesRegion: async function () {
         const allActiveFeatures = filterAllFeatures(this.selectedLayer, this.isFeatureActive),
-            coordinates = this.getCoordinates(allActiveFeatures, this.setByFeature),
+            coordinates = this.getCoordinates(allActiveFeatures, this.useOuterBoundaries),
             {distance, maxDistance, steps} = getDistances(parseFloat(this.scaleUnitValue), this.useTravelTimeIndex, this.time);
 
         if (
@@ -243,7 +240,7 @@ console.log(err);
         setBBoxToGeom(this, this.areaSelectorGeom || this.boundingGeometry, layerCollection.getLayers());
     },
 
-    getCoordinates: function (features, setByFeature) {
+    getCoordinates: function (features, useOuterBoundaries) {
         if (Array.isArray(features) && features.length > 0) {
             return features
                 .reduce((res, feature) => {
@@ -252,7 +249,7 @@ console.log(err);
                     if (geometry.getType() === "Point") {
                         return [...res, geometry.getCoordinates().splice(0, 2)];
                     }
-                    if (setByFeature) {
+                    if (useOuterBoundaries) {
                         return [...res, ...getFlatCoordinates(simplify(geometry, 10)) || [Extent.getCenter(geometry.getExtent())]];
                     }
                     return [...res, Extent.getCenter(geometry.getExtent())];

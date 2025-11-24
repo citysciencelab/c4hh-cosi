@@ -121,7 +121,6 @@ describe("AccessibilityAnalysis.vue", () => {
                                 isFeatureDisabled: () => sinon.stub().returns(false),
                                 isFeatureActive: () => sinon.stub().returns(true),
                                 activeVectorLayerList: sinon.stub().returns(layersMock),
-                                progress: () => sinon.stub()
                             }
                         },
                         ScenarioBuilder: {

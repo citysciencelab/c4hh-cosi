@@ -70,7 +70,7 @@ export default {
                         "coordinate",
                         "clickCoordinate",
                         "selectedFacilityNames",
-                        "setByFeature",
+                        "useOuterBoundaries",
                         "transportType",
                         "scaleUnit",
                         "distance",

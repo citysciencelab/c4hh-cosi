@@ -3,7 +3,6 @@ import AccessibilityAnalysisExport from "./AccessibilityAnalysisExport.vue";
 import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
-import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
 import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
@@ -43,7 +42,6 @@ export default {
         AccessibilityAnalysisExport,
         AccessibilityAnalysisLegend,
         AccessibilityAnalysisTrafficFlow,
-        AccordionItem,
         AlertMessage,
         ButtonGroup,
         DropdownAutocomplete,
@@ -71,7 +69,7 @@ export default {
                 {
                     type: "facility",
                     text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.facilities"),
-                    icon: "bi bi-building",
+                    icon: "bi bi-layers",
                     title: "Erreichbarkeit ab einer ausgewählten Einrichtung",
                     description: "Zeigt ein Gebiet an, welches von einer ausgewählten Einrichtung auf der Karte  innerhalb einer festgelegten Entfernung erreichbar ist.",
                     info: "Noch keine Einrichtung ausgewählt. Um eine Einrichtung zu wählen, bitte auf eine oder mehrere Einrichtungen in der Karte klicken!"
@@ -152,7 +150,6 @@ export default {
         ...mapGetters("Modules/DistrictSelector", ["boundingGeometry"]),
         ...mapGetters("Modules/Routing/Directions", ["directionsRouteSource", "directionsRouteLayer", "routingDirections", "settings"]),
         // ...mapGetters("Modules/FeaturesList", ["activeVectorLayerList", "isFeatureActive", "layerMapById"]),
-        // ...mapGetters("Modules/AreaSelector", {areaSelectorGeom: "geometry"}),
         // ...mapGetters("Modules/SelectionManager", ["activeSelection"]),
         // ...mapGetters("Modules/ScenarioBuilder", ["scenarioUpdated"]),
 
@@ -223,7 +220,12 @@ export default {
             }
 
             if (this.dataSets[index].inputs.mode === "point" || this.dataSets[index].inputs.mode === "facility") {
-                this.setMarkerByCoordinates(this.selectionCards.map(card => card.coord25832));
+                if (this.dataSets[index].inputs.useOuterBoundaries) {
+                    this.setMarkerByCoordinates(this.selectionCards.map(card => card.coord25832).flat());
+                }
+                else {
+                    this.setMarkerByCoordinates(this.selectionCards.map(card => card.coord25832));
+                }
             }
 
             this.setIsochroneFeatures(this.dataSets[index].results);
@@ -240,6 +242,7 @@ export default {
             }
             else {
                 this.removeInteraction(this.select);
+                this.setUseOuterBoundaries(false);
             }
 
             if (this.mode === "region" && this.activeSelection === null) {
@@ -260,7 +263,7 @@ export default {
                     coord4326: "",
                     icon: this.activeMode.icon,
                     id: this.routingDirections.bbox.toString(),
-                    text: "Berechnete Route",
+                    label: "Berechnete Route",
                     name: `Entfernung: ${this.routingDirections.distance} m | Zeit: ${this.routingDirections.duration} min | Verkehrsmittel: ${this.mappedRoutingProfiles[this.settings.speedProfile]}`,
                     layerName: "layerName"
                 };
@@ -335,7 +338,7 @@ export default {
         this.setMode(this.availableModes[0].type);
         this.removeInteraction(this.select);
         mapCollection.getMap("2D").removeEventListener("click", this.onMapClick);
-        this.removeAll();
+        // this.removeAll();
         this.setDefaults();
     },
     methods: {
@@ -363,7 +366,7 @@ export default {
                 const unpackedFeature = unpackCluster(feature);
 
                 unpackedFeature.forEach(unfeat => {
-                    let cardName = layer.getLayer().get("name");
+                    let cardName;
 
                     if (layer.attributes?.searchField?.length > 0) {
                         cardName = unfeat.get(layer.attributes?.searchField[0]);
@@ -450,7 +453,7 @@ export default {
          */
         onMapClick (evt) {
             if (this.mode === "point") {
-                this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode, evt.originalEvent.shiftKey);
+                this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode, evt.originalEvent.shiftKey, "Punkte");
             }
         },
 
@@ -465,10 +468,7 @@ export default {
                     foundLayer = this.visibleVectorLayers.find(layer => {
                         return getLayerSource(layer.getLayer()).hasFeature(unpackedFeature);
                     });
-
-                this.selectedFacilities.push(unpackedFeature);
-
-                let cardName = foundLayer.get("name");
+                let cardName;
 
                 if (foundLayer.attributes?.searchField?.length > 0) {
                     cardName = unpackedFeature.get(foundLayer.attributes?.searchField[0]);
@@ -517,25 +517,29 @@ export default {
                 this.setDefaults();
                 this.removeAll();
             }
-            let coords;
 
-            if (this.setByFeature) {
+            let coords,
+                cardText;
+
+            if (this.useOuterBoundaries) {
+                cardText = "Flächenaußengrenzen für " + (featureName || clickCoordinate.slice(0, 2) + "...");
                 coords = transformCoordinates(clickCoordinate, mapProjectionCode);
                 this.setMarkerByCoordinates(clickCoordinate);
             }
             else {
+                cardText = featureName || clickCoordinate.map(coord => coord.toFixed(6)).join(", ");
                 coords = transformCoordinate(clickCoordinate, mapProjectionCode);
                 this.setMarkerByCoordinates([clickCoordinate]);
             }
-
             const newCard = {
                     coord25832: clickCoordinate,
                     coord4326: coords,
                     icon: this.activeMode.icon,
                     id: clickCoordinate.toString(),
-                    text: this.activeMode.text,
-                    name: featureName,
+                    label: layerName || this.activeMode.text,
+                    text: cardText,
                     layerName: layerName,
+                    featureName,
                     feature
                 },
                 cardExists = this.selectionCards.some(card => card.id === newCard.id);
@@ -554,14 +558,14 @@ export default {
         setCoordinateFromFeature: function (feature, featureName, layerName) {
             let simplifiedGeom;
 
-            if (feature.getGeometry().getType() === "Polygon" && !this.setByFeature) {
+            if (feature.getGeometry().getType() === "Polygon" && !this.useOuterBoundaries) {
                 simplifiedGeom = simplify(feature.getGeometry().getInteriorPoint());
             }
             else {
                 simplifiedGeom = simplify(feature.getGeometry());
             }
 
-            if (this.setByFeature) {
+            if (this.useOuterBoundaries) {
                 this.setCoordinateFromClick(getFlatCoordinates(simplifiedGeom), this.projectionCode, featureName, layerName, feature);
             }
             else {
@@ -683,10 +687,8 @@ export default {
                     useTravelTimeIndex: this.useTravelTimeIndex !== undefined ? JSON.parse(JSON.stringify(this.useTravelTimeIndex)) : undefined,
                     travelTime: this.useTravelTimeIndex ? this.travelTime : undefined,
                     travelTimeIndex: this.useTravelTimeIndex ? travelTimeIndex[this.travelTime] : undefined,
-                    setByFeature: this.setByFeature ? JSON.parse(JSON.stringify(this.setByFeature)) : undefined,
+                    useOuterBoundaries: this.useOuterBoundaries ? JSON.parse(JSON.stringify(this.useOuterBoundaries)) : undefined,
                     steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
-                    selectedFacility: this.selectedFacility ? this.selectedFacility : undefined,
-                    selectedFacilities: this.selectedFacilities ? this.selectedFacilities : undefined,
                     selectionCards: this.selectionCards,
                     isAllFacilitiesChecked: this.isAllFacilitiesChecked,
                     title: "Erreichbarkeit " + this.cardCounter++
@@ -703,10 +705,6 @@ export default {
                 this.setCoordinate([]);
                 this.showSpinner = false;
             }
-
-            // this line adds the accessibility analysis data selection to the selection manger
-            // this does not seem to make much sense: the only reason to reproduce this would be to reproduce the accessibility analysis. However, since the accessibility analysis creates this selection on the fly, we need the previous selection for reproduction, not this one. this one is then recreated on the fly everytime the analysis is run. Leaving this in in case we want this for some reason down the line.
-            // this.addNewSelection({selection: analysisSet.results, source: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.title"), id: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes." + this._transportType) + ", " + this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits." + this.scaleUnit) + ", [...]"});
         },
 
         setPopulationSize () {
@@ -751,7 +749,6 @@ export default {
         },
         removeAll () {
             this.setCoordinate([]);
-            this.setSelectedFacilities([]);
             this.setSteps([0, 0, 0]);
             this.setIsochroneFeatures([]);
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
@@ -837,7 +834,7 @@ export default {
             this.removeAll();
             this.setScaleUnit(evt);
         },
-        test (val) {
+        updateTransportType (val) {
             if (this.hasActiveSet) {
                 this.setActiveSet(null);
                 this.removeAll();
@@ -858,7 +855,14 @@ export default {
         removeSelectionCard (cardToRemove, removeFromColl = true) {
             this.setSelectedFacilityNames(this.selectedFacilityNames.filter(name => name !== cardToRemove.layerName));
             this.setActiveSet(null);
-            this.removePointMarkerFeature(cardToRemove.coord25832);
+            if (cardToRemove.coord25832.some(item => Array.isArray(item))) {
+                cardToRemove.coord25832.forEach(coord => {
+                    this.removePointMarkerFeature(coord);
+                });
+            }
+            else {
+                this.removePointMarkerFeature(cardToRemove.coord25832);
+            }
             this.selectionCards = this.selectionCards.filter(card => !deepEqual(card, cardToRemove));
             if (removeFromColl) {
                 const index = this.select.getFeatures().getArray().findIndex(feat => feat.getId() === cardToRemove.feature.getId());
@@ -887,12 +891,6 @@ export default {
          */
         isSetActive (set) {
             return this.activeSet === this.dataSets.indexOf(set);
-        },
-
-
-        removeAllMarkerCards () {
-            this.selectionCards = [];
-            this.removePointMarker();
         },
 
         /**
@@ -935,19 +933,52 @@ export default {
             const result = [],
                 name = this.getScaleUnitByType(data.inputs?.scaleUnit)?.name,
                 title = name === "Zeit" ? data.inputs?.time + " Minuten" : data.inputs?.distance + " Meter",
-                pointDes = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0]?.text : "Mehrere " + data.inputs.selectionCards[0]?.text,
-                coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.coordinate[0].map(c => c.toFixed(6)).join(", ") : "",
+                pointDes = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].layerName : "Mehrere: " + [...new Set(data.inputs.selectionCards.map(card => card.layerName))],
+                coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].text : "",
                 icon = data.inputs.selectionCards[0]?.icon,
                 population = data.inputs.einwohner;
 
             result.push({label: name, value: title});
-            result.push({icon: icon, label: pointDes, value: coordinate});
+            if (data.inputs.selectionCards.length > 1 && data.inputs.useOuterBoundaries) {
+                result.push({icon: icon, label: pointDes, value: "Flächenaußengrenzen"});
+            }
+            else {
+                result.push({icon: icon, label: pointDes, value: coordinate});
+
+            }
             result.push({icon: "bi bi-people", label: "Einwohner: " + population});
             if (data.inputs.useTravelTimeIndex) {
                 result.push({icon: "bi bi-sliders", label: `Reisezeitindex: ${data.inputs.travelTimeIndex}, Tageszeit: ${data.inputs.travelTime}:00\u00A0Uhr`});
             }
 
             return result;
+        },
+
+
+        /**
+         * Resets the selection cards by removing all current selections and re-adding them.
+         * @returns {void}
+         */
+        resetSelectionCards () {
+            const cards = [...this.selectionCards];
+
+            this.removeAll();
+            cards.forEach(card => {
+                this.setCoordinateFromFeature(card.feature, card.featureName, card.layerName);
+            });
+        },
+
+        /**
+         * Toggles the use of outer boundaries for the analysis.
+         * @param {boolean} value - True if outer boundaries should be set, false otherwise.
+         * @returns {void}
+         */
+        toggleOuterBoundaries (value) {
+            this.setUseOuterBoundaries(value);
+            this.setActiveSet(null);
+            if (this.selectionCards.length) {
+                this.resetSelectionCards();
+            }
         },
 
         updateSelectedFacilityNames (newValue) {
@@ -974,16 +1005,10 @@ export default {
 
 <template lang="html">
     <div id="accessibilityanalysis">
-        <AccordionItem
-            id="accessibility-analysis-information"
-            icon="bi bi-info-circle"
-            :title="'Information'"
-        >
-            <ToolInfo
-                :url="readmeUrl"
-                :summary="$t('additional:modules.tools.cosi.accessibilityAnalysis.description')"
-            />
-        </AccordionItem>
+        <ToolInfo
+            :url="readmeUrl"
+            :summary="$t('additional:modules.tools.cosi.accessibilityAnalysis.description')"
+        />
         <hr class="mt-0">
         <TabBar
             class="mb-4"
@@ -1020,12 +1045,21 @@ export default {
             >
                 <SimpleCard
                     :icon="card.icon"
-                    :label="card.text"
-                    :text="card.name || card.coord25832.toString()"
+                    :label="card.label"
+                    :text="card.text"
                     @click:close="removeSelectionCard(card)"
                 />
             </div>
         </div>
+        <SwitchInput
+            v-if="mode === 'facility'"
+            :id="'featureOutline'"
+            :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
+            :checked="useOuterBoundaries"
+            :interaction="() => toggleOuterBoundaries(!useOuterBoundaries)"
+            :label="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
+            class="mb-3"
+        />
         <div
             v-if="mode !== 'path'"
         >
@@ -1042,7 +1076,7 @@ export default {
                     :aria="'test'"
                     :icon="type.icon"
                     :title="type.name"
-                    :interaction="() => test(type.type)"
+                    :interaction="() => updateTransportType(type.type)"
                     :class-array="['btn-light', 'mb-0', type.type === transportType ? 'active': '']"
                     :label="type.name"
                 />
@@ -1067,15 +1101,6 @@ export default {
             :unit="getScaleUnitByType(scaleUnit).unit"
             :model-value="scaleUnit === 'time' ? time : distance"
             @update:model-value="updateDistance"
-        />
-        <SwitchInput
-            v-if="mode === 'facility'"
-            :id="'featureOutline'"
-            :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
-            :checked="setByFeature"
-            :interaction="() => setSetByFeature(!setByFeature)"
-            :label="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
-            class="mb-3"
         />
         <div
             v-if="transportType === 'driving-car' && scaleUnit === 'time' && mode === 'point'"

@@ -1,17 +1,17 @@
 import {createIsochrones} from "../utils/createIsochrones.js";
 
 const actions = {
-    async getIsochrones ({rootGetters, getters, commit}, params) {
+    async getIsochrones ({rootGetters, getters}, params) {
         let ret;
 
         try {
-            ret = await createIsochrones({...params, batchSize: getters.batchSize, projectionCode: rootGetters["Maps/projectionCode"]}, (p) => commit("setProgress", p));
+            ret = await createIsochrones({...params, batchSize: getters.batchSize, projectionCode: rootGetters["Maps/projectionCode"]});
         }
         catch {
-            ret = await createIsochrones({...params, batchSize: getters.batchSize, projectionCode: rootGetters["Maps/projectionCode"]}, (p) => commit("setProgress", p));
+            ret = await createIsochrones({...params, batchSize: getters.batchSize, projectionCode: rootGetters["Maps/projectionCode"]});
         }
         finally {
-            commit("setProgress", 0);
+            console.warn("Isochrone request finished");
         }
         return ret;
     }
