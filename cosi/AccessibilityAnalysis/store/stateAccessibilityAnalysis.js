@@ -30,10 +30,28 @@ const state = {
     selectedFacilities: [],
     setByFeature: false,
     setBySearch: false,
+    rangeSettings: {
+        "driving-car": {},
+        "cycling-regular": {},
+        "foot-walking": {},
+        "wheelchair": {},
+        "default": {
+            time: {
+                value: 20,
+                max: 120,
+                min: 0
+            },
+            distance: {
+                value: 1000,
+                max: 10000,
+                min: 0
+            }
+        }
+    },
     transportType: "driving-car",
     scaleUnit: "time",
-    distance: 5,
-    time: 9,
+    distance: 0,
+    time: 0,
     travelTime: "9",
     steps: [0, 0, 0],
     dataSets: [],

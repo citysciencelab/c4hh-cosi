@@ -111,24 +111,17 @@ export default {
             ],
             scaleUnits: [
                 {
-                    default: 20,
-                    max: 180,
-                    maxLabel: "180 min",
-                    minLabel: "0 min",
                     name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits.time"),
                     type: "time",
                     unit: "min"
                 },
                 {
-                    default: 1000,
-                    max: 10000,
-                    maxLabel: "10.000 m",
-                    minLabel: "0 m",
                     name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.scaleUnits.distance"),
                     type: "distance",
                     unit: "m"
                 }
             ],
+            sliderRerenderKey: 0,
             legendColors: [
                 "rgba(0, 240, 3, 0.6)",
                 "rgba(200, 200, 3, 0.6)",
@@ -275,6 +268,14 @@ export default {
             }
         },
 
+        /**
+         * Forces the slider to rerender on scale unit change.
+         * @returns {void}
+         */
+        scaleUnit () {
+            this.sliderRerenderKey++;
+        },
+
         visibleVectorLayers (newValues) {
             this.setFacilityNames(newValues);
         },
@@ -321,6 +322,7 @@ export default {
         this.directionsLayer.getLayer().setSource(this.directionsRouteSource);
 
         mapCollection.getMap("2D").addEventListener("click", this.onMapClick);
+        this.setDefaults();
         // onSearchbar(this.setSearchResultToOrigin);
         // onShowFeaturesById(this.tryUpdateIsochrones);
         // onShowAllFeatures(this.tryUpdateIsochrones);
@@ -498,8 +500,8 @@ export default {
             this.isAllFacilitiesChecked = false;
             this.setTransportType("driving-car");
             this.setScaleUnit("time");
-            this.setTime(this.scaleUnits[0].default);
-            this.setDistance(this.scaleUnits[1].default);
+            this.setTime(this.rangeSettings[this.transportType]?.time?.value ?? this.rangeSettings.default.time.value);
+            this.setDistance(this.rangeSettings[this.transportType]?.distance?.value ?? this.rangeSettings.default.distance.value);
         },
 
         /**
@@ -1053,9 +1055,10 @@ export default {
             @show-view="toggleLevel"
         />
         <LabeledSlider
+            :key="sliderRerenderKey"
             class="mb-3"
-            :min="0"
-            :max="getScaleUnitByType(scaleUnit).max"
+            :min="rangeSettings[transportType]?.[scaleUnit]?.min ?? rangeSettings.default[scaleUnit].min"
+            :max="rangeSettings[transportType]?.[scaleUnit]?.max ?? rangeSettings.default[scaleUnit].max"
             :unit="getScaleUnitByType(scaleUnit).unit"
             :model-value="scaleUnit === 'time' ? time : distance"
             @update:model-value="updateDistance"
