@@ -79,8 +79,7 @@ export default {
             "2021"
         ],
         selectedYear: [],
-        printReportView: false,
-        categoryMapping: categoryMapping
+        printReportView: false
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
@@ -92,6 +91,17 @@ export default {
         ...mapGetters("Modules/ReportingTool", ["readmeUrl"]),
         ...mapGetters(["restServiceById"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
+
+        /**
+         * Gets the category mapping defined in the assets file including the current accessibility analyses.
+         * @returns {Object} The category mapping object including the analyses as items.
+         */
+        categoryMapping () {
+            const cM = categoryMapping;
+
+            cM.analyses.find(cardType => cardType.key === "accessibilityAnalyses").items = this.dataSets;
+            return cM;
+        },
 
         /**
          * Generates a file name for the report.

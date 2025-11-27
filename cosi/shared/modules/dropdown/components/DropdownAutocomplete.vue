@@ -2,7 +2,6 @@
 import {VAutocomplete} from "vuetify/components/VAutocomplete";
 import {VCheckboxBtn} from "vuetify/components/VCheckbox";
 import {VChip} from "vuetify/components/VChip";
-import {VCombobox} from "vuetify/components/VCombobox";
 import {VListItem} from "vuetify/components/VList";
 import {VSkeletonLoader} from "vuetify/components/VSkeletonLoader";
 
@@ -12,7 +11,6 @@ export default {
         VAutocomplete,
         VCheckboxBtn,
         VChip,
-        VCombobox,
         VListItem,
         VSkeletonLoader
     },
@@ -164,7 +162,7 @@ export default {
                 </span>
             </template>
         </v-autocomplete>
-        <v-combobox
+        <v-autocomplete
             v-else
             :model-value="modelValue"
             :items="items"
@@ -176,7 +174,7 @@ export default {
 </template>
 
 <style lang="scss">
-    .v-autocomplete, .v-combobox {
+    .v-autocomplete {
         .v-field__overlay {
             background-color: unset;
         }
@@ -210,7 +208,7 @@ export default {
             }
         }
     }
-    .v-autocomplete__content, .v-combobox__content {
+    .v-autocomplete__content {
         .v-list-item {
             &:hover {
                 background-color: $secondary;

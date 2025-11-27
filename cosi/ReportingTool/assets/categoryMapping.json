@@ -75,6 +75,15 @@
   ],
   "analyses": [
     {
+      "items": [],
+      "expandable": false,
+      "icon": "bi bi-geo",
+      "key": "accessibilityAnalyses",
+      "multiple": false,
+      "name": "Erreichbarkeitsanalysen",
+      "tag": "Erreichbarkeitsanalysen"
+    },
+    {
       "expandable": false,
       "icon": "bi bi-pencil",
       "key": "textArea",
@@ -89,15 +98,6 @@
       "multiple": true,
       "name": "Überschrift",
       "tag": null
-    },
-    {
-      "items": [],
-      "expandable": false,
-      "icon": "bi bi-geo",
-      "key": "accessibilityAnalysis",
-      "multiple": true,
-      "name": "Erreichbarkeitsanalyse",
-      "tag": "Erreichbarkeitsanalyse"
     }
   ],
   "annex": [

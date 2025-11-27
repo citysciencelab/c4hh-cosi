@@ -45,6 +45,7 @@ export default {
     },
     data () {
         return {
+            activelyClosedNonMultipleCardNames: [],
             cards: [],
             isCollapsed: false,
             customText: "",
@@ -52,12 +53,10 @@ export default {
         };
     },
     mounted () {
-        this.cards = this.cardMapping.reduce((cards, item) => {
-            if (item?.key !== "textArea" && item?.key !== "heading") {
-                cards.push({...item, id: uniqueId("reporting-tool-card-")});
-            }
-            return cards;
-        }, []);
+        this.initializeCards();
+    },
+    activated () {
+        this.initializeCards();
     },
 
     methods: {
@@ -77,14 +76,47 @@ export default {
          * @returns {Array} The filtered dropdown items.
          */
         getDropdownItems () {
-            const usedNames = this.cards.map(card => card.name);
+            const usedNames = this.cards.map(card => card.name),
+                filteredCardTypes = this.cardMapping.filter(cardType => cardType.multiple || !usedNames.includes(cardType.name)),
+                dropdownItems = [];
 
-            return this.cardMapping.filter(item => {
-                if (!item.multiple && usedNames.includes(item.name)) {
-                    return false;
+            filteredCardTypes.forEach(cardType => {
+                if (Array.isArray(cardType.items)) {
+                    const filteredItems = cardType.items.filter(item => cardType.multiple || !usedNames.includes(item.inputs.title));
+
+                    filteredItems.forEach(item => {
+                        dropdownItems.push(item.inputs.title);
+                    });
                 }
-                return true;
-            }).map(item => item.name);
+                else {
+                    dropdownItems.push(cardType.name);
+                }
+            });
+            return dropdownItems;
+        },
+
+        /**
+         * Initializes the cards array based on the cardMapping prop,
+         * excluding certain card types as well as cards that have been actively closed.
+         * @returns {void}
+         */
+        initializeCards () {
+            this.cards = [];
+            this.cardMapping.forEach(cardType => {
+                if (cardType.key === "textArea" || cardType.key === "heading") {
+                    return;
+                }
+                if (Array.isArray(cardType.items)) {
+                    cardType.items.forEach(item => {
+                        if (this.activelyClosedNonMultipleCardNames.includes(item.inputs.title)) {
+                            return;
+                        }
+                        this.cards.push({...cardType, name: item.inputs.title, id: uniqueId("reporting-tool-card-")});
+                    });
+                    return;
+                }
+                this.cards.push({...cardType, id: uniqueId("reporting-tool-card-")});
+            });
         },
 
         /**
@@ -95,22 +127,32 @@ export default {
          * @returns {void}
          */
         mergeCardAttributes (index, value) {
-            const obj = this.cardMapping.find(item => item.name === value);
+            const obj = this.cardMapping.find(item => item.name === value)
+                || this.cardMapping
+                    .find(cardType => Array.isArray(cardType.items)
+                        && cardType.items.some(subItem => subItem.inputs.title === value));
 
             if (typeof obj === "undefined") {
                 this.resetCard(index);
                 return;
             }
             this.cards[index] = Object.assign({}, this.cards[index], obj);
+            if (Array.isArray(obj?.items)) {
+                this.cards[index].name = value;
+            }
         },
 
         /**
          * Removes a card from the cards array at the specified index.
          * @param {Number} index - Index of the card to remove
+         * @param {Object} card - The card object to remove
          * @returns {void}
          */
-        removeCard (index) {
+        removeCard (index, card) {
             this.cards.splice(index, 1);
+            if (!card.multiple) {
+                this.activelyClosedNonMultipleCardNames.push(card.name);
+            }
         },
 
         /**
@@ -193,7 +235,7 @@ export default {
                 class="mb-3 d-flex flex-nowrap"
                 :class="[cards.length > 1 ? 'col col-10' : 'col col-11']"
                 :icon="card.icon"
-                @click:close="removeCard(index)"
+                @click:close="removeCard(index, card)"
             >
                 <Badges
                     v-if="card.tag"
