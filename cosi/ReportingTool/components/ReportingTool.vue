@@ -79,7 +79,9 @@ export default {
             "2021"
         ],
         selectedYear: [],
-        printReportView: false
+        printReportView: false,
+        selectedStatGroups: [],
+        selectedInfrastructureData: []
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
@@ -173,7 +175,10 @@ export default {
     mounted () {
         this.selectedReportComponents = [this.frontPageContent[0]];
     },
-    activated: () => undefined,
+    activated () {
+        this.preparesInfrastructureData();
+        this.preparesStatGroups();
+    },
     deactivated: () => undefined,
     methods: {
 
@@ -816,10 +821,10 @@ export default {
             this.selectedReportComponents.push(frontPagelabel.label);
         },
         /**
-         * Gets the statistical data depending on filtered data.
-         * @returns {Object[]} the groups of the statistical data.
+         * Prepares the statistical data depending on filtered data.
+         * @returns {void}
          */
-        getStatGroups () {
+        preparesStatGroups () {
             const allStatGroups = Object.groupBy(this.initMapping, (obj) => obj.group);
 
             if (this.statsFeatureFilter.length) {
@@ -828,19 +833,36 @@ export default {
                     }),
                     groups = Object.groupBy(filtered, (obj) => obj.group);
 
-                return Object.keys(groups);
+                this.selectedStatGroups = Object.keys(groups);
             }
-
-            return Object.keys(allStatGroups);
+            else {
+                this.selectedStatGroups = Object.keys(allStatGroups);
+            }
         },
         /**
          * Prepares the geospatial data.
-         * @returns {Object[]} the layer names.
+         * @returns {void}
          */
-        getInfrastructureData () {
+        preparesInfrastructureData () {
             const topicName = Object.groupBy(this.featuresListItems, (topic) => topic.layerName);
 
-            return Object.keys(topicName);
+            this.selectedInfrastructureData = Object.keys(topicName);
+        },
+        /**
+         * Updates the order of statistical data.
+         * @param {Object[]} groups The groups in the correct order.
+         * @returns {void}
+         */
+        updateStatGroups (groups) {
+            this.selectedStatGroups = groups;
+        },
+        /**
+         * Updates the order of the geospatial data.
+         * @param {Object[]} data The layer names in the correct order.
+         * @returns {void}
+         */
+        updateInfratsructureData (data) {
+            this.selectedInfrastructureData = data;
         }
     }
 };
@@ -965,7 +987,8 @@ export default {
                             :card-mapping="categoryMapping?.statData"
                             :title="'2. ' + $t('additional:modules.cosi.reportingTool.statisticalData')"
                             :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noStatisticalDataSelected')"
-                            :groups="getStatGroups()"
+                            :groups="selectedStatGroups"
+                            @set-order-of-cards="updateStatGroups"
                         />
                         <AlertMessage
                             v-else
@@ -1000,7 +1023,8 @@ export default {
                                 :card-mapping="categoryMapping?.subjectData"
                                 :title="'3. ' + $t('additional:modules.cosi.reportingTool.subjectData')"
                                 :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noSubjectDataSelected')"
-                                :groups="getInfrastructureData()"
+                                :groups="selectedInfrastructureData"
+                                @set-order-of-cards="updateInfratsructureData"
                             />
                         </template>
                         <AlertMessage

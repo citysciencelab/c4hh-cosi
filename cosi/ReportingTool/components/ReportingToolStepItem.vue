@@ -43,6 +43,7 @@ export default {
             default: null
         }
     },
+    emits: ["setOrderOfCards"],
     data () {
         return {
             activelyClosedNonMultipleCardNames: [],
@@ -52,13 +53,22 @@ export default {
             customHeading: ""
         };
     },
+    computed: {
+        draggableCards: {
+            get () {
+                return this.groups;
+            },
+            set (newValue) {
+                this.$emit("setOrderOfCards", newValue);
+            }
+        }
+    },
     mounted () {
         this.initializeCards();
     },
     activated () {
         this.initializeCards();
     },
-
     methods: {
         /**
          * Adds a new card to the cards array.
@@ -268,22 +278,22 @@ export default {
                         </small>
                     </a>
                     <div v-if="isCollapsed">
-                        <div
-                            v-for="group in groups"
-                            :key="group"
-                            class="mt-2"
+                        <Draggable
+                            v-model="draggableCards"
                         >
-                            <Draggable>
-                                <div class="card mb-2">
-                                    <div class="row card-body py-1">
-                                        <i class="col col-1 bi bi-grip-vertical fs-3 ps-0" />
-                                        <div class="col-11 mt-2">
-                                            {{ group }}
-                                        </div>
+                            <div
+                                v-for="(group, idx) in draggableCards"
+                                :key="idx"
+                                class="card drag-card mb-2"
+                            >
+                                <div class="row card-body py-1">
+                                    <i class="col col-1 bi bi-grip-vertical fs-3 ps-0" />
+                                    <div class="col-11 mt-2">
+                                        {{ group }}
                                     </div>
                                 </div>
-                            </Draggable>
-                        </div>
+                            </div>
+                        </Draggable>
                     </div>
                 </div>
                 <div v-if="card.key === 'textArea'">
@@ -314,3 +324,8 @@ export default {
         @click="addCard"
     />
 </template>
+<style scoped lang="scss">
+.drag-card {
+    cursor: grab;
+}
+</style>
