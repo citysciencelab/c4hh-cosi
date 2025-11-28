@@ -211,40 +211,30 @@ export default {
             return selectedDistricts.map(district => district.getLabel());
         },
 
-        setColDividers () {
-            for (let i = 0; i < this.districtColumns.length; i++) {
-                if (this.districtColumns[i].districtLevel !== this.districtColumns[i + 1]?.districtLevel) {
-                    this.districtColumns[i].divider = true;
-                }
-                else {
-                    this.districtColumns[i].divider = false;
-                }
-            }
-        },
-
         /**
-         * Moves a district column left/right
-         * @param {Object} col - the column to move
-         * @param {0 | 1} [dir=0] - the direction to move, 0 = left, 1 = right
+         * Reorders the district columns based on the given array of column names.
+         * @param {String[]} columnNames - Array of column names in the desired order.
          * @returns {void}
          */
-        moveCol (col, dir = 0) {
-            // dont move left if index is 0
-            if (this.districtColumns.findIndex(_col => _col === col) === 0 && dir === 0) {
+        reorderColumns (columnNames) {
+            if (!columnNames.length) {
                 return;
             }
 
-            const i = this.districtColumns.findIndex(_col => _col === col),
-                c0 = this.districtColumns.slice(0, i - 1 + dir),
-                c1 = this.districtColumns.slice(i + 1 + dir),
-                cSwap = this.districtColumns.slice(i - 1 + dir, i + 1 + dir).reverse(),
-                cols = [...c0, ...cSwap, ...c1];
+            const newDistrictColumns = columnNames.map(name => {
+                return this.districtColumns.find(col => col.text === name);
+            });
 
-            this.districtColumns = cols;
-            this.setColDividers();
+            this.districtColumns = newDistrictColumns;
         },
 
-        minimizeCol (col) {
+        /**
+         * Minimizes or maximizes a column in the table.
+         * @param {String} name - The name of the column to be minimized or maximized.
+         */
+        minimizeCol (name) {
+            const col = this.districtColumns.find(districtColumn => districtColumn.value === name);
+
             col.minimized = !col.minimized;
             col.class = col.minimized ? "minimized" : "";
         },
@@ -707,6 +697,7 @@ export default {
                 <ToolInfo
                     :url="readmeUrl"
                     :locale="currentLocale"
+                    :is-open="false"
                 />
                 <AlertMessage
                     v-if="selectedDistrictNames.length === 0"
@@ -719,8 +710,11 @@ export default {
                 >
                     <DashboardToolbar
                         :stats-feature-filter="statsFeatureFilter"
+                        :district-columns="districtColumns"
                         @setStatsFeatureFilter="setStatsFeatureFilter"
                         @exportTable="exportTable"
+                        @toggleColumn="minimizeCol"
+                        @reorderColumns="reorderColumns"
                     />
                     <v-row class="dashboard-table-wrapper">
                         <v-data-table
@@ -766,32 +760,6 @@ export default {
                                         density="compact"
                                         hide-details
                                     />
-                                    <template v-if="!district.isAggregation">
-                                        <v-btn
-                                            class="move-col left"
-                                            icon="mdi-chevron-left"
-                                            size="small"
-                                            density="compact"
-                                            :title="$t('additional:modules.tools.cosi.dashboard.moveColLeft')"
-                                            @click="moveCol(district, 0)"
-                                        />
-                                        <v-btn
-                                            class="move-col right ml-3"
-                                            icon="mdi-chevron-right"
-                                            size="small"
-                                            density="compact"
-                                            :title="$t('additional:modules.tools.cosi.dashboard.moveColRight')"
-                                            @click="moveCol(district, 1)"
-                                        />
-                                        <v-btn
-                                            class="move-col minimize"
-                                            :icon="district.minimized ? 'mdi-eye-off' : 'mdi-eye'"
-                                            size="small"
-                                            density="compact"
-                                            :title="$t('additional:modules.tools.cosi.dashboard.minimizeCol')"
-                                            @click="minimizeCol(district)"
-                                        />
-                                    </template>
                                 </div>
                             </template>
                             <!-- Column Group -->
@@ -1022,20 +990,6 @@ export default {
             .district-header {
                 position: relative;
                 margin-top: 10px;
-                .move-col {
-                    position: absolute;
-                    top: -10px;
-                    font-size: 12px;
-                    &.left {
-                        left: 0px;
-                    }
-                    &.right {
-                        left: 10px;
-                    }
-                    &.minimize {
-                        right: 0px;
-                    }
-                }
             }
             .v-input {
                 font-size: unset;
@@ -1055,18 +1009,6 @@ export default {
 
             .v-input {
                 display: none;
-            }
-            .move-col {
-                &.left {
-                    display: none;
-                }
-                &.right {
-                    display: none;
-                }
-                &.minimize {
-                    left: -10px;
-                    right: unset;
-                }
             }
         }
 

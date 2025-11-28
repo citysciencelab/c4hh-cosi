@@ -1,15 +1,14 @@
 <script>
-import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import ButtonGroup from "../../../../components/ButtonGroup.vue";
+import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
-import {uniqueId} from "@shared/js/utils/uniqueId";
 
 export default {
     name: "ToolBar",
     components: {
-        AccordionItem,
         ButtonGroup,
+        Draggable: draggable,
         FlatButton,
         SwitchInput
     },
@@ -19,25 +18,14 @@ export default {
             required: false,
             default: undefined
         },
-        icon: {
-            type: [Boolean, String],
-            required: false,
-            default: false
-        },
-        isAccordion: {
-            type: Boolean,
-            required: false,
-            default: true
-        },
         enableCalculation: {
             type: Boolean,
             required: false,
             default: true
         },
-        title: {
-            type: String,
-            required: false,
-            default: ""
+        settingItems: {
+            type: Array,
+            required: true
         },
         showDetail: {
             type: [Boolean, Object],
@@ -45,101 +33,172 @@ export default {
             default: false
         }
     },
-    emits: ["exportTable"],
+    emits: ["exportTable", "reorderedSettingItems", "toggleSettingItem"],
     data () {
         return {
+            checkedSettingItems: {},
             groupButtons: [
                 {"icon": "bi-table", "name": "Tabelle"},
                 {"icon": "bi-bar-chart", "name": "Diagramm"}
-            ]
+            ],
+            settingItemList: this.settingItems.slice()
+        };
+    },
+    watch: {
+        /**
+         * Emits an event to notify that the setting items have been reordered.
+         * @param {Array} items - The reordered list of setting items.
+         * @returns {void}
+         */
+        settingItemList (items) {
+            this.$emit("reorderedSettingItems", items);
+        }
+    },
+    mounted () {
+        this.checkedSettingItems = {
+            ...this.settingItems.reduce((acc, item) => {
+                acc[item] = true;
+                return acc;
+            }, {})
         };
     },
     methods: {
-        uniqueId
+        /**
+         * Emits the toggleSettingItem event with the changed setting item
+         * @param {Objecet} evt - Change event
+         * @returns {void}
+         */
+        toggleSettingItem (evt) {
+            this.$emit("toggleSettingItem", evt.target.value);
+        }
     }
 };
 </script>
 
 <template>
     <div class="toolbar-container">
-        <component
-            :is="isAccordion ? 'AccordionItem' : 'div'"
-            :id="uniqueId()"
-            :icon="icon"
-            :title="title"
-            :is-open="true"
-        >
-            <div class="button-level d-flex">
-                <FlatButton
-                    id="table-settings"
-                    :aria-label="$t('common:shared.modules.table.settings')"
-                    :text="$t('common:shared.modules.table.settings')"
-                    :title="$t('common:shared.modules.table.settingsTooltip')"
-                    :icon="'bi-gear'"
-                    :class="'mb-1 me-3 rounded-pill'"
-                    :interaction="() => {}"
-                />
-                <FlatButton
-                    v-if="typeof optionalButton !== 'undefined'"
-                    id="optional-button"
-                    :aria-label="optionalButton.text"
-                    :text="optionalButton.text"
-                    :title="optionalButton.text"
-                    :icon="optionalButton.icon"
-                    :class="'mb-1 me-3 rounded-pill'"
-                    data-bs-toggle="dropdown"
-                    data-bs-auto-close="outside"
-                    :interaction="optionalButton.event"
-                />
-                <slot name="optionalDropdown" />
-                <FlatButton
-                    v-if="enableCalculation"
-                    id="calculation-button"
-                    :aria-label="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                    :text="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                    :title="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                    :icon="'bi-plus-slash-minus'"
-                    :class="'mb-1 me-3 rounded-pill'"
-                    :interaction="() => {}"
-                />
-                <FlatButton
-                    id="table-download"
-                    :aria-label="$t('common:shared.modules.buttons.download')"
-                    :text="$t('common:shared.modules.buttons.download')"
-                    :title="$t('common:shared.modules.buttons.download')"
-                    :icon="'bi-save'"
-                    :class="'me-0 rounded-pill download'"
-                    @click.native="$emit('exportTable', true)"
-                />
+        <div class="d-flex">
+            <FlatButton
+                id="table-settings"
+                :aria-label="$t('common:shared.modules.table.settings')"
+                :text="$t('common:shared.modules.table.settings')"
+                :title="$t('common:shared.modules.table.settingsTooltip')"
+                :icon="'bi-gear'"
+                :class="'mb-1 me-3 rounded-pill'"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside"
+            />
+            <div
+                class="dropdown-menu p-0 border-0 mt-1"
+                @click.stop=""
+            >
+                <Draggable
+                    v-model="settingItemList"
+                    class="ps-0 m-2"
+                    handle=".list-group-item-draggable"
+                    item-key="id"
+                    tag="ul"
+                >
+                    <template #item="{ element }">
+                        <li
+                            :key="element"
+                            class="list-group-item d-flex justify-content-between align-items-center p-2 rounded list-group-item-draggable"
+                        >
+                            <div class="ms-2 me-auto d-flex form-check">
+                                <input
+                                    :id="element"
+                                    v-model="checkedSettingItems[element]"
+                                    :value="element"
+                                    class="me-2 mt-1 form-check-input"
+                                    type="checkbox"
+                                    @change="toggleSettingItem"
+                                >
+                                <label
+                                    class="text-nowrap form-check-label"
+                                    :for="element"
+                                >
+                                    <span>
+                                        {{ element }}
+                                    </span>
+                                </label>
+                            </div>
+                            <span class="me-2">
+                                <i class="bi bi-grip-vertical" />
+                            </span>
+                        </li>
+                    </template>
+                </Draggable>
             </div>
-            <hr class="mt-0">
-            <div class="d-flex">
-                <ButtonGroup
-                    class="mb-3 me-3"
-                    :buttons="groupButtons"
-                    group="tableDiagramm"
-                    @show-view="() => {}"
-                />
-                <SwitchInput
-                    v-if="showDetail"
-                    id="show-detail"
-                    :aria="$t('additional:modules.tools.cosi.dashboard.dietailView')"
-                    :checked="showDetail.visibility"
-                    :interaction="() => {}"
-                    :label="$t('additional:modules.tools.cosi.dashboard.dietailView')"
-                    class="mb-3 pt-1"
-                />
-            </div>
-        </component>
+            <slot name="table-settings" />
+            <FlatButton
+                v-if="typeof optionalButton !== 'undefined'"
+                id="optional-button"
+                :aria-label="optionalButton.text"
+                :text="optionalButton.text"
+                :title="optionalButton.text"
+                :icon="optionalButton.icon"
+                :class="'mb-1 me-3 rounded-pill'"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside"
+                :interaction="optionalButton.event"
+            />
+            <slot name="optionalDropdown" />
+            <FlatButton
+                v-if="enableCalculation"
+                id="calculation-button"
+                :aria-label="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
+                :text="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
+                :title="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
+                :icon="'bi-plus-slash-minus'"
+                :class="'mb-1 me-3 rounded-pill'"
+                :interaction="() => {}"
+            />
+            <FlatButton
+                id="table-download"
+                :aria-label="$t('common:shared.modules.buttons.download')"
+                :text="$t('common:shared.modules.buttons.download')"
+                :title="$t('common:shared.modules.buttons.download')"
+                :icon="'bi-save'"
+                class="me-0 rounded-pill ms-auto"
+                @click.native="$emit('exportTable', true)"
+            />
+        </div>
+        <hr class="mt-0">
+        <div class="d-flex">
+            <ButtonGroup
+                class="mb-3 me-3"
+                :buttons="groupButtons"
+                group="tableDiagramm"
+                @show-view="() => {}"
+            />
+            <SwitchInput
+                v-if="showDetail"
+                id="show-detail"
+                :aria="$t('additional:modules.tools.cosi.dashboard.dietailView')"
+                :checked="showDetail.visibility"
+                :interaction="() => {}"
+                :label="$t('additional:modules.tools.cosi.dashboard.dietailView')"
+                class="mb-3 pt-1"
+            />
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-    .button-level {
-        .download {
-            margin-left: auto;
-            order: 2;
+    .dropdown-menu {
+        --bs-dropdown-min-width: 25em;
+        overflow: auto;
+        li {
+            cursor: grab;
+            input:hover {
+                cursor: pointer;
+            }
+            .form-check-label {
+                cursor: pointer;
+            }
+            &:hover {
+                background: $light_blue;
+            }
         }
     }
-
 </style>

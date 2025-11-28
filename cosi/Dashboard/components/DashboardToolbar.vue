@@ -26,12 +26,16 @@ export default {
         VDivider
     },
     props: {
+        districtColumns: {
+            type: Array,
+            required: true
+        },
         statsFeatureFilter: {
             type: Array,
             required: true
         }
     },
-    emits: ["exportTable"],
+    emits: ["exportTable", "reorderColumns", "setStatsFeatureFilter", "toggleColumn"],
     data: () => ({
         exportTimeline: false
     }),
@@ -50,6 +54,14 @@ export default {
             set (value) {
                 this.$emit("setStatsFeatureFilter", value);
             }
+        },
+
+        /**
+         * Get column names from districtColumns prop.
+         * @returns {String[]} Array of column names.
+         */
+        columnNames () {
+            return this.districtColumns.map(col => col.text);
         }
     },
     methods: {
@@ -61,6 +73,14 @@ export default {
 
         exportTable (val) {
             this.$emit("exportTable", this.exportTimeline || val);
+        },
+
+        reorderSettingItems (settingItems) {
+            this.$emit("reorderColumns", settingItems);
+        },
+
+        toggleSettingItem (columnName) {
+            this.$emit("toggleColumn", columnName);
         }
     }
 };
@@ -68,10 +88,12 @@ export default {
 
 <template>
     <ToolBar
+        :setting-items="columnNames"
         :show-detail="{'visibility': true}"
-        :is-accordion="false"
         :optional-button="{'text': 'Filter hinzufügen', 'icon': 'bi-funnel-fill', 'event': () => {}}"
         @exportTable="exportTable"
+        @reorderedSettingItems="reorderSettingItems"
+        @toggleSettingItem="toggleSettingItem"
     >
         <template #optionalDropdown>
             <div
@@ -169,4 +191,5 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+
 </style>
