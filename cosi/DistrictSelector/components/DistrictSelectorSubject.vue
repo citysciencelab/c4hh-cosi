@@ -11,7 +11,7 @@ import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import {MultiPolygon, Polygon} from "ol/geom";
 import {polygon as turfPolygon} from "@turf/helpers";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
@@ -80,6 +80,7 @@ export default {
         this.selectedInteraction = "";
     },
     methods: {
+        ...mapActions("Maps", ["zoomToExtent"]),
         ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId"]),
 
         addCard (feature, buffer, districtNames, status, districtLevelId, districtLevelLabel) {
@@ -290,6 +291,15 @@ export default {
         },
 
         /**
+         * Sets the subject feature from imported features and zooms to its extent.
+         * @param {ol/Feature[]} features - The imported features to set as the subject feature.
+         */
+        setSubjectFeatureFromImport (features) {
+            this.setSubjectFeature(features, this.activeCard.buffer);
+            this.zoomToExtent({extent: this.activeCard.subjectFeature.getGeometry().getExtent()});
+        },
+
+        /**
          * Toggles the status of a card at the specified index.
          * @param {Number} index - Index of the card to toggle
          * @return {void}
@@ -411,7 +421,7 @@ export default {
             />
         </div>
         <DistrictSelectorSubjectImport
-            @set-imported-feature="setSubjectFeature($event, activeCard.buffer)"
+            @set-imported-feature="setSubjectFeatureFromImport"
         />
         <FlatButton
             :aria="$t('additional:modules.cosi.districtSelector.resetArea')"

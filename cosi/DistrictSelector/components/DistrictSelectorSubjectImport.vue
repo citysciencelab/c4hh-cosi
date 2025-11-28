@@ -110,7 +110,7 @@ export default {
 <template lang="html">
     <AccordionItem
         :id="uniqueId()"
-        :is-open="true"
+        :is-open="false"
         :title="$t('additional:modules.cosi.districtSelector.importHeader')"
     >
         <FileUpload
