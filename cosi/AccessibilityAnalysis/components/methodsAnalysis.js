@@ -26,7 +26,6 @@ export default {
     createIsochrones: async function () {
         this.setSteps([0, 0, 0]);
         this.setIsochroneFeatures([]);
-
         try {
             if (this.mode === "point" || this.mode === "facility") {
                 await this.createIsochronesPoint();
@@ -142,6 +141,7 @@ export default {
 
         styleIsochroneFeatures(newFeatures, this.isochroneColors);
         this.getLayerById("accessibility-analysis").getLayer().getSource().addFeatures(newFeatures);
+        this.zoomToExtent({extent: this.getLayerById("accessibility-analysis").getLayer().getSource().getExtent()});
         if (this.mode !== "region") {
             this.setIsochroneAsBbox();
         }

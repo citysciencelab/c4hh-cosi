@@ -342,19 +342,17 @@ export default {
         this.setDefaults();
     },
     methods: {
-        ...mapActions("Maps", ["setCenter", "removeInteraction", "addInteraction"]),
+        ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent"]),
         ...mapMutations("Modules/PopulationRequest", {
             setPopulationRequestGeometry: "setGeometry",
             setPopulationRequestActive: "setActive"
         }),
         ...mapMutations("Modules/AccessibilityAnalysis", Object.keys(mutations)),
         ...mapActions("Modules/AccessibilityAnalysis", ["getIsochrones"]),
-        // ...mapActions("Tools/SelectionManager", ["addNewSelection"]),
         ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "removePointMarkerFeature"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapActions("Modules/Routing/Directions", ["reset", "setRoutingDirections"]),
         ...methods,
-
 
         /**
          * Adds selection cards for all features in the given layer.
