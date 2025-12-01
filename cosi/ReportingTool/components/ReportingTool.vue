@@ -46,7 +46,6 @@ export default {
     data: () => ({
         infrastructureTableLimit: 10,
         infrastructureTableLimitEnabled: false,
-        percentage: 50,
         reportTitle: "",
         reportTitleMaxLength: 50,
         selectedAreasName: "",
@@ -54,6 +53,26 @@ export default {
         authorMaxLength: 35,
         freeHeadline: "",
         freeText: "",
+        frontPageItems: [
+            {
+                alert: undefined,
+                label: "Titelseite mit Kartenausschnitt",
+                selected: true,
+                value: "withoutNeuwerk"
+            },
+            {
+                alert: "Achtung Achtung",
+                label: "Titelseite mit Kartenausschnitt inkl. Neuwerk",
+                selected: false,
+                value: "withNeuwerk"
+            },
+            {
+                alert: undefined,
+                label: "Keine Titelseite",
+                selected: false,
+                value: "withoutFrontPage"
+            }
+        ],
         pdf: null,
         categoryInChart: [
             {"Bevölkerung": "Bevölkerung insgesamt"},
@@ -63,21 +82,9 @@ export default {
             {"Bevölkerung Migrationshintergrund": "Ausländer insgesamt"}
         ],
         reportLoader: false,
-        selectedReportComponents: [],
         selectedCategoryInChart: [],
         page: 1,
         isAllAreasSummariseChecked: false,
-        frontPageContent: [
-            "Titelseite mit Kartenausschnitt",
-            "Titelseite mit Kartenausschnitt inkl. Neuwerk",
-            "Keine Titelseite"
-        ],
-        years: [
-            "2024",
-            "2023",
-            "2022",
-            "2021"
-        ],
         selectedYear: [],
         printReportView: false,
         selectedStatGroups: [],
@@ -158,22 +165,14 @@ export default {
                 .filter(dist => this.selectedDistrictNames.includes(dist.getName()))
                 .map(dist => dist.getLabel());
         },
+
         /**
-         * Gets an array of front page labels with their corresponding selection status.
-         * Each object in the returned array contains:
-         * - `label`: The label of the district level.
-         * - `selected`: A boolean indicating whether the district level is currently selected.
-         * @returns {Object[]} An array of objects representing front page item labels.
+         * Gets the selected front page item.
+         * @returns {Object} The selected front page item.
          */
-        frontPageItems () {
-            return this.frontPageContent.map(label => ({
-                label: label,
-                selected: this.selectedReportComponents.includes(label)
-            }));
+        selectedFrontPageItem () {
+            return this.frontPageItems.find(item => item.selected === true);
         }
-    },
-    mounted () {
-        this.selectedReportComponents = [this.frontPageContent[0]];
     },
     activated () {
         this.preparesInfrastructureData();
@@ -192,7 +191,7 @@ export default {
             this.pdf.resetDocContent();
             this.pdf.addHeader(this.reportTitle.trim());
             this.pdf.setAuthor(this.author.trim());
-            await this.addOverViewPageToReport();
+            await this.addOverViewPage(this.selectedFrontPageItem.value);
             this.addStatsToReport(this.items);
             await this.addReferencesToReport(this.items);
             this.addTopicsToReport(this.featuresListItems);
@@ -381,28 +380,66 @@ export default {
         },
         /**
          * Adds the overview page to the report.
+         * @param {String} frontPageValue - The selected front page option value.
          * @returns {void}
          */
-        async addOverViewPageToReport () {
+        async addOverViewPage (frontPageValue) {
+            if (frontPageValue === "withoutFrontPage") {
+                return;
+            }
             const imageName = "overviewMap",
                 feature = this.selectedFeatures.length > 1 ? unionFeatures(this.selectedFeatures) : this.selectedFeatures[0],
                 template = typeof feature !== "undefined" ?
                     this.getObjectCopyWithoutReference(baseProportionTemplate) :
                     this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
                 {downloadURL: overviewImageUrl, bbox} = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, "A4 Hochformat").catch(error => console.error(error)),
-                headline = this.reportTitle ? this.reportTitle.trim() : "Übersichtskarte";
+                headline = this.reportTitle ? this.reportTitle.trim() : "Übersichtskarte",
+                {imageHeight, imageWidth} = frontPageValue === "withNeuwerk" ? {imageHeight: 400, imageWidth: 500} : {imageHeight: 500, imageWidth: 500},
+                minimap = await this.addOverViewPageMinimap(template, bbox, "miniMap", "right"),
+                overviewInfos = this.addDetailViewToOverviewPage();
 
             if (typeof overviewImageUrl !== "string") {
                 return;
             }
             this.pdf.addChapter(headline);
-            this.pdf.addImageByUrl(overviewImageUrl, imageName, {fit: [500, 500], alignment: "center"});
+            this.pdf.addImageByUrl(overviewImageUrl, imageName, {fit: [imageWidth, imageHeight], alignment: "center"});
             this.pdf.addLineBreak();
-            await this.addDetailViewToOverviewPage(template, bbox);
+            if (frontPageValue === "withNeuwerk") {
+
+                this.pdf.addColumns([await this.addOverViewPageMinimap(template, [461000.14, 5973660.79, 468500.95, 5979481.62], "neuwerkMap", "left"), minimap]);
+                this.pdf.addLineBreak();
+                this.pdf.addColumns([overviewInfos]);
+            }
+            else {
+                this.pdf.addColumns([overviewInfos, minimap]);
+            }
             this.pdf.addLineBreak();
             this.pdf.addHeadline(this.freeHeadline);
             this.pdf.addParagraph(this.freeText);
             this.pdf.addLineBreak();
+        },
+
+        /**
+         * Adds a minimap to the overview page.
+         * @param {Object} template - A template for mapfish.
+         * @param {Number[]} bbox - A bbox to use for the minimap as feature coordinates.
+         * @param {String} imageName - The image name.
+         * @param {String} alignment - The alignment of the image in the doc.
+         * @returns {Promise<Object>} The image object for pdfmake.
+         */
+        async addOverViewPageMinimap (template, bbox, imageName, alignment) {
+            template.baseLayer.map.proportion = 0.25;
+            const {downloadURL: minimapImageUrl} = await this.prepareImage(
+                new Feature({geometry: fromExtent(bbox)}),
+                template,
+                this.projection.getCode(),
+                imageName,
+                mapfishServerConfig,
+                "rectangleTemplate"
+            ).catch(error => console.error(error));
+
+            this.pdf.addImageInstance(minimapImageUrl, imageName);
+            return {image: imageName, fit: [300, 150], alignment};
         },
 
         /**
@@ -436,21 +473,11 @@ export default {
         },
 
         /**
-         * Adds a detail box and a detail view for the overview page.
-         * @param {Object} template A template for mapfish.
-         * @param {Number[]} bbox A bbox to use for the overviewmap as feature coordinates.
-         * @returns {void}
+         * Adds a detail box.
+         * @returns {Object} The detail box for pdfmake.
          */
-        async addDetailViewToOverviewPage (template, bbox) {
-            template.baseLayer.map.proportion = 0.25;
-            const {downloadURL: minimapImageUrl} = await this.prepareImage(
-                    new Feature({geometry: fromExtent(bbox)}),
-                    template, this.projection.getCode(),
-                    "miniMap",
-                    mapfishServerConfig,
-                    "rectangleTemplate"
-                ).catch(error => console.error(error)),
-                text = [],
+        addDetailViewToOverviewPage () {
+            const text = [],
                 tableBody = [[
                     {
                         margin: [0, 4, 0, 4]
@@ -464,17 +491,14 @@ export default {
             });
             tableBody[0][0].text = text;
 
-            this.pdf.addImageInstance(minimapImageUrl, "miniMap");
-            this.pdf.addColumns([
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: [200],
-                        body: tableBody
-                    }
-                },
-                {image: "miniMap", fit: [300, 150], alignment: "right"}
-            ]);
+            return {
+                layout: "noBorders",
+                table: {
+                    headerRows: 1,
+                    widths: ["auto"],
+                    body: tableBody
+                }
+            };
         },
 
         /**
@@ -828,18 +852,10 @@ export default {
             if (typeof frontPagelabel === "undefined") {
                 return;
             }
+            const selectedFrontPageItem = this.frontPageItems.find(item => item.selected === true);
 
-            this.selectedReportComponents.forEach(v => {
-                this.frontPageContent.forEach(content => {
-                    if (v === content) {
-                        const index = this.selectedReportComponents.indexOf(v);
-
-                        this.selectedReportComponents.splice(index, 1);
-                    }
-                });
-            });
-
-            this.selectedReportComponents.push(frontPagelabel.label);
+            selectedFrontPageItem.selected = false;
+            frontPagelabel.selected = true;
         },
         /**
          * Prepares the statistical data depending on filtered data.
@@ -978,8 +994,8 @@ export default {
                                 @update:selected-items="updateFrontPageItems"
                             />
                             <AlertMessage
-                                v-if="selectedReportComponents.includes('Titelseite mit Kartenausschnitt inkl. Neuwerk')"
-                                :text="$t('additional:modules.cosi.reportingTool.alert.infoFrontPage')"
+                                v-if="selectedFrontPageItem.alert"
+                                :text="selectedFrontPageItem.alert"
                                 type="info"
                             />
                             <h6 class="mt-4 mb-3">
