@@ -17,9 +17,34 @@
  */
 const state = {
     active: false,
+    aggregateColumns: [
+        {
+            get text () {
+                return i18next.t("additional:modules.tools.cosi.dashboard.totalCol");
+            },
+            value: "total",
+            align: "end",
+            sortable: false,
+            groupable: false,
+            selected: false,
+            isAggregation: true
+        },
+        {
+            get text () {
+                return i18next.t("additional:modules.tools.cosi.dashboard.avgCol");
+            },
+            value: "average",
+            align: "end",
+            sortable: false,
+            groupable: false,
+            selected: false,
+            isAggregation: true
+        }
+    ],
     calculations: [],
     columnHeader: {},
     deactivateGFI: false,
+    districtColumns: [],
     excludedPropsForExport: ["visualized", "expanded", "years", "groupIndex"],
     exportGrouped: false,
     fixedHeader: false,
@@ -37,7 +62,10 @@ const state = {
     renderToWindow: false,
     resizableWindow: true,
     reportTemplateMode: null,
+    rows: [],
     statsFeatureFilter: [],
+    timestampPrefix: "jahr_",
+    timestamps: [],
     // these two variables are required to make this addon compatible with the toolBridge addon (for details see toolBridge documentation)
     toolBridgeIn: {settings: {}, type: "", outputCallback: null}, // accepts settings from toolBridge - must have a *watcher*
     toolBridgeOut: {}, // pass current settings to toolBridge - must have a *getter*,

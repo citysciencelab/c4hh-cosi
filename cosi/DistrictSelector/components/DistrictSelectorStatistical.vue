@@ -156,6 +156,7 @@ export default {
     methods: {
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent", "resetView"]),
+        ...mapActions("Modules/Dashboard", ["generateTable"]),
         ...mapActions("Modules/DistrictSelector", ["loadStatFeatures"]),
         ...mapMutations("Modules/DistrictSelector", Object.keys(mutations)),
         ...mapMutations("Modules/Filter", ["setFilterGeometry"]),
@@ -395,6 +396,8 @@ export default {
                     districtLevel: this.selectedDistrictLevel,
                     getStatFeatures: getFeature.getFeaturePOST,
                     districts: selectedDistricts
+                }).then(() => {
+                    this.generateTable();
                 });
             }
             else {

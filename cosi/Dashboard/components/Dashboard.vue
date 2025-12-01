@@ -4,8 +4,6 @@ import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersDashboard.js";
 import mutations from "../store/mutationsDashboard.js";
 import actions from "../store/actionsDashboard.js";
-import {getTimestamps} from "../../utils/timeline";
-import beautifyKey from "@shared/js/utils/beautifyKey.js";
 import TableRowMenu from "./TableRowMenu.vue";
 import {
     addCalculation,
@@ -66,7 +64,6 @@ export default {
     data () {
         return {
             dashboardOpen: false,
-            rows: [],
             baseColumns: [
                 {
                     value: "category",
@@ -90,31 +87,8 @@ export default {
                     groupable: false
                 }
             ],
-            aggregateColumns: [
-                {
-                    text: this.$t("additional:modules.tools.cosi.dashboard.totalCol"),
-                    value: "total",
-                    align: "end",
-                    sortable: false,
-                    groupable: false,
-                    selected: false,
-                    isAggregation: true
-                },
-                {
-                    text: this.$t("additional:modules.tools.cosi.dashboard.avgCol"),
-                    value: "average",
-                    align: "end",
-                    sortable: false,
-                    groupable: false,
-                    selected: false,
-                    isAggregation: true
-                }
-            ],
-            districtColumns: [],
             currentItems: [], // all current (visible) items in the table
             selectedItems: [], // selected items in the table
-            timestampPrefix: "jahr_",
-            timestamps: [],
             search: "",
             fields: {
                 A: null,
@@ -178,14 +152,6 @@ export default {
         },
 
         /**
-         * Checks whether there is at least one object with an orientation value in the mapping json.
-         * @returns {Boolean} True if there is an orientation value.
-         */
-        hasMappingOrientationValue () {
-            return this.mapping.some(obj => typeof obj.orientationValue !== "undefined");
-        },
-
-        /**
          * The mapped key from value
          * @returns {Object} the key map object
          */
@@ -220,6 +186,7 @@ export default {
             this.calculateAll();
             if (this.selectedDistrictNames.length > 0) {
                 this.generateTable();
+                this.currentTimeStamp = this.selectedYear;
             }
         }
     },
@@ -242,120 +209,6 @@ export default {
             const selectedDistricts = districts.filter(district => district.isSelected === true);
 
             return selectedDistricts.map(district => district.getLabel());
-        },
-
-        /**
-         * Generates the table data for the v-data-table (headers/columns, items/rows)
-         * @listens #Change:DistrictSelector/loadend on DistrictSelector/loadend
-         * @returns {void}
-         */
-        generateTable () {
-            this.timestamps = [];
-            this.handleOrientationColumn(this.hasMappingOrientationValue, this.aggregateColumns);
-            this.districtColumns = this.getColumns(this.selectedDistrictLevel, this.selectedDistrictNames, []);
-            this.rows = this.getRows();
-            this.setItems(this.getData());
-
-            this.currentTimeStamp = this.selectedYear;
-        },
-        /**
-         * Generates empty rows for all data categories
-         * taken from the mapping.json in /portal/cosi/config/ and set in config.json
-         * @returns {void}
-         */
-        getRows () {
-            let counter = 0;
-
-            return this.mapping.reduce((rows, category, index, array) => {
-                const level = this.selectedDistrictLevel?.label?.toLowerCase() || "";
-                let layerId;
-
-                if (level.includes("stat") || level.includes("gebiet")) {
-                    layerId = category.stat_gebiet;
-                }
-                else if (level.includes("stadt")) {
-                    layerId = category.stadtteil;
-                }
-                else if (level.includes("bezirk")) {
-                    layerId = category.bezirk;
-                }
-            return [
-                    ...rows,
-                    {
-                        visualized: false, // is the data visualized in the map
-                        expanded: false, // is the timeline expanded
-                        category: category.value,
-                        group: category.group,
-                        valueType: category.valueType,
-                        isTemp: category.isTemp,
-                        calculation: category.calculation,
-                        groupIndex: array[index].group !== array[index + 1]?.group ? counter++ : counter,
-                        orientationValue: category.orientationValue,
-                        layerId: layerId ? String(layerId) : undefined
-                    }
-                ];
-            }, []);
-        },
-        getData () {
-            return this.rows.map(row => this.getDistrictStatsByCategory(row), []);
-        },
-        getDistrictStatsByCategory (row) {
-            const districtStats = {
-                ...row
-            };
-
-            for (const col of this.districtColumns) {
-                const statFeature = col.district.statFeatures
-                    .find(feature => feature.get("kategorie") === row.category);
-
-                if (statFeature) {
-                    districtStats[col.value] = statFeature.getProperties();
-                }
-            }
-
-            districtStats.years = [...getTimestamps(districtStats, this.timestampPrefix)];
-            districtStats.id = districtStats.category + districtStats.groupIndex;
-            this.timestamps = districtStats.years.reduce((timestamps, timestamp) => {
-                return timestamps.includes(timestamp) ? timestamps : [timestamp, ...timestamps].sort().reverse();
-            }, this.timestamps);
-
-            return districtStats;
-        },
-        getColumns (districtLevel, districtNames, colList) {
-            const districts = districtLevel.displayAll
-                    ? districtLevel.districts
-                    : districtLevel.districts.filter(dist => districtNames.includes(dist.getName())),
-                refDistrictNames = [];
-            let district, refDistrictName;
-
-            for (district of districts) {
-                colList.push({
-                    text: beautifyKey(district.getLabel()),
-                    value: district.getLabel(),
-                    align: "end",
-                    district,
-                    districtLevel: districtLevel.label,
-                    sortable: false,
-                    groupable: false,
-                    selected: false,
-                    minimized: false
-                });
-
-                refDistrictName = district.getReferencDistrictName();
-
-                if (refDistrictName) {
-                    refDistrictNames.push(refDistrictName);
-                }
-            }
-
-            colList[colList.length - 1].divider = true;
-
-            if (districtLevel.referenceLevel) {
-                // add columns for reference areas
-                this.getColumns(districtLevel.referenceLevel, refDistrictNames, colList);
-            }
-
-            return colList;
         },
 
         setColDividers () {
@@ -823,42 +676,6 @@ export default {
                 result = arr.map((item) => ({...def, ...item}));
 
             return result;
-        },
-
-        /**
-         * Adds a column for the orientations values if it is not yet available and
-         * there is at least one orientation value in the mapping json.
-         * @param {Boolean} hasMappingOrientationValue - True if there is an orientation value.
-         * @param {Object[]} aggregateColumns - Columns for total and average values.
-         * @returns {void}
-         */
-        handleOrientationColumn (hasMappingOrientationValue, aggregateColumns) {
-            const hasOrientationColumn = aggregateColumns.find(col => col.value === "orientationValue");
-
-            if (hasMappingOrientationValue && !hasOrientationColumn) {
-                this.aggregateColumns.splice(0, 0, {
-                    text: this.getColumnHeader("orientationValue"),
-                    value: "orientationValue",
-                    align: "end",
-                    sortable: false,
-                    groupable: false,
-                    selected: false,
-                    isAggregation: true
-                });
-            }
-        },
-
-        /**
-         * Gets the column header from value as key
-         * @param {String} value - the value of the column
-         * @return {String} the column header
-         */
-        getColumnHeader (value) {
-            if (Object.prototype.hasOwnProperty.call(this.columnHeader, value) && typeof this.columnHeader[value] === "string") {
-                return this.columnHeader[value];
-            }
-
-            return value;
         },
 
         /**
