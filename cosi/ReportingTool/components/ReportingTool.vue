@@ -198,8 +198,29 @@ export default {
             this.addTopicsToReport(this.featuresListItems);
             await this.addDiagram();
             await this.addInfrastructureMapPageToReport(this.featuresListItems);
+            this.addAccessibilityAnalysis();
             this.pdf.download(this.downloadName);
             this.reportLoader = false;
+        },
+
+        /**
+         * Prepares the data of the accessibility analysis and adds it to the report.
+         * @returns {void}
+         */
+        addAccessibilityAnalysis () {
+            this.pdf.addChapter("Analysen");
+            this.dataSets.forEach((analysis, idx) => {
+                this.pdf.addHeadline("Erreichbarkeitsanalyse");
+                this.pdf.addHeadline(analysis.inputs.title);
+                if (typeof analysis.inputs.screenshot !== "undefined") {
+                    this.pdf.addImageByUrl(analysis.inputs.screenshot, analysis.inputs.title + idx, {fit: [500, 500], alignment: "left"});
+                }
+
+                if (typeof analysis.inputs.screenshotLegend !== "undefined") {
+                    this.pdf.addImageByUrl(analysis.inputs.screenshotLegend, idx.toString(), {fit: [300, 300], alignment: "left"});
+                }
+            });
+
         },
 
         /**
