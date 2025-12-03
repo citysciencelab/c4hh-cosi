@@ -2,6 +2,7 @@
 import getMappingJson from "../../utils/getMappingJson";
 import getters from "../store/gettersTemplateAdmin";
 import isObject from "@shared/js/utils/isObject.js";
+import layerCollection from "@core/layers/js/layerCollection";
 import {mapGetters, mapMutations} from "vuex";
 import mutations from "../store/mutationsTemplateAdmin";
 import {sort} from "@shared/js/utils/sort.js";
@@ -37,8 +38,50 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/TemplateAdmin", Object.keys(getters)),
-        ...mapGetters("Modules/DistrictSelector", ["selectedDistrictLevel", "selectedDistrictLevelId", "selectedDistrictsCollection", "selectedDistrictNames"]),
+        ...mapGetters("Modules/Dashboard", ["statsFeatureFilter"]),
+        ...mapGetters("Modules/DistrictSelector", ["initMapping", "selectedDistrictLevel", "selectedDistrictLevelId", "selectedDistrictsCollection", "selectedDistrictNames"]),
         ...mapGetters(["configuredModules", "allLayerConfigs"])
+    },
+    watch: {
+        /**
+         * Loads the current status of layer and selected statistic data from dashboard.
+         * @param {Boolean} val - true if it is enabled.
+         * @returns {void}
+         */
+        enableExport (val) {
+            if (!val) {
+                this.setSelectedGeoDataList([]);
+                this.setSelectedStatDataList([]);
+                return;
+            }
+
+            const visibleLayers = layerCollection.getLayers().filter(layer => {
+                    return layer?.attributes.visibility && !layer?.attributes?.isNeverVisibleInTree;
+                }),
+                categoryList = [];
+
+            this.setSelectedGeoDataList([]);
+            this.setSelectedStatDataList([]);
+
+            visibleLayers.forEach(layer => {
+                this.setSelectedGeoDataList([...this.selectedGeoDataList, layer?.attributes.name]);
+            });
+
+            if (this.statsFeatureFilter.length) {
+                const filteredGroup = this.initMapping.filter(obj => {
+                    return this.statsFeatureFilter.includes(obj.value);
+                });
+
+                categoryList.push(...filteredGroup.map(group => group?.value));
+            }
+            else {
+                Object.values(Object.groupBy(this.initMapping, (obj) => obj.group)).forEach(data => {
+                    categoryList.push(...data.map(item => item?.value));
+                });
+            }
+
+            this.setSelectedStatDataList([...new Set(categoryList)]);
+        }
     },
     async created () {
         const mapping = await getMappingJson(),

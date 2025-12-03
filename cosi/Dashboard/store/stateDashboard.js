@@ -11,7 +11,7 @@
  * @property {String} prefixExportFilename - The prefix of exported file name.
  * @property {Boolean} [renderToWindow=true] - Renders tool in a window if true, otherwise in the sidebar (config-param).
  * @property {Boolean} [resizableWindow=false] - If True, window is resizable (config-param).
- * @property {object} toolBridgeIn: {settings: {}, type: "", outputCallback: ()=>{}} accepts settings from toolBridge (must have a *watcher*)
+ * @property {String|String[]} trendColors - The trend color of arrows.
  * @property {object} toolBridgeOut: {}  pass current settings to toolBridge (must have a *getter*)
  * @property {String|String[]} trendColors - The trend color of arrows.
  */

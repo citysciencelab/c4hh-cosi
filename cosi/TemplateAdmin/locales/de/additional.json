@@ -15,7 +15,7 @@
           "showLess": "weniger anzeigen..."
         },
         "label": {
-          "enableExport": "Aktuellen Zustand in Vorlage exportieren",
+          "enableExport": "Aktuellen Zustand in Vorlage übernehmen",
           "selectTemplate": "Vorlage",
           "name": "Name",
           "description": "Beschreibung",

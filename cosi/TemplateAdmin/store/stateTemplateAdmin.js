@@ -8,6 +8,8 @@
  * @property {Object} activeMode current active tab mode.
  * @property {Boolean} enableExport If true, the button export will be activated.
  * @property {String} labelOfOrientationValue the label of orientationValue
+ * @property {String[]} selectedGeoDataList the selected geodata list.
+ * @property {String[]} selectedStatDataList the selected statisdata list.
  */
 const state = {
     active: false,
@@ -29,6 +31,8 @@ const state = {
     loadedTemplates: [],
     savedTemplateContents: [],
     selectedTemplate: undefined,
+    selectedGeoDataList: [],
+    selectedStatDataList: [],
     labelOfOrientationValue: "additional:modules.cosi.templateAdmin.label.existingAreas"
 };
 

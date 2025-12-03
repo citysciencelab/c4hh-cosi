@@ -54,7 +54,7 @@ export default {
             isNameValidating: false,
             isStatDataValidating: false,
             isValidated: false,
-            limitReferenceValues: false,
+            limitReferenceValues: true,
             referenceValueList: [],
             importedReferenceValueList: [],
             selectedGeoDataLabel: [],
@@ -82,10 +82,13 @@ export default {
         }
     },
     watch: {
-        selectedStatData (val) {
-            const label = val.map(v => v.label);
+        selectedStatData: {
+            handler (val) {
+                const label = val.map(v => v.label);
 
-            this.referenceValueList = this.referenceValueList.filter(badge => label.includes(badge?.statisticName));
+                this.referenceValueList = this.referenceValueList.filter(badge => label.includes(badge?.statisticName));
+            },
+            deep: true
         },
         selectedTemplate (value) {
             if (this.showEditTemplate) {
@@ -94,7 +97,20 @@ export default {
         },
         selectedGeoDataLabel: {
             handler (value) {
+                this.setSelectedGeoDataList(value);
                 this.selectedGeoData = this.geoData.filter(data => value.includes(data?.label));
+            },
+            deep: true
+        },
+        selectedGeoDataList: {
+            handler (value) {
+                this.selectedGeoDataLabel = value;
+            },
+            deep: true
+        },
+        selectedStatDataList: {
+            handler (val) {
+                this.selectedStatData = this.getStatDataObj(val);
             },
             deep: true
         },
@@ -106,10 +122,13 @@ export default {
         if (this.showEditTemplate && this.selectedTemplate !== undefined) {
             this.changeSelectedTemplate(this.selectedTemplate);
         }
+
+        this.selectedGeoDataLabel = this.selectedGeoDataList;
+        this.selectedStatData = this.getStatDataObj(this.selectedStatDataList);
     },
     methods: {
         ...mapActions("Alerting", ["addSingleAlert"]),
-        ...mapMutations("Modules/TemplateAdmin", ["setEnableExport", "setImportedTemplateNames", "setLoadedTemplates", "setSavedTemplateContents", "setSelectedTemplate"]),
+        ...mapMutations("Modules/TemplateAdmin", ["setEnableExport", "setImportedTemplateNames", "setLoadedTemplates", "setSavedTemplateContents", "setSelectedTemplate", "setSelectedGeoDataList", "setSelectedStatDataList"]),
 
         /**
          * Adds or changes the key and value in object.
@@ -152,6 +171,22 @@ export default {
             }
 
             this.loadingTemplate(this.savedTemplateContents[id]);
+        },
+        /**
+         * Gets the statisdata object list.
+         * @param {String[]} val The label list.
+         * @returns {Object[]} the statisdata object list.
+         */
+        getStatDataObj (val) {
+            const statDataObj = [];
+
+            this.statData.forEach(stats => {
+                if (stats?.data.filter(data => val.includes(data?.label)).length) {
+                    statDataObj.push(...stats.data.filter(data => val.includes(data.label)));
+                }
+            });
+
+            return statDataObj;
         },
         /**
          * Removes the geo data by the given layerId.
@@ -767,7 +802,6 @@ export default {
             <FlatButton
                 class="mx-auto"
                 icon="bi bi-download"
-                :disabled="!enableExport && !showEditTemplate"
                 :text="showEditTemplate ? $t('additional:modules.cosi.templateAdmin.button.downloadeditTemplate') : $t('additional:modules.cosi.templateAdmin.button.downloadTemplate')"
                 @click.native="validateForm"
             />
