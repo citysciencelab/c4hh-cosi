@@ -3,19 +3,10 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2025-12-03 v3.17.0
 
 ### Added
 - PopulationRequest: Added support for OGC API Processes.
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ---
 
