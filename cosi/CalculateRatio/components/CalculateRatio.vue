@@ -3,6 +3,7 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
 import CalculateRatioSelection from "./CalculateRatioSelection.vue";
+import ChartItem from "../../shared/modules/charts/components/ChartItem.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersCalculateRatio";
 import getVectorlayerMapping from "../../FeaturesList/utils/getVectorlayerMapping";
@@ -26,6 +27,7 @@ export default {
         AlertMessage,
         ButtonGroup,
         CalculateRatioSelection,
+        ChartItem,
         DataTable,
         ResultManagement,
         ToolInfo
@@ -87,7 +89,8 @@ export default {
             visibleLayerListForDropdown: [],
             visibleVectorLayers: [],
             selectedDistricts: [],
-            tableOrChart: "table"
+            tableOrChart: "table",
+            chartData: []
         };
     },
     computed: {
@@ -807,6 +810,36 @@ export default {
                 this.exportAsGeoJson(i);
             });
         },
+        /**
+         * Prepares the data for the chart.
+         * @returns {Object[]} The prepared chart data.
+         */
+        preparesChartData () {
+            const chartData = [];
+
+            this.availableColumns.forEach((type, idx) => {
+                chartData.push(
+                    {
+                        name: type.name,
+                        title: "Versorgungsanalyse: " + type.name
+                    }
+                );
+
+                this.dataSets[this.activeSet].results.forEach(result => {
+                    if (type.key in result) {
+                        if (!chartData[idx].data) {
+                            chartData[idx].data = {};
+                        }
+
+                        chartData[idx].data = {
+                            ...chartData[idx].data,
+                            [result.scope]: result[type.key]
+                        };
+                    }
+                });
+            });
+            return chartData;
+        },
 
         // the export function from utils
         exportAsGeoJson
@@ -895,6 +928,11 @@ export default {
                     :f-active="dataSets[index].resultHeaders.fActive"
                     :faktor-f="dataSets[index].resultHeaders.faktorF"
                     :class="{ active: activeSet === index }"
+                />
+                <ChartItem
+                    v-if="tableOrChart === 'chart' && activeSet === index"
+                    class="mb-3"
+                    :data="preparesChartData()"
                 />
             </template>
         </ResultManagement>
