@@ -16,7 +16,6 @@ import Feature from "ol/Feature";
  */
 export function getValue (item, header, timestamp, districts, timestampPrefix = "jahr_", locale = "de-DE") {
     let val;
-console.log(header);
 
     if (!isObject(item)) {
         return "-";

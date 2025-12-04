@@ -39,9 +39,9 @@ export default {
             const availableYears = utils.getAvailableYears(this.selectedStatFeatures),
                 items = availableYears.map(year => ({title: year, value: year}));
 
-            if (items.length) {
-                items.unshift({title: this.$t("additional:modules.cosi.reportingTool.useMostRecentDataset"), value: "mostRecent"});
-            }
+            // if (items.length) {
+            //     items.unshift({title: this.$t("additional:modules.cosi.reportingTool.useMostRecentDataset"), value: "mostRecent"});
+            // }
             return items;
         },
 
@@ -76,8 +76,14 @@ export default {
             return level?.filter(object => !districtLevel.includes(object.label));
         }
     },
+    watch: {
+        selectedYear (newVal) {
+            this.$emit("update:statistical-year", newVal);
+        }
+    },
     mounted () {
         this.selectedStatisticalAreas = this.selectedDistrictNames;
+        this.selectedYear = this.years[0].value;
     },
     methods: {
         uniqueId,

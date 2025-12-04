@@ -87,7 +87,7 @@ export default {
         selectedCategoryInChart: [],
         page: 1,
         isAllAreasSummariseChecked: false,
-        selectedYear: [],
+        statisticalYear: undefined,
         printReportView: false,
         selectedStatGroups: [],
         selectedInfrastructureData: [],
@@ -348,6 +348,7 @@ export default {
                 groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group);
 
             this.pdf.addChapter("Statistische Datenübersicht");
+            this.pdf.addSubHeadline("Jahr: " + (this.statisticalYear || items[0].years[0]));
 
             this.selectedStatGroups.forEach((group) => {
                 const columns = this.pdf.getColumns(["", this.areaColumnName, ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
@@ -357,7 +358,7 @@ export default {
 
                 groupedMapping[group].forEach(mappingObject => {
                     const statFeature = items.find((item) => item.category === mappingObject.value),
-                        lastYear = statFeature.years[0],
+                        lastYear = this.statisticalYear || statFeature.years[0],
                         row = [];
 
                     columns.forEach((col, index) => {
@@ -430,6 +431,7 @@ export default {
             }
 
             this.pdf.addChapter("Quellenangaben");
+            this.pdf.addLineBreak();
 
             if (!unified.length) {
                 this.pdf.addParagraph("Keine Quellenangaben verfügbar.");
@@ -522,10 +524,10 @@ export default {
                 return;
             }
             this.pdf.addChapter(headline);
+            this.pdf.addLineBreak();
             this.pdf.addImageByUrl(overviewImageUrl, imageName, {fit: [imageWidth, imageHeight], alignment: "center"});
             this.pdf.addLineBreak();
             if (frontPageValue === "withNeuwerk") {
-
                 this.pdf.addColumns([await this.addOverViewPageMinimap(template, [461000.14, 5973660.79, 468500.95, 5979481.62], "neuwerkMap", "left"), minimap]);
                 this.pdf.addLineBreak();
                 this.pdf.addColumns([overviewInfos]);
@@ -588,6 +590,7 @@ export default {
                 return;
             }
             this.pdf.addChapter("Darstellung der Infrastrukturdaten");
+            this.pdf.addLineBreak();
             this.pdf.addImageByUrl(imageOptions.downloadURL, imageName, {fit: [500, 500], alignment: "center"});
             this.pdf.addLineBreak();
         },
@@ -755,6 +758,7 @@ export default {
             const groupedTopics = Object.groupBy(topics, (topic) => topic.layerName);
 
             this.pdf.addChapter("Infrastrukturdaten");
+            this.pdf.addLineBreak();
             Object.keys(groupedTopics).forEach(group => {
                 const topicLength = groupedTopics[group].length,
                     columns = this.pdf.getColumns(["Typ der Einrichtung", "Name", "Adresse"], []),
@@ -1005,6 +1009,16 @@ export default {
 
             this.selectedInfrastructureData = Object.keys(topicName);
         },
+
+        /**
+         * Sets the statistical year.
+         * @param {Number} year - The statistical year.
+         * @returns {void}
+         */
+        setStatisticalYear (year) {
+            this.statisticalYear = year;
+        },
+
         /**
          * Updates the order of statistical data.
          * @param {Object[]} groups The groups in the correct order.
@@ -1183,6 +1197,7 @@ export default {
                             :groups="selectedStatGroups"
                             @set-cards="setStatisticalDataCards"
                             @set-order-of-cards="updateStatGroups"
+                            @update:statistical-year="setStatisticalYear"
                         />
                         <AlertMessage
                             v-else

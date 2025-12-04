@@ -43,7 +43,7 @@ export default {
             default: null
         }
     },
-    emits: ["setCards", "setOrderOfCards"],
+    emits: ["setCards", "setOrderOfCards", "update:statistical-year"],
     data () {
         return {
             activelyClosedNonMultipleCardNames: [],
@@ -223,6 +223,7 @@ export default {
     </h5>
     <ReportingToolStepItemSettings
         v-if="title.startsWith('2. ')"
+        @update:statistical-year="$emit('update:statistical-year', $event)"
     />
     <AlertMessage
         v-if="cards.length === 0 && nothingSelectedText"

@@ -39,7 +39,6 @@ export default class PDFMaker {
      */
     addChapter (text) {
         this.content.push({...this.chapterHeadlineFormat, text});
-        this.content.push("\n");
     }
 
     /**
@@ -49,6 +48,15 @@ export default class PDFMaker {
      */
     addHeadline (text) {
         this.content.push({text, fontSize: 11, bold: true, margin: [0, 4]});
+    }
+
+    /**
+     * Adds a sub headline to the report.
+     * @param {String} text - The name of the sub headline.
+     * @returns {void}
+     */
+    addSubHeadline (text) {
+        this.content.push({text, fontSize: 11, bold: true, margin: [0, 0, 4, 0], color: "#3C5F94"});
     }
 
     /**
