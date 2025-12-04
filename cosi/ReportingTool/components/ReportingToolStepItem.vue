@@ -43,14 +43,12 @@ export default {
             default: null
         }
     },
-    emits: ["setOrderOfCards"],
+    emits: ["setCards", "setOrderOfCards"],
     data () {
         return {
             activelyClosedNonMultipleCardNames: [],
             cards: [],
-            isCollapsed: false,
-            customText: "",
-            customHeading: ""
+            isCollapsed: false
         };
     },
     computed: {
@@ -60,6 +58,14 @@ export default {
             },
             set (newValue) {
                 this.$emit("setOrderOfCards", newValue);
+            }
+        }
+    },
+    watch: {
+        cards: {
+            deep: true,
+            handler (newCards) {
+                this.$emit("setCards", newCards);
             }
         }
     },
@@ -196,6 +202,16 @@ export default {
                 indexTo = upOrDown === "down" ? indexFrom + 1 : indexFrom - 1;
 
             [this.cards[indexFrom], this.cards[indexTo]] = [this.cards[indexTo], this.cards[indexFrom]];
+        },
+
+        /**
+         * Sets the value of a card.
+         * @param {String} value - The new value for the card.
+         * @param {Object} card - The card object to update.
+         * @returns {void}
+         */
+        setCardValue (value, card) {
+            card.value = value;
         }
     }
 };
@@ -299,21 +315,23 @@ export default {
                 <div v-if="card.key === 'textArea'">
                     <InputText
                         id="customText"
-                        v-model="customText"
                         class="pt-0 mt-0"
                         :label="$t('additional:modules.cosi.reportingTool.label.freetext')"
                         :placeholder="$t('additional:modules.cosi.reportingTool.label.freetext')"
                         html-type="textarea"
                         max-length="1000"
+                        :model-value="card.value"
+                        @input="setCardValue($event, card)"
                     />
                 </div>
                 <div v-if="card.key === 'heading'">
                     <InputText
                         id="customHeading"
-                        v-model="customHeading"
                         class="pt-0"
                         :label="$t('additional:modules.cosi.reportingTool.label.heading')"
+                        :model-value="card.value"
                         :placeholder="$t('additional:modules.cosi.reportingTool.label.heading')"
+                        @input="setCardValue($event, card)"
                     />
                 </div>
             </CustomCard>

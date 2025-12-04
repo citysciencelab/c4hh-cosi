@@ -30,7 +30,7 @@
     {
       "expandable": false,
       "icon": "bi bi-bar-chart",
-      "key": "statDataOverview",
+      "key": "statDataCharts",
       "multiple": false,
       "name": "Datenvisualisierung",
       "tag": "Statistische Daten",

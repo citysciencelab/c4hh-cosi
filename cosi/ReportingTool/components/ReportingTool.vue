@@ -44,6 +44,8 @@ export default {
         VStepperWindowItem
     },
     data: () => ({
+        analysisCards: [],
+        annexCards: [],
         infrastructureTableLimit: 10,
         infrastructureTableLimitEnabled: false,
         reportTitle: "",
@@ -88,7 +90,9 @@ export default {
         selectedYear: [],
         printReportView: false,
         selectedStatGroups: [],
-        selectedInfrastructureData: []
+        selectedInfrastructureData: [],
+        statisticalDataCards: [],
+        subjectDataCards: []
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
@@ -192,23 +196,126 @@ export default {
             this.pdf.addHeader(this.reportTitle.trim());
             this.pdf.setAuthor(this.author.trim());
             await this.addOverViewPage(this.selectedFrontPageItem.value);
-            this.addStatsToReport(this.items);
-            await this.addReferencesToReport(this.items);
-            this.addTopicsToReport(this.featuresListItems);
-            await this.addDiagram();
-            await this.addInfrastructureMapPageToReport(this.featuresListItems);
-            this.addAccessibilityAnalysis();
+            this.addChapterStatisticalData(this.statisticalDataCards);
+            await this.addChapterSubjectData(this.subjectDataCards);
+            this.addChapterAnalysis(this.analysisCards);
+            await this.addChapterAnnex(this.annexCards);
             this.pdf.download(this.downloadName);
             this.reportLoader = false;
         },
 
         /**
-         * Prepares the data of the accessibility analysis and adds it to the report.
+         * Adds the statistical data to the report.
+         * @param {Object[]} cards - cards to be added in the chapter.
          * @returns {void}
          */
-        addAccessibilityAnalysis () {
+        addChapterStatisticalData (cards) {
+            if (!cards.length) {
+                this.addStatsToReport(this.items);
+                return;
+            }
+            cards.forEach(card => {
+                if (card.key === "statDataOverview") {
+                    this.addStatsToReport(this.items);
+                }
+                else if (card.key === "statDataCharts") {
+                    this.addDiagram();
+                }
+                else if (card.key === "heading") {
+                    this.pdf.addChapter(card.value);
+                }
+                else if (card.key === "textArea") {
+                    this.pdf.addParagraph(card.value);
+                }
+            });
+        },
+
+        /**
+         * Adds the subject data to the report.
+         * @param {Object[]} cards - cards to be added in the chapter.
+         * @returns {void}
+         */
+        async addChapterSubjectData (cards) {
+            if (!cards.length) {
+                this.addTopicsToReport(this.featuresListItems);
+                await this.addInfrastructureMapPageToReport(this.featuresListItems);
+                return;
+            }
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+
+                if (card.key === "subjectDataTable") {
+                    this.addTopicsToReport(this.featuresListItems);
+                }
+                else if (card.key === "subjectDataMap") {
+                    await this.addInfrastructureMapPageToReport(this.featuresListItems);
+                }
+                else if (card.key === "heading") {
+                    this.pdf.addChapter(card.value);
+                }
+                else if (card.key === "textArea") {
+                    this.pdf.addParagraph(card.value);
+                }
+            }
+        },
+
+        /**
+         * Adds the accessibility analysis to the report.
+         * @param {Object[]} cards - cards to be added in the chapter.
+         * @returns {void}
+         */
+        addChapterAnalysis (cards) {
+            if (!cards.length) {
+                this.addAccessibilityAnalysis(this.dataSets);
+                return;
+            }
+            cards.forEach(card => {
+                if (card.key === "accessibilityAnalyses") {
+                    this.addAccessibilityAnalysis(card.items);
+                }
+                else if (card.key === "heading") {
+                    this.pdf.addChapter(card.value);
+                }
+                else if (card.key === "textArea") {
+                    this.pdf.addParagraph(card.value);
+                }
+            });
+        },
+
+        /**
+         * Adds the annex to the report.
+         * @param {Object[]} cards - cards to be added in the chapter.
+         * @returns {void}
+         */
+        async addChapterAnnex (cards) {
+            if (!cards.length) {
+                await this.addReferencesToReport(this.items);
+                return;
+            }
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+
+                if (card.key === "sources") {
+                    await this.addReferencesToReport(card.items);
+                }
+                else if (card.key === "heading") {
+                    this.pdf.addChapter(card.value);
+                }
+                else if (card.key === "textArea") {
+                    this.pdf.addParagraph(card.value);
+                }
+            }
+        },
+
+        /**
+         * Prepares the data of the accessibility analysis and adds it to the report.
+         * @param {Object[]} items - Items from accessibility analysis component.
+         * @returns {void}
+         */
+        addAccessibilityAnalysis (items) {
             this.pdf.addChapter("Analysen");
-            this.dataSets.forEach((analysis, idx) => {
+
+            items.forEach((analysis, idx) => {
                 this.pdf.addHeadline("Erreichbarkeitsanalyse");
                 this.pdf.addHeadline(analysis.inputs.title);
                 if (typeof analysis.inputs.screenshot !== "undefined") {
@@ -236,7 +343,7 @@ export default {
 
             this.pdf.addChapter("Statistische Datenübersicht");
 
-            Object.keys(groupedMapping).forEach((group) => {
+            this.selectedStatGroups.forEach((group) => {
                 const columns = this.pdf.getColumns(["", this.areaColumnName, ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
                     body = [columns];
 
@@ -258,15 +365,22 @@ export default {
 
                         if (index === 0) {
                             alignment = "left";
-                            value = statFeature.category.slice(0, 70);
+                            value = statFeature.category;
+                            this.pdf.addCell(row, value, alignment);
                         }
                         else if (index === 1) {
                             value = this.getTotal(statFeature, this.selectedDistrictLabels, lastYear, "jahr_");
+                            this.pdf.addCell(row, value.toString(), alignment);
+                            // toLocalString macht bei pdf make Probleme
+                            // this.pdf.addCell(row, value.toLocaleString("de-DE", numberOptions), alignment);
                         }
                         else {
                             value = parseFloat(statFeature[col.text]["jahr_" + lastYear]) || "-";
+                            this.pdf.addCell(row, value.toString(), alignment);
+                            // toLocalString macht bei pdf make Probleme
+                            // this.pdf.addCell(row, value.toLocaleString("de-DE", numberOptions), alignment);
                         }
-                        this.pdf.addCell(row, value.toLocaleString("de-DE", numberOptions), alignment);
+
                     });
                     body.push(row);
                 });
@@ -900,6 +1014,42 @@ export default {
          */
         updateInfratsructureData (data) {
             this.selectedInfrastructureData = data;
+        },
+
+        /**
+         * Sets the analysis cards.
+         * @param {Object[]} cards - The analysis cards.
+         * @returns {void}
+         */
+        setAnalysisCards (cards) {
+            this.analysisCards = cards;
+        },
+
+        /**
+         * Sets the annex cards.
+         * @param {Object[]} cards - The annex cards.
+         * @returns {void}
+         */
+        setAnnexCards (cards) {
+            this.annexCards = cards;
+        },
+
+        /**
+         * Sets the statistical data cards.
+         * @param {Object[]} cards - The statistical data cards.
+         * @returns {void}
+         */
+        setStatisticalDataCards (cards) {
+            this.statisticalDataCards = cards;
+        },
+
+        /**
+         * Sets the subject data cards.
+         * @param {Object[]} cards - The subject data cards.
+         * @returns {void}
+         */
+        setSubjectDataCards (cards) {
+            this.subjectDataCards = cards;
         }
     }
 };
@@ -1025,6 +1175,7 @@ export default {
                             :title="'2. ' + $t('additional:modules.cosi.reportingTool.statisticalData')"
                             :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noStatisticalDataSelected')"
                             :groups="selectedStatGroups"
+                            @set-cards="setStatisticalDataCards"
                             @set-order-of-cards="updateStatGroups"
                         />
                         <AlertMessage
@@ -1061,6 +1212,7 @@ export default {
                                 :title="'3. ' + $t('additional:modules.cosi.reportingTool.subjectData')"
                                 :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noSubjectDataSelected')"
                                 :groups="selectedInfrastructureData"
+                                @set-cards="setSubjectDataCards"
                                 @set-order-of-cards="updateInfratsructureData"
                             />
                         </template>
@@ -1078,6 +1230,7 @@ export default {
                             :card-mapping="categoryMapping?.analyses"
                             :title="'4. ' + $t('additional:modules.cosi.reportingTool.analyses')"
                             :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noAnalysesSelected')"
+                            @set-cards="setAnalysisCards"
                         />
                         <AlertMessage
                             v-else
@@ -1091,6 +1244,7 @@ export default {
                         <ReportingToolStepItem
                             :card-mapping="categoryMapping?.annex"
                             :title="'5. ' + $t('additional:modules.cosi.reportingTool.annex')"
+                            @set-cards="setAnnexCards"
                         />
                     </v-stepper-window-item>
                 </v-stepper-window>
