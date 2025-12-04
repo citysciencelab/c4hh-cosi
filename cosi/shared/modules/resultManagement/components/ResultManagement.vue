@@ -93,6 +93,7 @@ export default {
                 :key="set"
             >
                 <Card
+                    :title="set.title"
                     :data="set.data"
                     :downloadable="set.downloadable"
                     :icon="set.icon"

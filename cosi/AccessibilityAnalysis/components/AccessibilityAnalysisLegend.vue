@@ -50,7 +50,7 @@ export default {
                 <span
                     class="steps"
                 >
-                    {{ step }} {{ unit }}
+                    {{ Math.round(step) }} {{ unit }}
                 </span>
             </span>
             <span v-else>
@@ -76,7 +76,7 @@ export default {
                 <span
                     class="steps"
                 >
-                    {{ step }} {{ unit }} bei Reisezeitindex 1.0
+                    {{ step }} {{ unit }} {{ $t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.atTravelTimeIndex") }} {{ $t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.travelTimeIndexBase") }}
                 </span>
             </span>
         </template>

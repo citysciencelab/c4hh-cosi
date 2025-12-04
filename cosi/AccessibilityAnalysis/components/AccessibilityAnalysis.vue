@@ -71,25 +71,25 @@ export default {
                 {
                     type: "point",
                     text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.points"),
-                    icon: "bi bi-geo-alt", title: "Erreichbarkeit ab einem Referenzpunkt",
-                    description: "Zeigt ein Gebiet an, welches von einem ausgewählten Punkt auf der Karte innerhalb einer festgelegten Entfernung erreichbar ist.",
-                    info: "Noch kein Punkt ausgewählt. Um einen Punkt zu setzen, bitte auf die Karte klicken!"
+                    icon: "bi bi-geo-alt", title: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.fromReferencePoint"),
+                    description: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.descReferencePoint"),
+                    info: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.noPointSelected")
                 },
                 {
                     type: "facility",
                     text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.facilities"),
                     icon: "bi bi-layers",
-                    title: "Erreichbarkeit ab einer ausgewählten Einrichtung",
-                    description: "Zeigt ein Gebiet an, welches von einer ausgewählten Einrichtung auf der Karte  innerhalb einer festgelegten Entfernung erreichbar ist.",
-                    info: "Noch keine Einrichtung ausgewählt. Um eine Einrichtung zu wählen, bitte auf eine oder mehrere Einrichtungen in der Karte klicken!"
+                    title: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.fromFacility"),
+                    description: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.descFacility"),
+                    info: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.noFacilitySelected")
                 },
                 {
                     type: "path",
                     text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.referToPath"),
                     icon: "bi bi-map",
-                    title: "Erreichbarkeit entlang einer Route",
-                    description: "Wenn Sie im Routing-Tool eine Route berechnet haben, können Sie hier die Erreichbarkeit entlang dieser Route analysieren.",
-                    info: "Noch keine Route berechnet. Um eine Route zu berechnen, bitte das Routing-Tool öffnen, Start- und Zielpunkt wählen und eine Route berechnen."
+                    title: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.fromRoute"),
+                    description: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.descRoute"),
+                    info: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.noRouteCalculated")
                 }
             ],
             cardCounter: 1,
@@ -470,7 +470,7 @@ export default {
          */
         onMapClick (evt) {
             if (this.mode === "point") {
-                this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode, evt.originalEvent.shiftKey, "Punkte");
+                this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode, evt.originalEvent.shiftKey, this.$t("additional:modules.tools.cosi.accessibilityAnalysis.points"));
             }
         },
 
@@ -712,9 +712,8 @@ export default {
                     isAllFacilitiesChecked: this.isAllFacilitiesChecked,
                     title: "Erreichbarkeit " + this.cardCounter++
                 };
-                this.dataSets.push(analysisSet);
-
-                this.setActiveSet(this.dataSets.length - 1);
+                this.dataSets.unshift(analysisSet);
+                this.setActiveSet(0);
 
                 if (this.dataSets.length === 1) {
                     this.renderIsochrones(this.isochroneFeatures);
@@ -965,9 +964,19 @@ export default {
                 result.push({icon: icon, label: pointDes, value: coordinate});
 
             }
-            result.push({icon: "bi bi-people", label: "Einwohner: " + population});
+            result.push({
+                icon: "bi bi-people",
+                label: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.inhabitants") + ": " + population
+            });
             if (data.inputs.useTravelTimeIndex) {
-                result.push({icon: "bi bi-sliders", label: `Reisezeitindex: ${data.inputs.travelTimeIndex}, Tageszeit: ${data.inputs.travelTime}:00\u00A0Uhr`});
+                const ttiTitle = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.title"),
+                    timeLabel = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.timeOfDay"),
+                    hourLabel = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.hour");
+
+                result.push({
+                    icon: "bi bi-sliders",
+                    label: `${ttiTitle}: ${data.inputs.travelTimeIndex}, ${timeLabel}: ${data.inputs.travelTime}:00 ${hourLabel}`
+                });
             }
             if (data.inputs.selectionCards.length >= 2) {
                 result.push(data.inputs.mergePolygons
@@ -1041,7 +1050,7 @@ export default {
             :active-item="activeMode"
             @change="setActiveMode"
         />
-        <div class="mb-4">
+        <div class="mb-4 scroll-container">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">
                     Ausgewählte {{ activeMode.text }}
@@ -1055,14 +1064,11 @@ export default {
                 label="Alle Fachdaten auswählen"
                 @update:model-value="updateSelectedFacilityNames($event)"
             />
-            <div
+            <AlertMessage
                 v-if="selectionCards.length === 0"
-                class="d-flex align-items-center justify-content-center alert alert-light"
-                role="alert"
-            >
-                <i class="bi bi-slash-circle me-4 fs-4" />
-                {{ activeMode.info }}
-            </div>
+                :text="activeMode.info"
+                type="noData"
+            />
             <div
                 v-for="card in selectionCards"
                 :key="card.id"
@@ -1155,7 +1161,7 @@ export default {
                     v-for="type in transportTypes"
                     :key="type.type"
                     class="me-5"
-                    :aria="'test'"
+                    :aria="type.name"
                     :icon="type.icon"
                     :title="type.name"
                     :interaction="() => updateTransportType(type.type)"
@@ -1190,10 +1196,10 @@ export default {
         >
             <SwitchInput
                 :id="'autoTrafficFlow'"
-                :aria="'Verkehrsfluss berücksichtigen'"
+                :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.considerTrafficFlow')"
                 :checked="useTravelTimeIndex"
                 :interaction="() => setUseTravelTimeIndex(!useTravelTimeIndex)"
-                :label="'Verkehrsfluss berücksichtigen'"
+                :label="$t('additional:modules.tools.cosi.accessibilityAnalysis.considerTrafficFlow')"
             />
             <AccessibilityAnalysisTrafficFlow
                 v-if="useTravelTimeIndex"
@@ -1205,7 +1211,7 @@ export default {
             class="mx-auto"
             icon="bi bi-play-circle"
             :disabled="selectionCards.length === 0"
-            :text="'Erreichbarkeit berechnen'"
+            :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.calculateAccessibility')"
             :spinner-trigger="showSpinner"
             @click.native="createAnalysisSet()"
         />
@@ -1255,6 +1261,10 @@ export default {
 
 <style lang="scss" scoped>
     #accessibilityanalysis {
+        .scroll-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
         .title {
             color: $secondary;
         }

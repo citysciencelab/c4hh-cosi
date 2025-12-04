@@ -64,7 +64,11 @@
                         "toggle": "Verkehrsfluss berücksichtigen",
                         "tooltip": "Reisezeitindex ggü. freiem Verkehrsfluss, gem. INRIX, 2021, FRC234",
                         "help": "<h4>Reisezeitindex</h4><p>Der Reisezeitindex beschreibt die Veränderung der Reisezeiten zu verschiedenen Tageszeiten gegenüber einem normierten freien Verkehrsfluss (d.h. ein Reisezeitindex von 1,3 entspricht einer Verlängerung der Reisezeiten bzw. einer Verkürzung der zurückgelegten Strecke um 30%). Die Daten wurden von der Firma INRIX erhoben und beziehen sich, aggregiert für das gesamte Stadtgebiet für die Straßenklassen 2, 3 und 4 (Bundesstraßen, Kreisstraßen, Gemeindestraßen), auf das Jahr 2021.</p><p><i>Der Reisezeitindex bezieht sich ausschließlich auf den Kfz-Verkehr.</i></p>",
-                        "warning": "ACHTUNG: Die Erreichbarkeit wurde unter Berücksichtigung des Reisezeitindizes für die ausgewählte Uhrzeit ermittelt. Das Ergebnis erhebt keinen Anspruch auf Genauigkeit und stellt keinen rechtlich verbindlichen Wert dar."
+                        "warning": "ACHTUNG: Die Erreichbarkeit wurde unter Berücksichtigung des Reisezeitindizes für die ausgewählte Uhrzeit ermittelt. Das Ergebnis erhebt keinen Anspruch auf Genauigkeit und stellt keinen rechtlich verbindlichen Wert dar.",
+                        "timeOfDay": "Tageszeit",
+                        "hour": "Uhr",
+                        "atTravelTimeIndex": "bei Reisezeitindex",
+                        "travelTimeIndexBase": "1.0"
                     },
                     "paginationRemove": "Dieses Ergebnis löschen",
                     "paginationRemoveAll": "Alle Ergebnisse in der Erreichbarkeitsanalyse löschen",
@@ -76,7 +80,19 @@
                       "title": "Ergebnisverwaltung",
                       "downloadAll": "Alle Herunterladen",
                       "removeAll": "Alle Daten löschen"
-                    }
+                    },
+                    "fromReferencePoint": "Erreichbarkeit ab einem Referenzpunkt",
+                    "descReferencePoint": "Zeigt ein Gebiet an, welches von einem ausgewählten Punkt auf der Karte innerhalb einer festgelegten Entfernung erreichbar ist.",
+                    "noPointSelected": "Noch kein Punkt ausgewählt. Um einen Punkt zu setzen, bitte auf die Karte klicken!",
+                    "fromFacility": "Erreichbarkeit ab einer ausgewählten Einrichtung",
+                    "descFacility": "Zeigt ein Gebiet an, welches von einer ausgewählten Einrichtung auf der Karte innerhalb einer festgelegten Entfernung erreichbar ist.",
+                    "noFacilitySelected": "Noch keine Einrichtung ausgewählt. Um eine Einrichtung zu wählen, bitte auf eine oder mehrere Einrichtungen in der Karte klicken!",
+                    "fromRoute": "Erreichbarkeit entlang einer Route",
+                    "descRoute": "Wenn Sie im Routing-Tool eine Route berechnet haben, können Sie hier die Erreichbarkeit entlang dieser Route analysieren.",
+                    "noRouteCalculated": "Noch keine Route berechnet. Um eine Route zu berechnen, bitte das Routing-Tool öffnen, Start- und Zielpunkt wählen und eine Route berechnen.",
+                    "considerTrafficFlow": "Verkehrsfluss berücksichtigen",
+                    "calculateAccessibility": "Erreichbarkeit berechnen",
+                    "inhabitants": "Einwohner"
                 }
             }
         }

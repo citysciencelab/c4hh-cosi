@@ -43,8 +43,9 @@ export default {
         icon="bi bi-info-circle"
         :title="'Information'"
     >
-        <ToolInfo
-            :summary="$t('additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.help')"
+        <p
+            class="cta"
+            v-html="$t('additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.help')"
         />
     </AccordionItem>
     <div class="mb-3">

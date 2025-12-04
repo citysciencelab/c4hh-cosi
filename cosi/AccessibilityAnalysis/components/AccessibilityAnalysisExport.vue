@@ -10,7 +10,7 @@ export default {
         <li>
             <h6 class="dropdown-header fs-6">
                 <i class="bi bi-map me-1" />
-                Download: Kartenbild
+                Download
             </h6>
         </li>
         <li class="ps-4">
