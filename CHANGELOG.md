@@ -11,6 +11,7 @@
 - gfiThemes: The GFI theme `combinedGfi` has been extended with more powerful configuration values to use OGC API processes with dynamic data. Please refer to the provided `README.md` file.
 
 ### Changed
+- Changed Node.js support: Versions from Node.js **22.19.0** up to Node.js **22.21.0** (LTS) are now supported
 
 ### Deprecated
 
