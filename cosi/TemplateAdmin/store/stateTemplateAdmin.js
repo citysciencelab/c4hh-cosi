@@ -7,6 +7,7 @@
  * @property {String} icon Icon next to the title. (config-param)
  * @property {Object} activeMode current active tab mode.
  * @property {Boolean} enableExport If true, the button export will be activated.
+ * @property {String} initialStatus - the initial status.
  * @property {String} labelOfOrientationValue the label of orientationValue
  * @property {String[]} selectedGeoDataList the selected geodata list.
  * @property {String[]} selectedStatDataList the selected statisdata list.
@@ -27,6 +28,7 @@ const state = {
     statOptions: [],
     toolOptions: [],
     ignorePropertyNames: [],
+    initialStatus: undefined,
     importedTemplateNames: [],
     loadedTemplates: [],
     savedTemplateContents: [],

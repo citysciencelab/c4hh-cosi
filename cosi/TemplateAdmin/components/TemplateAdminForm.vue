@@ -87,6 +87,11 @@ export default {
                 const label = val.map(v => v.label);
 
                 this.referenceValueList = this.referenceValueList.filter(badge => label.includes(badge?.statisticName));
+
+                if (this.enableExport && this.initialStatus?.statList !== JSON.stringify(label)) {
+                    this.setEnableExport(false);
+                    this.setSelectedStatDataList(label);
+                }
             },
             deep: true
         },
@@ -96,15 +101,18 @@ export default {
             }
         },
         selectedGeoDataLabel: {
-            handler (value) {
-                this.setSelectedGeoDataList(value);
-                this.selectedGeoData = this.geoData.filter(data => value.includes(data?.label));
+            handler (val) {
+                this.setSelectedGeoDataList(val);
+                this.selectedGeoData = this.geoData.filter(data => val.includes(data?.label));
             },
             deep: true
         },
         selectedGeoDataList: {
-            handler (value) {
-                this.selectedGeoDataLabel = value;
+            handler (val) {
+                this.selectedGeoDataLabel = val;
+                if (this.enableExport && this.initialStatus?.geoList !== JSON.stringify(val)) {
+                    this.setEnableExport(false);
+                }
             },
             deep: true
         },
@@ -128,7 +136,7 @@ export default {
     },
     methods: {
         ...mapActions("Alerting", ["addSingleAlert"]),
-        ...mapMutations("Modules/TemplateAdmin", ["setEnableExport", "setImportedTemplateNames", "setLoadedTemplates", "setSavedTemplateContents", "setSelectedTemplate", "setSelectedGeoDataList", "setSelectedStatDataList"]),
+        ...mapMutations("Modules/TemplateAdmin", ["setEnableExport", "setImportedTemplateNames", "setIsInitialLoad", "setLoadedTemplates", "setSavedTemplateContents", "setSelectedTemplate", "setSelectedGeoDataList", "setSelectedStatDataList"]),
 
         /**
          * Adds or changes the key and value in object.
@@ -185,6 +193,8 @@ export default {
                     statDataObj.push(...stats.data.filter(data => val.includes(data.label)));
                 }
             });
+
+            statDataObj.sort((a, b) => val.indexOf(a.label) - val.indexOf(b.label));
 
             return statDataObj;
         },

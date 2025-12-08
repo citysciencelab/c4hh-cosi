@@ -1,5 +1,4 @@
 <script>
-import getMappingJson from "../../utils/getMappingJson";
 import getters from "../store/gettersTemplateAdmin";
 import isObject from "@shared/js/utils/isObject.js";
 import layerCollection from "@core/layers/js/layerCollection";
@@ -50,8 +49,13 @@ export default {
          */
         enableExport (val) {
             if (!val) {
-                this.setSelectedGeoDataList([]);
-                this.setSelectedStatDataList([]);
+                if (this.initialStatus?.geoList === JSON.stringify(this.selectedGeoDataList) && this.initialStatus?.statList === JSON.stringify(this.selectedStatDataList)) {
+                    this.setSelectedGeoDataList([]);
+                    this.setSelectedStatDataList([]);
+                }
+
+                this.setInitialStatus(undefined);
+
                 return;
             }
 
@@ -75,25 +79,37 @@ export default {
                 categoryList.push(...filteredGroup.map(group => group?.value));
             }
             else {
-                Object.values(Object.groupBy(this.initMapping, (obj) => obj.group)).forEach(data => {
-                    categoryList.push(...data.map(item => item?.value));
+                this.statOptions.forEach(stats => {
+                    if (stats?.data.length) {
+                        categoryList.push(...stats.data.map(data => data.label));
+                    }
                 });
             }
 
-            this.setSelectedStatDataList([...new Set(categoryList)]);
+            this.setSelectedStatDataList(categoryList);
+            this.setInitialStatus({
+                geoList: JSON.stringify(this.selectedGeoDataList),
+                statList: JSON.stringify(this.selectedStatDataList)
+            });
         }
     },
     async created () {
-        const mapping = await getMappingJson(),
-            filteredPropertyNames = this.getFilteredPropertyNames(this.selectedDistrictLevel?.propertyNameList, this.ignorePropertyNames),
+        const filteredPropertyNames = this.getFilteredPropertyNames(this.selectedDistrictLevel?.propertyNameList, this.ignorePropertyNames),
             toIgnoreTools = ["templateAdmin", "templateManager"],
             configuredModules = this.configuredModules.map(value => {
                 return value.type;
             }).filter(toolNames => !toIgnoreTools.includes(toolNames));
 
         this.setToolOptions(this.getToolList(configuredModules));
-        this.setStatOptions(this.getMappedLabelByValue(filteredPropertyNames, mapping));
+        this.setStatOptions(this.getMappedLabelByValue(filteredPropertyNames, this.initMapping));
         this.setDataOptions(this.getLayerNames(this.allLayerConfigs));
+    },
+    unmounted () {
+        this.setEnableExport(false);
+        if (typeof this.initialStatus !== "undefined") {
+            this.setSelectedGeoDataList([]);
+            this.setSelectedStatDataList([]);
+        }
     },
     methods: {
         ...mapMutations("Modules/TemplateAdmin", Object.keys(mutations)),

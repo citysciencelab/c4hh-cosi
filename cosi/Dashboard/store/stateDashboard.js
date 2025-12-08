@@ -9,8 +9,6 @@
  * @property {String} id - The id of the district selector component.
  * @property {String} [name="Dashboard"] - The name of the tool (config-param).
  * @property {String} prefixExportFilename - The prefix of exported file name.
- * @property {Boolean} [renderToWindow=true] - Renders tool in a window if true, otherwise in the sidebar (config-param).
- * @property {Boolean} [resizableWindow=false] - If True, window is resizable (config-param).
  * @property {String|String[]} trendColors - The trend color of arrows.
  * @property {object} toolBridgeOut: {}  pass current settings to toolBridge (must have a *getter*)
  * @property {String|String[]} trendColors - The trend color of arrows.
