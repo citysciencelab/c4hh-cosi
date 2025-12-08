@@ -1,6 +1,9 @@
+import {getContainingDistrictForFeature} from "../../utils/geomUtils";
+import getFeatureStyle from "../../utils/features/getFeatureStyle";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
-import {createVectorLayerMappingObject} from "../utils/getVectorlayerMapping";
+import getVectorlayerMapping, {createVectorLayerMappingObject} from "../utils/getVectorlayerMapping";
 import layerCollection from "@core/layers/js/layerCollection";
+import setGeomAttributes from "../../utils/features/setGeomAttributes";
 
 const actions = {
     /**
@@ -94,6 +97,73 @@ const actions = {
         }
 
         commit("setMapping", _mapping);
+    },
+
+    /**
+     * Reads the active vector layers, constructs the list of table items and writes them to the store.
+     * Finds the containing district from districtSelector for each feature
+     * @todo connect to other features and statistics to build location score
+     * @param {string} senderName name of component trying to update the featuresList (optional, passed to updateFeaturesList event)
+     * @returns {void}
+     */
+    updateFeaturesList ({state, getters, commit, rootGetters, dispatch}) {
+        commit("setMapping", getVectorlayerMapping(rootGetters.layerConfig.subjectlayer)); // needed for initialization as well as to force cached vuex getters to recompute
+
+        if (typeof rootGetters["Modules/DistrictSelector/selectedDistrictLevel"] === "undefined") {
+            return;
+        }
+
+        if (!getters.groupActiveLayer.length) {
+            commit("setFeaturesListItems", []);
+            return;
+        }
+
+        commit("setFeaturesListItems", []);
+
+        getters.getActiveVectorLayerList.forEach(vectorLayer => {
+            getLayerSource(vectorLayer).once("addfeature", () => {
+                dispatch("updateFeaturesList");
+            });
+
+            const features = getLayerSource(vectorLayer)?.getFeatures() || [],
+                // only features that can be seen on the map
+                visibleFeatures = features.filter(getters.isFeatureActive),
+                layerMap = getters.layerMapById(vectorLayer.get("id")),
+                layerStyleFunction = vectorLayer.getStyleFunction?.(),
+                disabledFeatures = getters.checkDisabledFeatures(vectorLayer);
+
+            if (disabledFeatures.length > 0) {
+                commit("appendFeaturesListItems", ...disabledFeatures);
+            }
+            visibleFeatures.forEach(feature => {
+                /**
+                 * Set area attributes for polygons, where they are not set in the dataset
+                 * @todo should go somewhere else...
+                 */
+                setGeomAttributes(feature, state.geomAttributes);
+                const addressArray = layerMap.addressField.map(field => feature.get(field)),
+                    address = addressArray.length === 3 ? `${addressArray[0]} ${addressArray[1]}, ${addressArray[2]}` : addressArray.join(", ");
+
+                commit("appendFeaturesListItems", {
+                    key: feature.getId(),
+                    name: feature.get(layerMap.keyOfAttrName),
+                    style: getFeatureStyle(feature, layerStyleFunction),
+                    district: getContainingDistrictForFeature(rootGetters["Modules/DistrictSelector/selectedDistrictLevel"], feature, false),
+                    group: layerMap.group,
+                    layerName: layerMap.id,
+                    layerId: layerMap.layerId,
+                    gfiAttributes: vectorLayer.values_.gfiAttributes,
+                    type: feature.get(layerMap.categoryField),
+                    address,
+                    feature: feature,
+                    enabled: true,
+                    isSimulation: feature.get("isSimulation") || false,
+                    isModified: feature.get("isModified") || false,
+                    ...Object.fromEntries(layerMap.numericalValues.map(field => [field.id, feature.get(field.id)])),
+                    ...Object.fromEntries(layerMap.additionalValues.map(field => [field.id, feature.get(field.id)]))
+                });
+            });
+        });
     }
 };
 

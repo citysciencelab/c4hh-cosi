@@ -12,6 +12,14 @@ const mutations = {
     addDisabledFeatureItem (state, featureItem) {
         state.disabledFeatureItems.push(featureItem);
     },
+
+    /**
+     * @param {Object} state The vuex state
+     * @param {...Object} items The items to append to the features list
+     */
+    appendFeaturesListItems (state, ...items) {
+        state.featuresListItems.push(...items);
+    },
     removeDisabledFeatureItem (state, featureItem) {
         state.disabledFeatureItems = state.disabledFeatureItems.filter(item => item !== featureItem);
     }

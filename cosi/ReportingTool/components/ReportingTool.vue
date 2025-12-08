@@ -1,6 +1,6 @@
 <script>
 import dayjs from "dayjs";
-import {mapGetters} from "vuex";
+import {mapGetters, mapActions} from "vuex";
 import PDFMaker from "../js/createPdf";
 import {getTotal, getCulmulativeTotal} from "../../Dashboard/utils/operations";
 import {getCenter as getCenterOfExtent} from "ol/extent";
@@ -102,7 +102,7 @@ export default {
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevel", "selectedDistrictNames", "selectedFeatures", "initMapping"]),
         ...mapGetters("Modules/TemplateManager", ["reportName", "reportLayerIds", "reportCategories"]),
         ...mapGetters("Modules/ReportingTool", ["readmeUrl"]),
-        ...mapGetters(["restServiceById"]),
+        ...mapGetters(["restServiceById", "visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
 
         /**
@@ -178,12 +178,18 @@ export default {
             return this.frontPageItems.find(item => item.selected === true);
         }
     },
+    watch: {
+        featuresListItems: "preparesInfrastructureData",
+        visibleSubjectDataLayerConfigs: "updateFeaturesList"
+    },
     activated () {
+        this.updateFeaturesList();
         this.preparesInfrastructureData();
         this.preparesStatGroups();
     },
     deactivated: () => undefined,
     methods: {
+        ...mapActions("Modules/FeaturesList", ["updateFeaturesList"]),
 
         /**
          * Creates the report and calls the download function.

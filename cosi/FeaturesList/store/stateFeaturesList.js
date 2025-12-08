@@ -20,6 +20,16 @@ const state = {
     resizableWindow: true,
     width: 0.5,
     // FeaturesList State
+    geomAttributes: {
+        area: [
+            {key: "flaeche_qm", factorToSqm: 1},
+            {key: "flaeche_ha", factorToSqm: 0.0001}
+        ],
+        lineString: [
+            {key: "laenge_m", factorToM: 1},
+            {key: "laenge_km", factorToM: 0.001}
+        ]
+    },
     mapping: [],
     featuresListItems: [],
     selectedFeatureItems: [],

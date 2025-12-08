@@ -3,8 +3,19 @@ import {generateSimpleGetters} from "@shared/js/utils/generators";
 import stateFeaturesList from "./stateFeaturesList";
 import layerCollection from "@core/layers/js/layerCollection";
 
-const getters = {
+export default {
     ...generateSimpleGetters(stateFeaturesList),
+
+    checkDisabledFeatures: state => function (layer) {
+        return state.disabledFeatureItems.filter(item => item.layerId === layer.get("id"));
+    },
+
+    getActiveVectorLayerList: (state, getters) => {
+        const layerList = layerCollection.getOlLayers().filter(layer => layer.getVisible());
+
+        return layerList.filter(layer => getters.flatActiveVectorLayerIdList.includes(layer.get("id")));
+    },
+
     selectedFeatures (state, {selectedFeatureItems}) {
         return selectedFeatureItems.map(item => item.feature);
     },
@@ -86,6 +97,3 @@ const getters = {
     isFeatureDisabled: (state, {disabledFeatureItems}) => feature => disabledFeatureItems.filter(item => item.feature === feature).length > 0,
     isFeatureActive: (state, {isFeatureDisabled}) => feature => (typeof feature.style_ === "object" || feature.style_ === null || feature.style_ === undefined) && !isFeatureDisabled(feature)
 };
-
-
-export default getters;

@@ -3,9 +3,6 @@ import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersFeaturesList";
 import mutations from "../store/mutationsFeaturesList";
 import actions from "../store/actionsFeaturesList";
-import getVectorlayerMapping from "../utils/getVectorlayerMapping";
-import {getContainingDistrictForFeature} from "../../utils/geomUtils";
-import {getLayerSource} from "../../utils/layer/getLayerSource";
 import highlightVectorFeature from "../../utils/highlightVectorFeature";
 import DetailView from "./DetailView.vue";
 import FeatureIcon from "./FeatureIcon.vue";
@@ -13,13 +10,9 @@ import FeaturesListToolbar from "./FeaturesListToolbar.vue";
 import {prepareTableExport, prepareDetailsExport, composeFilename} from "../utils/prepareExport";
 import exportXlsx from "../../utils/exportXlsx";
 import isEqual from "../../utils/array/isEqual";
-import layerCollection from "@core/layers/js/layerCollection";
-import VectorLayer from "ol/layer/Vector.js";
 import getColorFromNumber from "../../utils/getColorFromNumber";
 import chartMethods from "../utils/charts";
 import FeaturesScore from "./FeaturesListScore.vue";
-import setGeomAttributes from "../../utils/features/setGeomAttributes";
-import getFeatureStyle from "../../utils/features/getFeatureStyle";
 import
 {
     Fill,
@@ -127,17 +120,7 @@ export default {
             distScoreLayer: null,
             exportDetails: false,
             dipasInFeaturesList: true,
-            sumUpLayers: false,
-            geomAttributes: {
-                area: [
-                    {key: "flaeche_qm", factorToSqm: 1},
-                    {key: "flaeche_ha", factorToSqm: 0.0001}
-                ],
-                lineString: [
-                    {key: "laenge_m", factorToM: 1},
-                    {key: "laenge_km", factorToM: 0.001}
-                ]
-            }
+            sumUpLayers: false
         };
     },
     computed: {
@@ -305,8 +288,6 @@ export default {
         // this.isTimeSeriesAnalyseShow = typeof this.$store.state.configJson.Portalconfig.menu.tools.children.timeSeriesAnalyse !== "undefined";
     },
     async mounted () {
-        // initally set the facilities mapping based on the config.json
-        this.setMapping(getVectorlayerMapping(this.layerConfig.subjectlayer));
         if (typeof this.selectedDistrictLevel !== "undefined") {
             this.updateFeaturesList();
         }
@@ -396,71 +377,6 @@ export default {
             }
 
             return additionalColumns;
-        },
-
-        getActiveVectorLayerList () {
-            const layerList = layerCollection.getOlLayers().filter(layer => layer.getVisible());
-
-            return layerList.filter(layer => this.flatActiveVectorLayerIdList.includes(layer.get("id")));
-        },
-
-        /**
-         * Reads the active vector layers, constructs the list of table items and writes them to the store.
-         * Finds the containing district from districtSelector for each feature
-         * @todo connect to other features and statistics to build location score
-         * @param {string} senderName name of component trying to update the featuresList (optional, passed to updateFeaturesList event)
-         * @returns {void}
-         */
-        updateFeaturesList (senderName) {
-            if (this.groupActiveLayer.length > 0) {
-                this.items = this.getActiveVectorLayerList().reduce((list, vectorLayer) => {
-
-                    const features = getLayerSource(vectorLayer)?.getFeatures() || [],
-                        // only features that can be seen on the map
-                        visibleFeatures = features.filter(this.isFeatureActive),
-                        layerMap = this.layerMapById(vectorLayer.get("id")),
-                        layerStyleFunction = vectorLayer.getStyleFunction?.();
-
-
-                    list.push(...this.checkDisabledFeatures(vectorLayer));
-                    return [...list, ...visibleFeatures.map((feature) => {
-                        /**
-                         * Set area attributes for polygons, where they are not set in the dataset
-                         * @todo should go somewhere else...
-                         */
-                        setGeomAttributes(feature, this.geomAttributes);
-                        const addressArray = layerMap.addressField.map(field => feature.get(field)),
-                            address = addressArray.length === 3 ? `${addressArray[0]} ${addressArray[1]}, ${addressArray[2]}` : addressArray.join(", ");
-
-                        return {
-                            key: feature.getId(),
-                            name: feature.get(layerMap.keyOfAttrName),
-                            style: getFeatureStyle(feature, layerStyleFunction),
-                            district: getContainingDistrictForFeature(this.selectedDistrictLevel, feature, false),
-                            group: layerMap.group,
-                            layerName: layerMap.id,
-                            layerId: layerMap.layerId,
-                            gfiAttributes: vectorLayer.values_.gfiAttributes,
-                            type: feature.get(layerMap.categoryField),
-                            address,
-                            feature: feature,
-                            enabled: true,
-                            isSimulation: feature.get("isSimulation") || false,
-                            isModified: feature.get("isModified") || false,
-                            ...Object.fromEntries(layerMap.numericalValues.map(field => [field.id, feature.get(field.id)])),
-                            ...Object.fromEntries(layerMap.additionalValues.map(field => [field.id, feature.get(field.id)]))
-                        };
-                    })];
-                }, []);
-            }
-            else {
-                this.items = [];
-            }
-            this.$root.$emit("featureListUpdatedBy-" + (senderName ? senderName : "Unknown"));
-        },
-
-        checkDisabledFeatures (layer) {
-            return this.disabledFeatureItems.filter(item => item.layerId === layer.get("id"));
         },
 
         /**
