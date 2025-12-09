@@ -262,7 +262,7 @@ export default {
                 class="mb-3 d-flex flex-nowrap"
                 :class="[cards.length > 1 ? 'col col-10' : 'col col-11']"
                 :icon="card.icon"
-                closable
+                closeable
                 @click:close="removeCard(index, card)"
             >
                 <Badges
