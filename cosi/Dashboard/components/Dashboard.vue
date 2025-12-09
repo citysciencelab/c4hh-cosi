@@ -225,7 +225,7 @@ export default {
                 return this.districtColumns.find(col => col.text === name);
             });
 
-            this.districtColumns = newDistrictColumns;
+            this.setDistrictColumns(newDistrictColumns);
         },
 
         /**
