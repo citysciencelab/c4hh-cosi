@@ -1,6 +1,7 @@
 .card {
     border-radius: $badge-border-radius;
     .card-body {
+        border-radius: calc($badge-border-radius - 1px);
         .label {
             color: adjust-color($dark_grey, $lightness: 15%);
             font-size: $font-size-base * 0.9;
@@ -22,7 +23,8 @@
 
 .card-active {
     border-color: $secondary;
-    border-width: 2px;
+    color: $secondary;
+    outline: 1px solid $secondary;
     i {
         color: $secondary;
     }

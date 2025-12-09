@@ -117,6 +117,7 @@ export default {
                 scaleUnit: this.scaleUnit,
                 distance,
                 maxDistance,
+                mergePolygons: this.mergePolygons,
                 baseUrl: this.baseUrl
             });
 

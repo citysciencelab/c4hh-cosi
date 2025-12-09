@@ -4,8 +4,12 @@ export default {
     props: {
         closeable: {
             type: Boolean,
-            default: true,
+            default: false,
             required: false
+        },
+        hoverable: {
+            type: Boolean,
+            default: false
         },
         icon: {
             type: String,
@@ -18,7 +22,10 @@ export default {
 </script>
 
 <template lang="html">
-    <div class="card shadow-sm">
+    <div
+        class="card shadow-sm"
+        :class="{hoverable}"
+    >
         <div class="card-body p-2 d-flex flex-row align-center">
             <div
                 v-if="icon"
@@ -26,7 +33,7 @@ export default {
             >
                 <i :class="icon" />
             </div>
-            <div class="ps-4 flex-grow-1">
+            <div class="px-4 flex-grow-1">
                 <slot />
             </div>
             <button

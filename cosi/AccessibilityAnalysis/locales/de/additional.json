@@ -23,6 +23,14 @@
                     "directions": "Berechnete Routen",
                     "transportType": "Verkehrsmittel",
                     "errorAlert": "Die Erreichbarkeit konnte nicht berechnet werden. Bitte wählen Sie andere Parameter und versuchen Sie es erneut.",
+                    "visualizationOptions": {
+                        "header": "Visualisierungsoptionen",
+                        "visualization": "Visualisierung",
+                        "mergePolygons": "Flächen zusammenführen",
+                        "mergePolygonsInfo": "Überlappende Erreichbarkeiten werden automatisch zu einer einzigen großen Fläche kombiniert.",
+                        "dontMergePolygons": "Flächen einzeln anzeigen",
+                        "dontMergePolygonsInfo": "Jede Erreichbarkeit bleibt getrennt. Wenn sie sich überschneiden, wird die Überlappung sichtbar."
+                    },
                     "transportTypes": {
                         "clear": "-Leeren-",
                         "driving-car": "Auto",

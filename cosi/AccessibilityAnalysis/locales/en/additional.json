@@ -23,6 +23,14 @@
                     "directions": "Calculated directions",
                     "transportType": "Type of transportation",
                     "errorAlert": "The accessibility could not be calculated. Please select different parameters and try again.",
+                    "visualizationOptions": {
+                        "header": "Visualization options",
+                        "visualization": "Visualization",
+                        "mergePolygons": "Merge areas",
+                        "mergePolygonsInfo": "Overlapping accessibility areas are automatically combined into a single large area.",
+                        "dontMergePolygons": "Show areas individually",
+                        "dontMergePolygonsInfo": "Each accessibility area remains separate. If they overlap, the overlap will be visible."
+                    },
                     "transportTypes": {
                         "clear": "-clear-",
                         "driving-car": "Car",

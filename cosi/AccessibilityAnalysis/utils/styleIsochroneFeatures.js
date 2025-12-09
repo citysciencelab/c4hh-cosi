@@ -13,7 +13,7 @@ const defaultIsochroneColors = [
  * @returns {void}
  */
 function styleIsochroneFeatures (features, colors = defaultIsochroneColors) {
-    if (!Array.isArray(features) || features.length !== 3 && features.length !== 4) {
+    if (!Array.isArray(features)) {
         console.error("AccessibilityAnalysis/utils/styleIsochroneFeatures: The first parameter must be a non empty array, but got " + typeof features);
         return;
     }
@@ -21,38 +21,55 @@ function styleIsochroneFeatures (features, colors = defaultIsochroneColors) {
         console.error("AccessibilityAnalysis/utils/styleIsochroneFeatures: The second parameter must be an array, but got " + typeof colors);
         return;
     }
-    const startIndex = features.length === 3 ? 0 : 1;
+    const containsTrafficFlowFeature = features.length % 4 === 0;
 
-    for (let i = startIndex; i < features.length; i++) {
-        features[i].setStyle(
+    if (containsTrafficFlowFeature) {
+        features.forEach((feature, index) => {
+            if (index % 4 === 0) {
+                feature.setStyle(
+                    new Style({
+                        fill: new Fill({
+                            color: "rgba(255, 255, 255, 0)"
+                        }),
+                        stroke: new Stroke({
+                            color: "rgba(159, 25, 215, 1)",
+                            width: 4,
+                            lineDash: [10, 10]
+                        })
+                    })
+                );
+                return;
+            }
+            feature.setStyle(
+                new Style({
+                    fill: new Fill({
+                        color: colors[(index % 4) - 1]
+                    }),
+                    stroke: new Stroke({
+                        color: "white",
+                        width: 2
+                    }),
+                    zIndex: index % 4
+                })
+            );
+        });
+        return;
+    }
+
+    features.forEach((feature, index) => {
+        feature.setStyle(
             new Style({
                 fill: new Fill({
-                    color: colors[i - startIndex]
+                    color: colors[index % 3]
                 }),
                 stroke: new Stroke({
                     color: "white",
                     width: 2
                 }),
-                zIndex: i
+                zIndex: index % 3
             })
         );
-    }
-
-    // reference isochrone feature for traffic flow index = 1
-    if (startIndex === 1) {
-        features[0].setStyle(
-            new Style({
-                fill: new Fill({
-                    color: "rgba(255, 255, 255, 0)"
-                }),
-                stroke: new Stroke({
-                    color: "rgba(159, 25, 215, 1)",
-                    width: 4,
-                    lineDash: [10, 10]
-                })
-            })
-        );
-    }
+    });
 }
 
 export {

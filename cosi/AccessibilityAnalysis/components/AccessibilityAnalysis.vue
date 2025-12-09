@@ -4,6 +4,8 @@ import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
+import {VExpandTransition} from "vuetify/components/transitions";
+import {VItemGroup, VItem} from "vuetify/components/VItemGroup";
 import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
@@ -30,11 +32,13 @@ import ResultManagement from "../../shared/modules/resultManagement/components/R
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
+import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import {singleClick} from "ol/events/condition";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 
 export default {
     name: "AccessibilityAnalysis",
@@ -42,6 +46,7 @@ export default {
         AccessibilityAnalysisExport,
         AccessibilityAnalysisLegend,
         AccessibilityAnalysisTrafficFlow,
+        AccordionItem,
         AlertMessage,
         ButtonGroup,
         DropdownAutocomplete,
@@ -50,9 +55,13 @@ export default {
         LabeledSlider,
         ResultManagement,
         SimpleCard,
+        CustomCard,
         SwitchInput,
         TabBar,
-        ToolInfo
+        ToolInfo,
+        VExpandTransition,
+        VItem,
+        VItemGroup
     },
     data () {
         return {
@@ -86,6 +95,7 @@ export default {
             cardCounter: 1,
             facilityNames: [],
             directionsLayer: null,
+            mergePolygons: true,
             transportTypes: [
                 {
                     type: "driving-car",
@@ -395,6 +405,15 @@ export default {
         },
 
         /**
+         * Exits the result view by clearing the polygon layer, resetting the active set and setting defaults.
+         * @returns {void}
+         */
+        exitResultView () {
+            this.setActiveSet(null);
+            this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
+        },
+
+        /**
          * Gets a layer by its ID from the layer collection. If the layer does not exist,
          * it creates a new vector-based layer with the specified ID, adds it to the layer collection,
          * and then returns the newly created layer.         *
@@ -496,6 +515,7 @@ export default {
          */
         setDefaults () {
             this.useTravelTimeIndex = false;
+            this.mergePolygons = true;
             this.isAllFacilitiesChecked = false;
             this.setTransportType("driving-car");
             this.setScaleUnit("time");
@@ -686,6 +706,7 @@ export default {
                     travelTime: this.useTravelTimeIndex ? this.travelTime : undefined,
                     travelTimeIndex: this.useTravelTimeIndex ? travelTimeIndex[this.travelTime] : undefined,
                     useOuterBoundaries: this.useOuterBoundaries ? JSON.parse(JSON.stringify(this.useOuterBoundaries)) : undefined,
+                    mergePolygons: this.mergePolygons,
                     steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
                     selectionCards: this.selectionCards,
                     isAllFacilitiesChecked: this.isAllFacilitiesChecked,
@@ -948,6 +969,12 @@ export default {
             if (data.inputs.useTravelTimeIndex) {
                 result.push({icon: "bi bi-sliders", label: `Reisezeitindex: ${data.inputs.travelTimeIndex}, Tageszeit: ${data.inputs.travelTime}:00\u00A0Uhr`});
             }
+            if (data.inputs.selectionCards.length >= 2) {
+                result.push(data.inputs.mergePolygons
+                    ? {icon: "bi bi-union", label: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.visualization") + ": " + this.$t("additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.mergePolygons")}
+                    : {icon: "bi bi-subtract", label: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.visualization") + ": " + this.$t("additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.dontMergePolygons")}
+                );
+            }
 
             return result;
         },
@@ -1058,6 +1085,63 @@ export default {
             :label="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
             class="mb-3"
         />
+        <v-expand-transition>
+            <div
+                v-if="selectionCards.length >= 2 && !useOuterBoundaries"
+                class="mb-3"
+            >
+                <AccordionItem
+                    id="AccessibilityAnalysisVisualizationOptionsAccordion"
+                    :title="$t('additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.header')"
+                >
+                    <v-item-group
+                        v-model="mergePolygons"
+                        class="d-flex justify-content-between gap-3"
+                        selected-class="card-active"
+                        mandatory
+                    >
+                        <v-item
+                            v-slot="{toggle, selectedClass}"
+                            :value="true"
+                        >
+                            <CustomCard
+                                hoverable
+                                :class="selectedClass"
+                                role="button"
+                                @click="toggle(); exitResultView()"
+                            >
+                                <div class="d-flex-column text-center">
+                                    <i class="bi bi-union" />
+                                    <div>{{ $t('additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.mergePolygons') }}</div>
+                                    <div class="description">
+                                        {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.mergePolygonsInfo') }}
+                                    </div>
+                                </div>
+                            </CustomCard>
+                        </v-item>
+                        <v-item
+                            v-slot="{toggle, selectedClass}"
+                            :value="false"
+                        >
+                            <CustomCard
+                                hoverable
+                                :class="selectedClass"
+                                role="button"
+                                @click="toggle(); exitResultView()"
+                            >
+                                <div class="d-flex-column text-center">
+                                    <i class="bi bi-subtract" />
+                                    <div>{{ $t('additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.dontMergePolygons') }}</div>
+                                    <div class="description">
+                                        {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.dontMergePolygonsInfo') }}
+                                    </div>
+                                </div>
+                            </CustomCard>
+                        </v-item>
+                    </v-item-group>
+                </AccordionItem>
+            </div>
+        </v-expand-transition>
         <div
             v-if="mode !== 'path'"
         >

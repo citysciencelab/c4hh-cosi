@@ -79,7 +79,7 @@ export default {
 </script>
 
 <template lang="html">
-    <CustomCard :closeable="false">
+    <CustomCard>
         <div class="d-flex flex-row mt-3 me-3">
             <div class="dropdown align-self-start mt-2 me-3">
                 <button

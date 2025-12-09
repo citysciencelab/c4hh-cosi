@@ -14,14 +14,14 @@ let abortController;
  * @param {*} {transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl} parameters
  * @return {*} features
  */
-export async function createIsochrones ({transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl, projectionCode}) {
+export async function createIsochrones ({transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl, projectionCode, mergePolygons}) {
     let ret;
 
     if (coordinates.length === 1) {
         ret = await createIsochronesPoint(transportType, coordinates[0], scaleUnit, distance, maxDistance, baseUrl, projectionCode);
         return ret;
     }
-    return createIsochronesPoints({transportType: transportType, coordinates: coordinates, scaleUnit: scaleUnit, distance: distance, maxDistance: maxDistance, selectedFacilityNames: null, batchSize: batchSize || 200, baseUrl: baseUrl, projectionCode: projectionCode});
+    return createIsochronesPoints({transportType, coordinates, scaleUnit, distance, maxDistance, selectedFacilityNames: null, batchSize: batchSize || 200, baseUrl, projectionCode, mergePolygons});
 }
 
 /**
@@ -85,6 +85,7 @@ async function createIsochronesPoint (transportType, coordinate, scaleUnit, dist
  * @param {*} args.batchSize batchSize
  * @param {*} args.baseUrl baseUrl
  * @param {*} args.projectionCode projectionCode
+ * @param {Boolean} args.mergePolygons mergePolygons
  * @return {*} features
  */
 async function createIsochronesPoints (args) {
@@ -130,6 +131,8 @@ async function createIsochronesPoints (args) {
                 reversedFeatures = json.reverse(),
                 groupedFeatures = [];
 
+            features = reversedFeatures;
+
             for (let i = 0; i < steps; i++) {
                 groupedFeatures.push([]);
             }
@@ -152,8 +155,13 @@ async function createIsochronesPoints (args) {
         }
     }
 
-    if (groupedFeaturesList.length) {
+    if (!groupedFeaturesList.length) {
+        return [];
+    }
+    if (args.mergePolygons) {
         const format = new GeoJSON();
+
+        features = [];
 
         for (let i = 0; i < steps; i++) {
             let layeredList = groupedFeaturesList.map(groupedFeatures => groupedFeatures[i]),
@@ -190,7 +198,11 @@ async function createIsochronesPoints (args) {
             });
             features = features.concat(layerUnionFeatures);
         }
+        return features;
     }
+
+    features = transformFeatures(features, "EPSG:4326", args.projectionCode);
+
     return features;
 }
 
