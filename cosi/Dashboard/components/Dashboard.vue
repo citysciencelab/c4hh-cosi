@@ -32,7 +32,7 @@ import {VApp} from "vuetify/components/VApp";
 import {VBtn} from "vuetify/components/VBtn";
 import {VCheckbox} from "vuetify/components/VCheckbox";
 import {VContainer, VRow} from "vuetify/components/VGrid";
-import {VDataTable} from "vuetify/components/VDataTable";
+import {VDataTableVirtual} from "vuetify/components/VDataTable";
 import {VIcon} from "vuetify/components/VIcon";
 import {VMain} from "vuetify/components/VMain";
 import {VSelect} from "vuetify/components/VSelect";
@@ -52,7 +52,7 @@ export default {
         VBtn,
         VCheckbox,
         VContainer,
-        VDataTable,
+        VDataTableVirtual,
         VIcon,
         VMain,
         VRow,
@@ -717,9 +717,10 @@ export default {
                         @reorderColumns="reorderColumns"
                     />
                     <v-row class="dashboard-table-wrapper">
-                        <v-data-table
+                        <v-data-table-virtual
                             ref="dashboard-table"
                             v-model="selectedItems"
+                            height="560"
                             :headers="columns"
                             :items="items"
                             :group-by="[{key: 'groupIndex', order: 'asc'}]"
@@ -728,7 +729,6 @@ export default {
                             show-select
                             hide-default-footer
                             fixed-header
-                            density="compact"
                             class="dashboard-table"
                             @update:current-items="setCurrentItems"
                             @hook:mounted="collapseAllGroups"
@@ -912,7 +912,7 @@ export default {
                                     <span>{{ $t('additional:modules.tools.cosi.dashboard.avgCol') }} {{ item.expanded ? '' : `(${currentTimeStamp})` }}</span>
                                 </v-tooltip>
                             </template>
-                        </v-data-table>
+                        </v-data-table-virtual>
                     </v-row>
                 </v-container>
             </v-main>
@@ -960,42 +960,44 @@ export default {
 <style lang="scss">
 
 #dashboard-wrapper {
-    height: 100%;
-    .v-main {
-        height: 100%;
-        .v-container {
-            height: 100%;
-            .dashboard-table-wrapper {
-                height: calc(100% - 80px);
-            }
-        }
-    }
-
     .name-input {
         .v-snack__wrapper {
             min-width: 40vw;
         }
     }
 
-
     .dashboard-table {
-        height: 100%;
         .v-table__wrapper {
             overflow-x: auto;
             overflow-y: auto;
-            height: 100%;
+            > table > thead > tr > th {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
         }
 
         thead {
             .district-header {
                 position: relative;
                 margin-top: 10px;
+                > div {
+                    min-width: 100px;
+                }
+                .v-selection-control__input {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 30px;
+                }
+
             }
             .v-input {
                 font-size: unset;
+                min-width: 100px;
                 label {
-                    font-size: 12px;
+                    font-size: 11px;
                     font-weight: 700;
+                    word-break: normal;
+                    text-align: left;
                     i {
                         font-size: 20px;
                     }
@@ -1004,9 +1006,6 @@ export default {
         }
 
         th.minimized {
-            width: 20px;
-            max-width:20px;
-
             .v-input {
                 display: none;
             }
