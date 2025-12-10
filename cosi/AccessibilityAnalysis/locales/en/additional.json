@@ -92,7 +92,8 @@
                     "noRouteCalculated": "No route calculated yet. To calculate a route, please open the routing tool, choose a start and end point, and calculate a route.",
                     "considerTrafficFlow": "Consider traffic flow",
                     "calculateAccessibility": "Calculate accessibility",
-                    "inhabitants": "Inhabitants"
+                    "inhabitants": "Inhabitants",
+                    "cardTitle": "Accessibility "
                 }
             }
         }

@@ -10,6 +10,7 @@
  * @property {boolean} isVisibleInMenu if true, tool is selectable in menu (config-param)
  * @property {boolean} deactivateGFI flag if tool should deactivate gfi (config-param)
  * @property {String[]} isochroneColors - colors for the isochrone features.
+ * @property {Number} cardCounter - counter for cards.
  */
 const state = {
     active: false,
@@ -61,7 +62,8 @@ const state = {
     serviceId: "bkg_ors",
     fallbackServiceId: "csl_ors",
     wpsServiceId: "1001",
-    wpsProcess: "einwohner_ermitteln.fmw"
+    wpsProcess: "einwohner_ermitteln.fmw",
+    cardCounter: 0
 };
 
 export default state;

@@ -92,7 +92,8 @@
                     "noRouteCalculated": "Noch keine Route berechnet. Um eine Route zu berechnen, bitte das Routing-Tool öffnen, Start- und Zielpunkt wählen und eine Route berechnen.",
                     "considerTrafficFlow": "Verkehrsfluss berücksichtigen",
                     "calculateAccessibility": "Erreichbarkeit berechnen",
-                    "inhabitants": "Einwohner"
+                    "inhabitants": "Einwohner",
+                    "cardTitle": "Erreichbarkeit "
                 }
             }
         }

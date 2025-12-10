@@ -92,7 +92,6 @@ export default {
                     info: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.noRouteCalculated")
                 }
             ],
-            cardCounter: 1,
             facilityNames: [],
             directionsLayer: null,
             mergePolygons: true,
@@ -309,7 +308,6 @@ export default {
     * @returns {void}
     */
     created () {
-        this.cardCounter = this.dataSets.length;
         this.visibleVectorLayers = this.getVisibleVectorLayers();
 
         if (this.routingDirections) {
@@ -364,6 +362,16 @@ export default {
         ...mapActions("Modules/Routing/Directions", ["reset", "setRoutingDirections"]),
         ...methods,
 
+        /**
+         * Generates the next card title and increments the internal card counter.
+         * @returns {String} The generated card title (e.g. "Erreichbarkeit 3").
+         */
+        generateCardTitle () {
+            const nextNumber = this.cardCounter + 1;
+
+            this.setCardCounter(nextNumber);
+            return `${this.$t('additional:modules.tools.cosi.accessibilityAnalysis.cardTitle')}${nextNumber}`;
+        },
         /**
          * Adds selection cards for all features in the given layer.
          * @param {ol/layer/Vector} layer - The layer from which to add cards.
@@ -654,7 +662,6 @@ export default {
             return 1 + Math.max(0, ...array.map(this.getArrayDepth));
         },
         createAnalysisSet: async function () {
-
             const analysisSet = {
                 inputs: {},
                 results: [],
@@ -710,7 +717,7 @@ export default {
                     steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
                     selectionCards: this.selectionCards,
                     isAllFacilitiesChecked: this.isAllFacilitiesChecked,
-                    title: "Erreichbarkeit " + this.cardCounter++
+                    title: this.generateCardTitle()
                 };
                 this.dataSets.unshift(analysisSet);
                 this.setActiveSet(0);
