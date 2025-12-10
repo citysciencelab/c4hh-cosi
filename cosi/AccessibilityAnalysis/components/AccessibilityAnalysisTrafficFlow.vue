@@ -2,15 +2,13 @@
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import {mapActions} from "vuex";
 import LabeledSlider from "../../shared/modules/slider/components/LabeledSlider.vue";
-import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
 
 export default {
     name: "AccessibilityAnalysisTrafficFlow",
     components: {
         AccordionItem,
-        LabeledSlider,
-        ToolInfo
+        LabeledSlider
     },
     props: {
         travelTime: {

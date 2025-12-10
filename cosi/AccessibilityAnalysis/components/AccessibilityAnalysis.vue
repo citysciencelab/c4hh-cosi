@@ -221,7 +221,7 @@ export default {
                 if (typeof computedProperty === "function") {
                     const capName = key.charAt(0).toUpperCase() + key.slice(1);
 
-                    if (this.dataSets[index].inputs[key]) {
+                    if (Object.prototype.hasOwnProperty.call(this.dataSets[index].inputs, key) && typeof this.dataSets[index].inputs[key] !== "undefined") {
                         this["set" + capName](this.dataSets[index].inputs[key]);
                     }
                 }
@@ -419,7 +419,10 @@ export default {
          * @returns {void}
          */
         exitResultView () {
-            this.setActiveSet(null);
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.removeDataOnMap();
+            }
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
         },
 
@@ -714,7 +717,7 @@ export default {
                     useTravelTimeIndex: this.useTravelTimeIndex !== undefined ? JSON.parse(JSON.stringify(this.useTravelTimeIndex)) : undefined,
                     travelTime: this.useTravelTimeIndex ? this.travelTime : undefined,
                     travelTimeIndex: this.useTravelTimeIndex ? travelTimeIndex[this.travelTime] : undefined,
-                    useOuterBoundaries: this.useOuterBoundaries ? JSON.parse(JSON.stringify(this.useOuterBoundaries)) : undefined,
+                    useOuterBoundaries: this.useOuterBoundaries,
                     mergePolygons: this.mergePolygons,
                     steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
                     selectionCards: this.selectionCards,
@@ -801,15 +804,20 @@ export default {
 
         },
         removeAll () {
+            this.removeDataOnMap();
+            this.removePointMarker();
+            this.showErrorAlert = false;
+            this.selectionCards = [];
+        },
+
+        removeDataOnMap () {
             this.setCoordinate([]);
             this.setSteps([0, 0, 0]);
             this.setIsochroneFeatures([]);
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
             this.resetIsochroneBBox();
-            this.removePointMarker();
-            this.showErrorAlert = false;
-            this.selectionCards = [];
         },
+
         /**
          * Removes all the data.
          * @returns {void}
@@ -859,20 +867,10 @@ export default {
         },
 
         /**
-         * Sets the value of `useTravelTimeIndex`.
-         * @param {Boolean} value - True if travel time index should be used
+         * Updates the active mode and deselects active card if any.
+         * @param {Object} obj - The mode object.
          * @returns {void}
          */
-        setUseTravelTimeIndex (value) {
-            this.showErrorAlert = false;
-            this.useTravelTimeIndex = value;
-        },
-
-        updateTime (value) {
-            this.showErrorAlert = false;
-            this.setTime(parseInt(value, 10));
-        },
-
         setActiveMode (obj) {
             this.activeMode = obj;
             this.setMode(this.activeMode.type);
@@ -881,27 +879,95 @@ export default {
                 this.setActiveSet(null);
             }
         },
-        toggleLevel (evt) {
-            this.setActiveSet(null);
-            this.removeAll();
-            this.setScaleUnit(evt);
+
+        /**
+         * Updates the calculation method (distance|time) and deselects active card if any.
+         * @param {String} value - The scale unit.
+         * @returns {void}
+         */
+        updateCalculationMethod (value) {
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.removeDataOnMap();
+            }
+            this.setScaleUnit(value);
         },
+
+        /**
+         * Updates the distance or time based on the selected scale unit.
+         * @param {String} value - The new distance or time value.
+         * @returns {void}
+         */
+        updateDistanceOrTime (value) {
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.removeDataOnMap();
+            }
+            if (this.scaleUnit === "time") {
+                this.setTime(parseInt(value, 10));
+            }
+            else {
+                this.setDistance(parseInt(value, 10));
+            }
+            this.showErrorAlert = false;
+        },
+
+        /**
+         * Toggles the use of outer boundaries for the analysis.
+         * @param {boolean} value - True if outer boundaries should be set, false otherwise.
+         * @returns {void}
+         */
+        updateOuterBoundaries (value) {
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.removeDataOnMap();
+            }
+            this.setUseOuterBoundaries(value);
+            if (this.selectionCards.length) {
+                this.resetSelectionCards();
+            }
+        },
+
+        /**
+         * Sets the transport type and deselects active card if any.
+         * @param {String} type - The transport type.
+         * @returns {void}
+         */
         updateTransportType (val) {
             if (this.hasActiveSet) {
                 this.setActiveSet(null);
-                this.removeAll();
+                this.removeDataOnMap();
             }
             this.setTransportType(val);
             this.showErrorAlert = false;
         },
-        updateDistance (distance) {
+
+        /**
+         * Sets the travel time and deselects active card if any.
+         * @param {String} value - The travel time value.
+         * @returns {void}
+         */
+        updateTravelTime (value) {
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.removeDataOnMap();
+            }
             this.showErrorAlert = false;
-            if (this.scaleUnit === "time") {
-                this.setTime(parseInt(distance, 10));
+            this.setTravelTime(value);
+        },
+
+        /**
+         * Sets the value of `useTravelTimeIndex` and deselects active card if any.
+         * @param {Boolean} value - True if travel time index should be used
+         * @returns {void}
+         */
+        updateUseTravelTimeIndex (value) {
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.removeDataOnMap();
             }
-            else {
-                this.setDistance(parseInt(distance, 10));
-            }
+            this.showErrorAlert = false;
+            this.useTravelTimeIndex = value;
         },
 
         removeSelectionCard (cardToRemove, removeFromColl = true) {
@@ -1036,18 +1102,6 @@ export default {
             });
         },
 
-        /**
-         * Toggles the use of outer boundaries for the analysis.
-         * @param {boolean} value - True if outer boundaries should be set, false otherwise.
-         * @returns {void}
-         */
-        toggleOuterBoundaries (value) {
-            this.setUseOuterBoundaries(value);
-            this.setActiveSet(null);
-            if (this.selectionCards.length) {
-                this.resetSelectionCards();
-            }
-        },
 
         updateSelectedFacilityNames (newValue) {
             if (this.mode !== "facility") {
@@ -1121,7 +1175,7 @@ export default {
             :id="'featureOutline'"
             :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
             :checked="useOuterBoundaries"
-            :interaction="() => toggleOuterBoundaries(!useOuterBoundaries)"
+            :interaction="() => updateOuterBoundaries(!useOuterBoundaries)"
             :label="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
             class="mb-3"
         />
@@ -1213,7 +1267,7 @@ export default {
             :buttons="scaleUnits.map(card => ({name: card.name, value: card.type}))"
             :pre-checked-value="scaleUnit"
             group="scaleUnits"
-            @show-view="toggleLevel"
+            @show-view="updateCalculationMethod"
         />
         <LabeledSlider
             :key="sliderRerenderKey"
@@ -1222,7 +1276,7 @@ export default {
             :max="rangeSettings[transportType]?.[scaleUnit]?.max ?? rangeSettings.default[scaleUnit].max"
             :unit="getScaleUnitByType(scaleUnit).unit"
             :model-value="scaleUnit === 'time' ? time : distance"
-            @update:model-value="updateDistance"
+            @update:model-value="updateDistanceOrTime"
         />
         <div
             v-if="transportType === 'driving-car' && scaleUnit === 'time' && mode === 'point'"
@@ -1232,19 +1286,19 @@ export default {
                 :id="'autoTrafficFlow'"
                 :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.considerTrafficFlow')"
                 :checked="useTravelTimeIndex"
-                :interaction="() => setUseTravelTimeIndex(!useTravelTimeIndex)"
+                :interaction="() => updateUseTravelTimeIndex(!useTravelTimeIndex)"
                 :label="$t('additional:modules.tools.cosi.accessibilityAnalysis.considerTrafficFlow')"
             />
             <AccessibilityAnalysisTrafficFlow
                 v-if="useTravelTimeIndex"
                 :travel-time="travelTime"
-                @update:travel-time="setTravelTime"
+                @update:travel-time="updateTravelTime"
             />
         </div>
         <FlatButton
             class="mx-auto"
             icon="bi bi-play-circle"
-            :disabled="selectionCards.length === 0"
+            :disabled="selectionCards.length === 0 || hasActiveSet"
             :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.calculateAccessibility')"
             :spinner-trigger="showSpinner"
             @click.native="createAnalysisSet()"
