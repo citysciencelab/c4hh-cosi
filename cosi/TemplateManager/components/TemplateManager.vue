@@ -11,6 +11,7 @@ import TemplateManagerCard from "./TemplateManagerCard.vue";
 import {VChip} from "vuetify/components/VChip";
 import {VChipGroup} from "vuetify/components/VChipGroup";
 import layerCollection from "@core/layers/js/layerCollection";
+import store from "@appstore/index.js";
 
 export default {
     name: "TemplateManager",
@@ -33,6 +34,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters(["configuredModules", "allLayerConfigs"]),
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Modules/TemplateManager", Object.keys(getters)),
         ...mapGetters("Modules/DistrictSelector", {
@@ -42,7 +44,6 @@ export default {
             isDistrictSelectorActive: "active"
         }),
         ...mapGetters("Maps", ["getVisibleLayerList"]),
-        ...mapGetters(["visibleSubjectDataLayerConfigs", "allLayerConfigs"]),
 
         /**
          * Checks whether at least one template is available.
@@ -212,7 +213,13 @@ export default {
         }
     },
     watch: {
-        templates: "createFilterObjects",
+        templates: {
+            handler () {
+                this.createFilterObjects();
+            },
+            deep: true,
+            immediate: true
+        },
 
         /**
          * Listens to the district selector.
@@ -238,11 +245,12 @@ export default {
         this.loadTemplates();
     },
     methods: {
+        ...mapActions(["addOrReplaceLayer"]),
         ...mapMutations("Modules/TemplateManager", Object.keys(mutations)),
         ...mapActions("Modules/TemplateManager", Object.keys(actions)),
+        ...mapActions("Menu", ["changeCurrentComponent"]),
         ...mapMutations("Modules/DistrictSelector", ["setMapping"]),
         ...mapActions("Modules/SaveSession", ["loadSessionData"]),
-        ...mapActions(["replaceByIdInLayerConfig"]),
 
         /**
          * Returns all visible vector layers from the layer collection that are of supported types.
@@ -365,15 +373,7 @@ export default {
                     else {
                         layer = this.allLayerConfigs.find(lay => lay.id === layerId);
                         if (layer) {
-                            this.replaceByIdInLayerConfig({
-                                layerConfigs: [{
-                                    id: layer.id,
-                                    layer: {
-                                        id: layer.id,
-                                        visibility: visiblity
-                                    }
-                                }]
-                            });
+                            this.addOrReplaceLayer({layerId: layer.id, visibility: visiblity});
                         }
                     }
                 });
@@ -392,10 +392,10 @@ export default {
             }
 
             if (typeof startingTool === "string") {
-                this.$store.dispatch("Tools/setToolActive", {id: startingTool, active: true});
+                store.dispatch("Menu/changeCurrentComponent", {type: startingTool, side: "secondaryMenu", props: {name: startingTool}}, {root: true});
             }
             else if (typeof this.toolToOpen === "string") {
-                this.$store.dispatch("Tools/setToolActive", {id: this.toolToOpen, active: true});
+                store.dispatch("Menu/changeCurrentComponent", {type: this.toolToOpen, side: "secondaryMenu", props: {name: this.toolToOpen}}, {root: true});
             }
         },
 
@@ -592,10 +592,6 @@ export default {
         async activeCard (name, active) {
             this.activeTemplateName = name;
             this.isTemplateActive = active;
-
-            if (!active) {
-                this.openExportWindow(true);
-            }
 
             this.loadFromTemplate(this.activeTemplate, this.activeTemplateIndex, active);
 

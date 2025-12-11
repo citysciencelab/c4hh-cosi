@@ -137,6 +137,7 @@ export default {
                         <IconButton
                             class="p-1"
                             icon="bi bi-download"
+                            aria="visible"
                             :interaction="() => $emit('downloadSet')"
                             data-bs-toggle="dropdown"
                             data-bs-auto-close="outside"
