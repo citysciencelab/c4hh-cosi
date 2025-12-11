@@ -389,13 +389,12 @@ export default {
          * Performs OAF request to get the statistical features and emits matching district names.
          * @param {Object} layer An oaf layer object containing at least url and collection.
          * @param {Number|String} year The year to retrieve the data for.
-         * @param {String[]} propertyNames The property names that should be available in the returned features.
          * @param {String} [filter = true] The CQL2 filter property for oaf request. (https://lgv-hamburg.atlassian.net/wiki/spaces/EDDUN/pages/109183062/OAF+OGC+API+Features#4-Filtern-mit-CQL2)
          * @returns {Object[]} The retrieved features or an empty array.
          */
-        async fetchFeatures (layer, year, propertyNames, filter = true) {
+        async fetchFeatures (layer, year, filter = true) {
 
-            if (!layer || !year || !propertyNames) {
+            if (!layer || !year) {
                 return [];
             }
 
@@ -403,9 +402,7 @@ export default {
                 limit: 10000,
                 filterCrs: "http://www.opengis.net/def/crs/EPSG/0/25832",
                 crs: "http://www.opengis.net/def/crs/EPSG/0/25832",
-                propertyNames: propertyNames,
                 filter: filter,
-                skipGeometry: false,
                 literalFilters: {jahr: `${year}`}
             });
 
@@ -564,7 +561,7 @@ export default {
                     requestTimestamp = this.latestPendingRequest = Date.now();
 
                     this.features = await this.fetchFeatures(
-                        this.selectedStatLayer, this.selectedYear, [this.selectedCategory, this.keyOfAttrNameForSelectedLayer], topFilter
+                        this.selectedStatLayer, this.selectedYear, topFilter
                     );
                     this.features.forEach(feature => {
                         feature.properties[this.selectedCategory] ||= 0;
@@ -588,7 +585,7 @@ export default {
             requestTimestamp = this.latestPendingRequest = Date.now();
 
             this.features = await this.fetchFeatures(
-                this.selectedStatLayer, this.selectedYear, [this.selectedCategory, this.keyOfAttrNameForSelectedLayer]
+                this.selectedStatLayer, this.selectedYear
             );
             this.features.forEach(feature => {
                 feature.properties[this.selectedCategory] ||= 0;
