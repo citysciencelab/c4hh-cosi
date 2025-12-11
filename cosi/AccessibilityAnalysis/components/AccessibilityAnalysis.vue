@@ -264,21 +264,19 @@ export default {
                 if (this.routingDirections === null) {
                     return;
                 }
+                const duration = Math.floor(this.routingDirections.duration / 60),
+                    newCard = {
+                        coord25832: [],
+                        coord4326: [],
+                        icon: this.activeMode.icon,
+                        id: this.routingDirections.bbox.toString(),
+                        label: "Berechnete Route",
+                        text: `Entfernung: ${this.routingDirections.distance} m | Zeit: ${duration} min | Verkehrsmittel: ${this.mappedRoutingProfiles[this.settings.speedProfile]}`,
+                        layerName: "Route"
+                    };
 
                 this.setScaleUnit("distance");
                 this.setTransportType("foot-walking");
-                layerCollection.addLayer(this.directionsLayer);
-
-                const newCard = {
-                    coord25832: "",
-                    coord4326: "",
-                    icon: this.activeMode.icon,
-                    id: this.routingDirections.bbox.toString(),
-                    label: "Berechnete Route",
-                    name: `Entfernung: ${this.routingDirections.distance} m | Zeit: ${this.routingDirections.duration} min | Verkehrsmittel: ${this.mappedRoutingProfiles[this.settings.speedProfile]}`,
-                    layerName: "layerName"
-                };
-
                 this.selectionCards = [newCard];
             }
         },
@@ -310,9 +308,13 @@ export default {
     * @returns {void}
     */
     created () {
+        this.setDefaults();
         this.visibleVectorLayers = this.getVisibleVectorLayers();
 
         if (this.routingDirections) {
+            this.directionsLayer = this.getLayerById("accessibility-directions");
+            this.directionsLayer.getLayer().setStyle(this.directionsRouteLayer.getStyleFunction());
+            this.directionsLayer.getLayer().setSource(this.directionsRouteSource);
             this.setActiveMode(this.getModeByType("path"));
         }
         else {
@@ -331,18 +333,12 @@ export default {
         this.getLayerById("accessibility-analysis").getLayer().setVisible(true);
         this.getLayerById("accessibility-analysis").getLayer().setZIndex(10);
 
-        this.directionsLayer = this.getLayerById("accessibility-directions");
-        this.directionsLayer.getLayer().setStyle(this.directionsRouteLayer.getStyleFunction());
-        this.directionsLayer.getLayer().setSource(this.directionsRouteSource);
-
         mapCollection.getMap("2D").addEventListener("click", this.onMapClick);
-        this.setDefaults();
+
         // onSearchbar(this.setSearchResultToOrigin);
         // onShowFeaturesById(this.tryUpdateIsochrones);
         // onShowAllFeatures(this.tryUpdateIsochrones);
         // onFeaturesLoaded(this.tryUpdateIsochrones);
-
-
     },
     unmounted () {
         this.setMode(this.availableModes[0].type);
@@ -361,7 +357,8 @@ export default {
         ...mapActions("Modules/AccessibilityAnalysis", ["getIsochrones"]),
         ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "removePointMarkerFeature"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
-        ...mapActions("Modules/Routing/Directions", ["reset", "setRoutingDirections"]),
+        ...mapActions("Modules/Routing/Directions", ["reset"]),
+        ...mapMutations("Modules/Routing/Directions", ["setRoutingDirections"]),
         ...methods,
 
         /**
