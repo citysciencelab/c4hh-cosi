@@ -262,6 +262,7 @@ export default {
                 tabindex="0"
             >
                 <TemplateAdminForm
+                    :key="activeMode.type"
                     :geo-data="dataOptions"
                     :stat-data="statOptions"
                     :tool-data="toolOptions"

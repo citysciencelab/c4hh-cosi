@@ -130,9 +130,6 @@ export default {
         if (this.showEditTemplate && this.selectedTemplate !== undefined) {
             this.changeSelectedTemplate(this.selectedTemplate);
         }
-
-        this.selectedGeoDataLabel = this.selectedGeoDataList;
-        this.selectedStatData = this.getStatDataObj(this.selectedStatDataList);
     },
     methods: {
         ...mapActions("Alerting", ["addSingleAlert"]),
