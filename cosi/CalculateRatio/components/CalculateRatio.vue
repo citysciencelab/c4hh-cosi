@@ -423,6 +423,7 @@ export default {
             this.setResults([]);
             this.setDataSets([]);
             this.setDataToColorCodeMap(false);
+            this.tableOrChart = "table";
         },
 
         setCoverageParams (obj) {
@@ -799,6 +800,10 @@ export default {
             }
 
             this.dataSets.splice(index, 1);
+
+            if (this.dataSets.length === 0) {
+                this.tableOrChart = "table";
+            }
         },
         /**
          * @description Downloads xls and geojson of each dataset.
@@ -815,13 +820,21 @@ export default {
          * @returns {Object[]} The prepared chart data.
          */
         preparesChartData () {
-            const chartData = [];
+            const chartData = [],
+                inputA = this.dataSets[this.activeSet].inputs.selectedFieldA,
+                inputB = this.dataSets[this.activeSet].inputs.selectedFieldB,
+                parameterA = this.dataSets[this.activeSet].inputs.facilityPropertyList_A.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_A[0] + ")" : "",
+                parameterB = this.dataSets[this.activeSet].inputs.facilityPropertyList_B.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_B[0] + ")" : "";
+
 
             this.availableColumns.forEach((type, idx) => {
                 chartData.push(
                     {
                         name: type.name,
-                        title: "Versorgungsanalyse: " + type.name
+                        title: [
+                            this.$t("additional:modules.tools.cosi.calculateRatio.title") + ": " + type.name + " - ",
+                            inputA + parameterA + " und " + inputB + parameterB + " für " + this.selectedYear
+                        ]
                     }
                 );
 

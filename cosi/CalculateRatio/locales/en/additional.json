@@ -43,7 +43,8 @@
                     "parameter": "Parameter",
                     "table": "Table",
                     "year": "Year",
-                    "yearsForStatisticalData": "Years for statistical data"
+                    "yearsForStatisticalData": "Years for statistical data",
+                    "calculationType": "Calculation type/ data set"
                 }
             }
         }

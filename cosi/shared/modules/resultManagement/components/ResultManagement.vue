@@ -68,7 +68,7 @@ export default {
             />
             {{ $t(title) }}
         </h5>
-        <div class="col-12 d-flex justify-content-end mb-3">
+        <div class="col-12 d-flex justify-content-between mb-3">
             <slot name="top" />
             <div class="d-flex align-self-center">
                 <IconButton

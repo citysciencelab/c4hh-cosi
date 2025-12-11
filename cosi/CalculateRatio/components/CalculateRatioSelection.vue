@@ -248,10 +248,10 @@ export default {
         v-model="selectedYear"
         :items="yearItemList"
         :label="$t('additional:modules.tools.cosi.calculateRatio.yearsForStatisticalData')"
-        class="mb-5"
+        class="mb-3"
     />
     <FlatButton
-        class="mx-auto mb-4"
+        class="mx-auto mb-3"
         icon="bi bi-plus-slash-minus"
         :disabled="calculationDisabled"
         :text="$t('additional:modules.tools.cosi.calculateRatio.calculate')"

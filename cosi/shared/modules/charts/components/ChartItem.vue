@@ -41,9 +41,15 @@ export default {
                     title: {
                         display: true,
                         text: "",
+                        align: "center",
                         font: {
                             size: 14,
                             color: "#424242"
+                        },
+                        fullSize: false,
+                        padding: {
+                            top: 10,
+                            bottom: 30
                         }
                     },
                     legend: {
@@ -157,6 +163,10 @@ export default {
          * @returns {void}
          */
         updateSelectedTag (newTag) {
+            if (!newTag) {
+                return;
+            }
+
             this.tags.forEach(tag => {
                 tag.selected = tag.label === newTag.label;
             });
@@ -169,20 +179,23 @@ export default {
     <div
         class="row"
     >
-        <TagGroup
-            v-if="data.length < 6"
-            class="mb-3 mt-2"
-            :items="tags"
-            :label="'Datensatz/Berechnung'"
-            @update:selected-items="updateSelectedTag"
-        />
-        <Dropdown-Autocomplete
-            v-else
-            :items="dropdownOptions"
-            :label="'Datensatz/Berechnung'"
-            :model-value="[selectedTagLabel]"
-            @update:model-value="loadChartData($event)"
-        />
+        <div v-if="data.length > 1">
+            <TagGroup
+                v-if="data.length < 6"
+                class="col mb-3 mt-2"
+                :items="tags"
+                :label="$t('additional:modules.tools.cosi.calculateRatio.calculationType')"
+                @update:selected-items="updateSelectedTag"
+            />
+            <Dropdown-Autocomplete
+                v-else
+                class="col"
+                :items="dropdownOptions"
+                :label="$t('additional:modules.tools.cosi.calculateRatio.calculationType')"
+                :model-value="[selectedTagLabel]"
+                @update:model-value="loadChartData($event)"
+            />
+        </div>
         <BarchartItem
             v-if="chartMode === 'bar'"
             :key="reloadChart"
