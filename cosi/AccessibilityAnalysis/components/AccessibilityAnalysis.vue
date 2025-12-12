@@ -721,10 +721,7 @@ export default {
                 };
                 this.dataSets.unshift(analysisSet);
                 this.setActiveSet(0);
-
-                if (this.dataSets.length === 1) {
-                    this.renderIsochrones(this.isochroneFeatures);
-                }
+                this.renderIsochrones(this.isochroneFeatures);
                 this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
                 this.setPopulationSize();
                 this.setCoordinate([]);
@@ -796,7 +793,7 @@ export default {
          * @returns {void}
          */
         downloadSet (evt) {
-            const index = evt.target.closest(".card").getAttribute("data-index");
+            const index = evt.target.closest(".card-total").getAttribute("data-index");
 
             downloadGeoJson(this.dataSets[index].geojson);
         },
@@ -813,7 +810,7 @@ export default {
          * @returns {void}
          */
         downloadScreenshot (evt) {
-            const index = evt.target.closest(".card").getAttribute("data-index"),
+            const index = evt.target.closest(".card-total").getAttribute("data-index"),
                 link = document.createElement("a");
 
             link.href = this.dataSets[index].inputs.screenshot;
@@ -827,7 +824,6 @@ export default {
 
             this.dataSets[this.activeSet].results = this.isochroneFeatures;
             this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
-
             this.renderIsochrones(this.isochroneFeatures);
         },
 

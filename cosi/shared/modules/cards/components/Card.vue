@@ -59,7 +59,7 @@ export default {
 </script>
 
 <template lang="html">
-    <div>
+    <div class="card-total">
         <div
             v-if="title"
             class="py-2 px-3"
