@@ -71,27 +71,43 @@ export default class PDFMaker {
     /**
      * Adds a table to the report.
      * @param {Array[]} body - The content of a table.
-     * @param {Number} width - The width of the first column.
+     * @param {Number} firstColumnWidth - The width of the first column.
+     * @param {String} [oddRowColor="#f5f5f5"] - Background color for odd (1,3,5...) rows.
+     * @param {String} [evenRowColor="#ffffff"] - Background color for even (2,4,6...) rows.
      * @returns {void}
      */
-    addTable (body, width) {
-        const widths = [];
+    addTable (body, firstColumnWidth, oddRowColor = "#f5f5f5", evenRowColor = "#ffffff") {
+        if (!Array.isArray(body) || body.length === 0) {
+            return;
+        }
 
-        body[0].forEach((columns, index) => {
-            if (index === 0) {
-                widths.push(width);
-            }
-            else {
-                widths.push("auto");
-            }
-        });
+        const widths = [],
+            tableBody = body.map((row, rowIndex) => {
+                return row.map((cell, colIndex) => {
+
+                    if (rowIndex === 0) {
+                        widths[colIndex] = colIndex === 0 ? firstColumnWidth : "auto";
+
+                        return cell;
+                    }
+                    const cellObj = typeof cell === "object"
+                        ? {...cell}
+                        : {text: cell, fontSize: 11, borderColor: this.borderColor};
+
+                    cellObj.fillColor = rowIndex % 2 === 0 ? evenRowColor : oddRowColor;
+
+                    return cellObj;
+                });
+            });
+
         this.content.push({
             table: {
                 headerRows: 1,
                 widths,
-                body
+                body: tableBody
             }
         });
+
         this.content.push("\n\n");
     }
 
