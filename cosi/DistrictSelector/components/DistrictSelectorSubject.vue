@@ -15,6 +15,7 @@ import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import {MultiPolygon, Polygon} from "ol/geom";
+import Overlay from "ol/Overlay.js";
 import {polygon as turfPolygon} from "@turf/helpers";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
@@ -78,9 +79,12 @@ export default {
                 this.toggleCardStatus(index);
             }
         });
+
+        this.createCircleOverlay();
     },
     beforeUnmount () {
         this.selectedInteraction = "";
+        mapCollection.getMap("2D").removeOverlay(this.circleOverlay);
     },
     methods: {
         ...mapActions("Maps", ["zoomToExtent"]),
@@ -127,6 +131,21 @@ export default {
                     return;
                 }
                 this.addCard(feature, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel);
+            });
+        },
+
+        /**
+         * Creates a circle overlay for displaying radius information during circle drawing.
+         * @returns {void}
+         */
+        createCircleOverlay () {
+            this.circleOverlayElement = document.createElement("div");
+            this.circleOverlayElement.className = "ol-tooltip ol-tooltip-measure";
+            this.circleOverlay = new Overlay({
+                id: "circle-overlay",
+                element: this.circleOverlayElement,
+                offset: [15, 0],
+                positioning: "center-left"
             });
         },
 
@@ -232,6 +251,7 @@ export default {
                     polygonGeom = polygonFromCircle(circleGeom, 128);
 
                 evt.feature.setGeometry(polygonGeom);
+                mapCollection.getMap("2D").removeOverlay(this.circleOverlay);
             }
             this.activeCard.drawnFeature = evt.feature;
             this.setSubjectFeature([this.activeCard.drawnFeature], this.activeCard.buffer);
@@ -239,9 +259,20 @@ export default {
 
         /**
          * Removes the drawing feature from the drawing layer and resets the drawingFeature property.
+         * If the selected draw type is "circle", it adds the circle overlay to the map and updates its position and radius display.
+         * @param {Object} evt - The event object containing the feature to be removed.
          * @return {void}
          */
-        removeDrawingFeature () {
+        removeDrawingFeature (evt) {
+            if (this.selectedDrawType === "circle") {
+                mapCollection.getMap("2D").addOverlay(this.circleOverlay);
+                evt.feature.getGeometry().on("change", (e) => {
+                    const radius = e.target.getRadius();
+
+                    this.circleOverlayElement.innerHTML = "Radius: " + (Math.round(radius * 10) / 10) + " m";
+                    this.circleOverlay.setPosition(e.target.getLastCoordinate());
+                });
+            }
             if (this.activeCard.drawnFeature === null) {
                 return;
             }
@@ -487,5 +518,17 @@ export default {
             font-size: 0.9rem;
             opacity: 0.6;
         }
+    }
+</style>
+
+<style lang="scss">
+    .ol-tooltip {
+        position: relative;
+        background: rgba(254, 110, 1, 0.8);
+        border-radius: 4px;
+        color: white;
+        padding: 4px 8px;
+        white-space: nowrap;
+        font-size: 12px;
     }
 </style>
