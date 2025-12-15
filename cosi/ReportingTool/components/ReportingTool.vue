@@ -357,6 +357,9 @@ export default {
                 this.pdf.addHeadline(group);
 
                 groupedMapping[group].forEach(mappingObject => {
+                    if (this.statsFeatureFilter.length > 0 && !this.statsFeatureFilter.includes(mappingObject.value)) {
+                        return;
+                    }
                     const statFeature = items.find((item) => item.category === mappingObject.value),
                         lastYear = this.statisticalYear || statFeature.years[0],
                         row = [];
