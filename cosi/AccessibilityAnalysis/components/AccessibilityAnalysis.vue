@@ -4,6 +4,8 @@ import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
+import GeoJSON from "ol/format/GeoJSON";
+import union from "@turf/union";
 import {VExpandTransition} from "vuetify/components/transitions";
 import {VItemGroup, VItem} from "vuetify/components/VItemGroup";
 import deepEqual from "deep-equal";
@@ -370,7 +372,7 @@ export default {
             const nextNumber = this.cardCounter + 1;
 
             this.setCardCounter(nextNumber);
-            return `${this.$t('additional:modules.tools.cosi.accessibilityAnalysis.cardTitle')}${nextNumber}`;
+            return i18next.t("additional:modules.tools.cosi.accessibilityAnalysis.cardTitle") + nextNumber;
         },
         /**
          * Adds selection cards for all features in the given layer.
@@ -736,12 +738,41 @@ export default {
                 console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");
             }
             else {
-                const outerPolygon = geometryToGeoJson(this.isochroneFeatures[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
+                const outerPolygon = this.getOuterPolygon();
 
                 WPS.wpsRequest(service.id, service.url, this.wpsProcess, {
                     "such_flaeche": JSON.stringify(outerPolygon)
                 }, this.handlePopulationResponsee.bind(this));
             }
+        },
+        /**
+         * Gets the outer polygon.
+         * @returns {GeoJSON|String|Boolean} The converted geometry as GeoJSON geometry or as string. False if the converting fails.
+         */
+        getOuterPolygon () {
+            if (!this.isochroneFeatures.length) {
+                return false;
+            }
+
+            if (this.isochroneFeatures.length === this.steps.length) {
+                return geometryToGeoJson(this.isochroneFeatures[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
+            }
+
+            if (this.isochroneFeatures.length > this.steps.length) {
+                const format = new GeoJSON();
+                let featureUnion = format.writeFeatureObject(this.isochroneFeatures[0]),
+                    formattedFeature = [];
+
+                for (let i = 0; i < this.isochroneFeatures.length; i = i + this.steps.length) {
+                    featureUnion = union(featureUnion, format.writeFeatureObject(this.isochroneFeatures[i]));
+                }
+
+                formattedFeature = format.readFeatures(JSON.stringify(featureUnion));
+
+                return geometryToGeoJson(formattedFeature[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
+            }
+
+            return false;
         },
 
         handlePopulationResponsee (resp) {
