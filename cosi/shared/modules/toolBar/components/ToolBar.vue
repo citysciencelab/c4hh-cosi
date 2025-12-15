@@ -90,7 +90,6 @@ export default {
             />
             <div
                 class="dropdown-menu p-0 border-0 mt-1"
-                @click.stop=""
             >
                 <Draggable
                     v-model="settingItemList"
@@ -130,19 +129,27 @@ export default {
                 </Draggable>
             </div>
             <slot name="table-settings" />
-            <FlatButton
+            <div
                 v-if="typeof optionalButton !== 'undefined'"
-                id="optional-button"
-                :aria-label="optionalButton.text"
-                :text="optionalButton.text"
-                :title="optionalButton.text"
-                :icon="optionalButton.icon"
-                :class="'mb-1 me-3 rounded-pill'"
-                data-bs-toggle="dropdown"
-                data-bs-auto-close="outside"
-                :interaction="optionalButton.event"
-            />
-            <slot name="optionalDropdown" />
+                class="dropdown"
+            >
+                <FlatButton
+                    :id="optionalButton.id ?? 'optional-button'"
+                    :aria-label="optionalButton.text"
+                    :text="optionalButton.text"
+                    :title="optionalButton.text"
+                    :icon="optionalButton.icon"
+                    class="mb-1 me-3 rounded-pill"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="false"
+                    :interaction="() => optionalButton.event?.()"
+                />
+                <div
+                    class="dropdown-menu px-3 border-0 mt-1"
+                >
+                    <slot name="optionalDropdown" />
+                </div>
+            </div>
             <FlatButton
                 v-if="enableCalculation"
                 id="calculation-button"
@@ -164,6 +171,10 @@ export default {
             />
         </div>
         <hr class="mt-0">
+        <slot
+            name="underHorizontalRule"
+            class="mb-3"
+        />
         <div class="d-flex">
             <ButtonGroup
                 class="mb-3 me-3"

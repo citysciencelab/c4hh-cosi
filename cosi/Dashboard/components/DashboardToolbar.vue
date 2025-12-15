@@ -1,5 +1,7 @@
 <script>
-import groupMapping from "../../utils/groupMapping";
+import {Dropdown} from "bootstrap";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {mapGetters} from "vuex";
 import {VCol, VRow} from "vuetify/components/VGrid";
 import {VAutocomplete} from "vuetify/components/VAutocomplete";
@@ -14,6 +16,8 @@ import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
 export default {
     name: "DashboardToolbar",
     components: {
+        DropdownAutocomplete,
+        FlatButton,
         ToolBar,
         VCol,
         VRow,
@@ -37,6 +41,7 @@ export default {
     },
     emits: ["exportTable", "reorderColumns", "setStatsFeatureFilter", "toggleColumn"],
     data: () => ({
+        addFilterButton: null,
         exportTimeline: false
     }),
     computed: {
@@ -44,9 +49,50 @@ export default {
             "mapping",
             "metadataUrls"
         ]),
-        statsMapping () {
-            return groupMapping(this.mapping);
+
+        /**
+         * Get unique groups from mapping.
+         * @returns {String[]} Array of unique group names.
+         */
+        groups () {
+            const groupsWithDuplicates = this.mapping.map(item => item.group);
+
+            return [...new Set(groupsWithDuplicates)];
         },
+
+        selectedGroups: {
+            /**
+             * Gets selected groups - a groups is considered selected if at least one of its categories is selected.
+             * @returns {String[]} Array of selected group names.
+             */
+            get () {
+                return this.groups.filter(
+                    group => this.mapping.some(
+                        mappingEntry => mappingEntry.group === group && this.statsFeatureFilter.includes(mappingEntry.value)
+                    )
+                );
+            },
+            /**
+             * Sets the selected groups - if a group has been added or removed, all its categories are added or removed, too.
+             * @param {String[]} newSelectedGroups Array of updated group names.
+             * @returns {void}
+             */
+            set (newSelectedGroups) {
+                const oldSelectedGroups = this.selectedGroups,
+                    addedGroups = newSelectedGroups.filter(group => !oldSelectedGroups.includes(group)),
+                    removedGroups = oldSelectedGroups.filter(group => !newSelectedGroups.includes(group)),
+                    categoriesToAdd = this.mapping.filter(mappingEntry => addedGroups.includes(mappingEntry.group))
+                        .map(mappingEntry => mappingEntry.value),
+                    categoriesToRemove = this.mapping.filter(mappingEntry => removedGroups.includes(mappingEntry.group))
+                        .map(mappingEntry => mappingEntry.value);
+
+                this._statsFeatureFilter = [
+                    ...this._statsFeatureFilter.filter(category => !categoriesToRemove.includes(category)),
+                    ...categoriesToAdd
+                ];
+            }
+        },
+
         _statsFeatureFilter: {
             get () {
                 return this.statsFeatureFilter;
@@ -63,6 +109,9 @@ export default {
         columnNames () {
             return this.districtColumns.map(col => col.text);
         }
+    },
+    mounted () {
+        this.addFilterButton = Dropdown.getOrCreateInstance(document.getElementById("add-filter-button"));
     },
     methods: {
         openMetadata () {
@@ -90,23 +139,56 @@ export default {
     <ToolBar
         :setting-items="columnNames"
         :show-detail="{'visibility': true}"
-        :optional-button="{'text': 'Filter hinzufügen', 'icon': 'bi-funnel-fill', 'event': () => {}}"
+        :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.addFilter'), icon: 'bi-funnel-fill', id: 'add-filter-button'}"
         @exportTable="exportTable"
         @reorderedSettingItems="reorderSettingItems"
         @toggleSettingItem="toggleSettingItem"
     >
         <template #optionalDropdown>
+            <h6 class="my-3">
+                {{ $t('additional:modules.tools.cosi.dashboard.addFilter') }}
+            </h6>
+            <DropdownAutocomplete
+                v-model="selectedGroups"
+                :items="groups"
+                label="Gruppen"
+                multiple
+            />
+            <DropdownAutocomplete
+                v-model="_statsFeatureFilter"
+                :items="mapping"
+                item-title="value"
+                :label="$t('additional:modules.tools.cosi.featuresList.layerFilter')"
+                multiple
+            />
+            <div class="d-flex justify-content-center">
+                <FlatButton
+                    id="apply-filter-button"
+                    customclass="mb-2"
+                    icon="bi bi-check2"
+                    :text="$t('additional:modules.tools.cosi.dashboard.closeFilter')"
+                    :interaction="() => addFilterButton.hide()"
+                />
+            </div>
+        </template>
+        <template #underHorizontalRule>
             <div
-                class="dropdown-menu p-0 border-0 mt-1"
+                v-if="_statsFeatureFilter.length > 0"
+                class="mb-4"
             >
-                <ul>
-                    <li>
-                        Test1
-                    </li>
-                    <li>
-                        Test2
-                    </li>
-                </ul>
+                <div>{{ $t('additional:modules.tools.cosi.dashboard.activeFilters') }}:</div>
+                <v-chip
+                    v-for="(item, index) in _statsFeatureFilter"
+                    :key="item"
+                    variant="flat"
+                    closable
+                    @click:close="_statsFeatureFilter.splice(index, 1)"
+                >
+                    {{ item }}
+                    <template #close>
+                        <v-icon>mdi-close</v-icon>
+                    </template>
+                </v-chip>
             </div>
         </template>
     </ToolBar>
@@ -117,7 +199,7 @@ export default {
         <v-col>
             <v-autocomplete
                 v-model="_statsFeatureFilter"
-                :items="statsMapping"
+                :items="mapping"
                 item-title="value"
                 item-type="type"
                 :label="$t('additional:modules.tools.cosi.featuresList.layerFilter')"
@@ -191,5 +273,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+
+.v-chip {
+    margin: 4px 8px 4px 0;
+    background-color: $light_blue;
+    color: unset;
+}
 
 </style>

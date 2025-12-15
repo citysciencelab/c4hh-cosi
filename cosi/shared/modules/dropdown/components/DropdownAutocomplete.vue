@@ -24,6 +24,11 @@ export default {
             type: Array,
             required: true
         },
+        itemTitle: {
+            type: String,
+            default: undefined,
+            required: false
+        },
         label: {
             type: String,
             required: true
@@ -117,6 +122,7 @@ export default {
             v-else-if="multiple"
             :model-value="modelValue"
             :items="items"
+            :item-title="itemTitle"
             :label="label"
             multiple
             class="mb-3"
