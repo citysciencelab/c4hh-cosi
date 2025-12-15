@@ -138,7 +138,6 @@ export default {
                 "rgba(199, 214, 250, 0.55)",
                 "rgba(159, 25, 215, 1)"
             ],
-            isAllFacilitiesChecked: false,
             selectionCards: [],
             useTravelTimeIndex: false,
             mappedRoutingProfiles: {
@@ -289,8 +288,12 @@ export default {
             this.sliderRerenderKey++;
         },
 
-        visibleVectorLayers (newValues) {
-            this.setFacilityNames(newValues);
+        visibleVectorLayers (newLayers, oldLayers) {
+            if (oldLayers.length > newLayers.length) {
+                this.removeCardsForRemovedLayers(newLayers, oldLayers);
+            }
+
+            this.setFacilityNames(newLayers);
         },
 
         /**
@@ -520,13 +523,26 @@ export default {
         },
 
         /**
+         * Removes selection cards for layers that are no longer visible.
+         * @param {Object[]} newLayers - The currently visible layers.
+         * @param {Object[]} oldLayers - The previously visible layers.
+         * @returns {void}
+         */
+        removeCardsForRemovedLayers (newLayers, oldLayers) {
+            const removedLayers = differenceJs(oldLayers, newLayers);
+
+            removedLayers.forEach(layer => {
+                this.removeCardsByLayerName(layer.getLayer().get("name"));
+            });
+        },
+
+        /**
          * Resets all options to default values.
          * @returns {void}
          */
         setDefaults () {
             this.useTravelTimeIndex = false;
             this.mergePolygons = true;
-            this.isAllFacilitiesChecked = false;
             this.setTransportType("driving-car");
             this.setScaleUnit("time");
             this.setTime(this.rangeSettings[this.transportType]?.time?.value ?? this.rangeSettings.default.time.value);
@@ -618,26 +634,21 @@ export default {
         },
 
         /**
-        * set facilityNames in model, trigger renderDropDownView
-        * @param {Object} vectorLayers layer models of updated selected layer
+        * Sets facilityNames array if the corresponding layer has features.
+        * @param {Object[]} layerList - The list of layers to check for features.
         * @returns {void}
         */
-        setFacilityNames: function (vectorLayers) {
+        setFacilityNames: function (layerList) {
             this.facilityNames = [];
 
-            vectorLayers.forEach(layer => {
-                this.facilityNames.push(layer.getLayer().get("name"));
+            layerList.forEach(layer => {
                 if (getLayerSource(layer.getLayer()).getFeatures().length > 0) {
-                    if (this.isAllFacilitiesChecked) {
-                        this.addCardsByLayer(layer);
-                    }
+                    this.facilityNames.push(layer.getLayer().get("name"));
                 }
                 else {
                     getLayerSource(layer.getLayer()).on("featuresloadend", () => {
                         if (layer.getLayer().getSource().getFeatures().length > 0) {
-                            if (this.isAllFacilitiesChecked) {
-                                this.addCardsByLayer(layer);
-                            }
+                            this.facilityNames.push(layer.getLayer().get("name"));
                         }
                     });
                 }
@@ -718,7 +729,6 @@ export default {
                     mergePolygons: this.mergePolygons,
                     steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
                     selectionCards: this.selectionCards,
-                    isAllFacilitiesChecked: this.isAllFacilitiesChecked,
                     title: this.generateCardTitle()
                 };
                 this.dataSets.unshift(analysisSet);
@@ -1017,9 +1027,6 @@ export default {
             if (index !== this.activeSet) {
                 this.setActiveMode(this.getModeByType(this.dataSets[index].inputs.mode));
                 this.setActiveSet(index);
-                if (this.dataSets[index].inputs.isAllFacilitiesChecked) {
-                    this.isAllFacilitiesChecked = true;
-                }
                 return;
             }
             this.setActiveSet(null);
