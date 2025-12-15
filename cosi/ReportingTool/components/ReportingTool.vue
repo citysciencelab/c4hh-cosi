@@ -25,6 +25,7 @@ import categoryMapping from "../assets/categoryMapping.json";
 import ReportingToolStepItem from "./ReportingToolStepItem.vue";
 import {VStepper, VStepperActions, VStepperItem, VStepperHeader, VStepperWindow, VStepperWindowItem} from "vuetify/components/VStepper";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
+import {markRaw} from "vue";
 
 export default {
     name: "ReportingTool",
@@ -191,22 +192,35 @@ export default {
         ...mapMutations("Modules/ReportingTool", ["setInfrastructureTableLimit", "setInfrastructureTableLimitEnabled"]),
 
         /**
-         * Creates the report and calls the download function.
-         * @returns {void}
+         * Creates the PDF report and triggers the download.
+         * The PDFMaker instance is wrapped with `markRaw` to prevent Vue from
+         * applying reactivity. This is required because pdfmake uses internal
+         * non-configurable properties (e.g. `_layoutEngine`) which are incompatible
+         * with Vue proxies.
+         *
+         * @async
+         * @returns {Promise<void>} Resolves when the report has been created and downloaded.
          */
         async createReport () {
             this.reportLoader = true;
-            this.pdf = new PDFMaker();
-            this.pdf.resetDocContent();
-            this.pdf.addHeader(this.reportTitle.trim());
-            this.pdf.setAuthor(this.author.trim());
-            await this.addOverViewPage(this.selectedFrontPageItem.value);
-            this.addChapterStatisticalData(this.statisticalDataCards);
-            await this.addChapterSubjectData(this.subjectDataCards);
-            this.addChapterAnalysis(this.analysisCards);
-            await this.addChapterAnnex(this.annexCards);
-            this.pdf.download(this.downloadName);
-            this.reportLoader = false;
+            try {
+                this.pdf = markRaw(new PDFMaker());
+                this.pdf.resetDocContent();
+                this.pdf.addHeader(this.reportTitle.trim());
+                this.pdf.setAuthor(this.author.trim());
+                await this.addOverViewPage(this.selectedFrontPageItem.value);
+                this.addChapterStatisticalData(this.statisticalDataCards);
+                await this.addChapterSubjectData(this.subjectDataCards);
+                this.addChapterAnalysis(this.analysisCards);
+                await this.addChapterAnnex(this.annexCards);
+                this.pdf.download(this.downloadName);
+            }
+            catch (error) {
+                console.error("Fehler beim Erstellen des PDFs:", error);
+            }
+            finally {
+                this.reportLoader = false;
+            }
         },
 
         /**
@@ -335,6 +349,30 @@ export default {
         },
 
         /**
+         * Formats a value safely for usage in pdfmake table cells.
+         * @param {*} value - The value to format.
+         * @param {Intl.NumberFormatOptions} [numberOptions={}]
+         * @param {string} [locale="de-DE"]
+         * @returns {string} Safe string value for pdfmake.
+         */
+        formatPdfCellValue (value, numberOptions = {}, locale = "de-DE") {
+            try {
+                if (value === null || value === undefined) {
+                    return "";
+                }
+
+                if (Number.isFinite(value)) {
+                    return value.toLocaleString(locale, numberOptions);
+                }
+
+                return String(value);
+            }
+            catch (error) {
+                return String(value ?? "");
+            }
+        },
+
+        /**
          * Prepares the statistical data and adds it to the report.
          * @param {Object[]} items - Items from dashboard component.
          * @returns {void}
@@ -344,16 +382,17 @@ export default {
                 filteredMappingByCategories = this.initMapping.filter(obj => {
                     return itemGroups.includes(obj.value);
                 }),
-                groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group);
+                groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group),
+                pdf = this.pdf;
 
-            this.pdf.addChapter("Statistische Datenübersicht");
-            this.pdf.addSubHeadline("Jahr: " + (this.statisticalYear || items[0].years[0]));
+            pdf.addChapter("Statistische Datenübersicht");
+            pdf.addSubHeadline("Jahr: " + (this.statisticalYear || items[0].years[0]));
 
             this.selectedStatGroups.forEach((group) => {
-                const columns = this.pdf.getColumns(["", this.areaColumnName, ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
+                const columns = pdf.getColumns(["", this.areaColumnName, ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
                     body = [columns];
 
-                this.pdf.addHeadline(group);
+                pdf.addHeadline(group);
 
                 groupedMapping[group].forEach(mappingObject => {
                     if (this.statsFeatureFilter.length > 0 && !this.statsFeatureFilter.includes(mappingObject.value)) {
@@ -375,25 +414,21 @@ export default {
                         if (index === 0) {
                             alignment = "left";
                             value = statFeature.category;
-                            this.pdf.addCell(row, value, alignment);
+                            pdf.addCell(row, value, alignment);
                         }
                         else if (index === 1) {
                             value = this.getTotal(statFeature, this.selectedDistrictLabels, lastYear, "jahr_");
-                            this.pdf.addCell(row, value.toString(), alignment);
-                            // toLocalString macht bei pdf make Probleme
-                            // this.pdf.addCell(row, value.toLocaleString("de-DE", numberOptions), alignment);
+                            pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
                         else {
                             value = parseFloat(statFeature[col.text]["jahr_" + lastYear]) || "-";
-                            this.pdf.addCell(row, value.toString(), alignment);
-                            // toLocalString macht bei pdf make Probleme
-                            // this.pdf.addCell(row, value.toLocaleString("de-DE", numberOptions), alignment);
+                            pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
 
                     });
                     body.push(row);
                 });
-                this.pdf.addTable(body, "*");
+                pdf.addTable(body, "*");
             });
         },
         /**
