@@ -65,6 +65,7 @@ export default {
     created () {
         this.drawingLayer = this.getLayerById("district-selector");
         this.drawingLayer.getLayer().setVisible(true);
+        this.setSelectionCardsSubjectData([]);
         this.createCardsFromStatisticalCards(this.cardsStatistical, this.cards);
 
         if (this.activeCard) {
@@ -81,7 +82,7 @@ export default {
     },
     methods: {
         ...mapActions("Maps", ["zoomToExtent"]),
-        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId"]),
+        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId", "setSelectionCardsSubjectData"]),
 
         addCard (feature, buffer, districtNames, status, districtLevelId, districtLevelLabel) {
             this.cards.push({
@@ -446,7 +447,6 @@ export default {
                 :removable="item.removable"
                 :status="item.status"
                 @click="toggleCardStatus(index)"
-                @remove-set="removeCard(index)"
             />
         </div>
     </div>
