@@ -1,6 +1,6 @@
 <script>
 import dayjs from "dayjs";
-import {mapGetters, mapActions} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import PDFMaker from "../js/createPdf";
 import {getTotal, getCulmulativeTotal} from "../../Dashboard/utils/operations";
 import {getCenter as getCenterOfExtent} from "ol/extent";
@@ -46,8 +46,6 @@ export default {
     data: () => ({
         analysisCards: [],
         annexCards: [],
-        infrastructureTableLimit: 10,
-        infrastructureTableLimitEnabled: false,
         reportTitle: "",
         reportTitleMaxLength: 50,
         selectedAreasName: "",
@@ -101,7 +99,7 @@ export default {
         ...mapGetters("Modules/FeaturesList", ["featuresListItems"]),
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevel", "selectedDistrictNames", "selectedFeatures", "initMapping"]),
         ...mapGetters("Modules/TemplateManager", ["reportName", "reportLayerIds", "reportCategories"]),
-        ...mapGetters("Modules/ReportingTool", ["readmeUrl"]),
+        ...mapGetters("Modules/ReportingTool", ["infrastructureTableLimit", "infrastructureTableLimitEnabled", "readmeUrl"]),
         ...mapGetters(["restServiceById", "visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
 
@@ -190,6 +188,7 @@ export default {
     deactivated: () => undefined,
     methods: {
         ...mapActions("Modules/FeaturesList", ["updateFeaturesList"]),
+        ...mapMutations("Modules/ReportingTool", ["setInfrastructureTableLimit", "setInfrastructureTableLimitEnabled"]),
 
         /**
          * Creates the report and calls the download function.
@@ -1220,16 +1219,18 @@ export default {
                                 :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
                                 :aria="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
                                 :checked="infrastructureTableLimitEnabled"
-                                :interaction="evt => infrastructureTableLimitEnabled = evt.target.checked"
+                                :interaction="evt => setInfrastructureTableLimitEnabled(evt.target.checked)"
                             />
                             <InputText
                                 v-if="infrastructureTableLimitEnabled"
                                 id="infrastructure-table-limit-input"
-                                v-model="infrastructureTableLimit"
+                                :model-value="infrastructureTableLimit"
+                                :min="1"
                                 type="number"
                                 class="mb-3"
                                 :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
                                 :placeholder="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
+                                @update:modelValue="setInfrastructureTableLimit($event)"
                             />
                             <ReportingToolStepItem
                                 :card-mapping="categoryMapping?.subjectData"

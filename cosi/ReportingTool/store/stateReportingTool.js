@@ -6,7 +6,8 @@
  * @property {String} type - The type of the module.
  * @property {string} name - The name of the tool (config-param).
  * @property {string} icon - Bootstrap icon class (config-param).
- * @property {Object} readmeUrl - URL that leads to the tool instructions.
+ * @property {Boolean} [infrastructureTableLimitEnabled=false] - Deciding if the count of infrastructure data is limited.
+ * @property {Number} infrastructureTableLimit - The count of infrastructure data.
  */
 const state = {
     active: false,
@@ -14,6 +15,8 @@ const state = {
     type: "reportingTool",
     name: "additional:modules.cosi.reportingTool.title",
     icon: "bi-printer",
+    infrastructureTableLimitEnabled: false,
+    infrastructureTableLimit: 10,
     readmeUrl: {
         "de-DE": "bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/015vorlagen.md"
     }
