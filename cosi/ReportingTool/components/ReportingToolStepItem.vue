@@ -52,6 +52,31 @@ export default {
         };
     },
     computed: {
+
+        /**
+         * Computed dropdown items, filtering out those that are not allowed to be added multiple times and are already used.
+         * @returns {String[]} The filtered dropdown items.
+         */
+        dropdownItems () {
+            const usedNames = this.cards.map(card => card.name),
+                filteredCardTypes = this.cardMapping.filter(cardType => cardType.multiple || !usedNames.includes(cardType.name)),
+                dropdownItems = [];
+
+            filteredCardTypes.forEach(cardType => {
+                if (Array.isArray(cardType.items)) {
+                    const filteredItems = cardType.items.filter(item => cardType.multiple || !usedNames.includes(item.inputs.title));
+
+                    filteredItems.forEach(item => {
+                        dropdownItems.push(item.inputs.title);
+                    });
+                }
+                else {
+                    dropdownItems.push(cardType.name);
+                }
+            });
+            return dropdownItems;
+        },
+
         draggableCards: {
             get () {
                 return this.groups;
@@ -72,9 +97,6 @@ export default {
     mounted () {
         this.initializeCards();
     },
-    activated () {
-        this.initializeCards();
-    },
     methods: {
         /**
          * Adds a new card to the cards array.
@@ -85,30 +107,6 @@ export default {
                 id: uniqueId("reporting-tool-card-"),
                 name: null
             });
-        },
-
-        /**
-         * Gets the dropdown items, filtering out those that are not allowed to be added multiple times and are already used.
-         * @returns {Array} The filtered dropdown items.
-         */
-        getDropdownItems () {
-            const usedNames = this.cards.map(card => card.name),
-                filteredCardTypes = this.cardMapping.filter(cardType => cardType.multiple || !usedNames.includes(cardType.name)),
-                dropdownItems = [];
-
-            filteredCardTypes.forEach(cardType => {
-                if (Array.isArray(cardType.items)) {
-                    const filteredItems = cardType.items.filter(item => cardType.multiple || !usedNames.includes(item.inputs.title));
-
-                    filteredItems.forEach(item => {
-                        dropdownItems.push(item.inputs.title);
-                    });
-                }
-                else {
-                    dropdownItems.push(cardType.name);
-                }
-            });
-            return dropdownItems;
         },
 
         /**
@@ -273,7 +271,7 @@ export default {
                     :icon="card.icon"
                 />
                 <DropdownAutocomplete
-                    :items="getDropdownItems()"
+                    :items="dropdownItems"
                     :label="'Inhalt'"
                     :model-value="[card.name]"
                     @update:model-value="mergeCardAttributes(index, $event)"
