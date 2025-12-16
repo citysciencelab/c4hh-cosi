@@ -1,9 +1,13 @@
 <script>
-import isObject from "@shared/js/utils/isObject";
-import {mapActions, mapGetters, mapMutations} from "vuex";
 
+import {mapActions, mapGetters, mapMutations} from "vuex";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import isObject from "@shared/js/utils/isObject";
 export default {
     name: "DistrictFinderFilterImport",
+    components: {
+        FlatButton
+    },
     emits: ["setConditionDate", "setConditionTitle", "setCardList", "setLatestYear", "setDistrictSelector"],
     data () {
         return {
@@ -34,7 +38,6 @@ export default {
                     valid = false;
                     return;
                 }
-
                 const valueType = this.mapping.find(stats => stats.category === element.statisticCategory).valueType;
 
                 if (valueType === "relative" && (!this.isNumberInRange(element.referenceValue) || !this.isNumberInRange(element.ruleTolerance))) {
@@ -182,20 +185,16 @@ export default {
         id="district-finder-import"
         class="dropdown"
     >
-        <button
-            class="dropdown-toggle btn btn-outline lh-1 fs-5 mb-3"
-            dropdown-toggle
-            type="button"
+        <FlatButton
+            class="my-3 dropdown-toggle"
+            icon="bi bi-upload"
+            :text="$t('additional:modules.tools.cosi.districtFinder.button.importConditions')"
             data-bs-toggle="dropdown"
-            aria-expanded="false"
             data-bs-auto-close="outside"
-        >
-            <i class="bi bi-upload pe-2" />
-            {{ $t("additional:modules.tools.cosi.districtFinder.button.importConditions") }}
-        </button>
+        />
         <div
             id="district-finder-import"
-            class="dropdown-menu p-3 rounded"
+            class="dropdown-menu p-4 rounded"
         >
             <h5 class="mt-0 mb-0">
                 {{ $t("additional:modules.tools.cosi.districtFinder.button.importConditions") }}
@@ -227,13 +226,12 @@ export default {
                     {{ $t("additional:modules.tools.cosi.districtFinder.label.latestData") }}
                 </label>
             </div>
-            <button
-                class="btn btn-primary lh-1 fs-5"
-                @click="triggerFileInput"
-            >
-                <i class="bi bi-upload pe-2" />
-                {{ $t("additional:modules.tools.cosi.districtFinder.button.import") }}
-            </button>
+            <FlatButton
+                class="my-3"
+                icon="bi bi-upload"
+                :text="$t('additional:modules.tools.cosi.districtFinder.button.import')"
+                @click.native="triggerFileInput"
+            />
         </div>
     </div>
 </template>
@@ -253,9 +251,6 @@ export default {
             background-color: $light_blue;
             color: $white;
        }
-       h5 {
-            font-family: $font_family_accent;
-        }
 
     }
 

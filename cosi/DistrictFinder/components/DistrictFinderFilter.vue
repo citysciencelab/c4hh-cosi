@@ -1,4 +1,5 @@
 <script>
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import dayjs from "dayjs";
 import {debounce} from "chart.js/helpers";
 import DistrictFinderFilterCard from "./DistrictFinderFilterCard.vue";
@@ -6,6 +7,7 @@ import DistrictFinderFilterExport from "./DistrictFinderFilterExport.vue";
 import DistrictFinderFilterImport from "./DistrictFinderFilterImport.vue";
 import DistrictFinderFilterOperator from "./DistrictFinderFilterOperator.vue";
 import {Fill, Style} from "ol/style.js";
+import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import isObject from "@shared/js/utils/isObject";
@@ -17,10 +19,12 @@ import {VSnackbar} from "vuetify/components/VSnackbar";
 export default {
     name: "DistrictFinderFilter",
     components: {
+        AlertMessage,
         DistrictFinderFilterCard,
         DistrictFinderFilterExport,
         DistrictFinderFilterImport,
         DistrictFinderFilterOperator,
+        FlatButton,
         IconButton,
         VSnackbar
     },
@@ -579,16 +583,17 @@ export default {
 
 <template lang="html">
     <div id="district-finder-filter">
-        <h4 class="pt-4">
+        <h5 class="pt-4">
             {{ $t("additional:modules.tools.cosi.districtFinder.newScreening") }}
-        </h4>
+        </h5>
         <DistrictFinderFilterImport
             @setLatestYear="setLatestYear"
             @setCardList="setConditionCards"
             @setConditionDate="importConditionDate"
             @setConditionTitle="importConditionTitle"
         />
-        <div class="d-flex align-items-center mb-3">
+        <hr>
+        <div class="d-flex align-items-center my-3">
             <h4 class="filter-title me-auto">
                 {{ conditionTitle }}
                 <br>
@@ -639,7 +644,8 @@ export default {
                     :operator="card.operator"
                     @change="setCardOperator"
                 />
-                <div
+                <!--Will be commented out until it is possible to select and activate the cards again.-->
+                <!--<div
                     class="card-section"
                     :class="activeCardId === card.id? 'active' : ''"
                     role="button"
@@ -647,97 +653,100 @@ export default {
                     @focusout="toggleCardActive('')"
                     @click="toggleCardActive(card.id)"
                     @keydown="toggleCardActive(card.id)"
-                >
-                    <DistrictFinderFilterCard
-                        :condition="card"
-                        :card-number="index + 1"
-                        :active="activeCardId === card.id"
-                        :change-to-latest-year="latestYear"
-                        class="mx-4"
-                        @delete="deleteCard"
-                        @scanCompleted="setCardAttributes"
-                        @validateField="setFieldValidated"
-                        @showHint="showLatestYear"
-                        @prepareFeatures="prepareOLFeatures"
-                    />
-                </div>
+                >-->
+                <DistrictFinderFilterCard
+                    :condition="card"
+                    :card-number="index + 1"
+                    :active="activeCardId === card.id"
+                    :change-to-latest-year="latestYear"
+                    class="mx-4"
+                    @delete="deleteCard"
+                    @scanCompleted="setCardAttributes"
+                    @validateField="setFieldValidated"
+                    @showHint="showLatestYear"
+                    @prepareFeatures="prepareOLFeatures"
+                />
+                <!--</div>-->
             </div>
         </transition-group>
-        <div class="d-flex justify-content-center my-3">
-            <button
-                class="btn btn-link lh-1 fs-5"
-                @click="addCard"
-            >
-                <i class="bi bi-plus-circle pe-2" />
-                {{ $t("additional:modules.tools.cosi.districtFinder.button.addCondition") }}
-            </button>
-        </div>
-        <div
-            v-if="resultList"
-            class="found-areas mx-4"
-        >
-            <h5 class="result-headline">
-                {{ resultList.length }} {{ resultList.length === 1 ? $t("additional:modules.tools.cosi.districtFinder.foundArea") : $t("additional:modules.tools.cosi.districtFinder.foundAreas") }}
-            </h5>
-            <template v-if="resultList.length > 0">
-                <div
-                    v-if="combinedDistricts.length"
-                    class="row info pb-2"
+        <div class="container pt-4">
+            <div class="row justify-content-center">
+                <button
+                    class="add-button col col-10 btn btn-light p-3 rounded-4 align-items-center "
+                    type="button"
+                    @click="addCard"
                 >
-                    <span class="col-1 info-icon d-flex align-items-center">
-                        <i class="bi-info-circle" />
-                    </span>
-                    <div class="col info-text ps-2">
-                        {{ $t("additional:modules.tools.cosi.districtFinder.infoCombinedDistrict") }} {{ combinedDistricts.join(', ') + "." }}
-                    </div>
-                </div>
-                <div class="copy-box mb-4 container rounded">
-                    <div class="row">
-                        <div class="col col-11 pe-0">
-                            {{ getCommaSeparatedAreaNames() }}
-                            <button
-                                v-if="resultList.length > numberOfLimitedAreas"
-                                class="btn btn-link lh-1 fs-6 ps-0"
-                                @click="showMoreAreas = !showMoreAreas"
+                    <i
+                        class="bi bi-plus-circle fs-5 me-3"
+                    />
+                    {{ $t("additional:modules.tools.cosi.districtFinder.button.addCondition") }}
+                </button>
+            </div>
+            <div
+                v-if="resultList"
+                class="pt-5 found-areas mx-4"
+            >
+                <h5 class="result-headline">
+                    {{ resultList.length }} {{ resultList.length === 1 ? $t("additional:modules.tools.cosi.districtFinder.foundArea") : $t("additional:modules.tools.cosi.districtFinder.foundAreas") }}
+                </h5>
+                <template v-if="resultList.length > 0">
+                    <AlertMessage
+                        v-if="combinedDistricts.length"
+                        closeable
+                        class="py-3"
+                        :text="$t('additional:modules.tools.cosi.districtFinder.infoCombinedDistrict') + combinedDistricts.join(', ') + '.'"
+                        type="info"
+                    />
+                    <div class="copy-box mb-4 p-2 container rounded">
+                        <div class="row">
+                            <div class="col col-11 ps-5 pe-0 py-2">
+                                {{ getCommaSeparatedAreaNames() }}
+                                <button
+                                    v-if="resultList.length > numberOfLimitedAreas"
+                                    class="btn btn-link lh-1 fs-6 ps-0"
+                                    @click="showMoreAreas = !showMoreAreas"
+                                >
+                                    {{ showMoreAreas ? $t("additional:modules.tools.cosi.districtFinder.button.showLess") : $t("additional:modules.tools.cosi.districtFinder.button.showMore") }}
+                                </button>
+                            </div>
+                            <div class="col col-1 text-end ps-0">
+                                <button
+                                    class="copy-button btn btn-link lh-1 fs-5 p-0"
+                                    @click="copyToClipboard (resultList.join(', '))"
+                                >
+                                    <i
+                                        class="copy-icon"
+                                        :class="copyValue ? 'bi bi-check2-all' : 'bi bi-back'"
+                                    />
+                                </button>
+                            </div>
+                            <v-snackbar
+                                v-model="copyValue"
+                                :timeout="5000"
                             >
-                                {{ showMoreAreas ? $t("additional:modules.tools.cosi.districtFinder.button.showLess") : $t("additional:modules.tools.cosi.districtFinder.button.showMore") }}
-                            </button>
-                        </div>
-                        <div class="col col-1 text-end ps-0">
-                            <button
-                                class="copy-button btn btn-link lh-1 fs-5 p-0"
-                                @click="copyToClipboard (resultList.join(', '))"
+                                {{ $t("additional:modules.tools.cosi.districtFinder.copyClipboard") }}
+                            </v-snackbar>
+                            <v-snackbar
+                                v-model="showHintToChangeLatestYear"
+                                :timeout="5000"
                             >
-                                <i
-                                    class="copy-icon"
-                                    :class="copyValue ? 'bi bi-check2-all' : 'bi bi-back'"
-                                />
-                            </button>
+                                {{ $t("additional:modules.tools.cosi.districtFinder.changeToLatestYear") }}
+                            </v-snackbar>
                         </div>
-                        <v-snackbar
-                            v-model="copyValue"
-                            :timeout="5000"
-                        >
-                            {{ $t("additional:modules.tools.cosi.districtFinder.copyClipboard") }}
-                        </v-snackbar>
-                        <v-snackbar
-                            v-model="showHintToChangeLatestYear"
-                            :timeout="5000"
-                        >
-                            {{ $t("additional:modules.tools.cosi.districtFinder.changeToLatestYear") }}
-                        </v-snackbar>
                     </div>
-                </div>
-            </template>
+                </template>
+            </div>
+            <div class="row justify-content-center pt-3">
+                <FlatButton
+                    id="confirmButton"
+                    icon="bi bi-check"
+                    :aria-label="$t('additional:modules.tools.cosi.districtFinder.button.confirm')"
+                    :text="$t('additional:modules.tools.cosi.districtFinder.button.confirm')"
+                    :disabled="resultList === false || resultList.length === 0"
+                    :interaction="() => setDistricts()"
+                />
+            </div>
         </div>
-        <button
-            class="btn btn-primary lh-1 fs-5"
-            :disabled="resultList === false || resultList.length === 0"
-            @click="setDistricts"
-        >
-            <i class="bi bi-check pe-2" />
-            {{ $t("additional:modules.tools.cosi.districtFinder.button.confirm") }}
-        </button>
     </div>
 </template>
 
@@ -745,7 +754,7 @@ export default {
 
     #district-finder-filter {
         .copy-box {
-            background-color: #dcdcdc;
+            background-color: $secondary_table_style;
             .copy-icon {
                 font-size: 16px;
             }
@@ -773,14 +782,6 @@ export default {
             }
         }
 
-        .filter-title {
-            font-family: $font_family_accent;
-        }
-
-        .result-headline {
-            font-family: $font_family_accent;
-        }
-
         .slide-fade-enter-active, .slide-fade-leave-active {
             transition: all 1s;
         }
@@ -798,8 +799,16 @@ export default {
                 font-size: 10px;
         }
     }
+    .add-button {
+        border: 2px dashed $secondary;
+        color: $secondary;
+        &:hover {
+            background-color: $light_blue;
+            border: 2px dashed $secondary;
+            color: $secondary;
+        }
+    }
 }
-
 </style>
 
 <style lang="scss">

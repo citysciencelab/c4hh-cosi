@@ -1,34 +1,25 @@
 <script>
 import BarchartItemAnnotated from "../../components/BarchartItemAnnotated.vue";
-import ContentCard from "../../components/ContentCard.vue";
+import Badges from "../../shared/modules/badges/components/Badges.vue";
+import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import deepAssign from "@shared/js/utils/deepAssign";
 import DistrictFinderFilterSpinner from "./DistrictFinderFilterSpinner.vue";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 // import groupMapping from "../../utils/groupMapping";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapGetters} from "vuex";
-import {VChip} from "vuetify/components/VChip";
 import {VSnackbar} from "vuetify/components/VSnackbar";
-import {VTextField} from "vuetify/components/VTextField";
-import {VSelect} from "vuetify/components/VSelect";
-import {VLabel} from "vuetify/components/VLabel";
-import {VAutocomplete} from "vuetify/components/VAutocomplete";
-import {VChipGroup} from "vuetify/components/VChipGroup";
-import {VListSubheader} from "vuetify/components/VList";
-
 export default {
     name: "DistrictFinderFilterCard",
     components: {
         BarchartItemAnnotated,
-        ContentCard,
+        Badges,
+        CustomCard,
         DistrictFinderFilterSpinner,
-        VChip,
-        VSnackbar,
-        VTextField,
-        VSelect,
-        VLabel,
-        VAutocomplete,
-        VChipGroup,
-        VListSubheader
+        DropdownAutocomplete,
+        InputText,
+        VSnackbar
     },
     props: {
         active: {
@@ -53,7 +44,6 @@ export default {
     emits: ["delete", "prepareFeatures", "scanCompleted", "validateField", "showHint"],
     data () {
         return {
-            dataChips: ["statistische Daten"],
             expandDataInfo: true,
             features: [],
             isLoading: false,
@@ -146,6 +136,20 @@ export default {
                     feature => selectedDistrictsArray.includes(feature?.properties?.[this.keyOfAttrNameForSelectedLayer]))
                 : this.features;
         },
+        /**
+         * Returns what the badges should look like.
+         * @returns {Object[]} data for the badges.
+         */
+        dataChips () {
+            return [
+                {
+                    backgroundColor: "#008DCB",
+                    color: "rgba(255, 255, 255, 1)",
+                    icon: "bi bi-bar-chart",
+                    text: this.$t("additional:modules.cosi.districtSelector.statisticalData")
+                }
+            ];
+        },
 
         /**
          * Returns translated dropdown entries for filter rules.
@@ -158,7 +162,22 @@ export default {
                 {value: ">", title: this.$t("additional:modules.tools.cosi.districtFinder.comparison.greater")}
             ];
         },
+        /**
+         * Returns the statistical values for the current district level as defined in the mapping.
+         * @returns {Object[]} The mapping dataset values or an empty array.
+         */
+        datasetStatItems () {
+            return this.datasetStat.map(v => v.value);
+        },
+        /**
+         *  Returns the selected item based on the category.
+         * @returns {Object[]} The mapping dataset values or an empty array.
+         */
+        selectedStatItems () {
+            const item = this.datasetStat.find(v => v.category === this.selectedCategory);
 
+            return item ? item.value : "";
+        },
         /**
          * Returns the statistical datasets for the current district level as defined in the mapping.
          * @returns {Object[]} The mapping datasets or an empty array.
@@ -426,7 +445,6 @@ export default {
             });
             return colorValues;
         },
-
         /**
          * Transforms an oaf temporal extent object into an array of years.
          * @param {Date[][]} extent The temporal extent.
@@ -601,7 +619,16 @@ export default {
             setTimeout(() => {
                 this.chartConfig.options.animation = false;
             });
+        },
+        /**
+         * Updates the category depending on user selection.
+         * @returns {void}
+         */
+        updateCategory (val) {
+            const item = this.datasetStat.find(v => v.value === val);
 
+            this.selectedCategory = item ? item.category : "";
+            this.updateSelectedCategory();
         }
     }
 };
@@ -609,238 +636,176 @@ export default {
 
 <template lang="html">
     <div class="filter-card">
-        <ContentCard
-            id="id"
-            close-icon="bi bi-trash"
-            :close-interaction="deleteCard"
+        <CustomCard
+            class="mb-3 d-flex flex-nowrap"
+            :closeable="true"
+            @click:close="deleteCard"
         >
-            <template #header>
-                <v-chip-group
-                    v-model="selectedData"
-                    mandatory
+            <Badges
+                v-for="(data, index) in dataChips"
+                :key="index"
+                class="mb-2 mt-1"
+                :color="data.color"
+                :text="data.text"
+                :background-color="data.backgroundColor"
+                :icon="data.icon"
+            />
+            <div class="container px-2 py-1">
+                <div class="row">
+                    <h5
+                        class="d-flex align-items-center col-md-9 py-0 pb-0 pt-3"
+                    >
+                        {{ cardNumber }}. {{ $t('additional:modules.tools.cosi.districtFinder.condition') }}
+                    </h5>
+                    <div
+                        v-if="typeof selectedDataset !== 'undefined' && selectedData === 'statistische Daten'"
+                        class="col-md-3 p-0"
+                    >
+                        <Dropdown-Autocomplete
+                            class="flex-grow-1"
+                            :items="years"
+                            :model-value="selectedYear"
+                            :label="$t('additional:modules.tools.cosi.districtFinder.label.year')"
+                            @update:model-value="updateYear"
+                        />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 py-0 pe-0">
+                        <Dropdown-Autocomplete
+                            class="flex-grow-1"
+                            :items="selectedData === 'statistische Daten' ? datasetStatItems : datasetFachdaten"
+                            :model-value="selectedStatItems"
+                            :label="$t('additional:modules.tools.cosi.districtFinder.label.dataset')"
+                            @update:model-value="updateCategory"
+                        />
+                    </div>
+                </div>
+                <div
+                    v-if="typeof selectedDataset !== 'undefined'"
+                    class="row align-items-center"
                 >
-                    <v-chip
-                        v-for="(data, index) in dataChips"
-                        :key="index"
-                        :value="data"
-                        :stat-color="data === 'statistische Daten'"
-                        :fachdata-color="data === 'Fachdaten'"
-                        x-small
-                        :disabled="data === 'Fachdaten'"
-                    >
-                        {{ data }}
-                    </v-chip>
-                </v-chip-group>
-            </template>
-            <template #body>
-                <div class="container px-2 py-1">
-                    <div class="row">
-                        <h4
-                            class="d-flex align-items-center col-md-9 py-0 pb-0 pt-3"
-                            :class="active ? 'active' : ''"
-                        >
-                            {{ cardNumber }}. {{ $t('additional:modules.tools.cosi.districtFinder.condition') }}
-                        </h4>
-                        <div
-                            v-if="typeof selectedDataset !== 'undefined' && selectedData === 'statistische Daten'"
-                            class="col-md-3 p-0"
-                        >
-                            <v-label
-                                class="text-black-50"
-                                for="year-filter"
-                            >
-                                {{ $t('additional:modules.tools.cosi.districtFinder.label.year') }}
-                            </v-label>
-                            <v-select
-                                v-model="selectedYear"
-                                class="year-filter"
-                                :items="years"
-                                outlined
-                                hide-details
-                                dense
-                                @update:model-value="updateYear"
-                            />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 py-0 pe-0">
-                            <v-label
-                                for="data-filter"
-                            >
-                                {{ $t('additional:modules.tools.cosi.districtFinder.label.dataset') }}
-                            </v-label>
-                            <v-autocomplete
-                                v-model="selectedCategory"
-                                class="data-filter"
-                                :items="selectedData === 'statistische Daten' ? datasetStat : datasetFachdaten"
-                                item-title="value"
-                                item-value="category"
-                                outlined
-                                hide-details
-                                dense
-                                @update:model-value="updateSelectedCategory"
-                            >
-                                <template #subheader="{ props }">
-                                    <v-list-subheader class="font-weight-bold bg-primary">
-                                        {{ props.title }}
-                                    </v-list-subheader>
-                                </template>
-                                <template #divider="">
-                                    <div class="d-flex ga-4 align-center">
-                                        <v-divider />
-                                    </div>
-                                </template>
-                            </v-autocomplete>
-                        </div>
-                    </div>
-                    <div
-                        v-if="typeof selectedDataset !== 'undefined' "
-                        class="row row-cols-auto"
-                    >
-                        <div
-                            v-if="typeof selectedDataset !== 'undefined'"
-                            class="col-5 pt-1 pb-0 pe-1"
-                        >
-                            <v-label
-                                class="filter-label"
-                                for="filter-rule"
-                            >
-                                {{ $t('additional:modules.tools.cosi.districtFinder.label.rule') }}
-                            </v-label>
-                            <v-select
-                                v-model="selectedFilter"
-                                class="filter-rule"
-                                :items="filterRules"
-                                outlined
-                                hide-details
-                                dense
-                                @update:model-value="updateResults"
-                            />
-                        </div>
-                        <div class="col pt-1 pb-0 pe-1 ps-1">
-                            <v-label
-                                class="filter-label"
-                                for="reference-filter"
-                            >
-                                {{ $t('additional:modules.tools.cosi.districtFinder.label.referenceValue') }}
-                            </v-label>
-                            <v-text-field
-                                v-model.number="referenceValue"
-                                class="reference-filter"
-                                :class="{invalid: referenceValue === '' || !checkInRange(selectedDataset?.valueType, referenceValue)}"
-                                outlined
-                                hide-details
-                                dense
-                                type="number"
-                                @update:model-value="updateResults"
-                            />
-                        </div>
-                        <div
-                            class="col pt-1 pb-0 pe-0 ps-1"
-                            :class="typeof selectedDataset !== 'undefined' && selectedFilter === '=' ? '' : 'invisible'"
-                        >
-                            <v-label
-                                class="filter-label"
-                                for="tolerance"
-                                :disabled="typeof referenceValue !== 'number'"
-                            >
-                                {{ $t('additional:modules.tools.cosi.districtFinder.label.tolerance') }}
-                            </v-label>
-                            <v-text-field
-                                v-model.number="tolerance"
-                                :disabled="typeof referenceValue !== 'number'"
-                                class="tolerance"
-                                :class="{invalid: tolerance === '' || !checkInRange(selectedDataset?.valueType, tolerance)}"
-                                prefix="±"
-                                outlined
-                                hide-details
-                                dense
-                                type="number"
-                                min="0"
-                                @update:model-value="updateResults"
-                            />
-                        </div>
-                    </div>
-                    <div
-                        v-if="!isFieldValidated"
-                        class="hint row gy-0 pt-0"
-                    >
-                        {{ $t("additional:modules.tools.cosi.districtFinder.errors.relativErr") }}
-                    </div>
                     <div
                         v-if="typeof selectedDataset !== 'undefined'"
-                        class="ps-0 pt-4 pb-1"
+                        class="col-4 pt-1 pb-0 pe-1"
                     >
-                        <button
-                            id="details-button"
-                            type="button"
-                            class="btn btn-link btn-sm pb-0 ps-0"
-                            @click="expandDataInfo = !expandDataInfo"
-                        >
-                            <i
-                                class="expand me-1"
-                                :class="!expandDataInfo ? 'bi bi-chevron-down' : 'bi bi-chevron-up'"
-                            />
-                            {{ !expandDataInfo ? $t('additional:modules.tools.cosi.districtFinder.showDetails') : $t('additional:modules.tools.cosi.districtFinder.hideDetails') }}
-                        </button>
+                        <Dropdown-Autocomplete
+                            v-model="selectedFilter"
+                            class="filter-rule flex-grow-1"
+                            :items="filterRules"
+                            :label="$t('additional:modules.tools.cosi.districtFinder.label.rule')"
+                            @update:model-value="updateResults"
+                        />
+                    </div>
+                    <div class="col-4">
+                        <InputText
+                            id="reference"
+                            v-model.number="referenceValue"
+                            class="reference-filter"
+                            :class="{invalid: referenceValue === '' || !checkInRange(selectedDataset?.valueType, referenceValue)}"
+                            type="number"
+                            :placeholder="$t('additional:modules.tools.cosi.districtFinder.label.referenceValue')"
+                            :label="$t('additional:modules.tools.cosi.districtFinder.label.referenceValue')"
+                            @update:model-value="updateResults"
+                        />
                     </div>
                     <div
-                        v-if="typeof selectedDataset !== 'undefined' && expandDataInfo"
+                        class="col-4"
+                        :class="typeof selectedDataset !== 'undefined' && selectedFilter === '=' ? '' : 'invisible'"
                     >
-                        <div
-                            v-if="features.length"
-                            class="chart-container"
-                        >
-                            <BarchartItemAnnotated
-                                :given-options="chartConfig.options"
-                                :data="chartConfig.data"
-                            />
+                        <InputText
+                            id="tolerance"
+                            v-model.number="tolerance"
+                            :disabled="typeof referenceValue !== 'number'"
+                            class="tolerance"
+                            :class="{invalid: tolerance === '' || !checkInRange(selectedDataset?.valueType, tolerance)}"
+                            :placeholder="$t('additional:modules.tools.cosi.districtFinder.label.tolerance')"
+                            type="number"
+                            :min="0"
+                            :label="$t('additional:modules.tools.cosi.districtFinder.label.tolerance')"
+                            @update:model-value="updateResults"
+                        />
+                    </div>
+                </div>
+                <div
+                    v-if="!isFieldValidated"
+                    class="hint row gy-0 pt-0"
+                >
+                    {{ $t("additional:modules.tools.cosi.districtFinder.errors.relativErr") }}
+                </div>
+                <div
+                    v-if="typeof selectedDataset !== 'undefined'"
+                    class="ps-0 pt-4 pb-1"
+                >
+                    <button
+                        id="details-button"
+                        type="button"
+                        class="btn btn-link btn-sm pb-0 ps-0"
+                        @click="expandDataInfo = !expandDataInfo"
+                    >
+                        <i
+                            class="expand me-1"
+                            :class="!expandDataInfo ? 'bi bi-chevron-down' : 'bi bi-chevron-up'"
+                        />
+                        {{ !expandDataInfo ? $t('additional:modules.tools.cosi.districtFinder.showDetails') : $t('additional:modules.tools.cosi.districtFinder.hideDetails') }}
+                    </button>
+                </div>
+                <div
+                    v-if="typeof selectedDataset !== 'undefined' && expandDataInfo"
+                >
+                    <div
+                        v-if="features.length"
+                        class="chart-container"
+                    >
+                        <BarchartItemAnnotated
+                            :given-options="chartConfig.options"
+                            :data="chartConfig.data"
+                        />
+                    </div>
+                    <hr class="px-0 mx-0">
+                    <div class="row">
+                        <div class="col-3 pb-0">
+                            <p class="text-center mb-0">
+                                {{ $t('additional:modules.tools.cosi.districtFinder.label.minimum') }}
+                            </p>
+                            <p class="info-value text-center">
+                                {{ minimum }}
+                            </p>
                         </div>
-                        <hr class="px-0 mx-0">
-                        <div class="row">
-                            <div class="col-3 pb-0">
-                                <p class="text-center">
-                                    {{ $t('additional:modules.tools.cosi.districtFinder.label.minimum') }}
-                                </p>
-                                <p class="info-value text-center">
-                                    {{ minimum }}
-                                </p>
-                            </div>
-                            <div class="col-3 pb-0">
-                                <p class="text-center">
-                                    {{ $t('additional:modules.tools.cosi.districtFinder.label.meanValue') }}
-                                </p>
-                                <p class="info-value text-center">
-                                    {{ meanValue }}
-                                </p>
-                            </div>
-                            <div class="col-3 pb-0">
-                                <p class="text-center">
-                                    {{ $t('additional:modules.tools.cosi.districtFinder.label.maximum') }}
-                                </p>
-                                <p class="info-value text-center">
-                                    {{ maximum }}
-                                </p>
-                            </div>
-                            <div class="col-3 pb-0">
-                                <p class="text-center">
-                                    {{ $t('additional:modules.tools.cosi.districtFinder.label.type') }}
-                                </p>
-                                <p class="info-value text-center">
-                                    {{ type }}
-                                </p>
-                            </div>
+                        <div class="col-3 pb-0">
+                            <p class="text-center mb-0">
+                                {{ $t('additional:modules.tools.cosi.districtFinder.label.meanValue') }}
+                            </p>
+                            <p class="info-value text-center">
+                                {{ meanValue }}
+                            </p>
+                        </div>
+                        <div class="col-3 pb-0">
+                            <p class="text-center mb-0">
+                                {{ $t('additional:modules.tools.cosi.districtFinder.label.maximum') }}
+                            </p>
+                            <p class="info-value text-center">
+                                {{ maximum }}
+                            </p>
+                        </div>
+                        <div class="col-3 pb-0">
+                            <p class="text-center mb-0">
+                                {{ $t('additional:modules.tools.cosi.districtFinder.label.type') }}
+                            </p>
+                            <p class="info-value text-center">
+                                {{ type }}
+                            </p>
                         </div>
                     </div>
-                    <v-snackbar
-                        v-model="noDataset"
-                        :timeout="5000"
-                    >
-                        {{ $t("additional:modules.tools.cosi.districtFinder.warnings.noDataset") }}
-                    </v-snackbar>
                 </div>
-            </template>
-        </ContentCard>
+                <v-snackbar
+                    v-model="noDataset"
+                    :timeout="5000"
+                >
+                    {{ $t("additional:modules.tools.cosi.districtFinder.warnings.noDataset") }}
+                </v-snackbar>
+            </div>
+        </CustomCard>
         <DistrictFinderFilterSpinner
             v-if="isLoading"
             class="loading-overlay"
@@ -894,26 +859,6 @@ h4 {
 
 .data-filter {
     font-family: $font_family_accent;
-}
-
-.v-label {
-    font-size: 11px;
-}
-</style>
-
-<style lang="scss">
-
-.v-text-field.v-text-field--enclosed .v-text-field__details {
-    margin-bottom: 0px;
-}
-.v-chip[stat-color='true'] {
-    background-color: #D6ECFF;
-}
-.v-chip[fachdata-color='true'] {
-    background-color: #ffcb9f;
-}
-.v-text-field__prefix {
-    padding-right: 10px;
 }
 
 </style>

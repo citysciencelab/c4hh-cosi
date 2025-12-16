@@ -1,16 +1,14 @@
 <script>
-import {VContainer, VRow, VSpacer} from "vuetify/components";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import {VSpacer} from "vuetify/components";
 import {VDivider} from "vuetify/components/VDivider";
-import {VSelect} from "vuetify/components/VSelect";
 
 export default {
     name: "DistrictFinderFilterOperator",
     components: {
-        VContainer,
-        VRow,
+        DropdownAutocomplete,
         VSpacer,
-        VDivider,
-        VSelect
+        VDivider
     },
     props: {
         id: {
@@ -35,33 +33,31 @@ export default {
 </script>
 
 <template lang="html">
-    <v-container>
-        <v-row class="justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
             <v-divider
                 class="conditionline"
                 vertical
             />
-        </v-row>
-        <v-row class="justify-content-center">
+        </div>
+        <div class="row justify-content-center">
             <v-spacer />
-            <v-select
+            <Dropdown-Autocomplete
+                class="col col-md-3 conditionselect"
                 :items="options"
                 :model-value="operator"
-                dense
-                outlined
-                hide-details
-                class="conditionselect"
+                :label="$t('additional:modules.tools.cosi.districtFinder.label.linkConditions')"
                 @update:model-value="value => $emit('change', id, value)"
             />
             <v-spacer />
-        </v-row>
-        <v-row class="justify-content-center">
+        </div>
+        <div class="row justify-content-center">
             <v-divider
-                class="conditionline"
+                class="conditionline m-0"
                 vertical
             />
-        </v-row>
-    </v-container>
+        </div>
+    </div>
 </template>
 
 <style lang="scss" scoped>
@@ -69,12 +65,9 @@ export default {
 .conditionline {
     height: 26px;
     padding: 0;
-    border-color: $light_blue;
+    border-color: $secondary;
     opacity: 1;
     border-width: 1px;
 }
 
-.conditionselect {
-    flex: 0 1 7em;
-}
 </style>

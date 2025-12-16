@@ -1,16 +1,13 @@
 <script>
 import differenceJs from "@shared/js/utils/differenceJS";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import {mapGetters, mapMutations} from "vuex";
-import {VChip} from "vuetify/components/VChip";
-import {VAutocomplete} from "vuetify/components/VAutocomplete";
-import {VChipGroup} from "vuetify/components/VChipGroup";
-
+import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 export default {
     name: "DistrictFinderSelector",
     components: {
-        VChip,
-        VAutocomplete,
-        VChipGroup
+        DropdownAutocomplete,
+        TagGroup
     },
     data () {
         return {
@@ -28,7 +25,17 @@ export default {
         screeningLevels () {
             return this.districtLevels.slice(0, 2).reverse();
         },
-
+        /**
+         * Gets the levels tags.
+         * @returns {Object[]} The district levels.
+         */
+        screeningLevelTags () {
+            return this.screeningLevels.map(level => ({
+                label: level.label,
+                value: level.layerId,
+                selected: level.layerId === this.selectedLevelId
+            }));
+        },
         /**
          * Gets the selected level for screening.
          * @returns {Object} The selected district level.
@@ -75,6 +82,13 @@ export default {
          */
         topLevelDistricts () {
             return this.topLevel.districts.map(district => district.getName()).sort();
+        },
+        topLevelDistrictsTags () {
+            return this.topLevelDistricts?.map(v => ({
+                label: v,
+                value: v,
+                selected: this.topLevelSelection.includes(v)
+            }));
         }
     },
     watch: {
@@ -228,6 +242,36 @@ export default {
 
             this.removeElementFromArray(item, subLevelSelection);
             this.setSubLevelSelection(subLevelSelection);
+        },
+        updateLevelLayerIds (tag) {
+            if (typeof tag === "undefined") {
+                return;
+            }
+            this.setSelectedLevelId(tag.value);
+        },
+        updateTopLevelSelection (level) {
+            const temp = [];
+
+            if (level.length) {
+                level.forEach(val => {
+                    temp.push(val.value);
+                });
+                this.setTopLevelSelection(temp);
+            }
+        },
+        updateSublevelSelection (newValue) {
+            const oldValue = this.subLevelSelection,
+                difference = differenceJs(newValue, oldValue),
+                diff = differenceJs(oldValue, newValue);
+
+            if (diff.length) {
+                this.removeFromSubLevelSelection(diff[0]);
+            }
+            if (difference.length) {
+                const values = this.subLevelSelection.concat(difference);
+
+                this.setSubLevelSelection(values);
+            }
         }
     }
 };
@@ -235,104 +279,36 @@ export default {
 
 <template lang="html">
     <div id="district-finder-selector">
-        <label
-            class="text-black-50"
-            for="chip-group"
-        >
-            {{ $t('additional:modules.tools.cosi.districtFinder.selector.label.level') }}
-        </label>
         <div class="text-left mt-1 mb-4">
-            <v-chip-group
-                :model-value="selectedLevelId"
-                mandatory
-                @update:model-value="setSelectedLevelId"
-            >
-                <v-chip
-                    v-for="level in screeningLevels"
-                    :key="level.layerId"
-                    class="me-2"
-                    :value="level.layerId"
-                    filter
-                >
-                    {{ level.label }}
-                </v-chip>
-            </v-chip-group>
+            <TagGroup
+                class="my-4"
+                :items="screeningLevelTags"
+                :label="$t('additional:modules.tools.cosi.districtFinder.selector.label.level')"
+                @update:selected-items="updateLevelLayerIds"
+            />
         </div>
-        <div class="mb-2 font-subtitle">
+        <h5 class="mb-2">
             {{ $t('additional:modules.tools.cosi.districtFinder.selector.subtitle', {selectedScreeningLevelLabel}) }}
-        </div>
-        <label
-            class="text-black-50"
-            for="chip-group"
-        >
-            {{ topLevel.label }}
-        </label>
-        <v-chip-group
-            :model-value="topLevelSelection"
-            column
-            mandatory
-            multiple
-            class="mb-2"
-            @update:model-value="setTopLevelSelection"
-        >
-            <v-chip
-                v-for="tag in topLevelDistricts"
-                :key="tag"
-                :input-value="topLevelSelection.includes(tag)"
-                :value="tag"
-                filter
-            >
-                {{ tag }}
-            </v-chip>
-        </v-chip-group>
+        </h5>
+        <TagGroup
+            class="my-4"
+            :items="topLevelDistrictsTags"
+            :label="topLevel.label"
+            :multiple="true"
+            @update:selected-items="updateTopLevelSelection"
+        />
         <template v-if="showSubLevel">
-            <label
-                class="text-black-50"
-                :for="'region-filter'"
-            >
-                {{ subLevel.label }}
-            </label>
-            <v-autocomplete
-                :model-value="subLevelSelection"
+            <Dropdown-Autocomplete
+                class="flex-grow-1"
                 :items="subLevelDistricts"
-                outlined
-                chips
-                closable-chips
+                :model-value="subLevelSelection"
                 multiple
-                small-chips
-                dense
-                hide-details
-                @update:model-value="setSubLevelSelection"
-            >
-                <template #chip="{ item, index, props }">
-                    <v-chip
-                        v-if="index < 2"
-                        v-bind="props"
-                        close
-                        :input-value="true"
-                        @click:close="removeFromSubLevelSelection(item.raw)"
-                    >
-                        <span>{{ item.raw }}</span>
-                    </v-chip>
-                    <span
-                        v-if="index === 2"
-                        class="fs-6 pt-2"
-                    >
-                        (+{{ subLevelSelection.length - 2 }} weitere)
-                    </span>
-                </template>
-            </v-autocomplete>
+                :label="subLevel.label"
+                @update:model-value="updateSublevelSelection($event)"
+            />
         </template>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
-    #district-finder-selector {
-        .font-subtitle {
-            font-size: 0.85rem;
-            font-family: $font_family_accent;
-        }
-    }
-
 </style>

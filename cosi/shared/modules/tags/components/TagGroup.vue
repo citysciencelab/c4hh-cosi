@@ -101,6 +101,7 @@ export default {
                 :model-value="selectedItems"
                 :disabled="disabled"
                 :multiple="multiple"
+                column
                 @update:model-value="emitSelectedItems"
             >
                 <v-chip

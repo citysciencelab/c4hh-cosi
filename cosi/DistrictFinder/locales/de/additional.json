@@ -43,7 +43,8 @@
                         "exportAreas": "mit ausgewählten Gebieten",
                         "valueType_absolute": "absolut",
                         "valueType_relative": "relativ",
-                        "latestData": "Für alle Bedingungen die Daten aus dem aktuellsten verfügbaren Jahr verwenden."
+                        "latestData": "Für alle Bedingungen die Daten aus dem aktuellsten verfügbaren Jahr verwenden.",
+                        "linkConditions": "Verknüpfung"
                     },
                     "button": {
                         "addCondition": "Bedingung hinzufügen",
