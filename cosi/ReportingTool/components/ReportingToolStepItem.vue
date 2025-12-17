@@ -28,22 +28,27 @@ export default {
             type: Array,
             required: true
         },
+        groups: {
+            type: Array,
+            required: false,
+            default: null
+        },
         nothingSelectedText: {
             type: String,
             required: false,
             default: null
         },
+        selectedAreasName: {
+            type: String,
+            required: false,
+            default: ""
+        },
         title: {
             type: String,
             required: true
-        },
-        groups: {
-            type: Array,
-            required: false,
-            default: null
         }
     },
-    emits: ["setCards", "setOrderOfCards", "update:statistical-year"],
+    emits: ["setCards", "setOrderOfCards", "update:selected-areas-name", "update:statistical-year"],
     data () {
         return {
             activelyClosedNonMultipleCardNames: [],
@@ -221,6 +226,8 @@ export default {
     </h5>
     <ReportingToolStepItemSettings
         v-if="title.startsWith('2. ')"
+        :selected-areas-name="selectedAreasName"
+        @update:selected-areas-name="$emit('update:selected-areas-name', $event)"
         @update:statistical-year="$emit('update:statistical-year', $event)"
     />
     <AlertMessage

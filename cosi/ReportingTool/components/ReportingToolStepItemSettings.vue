@@ -17,11 +17,18 @@ export default {
         SwitchInput,
         TagGroup
     },
+    props: {
+        selectedAreasName: {
+            type: String,
+            required: false,
+            default: ""
+        }
+    },
+    emits: ["update:selected-areas-name", "update:statistical-year"],
     data () {
         return {
             higherDistrictLevel: [],
             isAllAreasSummariseChecked: true,
-            selectedAreasName: "",
             selectedAreasNameMaxLength: 50,
             selectedStatisticalAreas: [],
             selectedDistricts: [],
@@ -77,6 +84,7 @@ export default {
         }
     },
     watch: {
+
         selectedYear (newVal) {
             this.$emit("update:statistical-year", newVal);
         }
@@ -87,6 +95,16 @@ export default {
     },
     methods: {
         uniqueId,
+
+        /**
+         * Emits the updated name for selected areas.
+         * @param {String} evt - The new name for the selected areas.
+         * @returns {void}
+         */
+        emitSelectedAreasName (name) {
+            this.$emit("update:selected-areas-name", name);
+        },
+
         /**
          * Updates the selected higher district level for multiselect tags.
          * @param {Object[]} selectedDistricts - The labels object containing information about the higher district level.
@@ -130,6 +148,7 @@ export default {
                 :label="$t('additional:modules.cosi.reportingTool.label.summedColumns')"
                 :placeholder="$t('additional:modules.cosi.reportingTool.label.summedColumns')"
                 :max-length="selectedAreasNameMaxLength.toString()"
+                @update:model-value="emitSelectedAreasName"
             />
             <TagGroup
                 v-if="higherDistrictLevelLabels.length"

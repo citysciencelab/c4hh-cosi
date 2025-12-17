@@ -47,11 +47,11 @@ export default {
     data: () => ({
         analysisCards: [],
         annexCards: [],
-        reportTitle: "",
-        reportTitleMaxLength: 50,
-        selectedAreasName: "",
         author: "",
         authorMaxLength: 35,
+        reportTitle: "",
+        reportTitleMaxLength: 50,
+
         freeHeadline: "",
         freeText: "",
         frontPageItems: [
@@ -85,13 +85,13 @@ export default {
         reportLoader: false,
         selectedCategoryInChart: [],
         page: 1,
-        isAllAreasSummariseChecked: false,
-        statisticalYear: undefined,
         printReportView: false,
-        selectedStatGroups: [],
         selectedInfrastructureData: [],
+        selectedStatGroups: [],
         statisticalDataCards: [],
-        subjectDataCards: []
+        statisticalYear: undefined,
+        subjectDataCards: [],
+        selectedAreasName: ""
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
@@ -131,7 +131,7 @@ export default {
          * @returns {String} the column name to use for the selected area.
          */
         areaColumnName () {
-            return this.selectedAreasName ? this.selectedAreasName.trim() : "Ausgewähltes Gebiet";
+            return this.selectedAreasName ? this.selectedAreasName.trim() : this.$t("additional:modules.cosi.reportingTool.label.selectedAreasName");
         },
 
         /**
@@ -1228,6 +1228,7 @@ export default {
                     <v-stepper-window-item value="2">
                         <ReportingToolStepItem
                             v-if="selectedDistrictNames?.length"
+                            v-model:selected-areas-name="selectedAreasName"
                             :card-mapping="categoryMapping?.statData"
                             :title="'2. ' + $t('additional:modules.cosi.reportingTool.statisticalData')"
                             :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noStatisticalDataSelected')"
