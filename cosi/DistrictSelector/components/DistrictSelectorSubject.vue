@@ -272,7 +272,7 @@ export default {
         setBuffer (value) {
             this.buffer = value;
             this.activeCard.buffer = value;
-            this.activeCard.data[2].label = "Puffer " + value + " m";
+            this.activeCard.data[3].label = "Puffer " + value + " m";
             if (this.activeCard.drawnFeature !== null) {
                 this.setSubjectFeature([this.activeCard.drawnFeature], this.activeCard.buffer);
             }
