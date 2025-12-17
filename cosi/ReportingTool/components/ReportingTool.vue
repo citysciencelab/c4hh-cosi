@@ -291,12 +291,14 @@ export default {
          */
         addChapterAnalysis (cards) {
             if (!cards.length) {
-                this.addAccessibilityAnalysis(this.dataSets);
                 return;
             }
+            this.pdf.addChapter("Analysen");
             cards.forEach(card => {
                 if (card.key === "accessibilityAnalyses") {
-                    this.addAccessibilityAnalysis(card.items);
+                    const analysis = card.items.find(item => item.inputs.title === card.name);
+
+                    this.addAccessibilityAnalysis(analysis);
                 }
                 else if (card.key === "heading") {
                     this.pdf.addChapter(card.value);
@@ -334,23 +336,19 @@ export default {
 
         /**
          * Prepares the data of the accessibility analysis and adds it to the report.
-         * @param {Object[]} items - Items from accessibility analysis component.
+         * @param {Object} analysis - Analysis from accessibility analysis component.
          * @returns {void}
          */
-        addAccessibilityAnalysis (items) {
-            this.pdf.addChapter("Analysen");
+        addAccessibilityAnalysis (analysis) {
+            this.pdf.addHeadline("Erreichbarkeitsanalyse");
+            this.pdf.addHeadline(analysis.inputs.title);
+            if (typeof analysis.inputs.screenshot !== "undefined") {
+                this.pdf.addImageByUrl(analysis.inputs.screenshot, analysis.inputs.title, {fit: [500, 500], alignment: "left"});
+            }
 
-            items.forEach((analysis, idx) => {
-                this.pdf.addHeadline("Erreichbarkeitsanalyse");
-                this.pdf.addHeadline(analysis.inputs.title);
-                if (typeof analysis.inputs.screenshot !== "undefined") {
-                    this.pdf.addImageByUrl(analysis.inputs.screenshot, analysis.inputs.title + idx, {fit: [500, 500], alignment: "left"});
-                }
-
-                if (typeof analysis.inputs.screenshotLegend !== "undefined") {
-                    this.pdf.addImageByUrl(analysis.inputs.screenshotLegend, idx.toString(), {fit: [300, 300], alignment: "left"});
-                }
-            });
+            if (typeof analysis.inputs.screenshotLegend !== "undefined") {
+                this.pdf.addImageByUrl(analysis.inputs.screenshotLegend, analysis.inputs.title + "-legend", {fit: [300, 300], alignment: "left"});
+            }
 
         },
 
