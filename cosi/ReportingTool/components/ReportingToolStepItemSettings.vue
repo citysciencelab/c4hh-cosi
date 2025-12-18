@@ -91,7 +91,7 @@ export default {
     },
     mounted () {
         this.selectedStatisticalAreas = this.selectedDistrictNames;
-        this.selectedYear = this.years[0].value;
+        this.selectedYear = this.years[0]?.value;
     },
     methods: {
         uniqueId,

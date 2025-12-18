@@ -15,8 +15,8 @@ const state = {
     type: "reportingTool",
     name: "additional:modules.cosi.reportingTool.title",
     icon: "bi-printer",
-    infrastructureTableLimitEnabled: false,
-    infrastructureTableLimit: 10,
+    infrastructureTableLimitEnabledConfig: false,
+    infrastructureTableLimitConfig: 10,
     readmeUrl: {
         "de-DE": "bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/015vorlagen.md"
     }

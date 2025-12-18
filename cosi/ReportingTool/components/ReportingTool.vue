@@ -1,6 +1,6 @@
 <script>
 import dayjs from "dayjs";
-import {mapGetters, mapActions, mapMutations} from "vuex";
+import {mapGetters, mapActions} from "vuex";
 import PDFMaker from "../js/createPdf";
 import {getTotal, getCulmulativeTotal} from "../../Dashboard/utils/operations";
 import {getCenter as getCenterOfExtent} from "ol/extent";
@@ -82,6 +82,8 @@ export default {
             {"Bevölkerung Migrationshintergrund": "Bevölkerung mit Migrationshintergrund"},
             {"Bevölkerung Migrationshintergrund": "Ausländer insgesamt"}
         ],
+        infrastructureTableLimit: 10,
+        infrastructureTableLimitEnabled: false,
         reportLoader: false,
         selectedCategoryInChart: [],
         page: 1,
@@ -91,6 +93,7 @@ export default {
         statisticalDataCards: [],
         statisticalYear: undefined,
         subjectDataCards: [],
+        stepperRerenderKey: 0,
         selectedAreasName: ""
     }),
     computed: {
@@ -100,7 +103,7 @@ export default {
         ...mapGetters("Modules/FeaturesList", ["featuresListItems"]),
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevel", "selectedDistrictNames", "selectedFeatures", "initMapping"]),
         ...mapGetters("Modules/TemplateManager", ["reportName", "reportLayerIds", "reportCategories"]),
-        ...mapGetters("Modules/ReportingTool", ["infrastructureTableLimit", "infrastructureTableLimitEnabled", "readmeUrl"]),
+        ...mapGetters("Modules/ReportingTool", ["infrastructureTableLimitConfig", "infrastructureTableLimitEnabledConfig", "readmeUrl"]),
         ...mapGetters(["restServiceById", "visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
 
@@ -181,6 +184,10 @@ export default {
         featuresListItems: "preparesInfrastructureData",
         visibleSubjectDataLayerConfigs: "updateFeaturesList"
     },
+    created () {
+        this.infrastructureTableLimit = this.infrastructureTableLimitConfig;
+        this.infrastructureTableLimitEnabled = this.infrastructureTableLimitEnabledConfig;
+    },
     activated () {
         this.updateFeaturesList();
         this.preparesInfrastructureData();
@@ -189,7 +196,6 @@ export default {
     deactivated: () => undefined,
     methods: {
         ...mapActions("Modules/FeaturesList", ["updateFeaturesList"]),
-        ...mapMutations("Modules/ReportingTool", ["setInfrastructureTableLimit", "setInfrastructureTableLimitEnabled"]),
 
         /**
          * Creates the PDF report and triggers the download.
@@ -996,15 +1002,6 @@ export default {
         },
 
         /**
-        * Updates the page number during the steps.
-        * @param {Object} event The event.
-        * @returns {void}
-        */
-        valueChanged (event) {
-            this.page = event;
-        },
-
-        /**
          * Updates the selected report components with the selected front page items.
          * @param {Object} frontPagelabel - The labels object containing information about front page items.
          * @returns {void}
@@ -1045,6 +1042,29 @@ export default {
             const topicName = Object.groupBy(this.featuresListItems, (topic) => topic.layerName);
 
             this.selectedInfrastructureData = Object.keys(topicName);
+        },
+
+        /**
+         * Resets all settings to default values.
+         * @returns {void}
+         */
+        resetAllSettings () {
+            this.reportTitle = "";
+            this.author = "";
+            this.frontPageItems.forEach(item => {
+                item.selected = false;
+            });
+            this.frontPageItems[0].selected = true;
+            this.frontPageItems = [...this.frontPageItems];
+            this.freeHeadline = "";
+            this.freeText = "";
+            this.statisticalYear = undefined;
+            this.infrastructureTableLimit = this.infrastructureTableLimitConfig;
+            this.infrastructureTableLimitEnabled = this.infrastructureTableLimitEnabledConfig;
+
+            this.page = 1;
+            this.stepperRerenderKey++;
+            this.printReportView = false;
         },
 
         /**
@@ -1119,18 +1139,21 @@ export default {
             :locale="currentLocale"
             summary="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum."
         />
-        <div v-if="!printReportView && !noDataView">
+        <div
+            v-show="!printReportView && !noDataView"
+            :key="stepperRerenderKey"
+        >
             <v-stepper
                 ref="stepperActions"
+                v-model="page"
                 class="mt-3"
                 color="#3C5F94"
                 non-linear
                 alt-labels
-                @update:modelValue="valueChanged($event)"
             >
                 <v-stepper-header>
                     <v-stepper-item
-                        value="1"
+                        :value="1"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.generalSettings") }}
@@ -1139,7 +1162,7 @@ export default {
                     <v-divider />
 
                     <v-stepper-item
-                        value="2"
+                        :value="2"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.statisticalData") }}
@@ -1148,7 +1171,7 @@ export default {
                     <v-divider />
 
                     <v-stepper-item
-                        value="3"
+                        :value="3"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.subjectData") }}
@@ -1157,7 +1180,7 @@ export default {
                     <v-divider />
 
                     <v-stepper-item
-                        value="4"
+                        :value="4"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.analyses") }}
@@ -1166,16 +1189,14 @@ export default {
                     <v-divider />
 
                     <v-stepper-item
-                        value="5"
+                        :value="5"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.annex") }}
                     </v-stepper-item>
                 </v-stepper-header>
                 <v-stepper-window class="ms-0 pe-0">
-                    <v-stepper-window-item
-                        value="1"
-                    >
+                    <v-stepper-window-item :value="1">
                         <h5>
                             {{ "1. " + $t("additional:modules.cosi.reportingTool.generalReportInformation") }}
                         </h5>
@@ -1225,7 +1246,7 @@ export default {
                             />
                         </form>
                     </v-stepper-window-item>
-                    <v-stepper-window-item value="2">
+                    <v-stepper-window-item :value="2">
                         <ReportingToolStepItem
                             v-if="selectedDistrictNames?.length"
                             v-model:selected-areas-name="selectedAreasName"
@@ -1243,9 +1264,7 @@ export default {
                             type="noData"
                         />
                     </v-stepper-window-item>
-                    <v-stepper-window-item
-                        value="3"
-                    >
+                    <v-stepper-window-item :value="3">
                         <template
                             v-if="featuresListItems?.length"
                         >
@@ -1255,18 +1274,17 @@ export default {
                                 :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
                                 :aria="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
                                 :checked="infrastructureTableLimitEnabled"
-                                :interaction="evt => setInfrastructureTableLimitEnabled(evt.target.checked)"
+                                :interaction="evt => infrastructureTableLimitEnabled = evt.target.checked"
                             />
                             <InputText
                                 v-if="infrastructureTableLimitEnabled"
                                 id="infrastructure-table-limit-input"
-                                :model-value="infrastructureTableLimit"
+                                v-model="infrastructureTableLimit"
                                 :min="1"
                                 type="number"
                                 class="mb-3"
                                 :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
                                 :placeholder="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
-                                @update:modelValue="setInfrastructureTableLimit($event)"
                             />
                             <ReportingToolStepItem
                                 :card-mapping="categoryMapping?.subjectData"
@@ -1283,9 +1301,7 @@ export default {
                             type="noData"
                         />
                     </v-stepper-window-item>
-                    <v-stepper-window-item
-                        value="4"
-                    >
+                    <v-stepper-window-item :value="4">
                         <ReportingToolStepItem
                             v-if="dataSets?.length"
                             :card-mapping="categoryMapping?.analyses"
@@ -1299,9 +1315,7 @@ export default {
                             type="noData"
                         />
                     </v-stepper-window-item>
-                    <v-stepper-window-item
-                        value="5"
-                    >
+                    <v-stepper-window-item :value="5">
                         <ReportingToolStepItem
                             :card-mapping="categoryMapping?.annex"
                             :title="'5. ' + $t('additional:modules.cosi.reportingTool.annex')"
@@ -1339,11 +1353,11 @@ export default {
             </v-stepper>
         </div>
         <AlertMessage
-            v-else-if="noDataView"
+            v-if="noDataView"
             :text="$t('additional:modules.cosi.reportingTool.alert.noDataAlert')"
             type="noData"
         />
-        <div v-else>
+        <div v-if="printReportView">
             <p>
                 {{ $t("additional:modules.cosi.reportingTool.infoText") }}
             </p>
@@ -1363,6 +1377,7 @@ export default {
                     type="button"
                     :aria-label="$t('additional:modules.cosi.reportingTool.button.backToEditView')"
                     :text="$t('additional:modules.cosi.reportingTool.button.backToEditView')"
+                    :interaction="() => printReportView = false"
                 />
                 <FlatButton
                     id="new-report"
@@ -1370,7 +1385,7 @@ export default {
                     type="button"
                     :aria-label="$t('additional:modules.cosi.reportingTool.button.createNewReport')"
                     :text="$t('additional:modules.cosi.reportingTool.button.createNewReport')"
-                    :interaction="() => printReportView = false"
+                    :interaction="() => resetAllSettings()"
                 />
             </div>
         </div>
