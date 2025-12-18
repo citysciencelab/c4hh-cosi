@@ -101,7 +101,7 @@ export default {
             >
                 {{ summary }}
             </p>
-            <div
+            <!-- <div
                 v-if="url"
                 class="d-flex justify-content-end"
             >
@@ -113,7 +113,7 @@ export default {
                     :interaction="() => openLink()"
                     :text="'Mehr Infos'"
                 />
-            </div>
+            </div> -->
         </AccordionItem>
     </div>
 </template>
