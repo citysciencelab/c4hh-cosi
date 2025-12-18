@@ -196,57 +196,6 @@ export default {
         id="dashboard-toolbar"
         dense
     >
-        <v-col>
-            <v-autocomplete
-                v-model="_statsFeatureFilter"
-                :items="mapping"
-                item-title="value"
-                item-type="type"
-                :label="$t('additional:modules.tools.cosi.featuresList.layerFilter')"
-                outlined
-                dense
-                multiple
-                chips
-                clearable
-                hide-details
-            >
-                <template #chip="{ item, index }">
-                    <v-chip
-                        v-if="index === 0"
-                        small
-                    >
-                        <span>{{ item.value }}</span>
-                    </v-chip>
-                    <span
-                        v-if="index === 1"
-                        class="grey--text text-caption"
-                    >
-                        (+{{ statsFeatureFilter.length - 1 }} weitere)
-                    </span>
-                </template>
-                <template #subheader="{ props }">
-                    <div class="d-flex ga-4 align-center">
-                        {{ props }}
-                        <v-list-subheader class="font-weight-bold bg-primary">
-                            {{ props }}
-                        </v-list-subheader>
-                    </div>
-                </template>
-                <template #divider>
-                    <div class="d-flex ga-4 align-center">
-                        <v-divider />
-                    </div>
-                </template>
-                <template #append>
-                    <v-icon
-                        title="Anmerkungen öffnen"
-                        @click="openMetadata"
-                    >
-                        mdi-information
-                    </v-icon>
-                </template>
-            </v-autocomplete>
-        </v-col>
         <v-col cols="auto">
             <v-checkbox
                 id="export-details"
