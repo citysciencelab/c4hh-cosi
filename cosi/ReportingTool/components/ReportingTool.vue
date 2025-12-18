@@ -60,6 +60,20 @@ export default {
                 set: (value) => {
                     this.selectedLevels = value;
                 }
+            }),
+            shouldAreasSummedUp: computed({
+                /**
+                 * Gets whether areas should be summed up.
+                 * @returns {Boolean} True if areas should be summed up.
+                 */
+                get: () => this.shouldAreasSummedUp,
+                /**
+                 * Sets whether areas should be summed up.
+                 * @param {Boolean} value - The new value.
+                 */
+                set: (value) => {
+                    this.shouldAreasSummedUp = value;
+                }
             })
         };
     },
@@ -110,6 +124,7 @@ export default {
         selectedLevels: undefined,
         selectedInfrastructureData: [],
         selectedStatGroups: [],
+        shouldAreasSummedUp: true,
         statisticalDataCards: [],
         statisticalYear: undefined,
         subjectDataCards: [],
@@ -417,7 +432,7 @@ export default {
             pdf.addSubHeadline("Jahr: " + (this.statisticalYear || items[0].years[0]));
 
             this.selectedStatGroups.forEach((group) => {
-                const columns = pdf.getColumns(["", this.areaColumnName, ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
+                const columns = pdf.getColumns(["", ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
                     body = [columns];
 
                 pdf.addHeadline(group);
@@ -444,7 +459,7 @@ export default {
                             value = statFeature.category;
                             pdf.addCell(row, value, alignment);
                         }
-                        else if (index === 1) {
+                        else if (index === 1 && this.shouldAreasSummedUp) {
                             value = this.getTotal(statFeature, this.selectedDistrictLabels, lastYear, "jahr_");
                             pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
@@ -795,7 +810,7 @@ export default {
             let refDistrictName, district;
 
             for (district of districts) {
-                if (this.selectedLevels.includes(districtLevel.label)) {
+                if (this.selectedLevels.includes(districtLevel.label) || !this.shouldAreasSummedUp) {
                     columns.push(district.getLabel());
                 }
 
@@ -809,6 +824,9 @@ export default {
                 this.getStatCols(districtLevel.referenceLevel, refDistrictNames, columns);
             }
 
+            if (this.shouldAreasSummedUp) {
+                return [this.areaColumnName, ...columns];
+            }
             return columns;
         },
         getCulmulativeTotal,
@@ -1084,6 +1102,7 @@ export default {
             this.infrastructureTableLimit = this.infrastructureTableLimitConfig;
             this.infrastructureTableLimitEnabled = this.infrastructureTableLimitEnabledConfig;
             this.selectedLevels = this.districtLevels.map(level => level.label).slice(1);
+            this.shouldAreasSummedUp = true;
 
             this.page = 1;
             this.stepperRerenderKey++;

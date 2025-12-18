@@ -17,7 +17,7 @@ export default {
         SwitchInput,
         TagGroup
     },
-    inject: ["selectedLevels"],
+    inject: ["selectedLevels", "shouldAreasSummedUp"],
     props: {
         selectedAreasName: {
             type: String,
@@ -28,7 +28,7 @@ export default {
     emits: ["update:statistical-year"],
     data () {
         return {
-            isAllAreasSummariseChecked: true,
+            higherDistrictLevel: [],
             selectedAreasNameMaxLength: 50,
             selectedDistricts: [],
             selectedStatisticalAreas: [],
@@ -123,13 +123,13 @@ export default {
             <SwitchInput
                 id="summarise-areas"
                 :aria="$t('additional:modules.cosi.reportingTool.label.summariseStatisticalAreas')"
-                :checked="isAllAreasSummariseChecked"
-                :interaction="() => isAllAreasSummariseChecked = !isAllAreasSummariseChecked"
+                :checked="shouldAreasSummedUp"
+                :interaction="() => shouldAreasSummedUp = !shouldAreasSummedUp"
                 :label="$t('additional:modules.cosi.reportingTool.label.summariseStatisticalAreas')"
                 class="mb-3"
             />
             <InputText
-                v-if="isAllAreasSummariseChecked"
+                v-if="shouldAreasSummedUp"
                 id="summed-columns"
                 :model-value="selectedAreasName"
                 :label="$t('additional:modules.cosi.reportingTool.label.summedColumns')"
