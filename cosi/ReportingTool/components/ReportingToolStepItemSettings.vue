@@ -17,6 +17,7 @@ export default {
         SwitchInput,
         TagGroup
     },
+    inject: ["selectedLevels"],
     props: {
         selectedAreasName: {
             type: String,
@@ -24,19 +25,18 @@ export default {
             default: ""
         }
     },
-    emits: ["update:selected-areas-name", "update:statistical-year"],
+    emits: ["update:statistical-year"],
     data () {
         return {
-            higherDistrictLevel: [],
             isAllAreasSummariseChecked: true,
             selectedAreasNameMaxLength: 50,
-            selectedStatisticalAreas: [],
             selectedDistricts: [],
+            selectedStatisticalAreas: [],
             selectedYear: null
         };
     },
     computed: {
-        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictNames", "selectedDistrictLevel", "selectedStatFeatures"]),
+        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictNames", "selectedDistrictLevelId", "selectedStatFeatures"]),
 
         /**
          * Gets the selectable years based on the selected statistical features.
@@ -53,6 +53,18 @@ export default {
         },
 
         /**
+         * Gets an array of higher district levels than the currently selected one.
+         * If the currently selected level is the highest, it returns an array with only that level.
+         * @returns {Object[]} An array of higher district level objects.
+         */
+        higherDistrictLevels () {
+            const index = this.districtLevels.findIndex(level => level.layerId === this.selectedDistrictLevelId),
+                levelsLength = this.districtLevels.length - 1;
+
+            return index !== levelsLength ? this.districtLevels.slice(index + 1) : [this.districtLevels[levelsLength]];
+        },
+
+        /**
          * Gets an array of higher district levels with their corresponding selection status.
          * Each object in the returned array contains:
          * - `label`: The label of the district level.
@@ -60,27 +72,10 @@ export default {
          * @returns {Object[]} An array of objects representing higher district level labels.
          */
         higherDistrictLevelLabels () {
-            let level = this.districtLevels.map(lev => ({
+            return this.higherDistrictLevels.map(lev => ({
                 label: lev.label,
-                selected: this.higherDistrictLevel.length ? this.higherDistrictLevel.includes(lev.label) : true
+                selected: this.selectedLevels.includes(lev.label)
             }));
-            const districtLevel = [];
-
-            if (this.selectedDistrictLevel.label === "Hamburg") {
-                level = [];
-            }
-            else {
-                this.districtLevels.forEach(v => {
-                    if (v.label === this.selectedDistrictLevel.label) {
-                        districtLevel.push(v.label);
-                    }
-                    if (v.label === this.selectedDistrictLevel.subLevel?.label || v.label === "Statistische Gebiete") {
-                        districtLevel.push(v.label);
-                    }
-                });
-            }
-
-            return level?.filter(object => !districtLevel.includes(object.label));
         }
     },
     watch: {
@@ -106,19 +101,11 @@ export default {
         },
 
         /**
-         * Updates the selected higher district level for multiselect tags.
-         * @param {Object[]} selectedDistricts - The labels object containing information about the higher district level.
-         * @returns {void}
+         * Sets the selected levels.
+         * @param {Object[]} levels - An array of selected level.
          */
-        updateSelectedDistricts (selectedDistricts) {
-            if (typeof selectedDistricts === "undefined") {
-                return;
-            }
-            this.higherDistrictLevel = [];
-
-            selectedDistricts.forEach(v => {
-                this.higherDistrictLevel.push(v.label);
-            });
+        setSelectedLevels (levels) {
+            this.selectedLevels = levels.map(level => level.label);
         }
     }
 };
@@ -156,7 +143,7 @@ export default {
                 :items="higherDistrictLevelLabels"
                 :multiple="true"
                 :label="$t('additional:modules.cosi.reportingTool.label.higherDistrictLevel')"
-                @update:selected-items="updateSelectedDistricts"
+                @update:selected-items="setSelectedLevels"
             />
             <Dropdown-Autocomplete
                 v-model="selectedStatisticalAreas"

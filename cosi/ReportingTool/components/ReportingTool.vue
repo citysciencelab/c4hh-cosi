@@ -25,7 +25,7 @@ import categoryMapping from "../assets/categoryMapping.json";
 import ReportingToolStepItem from "./ReportingToolStepItem.vue";
 import {VStepper, VStepperActions, VStepperItem, VStepperHeader, VStepperWindow, VStepperWindowItem} from "vuetify/components/VStepper";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
-import {markRaw} from "vue";
+import {computed, markRaw} from "vue";
 
 export default {
     name: "ReportingTool",
@@ -43,6 +43,25 @@ export default {
         VStepperHeader,
         VStepperWindow,
         VStepperWindowItem
+    },
+    provide () {
+        return {
+            selectedLevels: computed({
+                /**
+                 * Gets the selected district levels for the report.
+                 * @returns {String[]} The selected district levels.
+                 */
+                get: () => this.selectedLevels,
+                /*
+                 * Sets the selected district levels for the report.
+                 * @param {String[]} value - The new selected district levels.
+                 * @return {void}
+                 */
+                set: (value) => {
+                    this.selectedLevels = value;
+                }
+            })
+        };
     },
     data: () => ({
         analysisCards: [],
@@ -88,6 +107,7 @@ export default {
         selectedCategoryInChart: [],
         page: 1,
         printReportView: false,
+        selectedLevels: undefined,
         selectedInfrastructureData: [],
         selectedStatGroups: [],
         statisticalDataCards: [],
@@ -192,6 +212,10 @@ export default {
         this.updateFeaturesList();
         this.preparesInfrastructureData();
         this.preparesStatGroups();
+
+        if (typeof this.selectedLevels === "undefined") {
+            this.selectedLevels = this.districtLevels.map(level => level.label).slice(1);
+        }
     },
     deactivated: () => undefined,
     methods: {
@@ -771,7 +795,7 @@ export default {
             let refDistrictName, district;
 
             for (district of districts) {
-                if (districtLevel.label !== this.selectedDistrictLevel.label) {
+                if (this.selectedLevels.includes(districtLevel.label)) {
                     columns.push(district.getLabel());
                 }
 
@@ -1059,6 +1083,7 @@ export default {
             this.statisticalYear = undefined;
             this.infrastructureTableLimit = this.infrastructureTableLimitConfig;
             this.infrastructureTableLimitEnabled = this.infrastructureTableLimitEnabledConfig;
+            this.selectedLevels = this.districtLevels.map(level => level.label).slice(1);
 
             this.page = 1;
             this.stepperRerenderKey++;
