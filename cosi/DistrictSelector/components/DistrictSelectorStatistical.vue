@@ -4,7 +4,9 @@ import {calculateExtent} from "../../utils/features/calculateExtent.js";
 import Card from "../../shared/modules/cards/components/Card.vue";
 import DistrictSelectorFilter from "./DistrictSelectorFilter.vue";
 import DistrictSelectorStatisticalAdditionalLayer from "./DistrictSelectorStatisticalAdditionalLayer.vue";
+import {downloadJsonToFile} from "../../utils/download";
 import {DragBox, Select} from "ol/interaction";
+import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
 import {Fill, Stroke, Style} from "ol/style.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
@@ -127,10 +129,9 @@ export default {
         });
     },
     deactivated () {
-        const features = this.select.getFeatures();
-
-        // Hole die Features der aktiven Karte
-        const activeCardFeatures = this.activeCard?.features || []; // Fallback auf leeres Array, falls keine aktive Karte vorhanden ist
+        const features = this.select.getFeatures(),
+            // Hole die Features der aktiven Karte
+            activeCardFeatures = this.activeCard?.features || []; // Fallback auf leeres Array, falls keine aktive Karte vorhanden ist
 
         // Entferne alle Features, die nicht zur aktiven Karte gehören
         features.forEach(feature => {
@@ -179,6 +180,15 @@ export default {
          */
         clearFeatures () {
             this.select.getFeatures().clear();
+        },
+
+        /**
+         * Downloads the feature in geojson file.
+         * @param {Object} val - The item object.
+         * @returns {void}
+         */
+        exportFeature (val) {
+            downloadJsonToFile(featuresToGeoJsonCollection(val?.features), val?.districtLevelLabel + ".geojson");
         },
 
         /**
@@ -567,9 +577,23 @@ export default {
                 :downloadable="item.downloadable"
                 :icon="item.icon"
                 :status="item.status"
+                :visible="false"
                 @click="toggleCardStatus(index)"
                 @remove-set="removeCard(index)"
-            />
+            >
+                <template #download-menu>
+                    <ul class="dropdown-menu">
+                        <li class="ps-4">
+                            <button
+                                class="dropdown-item"
+                                @click.stop="exportFeature(item)"
+                            >
+                                GeoJSON
+                            </button>
+                        </li>
+                    </ul>
+                </template>
+            </Card>
         </div>
     </div>
 </template>

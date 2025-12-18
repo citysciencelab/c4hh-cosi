@@ -3,8 +3,10 @@ import Card from "../../shared/modules/cards/components/Card.vue";
 import {default as turfUnion} from "@turf/union";
 import DistrictSelectorSubjectImport from "./DistrictSelectorSubjectImport.vue";
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
+import {downloadJsonToFile} from "../../utils/download";
 import {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
 import Feature from "ol/Feature";
+import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
@@ -126,6 +128,15 @@ export default {
                 }
                 this.addCard(feature, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel);
             });
+        },
+
+        /**
+         * Downloads the feature in geojson file.
+         * @param {Object} val - The item object.
+         * @returns {void}
+         */
+        exportFeature (val) {
+            downloadJsonToFile(featuresToGeoJsonCollection([val?.subjectFeature]), "Gebiet für Fachdaten.geojson");
         },
 
         /**
@@ -447,7 +458,20 @@ export default {
                 :removable="item.removable"
                 :status="item.status"
                 @click="toggleCardStatus(index)"
-            />
+            >
+                <template #download-menu>
+                    <ul class="dropdown-menu">
+                        <li class="ps-4">
+                            <button
+                                class="dropdown-item"
+                                @click.stop="exportFeature(item)"
+                            >
+                                GeoJSON
+                            </button>
+                        </li>
+                    </ul>
+                </template>
+            </Card>
         </div>
     </div>
 </template>
