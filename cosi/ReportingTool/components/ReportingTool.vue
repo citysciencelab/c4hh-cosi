@@ -110,10 +110,10 @@ export default {
         pdf: null,
         categoryInChart: [
             {"Bevölkerung": "Bevölkerung insgesamt"},
-            {"Bevölkerung unter x Jahren": "Bevölkerung unter 18 Jahren"},
-            {"Bevölkerung ab x Jahren": "Bevölkerung ab 65 Jahren"},
+            {"Bevölkerung bis unter 26 Jahre": "Bevölkerung unter 18 Jahre"},
+            {"Bevölkerung ab 56 Jahre": "Bevölkerung 65 Jahre und älter"},
             {"Bevölkerung Migrationshintergrund": "Bevölkerung mit Migrationshintergrund"},
-            {"Bevölkerung Migrationshintergrund": "Ausländer insgesamt"}
+            {"Bevölkerung Migrationshintergrund": "Ausländische Bevölkerung"}
         ],
         infrastructureTableLimit: 10,
         infrastructureTableLimitEnabled: false,
@@ -137,7 +137,7 @@ export default {
         ...mapGetters("Modules/Dashboard", ["items", "statsFeatureFilter"]),
         ...mapGetters("Modules/FeaturesList", ["featuresListItems"]),
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevel", "selectedDistrictNames", "selectedFeatures", "initMapping"]),
-        ...mapGetters("Modules/TemplateManager", ["reportName", "reportLayerIds", "reportCategories"]),
+        ...mapGetters("Modules/TemplateManager", ["reportName"]),
         ...mapGetters("Modules/ReportingTool", ["infrastructureTableLimitConfig", "infrastructureTableLimitEnabledConfig", "readmeUrl"]),
         ...mapGetters(["restServiceById", "visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
@@ -254,7 +254,7 @@ export default {
                 this.pdf.addHeader(this.reportTitle.trim());
                 this.pdf.setAuthor(this.author.trim());
                 await this.addOverViewPage(this.selectedFrontPageItem.value);
-                this.addChapterStatisticalData(this.statisticalDataCards);
+                await this.addChapterStatisticalData(this.statisticalDataCards);
                 await this.addChapterSubjectData(this.subjectDataCards);
                 this.addChapterAnalysis(this.analysisCards);
                 await this.addChapterAnnex(this.annexCards);
@@ -273,17 +273,20 @@ export default {
          * @param {Object[]} cards - cards to be added in the chapter.
          * @returns {void}
          */
-        addChapterStatisticalData (cards) {
+        async addChapterStatisticalData (cards) {
             if (!cards.length) {
                 this.addStatsToReport(this.items);
+                await this.addDiagram();
                 return;
             }
-            cards.forEach(card => {
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+
                 if (card.key === "statDataOverview") {
                     this.addStatsToReport(this.items);
                 }
                 else if (card.key === "statDataCharts") {
-                    this.addDiagram();
+                    await this.addDiagram();
                 }
                 else if (card.key === "heading") {
                     this.pdf.addChapter(card.value);
@@ -291,7 +294,7 @@ export default {
                 else if (card.key === "textArea") {
                     this.pdf.addParagraph(card.value);
                 }
-            });
+            }
         },
 
         /**
@@ -870,7 +873,7 @@ export default {
          * @returns {void}
          */
         async addDiagram () {
-            const data = this.getChartData(this.items, this.reportCategories, this.selectedDistrictNames, this.areaColumnName, this.categoryInChart, this.initMapping),
+            const data = this.getChartData(this.items, this.selectedDistrictNames, this.areaColumnName, this.categoryInChart, this.initMapping),
                 imageArr = [];
 
             if (!Array.isArray(data) || !data.length) {
@@ -931,21 +934,20 @@ export default {
         /**
          * Gets the data for chart.
          * @param {Object[]} items - Items from dashboard component.
-         * @param {Object[]} reportCategories - the report stats categories.
          * @param {String[]} selectedDistrictNames - the selected district name in id.
          * @param {String} areaColumnName - the area name.
          * @param {Object[]} categoryInChart - the category to be used in chart.
          * @param {Object[]} mappingJson - the mapping json.
          * @returns {Object} the data.
          */
-        getChartData (items, reportCategories, selectedDistrictNames, areaColumnName, categoryInChart, mappingJson) {
+        getChartData (items, selectedDistrictNames, areaColumnName, categoryInChart, mappingJson) {
             const filteredMappingByCategories = mappingJson.filter(obj => {
-                    return reportCategories.includes(obj.value);
+                    return this.selectedStatGroups.includes(obj.group);
                 }),
                 groupedMapping = this.groupBy(filteredMappingByCategories, "group"),
                 categoryData = [];
 
-            if (!Array.isArray(mappingJson) || mappingJson.length === 0 || !Array.isArray(items) || !items.length || !Array.isArray(reportCategories) || !reportCategories.length || !Array.isArray(selectedDistrictNames) || !selectedDistrictNames.length) {
+            if (!Array.isArray(mappingJson) || mappingJson.length === 0 || !Array.isArray(items) || !items.length || !Array.isArray(selectedDistrictNames) || !selectedDistrictNames.length) {
                 return categoryData;
             }
 
@@ -960,20 +962,16 @@ export default {
                     data = [];
 
                 Object.keys(category).forEach(key => {
-                    if (!Object.prototype.hasOwnProperty.call(groupedMapping, key) || !reportCategories.includes(category[key])) {
+                    if (!Object.prototype.hasOwnProperty.call(groupedMapping, key)) {
                         return;
                     }
+                    const innerObj = {},
+                        statFeature = items.find((item) => item.category === category[key]);
 
-                    if (reportCategories.includes(category[key])) {
-                        const innerObj = {};
-
-                        innerObj[key] = category[key];
-                        this.selectedCategoryInChart.push(innerObj);
-                    }
-
-                    const statFeature = items.find((item) => item.category === category[key]);
-
-                    statFeature.years.reverse().forEach(year => {
+                    statFeature.years.sort((a, b) => a - b);
+                    innerObj[key] = category[key];
+                    this.selectedCategoryInChart.push(innerObj);
+                    statFeature.years.forEach(year => {
                         const value = this.getTotal(statFeature, selectedDistrictNames, year, "jahr_");
 
                         labels.push(year);
