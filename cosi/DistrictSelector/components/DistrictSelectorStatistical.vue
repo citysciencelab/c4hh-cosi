@@ -94,6 +94,16 @@ export default {
             prepareDistrictLevels(this.districtLevels, newLayerList);
         },
 
+        /**
+         * Styles the selected district level when loading is false (map emits "rendercomplete").
+         * @returns {void}
+         */
+        loading () {
+            if (!this.loading) {
+                styleSelectedDistrictLevels(this.districtLevels, this.selectedDistrictLevelId, this.selectedDistrictLevel.activeStyle);
+            }
+        },
+
         selectedDistrictsCollection: "transferFeatures",
         selectedDistrictLevelId: ["clearFeatures", "changeSelectedDistrictLevel"]
     },
