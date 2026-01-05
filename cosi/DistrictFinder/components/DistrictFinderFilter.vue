@@ -126,10 +126,11 @@ export default {
         this.resetFilteredLayer();
     },
     methods: {
-        ...mapActions("Modules/DistrictSelector", ["loadStatFeatures"]),
+        ...mapActions("Modules/DistrictSelector", ["setDistrictsByName"]),
+        ...mapActions("Menu", ["changeCurrentComponent"]),
         ...mapActions("Maps", ["addNewLayerIfNotExists"]),
         ...mapMutations("Modules/DistrictFinder", ["setCardList", "setConditionDate", "setConditionTitle", "setFilteredLayer", "setMapping"]),
-        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictNames", "setSelectedDistrictLevel", "setSelectedDistrictLevelId"]),
+        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevel", "setSelectedDistrictLevelId"]),
 
         /**
          * Adds a new card to the list of cards.
@@ -444,17 +445,15 @@ export default {
          */
         async setDistricts () {
             const districtNamesToSet = this.selectedDistrictLevel?.districtNamesMap
-                    ? this.resolveByMapping(this.resultList, this.reverseDistrictNamesMap(this.selectedDistrictLevel.districtNamesMap))
-                    : this.resultList,
-                districtsToSet = this.selectedDistrictLevel.districts.filter(d => districtNamesToSet.includes(d.getName()));
+                ? this.resolveByMapping(this.resultList, this.reverseDistrictNamesMap(this.selectedDistrictLevel.districtNamesMap))
+                : this.resultList;
 
-            districtsToSet.forEach(d => {
-                d.isSelected = true;
-            });
             this.setSelectedDistrictLevelId(this.selectedLevelId);
             this.setSelectedDistrictLevel(this.selectedDistrictLevel);
-            this.setSelectedDistrictNames(districtNamesToSet);
-            this.loadStatFeatures({districtLevel: this.selectedDistrictLevel, districts: districtsToSet});
+
+            this.changeCurrentComponent({type: "districtSelector", side: "secondaryMenu", props: {name: "additional:modules.cosi.districtSelector.title"}});
+            await this.$nextTick();
+            this.setDistrictsByName({districtNames: districtNamesToSet});
         },
 
         /**
