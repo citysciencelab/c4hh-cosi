@@ -121,7 +121,7 @@ const actions = {
         commit("setFeaturesListItems", []);
 
         getters.getActiveVectorLayerList.forEach(vectorLayer => {
-            getLayerSource(vectorLayer).once("addfeature", () => {
+            getLayerSource(vectorLayer).once("featuresloadend", () => {
                 dispatch("updateFeaturesList");
             });
 
