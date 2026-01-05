@@ -79,7 +79,7 @@ export default {
     },
     data: () => ({
         analysisCards: [],
-        annexCards: [],
+        annexCards: undefined,
         author: "",
         authorMaxLength: 35,
         reportTitle: "",
@@ -368,15 +368,26 @@ export default {
          * @returns {void}
          */
         async addChapterAnnex (cards) {
-            if (!cards.length) {
+            if (!Array.isArray(cards)) {
                 await this.addReferencesToReport(this.items);
                 return;
             }
+
+            const sortedItems = [];
+
+            this.selectedStatGroups.forEach((group) => {
+                this.items.forEach(item => {
+                    if (item.group === group) {
+                        sortedItems.push(item);
+                    }
+                });
+            });
+
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
 
                 if (card.key === "sources") {
-                    await this.addReferencesToReport(card.items);
+                    await this.addReferencesToReport(sortedItems);
                 }
                 else if (card.key === "heading") {
                     this.pdf.addChapter(card.value);
