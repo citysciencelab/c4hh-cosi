@@ -368,11 +368,6 @@ export default {
          * @returns {void}
          */
         async addChapterAnnex (cards) {
-            if (!Array.isArray(cards)) {
-                await this.addReferencesToReport(this.items);
-                return;
-            }
-
             const sortedItems = [];
 
             this.selectedStatGroups.forEach((group) => {
@@ -382,6 +377,11 @@ export default {
                     }
                 });
             });
+
+            if (!Array.isArray(cards)) {
+                await this.addReferencesToReport(sortedItems);
+                return;
+            }
 
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
