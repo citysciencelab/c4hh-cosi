@@ -129,7 +129,18 @@ export default {
         statisticalYear: undefined,
         subjectDataCards: [],
         stepperRerenderKey: 0,
-        selectedAreasName: ""
+        selectedAreasName: "",
+        transportTypeMapping: {
+            "driving-car": "Auto",
+            "foot-walking": "zu Fuss",
+            "cycling-regular": "Fahrrad",
+            "wheelchair": "Rollstuhl"
+        },
+        modeMapping: {
+            "point": "Referenzpunkten",
+            "facility": "Einrichtungen",
+            "path": "Route"
+        }
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
@@ -382,8 +393,29 @@ export default {
          * @returns {void}
          */
         addAccessibilityAnalysis (analysis) {
+            const inputs = {"Verkehrsmittel": this.transportTypeMapping[analysis.inputs.transportType],
+                [analysis.inputs.scaleUnit === "time" ? "Zeit" : "Entfernung"]: analysis.inputs[analysis.inputs.scaleUnit] + " min",
+                ... analysis.inputs.useTravelTimeIndex && {
+                    "Reisezeitindex": analysis.inputs.travelTimeIndex,
+                    "Tageszeit": analysis.inputs.travelTime + ":00 Uhr"},
+                "Einwohner": analysis.inputs.einwohner
+            };
+
             this.pdf.addHeadline("Erreichbarkeitsanalyse");
             this.pdf.addHeadline(analysis.inputs.title);
+
+            this.pdf.addColumns(this.addDetailAnalysisInfo(inputs));
+            this.pdf.addLineBreak();
+            this.pdf.addHeadline("Erreichbarkeit ab " + this.modeMapping[analysis.inputs.mode]);
+
+            if (analysis.inputs.mode === "point" || analysis.inputs.mode === "facility") {
+                const text = analysis.inputs.selectionCards;
+
+                text.forEach(val => {
+                    this.pdf.addParagraph(val.text);
+                });
+            }
+
             if (typeof analysis.inputs.screenshot !== "undefined") {
                 this.pdf.addImageByUrl(analysis.inputs.screenshot, analysis.inputs.title, {fit: [500, 500], alignment: "left"});
             }
@@ -393,6 +425,21 @@ export default {
             }
 
         },
+        /**
+         * Returns the input value and label, which are displayed one below the other.
+         * @param {Object} inputs - The input values of the Accessibility Analysis.
+         * @returns {Object[]} The input values.
+         */
+        addDetailAnalysisInfo (inputs) {
+            const text = [];
+
+            Object.entries(inputs).forEach(([key, val]) => {
+                text.push([{text: `${val}\n`, bold: true, alignment: "center"}, {text: `${key}`, alignment: "center"}]);
+            });
+
+            return text;
+        },
+
 
         /**
          * Formats a value safely for usage in pdfmake table cells.
