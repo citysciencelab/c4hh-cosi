@@ -3,8 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-01-07 v3.18.0
 
 ### Added
 - PopulationRequest: Added support for OGC API Processes.
@@ -12,10 +11,6 @@
 
 ### Changed
 - Changed Node.js support: Versions from Node.js **22.19.0** up to Node.js **22.21.0** (LTS) are now supported
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - SimulationTool: Corrected path to logo.
