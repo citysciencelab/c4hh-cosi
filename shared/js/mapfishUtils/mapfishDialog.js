@@ -7,6 +7,7 @@ import {Point} from "ol/geom.js";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
 import BuildSpec from "../../../../src/modules/print/js/buildSpec.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
+import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 
 /**
  * Mapfish is a class for communicating with mapfish.
@@ -370,7 +371,7 @@ export default class MapfishDialog {
                     return;
                 }
 
-                layer = layerFactory.createLayer(rawLayerList.getLayerWhere({id: id}))?.layer;
+                layer = layerCollection.getLayerById(id) ? layerCollection.getLayerById(id).layer : layerFactory.createLayer(rawLayerList.getLayerWhere({id: id}))?.layer;
 
                 if (typeof layer !== "undefined") {
                     printedLayers.push({
