@@ -36,7 +36,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictNames", "selectedDistrictLevelId", "selectedStatFeatures"]),
+        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictNames", "selectedDistrictLevelId", "selectedStatFeatures", "selectedDistrictLevel"]),
 
         /**
          * Gets the selectable years based on the selected statistical features.
@@ -149,7 +149,7 @@ export default {
                 v-model="selectedStatisticalAreas"
                 :items="selectedDistrictNames"
                 multiple
-                :label="$t('additional:modules.cosi.reportingTool.label.statisticalAreas')"
+                :label="selectedDistrictLevel.label"
             />
             <Dropdown-Autocomplete
                 v-model="selectedYear"
