@@ -5,14 +5,29 @@ import dayjs from "dayjs";
  * @param {number} currentPage - The number of current page
  * @param {number} pageCount - The total number of pages
  * @param {string} author - The author
+ * @param {string} pageOrientation - The page orientation
  * @returns {Object} svg as Object
  */
-function getSvg (currentPage, pageCount, author) {
+function getSvg (currentPage, pageCount, author, pageOrientation) {
+    const footerObject = pageOrientation === "landscape" ? {
+            footerWidth: 845,
+            viewBox: 225.42708,
+            blueboxWidth: 225.43767,
+            pageTextWidth: 213.69656,
+            dateWidth: 114.322624
+        } : {
+            footerWidth: 595,
+            viewBox: 157.42708,
+            blueboxWidth: 157.43767,
+            pageTextWidth: 149.69656,
+            dateWidth: 82.322624
+        };
+
     return {
         svg: "<svg\n" +
-            "   width=\"595\"\n" +
+            "   width=\"" + footerObject.footerWidth + "\"\n" +
             "   height=\"60\"\n" +
-            "   viewBox=\"0 0 157.42708 15.875\"\n" +
+            "   viewBox=\"0 0 " + footerObject.viewBox + " 15.875\"\n" +
             "   version=\"1.1\"\n" +
             "   id=\"svg1\"\n" +
             "   xml:space=\"preserve\"\n" +
@@ -50,7 +65,7 @@ function getSvg (currentPage, pageCount, author) {
             "     id=\"layer1\"><rect\n" +
             "       style=\"fill:#003063;fill-opacity:1;stroke-width:2.72967\"\n" +
             "       id=\"rect1\"\n" +
-            "       width=\"157.43767\"\n" +
+            "       width=\"" + footerObject.blueboxWidth + "\"\n" +
             "       height=\"11.1125\"\n" +
             "       x=\"0\"\n" +
             "       y=\"4.7624998\" /><image\n" +
@@ -63,12 +78,12 @@ function getSvg (currentPage, pageCount, author) {
             "       y=\"0\" /><text\n" +
             "       xml:space=\"preserve\"\n" +
             "       style=\"font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;font-family:HamburgSans;-inkscape-font-specification:HamburgSans;text-align:center;text-anchor:middle;fill:#000000;stroke-width:0.264583\"\n" +
-            "       x=\"149.69656\"\n" +
+            "       x=\"" + footerObject.pageTextWidth + "\"\n" +
             "       y=\"11.192586\"\n" +
             "       id=\"text1\"><tspan\n" +
             "         id=\"tspan1\"\n" +
             "         style=\"font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;font-family:HamburgSans;-inkscape-font-specification:HamburgSans;fill:#fffff0;fill-opacity:1;stroke-width:0.264583\"\n" +
-            "         x=\"149.69656\"\n" +
+            "         x=\"" + footerObject.pageTextWidth + "\"\n" +
             "         y=\"11.192586\"\n" +
             "         sodipodi:role=\"line\">" + getPageStr(currentPage, pageCount) + "</tspan></text><text\n" +
             "       xml:space=\"preserve\"\n" +
@@ -83,17 +98,17 @@ function getSvg (currentPage, pageCount, author) {
             "         sodipodi:role=\"line\">" + getAuthor(author) + "</tspan></text><text\n" +
             "       xml:space=\"preserve\"\n" +
             "       style=\"font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.85208px;line-height:0px;font-family:HamburgSans;-inkscape-font-specification:HamburgSans;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#fffff0;fill-opacity:1;stroke-width:0.264583\"\n" +
-            "       x=\"82.322624\"\n" +
+            "       x=\"" + footerObject.dateWidth + "\"\n" +
             "       y=\"10.982323\"\n" +
             "       id=\"text3\"><tspan\n" +
             "         sodipodi:role=\"line\"\n" +
             "         id=\"tspan3\"\n" +
             "         style=\"font-size:2.11667px;stroke-width:0.264583\"\n" +
-            "         x=\"82.322624\"\n" +
+            "         x=\"" + footerObject.dateWidth + "\"\n" +
             "         y=\"10.982323\">Erstellt am: " + getDate() + "</tspan><tspan\n" +
             "         sodipodi:role=\"line\"\n" +
             "         style=\"font-size:1.85208px;stroke-width:0.264583\"\n" +
-            "         x=\"82.322624\"\n" +
+            "         x=\"" + footerObject.dateWidth + "\"\n" +
             "         y=\"10.982323\"\n" +
             "         id=\"tspan6\" /></text></g></svg>"
     };

@@ -34,11 +34,16 @@ export default class PDFMaker {
 
     /**
      * Adds a chapter to the report.
-     * @param {String} text - The name of the chapter.
+     * @param {String|Object} text - The name of the chapter or the name and page orientation of the chapter.
      * @returns {void}
      */
     addChapter (text) {
-        this.content.push({...this.chapterHeadlineFormat, text});
+        if (typeof text === "string") {
+            this.content.push({...this.chapterHeadlineFormat, text});
+        }
+        else {
+            this.content.push({...this.chapterHeadlineFormat, ...text});
+        }
     }
 
     /**
@@ -65,7 +70,7 @@ export default class PDFMaker {
      * @returns {void}
      */
     addParagraph (text) {
-        this.content.push({text, fontSize: 11, margin: [0, 4]});
+        this.content.push({text, fontSize: 11, margin: [0, 4], pageOrientation: "portrait"});
     }
 
     /**
@@ -225,8 +230,8 @@ export default class PDFMaker {
             pageMargins: this.pageMargins,
             images: this.images,
             header: this.header,
-            footer: (currentPage, pageCount) => {
-                return getSvg(currentPage, pageCount, this.footerInfo.author);
+            footer: (currentPage, pageCount, headlines) => {
+                return getSvg(currentPage, pageCount, this.footerInfo.author, headlines.orientation);
             }
         };
     }

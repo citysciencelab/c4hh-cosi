@@ -527,7 +527,13 @@ export default {
                 pdf = this.pdf,
                 printedYear = this.statisticalYear || items[0].years[0];
 
-            pdf.addChapter("Statistische Datenübersicht");
+            let additionalPara = {pageOrientation: "portrait"};
+
+            if (this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, []).length >= 6) {
+                additionalPara = {pageOrientation: "landscape", pageBreak: "before"};
+            }
+
+            pdf.addChapter({text: "Statistische Datenübersicht", ...additionalPara});
             pdf.addSubHeadline("Jahr: " + printedYear);
 
             this.selectedStatGroups.forEach((group) => {
@@ -569,6 +575,7 @@ export default {
                     });
                     body.push(row);
                 });
+
                 pdf.addTable(body, "*");
             });
         },
@@ -713,10 +720,13 @@ export default {
             else {
                 this.pdf.addColumns([overviewInfos, minimap]);
             }
-            this.pdf.addLineBreak();
-            this.pdf.addHeadline(this.freeHeadline);
-            this.pdf.addParagraph(this.freeText);
-            this.pdf.addLineBreak();
+
+            if (this.freeHeadline.trim() !== "" || this.freeText.trim() !== "") {
+                this.pdf.addLineBreak();
+                this.pdf.addHeadline(this.freeHeadline);
+                this.pdf.addParagraph(this.freeText);
+                this.pdf.addLineBreak();
+            }
         },
 
         /**
@@ -938,7 +948,7 @@ export default {
         addTopicsToReport (topics) {
             const groupedTopics = Object.groupBy(topics, (topic) => topic.layerName);
 
-            this.pdf.addChapter("Infrastrukturdaten");
+            this.pdf.addChapter({text: "Infrastrukturdaten", pageOrientation: "portrait", pageBreak: "before"});
             this.pdf.addLineBreak();
             Object.keys(groupedTopics).forEach(group => {
                 const topicLength = groupedTopics[group].length,
@@ -980,8 +990,7 @@ export default {
             }
 
             if (imageArr.length) {
-                this.pdf.addChapter("Datenvisualisierung");
-
+                this.pdf.addChapter({text: "Datenvisualisierung", pageOrientation: "portrait", pageBreak: "before"});
                 imageArr.forEach((image, index) => {
                     this.pdf.addHeadline(Object.keys(this.selectedCategoryInChart[index])[0]);
                     this.pdf.addParagraph(Object.values(this.selectedCategoryInChart[index])[0]);
