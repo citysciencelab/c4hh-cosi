@@ -8,6 +8,7 @@
  * @property {string} icon - Bootstrap icon class (config-param).
  * @property {Boolean} [infrastructureTableLimitEnabled=false] - Deciding if the count of infrastructure data is limited.
  * @property {Number} infrastructureTableLimit - The count of infrastructure data.
+ * @property {Boolean} reportLoader - check if the report is generating.
  */
 const state = {
     active: false,
@@ -19,7 +20,8 @@ const state = {
     infrastructureTableLimitConfig: 10,
     readmeUrl: {
         "de-DE": "bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/015vorlagen.md"
-    }
+    },
+    reportLoader: false
 };
 
 export default state;

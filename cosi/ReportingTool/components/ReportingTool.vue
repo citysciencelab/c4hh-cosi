@@ -1,6 +1,6 @@
 <script>
 import dayjs from "dayjs";
-import {mapGetters, mapActions} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import PDFMaker from "../js/createPdf";
 import {getTotal, getCulmulativeTotal} from "../../Dashboard/utils/operations";
 import {getCenter as getCenterOfExtent} from "ol/extent";
@@ -117,7 +117,6 @@ export default {
         ],
         infrastructureTableLimit: 10,
         infrastructureTableLimitEnabled: false,
-        reportLoader: false,
         selectedCategoryInChart: [],
         page: 1,
         printReportView: false,
@@ -149,7 +148,7 @@ export default {
         ...mapGetters("Modules/FeaturesList", ["featuresListItems"]),
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevel", "selectedDistrictNames", "selectedFeatures", "initMapping"]),
         ...mapGetters("Modules/TemplateManager", ["reportName"]),
-        ...mapGetters("Modules/ReportingTool", ["infrastructureTableLimitConfig", "infrastructureTableLimitEnabledConfig", "readmeUrl"]),
+        ...mapGetters("Modules/ReportingTool", ["infrastructureTableLimitConfig", "infrastructureTableLimitEnabledConfig", "readmeUrl", "reportLoader"]),
         ...mapGetters(["restServiceById", "visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
 
@@ -246,6 +245,7 @@ export default {
     deactivated: () => undefined,
     methods: {
         ...mapActions("Modules/FeaturesList", ["updateFeaturesList"]),
+        ...mapMutations("Modules/ReportingTool", ["setReportLoader"]),
 
         /**
          * Creates the PDF report and triggers the download.
@@ -258,7 +258,7 @@ export default {
          * @returns {Promise<void>} Resolves when the report has been created and downloaded.
          */
         async createReport () {
-            this.reportLoader = true;
+            this.setReportLoader(true);
             try {
                 this.pdf = markRaw(new PDFMaker());
                 this.pdf.resetDocContent();
@@ -275,7 +275,7 @@ export default {
                 console.error("Fehler beim Erstellen des PDFs:", error);
             }
             finally {
-                this.reportLoader = false;
+                this.setReportLoader(false);
             }
         },
 
@@ -1252,6 +1252,7 @@ export default {
                 <v-stepper-header>
                     <v-stepper-item
                         :value="1"
+                        :disabled="reportLoader"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.generalSettings") }}
@@ -1261,6 +1262,7 @@ export default {
 
                     <v-stepper-item
                         :value="2"
+                        :disabled="reportLoader"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.statisticalData") }}
@@ -1270,6 +1272,7 @@ export default {
 
                     <v-stepper-item
                         :value="3"
+                        :disabled="reportLoader"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.subjectData") }}
@@ -1279,6 +1282,7 @@ export default {
 
                     <v-stepper-item
                         :value="4"
+                        :disabled="reportLoader"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.analyses") }}
@@ -1288,6 +1292,7 @@ export default {
 
                     <v-stepper-item
                         :value="5"
+                        :disabled="reportLoader"
                         editable
                     >
                         {{ $t("additional:modules.cosi.reportingTool.annex") }}
@@ -1302,6 +1307,7 @@ export default {
                             <InputText
                                 id="report-title"
                                 v-model="reportTitle"
+                                :disabled="reportLoader"
                                 :label="$t('additional:modules.cosi.reportingTool.label.title')"
                                 :placeholder="$t('additional:modules.cosi.reportingTool.label.title')"
                                 max-length="50"
@@ -1309,12 +1315,14 @@ export default {
                             <InputText
                                 id="report-author"
                                 v-model="author"
+                                :disabled="reportLoader"
                                 :label="$t('additional:modules.cosi.reportingTool.label.author')"
                                 :placeholder="$t('additional:modules.cosi.reportingTool.label.author')"
                                 max-length="35"
                             />
                             <TagGroup
                                 class="mb-3"
+                                :disabled="reportLoader"
                                 :items="frontPageItems"
                                 :label="$t('additional:modules.cosi.reportingTool.label.frontPage')"
                                 @update:selected-items="updateFrontPageItems"
@@ -1330,6 +1338,7 @@ export default {
                             <InputText
                                 id="freetext-headline"
                                 v-model="freeHeadline"
+                                :disabled="reportLoader"
                                 :label="$t('additional:modules.cosi.reportingTool.label.headline')"
                                 :placeholder="$t('additional:modules.cosi.reportingTool.label.headline')"
                                 max-length="50"
@@ -1337,6 +1346,7 @@ export default {
                             <InputText
                                 id="freetext-text"
                                 v-model="freeText"
+                                :disabled="reportLoader"
                                 :label="$t('additional:modules.cosi.reportingTool.label.freetext')"
                                 :placeholder="$t('additional:modules.cosi.reportingTool.label.freetext')"
                                 html-type="textarea"
@@ -1432,8 +1442,9 @@ export default {
                             :icon="page != 1 ? 'bi-arrow-left' : 'bi bi-printer'"
                             type="button"
                             :aria-label="page != 1 ? $t('additional:modules.cosi.reportingTool.button.back') : $t('additional:modules.cosi.reportingTool.button.printNow')"
-                            :text="page != 1 ? $t('additional:modules.cosi.reportingTool.button.back') : $t('additional:modules.cosi.reportingTool.button.printNow')"
                             :spinner-trigger="reportLoader"
+                            :disabled="reportLoader"
+                            :text="page != 1 ? $t('additional:modules.cosi.reportingTool.button.back') : $t('additional:modules.cosi.reportingTool.button.printNow')"
                             :interaction="() => page != 1 ? props.onClick() : createReport()"
                         />
                     </template>
@@ -1443,6 +1454,7 @@ export default {
                             :icon="page != 5 ? 'bi-arrow-right' : 'bi bi-play'"
                             type="button"
                             :aria-label="page != 5 ? $t('additional:modules.cosi.reportingTool.button.confirmAndNext') : $t('additional:modules.cosi.reportingTool.button.generateReport')"
+                            :disabled="reportLoader"
                             :text="page != 5 ? $t('additional:modules.cosi.reportingTool.button.confirmAndNext') : $t('additional:modules.cosi.reportingTool.button.generateReport')"
                             :interaction="() => page != 5 ? props.onClick() : printReportView = true"
                         />
@@ -1467,6 +1479,7 @@ export default {
                     :aria-label="$t('additional:modules.cosi.reportingTool.button.downloadReport')"
                     :interaction="() => createReport()"
                     :spinner-trigger="reportLoader"
+                    :disabled="reportLoader"
                     :text="$t('additional:modules.cosi.reportingTool.button.downloadReport')"
                 />
                 <FlatButton
@@ -1474,6 +1487,7 @@ export default {
                     icon="bi bi-pencil"
                     type="button"
                     :aria-label="$t('additional:modules.cosi.reportingTool.button.backToEditView')"
+                    :disabled="reportLoader"
                     :text="$t('additional:modules.cosi.reportingTool.button.backToEditView')"
                     :interaction="() => printReportView = false"
                 />
@@ -1482,6 +1496,7 @@ export default {
                     icon="bi bi-arrow-clockwise"
                     type="button"
                     :aria-label="$t('additional:modules.cosi.reportingTool.button.createNewReport')"
+                    :disabled="reportLoader"
                     :text="$t('additional:modules.cosi.reportingTool.button.createNewReport')"
                     :interaction="() => resetAllSettings()"
                 />
