@@ -36,6 +36,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("Modules/Dashboard", ["items"]),
         ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictNames", "selectedDistrictLevelId", "selectedStatFeatures", "selectedDistrictLevel"]),
 
         /**
@@ -86,7 +87,7 @@ export default {
     },
     mounted () {
         this.selectedStatisticalAreas = this.selectedDistrictNames;
-        this.selectedYear = this.years[0]?.value;
+        this.selectedYear = this.items[0].years[0];
     },
     methods: {
         uniqueId,

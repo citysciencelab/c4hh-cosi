@@ -487,10 +487,11 @@ export default {
                     return itemGroups.includes(obj.value);
                 }),
                 groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group),
-                pdf = this.pdf;
+                pdf = this.pdf,
+                printedYear = this.statisticalYear || items[0].years[0];
 
             pdf.addChapter("Statistische Datenübersicht");
-            pdf.addSubHeadline("Jahr: " + (this.statisticalYear || items[0].years[0]));
+            pdf.addSubHeadline("Jahr: " + printedYear);
 
             this.selectedStatGroups.forEach((group) => {
                 const columns = pdf.getColumns(["", ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
@@ -503,7 +504,6 @@ export default {
                         return;
                     }
                     const statFeature = items.find((item) => item.category === mappingObject.value),
-                        lastYear = this.statisticalYear || statFeature.years[0],
                         row = [];
 
                     columns.forEach((col, index) => {
@@ -521,11 +521,11 @@ export default {
                             pdf.addCell(row, value, alignment);
                         }
                         else if (index === 1 && this.shouldAreasSummedUp) {
-                            value = this.getTotal(statFeature, this.selectedDistrictLabels, lastYear, "jahr_");
+                            value = this.getTotal(statFeature, this.selectedDistrictLabels, printedYear, "jahr_");
                             pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
                         else {
-                            value = parseFloat(statFeature[col.text]["jahr_" + lastYear]) || "-";
+                            value = parseFloat(statFeature[col.text]["jahr_" + printedYear]) || "-";
                             pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
 
