@@ -138,7 +138,6 @@ export default {
 <template>
     <ToolBar
         :setting-items="columnNames"
-        :show-detail="{'visibility': true}"
         :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.addFilter'), icon: 'bi-funnel-fill', id: 'add-filter-button'}"
         @exportTable="exportTable"
         @reorderedSettingItems="reorderSettingItems"
