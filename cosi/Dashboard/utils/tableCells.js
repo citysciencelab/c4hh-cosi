@@ -32,7 +32,8 @@ export function getValue (item, header, timestamp, districts, timestampPrefix = 
     if (!val && isObject(item.calculation) && item.valueType === "relative" && item[header.value]) {
         const foundDistrict = getDistrictByName(districts, header.value),
             statFeature_A = getStatisticByCategory(foundDistrict, item.calculation.category_A),
-            statFeature_B = getStatisticByCategory(foundDistrict, item.calculation.category_B);
+            statFeature_B = getStatisticByCategory(foundDistrict, item.calculation.category_B),
+            resultFeature = getStatisticByCategory(foundDistrict, item.category);
 
         let dividend, divisor, result;
 
@@ -42,6 +43,7 @@ export function getValue (item, header, timestamp, districts, timestampPrefix = 
             result = mathutils[item.calculation.operation](dividend, divisor) * (item.calculation.modifier || 1);
             if (Number.isFinite(result)) {
                 val = result.toLocaleString(locale, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+                resultFeature.set(timestampPrefix + timestamp, val);
             }
             item[header.value].isCalculated = true;
         }
