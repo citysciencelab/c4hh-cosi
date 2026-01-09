@@ -5,6 +5,20 @@
             "description": "Bitte eine Beschreibung einfügen.",
             "loadingSpinnerText": {
                 "general": "Daten werden geladen. Bitte warten..."
+            },
+            "tabs": {
+              "tabDetails": {
+                "label": "Details"
+              },
+              "tabSearch": {
+                "label": "Suche"
+              },
+              "tabResult": {
+                "label": "Ergebnisse"
+              },
+              "tabDownload": {
+                "label": "Download"
+              }
             }
         }
     }
