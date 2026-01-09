@@ -7,18 +7,24 @@
                 "general": "Daten werden geladen. Bitte warten..."
             },
             "tabs": {
-              "tabDetails": {
-                "label": "Details"
-              },
-              "tabSearch": {
-                "label": "Suche"
-              },
-              "tabResult": {
-                "label": "Ergebnisse"
-              },
-              "tabDownload": {
-                "label": "Download"
-              }
+                "tabDetails": {
+                    "label": "Details"
+                },
+                "tabSearch": {
+                    "label": "Suche",
+                    "backButtonLabel": "Zurück",
+                    "dossiersButtonLabel": "Dossiers",
+                    "searchButtonLabel": "Suchen",
+                    "resetButtonLabel": "Zurücksetzen",
+                    "searchWithAttributeHeading": "Suche Daten über Attribute",
+                    "searchWithGeometryHeading": "Suche Daten über räumliches Gebiet"
+                },
+                "tabResult": {
+                    "label": "Ergebnisse"
+                },
+                "tabDownload": {
+                    "label": "Download"
+                }
             }
         }
     }

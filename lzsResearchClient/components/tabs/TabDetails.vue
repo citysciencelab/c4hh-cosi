@@ -2,6 +2,7 @@
 import {TAB_SET_CURRENT} from "../TabContainer.vue";
 
 export default {
+    name: "TabDetails",
     components: {},
     inject: {
         setCurrentTab: {from: TAB_SET_CURRENT, default: null}
