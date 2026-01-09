@@ -12,6 +12,10 @@ export default {
             type: String,
             required: false,
             default: null
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["onScreenshotCreated", "onScreenshotDeleted"],
@@ -33,11 +37,13 @@ export default {
     },
     methods: {
         createScreenshot () {
-            const map = mapCollection.getMap("2D"),
-                canvas = map.getViewport().querySelector("canvas");
+            if (!this.readonly) {
+                const map = mapCollection.getMap("2D"),
+                    canvas = map.getViewport().querySelector("canvas");
 
-            this.base64Image = canvas.toDataURL("image/png");
-            this.$emit("onScreenshotCreated", this.base64Image);
+                this.base64Image = canvas.toDataURL("image/png");
+                this.$emit("onScreenshotCreated", this.base64Image);
+            }
         },
         deleteScreenshot () {
             this.base64Image = undefined;
@@ -53,8 +59,25 @@ export default {
             class="createScreenshot"
             role="button"
             tabindex="0"
-            @click="imgSource ? showModal = true : createScreenshot()"
-            @keyup.enter="imgSource ? showModal = true : createScreenshot()"
+            v-on="
+                readonly || imgSource ? {
+                    click: () => showModal = true,
+                    keyup: (event) => {
+                        // Handle enter key for enter and space key
+                        if (event.keyCode === 13 || event.keyCode === 32) {
+                            showModal = true
+                        }
+                    }
+                } : {
+                    click: () => createScreenshot(),
+                    keyup: (event) => {
+                        // Handle enter key for enter and space key
+                        if (event.keyCode === 13 || event.keyCode === 32) {
+                            createScreenshot()
+                        }
+                    }
+                }
+            "
         >
             <img
                 v-if="imgSource"
@@ -64,13 +87,21 @@ export default {
             >
 
             <i
-                v-else
+                v-else-if="!readonly && !imgSource"
                 class="placeholderIcon icon bi-camera-fill"
             />
+
+            <p
+                v-else
+                class="no-edit-cursor"
+            >
+                {{ $t("additional:modules.geoMarker.screenshot.noImageAvailable") }}
+            </p>
         </div>
 
         <div class="screenshotButtonContainer">
             <IconButton
+                v-if="!readonly"
                 :class-array="['btn-light']"
                 :aria="$t('additional:modules.geoMarker.screenshot.buttonCreate')"
                 icon="bi-camera-fill"
@@ -86,7 +117,7 @@ export default {
             />
 
             <IconButton
-                v-if="imgSource"
+                v-if="imgSource && !readonly"
                 id="deleteScreenshotButton"
                 :class-array="['btn-light']"
                 :aria="$t('additional:modules.geoMarker.screenshot.buttonDelete')"
@@ -137,6 +168,10 @@ export default {
                 justify-content: center;
                 align-items: center;
                 height: 100%;
+            }
+
+            p.no-edit-cursor {
+                cursor: default;
             }
         }
 

@@ -47,7 +47,7 @@ export default {
             default: false
         }
     },
-    emits: ["cancel-edit", "update-successfull", "geomarker-created"],
+    emits: ["cancel-edit", "update-successfull", "geomarker-created", "editing"],
     data () {
         return {
             selectedCategoryId: null,
@@ -64,7 +64,8 @@ export default {
             attachment: null,
             createAnotherGeoMarker: false,
             savingInProgress: false,
-            map: mapCollection.getMap("2D")
+            map: mapCollection.getMap("2D"),
+            readonly: this.mode === "edit"
         };
     },
     computed: {
@@ -251,6 +252,12 @@ export default {
         selectedFeature: {
             handler (newFeature) {
                 if (newFeature && this.mode === "edit") {
+                    // set form to readonly again on change of selected GeoMarker
+                    // this is only necessary, if it is not already 'readonly' yet
+                    if (!this.readonly) {
+                        this.updateEditingMode(false);
+                    }
+
                     this.loadFeatureData(newFeature);
                 }
             },
@@ -722,7 +729,10 @@ export default {
             }
             else {
                 this.$emit("cancel-edit");
+                this.initializeComponent();
             }
+
+            this.updateEditingMode(this.mode !== "edit");
         },
         /**
          * Refreshes the new feature point on the map and resets draw interaction
@@ -737,13 +747,15 @@ export default {
          * Handles the save action based on the current mode (create or edit)
          * @returns {void}
          */
-        handleSave () {
+        async handleSave () {
             if (this.mode === "create") {
                 this.createNewGeomarker();
             }
             else {
-                this.updateExistingGeomarker();
+                await this.updateExistingGeomarker();
             }
+
+            this.updateEditingMode(this.mode !== "edit");
         },
         /**
          * Updates the geoMarkerFeatureList in the store after editing a geomarker.
@@ -989,6 +1001,10 @@ export default {
             return newestDate
                 ? newestDate.toISOString()
                 : null;
+        },
+        updateEditingMode (status) {
+            this.readonly = !status;
+            this.$emit("editing", status);
         }
     }
 };
@@ -1012,6 +1028,7 @@ export default {
                             id="categories"
                             class="form-select"
                             :value="selectedCategoryId"
+                            :disabled="readonly"
                             @change="onCategorySelect($event.target.value)"
                         >
                             <option
@@ -1041,9 +1058,9 @@ export default {
                         v-model="geomarkerDescription"
                         :class="[
                             'form-control',
-                            isGemisFeatureEditNotAllowed ? 'no-edit-cursor' : ''
+                            isGemisFeatureEditNotAllowed || readonly ? 'no-edit-cursor' : ''
                         ]"
-                        :readOnly="isGemisFeatureEditNotAllowed"
+                        :readOnly="isGemisFeatureEditNotAllowed || readonly"
                         :rows="mode === 'create' ? '8' : '12'"
                     />
 
@@ -1064,6 +1081,7 @@ export default {
                 >
                     <div class="attachment">
                         <FileUpload
+                            v-if="!readonly"
                             id="attachmentUpload"
                             ref="fileUpload"
                             :change="onAttachmentChange"
@@ -1090,6 +1108,16 @@ export default {
                                 />
                             </div>
                         </FileUpload>
+
+                        <div
+                            v-if="readonly && attachment"
+                            class="fileUploadSlotContent"
+                        >
+                            <span>
+                                {{ attachment.name }}
+                            </span>
+                        </div>
+
                         <div
                             v-if="mode==='edit' && attachment"
                             class="editMode"
@@ -1110,16 +1138,11 @@ export default {
                         <CreateScreenshot
                             ref="screenshotComponent"
                             :screenshot-image="screenshotImage"
+                            :readonly="readonly"
                             @onScreenshotCreated="onScreenshotCreated"
                             @onScreenshotDeleted="onScreenshotDeleted"
                         />
                     </div>
-
-                    <!-- Overlay for Edit-Not-Allowed -->
-                    <div
-                        v-if="isGemisFeatureEditNotAllowed"
-                        class="attachmentSectionOverlay"
-                    />
                 </GeoMarkerFormBox>
 
                 <GeoMarkerFormBox
@@ -1136,7 +1159,7 @@ export default {
                                 :label="department.name"
                                 :aria="department.name"
                                 :checked="Boolean(departmentData[departmentId])"
-                                :disabled="isGemisFeatureEditNotAllowed"
+                                :disabled="isGemisFeatureEditNotAllowed || readonly"
                                 :interaction="() => toggleDepartment(departmentId)"
                             />
                         </template>
@@ -1171,6 +1194,7 @@ export default {
                                 v-model="departmentData[cellData.departmentId].status"
                                 class="departmentStatusSelect"
                                 :options="statusOptions"
+                                :disabled="readonly"
                                 name="select-box"
                                 :multiple="false"
                                 :placeholder="$t('additional:modules.geoMarker.filter.status.placeholder')"
@@ -1205,7 +1229,7 @@ export default {
                                 v-model="departmentData[cellData.departmentId].wiedervorlage"
                                 :label="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
                                 type="date"
-                                :disabled="departmentData[cellData.departmentId].status === 'offen'"
+                                :disabled="departmentData[cellData.departmentId].status === 'offen' || readonly"
                                 :placeholder="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
                             />
                         </template>
@@ -1214,8 +1238,13 @@ export default {
                             <textarea
                                 :id="`departmentDescription-${cellData.departmentId}`"
                                 v-model="departmentData[cellData.departmentId].bemerkung"
-                                class="categoryDescriptionInput form-control"
+                                :class="[
+                                    'categoryDescriptionInput',
+                                    'form-control',
+                                    readonly ? 'no-edit-cursor' : ''
+                                ]"
                                 rows="3"
+                                :readOnly="readonly"
                             />
                         </template>
                     </SelectableList>
@@ -1228,7 +1257,7 @@ export default {
             class="footer"
         >
             <SwitchInput
-                v-if="showCreateAnotherSwitch && mode === 'create'"
+                v-if="showCreateAnotherSwitch && mode === 'create' && !readonly"
                 id="createAnotherGeoMarker"
                 :label="$t('additional:modules.geoMarker.geoMarkerForm.createAnotherGeoMarker')"
                 :aria="$t('additional:modules.geoMarker.geoMarkerForm.createAnotherGeoMarker')"
@@ -1238,19 +1267,29 @@ export default {
 
             <div class="buttons">
                 <FlatButton
-                    :aria-label="mode === 'create' ? $t('additional:modules.geoMarker.geoMarkerForm.save') : $t('additional:modules.geoMarker.geoMarkerForm.update')"
-                    :text="mode === 'create' ? $t('additional:modules.geoMarker.geoMarkerForm.save') : $t('additional:modules.geoMarker.geoMarkerForm.update')"
+                    v-if="!readonly"
+                    :aria-label="$t('additional:modules.geoMarker.geoMarkerForm.save')"
+                    :text="$t('additional:modules.geoMarker.geoMarkerForm.save')"
                     :disabled="formValidation || savingInProgress"
                     @click="handleSave"
                 />
 
                 <FlatButton
+                    v-if="!readonly"
                     :aria-label="$t('additional:modules.geoMarker.geoMarkerForm.cancel')"
                     :text="$t('additional:modules.geoMarker.geoMarkerForm.cancel')"
                     :disabled="savingInProgress"
+                    :secondary="true"
                     @click="cancelForm"
                 />
             </div>
+
+            <FlatButton
+                v-if="readonly"
+                :aria-label="$t('additional:modules.geoMarker.geoMarkerForm.edit')"
+                :text="$t('additional:modules.geoMarker.geoMarkerForm.edit')"
+                @click="updateEditingMode(true)"
+            />
         </div>
     </div>
 </template>
@@ -1291,10 +1330,6 @@ div.GeoMarkerForm {
                     gap: 0.5rem;
                 }
 
-                textarea.no-edit-cursor {
-                    cursor: default;
-                }
-
                 p.infoFeatureEditNotAllowed {
                     margin: 0.25rem 0;
                     font-weight: bold;
@@ -1320,18 +1355,6 @@ div.GeoMarkerForm {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                }
-
-                .attachmentSectionOverlay {
-                    position: absolute;
-                    top: 0.4rem;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(255,255,255,0.6);
-                    z-index: 21;
-                    pointer-events: all;
-                    border-radius: 0.5rem;
                 }
             }
         }
@@ -1382,6 +1405,10 @@ div.GeoMarkerForm {
             justify-content: flex-end;
             gap: 1rem;
         }
+    }
+
+    textarea.no-edit-cursor {
+        cursor: default;
     }
 }
 </style>

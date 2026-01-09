@@ -5,6 +5,7 @@
             "description": "Anwendung für Informationen, die der Laufendhaltung der Geobasisdaten dienen.",
             "screenshot": {
               "altImage": "Screenshot",
+              "noImageAvailable": "No Screenshot available.",
               "buttonCreate": "Create screenshot",
               "buttonPreview": "Show screenshot preview",
               "buttonDelete": "Delete screenshot"
@@ -25,8 +26,8 @@
                 "selectedDepartmentsTitle": "Selected departments",
                 "save": "Save",
                 "cancel": "Cancel",
+                "edit": "Edit",
                 "createAnotherGeoMarker": "Create another GeoMarker",
-                "update": "Update",
                 "downloadAttachment": "Download Attachment",
                 "successMessageAfterUpdate": "Geomarker is successfully updated",
                 "successMessageAfterSave": "Geomarker with Id {{id}} is successfully created.",

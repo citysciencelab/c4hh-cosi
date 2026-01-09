@@ -176,6 +176,11 @@ describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
                 replaceByIdInLayerConfig: () => {
                     return null;
                 }
+            },
+            getters: {
+                layerUrlParams: () => {
+                    return {};
+                }
             }
         });
 

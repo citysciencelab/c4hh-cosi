@@ -235,8 +235,6 @@ export default {
                 this.setUpdateModeParameters();
                 this.geoMarkerUpdateMode = false;
             }
-
-            this.resetSelectedFeature();
         },
         onSuccess () {
             this.showUpdateMessage = false;
@@ -289,17 +287,16 @@ export default {
                 }
             }
         },
-        toggleUpdateMode () {
-            if (this.geoMarkerFeatureSelected) {
-                this.geoMarkerUpdateMode = !this.geoMarkerUpdateMode;
-            }
-        },
-        onClickMoveButton () {
-            this.toggleUpdateMode();
-            this.setUpdateModeParameters();
-        },
         resetGeoMarkerForm () {
             this.$refs.geoMarkerForm?.resetForm();
+        },
+        changeEditFeatureMode (status) {
+            if (!this.selectedFeatureIsGemisEditNotAllowed) {
+                if (this.geoMarkerFeatureSelected) {
+                    this.geoMarkerUpdateMode = status;
+                }
+                this.setUpdateModeParameters();
+            }
         }
     }
 };
@@ -370,17 +367,6 @@ export default {
             />
 
             <IconButton
-                v-if="!selectedFeatureIsGemisEditNotAllowed"
-                :class-array="[
-                    'btn-light', 'me-2', 'listAction',
-                    geoMarkerUpdateMode ? 'geoMarkerUpdateMode' : '']"
-                :aria="$t('additional:modules.geoMarker.GeoMakerList.button.moveGeoMarker')"
-                icon="bi-arrows-move"
-                :disabled="!geoMarkerFeatureSelected"
-                @click="onClickMoveButton()"
-            />
-
-            <IconButton
                 :class-array="['btn-light', 'me-2', 'listAction']"
                 :aria="$t('additional:modules.geoMarker.GeoMakerList.button.openVcOblique')"
                 icon="bi-image"
@@ -402,6 +388,7 @@ export default {
                 :selected-feature="geoMarkerFeatureSelected"
                 @cancel-edit="onCancelEdit"
                 @update-successfull="onSuccess()"
+                @editing="changeEditFeatureMode"
             />
         </div>
     </div>
