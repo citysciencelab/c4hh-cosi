@@ -17,7 +17,7 @@ export default {
         SwitchInput,
         TagGroup
     },
-    inject: ["selectedLevels", "shouldAreasSummedUp"],
+    inject: ["selectedDistrictNamesForReport", "selectedLevels", "shouldAreasSummedUp"],
     props: {
         selectedAreasName: {
             type: String,
@@ -25,7 +25,7 @@ export default {
             default: ""
         }
     },
-    emits: ["update:statistical-year"],
+    emits: ["update:selected-areas-name", "update:statistical-year"],
     data () {
         return {
             higherDistrictLevel: [],
@@ -37,7 +37,7 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/Dashboard", ["items"]),
-        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictNames", "selectedDistrictLevelId", "selectedStatFeatures", "selectedDistrictLevel"]),
+        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevelId", "selectedStatFeatures", "selectedDistrictLevel"]),
 
         /**
          * Gets the selectable years based on the selected statistical features.
@@ -80,14 +80,13 @@ export default {
         }
     },
     watch: {
-
         selectedYear (newVal) {
             this.$emit("update:statistical-year", newVal);
         }
     },
     mounted () {
-        this.selectedStatisticalAreas = this.selectedDistrictNames;
-        this.selectedYear = this.items[0].years[0];
+        this.selectedStatisticalAreas = this.selectedDistrictNamesForReport;
+        this.selectedYear = this.items[0].years.sort((a, b) => b - a)[0];
     },
     methods: {
         uniqueId,
@@ -99,6 +98,14 @@ export default {
          */
         emitSelectedAreasName (name) {
             this.$emit("update:selected-areas-name", name);
+        },
+
+        /**
+         * Sets the selected district names for the report.
+         * @param {String[]} names - An array of selected district names.
+         */
+        setSelectedDistrictNamesForReport (names) {
+            this.selectedDistrictNamesForReport = names;
         },
 
         /**
@@ -148,9 +155,10 @@ export default {
             />
             <Dropdown-Autocomplete
                 v-model="selectedStatisticalAreas"
-                :items="selectedDistrictNames"
+                :items="selectedDistrictNamesForReport"
                 multiple
                 :label="selectedDistrictLevel.label"
+                @update:model-value="setSelectedDistrictNamesForReport"
             />
             <Dropdown-Autocomplete
                 v-model="selectedYear"

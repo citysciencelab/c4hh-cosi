@@ -47,6 +47,21 @@ export default {
     },
     provide () {
         return {
+            selectedDistrictNamesForReport: computed({
+                /**
+                 * Gets the selected district names for the report.
+                 * @returns {String[]} The selected district names.
+                 */
+                get: () => this.selectedDistrictNamesForReport,
+                /**
+                 * Sets the selected district names for the report.
+                 * @param {String[]} value - The new selected district names.
+                 * @return {void}
+                 */
+                set: (value) => {
+                    this.selectedDistrictNamesForReport = value;
+                }
+            }),
             selectedLevels: computed({
                 /**
                  * Gets the selected district levels for the report.
@@ -236,16 +251,6 @@ export default {
                 && !this.dataSets?.length
                 && !this.featuresListItems?.length;
         },
-        /**
-         * Gets the labels of the selected districts.
-         * These are the identifiers used in the dashboard (e.g. "Bergedorf (Bezirk)" instead of "Bergedorf")
-         * @returns {String[]} The labels of the selected districts.
-         */
-        selectedDistrictLabels () {
-            return this.selectedDistrictLevel.districts
-                .filter(dist => this.selectedDistrictNames.includes(dist.getName()))
-                .map(dist => dist.getLabel());
-        },
 
         /**
          * Gets the selected front page item.
@@ -271,6 +276,7 @@ export default {
         if (typeof this.selectedLevels === "undefined") {
             this.selectedLevels = this.districtLevels.map(level => level.label).slice(1);
         }
+        this.selectedDistrictNamesForReport = [...this.selectedDistrictNames];
     },
     deactivated: () => undefined,
     methods: {
@@ -525,7 +531,8 @@ export default {
                 }),
                 groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group),
                 pdf = this.pdf,
-                printedYear = this.statisticalYear || items[0].years[0];
+                printedYear = this.statisticalYear || items[0].years[0],
+                selectedDistrictLabels = this.getSelectedDistrictLabels(this.selectedDistrictLevel.districts, this.selectedDistrictNamesForReport);
 
             let additionalPara = {pageOrientation: "portrait"};
 
@@ -537,7 +544,7 @@ export default {
             pdf.addSubHeadline("Jahr: " + printedYear);
 
             this.selectedStatGroups.forEach((group) => {
-                const columns = pdf.getColumns(["", ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
+                const columns = pdf.getColumns(["", ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNamesForReport, [])]),
                     body = [columns];
 
                 pdf.addHeadline(group);
@@ -564,7 +571,7 @@ export default {
                             pdf.addCell(row, value, alignment);
                         }
                         else if (index === 1 && this.shouldAreasSummedUp) {
-                            value = this.getTotal(statFeature, this.selectedDistrictLabels, printedYear, "jahr_");
+                            value = this.getTotal(statFeature, selectedDistrictLabels, printedYear, "jahr_");
                             pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
                         else {
@@ -628,6 +635,20 @@ export default {
 
             this.pdf.addTable(bodyWithHeader, 180);
         },
+
+        /**
+         * Gets the labels of the selected districts.
+         * These are the identifiers used in the dashboard (e.g. "Bergedorf (Bezirk)" instead of "Bergedorf")
+         * @param {Object[]} districts - The district objects.
+         * @param {String[]} districtNames - The names of the selected districts.
+         * @returns {String[]} The labels of the selected districts.
+         */
+        getSelectedDistrictLabels (districts, districtNames) {
+            return districts
+                .filter(dist => districtNames.includes(dist.getName()))
+                .map(dist => dist.getLabel());
+        },
+
         /**
          * Retrieves and normalizes metadata for a specific layer ID.
          * @param {string} layerId - The ID of the layer whose metadata should be retrieved.
@@ -978,7 +999,7 @@ export default {
          * @returns {void}
          */
         async addDiagram () {
-            const data = this.getChartData(this.items, this.selectedDistrictNames, this.areaColumnName, this.categoryInChart, this.initMapping),
+            const data = this.getChartData(this.items, this.selectedDistrictNamesForReport, this.areaColumnName, this.categoryInChart, this.initMapping),
                 imageArr = [];
 
             if (!Array.isArray(data) || !data.length) {
