@@ -1092,7 +1092,6 @@ export default {
             return result;
         },
 
-
         /**
          * Resets the selection cards by removing all current selections and re-adding them.
          * @returns {void}
@@ -1106,7 +1105,11 @@ export default {
             });
         },
 
-
+        /**
+         * Updates the selected facility names.
+         * @param {String[]} newValue - the new falility names in array lists.
+         * @returns {void}
+         */
         updateSelectedFacilityNames (newValue) {
             if (this.mode !== "facility") {
                 return;
@@ -1116,12 +1119,16 @@ export default {
                 diff = differenceJs(oldValue, newValue);
 
             if (diff.length) {
-                this.removeCardsByLayerName(diff[0]);
+                diff.forEach(layer => {
+                    this.removeCardsByLayerName(layer);
+                });
             }
             if (difference.length) {
-                const layer = this.visibleVectorLayers.find(layerr => layerr.getLayer().get("name") === difference[0]);
-
-                this.addCardsByLayer(layer);
+                this.visibleVectorLayers.forEach(layer => {
+                    if (difference.includes(layer.getLayer().get("name"))) {
+                        this.addCardsByLayer(layer);
+                    }
+                })
             }
             this.setSelectedFacilityNames(newValue);
         }
@@ -1152,6 +1159,7 @@ export default {
                 v-if="mode === 'facility'"
                 :items="facilityNames ? facilityNames : []"
                 :model-value="selectedFacilityNames ? selectedFacilityNames : []"
+                :select-all="true"
                 multiple
                 label="Alle Fachdaten auswählen"
                 @update:model-value="updateSelectedFacilityNames($event)"
