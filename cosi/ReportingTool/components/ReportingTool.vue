@@ -26,6 +26,7 @@ import ReportingToolStepItem from "./ReportingToolStepItem.vue";
 import {VStepper, VStepperActions, VStepperItem, VStepperHeader, VStepperWindow, VStepperWindowItem} from "vuetify/components/VStepper";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {computed, markRaw} from "vue";
+import {uniqueId} from "@shared/js/utils/uniqueId";
 
 export default {
     name: "ReportingTool",
@@ -78,7 +79,7 @@ export default {
         };
     },
     data: () => ({
-        analysisCards: [],
+        analysisCards: undefined,
         annexCards: undefined,
         author: "",
         authorMaxLength: 35,
@@ -201,6 +202,25 @@ export default {
         },
 
         /**
+         * Gets the initial analysis cards.
+         * @returns {Object[]} the initial analysis cards.
+         */
+        initialAnalysisCards () {
+            if (!Array.isArray(this.dataSets) || !this.dataSets.length) {
+                return [];
+            }
+
+            const cards = [],
+                cardType = this.categoryMapping.analyses.find(al => al.key === "accessibilityAnalyses");
+
+            cardType.items.forEach(item => {
+                cards.push({...cardType, name: item.inputs.title, id: uniqueId("reporting-tool-card-")});
+            });
+
+            return cards;
+        },
+
+        /**
          * Checks if the author is valid.
          * @returns {Boolean} True if valid.
          */
@@ -279,7 +299,12 @@ export default {
                     await this.addChapterStatisticalData(this.statisticalDataCards);
                 }
                 await this.addChapterSubjectData(this.subjectDataCards);
-                this.addChapterAnalysis(this.analysisCards);
+                if (Array.isArray(this.analysisCards)) {
+                    this.addChapterAnalysis(this.analysisCards);
+                }
+                else {
+                    this.addChapterAnalysis(this.initialAnalysisCards);
+                }
                 await this.addChapterAnnex(this.annexCards);
                 this.pdf.download(this.downloadName);
             }
