@@ -36,6 +36,9 @@ describe("addons/geoMarker/components/tabs/TabNewContent.vue", () => {
         });
 
         wrapper = mount(TabNewContent, {
+            props: {
+                tabActive: true
+            },
             global: {
                 mocks: {
                     $t: key => key

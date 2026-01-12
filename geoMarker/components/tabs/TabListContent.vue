@@ -4,13 +4,15 @@ import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {formatDateTime} from "../../utils/dateHelpers";
 import SelectableList from "../SelectableList.vue";
 import GeoMarkerForm from "../GeoMarkerForm.vue";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 
 export default {
     name: "TabListContent",
     components: {
         IconButton,
         SelectableList,
-        GeoMarkerForm
+        GeoMarkerForm,
+        SpinnerItem
     },
     props: {
         tabActive: {
@@ -24,10 +26,10 @@ export default {
             savingInProgress: false,
             showList: true,
             geoMarkerUpdateMode: false,
-            showUpdateMessage: false,
             originalCoordinates: null,
             selectedFeatureIsGemisEditNotAllowed: false,
-            formRenderKey: 0
+            formRenderKey: 0,
+            isLoading: false
         };
     },
     computed: {
@@ -122,17 +124,6 @@ export default {
 
             this.defineUpdateLayers();
         },
-        geoMarkerUpdateFeatureCoordinates: {
-            handler (newValue) {
-                if (this.originalCoordinates && newValue) {
-                    this.showUpdateMessage = JSON.stringify(newValue) !== JSON.stringify(this.originalCoordinates);
-                }
-                else {
-                    this.showUpdateMessage = false;
-                }
-            },
-            deep: true
-        },
         async tabActive (val) {
             this.unregisterListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
 
@@ -142,6 +133,9 @@ export default {
                 this.registerListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
 
                 this.$refs.selectableList.restoreScroll();
+            }
+            else {
+                this.$refs.geoMarkerForm?.releaseFeatureLockOnTabChange();
             }
         }
     },
@@ -163,7 +157,6 @@ export default {
         ...mapActions("Modules/GeoMarker", [
             "setMapInteraction",
             "rollbackGeoMarkerUpdateFeature",
-            "loadFeaturesForEditLayer",
             "requestGFI"
         ]),
         setSelectedFeature (item) {
@@ -191,23 +184,26 @@ export default {
 
             window.open(useUrl, "_blank");
         },
-        centerVisibleMap () {
-            if (this.geoMarkerFeatureSelected) {
-                const coordinates = this.geoMarkerFeatureSelected.getGeometry().getCoordinates(),
-                    map = mapCollection.getMap("2D"),
-                    pixelAtCoordinates = map?.getPixelFromCoordinate(coordinates),
-                    rightPadding = this.expanded("secondaryMenu")
-                        ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
-                        : 20,
-                    leftPadding = this.expanded("mainMenu")
-                        ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
-                        : 20,
-                    offset = (rightPadding - leftPadding) / 2,
-                    shiftedPixelX = [pixelAtCoordinates[0] + offset, pixelAtCoordinates[1]],
-                    shiftedCoordinate = map.getCoordinateFromPixel(shiftedPixelX);
+        centerVisibleMap (coord = null) {
+            let coordinates = coord;
 
-                this.setCenter(shiftedCoordinate);
+            if (this.geoMarkerFeatureSelected) {
+                coordinates = this.geoMarkerFeatureSelected.getGeometry().getCoordinates();
             }
+
+            const map = mapCollection.getMap("2D"),
+                pixelAtCoordinates = map?.getPixelFromCoordinate(coordinates),
+                rightPadding = this.expanded("secondaryMenu")
+                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
+                    : 20,
+                leftPadding = this.expanded("mainMenu")
+                    ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
+                    : 20,
+                offset = (rightPadding - leftPadding) / 2,
+                shiftedPixelX = [pixelAtCoordinates[0] + offset, pixelAtCoordinates[1]],
+                shiftedCoordinate = map.getCoordinateFromPixel(shiftedPixelX);
+
+            this.setCenter(shiftedCoordinate);
         },
         zoomToGeoMarker () {
             if (this.geoMarkerFeatureSelected) {
@@ -229,17 +225,7 @@ export default {
                 }
             }
         },
-        onCancelEdit () {
-            this.rollbackGeoMarkerUpdateFeature();
-            this.showUpdateMessage = false;
-
-            if (this.geoMarkerUpdateMode) {
-                this.setUpdateModeParameters();
-                this.geoMarkerUpdateMode = false;
-            }
-        },
         onSuccess () {
-            this.showUpdateMessage = false;
             this.setUpdateModeParameters();
             this.geoMarkerUpdateMode = false;
         },
@@ -273,6 +259,7 @@ export default {
         setUpdateModeParameters () {
             if (this.geoMarkerFeatureSelected) {
                 if (this.geoMarkerUpdateMode) {
+                    // start updating a feature
                     this.defineUpdateLayers();
 
                     if (!this.originalCoordinates) {
@@ -281,12 +268,11 @@ export default {
                             .getGeometry()
                             .getCoordinates();
                     }
-                    this.showUpdateMessage = false;
                 }
                 else {
+                    // stop updating a feature (after cancel or save)
                     this.rollbackGeoMarkerUpdateFeature();
                     this.setMapInteraction(null);
-                    this.showUpdateMessage = false;
                     this.originalCoordinates = null;
                 }
             }
@@ -299,6 +285,7 @@ export default {
                 if (this.geoMarkerFeatureSelected) {
                     this.geoMarkerUpdateMode = status;
                 }
+
                 this.setUpdateModeParameters();
             }
         }
@@ -377,11 +364,8 @@ export default {
                 icon="bi-image"
                 @click="openVcOblique()"
             />
-
-            <p v-if="showUpdateMessage">
-                {{ $t('additional:modules.geoMarker.GeoMakerList.updateMessage') }}
-            </p>
         </div>
+
         <div
             v-if="geoMarkerFeatureSelected"
             class="geoMarkerEdit"
@@ -391,10 +375,23 @@ export default {
                 :key="formRenderKey"
                 mode="edit"
                 :selected-feature="geoMarkerFeatureSelected"
-                @cancel-edit="onCancelEdit"
                 @update-successfull="onSuccess()"
                 @editing="changeEditFeatureMode"
+                @start-loading="isLoading = true"
+                @stop-loading="isLoading = false"
             />
+        </div>
+
+        <div
+            v-if="isLoading"
+            class="loadingSpinner"
+        >
+            <SpinnerItem
+                custom-class="spinner"
+                class="ms-3"
+            />
+
+            <p> {{ $t("additional:modules.geoMarker.GeoMakerList.isLoading") }} </p>
         </div>
     </div>
 </template>
@@ -457,6 +454,30 @@ export default {
             position: absolute;
             top: 0;
             left: 0;
+        }
+    }
+
+    div.loadingSpinner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.7);
+        z-index: 2;
+
+        div.spinner {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        p {
+            background-color: white;
         }
     }
 }

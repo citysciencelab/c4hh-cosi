@@ -29,9 +29,17 @@
                 "edit": "Bearbeiten",
                 "createAnotherGeoMarker": "Weiteren GeoMarker anlegen",
                 "downloadAttachment": "Anhang herunterladen",
-                "successMessageAfterUpdate": "Geomarker ist erfolgreich aktualisiert",
-                "successMessageAfterSave": "Geomarker mit Id {{id}} ist erfolgreich erstellt.",
-                "geoMarkerClosedAt": "GeoMarker geschlossen am"
+                "successMessageAfterUpdate": "GeoMarker ist erfolgreich aktualisiert",
+                "successMessageAfterSave": "GeoMarker mit Id {{id}} ist erfolgreich erstellt.",
+                "geoMarkerClosedAt": "GeoMarker geschlossen am",
+                "featureIsLocked": {
+                  "header": "Bearbeiten nicht möglich",
+                  "text": "Der ausgewählte GeoMarker wird gerade durch jemand anderen bearbeitet und ist gesperrt."
+                },
+                "geomHasChanged": {
+                  "header": "Geänderte Geometrie!",
+                  "text": "Die Position des GeoMarkers wurde verändert. Sie sehen die neue Position in der Karte. (Blauer Kreis)"
+                }
             },
             "status": {
                 "offen": "offen",
@@ -70,7 +78,8 @@
                     "hideList": "GeoMarker-Liste umschalten",
                     "moveGeoMarker": "GeoMarker verschieben"
                 },
-                "updateMessage": "Der GeoMarker wurde verschoben. Bitte speichern Sie den GeoMarker, um die Änderung zu übernehmen."
+                "updateMessage": "Der GeoMarker wurde verschoben. Bitte speichern Sie den GeoMarker, um die Änderung zu übernehmen.",
+                "isLoading": "Daten werden vom Server geholt..."
             },
             "filter": {
                 "isFiltering": "Bitte etwas Geduld, die GeoMarker werden gerade gefiltert ...",

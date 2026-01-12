@@ -33,6 +33,7 @@
  * @property {Object|null} modifyInteraction - The current modify interaction object
  * @property {Object|null} selectInteraction - The current select interaction object
  * @property {Object|null} translateInteraction - The current translate interaction object
+ * @property {Object} currentlyLockedFeature - The currently locked GeoMarker feature and some information on timeouts to release or renew the lock
  * @property {String[]} statusOptions - List of possible selections for 'status'
  * @property {Object} filterSelections - settings the user chose for the filter
  * @property {Boolean} initialLoading - only true for initial loading to indicate whether the filter needs to wait for all features loaded
@@ -75,6 +76,14 @@ const state = {
     modifyInteraction: null,
     selectInteraction: null,
     translateInteraction: null,
+    currentlyLockedFeature: {
+        featureId: null,
+        lockId: null,
+        lockRefreshTimeStamp: null,
+        lockRefreshTimeoutId: null,
+        lockMaxTimeStamp: null,
+        expiration: 300
+    },
     // filter settings
     statusOptions: ["offen", "geschlossen", "inaktiv"],
     filterSelections: {

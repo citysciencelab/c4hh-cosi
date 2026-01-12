@@ -5,6 +5,24 @@ export default {
     name: "TabNewContent",
     components: {
         GeoMarkerForm
+    },
+    props: {
+        tabActive: {
+            type: Boolean,
+            required: true
+        }
+    },
+    data () {
+        return {
+            formRenderKey: 0
+        };
+    },
+    watch: {
+        tabActive (val) {
+            if (val) {
+                ++this.formRenderKey;
+            }
+        }
     }
 };
 </script>
@@ -12,6 +30,7 @@ export default {
 <template>
     <div class="TabNewContent">
         <GeoMarkerForm
+            :key="formRenderKey"
             mode="create"
             :show-create-another-switch="true"
         />

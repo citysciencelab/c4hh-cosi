@@ -253,7 +253,9 @@ export default {
                 aria-labelledby="tabNew"
                 tabindex="0"
             >
-                <TabNewContent />
+                <TabNewContent
+                    :tab-active="geoMarkerActiveTab === 'tabNew'"
+                />
             </div>
 
             <div

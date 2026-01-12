@@ -4,6 +4,7 @@ import InputText from "@shared/modules/inputs/components/InputText.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
+import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
 import GeoMarkerFormBox from "./GeoMarkerFormBox.vue";
 import SelectableList from "./SelectableList.vue";
 import CreateScreenshot from "./CreateScreenshot.vue";
@@ -24,7 +25,8 @@ export default {
         Multiselect,
         InputText,
         FileUpload,
-        FlatButton
+        FlatButton,
+        ModalItem
     },
     props: {
         /**
@@ -47,7 +49,7 @@ export default {
             default: false
         }
     },
-    emits: ["cancel-edit", "update-successfull", "geomarker-created", "editing"],
+    emits: ["update-successfull", "geomarker-created", "editing", "start-loading", "stop-loading"],
     data () {
         return {
             selectedCategoryId: null,
@@ -65,7 +67,12 @@ export default {
             createAnotherGeoMarker: false,
             savingInProgress: false,
             map: mapCollection.getMap("2D"),
-            readonly: this.mode === "edit"
+            readonly: this.mode === "edit",
+            showErrorModal: false,
+            errorFeatureIsLocked: false,
+            featureHasChangedOnServer: false,
+            geomHasChangedOnServer: false,
+            layerIdsForChangedDepartments: []
         };
     },
     computed: {
@@ -256,9 +263,12 @@ export default {
                     // this is only necessary, if it is not already 'readonly' yet
                     if (!this.readonly) {
                         this.updateEditingMode(false);
+                        this.releaseLockOfCurrentlyLockedFeature();
                     }
 
                     this.loadFeatureData(newFeature);
+                    this.showErrorModal = false;
+                    this.errorFeatureIsLocked = false;
                 }
             },
             immediate: true
@@ -275,6 +285,8 @@ export default {
             "setMapInteraction",
             "updateGeoMarker",
             "loadPropertyOfFeatureById",
+            "loadFeatureWithLockById",
+            "releaseLockOfCurrentlyLockedFeature",
             "refreshLayer",
             "refreshLayerAndReapplyFilter",
             "setGeoMarkerFeatureListAction"
@@ -645,7 +657,7 @@ export default {
                     category: "success"
                 });
 
-                await this.loadNewlyCreatedGeoMarker(transactionFeature, transactionResponse);
+                await this.loadNewlyCreatedOrUpdatedGeoMarker(transactionResponse.featureIds[0]);
             }
 
             this.resetForm();
@@ -694,6 +706,8 @@ export default {
 
                     await this.updateGeoMarkerFeatureListAfterEdit();
 
+                    await this.loadNewlyCreatedOrUpdatedGeoMarker(this.selectedFeature.getId());
+
                     this.moveUpdatedFeatureToTop(this.selectedFeature.getId());
 
                     if (this.isFilterApplied) {
@@ -730,11 +744,10 @@ export default {
                 this.refreshNewFeaturePointOnMap();
             }
             else {
-                this.$emit("cancel-edit");
                 this.initializeComponent();
+                this.releaseLockOfCurrentlyLockedFeature();
+                this.updateEditingMode(false);
             }
-
-            this.updateEditingMode(this.mode !== "edit");
         },
         /**
          * Refreshes the new feature point on the map and resets draw interaction
@@ -752,12 +765,13 @@ export default {
         async handleSave () {
             if (this.mode === "create") {
                 this.createNewGeomarker();
+                this.updateEditingMode(false);
             }
             else {
+                this.findLayerIdsForChangedDepartments();
                 await this.updateExistingGeomarker();
+                this.updateEditingMode(false);
             }
-
-            this.updateEditingMode(this.mode !== "edit");
         },
         /**
          * Updates the geoMarkerFeatureList in the store after editing a geomarker.
@@ -827,12 +841,12 @@ export default {
             }
         },
         /**
-         * Loads the newly created GeoMarker and displays it in the list, makes relevant layer(s) visible, if necessary
-         * @param {Object} transactionFeature - The feature that was just created
+         * Loads the newly created or updated GeoMarker and displays it in the list, makes relevant layer(s) visible or reload them, if necessary
+         * @param {String} featureId - The id of the feature that was just created / updated
          * @returns {Promise<void>}
          */
-        async loadNewlyCreatedGeoMarker (transactionFeature, transactionResponse) {
-            const relevantLayerIds = this.layerIdsForSelectedDepartments,
+        async loadNewlyCreatedOrUpdatedGeoMarker (featureId) {
+            const relevantLayerIds = [...new Set(this.layerIdsForSelectedDepartments.concat(this.layerIdsForChangedDepartments))],
                 loadPromises = relevantLayerIds.map(layerId => {
                     return new Promise(resolve => {
                         const layer = layerCollection.getLayerById(layerId);
@@ -881,7 +895,7 @@ export default {
 
             await Promise.all(loadPromises);
 
-            this.findAndDisplayNewFeature(transactionResponse, relevantLayerIds);
+            this.findAndDisplayNewFeature(featureId, relevantLayerIds);
 
             if (this.isFilterApplied) {
                 relevantLayerIds.forEach(layerId => {
@@ -924,17 +938,19 @@ export default {
         },
         /**
          * Finds the newly created feature and displays it in the list
-         * @param {Object} transactionResponse - The newly created feature response from transaction
+         * @param {String} featureId - The id of the feature from transaction
          * @param {Array<String>} relevantLayerIds - Array of layer IDs to search
          * @returns {void}
          */
-        findAndDisplayNewFeature (transactionResponse, relevantLayerIds) {
+        findAndDisplayNewFeature (featureId, relevantLayerIds) {
             const list = this.geoMarkerFeatureList,
-                feature = layerCollection.getLayerById(relevantLayerIds[0])?.getLayerSource()?.getFeatureById(transactionResponse.featureIds[0]);
+                feature = layerCollection.getLayerById(relevantLayerIds[0])?.getLayerSource()?.getFeatureById(featureId);
 
             if (feature) {
-                list.push(feature);
-                this.setGeoMarkerFeatureList(list);
+                if (this.mode === "create") {
+                    list.push(feature);
+                    this.setGeoMarkerFeatureList(list);
+                }
                 this.setGeoMarkerFeatureSelected(feature);
             }
         },
@@ -983,6 +999,8 @@ export default {
         },
         /**
          * If all departments are closed, return the latest date.
+         *
+         * @returns {String|null} the latest date or null if there is none
          */
         closedDateIfEveryDepartmentIsClosed () {
             const departmentStatus = Object.keys(this.departmentData).map(departmentId => {
@@ -1003,9 +1021,247 @@ export default {
                 ? newestDate.toISOString()
                 : null;
         },
-        updateEditingMode (status) {
+        /**
+         * Updates the editing mode.
+         * when status is true, it is tried to reload the feature with lock from the WFS
+         *  if it is already locked by another user an error modal is shown, saying that the feature cannot be edited
+         *  otherwise the latest feature data are returned from the database and inserted to the form
+         * @param {Boolean} status
+         * @returns {void}
+         */
+        async updateEditingMode (status) {
+            if (status && this.mode === "edit") {
+                this.$emit("start-loading");
+                const feat = await this.loadFeatureWithLockById({geomarkerId: this.selectedFeature.getId()});
+
+                if (!feat) {
+                    this.errorFeatureIsLocked = true;
+                    this.showErrorModal = true;
+                    this.$emit("stop-loading");
+                    return;
+                }
+
+                if (this.checkIfFeatureHasChangedOnServer(feat)) {
+                    this.setGeoMarkerFeatureSelected(feat);
+                    await this.reloadChangedFeatureToAllLayers(feat);
+                    await this.loadFeatureData(feat);
+                    await this.updateGeoMarkerFeatureListAfterEdit();
+
+                    if (this.geomHasChangedOnServer) {
+                        this.showErrorModal = true;
+                    }
+                }
+            }
+
             this.readonly = !status;
             this.$emit("editing", status);
+            this.$emit("stop-loading");
+        },
+        /**
+         * Checks if the properties and the geometry of the GeoMarker has changed on the server
+         *   because someone has updated it inbetween the last reload and the click on "edit"
+         *
+         * @param {Object} featureFromServer the feature that has freshly been loaded from the server
+         * @returns {Boolean} indicates whether the properties and / or the geometry has been changed
+         */
+        checkIfFeatureHasChangedOnServer (featureFromServer) {
+            const localFeature = this.selectedFeature,
+                localGeom = localFeature.getGeometry(),
+                serverGeom = featureFromServer.getGeometry(),
+                geometryChanged = JSON.stringify(localGeom.getCoordinates()) !== JSON.stringify(serverGeom.getCoordinates()),
+                localProps = {...localFeature.getProperties()},
+                serverProps = {...featureFromServer.getProperties()};
+
+            delete localProps.geom;
+            delete serverProps.geom;
+
+            let attributesChanged = false;
+            const allKeys = new Set([...Object.keys(localProps), ...Object.keys(serverProps)]);
+
+            for (const key of allKeys) {
+                let localPropToCompare = localProps[key];
+
+                if (key === "screenshot_base_64") {
+                    localPropToCompare = this.screenshotImage;
+                }
+                else if (key === "anhang_name") {
+                    localPropToCompare = this.attachment.name;
+                }
+
+                if (localPropToCompare !== serverProps[key]) {
+                    attributesChanged = true;
+                    break;
+                }
+            }
+
+            // Result
+            if (geometryChanged || attributesChanged) {
+                // Changes available
+                this.featureHasChangedOnServer = true;
+                this.geomHasChangedOnServer = geometryChanged;
+                return true;
+            }
+            // No Changes
+            this.featureHasChangedOnServer = false;
+            this.geomHasChangedOnServer = false;
+            return false;
+        },
+        /**
+         * If the geometry or the properties of the GeoMarker has changed on the server
+         *   reload the feature on all layers where it is available
+         *
+         *  afterwards, if the geometry is new, center the visible map on the new geometry by calling a parent-function
+         *
+         * @returns {void}
+         */
+        async reloadChangedFeatureToAllLayers (featureFromServer) {
+            /* check
+                - on which layers the feature (selectedFeature) was previously
+                - on which layers the feature is now (featureFromServer)
+
+                - on layer A the feature was present, but is not anymore => remove feature from layer
+                - on layer B the feature was not present before, but is now => add feature to layer
+                - on layer C the feature was present before and is still present => update properties and geometry of the feature
+                */
+
+            const localFeature = this.selectedFeature,
+                localProps = {...localFeature.getProperties()},
+                serverProps = {...featureFromServer.getProperties()},
+                localDepartmentsData = this.extractDepartmentData(localProps),
+                serverDepartmentsData = this.extractDepartmentData(serverProps),
+                allUsedLayerIds = {};
+
+            Object.keys(this.departments).forEach(departmentId => {
+
+                if (localDepartmentsData[departmentId]) {
+                    const status = localDepartmentsData[departmentId].status,
+                        layerId = this.departments[departmentId].layerIds[status];
+
+                    localDepartmentsData[departmentId].layerId = layerId;
+                    allUsedLayerIds[layerId] = {status: "remove"};
+                }
+
+                if (serverDepartmentsData[departmentId]) {
+                    const status = serverDepartmentsData[departmentId].status,
+                        layerId = this.departments[departmentId].layerIds[status];
+
+                    serverDepartmentsData[departmentId].layerId = layerId;
+
+                    if (Object.hasOwn(allUsedLayerIds, layerId)) {
+                        allUsedLayerIds[layerId].status = "update";
+                    }
+                    else {
+                        allUsedLayerIds[layerId] = {status: "add"};
+                    }
+                }
+            });
+
+            await Promise.all(Object.keys(allUsedLayerIds).map(layerId => new Promise(resolve => {
+                const layerSource = this.map?.getLayers().getArray().find(l => l.get("id") === layerId)?.getSource(),
+                    featureOnLayer = layerSource?.getFeatureById(featureFromServer.getId());
+
+                switch (allUsedLayerIds[layerId].status) {
+                    case "update":
+                        if (layerSource && featureOnLayer) {
+                            const updatedFeatureProps = featureFromServer.getProperties();
+                            const currentFeatureProps = featureOnLayer.getProperties();
+
+                            // 1. remove all properties that are no longer existent in featureFromServer
+                            Object.keys(currentFeatureProps).forEach(key => {
+                                if (!(key in updatedFeatureProps)) {
+                                    featureOnLayer.unset(key);
+                                }
+                            });
+                            // 2. update all properties that exist both on the server and on the local feature
+                            //    or add properties that are not yet existent on the local feature
+                            Object.entries(updatedFeatureProps).forEach(([key, value]) => {
+                                featureOnLayer.set(key, value);
+                            });
+                            // 3. update the geometry
+                            featureOnLayer.setGeometry(featureFromServer.getGeometry());
+                            featureOnLayer.changed();
+                        }
+                        break;
+                    case "add":
+                        if (layerSource) {
+                            layerSource.addFeature(featureFromServer);
+                        }
+                        break;
+                    case "remove":
+                        if (layerSource && featureOnLayer) {
+                            layerSource.removeFeature(featureOnLayer);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                resolve();
+            })));
+
+            // center the map on the new geometry to that the user can find it!
+            if (this.geomHasChangedOnServer) {
+                this.$parent.centerVisibleMap(featureFromServer.getGeometry().getCoordinates());
+            }
+        },
+        /**
+         * Release lock of feature on change of active tab
+         * this is only necessary, if it is not 'readonly'
+         *
+         * this function is called from parentComponent on change of active tab
+         *
+         * @returns {void}
+         */
+        releaseFeatureLockOnTabChange () {
+            if (!this.readonly) {
+                this.releaseLockOfCurrentlyLockedFeature();
+            }
+        },
+        /**
+         * Checks the departments and status values for the updated GeoMarker to know,
+         * which layers need to be reloaded to display the correct GeoMarker after the update
+         *
+         * needs to be called before the values of the updated GeoMarker are inserted to selectedFeature
+         *
+         * @returns {String[]} array to layer ids that are affected by the changed status and or departments
+         */
+        findLayerIdsForChangedDepartments () {
+            const layerIdsArray = [],
+                previousDepartments = Object.keys(this.selectedFeature.getProperties()).filter((prop) => prop.startsWith("sta_")),
+                newDepartments = Object.keys(this.departmentData || {}).map((prop) => {
+                    return "sta_" + prop;
+                });
+
+            previousDepartments.forEach(departmentId => {
+                const statusPrevious = this.selectedFeature.get(departmentId),
+                    statusNew = this.updatedGeoMarker[departmentId],
+                    index = newDepartments.indexOf(departmentId);
+
+                if (statusPrevious !== statusNew) {
+                    const departmentKey = departmentId.replace("sta_", "");
+
+                    if (this.departments[departmentKey]?.layerIds[statusPrevious]) {
+                        layerIdsArray.push(this.departments[departmentKey]?.layerIds[statusPrevious]);
+                    }
+
+                    if (this.departments[departmentKey]?.layerIds[statusNew]) {
+                        layerIdsArray.push(this.departments[departmentKey]?.layerIds[statusNew]);
+                    }
+                }
+
+                if (index !== -1) {
+                    newDepartments.splice(index, 1);
+                }
+            });
+
+            newDepartments.forEach(departmentId => {
+                const statusNew = this.updatedGeoMarker[departmentId],
+                    departmentKey = departmentId.replace("sta_", "");
+
+                layerIdsArray.push(this.departments[departmentKey].layerIds[statusNew]);
+            });
+
+            this.layerIdsForChangedDepartments = layerIdsArray;
         }
     }
 };
@@ -1292,6 +1548,31 @@ export default {
                 @click="updateEditingMode(true)"
             />
         </div>
+
+        <ModalItem
+            :show-modal="showErrorModal"
+            @modalHid="showErrorModal = false"
+        >
+            <template #header>
+                <h4 v-if="errorFeatureIsLocked">
+                    {{ $t("additional:modules.geoMarker.geoMarkerForm.featureIsLocked.header") }}
+                </h4>
+
+                <h4 v-else-if="geomHasChangedOnServer">
+                    {{ $t("additional:modules.geoMarker.geoMarkerForm.geomHasChanged.header") }}
+                </h4>
+            </template>
+
+            <template #default>
+                <p v-if="errorFeatureIsLocked">
+                    {{ $t("additional:modules.geoMarker.geoMarkerForm.featureIsLocked.text") }}
+                </p>
+
+                <p v-else-if="geomHasChangedOnServer">
+                    {{ $t("additional:modules.geoMarker.geoMarkerForm.geomHasChanged.text") }}
+                </p>
+            </template>
+        </ModalItem>
     </div>
 </template>
 

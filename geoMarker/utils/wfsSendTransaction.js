@@ -10,28 +10,34 @@ import {wfs} from "@masterportal/masterportalapi";
  * @param {string} url of the wfs-t service
  * @param {Object} layer the configured representation of the layer in the Masterportal
  * @param {string} transactionMethod which transaction to perform. Possible values are: "insert"|"delete"|"selectedUpdate"
+ * @param {string|null} lockId which lockId shall be released on this transaction
  * @returns {Object|void} Processed data info (featureIds: [], status: { inserted: 0, updated: 0, deleted: 0 })
  * @throws {Error} error if occurs
  */
-export default async function wfsSendTransaction (srsName, feature, url, layer, transactionMethod) {
+export default async function wfsSendTransaction (srsName, feature, url, layer, transactionMethod, lockId) {
+    const baseUrl = new URL(url),
+        {featureNS, featurePrefix, featureType, version} = layer;
+
     let exception,
         response,
         xmlDocument = null,
         transactionSummary = null,
-        data = null;
+        data = null,
+        transactionBody = wfs.writeTransactionBody(feature,
+            {featureNS, featurePrefix, featureType, version, srsName},
+            transactionMethod,
+            version);
 
-    const baseUrl = new URL(url),
-        {featureNS, featurePrefix, featureType, version} = layer;
+    if (transactionMethod === "selectedUpdate" && lockId) {
+        transactionBody = addReleaseLockAttributes(transactionBody, lockId);
+    }
 
     try {
         response = await fetch(baseUrl, {
             method: "POST",
             headers: {"Content-Type": "text/xml"},
             credentials: layer.isSecured ? "include" : "omit",
-            body: wfs.writeTransactionBody(feature,
-                {featureNS, featurePrefix, featureType, version, srsName},
-                transactionMethod,
-                version),
+            body: transactionBody,
             responseType: "text"
         });
 
@@ -107,4 +113,22 @@ function getExceptionFromTransactionResponse (xmlDocument) {
     }
 
     return response;
+}
+
+/**
+ * add the attributes 'releaseAction' and 'lockId' to the transaction request
+ *
+ * @param {String} xmlString the stringyfied transaction body
+ * @param {String} lockId the lockId to be released with this transaction
+ * @returns {String} stringyfied transaction body enriched by the new attributes
+ */
+function addReleaseLockAttributes (xmlString, lockId) {
+    const xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml"),
+        transactionElement = xmlDoc.getElementsByTagNameNS("http://www.opengis.net/wfs/2.0", "Transaction")[0];
+
+    transactionElement.setAttribute("releaseAction", "ALL");
+    transactionElement.setAttribute("lockId", lockId);
+
+    // Serialisieren zurück zu String
+    return new XMLSerializer().serializeToString(xmlDoc);
 }

@@ -331,6 +331,11 @@ const actions = {
         finally {
             commit("setNewGeoMarkerFeature", null);
             commit("setGeoMarkerUpdateFeature", null);
+
+            // delete possibly set timeout for refreshing the lock of the feature (only for update)
+            if (isUpdate) {
+                dispatch("cancelRefreshLockTimeout");
+            }
         }
 
         return {transactionFeature, transactionResponse};
@@ -349,7 +354,7 @@ const actions = {
      * @returns {Promise<Object|null>} - The server response, or null if an error occurred.
      */
     async sendTransaction ({dispatch, rootGetters, getters}, {feature, selectedInteraction}) {
-        const {layerInformation} = getters,
+        const {layerInformation, currentlyLockedFeature} = getters,
             layer = layerInformation[0];
 
         let response = null;
@@ -360,7 +365,8 @@ const actions = {
                 feature,
                 layer.url,
                 layer,
-                selectedInteraction
+                selectedInteraction,
+                currentlyLockedFeature.lockId
             );
 
             if (response !== null) {
@@ -419,9 +425,9 @@ const actions = {
      * @param {*} payload.propertyName Name of the property that will be loaded
      * @returns {*} - property
      */
-    async loadPropertyOfFeatureById ({dispatch, getters}, payload) {
+    async loadPropertyOfFeatureById ({dispatch, getters, rootGetters}, payload) {
         const featureRequest = new WFS({version: "2.0.0"}).writeGetFeature({
-                srsName: mapCollection.getMapView("2D").getProjection().getCode(),
+                srsName: rootGetters["Maps/projectionCode"],
                 featureTypes: ["geomarker"],
                 filter: resourceId(payload.geomarkerId)
             }),
@@ -453,6 +459,196 @@ const actions = {
         }
 
         return property;
+    },
+    /**
+     * Loads a property of a feature using its featureId. Locks the feature on the server for editing purposes.
+     * @param {*} context Vuex action context.
+     * @param {*} payload.geomarkerId Geomarker geomarkerId
+     * @returns {*} - feature or false if feature is locked or null if an error occoured
+     */
+    async loadFeatureWithLockById ({rootGetters, getters, dispatch}, payload) {
+        const featureRequest = new WFS({version: "2.0.0"}).writeGetFeature({
+                srsName: rootGetters["Maps/projectionCode"],
+                featureTypes: ["geomarker"],
+                filter: resourceId(payload.geomarkerId)
+            }),
+            {geomarkerEditLayerUrl} = getters;
+
+        return fetch(geomarkerEditLayerUrl,
+            {
+                headers: {
+                    "Content-Type": "text/xml"
+                },
+                method: "POST",
+                body: new XMLSerializer().serializeToString(featureRequest).replaceAll("GetFeature", "GetFeatureWithLock")
+            }
+        )
+            .then(response => response.text())
+            .then(responseString => {
+                if (responseString.includes("CannotLockAllFeatures")) {
+                    return false;
+                }
+
+                const newLoadedFeature = new WFS({version: "2.0.0"}).readFeature(responseString),
+                    xmlDoc = new DOMParser().parseFromString(responseString, "text/xml"),
+                    lockId = xmlDoc?.documentElement?.attributes?.lockId?.value,
+                    timestamp = xmlDoc?.documentElement?.attributes?.timeStamp?.value;
+
+                dispatch("createRefreshLockTimeout", {
+                    featureId: newLoadedFeature.getId(),
+                    lockId: lockId,
+                    timestamp: timestamp
+                });
+
+                return newLoadedFeature;
+            })
+            .catch(error => {
+                console.error(error);
+                return null;
+            });
+    },
+    /**
+     * Send a LockFeature request to the server to renew the locking on a currently edited GeoMarker.
+     * @param {*} context Vuex action context.
+     * @returns {void}
+     */
+    async refreshLockOfCurrentlyLockedFeature ({getters, dispatch}) {
+        const {geomarkerEditLayerUrl, currentlyLockedFeature} = getters;
+
+        await fetch(geomarkerEditLayerUrl,
+            {
+                headers: {
+                    "Content-Type": "text/xml"
+                },
+                method: "POST",
+                body: `<LockFeature
+                    xmlns="http://www.opengis.net/wfs/2.0"
+                    service="WFS"
+                    version="2.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd"
+                    expiry="${currentlyLockedFeature.expiration}"
+                    lockId="${currentlyLockedFeature.lockId}" />`
+            }
+        )
+            .then(response => response.text())
+            .then(responseString => {
+                if (responseString.includes("wfs:FeaturesLocked")) {
+                    dispatch("createRefreshLockTimeout", {
+                        featureId: currentlyLockedFeature.featureId,
+                        lockId: currentlyLockedFeature.lockId,
+                        timestamp: Date.now()
+                    });
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    },
+    /**
+     * Sets a timeout for the next 4 minutes.
+     * Raises a refreshLockOfCurrentlyLockedFeature to renew the locking after the timeout is gone
+     * @param {*} context Vuex action context.
+     * @param {*} payload.featureId GeoMarker featureId
+     * @param {*} payload.lockId lockId of the locked GeoMarker
+     * @param {*} payload.timestamp timestamp, used as basis for the timeout
+     * @returns {void}
+     */
+    createRefreshLockTimeout ({getters, commit, dispatch}, payload) {
+        let lockRefreshTimeStamp = null,
+            msUntilRefreshLock = null,
+            lockRefreshTimeoutId = null,
+            lockMaxTimeStamp = null;
+        const {featureId, lockId, timestamp} = payload,
+            exiprationTime = 300; // expiration of lock must be increased by 300 ms each time "LockFeature" is called
+
+        if (timestamp) {
+            const timestampDateObject = new Date(timestamp);
+
+            timestampDateObject.setMinutes(timestampDateObject.getMinutes() + 4);
+            lockRefreshTimeStamp = timestampDateObject.getTime();
+
+            // if lockRefreshTimeStamp is in future, set a timer to refresh the lock to keep the GeoMarker locked
+            msUntilRefreshLock = lockRefreshTimeStamp - Date.now();
+
+            if (msUntilRefreshLock > 0) {
+                lockRefreshTimeoutId = setTimeout(() => {
+                    dispatch("refreshLockOfCurrentlyLockedFeature");
+                }, msUntilRefreshLock);
+            }
+
+            // lock a feature for maximum 30 minutes, release the lock afterwards => still ToDo!
+            // have in mind to inform the user, before you release the lock
+            if (!getters.currentlyLockedFeature.lockMaxTimeStamp) {
+                timestampDateObject.setMinutes(timestampDateObject.getMinutes() + 26);
+                lockMaxTimeStamp = timestampDateObject.getTime();
+            }
+            else {
+                lockMaxTimeStamp = getters.currentlyLockedFeature.lockMaxTimeStamp;
+            }
+
+            commit("setCurrentlyLockedFeature", {
+                featureId: featureId,
+                lockId: lockId,
+                lockRefreshTimeStamp: lockRefreshTimeStamp,
+                lockRefreshTimeoutId: lockRefreshTimeoutId,
+                lockMaxTimeStamp: lockMaxTimeStamp,
+                expiration: getters.currentlyLockedFeature.expiration + exiprationTime
+            });
+        }
+    },
+    /**
+     * Cancels the timeout for refreshing the lock on a GeoMarker, uses currentlyLockedFeature
+     * @param {*} context Vuex action context.
+     * @returns {void}
+     */
+    cancelRefreshLockTimeout ({getters, commit}) {
+        const {currentlyLockedFeature} = getters;
+
+        if (currentlyLockedFeature.lockRefreshTimeoutId) {
+            clearTimeout(currentlyLockedFeature.lockRefreshTimeoutId);
+
+            commit("setCurrentlyLockedFeature", {
+                featureId: currentlyLockedFeature.featureId,
+                lockId: currentlyLockedFeature.lockId,
+                lockRefreshTimeStamp: null,
+                lockRefreshTimeoutId: null
+            });
+        }
+    },
+    /**
+     * Send an empty Transaction request to the server to release the locking on the currently edited GeoMarker.
+     * @param {*} context Vuex action context.
+     * @returns {void}
+     */
+    async releaseLockOfCurrentlyLockedFeature ({getters, dispatch}) {
+        const {geomarkerEditLayerUrl, currentlyLockedFeature} = getters;
+
+        await fetch(geomarkerEditLayerUrl,
+            {
+                headers: {
+                    "Content-Type": "text/xml"
+                },
+                method: "POST",
+                body: `<Transaction
+                    xmlns="http://www.opengis.net/wfs/2.0"
+                    service="WFS"
+                    version="2.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd"
+                    releaseAction="ALL"
+                    lockId="${currentlyLockedFeature.lockId}" />`
+            }
+        )
+            .then(response => response.text())
+            .then(responseString => {
+                if (responseString.includes("wfs:TransactionSummary")) {
+                    dispatch("cancelRefreshLockTimeout");
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
     },
     /**
      * Converts a base64 string and adds the appropriate MIME type prefix

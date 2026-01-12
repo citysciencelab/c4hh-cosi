@@ -29,9 +29,17 @@
                 "edit": "Edit",
                 "createAnotherGeoMarker": "Create another GeoMarker",
                 "downloadAttachment": "Download Attachment",
-                "successMessageAfterUpdate": "Geomarker is successfully updated",
-                "successMessageAfterSave": "Geomarker with Id {{id}} is successfully created.",
-                "geoMarkerClosedAt": "GeoMarker closed at"
+                "successMessageAfterUpdate": "GeoMarker is successfully updated",
+                "successMessageAfterSave": "GeoMarker with Id {{id}} is successfully created.",
+                "geoMarkerClosedAt": "GeoMarker closed at",
+                "featureIsLocked": {
+                  "header": "Editing not possible",
+                  "text": "The selected GeoMarker is currently edited by some else and is locked."
+                },
+                "geomHasChanged": {
+                  "header": "Changed geometry!",
+                  "text": "The position of the GeoMarker has changed. You see the new position in the map. (blue circle)"
+                }
             },
             "status": {
                 "offen": "open",
@@ -70,7 +78,8 @@
                     "hideList": "Toggle GeoMarker List",
                     "moveGeoMarker": "Move GeoMarker"
                 },
-                "updateMessage": "The GeoMarker has been moved. Please save the GeoMarker to apply the change."
+                "updateMessage": "The GeoMarker has been moved. Please save the GeoMarker to apply the change.",
+                "isLoading": "Data are loaded from the server ..."
 
             },
             "filter": {
