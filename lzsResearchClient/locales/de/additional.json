@@ -17,7 +17,11 @@
                     "searchButtonLabel": "Suchen",
                     "resetButtonLabel": "Zurücksetzen",
                     "searchWithAttributeHeading": "Suche Daten über Attribute",
-                    "searchWithGeometryHeading": "Suche Daten über räumliches Gebiet"
+                    "searchWithGeometryHeading": "Suche Daten über räumliches Gebiet",
+                    "selectArchivLabel": "Archiv",
+                    "jahrgang": "Jahrgang",
+                    "kachelnummer": "Kachelnummer",
+                    "maxValueCount": "Max. Trefferanzahl"
                 },
                 "tabResult": {
                     "label": "Ergebnisse"

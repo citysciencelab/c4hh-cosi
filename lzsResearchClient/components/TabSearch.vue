@@ -1,26 +1,80 @@
 <script>
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
+
+import {mapGetters, mapActions} from "vuex";
 
 export default {
     name: "TabSearch",
     components: {
-        FlatButton
+        FlatButton,
+        InputText
     },
     data () {
         return {
-            activeContent: "searchOptionsList"
+            activeContent: "searchOptionsList",
+            selectedArchiv: "",
+            searchWithAttributeForm: {}
         };
     },
+    computed: {
+        ...mapGetters("Modules/LzsResearchClient", [
+            "dataClassList"
+        ])
+    },
+    async mounted () {
+        await this.fetchDataClassList();
+
+        this.initializeSearchForm();
+        this.setSelectedArchiv(this.dataClassList[0]?.name);
+    },
     methods: {
+        ...mapActions("Modules/LzsResearchClient", [
+            "fetchDataClassList"
+        ]),
         changeSearchContent (contentId) {
             this.activeContent = contentId;
+        },
+        setSelectedArchiv (archiv) {
+            this.selectedArchiv = archiv;
+        },
+        initializeSearchForm () {
+            const formValues = {};
+
+            this.dataClassList?.forEach(element => {
+                const archivName = element.name,
+                    attributes = element.highestActiveDataclassVersion.dataclassAttributs
+                        .filter(attribute => attribute.usage === "I")
+                        .map(attribute => ({
+                            ...attribute,
+                            value: ""
+                        }))
+                        .map(attribute => ({
+                            ...attribute,
+                            value: "",
+                            label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`)
+                        }));
+
+                formValues[archivName] = attributes;
+                formValues[archivName].push(
+                    {
+                        name: "maxValueCount",
+                        value: "",
+                        label: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount"),
+                        pattern: "[0-9]{4}"
+                    });
+            });
+
+            this.searchWithAttributeForm = formValues;
         }
     }
 };
 </script>
 
 <template>
-    <div id="TabSearch">
+    <div
+        id="TabSearch"
+    >
         <transition
             name="slide"
             mode="out-in"
@@ -49,7 +103,7 @@ export default {
                     @click="changeSearchContent('searchFormWithGeometry')"
                     @keydown.enter="changeSearchContent('searchFormWithGeometry')"
                 >
-                    {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.searchWithGeometryHeading') }}
+                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.searchWithGeometryHeading") }}
 
                     <i class="bi bi-arrow-right-circle" />
                 </li>
@@ -65,10 +119,35 @@ export default {
                     id="searchFormWithAttributes"
                     class="searchFormWithAttributes"
                 >
-                    Search with attribute
-                    <hr>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus qui saepe quae nihil, numquam, ut tempore consequatur cumque sapiente explicabo mollitia eligendi non rerum laboriosam? Voluptatibus odit delectus ratione eum.
-                    <hr>
+                    <label for="archiv">
+                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
+                    </label>
+
+                    <select
+                        id="archiv"
+                        class="form-select archiv"
+                        :value="selectedArchiv"
+                        @change="setSelectedArchiv($event.target.value)"
+                    >
+                        <option
+                            v-for="(_, name) in searchWithAttributeForm"
+                            :key="name"
+                            :value="name"
+                        >
+                            {{ name }}
+                        </option>
+                    </select>
+
+                    <div class="searchWithAttributeForm">
+                        <InputText
+                            v-for="attribute in searchWithAttributeForm[selectedArchiv]"
+                            :id="attribute.name"
+                            :key="attribute.name"
+                            v-model="attribute.value"
+                            :label="attribute.label"
+                            :placeholder="attribute.name"
+                        />
+                    </div>
                 </div>
 
                 <div
@@ -113,8 +192,9 @@ export default {
 <style lang="scss" scoped>
 #TabSearch {
     padding: 1rem 0.5rem;
-    position:relative;
+    position: relative;
 
+    // Transition classes - START
     .slide-enter-active,
     .slide-leave-active {
         transition: all 0.2s ease-in-out;
@@ -129,8 +209,14 @@ export default {
         opacity: 0;
         transform: translateX(6rem);
     }
+    // Transition classes - END
 
     div.searchAttributes {
+        div.searchFormWithAttributes {
+            select.archiv {
+                margin-bottom: 1rem;
+            }
+        }
         div.searchButtons {
             display: flex;
             gap: 0.5rem;

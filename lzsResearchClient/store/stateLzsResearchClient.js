@@ -11,9 +11,11 @@
  * @property {Boolean} isVisibleInMenu - if true, tool is selectable in menu (config-param)
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * @property {Boolean} standAlonePortal - flag if tool is used in a standalone portal, then titles are removed via CSS (config-param)
+ * @property {String} apiBasePath - Base url for api requests to gis portal
 
  * Addon state
  * @property {Boolean} showLoadingSpinner - Show loading spinner or not
+ * @property {Object} dataClassList - List of data classes (see fetchDataClassList) used in tab search
  */
 
 const state = {
@@ -30,9 +32,9 @@ const state = {
     standAlonePortal: false,
 
     // Addon state
-    showLoadingSpinner: false
+    showLoadingSpinner: false,
+    dataClassList: {},
+    apiBasePath: ""
 };
 
 export default state;
-
-

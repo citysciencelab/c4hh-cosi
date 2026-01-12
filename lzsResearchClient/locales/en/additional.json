@@ -16,8 +16,12 @@
                     "dossiersButtonLabel": "Dossiers",
                     "searchButtonLabel": "Search",
                     "resetButtonLabel": "Reset",
-                    "searchWithAttributeHeading": "Suche Daten über Attribute",
-                    "searchWithGeometryHeading": "Suche Daten über räumliches Gebiet"
+                    "searchWithAttributeHeading": "Search Data by Attributes",
+                    "searchWithGeometryHeading": "Search Data by Geometry",
+                    "selectArchivLabel": "Archive",
+                    "jahrgang": "Year",
+                    "kachelnummer": "Tile Number",
+                    "maxValueCount": "Max. Results"
                 },
                 "tabResult": {
                     "label": "Results"
