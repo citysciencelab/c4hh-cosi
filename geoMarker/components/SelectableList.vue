@@ -1,6 +1,6 @@
 <script>
 import dayjs from "dayjs";
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 
 export default {
     name: "SelectableList",
@@ -91,13 +91,16 @@ export default {
             currentSorting: {
                 columnName: "",
                 order: "origin"
-            }
+            },
+            rowRefs: {}
         };
     },
     computed: {
         ...mapGetters("Modules/GeoMarker", [
             "geoMarkerFeatureSelected",
-            "geoMarkerShortFeatureId"
+            "geoMarkerShortFeatureId",
+            "scrollToGeoMarkerId",
+            "listScrollTop"
         ]),
         sortedTable () {
             const table = {
@@ -127,14 +130,27 @@ export default {
             else {
                 this.selectItem(this.tableData.items.find(item => item[this.itemPropertyId] === id));
             }
+        },
+        scrollToGeoMarkerId (id) {
+            if (id !== null) {
+                this.scrollToRow(id);
+            }
+            else {
+                this.restoreScroll();
+            }
         }
     },
     mounted () {
         if (this.selectedItemId) {
             this.selectItem(this.tableData.items.find(item => item[this.itemPropertyId] === this.selectedItemId));
         }
+
+        this.$refs.selectableList.scrollTop = this.listScrollTop;
     },
     methods: {
+        ...mapMutations("Modules/GeoMarker", [
+            "setListScrollTop"
+        ]),
         selectItem (item) {
             this.selectedItem = item;
 
@@ -278,6 +294,56 @@ export default {
                 });
 
             return order === "desc" ? sorted.reverse() : sorted;
+        },
+        /**
+         * Sets a reference to a row element in the table.
+         * This function is typically used to store a reference to a DOM element for later access,
+         * such as for scrolling, focusing, or measuring purposes.
+         *
+         * @param {number|string} rowKey - The unique key identifying the row.
+         * @param {HTMLElement|null} el - The DOM element representing the row, or null if not present.
+         */
+        setRowRef (id, el) {
+            if (el) {
+                this.rowRefs[id] = el;
+            }
+        },
+        /**
+         * Scrolls the container to bring the specified table row into view.
+         *
+         * @param {number} id - The id of the row to scroll to.
+         * @returns {void}
+         */
+        scrollToRow (id) {
+            const row = this.rowRefs[id];
+
+            setTimeout(() => {
+                if (row) {
+                    row.scrollIntoView({behavior: "smooth", block: "center"});
+                }
+            }, 100);
+        },
+        /**
+         * Handles the scroll event for the element.
+         * Updates the actual scroll position.
+         * @returns {void}
+         */
+        onScroll () {
+            if (this.$refs.selectableList.scrollTop !== 0) {
+                this.setListScrollTop(this.$refs.selectableList.scrollTop);
+            }
+        },
+        /**
+         * Restores the scroll position of the table rows to the specified value.
+         *
+         * @returns {void}
+         */
+        restoreScroll () {
+            this.$nextTick(() => {
+                const el = this.$refs.selectableList;
+
+                el.scrollTop = this.listScrollTop;
+            });
         }
     }
 };
@@ -286,7 +352,9 @@ export default {
 <template>
     <div
         id="SelectableList"
+        ref="selectableList"
         class="selectableList fixed"
+        @scroll="onScroll"
     >
         <table
             class="dynamic-column-table table-hover"
@@ -322,6 +390,7 @@ export default {
                 <tr
                     v-for="(trItem, trIndex) in sortedTable.items"
                     :key="`th_${trIndex}`"
+                    :ref="el => setRowRef(trItem.id, el)"
                     :class="[
                         selectedFeatureId === trItem.id ? 'rowSelected' : '',
                         highlightSelection ? 'highlightSelection' : ''

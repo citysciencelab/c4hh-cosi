@@ -54,6 +54,7 @@ export default {
                     this.setGeoMarkerUpdateFeature(null);
                     this.$refs.tabList.resetGeoMarkerForm();
                     this.removePointMarker();
+                    this.setScrollToGeoMarkerId(null);
 
                     if (this.rollbackGeoMarkerFeature && oldValue === "tabList") {
                         this.rollbackGeoMarkerUpdateFeature();
@@ -103,7 +104,8 @@ export default {
             "setGeoMarkerFeatureSelected",
             "setGeoMarkerFeatureList",
             "setLockListSelection",
-            "setNewGeoMarkerCreated"
+            "setNewGeoMarkerCreated",
+            "setScrollToGeoMarkerId"
         ]),
         ...mapActions("Modules/GeoMarker", [
             "loadCategories",

@@ -51,7 +51,9 @@ describe("addons/geoMarker/components/SelectableList.vue", () => {
                             namespaced: true,
                             getters: {
                                 geoMarkerFeatureSelected: () => null,
-                                geoMarkerShortFeatureId: () => (featureId) => featureId
+                                geoMarkerShortFeatureId: () => (featureId) => featureId,
+                                scrollToGeoMarkerId: () => null,
+                                listScrollTop: () => 0
                             }
                         }
                     }

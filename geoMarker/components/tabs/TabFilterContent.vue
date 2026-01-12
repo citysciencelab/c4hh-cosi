@@ -197,6 +197,15 @@ export default {
 
                 this.registerListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
             }
+        },
+        filterSelections: {
+            handler: async function () {
+                if (this.filterUpdated) {
+                    this.setListScrollTop(0);
+                    this.setScrollToGeoMarkerId(null);
+                }
+            },
+            deep: true
         }
     },
     mounted () {
@@ -207,7 +216,9 @@ export default {
             "setFilterSelections",
             "setGeoMarkerFeatureList",
             "setGeoMarkerActiveTab",
-            "setIsFilterApplied"
+            "setIsFilterApplied",
+            "setListScrollTop",
+            "setScrollToGeoMarkerId"
         ]),
         ...mapActions("Modules/GeoMarker", [
             "requestGFI",

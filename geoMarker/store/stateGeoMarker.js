@@ -101,7 +101,9 @@ const state = {
     },
     isFilterApplied: false,
     initialLoading: true,
-    newGeoMarkerCreated: false
+    newGeoMarkerCreated: false,
+    scrollToGeoMarkerId: null,
+    listScrollTop: 0
 };
 
 export default state;

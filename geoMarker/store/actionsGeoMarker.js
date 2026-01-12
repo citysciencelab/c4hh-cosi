@@ -604,9 +604,15 @@ const actions = {
 
         // if one more more GeoMarkers have been found, open the list to show all of them (select the first one)
         if (subSetOfUniqueFeatures.length > 0) {
-            commit("setGeoMarkerFeatureList", subSetOfUniqueFeatures);
+            if (!getters.isFilterApplied) {
+                commit("setGeoMarkerFeatureList", subSetOfUniqueFeatures);
+            }
+
+            commit("setScrollToGeoMarkerId", Number(subSetOfUniqueFeatures[0].getId().replace(getters.geoMarkerWfsFeatureIdPrefix, "")));
             commit("setGeoMarkerActiveTab", "tabList");
+
             await nextTick();
+
             commit("setGeoMarkerFeatureSelected", subSetOfUniqueFeatures[0]);
         }
     },

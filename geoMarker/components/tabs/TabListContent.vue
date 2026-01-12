@@ -140,6 +140,8 @@ export default {
                 await this.$nextTick();
 
                 this.registerListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
+
+                this.$refs.selectableList.restoreScroll();
             }
         }
     },
@@ -335,6 +337,7 @@ export default {
             <div class="geoMarkerListContainer">
                 <SelectableList
                     v-show="showList"
+                    ref="selectableList"
                     :selected-item-id="selectedListItemId"
                     :table-data="tableData"
                     @item-selected="setSelectedFeature"
