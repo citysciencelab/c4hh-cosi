@@ -175,6 +175,16 @@ export default {
             return prepareName + "-" + date + ".pdf";
         },
         /**
+         * Gets frontpageitems with required selection status for the case that no districts are selected.
+         * @returns {Object[]} Array of frontpageitems.
+         */
+        frontPageItemsForEmptyDistrictSelection () {
+            return this.frontPageItems.map(item => ({
+                ...item,
+                selected: item.value === "withoutFrontPage"
+            }));
+        },
+        /**
          * Gets the column name for the export based on entered selected areas name.
          * @returns {String} the column name to use for the selected area.
          */
@@ -264,8 +274,10 @@ export default {
                 this.pdf.resetDocContent();
                 this.pdf.addHeader(this.reportTitle.trim());
                 this.pdf.setAuthor(this.author.trim());
-                await this.addOverViewPage(this.selectedFrontPageItem.value);
-                await this.addChapterStatisticalData(this.statisticalDataCards);
+                if (this.selectedDistrictNames.length > 0) {
+                    await this.addOverViewPage(this.selectedFrontPageItem.value);
+                    await this.addChapterStatisticalData(this.statisticalDataCards);
+                }
                 await this.addChapterSubjectData(this.subjectDataCards);
                 this.addChapterAnalysis(this.analysisCards);
                 await this.addChapterAnnex(this.annexCards);
@@ -711,7 +723,7 @@ export default {
          */
         async addInfrastructureMapPageToReport (items) {
             const imageName = "infrastructureMap",
-                feature = this.selectedFeatures.length > 1 ? unionFeatures(this.selectedFeatures) : this.selectedFeatures[0],
+                feature = this.selectedFeatures.length > 0 ? unionFeatures(this.selectedFeatures) : this.districtLevels[3].districts[0].adminFeature,
                 template = typeof feature !== "undefined" ?
                     this.getObjectCopyWithoutReference(baseProportionTemplate) :
                     this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
@@ -1322,8 +1334,8 @@ export default {
                             />
                             <TagGroup
                                 class="mb-3"
-                                :disabled="reportLoader"
-                                :items="frontPageItems"
+                                :disabled="reportLoader || selectedDistrictNames.length === 0"
+                                :items="selectedDistrictNames.length > 0 ? frontPageItems : frontPageItemsForEmptyDistrictSelection"
                                 :label="$t('additional:modules.cosi.reportingTool.label.frontPage')"
                                 @update:selected-items="updateFrontPageItems"
                             />
