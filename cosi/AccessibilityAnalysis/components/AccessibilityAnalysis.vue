@@ -647,7 +647,7 @@ export default {
                 }
                 else {
                     getLayerSource(layer.getLayer()).on("featuresloadend", () => {
-                        if (layer.getLayer().getSource().getFeatures().length > 0) {
+                        if (layer.getLayer().getSource().getFeatures().length > 0 && !this.facilityNames.includes(layer.getLayer().get("name"))) {
                             this.facilityNames.push(layer.getLayer().get("name"));
                         }
                     });
