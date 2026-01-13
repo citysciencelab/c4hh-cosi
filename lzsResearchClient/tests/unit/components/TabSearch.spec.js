@@ -2,7 +2,7 @@ import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 
-import Component from "../../../../components/tabs/TabSearch.vue";
+import Component from "../../../components/TabSearch.vue";
 
 describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js", () => {
     let wrapper,

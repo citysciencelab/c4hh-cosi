@@ -1,5 +1,5 @@
 <script>
-import {TAB_SET_CURRENT} from "../TabContainer.vue";
+import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
 
 export default {
     name: "TabDetails",

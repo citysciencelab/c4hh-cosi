@@ -1,11 +1,11 @@
 <script>
 import {mapGetters, mapMutations} from "vuex";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
-import TabContainer from "./TabContainer.vue";
-import TabDetails from "./tabs/TabDetails.vue";
-import TabResult from "./tabs/TabResult.vue";
-import TabSearch from "./tabs/TabSearch.vue";
-import TabDownload from "./tabs/TabDownload.vue";
+import TabContainer from "./shared/TabContainer.vue";
+import TabDetails from "./TabDetails.vue";
+import TabResult from "./TabResult.vue";
+import TabSearch from "./TabSearch.vue";
+import TabDownload from "./TabDownload.vue";
 
 export default {
     name: "LzsResearchClient",
