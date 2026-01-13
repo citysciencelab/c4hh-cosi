@@ -670,9 +670,28 @@ export default {
          */
         resetGeomFilter () {
             this.filterSelections.geom = null;
-            this.graphicalSelectOpen = false;
+            this.toggleGraphicalSelect();
             this.filterUpdated = true;
             this.setIsFilterApplied(false);
+        },
+        /**
+         * Toggles the graphical selection mode.
+         * If enabled, allows users to select elements on the map by drawing a rectangle.
+         * The GFI is disabled while graphical selection is active.
+         * If disabled, graphical selection is turned off.
+         * The GFI is re-enabled when graphical selection is turned off.
+         *
+         * @returns {void}
+         */
+        toggleGraphicalSelect () {
+            this.graphicalSelectOpen = !this.graphicalSelectOpen;
+
+            if (this.graphicalSelectOpen) {
+                this.unregisterListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
+            }
+            else {
+                this.registerListener({type: "click", listener: this.requestGFI, keyForBoundFunctions: "geoMarkerRequestGFIEvent"});
+            }
         }
     }
 };
@@ -703,7 +722,7 @@ export default {
                             :icon="filterSelections.geom ? 'bi-check-circle' : 'bi-bounding-box-circles'"
                             :secondary="true"
                             :customclass="filterSelections.geom ? 'geomFilterActive' : ''"
-                            @click="graphicalSelectOpen = !graphicalSelectOpen"
+                            @click="toggleGraphicalSelect"
                         />
                     </div>
                 </div>
