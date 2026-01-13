@@ -11,6 +11,16 @@ export default {
             type: Boolean,
             default: false
         },
+        status: {
+            type: String,
+            required: false,
+            default: ""
+        },
+        selected: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         icon: {
             type: String,
             default: null,
@@ -24,7 +34,7 @@ export default {
 <template lang="html">
     <div
         class="card shadow-sm"
-        :class="{hoverable}"
+        :class="[{hoverable}, status === 'active' ? 'card-active' : '', selected ? 'card-selected' : '']"
     >
         <div class="card-body p-2 d-flex flex-row align-center">
             <div

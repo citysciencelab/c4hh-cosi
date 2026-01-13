@@ -1,9 +1,11 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 
 export default {
     name: "TemplateManagerCard",
     components: {
+        CustomCard
     },
     props: {
         title: {
@@ -97,184 +99,95 @@ export default {
     <div
         class="col col-md-12"
     >
-        <div
-            class="card h-100"
-            :class="!isEnabled ? 'disabled' : ''"
-            :isSelected="selectedTemplate"
-            :isActive="activeTemplate"
+        <CustomCard
+            hoverable
+            :status="activeTemplate ? 'active' : ''"
+            :selected="selectedTemplate"
+            :icon="activeTemplate ? 'bi bi-file-earmark-text' : 'bi bi-file-earmark-x'"
         >
-            <div class="card-body p-3">
-                <div class="container p-1">
+            <div
+                class="row align-items-center"
+            >
+                <div
+                    class="title-button btn pe-0 py-0 btn-block col col-md-8"
+                >
+                    <a
+                        href="#"
+                        class="pe-0 mb-0 stretched-link"
+                        :class="activeTemplate ? 'card-title-active' : 'card-title'"
+                        @click.prevent="$emit('showTemplate', title)"
+                    >{{ title }}</a>
+                    <div class="created-section mt-0">
+                        {{ created }}
+                    </div>
+                </div>
+                <div class="switch-input col col-md-4">
                     <div
-                        class="header row"
+                        v-if="isEnabled"
+                        class="form-check form-switch"
                     >
-                        <i
-                            class="card-icon justify-content-center col col-md-1 h4 p-0 align-self-center mb-0"
-                            :class="activeTemplate ? 'bi bi-file-earmark-text' : 'bi bi-file-earmark-x' "
-                        />
-                        <button
-                            class="title-button btn pe-0 py-0 btn-block col col-md-8"
-                            @click.prevent="$emit('showTemplate', title)"
+                        <input
+                            :id="`flexSwitchCheckChecked-${cardId}`"
+                            v-model="checked"
+                            type="checkbox"
+                            role="switch"
+                            name="template-card"
+                            :title="title"
+                            :aria-label="checked ? $t('additional:modules.tools.cosi.templateManager.label.enable') : $t('additional:modules.tools.cosi.templateManager.label.disable')"
+                            class="form-check-input align-self-center"
+                            :disabled="!isEnabled ? 'disabled' : false"
+                            @change="checkActive"
                         >
-                            <h5 class=" card-title pe-0 mb-0">
-                                {{ title }}
-                            </h5>
-                            <div class="created-section mt-0">
-                                {{ created }}
-                            </div>
-                        </button>
                         <label
-                            class="switch"
-                            :class="isEnabled ? 'middle' : ''"
-                            role="button"
-                            tabindex="0"
-                            @click="showDistrictInfo(isEnabled)"
-                            @keydown="showDistrictInfo(isEnabled)"
+                            class="form-check-label ps-2 pt-1 me-0"
+                            for="template-card"
                         >
-                            <input
-                                :id="`flexSwitchCheckChecked-${cardId}`"
-                                v-model="checked"
-                                type="checkbox"
-                                name="template-card"
-                                :title="title"
-                                :disabled="!isEnabled ? 'disabled' : false"
-                                @change="checkActive"
-                            >
-                            <span class="slider round" />
+                            {{ checked ? $t('additional:modules.tools.cosi.templateManager.label.enable') : $t('additional:modules.tools.cosi.templateManager.label.disable') }}
                         </label>
-                        <span
-                            :class="isEnabled ? 'middle' : ''"
-                        >
-                            {{ checked ? $t("additional:modules.tools.cosi.templateManager.label.enable") : $t("additional:modules.tools.cosi.templateManager.label.disable") }}
-                        </span>
-                        <div
-                            v-if="!isEnabled"
-                            class="hint"
-                        >
-                            <i class="bi bi-info-circle" />
-                            {{ $t("additional:modules.tools.cosi.templateManager.chooseDistricts") }}
-                        </div>
+                    </div>
+                    <div
+                        v-else
+                        class="hint align-items-start text-center"
+                    >
+                        <i class="bi bi-info-circle me-2" />
+                        {{ $t("additional:modules.tools.cosi.templateManager.chooseDistricts") }}
                     </div>
                 </div>
             </div>
-        </div>
+        </CustomCard>
     </div>
 </template>
 <style lang="scss" scoped>
+.switch-input {
+    position: relative;
+    z-index: 5000;
+}
 .card {
-    border: 1px solid $light_grey;
-    border-radius: 5px;
-    padding-top: 5px;
-    &.disabled {
-        opacity: 0.5;
-    }
-   i {
-        color: #6E7174;
-        font-size: 30px;
-   }
-    &:hover {
-        background-color: #DCE2F3;
-    }
     .title-button {
-        box-shadow: none;
         text-align: left;
-        &:enabled {
-            border: none;
-            outline: 0;
+        box-shadow: none;
+        border: none;
+        .card-title {
+            color: $dark_grey
+        }
+        .card-title-active {
+            color: $secondary;
         }
     }
-    .card-title {
-        font-size: 12px;
-        color: #6E7174;
-        font-family: $font_family_accent;
-    }
-    .created-section {
-        font-size: 11px;
-        color: #6E7174;
-    }
-    .middle {
-        align-self: center;
-    }
+
     .hint {
-        position: absolute;
-        right: 0;
-        bottom: 5px;
-        font-size: 10px;
+        font-size: $font_size_sm;
         i {
             font-size: 14px;
         }
     }
 }
-.card[isActive='true'] {
-    border: 2px solid $light_blue;
-    .card-title {
-        color: $light_blue;
-    }
-    i {
-        color: $light_blue
-    }
-}
-.card[isSelected='true'] {
-    background-color: #DCE2F3;
-}
 
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 30px;
-    height: 14px;
+.form-check-input {
+    width: 2.5rem;
+    height: 1.5rem;
 }
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 12px;
-    width: 12px;
-    left: 2px;
-    bottom: 1px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-input:checked + .slider {
-    background-color: #003063;
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #003063;
-}
-
-input:checked + .slider:before {
-    -webkit-transform: translateX(14px);
-    -ms-transform: translateX(14px);
-    transform: translateX(14px);
-}
-
-/* Rounded sliders */
-.slider.round {
-    border-radius: 14px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
+.form-check-label {
+    font-size: $font-size-base * 0.9;
 }
 </style>
