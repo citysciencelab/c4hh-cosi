@@ -246,11 +246,13 @@ export default {
                 if (this.geoMarkerUpdateMode) {
                     const updateProperties = this.geoMarkerFeatureSelected.getProperties(),
                         departmentKeys = Object.keys(this.departments),
-                        updateLayers = Object.entries(updateProperties)
+                        statusProperties = Object.entries(updateProperties)
                             // eslint-disable-next-line no-unused-vars
                             .filter(([key, value]) => ["offen", "inaktiv", "geschlossen"].includes(value)),
-                        allUpdateLayers = updateLayers.map(layer => {
-                            const department = departmentKeys.find(key => {
+                        allUpdateLayers = statusProperties.map(layer => {
+                            // The features in the gebaeude layer are stored with the status of the gemis department (sta_gemis).
+                            // Since the features in the gemis layer are not editable they should not reach this point and do not need to be treated here.
+                            const department = layer[0] === "sta_gemis" ? "gebaeude" : departmentKeys.find(key => {
                                 return layer[0].includes(key) ? this.departments[key].layerIds[layer[1]] : null;
                             });
 
