@@ -15,6 +15,8 @@
                     "closeFilter": "Schließen",
                     "activeFilters": "Aktive Filter",
                     "search": "Tabelle durchsuchen",
+                    "showLessFilters": "....weniger anzeigen",
+                    "showAllFilters": "....mehr anzeigen",
                     "exportTable": "Tabelle exportieren",
                     "exportTableTimeline": "alle Jahre exportieren",
                     "exportFilename": "{{prefix}}_Dashboard-Tabelle",

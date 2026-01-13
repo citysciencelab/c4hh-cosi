@@ -41,14 +41,32 @@ export default {
         exportTimeline: false,
         category_A: null,
         category_B: null,
-        operation: "add"
+        operation: "add",
+        showAllFilters: false
     }),
     computed: {
         ...mapGetters("Modules/DistrictSelector", [
             "mapping",
             "metadataUrls"
         ]),
+        /**
+         * Filters to display in active filter area.
+         * @returns {String[]} List of active filters.
+         */
+        visibleStatsFeatureFilter () {
+            const maxVisible = 5;
 
+            return this.showAllFilters
+                ? this._statsFeatureFilter
+                : this._statsFeatureFilter.slice(0, maxVisible);
+        },
+        /**
+         * Whether "show more / less" toggle should be shown.
+         * @returns {Boolean} `true` if more than five filters are available, otherwise `false`.
+         */
+        hasMoreFilters () {
+            return this._statsFeatureFilter.length > 5;
+        },
         /**
         * Get calculation operator items with localized titles.
         * @returns {Object[]} Array of calculation operator items.
@@ -246,7 +264,7 @@ export default {
             >
                 <div>{{ $t('additional:modules.tools.cosi.dashboard.activeFilters') }}:</div>
                 <v-chip
-                    v-for="(item, index) in _statsFeatureFilter"
+                    v-for="(item, index) in visibleStatsFeatureFilter"
                     :key="item"
                     variant="flat"
                     closable
@@ -257,6 +275,19 @@ export default {
                         <v-icon>mdi-close</v-icon>
                     </template>
                 </v-chip>
+                <button
+                    v-if="hasMoreFilters"
+                    type="button"
+                    class="filter-toggle text-primary"
+                    :aria-expanded="showAllFilters.toString()"
+                    @click="showAllFilters = !showAllFilters"
+                >
+                    {{
+                        showAllFilters
+                            ? $t('additional:modules.tools.cosi.dashboard.showLessFilters')
+                            : $t('additional:modules.tools.cosi.dashboard.showAllFilters')
+                    }}
+                </button>
             </div>
         </template>
     </ToolBar>
@@ -278,7 +309,18 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.filter-toggle {
+    margin-top: 4px;
+    font-size: 0.85rem;
 
+    a {
+        cursor: pointer;
+        text-decoration: none;
+    }
+    &:hover {
+        text-decoration: underline;
+    }
+}
 .v-chip {
     margin: 4px 8px 4px 0;
     background-color: $light_blue;
