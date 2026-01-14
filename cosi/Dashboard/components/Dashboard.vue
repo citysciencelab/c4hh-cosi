@@ -7,7 +7,6 @@ import actions from "../store/actionsDashboard.js";
 import TableRowMenu from "./TableRowMenu.vue";
 import {
     addCalculation,
-    addDivideSelectedCalculations,
     calculateAll,
     calculateStats,
     calculateCorrelation,
@@ -29,15 +28,12 @@ import TableCell from "./TableCell.vue";
 import isObject from "@shared/js/utils/isObject.js";
 import utils from "../../utils";
 import {VApp} from "vuetify/components/VApp";
-import {VBtn} from "vuetify/components/VBtn";
 import {VCheckbox} from "vuetify/components/VCheckbox";
 import {VContainer, VRow} from "vuetify/components/VGrid";
 import {VDataTableVirtual} from "vuetify/components/VDataTable";
 import {VIcon} from "vuetify/components/VIcon";
 import {VMain} from "vuetify/components/VMain";
 import {VSelect} from "vuetify/components/VSelect";
-import {VSnackbar} from "vuetify/components/VSnackbar";
-import {VTextField} from "vuetify/components/VTextField";
 import {VTooltip} from "vuetify/components/VTooltip";
 
 export default {
@@ -49,7 +45,6 @@ export default {
         TableRowMenu,
         ToolInfo,
         VApp,
-        VBtn,
         VCheckbox,
         VContainer,
         VDataTableVirtual,
@@ -57,8 +52,6 @@ export default {
         VMain,
         VRow,
         VSelect,
-        VSnackbar,
-        VTextField,
         VTooltip
     },
     data () {
@@ -105,7 +98,6 @@ export default {
                 field_B: null,
                 selectedItems: []
             },
-            calculationDialog: false,
             yearSelector: "jahr_"
         };
     },
@@ -562,7 +554,6 @@ export default {
         },
 
         addCalculation,
-        addDivideSelectedCalculations,
         calculateAll,
         calculateStats,
         calculateCorrelation,
@@ -606,30 +597,6 @@ export default {
                     this.$el.querySelector(".dashboard-table-wrapper").style.height = "calc(100% - 80px)";
                 }
             }
-        },
-
-        /**
-         * Opens the dialog to create a new calculation
-         * @param {"add" | "subtract" | "multiply" | "divide" | "sumUpSelected"} operation - the mathmatical operation to execute
-         * @param {{field_A: Object, field_B: Object, selectedItems: Object[] }} [options={}] - fields and selected items list
-         * @returns {void}
-         */
-        openCalcDialog (operation, options) {
-            this.calculationData.operation = operation;
-            this.calculationData.field_A = options.field_A;
-            this.calculationData.field_B = options.field_B;
-            this.calculationData.selectedItems = options.selectedItems;
-
-            if (operation === "sumUpSelected") {
-                this.calculationData.selectedCategories = this.calculationData.selectedItems.map(item => item.category);
-            }
-            else {
-                this.calculationData.category_A = this.calculationData.field_A.category;
-                this.calculationData.category_B = this.calculationData.field_B.category;
-            }
-
-            this.calculationData.id = getCalculationId(this.calculationData);
-            this.calculationDialog = true;
         },
 
         /**
@@ -680,6 +647,27 @@ export default {
                     groupStates[e] = false;
                 }
             }
+        },
+
+        /**
+         * Starts a calculation from the toolbar
+         * @param {String} calculationName - the name of the new calculation
+         * @param {"add"|"subtract"|"multiply"|"divide"|"dividePercent"|"sumUpSelected"|"divideSelected"} operation - the mathmatical operation to execute
+         * @param {String} category_A - the first category
+         * @param {String} category_B - the second category
+         * @returns {void}
+         */
+        onStartCalculation (calculationName, operation, category_A, category_B) {
+            const calcName = calculationName || getCalculationId({operation, category_A, category_B}),
+                field_A = this.items.find(item => item.category === category_A),
+                field_B = this.items.find(item => item.category === category_B),
+                selectedItems = this.selectedItems.length > 0 ? this.selectedItems : this.items;
+
+            addCalculation.call(this, operation, {field_A, field_B, selectedItems}, calcName);
+
+            if (this.statsFeatureFilter.length > 0) {
+                this.statsFeatureFilter.push(calcName);
+            }
         }
 
     }
@@ -715,6 +703,7 @@ export default {
                         @exportTable="exportTable"
                         @toggleColumn="minimizeCol"
                         @reorderColumns="reorderColumns"
+                        @start-calculation="onStartCalculation"
                     />
                     <v-row class="dashboard-table-wrapper">
                         <v-data-table-virtual
@@ -784,13 +773,6 @@ export default {
                                     :selected-items="selectedItems"
                                     @setField="setField"
                                     @resetFields="resetFields"
-                                    @add="openCalcDialog('add', {field_A: fields.A, field_B: fields.B})"
-                                    @subtract="openCalcDialog('subtract', {field_A: fields.A, field_B: fields.B})"
-                                    @multiply="openCalcDialog('multiply', {field_A: fields.A, field_B: fields.B})"
-                                    @divide="openCalcDialog('divide', {field_A: fields.A, field_B: fields.B})"
-                                    @dividePercent="openCalcDialog('dividePercent', {field_A: fields.A, field_B: fields.B})"
-                                    @sum="openCalcDialog('sumUpSelected', {selectedItems})"
-                                    @divideSelected="addDivideSelectedCalculations"
                                     @correlate="renderScatterplot"
                                     @visualizationChanged="onVisualizationChanged"
                                     @renderCharts="renderCharts"
@@ -916,43 +898,6 @@ export default {
                     </v-row>
                 </v-container>
             </v-main>
-            <v-snackbar
-                v-model="calculationDialog"
-                :timeout="-1"
-                color="primary"
-                class="name-input"
-            >
-                {{ $t('additional:modules.tools.cosi.dashboard.nameCalc') }}
-                <v-text-field
-                    id="title-field"
-                    v-model="calculationData.id"
-                    name="session-title"
-                />
-
-                <template #actions="{ props }">
-                    <v-btn
-                        id="confirm-calc"
-                        v-bind="props"
-                        text
-                        :title="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                        @click="addCalculation(
-                            calculationData.operation,
-                            {field_A: calculationData.field_A, field_B: calculationData.field_B, selectedItems: calculationData.selectedItems},
-                            calculationData.id
-                        ); calculationDialog = false;"
-                    >
-                        <v-icon>mdi-calculator-variant</v-icon>
-                    </v-btn>
-                    <v-btn
-                        id="cancel-calc"
-                        v-bind="props"
-                        text
-                        @click="calculationDialog = false"
-                    >
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </template>
-            </v-snackbar>
         </v-app>
     </div>
 </template>

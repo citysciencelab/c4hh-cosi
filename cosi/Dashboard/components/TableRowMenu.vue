@@ -3,7 +3,7 @@ import {mapGetters, mapMutations, mapActions} from "vuex";
 import FieldsTooltip from "./FieldsTooltip.vue";
 import {VIcon} from "vuetify/components/VIcon";
 import {VToolbar, VToolbarTitle} from "vuetify/components/VToolbar";
-import {VListItem, VListItemTitle, VList, VListGroup} from "vuetify/components/VList";
+import {VListItem, VList, VListGroup} from "vuetify/components/VList";
 import {VMenu} from "vuetify/components/VMenu";
 import {VCard} from "vuetify/components/VCard";
 import {VTooltip} from "vuetify/components/VTooltip";
@@ -20,7 +20,6 @@ export default {
         VToolbarTitle,
         VList,
         VListItem,
-        VListItemTitle,
         VTooltip
     },
     props: {
@@ -175,81 +174,6 @@ export default {
                     </v-tooltip>
                     <v-tooltip left>
                         <template #activator="{ props }">
-                            <v-list-group
-                                no-action
-                                v-bind="props"
-                            >
-                                <template #activator=" {props}">
-                                    <v-list-item
-                                        v-bind="props"
-                                        prepend-icon="mdi-calculator-variant"
-                                        :title="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                                    />
-                                </template>
-
-                                <v-list-item
-                                    id="add"
-                                    density="compact"
-                                    :disabled="!fields.A || !fields.B"
-                                    @click="$emit('add')"
-                                >
-                                    <v-icon>mdi-plus</v-icon>
-                                    {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.add') }}
-                                </v-list-item>
-                                <v-list-item
-                                    id="subtract"
-                                    density="compact"
-                                    :disabled="!fields.A || !fields.B"
-                                    @click="$emit('subtract')"
-                                >
-                                    <v-icon>mdi-minus</v-icon>
-                                    {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.subtract') }}
-                                </v-list-item>
-                                <v-list-item
-                                    id="multiply"
-                                    density="compact"
-                                    :disabled="!fields.A || !fields.B"
-                                    @click="$emit('multiply')"
-                                >
-                                    <v-icon>mdi-close</v-icon>
-                                    {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.multiply') }}
-                                </v-list-item>
-                                <v-list-item
-                                    id="divide"
-                                    density="compact"
-                                    :disabled="!fields.A || !fields.B"
-                                    @click="$emit('divide')"
-                                >
-                                    <v-icon>mdi-slash-forward</v-icon>
-                                    {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.divide') }}
-                                </v-list-item>
-                                <v-list-item
-                                    id="dividePercent"
-                                    density="compact"
-                                    :disabled="!fields.A || !fields.B"
-                                    @click="$emit('dividePercent')"
-                                >
-                                    <v-icon>mdi-percent</v-icon>
-                                    {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.dividePercent') }}
-                                </v-list-item>
-                                <v-list-item
-                                    id="sum"
-                                    density="compact"
-                                    :disabled="selectedItems.length === 0"
-                                    @click="$emit('sum')"
-                                >
-                                    <v-icon>mdi-plus-box-multiple</v-icon>
-                                    {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.sumUpSelected') }}
-                                </v-list-item>
-                                <v-list-item
-                                    density="compact"
-                                    :disabled="selectedItems.length === 0 || !fields.B"
-                                    @click="$emit('divideSelected')"
-                                >
-                                    <v-icon>mdi-calculator</v-icon>
-                                    {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.divideSelected') }}
-                                </v-list-item>
-                            </v-list-group>
                             <v-list-group
                                 no-action
                                 v-bind="props"

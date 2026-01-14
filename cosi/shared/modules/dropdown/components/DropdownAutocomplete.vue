@@ -20,6 +20,11 @@ export default {
             default: false,
             required: false
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+            required: false
+        },
         items: {
             type: Array,
             required: true
@@ -172,6 +177,9 @@ export default {
             v-else
             :model-value="modelValue"
             :items="items"
+            :item-title
+            :disabled
+            hide-details
             :label="label"
             :clearable="clearable"
             @update:modelValue="(value) => $emit('update:modelValue', value?.value ? value.value : value)"

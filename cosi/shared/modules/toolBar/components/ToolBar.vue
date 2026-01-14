@@ -158,8 +158,15 @@ export default {
                 :title="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
                 :icon="'bi-plus-slash-minus'"
                 :class="'mb-1 me-3 rounded-pill'"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="false"
                 :interaction="() => {}"
             />
+            <div
+                class="dropdown-menu px-3 border-0 mt-1"
+            >
+                <slot name="calculationDropdown" />
+            </div>
             <FlatButton
                 id="table-download"
                 :aria-label="$t('common:shared.modules.buttons.download')"

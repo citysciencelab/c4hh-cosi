@@ -4,30 +4,26 @@ import DropdownAutocomplete from "../../shared/modules/dropdown/components/Dropd
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {mapGetters} from "vuex";
 import {VCol, VRow} from "vuetify/components/VGrid";
-import {VAutocomplete} from "vuetify/components/VAutocomplete";
 import {VChip} from "vuetify/components/VChip";
 import {VIcon} from "vuetify/components/VIcon";
 import {VCheckbox} from "vuetify/components/VCheckbox";
 import {VBtn} from "vuetify/components/VBtn";
-import {VListSubheader} from "vuetify/components/VList";
-import {VDivider} from "vuetify/components/VDivider";
 import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 
 export default {
     name: "DashboardToolbar",
     components: {
         DropdownAutocomplete,
         FlatButton,
+        InputText,
         ToolBar,
         VCol,
         VRow,
-        VAutocomplete,
         VChip,
         VIcon,
         VCheckbox,
-        VBtn,
-        VListSubheader,
-        VDivider
+        VBtn
     },
     props: {
         districtColumns: {
@@ -39,16 +35,35 @@ export default {
             required: true
         }
     },
-    emits: ["exportTable", "reorderColumns", "setStatsFeatureFilter", "toggleColumn"],
+    emits: ["exportTable", "reorderColumns", "setStatsFeatureFilter", "toggleColumn", "startCalculation"],
     data: () => ({
         addFilterButton: null,
-        exportTimeline: false
+        calculateButton: null,
+        calculationName: "",
+        exportTimeline: false,
+        category_A: null,
+        category_B: null,
+        operation: "add"
     }),
     computed: {
         ...mapGetters("Modules/DistrictSelector", [
             "mapping",
             "metadataUrls"
         ]),
+
+        /**
+        * Get calculation operator items with localized titles.
+        * @returns {Object[]} Array of calculation operator items.
+        */
+        calculationOperatorItems () {
+            return [
+                {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.add"), value: "add"},
+                {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.subtract"), value: "subtract"},
+                {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.multiply"), value: "multiply"},
+                {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.divide"), value: "divide"},
+                {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.dividePercent"), value: "dividePercent"}
+            ];
+        },
 
         /**
          * Get unique groups from mapping.
@@ -112,6 +127,7 @@ export default {
     },
     mounted () {
         this.addFilterButton = Dropdown.getOrCreateInstance(document.getElementById("add-filter-button"));
+        this.calculateButton = Dropdown.getOrCreateInstance(document.getElementById("calculation-button"));
     },
     methods: {
         openMetadata () {
@@ -122,6 +138,19 @@ export default {
 
         exportTable (val) {
             this.$emit("exportTable", this.exportTimeline || val);
+        },
+
+        /**
+         * Emits startCalculation event with necessary parameters and resets input fields.
+         * @returns {void}
+         */
+        onStartCalculation () {
+            this.$emit("startCalculation", this.calculationName, this.operation, this.category_A, this.category_B);
+            this.calculateButton.hide();
+            this.calculationName = "";
+            this.category_A = null;
+            this.category_B = null;
+            this.operation = "add";
         },
 
         reorderSettingItems (settingItems) {
@@ -167,6 +196,52 @@ export default {
                     icon="bi bi-check2"
                     :text="$t('additional:modules.tools.cosi.dashboard.closeFilter')"
                     :interaction="() => addFilterButton.hide()"
+                />
+            </div>
+        </template>
+        <template #calculationDropdown>
+            <h6 class="my-2">
+                {{ $t('additional:modules.tools.cosi.dashboard.createCalc') }}
+            </h6>
+            <InputText
+                id="calculation-name-input"
+                v-model="calculationName"
+                :label="$t('additional:modules.tools.cosi.dashboard.nameCalc')"
+                placeholder=""
+            />
+            <DropdownAutocomplete
+                v-model="category_A"
+                :items="mapping"
+                item-title="value"
+                :label="$t('additional:modules.tools.cosi.dashboard.categoryCol')"
+            />
+            <div class="d-flex flex-column align-items-center">
+                <div>
+                    <div class="vr" />
+                </div>
+                <DropdownAutocomplete
+                    v-model="operation"
+                    :items="calculationOperatorItems"
+                    :label="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.operation')"
+                />
+                <div>
+                    <div class="vr" />
+                </div>
+            </div>
+            <DropdownAutocomplete
+                v-model="category_B"
+                :items="mapping"
+                item-title="value"
+                :label="$t('additional:modules.tools.cosi.dashboard.categoryCol')"
+            />
+            <div class="d-flex justify-content-center">
+                <FlatButton
+                    id="calculation-button"
+                    customclass="mt-3 mb-2"
+                    icon="bi bi-plus-circle"
+                    :text="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
+                    :disabled="!category_A || !category_B"
+                    :interaction="() => onStartCalculation()"
                 />
             </div>
         </template>
@@ -226,6 +301,14 @@ export default {
     margin: 4px 8px 4px 0;
     background-color: $light_blue;
     color: unset;
+}
+
+.vr {
+    width: 2px;
+    background-color: $secondary;
+    display: block;
+    opacity: unset;
+    height: 2em;
 }
 
 </style>
