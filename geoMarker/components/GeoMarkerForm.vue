@@ -1486,7 +1486,7 @@ export default {
                                 v-model="departmentData[cellData.departmentId].wiedervorlage"
                                 :label="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
                                 type="date"
-                                :disabled="departmentData[cellData.departmentId].status === 'offen' || readonly"
+                                :disabled="departmentData[cellData.departmentId].status === 'offen' || departmentData[cellData.departmentId].status === 'geschlossen' || readonly"
                                 :placeholder="$t('additional:modules.geoMarker.geoMarkerForm.reminderDate')"
                             />
                         </template>
