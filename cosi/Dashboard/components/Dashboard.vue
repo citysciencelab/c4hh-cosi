@@ -28,7 +28,6 @@ import TableCell from "./TableCell.vue";
 import isObject from "@shared/js/utils/isObject.js";
 import utils from "../../utils";
 import {VApp} from "vuetify/components/VApp";
-import {VCheckbox} from "vuetify/components/VCheckbox";
 import {VContainer, VRow} from "vuetify/components/VGrid";
 import {VDataTableVirtual} from "vuetify/components/VDataTable";
 import {VIcon} from "vuetify/components/VIcon";
@@ -45,7 +44,6 @@ export default {
         TableRowMenu,
         ToolInfo,
         VApp,
-        VCheckbox,
         VContainer,
         VDataTableVirtual,
         VIcon,
@@ -80,8 +78,6 @@ export default {
                     groupable: false
                 }
             ],
-            currentItems: [], // all current (visible) items in the table
-            selectedItems: [], // selected items in the table
             search: "",
             fields: {
                 A: null,
@@ -124,15 +120,22 @@ export default {
         minimizedCols () {
             return this.districtColumns.filter(col => col.minimized === true);
         },
+        /**
+         * Gets the selected columns (those that are not minimized).
+         * @returns {Object[]} The selected columns.
+         */
         selectedColumns () {
-            const selectedCols = this.valueColumns.filter(col => col.selected);
-
-            return selectedCols.length > 0
-                ? selectedCols
-                : this.valueColumns;
+            return this.valueColumns.filter(col => !col.minimized);
         },
         unselectedColumnLabels () {
             return this.valueColumns.filter(col => !this.selectedColumns.includes(col)).map(col => col.text);
+        },
+        /**
+         * Gets the items that are selected for display in the table (filtered by statsFeatureFilter).
+         * @returns {Object[]} The selected items.
+         */
+        selectedItems () {
+            return this.items.filter(item => this.statsFeatureFilter.includes(item.category));
         },
         currentTimeStamp: {
             get () {
@@ -353,9 +356,7 @@ export default {
         /**
          * Export the table as XLSX.
          * Either the simple view for the selected or all years.
-         * @param {Boolean} exportTimeline - Whether to include all years.
-         * @param {Object[]} selectedItems - Selected items in the table.
-         * @param {Object[]} currentItems - All current (visible) items in the table
+         * @param {Boolean} [exportTimeline=false] - Whether to include all years.
          * @returns {void}
          */
         async exportTable (exportTimeline = false) {
@@ -364,8 +365,8 @@ export default {
                 fixedHeaderStart = null,
                 fixedHeaderEnd = null,
                 header = null;
-            const items = this.selectedItems.length > 0 ? this.selectedItems : this.currentItems,
-                preparedItems = this.ignoreColumnsByExport && this.minimizedCols.length ? this.getPreparedItems(items) : items,
+            const items = this.selectedItems.length > 0 ? this.selectedItems : this.items,
+                preparedItems = this.getPreparedItems(items),
                 prefix = this.prefixExportFilename,
                 rawData = exportTimeline
                     ? this.prepareTableExportWithTimeline(preparedItems, this.selectedDistrictNames, this.timestamps, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns)
@@ -377,6 +378,14 @@ export default {
                 exportedData = this.sanitizeData(JSON.parse(JSON.stringify(rawData)), [...this.excludedPropsForExport, ...this.unselectedColumnLabels]);
                 iniHeader = this.exportGrouped ?
                     Object.keys(Object.values(exportedData)[0][0]) : Object.keys(exportedData[0]);
+                this.selectedColumns.forEach(column => {
+                    const oldIndex = iniHeader.indexOf(column.text);
+
+                    if (oldIndex > -1) {
+                        iniHeader.splice(oldIndex, 1);
+                        iniHeader.push(column.text);
+                    }
+                });
             }
             catch (error) {
                 this.addSingleAlert({
@@ -567,15 +576,6 @@ export default {
         getCulmulativeTotal,
 
         /**
-         * Sets the current (visible) items of the table.
-         * @param {Object[]} items - The of the table.
-         * @returns {void}
-         */
-        setCurrentItems (items) {
-            this.currentItems = items;
-        },
-
-        /**
          * Sets the offs et of the tool sidebar from left viewport
          * @param {Event} evt - the resizeing event
          * @returns {void}
@@ -708,18 +708,15 @@ export default {
                     <v-row class="dashboard-table-wrapper">
                         <v-data-table-virtual
                             ref="dashboard-table"
-                            v-model="selectedItems"
                             height="560"
                             :headers="columns"
                             :items="items"
                             :group-by="[{key: 'groupIndex', order: 'asc'}]"
                             :items-per-page="-1"
                             :search="search"
-                            show-select
                             hide-default-footer
                             fixed-header
                             class="dashboard-table"
-                            @update:current-items="setCurrentItems"
                             @hook:mounted="collapseAllGroups"
                         >
                             <!-- Header for years selector -->
@@ -739,16 +736,11 @@ export default {
                                 #[`header.${district.value}`]
                             >
                                 <div
+                                    v-if="!district.minimized"
                                     :key="district.value"
                                     class="district-header"
                                 >
-                                    <v-checkbox
-                                        v-if="!district.minimized"
-                                        v-model="district.selected"
-                                        :label="district.text"
-                                        density="compact"
-                                        hide-details
-                                    />
+                                    {{ district.text }}
                                 </div>
                             </template>
                             <!-- Column Group -->

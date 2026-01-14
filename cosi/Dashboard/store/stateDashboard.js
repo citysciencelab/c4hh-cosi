@@ -48,7 +48,6 @@ const state = {
     fixedHeader: false,
     icon: "bi-speedometer",
     id: "dashboard",
-    ignoreColumnsByExport: false,
     isVisibleInMenu: true,
     items: [],
     name: "Dashboard",

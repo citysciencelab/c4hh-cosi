@@ -73,7 +73,7 @@ export function prepareTableExportWithTimeline (data, districtNames, timestamps,
         delete keyMap.group;
     }
     const
-        ctimestamps = timestamps.slice().reverse(),
+        ctimestamps = timestamps.slice().sort(),
         exportData = data.reduce((items, item) => {
             const _item = replaceValues(renameKeys(keyMap, item), valuesMap),
                 categoryRows = ctimestamps.map(timestamp => {

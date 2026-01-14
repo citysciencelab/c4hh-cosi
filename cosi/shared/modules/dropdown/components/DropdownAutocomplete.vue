@@ -158,12 +158,10 @@ export default {
                     v-if="index < maxChipCount"
                     v-bind="props"
                     closable
+                    close-icon="mdi-close"
                     @click="removeItem(item.value)"
                 >
                     {{ item.value }}
-                    <template #close>
-                        <v-icon>mdi-close</v-icon>
-                    </template>
                 </v-chip>
                 <span
                     v-if="multiple && index === maxChipCount"

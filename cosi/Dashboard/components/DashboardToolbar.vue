@@ -7,7 +7,6 @@ import {VCol, VRow} from "vuetify/components/VGrid";
 import {VChip} from "vuetify/components/VChip";
 import {VIcon} from "vuetify/components/VIcon";
 import {VCheckbox} from "vuetify/components/VCheckbox";
-import {VBtn} from "vuetify/components/VBtn";
 import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 
@@ -22,8 +21,7 @@ export default {
         VRow,
         VChip,
         VIcon,
-        VCheckbox,
-        VBtn
+        VCheckbox
     },
     props: {
         districtColumns: {
@@ -136,10 +134,6 @@ export default {
             });
         },
 
-        exportTable (val) {
-            this.$emit("exportTable", this.exportTimeline || val);
-        },
-
         /**
          * Emits startCalculation event with necessary parameters and resets input fields.
          * @returns {void}
@@ -168,7 +162,7 @@ export default {
     <ToolBar
         :setting-items="columnNames"
         :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.addFilter'), icon: 'bi-funnel-fill', id: 'add-filter-button'}"
-        @exportTable="exportTable"
+        @exportTable="$emit('exportTable', exportTimeline)"
         @reorderedSettingItems="reorderSettingItems"
         @toggleSettingItem="toggleSettingItem"
     >
@@ -279,18 +273,6 @@ export default {
                 :label="$t('additional:modules.tools.cosi.dashboard.exportTableTimeline')"
                 :title="$t('additional:modules.tools.cosi.dashboard.exportTableTimeline')"
             />
-        </v-col>
-        <v-col cols="auto">
-            <v-btn
-                dense
-                small
-                tile
-                color="grey lighten-1"
-                :title="$t('additional:modules.tools.cosi.dashboard.exportTable')"
-                @click="exportTable"
-            >
-                {{ $t('additional:modules.tools.cosi.dashboard.exportTable') }}
-            </v-btn>
         </v-col>
     </v-row>
 </template>
