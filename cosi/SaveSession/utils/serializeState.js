@@ -14,8 +14,8 @@ function serializeState (storePaths, store, deepFeatures) {
     const state = deepCopyState(storePaths, store.state, deepFeatures);
 
     serializeView(state, store);
-    serializeScenarios(state);
-    serializeDrawFeatures(state);
+    // serializeScenarios(state);
+    // serializeDrawFeatures(state);
 
     return state;
 }

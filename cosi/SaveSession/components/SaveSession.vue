@@ -1,6 +1,9 @@
 <script>
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import getters from "../store/gettersSaveSession";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import mutations from "../store/mutationsSaveSession";
 import actions from "../store/actionsSaveSession";
 import {downloadJsonToFile} from "../../utils/download";
@@ -11,22 +14,19 @@ import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import openDB from "../utils/indexedDb";
 // import {addModelsByAttributes, getModelByAttributes} from "../../utils/radioBridge.js";
 import layerCollection from "@core/layers/js/layerCollection";
-import {VApp} from "vuetify/components/VApp";
-import {VBtn} from "vuetify/components/VBtn";
-import {VCheckbox} from "vuetify/components/VCheckbox";
-import {VContainer, VCol, VRow} from "vuetify/components/VGrid";
 import {VSnackbar} from "vuetify/components/VSnackbar";
+import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 
 export default {
     name: "SaveSession",
     components: {
+        AlertMessage,
+        FileUpload,
+        FlatButton,
+        InputText,
         ToolInfo,
-        VApp,
-        VBtn,
-        VCheckbox,
-        VContainer,
-        VCol,
-        VRow,
+        SimpleCard,
         VSnackbar
     },
     data () {
@@ -42,10 +42,11 @@ export default {
                     "center",
                     "zoom"
                 ],
-                Tools: {
+                // Tools: {
+                Modules: {
                     ChartGenerator: [
-                        "datasets",
-                        "chartConfigs"
+                        // "datasets",
+                        // "chartConfigs"
                     ],
                     CalculateRatio: [
                         "dataSets",
@@ -54,8 +55,8 @@ export default {
                         "active"
                     ],
                     ScenarioBuilder: [
-                        "scenarios",
-                        "active"
+                        // "scenarios",
+                        // "active"
                     ],
                     DistrictSelector: [
                         "selectedDistrictLevelId",
@@ -85,11 +86,11 @@ export default {
                         "geometry"
                     ],
                     Draw: [
-                        "layer"
+                        // "layer"
                     ],
                     QueryDistricts: [
-                        "dataSets",
-                        "propertiesMap"
+                        // "dataSets",
+                        // "propertiesMap"
                     ]
                 }
             },
@@ -114,6 +115,9 @@ export default {
             successDialog: false,
             successText: "",
             confirmDialog: false,
+            displayWorkStatus: false,
+            successLoading: false,
+            failedLoading: false,
             geomConstructors: {Point, Polygon, MultiPoint, MultiPolygon},
             // toolsWithDatasets: ["AccessibilityAnalysis", "CalculateRatio", "QueryDistricts"]
             deepFeatures: {
@@ -352,6 +356,8 @@ export default {
             const file = evt.target.files[0],
                 reader = new FileReader();
 
+            this.failedLoading = false;
+
             reader.onload = res => {
                 try {
                     const session = JSON.parse(res.target.result);
@@ -362,11 +368,7 @@ export default {
                     console.error(e);
                     console.warn("File could not be read");
 
-                    this.addSingleAlert({
-                        content: "Die Datei konnte nicht gelesen werden.",
-                        category: "Warning",
-                        displayClass: "warning"
-                    });
+                    this.failedLoading = true;
                 }
             };
             reader.readAsText(file);
@@ -377,18 +379,18 @@ export default {
          * @returns {void}
          */
         load (session) {
-            let state,
-                createdTime;
+            let state;
+            // createdTime;
 
             if (!Object.hasOwnProperty.call(session, "template") && !Object.hasOwnProperty.call(session, "reset")) {
                 state = session.state || session; // fallback for old saves
                 this.session.meta.title = session.meta?.title || this.session.meta.title;
-                createdTime = session.meta?.created;
+                // createdTime = session.meta?.created;
             }
             else {
                 state = session.template.state || session.template; // fallback for old saves
                 this.session.meta.title = session.template.meta?.title || this.session.meta.title;
-                createdTime = session.template.meta?.created;
+                // createdTime = session.template.meta?.created;
             }
 
             this.setActive(false);
@@ -398,11 +400,8 @@ export default {
             }
 
             if (!session.reset) {
-                this.addSingleAlert({
-                    content: `Sitzung ${this.session.meta?.title} vom ${createdTime} erfolgreich geladen.`,
-                    category: "Erfolg",
-                    displayClass: "success"
-                });
+                this.displayWorkStatus = true;
+                this.successLoading = true;
             }
         },
         /**
@@ -475,6 +474,37 @@ export default {
             const tool = Object.keys(this.deepFeatures).find(id => key.includes(id));
 
             return this.deepFeatures[tool]?.includes(attr);
+        },
+        /**
+         * Called when user clicks to input files
+         * @param {HTMLInputEvent} e event with click.
+         * @returns {void}
+         */
+        triggerClickOnFileInput (e) {
+            if (e.which === 32 || e.which === 13) {
+                this.$refs["upload-input-file"].click();
+            }
+        },
+        /**
+         * Called when user drops a file in the upload container
+         * @param {HTMLInputEvent} e event with the files
+         * @returns {void}
+         */
+        onDrop (e) {
+            if (e.dataTransfer.files !== undefined) {
+                this.handleFile(e);
+            }
+        },
+        /**
+         * Called when user uploads a file to process
+         * @param {HTMLInputEvent} e event with the files
+         * @returns {void}
+         */
+        onInputChange (e) {
+            if (e.target.files !== undefined) {
+                this.handleFile(e);
+                e.target.value = null;
+            }
         }
     }
 };
@@ -482,304 +512,74 @@ export default {
 
 <template lang="html">
     <div>
-        <v-app class="clamp-40vw">
-            <ToolInfo
-                :url="readmeUrl"
-                :locale="currentLocale"
+        <ToolInfo
+            :url="readmeUrl"
+            :locale="currentLocale"
+            :summary="$t('additional:modules.tools.cosi.saveSession.localSaveDescription')"
+        />
+        <h5 class="mb-3">
+            {{ $t("additional:modules.tools.cosi.saveSession.currentWorkStatus") }}
+        </h5>
+        <InputText
+            id="session-name"
+            v-model="session.meta.title"
+            class="mb-3"
+            :placeholder="$t('additional:modules.tools.cosi.saveSession.sessionName')"
+            :label="$t('additional:modules.tools.cosi.saveSession.sessionName')"
+        />
+        <FlatButton
+            class="mx-auto"
+            icon="bi bi-cloud-arrow-down"
+            :disabled="session.meta.title.length === 0"
+            :text="$t('additional:modules.tools.cosi.saveSession.saveAsFile')"
+            @click="saveMode = 'saveAs', onSavePrompt()"
+        />
+        <hr class="my-8">
+        <h5 class="mb-3">
+            {{ $t("additional:modules.tools.cosi.saveSession.currentWorkStatusFromFile") }}
+        </h5>
+        <FileUpload
+            :id="'sessionUpload'"
+            class="mt-5 ms-3"
+            :keydown="(e) => triggerClickOnFileInput(e)"
+            :change="(e) => onInputChange(e)"
+            :drop="(e) => onDrop(e)"
+        />
+        <AlertMessage
+            v-if="failedLoading"
+            :text="$t('additional:modules.tools.cosi.saveSession.sessionError')"
+            type="error"
+            :closeable="true"
+        />
+        <div
+            v-if="displayWorkStatus"
+            class="mx-4 mt-5"
+        >
+            <h6 class="loaded-work-status">
+                {{ $t("additional:modules.tools.cosi.saveSession.loadedWorkingStatus") }}
+            </h6>
+            <SimpleCard
+                icon="bi bi-file-earmark-text"
+                :label="$t('additional:modules.tools.cosi.saveSession.sessionName')"
+                :text="session.meta.title"
+                @click:close="''"
             />
-            <v-container class="flex btn-grid">
-                <v-card-title secondary-title>
-                    {{ $t('additional:modules.tools.cosi.saveSession.quickSave') }}
-                </v-card-title>
-                <div
-                    class="mb-2"
-                    v-html="$t('additional:modules.tools.cosi.saveSession.quickSaveDescription')"
-                />
-                <v-row class="flex">
-                    <v-col
-                        cols="6"
-                        class="flex"
-                    >
-                        <v-btn
-                            id="save-session"
-                            tile
-                            dense
-                            small
-                            color="grey lighten-1"
-                            :title="$t('additional:modules.tools.cosi.saveSession.saveTooltip')"
-                            @click="quickSave"
-                        >
-                            {{ $t('additional:modules.tools.cosi.saveSession.save') }}
-                        </v-btn>
-                    </v-col>
-                    <v-col
-                        cols="5"
-                        class="flex"
-                    >
-                        <v-btn
-                            id="load-session"
-                            tile
-                            dense
-                            small
-                            color="grey lighten-1"
-                            :title="$t('additional:modules.tools.cosi.saveSession.loadTooltip')"
-                            :disabled="!latestDate"
-                            @click="loadLastSession"
-                        >
-                            {{ $t('additional:modules.tools.cosi.saveSession.load') }}
-                        </v-btn>
-                    </v-col>
-                    <v-col
-                        cols="1"
-                        class="flex"
-                    >
-                        <v-btn
-                            id="clear-session"
-                            tile
-                            dense
-                            small
-                            color="grey lighten-1"
-                            :title="$t('additional:modules.tools.cosi.saveSession.clear')"
-                            @click="confirmDialog = true"
-                        >
-                            <v-icon>mdi-delete</v-icon>
-                        </v-btn>
-                    </v-col>
-                </v-row>
-                <v-row
-                    class="flex"
-                    dense
-                >
-                    <v-col
-                        cols="6"
-                        class="flex"
-                    >
-                        <v-checkbox
-                            id="auto-save"
-                            v-model="autoSave"
-                            dense
-                            hide-details
-                            :label="$t('additional:modules.tools.cosi.saveSession.autoSave')"
-                            :title="$t('additional:modules.tools.cosi.saveSession.autoSaveCheck')"
-                        />
-                    </v-col>
-                </v-row>
-                <v-divider />
-                <v-card-title secondary-title>
-                    {{ $t('additional:modules.tools.cosi.saveSession.localSave') }}
-                </v-card-title>
-                <div
-                    class="mb-2"
-                    v-html="$t('additional:modules.tools.cosi.saveSession.localSaveDescription')"
-                />
-                <v-row class="flex">
-                    <v-col
-                        cols="6"
-                        class="flex"
-                    >
-                        <v-btn
-                            id="save-to-file"
-                            tile
-                            dense
-                            small
-                            color="grey lighten-1"
-                            :title="$t('additional:modules.tools.cosi.saveSession.saveToFileTooltip')"
-                            @click="saveDialog = true; saveMode = 'saveAs'"
-                        >
-                            {{ $t('additional:modules.tools.cosi.saveSession.saveToFile') }}
-                        </v-btn>
-                    </v-col>
-                    <v-col
-                        cols="6"
-                        class="flex"
-                    >
-                        <v-btn
-                            id="load-from-file"
-                            tile
-                            dense
-                            small
-                            color="grey lighten-1"
-                            :title="$t('additional:modules.tools.cosi.saveSession.loadFromFileTooltip')"
-                            @click="loadFromFile"
-                        >
-                            {{ $t('additional:modules.tools.cosi.saveSession.loadFromFile') }}
-                        </v-btn>
-                    </v-col>
-                </v-row>
-                <v-row class="hidden">
-                    <v-col
-                        cols="6"
-                        class="flex"
-                    >
-                        <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-                        <input
-                            id="file-prompt"
-                            ref="file-prompt"
-                            type="file"
-                            accept="text/json;charset=utf-8"
-                            @change="handleFile"
-                        >
-                    </v-col>
-                </v-row>
-                <v-divider />
-                <v-row
-                    class="flex"
-                    dense
-                >
-                    <small>
-                        {{ $t('additional:modules.tools.cosi.saveSession.sessionHint') }}
-                    </small>
-                </v-row>
-            </v-container>
-        </v-app>
-        <v-app>
-            <v-snackbar
-                v-model="loadDialog"
-                :timeout="60000"
-                color="white"
-                class="light"
-            >
-                <span>
-                    {{ $t('additional:modules.tools.cosi.saveSession.loadLast') }}
-                    <template v-if="latestDate">
-                        ({{ latestDate }})
-                    </template>
-                </span>
-                <template #action="{ attrs }">
-                    <v-btn
-                        v-bind="attrs"
-                        text
-                        @click="loadLastSession"
-                    >
-                        {{ $t("additional:modules.tools.cosi.saveSession.load") }}
-                    </v-btn>
-                    <v-btn
-                        v-bind="attrs"
-                        text
-                        @click="loadDialog = false"
-                    >
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </template>
-            </v-snackbar>
-            <v-snackbar
-                id="save-dialog"
-                v-model="saveDialog"
-                :timeout="-1"
-                color="primary"
-            >
-                {{ $t('additional:modules.tools.cosi.saveSession.filenamePrompt') }}
-                <v-text-field
-                    id="title-field"
-                    v-model="session.meta.title"
-                    name="session-title"
-                />
-
-                <template #action="{ attrs }">
-                    <v-btn
-                        id="save-to-file-action"
-                        v-bind="attrs"
-                        text
-                        @click="onSavePrompt"
-                    >
-                        <v-icon>mdi-content-save</v-icon>
-                    </v-btn>
-                    <v-btn
-                        id="close-save-dialog"
-                        v-bind="attrs"
-                        text
-                        @click="saveDialog = false"
-                    >
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </template>
-            </v-snackbar>
-            <v-snackbar
-                v-model="autoSaveDialog"
-                :multi-line="true"
-                :timeout="-1"
-                color="secondary"
-            >
-                {{ $t('additional:modules.tools.cosi.saveSession.autoSaveCheck') }} <br>
-                <small>{{ $t('additional:modules.tools.cosi.saveSession.autoSaveInfo') }}</small>
-                <template #action="{ attrs }">
-                    <v-btn
-                        v-bind="attrs"
-                        text
-                        @click="autoSave = true; autoSaveDialog = false"
-                    >
-                        {{ $t('additional:modules.tools.cosi.saveSession.yes') }}
-                    </v-btn>
-                    <v-btn
-                        v-bind="attrs"
-                        text
-                        @click="autoSave = false; autoSaveDialog = false"
-                    >
-                        {{ $t('additional:modules.tools.cosi.saveSession.no') }}
-                    </v-btn>
-                </template>
-            </v-snackbar>
-            <v-snackbar
-                v-model="successDialog"
-                :timeout="2000"
-                color="success"
-            >
-                {{ successText }}
-                <template #action="{ attrs }">
-                    <v-btn
-                        v-bind="attrs"
-                        text
-                        @click="successDialog = false"
-                    >
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </template>
-            </v-snackbar>
-            <v-snackbar
-                v-model="confirmDialog"
-                :timeout="-1"
-                color="white"
-                light
-                centered
-            >
-                {{ $t('additional:modules.tools.cosi.saveSession.clearConfirm') }}
-
-                <template #action="{ attrs }">
-                    <v-btn
-                        v-bind="attrs"
-                        text
-                        @click="clear"
-                    >
-                        {{ $t('common:button.delete') }}
-                    </v-btn>
-                    <v-btn
-                        text
-                        v-bind="attrs"
-                        @click="confirmDialog = false"
-                    >
-                        {{ $t('common:button.cancel') }}
-                    </v-btn>
-                </template>
-            </v-snackbar>
-        </v-app>
+        </div>
+        <v-snackbar
+            v-model="successLoading"
+            :timeout="6000"
+            color="primary"
+        >
+            <span>
+                {{ $t("additional:modules.tools.cosi.saveSession.succesLoadingFile") + session.meta.title }}
+            </span>
+        </v-snackbar>
     </div>
 </template>
 
 <style lang="scss" scoped>
-    .hidden {
-        display: hidden;
-    }
-
-    #title-field {
-        width: 20vw;
-    }
-
-    .light {
-        span {
-            color: #111;
-        }
-        button {
-            color: #111;
-        }
+    .loaded-work-status{
+        color: $secondary;
+        font-family: $font_family_accent;
     }
 </style>

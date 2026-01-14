@@ -3,7 +3,7 @@
         "tools": {
             "cosi": {
                 "saveSession": {
-                    "title": "Sitzungen speichern / laden",
+                    "title": "Sitzungen speichern und laden",
                     "save": "Schnell speichern",
                     "saveTooltip": "Aktuelle Sitzung im Browser speichern",
                     "saveToFile": "Speichern unter",
@@ -21,7 +21,6 @@
                     "loadFromTemplate": "Vorlage laden",
                     "infoLoadFromTemplates": "Laden Sie eine thematische Basis-Konfiguration für fachspezifische Analysen.",
                     "noInfo": "Keine Beschreibung verfügbar",
-                    "filenamePrompt": "Sitzung benennen",
                     "newSession": "Neue Sitzung",
                     "autoSaveCheck": "Soll die Sitzung automatisch alle 10 Minuten gespeichert werden?",
                     "autoSaveInfo": "Kann jederzeit im Dienst 'Sitzung Speichern' geändert werden.",
@@ -35,8 +34,15 @@
                     "quickSave": "Schnelles Speichern",
                     "quickSaveDescription": "Sitzungen im Browser (z.B. Edge, Firefox) speichern. Diese können beim Start von CoSI über den Button 'Letzte Laden' wieder geladen werden. <br>\nWenn Browserverlauf oder Cache geleert werden, geht dieser Speicherstand verloren! Es kann immer nur eine Sitzung vorgehalten werden.",
                     "localSave": "Lokales Speichern",
-                    "localSaveDescription": "Sitzungen als Datei auf dem Rechner speichern und über den Button 'Datei laden' wieder laden. Diese können jederzeit wieder geladen oder mit anderen CoSI Nutzer:innen geteilt werden.",
-                    "sessionHint": "Bitte beachten Sie, dass nicht alle Daten und Aktionen gespeichert werden können. Grundsätzlich bezieht sich das Speichern auf die Gebiets- und Themenauswahl, Analyse- und Simulationsergebnisse. Welche Daten gespeichert werden können entnehmen Sie bitte der Anleitung."
+                    "localSaveDescription": "Sitzungen können als Datei auf dem Rechner gespeichert werden. Diese können jederzeit wieder geladen oder mit anderen CoSI Nutzer:innen geteilt werden. Bitte beachten Sie, dass nicht alle Daten und Aktionen gespeichert werden können. Grundsätzlich bezieht sich das Speichern auf die Gebiets- und Themenauswahl, Analyse- und Simulationsergebnisse. Welche Daten gespeichert werden können entnehmen Sie bitte der Anleitung.",
+                    "sessionError": "Die Datei konnte nicht gelesen werden. Bitte wiederholen Sie den Vorgang mit einer anderen Datei.",
+                    "currentWorkStatus": "Aktuellen Arbeitsstand speichern",
+                    "currentWorkStatusFromFile": "Arbeitsstand aus Datei laden",
+                    "sessionName": "Name",
+                    "saveAsFile": "als Datei speichern",
+                    "loadedWorkingStatus": "Geladener Arbeitsstand",
+                    "created": "Erstellt:",
+                    "succesLoadingFile": "Arbeitsstand erfolgreich geladen: "
                 }
             }
         }
