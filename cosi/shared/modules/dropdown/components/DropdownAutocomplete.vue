@@ -2,7 +2,7 @@
 import {VAutocomplete} from "vuetify/components/VAutocomplete";
 import {VCheckboxBtn} from "vuetify/components/VCheckbox";
 import {VChip} from "vuetify/components/VChip";
-import {VListItem} from "vuetify/components/VList";
+import {VListItem, VListSubheader} from "vuetify/components/VList";
 import {VSkeletonLoader} from "vuetify/components/VSkeletonLoader";
 
 export default {
@@ -12,6 +12,7 @@ export default {
         VCheckboxBtn,
         VChip,
         VListItem,
+        VListSubheader,
         VSkeletonLoader
     },
     props: {
@@ -21,6 +22,11 @@ export default {
             required: false
         },
         disabled: {
+            type: Boolean,
+            default: false,
+            required: false
+        },
+        isGroup: {
             type: Boolean,
             default: false,
             required: false
@@ -123,65 +129,118 @@ export default {
         <template v-if="loading">
             <v-skeleton-loader type="button" />
         </template>
-        <v-autocomplete
-            v-else-if="multiple"
-            :model-value="modelValue"
-            :items="items"
-            :item-title="itemTitle"
-            :label="label"
-            multiple
-            class="mb-3"
-            chips
-            closable-chips
-            hide-details
-            @update:modelValue="(value) => $emit('update:modelValue', value)"
-        >
-            <template
-                v-if="selectAll"
-                #prepend-item
+        <template v-else-if="!isGroup">
+            <v-autocomplete
+                v-if="multiple"
+                :model-value="modelValue"
+                :items="items"
+                :item-title="itemTitle"
+                :label="label"
+                multiple
+                class="mb-3"
+                chips
+                closable-chips
+                hide-details
+                @update:modelValue="(value) => $emit('update:modelValue', value)"
             >
-                <v-list-item
-                    title="Alle auswählen"
-                    @click="toggleSelectAll"
+                <template
+                    v-if="selectAll"
+                    #prepend-item
                 >
-                    <template #prepend>
-                        <v-checkbox-btn
-                            :indeterminate="someSelectedItems && !allSelectedItems"
-                            :model-value="allSelectedItems"
-                        />
-                    </template>
-                </v-list-item>
-                <v-divider class="mt-2" />
-            </template>
-            <template #chip="{ item, index, props }">
-                <v-chip
-                    v-if="index < maxChipCount"
-                    v-bind="props"
-                    closable
-                    close-icon="mdi-close"
-                    @click="removeItem(item.value)"
-                >
-                    {{ item.value }}
-                </v-chip>
-                <span
-                    v-if="multiple && index === maxChipCount"
-                    class="grey--text text-caption"
-                >
-                    (+{{ modelValue.length - maxChipCount }} weitere)
-                </span>
-            </template>
-        </v-autocomplete>
-        <v-autocomplete
-            v-else
-            :model-value="modelValue"
-            :items="items"
-            :item-title
-            :disabled
-            hide-details
-            :label="label"
-            :clearable="clearable"
-            @update:modelValue="(value) => $emit('update:modelValue', value?.value ? value.value : value)"
-        />
+                    <v-list-item
+                        title="Alle auswählen"
+                        @click="toggleSelectAll"
+                    >
+                        <template #prepend>
+                            <v-checkbox-btn
+                                :indeterminate="someSelectedItems && !allSelectedItems"
+                                :model-value="allSelectedItems"
+                            />
+                        </template>
+                    </v-list-item>
+                    <v-divider class="mt-2" />
+                </template>
+                <template #chip="{ item, index, props }">
+                    <v-chip
+                        v-if="index < maxChipCount"
+                        v-bind="props"
+                        closable
+                        close-icon="mdi-close"
+                        @click="removeItem(item.value)"
+                    >
+                        {{ item.value }}
+                    </v-chip>
+                    <span
+                        v-if="multiple && index === maxChipCount"
+                        class="grey--text text-caption"
+                    >
+                        (+{{ modelValue.length - maxChipCount }} weitere)
+                    </span>
+                </template>
+            </v-autocomplete>
+            <v-autocomplete
+                v-else
+                :model-value="modelValue"
+                :items="items"
+                :item-title="itemTitle"
+                :disabled="disabled"
+                hide-details
+                :label="label"
+                :clearable="clearable"
+                @update:modelValue="(value) => $emit('update:modelValue', value?.value ? value.value : value)"
+            />
+        </template>
+        <template v-else>
+            <v-autocomplete
+                :model-value="modelValue"
+                :items="items"
+                chips
+                closable-chips
+                :label="label"
+                item-title="name"
+                item-value="name"
+                :multiple="multiple"
+                @update:modelValue="(value) => $emit('update:modelValue', value)"
+            >
+                <template #chip="{ item, index, props }">
+                    <v-chip
+                        v-if="index < maxChipCount"
+                        v-bind="props"
+                        closable
+                        close-icon="mdi-close"
+                        @click="removeItem(item.value)"
+                    >
+                        {{ item.value }}
+                    </v-chip>
+                    <span
+                        v-if="multiple && index === maxChipCount"
+                        class="grey--text text-caption"
+                    >
+                        (+{{ modelValue.length - maxChipCount }} weitere)
+                    </span>
+                </template>
+                <template #item="{ props, item }">
+                    <v-list-subheader
+                        v-if="typeof item.raw.group !== 'undefined'"
+                        class="group-title"
+                    >
+                        {{ item.raw.group }}
+                    </v-list-subheader>
+                    <v-list-item
+                        v-else
+                        v-bind="props"
+                        :title="item.raw.name"
+                    >
+                        <template
+                            v-if="multiple"
+                            #prepend="{ isSelected }"
+                        >
+                            <v-checkbox-btn :model-value="isSelected" />
+                        </template>
+                    </v-list-item>
+                </template>
+            </v-autocomplete>
+        </template>
     </div>
 </template>
 
@@ -241,5 +300,9 @@ export default {
             height: 56px;
             margin: 0 0 5px 0;
         }
+    }
+
+    .group-title {
+        font-size: $font_size_big;
     }
 </style>
