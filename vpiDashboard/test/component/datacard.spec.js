@@ -36,7 +36,17 @@ describe("addons/vpiDashboard/test/ data card component", () => {
                     },
                     getters: {
                         yearList () {
-                            return [2024, 2025];
+                            const thisYear = new Date().getFullYear(),
+                                yearListReturnArray = [];
+
+                            let startYear = 2024;
+
+                            while (startYear <= thisYear) {
+                                yearListReturnArray.push(startYear);
+                                startYear++;
+                            }
+
+                            return yearListReturnArray;
                         },
                         currentIndex () {
                             return 0;
