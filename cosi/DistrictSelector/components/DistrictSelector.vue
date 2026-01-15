@@ -63,6 +63,8 @@ export default {
             this.tabItems[1].disabled = false;
         }
     },
+    activated: () => undefined,
+    deactivated: () => undefined,
     methods: {
         ...mapMutations("Modules/DistrictSelector", ["setSelectedTabItem"])
     }

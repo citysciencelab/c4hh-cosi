@@ -133,9 +133,6 @@ export default {
         this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
 
         if (newFeatures.length === 0) {
-            this.allLayerConfigs.forEach(configg => {
-                configg.bboxGeometry = this.areaSelectorGeom || this.boundingGeometry;
-            });
             setBBoxToGeom(this, this.areaSelectorGeom || this.boundingGeometry, layerCollection.getLayers());
             return;
         }
@@ -218,16 +215,12 @@ export default {
     /**
      * sets facility layers' bbox as the isochrones
      * @fires Core.ConfigLoader#RadioRequestParserGetItemsByAttributes
-     * @fires BboxSettor#RadioTriggerSetBboxGeometryToLayer
      * @returns {void}
      */
     setIsochroneAsBbox: function () {
         const polygonGeometry = this.isochroneFeatures[this.isochroneFeatures.length === 4 ? 1 : 0].getGeometry(),
             geometryCollection = new GeometryCollection([polygonGeometry]);
 
-        this.allLayerConfigs.forEach(configg => {
-            configg.bboxGeometry = this.areaSelectorGeom || geometryCollection;
-        });
         setBBoxToGeom(this, geometryCollection, layerCollection.getLayers());
     },
 
@@ -236,9 +229,6 @@ export default {
     * @returns {void}
     */
     resetIsochroneBBox () {
-        this.allLayerConfigs.forEach(configg => {
-            configg.bboxGeometry = this.areaSelectorGeom || this.boundingGeometry;
-        });
         setBBoxToGeom(this, this.areaSelectorGeom || this.boundingGeometry, layerCollection.getLayers());
     },
 

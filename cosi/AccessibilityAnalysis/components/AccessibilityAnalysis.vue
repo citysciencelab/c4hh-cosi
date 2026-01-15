@@ -881,9 +881,9 @@ export default {
         setActiveMode (obj) {
             this.activeMode = obj;
             this.setMode(this.activeMode.type);
-            this.removeAll();
             if (this.hasActiveSet) {
                 this.setActiveSet(null);
+                this.removeAll();
             }
         },
 

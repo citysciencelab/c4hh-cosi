@@ -53,7 +53,7 @@ const state = {
     travelTime: "9",
     steps: [0, 0, 0],
     dataSets: [],
-    activeSet: 0,
+    activeSet: null,
     readmeUrl: {
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/003accessibilityanalysis.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/003erreichbarkeitsanalyse.md"

@@ -55,7 +55,7 @@ export default {
             cards: "selectionCardsStatisticalData",
             cardsSubject: "selectionCardsSubjectData"
         }),
-        ...mapGetters(["allLayerConfigs", "restServiceById"]),
+        ...mapGetters(["allLayerConfigs", "restServiceById", "visibleSubjectDataLayerConfigs"]),
 
         activeCard () {
             return this.cards.find(card => card.status === "active");
@@ -115,7 +115,15 @@ export default {
         },
 
         selectedDistrictsCollection: "transferFeatures",
-        selectedDistrictLevelId: ["clearFeatures", "changeSelectedDistrictLevel"]
+        selectedDistrictLevelId: ["clearFeatures", "changeSelectedDistrictLevel"],
+
+        visibleSubjectDataLayerConfigs: {
+            handler () {
+                this.updateLayerBbox(this.activeCard?.geometry);
+
+            },
+            deep: true
+        }
     },
     async created () {
         this.setNonReactiveData();
@@ -433,18 +441,12 @@ export default {
             else {
                 this.resetView();
                 this.setBoundingGeometry(undefined);
-                this.allLayerConfigs.forEach(configg => {
-                    configg.bboxGeometry = this.areaSelectorGeom || bboxGeom;
-                });
-                setBBoxToGeom(this, this.areaSelectorGeom || bboxGeom, layerCollection.getLayers());
+                this.updateLayerBbox(undefined);
                 this.setFilterGeometry(this.areaSelectorGeom || false);
             }
         },
 
         updateLayerBbox (geometry) {
-            this.allLayerConfigs.forEach(layerConfig => {
-                layerConfig.bboxGeometry = geometry;
-            });
             setBBoxToGeom(this, geometry, layerCollection.getLayers());
         },
 
