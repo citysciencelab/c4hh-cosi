@@ -194,15 +194,19 @@ export default {
             <v-autocomplete
                 :model-value="modelValue"
                 :items="items"
-                chips
-                closable-chips
+                :chips="multiple"
+                :closable-chips="multiple"
+                :clearable="!multiple && clearable"
                 :label="label"
                 item-title="name"
                 item-value="name"
                 :multiple="multiple"
                 @update:modelValue="(value) => $emit('update:modelValue', value)"
             >
-                <template #chip="{ item, index, props }">
+                <template
+                    v-if="multiple"
+                    #chip="{ item, index, props }"
+                >
                     <v-chip
                         v-if="index < maxChipCount"
                         v-bind="props"
@@ -304,5 +308,7 @@ export default {
 
     .group-title {
         font-size: $font_size_big;
+        font-family: $font_family_accent;
+        color: $secondary;
     }
 </style>

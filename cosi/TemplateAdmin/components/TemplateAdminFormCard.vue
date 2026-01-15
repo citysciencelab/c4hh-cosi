@@ -70,7 +70,10 @@ export default {
     mounted () {
         this.referenceValue = typeof this.importedReferenceValue !== "undefined" ? this.importedReferenceValue : "";
         this.statData.forEach(stats => {
-            this.statisticDataList.push(...stats.data.map(data => data.label));
+            this.statisticDataList.push({"group": stats.category});
+            stats.data.forEach(data => {
+                this.statisticDataList.push({"name": data.label});
+            });
         });
     },
     methods: {
@@ -138,6 +141,7 @@ export default {
                     <div class="card-title col-md-7 pe-2">
                         <Dropdown-Autocomplete
                             v-model="selectedStatData"
+                            :is-group="true"
                             :items="statisticDataList"
                             :label="$t('additional:modules.cosi.templateAdmin.label.statistic')"
                         />
