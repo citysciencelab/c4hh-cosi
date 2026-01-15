@@ -104,6 +104,16 @@ export default {
             }
         },
 
+        /**
+         * Updates the active card status when the selected district names change.
+         * @returns {void}
+         */
+        selectedDistrictNames () {
+            if (this.activeCard && this.selectedDistrictNames.sort().toString() !== this.activeCard.selectedDistricts.sort().toString()) {
+                this.activeCard.status = "";
+            }
+        },
+
         selectedDistrictsCollection: "transferFeatures",
         selectedDistrictLevelId: ["clearFeatures", "changeSelectedDistrictLevel"]
     },
@@ -132,6 +142,7 @@ export default {
             drawingLayer.getLayerSource().clear();
             drawingLayer.getLayer().setVisible(false);
         }
+
         this.cardsSubject.forEach((card, index) => {
             if (card.status === "active") {
                 this.toggleCardStatus(index);
@@ -249,6 +260,7 @@ export default {
 
                 this.setSelectedDistrictsCollection(evt.target);
                 this.setSelectedDistrictNames([...new Set(selectedNames)]);
+
             });
 
             featureCollection.on("remove", (evt) => {
@@ -408,9 +420,7 @@ export default {
 
             if (extent) {
                 this.setBoundingGeometry(bboxGeom);
-                this.updateLayerBbox(this.activeCard.geometry);
                 this.setFilterGeometry(this.areaSelectorGeom || bboxGeom);
-                this.zoomToExtent({extent, options: {}});
 
                 this.loadStatFeatures({
                     districtLevel: this.selectedDistrictLevel,
@@ -473,6 +483,12 @@ export default {
                 return;
             }
             this.setSelectedDistrictLevelId(districtLevelLabel.value);
+            if (this.activeCard) {
+                this.activeCard.status = "";
+                this.$nextTick(() => {
+                    this.updateLayerBbox(undefined);
+                });
+            }
         },
         /**
          * Toggles the status of a card at the specified index.
