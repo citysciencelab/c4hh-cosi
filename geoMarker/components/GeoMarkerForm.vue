@@ -696,9 +696,11 @@ export default {
 
                     this.moveUpdatedFeatureToTop(this.selectedFeature.getId());
 
-                    this.layerIdsForSelectedDepartments.forEach(async layerId => {
-                        await this.setFilterAgain(layerId);
-                    });
+                    if (this.isFilterApplied) {
+                        this.layerIdsForSelectedDepartments.forEach(async layerId => {
+                            await this.setFilterAgain(layerId);
+                        });
+                    }
 
                     this.addSingleAlert({
                         content: this.$t("additional:modules.geoMarker.geoMarkerForm.successMessageAfterUpdate"),
