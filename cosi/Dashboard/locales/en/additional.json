@@ -12,6 +12,7 @@
                     "dietailView": "View in detail",
                     "timestamp": "Years",
                     "addFilter": "Add filter",
+                    "resetFilter": "reset",
                     "closeFilter": "Close",
                     "activeFilters": "Active filters",
                     "search": "Search Table",

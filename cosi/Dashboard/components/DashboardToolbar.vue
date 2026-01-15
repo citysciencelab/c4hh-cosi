@@ -2,17 +2,19 @@
 import {Dropdown} from "bootstrap";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapGetters} from "vuex";
+import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
 import {VChip} from "vuetify/components/VChip";
 import {VIcon} from "vuetify/components/VIcon";
-import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
-import InputText from "@shared/modules/inputs/components/InputText.vue";
 
 export default {
     name: "DashboardToolbar",
     components: {
         DropdownAutocomplete,
         FlatButton,
+        IconButton,
         InputText,
         ToolBar,
         VChip,
@@ -166,6 +168,16 @@ export default {
 
         toggleSettingItem (columnName) {
             this.$emit("toggleColumn", columnName);
+        },
+        /**
+         * Resets all active filters and related export options to their default state.
+         * @returns {void}
+         */
+        resetFilters () {
+            this._statsFeatureFilter = [];
+            this.exportTimeline = false;
+            this.showAllFilters = false;
+            this.$emit("setTimestampsValues", []);
         }
     }
 };
@@ -180,6 +192,18 @@ export default {
         @toggleSettingItem="toggleSettingItem"
     >
         <template #optionalDropdown>
+            <div
+                v-if="_statsFeatureFilter.length > 0 || timestampsFiltered.length > 0"
+                class="reset-filter-row"
+            >
+                <IconButton
+                    class="reset-filter-btn"
+                    icon="bi-arrow-clockwise"
+                    :aria="$t('additional:modules.tools.cosi.dashboard.resetFilter')"
+                    :interaction="resetFilters"
+                    :label="$t('additional:modules.tools.cosi.dashboard.resetFilter')"
+                />
+            </div>
             <DropdownAutocomplete
                 v-model="selectedGroups"
                 :items="groups"
@@ -278,12 +302,34 @@ export default {
                             : $t('additional:modules.tools.cosi.dashboard.showAllFilters')
                     }}
                 </button>
+                <div class="d-inline-block text-center d-flex justify-content-center mt-3">
+                    <FlatButton
+                        :aria-label="$t('common:modules.filter.filterResetAll')"
+                        :text="$t('common:modules.filter.filterResetAll')"
+                        :icon="'bi-x-circle'"
+                        :interaction="resetFilters"
+                    />
+                </div>
             </div>
         </template>
     </ToolBar>
 </template>
 
 <style lang="scss" scoped>
+.reset-filter-row {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+.reset-filter-btn :deep(button, .btn) {
+    padding: 4px 8px;
+    border-radius: 999px;
+    transition: all 150ms ease;
+}
+.reset-filter-btn :deep(button:hover, .btn:hover) {
+    background: #D6E3FF;
+    box-shadow: 0 0 0 2px rgba(60, 95, 148, 0.25);
+}
 .filter-toggle {
     margin-top: 4px;
     font-size: 0.85rem;

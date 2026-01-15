@@ -12,6 +12,7 @@
                     "dietailView": "Detailansicht",
                     "timestamp": "Jahre",
                     "addFilter": "Filter hinzufügen",
+                    "resetFilter": "zurücksetzen",
                     "closeFilter": "Schließen",
                     "activeFilters": "Aktive Filter",
                     "search": "Tabelle durchsuchen",
