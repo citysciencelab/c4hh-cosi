@@ -1,0 +1,11 @@
+{
+    "modules": {
+        "vueComponents": {
+            "cosiPrintLayoutSelection": {
+                "layoutVariant": "Layout variant",
+                "orientation": "Orientation",
+                "pageSize": "Page size"
+            }
+        }
+    }
+}
