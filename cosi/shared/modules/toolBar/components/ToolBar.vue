@@ -1,6 +1,7 @@
 <script>
 import ButtonGroup from "../../../../components/ButtonGroup.vue";
 import draggable from "vuedraggable";
+import {Dropdown} from "bootstrap";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 
@@ -37,12 +38,22 @@ export default {
     data () {
         return {
             checkedSettingItems: {},
+            optionalDropdownInstance: null,
             groupButtons: [
                 {"icon": "bi-table", "name": "Tabelle"},
                 {"icon": "bi-bar-chart", "name": "Diagramm"}
             ],
             settingItemList: this.settingItems.slice()
         };
+    },
+    computed: {
+        /**
+         * Whether the optional dropdown should close when clicking outside.
+         * @returns {Boolean} `true` if outside clicks should close the optional dropdown.
+         */
+        closeOnOutside () {
+            return this.optionalButton?.closeOnOutside === true;
+        }
     },
     watch: {
         /**
@@ -61,6 +72,20 @@ export default {
                 return acc;
             }, {})
         };
+        if (!this.closeOnOutside || !this.optionalButton?.id) {
+            return;
+        }
+        const toggleElement = document.getElementById(this.optionalButton.id);
+
+        if (toggleElement) {
+            this.optionalDropdownInstance = Dropdown.getOrCreateInstance(toggleElement);
+            document.addEventListener("pointerdown", this.onGlobalPointerDown, true);
+            document.addEventListener("keydown", this.onGlobalKeyDown);
+        }
+    },
+    beforeUnmount () {
+        document.removeEventListener("pointerdown", this.onGlobalPointerDown, true);
+        document.removeEventListener("keydown", this.onGlobalKeyDown);
     },
     methods: {
         /**
@@ -70,6 +95,47 @@ export default {
          */
         toggleSettingItem (evt) {
             this.$emit("toggleSettingItem", evt.target.value);
+        },
+        /**
+         * Handles global pointer interactions to close the optional dropdown
+         * when clicking outside of it.
+         * The dropdown remains open when the interaction occurs:
+         * - inside the optional dropdown container
+         * - inside a Vuetify overlay (e.g. autocomplete menus)
+         * @param {PointerEvent} event - The global pointer event.
+         * @returns {void}
+         */
+        onGlobalPointerDown (event) {
+            if (!this.closeOnOutside) {
+                return;
+            }
+            const root = this.$refs.optionalDropdownRoot,
+                clickedInVuetifyOverlay = event.target.closest(".v-overlay"),
+                clickedInside = root.contains(event.target);
+
+            if (!root) {
+                return;
+            }
+
+            if (clickedInside || clickedInVuetifyOverlay) {
+                return;
+            }
+
+            this.optionalDropdownInstance?.hide();
+        },
+        /**
+         * Handles global keyboard interactions for the optional dropdown.
+         * Closes the dropdown when the Escape key is pressed
+         * @param {KeyboardEvent} event - The keyboard event.
+         * @returns {void}
+         */
+        onGlobalKeyDown (event) {
+            if (!this.closeOnOutside) {
+                return;
+            }
+            if (event.key === "Escape") {
+                this.optionalDropdownInstance?.hide();
+            }
         }
     }
 };
@@ -131,6 +197,7 @@ export default {
             <slot name="table-settings" />
             <div
                 v-if="typeof optionalButton !== 'undefined'"
+                ref="optionalDropdownRoot"
                 class="dropdown"
             >
                 <FlatButton

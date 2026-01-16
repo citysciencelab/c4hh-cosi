@@ -179,15 +179,12 @@ export default {
 <template>
     <ToolBar
         :setting-items="columnNames"
-        :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.addFilter'), icon: 'bi-funnel-fill', id: 'add-filter-button'}"
+        :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.addFilter'), icon: 'bi-funnel-fill', id: 'add-filter-button', closeOnOutside: true}"
         @exportTable="$emit('exportTable', exportTimeline)"
         @reorderedSettingItems="reorderSettingItems"
         @toggleSettingItem="toggleSettingItem"
     >
         <template #optionalDropdown>
-            <h6 class="my-3">
-                {{ $t('additional:modules.tools.cosi.dashboard.addFilter') }}
-            </h6>
             <DropdownAutocomplete
                 v-model="selectedGroups"
                 :items="groups"
@@ -201,15 +198,6 @@ export default {
                 :label="$t('additional:modules.tools.cosi.featuresList.layerFilter')"
                 multiple
             />
-            <div class="d-flex justify-content-center">
-                <FlatButton
-                    id="apply-filter-button"
-                    customclass="mb-2"
-                    icon="bi bi-check2"
-                    :text="$t('additional:modules.tools.cosi.dashboard.closeFilter')"
-                    :interaction="() => addFilterButton.hide()"
-                />
-            </div>
         </template>
         <template #calculationDropdown>
             <h6 class="my-2">
