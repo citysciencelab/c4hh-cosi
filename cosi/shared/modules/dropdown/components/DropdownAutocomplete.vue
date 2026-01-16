@@ -198,8 +198,8 @@ export default {
                 :closable-chips="multiple"
                 :clearable="!multiple && clearable"
                 :label="label"
-                item-title="name"
-                item-value="name"
+                item-title="label"
+                item-value="label"
                 :multiple="multiple"
                 @update:modelValue="(value) => $emit('update:modelValue', value)"
             >
@@ -226,14 +226,18 @@ export default {
                 <template #item="{ props, item }">
                     <v-list-subheader
                         v-if="typeof item.raw.group !== 'undefined'"
-                        class="group-title"
+                        :class="[
+                            'group-title',
+                            item.raw.level ? 'level-' + item.raw.level : ''
+                        ]"
                     >
                         {{ item.raw.group }}
                     </v-list-subheader>
                     <v-list-item
                         v-else
                         v-bind="props"
-                        :title="item.raw.name"
+                        :title="item.raw.label"
+                        :class="multiple ? '' : 'pl-8'"
                     >
                         <template
                             v-if="multiple"
@@ -308,7 +312,13 @@ export default {
 
     .group-title {
         font-size: $font_size_big;
-        font-family: $font_family_accent;
         color: $secondary;
+        &.level-1 {
+            font-family: $font_family_accent;
+        }
+        &.level-2 {
+            font-family: $font_family_default;
+            font-size: $font-size-base;
+        }
     }
 </style>

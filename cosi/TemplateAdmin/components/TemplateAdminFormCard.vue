@@ -72,7 +72,7 @@ export default {
         this.statData.forEach(stats => {
             this.statisticDataList.push({"group": stats.category});
             stats.data.forEach(data => {
-                this.statisticDataList.push({"name": data.label});
+                this.statisticDataList.push({"label": data.label});
             });
         });
     },

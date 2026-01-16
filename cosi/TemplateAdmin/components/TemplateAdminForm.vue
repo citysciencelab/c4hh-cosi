@@ -74,9 +74,6 @@ export default {
         uploadedTemplates () {
             return this.importedTemplateNames;
         },
-        geoDataList () {
-            return this.geoData.map(data => data?.label);
-        },
         toolDataList () {
             return this.toolData.map(data => data?.label);
         }
@@ -730,7 +727,8 @@ export default {
                 <Dropdown-Autocomplete
                     v-model="selectedGeoDataLabel"
                     multiple
-                    :items="geoDataList"
+                    :is-group="true"
+                    :items="geoData"
                     :label="$t('additional:modules.cosi.templateAdmin.label.layer')"
                 />
             </div>

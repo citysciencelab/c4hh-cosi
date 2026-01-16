@@ -10,6 +10,7 @@ import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import TabBar from "../../shared/modules/tabBar/components/TabBar.vue";
 import TemplateAdminForm from "./TemplateAdminForm.vue";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
+import {treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 export default {
     name: "TemplateAdmin",
@@ -39,7 +40,7 @@ export default {
         ...mapGetters("Modules/TemplateAdmin", Object.keys(getters)),
         ...mapGetters("Modules/Dashboard", ["statsFeatureFilter"]),
         ...mapGetters("Modules/DistrictSelector", ["initMapping", "selectedDistrictLevel", "selectedDistrictLevelId", "selectedDistrictsCollection", "selectedDistrictNames"]),
-        ...mapGetters(["configuredModules", "allLayerConfigs"])
+        ...mapGetters(["configuredModules", "allBaselayerConfigs", "allSubjectDataLayerConfigs", "allLayerConfigsStructured"])
     },
     watch: {
         /**
@@ -102,7 +103,7 @@ export default {
 
         this.setToolOptions(this.getToolList(configuredModules));
         this.setStatOptions(this.getMappedLabelByValue(filteredPropertyNames, this.initMapping));
-        this.setDataOptions(this.getLayerNames(this.allLayerConfigs));
+        this.setDataOptions(this.getLayerConfigs());
     },
     unmounted () {
         this.setEnableExport(false);
@@ -202,12 +203,68 @@ export default {
         },
 
         /**
+         * Returns a list of layer names and groups.
+         * @returns {Object[]} A list of objects with groups and layers.
+         */
+        getLayerConfigs () {
+            const layerConfigs = [],
+                backgroundLayerConfigs = this.allLayerConfigsStructured(treeBaselayersKey),
+                subjectLayerConfigs = this.allLayerConfigsStructured(treeSubjectsKey);
+
+            // Adds background layers
+            layerConfigs.push({group: i18next.t("common:modules.layerSelection.backgrounds"), level: 1});
+            layerConfigs.push(...this.getLayerNames(backgroundLayerConfigs));
+
+            // Adds Subject layers
+            subjectLayerConfigs.forEach(config => {
+                if (config.type !== "folder") {
+                    return;
+                }
+
+                layerConfigs.push({group: config.name, level: 1});
+
+                config?.elements.forEach(element => {
+                    if (element.type !== "folder") {
+                        return;
+                    }
+
+                    layerConfigs.push({group: element.name, level: 2});
+                    layerConfigs.push(...this.getLayerNames(this.findAllObjectsByKeyValueDeep(element.elements)));
+                });
+            });
+
+            return layerConfigs;
+        },
+
+        /**
+         * Returns a list of layers objects.
+         * @param {Objects[]|Object} data the data to be checked if it is a layer or folder.
+         * @param {Objects[]} results the found results in array.
+         * @returns {Object[]} A list of found results in array.
+         */
+        findAllObjectsByKeyValueDeep (data, results = []) {
+            if (Array.isArray(data)) {
+                data.forEach(element => this.findAllObjectsByKeyValueDeep(element, results));
+            }
+
+            if (data.type === "folder") {
+                this.findAllObjectsByKeyValueDeep(data.elements, results);
+            }
+
+            if (data.type === "layer") {
+                results.push(data);
+            }
+
+            return results;
+        },
+
+        /**
          * Returns a list of layer names.
          * @param {Object} layers the Layers from the card.
          * @returns {Object[]} A list of objects with following format: {propertyName: x, label: y}
          */
         getLayerNames (layers) {
-            let layerNames = [];
+            const layerNames = [];
 
             if (!Array.isArray(layers)) {
                 return [];
@@ -218,8 +275,6 @@ export default {
                     layerNames.push({layerId: layer.id, label: layer.name});
                 }
             });
-
-            layerNames = sort("", layerNames, "label");
 
             return layerNames;
         },
