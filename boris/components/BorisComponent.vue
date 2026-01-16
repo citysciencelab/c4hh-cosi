@@ -562,7 +562,6 @@ export default {
 
 
 <style lang="scss" scoped>
-;
 
 .btn-component {
   --bs-btn-color: #001B3D;

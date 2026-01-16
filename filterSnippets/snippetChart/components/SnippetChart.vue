@@ -225,7 +225,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    ;
 
 .info-icon i {
     font-size: $icon_length_small;

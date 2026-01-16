@@ -293,7 +293,7 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
 
         });
     });
-    describe.skip("startPrint method", () => {
+    describe("startPrint method", () => {
         it("startPrint", () => {
             store.state.Modules.BorisComponent.selectedBrwFeature = {id: 1, name: "feature1", get: () => "value"};
 

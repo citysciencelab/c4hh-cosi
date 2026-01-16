@@ -43,7 +43,6 @@ export default {
 </template>
 
 <style lang="scss">
-;
 
 #bim-factory {
     div.BimFactoryWorkflowInputErrors {

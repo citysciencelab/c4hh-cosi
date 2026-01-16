@@ -189,8 +189,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  ;
-  ;
 
 /*sdp download*/
     #button-selectedDownload{
@@ -201,7 +199,6 @@ export default {
 
 // Only works unscoped
 <style lang="scss">
- ;
 
     #sdp-circle-overlay {
         position: absolute;
