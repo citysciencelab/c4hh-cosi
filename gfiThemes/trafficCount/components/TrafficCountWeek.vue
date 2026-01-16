@@ -72,8 +72,8 @@ export default {
             },
             descriptionYAxis: i18next.t("additional:modules.tools.gfi.themes.trafficCount.yAxisTextWeek"),
             renderLabelLegend: (datetime) => {
-                const weeknumber = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").week(),
-                    year = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").format("YYYY");
+                const weeknumber = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").isoWeek(),
+                    year = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").isoWeekYear();
 
                 return this.calendarweek + " " + weeknumber + " / " + year;
             },
@@ -169,7 +169,7 @@ export default {
         }
     },
     created () {
-        this.weekFormat = "YYYY [KW] WW";
+        this.weekFormat = "GGGG [KW] WW";
         this.initializeDates();
         this.maxDate = this.checkGurlittInsel ? dayjs().subtract(1, "day").format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD");
         this.minDate = dayjs().subtract(1, "year").startOf("year").format("YYYY-MM-DD");

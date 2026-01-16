@@ -292,7 +292,11 @@ export default {
                         },
                         legend: {
                             display: true,
-                            onClick: (e) => e.stopPropagation(),
+                            onClick: (e) => {
+                                if (typeof e.stopPropagation === "function") {
+                                    e.stopPropagation();
+                                }
+                            },
                             labels: {
                                 usePointStyle: true,
                                 generateLabels: chart => {
@@ -347,7 +351,7 @@ export default {
                                         tooltipItem.datetime = chartJsData.datasets[tooltipItem.datasetIndex].datetimes[tooltipItem.index];
                                     }
                                     else if (typeof tooltipItem === "object") {
-                                        tooltipItem.datetime = tooltipItem.label;
+                                        tooltipItem.datetime = tooltipItem.dataset.datetimes[tooltipItem.dataIndex];
                                     }
 
                                     return options.setTooltipValue(tooltipItem);

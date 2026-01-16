@@ -15,6 +15,7 @@
 ### Removed
 
 ### Fixed
+- TrafficCount: Fixed bug that displayed the wrong calendarweek for the first calendarweek of each year and fixed tooltip label.
 
 ---
 

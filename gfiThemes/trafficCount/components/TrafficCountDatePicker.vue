@@ -23,7 +23,7 @@ export default {
         format: {
             type: String,
             required: false,
-            default: "YYYY-MM-DD"
+            default: "GGGG-MM-DD"
         },
         type: {
             type: String,
