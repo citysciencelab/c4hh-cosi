@@ -4,6 +4,7 @@ import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
 import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
 import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
 import {translateKeyIfPossible} from "./translationUtils.js";
+import {featureIntersectsGeometry} from "./featureIntersectsGeometry.js";
 
 /**
  * Normalizes attributes configuration to a consistent format for extraction functions.
@@ -336,9 +337,10 @@ export function extractFeaturesFromEsriWms (parsedResponse, attributes, ignoredK
  * @param {string|Array<string>|Object} attributes - The gfiAttributes configuration.
  *                                                   Can be "ignore", "showAll", Array of strings or Object.
  * @param {Array<string>} ignoredKeys - Keys to be ignored when using "showAll".
+ * @param {Geometry} geometry - If given, features in GML are filtered by intersection with it.
  * @returns {Array<Object>} An array of extracted features.
  */
-export function extractFeaturesFromWfsGml (parsedResponse, attributes, ignoredKeys) {
+export function extractFeaturesFromWfsGml (parsedResponse, attributes, ignoredKeys, geometry) {
     if (attributes === "ignore") {
         return [];
     }
@@ -391,7 +393,7 @@ export function extractFeaturesFromWfsGml (parsedResponse, attributes, ignoredKe
         const featureNode = member.firstElementChild,
             feature = {};
 
-        if (!featureNode) {
+        if (!featureNode || !featureIntersectsGeometry(member, geometry)) {
             return;
         }
 
@@ -511,9 +513,10 @@ export function getCrsUrl (epsgCode) {
  * @param {string|Array} attributes - The attributes configuration.
  *                                    Can be "ignore", "showAll", or Array of strings.
  * @param {Array<string>} ignoredKeys - Keys to be ignored when attributes is "showAll".
+ * @param {(Geometry | null)} geometry - If given, features in GML are filtered by intersection with it.
  * @returns {Array} An array of feature objects.
  */
-export function extractFeaturesFromOafJson (data, attributes, ignoredKeys) {
+export function extractFeaturesFromOafJson (data, attributes, ignoredKeys, geometry) {
     try {
         if (attributes === "ignore") {
             return [];
@@ -527,7 +530,7 @@ export function extractFeaturesFromOafJson (data, attributes, ignoredKeys) {
         const shouldShowAll = attributes === "showAll" || !attributes,
             attributeList = Array.isArray(attributes) ? attributes.filter(attr => typeof attr === "string") : [];
 
-        return data.features.map(feature => {
+        return data.features.filter(feature => featureIntersectsGeometry(feature, geometry)).map(feature => {
             const properties = feature.properties || {},
                 result = {};
 

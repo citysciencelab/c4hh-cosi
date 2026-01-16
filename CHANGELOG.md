@@ -25,6 +25,7 @@
 - Boris: Fixed incorrect Vuex dispatches caused by renamed actions and active buttons are now highlighted correctly on initial load.
 - Boris: Fixed console error.
 - WaterRiskCheck: Fixed a bug where secondary menu is unusable on mobile.
+- gfiThemes: The GFI theme `combinedGfi` erroneously showed features that intersect the BBOX of the selected geometry rather than only the features that actually intersect the selected geometry. This has been resolved.
 
 ---
 

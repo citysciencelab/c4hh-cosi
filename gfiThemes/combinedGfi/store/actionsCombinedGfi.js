@@ -649,7 +649,7 @@ const actions = {
                 const response = await fetch(url.toString()),
                     text = await response.text(),
                     parsedResponse = new DOMParser().parseFromString(text, "application/xml"),
-                    features = extractFeaturesFromWfsGml(parsedResponse, normalizedAttributes, ignoredKeys);
+                    features = extractFeaturesFromWfsGml(parsedResponse, normalizedAttributes, ignoredKeys, geometry);
 
                 if (!response.ok) {
                     if (response.status === 404) {
@@ -1062,7 +1062,8 @@ const actions = {
                             "Accept": "application/json"
                         }
                     }),
-                    data = await response.json();
+                    data = await response.json(),
+                    extractionGeometry = ["Polygon", "MultiPolygon"].includes(geometry?.getType()) ? geometry : null;
 
                 if (!response.ok) {
                     if (response.status === 404) {
@@ -1072,7 +1073,7 @@ const actions = {
                     return {error: `Dienstfehler (${response.status})`};
                 }
 
-                return extractFeaturesFromOafJson(data, normalizedAttributes, ignoredKeys);
+                return extractFeaturesFromOafJson(data, normalizedAttributes, ignoredKeys, extractionGeometry);
             }
             return null;
         }
