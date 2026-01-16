@@ -86,7 +86,6 @@ describe("addons/bimFactory/components/BimFactoryWorkflowFilter.vue", () => {
 
         tableComponent = wrapper.findComponent(TableComponent);
 
-        // eslint-disable-next-line one-var
         const tableData = tableComponent.props("data");
 
         expect(tableComponent.exists()).to.be.true;
@@ -140,7 +139,6 @@ describe("addons/bimFactory/components/BimFactoryWorkflowFilter.vue", () => {
 
         expect(wrapper.find("ul.responseList").exists()).to.be.false;
 
-        // eslint-disable-next-line one-var
         const tableComponent = wrapper.findComponent(TableComponent);
 
         expect(tableComponent.exists()).to.be.false;
