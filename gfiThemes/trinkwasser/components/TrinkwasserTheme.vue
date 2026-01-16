@@ -128,7 +128,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    ;
 
     th {
         font-family: $font_family_accent;

@@ -76,7 +76,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-;
 .sturmflut-theme {
     padding: 10px;
     max-width: 500px;
@@ -120,7 +119,6 @@ export default {
 </style>
 
 <style lang="scss">
-    ;
     #sturmflut-theme-table-description {
         p {
             color: $black;

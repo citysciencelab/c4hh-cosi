@@ -3,15 +3,13 @@ import {SensorThingsMqtt} from "./../../../../src/shared/js/api/sensorThingsMqtt
 import {getPublicHoliday} from "./../../../../src/shared/js/utils/calendar.js";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
+import de from "dayjs/locale/de";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 
 dayjs.extend(isoWeek);
 dayjs.extend(weekOfYear);
-
 // change language from day.js to german
-// todo vite: ohne das require wird die Sprache nicht auf de gewechselt. Warum soll das überhaupt sein?
-// require("dayjs/locale/de.js");
-// dayjs.locale("de");
+dayjs.locale(de);
 
 /**
  * TrafficCountApi is the api for the TrafficCount GFI Theme

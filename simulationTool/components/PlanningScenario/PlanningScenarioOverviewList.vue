@@ -161,7 +161,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-;
 
 .list-group-item:hover {
     cursor: pointer;

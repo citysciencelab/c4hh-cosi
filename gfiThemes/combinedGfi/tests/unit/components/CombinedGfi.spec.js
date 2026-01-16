@@ -94,7 +94,8 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
                                 tableData: () => ({}),
                                 printServerUrl: () => "https://print-server.example.com",
                                 printConfigPath: () => "/resources/printConfig.json",
-                                printUtilsPath: () => "/resources/printUtils.js"
+                                printUtilsPath: () => "/resources/printUtils.js",
+                                bufferHint: sinon.stub()
                             },
                             actions: {
                                 initCombinedGfi: initSpy,

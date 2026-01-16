@@ -4,7 +4,6 @@ import {DEVICE_PIXEL_RATIO} from "ol/has.js";
 import Canvas from "../../../src/modules/print/js/buildCanvas.js";
 import layerProvider from "../js/getVisibleLayer.js";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
-import i18next from "i18next";
 
 let lastPrintedExtent;
 

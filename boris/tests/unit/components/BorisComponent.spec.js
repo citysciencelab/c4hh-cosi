@@ -82,8 +82,10 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
                 },
                 Maps: {
                     namespaced: true,
-                    actions: {registerListener: () => sinon.stub(),
-                        unregisterListener: () => sinon.stub()}
+                    actions: {
+                        registerListener: () => sinon.stub(),
+                        unregisterListener: () => sinon.stub()
+                    }
                 },
                 Menu: {
                     namespaced: true,
@@ -291,12 +293,12 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
 
         });
     });
-    describe.skip("startPrint method", () => {
+    describe("startPrint method", () => {
         it("startPrint", () => {
             store.state.Modules.BorisComponent.selectedBrwFeature = {id: 1, name: "feature1", get: () => "value"};
 
             let printButton = null;
-            const startPrintSpy = sinon.spy(BorisComponent.methods, "startPrint");
+            const startPrintSpy = sinon.stub(BorisComponent.methods, "startPrint");
 
             wrapper = shallowMount(BorisComponent, {global: {plugins: [store]}});
             printButton = wrapper.find(".btn-infos");

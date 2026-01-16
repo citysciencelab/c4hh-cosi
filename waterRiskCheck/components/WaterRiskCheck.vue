@@ -1360,7 +1360,6 @@ export default {
 
 
 <style lang="scss" scoped>
-;
 
 #collapseHiddenButton {
     display: none;

@@ -183,7 +183,7 @@ describe("addons/vpiDashboard/test/ data card component", () => {
         );
 
         expect(wrapper.vm.paginatorData).to.be.an("array");
-        expect(wrapper.vm.paginatorData.length).to.equal(thisYear - 2024 + 1);
+        expect(wrapper.vm.paginatorData.length).to.equal(thisYear - 2025 + 1);
         expect(wrapper.vm.paginatorData[1]).to.equal(2025);
     });
 });

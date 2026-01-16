@@ -727,9 +727,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    @import "/src/assets/css/mixins.scss";
-    @import "/src/assets/css/variables";
-
     .section {
         .col-sm-6, .col-sm-12 {
             padding-left: 2px;

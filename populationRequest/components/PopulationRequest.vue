@@ -566,7 +566,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "/src/assets/css/mixins.scss";
 
 .population-request {
     .form-horizontal {

@@ -268,7 +268,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-;
+
     .snippetFeatureInfoContainer {
         dt {
             font-weight: normal;

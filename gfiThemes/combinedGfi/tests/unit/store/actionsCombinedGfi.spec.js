@@ -2,7 +2,7 @@ import sinon from "sinon";
 import {expect} from "chai";
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
-import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses";
+import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses.js";
 import actions from "../../../store/actionsCombinedGfi.js";
 import {loadModule} from "../../../utils/loadModule.js";
 
