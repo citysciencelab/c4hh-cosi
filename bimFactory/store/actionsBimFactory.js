@@ -239,7 +239,6 @@ export default {
             throw new Error(`Failed to fetch file: ${response.statusText}`);
         }
 
-        // eslint-disable-next-line one-var
         const urlParts = url.split("/"),
             fileName = urlParts[urlParts.length - 1],
             blob = await response.blob(),

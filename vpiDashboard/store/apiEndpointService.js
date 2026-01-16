@@ -61,7 +61,6 @@ const apiEndpointService = {
             promises.push(this.fetchAllFeatures(url, query));
         });
 
-        // eslint-disable-next-line one-var
         const responses = await Promise.all(promises);
 
         responses.forEach(response => {

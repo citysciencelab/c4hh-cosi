@@ -41,7 +41,6 @@ const generateDataArray = {
 
         const sum_num_visitors = [];
 
-        // eslint-disable-next-line
         let labels = [];
 
         dataFromEndpoint?.data.forEach((element) => {
@@ -97,7 +96,6 @@ const generateDataArray = {
             }
         }
 
-        // eslint-disable-next-line
         let chartData = {};
 
         switch (chartType) {

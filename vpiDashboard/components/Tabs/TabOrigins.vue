@@ -342,7 +342,6 @@ export default {
                 aggregatedData[combinedLabel] += element.properties.besucher;
             });
 
-            // eslint-disable-next-line one-var
             const sortedData = Object.entries(aggregatedData)
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 10),
