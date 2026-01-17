@@ -17,23 +17,6 @@ const mutations = {
     },
     overwriteAllCalculations (state, payload) {
         state.calcualtions = payload;
-
-    },
-
-    /**
-     * Fills the timestamps with the unique years from all items.
-     * @param {Object} state The vuex state.
-     * @returns {void}
-     */
-    updateTimestamps (state) {
-        state.timestamps = [];
-        state.items.forEach(item => {
-            item.years.forEach(year => {
-                if (!state.timestamps.includes(year)) {
-                    state.timestamps.push(year);
-                }
-            });
-        });
     }
 };
 

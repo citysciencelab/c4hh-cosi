@@ -139,12 +139,10 @@ const actions = {
      * @param {Function} store.commit - Function to dispatch an action.
      * @returns {void}
      */
-    async updateDistricts ({commit, getters}) {
+    async updateDistricts ({commit}) {
         commit("setLoadend", false);
         await nextTick();
         commit("setLoadend", true);
-        console.log(getters.loadend);
-
     },
 
     /**

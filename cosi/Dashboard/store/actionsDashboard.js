@@ -1,4 +1,5 @@
 import getColumns from "../utils/getColumns";
+import {getTimestamps} from "../../utils/timeline";
 
 export default {
 
@@ -14,8 +15,9 @@ export default {
         });
         commit("setDistrictColumns", getColumns(rootGetters["Modules/DistrictSelector/selectedDistrictLevel"], rootGetters["Modules/DistrictSelector/selectedDistrictNames"], []));
         commit("setRows", getters.getRows);
+
         commit("setItems", getters.getData);
-        commit("updateTimestamps");
+        commit("setTimestamps", [...getTimestamps(state.items, state.timestampPrefix)]);
     },
 
     /**

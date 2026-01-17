@@ -3,10 +3,8 @@ import {Dropdown} from "bootstrap";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {mapGetters} from "vuex";
-import {VCol, VRow} from "vuetify/components/VGrid";
 import {VChip} from "vuetify/components/VChip";
 import {VIcon} from "vuetify/components/VIcon";
-import {VCheckbox} from "vuetify/components/VCheckbox";
 import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 
@@ -17,11 +15,8 @@ export default {
         FlatButton,
         InputText,
         ToolBar,
-        VCol,
-        VRow,
         VChip,
-        VIcon,
-        VCheckbox
+        VIcon
     },
     props: {
         districtColumns: {
@@ -33,22 +28,20 @@ export default {
             required: true
         }
     },
-    emits: ["exportTable", "reorderColumns", "setStatsFeatureFilter", "toggleColumn", "startCalculation"],
+    emits: ["exportTable", "reorderColumns", "setStatsFeatureFilter", "setTimestampsValues", "startCalculation", "toggleColumn"],
     data: () => ({
         addFilterButton: null,
         calculateButton: null,
         calculationName: "",
-        exportTimeline: false,
         category_A: null,
         category_B: null,
+        exportTimeline: false,
         operation: "add",
         showAllFilters: false
     }),
     computed: {
-        ...mapGetters("Modules/DistrictSelector", [
-            "mapping",
-            "metadataUrls"
-        ]),
+        ...mapGetters("Modules/Dashboard", ["timestamps", "timestampsFiltered"]),
+        ...mapGetters("Modules/DistrictSelector", ["mapping"]),
         /**
          * Filters to display in active filter area.
          * @returns {String[]} List of active filters.
@@ -124,6 +117,14 @@ export default {
             }
         },
 
+        /**
+         * Get timestamps sorted in descending order.
+         * @returns {String[]} Array of sorted timestamps.
+         */
+        sortedTimestamps () {
+            return this.timestamps.slice(0).sort().reverse();
+        },
+
         _statsFeatureFilter: {
             get () {
                 return this.statsFeatureFilter;
@@ -146,12 +147,6 @@ export default {
         this.calculateButton = Dropdown.getOrCreateInstance(document.getElementById("calculation-button"));
     },
     methods: {
-        openMetadata () {
-            this.metadataUrls.forEach(url => {
-                window.open(url);
-            });
-        },
-
         /**
          * Emits startCalculation event with necessary parameters and resets input fields.
          * @returns {void}
@@ -195,8 +190,15 @@ export default {
                 v-model="_statsFeatureFilter"
                 :items="mapping"
                 item-title="value"
-                :label="$t('additional:modules.tools.cosi.featuresList.layerFilter')"
+                :label="$t('additional:modules.tools.cosi.dashboard.category')"
                 multiple
+            />
+            <DropdownAutocomplete
+                :items="sortedTimestamps"
+                :label="$t('additional:modules.tools.cosi.dashboard.timestamp')"
+                :model-value="timestampsFiltered"
+                multiple
+                @update:modelValue="(value) => $emit('setTimestampsValues', value)"
             />
         </template>
         <template #calculationDropdown>
@@ -213,7 +215,7 @@ export default {
                 v-model="category_A"
                 :items="mapping"
                 item-title="value"
-                :label="$t('additional:modules.tools.cosi.dashboard.categoryCol')"
+                :label="$t('additional:modules.tools.cosi.dashboard.category')"
             />
             <div class="d-flex flex-column align-items-center">
                 <div>
@@ -232,7 +234,7 @@ export default {
                 v-model="category_B"
                 :items="mapping"
                 item-title="value"
-                :label="$t('additional:modules.tools.cosi.dashboard.categoryCol')"
+                :label="$t('additional:modules.tools.cosi.dashboard.category')"
             />
             <div class="d-flex justify-content-center">
                 <FlatButton
@@ -279,21 +281,6 @@ export default {
             </div>
         </template>
     </ToolBar>
-    <v-row
-        id="dashboard-toolbar"
-        dense
-    >
-        <v-col cols="auto">
-            <v-checkbox
-                id="export-details"
-                v-model="exportTimeline"
-                dense
-                hide-details
-                :label="$t('additional:modules.tools.cosi.dashboard.exportTableTimeline')"
-                :title="$t('additional:modules.tools.cosi.dashboard.exportTableTimeline')"
-            />
-        </v-col>
-    </v-row>
 </template>
 
 <style lang="scss" scoped>

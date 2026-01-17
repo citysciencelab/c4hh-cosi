@@ -1,6 +1,7 @@
 <script>
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
+import {getTimestamps} from "../../utils/timeline";
 import getters from "../store/gettersDashboard.js";
 import mutations from "../store/mutationsDashboard.js";
 import actions from "../store/actionsDashboard.js";
@@ -26,13 +27,11 @@ import DashboardToolbar from "./DashboardToolbar.vue";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import TableCell from "./TableCell.vue";
 import isObject from "@shared/js/utils/isObject.js";
-import utils from "../../utils";
 import {VApp} from "vuetify/components/VApp";
 import {VContainer, VRow} from "vuetify/components/VGrid";
 import {VDataTableVirtual} from "vuetify/components/VDataTable";
 import {VIcon} from "vuetify/components/VIcon";
 import {VMain} from "vuetify/components/VMain";
-import {VSelect} from "vuetify/components/VSelect";
 import {VTooltip} from "vuetify/components/VTooltip";
 
 export default {
@@ -49,7 +48,6 @@ export default {
         VIcon,
         VMain,
         VRow,
-        VSelect,
         VTooltip
     },
     data () {
@@ -58,7 +56,7 @@ export default {
             baseColumns: [
                 {
                     value: "category",
-                    text: this.$t("additional:modules.tools.cosi.dashboard.categoryCol"),
+                    text: this.$t("additional:modules.tools.cosi.dashboard.category"),
                     sortable: false,
                     groupable: false,
                     filter: this.filterTable
@@ -71,7 +69,7 @@ export default {
                 },
                 {
                     value: "years",
-                    text: this.$t("additional:modules.tools.cosi.dashboard.timestampCol"),
+                    text: this.$t("additional:modules.tools.cosi.dashboard.timestamp"),
                     filterable: false,
                     sortable: false,
                     divider: true,
@@ -94,6 +92,7 @@ export default {
                 field_B: null,
                 selectedItems: []
             },
+            timestampSelected: null,
             yearSelector: "jahr_"
         };
     },
@@ -106,7 +105,6 @@ export default {
             "loadend"
         ]),
         ...mapGetters("Modules/Language", ["currentLocale"]),
-        ...mapGetters("Modules/ColorCodeMap", ["selectedYear"]),
         columns () {
             return [
                 ...this.baseColumns,
@@ -136,14 +134,6 @@ export default {
          */
         selectedItems () {
             return this.items.filter(item => this.statsFeatureFilter.includes(item.category));
-        },
-        currentTimeStamp: {
-            get () {
-                return parseInt(this.selectedYear, 10);
-            },
-            set (v) {
-                this.setSelectedYear(v);
-            }
         },
 
         /**
@@ -177,11 +167,10 @@ export default {
 
         if (selectedDistricts.length) {
             this.selectedStatFeatures = selectedDistricts.map(district => district.statFeatures).flat();
-            this.setSelectedYear(utils.getAvailableYears([this.selectedStatFeatures[0]], this.yearSelector)[0]);
             this.calculateAll();
             if (this.selectedDistrictNames.length > 0) {
                 this.generateTable();
-                this.currentTimeStamp = this.selectedYear;
+                this.timestampSelected = this.items[0].years[0];
             }
         }
     },
@@ -190,7 +179,6 @@ export default {
         ...mapMutations("Modules/Dashboard", Object.keys(mutations)),
         ...mapActions("Modules/Dashboard", Object.keys(actions)),
         ...mapMutations("Modules/DistrictSelector", ["addCategoryToMapping", "removeCategoryFromMapping"]),
-        ...mapMutations("Modules/ColorCodeMap", ["setSelectedYear"]),
         ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
         ...mapActions("Modules/DistrictSelector", ["updateDistricts"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
@@ -369,8 +357,8 @@ export default {
                 preparedItems = this.getPreparedItems(items),
                 prefix = this.prefixExportFilename,
                 rawData = exportTimeline
-                    ? this.prepareTableExportWithTimeline(preparedItems, this.selectedDistrictNames, this.timestamps, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns)
-                    : this.prepareTableExport(preparedItems, this.selectedDistrictNames, this.selectedYear, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns),
+                    ? this.prepareTableExportWithTimeline(preparedItems, this.selectedDistrictNames, this.timestampsFiltered, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns)
+                    : this.prepareTableExport(preparedItems, this.selectedDistrictNames, this.timestampSelected, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns),
                 filename = composeFilename(this.$t("additional:modules.tools.cosi.dashboard.exportFilename", {prefix})),
                 modifiedKey = [{"oldKey": "isTemp", "newKey": "eigene Berechnungen"}];
 
@@ -668,6 +656,26 @@ export default {
             if (this.statsFeatureFilter.length > 0) {
                 this.statsFeatureFilter.push(calcName);
             }
+        },
+
+        /**
+         * Updates the timestamps in the table based on the selected years.
+         * @param {String[]} selectedYears - array of years to filter timestamps
+         * @returns {void}
+         */
+        updateTimestampsValues (selectedYears) {
+            const sortedSelectedYears = selectedYears.slice(0).sort((a, b) => b - a);
+
+            this.setTimestampsFiltered(sortedSelectedYears);
+            this.items.forEach(item => {
+                if (selectedYears.length === 0) {
+                    item.years = [...getTimestamps(item, this.timestampPrefix)];
+                }
+                else {
+                    item.years = sortedSelectedYears;
+                }
+            });
+            this.timestampSelected = this.items[0].years[0];
         }
 
     }
@@ -697,12 +705,13 @@ export default {
                     fluid
                 >
                     <DashboardToolbar
-                        :stats-feature-filter="statsFeatureFilter"
                         :district-columns="districtColumns"
+                        :stats-feature-filter="statsFeatureFilter"
                         @setStatsFeatureFilter="setStatsFeatureFilter"
                         @exportTable="exportTable"
                         @toggleColumn="minimizeCol"
                         @reorderColumns="reorderColumns"
+                        @setTimestampsValues="updateTimestampsValues"
                         @start-calculation="onStartCalculation"
                     />
                     <v-row class="dashboard-table-wrapper">
@@ -721,14 +730,9 @@ export default {
                         >
                             <!-- Header for years selector -->
                             <template #[`header.years`]>
-                                <v-select
-                                    v-model="currentTimeStamp"
-                                    :items="timestamps"
-                                    :height="20"
-                                    :label="$t('additional:modules.tools.cosi.dashboard.timestampCol')"
-                                    density="compact"
-                                    hide-details
-                                />
+                                <div>
+                                    {{ $t('additional:modules.tools.cosi.dashboard.timestamp') }}
+                                </div>
                             </template>
                             <!-- Header for districts -->
                             <template
@@ -786,7 +790,7 @@ export default {
                                         </ul>
                                     </template>
                                     <template v-else>
-                                        <span><small class="timestamp">{{ currentTimeStamp }}</small></span>
+                                        <span><small class="timestamp">{{ timestampSelected }}</small></span>
                                     </template>
                                 </div>
                             </template>
@@ -799,7 +803,7 @@ export default {
                                     :key="district.value"
                                     :item="item"
                                     :header="district"
-                                    :current-timestamp="currentTimeStamp"
+                                    :current-timestamp="timestampSelected"
                                     :timestamp-prefix="timestampPrefix"
                                     :current-locale="'de-DE'"
                                     :tooltip-offset="toolOffset"
@@ -812,7 +816,7 @@ export default {
                                     v-if="item.total"
                                     :item="item"
                                     :header="header"
-                                    :current-timestamp="currentTimeStamp"
+                                    :current-timestamp="timestampSelected"
                                     :timestamp-prefix="timestampPrefix"
                                     :current-locale="'de-DE'"
                                     :tooltip-offset="toolOffset"
@@ -839,11 +843,11 @@ export default {
                                                 </ul>
                                             </template>
                                             <template v-else>
-                                                <span>{{ getTotalAsString(item, currentTimeStamp) }}</span>
+                                                <span>{{ getTotalAsString(item, timestampSelected) }}</span>
                                             </template>
                                         </div>
                                     </template>
-                                    <span>{{ $t('additional:modules.tools.cosi.dashboard.totalCol') }} {{ item.expanded ? '' : `(${currentTimeStamp})` }}</span>
+                                    <span>{{ $t('additional:modules.tools.cosi.dashboard.totalCol') }} {{ item.expanded ? '' : `(${timestampSelected})` }}</span>
                                 </v-tooltip>
                             </template>
                             <!-- Columns for aggregated data -->
@@ -852,7 +856,7 @@ export default {
                                     v-if="item.average"
                                     :item="item"
                                     :header="header"
-                                    :current-timestamp="currentTimeStamp"
+                                    :current-timestamp="timestampSelected"
                                     :timestamp-prefix="timestampPrefix"
                                     :current-locale="'de-DE'"
                                     :tooltip-offset="toolOffset"
@@ -879,11 +883,11 @@ export default {
                                                 </ul>
                                             </template>
                                             <template v-else>
-                                                {{ getAverageAsString(item, currentTimeStamp) }}
+                                                {{ getAverageAsString(item, timestampSelected) }}
                                             </template>
                                         </div>
                                     </template>
-                                    <span>{{ $t('additional:modules.tools.cosi.dashboard.avgCol') }} {{ item.expanded ? '' : `(${currentTimeStamp})` }}</span>
+                                    <span>{{ $t('additional:modules.tools.cosi.dashboard.avgCol') }} {{ item.expanded ? '' : `(${timestampSelected})` }}</span>
                                 </v-tooltip>
                             </template>
                         </v-data-table-virtual>
@@ -916,7 +920,6 @@ export default {
         thead {
             .district-header {
                 position: relative;
-                margin-top: 10px;
                 > div {
                     min-width: 100px;
                 }

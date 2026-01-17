@@ -642,8 +642,6 @@ describe("addons/cosi/Dashboard/components/Dashboard.vue", () => {
                                         statsFeatureFilter: () => [],
                                         calculations: () => [],
                                         reportTemplateMode: () => null,
-                                        toolBridgeIn: () => sinon.stub(),
-                                        toolBridgeOut: () => sinon.stub(),
                                         prefixExportFilename: () => "",
                                         items: () => []
                                     }
