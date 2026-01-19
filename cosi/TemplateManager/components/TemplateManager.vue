@@ -293,6 +293,7 @@ export default {
     },
     methods: {
         ...mapActions(["addOrReplaceLayer"]),
+        ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Modules/TemplateManager", Object.keys(mutations)),
         ...mapActions("Modules/TemplateManager", Object.keys(actions)),
         ...mapActions("Menu", ["changeCurrentComponent"]),
@@ -400,7 +401,7 @@ export default {
         },
 
         /**
-         * Loading the layers from id
+         * Loading the layers from id and removing the existed other layers which are not in the black layer list.
          * @param {String[]} layerIds The layer Id list
          * @param {Boolean} active - Flag if it is activated.
          * @param {Object[]} templates - The templates.
@@ -409,19 +410,21 @@ export default {
         loadLayer (layerIds, active, templates) {
             const activeLayersId = this.getActiveLayerIds(templates);
 
+            if (active) {
+                this.getVisibleLayers().forEach(layer => {
+                    if (!this.blackLayerlist.includes(layer?.attributes?.id)) {
+                        this.removeLayer(layer?.attributes);
+                    }
+                });
+            }
+
             if (Array.isArray(layerIds) && layerIds.length) {
                 layerIds.forEach(layerId => {
-                    let layer = layerCollection.getLayerById(layerId);
                     const visiblity = !this.defaultActiveLayerIds.includes(layerId) && !activeLayersId.includes(layerId) ? active : true;
 
-                    if (layer) {
-                        layer.layer.setVisible(visiblity);
-                    }
-                    else {
-                        layer = this.allLayerConfigs.find(lay => lay.id === layerId);
-                        if (layer) {
-                            this.addOrReplaceLayer({layerId: layer.id, visibility: visiblity});
-                        }
+                    this.addOrReplaceLayer({layerId: layerId, visibility: visiblity});
+                    if (!visiblity && layerCollection.getLayerById(layerId)) {
+                        this.removeLayer(layerCollection.getLayerById(layerId)?.attributes);
                     }
                 });
             }

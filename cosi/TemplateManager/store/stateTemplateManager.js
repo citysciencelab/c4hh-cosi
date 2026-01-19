@@ -3,6 +3,7 @@
  * @typedef {Object} DistrictSelectorState
  * @property {Boolean} [active=false] - Is activated (will rendered) or not (config-param).
  * @property {String[]} activeTemplates - the active templates.
+ * @property {String[]} blackLayerlist - the layer will not be removed by toggle the button.
  * @property {String} currentActiveTemplate - the current active template name.
  * @property {Boolean} [deactivateGFI=false] - Deactivates the gfi if true (config-param).
  * @property {String} [icon="bi-folder2-open"] - Bootstrap icon class (config-param).
@@ -23,6 +24,7 @@
 const state = {
     active: false,
     activeTemplates: [],
+    blackLayerlist: ["33780", "27773", "28201", "28028", "28150"],
     currentActiveTemplate: "",
     deactivateGFI: false,
     defaultActiveLayerIds: [],
