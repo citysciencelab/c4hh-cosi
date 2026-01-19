@@ -244,7 +244,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             expect(dispatch.callCount).to.equal(4);
             expect(dispatch.args[0][0]).to.equal("selectLayerByName");
             expect(dispatch.args[0][1]).to.equal(selectedLayerName);
-            expect(dispatch.args[1][0]).to.equal("MapMarker/removePolygonMarker");
+            expect(dispatch.args[1][0]).to.equal("Maps/removePolygonMarker");
             expect(dispatch.args[1][1]).to.equal(null);
             expect(dispatch.args[2][0]).to.equal("requestGFI");
             expect(dispatch.args[3][0]).to.equal("toggleStripesLayer");
@@ -306,7 +306,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             expect(commit.args[3][1]).to.equal(false);
             expect(dispatch.callCount).to.equal(4);
             expect(dispatch.args[1][0]).to.equal("requestGFI");
-            expect(dispatch.args[2][0]).to.equal("MapMarker/removePointMarker");
+            expect(dispatch.args[2][0]).to.equal("Maps/removePointMarker");
             expect(dispatch.args[3][0]).to.equal("toggleStripesLayer");
             expect(dispatch.args[3][1]).to.equal(false);
         });
@@ -397,7 +397,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             expect(commit.secondCall.args[0]).to.equal("setSelectedPolygon");
             expect(commit.secondCall.args[1]).to.equal(null);
             expect(dispatch.calledThrice).to.be.true;
-            expect(dispatch.firstCall.args[0]).to.equal("MapMarker/placingPointMarker");
+            expect(dispatch.firstCall.args[0]).to.equal("Maps/placingPointMarker");
             expect(dispatch.firstCall.args[1]).to.equal(coordinate);
             expect(dispatch.secondCall.args[0]).to.equal("Maps/setCenter");
             expect(dispatch.secondCall.args[1]).to.equal(coordinate);
@@ -412,8 +412,8 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             actions.handleGfiResponse({state, dispatch, commit}, {response, status, coordinate});
             expect(dispatch.calledThrice).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("Alerting/addSingleAlert");
-            expect(dispatch.secondCall.args[0]).to.equal("MapMarker/removePolygonMarker");
-            expect(dispatch.thirdCall.args[0]).to.equal("MapMarker/removePointMarker");
+            expect(dispatch.secondCall.args[0]).to.equal("Maps/removePolygonMarker");
+            expect(dispatch.thirdCall.args[0]).to.equal("Maps/removePointMarker");
             expect(commit.callCount).to.equal(5);
             expect(commit.firstCall.args[0]).to.equal("setSelectedBrwFeature");
             expect(commit.firstCall.args[1]).to.deep.equal({});

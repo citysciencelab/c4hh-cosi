@@ -360,18 +360,21 @@ export default {
                 >
                     <button
                         class="bi-info-circle-fill col me-1 btn btn-component"
+                        :class="{ 'btn-active-color': buttonValue === 'info' }"
                         value="info"
                         :title="$t('additional:modules.boris.detailInformation.title')"
                         @click="setButtonValue($event.target.value)"
                     />
                     <button
                         class="bi-geo-alt-fill col me-1 btn btn-component"
+                        :class="{ 'btn-active-color': buttonValue === 'lage' }"
                         value="lage"
                         :title="$t('additional:modules.boris.locationDescription.title')"
                         @click="setButtonValue($event.target.value)"
                     />
                     <button
                         class="bi-currency-euro col me-1 btn btn-component"
+                        :class="{ 'btn-active-color': buttonValue === 'euro' }"
                         value="euro"
                         :title="$t('additional:modules.boris.landCalculation.title')"
                         @click="setButtonValue($event.target.value)"
@@ -379,6 +382,7 @@ export default {
                     <button
                         v-if="selectedBrwFeature.get('schichtwert')"
                         class="bi-list-ul col btn btn-component"
+                        :class="{ 'btn-active-color': buttonValue === 'liste' }"
                         value="liste"
                         :title="$t('additional:modules.boris.floorValues.title')"
                         @click="setButtonValue($event.target.value)"
@@ -569,7 +573,6 @@ export default {
   --bs-btn-border: none;
   --bs-btn-active-color: #fff;
   --bs-btn-active-bg: #001B3D;
-  --bs-btn-focus-color: #fff;
   --bs-btn-focus-bg: #001B3D;
   --bs-btn-transition: all 0.3s ease-in-out;
   color: var(--bs-btn-color);
@@ -578,6 +581,11 @@ export default {
   border: var(--bs-btn-border);
   transition: var(--bs-btn-transition);
   box-sizing: border-box;
+}
+
+.btn-active-color {
+    background-color: var(--bs-btn-active-bg);
+    color: var(--bs-btn-active-color);
 }
 
 .btn-component:hover {

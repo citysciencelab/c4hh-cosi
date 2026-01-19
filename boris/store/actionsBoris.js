@@ -109,7 +109,7 @@ const actions = {
             }
         }
         else {
-            dispatch("MapMarker/removePolygonMarker", null, {root: true});
+            dispatch("Maps/removePolygonMarker", null, {root: true});
             if (rootGetters["Maps/clickCoordinate"] && !(previousYear > 2008 && currentYear <= 2008)) {
                 dispatch("requestGFI", {processFromParametricUrl: false, center: null});
             }
@@ -118,7 +118,7 @@ const actions = {
             dispatch("requestGFI", {processFromParametricUrl: false, center: null});
         }
         else if (currentYear > 2008 && previousYear <= 2008) {
-            dispatch("MapMarker/removePointMarker", null, {root: true});
+            dispatch("Maps/removePointMarker", null, {root: true});
             commit("setSelectedBrwFeature", {});
             commit("setTextIds", []);
         }
@@ -263,7 +263,7 @@ const actions = {
             }
             else {
                 commit("setBrwFeatures", feature);
-                dispatch("MapMarker/placingPointMarker", coordinate, {root: true});
+                dispatch("Maps/placingPointMarker", coordinate, {root: true});
                 dispatch("Maps/setCenter", coordinate, {root: true});
                 dispatch("combineFeatureWithSelectedDate", feature);
                 commit("setSelectedPolygon", null);
@@ -271,8 +271,8 @@ const actions = {
         }
         else {
             dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.boris.alertMessage:noBrw"), {root: true});
-            dispatch("MapMarker/removePolygonMarker", null, {root: true});
-            dispatch("MapMarker/removePointMarker", null, {root: true});
+            dispatch("Maps/removePolygonMarker", null, {root: true});
+            dispatch("Maps/removePointMarker", null, {root: true});
             commit("setSelectedBrwFeature", {});
             commit("setSelectedPolygon", null);
             commit("setSelectedLanduse", "");
