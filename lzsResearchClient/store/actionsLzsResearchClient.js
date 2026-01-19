@@ -14,5 +14,11 @@ export default {
             });
 
         commit("setDataClassList", response.data);
+    },
+    async fetchPlaceholders ({state, commit}) {
+        const timestamp = Date.now(),
+            response = await axios.get(state.placeholderJsonPath + "?t=" + timestamp);
+
+        commit("setPlaceholderDataClassList", response.data);
     }
 };

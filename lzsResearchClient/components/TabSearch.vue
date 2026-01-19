@@ -19,18 +19,21 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
-            "dataClassList"
+            "dataClassList",
+            "placeholderDataClassList"
         ])
     },
     async mounted () {
         await this.fetchDataClassList();
+        await this.fetchPlaceholders();
 
         this.initializeSearchForm();
         this.setSelectedArchiv(this.dataClassList[0]?.name);
     },
     methods: {
         ...mapActions("Modules/LzsResearchClient", [
-            "fetchDataClassList"
+            "fetchDataClassList",
+            "fetchPlaceholders"
         ]),
         changeSearchContent (contentId) {
             this.activeContent = contentId;
@@ -47,11 +50,8 @@ export default {
                         .filter(attribute => attribute.usage === "I")
                         .map(attribute => ({
                             ...attribute,
-                            value: ""
-                        }))
-                        .map(attribute => ({
-                            ...attribute,
-                            value: "",
+                            value: this.placeholderDataClassList?.[archivName]?.[attribute.name] || "",
+                            placeholder: this.placeholderDataClassList?.[archivName]?.[attribute.name] || "",
                             label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`)
                         }));
 
@@ -59,9 +59,10 @@ export default {
                 formValues[archivName].push(
                     {
                         name: "maxValueCount",
-                        value: "",
+                        value: "10",
                         label: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount"),
-                        pattern: "[0-9]{4}"
+                        pattern: "[0-9]{4}",
+                        placeholder: "10"
                     });
             });
 
@@ -72,9 +73,7 @@ export default {
 </script>
 
 <template>
-    <div
-        id="TabSearch"
-    >
+    <div id="TabSearch">
         <transition
             name="slide"
             mode="out-in"
@@ -145,7 +144,7 @@ export default {
                             :key="attribute.name"
                             v-model="attribute.value"
                             :label="attribute.label"
-                            :placeholder="attribute.name"
+                            :placeholder="attribute.placeholder"
                         />
                     </div>
                 </div>

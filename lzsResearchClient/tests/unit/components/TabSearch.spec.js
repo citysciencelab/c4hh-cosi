@@ -52,10 +52,25 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                             namespaced: true,
                             state: () => ({}),
                             getters: {
-                                dataClassList: () => mockDataClassList
+                                dataClassList: () => mockDataClassList,
+                                placeholderDataClassList: () => ({
+                                    "3D-Stadtmodell LoD1": {
+                                        "JAHRGANG": "1234",
+                                        "KACHELNUMMER": "1234"
+                                    },
+                                    "3D-Stadtmodell LoD2": {
+                                        "JAHRGANG": "1234",
+                                        "KACHELNUMMER": "1234"
+                                    },
+                                    "AFIS-Einzelnachweise": {
+                                        "JAHRGANG": "1234",
+                                        "PUNKTKENNUNG": "123456789"
+                                    }
+                                })
                             },
                             actions: {
-                                fetchDataClassList: () => Promise.resolve()
+                                fetchDataClassList: () => Promise.resolve(),
+                                fetchPlaceholders: () => Promise.resolve()
                             }
                         }
                     }
@@ -156,9 +171,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
 
         await wrapper.vm.$nextTick();
 
-        const searchFormWithAttributes = wrapper.findAllComponents({name: "InputText"});
+        const searchAttributes = wrapper.vm.searchWithAttributeForm;
 
-        expect(searchFormWithAttributes.length).to.be.at.least(1);
+        expect(searchAttributes).to.have.property("3D-Stadtmodell LoD1");
+        expect(searchAttributes["3D-Stadtmodell LoD1"]).to.be.an("array").that.is.not.empty;
 
         wrapper.vm.searchWithAttributeForm["3D-Stadtmodell LoD1"][0].value = "newValue";
 

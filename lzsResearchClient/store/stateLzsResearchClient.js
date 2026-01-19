@@ -12,6 +12,7 @@
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * @property {Boolean} standAlonePortal - flag if tool is used in a standalone portal, then titles are removed via CSS (config-param)
  * @property {String} apiBasePath - Base url for api requests to gis portal
+ * @property {String} placeholderJsonPath - Path placeholder.json file in portalconfigs.
 
  * Addon state
  * @property {Boolean} showLoadingSpinner - Show loading spinner or not
@@ -34,7 +35,9 @@ const state = {
     // Addon state
     showLoadingSpinner: false,
     dataClassList: {},
-    apiBasePath: ""
+    apiBasePath: "",
+    placeholderDataClassList: {},
+    placeholderJsonPath: ""
 };
 
 export default state;
