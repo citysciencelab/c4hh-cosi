@@ -1,4 +1,6 @@
 <script>
+import {mapGetters} from "vuex";
+
 export default {
     name: "TabResult",
     components: {},
@@ -6,7 +8,11 @@ export default {
     data () {
         return {};
     },
-    computed: {},
+    computed: {
+        ...mapGetters("Modules/LzsResearchClient", [
+            "searchAttributeResponse"
+        ])
+    },
     watch: {},
     methods: {}
 };
@@ -15,6 +21,9 @@ export default {
 <template>
     <div id="TabResult">
         "TabResult Content"
+        <div v-if="searchAttributeResponse.length > 0">
+            {{ searchAttributeResponse }}
+        </div>
     </div>
 </template>
 

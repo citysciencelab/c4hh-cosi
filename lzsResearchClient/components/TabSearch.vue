@@ -1,6 +1,8 @@
 <script>
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
+import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
 
 import {mapGetters, mapActions} from "vuex";
 
@@ -8,13 +10,20 @@ export default {
     name: "TabSearch",
     components: {
         FlatButton,
-        InputText
+        InputText,
+        SpinnerItem
+    },
+    inject: {
+        setCurrentTab: {from: TAB_SET_CURRENT, default: null}
     },
     data () {
         return {
             activeContent: "searchOptionsList",
             selectedArchiv: "",
-            searchWithAttributeForm: {}
+            searchWithAttributeFormData: {},
+            archives: {},
+            showSpinner: false,
+            isAttributeSearchFormValid: true
         };
     },
     computed: {
@@ -23,26 +32,45 @@ export default {
             "placeholderDataClassList"
         ])
     },
+    watch: {
+        selectedArchiv (newValue) {
+            if (newValue) {
+                this.validateSearchWithAttributeForm();
+            }
+        }
+    },
     async mounted () {
         await this.fetchDataClassList();
         await this.fetchPlaceholders();
 
         this.initializeSearchForm();
-        this.setSelectedArchiv(this.dataClassList[0]?.name);
     },
     methods: {
         ...mapActions("Modules/LzsResearchClient", [
             "fetchDataClassList",
+            "searchByAttribute",
             "fetchPlaceholders"
         ]),
+        /**
+         * Update the active content section to the given `contentId`.
+         * @param {string} contentId - The id of the content to activate.
+         */
         changeSearchContent (contentId) {
             this.activeContent = contentId;
         },
+        /**
+         * Set the selected archive identifier.
+         * @param {string} archiv - The archive name to select.
+         */
         setSelectedArchiv (archiv) {
             this.selectedArchiv = archiv;
         },
+        /**
+         * Initialize archive and form data structures from `dataClassList`.
+         */
         initializeSearchForm () {
-            const formValues = {};
+            const formData = {},
+                archives = {};
 
             this.dataClassList?.forEach(element => {
                 const archivName = element.name,
@@ -50,23 +78,97 @@ export default {
                         .filter(attribute => attribute.usage === "I")
                         .map(attribute => ({
                             ...attribute,
-                            value: this.placeholderDataClassList?.[archivName]?.[attribute.name] || "",
-                            placeholder: this.placeholderDataClassList?.[archivName]?.[attribute.name] || "",
-                            label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`)
+                            value: this.placeholderDataClassList?.[archivName]?.[attribute.name].PLACEHOLDER || "",
+                            placeholder: this.placeholderDataClassList?.[archivName]?.[attribute.name].PLACEHOLDER || "",
+                            label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`),
+                            pattern: this.placeholderDataClassList?.[archivName]?.[attribute.name].PATTERN || "",
+                            errorMessage: ""
                         }));
 
-                formValues[archivName] = attributes;
-                formValues[archivName].push(
+                formData[archivName] = [
+                    ...attributes,
                     {
                         name: "maxValueCount",
                         value: "10",
                         label: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount"),
-                        pattern: "[0-9]{4}",
-                        placeholder: "10"
-                    });
+                        pattern: "[0-9]{1,4}",
+                        placeholder: "10",
+                        errorMessage: ""
+                    }
+                ];
+
+                archives[element.name] = element.id;
             });
 
-            this.searchWithAttributeForm = formValues;
+            this.searchWithAttributeFormData = formData;
+            this.archives = archives;
+            this.setSelectedArchiv(this.dataClassList[0]?.name);
+        },
+        /**
+         * Build a search payload from the form data, show a spinner and perform the search.
+         * After search, switch to the result tab.
+         */
+        async searchWithAttribute () {
+            if (!this.isAttributeSearchFormValid) {
+                return;
+            }
+
+            const payload = {
+                dataclassIds: [this.archives[this.selectedArchiv]],
+                maxvaluecount: "",
+                fachattribute: []
+            };
+
+            this.searchWithAttributeFormData[this.selectedArchiv].forEach(formItem => {
+                if (formItem.usage === "I") {
+                    payload.fachattribute.push({
+                        id: formItem.name.toUpperCase(),
+                        value: formItem.value, type: formItem.usage
+                    });
+                }
+
+                if (formItem.name === "maxValueCount") {
+                    payload.maxvaluecount = formItem.value;
+                }
+            });
+
+            this.showSpinner = true;
+
+            await this.searchByAttribute(payload);
+
+            this.showSpinner = false;
+
+            this.setCurrentTab("tabResult");
+        },
+        /**
+         * Validate form fields against their patterns and set error messages accordingly.
+         */
+        validateSearchWithAttributeForm () {
+            const attributes = this.searchWithAttributeFormData[this.selectedArchiv];
+
+            this.isAttributeSearchFormValid = true;
+
+            attributes.forEach(attribute => {
+                attribute.errorMessage = "";
+
+                if (attribute.pattern && attribute.value !== null && String(attribute.value) !== "") {
+                    const regex = new RegExp(`^${attribute.pattern}$`);
+
+                    if (!regex.test(String(attribute.value))) {
+                        attribute.errorMessage = this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.patternError",
+                            {digitNumber: attribute.placeholder.length}
+                        );
+                        this.isAttributeSearchFormValid = false;
+                    }
+                }
+            });
+        },
+        /**
+         * Reset the form to its initial state and run validation.
+         */
+        resetForm () {
+            this.initializeSearchForm();
+            this.validateSearchWithAttributeForm();
         }
     }
 };
@@ -114,74 +216,92 @@ export default {
                 class="searchAttributes"
             >
                 <div
-                    v-if="activeContent === 'searchFormWithAttributes'"
-                    id="searchFormWithAttributes"
-                    class="searchFormWithAttributes"
+                    v-if="showSpinner"
+                    class="loadingSpinner"
                 >
-                    <label for="archiv">
-                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
-                    </label>
+                    <SpinnerItem
+                        custom-class="spinner"
+                        class="ms-3"
+                    />
+                </div>
 
-                    <select
-                        id="archiv"
-                        class="form-select archiv"
-                        :value="selectedArchiv"
-                        @change="setSelectedArchiv($event.target.value)"
+                <div v-else>
+                    <div
+                        v-if="activeContent === 'searchFormWithAttributes'"
+                        id="searchFormWithAttributes"
+                        class="searchFormWithAttributes"
                     >
-                        <option
-                            v-for="(_, name) in searchWithAttributeForm"
-                            :key="name"
-                            :value="name"
-                        >
-                            {{ name }}
-                        </option>
-                    </select>
+                        <label for="archiv">
+                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
+                        </label>
 
-                    <div class="searchWithAttributeForm">
-                        <InputText
-                            v-for="attribute in searchWithAttributeForm[selectedArchiv]"
-                            :id="attribute.name"
-                            :key="attribute.name"
-                            v-model="attribute.value"
-                            :label="attribute.label"
-                            :placeholder="attribute.placeholder"
+                        <select
+                            id="archiv"
+                            class="form-select archiv"
+                            :value="selectedArchiv"
+                            @change="setSelectedArchiv($event.target.value)"
+                        >
+                            <option
+                                v-for="(_, name) in searchWithAttributeFormData"
+                                :key="name"
+                                :value="name"
+                            >
+                                {{ name }}
+                            </option>
+                        </select>
+
+                        <div class="searchWithAttributeForm">
+                            <InputText
+                                v-for="attribute in searchWithAttributeFormData[selectedArchiv]"
+                                :id="attribute.name"
+                                :key="attribute.name"
+                                v-model="attribute.value"
+                                :class-obj="['form-control' + (attribute.errorMessage.length > 0 ? ' is-invalid': ' is-valid')]"
+                                :label="attribute.name"
+                                :placeholder="attribute.placeholder"
+                                :error-message="attribute.errorMessage"
+                                @input="validateSearchWithAttributeForm()"
+                            />
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="activeContent === 'searchFormWithGeometry'"
+                        id="searchFormWithGeometry"
+                        class="searchFormWithGeometry"
+                    >
+                        Search with geometry
+                        <hr>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores, quo, blanditiis ducimus ipsam optio voluptates mollitia odit tempora provident perspiciatis modi commodi fugiat numquam accusantium rem facere? Saepe, a accusamus.
+                        <hr>
+                    </div>
+
+                    <div class="searchButtons">
+                        <FlatButton
+                            :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.dossiersButtonLabel')"
+                            :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.dossiersButtonLabel')"
+                        />
+
+                        <FlatButton
+                            id="backButton"
+                            :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.backButtonLabel')"
+                            :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.backButtonLabel')"
+                            @click="changeSearchContent('searchOptionsList')"
+                        />
+
+                        <FlatButton
+                            :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
+                            :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
+                            :disabled="!isAttributeSearchFormValid"
+                            @click="searchWithAttribute()"
+                        />
+
+                        <FlatButton
+                            :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
+                            :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
+                            @click="resetForm()"
                         />
                     </div>
-                </div>
-
-                <div
-                    v-if="activeContent === 'searchFormWithGeometry'"
-                    id="searchFormWithGeometry"
-                    class="searchFormWithGeometry"
-                >
-                    Search with geometry
-                    <hr>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores, quo, blanditiis ducimus ipsam optio voluptates mollitia odit tempora provident perspiciatis modi commodi fugiat numquam accusantium rem facere? Saepe, a accusamus.
-                    <hr>
-                </div>
-
-                <div class="searchButtons">
-                    <FlatButton
-                        :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.dossiersButtonLabel')"
-                        :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.dossiersButtonLabel')"
-                    />
-
-                    <FlatButton
-                        id="backButton"
-                        :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.backButtonLabel')"
-                        :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.backButtonLabel')"
-                        @click="changeSearchContent('searchOptionsList')"
-                    />
-
-                    <FlatButton
-                        :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
-                        :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
-                    />
-
-                    <FlatButton
-                        :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
-                        :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
-                    />
                 </div>
             </div>
         </transition>
@@ -192,6 +312,7 @@ export default {
 #TabSearch {
     padding: 1rem 0.5rem;
     position: relative;
+    height: 100%;
 
     // Transition classes - START
     .slide-enter-active,
@@ -211,6 +332,40 @@ export default {
     // Transition classes - END
 
     div.searchAttributes {
+        height: 100%;
+
+        div.searchFormWithAttributes {
+            select.archiv {
+                margin-bottom: 1rem;
+            }
+        }
+
+        div.loadingSpinner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.7);
+            z-index: 2;
+
+            div.spinner {
+                width: 4rem;
+                height: 4rem;
+            }
+
+            p {
+                background-color: white;
+                white-space: pre-line;
+                padding: 1.5rem;
+            }
+        }
+
         div.searchFormWithAttributes {
             select.archiv {
                 margin-bottom: 1rem;

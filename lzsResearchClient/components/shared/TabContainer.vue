@@ -98,5 +98,13 @@ export default {
 <style lang="scss" scoped>
 #TabContainer {
     height: 100%;
+
+    div.tab-content {
+        height: 100%;
+
+        div.tab-pane {
+            height: 100%;
+        }
+    }
 }
 </style>

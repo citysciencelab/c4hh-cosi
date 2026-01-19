@@ -9,6 +9,11 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
         store;
 
     beforeEach(() => {
+        const mockSearchAttributeResponse = [
+            {"archiveId": "DKL_3DSTADT_LOD1", "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "6232", "type": "I"}]},
+            {"archiveId": "DKL_3DSTADT_LOD1", "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "4835", "type": "I"}]}
+        ];
+
         store = createStore({
             modules: {
                 namespaced: true,
@@ -19,7 +24,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
                             namespaced: true,
                             state: () => ({
                                 // to be used later
-                            })
+                            }),
+                            getters: {
+                                searchAttributeResponse: () => mockSearchAttributeResponse
+                            }
                         }
                     }
                 }

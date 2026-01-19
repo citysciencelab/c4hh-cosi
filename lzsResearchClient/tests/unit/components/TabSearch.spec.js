@@ -10,38 +10,72 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
 
     beforeEach(() => {
         const mockDataClassList = [
-            {
-                name: "3D-Stadtmodell LoD1",
-                id: "DKL_3DSTADT_LOD1",
-                active: true,
-                highestActiveDataclassVersion: {
-                    dataclassAttributs: [
-                        {name: "attr1", usage: "I"},
-                        {name: "attr2", usage: "I"}
-                    ]
+                {
+                    name: "3D-Stadtmodell LoD1",
+                    id: "DKL_3DSTADT_LOD1",
+                    active: true,
+                    highestActiveDataclassVersion: {
+                        dataclassAttributs: [
+                            {name: "JAHRGANG", usage: "I"},
+                            {name: "KACHELNUMMER", usage: "I"}
+                        ]
+                    }
+                },
+                {
+                    name: "3D-Stadtmodell LoD2",
+                    id: "DKL_3DSTADT_LOD2",
+                    active: true,
+                    highestActiveDataclassVersion: {
+                        dataclassAttributs: [
+                            {name: "JAHRGANG", usage: "I"},
+                            {name: "KACHELNUMMER", usage: "I"}
+                        ]
+                    }
+                },
+                {
+                    name: "AFIS-Einzelnachweise",
+                    id: "DKL_AFIS_EINZEL",
+                    active: true,
+                    highestActiveDataclassVersion: {
+                        dataclassAttributs: [
+                            {name: "JAHRGANG", usage: "I"},
+                            {name: "PUNKTKENNUNG", usage: "I"}
+                        ]
+                    }
                 }
-            },
-            {
-                name: "3D-Stadtmodell LoD2",
-                id: "DKL_3DSTADT_LOD2",
-                active: true,
-                highestActiveDataclassVersion: {
-                    dataclassAttributs: [
-                        {name: "lod2_attr", usage: "I"}
-                    ]
+            ],
+            mockPlaceholdersJson = {
+                "3D-Stadtmodell LoD1": {
+                    "JAHRGANG": {
+                        "PLACEHOLDER": "2023",
+                        "PATTERN": "[0-9*]{4}"
+                    },
+                    "KACHELNUMMER": {
+                        "PLACEHOLDER": "6628",
+                        "PATTERN": "[0-9*]{4}"
+                    }
+                },
+                "3D-Stadtmodell LoD2": {
+                    "JAHRGANG": {
+                        "PLACEHOLDER": "2023",
+                        "PATTERN": "[0-9*]{4}"
+                    },
+                    "KACHELNUMMER": {
+                        "PLACEHOLDER": "6628",
+                        "PATTERN": "[0-9*]{4}"
+                    }
+                },
+                "AFIS-Einzelnachweise": {
+                    "JAHRGANG": {
+                        "PLACEHOLDER": "2023",
+                        "PATTERN": "[0-9*]{4}"
+                    },
+                    "PUNKTKENNUNG": {
+                        "PLACEHOLDER": "232590148",
+                        "PATTERN": "[0-9*]{9}"
+                    }
                 }
-            },
-            {
-                name: "AFIS-Einzelnachweise",
-                id: "DKL_AFIS_EINZEL",
-                active: true,
-                highestActiveDataclassVersion: {
-                    dataclassAttributs: [
-                        {name: "afis_attr", usage: "I"}
-                    ]
-                }
-            }
-        ];
+            };
 
         store = createStore({
             modules: {
@@ -53,20 +87,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                             state: () => ({}),
                             getters: {
                                 dataClassList: () => mockDataClassList,
-                                placeholderDataClassList: () => ({
-                                    "3D-Stadtmodell LoD1": {
-                                        "JAHRGANG": "1234",
-                                        "KACHELNUMMER": "1234"
-                                    },
-                                    "3D-Stadtmodell LoD2": {
-                                        "JAHRGANG": "1234",
-                                        "KACHELNUMMER": "1234"
-                                    },
-                                    "AFIS-Einzelnachweise": {
-                                        "JAHRGANG": "1234",
-                                        "PUNKTKENNUNG": "123456789"
-                                    }
-                                })
+                                placeholderDataClassList: () => mockPlaceholdersJson
                             },
                             actions: {
                                 fetchDataClassList: () => Promise.resolve(),
@@ -143,14 +164,14 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         expect(wrapper.find("#searchOptionsList").exists()).to.be.true;
     });
 
-    it("initializes searchWithAttributeForm from dataClassList", async () => {
+    it("initializes searchWithAttributeFormData from dataClassList", async () => {
         const items = wrapper.findAll("#searchOptionsList li");
 
         await items[0].trigger("click");
 
         await wrapper.vm.$nextTick();
 
-        const searchAttributes = wrapper.vm.searchWithAttributeForm,
+        const searchAttributes = wrapper.vm.searchWithAttributeFormData,
             searchWithAttributeForm = searchAttributes["3D-Stadtmodell LoD1"];
 
         expect(Object.keys(searchAttributes)).to.include.members([
@@ -161,7 +182,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
 
         expect(searchWithAttributeForm).to.be.an("array");
         expect(searchWithAttributeForm.length).to.equal(3);
-        expect(searchWithAttributeForm[0].value).to.equal("");
+        expect(searchWithAttributeForm[0].value).to.equal("2023");
     });
 
     it("updates attribute value when input changes", async () => {
@@ -171,15 +192,41 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
 
         await wrapper.vm.$nextTick();
 
-        const searchAttributes = wrapper.vm.searchWithAttributeForm;
+        const searchAttributes = wrapper.vm.searchWithAttributeFormData;
 
         expect(searchAttributes).to.have.property("3D-Stadtmodell LoD1");
         expect(searchAttributes["3D-Stadtmodell LoD1"]).to.be.an("array").that.is.not.empty;
 
-        wrapper.vm.searchWithAttributeForm["3D-Stadtmodell LoD1"][0].value = "newValue";
+        wrapper.vm.searchWithAttributeFormData["3D-Stadtmodell LoD1"][0].value = "newValue";
 
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.searchWithAttributeForm["3D-Stadtmodell LoD1"][0].value).to.equal("newValue");
+        expect(wrapper.vm.searchWithAttributeFormData["3D-Stadtmodell LoD1"][0].value).to.equal("newValue");
+    });
+
+    it("select shows correct archiv options and selecting updates selectedArchiv", async () => {
+        const items = wrapper.findAll("#searchOptionsList li");
+
+        await items[0].trigger("click");
+
+        await wrapper.vm.$nextTick();
+
+        const keys = Object.keys(wrapper.vm.searchWithAttributeFormData);
+
+        expect(keys).to.include.members([
+            "3D-Stadtmodell LoD1",
+            "3D-Stadtmodell LoD2",
+            "AFIS-Einzelnachweise"
+        ]);
+
+        const select = wrapper.find("select#archiv");
+
+        expect(select.exists()).to.be.true;
+
+        wrapper.vm.setSelectedArchiv("AFIS-Einzelnachweise");
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.selectedArchiv).to.equal("AFIS-Einzelnachweise");
     });
 });

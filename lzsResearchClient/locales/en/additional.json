@@ -21,7 +21,8 @@
                     "selectArchivLabel": "Archive",
                     "jahrgang": "Year",
                     "kachelnummer": "Tile Number",
-                    "maxValueCount": "Max. Results"
+                    "maxValueCount": "Max. Results",
+                    "patternError": "Please enter a numeric value with \"{ digitNumber }\" digit."
                 },
                 "tabResult": {
                     "label": "Results"

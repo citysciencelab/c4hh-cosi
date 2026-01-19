@@ -21,7 +21,8 @@
                     "selectArchivLabel": "Archiv",
                     "jahrgang": "Jahrgang",
                     "kachelnummer": "Kachelnummer",
-                    "maxValueCount": "Max. Trefferanzahl"
+                    "maxValueCount": "Max. Trefferanzahl",
+                    "patternError": "Please enter a numeric value with {{ digitNumber }} digit."
                 },
                 "tabResult": {
                     "label": "Ergebnisse"

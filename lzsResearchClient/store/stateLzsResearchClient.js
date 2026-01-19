@@ -36,6 +36,7 @@ const state = {
     showLoadingSpinner: false,
     dataClassList: {},
     apiBasePath: "",
+    searchAttributeResponse: [],
     placeholderDataClassList: {},
     placeholderJsonPath: ""
 };
