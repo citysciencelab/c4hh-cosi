@@ -16,7 +16,14 @@ export default {
      */
     parseState (map, state, path = [], districtsSet = false, reset = false) {
         for (const key in map) {
-            if (
+            if (Array.isArray(map[key]) && key === "Root") {
+                for (const attr of map[key]) {
+                    const mutation = `set${attr[0].toUpperCase() + attr.substring(1)}`;
+
+                    this.commitState(mutation, attr, state[attr]);
+                }
+            }
+            else if (
                 Array.isArray(map[key]) &&
                 Object.hasOwnProperty.call(state, key) &&
                 map[key].every(e => typeof e === "string")

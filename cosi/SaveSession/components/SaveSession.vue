@@ -12,7 +12,6 @@ import {serializeState} from "../utils/serializeState.js";
 import parseState from "../utils/parseState";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import openDB from "../utils/indexedDb";
-// import {addModelsByAttributes, getModelByAttributes} from "../../utils/radioBridge.js";
 import layerCollection from "@core/layers/js/layerCollection";
 import {VSnackbar} from "vuetify/components/VSnackbar";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
@@ -35,6 +34,9 @@ export default {
             db: null,
             storePaths: {
                 // The order matters for loading
+                Root: [
+                    "layerConfig"
+                ],
                 Maps: [
                     "layerIds",
                     "loadedLayers",
@@ -59,6 +61,7 @@ export default {
                         // "active"
                     ],
                     DistrictSelector: [
+                        "selectionCardsStatisticalData",
                         "selectedDistrictLevelId",
                         "selectedDistrictNames",
                         "active"
@@ -133,7 +136,8 @@ export default {
         // ...mapGetters("Modules/ResidentialSimulation", {simNeighborhoodLayer: "drawingLayer"}),
         ...mapGetters("Modules/DistrictSelector", ["selectedDistrictLevel", "districtLevels", "selectedDistrictNames"]),
         ...mapGetters("Maps", ["getLayerById", "getVisibleLayerList"]),
-        ...mapGetters("Modules/TemplateManager", ["useTemplatesForMapping"])
+        ...mapGetters("Modules/TemplateManager", ["useTemplatesForMapping"]),
+        ...mapGetters(["layerConfig"])
     },
     watch: {
         autoSave () {

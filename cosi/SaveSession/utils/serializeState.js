@@ -31,11 +31,15 @@ function deepCopyState (map, store, deepFeatures) {
     const state = {};
 
     for (const key in map) {
-        if (
-            Array.isArray(map[key]) &&
-                map[key].every(e => typeof e === "string")
-        ) {
+
+        if (Array.isArray(map[key]) && key === "Root") {
+            for (const attr of map[key]) {
+                state[attr] = serializeToolDatasets(store[attr]);
+            }
+        }
+        else if (Array.isArray(map[key]) && map[key].every(e => typeof e === "string")) {
             state[key] = {};
+
             for (const attr of map[key]) {
                 const val = hasDeepFeatures(key, attr, deepFeatures) ?
                     serializeToolDatasets(store[key][attr]) :
