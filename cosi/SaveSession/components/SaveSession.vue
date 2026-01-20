@@ -63,8 +63,7 @@ export default {
                     DistrictSelector: [
                         "selectionCardsStatisticalData",
                         "selectedDistrictLevelId",
-                        "selectedDistrictNames",
-                        "active"
+                        "selectedDistrictNames"
                     ],
                     AccessibilityAnalysis: [
                         "dataSets",
