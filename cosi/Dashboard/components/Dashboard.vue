@@ -160,6 +160,9 @@ export default {
             if (this.loadend && this.selectedDistrictNames.length > 0) {
                 this.generateTable();
             }
+        },
+        timestampSelected () {
+            this.setSelectedYear(this.timestampSelected);
         }
     },
     created () {
@@ -181,6 +184,7 @@ export default {
         ...mapMutations("Modules/DistrictSelector", ["addCategoryToMapping", "removeCategoryFromMapping"]),
         ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
         ...mapActions("Modules/DistrictSelector", ["updateDistricts"]),
+        ...mapMutations("Modules/ColorCodeMap", ["setSelectedYear"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
 
         /**
