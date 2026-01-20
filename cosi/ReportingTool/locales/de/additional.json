@@ -24,6 +24,9 @@
             "generalReportInformation": "Allgemeine Berichtsangaben",
             "addAdditionalInformation": "Freitextfeld hinzufügen",
             "useMostRecentDataset": "Aktuellsten Datensatz verwenden",
+            "noLegendAvailable": "Keine Legende verfügbar",
+            "legendLoadFailed": "Legende kann nicht geladen werden",
+            "unknownLegendFormat": "Unbekanntes Legendenformat",
             "label": {
               "infrastructureTableLimitEnabled": "Sollen Tabellen ab einer bestimmten Anzahl von Einrichtungen vom Bericht ausgenommen werden?",
               "infrastructureTableLimit": "Maximale Anzahl an auszugebenen Einrichtungen",

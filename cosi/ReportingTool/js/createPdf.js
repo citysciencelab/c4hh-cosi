@@ -168,6 +168,15 @@ export default class PDFMaker {
     }
 
     /**
+     * Adds an empty legend page at the end of the report.
+     * @returns {void}
+     */
+    addLegendPage () {
+        this.addChapter({text: "Legende", pageBreak: "before"});
+        this.addLineBreak();
+    }
+
+    /**
      * Adds an image to the content.
      * @param {String} imageUrl The image url.
      * @param {String} label The label of the imageUrl. Is needed to create unique links.

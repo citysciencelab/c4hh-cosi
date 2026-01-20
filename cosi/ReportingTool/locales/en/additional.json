@@ -24,6 +24,9 @@
           "generalReportInformation": "General report information",
           "addAdditionalInformation": "Add free text field",
           "useMostRecentDataset": "Use most recent dataset",
+          "noLegendAvailable": "No legend available",
+          "legendLoadFailed": "Legend could not be loaded.",
+          "unknownLegendFormat": "Unknown legend format",
           "label": {
             "infrastructureTableLimitEnabled": "Should tables be excluded from the report if there are more than a certain number of institutions?",
             "infrastructureTableLimit": "Maximum number of institutions to be included",

@@ -159,6 +159,7 @@ export default {
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
+        ...mapGetters("Modules/Legend", ["legends"]),
         ...mapGetters("Modules/AccessibilityAnalysis", ["dataSets"]),
         ...mapGetters("Modules/Dashboard", ["items", "statsFeatureFilter"]),
         ...mapGetters("Modules/FeaturesList", ["featuresListItems"]),
@@ -312,6 +313,9 @@ export default {
                     this.addChapterAnalysis(this.initialAnalysisCards);
                 }
                 await this.addChapterAnnex(this.annexCards);
+
+                await this.addLegendFromStore();
+
                 this.pdf.download(this.downloadName);
             }
             catch (error) {
@@ -319,6 +323,251 @@ export default {
             }
             finally {
                 this.setReportLoader(false);
+            }
+        },
+
+        /**
+         * Normalizes legend entries from the legend store to a stable format.
+         *
+         * Supported input formats:
+         * - string (URL/DataURL)
+         * - object with {label|name|title, graphic, imageScale}
+         *
+         * @param {Object} legendObj - Legend object from the store.
+         * @returns {{label: string, graphic: string, imageScale: number}[]} Normalized legend entries.
+         */
+        getLegendEntries (legendObj) {
+            const defaultImageScale = 1,
+                entries = Array.isArray(legendObj?.legend) ? legendObj.legend : [];
+
+            return entries
+                .map(entry => {
+                    if (typeof entry === "string") {
+                        return {label: "", graphic: entry, imageScale: defaultImageScale};
+                    }
+
+                    const label = entry?.name ?? "",
+                        graphic = entry?.graphic ?? null,
+                        imageScale = Number.isFinite(entry?.imageScale) ? entry.imageScale : defaultImageScale;
+
+                    return {label, graphic, imageScale};
+                })
+                .filter(item => typeof item.graphic === "string" && item.graphic.length > 0);
+        },
+
+        /**
+         * Adds a legend section to the PDF using the active legends from the Legend store.
+         * A new legend page is created and all legend entries are rendered in sorted order.
+         *
+         * @async
+         * @returns {Promise<void>} Resolves when the legend page and entries are added.
+         */
+        async addLegendFromStore () {
+            const defaultLayerTitlePrefix = "Layer ",
+                legends = Array.isArray(this.legends) ? this.legends : [],
+                sortedLegends = legends.slice().sort((a, b) => (a?.position ?? 0) - (b?.position ?? 0));
+
+            if (legends.length === 0) {
+                return;
+            }
+
+            this.pdf.addLegendPage();
+            this.pdf.addSubHeadline("Layer-Legenden");
+
+            for (let layerIndex = 0; layerIndex < sortedLegends.length; layerIndex++) {
+                const legendObj = sortedLegends[layerIndex],
+                    title = legendObj?.name || `${defaultLayerTitlePrefix}${layerIndex + 1}`,
+                    entries = this.getLegendEntries(legendObj);
+
+                this.pdf.addHeadline(title);
+
+                if (entries.length === 0) {
+                    this.pdf.addParagraph(this.$t("additional:modules.cosi.reportingTool.noLegendAvailable"));
+                    this.pdf.addLineBreak();
+                    continue;
+                }
+
+                for (let entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+                    const entry = entries[entryIndex];
+
+                    await this.addLegendEntryToPdf(entry.graphic, entry.label, layerIndex, entryIndex, entry.imageScale);
+                }
+
+                this.pdf.addLineBreak();
+            }
+        },
+        /**
+         * Adds a single legend entry (icon + label) to the PDF content.
+         *
+         * @async
+         * @param {string} graphic - Legend graphic as URL or DataURL.
+         * @param {string} label - Label shown next to the icon.
+         * @param {number} layerIndex - Index of the layer in the legend list.
+         * @param {number} entryIndex - Index of the legend entry within the layer.
+         * @param {number} [imageScale=1] - Optional scale factor from the legend store.
+         * @returns {Promise<void>} Resolves when the legend entry has been added.
+         */
+        async addLegendEntryToPdf (graphic, label, layerIndex, entryIndex, imageScale = 1) {
+            const baseIconSize = 26,
+                minEffectiveScale = 0.85,
+                maxEffectiveScale = 1.1,
+                minIconSize = 12,
+                svgExtraSize = 4,
+                iconColumnExtraWidth = 14,
+                textFontSize = 10,
+                textLineHeight = 1.1,
+                textMargin = [4, 6, 0, 0],
+                rowMargin = [0, 2, 0, 2],
+                imageKeyPrefix = "legend-",
+                svgDataUrlPrefix = "data:image/svg+xml",
+                imageDataUrlPrefix = "data:image/",
+                httpUrlRegex = /^https?:\/\//,
+                scale = Number.isFinite(imageScale) ? imageScale : 1,
+                effectiveScale = Math.max(minEffectiveScale, Math.min(maxEffectiveScale, scale)),
+                size = Math.max(minIconSize, Math.round(baseIconSize * effectiveScale)),
+                svgSize = size + svgExtraSize,
+                imageKey = `${imageKeyPrefix}${layerIndex}-${entryIndex}`,
+                isString = typeof graphic === "string",
+                isSvgDataUrl = isString && graphic.startsWith(svgDataUrlPrefix),
+                isAnyImageDataUrl = isString && graphic.startsWith(imageDataUrlPrefix),
+                isHttpUrl = isString && httpUrlRegex.test(graphic);
+
+            if (!this.pdf.images) {
+                this.pdf.images = {};
+            }
+
+            let iconNode = null;
+
+            if (isSvgDataUrl) {
+                const svg = this.decodeSvgDataUrl(graphic);
+
+                if (svg) {
+                    iconNode = {svg, width: svgSize, height: svgSize};
+                }
+            }
+            else if (isAnyImageDataUrl) {
+                this.pdf.images[imageKey] = graphic;
+                iconNode = {image: imageKey, width: size, height: size};
+            }
+            else if (isHttpUrl) {
+                const lowerUrl = graphic.toLowerCase(),
+                    isLikelySvgUrl = lowerUrl.includes(".svg") || lowerUrl.includes("image/svg");
+
+                try {
+                    if (isLikelySvgUrl) {
+                        const svgText = await this.fetchSvgText(graphic);
+
+                        if (svgText) {
+                            iconNode = {svg: svgText, width: svgSize, height: svgSize};
+                        }
+                    }
+                    else {
+                        const dataUrl = await this.fetchAsDataUrl(graphic);
+
+                        if (typeof dataUrl === "string" && dataUrl.startsWith(imageDataUrlPrefix)) {
+                            this.pdf.images[imageKey] = dataUrl;
+                            iconNode = {image: imageKey, width: size, height: size};
+                        }
+                    }
+                }
+                catch (error) {
+                    this.pdf.addParagraph(this.$t("additional:modules.cosi.reportingTool.legendLoadFailed"));
+                    return;
+                }
+            }
+
+            if (!iconNode) {
+                this.pdf.addParagraph(this.$t("additional:modules.cosi.reportingTool.legendLoadFailed"));
+                return;
+            }
+
+            this.pdf.content.push({
+                table: {
+                    widths: [baseIconSize + iconColumnExtraWidth, "*"],
+                    body: [[
+                        iconNode,
+                        {text: label || "", fontSize: textFontSize, lineHeight: textLineHeight, margin: textMargin}
+                    ]]
+                },
+                layout: "noBorders",
+                margin: rowMargin
+            });
+        },
+
+        /**
+         * Decodes an SVG DataURL into a raw SVG string.
+         * The payload may be percent-encoded and will be decoded if possible.
+         *
+         * @param {string} dataUrl - SVG DataURL (e.g. "data:image/svg+xml;charset=utf-8,<svg ...>").
+         * @returns {string|null} The decoded SVG string, or `null` if the DataURL is invalid.
+         */
+        decodeSvgDataUrl (dataUrl) {
+            const isString = typeof dataUrl === "string",
+                commaIndex = isString ? dataUrl.indexOf(",") : -1,
+                hasPayload = commaIndex !== -1,
+                payload = hasPayload ? dataUrl.slice(commaIndex + 1) : null;
+
+            if (!hasPayload) {
+                return null;
+            }
+
+            try {
+                return decodeURIComponent(payload);
+            }
+            catch (error) {
+                return payload;
+            }
+        },
+
+        /**
+         * Fetches an SVG file from a URL and returns its raw text content.
+         *
+         * @async
+         * @param {string} url - The URL pointing to an SVG resource.
+         * @returns {Promise<string|null>} Resolves with the SVG text content or `null` on failure.
+         */
+        async fetchSvgText (url) {
+            try {
+                const {data, status} = await axios.get(url, {
+                    responseType: "text"
+                });
+
+                return status === 200 ? data : null;
+            }
+            catch (error) {
+                console.error("[Legend] SVG fetch failed:", url, error);
+                return null;
+            }
+        },
+
+        /**
+         * Fetches an image from a URL and converts it into a DataURL.
+         *
+         * @async
+         * @param {string} url - The URL of the image resource.
+         * @returns {Promise<string|null>} Resolves with the image as DataURL or `null` on failure.
+         */
+        async fetchAsDataUrl (url) {
+            try {
+                const {data: blob} = await axios.get(url, {
+                    responseType: "blob"
+                });
+
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = (error) => {
+                        console.error("[Legend] FileReader failed:", error);
+                        reject(error);
+                    };
+
+                    reader.readAsDataURL(blob);
+                });
+            }
+            catch (error) {
+                console.error("[Legend] Image fetch failed:", url, error);
+                return null;
             }
         },
 
