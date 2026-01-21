@@ -109,14 +109,9 @@ export default {
                     divider: true
                 }
             ],
-            actionColumns: [
-                {
-                    title: this.$t("additional:modules.tools.cosi.featuresList.colToggleEnabled"),
-                    value: "enabled"
-                }
-            ],
             numericalColumns: [],
             additionalColumns: [],
+            columns: [],
             distScoreLayer: null,
             exportDetails: false,
             dipasInFeaturesList: true,
@@ -130,12 +125,33 @@ export default {
         ...mapGetters("Modules/DistrictSelector", {selectedDistrictLevel: "selectedDistrictLevel", selectedDistrictFeatures: "selectedFeatures", districtLayer: "layer", bufferValue: "bufferValue", extent: "extent"}),
         ...mapGetters("Modules/DistanceScoreService", ["wmsLayersInfo"]),
         ...mapGetters(["layerConfig", "visibleSubjectDataLayerConfigs"]),
-        columns () {
-            return [
-                ...this.featureColumns,
-                ...this.numericalColumns,
-                ...this.additionalColumns
-            ];
+
+        /**
+         * Gets the column titles of all columns that have one.
+         * @returns {String[]} The column titles.
+         */
+        columnTitles () {
+            return this.columns
+                .filter(column => typeof column.title === "string")
+                .map(column => column.title);
+        },
+
+        /**
+         * Gets the columns that are not hidden.
+         * @returns {String[]} The columns to show.
+         */
+        columnsToShow () {
+            return this.columns.filter(column => !column.hidden);
+        },
+
+        /**
+         * Gets the column titles which may not be deselected by the user because of their filter functinality.
+         * @returns {String[]} The mandatory column titles.
+         */
+        mandatoryColumnTitles () {
+            return this.columns
+                .filter(column => typeof column.filter === "function")
+                .map(column => column.title);
         },
         selected: {
             get () {
@@ -157,6 +173,8 @@ export default {
         }
     },
     watch: {
+        additionalColumns: "resetColumns",
+        numericalColumns: "resetColumns",
 
         /**
          * Detects changes in visible Layers.
@@ -277,6 +295,7 @@ export default {
         }
     },
     created () {
+        this.resetColumns();
         /**
          * listens to the close event of the Tool Component
          * @listens #close
@@ -400,6 +419,45 @@ export default {
                 this.removeHighlightFeature();
                 this.highlightVectorFeature(item.feature, item.layerId);
             }
+        },
+
+        /**
+         * Reorders the column based on the new user-defined order.
+         * @param {String[]} columnTitles The new order for the column titles.
+         * @returns {void}
+         */
+        reorderColumns (columnTitles) {
+            this.columns.sort((a, b) => {
+                const aIndex = columnTitles.indexOf(a.title),
+                    bIndex = columnTitles.indexOf(b.title);
+
+                if (aIndex === -1 || bIndex === -1) {
+                    return 0;
+                }
+                return aIndex - bIndex;
+            });
+        },
+
+        /**
+         * Sets the initital state of the columns.
+         * @returns {void}
+         */
+        resetColumns () {
+            this.columns = [
+                ...this.featureColumns,
+                ...this.numericalColumns,
+                ...this.additionalColumns
+            ];
+        },
+
+        /**
+         * Toggles the visibility of a column.
+         * @param {String} columnTitle The title of the colum to toggle.
+         */
+        toggleColumn (columnTitle) {
+            const column = this.columns.find(col => col.title === columnTitle);
+
+            column.hidden = !column.hidden;
         },
 
         updateFilterProps (newFilterProps) {
@@ -685,7 +743,11 @@ export default {
         <v-app id="features-list-wrapper">
             <FeaturesListToolbar
                 :filter-items="groupActiveLayer"
+                :setting-items="columnTitles"
+                :mandatory-setting-items="mandatoryColumnTitles"
                 :show-dipas-button="dipasInFeaturesList"
+                @toggle-setting-item="toggleColumn"
+                @reordered-setting-items="reorderColumns"
                 @setLayerFilter="setLayerFilter"
                 @setSearch="setSearch"
                 @createCharts="createCharts"
@@ -698,7 +760,7 @@ export default {
                     <div class="features-list-table">
                         <v-data-table
                             v-model="selected"
-                            :headers="columns"
+                            :headers="columnsToShow"
                             :items="items"
                             :search="search"
                             :custom-filter="searchAllAttributes"
@@ -822,11 +884,6 @@ export default {
 
         .v-divider {
             border-color: $light_grey;
-        }
-
-        button {
-            text-transform: inherit;
-            font-family: $font_family_accent;
         }
     }
     #features-list {

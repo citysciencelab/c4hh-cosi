@@ -7,6 +7,7 @@
                     "titleLocationScore": "Standortbewertung",
                     "help": "Listet alle geladenen Einrichtungen für die ausgewählten Gebiete",
                     "layerFilter": "Liste nach Thema filtern",
+                    "addFilter": "Filter hinzufügen",
                     "search": "Liste durchsuchen",
                     "colIcon": "Icon",
                     "colFacility": "Einrichtung",

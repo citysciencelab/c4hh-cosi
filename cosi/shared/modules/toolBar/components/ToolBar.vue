@@ -14,15 +14,15 @@ export default {
         SwitchInput
     },
     props: {
+        mandatorySettingItems: {
+            type: Array,
+            required: false,
+            default: () => []
+        },
         optionalButton: {
             type: Object,
             required: false,
             default: undefined
-        },
-        enableCalculation: {
-            type: Boolean,
-            required: false,
-            default: true
         },
         settingItems: {
             type: Array,
@@ -39,6 +39,8 @@ export default {
         return {
             checkedSettingItems: {},
             optionalDropdownInstance: null,
+            filterMenuDropdownInstance: null,
+            filterButtonId: "add-filter-button",
             groupButtons: [
                 {"icon": "bi-table", "name": "Tabelle"},
                 {"icon": "bi-bar-chart", "name": "Diagramm"}
@@ -72,16 +74,17 @@ export default {
                 return acc;
             }, {})
         };
-        if (!this.closeOnOutside || !this.optionalButton?.id) {
-            return;
-        }
-        const toggleElement = document.getElementById(this.optionalButton.id);
+        const toggleElement = document.getElementById(this.optionalButton.id),
+            filterElement = document.getElementById(this.filterButtonId);
 
+        if (filterElement) {
+            this.filterMenuDropdownInstance = Dropdown.getOrCreateInstance(filterElement);
+        }
         if (toggleElement) {
             this.optionalDropdownInstance = Dropdown.getOrCreateInstance(toggleElement);
-            document.addEventListener("pointerdown", this.onGlobalPointerDown, true);
-            document.addEventListener("keydown", this.onGlobalKeyDown);
         }
+        document.addEventListener("pointerdown", this.onGlobalPointerDown, true);
+        document.addEventListener("keydown", this.onGlobalKeyDown);
     },
     beforeUnmount () {
         document.removeEventListener("pointerdown", this.onGlobalPointerDown, true);
@@ -97,31 +100,27 @@ export default {
             this.$emit("toggleSettingItem", evt.target.value);
         },
         /**
-         * Handles global pointer interactions to close the optional dropdown
+         * Handles global pointer interactions to close the dropdown
          * when clicking outside of it.
          * The dropdown remains open when the interaction occurs:
-         * - inside the optional dropdown container
+         * - inside a dropdown container
          * - inside a Vuetify overlay (e.g. autocomplete menus)
          * @param {PointerEvent} event - The global pointer event.
          * @returns {void}
          */
         onGlobalPointerDown (event) {
-            if (!this.closeOnOutside) {
-                return;
-            }
-            const root = this.$refs.optionalDropdownRoot,
+            const roots = [this.$refs.optionalDropdownRoot, this.$refs.filterDropdownRoot],
                 clickedInVuetifyOverlay = event.target.closest(".v-overlay"),
-                clickedInside = root.contains(event.target);
-
-            if (!root) {
-                return;
-            }
+                clickedInside = roots.some(root => root?.contains(event.target));
 
             if (clickedInside || clickedInVuetifyOverlay) {
                 return;
             }
 
-            this.optionalDropdownInstance?.hide();
+            this.filterMenuDropdownInstance?.hide();
+            if (this.closeOnOutside) {
+                this.optionalDropdownInstance?.hide();
+            }
         },
         /**
          * Handles global keyboard interactions for the optional dropdown.
@@ -130,10 +129,11 @@ export default {
          * @returns {void}
          */
         onGlobalKeyDown (event) {
-            if (!this.closeOnOutside) {
+            if (!event.key === "Escape") {
                 return;
             }
-            if (event.key === "Escape") {
+            this.filterMenuDropdownInstance?.hide();
+            if (this.closeOnOutside) {
                 this.optionalDropdownInstance?.hide();
             }
         }
@@ -174,7 +174,8 @@ export default {
                                     :id="element"
                                     v-model="checkedSettingItems[element]"
                                     :value="element"
-                                    class="me-2 mt-1 form-check-input"
+                                    class="me-2 mt-1 form-check-input opacity-100"
+                                    :disabled="mandatorySettingItems.includes(element)"
                                     type="checkbox"
                                     @change="toggleSettingItem"
                                 >
@@ -196,6 +197,27 @@ export default {
             </div>
             <slot name="table-settings" />
             <div
+                v-if="$slots.filterMenu"
+                ref="filterDropdownRoot"
+                class="dropdown"
+            >
+                <FlatButton
+                    :id="filterButtonId"
+                    :aria-label="$t('additional:modules.tools.cosi.dashboard.addFilter')"
+                    :text="$t('additional:modules.tools.cosi.dashboard.addFilter')"
+                    :title="$t('additional:modules.tools.cosi.dashboard.addFilter')"
+                    icon="bi-funnel-fill"
+                    class="mb-1 me-3 rounded-pill"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="false"
+                />
+                <div
+                    class="dropdown-menu px-3 border-0 mt-1"
+                >
+                    <slot name="filterMenu" />
+                </div>
+            </div>
+            <div
                 v-if="typeof optionalButton !== 'undefined'"
                 ref="optionalDropdownRoot"
                 class="dropdown"
@@ -216,23 +238,6 @@ export default {
                 >
                     <slot name="optionalDropdown" />
                 </div>
-            </div>
-            <FlatButton
-                v-if="enableCalculation"
-                id="calculation-button"
-                :aria-label="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                :text="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                :title="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                :icon="'bi-plus-slash-minus'"
-                :class="'mb-1 me-3 rounded-pill'"
-                data-bs-toggle="dropdown"
-                data-bs-auto-close="false"
-                :interaction="() => {}"
-            />
-            <div
-                class="dropdown-menu px-3 border-0 mt-1"
-            >
-                <slot name="calculationDropdown" />
             </div>
             <FlatButton
                 id="table-download"

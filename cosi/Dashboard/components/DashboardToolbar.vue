@@ -186,12 +186,12 @@ export default {
 <template>
     <ToolBar
         :setting-items="columnNames"
-        :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.addFilter'), icon: 'bi-funnel-fill', id: 'add-filter-button', closeOnOutside: true}"
+        :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate'), icon: 'bi-plus-slash-minus', id: 'calculation-button', closeOnOutside: true}"
         @exportTable="$emit('exportTable', exportTimeline)"
         @reorderedSettingItems="reorderSettingItems"
         @toggleSettingItem="toggleSettingItem"
     >
-        <template #optionalDropdown>
+        <template #filterMenu>
             <div
                 v-if="_statsFeatureFilter.length > 0 || timestampsFiltered.length > 0"
                 class="reset-filter-row"
@@ -225,7 +225,7 @@ export default {
                 @update:modelValue="(value) => $emit('setTimestampsValues', value)"
             />
         </template>
-        <template #calculationDropdown>
+        <template #optionalDropdown>
             <h6 class="my-2">
                 {{ $t('additional:modules.tools.cosi.dashboard.createCalc') }}
             </h6>

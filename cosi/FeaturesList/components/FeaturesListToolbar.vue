@@ -1,20 +1,20 @@
 <script>
+import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
 import {VBtn} from "vuetify/components/VBtn";
 import {VCheckbox} from "vuetify/components/VCheckbox";
 import {VCol, VRow} from "vuetify/components/VGrid";
 import {VIcon} from "vuetify/components/VIcon";
-import {VListSubheader} from "vuetify/components/VList";
 import {VSelect} from "vuetify/components/VSelect";
 import {VTextField} from "vuetify/components/VTextField";
 
 export default {
     name: "FeaturesListToolbar",
     components: {
+        ToolBar,
         VBtn,
         VCheckbox,
         VCol,
         VIcon,
-        VListSubheader,
         VRow,
         VSelect,
         VTextField
@@ -37,6 +37,21 @@ export default {
             sumUpLayers: false
         };
     },
+    computed: {
+
+        /**
+         * Gets a localised object defining the location score button.
+         * @returns {Object} The location score button definition.
+         */
+        locationScoreButton () {
+            return {
+                id: "location-score-button",
+                text: this.$t("additional:modules.tools.cosi.featuresList.titleLocationScore"),
+                icon: "bi bi-house-door",
+                closeOnOutside: true
+            };
+        }
+    },
     watch: {
         selectedLayerList (value) {
             this.$emit("setLayerFilter", value);
@@ -49,6 +64,17 @@ export default {
 </script>
 
 <template lang="html">
+    <ToolBar
+        :optional-button="locationScoreButton"
+        v-bind="$attrs"
+    >
+        <template #filterMenu>
+            Filter für Einrichtungsübersicht
+        </template>
+        <template #optionalDropdown>
+            Standortbewertung
+        </template>
+    </ToolBar>
     <div id="features-list-toolbar">
         <v-row>
             <v-col cols="8">
@@ -146,29 +172,3 @@ export default {
         </v-row>
     </div>
 </template>
-
-<style lang="scss">
-    #features-list-toolbar {
-        font-family: $font_family_default;
-
-        .row+.row {
-            margin-top: 0;
-        }
-
-        .v-input {
-            font-size: 14px;
-            .v-label {
-                font-size: 14px;
-            }
-        }
-
-        button {
-            text-transform: inherit;
-            font-family: $font_family_accent;
-        }
-
-        .border-style {
-            border-left: 1px solid $light_grey;
-        }
-    }
-</style>
