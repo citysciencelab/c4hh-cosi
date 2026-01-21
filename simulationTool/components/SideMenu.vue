@@ -138,13 +138,13 @@ export default {
     </nav>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     nav.simulation-tool-sidebar {
         display: flex;
         flex-direction: column;
         width: 65px;
         gap: 1.5rem;
-        background-color: var(--bs-primary);
+        background-color: $primary;
         padding: 0 .5rem;
 
         .btn {
