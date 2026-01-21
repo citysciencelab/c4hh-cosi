@@ -87,11 +87,18 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                             state: () => ({}),
                             getters: {
                                 dataClassList: () => mockDataClassList,
+                                archiveList: () => mockDataClassList.map(a => ({id: a.id, name: a.name})),
+                                yearsList: () => [2020],
+                                archiveYears: () => ({}),
                                 placeholderDataClassList: () => mockPlaceholdersJson
                             },
                             actions: {
                                 fetchDataClassList: () => Promise.resolve(),
-                                fetchPlaceholders: () => Promise.resolve()
+                                fetchPlaceholders: () => Promise.resolve(),
+                                fetchYears: () => Promise.resolve()
+                            },
+                            mutations: {
+                                setYearsList: () => Promise.resolve()
                             }
                         }
                     }
@@ -204,7 +211,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         expect(wrapper.vm.searchWithAttributeFormData["3D-Stadtmodell LoD1"][0].value).to.equal("newValue");
     });
 
-    it("select shows correct archiv options and selecting updates selectedArchiv", async () => {
+    it("select shows correct archive options and selecting updates selectedArchiv", async () => {
         const items = wrapper.findAll("#searchOptionsList li");
 
         await items[0].trigger("click");
@@ -219,14 +226,78 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
             "AFIS-Einzelnachweise"
         ]);
 
-        const select = wrapper.find("select#archiv");
+        const select = wrapper.find("select#archive");
 
         expect(select.exists()).to.be.true;
 
-        wrapper.vm.setSelectedArchiv("AFIS-Einzelnachweise");
+        wrapper.vm.setSelectedArchive("AFIS-Einzelnachweise");
 
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.selectedArchiv).to.equal("AFIS-Einzelnachweise");
+        expect(wrapper.vm.selectedArchive).to.equal("AFIS-Einzelnachweise");
+    });
+
+    it("toggles archive checkbox updates selectedArchivIds", async () => {
+        const items = wrapper.findAll("#searchOptionsList li"),
+            archiveId = "DKL_3DSTADT_LOD2";
+
+        await items[1].trigger("click");
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.onSelectedArchiveIdsChange(archiveId, {target: {checked: true}});
+
+        expect(wrapper.vm.selectedArchiveIds).to.include(archiveId);
+
+        await wrapper.vm.onSelectedArchiveIdsChange(archiveId, {target: {checked: false}});
+
+        expect(wrapper.vm.selectedArchiveIds).to.not.include(archiveId);
+    });
+
+    it("toggles year checkbox updates selectedYears", async () => {
+        const items = wrapper.findAll("#searchOptionsList li"),
+            year = 2020;
+
+        await items[1].trigger("click");
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.onSelectedYearsChange(year, {target: {checked: true}});
+
+        expect(wrapper.vm.selectedYears).to.include(year);
+
+        await wrapper.vm.onSelectedYearsChange(year, {target: {checked: false}});
+
+        expect(wrapper.vm.selectedYears).to.not.include(year);
+    });
+
+    it("resetForm restores attribute form and geometric selections", async () => {
+        const items = wrapper.findAll("#searchOptionsList li"),
+            archiveId = "DKL_3DSTADT_LOD2",
+            year = 2020;
+
+        await items[0].trigger("click");
+        await wrapper.vm.$nextTick();
+
+        const formData = wrapper.vm.searchWithAttributeFormData["3D-Stadtmodell LoD1"][0];
+
+        formData.value = "newValue";
+        wrapper.vm.setSelectedArchive("AFIS-Einzelnachweise");
+
+        await wrapper.vm.$nextTick();
+        await items[1].trigger("click");
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.onSelectedArchiveIdsChange(archiveId, {target: {checked: true}});
+        await wrapper.vm.onSelectedYearsChange(year, {target: {checked: true}});
+
+        expect(wrapper.vm.selectedArchive).to.equal("AFIS-Einzelnachweise");
+        expect(wrapper.vm.selectedArchiveIds).to.include(archiveId);
+        expect(wrapper.vm.selectedYears).to.include(year);
+
+        wrapper.vm.resetForm();
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.selectedArchive).to.equal("3D-Stadtmodell LoD1");
+        expect(wrapper.vm.searchWithAttributeFormData["3D-Stadtmodell LoD1"][0].value).to.equal("2023");
+        expect(wrapper.vm.selectedArchiveIds).to.be.an("array").that.is.empty;
+        expect(wrapper.vm.selectedYears).to.be.an("array").that.is.empty;
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.true;
     });
 });

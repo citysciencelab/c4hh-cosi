@@ -13,12 +13,12 @@
                 "tabSearch": {
                     "label": "Search",
                     "backButtonLabel": "Back",
-                    "dossiersButtonLabel": "Dossiers",
                     "searchButtonLabel": "Search",
                     "resetButtonLabel": "Reset",
                     "searchWithAttributeHeading": "Search Data by Attributes",
                     "searchWithGeometryHeading": "Search Data by Geometry",
                     "selectArchivLabel": "Archive",
+                    "selectYearsLabel": "Years",
                     "jahrgang": "Year",
                     "kachelnummer": "Tile Number",
                     "maxValueCount": "Max. Results",

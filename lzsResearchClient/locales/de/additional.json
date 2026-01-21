@@ -13,12 +13,12 @@
                 "tabSearch": {
                     "label": "Suche",
                     "backButtonLabel": "Zurück",
-                    "dossiersButtonLabel": "Dossiers",
                     "searchButtonLabel": "Suchen",
                     "resetButtonLabel": "Zurücksetzen",
                     "searchWithAttributeHeading": "Suche Daten über Attribute",
                     "searchWithGeometryHeading": "Suche Daten über räumliches Gebiet",
                     "selectArchivLabel": "Archiv",
+                    "selectYearsLabel": "Jahrgang",
                     "jahrgang": "Jahrgang",
                     "kachelnummer": "Kachelnummer",
                     "maxValueCount": "Max. Trefferanzahl",
