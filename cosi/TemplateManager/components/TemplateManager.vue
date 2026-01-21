@@ -390,7 +390,8 @@ export default {
 
             const _template = this.applyFilters(template, this.filters[index]),
                 startingTool = template?.state?.Tools?.toolToOpen,
-                time = new Date().getTime();
+                time = new Date().getTime(),
+                visibleLayerIds = this.saveTemplate[this.selectedTemplateIndex].activeLayer.map(layer => layer.id);
 
             if (this.useTemplatesForMapping) {
                 template.meta.time = time;
@@ -400,7 +401,7 @@ export default {
 
             this.loadSessionData({template: _template, reset: !active});
             this.openTool(startingTool, active);
-            this.loadLayer(_template?.state?.Maps?.layerIds, active, this.templates);
+            this.loadLayer(visibleLayerIds, active, this.templates);
         },
 
         /**
