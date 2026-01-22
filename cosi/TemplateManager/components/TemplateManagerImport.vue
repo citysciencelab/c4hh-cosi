@@ -3,7 +3,7 @@
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import getters from "../store/gettersTemplateManager";
-import {mapGetters, mapActions} from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     name: "TemplateManagerImport",
@@ -20,8 +20,6 @@ export default {
         ...mapGetters("Modules/TemplateManager", Object.keys(getters))
     },
     methods: {
-        ...mapActions("Alerting", ["addSingleAlert"]),
-
         /**
          * Triggers the click event on the file input to open the explorer.
          * @returns {void}
@@ -38,11 +36,8 @@ export default {
         loadFiles (evt) {
             for (const file of evt.target.files) {
                 if (!file.type.match("application/json")) {
-                    this.addSingleAlert({
-                        content: `${file.name}: ${this.$t("additional:modules.tools.cosi.templateManager.errors.wrongFileFormat")}`,
-                        category: "Warning",
-                        displayClass: "warning"
-                    });
+                    this.errorInfo = file.name + ": " + this.$t("additional:modules.tools.cosi.templateManager.errors.wrongFileFormat");
+
                     continue;
                 }
                 const reader = new FileReader();
@@ -65,72 +60,51 @@ export default {
                 template = JSON.parse(evt?.target?.result);
             }
             catch (err) {
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.invalid")}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
+                this.errorInfo = this.$t("additional:modules.tools.cosi.templateManager.errors.invalid");
+
                 return;
             }
 
             if (!Object.prototype.hasOwnProperty.call(template, "meta")) {
                 const attribute = "Meta";
 
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.invalid")} ${this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute})}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
+                this.errorInfo = this.$t("additional:modules.tools.cosi.templateManager.errors.invalid") + " " + this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute});
+
                 return;
             }
             if (!Object.prototype.hasOwnProperty.call(template?.meta, "title")) {
                 const attribute = "Title";
 
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.invalid")} ${this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute})}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
+                this.errorInfo = this.$t("additional:modules.tools.cosi.templateManager.errors.invalid") + " " + this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute});
+
                 return;
             }
             if (!Object.prototype.hasOwnProperty.call(template, "state")) {
                 const attribute = "State";
 
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.invalid")} ${this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute})}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
+                this.errorInfo = this.$t("additional:modules.tools.cosi.templateManager.errors.invalid") + " " + this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute});
+
                 return;
             }
             if (!Object.prototype.hasOwnProperty.call(template?.state, "Tools")) {
                 const attribute = "Tools";
 
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.invalid")} ${this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute})}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
+                this.errorInfo = this.$t("additional:modules.tools.cosi.templateManager.errors.invalid") + " " + this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute});
+
                 return;
             }
             if (!Object.prototype.hasOwnProperty.call(template?.state?.Tools, "Dashboard")) {
                 const attribute = "Dashboard";
 
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.invalid")} ${this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute})}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
+                this.errorInfo = this.$t("additional:modules.tools.cosi.templateManager.errors.invalid") + " " + this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute});
+
                 return;
             }
             if (!Object.prototype.hasOwnProperty.call(template?.state?.Tools?.Dashboard, "statsFeatureFilter")) {
                 const attribute = "statsFeatureFilter";
 
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.invalid")} ${this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute})}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
+                this.errorInfo = this.$t("additional:modules.tools.cosi.templateManager.errors.invalid") + " " + this.$t("additional:modules.tools.cosi.templateManager.errors.attErr", {attribute});
+
                 return;
             }
 

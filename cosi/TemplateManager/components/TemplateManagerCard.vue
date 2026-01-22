@@ -1,5 +1,5 @@
 <script>
-import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 
 export default {
@@ -54,7 +54,6 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Alerting", ["addSingleAlert"]),
         ...mapMutations("Modules/TemplateManager", ["setCurrentActiveTemplate"]),
 
         /**
@@ -76,21 +75,6 @@ export default {
 
             this.$emit("showTemplate", this.title);
             this.$emit("activateTemplate", this.title, evt?.target?.checked);
-        },
-
-        /**
-         * Shows alert info if there are no districts existed.
-         * @param {Boolean} val - the flag if this template is enabled.
-         * @returns {void}
-         */
-        showDistrictInfo (val) {
-            if (!val) {
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.templateName")} ${this.title} ${this.$t("additional:modules.tools.cosi.templateManager.errors.notAllowLoaded")}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
-            }
         }
     }
 };
