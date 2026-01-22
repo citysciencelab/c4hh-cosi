@@ -1,6 +1,6 @@
 <script>
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
-import InputText from "@shared/modules/inputs/components/InputText.vue";
+import InputText from "./shared/InputText.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
 
@@ -117,7 +117,7 @@ export default {
                         .filter(attribute => attribute.usage === "I")
                         .map(attribute => ({
                             ...attribute,
-                            value: this.placeholderDataClassList?.[archiveName]?.[attribute.name].PLACEHOLDER || "",
+                            value: "",
                             placeholder: this.placeholderDataClassList?.[archiveName]?.[attribute.name].PLACEHOLDER || "",
                             label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`),
                             pattern: this.placeholderDataClassList?.[archiveName]?.[attribute.name].PATTERN || "",
@@ -128,7 +128,7 @@ export default {
                     ...attributes,
                     {
                         name: "maxValueCount",
-                        value: "10",
+                        value: "",
                         label: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount"),
                         pattern: "[0-9]{1,4}",
                         placeholder: "10",

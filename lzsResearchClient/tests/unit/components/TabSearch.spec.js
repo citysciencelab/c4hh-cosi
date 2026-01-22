@@ -189,7 +189,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
 
         expect(searchWithAttributeForm).to.be.an("array");
         expect(searchWithAttributeForm.length).to.equal(3);
-        expect(searchWithAttributeForm[0].value).to.equal("2023");
+        expect(searchWithAttributeForm[0].value).to.equal("");
     });
 
     it("updates attribute value when input changes", async () => {
@@ -295,7 +295,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.selectedArchive).to.equal("3D-Stadtmodell LoD1");
-        expect(wrapper.vm.searchWithAttributeFormData["3D-Stadtmodell LoD1"][0].value).to.equal("2023");
+        expect(wrapper.vm.searchWithAttributeFormData["3D-Stadtmodell LoD1"][0].value).to.equal("");
         expect(wrapper.vm.selectedArchiveIds).to.be.an("array").that.is.empty;
         expect(wrapper.vm.selectedYears).to.be.an("array").that.is.empty;
         expect(wrapper.vm.isAttributeSearchFormValid).to.be.true;
