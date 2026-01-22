@@ -1229,7 +1229,7 @@ export default {
             const layerIdsArray = [],
                 previousDepartments = Object.keys(this.selectedFeature.getProperties()).filter((prop) => prop.startsWith("sta_")),
                 newDepartments = Object.keys(this.departmentData || {}).map((prop) => {
-                    return "sta_" + prop;
+                    return prop !== "gebaeude" ? "sta_" + prop : "sta_gemis";
                 });
 
             previousDepartments.forEach(departmentId => {
