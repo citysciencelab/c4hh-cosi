@@ -1,5 +1,6 @@
 <script>
 
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import getters from "../store/gettersTemplateManager";
 import {mapGetters, mapActions} from "vuex";
@@ -7,7 +8,13 @@ import {mapGetters, mapActions} from "vuex";
 export default {
     name: "TemplateManagerImport",
     components: {
+        AlertMessage,
         FlatButton
+    },
+    data () {
+        return {
+            errorInfo: undefined
+        };
     },
     computed: {
         ...mapGetters("Modules/TemplateManager", Object.keys(getters))
@@ -128,17 +135,23 @@ export default {
             }
 
             if (Array.isArray(this.importedTemplateNames) && this.importedTemplateNames.includes(template?.meta?.title)) {
-                this.addSingleAlert({
-                    content: `${this.$t("additional:modules.tools.cosi.templateManager.errors.templateName")} ${template?.meta?.title} ${this.$t("additional:modules.tools.cosi.templateManager.errors.isLoaded")}`,
-                    category: "Warning",
-                    displayClass: "warning"
-                });
+                this.errorInfo = this.$t("additional:modules.tools.cosi.templateManager.errors.templateName") + template?.meta?.title + " " + this.$t("additional:modules.tools.cosi.templateManager.errors.isLoaded");
 
                 return;
             }
+
+            this.errorInfo = undefined;
             this.importedTemplateNames.push(template?.meta?.title);
 
             this.$emit("addTemplate", template);
+        },
+
+        /**
+         * Resets the error info into undefined.
+         * @returns {void}
+         */
+        resetErrorInfo () {
+            this.errorInfo = undefined;
         }
     }
 };
@@ -165,6 +178,13 @@ export default {
                 >
             </label>
         </form>
+        <AlertMessage
+            v-if="typeof errorInfo !== 'undefined'"
+            :closeable="true"
+            :text="errorInfo"
+            type="error"
+            @closed="resetErrorInfo"
+        />
     </div>
 </template>
 

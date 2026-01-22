@@ -337,6 +337,9 @@ export default {
             this.selectedTemplateName = this.templates[0].meta.title;
             this.templates.forEach(temp => {
                 this.templateData(temp);
+                if (!this.importedTemplateNames.includes(temp?.meta?.title)) {
+                    this.importedTemplateNames.push(temp?.meta?.title);
+                }
             });
         },
 

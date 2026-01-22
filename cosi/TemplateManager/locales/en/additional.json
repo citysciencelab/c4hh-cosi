@@ -41,7 +41,7 @@
                       "default": "File could not be loaded.",
                       "invalid": "File could not be read.",
                       "wrongFileFormat": "The file is not in the correct format.",
-                      "templateName": "One template with the name: ",
+                      "templateName": "One template with the name ",
                       "isLoaded": "is already loaded.",
                       "notAllowLoaded": "can not be loaded without selected district(s).",
                       "attErr": " {{attribute}} node does not exist.",

@@ -41,7 +41,7 @@
                       "default": "Datei konnte nicht geladen werden.",
                       "invalid": "Datei konnte nicht gelesen werden.",
                       "wrongFileFormat": "Die Datei hat nicht das richtige Format.",
-                      "templateName": "Eine Vorlage mit dem Namen: ",
+                      "templateName": "Eine Vorlage mit dem Namen ",
                       "isLoaded": "ist bereits geladen.",
                       "notAllowLoaded": "kann ohne ausgewählte Gebiete nicht geladen werden.",
                       "attErr": " {{attribute}} Tag existiert nicht.",
