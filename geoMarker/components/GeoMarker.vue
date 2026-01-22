@@ -30,7 +30,8 @@ export default {
             "geoMarkerFeatureList",
             "newGeoMarkerCreated",
             "isFilterApplied",
-            "geoMarkerFeatureSelected"
+            "geoMarkerFeatureSelected",
+            "reloadIntervalId"
         ]),
         ...mapGetters(["allLayerConfigs"])
     },
@@ -105,7 +106,8 @@ export default {
             "setGeoMarkerFeatureList",
             "setLockListSelection",
             "setNewGeoMarkerCreated",
-            "setScrollToGeoMarkerId"
+            "setScrollToGeoMarkerId",
+            "setReloadIntervalId"
         ]),
         ...mapActions("Modules/GeoMarker", [
             "loadCategories",
@@ -120,7 +122,12 @@ export default {
         },
         activateGeoMarkerReloading () {
             // Reloading the GeoMarker features every minute to have latest data all the time
-            setInterval(async () => {
+            if (this.reloadIntervalId) {
+                clearInterval(this.reloadIntervalId);
+                this.setReloadIntervalId(null);
+            }
+
+            const reloadInterval = setInterval(async () => {
                 let allNewFeaturesLoaded = [];
                 // get all possible layerIds
                 const layerIds = Object.values(this.departments).flatMap(options => [
@@ -199,6 +206,8 @@ export default {
                 }
 
             }, 600000);
+
+            this.setReloadIntervalId(reloadInterval);
         }
     }
 };

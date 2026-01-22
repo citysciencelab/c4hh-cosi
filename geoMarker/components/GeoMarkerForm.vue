@@ -84,7 +84,8 @@ export default {
             "isFilterApplied",
             "geoMarkerShortFeatureId",
             "geoMarkerState",
-            "isGemisFeature"
+            "isGemisFeature",
+            "reloadIntervalId"
         ]),
         ...mapGetters(["visibleLayerConfigs"]),
         /**
@@ -297,7 +298,8 @@ export default {
             "setGeoMarkerFeatureList",
             "setTriggerFilter",
             "setGeoMarkerFeatureSelected",
-            "setNewGeoMarkerCreated"
+            "setNewGeoMarkerCreated",
+            "setReloadIntervalId"
         ]),
         /**
          * Register dayjs in order to use it in the template
@@ -1031,6 +1033,9 @@ export default {
          */
         async updateEditingMode (status) {
             if (status && this.mode === "edit") {
+                clearInterval(this.reloadIntervalId);
+                this.setReloadIntervalId(null);
+
                 this.$emit("start-loading");
                 const feat = await this.loadFeatureWithLockById({geomarkerId: this.selectedFeature.getId()});
 
@@ -1051,6 +1056,10 @@ export default {
                         this.showErrorModal = true;
                     }
                 }
+            }
+
+            if (!status && this.mode === "edit") {
+                this.$parent.$parent.activateGeoMarkerReloading();
             }
 
             this.readonly = !status;

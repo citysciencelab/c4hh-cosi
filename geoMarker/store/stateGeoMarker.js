@@ -39,6 +39,9 @@
  * @property {Boolean} initialLoading - only true for initial loading to indicate whether the filter needs to wait for all features loaded
  * @property {Boolean} newGeoMarkerCreated - after a geomarker created, it is true, and used in tablistContent to show the geomarker as selected.
  * @property {Boolean} isFilterApplied - after filter is applied it becomes true. It is used in geoMarkerForm to set the filter again after a new geomarker created.
+ * @property {String|null} scrollToGeoMarkerId - this holds the id of the geomarker to scroll to it in the list.
+ * @property {Number} listScrollTop - holds the scroll position of the list to restore it when needed
+ * @property {Number|null} reloadIntervalId - holds the interval ID for reloading GeoMarker features periodically
  */
 
 const state = {
@@ -112,7 +115,8 @@ const state = {
     initialLoading: true,
     newGeoMarkerCreated: false,
     scrollToGeoMarkerId: null,
-    listScrollTop: 0
+    listScrollTop: 0,
+    reloadIntervalId: null
 };
 
 export default state;
