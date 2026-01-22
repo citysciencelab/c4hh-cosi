@@ -492,8 +492,20 @@ export default {
             return template?.state?.Tools?.Dashboard?.statsFeatureFilter || [];
         },
 
+        /**
+         * Returns the beautified tool name from translation.
+         * @param {Object} template - The template.
+         * @returns {String} the beautified tool name.
+         */
         getInitTool (template) {
-            return template?.state?.Tools?.toolToOpen;
+            if (!template?.state?.Tools?.toolToOpen) {
+                return undefined;
+            }
+
+            const tool = template?.state?.Tools?.toolToOpen,
+                capModuleName = tool.charAt(0).toUpperCase() + tool.slice(1);
+
+            return i18next.t(store.getters["Modules/" + capModuleName + "/name"]);
         },
 
         getCalculations (template) {
