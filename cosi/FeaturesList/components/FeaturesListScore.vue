@@ -1,9 +1,11 @@
 <script>
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import getNestedValues from "@shared/js/utils/getNestedValues.js";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
+import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 import Weights from "./FeaturesListScoreWeights.vue";
-import {mapActions} from "vuex";
+import {mapGetters, mapActions} from "vuex";
 import deepEqual from "deep-equal";
-import {VAutocomplete} from "vuetify/components/VAutocomplete";
 import {VBtn} from "vuetify/components/VBtn";
 import {VCard, VCardTitle, VCardText, VCardActions} from "vuetify/components/VCard";
 import {VIcon} from "vuetify/components/VIcon";
@@ -14,8 +16,8 @@ import {VRow} from "vuetify/components/VGrid";
 export default {
     name: "FeaturesListScore",
     components: {
+        DropdownAutocomplete,
         ToolInfo,
-        VAutocomplete,
         VBtn,
         VCard,
         VCardActions,
@@ -45,15 +47,31 @@ export default {
         };
     },
     computed: {
+        ...mapGetters(["allLayerConfigsStructured"]),
+
+        /**
+         * Gets the subject layer list as vuetify autocomplete items with subheaders.
+         * @return {Object[]} The list of all subject layers.
+         */
         layerList () {
-            let layerList = [];
+            const list = [],
+                subjectLayerConfigs = this.allLayerConfigsStructured(treeSubjectsKey);
 
-            this.groupedLayer.forEach(group => {
-                layerList.push({header: group.group});
-                layerList = layerList.concat(group.layer);
+            subjectLayerConfigs.forEach(config => {
+                if (config.type !== "folder") {
+                    return;
+                }
+                list.push({type: "subheader", name: config.name, level: 1});
+
+                config.elements?.forEach(element => {
+                    if (element.type !== "folder") {
+                        return;
+                    }
+                    list.push({type: "subheader", name: element.name, level: 2});
+                    list.push(...getNestedValues(element, "elements", true).flat(Infinity));
+                });
             });
-
-            return layerList;
+            return list;
         },
 
 
@@ -158,7 +176,7 @@ export default {
     <v-card
         outlined
         rounded="0"
-        class="mb-4"
+        class="mb-4 overflow-visible"
     >
         <v-progress-linear
             v-if="progressValue > 0"
@@ -177,7 +195,7 @@ export default {
             <v-row
                 dense
             >
-                <v-autocomplete
+                <DropdownAutocomplete
                     id="selectedDistanceScoreLayers"
                     v-model="selectedLayerList"
                     class="rounded-0"
@@ -186,7 +204,7 @@ export default {
                     outlined
                     :disabled="scoringIsOngoing"
                     dense
-                    item-text="id"
+                    item-title="name"
                     return-object
                     hide-details
                     chips

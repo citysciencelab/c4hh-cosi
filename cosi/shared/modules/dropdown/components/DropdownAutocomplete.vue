@@ -177,6 +177,15 @@ export default {
                         (+{{ modelValue.length - maxChipCount }} weitere)
                     </span>
                 </template>
+                <template #subheader="{props}">
+                    <VListSubheader
+                        v-bind="props"
+                        class="group-title"
+                        :class="props.level === 1 ? 'level-1' : 'level-2'"
+                    >
+                        {{ props[itemTitle || "title"] }}
+                    </VListSubheader>
+                </template>
             </v-autocomplete>
             <v-autocomplete
                 v-else
