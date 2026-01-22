@@ -497,7 +497,6 @@ export default {
                     }
 
                     // Description, Source, GeoMarkerID
-                    // eslint-disable-next-line one-var
                     const filterValueSourceTrimLC = this.filterSelections.filterValueSource?.trim().toLowerCase(),
                         filterValueDescrTrimLC = this.filterSelections.filterValueDescr?.trim().toLowerCase(),
                         filterValueIDTrimLC = this.filterSelections.filterValueId?.trim().toLowerCase();

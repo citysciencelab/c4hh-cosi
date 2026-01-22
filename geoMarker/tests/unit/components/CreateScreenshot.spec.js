@@ -54,7 +54,6 @@ describe("CreateScreenshot.vue", () => {
             props: {screenshotImage: base64}
         });
 
-        // eslint-disable-next-line one-var
         const iconButtons = wrapper.findAllComponents({name: "IconButton"});
 
         expect(wrapper.find("img.screenshotArea").exists()).to.be.true;
@@ -88,7 +87,6 @@ describe("CreateScreenshot.vue", () => {
             props: {screenshotImage: base64}
         });
 
-        // eslint-disable-next-line one-var
         const iconButtons = wrapper.findAllComponents({name: "IconButton"});
 
         expect(iconButtons).to.be.an("array");

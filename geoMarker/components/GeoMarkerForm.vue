@@ -993,7 +993,6 @@ export default {
                 return null;
             }
 
-            // eslint-disable-next-line one-var
             const newestDate = Object.keys(this.departmentData).map(departmentId => {
                 return this.departmentData[departmentId].geschlossen;
             })
