@@ -103,10 +103,8 @@ const actions = {
         dispatch("selectLayerByName", selectedLayerName);
         commit("setSelectedLayerName", selectedLayerName);
 
-        if (currentYear > 2008) {
-            if (rootGetters["Maps/clickCoordinate"]) {
-                dispatch("requestGFI", {processFromParametricUrl: false, center: null});
-            }
+        if (currentYear > 2008 && rootGetters["Maps/clickCoordinate"]) {
+            dispatch("requestGFI", {processFromParametricUrl: false, center: null});
         }
         else {
             dispatch("Maps/removePolygonMarker", null, {root: true});
@@ -114,7 +112,7 @@ const actions = {
                 dispatch("requestGFI", {processFromParametricUrl: false, center: null});
             }
         }
-        if (previousYear > 2008 && currentYear <= 2008) {
+        if (previousYear > 2008 && currentYear <= 2008 && rootGetters["Maps/clickCoordinate"]) {
             dispatch("requestGFI", {processFromParametricUrl: false, center: null});
         }
         else if (currentYear > 2008 && previousYear <= 2008) {
