@@ -3,13 +3,13 @@ import {TrafficCountApi} from "../../../utils/trafficCountApi";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import weekOfYear from "dayjs/plugin/weekOfYear";
+import de from "dayjs/locale/de";
 
 dayjs.extend(isoWeek);
 dayjs.extend(weekOfYear);
 
 // change language from day.js to german
-require("dayjs/locale/de.js");
-dayjs.locale("de");
+dayjs.locale(de);
 
 describe("addons/trafficCount/utils/trafficCountApi.js", () => {
     describe("TrafficCountApi.constructor", () => {

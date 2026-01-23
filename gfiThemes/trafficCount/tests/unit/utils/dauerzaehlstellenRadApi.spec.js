@@ -1,10 +1,10 @@
 import {expect} from "chai";
 import {DauerzaehlstellenRadApi} from "../../../utils/dauerzaehlstellenRadApi";
+import de from "dayjs/locale/de";
 import dayjs from "dayjs";
 
 // change language from day.js to german
-require("dayjs/locale/de.js");
-dayjs.locale("de");
+dayjs.locale(de);
 
 describe("addons/trafficCount/utils/dauerzaehlstellenRadApi.js", () => {
     let dummyApi = null;
