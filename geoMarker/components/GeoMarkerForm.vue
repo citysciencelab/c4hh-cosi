@@ -897,7 +897,9 @@ export default {
 
             await Promise.all(loadPromises);
 
-            this.findAndDisplayNewFeature(featureId, relevantLayerIds);
+            if (this.mode === "create") {
+                this.findAndDisplayNewFeature(featureId, relevantLayerIds);
+            }
 
             if (this.isFilterApplied) {
                 relevantLayerIds.forEach(layerId => {
@@ -948,11 +950,9 @@ export default {
             const list = this.geoMarkerFeatureList,
                 feature = layerCollection.getLayerById(relevantLayerIds[0])?.getLayerSource()?.getFeatureById(featureId);
 
-            if (feature) {
-                if (this.mode === "create") {
-                    list.push(feature);
-                    this.setGeoMarkerFeatureList(list);
-                }
+            if (feature && this.mode === "create") {
+                list.push(feature);
+                this.setGeoMarkerFeatureList(list);
                 this.setGeoMarkerFeatureSelected(feature);
             }
         },
