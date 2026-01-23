@@ -76,14 +76,14 @@ export default {
             url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/dataclass/computeyears`, params),
             response = await axios.post(url, [archiveId]);
 
-        response.data?.forEach(year => {
-            commit("addArchiveYear", {
-                [archiveId]: {
-                    year: year,
-                    archiveName: (state.archiveList.find(a => a.id === archiveId) || {}).name
-                }
-            });
+        // response.data?.forEach(year => {
+        commit("addArchiveYear", {
+            [archiveId]: {
+                years: response?.data,
+                archiveName: (state.archiveList.find(a => a.id === archiveId) || {}).name
+            }
         });
+        // });
     },
     // It can be deleted and written again..
     //

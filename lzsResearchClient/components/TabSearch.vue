@@ -48,17 +48,23 @@ export default {
             const yearsList = {};
 
             this.selectedArchiveIds.forEach(id => {
-                const item = this.archiveYears[id];
+                const item = this.archiveYears && this.archiveYears[id];
 
-                if (item && item.year) {
-                    if (!yearsList[item.year]) {
-                        yearsList[item.year] = {
-                            year: item.year,
+                if (!item || !Array.isArray(item.years)) {
+                    return;
+                }
+
+                item.years.forEach(singleYear => {
+                    if (!yearsList[singleYear]) {
+                        yearsList[singleYear] = {
+                            year: singleYear,
                             archiveNames: []
                         };
                     }
-                    yearsList[item.year].archiveNames.push(item.archiveName);
-                }
+                    if (!yearsList[singleYear].archiveNames.includes(item.archiveName)) {
+                        yearsList[singleYear].archiveNames.push(item.archiveName);
+                    }
+                });
             });
 
             return Object.values(yearsList).sort((a, b) => a.year - b.year);
@@ -118,9 +124,9 @@ export default {
                         .map(attribute => ({
                             ...attribute,
                             value: "",
-                            placeholder: this.placeholderDataClassList?.[archiveName]?.[attribute.name].PLACEHOLDER || "",
+                            placeholder: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.PLACEHOLDER || "",
                             label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`),
-                            pattern: this.placeholderDataClassList?.[archiveName]?.[attribute.name].PATTERN || "",
+                            pattern: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.PATTERN || "",
                             errorMessage: ""
                         }));
 
