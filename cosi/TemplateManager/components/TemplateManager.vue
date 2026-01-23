@@ -24,13 +24,8 @@ export default {
     },
     data () {
         return {
-            activeTemplateName: false,
-            filters: [],
             isTemplateActive: false,
-            saveTemplate: [],
-            selectedTemplateName: false,
-            showImportSection: true,
-            templates: []
+            showImportSection: true
         };
     },
     computed: {
@@ -317,6 +312,10 @@ export default {
          * @returns {void}
          */
         async loadTemplates () {
+            if (this.templates.length) {
+                return;
+            }
+
             let path, res;
             const templates = [];
 
@@ -333,8 +332,8 @@ export default {
                 }
             }
 
-            this.templates = templates;
-            this.selectedTemplateName = this.templates[0].meta.title;
+            this.templates.push(...templates);
+            this.setSelectedTemplateName(this.templates[0].meta.title);
             this.templates.forEach(temp => {
                 this.templateData(temp);
                 if (!this.importedTemplateNames.includes(temp?.meta?.title)) {
@@ -344,13 +343,13 @@ export default {
         },
 
         createFilterObjects () {
-            this.filters = this.templates.map(template => ({
+            this.setFilters(this.templates.map(template => ({
                 name: template.meta.title,
                 activeLayerList: Object.fromEntries(this.getActiveLayerList(template).map(el => [el.id, true])),
                 selectedDistrictNames: Object.fromEntries(this.getSelectedDistricts(template).map(el => [el, true])),
                 statsCategories: Object.fromEntries(this.getStatsCategories(template).map(el => [el, true])),
                 calculations: Object.fromEntries(this.getCalculations(template).map(el => [el.id, true]))
-            }));
+            })));
         },
 
         templateData (template) {
@@ -563,7 +562,7 @@ export default {
          */
         addTemplate (template) {
             this.templates.push(template);
-            this.selectedTemplateName = template.meta.title;
+            this.setSelectedTemplateName(template.meta.title);
             this.templateData(template);
         },
 
@@ -645,7 +644,7 @@ export default {
          * @returns {void}
          */
         selectCard (name) {
-            this.selectedTemplateName = name;
+            this.setSelectedTemplateName(name);
 
             this.isTemplateActive = this.activeTemplates.includes(name);
         },
@@ -656,7 +655,7 @@ export default {
          * @returns {void}
          */
         async activeCard (name, active) {
-            this.activeTemplateName = name;
+            this.setActiveTemplateName(name);
             this.isTemplateActive = active;
 
             this.loadFromTemplate(this.activeTemplate, this.activeTemplateIndex, active);
@@ -669,7 +668,7 @@ export default {
             }
 
             if (!active && this.currentActiveTemplate === "") {
-                this.activeTemplateName = "";
+                this.setActiveTemplateName("");
                 this.setCurrentActiveTemplate("");
                 if (!this.activeTemplates.length) {
                     this.setMapping(await getMappingJson());
