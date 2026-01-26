@@ -18,6 +18,7 @@
 - TrafficCount: Fixed bug that displayed the wrong calendarweek for the first calendarweek of each year and fixed tooltip label.
 - Boris: Fixed incorrect Vuex dispatches caused by renamed actions and active buttons are now highlighted correctly on initial load.
 - Boris: Fixed console error.
+- WaterRiskCheck: Fixed a bug where secondary menu is unusable on mobile.
 
 ---
 

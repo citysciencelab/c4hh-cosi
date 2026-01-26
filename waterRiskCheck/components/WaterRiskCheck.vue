@@ -405,7 +405,9 @@ export default {
     mounted () {
         this.questions = [...this.configuredQuestions];
         this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
-        document.getElementById("mp-menu-secondaryMenu").style.width = "37vw";
+        if (!this.isMobile) {
+            document.getElementById("mp-menu-secondaryMenu").style.width = "37vw";
+        }
         this.setConfig();
     },
     unmounted () {
