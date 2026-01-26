@@ -13,6 +13,7 @@
  * @property {Boolean} standAlonePortal - flag if tool is used in a standalone portal, then titles are removed via CSS (config-param)
  * @property {String} apiBasePath - Base url for api requests to gis portal
  * @property {String} placeholderJsonPath - Path placeholder.json file in portalconfigs.
+ * @property {Object} placeholderDataClassList - Placeholder data class list from placeholder.json
 
  * Addon state
  * @property {Boolean} showLoadingSpinner - Show loading spinner or not
@@ -21,6 +22,9 @@
  * @property {Object} archiveYears - Map of archive IDs to year data { [archiveId]: { year: "2022", archiveName: ["xyz", "abc"] } }
  * @property {Object[]} searchAttributeResponse - List of dataclass objects from the search response
  * @property {String} selectedInstanceId - instance id of the selected primary object to watch details for
+ * @property {Object} lzsCurrentLayout - Current layout settings for the drawn features in the draw component
+ * @property {Object} lzsDrawIcons - Icons used in the draw component
+ * @property {String[]} lzsDrawTypes - Draw types available in the draw component
  */
 
 const state = {
@@ -35,6 +39,7 @@ const state = {
     isVisibleInMenu: true,
     deactivateGFI: true,
     standAlonePortal: false,
+    hasMouseMapInteractions: true,
 
     // Addon state
     showLoadingSpinner: false,
@@ -45,7 +50,27 @@ const state = {
     placeholderJsonPath: "",
     archiveYears: {},
     archiveList: [],
-    selectedInstanceId: null
+    selectedInstanceId: null,
+
+    // Draw component
+    lzsCurrentLayout: {
+        fillColor: [148, 10, 65, 0.5],
+        strokeColor: [148, 10, 65],
+        strokeWidth: 3,
+        circleStrokeColor: [148, 10, 65]
+    },
+    lzsDrawIcons: {
+        box: "bi-square",
+        deleteAll: "bi-trash",
+        pen: "bi-pencil",
+        point: "bi-dot",
+        polygon: "bi-hexagon"
+    },
+    lzsDrawTypes: ["box", "polygon", "pen", "point"],
+    lzsSelectedDrawType: "",
+    lzsSelectedInteraction: null,
+    lzsDrawEdits: ["deleteAll"],
+    minScaleValue: 5000
 };
 
 export default state;

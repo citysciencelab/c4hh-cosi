@@ -1,6 +1,11 @@
 import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
+import sinon from "sinon";
 import {createStore} from "vuex";
+
+import Point from "ol/geom/Point";
+import LineString from "ol/geom/LineString";
+import Polygon from "ol/geom/Polygon";
 
 import Component from "../../../components/TabSearch.vue";
 
@@ -75,6 +80,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                         "PATTERN": "[0-9*]{9}"
                     }
                 }
+            },
+            drawLayerSourceMock = {
+                clear: sinon.stub(),
+                addFeature: sinon.stub()
             };
 
         store = createStore({
@@ -90,17 +99,60 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                                 archiveList: () => mockDataClassList.map(a => ({id: a.id, name: a.name})),
                                 yearsList: () => [2020],
                                 archiveYears: () => ({}),
-                                placeholderDataClassList: () => mockPlaceholdersJson
+                                placeholderDataClassList: () => mockPlaceholdersJson,
+                                lzsCurrentLayout: () => ({
+                                    fillColor: [148, 10, 65, 0.5],
+                                    strokeColor: [148, 10, 65],
+                                    strokeWidth: 3,
+                                    circleStrokeColor: [148, 10, 65]
+                                }),
+                                lzsDrawIcons: () => ({
+                                    box: "bi-square",
+                                    deleteAll: "bi-trash",
+                                    pen: "bi-pencil",
+                                    point: "bi-dot",
+                                    polygon: "bi-hexagon"
+                                }),
+                                lzsDrawTypes: () => ["box", "polygon", "pen", "point"],
+                                lzsSelectedDrawType: () => "",
+                                lzsSelectedInteraction: () => null,
+                                lzsDrawEdits: () => ["deleteAll"],
+                                minScaleValue: () => 5000
                             },
                             actions: {
                                 fetchDataClassList: () => Promise.resolve(),
                                 fetchPlaceholders: () => Promise.resolve(),
-                                fetchYears: () => Promise.resolve()
+                                fetchYears: () => Promise.resolve(),
+                                searchByGeometry: () => Promise.resolve()
                             },
                             mutations: {
-                                setYearsList: () => Promise.resolve()
+                                setYearsList: () => Promise.resolve(),
+                                setLzsSelectedDrawType: () => "box",
+                                setLzsSelectedInteraction: () => "draw"
                             }
                         }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        addNewLayerIfNotExists: () => ({
+                            getSource: () => drawLayerSourceMock
+                        }),
+                        registerListener: () => sinon.stub(),
+                        addInteraction: () => sinon.stub(),
+                        removeInteraction: () => sinon.stub()
+                    },
+                    getters: {
+                        projectionCode: () => "EPSG:25832",
+                        scale: () => 5000,
+                        extent: () => [0, 0, 100, 100]
+                    }
+                },
+                Menu: {
+                    namespaced: true,
+                    getters: {
+                        expanded: () => sinon.stub()
                     }
                 }
             }
@@ -268,6 +320,11 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     });
 
     it("resetForm restores attribute form and geometric selections", async () => {
+        // Ensure lzsDrawLayerSource is mocked before calling setSearchGeometry
+        wrapper.vm.lzsDrawLayerSource = {
+            clear: sinon.stub(),
+            addFeature: sinon.stub()
+        };
         const items = wrapper.findAll("#searchOptionsList li"),
             archiveId = "DKL_3DSTADT_LOD2",
             year = 2020;
@@ -285,10 +342,12 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         await wrapper.vm.$nextTick();
         await wrapper.vm.onSelectedArchiveIdsChange(archiveId, {target: {checked: true}});
         await wrapper.vm.onSelectedYearsChange(year, {target: {checked: true}});
+        await wrapper.vm.setSearchGeometry(new Point([0, 0]));
 
         expect(wrapper.vm.selectedArchive).to.equal("AFIS-Einzelnachweise");
         expect(wrapper.vm.selectedArchiveIds).to.include(archiveId);
         expect(wrapper.vm.selectedYears).to.include(year);
+        expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Point", coordinates: [0, 0]});
 
         wrapper.vm.resetForm();
 
@@ -299,5 +358,43 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         expect(wrapper.vm.selectedArchiveIds).to.be.an("array").that.is.empty;
         expect(wrapper.vm.selectedYears).to.be.an("array").that.is.empty;
         expect(wrapper.vm.isAttributeSearchFormValid).to.be.true;
+        expect(wrapper.vm.isSpatialSearchFormValid).to.be.false;
+        expect(wrapper.vm.searchGeometry).to.be.null;
+    });
+
+    it("set SearchGeometry correctly", async () => {
+        const items = wrapper.findAll("#searchOptionsList li"),
+            mockPoint = new Point([0, 0]),
+            mockLineString = new LineString([[0, 0], [1, 1]]),
+            mockPolygon = new Polygon([[[0, 0], [1, 1], [1, 0], [0, 0]]]);
+
+        await items[1].trigger("click");
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.setSearchGeometry(mockPoint);
+
+        expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Point", coordinates: [0, 0]});
+
+        await wrapper.vm.setSearchGeometry(mockLineString);
+
+        // Lines should be converted to polygons
+        expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Polygon", coordinates: [[[0, 0], [1, 1], [0, 0]]]});
+
+        await wrapper.vm.setSearchGeometry(mockPolygon);
+
+        expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Polygon", coordinates: [[[0, 0], [1, 1], [1, 0], [0, 0]]]});
+    });
+
+    it("sets selected button group of spatial selection", async () => {
+        const items = wrapper.findAll("#searchOptionsList li");
+
+        await items[1].trigger("click");
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.setSelectedButtonGroup("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries");
+
+        expect(wrapper.vm.selectedButtonGroup).to.equal("geometry");
+
+        await wrapper.vm.setSelectedButtonGroup("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent");
+
+        expect(wrapper.vm.selectedButtonGroup).to.equal("extent");
     });
 });

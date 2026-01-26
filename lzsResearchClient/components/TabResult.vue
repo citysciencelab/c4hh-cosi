@@ -44,7 +44,7 @@ export default {
 
                     return {
                         archiveId: val,
-                        attributeToGroupBy: attributes[0].name,
+                        attributeToGroupBy: attributes[0].name || attributes[0].id,
                         attributeCount: attributes.length
                     };
                 });
@@ -84,7 +84,7 @@ export default {
                     return archive.archiveId === archiveData.archiveId;
                 }),
                 groupList = [...new Set(resultsForArchiveId.map(result => {
-                    const groupByObj = result.attributes.find(attr => attr.name === archiveData.attributeToGroupBy),
+                    const groupByObj = result?.attributes?.find(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy),
                         groupByValue = groupByObj ? groupByObj.value : "";
 
                     return groupByValue;
@@ -108,11 +108,11 @@ export default {
                 }))),
                 resultsForGroup = groupByValue
                     ? resultsForArchiveId.filter((dataset) => {
-                        const groupByObj = dataset.attributes.find(attr => attr.name === archiveData.attributeToGroupBy);
+                        const groupByObj = dataset.attributes.find(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy);
 
                         return groupByObj && groupByObj.value === groupByValue;
                     }).map((dataset) => {
-                        const attributeIndexToDelete = dataset.attributes.findIndex(attr => attr.name === archiveData.attributeToGroupBy);
+                        const attributeIndexToDelete = dataset.attributes.findIndex(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy);
 
                         dataset.attributes.splice(attributeIndexToDelete, 1);
 
@@ -132,7 +132,7 @@ export default {
          * @returns {String[]} - Array of strings to be used as table headers.
          */
         getTableHeaders (step, groupValue = null) {
-            let headers = this.resultsForGroupsForArchive(step, groupValue)[0].attributes.map(a => a.name);
+            let headers = this.resultsForGroupsForArchive(step, groupValue)[0].attributes.map(a => a.name || a.id);
 
             if (groupValue) {
                 headers = headers.filter(a => a !== step.attributeToGroupBy);
@@ -154,7 +154,7 @@ export default {
             }
 
             return this.searchAttributeResponse.find(attr => attr.archiveId === archiveData.archiveId).attributes.map((attribute) => {
-                return attribute.name;
+                return attribute.name || attribute.id;
             });
         },
         /**

@@ -22,7 +22,13 @@
                     "jahrgang": "Year",
                     "kachelnummer": "Tile Number",
                     "maxValueCount": "Max. Results",
-                    "patternError": "Please enter a numeric value with \"{ digitNumber }\" digit."
+                    "patternError": "Please enter a numeric value with \"{ digitNumber }\" digit.",
+                    "spatialSelectionGroup": {
+                        "geometries": "Drawn Area",
+                        "extent": "Map Extent"
+                    },
+                    "spatialSelectionLabel": "Search in:",
+                    "extentWarningMessage": "The map scale is smaller than 1:{ scale }. Please zoom in to enable searching within the map extent."
                 },
                 "tabResult": {
                     "label": "Results",
