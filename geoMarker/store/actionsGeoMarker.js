@@ -368,15 +368,6 @@ const actions = {
                 selectedInteraction,
                 currentlyLockedFeature.lockId
             );
-
-            if (response !== null) {
-                dispatch("Alerting/addSingleAlert", {
-                    category: "success",
-                    content: i18next.t("common:modules.wfst.transaction.success.baseSuccess", {
-                        transaction: i18next.t("common:modules.wfst.transaction.success." + selectedInteraction)
-                    })
-                }, {root: true});
-            }
         }
         catch (e) {
             await dispatch("Alerting/addSingleAlert", {

@@ -39,7 +39,9 @@
                 "geomHasChanged": {
                   "header": "Changed geometry!",
                   "text": "The position of the GeoMarker has changed. You see the new position in the map. (blue circle)"
-                }
+                },
+                "isSaving": "GeoMarker is being saved...",
+                "isLoading": "Data are loaded from the server ..."
             },
             "status": {
                 "offen": "open",
@@ -78,8 +80,7 @@
                     "hideList": "Toggle GeoMarker List",
                     "moveGeoMarker": "Move GeoMarker"
                 },
-                "updateMessage": "The GeoMarker has been moved. Please save the GeoMarker to apply the change.",
-                "isLoading": "Data are loaded from the server ..."
+                "updateMessage": "The GeoMarker has been moved. Please save the GeoMarker to apply the change."
 
             },
             "filter": {

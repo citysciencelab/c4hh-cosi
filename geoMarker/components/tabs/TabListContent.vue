@@ -4,15 +4,13 @@ import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {formatDateTime} from "../../utils/dateHelpers";
 import SelectableList from "../SelectableList.vue";
 import GeoMarkerForm from "../GeoMarkerForm.vue";
-import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 
 export default {
     name: "TabListContent",
     components: {
         IconButton,
         SelectableList,
-        GeoMarkerForm,
-        SpinnerItem
+        GeoMarkerForm
     },
     props: {
         tabActive: {
@@ -28,8 +26,7 @@ export default {
             geoMarkerUpdateMode: false,
             originalCoordinates: null,
             selectedFeatureIsGemisEditNotAllowed: false,
-            formRenderKey: 0,
-            isLoading: false
+            formRenderKey: 0
         };
     },
     computed: {
@@ -377,21 +374,7 @@ export default {
                 :selected-feature="geoMarkerFeatureSelected"
                 @update-successfull="onSuccess()"
                 @editing="changeEditFeatureMode"
-                @start-loading="isLoading = true"
-                @stop-loading="isLoading = false"
             />
-        </div>
-
-        <div
-            v-if="isLoading"
-            class="loadingSpinner"
-        >
-            <SpinnerItem
-                custom-class="spinner"
-                class="ms-3"
-            />
-
-            <p> {{ $t("additional:modules.geoMarker.GeoMakerList.isLoading") }} </p>
         </div>
     </div>
 </template>
@@ -454,30 +437,6 @@ export default {
             position: absolute;
             top: 0;
             left: 0;
-        }
-    }
-
-    div.loadingSpinner {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255,255,255,0.7);
-        z-index: 2;
-
-        div.spinner {
-            width: 4rem;
-            height: 4rem;
-        }
-
-        p {
-            background-color: white;
         }
     }
 }

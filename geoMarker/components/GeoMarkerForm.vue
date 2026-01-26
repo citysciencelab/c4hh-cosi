@@ -5,6 +5,7 @@ import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import GeoMarkerFormBox from "./GeoMarkerFormBox.vue";
 import SelectableList from "./SelectableList.vue";
 import CreateScreenshot from "./CreateScreenshot.vue";
@@ -26,7 +27,8 @@ export default {
         InputText,
         FileUpload,
         FlatButton,
-        ModalItem
+        ModalItem,
+        SpinnerItem
     },
     props: {
         /**
@@ -49,7 +51,7 @@ export default {
             default: false
         }
     },
-    emits: ["update-successfull", "geomarker-created", "editing", "start-loading", "stop-loading"],
+    emits: ["update-successfull", "geomarker-created", "editing"],
     data () {
         return {
             selectedCategoryId: null,
@@ -66,6 +68,7 @@ export default {
             attachment: null,
             createAnotherGeoMarker: false,
             savingInProgress: false,
+            isLoading: false,
             map: mapCollection.getMap("2D"),
             readonly: this.mode === "edit",
             showErrorModal: false,
@@ -726,10 +729,6 @@ export default {
             }
             catch (error) {
                 console.error("Error updating GeoMarker:", error);
-                this.addSingleAlert({
-                    content: this.$t("additional:modules.geoMarker.edit.errorMessage"),
-                    category: "error"
-                });
             }
             finally {
                 this.$emit("update-successfull");
@@ -1054,13 +1053,13 @@ export default {
                 clearInterval(this.reloadIntervalId);
                 this.setReloadIntervalId(null);
 
-                this.$emit("start-loading");
+                this.isLoading = true;
                 const feat = await this.loadFeatureWithLockById({geomarkerId: this.selectedFeature.getId()});
 
                 if (!feat) {
                     this.errorFeatureIsLocked = true;
                     this.showErrorModal = true;
-                    this.$emit("stop-loading");
+                    this.isLoading = false;
                     return;
                 }
 
@@ -1082,7 +1081,7 @@ export default {
 
             this.readonly = !status;
             this.$emit("editing", status);
-            this.$emit("stop-loading");
+            this.isLoading = false;
         },
         /**
          * Checks if the properties and the geometry of the GeoMarker has changed on the server
@@ -1576,6 +1575,24 @@ export default {
             />
         </div>
 
+        <div
+            v-if="savingInProgress || isLoading"
+            class="loadingSpinner"
+        >
+            <SpinnerItem
+                custom-class="spinner"
+                class="ms-3"
+            />
+
+            <p v-if="savingInProgress">
+                {{ $t("additional:modules.geoMarker.geoMarkerForm.isSaving") }}
+            </p>
+
+            <p v-else-if="isLoading">
+                {{ $t("additional:modules.geoMarker.geoMarkerForm.isLoading") }}
+            </p>
+        </div>
+
         <ModalItem
             :show-modal="showErrorModal"
             @modalHid="showErrorModal = false"
@@ -1718,6 +1735,30 @@ div.GeoMarkerForm {
 
     textarea.no-edit-cursor {
         cursor: default;
+    }
+
+    div.loadingSpinner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.7);
+        z-index: 2;
+
+        div.spinner {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        p {
+            background-color: white;
+        }
     }
 }
 </style>
