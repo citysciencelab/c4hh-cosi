@@ -292,7 +292,8 @@ export default {
         ...mapMutations("Modules/TemplateManager", Object.keys(mutations)),
         ...mapActions("Modules/TemplateManager", Object.keys(actions)),
         ...mapActions("Menu", ["changeCurrentComponent"]),
-        ...mapMutations("Modules/DistrictSelector", ["setMapping"]),
+        ...mapActions("Modules/DistrictSelector", ["setDistrictsByName"]),
+        ...mapMutations("Modules/DistrictSelector", ["setMapping", "setSelectedDistrictLevelId"]),
         ...mapActions("Modules/SaveSession", ["loadSessionData"]),
 
         /**
@@ -673,6 +674,17 @@ export default {
                 if (!this.activeTemplates.length) {
                     this.setMapping(await getMappingJson());
                 }
+            }
+
+            if (active && this.selectedDistricts.length) {
+                this.setSelectedDistrictLevelId(this.activeTemplate?.state?.Tools?.DistrictSelector?.selectedDistrictLevelId);
+                this.$nextTick(async () => {
+                    await this.$nextTick();
+                    this.setDistrictsByName({
+                        districtNames: this.selectedDistricts,
+                        zoomToExtent: false
+                    });
+                });
             }
 
             this.setReportName(this.activeTemplate?.meta?.title);
