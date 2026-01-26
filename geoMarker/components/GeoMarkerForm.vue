@@ -881,12 +881,30 @@ export default {
                                 if (layerSource.getFeatures().length) {
                                     layerSource.refresh();
                                     layerSource.once("featuresloadend", () => {
+                                        // make layer invisible again since it has been invisible before
+                                        this.$store.dispatch("replaceByIdInLayerConfig", {
+                                            layerConfigs: [{
+                                                id: layerId,
+                                                layer: {
+                                                    visibility: false
+                                                }
+                                            }]
+                                        });
                                         resolve();
                                     });
                                 }
                                 // the layer has never been visible before = no features have been loaded yet
                                 else {
                                     layerSource.once("featuresloadend", () => {
+                                        // make layer invisible again since it has been invisible before
+                                        this.$store.dispatch("replaceByIdInLayerConfig", {
+                                            layerConfigs: [{
+                                                id: layerId,
+                                                layer: {
+                                                    visibility: false
+                                                }
+                                            }]
+                                        });
                                         resolve();
                                     });
                                 }
