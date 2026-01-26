@@ -20,7 +20,7 @@ import {
     getCalculationId
 } from "../utils/operations";
 import {generateChartForDistricts, generateChartForCorrelation, generateChartsForItems} from "../utils/chart";
-import {prepareTableExport, prepareTableExportWithTimeline} from "../utils/export";
+import {prepareTableExportWithTimeline} from "../utils/export";
 import composeFilename from "../../utils/composeFilename";
 import exportXlsx from "../../utils/exportXlsx";
 import DashboardToolbar from "./DashboardToolbar.vue";
@@ -347,11 +347,10 @@ export default {
 
         /**
          * Export the table as XLSX.
-         * Either the simple view for the selected or all years.
-         * @param {Boolean} [exportTimeline=false] - Whether to include all years.
+         * If a year filter is set, only the selected years will be included, otherwise all.
          * @returns {void}
          */
-        async exportTable (exportTimeline = false) {
+        async exportTable () {
             let exportedData = null,
                 iniHeader = null,
                 fixedHeaderStart = null,
@@ -360,9 +359,7 @@ export default {
             const items = this.selectedItems.length > 0 ? this.selectedItems : this.items,
                 preparedItems = this.getPreparedItems(items),
                 prefix = this.prefixExportFilename,
-                rawData = exportTimeline
-                    ? this.prepareTableExportWithTimeline(preparedItems, this.selectedDistrictNames, this.timestampsFiltered, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns)
-                    : this.prepareTableExport(preparedItems, this.selectedDistrictNames, this.timestampSelected, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns),
+                rawData = this.prepareTableExportWithTimeline(preparedItems, this.selectedDistrictNames, this.items[0].years, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns),
                 filename = composeFilename(this.$t("additional:modules.tools.cosi.dashboard.exportFilename", {prefix})),
                 modifiedKey = [{"oldKey": "isTemp", "newKey": "eigene Berechnungen"}];
 
@@ -563,7 +560,6 @@ export default {
         deleteStats,
         getTotal,
         getAverage,
-        prepareTableExport,
         prepareTableExportWithTimeline,
         getCulmulativeTotal,
 
