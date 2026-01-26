@@ -10,6 +10,7 @@ import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
+import {getLayerById} from "../utils/getLayerById.js";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
@@ -19,6 +20,7 @@ import Overlay from "ol/Overlay.js";
 import {polygon as turfPolygon} from "@turf/helpers";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
+import wktParser from "../../utils/wktParser";
 import WPS from "@shared/js/api/wps.js";
 
 export default {
@@ -66,8 +68,9 @@ export default {
         }
     },
     created () {
-        this.drawingLayer = this.getLayerById("district-selector");
+        this.drawingLayer = getLayerById("district-selector");
         this.drawingLayer.getLayer().setVisible(true);
+
         this.createCardsFromStatisticalCards(this.cardsStatistical, this.cards);
 
         if (this.activeCard) {
@@ -89,7 +92,17 @@ export default {
         ...mapActions("Maps", ["zoomToExtent"]),
         ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId"]),
 
-        addCard (feature, buffer, districtNames, status, districtLevelId, districtLevelLabel) {
+        /**
+         * Adds a new card to the cards array with the provided parameters.
+         * @param {String} wktFeature - The feature as WKT string to be added to the card.
+         * @param {Number} buffer - The buffer for the subject area(s).
+         * @param {String[]} districtNames - The names of the selected districts.
+         * @param {String} status - The status of the card (e.g., "active").
+         * @param {Number} districtLevelId - The ID of the district level.
+         * @param {String} districtLevelLabel - The label of the district level.
+         * @returns {void}
+         */
+        addCard (wktFeature, buffer, districtNames, status, districtLevelId, districtLevelLabel) {
             this.cards.push({
                 badgeList: this.getBadges(),
                 buffer,
@@ -101,13 +114,13 @@ export default {
                 ],
                 districtLevelId,
                 districtNames,
-                drawnFeature: null,
+                drawnFeatureWKT: null,
                 downloadable: false,
                 icon: "bi bi-bounding-box-circles",
                 removable: false,
-                statisticalFeature: feature,
+                statisticalFeatureWKT: wktFeature,
                 status,
-                subjectFeature: this.getBufferedFeature([feature], buffer)
+                subjectFeatureWKT: this.getBufferedFeature(wktFeature, buffer)
             });
         },
 
@@ -119,17 +132,14 @@ export default {
          */
         createCardsFromStatisticalCards (cardsStatistical, cards) {
             cardsStatistical.forEach(card => {
-                const feature = new Feature({
-                        geometry: card.geometry
-                    }),
-                    foundEqualObject = cards.find(existingCard => {
-                        return JSON.stringify(existingCard.statisticalFeature.getGeometry()) === JSON.stringify(feature.getGeometry());
-                    });
+                const foundEqualObject = cards.find(existingCard => {
+                    return existingCard.statisticalFeatureWKT === card.bboxGeomWKT;
+                });
 
                 if (foundEqualObject) {
                     return;
                 }
-                this.addCard(feature, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel);
+                this.addCard(card.bboxGeomWKT, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel);
             });
         },
 
@@ -149,12 +159,14 @@ export default {
         },
 
         /**
-         * Downloads the feature in geojson file.
-         * @param {Object} val - The item object.
+         * Downloads the feature of the subject area in geojson file.
+         * @param {Object} card - The card object.
          * @returns {void}
          */
-        exportFeature (val) {
-            downloadJsonToFile(featuresToGeoJsonCollection([val?.subjectFeature]), "Gebiet für Fachdaten.geojson");
+        exportFeature (card) {
+            const feature = wktParser.decodeFeature(card?.subjectFeatureWKT);
+
+            downloadJsonToFile(featuresToGeoJsonCollection([feature]), "Gebiet für Fachdaten.geojson");
         },
 
         /**
@@ -180,12 +192,13 @@ export default {
 
         /**
          * Creates a buffered feature of the given features.
-         * @param {ol/Feature[]} features - The array of features to be buffered.
+         * @param {String} wktFeature - The feature to be buffered as WKT.
          * @param {Number} buffer - The buffer distance to apply around each feature.
-         * @returns {ol/Feature} - The buffered feature.
+         * @returns {String} - The buffered feature as WKT.
          */
-        getBufferedFeature (features, buffer) {
-            const geometries = getBoundingGeometry(features, buffer).getGeometries(),
+        getBufferedFeature (wktFeature, buffer) {
+            const feature = wktParser.decodeFeature(wktFeature),
+                geometries = getBoundingGeometry([feature], buffer).getGeometries(),
                 geojsonPolygons = geometries.map(polygon => turfPolygon(polygon.getCoordinates()));
 
             let merged = geojsonPolygons[0],
@@ -202,40 +215,9 @@ export default {
                 mergedPolygon = new MultiPolygon(merged.geometry.coordinates);
             }
 
-            return new Feature({
+            return wktParser.encodeFeature(new Feature({
                 geometry: mergedPolygon
-            });
-        },
-
-        /**
-         * Gets a layer by its ID from the layer collection. If the layer does not exist,
-         * it creates a new vector-based layer with the specified ID, adds it to the layer collection,
-         * and then returns the newly created layer.         *
-         * @param {string} id - The unique identifier of the layer to get or create.
-         * @returns {Object} The layer object corresponding to the given ID.
-         */
-        getLayerById (id) {
-            if (typeof layerCollection.getLayerById(id) !== "undefined") {
-                return layerCollection.getLayerById(id);
-            }
-            const layer = layerFactory.createLayer({
-                typ: "VECTORBASE",
-                id: id,
-                name: id,
-                alwaysOnTop: true
-            });
-
-            layer.getLayer().setStyle(
-                {
-                    "fill-color": "rgba(0, 0, 0, 0)",
-                    "stroke-color": "#EB8A3E",
-                    "stroke-line-dash": [6, 6],
-                    "stroke-width": 4
-                }
-            );
-
-            layerCollection.addLayer(layer);
-            return layer;
+            }));
         },
 
         /**
@@ -252,8 +234,8 @@ export default {
                 evt.feature.setGeometry(polygonGeom);
                 mapCollection.getMap("2D").removeOverlay(this.circleOverlay);
             }
-            this.activeCard.drawnFeature = evt.feature;
-            this.setSubjectFeature([this.activeCard.drawnFeature], this.activeCard.buffer);
+            this.activeCard.drawnFeatureWKT = wktParser.encodeFeature(evt.feature);
+            this.setSubjectFeature(this.activeCard.drawnFeatureWKT, this.activeCard.buffer);
         },
 
         /**
@@ -272,11 +254,11 @@ export default {
                     this.circleOverlay.setPosition(e.target.getLastCoordinate());
                 });
             }
-            if (this.activeCard.drawnFeature === null) {
+            if (this.activeCard.drawnFeatureWKT === null) {
                 return;
             }
-            this.activeCard.drawnFeature = null;
-            this.setSubjectFeature([this.activeCard.statisticalFeature], this.activeCard.buffer);
+            this.activeCard.drawnFeatureWKT = null;
+            this.setSubjectFeature(this.activeCard.statisticalFeatureWKT, this.activeCard.buffer);
         },
 
         /**
@@ -285,7 +267,7 @@ export default {
          */
         reset () {
             this.selectedInteraction = "";
-            this.activeCard.drawnFeature = null;
+            this.activeCard.drawnFeatureWKT = null;
             this.setBuffer(0);
         },
 
@@ -301,8 +283,7 @@ export default {
             this.$nextTick(() => {
                 this.updateSelectedFeatures(this.cards[index].districtNames);
             });
-
-            this.updateMap();
+            this.updateMap(this.activeCard);
         },
 
         /**
@@ -314,22 +295,22 @@ export default {
             this.buffer = value;
             this.activeCard.buffer = value;
             this.activeCard.data[3].label = "Puffer " + value + " m";
-            if (this.activeCard.drawnFeature !== null) {
-                this.setSubjectFeature([this.activeCard.drawnFeature], this.activeCard.buffer);
+            if (this.activeCard?.drawnFeatureWKT !== null) {
+                this.setSubjectFeature(this.activeCard.drawnFeatureWKT, this.activeCard.buffer);
             }
             else {
-                this.setSubjectFeature([this.activeCard.statisticalFeature], this.activeCard.buffer);
+                this.setSubjectFeature(this.activeCard.statisticalFeatureWKT, this.activeCard.buffer);
             }
         },
 
         /**
          * Sets the subject feature to the active card with an optional buffer.
-         * @param {ol/Feature[]} features - The features to set as the subject feature.
+         * @param {String} wktString - The feature as wkt string to set as the subject feature.
          * @param {Number} buffer - The buffer value to apply to the feature.
          */
-        setSubjectFeature (features, buffer) {
-            this.activeCard.subjectFeature = this.getBufferedFeature(features, buffer);
-            this.updateMap();
+        setSubjectFeature (wktString, buffer) {
+            this.activeCard.subjectFeatureWKT = this.getBufferedFeature(wktString, buffer);
+            this.updateMap(this.activeCard);
         },
 
         /**
@@ -337,8 +318,10 @@ export default {
          * @param {ol/Feature[]} features - The imported features to set as the subject feature.
          */
         setSubjectFeatureFromImport (features) {
+            const extent = wktParser.decodeFeature(this.activeCard.subjectFeatureWKT).getGeometry().getExtent();
+
             this.setSubjectFeature(features, this.activeCard.buffer);
-            this.zoomToExtent({extent: this.activeCard.subjectFeature.getGeometry().getExtent()});
+            this.zoomToExtent({extent: extent});
         },
 
         /**
@@ -350,7 +333,7 @@ export default {
             const activeIndex = this.cards.findIndex(card => card.status === "active");
 
             if (activeIndex === index) {
-                this.updateMap();
+                this.updateMap(this.activeCard);
                 return;
             }
             if (activeIndex !== -1) {
@@ -359,6 +342,11 @@ export default {
             this.setActiveCard(index);
         },
 
+        /**
+         * Updates the bounding box geometry for all layer configurations and sets it to the map layers.
+         * @param {ol/geom/Geometry} geometry - The geometry to set as the bounding box.
+         * @returns {void}
+         */
         updateLayerBbox (geometry) {
             this.allLayerConfigs.forEach(layerConfig => {
                 layerConfig.bboxGeometry = geometry;
@@ -366,11 +354,18 @@ export default {
             setBBoxToGeom(this, geometry, layerCollection.getLayers());
         },
 
-        updateMap () {
+        /**
+         * Updates the map based on the active card.
+         * @param {Object} card - The active card object.
+         * @returns {void}
+         */
+        updateMap (card) {
+            const subjectFeature = wktParser.decodeFeature(card.subjectFeatureWKT);
+
             this.drawingLayer.getLayerSource().clear();
-            this.drawingLayer.getLayerSource().addFeature(this.activeCard.subjectFeature);
-            this.updateLayerBbox(this.activeCard.subjectFeature.getGeometry());
-            this.setPopulationSize(this.activeCard);
+            this.drawingLayer.getLayerSource().addFeature(subjectFeature);
+            this.updateLayerBbox(subjectFeature.getGeometry());
+            this.setPopulationSize(card);
         },
 
         /**
@@ -403,8 +398,9 @@ export default {
         },
 
         setPopulationSize (card) {
-            const service = this.restServiceById(this.wpsServiceId),
-                geometry = card.subjectFeature.getGeometry();
+            const subjectFeature = wktParser.decodeFeature(card.subjectFeatureWKT),
+                service = this.restServiceById(this.wpsServiceId),
+                geometry = subjectFeature.getGeometry();
 
             if (service === undefined) {
                 console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");

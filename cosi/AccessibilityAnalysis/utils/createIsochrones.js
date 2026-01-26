@@ -1,7 +1,6 @@
 import requestIsochrones from "./requestIsochrones";
 import {transformFeatures} from "../../utils/features/transform";
 import {default as turfUnion} from "@turf/union";
-import {default as turfBooleanPointInPolygon} from "@turf/boolean-point-in-polygon";
 import axios from "axios";
 import GeoJSON from "ol/format/GeoJSON";
 
@@ -104,8 +103,6 @@ async function createIsochronesPoints (args) {
         // group coordinates into groups of 5
         coordinatesList = [],
         groupedFeaturesList = [],
-        // filteredCoordinates = filterPoly === undefined ? args.coordinates :
-        //     args.coordinates.filter(c => turfBooleanPointInPolygon(c, filterPoly));
         filteredCoordinates = args.coordinates;
 
     for (let i = 0; i < filteredCoordinates.length; i += args.batchSize) {

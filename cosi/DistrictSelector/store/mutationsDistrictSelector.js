@@ -11,6 +11,36 @@ const mutations = {
     ...generateSimpleMutations(stateDistrictSelector),
 
     /**
+     * Sets the statistical data cards.
+     * @param {Object} state - The DistrictSelector store state.
+     * @param {Object[]} payload - The statistical data cards.
+     * @returns {void}
+     */
+    setSelectionCardsStatisticalData (state, payload) {
+        state.selectionCardsStatisticalData = payload;
+    },
+
+    /**
+     * Sets the subject data cards.
+     * @param {Object} state - The DistrictSelector store state.
+     * @param {Object[]} payload - The subject data cards.
+     * @returns {void}
+     */
+    setSelectionCardsSubjectData (state, payload) {
+        state.selectionCardsSubjectData = payload;
+    },
+
+    /**
+     * Sets the selected tab item.
+     * @param {Object} state - The DistrictSelector store state.
+     * @param {Object} payload - The selected tab item.
+     * @returns {void}
+     */
+    setSelectedTabItem (state, payload) {
+        state.selectedTabItem = payload;
+    },
+
+    /**
      * Adds a new statistical category to the mapping
      * @param {Object} state - the DistrictSelector store state
      * @param {String} category - the new category

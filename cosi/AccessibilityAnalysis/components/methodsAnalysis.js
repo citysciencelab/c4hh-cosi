@@ -43,14 +43,14 @@ export default {
             }
 
             // try {
-                const code = (err.error || err).response.data.error.code;
+            const code = (err.error || err).response.data.error.code;
 
-                if (code === 3002 || code === 3099) {
-                    this.showErrorInvalidInput();
-                }
-                else {
-                    this.showError();
-                }
+            if (code === 3002 || code === 3099) {
+                this.showErrorInvalidInput();
+            }
+            else {
+                this.showError();
+            }
             // }
             // catch (e) {
             //     console.error(e);
@@ -139,7 +139,7 @@ export default {
 
         styleIsochroneFeatures(newFeatures, this.isochroneColors);
         this.getLayerById("accessibility-analysis").getLayer().getSource().addFeatures(newFeatures);
-        //Removing the delay of zoomtiextent so that the full content of canvas for screenshot will be got.
+        // Removing the delay of zoomtiextent so that the full content of canvas for screenshot will be got.
         this.zoomToExtent({extent: this.getLayerById("accessibility-analysis").getLayer().getSource().getExtent(), options: {duration: 0}});
         if (this.mode !== "region") {
             this.setIsochroneAsBbox();

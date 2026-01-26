@@ -38,8 +38,8 @@ export default {
                     "layerConfig"
                 ],
                 Maps: [
-                    "layerIds",
-                    "loadedLayers",
+                    // "layerIds",
+                    // "loadedLayers",
                     // "view"
                     "center",
                     "zoom"
@@ -61,9 +61,9 @@ export default {
                         // "active"
                     ],
                     DistrictSelector: [
+                        "selectedTabItem",
                         "selectionCardsStatisticalData",
-                        "selectedDistrictLevelId",
-                        "selectedDistrictNames"
+                        "selectionCardsSubjectData"
                     ],
                     AccessibilityAnalysis: [
                         "dataSets",

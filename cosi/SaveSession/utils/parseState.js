@@ -44,16 +44,6 @@ export default {
                         case "ScenarioBuilder/scenarios":
                             // this.$store.commit(mutation, this.parseScenarios(state[key][attr]));
                             break;
-                        case "DistrictSelector/selectedDistrictNames":
-                            this.$nextTick(async () => {
-                                // hacky, wait for the districtStyle to be drawn
-                                await this.$nextTick();
-                                this.setDistrictsByName({
-                                    districtNames: reset ? [] : state[key][attr],
-                                    zoomToExtent: false
-                                });
-                            });
-                            break;
                         case "Maps/layerIds":
                             this.$nextTick(() => {
                                 state[key][attr].forEach(layerId => this.getTopicsLayer(layerId, reset));
@@ -74,13 +64,6 @@ export default {
                             break;
                         case "Maps/zoom":
                             mapCollection.getMapView("2D").setZoom(state[key][attr]);
-                            break;
-                        case "AreaSelector/geometry":
-                            // hacky, wait for the districts to be selected
-                            this.$nextTick(async () => {
-                                await this.$nextTick();
-                                this.commitState(mutation, attr, state[key][attr]);
-                            });
                             break;
                         case "Draw/layer":
                             // this.parseDrawFeatures(state, mutation, key, attr);

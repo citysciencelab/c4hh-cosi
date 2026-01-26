@@ -12,11 +12,12 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
 import getFeature from "@shared/js/api/wfs/getFeature.js";
+import {getLayerById} from "../utils/getLayerById.js";
 import getMappingJson from "../../utils/getMappingJson.js";
 import getters from "../store/gettersDistrictSelector.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
-import {mapGetters, mapActions, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import mutations from "../store/mutationsDistrictSelector.js";
 import {prepareDistrictLevels} from "../utils/prepareDistrictLevels.js";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
@@ -25,6 +26,7 @@ import {styleSelectedDistrictLevels} from "../utils/styleSelectedDistrictLevels.
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
 import WPS from "@shared/js/api/wps.js";
+import wktParser from "../../utils/wktParser";
 
 export default {
     name: "DistrictSelectorStatistical",
@@ -46,7 +48,9 @@ export default {
     data () {
         return {
             // color for the drag box button
-            dragBoxButtonColor: "grey lighten-1"
+            dragBoxButtonColor: "grey lighten-1",
+            // Indicates whether the district selector is currently active.
+            isActive: false
         };
     },
     computed: {
@@ -57,8 +61,20 @@ export default {
         }),
         ...mapGetters(["allLayerConfigs", "restServiceById", "visibleSubjectDataLayerConfigs"]),
 
+        /**
+         * Returns the currently active card from the cards array.
+         * @returns {Object} The active card object.
+         */
         activeCard () {
             return this.cards.find(card => card.status === "active");
+        },
+
+        /**
+         * Returns the currently active subject card from the cardsSubject array.
+         * @returns {Object} The active subject card object.
+         */
+        activeSubjectCard () {
+            return this.cardsSubject.find(card => card.status === "active");
         },
 
         disableButton () {
@@ -85,6 +101,29 @@ export default {
         }
     },
     watch: {
+        cards () {
+            if (!this.isActive) {
+                const drawingLayer = getLayerById("district-selector");
+
+                if (typeof this.activeCard !== "undefined") {
+                    this.setSelectedDistrictLevelId(this.activeCard.districtLevelId);
+                    this.$nextTick(() => {
+                        this.updateSelectedFeatures(this.activeCard.selectedDistricts);
+                        this.updateLayerBbox(this.activeCard.bboxGeomWKT);
+                    });
+                }
+
+                if (this.activeSubjectCard) {
+                    const subjectFeature = wktParser.decodeFeature(this.activeSubjectCard.subjectFeatureWKT);
+
+                    drawingLayer.getLayerSource().addFeature(subjectFeature);
+                    drawingLayer.getLayer().setVisible(true);
+                    this.allLayerConfigs.forEach(layerConfig => {
+                        layerConfig.bboxGeometry = subjectFeature.getGeometry();
+                    });
+                }
+            }
+        },
         /**
          * Every time the list of layers of the map changes the function prepareDistricts is called.
          * @param {module:ol/layer[]} newLayerList - An array of layers.
@@ -109,7 +148,7 @@ export default {
          * @returns {void}
          */
         selectedDistrictNames () {
-            if (this.activeCard && this.selectedDistrictNames.sort().toString() !== this.activeCard.selectedDistricts.sort().toString()) {
+            if (this.isActive && this.activeCard && this.selectedDistrictNames.sort().toString() !== this.activeCard.selectedDistricts.sort().toString()) {
                 this.activeCard.status = "";
             }
         },
@@ -119,8 +158,11 @@ export default {
 
         visibleSubjectDataLayerConfigs: {
             handler () {
-                this.updateLayerBbox(this.activeCard?.geometry);
-
+                if (typeof this.activeSubjectCard !== "undefined") {
+                    this.updateLayerBbox(this.activeSubjectCard.subjectFeatureWKT);
+                    return;
+                }
+                this.updateLayerBbox(this.activeCard?.bboxGeomWKT);
             },
             deep: true
         }
@@ -143,34 +185,26 @@ export default {
 
     },
     activated () {
-        this.select.setActive(true);
-        const drawingLayer = layerCollection.getLayerById("district-selector");
+        const drawingLayer = getLayerById("district-selector");
 
-        if (drawingLayer) {
-            drawingLayer.getLayerSource().clear();
-            drawingLayer.getLayer().setVisible(false);
-        }
+        drawingLayer.getLayerSource().clear();
+        drawingLayer.getLayer().setVisible(false);
 
         this.cardsSubject.forEach((card, index) => {
             if (card.status === "active") {
                 this.toggleCardStatus(index);
             }
         });
+
+        this.isActive = true;
+        this.select.setActive(true);
     },
     deactivated () {
-        const features = this.select.getFeatures(),
-            // Hole die Features der aktiven Karte
-            activeCardFeatures = this.activeCard?.features || []; // Fallback auf leeres Array, falls keine aktive Karte vorhanden ist
+        if (!this.activeCard) {
+            this.clearFeatures();
+        }
 
-        // Entferne alle Features, die nicht zur aktiven Karte gehören
-        features.forEach(feature => {
-            const isInActiveCard = activeCardFeatures.some(activeFeature => JSON.stringify(feature?.getGeometry()) === JSON.stringify(activeFeature.getGeometry()));
-
-            if (!isInActiveCard) {
-                features.remove(feature);
-            }
-        });
-
+        this.isActive = false;
         this.select.setActive(false);
     },
     beforeUnmount () {
@@ -297,6 +331,7 @@ export default {
          */
         removeCard (index) {
             this.cards.splice(index, 1);
+            this.cardsSubject.splice(index, 1);
             if (!this.activeCard && this.cards.length > 0) {
                 this.toggleCardStatus(this.cards.length - 1);
             }
@@ -417,18 +452,19 @@ export default {
                 districtLevelLabel: this.selectedDistrictLevel.label,
                 downloadable: false,
                 extent,
-                features: this.selectedFeatures.slice(),
-                geometry: bboxGeom,
+                features: wktParser.encodeFeatures(this.selectedFeatures.slice()),
+                bboxGeomWKT: wktParser.encodeGeometry(bboxGeom),
                 icon: "bi-image",
                 selectedDistricts: selectedDistricts.map(district => district.getName()),
                 status: ""
             });
+
             this.setPopulationSize(this.cards.at(-1));
             this.toggleCardStatus(this.cards.length - 1);
 
             if (extent) {
                 this.setBoundingGeometry(bboxGeom);
-                this.setFilterGeometry(this.areaSelectorGeom || bboxGeom);
+                this.setFilterGeometry(bboxGeom);
 
                 this.loadStatFeatures({
                     districtLevel: this.selectedDistrictLevel,
@@ -447,7 +483,14 @@ export default {
         },
 
         updateLayerBbox (geometry) {
-            setBBoxToGeom(this, geometry, layerCollection.getLayers());
+            if (typeof geometry === "undefined") {
+                setBBoxToGeom(this, geometry, layerCollection.getLayers());
+            }
+            else {
+                const geometryCollection = wktParser.decodeGeometry(geometry);
+
+                setBBoxToGeom(this, geometryCollection, layerCollection.getLayers());
+            }
         },
 
         /**
@@ -501,7 +544,7 @@ export default {
             const activeIndex = this.cards.findIndex(card => card.status === "active");
 
             if (activeIndex === index) {
-                this.updateLayerBbox(this.cards[index].geometry);
+                this.updateLayerBbox(this.cards[index].bboxGeomWKT);
                 return;
             }
             if (activeIndex !== -1) {
@@ -511,7 +554,7 @@ export default {
             this.setSelectedDistrictLevelId(this.cards[index].districtLevelId);
             this.$nextTick(() => {
                 this.updateSelectedFeatures(this.cards[index].selectedDistricts);
-                this.updateLayerBbox(this.cards[index].geometry);
+                this.updateLayerBbox(this.cards[index].bboxGeomWKT);
                 this.zoomToExtent({extent: this.cards[index].extent, options: {}});
             });
         },
@@ -523,7 +566,8 @@ export default {
                 console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");
             }
             else {
-                const outerPolygon = geometryToGeoJson(card.geometry, false, "EPSG:25832", "EPSG:25832");
+                const geometry = wktParser.decodeGeometry(card.bboxGeomWKT),
+                    outerPolygon = geometryToGeoJson(geometry, false, "EPSG:25832", "EPSG:25832");
 
                 WPS.wpsRequest(service.id, service.url, this.wpsProcess, {
                     "such_flaeche": JSON.stringify(outerPolygon)
