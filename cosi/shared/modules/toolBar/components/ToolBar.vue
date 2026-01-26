@@ -142,7 +142,7 @@ export default {
 </script>
 
 <template>
-    <div class="toolbar-container">
+    <div class="toolbar-container mb-3">
         <div class="d-flex">
             <FlatButton
                 id="table-settings"
@@ -150,7 +150,7 @@ export default {
                 :text="$t('common:shared.modules.table.settings')"
                 :title="$t('common:shared.modules.table.settingsTooltip')"
                 :icon="'bi-gear'"
-                :class="'mb-1 me-3 rounded-pill'"
+                :class="'me-3 rounded-pill'"
                 data-bs-toggle="dropdown"
                 data-bs-auto-close="outside"
             />

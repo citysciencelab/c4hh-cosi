@@ -38,8 +38,8 @@ export default {
         category_A: null,
         category_B: null,
         exportTimeline: false,
-        operation: "add",
-        showAllFilters: false
+        operation: "add"
+        // showAllFilters: false
     }),
     computed: {
         ...mapGetters("Modules/Dashboard", ["timestamps", "timestampsFiltered"]),
@@ -48,20 +48,20 @@ export default {
          * Filters to display in active filter area.
          * @returns {String[]} List of active filters.
          */
-        visibleStatsFeatureFilter () {
-            const maxVisible = 5;
+        // visibleStatsFeatureFilter () {
+        //     const maxVisible = 5;
 
-            return this.showAllFilters
-                ? this._statsFeatureFilter
-                : this._statsFeatureFilter.slice(0, maxVisible);
-        },
+        //     return this.showAllFilters
+        //         ? this._statsFeatureFilter
+        //         : this._statsFeatureFilter.slice(0, maxVisible);
+        // },
         /**
          * Whether "show more / less" toggle should be shown.
          * @returns {Boolean} `true` if more than five filters are available, otherwise `false`.
          */
-        hasMoreFilters () {
-            return this._statsFeatureFilter.length > 5;
-        },
+        // hasMoreFilters () {
+        //     return this._statsFeatureFilter.length > 5;
+        // },
         /**
         * Get calculation operator items with localized titles.
         * @returns {Object[]} Array of calculation operator items.
@@ -176,7 +176,7 @@ export default {
         resetFilters () {
             this._statsFeatureFilter = [];
             this.exportTimeline = false;
-            this.showAllFilters = false;
+            // this.showAllFilters = false;
             this.$emit("setTimestampsValues", []);
         }
     }
@@ -271,7 +271,7 @@ export default {
                 />
             </div>
         </template>
-        <template #underHorizontalRule>
+        <!-- <template #underHorizontalRule>
             <div
                 v-if="_statsFeatureFilter.length > 0"
                 class="mb-4"
@@ -311,7 +311,7 @@ export default {
                     />
                 </div>
             </div>
-        </template>
+        </template> -->
     </ToolBar>
 </template>
 
