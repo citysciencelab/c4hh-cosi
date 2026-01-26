@@ -17,7 +17,7 @@ export default {
         SwitchInput,
         TagGroup
     },
-    inject: ["selectedDistrictNamesForReport", "selectedLevels", "shouldAreasSummedUp"],
+    inject: ["selectedLevels", "shouldAreasSummedUp"],
     props: {
         selectedAreasName: {
             type: String,
@@ -31,7 +31,6 @@ export default {
             higherDistrictLevel: [],
             selectedAreasNameMaxLength: 50,
             selectedDistricts: [],
-            selectedStatisticalAreas: [],
             selectedYear: null
         };
     },
@@ -85,7 +84,6 @@ export default {
         }
     },
     mounted () {
-        this.selectedStatisticalAreas = this.selectedDistrictNamesForReport;
         this.selectedYear = this.items[0].years.sort((a, b) => b - a)[0];
     },
     methods: {
@@ -98,14 +96,6 @@ export default {
          */
         emitSelectedAreasName (name) {
             this.$emit("update:selected-areas-name", name);
-        },
-
-        /**
-         * Sets the selected district names for the report.
-         * @param {String[]} names - An array of selected district names.
-         */
-        setSelectedDistrictNamesForReport (names) {
-            this.selectedDistrictNamesForReport = names;
         },
 
         /**
@@ -152,13 +142,6 @@ export default {
                 :multiple="true"
                 :label="$t('additional:modules.cosi.reportingTool.label.higherDistrictLevel')"
                 @update:selected-items="setSelectedLevels"
-            />
-            <Dropdown-Autocomplete
-                v-model="selectedStatisticalAreas"
-                :items="selectedDistrictNamesForReport"
-                multiple
-                :label="selectedDistrictLevel.label"
-                @update:model-value="setSelectedDistrictNamesForReport"
             />
             <Dropdown-Autocomplete
                 v-model="selectedYear"
