@@ -18,10 +18,19 @@ export default class PDFMaker {
         this.pageMargins = [40, 60, 40, 60];
         this.images = {};
         this.borderColor = ["#cdcdcd", "#cdcdcd", "#cdcdcd", "#cdcdcd"];
-        this.chapterHeadlineFormat = {decoration: "underline", fontSize: 14, bold: true};
+        this.chapterHeadlineFormat = {fontSize: 12, bold: true};
         this.footerInfo = {
             author: ""
         };
+    }
+
+    /**
+     * Adds the main heading to the report.
+     * @param {String} text - The name of the main headline.
+     * @returns {void}
+     */
+    addMainHeading (text) {
+        this.content.push({text, fontSize: 18, bold: true, margin: [0, 4], color: "#151C27"});
     }
 
     /**
@@ -56,6 +65,31 @@ export default class PDFMaker {
     }
 
     /**
+     * Adds a section headline to the report.
+     * @param {String} text - The name of the headline.
+     * @param {Object} options An options object to adjust the text.
+     * @returns {void}
+     */
+    addSectionHeadline (text, options = {}) {
+        this.content.push({text, fontSize: 14, bold: true, margin: [0, 6], ...options});
+    }
+
+    /**
+     * Creates a headline definition for pdfmake without adding it to the document content.
+     * @param {String} text - The name of the headline.
+     * @returns {Object} A pdfmake text definition representing the headline.
+     */
+    getHeadline (text) {
+        return {
+            text,
+            fontSize: 11,
+            color: "#3C5F94",
+            bold: true,
+            margin: [0, 2]
+        };
+    }
+
+    /**
      * Adds a sub headline to the report.
      * @param {String} text - The name of the sub headline.
      * @returns {void}
@@ -67,10 +101,66 @@ export default class PDFMaker {
     /**
      * Adds a paragraph to the report.
      * @param {String} text - The content of the paragraph.
+     * @param {Object[]} [coloredParts = []] - Text parts that should be colored.
      * @returns {void}
      */
-    addParagraph (text) {
-        this.content.push({text, fontSize: 11, margin: [0, 4], pageOrientation: "portrait"});
+    addParagraph (text, coloredParts = []) {
+        let contentText;
+
+        if (!Array.isArray(coloredParts) || coloredParts.length === 0) {
+            contentText = text;
+        }
+        else {
+            let remainingText = text;
+            const textArray = [];
+
+            coloredParts.forEach(val => {
+                const index = remainingText.indexOf(val.text);
+
+                if (index !== -1) {
+                    if (index > 0) {
+                        textArray.push({
+                            text: remainingText.substring(0, index)
+                        });
+                    }
+                    textArray.push({
+                        text: val.text,
+                        color: val.color || "#000000",
+                        bold: val.bold || false
+                    });
+                    remainingText = remainingText.substring(index + val.text.length);
+                }
+            });
+
+            if (remainingText) {
+                textArray.push({text: remainingText});
+            }
+
+            contentText = textArray;
+        }
+
+        this.content.push({
+            text: contentText,
+            fontSize: 11,
+            margin: [0, 4],
+            pageOrientation: "portrait"
+        });
+    }
+
+    /**
+     * Adds bulletpoints to the report.
+     * @param {String|Object} text - The text.
+     * @returns {void}
+     */
+    addBulletPoints (text) {
+        const items = Array.isArray(text) ? text : [text],
+
+            bulletList = {
+                ul: items.map(item => ({text: item, fontSize: 10})),
+                margin: [0, 5, 0, 5]
+            };
+
+        this.content.push(bulletList);
     }
 
     /**
@@ -79,9 +169,10 @@ export default class PDFMaker {
      * @param {Number} firstColumnWidth - The width of the first column.
      * @param {String} [oddRowColor="#f5f5f5"] - Background color for odd (1,3,5...) rows.
      * @param {String} [evenRowColor="#ffffff"] - Background color for even (2,4,6...) rows.
+     * @param {String} [headerFillColor="#3C5F94"] - Background color for header.
      * @returns {void}
      */
-    addTable (body, firstColumnWidth, oddRowColor = "#f5f5f5", evenRowColor = "#ffffff") {
+    addTable (body, firstColumnWidth, oddRowColor = "#f5f5f5", evenRowColor = "#ffffff", headerFillColor = "#3C5F94") {
         if (!Array.isArray(body) || body.length === 0) {
             return;
         }
@@ -89,17 +180,27 @@ export default class PDFMaker {
         const widths = [],
             tableBody = body.map((row, rowIndex) => {
                 return row.map((cell, colIndex) => {
+                    const isHeader = rowIndex === 0,
+                        cellObj = typeof cell === "object" ? {...cell} : {text: cell, fontSize: 11};
 
-                    if (rowIndex === 0) {
+                    cellObj.unbreakable = true;
+
+                    if (isHeader) {
                         widths[colIndex] = colIndex === 0 ? firstColumnWidth : "auto";
-
-                        return cell;
                     }
-                    const cellObj = typeof cell === "object"
-                        ? {...cell}
-                        : {text: cell, fontSize: 11, borderColor: this.borderColor};
 
-                    cellObj.fillColor = rowIndex % 2 === 0 ? evenRowColor : oddRowColor;
+                    if (isHeader) {
+                        cellObj.fillColor = headerFillColor;
+                        cellObj.bold = true;
+                        cellObj.color = "#ffffff";
+                        cellObj.margin = [2, 2, 0, 2];
+                    }
+                    else {
+                        cellObj.fillColor = rowIndex % 2 === 0 ? evenRowColor : oddRowColor;
+                    }
+
+                    cellObj.borderColor = this.borderColor;
+                    cellObj.lineHeight = 1.1;
 
                     return cellObj;
                 });
@@ -110,10 +211,19 @@ export default class PDFMaker {
                 headerRows: 1,
                 widths,
                 body: tableBody
+            },
+            layout: {
+                hLineWidth: () => 1,
+                vLineWidth: () => 1,
+                hLineColor: () => this.borderColor,
+                vLineColor: () => this.borderColor,
+                paddingLeft: () => 4,
+                paddingRight: () => 4,
+                paddingTop: () => 2,
+                paddingBottom: () => 2
             }
         });
-
-        this.content.push("\n\n");
+        this.content.push("\n");
     }
 
     /**
@@ -123,7 +233,7 @@ export default class PDFMaker {
      * @returns {void}
      */
     addColumns (columns, columnGap) {
-        this.content.push({columns, columnGap});
+        this.content.push({columns, columnGap, margin: [0, 0, 19, 0]});
     }
 
     /**
@@ -172,7 +282,7 @@ export default class PDFMaker {
      * @returns {void}
      */
     addLegendPage () {
-        this.addChapter({text: "Legende", pageBreak: "before"});
+        this.addChapter({text: "Legende"});
         this.addLineBreak();
     }
 
@@ -181,13 +291,80 @@ export default class PDFMaker {
      * @param {String} imageUrl The image url.
      * @param {String} label The label of the imageUrl. Is needed to create unique links.
      * @param {Object} options An options object to adjust the image. For more info see: https://pdfmake.github.io/docs/0.1/document-definition-object/images/
+     * @param {String} [title = null] Optional title for the image. Image and title always appear together on a site.
+     * @param {String} [showBorder = true] Optional border around the image.
      * @returns {void}
      */
-    addImageByUrl (imageUrl, label, options) {
+    addImageByUrl (imageUrl, label, options, title = null, showBorder = true) {
         if (typeof imageUrl === "string") {
             this.images[label] = imageUrl;
         }
-        this.content.push({image: label, ...options});
+
+        const block = [];
+
+        if (title) {
+            block.push({
+                text: title,
+                fontSize: 12,
+                bold: true,
+                margin: [0, 0, 0, 5]
+            });
+        }
+
+        block.push({
+            table: {
+                body: [[
+                    {image: label, ...options}
+                ]]
+            },
+            layout: showBorder ? {
+                hLineWidth: () => 1,
+                vLineWidth: () => 1,
+                hLineColor: () => "#868686",
+                vLineColor: () => "#868686",
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+            } : {
+                hLineWidth: () => 0,
+                vLineWidth: () => 0,
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+            }
+        });
+
+        this.content.push({
+            unbreakable: true,
+            stack: block
+        });
+    }
+
+    /**
+     * Creates a colored box.
+     * @param {Object} body A body object.
+     */
+    addBoxLayout (body) {
+        const box = {
+            table: {
+                widths: Array(body[0].length).fill("*"),
+                body
+            },
+            layout: {
+                fillColor: () => "#EDF3FF",
+                hLineWidth: () => 0,
+                vLineWidth: () => 0,
+                paddingLeft: () => 8,
+                paddingRight: () => 8,
+                paddingTop: () => 8,
+                paddingBottom: () => 8
+            },
+            margin: [0, 10, 0, 10]
+        };
+
+        this.content.push(box);
     }
 
     /**

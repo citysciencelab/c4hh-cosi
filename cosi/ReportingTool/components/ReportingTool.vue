@@ -291,7 +291,9 @@ export default {
                     await this.addOverViewPage(this.selectedFrontPageItem.value);
                     await this.addChapterStatisticalData(this.statisticalDataCards);
                 }
-                await this.addChapterSubjectData(this.subjectDataCards);
+                if (this.featuresListItems.length > 0) {
+                    await this.addChapterSubjectData(this.subjectDataCards);
+                }
                 if (Array.isArray(this.analysisCards)) {
                     this.addChapterAnalysis(this.analysisCards);
                 }
@@ -299,8 +301,6 @@ export default {
                     this.addChapterAnalysis(this.initialAnalysisCards);
                 }
                 await this.addChapterAnnex(this.annexCards);
-
-                await this.addLegendFromStore();
 
                 this.pdf.download(this.downloadName);
             }
@@ -359,7 +359,6 @@ export default {
             }
 
             this.pdf.addLegendPage();
-            this.pdf.addSubHeadline("Layer-Legenden");
 
             for (let layerIndex = 0; layerIndex < sortedLegends.length; layerIndex++) {
                 const legendObj = sortedLegends[layerIndex],
@@ -559,6 +558,17 @@ export default {
         },
 
         /**
+         * Gets the page orientation for the PDF based on the number of statistical columns.
+         * @returns {string} Returns landscape if there are 6 or more columns, otherwise portrait.
+         */
+
+        getPageOrientation () {
+            const cols = this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, []);
+
+            return cols.length >= 6 ? "landscape" : "portrait";
+        },
+
+        /**
          * Adds the statistical data to the report.
          * @param {Object[]} cards - cards to be added in the chapter.
          * @returns {void}
@@ -568,6 +578,9 @@ export default {
                 this.addStatsToReport(this.items);
                 await this.addDiagram();
                 return;
+            }
+            if (this.getPageOrientation() === "portrait") {
+                this.pdf.addSectionHeadline("Statistische Daten");
             }
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
@@ -594,10 +607,9 @@ export default {
          */
         async addChapterSubjectData (cards) {
             if (!cards.length) {
-                this.addTopicsToReport(this.featuresListItems);
-                await this.addInfrastructureMapPageToReport(this.featuresListItems);
                 return;
             }
+            this.pdf.addSectionHeadline("Fachdaten", {pageOrientation: "portrait", pageBreak: "before"});
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
 
@@ -625,7 +637,7 @@ export default {
             if (!cards.length) {
                 return;
             }
-            this.pdf.addChapter("Analysen");
+            this.pdf.addSectionHeadline("Analyse", {pageBreak: "before", pageOrientation: "portrait"});
             cards.forEach(card => {
                 if (card.key === "accessibilityAnalyses") {
                     const analysis = card.items.find(item => item.inputs.title === card.name);
@@ -661,9 +673,14 @@ export default {
                 await this.addReferencesToReport(sortedItems);
                 return;
             }
+            this.pdf.addSectionHeadline("Anhang", {pageBreak: "before", pageOrientation: "portrait"});
 
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
+
+                if (card.key === "legend") {
+                    await this.addLegendFromStore();
+                }
 
                 if (card.key === "sources") {
                     await this.addReferencesToReport(sortedItems);
@@ -691,27 +708,27 @@ export default {
                 "Einwohner": analysis.inputs.einwohner
             };
 
-            this.pdf.addHeadline("Erreichbarkeitsanalyse");
-            this.pdf.addHeadline(analysis.inputs.title);
+            this.pdf.addChapter("Erreichbarkeitsanalyse");
+            this.pdf.addSubHeadline(analysis.inputs.title);
 
-            this.pdf.addColumns(this.addDetailAnalysisInfo(inputs));
+            this.pdf.addBoxLayout(this.addDetailAnalysisInfo(inputs));
             this.pdf.addLineBreak();
             this.pdf.addHeadline("Erreichbarkeit ab " + this.modeMapping[analysis.inputs.mode]);
 
-            if (analysis.inputs.mode === "point" || analysis.inputs.mode === "facility") {
+            if (analysis.inputs.mode === "facility") {
                 const text = analysis.inputs.selectionCards;
 
                 text.forEach(val => {
-                    this.pdf.addParagraph(val.text);
+                    this.pdf.addBulletPoints(val.text);
                 });
             }
 
             if (typeof analysis.inputs.screenshot !== "undefined") {
-                this.pdf.addImageByUrl(analysis.inputs.screenshot, analysis.inputs.title, {fit: [500, 500], alignment: "left"});
+                this.pdf.addImageByUrl(analysis.inputs.screenshot, analysis.inputs.title, {fit: [500, 500], alignment: "left"}, null, false);
             }
 
             if (typeof analysis.inputs.screenshotLegend !== "undefined") {
-                this.pdf.addImageByUrl(analysis.inputs.screenshotLegend, analysis.inputs.title + "-legend", {fit: [300, 300], alignment: "left"});
+                this.pdf.addImageByUrl(analysis.inputs.screenshotLegend, analysis.inputs.title + "-legend", {fit: [300, 300], alignment: "left"}, null, false);
             }
 
         },
@@ -721,15 +738,19 @@ export default {
          * @returns {Object[]} The input values.
          */
         addDetailAnalysisInfo (inputs) {
-            const text = [];
+            const row = [];
 
             Object.entries(inputs).forEach(([key, val]) => {
-                text.push([{text: `${val}\n`, bold: true, alignment: "center"}, {text: `${key}`, alignment: "center"}]);
+                row.push({
+                    stack: [
+                        {text: val, bold: true, alignment: "center", fontSize: 12},
+                        {text: key, alignment: "center", fontSize: 11}
+                    ]
+                });
             });
 
-            return text;
+            return [row];
         },
-
 
         /**
          * Formats a value safely for usage in pdfmake table cells.
@@ -762,9 +783,7 @@ export default {
          */
         addStatsToReport (items) {
             const itemGroups = items.map(item => item.category),
-                filteredMappingByCategories = this.initMapping.filter(obj => {
-                    return itemGroups.includes(obj.value);
-                }),
+                filteredMappingByCategories = this.initMapping.filter(obj => itemGroups.includes(obj.value)),
                 groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group),
                 pdf = this.pdf,
                 printedYear = this.statisticalYear || items[0].years[0],
@@ -772,18 +791,19 @@ export default {
 
             let additionalPara = {pageOrientation: "portrait"};
 
-            if (this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, []).length >= 6) {
+            if (this.getPageOrientation() === "landscape") {
                 additionalPara = {pageOrientation: "landscape", pageBreak: "before"};
+                this.pdf.addSectionHeadline("Statistische Daten", additionalPara);
             }
 
-            pdf.addChapter({text: "Statistische Datenübersicht", ...additionalPara});
+            pdf.addChapter({text: "Statistische Datenübersicht"});
             pdf.addSubHeadline("Jahr: " + printedYear);
+            pdf.addLineBreak();
 
             this.selectedStatGroups.forEach((group) => {
-                const columns = pdf.getColumns(["", ...this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, [])]),
+                const districtCols = this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, []),
+                    columns = [group, ...districtCols],
                     body = [columns];
-
-                pdf.addHeadline(group);
 
                 groupedMapping[group].forEach(mappingObject => {
                     if (this.statsFeatureFilter.length > 0 && !this.statsFeatureFilter.includes(mappingObject.value)) {
@@ -811,7 +831,7 @@ export default {
                             pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
                         else {
-                            value = parseFloat(statFeature[col.text]["jahr_" + printedYear]) || "-";
+                            value = parseFloat(statFeature[col]["jahr_" + printedYear]) || "-";
                             pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
 
@@ -965,7 +985,7 @@ export default {
             if (typeof overviewImageUrl !== "string") {
                 return;
             }
-            this.pdf.addChapter(headline);
+            this.pdf.addMainHeading(headline);
             this.pdf.addLineBreak();
             this.pdf.addImageByUrl(overviewImageUrl, imageName, {fit: [imageWidth, imageHeight], alignment: "center"});
             this.pdf.addLineBreak();
@@ -980,7 +1000,7 @@ export default {
 
             if (this.freeHeadline.trim() !== "" || this.freeText.trim() !== "") {
                 this.pdf.addLineBreak();
-                this.pdf.addHeadline(this.freeHeadline);
+                this.pdf.addChapter(this.freeHeadline);
                 this.pdf.addParagraph(this.freeText);
                 this.pdf.addLineBreak();
             }
@@ -1006,7 +1026,27 @@ export default {
             ).catch(error => console.error(error));
 
             this.pdf.addImageInstance(minimapImageUrl, imageName);
-            return {image: imageName, fit: [300, 150], alignment};
+            return {
+                table: {
+                    body: [[
+                        {
+                            image: imageName,
+                            fit: [300, 150],
+                            alignment
+                        }
+                    ]]
+                },
+                layout: {
+                    hLineWidth: () => 1,
+                    vLineWidth: () => 1,
+                    hLineColor: () => "#868686",
+                    vLineColor: () => "#868686",
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                }
+            };
         },
 
         /**
@@ -1034,9 +1074,8 @@ export default {
             if (typeof imageOptions.downloadURL !== "string") {
                 return;
             }
-            this.pdf.addChapter("Darstellung der Infrastrukturdaten");
             this.pdf.addLineBreak();
-            this.pdf.addImageByUrl(imageOptions.downloadURL, imageName, {fit: [500, 500], alignment: "center"});
+            this.pdf.addImageByUrl(imageOptions.downloadURL, imageName, {fit: [500, 500], alignment: "center"}, "Kartendarstellung");
             this.pdf.addLineBreak();
         },
 
@@ -1054,18 +1093,23 @@ export default {
                 infoData = getBasicInfo.getOverviewBasicInfo(this.selectedDistrictLevel);
 
             infoData.forEach(data => {
-                text.push({text: `${data.label}: `, bold: true});
-                text.push(`${data.value}\n`);
+                text.push({text: `${data.label}: `, bold: true, fontSize: 11});
+                text.push({text: `${data.value}\n`, fontSize: 10, margin: [8, 5, 0, 0]});
             });
             tableBody[0][0].text = text;
 
             return {
-                layout: "noBorders",
-                table: {
-                    headerRows: 1,
-                    widths: ["auto"],
-                    body: tableBody
-                }
+                stack: [
+                    this.pdf.getHeadline("Ausgewählte Gebiete"),
+                    {
+                        layout: "noBorders",
+                        table: {
+                            headerRows: 1,
+                            widths: ["auto"],
+                            body: tableBody
+                        }
+                    }
+                ]
             };
         },
 
@@ -1205,7 +1249,7 @@ export default {
         addTopicsToReport (topics) {
             const groupedTopics = Object.groupBy(topics, (topic) => topic.layerName);
 
-            this.pdf.addChapter({text: "Infrastrukturdaten", pageOrientation: "portrait", pageBreak: "before"});
+            this.pdf.addChapter({text: "Auflistung", pageOrientation: "portrait"});
             this.pdf.addLineBreak();
             Object.keys(groupedTopics).forEach(group => {
                 const topicLength = groupedTopics[group].length,
@@ -1214,7 +1258,8 @@ export default {
                     columnAttirbutes = ["type", "name", "address"];
 
                 this.pdf.addHeadline(group);
-                this.pdf.addParagraph(`Anzahl der ${group} im ausgewählten Gebiet: ${groupedTopics[group].length}`);
+                this.pdf.addParagraph(`Es sind ${groupedTopics[group].length} ${group} im ausgewählten Gebiet vorhanden.`,
+                    [{text: `${groupedTopics[group].length}`, color: "#3C5F94", bold: true}, {text: `${group}`, color: "#3C5F94", bold: true}]);
 
                 if (topicLength <= this.infrastructureTableLimit || !this.infrastructureTableLimitEnabled) {
                     groupedTopics[group].forEach(topic => {
@@ -1226,6 +1271,10 @@ export default {
                         body.push(row);
                     });
                     this.pdf.addTable(body, 120);
+                }
+                else {
+                    this.pdf.addParagraph(`Hinweis: Bei mehr als ${this.infrastructureTableLimit} Einrichtungen wird keine Fachdaten-Tabelle dargestellt.`,
+                        [{text: `Hinweis: Bei mehr als ${this.infrastructureTableLimit} Einrichtungen wird keine Fachdaten-Tabelle dargestellt.`, color: "#868686"}]);
                 }
             });
         },

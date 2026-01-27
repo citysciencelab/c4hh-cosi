@@ -5,7 +5,7 @@
  */
 function addChapter (chapter, docDefinition) {
     // title, desc, tool, settings are attributes of json file of ReportTemplate with optional styles
-    const title = {text: chapter.title, style: "header", bold: true, fontSize: 14},
+    const title = {text: chapter.title, style: "header", bold: true, fontSize: 12},
         desc = {text: chapter.description, style: "header"},
         tool = {text: chapter.tool, style: "header"};
     let sourceInfo = "Quelleninformation fehlt.";
