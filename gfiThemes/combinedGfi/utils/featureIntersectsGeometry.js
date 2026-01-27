@@ -4,8 +4,8 @@ import buffer from "@turf/buffer";
 import booleanContains from "@turf/boolean-contains";
 import booleanIntersects from "@turf/boolean-intersects";
 
-const geoJsonFormatter = new GeoJSON(),
-    gmlFormatter = new GML32();
+const geoJsonFormatter = new GeoJSON({dataProjection: "EPSG:4326"}),
+    gmlFormatter = new GML32({dataProjection: "EPSG:4326"});
 
 /**
  * Function to check whether a feature's geometry and a given geometry overlap.
@@ -22,8 +22,7 @@ export function featureIntersectsGeometry (feature, geometry) {
     }
 
     const geoJsonGeometry = geoJsonFormatter.writeGeometryObject(geometry, {
-        dataProjection: "EPSG:4326",
-        featureProjection: "EPSG:25832"
+        featureProjection: mapCollection.getMap("2D").getView().getProjection().getCode()
     });
 
     let featureGeometry = null;
@@ -34,8 +33,7 @@ export function featureIntersectsGeometry (feature, geometry) {
         }
         else if (feature instanceof Node) {
             featureGeometry = geoJsonFormatter.writeGeometryObject(gmlFormatter.readFeatures(feature).getGeometry(), {
-                dataProjection: "EPSG:4326",
-                featureProjection: "EPSG:25832"
+                featureProjection: mapCollection.getMapView("2D").getProjection().getCode()
             });
         }
         else {
