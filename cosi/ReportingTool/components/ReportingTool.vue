@@ -140,7 +140,8 @@ export default {
             "point": "Referenzpunkten",
             "facility": "Einrichtungen",
             "path": "Route"
-        }
+        },
+        showError: false
     }),
     computed: {
         ...mapGetters("Modules/Language", ["currentLocale"]),
@@ -279,6 +280,7 @@ export default {
          * @returns {Promise<void>} Resolves when the report has been created and downloaded.
          */
         async createReport () {
+            this.showError = false;
             this.setReportLoader(true);
             try {
                 this.pdf = markRaw(new PDFMaker());
@@ -303,6 +305,7 @@ export default {
                 this.pdf.download(this.downloadName);
             }
             catch (error) {
+                this.showError = true;
                 console.error("Fehler beim Erstellen des PDFs:", error);
             }
             finally {
@@ -1525,6 +1528,13 @@ export default {
          */
         setSubjectDataCards (cards) {
             this.subjectDataCards = cards;
+        },
+        /**
+         * Closes the error message if it is visible.
+         * @returns {void}
+         */
+        resetError () {
+            this.showError = false;
         }
     }
 };
@@ -1737,6 +1747,12 @@ export default {
                     @click:prev="stepperPrev"
                 >
                     <template #prev="{ props }">
+                        <AlertMessage
+                            v-if="page === 1 && showError"
+                            :text="$t('additional:modules.cosi.reportingTool.alert.errorDuringPrinting')"
+                            :closeable="true"
+                            type="error"
+                        />
                         <FlatButton
                             id="confirmButtonFirst"
                             :icon="page != 1 ? 'bi-arrow-left' : 'bi bi-printer'"
@@ -1756,7 +1772,7 @@ export default {
                             :aria-label="page != 5 ? $t('additional:modules.cosi.reportingTool.button.confirmAndNext') : $t('additional:modules.cosi.reportingTool.button.generateReport')"
                             :disabled="reportLoader"
                             :text="page != 5 ? $t('additional:modules.cosi.reportingTool.button.confirmAndNext') : $t('additional:modules.cosi.reportingTool.button.generateReport')"
-                            :interaction="() => page != 5 ? props.onClick() : printReportView = true"
+                            :interaction="() => {page != 5 ? props.onClick() : printReportView = true, resetError()}"
                         />
                     </template>
                 </v-stepper-actions>
@@ -1782,6 +1798,12 @@ export default {
                     :disabled="reportLoader"
                     :text="$t('additional:modules.cosi.reportingTool.button.downloadReport')"
                 />
+                <AlertMessage
+                    v-if="showError"
+                    :text="$t('additional:modules.cosi.reportingTool.alert.errorDuringPrinting')"
+                    :closeable="true"
+                    type="error"
+                />
                 <FlatButton
                     id="back-report"
                     icon="bi bi-pencil"
@@ -1789,7 +1811,7 @@ export default {
                     :aria-label="$t('additional:modules.cosi.reportingTool.button.backToEditView')"
                     :disabled="reportLoader"
                     :text="$t('additional:modules.cosi.reportingTool.button.backToEditView')"
-                    :interaction="() => printReportView = false"
+                    :interaction="() => {printReportView = false, resetError()}"
                 />
                 <FlatButton
                     id="new-report"
@@ -1798,7 +1820,7 @@ export default {
                     :aria-label="$t('additional:modules.cosi.reportingTool.button.createNewReport')"
                     :disabled="reportLoader"
                     :text="$t('additional:modules.cosi.reportingTool.button.createNewReport')"
-                    :interaction="() => resetAllSettings()"
+                    :interaction="() => {resetAllSettings(), resetError()}"
                 />
             </div>
         </div>

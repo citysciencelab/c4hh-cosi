@@ -54,7 +54,8 @@
               "noSubjectData": "Es sind keine Fachdaten zum Auswählen vorhanden.",
               "noSubjectDataSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Fachdaten.",
               "noAnalyses": "Es sind keine Analysen zum Auswählen vorhanden.",
-              "noAnalysesSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Analysen."
+              "noAnalysesSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Analysen.",
+              "errorDuringPrinting": "Der Bericht konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
             },
             "button": {
               "confirmAndNext": "Bestätigen und weiter",

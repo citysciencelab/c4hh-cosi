@@ -54,7 +54,8 @@
             "noSubjectData": "There is no subject data available for selection.",
             "noSubjectDataSelected": "No content has been selected. The report contains no subject data.",
             "noAnalyses": "There are no analyses available for selection.",
-            "noAnalysesSelected": "No content has been selected. The report contains no analyses."
+            "noAnalysesSelected": "No content has been selected. The report contains no analyses.",
+            "errorDuringPrinting": "The report could not be generated. Please try again."
           },
            "button": {
               "confirmAndNext": "Confirm and next",
