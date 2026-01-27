@@ -16,7 +16,7 @@ The Combined GFI addon provides the following key features:
 ## Installation
 
 1. Place the `combinedGfi` folder in the `addons/gfiThemes/` directory of your Masterportal installation.
-2. Run `npm install` in the `combinedGfi` folder.
+2. Run `npm install` in the `addons` folder.
 3. Register the addon in your Masterportal configuration.
 
 ## Configuration
