@@ -2,9 +2,9 @@ import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 
-import Component from "../../../components/TabDetails.vue";
+import Component from "../../../components/TabResultTable.vue";
 
-describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js", () => {
+describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spec.js", () => {
     let wrapper,
         store;
 
@@ -21,7 +21,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                                 // to be used later
                             }),
                             getters: {
-                                getDetailsForSelectedInstanceId: () => "Details"
+                                // to be used later
                             }
                         }
                     }
@@ -31,6 +31,21 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
 
         wrapper = shallowMount(Component, {
             props: {
+                tableIndex: "tableIndex-1",
+                tableHeader: ["header1", "header2", "header3", "header4"],
+                tableDatasets: [{
+                    instanceId: "dataset1",
+                    attributes: [
+                        {
+                            name: "JAHRGANG",
+                            value: "2023"
+                        },
+                        {
+                            name: "NUMMER",
+                            value: "6088"
+                        }
+                    ]
+                }]
             },
             global: {
                 mocks: {

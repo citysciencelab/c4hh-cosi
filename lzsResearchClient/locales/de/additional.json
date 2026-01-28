@@ -25,7 +25,21 @@
                     "patternError": "Please enter a numeric value with {{ digitNumber }} digit."
                 },
                 "tabResult": {
-                    "label": "Ergebnisse"
+                    "label": "Ergebnisse",
+                    "numberOfResults": "Anzahl der gefundenen Datensätze:",
+                    "toggleAccordions": {
+                      "openAll": "Alles aufklappen",
+                      "closeAll": "Alles zuklappen"
+                    },
+                    "groupByLabel": "Gruppieren nach",
+                    "table": {
+                      "showPositionInMap": "Position des Datensatzes in der Karte anzeigen",
+                      "goToDetails": "Details zum Datensatz anzeigen",
+                      "headers": {
+                        "position": "Lage",
+                        "details": "Details"
+                      }
+                    }
                 },
                 "tabDownload": {
                     "label": "Download"

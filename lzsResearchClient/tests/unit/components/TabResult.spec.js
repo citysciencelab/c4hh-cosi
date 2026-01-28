@@ -26,7 +26,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
                                 // to be used later
                             }),
                             getters: {
-                                searchAttributeResponse: () => mockSearchAttributeResponse
+                                searchAttributeResponse: () => mockSearchAttributeResponse,
+                                nameForArchiveId: () => (id) => {
+                                    return id;
+                                }
                             }
                         }
                     }

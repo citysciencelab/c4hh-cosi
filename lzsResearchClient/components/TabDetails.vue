@@ -1,4 +1,5 @@
 <script>
+import {mapGetters, mapMutations} from "vuex";
 import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
 
 export default {
@@ -11,9 +12,21 @@ export default {
     data () {
         return {};
     },
-    computed: {},
+    computed: {
+        ...mapGetters("Modules/LzsResearchClient", [
+            "getDetailsForSelectedInstanceId"
+        ])
+    },
     watch: {},
-    methods: {}
+    methods: {
+        ...mapMutations("Modules/LzsResearchClient", [
+            "setSelectedInstanceId"
+        ]),
+        returnToResultTab () {
+            this.setSelectedInstanceId(null);
+            this.setCurrentTab("tabResult");
+        }
+    }
 };
 </script>
 
@@ -21,8 +34,10 @@ export default {
     <div id="TabDetails">
         "TabDetails Content"
 
+        {{ getDetailsForSelectedInstanceId }}
+
         <button
-            @click="setCurrentTab('tabResult')"
+            @click="returnToResultTab()"
         >
             Change tab from child..
         </button>

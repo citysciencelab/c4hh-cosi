@@ -46,6 +46,7 @@ export default {
         response.data.forEach(element => {
             searchAttributeResponse.push({
                 archiveId: element.dataclassId,
+                instanceId: element.dataclassinstanceId,
                 attributes: element.dataclassinstanceAttributeArr
             });
         });

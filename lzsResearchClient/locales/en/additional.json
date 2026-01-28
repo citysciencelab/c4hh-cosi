@@ -25,7 +25,21 @@
                     "patternError": "Please enter a numeric value with \"{ digitNumber }\" digit."
                 },
                 "tabResult": {
-                    "label": "Results"
+                    "label": "Results",
+                    "numberOfResults": "Number of results:",
+                    "toggleAccordions": {
+                      "openAll": "Open all",
+                      "closeAll": "Close all"
+                    },
+                    "groupByLabel": "Group by",
+                    "table": {
+                      "showPositionInMap": "Show position of dataset in map",
+                      "goToDetails": "Show details for this dataset",
+                      "headers": {
+                        "position": "Position",
+                        "details": "Details"
+                      }
+                    }
                 },
                 "tabDownload": {
                     "label": "Download"

@@ -16,9 +16,11 @@
 
  * Addon state
  * @property {Boolean} showLoadingSpinner - Show loading spinner or not
- * @property {Object} dataClassList - List of data classes (see fetchDataClassList) used in tab search
+ * @property {Array} dataClassList - List of data classes (see fetchDataClassList) used in tab search
  * @property {Array} archiveList - List of archives to use in TabSearch
  * @property {Object} archiveYears - Map of archive IDs to year data { [archiveId]: { year: "2022", archiveName: ["xyz", "abc"] } }
+ * @property {Object[]} searchAttributeResponse - List of dataclass objects from the search response
+ * @property {String} selectedInstanceId - instance id of the selected primary object to watch details for
  */
 
 const state = {
@@ -36,13 +38,14 @@ const state = {
 
     // Addon state
     showLoadingSpinner: false,
-    dataClassList: {},
+    dataClassList: [],
     apiBasePath: "",
     searchAttributeResponse: [],
     placeholderDataClassList: {},
     placeholderJsonPath: "",
     archiveYears: {},
-    archiveList: []
+    archiveList: [],
+    selectedInstanceId: null
 };
 
 export default state;
