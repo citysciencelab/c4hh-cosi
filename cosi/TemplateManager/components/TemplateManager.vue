@@ -292,9 +292,9 @@ export default {
         ...mapMutations("Modules/TemplateManager", Object.keys(mutations)),
         ...mapActions("Modules/TemplateManager", Object.keys(actions)),
         ...mapActions("Menu", ["changeCurrentComponent"]),
+        ...mapMutations("Modules/Dashboard", ["setCalculations", "setStatsFeatureFilter"]),
         ...mapActions("Modules/DistrictSelector", ["setDistrictsByName"]),
         ...mapMutations("Modules/DistrictSelector", ["setMapping", "setSelectedDistrictLevelId"]),
-        ...mapActions("Modules/SaveSession", ["loadSessionData"]),
 
         /**
          * Returns all visible vector layers from the layer collection that are of supported types.
@@ -399,7 +399,6 @@ export default {
                 this.createMappingByTemplates(this.templates, await getMappingJson());
             }
 
-            this.loadSessionData({template: _template, reset: !active});
             this.openTool(startingTool, active);
             this.loadLayer(visibleLayerIds, active, this.templates);
         },
@@ -685,6 +684,10 @@ export default {
                         zoomToExtent: false
                     });
                 });
+            }
+
+            if (active && this.selectedStatsCategories.length) {
+                this.setStatsFeatureFilter(this.selectedStatsCategories);
             }
 
             this.setReportName(this.activeTemplate?.meta?.title);
