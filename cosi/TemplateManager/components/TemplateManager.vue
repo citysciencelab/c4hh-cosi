@@ -385,11 +385,17 @@ export default {
             return _template;
         },
 
-        async loadFromTemplate (template, index, active) {
+
+        /**
+         * Loading all the data from template.
+         * @param {Object} template - The template.
+         * @param {Boolean} active - activated or inactivated of the template.
+         * @returns {void}
+         */
+        async loadFromTemplate (template, active) {
             template.meta.isActive = active;
 
-            const _template = this.applyFilters(template, this.filters[index]),
-                startingTool = template?.state?.Tools?.toolToOpen,
+            const startingTool = template?.state?.Tools?.toolToOpen,
                 time = new Date().getTime(),
                 visibleLayerIds = this.saveTemplate[this.selectedTemplateIndex].activeLayer.map(layer => layer.id);
 
@@ -658,7 +664,7 @@ export default {
             this.setActiveTemplateName(name);
             this.isTemplateActive = active;
 
-            this.loadFromTemplate(this.activeTemplate, this.activeTemplateIndex, active);
+            this.loadFromTemplate(this.activeTemplate, active);
 
             if (active) {
                 this.setActiveTemplates([...this.activeTemplates, name]);
@@ -688,6 +694,10 @@ export default {
 
             if (active && this.selectedStatsCategories.length) {
                 this.setStatsFeatureFilter(this.selectedStatsCategories);
+            }
+
+            if (active && this.selectedCalculations.length) {
+                this.setCalculations(this.selectedCalculations);
             }
 
             this.setReportName(this.activeTemplate?.meta?.title);
