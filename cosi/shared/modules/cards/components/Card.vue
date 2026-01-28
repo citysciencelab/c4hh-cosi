@@ -64,7 +64,7 @@ export default {
             v-if="title"
             class="py-2 px-3"
         >
-            <h6 class="m-0">
+            <h6 class="card-title m-0">
                 {{ title }}
             </h6>
         </div>
@@ -183,6 +183,11 @@ export default {
         border-left: .3rem solid transparent;
         border-right: .3rem solid transparent;
         border-top: .3rem solid #000;
+    }
+
+    .card-title {
+        font-family: $font_family_accent;
+        color: $secondary;
     }
 
     .grid {

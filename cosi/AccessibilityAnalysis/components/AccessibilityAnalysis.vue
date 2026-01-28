@@ -9,6 +9,7 @@ import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import union from "@turf/union";
 import {VExpandTransition} from "vuetify/components/transitions";
 import {VItemGroup, VItem} from "vuetify/components/VItemGroup";
+import dayjs from "dayjs";
 import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
@@ -30,6 +31,7 @@ import TabBar from "../../shared/modules/tabBar/components/TabBar.vue";
 import {simplify} from "../../utils/geometry/simplify";
 import {getFlatCoordinates} from "../../utils/geometry/getFlatCoordinates";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 import LabeledSlider from "../../shared/modules/slider/components/LabeledSlider.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
@@ -56,6 +58,7 @@ export default {
         DropdownAutocomplete,
         FlatButton,
         IconButton,
+        InputText,
         LabeledSlider,
         ResultManagement,
         SimpleCard,
@@ -143,7 +146,9 @@ export default {
             useTravelTimeIndex: false,
             visibleVectorLayers: [],
             showErrorAlert: false,
-            showSpinner: false
+            showSpinner: false,
+            analysisName: "",
+            generatedName: ""
         };
     },
     computed: {
@@ -241,7 +246,19 @@ export default {
         activeSet (index) {
             if (!this.dataSets[index]) {
                 this.resetIsochroneBBox();
+
+                const newTitle = this.generateCardTitle();
+
+                this.generatedName = newTitle;
+                this.analysisName = newTitle;
                 return;
+            }
+
+            const inputs = this.dataSets[index].inputs;
+
+            if (inputs.title) {
+                this.analysisName = inputs.title;
+                this.generatedName = inputs.title;
             }
 
             for (const key in this.dataSets[index].inputs) {
@@ -354,6 +371,9 @@ export default {
         this.baseUrl = this.restServiceById(this.serviceId || this.fallbackServiceId).url + "/v2/";
         this.getLayerById("accessibility-analysis").getLayer().setVisible(true);
         this.getLayerById("accessibility-analysis").getLayer().setZIndex(10);
+
+        this.generatedName = this.generateCardTitle();
+        this.analysisName = this.generatedName;
     },
     unmounted () {
         this.removeInteraction(this.select);
@@ -435,15 +455,25 @@ export default {
         },
 
         /**
-         * Generates the next card title and increments the internal card counter.
-         * @returns {String} The generated card title (e.g. "Erreichbarkeit 3").
+         * Generates the next random card title.
+         * @returns {String} The generated card title.
          */
         generateCardTitle () {
-            const nextNumber = this.cardCounter + 1;
+            const titlePart = "Erreichbarkeit ID:",
+                allowedCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ2346789",
+                idLength = 6;
+            let id = "";
 
-            this.setCardCounter(nextNumber);
-            return i18next.t("additional:modules.tools.cosi.accessibilityAnalysis.cardTitle") + nextNumber;
+            for (let i = 0; i < idLength; i++) {
+                const randomIndex = Math.floor(Math.random() * allowedCharacters.length),
+                    randomChar = allowedCharacters[randomIndex];
+
+                id += randomChar;
+            }
+
+            return titlePart + " " + id;
         },
+
         /**
          * Adds selection cards for all features in the given layer.
          * @param {ol/layer/Vector} layer - The layer from which to add cards.
@@ -739,7 +769,8 @@ export default {
                     mergePolygons: this.mergePolygons,
                     steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
                     selectionCards: this.selectionCards,
-                    title: this.generateCardTitle()
+                    title: this.analysisName,
+                    id: this.generateAnalysisId(this.analysisName)
                 };
                 this.dataSets.unshift(analysisSet);
                 this.setActiveSet(0);
@@ -879,6 +910,11 @@ export default {
         setActiveMode (obj) {
             this.activeMode = obj;
             this.selectionCards = [];
+
+            const newTitle = this.generateCardTitle();
+
+            this.generatedName = newTitle;
+            this.analysisName = newTitle;
             if (this.hasActiveSet) {
                 this.setActiveSet(null);
                 this.removeAll();
@@ -1017,6 +1053,7 @@ export default {
                 this.setActiveSet(index);
                 return;
             }
+
             this.setActiveSet(null);
             this.setDefaults();
             this.removeAll();
@@ -1119,6 +1156,33 @@ export default {
                 });
             }
             this.setSelectedFacilityNames(newValue);
+        },
+        /**
+         * Generates an ID to identify the analyses with name and timestamp.
+         * @param {String} name - the currently given name.
+          * @returns {String} the generated id.
+         */
+        generateAnalysisId (name) {
+            const idName = name.trim().toLowerCase().replace(/[^a-z0-9]/g, ""),
+                timestamp = dayjs().format("YYYYMMDDHHmmss");
+
+            return idName + timestamp;
+        },
+        /**
+         * Updated the analysis name with a generated or user-assigned name.
+         * @returns {void}
+         */
+        updatesAnalysisName () {
+            if (!this.analysisName.trim()) {
+                const newTitle = this.generateCardTitle();
+
+                this.generatedName = newTitle;
+                this.analysisName = newTitle;
+            }
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.removeDataOnMap();
+            }
         }
     }
 };
@@ -1137,7 +1201,23 @@ export default {
             :active-item="activeMode"
             @change="setActiveMode"
         />
-        <div class="mb-4 scroll-container">
+        <h5 class="mode-title my-4">
+            {{ $t(`additional:modules.tools.cosi.accessibilityAnalysis.${activeMode.type}Mode`) }}
+        </h5>
+        <InputText
+            id="analysis-name"
+            v-model="analysisName"
+            class="mt-2"
+            :label="'Name der Erreichbarkeitsanalyse'"
+            :placeholder="'Name der Erreichbarkeitsanalyse'"
+            @blur="updatesAnalysisName"
+            @focus="updatesAnalysisName"
+        />
+        <small class="title-hint ms-3">
+            <i class="bi bi-info-circle" />
+            {{ $t("additional:modules.tools.cosi.accessibilityAnalysis.titleHint") }}
+        </small>
+        <div class="mb-4 mt-3 scroll-container">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">
                     Ausgewählte {{ activeMode.text }}
@@ -1355,6 +1435,14 @@ export default {
         }
         .title {
             color: $secondary;
+        }
+
+        .mode-title {
+            color: $secondary;
+        }
+
+        .title-hint {
+            color: $dark_grey;
         }
 
         .description {
