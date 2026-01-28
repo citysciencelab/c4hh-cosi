@@ -289,7 +289,7 @@ export default {
                 this.pdf.setAuthor(this.author.trim());
                 if (this.selectedDistrictNames.length > 0) {
                     await this.addOverViewPage(this.selectedFrontPageItem.value);
-                    await this.addChapterStatisticalData(this.statisticalDataCards);
+                    this.addChapterStatisticalData(this.statisticalDataCards);
                 }
                 if (this.featuresListItems.length > 0) {
                     await this.addChapterSubjectData(this.subjectDataCards);
@@ -573,10 +573,10 @@ export default {
          * @param {Object[]} cards - cards to be added in the chapter.
          * @returns {void}
          */
-        async addChapterStatisticalData (cards) {
+        addChapterStatisticalData (cards) {
             if (!cards.length) {
                 this.addStatsToReport(this.items);
-                await this.addDiagram();
+                this.addDiagram();
                 return;
             }
             if (this.getPageOrientation() === "portrait") {
@@ -589,7 +589,7 @@ export default {
                     this.addStatsToReport(this.items);
                 }
                 else if (card.key === "statDataCharts") {
-                    await this.addDiagram();
+                    this.addDiagram();
                 }
                 else if (card.key === "heading") {
                     this.pdf.addChapter(card.value);
@@ -1283,7 +1283,7 @@ export default {
          * Add diagram to report
          * @returns {void}
          */
-        async addDiagram () {
+        addDiagram () {
             const data = this.getChartData(this.items, this.selectedDistrictNames, this.areaColumnName, this.categoryInChart, this.initMapping),
                 imageArr = [];
 
@@ -1292,7 +1292,7 @@ export default {
             }
 
             for (let i = 0; i < data.length; i++) {
-                imageArr.push(await this.getChartImage(data[i]));
+                imageArr.push(this.getChartImage(data[i]));
             }
 
             if (imageArr.length) {
@@ -1309,7 +1309,7 @@ export default {
         /**
          * Gets the chart image as Base64 format.
          * @param {Object} data - the chart data.
-         * @returns {Promise<string>} the toBase64Image image string.
+         * @returns {string} the toBase64Image image string.
          */
         getChartImage (data) {
             const oldCanvasElement = document.getElementById("canvas"),
@@ -1324,21 +1324,13 @@ export default {
             document.body.appendChild(canvasElement);
             ChartJS.defaults.font.size = 22;
 
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const chartDiagram = new ChartJS(document.getElementById("canvas").getContext("2d"), {
-                        type: "line",
-                        data: data,
-                        options: {
-                            animation: {
-                                onComplete: function () {
-                                    resolve(chartDiagram.toBase64Image());
-                                }
-                            }
-                        }
-                    });
-                }, 0);
-            });
+            return new ChartJS(document.getElementById("canvas").getContext("2d"), {
+                type: "line",
+                data: data,
+                options: {
+                    animation: false
+                }
+            }).toBase64Image();
         },
 
         /**
