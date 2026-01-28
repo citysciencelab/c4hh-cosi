@@ -93,6 +93,7 @@ export default {
                 selectedItems: []
             },
             timestampSelected: null,
+            valueColumns: [],
             yearSelector: "jahr_"
         };
     },
@@ -108,22 +109,30 @@ export default {
         columns () {
             return [
                 ...this.baseColumns,
-                ...this.districtColumns,
-                ...this.aggregateColumns
+                ...this.valueColumns.filter(column => column.show)
             ];
         },
-        valueColumns () {
-            return [...this.districtColumns, ...this.aggregateColumns];
+
+        /**
+         * Gets the default value columns: the district columns and the aggregate colums.
+         * All are set to visible by default.
+         * @returns {Object[]} The default columns.
+         */
+        defaultValueColumns () {
+            return [...this.districtColumns, ...this.aggregateColumns].map(column => ({
+                ...column,
+                show: true
+            }));
         },
         minimizedCols () {
-            return this.districtColumns.filter(col => col.minimized === true);
+            return this.valueColumns.filter(col => !col.show);
         },
         /**
          * Gets the selected columns (those that are not minimized).
          * @returns {Object[]} The selected columns.
          */
         selectedColumns () {
-            return this.valueColumns.filter(col => !col.minimized);
+            return this.valueColumns.filter(col => col.show);
         },
         unselectedColumnLabels () {
             return this.valueColumns.filter(col => !this.selectedColumns.includes(col)).map(col => col.text);
@@ -159,6 +168,7 @@ export default {
         loadend () {
             if (this.loadend && this.selectedDistrictNames.length > 0) {
                 this.generateTable();
+                this.valueColumns = [...this.defaultValueColumns];
             }
         },
         timestampSelected () {
@@ -174,6 +184,7 @@ export default {
             if (this.selectedDistrictNames.length > 0) {
                 this.generateTable();
                 this.timestampSelected = this.items[0].years[0];
+                this.valueColumns = [...this.defaultValueColumns];
             }
         }
     },
@@ -196,34 +207,6 @@ export default {
             const selectedDistricts = districts.filter(district => district.isSelected === true);
 
             return selectedDistricts.map(district => district.getLabel());
-        },
-
-        /**
-         * Reorders the district columns based on the given array of column names.
-         * @param {String[]} columnNames - Array of column names in the desired order.
-         * @returns {void}
-         */
-        reorderColumns (columnNames) {
-            if (!columnNames.length) {
-                return;
-            }
-
-            const newDistrictColumns = columnNames.map(name => {
-                return this.districtColumns.find(col => col.text === name);
-            });
-
-            this.setDistrictColumns(newDistrictColumns);
-        },
-
-        /**
-         * Minimizes or maximizes a column in the table.
-         * @param {String} name - The name of the column to be minimized or maximized.
-         */
-        minimizeCol (name) {
-            const col = this.districtColumns.find(districtColumn => districtColumn.value === name);
-
-            col.minimized = !col.minimized;
-            col.class = col.minimized ? "minimized" : "";
         },
 
         getAverageAsString (item, timestamp) {
@@ -387,7 +370,7 @@ export default {
 
             if (!this.fixedHeader) {
                 fixedHeaderStart = iniHeader.includes("Gruppe") ? ["Kategorie", "Gruppe", "Datentyp"] : ["Kategorie", "Datentyp"];
-                fixedHeaderEnd = iniHeader.includes(this.getColumnHeader("orientationValue")) ? [this.getColumnHeader("orientationValue"), "Gesamt", "Durchschnitt", "Jahr"] : ["Gesamt", "Durchschnitt", "Jahr"];
+                fixedHeaderEnd = iniHeader.includes(this.getColumnHeader("orientationValue")) ? [this.getColumnHeader("orientationValue"), "Jahr"] : ["Jahr"];
                 header = fixedHeaderStart.concat(iniHeader.filter((value) => {
                     return !fixedHeaderStart.includes(value) && !fixedHeaderEnd.includes(value);
                 }), fixedHeaderEnd);
@@ -705,12 +688,11 @@ export default {
                     fluid
                 >
                     <DashboardToolbar
-                        :district-columns="districtColumns"
+                        v-model:setting-items="valueColumns"
+                        item-title="text"
                         :stats-feature-filter="statsFeatureFilter"
                         @setStatsFeatureFilter="setStatsFeatureFilter"
                         @exportTable="exportTable"
-                        @toggleColumn="minimizeCol"
-                        @reorderColumns="reorderColumns"
                         @setTimestampsValues="updateTimestampsValues"
                         @start-calculation="onStartCalculation"
                     />
@@ -740,7 +722,6 @@ export default {
                                 #[`header.${district.value}`]
                             >
                                 <div
-                                    v-if="!district.minimized"
                                     :key="district.value"
                                     class="district-header"
                                 >
@@ -757,7 +738,7 @@ export default {
                                         <v-icon @click="toggleGroup(item)">
                                             {{ isGroupOpen(item) ? 'mdi-minus' : 'mdi-plus' }}
                                         </v-icon>
-                                        {{ item.items[0].columns[districtColumns[0].text].group }}
+                                        {{ items.find(i => i.groupIndex === item.value).group }}
                                     </th>
                                 </tr>
                             </template>

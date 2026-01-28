@@ -56,11 +56,16 @@ export default {
                 "key",
                 "gfiAttributes"
             ],
-            featureColumns: [
+            fixedColumns: [
                 {
                     key: "data-table-expand",
                     align: "start"
                 },
+                {
+                    value: "warning"
+                }
+            ],
+            featureColumns: [
                 {
                     title: this.$t("additional:modules.tools.cosi.featuresList.colIcon"),
                     value: "style",
@@ -74,9 +79,6 @@ export default {
                 {
                     title: this.$t("additional:modules.tools.cosi.featuresList.colFacility"),
                     value: "name"
-                },
-                {
-                    value: "warning"
                 },
                 {
                     title: this.$t("additional:modules.tools.cosi.featuresList.colDistrict"),
@@ -137,21 +139,40 @@ export default {
         },
 
         /**
-         * Gets the columns that are not hidden.
-         * @returns {String[]} The columns to show.
+         * Gets the columns to show in the table: the fixed columns and all other columns unless deselected.
+         * @returns {Object[]} The columns to show.
          */
         columnsToShow () {
-            return this.columns.filter(column => !column.hidden);
+            return [
+                ...this.fixedColumns,
+                ...this.columns.filter(column => column.show)
+            ];
         },
 
         /**
-         * Gets the column titles which may not be deselected by the user because of their filter functinality.
+         * Gets the default columns: feature columns, numerical columns, additional columns.
+         * All are set to visible by default.
+         * @returns {Object[]} The default columns.
+         */
+        defaultColumns () {
+            return [
+                ...this.featureColumns,
+                ...this.numericalColumns,
+                ...this.additionalColumns
+            ].map(column => ({
+                ...column,
+                show: true
+            }));
+        },
+
+        /**
+         * Gets the column values which may not be deselected by the user because of their filter functinality.
          * @returns {String[]} The mandatory column titles.
          */
-        mandatoryColumnTitles () {
+        mandatoryColumns () {
             return this.columns
                 .filter(column => typeof column.filter === "function")
-                .map(column => column.title);
+                .map(column => column.value);
         },
         selected: {
             get () {
@@ -422,42 +443,11 @@ export default {
         },
 
         /**
-         * Reorders the column based on the new user-defined order.
-         * @param {String[]} columnTitles The new order for the column titles.
-         * @returns {void}
-         */
-        reorderColumns (columnTitles) {
-            this.columns.sort((a, b) => {
-                const aIndex = columnTitles.indexOf(a.title),
-                    bIndex = columnTitles.indexOf(b.title);
-
-                if (aIndex === -1 || bIndex === -1) {
-                    return 0;
-                }
-                return aIndex - bIndex;
-            });
-        },
-
-        /**
          * Sets the initital state of the columns.
          * @returns {void}
          */
         resetColumns () {
-            this.columns = [
-                ...this.featureColumns,
-                ...this.numericalColumns,
-                ...this.additionalColumns
-            ];
-        },
-
-        /**
-         * Toggles the visibility of a column.
-         * @param {String} columnTitle The title of the colum to toggle.
-         */
-        toggleColumn (columnTitle) {
-            const column = this.columns.find(col => col.title === columnTitle);
-
-            column.hidden = !column.hidden;
+            this.columns = [...this.defaultColumns];
         },
 
         updateFilterProps (newFilterProps) {
@@ -742,12 +732,10 @@ export default {
         />
         <v-app id="features-list-wrapper">
             <FeaturesListToolbar
+                v-model:setting-items="columns"
                 :filter-items="groupActiveLayer"
-                :setting-items="columnTitles"
-                :mandatory-setting-items="mandatoryColumnTitles"
+                :mandatory-setting-items="mandatoryColumns"
                 :show-dipas-button="dipasInFeaturesList"
-                @toggle-setting-item="toggleColumn"
-                @reordered-setting-items="reorderColumns"
                 @setLayerFilter="setLayerFilter"
                 @setSearch="setSearch"
                 @createCharts="createCharts"

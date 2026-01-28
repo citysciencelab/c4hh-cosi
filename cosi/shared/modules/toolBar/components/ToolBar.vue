@@ -14,6 +14,10 @@ export default {
         SwitchInput
     },
     props: {
+        itemTitle: {
+            type: String,
+            default: "title"
+        },
         mandatorySettingItems: {
             type: Array,
             required: false,
@@ -34,18 +38,16 @@ export default {
             default: false
         }
     },
-    emits: ["exportTable", "reorderedSettingItems", "toggleSettingItem"],
+    emits: ["exportTable", "update:setting-items"],
     data () {
         return {
-            checkedSettingItems: {},
             optionalDropdownInstance: null,
             filterMenuDropdownInstance: null,
             filterButtonId: "add-filter-button",
             groupButtons: [
                 {"icon": "bi-table", "name": "Tabelle"},
                 {"icon": "bi-bar-chart", "name": "Diagramm"}
-            ],
-            settingItemList: this.settingItems.slice()
+            ]
         };
     },
     computed: {
@@ -57,23 +59,7 @@ export default {
             return this.optionalButton?.closeOnOutside === true;
         }
     },
-    watch: {
-        /**
-         * Emits an event to notify that the setting items have been reordered.
-         * @param {Array} items - The reordered list of setting items.
-         * @returns {void}
-         */
-        settingItemList (items) {
-            this.$emit("reorderedSettingItems", items);
-        }
-    },
     mounted () {
-        this.checkedSettingItems = {
-            ...this.settingItems.reduce((acc, item) => {
-                acc[item] = true;
-                return acc;
-            }, {})
-        };
         const toggleElement = document.getElementById(this.optionalButton.id),
             filterElement = document.getElementById(this.filterButtonId);
 
@@ -91,14 +77,6 @@ export default {
         document.removeEventListener("keydown", this.onGlobalKeyDown);
     },
     methods: {
-        /**
-         * Emits the toggleSettingItem event with the changed setting item
-         * @param {Objecet} evt - Change event
-         * @returns {void}
-         */
-        toggleSettingItem (evt) {
-            this.$emit("toggleSettingItem", evt.target.value);
-        },
         /**
          * Handles global pointer interactions to close the dropdown
          * when clicking outside of it.
@@ -158,33 +136,32 @@ export default {
                 class="dropdown-menu p-0 border-0 mt-1"
             >
                 <Draggable
-                    v-model="settingItemList"
                     class="ps-0 m-2"
                     handle=".list-group-item-draggable"
                     item-key="id"
                     tag="ul"
+                    :model-value="settingItems"
+                    @update:model-value="$emit('update:setting-items', $event)"
                 >
                     <template #item="{ element }">
                         <li
-                            :key="element"
+                            :key="element.value"
                             class="list-group-item d-flex justify-content-between align-items-center p-2 rounded list-group-item-draggable"
                         >
                             <div class="ms-2 me-auto d-flex form-check">
                                 <input
-                                    :id="element"
-                                    v-model="checkedSettingItems[element]"
-                                    :value="element"
+                                    :id="element.value"
+                                    v-model="element.show"
                                     class="me-2 mt-1 form-check-input opacity-100"
-                                    :disabled="mandatorySettingItems.includes(element)"
+                                    :disabled="mandatorySettingItems.includes(element.value)"
                                     type="checkbox"
-                                    @change="toggleSettingItem"
                                 >
                                 <label
                                     class="text-nowrap form-check-label"
-                                    :for="element"
+                                    :for="element.value"
                                 >
                                     <span>
-                                        {{ element }}
+                                        {{ element[itemTitle] }}
                                     </span>
                                 </label>
                             </div>

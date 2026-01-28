@@ -21,10 +21,6 @@ export default {
         VIcon
     },
     props: {
-        districtColumns: {
-            type: Array,
-            required: true
-        },
         statsFeatureFilter: {
             type: Array,
             required: true
@@ -134,14 +130,6 @@ export default {
             set (value) {
                 this.$emit("setStatsFeatureFilter", value);
             }
-        },
-
-        /**
-         * Get column names from districtColumns prop.
-         * @returns {String[]} Array of column names.
-         */
-        columnNames () {
-            return this.districtColumns.map(col => col.text);
         }
     },
     mounted () {
@@ -185,11 +173,8 @@ export default {
 
 <template>
     <ToolBar
-        :setting-items="columnNames"
         :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate'), icon: 'bi-plus-slash-minus', id: 'calculation-button', closeOnOutside: true}"
         @exportTable="$emit('exportTable', exportTimeline)"
-        @reorderedSettingItems="reorderSettingItems"
-        @toggleSettingItem="toggleSettingItem"
     >
         <template #filterMenu>
             <div
