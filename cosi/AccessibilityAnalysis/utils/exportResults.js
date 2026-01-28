@@ -49,13 +49,13 @@ export function exportAsGeoJson (mapLayer, projectionCode) {
         featureCollection.features[0].properties.index = "ref";
     }
 
-    if (this.mode === "point") {
+    if (this.activeMode.type === "point") {
         const feature = new Feature(new Point(this.clickCoordinate)),
             featureGeoJson = featureToGeoJson(feature, false, "EPSG:4326");
 
         featureCollection.features.push(featureGeoJson);
     }
-    else if (this.mode === "region") {
+    else if (this.activeMode.type === "region") {
         const allActviceFeatures = filterAllFeatures(this.activeVectorLayerList, this.isFeatureActive),
             coordinates = this.getCoordinates(allActviceFeatures);
 

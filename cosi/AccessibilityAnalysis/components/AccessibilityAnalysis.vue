@@ -2,16 +2,19 @@
 import AccessibilityAnalysisExport from "./AccessibilityAnalysisExport.vue";
 import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
-import GeoJSON from "ol/format/GeoJSON";
+import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import union from "@turf/union";
 import {VExpandTransition} from "vuetify/components/transitions";
 import {VItemGroup, VItem} from "vuetify/components/VItemGroup";
 import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import {featureToGeoJson, featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {geoJsonCollectionToFeatures} from "../../utils/features/convertFromGeoJson";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import getters from "../store/gettersAccessibilityAnalysis";
 import html2canvas from "html2canvas";
@@ -34,13 +37,12 @@ import ResultManagement from "../../shared/modules/resultManagement/components/R
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster.js";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
-import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import {singleClick} from "ol/events/condition";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
+import uniq from "../../utils/array/uniq";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
-import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 
 export default {
     name: "AccessibilityAnalysis",
@@ -86,7 +88,7 @@ export default {
                     info: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.noFacilitySelected")
                 },
                 {
-                    type: "path",
+                    type: "route",
                     text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.referToPath"),
                     icon: "bi bi-map",
                     title: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.fromRoute"),
@@ -95,7 +97,6 @@ export default {
                 }
             ],
             facilityNames: [],
-            directionsLayer: null,
             mergePolygons: true,
             transportTypes: [
                 {
@@ -140,13 +141,6 @@ export default {
             ],
             selectionCards: [],
             useTravelTimeIndex: false,
-            mappedRoutingProfiles: {
-                "CAR": "Auto",
-                "HGV": "LKW",
-                "CYCLING": "Fahrrad",
-                "FOOT": "Fußweg",
-                "WHEELCHAIR": "Rollstuhl"
-            },
             visibleVectorLayers: [],
             showErrorAlert: false,
             showSpinner: false
@@ -160,8 +154,6 @@ export default {
         ...mapGetters("Modules/DistrictSelector", ["boundingGeometry"]),
         ...mapGetters("Modules/Routing/Directions", ["directionsRouteSource", "directionsRouteLayer", "routingDirections", "settings"]),
         // ...mapGetters("Modules/FeaturesList", ["activeVectorLayerList", "isFeatureActive", "layerMapById"]),
-        // ...mapGetters("Modules/SelectionManager", ["activeSelection"]),
-        // ...mapGetters("Modules/ScenarioBuilder", ["scenarioUpdated"]),
 
         /**
          * Gets the datasets for card in shared component resultManagement.
@@ -196,6 +188,22 @@ export default {
         },
 
         /**
+         * Maps the routing profile.
+         * @returns {String} The mapped routing profile.
+         */
+        routingTransportType () {
+            const mappedRoutingProfiles = {
+                "CAR": this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.driving-car"),
+                "HGV": this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.driving-hgv"),
+                "CYCLING": this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.cycling-regular"),
+                "FOOT": this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.foot-walking"),
+                "WHEELCHAIR": this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.wheelchair")
+            };
+
+            return mappedRoutingProfiles[this.settings.speedProfile];
+        },
+
+        /**
          * Returns the value of distance or time based on the selected scale unit.
          * @returns {Number} The value of distance or time.
          */
@@ -205,12 +213,34 @@ export default {
     },
     watch: {
         /**
+         * Watches changes on the active mode.
+         * Depending on the mode type, it adds or removes the select interaction and updates selection cards.
+         */
+        activeMode () {
+            if (this.activeMode.type === "facility") {
+                this.addInteraction(this.select);
+            }
+            else {
+                this.removeInteraction(this.select);
+                this.setUseOuterBoundaries(false);
+            }
+
+            if (this.activeMode.type === "route") {
+                if (this.routingDirections === null) {
+                    return;
+                }
+                this.addSelectionCardRoute(this.routingDirections, this.routingTransportType, this.activeMode.icon);
+            }
+        },
+
+        /**
          * Watches changes on the active set index. If the new index is valid, it updates the component's state.
          * @param {Number} index - The new active set index.
          * @returns {void}
          */
         activeSet (index) {
             if (!this.dataSets[index]) {
+                this.resetIsochroneBBox();
                 return;
             }
 
@@ -230,6 +260,19 @@ export default {
             }
 
             if (this.dataSets[index].inputs.mode === "point" || this.dataSets[index].inputs.mode === "facility") {
+                const layerIds = uniq(this.dataSets[index].inputs.selectionCards.map(card => card.layerId));
+
+                layerIds.forEach(layerId => {
+                    this.replaceByIdInLayerConfig({
+                        layerConfigs: [{
+                            id: layerId,
+                            layer: {
+                                visibility: true
+                            }
+                        }]
+                    });
+                });
+
                 if (this.dataSets[index].inputs.useOuterBoundaries) {
                     this.setMarkerByCoordinates(this.selectionCards.map(card => card.coord25832).flat());
                 }
@@ -238,45 +281,21 @@ export default {
                 }
             }
 
-            this.setIsochroneFeatures(this.dataSets[index].results);
+            this.setIsochroneFeatures(geoJsonCollectionToFeatures(this.dataSets[index].resultsGeoJSON));
             this.renderIsochrones(this.isochroneFeatures);
         },
 
-        // async scenarioUpdated () {
-        //     await this.$nextTick();
-        //     this.tryUpdateIsochrones();
-        // },
-        mode () {
-            if (this.mode === "facility") {
-                this.addInteraction(this.select);
-            }
-            else {
-                this.removeInteraction(this.select);
-                this.setUseOuterBoundaries(false);
-            }
+        /**
+         * Watches click coordinates on the map and adds a selection card if the active mode is "point".
+         * @param {Number[]} newClickCoordinate - The click coordinate on the map.
+         * @returns {void}
+         */
+        clickCoordinate (newClickCoordinate) {
+            if (this.activeMode.type === "point") {
+                const coordinate4326 = transformCoordinate(newClickCoordinate, this.projectionCode),
+                    cardText = newClickCoordinate.map(coord => coord.toFixed(6)).join(", ");
 
-            if (this.mode === "region" && this.activeSelection === null) {
-                this.resetIsochroneBBox();
-            }
-
-            if (this.mode === "path") {
-                if (this.routingDirections === null) {
-                    return;
-                }
-                const duration = Math.floor(this.routingDirections.duration / 60),
-                    newCard = {
-                        coord25832: [],
-                        coord4326: [],
-                        icon: this.activeMode.icon,
-                        id: this.routingDirections.bbox.toString(),
-                        label: "Berechnete Route",
-                        text: `Entfernung: ${this.routingDirections.distance} m | Zeit: ${duration} min | Verkehrsmittel: ${this.mappedRoutingProfiles[this.settings.speedProfile]}`,
-                        layerName: "Route"
-                    };
-
-                this.setScaleUnit("distance");
-                this.setTransportType("foot-walking");
-                this.selectionCards = [newCard];
+                this.addSelectionCard(this.clickCoordinate, coordinate4326, undefined, this.$t("additional:modules.tools.cosi.accessibilityAnalysis.points"), false, false, cardText);
             }
         },
 
@@ -315,10 +334,11 @@ export default {
         this.visibleVectorLayers = this.getVisibleVectorLayers();
 
         if (this.routingDirections) {
-            this.directionsLayer = this.getLayerById("accessibility-directions");
-            this.directionsLayer.getLayer().setStyle(this.directionsRouteLayer.getStyleFunction());
-            this.directionsLayer.getLayer().setSource(this.directionsRouteSource);
-            this.setActiveMode(this.getModeByType("path"));
+            const directionsLayer = this.getLayerById("accessibility-directions");
+
+            directionsLayer.getLayer().setStyle(this.directionsRouteLayer.getStyleFunction());
+            directionsLayer.getLayer().setSource(this.directionsRouteSource);
+            this.setActiveMode(this.getModeByType("route"));
         }
         else {
             this.setActiveMode(this.availableModes[0]);
@@ -332,30 +352,18 @@ export default {
    */
     mounted () {
         this.baseUrl = this.restServiceById(this.serviceId || this.fallbackServiceId).url + "/v2/";
-
         this.getLayerById("accessibility-analysis").getLayer().setVisible(true);
         this.getLayerById("accessibility-analysis").getLayer().setZIndex(10);
-
-        mapCollection.getMap("2D").addEventListener("click", this.onMapClick);
-
-        // onSearchbar(this.setSearchResultToOrigin);
-        // onShowFeaturesById(this.tryUpdateIsochrones);
-        // onShowAllFeatures(this.tryUpdateIsochrones);
-        // onFeaturesLoaded(this.tryUpdateIsochrones);
     },
     unmounted () {
-        this.setMode(this.availableModes[0].type);
         this.removeInteraction(this.select);
-        mapCollection.getMap("2D").removeEventListener("click", this.onMapClick);
-        // this.removeAll();
+        this.removeAll();
         this.setDefaults();
+        this.resetIsochroneBBox();
     },
     methods: {
-        ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent"]),
-        ...mapMutations("Modules/PopulationRequest", {
-            setPopulationRequestGeometry: "setGeometry",
-            setPopulationRequestActive: "setActive"
-        }),
+        ...mapActions(["replaceByIdInLayerConfig"]),
+        ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent", "clickCoordinate"]),
         ...mapMutations("Modules/AccessibilityAnalysis", Object.keys(mutations)),
         ...mapActions("Modules/AccessibilityAnalysis", ["getIsochrones"]),
         ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "removePointMarkerFeature"]),
@@ -363,6 +371,68 @@ export default {
         ...mapActions("Modules/Routing/Directions", ["reset"]),
         ...mapMutations("Modules/Routing/Directions", ["setRoutingDirections"]),
         ...methods,
+
+        /**
+         * Adds a selection card for points or subjects.
+         * @param {Number[]} clickCoordinate - The coordinate of the click event in the current map projection.
+         * @param {Number[]} coordinate4326 - The coordinate of the click event in WGS84 (EPSG:4326) projection.
+         * @param {String|undefined} featureName - The name of the selected feature.
+         * @param {String} layerName - The name of the layer containing the selected feature.
+         * @param {Object|undefined} feature - The feature object that was selected.
+         * @param {String|undefined} layerId - The unique identifier of the layer containing the selected feature.
+         * @param {String} cardText - The text content to be displayed on the selection card.
+         * @returns {void}
+         */
+        addSelectionCard: function (clickCoordinate, coordinate4326, featureName, layerName, feature, layerId, cardText) {
+            if (this.hasActiveSet) {
+                this.setActiveSet(null);
+                this.setDefaults();
+                this.removeAll();
+            }
+            this.setMarkerByCoordinates(this.useOuterBoundaries ? clickCoordinate : [clickCoordinate]);
+
+            const newCard = {
+                    coord25832: clickCoordinate,
+                    coord4326: coordinate4326,
+                    icon: this.activeMode.icon,
+                    id: clickCoordinate.toString(),
+                    label: layerName || this.activeMode.text,
+                    text: cardText,
+                    layerName: layerName,
+                    layerId,
+                    featureName,
+                    feature
+                },
+                cardExists = this.selectionCards.some(card => card.id === newCard.id);
+
+            if (!cardExists) {
+                this.selectionCards.push(newCard);
+            }
+        },
+
+        /**
+         * Adds a selection card for a calculated route.
+         * @param {Object} routingDirections - The routing directions object.
+         * @param {Sting} transportType - The transport type.
+         * @param {String} icon - The icon for the selection card.
+         * @returns {void}
+         */
+        addSelectionCardRoute (routingDirections, transportType, icon) {
+            const duration = Math.floor(routingDirections.duration / 60),
+                card = {
+                    coord25832: [],
+                    coord4326: [],
+                    icon,
+                    id: routingDirections.bbox.toString(),
+                    label: "Berechnete Route",
+                    text: `Entfernung: ${this.routingDirections.distance} m | Zeit: ${duration} min | Verkehrsmittel: ${transportType}`,
+                    layerName: "Route"
+                };
+
+            this.setScaleUnit("distance");
+            this.setTransportType("foot-walking");
+            this.selectionCards = [card];
+        },
 
         /**
          * Generates the next card title and increments the internal card counter.
@@ -390,7 +460,7 @@ export default {
                         cardName = unfeat.get(layer.attributes?.searchField[0]);
                     }
                     this.select.getFeatures().push(unfeat);
-                    this.setCoordinateFromFeature(unfeat, cardName, layer.getLayer().get("name"));
+                    this.setCoordinateFromFeature(unfeat, cardName, layer.getLayer().get("name"), layer.get("id"));
                 });
             });
         },
@@ -478,16 +548,6 @@ export default {
         },
 
         /**
-         * Registers the listeners to keyboard events onkeydown and onkeyup
-         * @returns {void}
-         */
-        onMapClick (evt) {
-            if (this.mode === "point") {
-                this.setCoordinateFromClick(this.clickCoordinate, this.projectionCode, evt.originalEvent.shiftKey, this.$t("additional:modules.tools.cosi.accessibilityAnalysis.points"));
-            }
-        },
-
-        /**
          * Registers listeners for the select interaction's feature collection.
          * @param {ol/Collection} featureCollection - The feature collection to register listeners on.
          * @returns {void}
@@ -503,7 +563,7 @@ export default {
                 if (foundLayer.attributes?.searchField?.length > 0) {
                     cardName = unpackedFeature.get(foundLayer.attributes?.searchField[0]);
                 }
-                this.setCoordinateFromFeature(unpackedFeature, cardName, foundLayer.get("name"));
+                this.setCoordinateFromFeature(unpackedFeature, cardName, foundLayer.get("name"), foundLayer.get("id"));
 
                 if (this.areAllFeaturesInCollection(foundLayer, featureCollection.getArray())) {
                     this.selectedFacilityNames.push(foundLayer.get("name"));
@@ -550,56 +610,12 @@ export default {
         },
 
         /**
-         * Sets and transforms the click coordinate to EPSG 4326.
-         * @param {event} clickCoordinate - The coordinate of the click.
-         * @param {String} mapProjectionCode - The code of the current map projection.
-         * @returns {void}
-         */
-        setCoordinateFromClick: function (clickCoordinate, mapProjectionCode, featureName, layerName, feature) {
-            if (this.hasActiveSet) {
-                this.setActiveSet(null);
-                this.setDefaults();
-                this.removeAll();
-            }
-
-            let coords,
-                cardText;
-
-            if (this.useOuterBoundaries) {
-                cardText = "Flächenaußengrenzen für " + (featureName || clickCoordinate.slice(0, 2) + "...");
-                coords = transformCoordinates(clickCoordinate, mapProjectionCode);
-                this.setMarkerByCoordinates(clickCoordinate);
-            }
-            else {
-                cardText = featureName || clickCoordinate.map(coord => coord.toFixed(6)).join(", ");
-                coords = transformCoordinate(clickCoordinate, mapProjectionCode);
-                this.setMarkerByCoordinates([clickCoordinate]);
-            }
-            const newCard = {
-                    coord25832: clickCoordinate,
-                    coord4326: coords,
-                    icon: this.activeMode.icon,
-                    id: clickCoordinate.toString(),
-                    label: layerName || this.activeMode.text,
-                    text: cardText,
-                    layerName: layerName,
-                    featureName,
-                    feature
-                },
-                cardExists = this.selectionCards.some(card => card.id === newCard.id);
-
-            if (!cardExists) {
-                this.selectionCards.push(newCard);
-            }
-        },
-
-        /**
          * Sets and transforms the coordinate(s) of a feature to EPSG 4326.
          * @param {ol/Feature} feature - The feature.
          * @param {String} mapProjectionCode - The code of the current map projection.
          * @returns {void}
          */
-        setCoordinateFromFeature: function (feature, featureName, layerName) {
+        setCoordinateFromFeature: function (feature, featureName, layerName, layerId) {
             let simplifiedGeom;
 
             if (feature.getGeometry().getType() === "Polygon" && !this.useOuterBoundaries) {
@@ -610,11 +626,18 @@ export default {
             }
 
             if (this.useOuterBoundaries) {
-                this.setCoordinateFromClick(getFlatCoordinates(simplifiedGeom), this.projectionCode, featureName, layerName, feature);
+                const flatCoordinates = getFlatCoordinates(simplifiedGeom),
+                    coordinates4326 = transformCoordinates(flatCoordinates, this.projectionCode),
+                    cardText = "Flächenaußengrenzen für " + (featureName || flatCoordinates.slice(0, 2) + "...");
+
+                this.addSelectionCard(getFlatCoordinates(simplifiedGeom), coordinates4326, featureName, layerName, feature, layerId, cardText);
             }
             else {
                 getFlatCoordinates(simplifiedGeom).forEach((coordinate) => {
-                    this.setCoordinateFromClick(coordinate, this.projectionCode, featureName, layerName, feature);
+                    const coordinate4326 = transformCoordinate(coordinate, this.projectionCode),
+                        cardText = featureName;
+
+                    this.addSelectionCard(coordinate, coordinate4326, featureName, layerName, feature, layerId, cardText);
                 });
             }
         },
@@ -654,20 +677,6 @@ export default {
                 }
             });
         },
-
-        /**
-        * closes this component and opens requestInhabitants component and executes makeRequest with the calculated geoJSON of this component
-        * @returns {void}
-        */
-        async requestInhabitants () {
-            const outerPolygon = geometryToGeoJson(this.isochroneFeatures[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
-
-            this.close();
-            await this.$nextTick();
-            this.setPopulationRequestActive(true);
-            this.setPopulationRequestGeometry(outerPolygon);
-        },
-
         getArrayDepth (array) {
             if (!Array.isArray(array)) {
                 return 0; // Kein Array, also Tiefe 0
@@ -710,11 +719,12 @@ export default {
                 });
 
                 analysisSet.results = this.isochroneFeatures;
+                analysisSet.resultsGeoJSON = featuresToGeoJsonCollection(this.isochroneFeatures);
                 analysisSet.inputs = {
                 // These lines have been changed back and forth so arguing my case for checking first if the value is undefined
                 // JSON.parse throws error on undefined
                 // So if the original variable is undefined, we don't copy undefined, but instead cause an error
-                    mode: this.mode ? JSON.parse(JSON.stringify(this.mode)) : undefined,
+                    mode: this.activeMode.type ? JSON.parse(JSON.stringify(this.activeMode.type)) : undefined,
                     coordinate: this.coordinate ? JSON.parse(JSON.stringify(this.coordinate)) : undefined,
                     selectedFacilityNames: this.selectedFacilityNames ? JSON.parse(JSON.stringify(this.selectedFacilityNames)) : undefined,
                     routingDirections: this.routingDirections ? JSON.parse(JSON.stringify(this.routingDirections)) : undefined,
@@ -763,23 +773,20 @@ export default {
             if (!this.isochroneFeatures.length) {
                 return false;
             }
-
             if (this.isochroneFeatures.length === this.steps.length) {
                 return geometryToGeoJson(this.isochroneFeatures[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
             }
 
             if (this.isochroneFeatures.length > this.steps.length) {
-                const format = new GeoJSON();
-                let featureUnion = format.writeFeatureObject(this.isochroneFeatures[0]),
+                let featureUnion = featureToGeoJson(this.isochroneFeatures[0], false, "EPSG:25832", "EPSG:25832"),
                     formattedFeature = [];
 
                 for (let i = 0; i < this.isochroneFeatures.length; i = i + this.steps.length) {
-                    featureUnion = union(featureUnion, format.writeFeatureObject(this.isochroneFeatures[i]));
+                    featureUnion = union(featureUnion, featureToGeoJson(this.isochroneFeatures[i]));
                 }
+                formattedFeature = geoJsonCollectionToFeatures(JSON.stringify(featureUnion));
 
-                formattedFeature = format.readFeatures(JSON.stringify(featureUnion));
-
-                return geometryToGeoJson(formattedFeature[0].getGeometry(), false, "EPSG:25832", "EPSG:25832");
+                return geometryToGeoJson(formattedFeature[0].getGeometry());
             }
 
             return false;
@@ -822,7 +829,6 @@ export default {
             this.setSteps([0, 0, 0]);
             this.setIsochroneFeatures([]);
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
-            this.resetIsochroneBBox();
         },
 
         /**
@@ -865,14 +871,6 @@ export default {
             link.click();
         },
 
-        async updateAnalysisSet () {
-            await this.createIsochrones();
-
-            this.dataSets[this.activeSet].results = this.isochroneFeatures;
-            this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
-            this.renderIsochrones(this.isochroneFeatures);
-        },
-
         /**
          * Updates the active mode and deselects active card if any.
          * @param {Object} obj - The mode object.
@@ -880,7 +878,7 @@ export default {
          */
         setActiveMode (obj) {
             this.activeMode = obj;
-            this.setMode(this.activeMode.type);
+            this.selectionCards = [];
             if (this.hasActiveSet) {
                 this.setActiveSet(null);
                 this.removeAll();
@@ -995,7 +993,7 @@ export default {
                 this.select.getFeatures().removeAt(index);
             }
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
-            if (this.mode === "path") {
+            if (this.activeMode.type === "route") {
                 this.reset();
             }
         },
@@ -1006,16 +1004,6 @@ export default {
 
         getScaleUnitByType (type) {
             return this.scaleUnits.find(s => s.type === type);
-        },
-
-        /**
-         *
-         *
-         * @param {Object} set - analysis set
-         * @returns {Boolean} True if the given set is the active set, false otherwise.
-         */
-        isSetActive (set) {
-            return this.activeSet === this.dataSets.indexOf(set);
         },
 
         /**
@@ -1101,7 +1089,7 @@ export default {
 
             this.removeAll();
             cards.forEach(card => {
-                this.setCoordinateFromFeature(card.feature, card.featureName, card.layerName);
+                this.setCoordinateFromFeature(card.feature, card.featureName, card.layerName, card.layerId);
             });
         },
 
@@ -1111,7 +1099,7 @@ export default {
          * @returns {void}
          */
         updateSelectedFacilityNames (newValue) {
-            if (this.mode !== "facility") {
+            if (this.activeMode.type !== "facility") {
                 return;
             }
             const oldValue = this.selectedFacilityNames,
@@ -1128,7 +1116,7 @@ export default {
                     if (difference.includes(layer.getLayer().get("name"))) {
                         this.addCardsByLayer(layer);
                     }
-                })
+                });
             }
             this.setSelectedFacilityNames(newValue);
         }
@@ -1156,7 +1144,7 @@ export default {
                 </h5>
             </div>
             <Dropdown-Autocomplete
-                v-if="mode === 'facility'"
+                v-if="activeMode.type === 'facility'"
                 :items="facilityNames ? facilityNames : []"
                 :model-value="selectedFacilityNames ? selectedFacilityNames : []"
                 :select-all="true"
@@ -1183,7 +1171,7 @@ export default {
             </div>
         </div>
         <SwitchInput
-            v-if="mode === 'facility'"
+            v-if="activeMode.type === 'facility'"
             :id="'featureOutline'"
             :aria="$t('additional:modules.tools.cosi.accessibilityAnalysis.setByFeatureOutline')"
             :checked="useOuterBoundaries"
@@ -1249,7 +1237,7 @@ export default {
             </div>
         </v-expand-transition>
         <div
-            v-if="mode !== 'path'"
+            v-if="activeMode.type !== 'path'"
         >
             <h5 class="mb-3">
                 Verkehrsmittel
@@ -1274,7 +1262,7 @@ export default {
             Berechnungsmethode
         </h5>
         <ButtonGroup
-            v-if="mode !== 'path'"
+            v-if="activeMode.type !== 'path'"
             class="mb-3"
             :buttons="scaleUnits.map(card => ({name: card.name, value: card.type}))"
             :pre-checked-value="scaleUnit"

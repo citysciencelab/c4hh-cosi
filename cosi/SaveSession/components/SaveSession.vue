@@ -66,23 +66,23 @@ export default {
                         "selectionCardsSubjectData"
                     ],
                     AccessibilityAnalysis: [
-                        "dataSets",
-                        "isochroneFeatures",
-                        "rawGeoJson",
-                        "mode",
-                        "coordinate",
-                        "clickCoordinate",
-                        "selectedFacilityNames",
-                        "useOuterBoundaries",
-                        "transportType",
-                        "scaleUnit",
-                        "distance",
-                        "steps",
-                        "active"
+                        "dataSets"
+                        // "isochroneFeatures",
+                        // "rawGeoJson",
+                        // "mode",
+                        // "coordinate",
+                        // "clickCoordinate",
+                        // "selectedFacilityNames",
+                        // "useOuterBoundaries",
+                        // "transportType",
+                        // "scaleUnit",
+                        // "distance",
+                        // "steps",
+                        // "active"
                     ],
                     Dashboard: [
-                        "statsFeatureFilter",
-                        "calculations"
+                        "calculations",
+                        "statsFeatureFilter"
                     ],
                     AreaSelector: [
                         "geometry"

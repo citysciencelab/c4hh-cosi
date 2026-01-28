@@ -34,6 +34,7 @@
                     "transportTypes": {
                         "clear": "-clear-",
                         "driving-car": "Car",
+                        "driving-hgv": "HGV",
                         "cycling-regular": "Bicycle",
                         "cycling-electric": "Bicycle (electric)",
                         "foot-walking": "Walking",

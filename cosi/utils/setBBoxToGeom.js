@@ -56,6 +56,7 @@ function setBBoxToGeom (app, bboxGeometry, layerlist) {
 
     filteredList.forEach(function (item) {
         item.attributes.bboxGeometry = bboxGeometry;
+        item.attributes.bboxGeometryExtent = bboxGeometry?.getExtent();
         updateSource(item, app);
     });
 

@@ -139,7 +139,7 @@ export default {
         modeMapping: {
             "point": "Referenzpunkten",
             "facility": "Einrichtungen",
-            "path": "Route"
+            "route": "Route"
         },
         showError: false
     }),

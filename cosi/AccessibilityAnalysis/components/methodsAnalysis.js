@@ -1,7 +1,6 @@
 import * as Extent from "ol/extent";
 import GeometryCollection from "ol/geom/GeometryCollection";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom";
-import {getSearchResultsCoordinates} from "../../utils/getSearchResultsGeom";
 import {
     lineString as turfLineString,
     featureCollection as turfFeatureCollection
@@ -9,7 +8,6 @@ import {
 import {default as turfBuffer} from "@turf/buffer";
 import GeoJSON from "ol/format/GeoJSON";
 import {transformFeatures} from "../../utils/features/transform";
-import {filterAllFeatures} from "../../utils/layer/filterAllFeatures";
 import {styleIsochroneFeatures} from "../utils/styleIsochroneFeatures.js";
 import {simplify} from "../../utils/geometry/simplify";
 import {getFlatCoordinates} from "../../utils/geometry/getFlatCoordinates";
@@ -27,13 +25,10 @@ export default {
         this.setSteps([0, 0, 0]);
         this.setIsochroneFeatures([]);
         try {
-            if (this.mode === "point" || this.mode === "facility") {
+            if (this.activeMode.type === "point" || this.activeMode.type === "facility") {
                 await this.createIsochronesPoint();
             }
-            else if (this.mode === "region") {
-                await this.createIsochronesRegion();
-            }
-            else if (this.mode === "path") {
+            else if (this.activeMode.type === "route") {
                 await this.createBufferFromDirections();
             }
         }
@@ -58,43 +53,7 @@ export default {
             // }
         }
     },
-    /**
-     * create isochrones features for selected several coordiantes
-     * TODO: break apart into smaller functions
-     * @fires Core#RadioRequestMapGetLayerByName
-     * @fires OpenRouteService#RadioRequestOpenRouteServiceRequestIsochrones
-     * @returns {void}
-     */
-    createIsochronesRegion: async function () {
-        const allActiveFeatures = filterAllFeatures(this.selectedLayer, this.isFeatureActive),
-            coordinates = this.getCoordinates(allActiveFeatures, this.useOuterBoundaries),
-            {distance, maxDistance, steps} = getDistances(parseFloat(this.scaleUnitValue), this.useTravelTimeIndex, this.time);
 
-        if (
-            coordinates !== null &&
-            this.transportType !== "" &&
-            this.scaleUnit !== "" &&
-            distance !== 0
-        ) {
-            this.cleanup();
-
-            const features = await this.getIsochrones({
-                transportType: this.transportType,
-                coordinates,
-                scaleUnit: this.scaleUnit,
-                distance,
-                maxDistance,
-                baseUrl: this.baseUrl
-            });
-
-            // TODO: get locale from store
-            this.setSteps(steps);
-            this.setIsochroneFeatures(features);
-        }
-        else {
-            this.inputReminder();
-        }
-    },
     /**
      * TODO: see TODOs in createIsochronesRegion
      * create isochrones features for selected several coordiantes
@@ -131,19 +90,11 @@ export default {
     },
     renderIsochrones (newFeatures) {
         this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
-
-        if (newFeatures.length === 0) {
-            setBBoxToGeom(this, this.areaSelectorGeom || this.boundingGeometry, layerCollection.getLayers());
-            return;
-        }
-
         styleIsochroneFeatures(newFeatures, this.isochroneColors);
         this.getLayerById("accessibility-analysis").getLayer().getSource().addFeatures(newFeatures);
         // Removing the delay of zoomtiextent so that the full content of canvas for screenshot will be got.
         this.zoomToExtent({extent: this.getLayerById("accessibility-analysis").getLayer().getSource().getExtent(), options: {duration: 0}});
-        if (this.mode !== "region") {
-            this.setIsochroneAsBbox();
-        }
+        this.setIsochroneAsBbox();
     },
 
     createBufferFromDirections: function () {
@@ -172,19 +123,6 @@ export default {
         this.setIsochroneFeatures(bufferFeatures);
     },
 
-    /**
-     * TODO: replace calls to this function with /addons/cosi/utils/getSearchResultsCoordinate.js
-     * @returns {void}
-     */
-    setSearchResultToOrigin: function () {
-        const coord = getSearchResultsCoordinates();
-
-        if (coord) {
-            this.setCoordinate([transformCoordinate(coord, this.projectionCode, "EPSG:4326")]);
-            this.setClickCoordinate(coord);
-            this.setSetBySearch(true);
-        }
-    },
     /**
      * reminds user to set inputs
      * @returns {void}
@@ -221,6 +159,9 @@ export default {
         const polygonGeometry = this.isochroneFeatures[this.isochroneFeatures.length === 4 ? 1 : 0].getGeometry(),
             geometryCollection = new GeometryCollection([polygonGeometry]);
 
+        this.allLayerConfigs.forEach(layerConfig => {
+            layerConfig.bboxGeometry = geometryCollection;
+        });
         setBBoxToGeom(this, geometryCollection, layerCollection.getLayers());
     },
 
@@ -229,7 +170,7 @@ export default {
     * @returns {void}
     */
     resetIsochroneBBox () {
-        setBBoxToGeom(this, this.areaSelectorGeom || this.boundingGeometry, layerCollection.getLayers());
+        setBBoxToGeom(this, this.boundingGeometry, layerCollection.getLayers());
     },
 
     getCoordinates: function (features, useOuterBoundaries) {

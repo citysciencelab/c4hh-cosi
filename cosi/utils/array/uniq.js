@@ -8,6 +8,6 @@ export default function uniq (array) {
         console.error("utils/array/uniq: The passed parameter must be an array, but got " + typeof array);
         return false;
     }
-    return [...new Set(array)];
+    return [...new Set(array)].filter(item => typeof item !== "undefined");
 }
 

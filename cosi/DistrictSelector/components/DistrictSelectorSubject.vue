@@ -13,7 +13,6 @@ import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
 import {getLayerById} from "../utils/getLayerById.js";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection";
-import layerFactory from "@core/layers/js/layerFactory";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import {MultiPolygon, Polygon} from "ol/geom";
 import Overlay from "ol/Overlay.js";
@@ -90,7 +89,7 @@ export default {
     },
     methods: {
         ...mapActions("Maps", ["zoomToExtent"]),
-        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId"]),
+        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId", "setBoundingGeometry"]),
 
         /**
          * Adds a new card to the cards array with the provided parameters.
@@ -139,6 +138,7 @@ export default {
                 if (foundEqualObject) {
                     return;
                 }
+
                 this.addCard(card.bboxGeomWKT, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel);
             });
         },
@@ -198,8 +198,10 @@ export default {
          */
         getBufferedFeature (wktFeature, buffer) {
             const feature = wktParser.decodeFeature(wktFeature),
-                geometries = getBoundingGeometry([feature], buffer).getGeometries(),
-                geojsonPolygons = geometries.map(polygon => turfPolygon(polygon.getCoordinates()));
+                geometryCollection = getBoundingGeometry([feature], buffer).getGeometries(),
+                geojsonPolygons = geometryCollection.map(polygon => turfPolygon(polygon.getCoordinates()));
+
+            this.setBoundingGeometry(geometryCollection);
 
             let merged = geojsonPolygons[0],
                 mergedPolygon = null;
@@ -364,6 +366,7 @@ export default {
 
             this.drawingLayer.getLayerSource().clear();
             this.drawingLayer.getLayerSource().addFeature(subjectFeature);
+            this.setBoundingGeometry(subjectFeature.getGeometry());
             this.updateLayerBbox(subjectFeature.getGeometry());
             this.setPopulationSize(card);
         },

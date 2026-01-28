@@ -34,6 +34,7 @@
                     "transportTypes": {
                         "clear": "-Leeren-",
                         "driving-car": "Auto",
+                        "driving-hgv": "Lkw",
                         "cycling-regular": "Rad",
                         "cycling-electric": "Rad (elektrisch)",
                         "foot-walking": "Gehen",

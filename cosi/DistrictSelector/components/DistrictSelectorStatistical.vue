@@ -49,7 +49,7 @@ export default {
         return {
             // color for the drag box button
             dragBoxButtonColor: "grey lighten-1",
-            // Indicates whether the district selector is currently active.
+            // Indicates whether this component is active
             isActive: false
         };
     },
@@ -102,26 +102,25 @@ export default {
     },
     watch: {
         cards () {
-            if (!this.isActive) {
-                const drawingLayer = getLayerById("district-selector");
-
-                if (typeof this.activeCard !== "undefined") {
-                    this.setSelectedDistrictLevelId(this.activeCard.districtLevelId);
-                    this.$nextTick(() => {
-                        this.updateSelectedFeatures(this.activeCard.selectedDistricts);
-                        this.updateLayerBbox(this.activeCard.bboxGeomWKT);
-                    });
-                }
+            if (!this.isActive && typeof this.activeCard !== "undefined") {
+                const drawingLayer = getLayerById("district-selector"),
+                    bboxGeomWKT = this.activeSubjectCard?.subjectFeatureWKT || this.activeCard.bboxGeomWKT,
+                    decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
 
                 if (this.activeSubjectCard) {
-                    const subjectFeature = wktParser.decodeFeature(this.activeSubjectCard.subjectFeatureWKT);
-
-                    drawingLayer.getLayerSource().addFeature(subjectFeature);
+                    drawingLayer.getLayerSource().addFeature(decodedFeature);
                     drawingLayer.getLayer().setVisible(true);
-                    this.allLayerConfigs.forEach(layerConfig => {
-                        layerConfig.bboxGeometry = subjectFeature.getGeometry();
-                    });
                 }
+
+                this.setBoundingGeometry(decodedFeature.getGeometry());
+                this.setSelectedDistrictLevelId(this.activeCard.districtLevelId);
+                this.$nextTick(() => {
+                    this.updateSelectedFeatures(this.activeCard.selectedDistricts);
+                    this.allLayerConfigs.forEach(layerConfig => {
+                        layerConfig.bboxGeometry = decodedFeature.getGeometry();
+                    });
+                    this.updateLayerBbox(bboxGeomWKT);
+                });
             }
         },
         /**
@@ -158,11 +157,13 @@ export default {
 
         visibleSubjectDataLayerConfigs: {
             handler () {
-                if (typeof this.activeSubjectCard !== "undefined") {
-                    this.updateLayerBbox(this.activeSubjectCard.subjectFeatureWKT);
-                    return;
+                if (this.isActive) {
+                    if (typeof this.activeSubjectCard !== "undefined") {
+                        this.updateLayerBbox(this.activeSubjectCard.subjectFeatureWKT);
+                        return;
+                    }
+                    this.updateLayerBbox(this.activeCard?.bboxGeomWKT);
                 }
-                this.updateLayerBbox(this.activeCard?.bboxGeomWKT);
             },
             deep: true
         }
@@ -206,6 +207,7 @@ export default {
 
         this.isActive = false;
         this.select.setActive(false);
+        this.isActive = false;
     },
     beforeUnmount () {
         this.removeInteraction(this.dragBox);
