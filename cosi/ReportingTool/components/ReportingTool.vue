@@ -85,7 +85,6 @@ export default {
         authorMaxLength: 35,
         reportTitle: "",
         reportTitleMaxLength: 50,
-
         freeHeadline: "",
         freeText: "",
         frontPageItems: [
@@ -154,6 +153,24 @@ export default {
         ...mapGetters("Modules/ReportingTool", ["infrastructureTableLimitConfig", "infrastructureTableLimitEnabledConfig", "readmeUrl", "reportLoader"]),
         ...mapGetters(["restServiceById", "visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
+
+        /**
+         * Checks whether more than one area is currently selected.
+         * @returns {Boolean} True if multiple areas are selected.
+         */
+        hasMultipleSelectedAreas () {
+            return Array.isArray(this.selectedDistrictNames) && this.selectedDistrictNames.length > 1;
+        },
+
+        /**
+         * Gets whether areas should be summed up in the report.
+         * If only one area is selected, summing up is effectively disabled (and the "selected area" column is not shown).
+         * @returns {Boolean} True if areas should be summed up in the report.
+         */
+        shouldAreasBeSummedUpInReport () {
+            return this.shouldAreasSummedUp && this.hasMultipleSelectedAreas;
+        },
+
 
         /**
          * Gets the category mapping defined in the assets file including the current accessibility analyses.
@@ -249,7 +266,15 @@ export default {
     },
     watch: {
         featuresListItems: "preparesInfrastructureData",
-        visibleSubjectDataLayerConfigs: "updateFeaturesList"
+        visibleSubjectDataLayerConfigs: "updateFeaturesList",
+        selectedDistrictNames: {
+            deep: true,
+            handler () {
+                if (this.selectedDistrictNames.length <= 1) {
+                    this.shouldAreasSummedUp = false;
+                }
+            }
+        }
     },
     created () {
         this.infrastructureTableLimit = this.infrastructureTableLimitConfig;
@@ -826,7 +851,7 @@ export default {
                             value = statFeature.category;
                             pdf.addCell(row, value, alignment);
                         }
-                        else if (index === 1 && this.shouldAreasSummedUp) {
+                        else if (index === 1 && this.shouldAreasBeSummedUpInReport) {
                             value = this.getTotal(statFeature, selectedDistrictLabels, printedYear, "jahr_");
                             pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
@@ -1219,7 +1244,7 @@ export default {
             let refDistrictName, district;
 
             for (district of districts) {
-                if (this.selectedLevels.includes(districtLevel.label) || !this.shouldAreasSummedUp) {
+                if (this.selectedLevels.includes(districtLevel.label) || !this.shouldAreasBeSummedUpInReport) {
                     columns.push(district.getLabel());
                 }
 
@@ -1233,7 +1258,7 @@ export default {
                 this.getStatCols(districtLevel.referenceLevel, refDistrictNames, columns);
             }
 
-            if (this.shouldAreasSummedUp) {
+            if (this.shouldAreasBeSummedUpInReport) {
                 return [this.areaColumnName, ...columns];
             }
             return columns;

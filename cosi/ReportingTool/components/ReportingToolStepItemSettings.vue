@@ -31,12 +31,33 @@ export default {
             higherDistrictLevel: [],
             selectedAreasNameMaxLength: 50,
             selectedDistricts: [],
-            selectedYear: null
+            selectedYear: null,
+            stableSelectedDistrictNames: [],
+            lastUserShouldAreasSummedUp: true,
+            didInitialSummariseSync: false
         };
     },
     computed: {
         ...mapGetters("Modules/Dashboard", ["items"]),
-        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevelId", "selectedStatFeatures", "selectedDistrictLevel"]),
+        ...mapGetters(
+            "Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevelId", "selectedStatFeatures", "selectedDistrictLevel", "selectedDistrictNames"]
+        ),
+
+        /**
+         * Determines whether the "summarise areas" controls must be disabled.
+         * @returns {boolean} True if the summarise areas controls must be disabled.
+         */
+        isSummariseAreasDisabled () {
+            return this.stableSelectedDistrictNames.length <= 1;
+        },
+
+        /**
+         * Gets the effective checked state of the "summarise areas" switch.
+         * @returns {boolean} The effective checked state of the switch.
+         */
+        effectiveShouldAreasSummedUp () {
+            return !this.isSummariseAreasDisabled && this.shouldAreasSummedUp;
+        },
 
         /**
          * Gets the selectable years based on the selected statistical features.
@@ -81,6 +102,35 @@ export default {
     watch: {
         selectedYear (newVal) {
             this.$emit("update:statistical-year", newVal);
+        },
+
+        selectedDistrictNames: {
+            immediate: true,
+            deep: true,
+            async handler (names) {
+                await this.$nextTick();
+
+                const arr = Array.isArray(names) ? names : [],
+                    unique = [...new Set(arr)],
+                    prevLen = this.stableSelectedDistrictNames.length,
+                    newLen = unique.length;
+
+                this.stableSelectedDistrictNames = unique;
+
+                if (newLen <= 1) {
+                    if (this.shouldAreasSummedUp) {
+                        this.lastUserShouldAreasSummedUp = true;
+                        this.shouldAreasSummedUp = false;
+                    }
+                    this.didInitialSummariseSync = true;
+                    return;
+                }
+
+                if (!this.didInitialSummariseSync || prevLen <= 1) {
+                    this.shouldAreasSummedUp = this.lastUserShouldAreasSummedUp;
+                    this.didInitialSummariseSync = true;
+                }
+            }
         }
     },
     mounted () {
@@ -88,6 +138,20 @@ export default {
     },
     methods: {
         uniqueId,
+
+        /**
+         * Toggles the "summarise areas" switch when the control is enabled.
+         * @returns {void}
+         */
+        onToggleSummariseAreas () {
+            if (!this.isSummariseAreasDisabled) {
+                const nextVal = !this.shouldAreasSummedUp;
+
+                this.shouldAreasSummedUp = nextVal;
+                this.lastUserShouldAreasSummedUp = nextVal;
+                this.didInitialSummariseSync = true;
+            }
+        },
 
         /**
          * Emits the updated name for selected areas.
@@ -107,7 +171,6 @@ export default {
         }
     }
 };
-
 </script>
 
 <template lang="html">
@@ -121,18 +184,20 @@ export default {
             <SwitchInput
                 id="summarise-areas"
                 :aria="$t('additional:modules.cosi.reportingTool.label.summariseStatisticalAreas')"
-                :checked="shouldAreasSummedUp"
-                :interaction="() => shouldAreasSummedUp = !shouldAreasSummedUp"
+                :checked="effectiveShouldAreasSummedUp"
+                :disabled="isSummariseAreasDisabled"
+                :interaction="onToggleSummariseAreas"
                 :label="$t('additional:modules.cosi.reportingTool.label.summariseStatisticalAreas')"
                 class="mb-3"
             />
             <InputText
-                v-if="shouldAreasSummedUp"
+                v-if="effectiveShouldAreasSummedUp"
                 id="summed-columns"
                 :model-value="selectedAreasName"
                 :label="$t('additional:modules.cosi.reportingTool.label.summedColumns')"
                 :placeholder="$t('additional:modules.cosi.reportingTool.label.summedColumns')"
                 :max-length="selectedAreasNameMaxLength.toString()"
+                :disabled="!effectiveShouldAreasSummedUp"
                 @update:model-value="emitSelectedAreasName"
             />
             <TagGroup
