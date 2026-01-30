@@ -6,8 +6,6 @@ import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapGetters} from "vuex";
 import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
-import {VChip} from "vuetify/components/VChip";
-import {VIcon} from "vuetify/components/VIcon";
 
 export default {
     name: "DashboardToolbar",
@@ -16,9 +14,7 @@ export default {
         FlatButton,
         IconButton,
         InputText,
-        ToolBar,
-        VChip,
-        VIcon
+        ToolBar
     },
     props: {
         statsFeatureFilter: {

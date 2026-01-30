@@ -82,7 +82,9 @@ export default {
                     ],
                     Dashboard: [
                         "calculations",
-                        "statsFeatureFilter"
+                        "statsFeatureFilter",
+                        "timestamps",
+                        "timestampsFiltered"
                     ],
                     AreaSelector: [
                         "geometry"

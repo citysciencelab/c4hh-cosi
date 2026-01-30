@@ -103,19 +103,18 @@ export default {
     watch: {
         cards () {
             if (!this.isActive && typeof this.activeCard !== "undefined") {
-                const drawingLayer = getLayerById("district-selector"),
-                    bboxGeomWKT = this.activeSubjectCard?.subjectFeatureWKT || this.activeCard.bboxGeomWKT,
+                const bboxGeomWKT = this.activeSubjectCard?.subjectFeatureWKT || this.activeCard.bboxGeomWKT,
                     decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
 
                 if (this.activeSubjectCard) {
-                    drawingLayer.getLayerSource().addFeature(decodedFeature);
-                    drawingLayer.getLayer().setVisible(true);
+                    this.addSubjectAreaToLayer(decodedFeature);
                 }
 
                 this.setBoundingGeometry(decodedFeature.getGeometry());
                 this.setSelectedDistrictLevelId(this.activeCard.districtLevelId);
                 this.$nextTick(() => {
                     this.updateSelectedFeatures(this.activeCard.selectedDistricts);
+                    this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts);
                     this.allLayerConfigs.forEach(layerConfig => {
                         layerConfig.bboxGeometry = decodedFeature.getGeometry();
                     });
@@ -186,10 +185,7 @@ export default {
 
     },
     activated () {
-        const drawingLayer = getLayerById("district-selector");
-
-        drawingLayer.getLayerSource().clear();
-        drawingLayer.getLayer().setVisible(false);
+        this.clearSubjectAreaFromLayer();
 
         this.cardsSubject.forEach((card, index) => {
             if (card.status === "active") {
@@ -207,7 +203,6 @@ export default {
 
         this.isActive = false;
         this.select.setActive(false);
-        this.isActive = false;
     },
     beforeUnmount () {
         this.removeInteraction(this.dragBox);
@@ -228,6 +223,18 @@ export default {
         ...mapMutations("Modules/Filter", ["setFilterGeometry"]),
 
         /**
+         * Adds the subject area feature to the subject-area layer.
+         * @param {ol/Feature} feature - The feature to add to the layer.
+         * @returns {void}
+         */
+        addSubjectAreaToLayer (feature) {
+            const layer = getLayerById("subject-area");
+
+            layer.getLayerSource().addFeature(feature);
+            layer.getLayer().setVisible(true);
+        },
+
+        /**
          * Sets the district level to the given id.
          * @param {String} id - The layer id of the selected district lelvel.
          * @returns {void}
@@ -245,6 +252,17 @@ export default {
          */
         clearFeatures () {
             this.select.getFeatures().clear();
+        },
+
+        /**
+         * Clears the subject area from the subject-area layer.
+         * @returns {void}
+         */
+        clearSubjectAreaFromLayer () {
+            const layer = getLayerById("subject-area");
+
+            layer.getLayerSource().clear();
+            layer.getLayer().setVisible(false);
         },
 
         /**
@@ -304,7 +322,6 @@ export default {
 
                 this.setSelectedDistrictsCollection(evt.target);
                 this.setSelectedDistrictNames([...new Set(selectedNames)]);
-
             });
 
             featureCollection.on("remove", (evt) => {
@@ -435,8 +452,8 @@ export default {
          */
         updateExtent () {
             const extent = calculateExtent(this.selectedFeatures, parseInt(0, 10)),
-                bboxGeom = getBoundingGeometry(this.selectedFeatures, 0),
-                selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
+                bboxGeom = getBoundingGeometry(this.selectedFeatures, 0);
+
 
             this.cards.push({
                 badgeList: [{
@@ -447,7 +464,7 @@ export default {
                 }],
                 data: [
                     {value: "Bezugsebene: " + this.selectedDistrictLevel.label},
-                    {icon: "bi-map", label: "Gebiete: " + selectedDistricts.map(district => district.getName())},
+                    {icon: "bi-map", label: "Gebiete: " + this.selectedDistrictNames},
                     {icon: "bi-people", label: "Einwohner: Berechnung läuft..."}
                 ],
                 districtLevelId: this.selectedDistrictLevel.layerId,
@@ -457,7 +474,7 @@ export default {
                 features: wktParser.encodeFeatures(this.selectedFeatures.slice()),
                 bboxGeomWKT: wktParser.encodeGeometry(bboxGeom),
                 icon: "bi-image",
-                selectedDistricts: selectedDistricts.map(district => district.getName()),
+                selectedDistricts: this.selectedDistrictNames,
                 status: ""
             });
 
@@ -467,14 +484,7 @@ export default {
             if (extent) {
                 this.setBoundingGeometry(bboxGeom);
                 this.setFilterGeometry(bboxGeom);
-
-                this.loadStatFeatures({
-                    districtLevel: this.selectedDistrictLevel,
-                    getStatFeatures: getFeature.getFeaturePOST,
-                    districts: selectedDistricts
-                }).then(() => {
-                    this.generateTable();
-                });
+                this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts);
             }
             else {
                 this.resetView();
@@ -537,6 +547,23 @@ export default {
                 });
             }
         },
+
+        /**
+         * Updates the statistical features based on the selected district level and the selected districts.
+         * @param {Object} selectedDistrictLevel - The selected district level.
+         * @param {Object[]} selectedDistricts - Array of the selected districts.
+         * @return {void}
+         */
+        updateStatFeatures (selectedDistrictLevel, selectedDistricts) {
+            this.loadStatFeatures({
+                districtLevel: selectedDistrictLevel,
+                getStatFeatures: getFeature.getFeaturePOST,
+                districts: selectedDistricts
+            }).then(() => {
+                this.generateTable();
+            });
+        },
+
         /**
          * Toggles the status of a card at the specified index.
          * @param {Number} index - Index of the card to toggle
