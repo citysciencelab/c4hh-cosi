@@ -915,6 +915,7 @@ export default {
 
             this.generatedName = newTitle;
             this.analysisName = newTitle;
+            this.removePointMarker();
             if (this.hasActiveSet) {
                 this.setActiveSet(null);
                 this.removeAll();
