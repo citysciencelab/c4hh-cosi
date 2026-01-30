@@ -21,6 +21,7 @@ import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
 import wktParser from "../../utils/wktParser";
 import WPS from "@shared/js/api/wps.js";
+import truncate from "@turf/truncate";
 
 export default {
     name: "DistrictSelectorSubject",
@@ -207,7 +208,7 @@ export default {
                 mergedPolygon = null;
 
             for (let i = 1; i < geojsonPolygons.length; i++) {
-                merged = turfUnion(merged, geojsonPolygons[i]);
+                merged = turfUnion(truncate(merged, {precision: 3, mutate: true}), truncate(geojsonPolygons[i], {precision: 3, mutate: true}));
             }
 
             if (merged.geometry.type === "Polygon") {

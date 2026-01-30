@@ -17,6 +17,7 @@
     "@turf/helpers": "^6.5.0",
     "@turf/intersect": "^6.5.0",
     "@turf/simplify": "^6.5.0",
+    "@turf/truncate": "^6.5.0",
     "@turf/union": "^6.5.0",
     "chartjs-plugin-annotation": "3.1.0",
     "d3-array": "^3.1.1",
@@ -31,10 +32,10 @@
     "tableify": "^1.1.1",
     "turf-featurecollection": "^1.0.1",
     "vue-chartjs": "^5.3.1",
+    "vue-draggable-next": "2.3.0",
     "vue-inline-svg": "^2.1.0",
     "vue-json-excel": "^0.3.0",
     "vuetify": "3.11.x",
-    "vue-draggable-next": "2.3.0",
     "xlsx": "^0.16.9"
   }
 }
