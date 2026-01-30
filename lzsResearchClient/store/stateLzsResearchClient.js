@@ -17,6 +17,10 @@
 
  * Addon state
  * @property {Boolean} showLoadingSpinner - Show loading spinner or not
+ * @property {Object|null} globalError - Global error message, {type: "", message: ""}
+ * @property {String|null} dispatchRequestUrl - Url for dispatch requests to gis portal
+ * @property {String|null} requestToken - Token for requests to gis portal
+ * @property {Number|null} requestTokenExpireTime - Expire time of request token
  * @property {Array} dataClassList - List of data classes (see fetchDataClassList) used in tab search
  * @property {Array} archiveList - List of archives to use in TabSearch
  * @property {Object} archiveYears - Map of archive IDs to year data { [archiveId]: { year: "2022", archiveName: ["xyz", "abc"] } }
@@ -43,6 +47,10 @@ const state = {
 
     // Addon state
     showLoadingSpinner: false,
+    globalError: null,
+    dispatchRequestUrl: null,
+    requestToken: null,
+    requestTokenExpireTime: null,
     dataClassList: [],
     apiBasePath: "",
     searchAttributeResponse: [],

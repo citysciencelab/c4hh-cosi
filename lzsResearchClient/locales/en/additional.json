@@ -6,6 +6,10 @@
             "loadingSpinnerText": {
                 "general": "Data is loading. Please wait..."
             },
+            "globalError": {
+                "title": "LZS: Error during initialization",
+                "content": "Please try again later."
+            },
             "generalErrorMessage": "An unknown error has occured.",
             "tabs": {
                 "backToSearchButtonLabel": "Back to search",

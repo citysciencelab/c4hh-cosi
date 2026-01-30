@@ -1,17 +1,37 @@
 import axios from "axios";
 import {buildEndpointUrl} from "../utils/buildEndpointUrl";
 
-// will be imported later..
-const Token = "";
-
 export default {
+    /**
+     * Fetch a new request token, store it, and set the refresh schedule.
+     *
+     * @param {object} context - Vuex action context (commit, state).
+     */
+    async fetchRequestToken ({commit, state}) {
+        try {
+            const response = await axios.get(
+                buildEndpointUrl(state.dispatchRequestUrl, {
+                    preventCache: Date.now()
+                })
+            );
+
+            commit("setRequestToken", response.data.token);
+            commit("setRequestTokenExpireTime", response.data.expirationTime);
+        }
+        catch (error) {
+            commit("setGlobalError", {
+                type: "server",
+                message: "Failed to fetch request token."
+            });
+        }
+    },
     /**
      * Fetch the dataclass list from the API and store it in Vuex.
      * @param {object} context - Vuex action context (state, commit, dispatch).
      */
     async fetchDataClassList ({state, commit, dispatch}) {
         const params = {
-                Token: Token
+                Token: state.requestToken
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/dataclass/list`, params);
 
@@ -40,7 +60,7 @@ export default {
     async searchByAttribute ({state, commit, dispatch}, payload) {
         commit("setSearchAttributeResponse", []);
         const params = {
-                Token: Token,
+                Token: state.requestToken,
                 f: "json",
                 preventCache: Date.now()
             },
@@ -86,7 +106,7 @@ export default {
      */
     async fetchYears ({state, commit, dispatch}, archiveId) {
         const params = {
-                Token: Token,
+                Token: state.requestToken,
                 f: "json",
                 preventCache: Date.now()
             },
@@ -114,7 +134,7 @@ export default {
         commit("setSearchAttributeResponse", []);
 
         const params = {
-                Token: Token,
+                Token: state.requestToken,
                 f: "json",
                 preventCache: Date.now()
             },
@@ -153,7 +173,7 @@ export default {
     async fetchPrimarydata ({state, commit, dispatch}, payload) {
         const {archiveId, instanceId} = payload,
             params = {
-                Token: Token,
+                Token: state.requestToken,
                 f: "json",
                 preventCache: Date.now()
             },
@@ -182,7 +202,7 @@ export default {
     async downloadPreview ({state, dispatch}, payload) {
         const {archiveId, instanceId, primaryDataId} = payload,
             params = {
-                Token: Token,
+                Token: state.requestToken,
                 f: "json",
                 preventCache: Date.now()
             },
@@ -222,7 +242,7 @@ export default {
     downloadDatafile ({state}, payload) {
         const {archiveId, instanceId, primaryDataId} = payload,
             params = {
-                Token: Token
+                Token: state.requestToken
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}/${primaryDataId}/content`, params);
 

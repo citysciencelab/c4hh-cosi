@@ -11,7 +11,19 @@ export function buildEndpointUrl (url, queryParameters) {
     let endpointUrl = url;
 
     if (Object.keys(queryParameters).length) {
-        endpointUrl += `?${querystring.stringify(queryParameters)}`;
+        // Split hash fragment if present
+        const [baseUrl, hash] = endpointUrl.split("#", 2);
+
+        // Check if there are already query parameters
+        const hasQuery = baseUrl.includes("?");
+        const paramString = querystring.stringify(queryParameters);
+
+        // Append parameters correctly
+        const newUrl = hasQuery
+            ? `${baseUrl}&${paramString}`
+            : `${baseUrl}?${paramString}`;
+
+        endpointUrl = hash !== undefined ? `${newUrl}#${hash}` : newUrl;
     }
 
     // In order to debug the generated endpoint URL and query parameters, use this line.

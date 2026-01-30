@@ -1,4 +1,4 @@
-import {shallowMount} from "@vue/test-utils";
+import {flushPromises, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 
@@ -11,23 +11,31 @@ describe("addons/lzsResearchClient/tests/unit/LzsResearchClient.spec.js", () => 
     beforeEach(() => {
         store = createStore({
             modules: {
-                namespaced: true,
                 Modules: {
                     namespaced: true,
                     modules: {
                         LzsResearchClient: {
                             namespaced: true,
                             state: () => ({
-                                showLoadingSpinner: false
+                                showLoadingSpinner: false,
+                                requestToken: "test-token"
                             }),
                             getters: {
                                 showLoadingSpinner: state => state.showLoadingSpinner,
-                                errorMessage: () => ""
+                                errorMessage: () => "",
+                                globalError: state => state.globalError ?? null,
+                                requestToken: state => state.requestToken
                             },
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {
                                     state.showLoadingSpinner = payload;
+                                },
+                                setGlobalError (state, payload) {
+                                    state.globalError = payload;
                                 }
+                            },
+                            actions: {
+                                fetchRequestToken: () => Promise.resolve("mocked-request-token")
                             }
                         }
                     }
@@ -57,7 +65,27 @@ describe("addons/lzsResearchClient/tests/unit/LzsResearchClient.spec.js", () => 
         expect(wrapper.exists()).to.be.true;
     });
 
-    it("should have showLoadingSpinner state set to false", () => {
+    it("should have requestToken state set to 'test-token'", () => {
+        expect(store.state.Modules.LzsResearchClient.requestToken).to.equal("test-token");
+    });
+
+    it("should have showLoadingSpinner state set to false", async () => {
+        // Wait for all promises in mounted to resolve
+        await flushPromises();
+
         expect(store.state.Modules.LzsResearchClient.showLoadingSpinner).to.equal(false);
+    });
+
+    it("should set globalError state when setGlobalError mutation is committed", async () => {
+        const errorPayload = {
+            type: "server",
+            message: "Test error message"
+        };
+
+        store.commit("Modules/LzsResearchClient/setGlobalError", errorPayload);
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find("confirm-modal-stub").attributes("showmodal")).to.equal("true");
     });
 });

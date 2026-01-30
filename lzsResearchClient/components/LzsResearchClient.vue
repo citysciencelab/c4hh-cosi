@@ -1,5 +1,5 @@
 <script>
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import TabContainer from "./shared/TabContainer.vue";
@@ -7,17 +7,26 @@ import TabDetails from "./TabDetails.vue";
 import TabResult from "./TabResult.vue";
 import TabSearch from "./TabSearch.vue";
 import TabDownload from "./TabDownload.vue";
+import ConfirmModal from "@shared/modules/modals/components/ConfirmModal.vue";
 
 export default {
     name: "LzsResearchClient",
     components: {
         SpinnerItem,
         IconButton,
-        TabContainer
+        TabContainer,
+        ConfirmModal
+    },
+    data () {
+        return {
+            modalDismissed: false
+        };
     },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
             "showLoadingSpinner",
+            "requestToken",
+            "globalError",
             "errorMessage"
         ]),
         errorOccured () {
@@ -67,7 +76,6 @@ export default {
             ];
         }
     },
-
     /**
      * KeepAlive: This addon uses the Masterportal module caching feature,
      * see docs/Dev/vueComponents/ModuleCaching.md
@@ -75,16 +83,20 @@ export default {
      * The activated and deactivated hooks are called, when the component is
      * shown or closed via "menu" link.
      */
-    async mounted () {
-        // this.setShowLoadingSpinner(true);
-    },
-    activated () {
-        // Handle KeepAlive visibility. Triggered if component is activated
+    async activated () {
+        this.setShowLoadingSpinner(true);
+
+        await this.fetchRequestToken();
+
+        this.setShowLoadingSpinner(false);
     },
     deactivated () {
         // Handle KeepAlive visibility. Triggered if component is deactivated
     },
     methods: {
+        ...mapActions("Modules/LzsResearchClient", [
+            "fetchRequestToken"
+        ]),
         ...mapMutations("Modules/LzsResearchClient", [
             "setShowLoadingSpinner",
             "setErrorMessage"
@@ -126,12 +138,21 @@ export default {
             </p>
         </div>
 
-        <template v-else>
+        <template v-else-if="requestToken">
             <TabContainer
                 :tabs="tabs"
                 initial-active-tab-id="tabSearch"
             />
         </template>
+
+        <ConfirmModal
+            :show-modal="modalDismissed !== true && globalError !== null"
+            :modal-title="$t('additional:modules.lzsResearchClient.globalError.title')"
+            :modal-content="$t('additional:modules.lzsResearchClient.globalError.content')"
+            :button-cancel-hidden="true"
+            :button-close-hidden="true"
+            @clicked-confirm="modalDismissed = true"
+        />
     </div>
 </template>
 
