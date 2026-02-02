@@ -97,6 +97,7 @@
                     "considerTrafficFlow": "Consider traffic flow",
                     "calculateAccessibility": "Calculate accessibility",
                     "inhabitants": "Inhabitants",
+                    "area": "Area",
                     "cardTitle": "Accessibility ",
                     "titleHint": "Note: You can choose any name you like. If you do not enter a name, an analysis name will be created automatically."
                 }

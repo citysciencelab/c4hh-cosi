@@ -97,6 +97,7 @@
                     "considerTrafficFlow": "Verkehrsfluss berücksichtigen",
                     "calculateAccessibility": "Erreichbarkeit berechnen",
                     "inhabitants": "Einwohner",
+                    "area": "Fläche",
                     "cardTitle": "Erreichbarkeit ",
                     "titleHint": "Hinweis: Sie können den Namen frei wählen. Wenn Sie keinen eingeben, wird automatisch ein Analyse-Name erstellt."
                 }

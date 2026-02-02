@@ -45,6 +45,7 @@ import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
 import uniq from "../../utils/array/uniq";
 import VectorLayer from "ol/layer/Vector.js";
 import WPS from "@shared/js/api/wps.js";
+import {Polygon} from "ol/geom";
 
 export default {
     name: "AccessibilityAnalysis",
@@ -153,7 +154,7 @@ export default {
     },
     computed: {
         ...mapGetters(["allLayerConfigs", "restServiceById", "visibleSubjectDataLayerConfigs"]),
-        ...mapGetters("Language", ["currentLocale"]),
+        ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Maps", ["clickCoordinate", "getVisibleLayerList", "projectionCode"]),
         ...mapGetters("Modules/AccessibilityAnalysis", Object.keys(getters)),
         ...mapGetters("Modules/DistrictSelector", ["boundingGeometry"]),
@@ -770,7 +771,8 @@ export default {
                     steps: this.steps ? JSON.parse(JSON.stringify(this.steps)) : [],
                     selectionCards: this.selectionCards,
                     title: this.analysisName,
-                    id: this.generateAnalysisId(this.analysisName)
+                    id: this.generateAnalysisId(this.analysisName),
+                    areaInSqKm: new Polygon(this.getOuterPolygon().coordinates).getArea() / (1000 * 1000)
                 };
                 this.dataSets.unshift(analysisSet);
                 this.setActiveSet(0);
@@ -1084,7 +1086,9 @@ export default {
                 pointDes = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].layerName : "Mehrere: " + [...new Set(data.inputs.selectionCards.map(card => card.layerName))],
                 coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].text : "",
                 icon = data.inputs.selectionCards[0]?.icon,
-                population = data.inputs.einwohner;
+                population = data.inputs.einwohner,
+                areaInSqKm = data.inputs.areaInSqKm,
+                locale = this.currentLocale || "de-DE";
 
             result.push({label: name, value: title});
             if (data.inputs.selectionCards.length > 1 && data.inputs.useOuterBoundaries) {
@@ -1094,6 +1098,10 @@ export default {
                 result.push({icon: icon, label: pointDes, value: coordinate});
 
             }
+            result.push({
+                icon: "bi bi-bounding-box",
+                label: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.area") + ": " + areaInSqKm.toLocaleString(locale) + "\u00A0km²"
+            });
             result.push({
                 icon: "bi bi-people",
                 label: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.inhabitants") + ": " + population
