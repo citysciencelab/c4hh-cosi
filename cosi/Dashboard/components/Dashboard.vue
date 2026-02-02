@@ -23,6 +23,7 @@ import {generateChartForDistricts, generateChartForCorrelation, generateChartsFo
 import {prepareTableExportWithTimeline} from "../utils/export";
 import composeFilename from "../../utils/composeFilename";
 import exportXlsx from "../../utils/exportXlsx";
+import DashboardChartView from "./DashboardChartView.vue";
 import DashboardToolbar from "./DashboardToolbar.vue";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import TableCell from "./TableCell.vue";
@@ -38,6 +39,7 @@ export default {
     name: "Dashboard",
     components: {
         AlertMessage,
+        DashboardChartView,
         DashboardToolbar,
         TableCell,
         TableRowMenu,
@@ -81,6 +83,7 @@ export default {
                 A: null,
                 B: null
             },
+            tableOrChart: "table",
             toolOffset: 0,
             calculationData: {
                 id: "",
@@ -693,10 +696,14 @@ export default {
                         :stats-feature-filter="statsFeatureFilter"
                         @setStatsFeatureFilter="setStatsFeatureFilter"
                         @exportTable="exportTable"
+                        @showView="tableOrChart = $event"
                         @setTimestampsValues="updateTimestampsValues"
                         @start-calculation="onStartCalculation"
                     />
-                    <v-row class="dashboard-table-wrapper">
+                    <v-row
+                        v-if="tableOrChart === 'table'"
+                        class="dashboard-table-wrapper"
+                    >
                         <v-data-table-virtual
                             ref="dashboard-table"
                             height="560"
@@ -873,6 +880,9 @@ export default {
                             </template>
                         </v-data-table-virtual>
                     </v-row>
+                    <DashboardChartView
+                        v-else-if="tableOrChart === 'chart'"
+                    />
                 </v-container>
             </v-main>
         </v-app>

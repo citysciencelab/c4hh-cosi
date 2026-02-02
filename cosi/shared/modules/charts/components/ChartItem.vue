@@ -83,6 +83,10 @@ export default {
         }
     },
 
+    watch: {
+        data: "loadChartData"
+    },
+
     mounted () {
         this.initializeTags();
         this.loadInitialChart();
@@ -121,17 +125,23 @@ export default {
          */
         loadChartData (selectedLabel) {
             const entry = this.data.find(
-                    item => item.name === selectedLabel && item.data
-                ),
-                values = Object.values(entry.data),
-                labels = Object.keys(entry.data),
-                dataset = {
+                item => item.name === selectedLabel && item.data
+            );
+
+            if (!entry) {
+                this.initializeTags();
+                this.loadInitialChart();
+                return;
+            }
+            // eslint-disable-next-line one-var
+            const labels = [... new Set(entry.data.flatMap(dataSet => Object.keys(dataSet)))],
+                datasets = entry.data.map(dataSet => ({
                     backgroundColor: "#3C5F94",
                     borderColor: "#3C5F94",
                     borderWidth: 2,
                     fill: false,
-                    data: values
-                };
+                    data: Object.values(dataSet)
+                }));
 
             this.chartTitle = entry.title;
             this.chartOptions.plugins.title.text = entry.title;
@@ -139,20 +149,20 @@ export default {
             if (this.chartMode === "bar") {
                 this.chartdata.bar = {
                     labels,
-                    datasets: [dataset]
+                    datasets
                 };
             }
             else if (this.chartMode === "line") {
                 this.chartdata.line = {
                     labels,
-                    datasets: [
+                    datasets: datasets.map(dataset => (
                         {
                             ...dataset,
                             fill: false,
                             pointBorderColor: "#3C5F94",
                             pointBackgroundColor: "#3C5F94"
                         }
-                    ]
+                    ))
                 };
             }
             this.reloadChart++;

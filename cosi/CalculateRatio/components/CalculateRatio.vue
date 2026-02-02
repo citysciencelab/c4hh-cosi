@@ -841,11 +841,11 @@ export default {
                 this.dataSets[this.activeSet].results.forEach(result => {
                     if (type.key in result) {
                         if (!chartData[idx].data) {
-                            chartData[idx].data = {};
+                            chartData[idx].data = [{}];
                         }
 
-                        chartData[idx].data = {
-                            ...chartData[idx].data,
+                        chartData[idx].data[0] = {
+                            ...chartData[idx].data[0],
                             [result.scope]: result[type.key]
                         };
                     }

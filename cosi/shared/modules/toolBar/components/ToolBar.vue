@@ -38,15 +38,15 @@ export default {
             default: false
         }
     },
-    emits: ["exportTable", "update:setting-items"],
+    emits: ["exportTable", "update:setting-items", "showView"],
     data () {
         return {
             optionalDropdownInstance: null,
             filterMenuDropdownInstance: null,
             filterButtonId: "add-filter-button",
             groupButtons: [
-                {"icon": "bi-table", "name": "Tabelle"},
-                {"icon": "bi-bar-chart", "name": "Diagramm"}
+                {"value": "table", "icon": "bi-table", "name": "Tabelle"},
+                {"value": "chart", "icon": "bi-bar-chart", "name": "Diagramm"}
             ]
         };
     },
@@ -236,7 +236,7 @@ export default {
                 class="mb-3 me-3"
                 :buttons="groupButtons"
                 group="tableDiagramm"
-                @show-view="() => {}"
+                @show-view="$emit('showView', $event)"
             />
             <SwitchInput
                 v-if="showDetail"
