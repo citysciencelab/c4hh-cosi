@@ -99,7 +99,14 @@
                     "inhabitants": "Einwohner",
                     "area": "Fläche",
                     "cardTitle": "Erreichbarkeit ",
-                    "titleHint": "Hinweis: Sie können den Namen frei wählen. Wenn Sie keinen eingeben, wird automatisch ein Analyse-Name erstellt."
+                    "titleHint": "Hinweis: Sie können den Namen frei wählen. Wenn Sie keinen eingeben, wird automatisch ein Analyse-Name erstellt.",
+                    "overwriteSubjectData": "Fachdatengebiet überschreiben?",
+                    "newSubjectDataNote": "Sie erstetzen das aktuelle Fachdatengebiet durch das neu ausgewählte Gebiet. Das alte Gebiet wird gelöscht und kann danach nicht wiederhergestellt werden.",
+                    "confirmSubjectDataArea": "Ja, neues Gebiet verwenden",
+                    "cancelSubjectDataArea": "Nein, abbrechen.",
+                    "currentSubjectDataArea": "aktuelles Fachdatengebiet",
+                    "activeSubjectDataArea": "Fachdatengebiet ist bereits aktiv",
+                    "activeSubjectDataAreaText": "Die ausgewählte Erreichbarkeit ist bereits das Fachdatengebiet. Wählen Sie eine andere Erreichbarkeitsanalyse oder gehen Sie in die Gebietsauswahl um ein neues Fachdatengebiet festzulegen."
                 }
             }
         }

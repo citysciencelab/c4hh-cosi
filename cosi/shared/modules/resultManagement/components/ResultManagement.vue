@@ -41,9 +41,13 @@ export default {
         title: {
             type: String,
             default: "additional:modules.tools.cosi.accessibilityAnalysis.resultManagement.title"
+        },
+        subjectData: {
+            type: Boolean,
+            default: false
         }
     },
-    emits: ["downloadAll", "removeAllData", "updateActiveSet", "removeSet"],
+    emits: ["downloadAll", "removeAllData", "updateActiveSet", "removeSet", "subjectDataSet"],
     methods: {
         uniqueId
     }
@@ -94,6 +98,7 @@ export default {
             >
                 <Card
                     :title="set.title"
+                    :badge-list="set.badge"
                     :data="set.data"
                     :downloadable="set.downloadable"
                     :icon="set.icon"
@@ -102,13 +107,22 @@ export default {
                     :visible="set.visible"
                     :data-index="index"
                     :layout-style="cardLayoutStyle"
+                    :subject-data="set.subjectData"
+                    :subject-data-disabled="set.subjectDataDisabled"
                     class="col-12"
                     @click="$emit('updateActiveSet', index)"
                     @hide-set="$emit('updateActiveSet', index)"
                     @remove-set="$emit('removeSet', index)"
+                    @subject-Data-Set="$emit('subjectDataSet', index)"
                 >
                     <template #download-menu>
                         <slot name="card" />
+                    </template>
+                    <template #subjectData-menu>
+                        <slot
+                            name="subjectData"
+                            :index="index"
+                        />
                     </template>
                 </Card>
                 <slot

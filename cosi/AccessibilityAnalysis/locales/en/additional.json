@@ -99,7 +99,14 @@
                     "inhabitants": "Inhabitants",
                     "area": "Area",
                     "cardTitle": "Accessibility ",
-                    "titleHint": "Note: You can choose any name you like. If you do not enter a name, an analysis name will be created automatically."
+                    "titleHint": "Note: You can choose any name you like. If you do not enter a name, an analysis name will be created automatically.",
+                    "overwriteSubjectData": "Overwrite subject data area?",
+                    "newSubjectDataNote": "You replace the current subject area with the newly selected area. The old area is deleted and cannot be restored afterwards.",
+                    "confirmSubjectDataArea": "Yes, use new area",
+                    "cancelSubjectDataArea": "No, cancel",
+                    "currentSubjectDataArea": "current subject data area",
+                    "activeSubjectDataArea": "Subject area is already active",
+                    "activeSubjectDataAreaText": "The selected accessibility is already the subject data area. Select a different accessibility analysis or go to the area selection to define a new subject data area."
                 }
             }
         }

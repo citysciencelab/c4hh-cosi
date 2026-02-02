@@ -52,9 +52,19 @@ export default {
             type: Boolean,
             required: false,
             default: false
+        },
+        subjectData: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
+        subjectDataDisabled: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
-    emits: ["downloadSet", "hideSet", "removeSet"]
+    emits: ["downloadSet", "hideSet", "removeSet", "subjectDataSet"]
 };
 </script>
 
@@ -89,10 +99,16 @@ export default {
                         class="col-6"
                     >
                         <div>
-                            <i v-if="element?.icon" :class="element?.icon" class="me-2" />
-                            <span>{{ element.label}}</span>
+                            <i
+                                v-if="element?.icon"
+                                :class="element?.icon"
+                                class="me-2"
+                            />
+                            <span>{{ element.label }}</span>
                         </div>
-                        <div class="value">{{ element.value }}</div>
+                        <div class="value">
+                            {{ element.value }}
+                        </div>
                     </div>
                 </div>
                 <div
@@ -133,6 +149,21 @@ export default {
                     </div>
                 </div>
                 <div class="d-flex align-self-center">
+                    <div
+                        v-if="subjectData"
+                        class="dropdown custom-dd"
+                    >
+                        <IconButton
+                            class="p-1"
+                            icon="bi bi-layers"
+                            :aria="'Fachdatengebiet setzen'"
+                            :disabled="!subjectDataDisabled"
+                            :interaction="() => $emit('subjectDataSet')"
+                            data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside"
+                        />
+                        <slot name="subjectData-menu" />
+                    </div>
                     <div class="dropdown custom-dd">
                         <IconButton
                             class="p-1"
@@ -166,24 +197,6 @@ export default {
 
 <style scoped lang="scss">
     @import "../assets/style.scss";
-    .dropdown .dropdown-toggle::after {
-        display: none !important;
-    }
-
-    .dropdown {
-        position: relative;
-    }
-
-    .dropdown::after {
-        content: "";
-        position: absolute;
-        bottom: -6px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-left: .3rem solid transparent;
-        border-right: .3rem solid transparent;
-        border-top: .3rem solid #000;
-    }
 
     .card-title {
         font-family: $font_family_accent;

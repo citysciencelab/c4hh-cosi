@@ -4,6 +4,7 @@ import AccessibilityAnalysisLegend from "./AccessibilityAnalysisLegend.vue";
 import AccessibilityAnalysisTrafficFlow from "./AccessibilityAnalysisTrafficFlow.vue";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
+import {Dropdown} from "bootstrap";
 import ButtonGroup from "../../components/ButtonGroup.vue";
 import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import union from "@turf/union";
@@ -157,7 +158,7 @@ export default {
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Maps", ["clickCoordinate", "getVisibleLayerList", "projectionCode"]),
         ...mapGetters("Modules/AccessibilityAnalysis", Object.keys(getters)),
-        ...mapGetters("Modules/DistrictSelector", ["boundingGeometry"]),
+        ...mapGetters("Modules/DistrictSelector", ["boundingGeometry", "selectedDistrictNames"]),
         ...mapGetters("Modules/Routing/Directions", ["directionsRouteSource", "directionsRouteLayer", "routingDirections", "settings"]),
         // ...mapGetters("Modules/FeaturesList", ["activeVectorLayerList", "isFeatureActive", "layerMapById"]),
 
@@ -177,7 +178,13 @@ export default {
                         removable: true,
                         status: this.dataSets.indexOf(set) === this.activeSet ? "active" : "",
                         title: set.inputs.title,
-                        visible: true
+                        visible: true,
+                        subjectData: true,
+                        isSubjectDataArea: set.inputs.isSubjectDataArea,
+                        subjectDataDisabled: this.selectedDistrictNames.length > 0,
+                        badge: set.inputs.isSubjectDataArea
+                            ? this.getBadge()
+                            : []
                     }
                 );
             });
@@ -375,6 +382,12 @@ export default {
 
         this.generatedName = this.generateCardTitle();
         this.analysisName = this.generatedName;
+
+        document.addEventListener("shown.bs.dropdown", this.onDropdownShown);
+
+    },
+    beforeUnmount () {
+        document.removeEventListener("shown.bs.dropdown", this.onDropdownShown);
     },
     unmounted () {
         this.removeInteraction(this.select);
@@ -888,7 +901,6 @@ export default {
             });
         },
 
-
         /**
          * Downloads the screenshot of the given set.
          * @param {Event} evt - The click event.
@@ -1192,6 +1204,72 @@ export default {
                 this.setActiveSet(null);
                 this.removeDataOnMap();
             }
+        },
+
+        /**
+         * Sets the badge in the card.
+         * @param {index} Number - The index of data set.
+         * @returns {void}
+         */
+        confirmSubjectDataArea (index) {
+            this.dataSets.forEach(set => {
+                set.inputs.isSubjectDataArea = false;
+            });
+
+            if (this.dataSets[index]) {
+                this.dataSets[index].inputs.isSubjectDataArea = true;
+            }
+        },
+
+        /**
+         * Closes the dropdown menu.
+         * @param {Event} event - The click event.
+         * @returns {void}
+         */
+        closeDropdown (event) {
+            const dropdownEl = event.target.closest(".dropdown");
+
+            if (dropdownEl) {
+                let bsDropdown = Dropdown.getInstance(dropdownEl);
+
+                if (!bsDropdown) {
+                    bsDropdown = new Dropdown(dropdownEl);
+                }
+                bsDropdown.hide();
+            }
+        },
+
+        /**
+         * Returns an array that shows that the subject area is set
+         * @returns {Object[]} An array of badge objects.
+         */
+        getBadge () {
+            return [
+                {
+                    backgroundColor: "#EB8A3E",
+                    color: "rgba(255, 255, 255, 1)",
+                    icon: "bi bi-layers",
+                    text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.currentSubjectDataArea")
+                }
+            ];
+        },
+
+        /**
+         * Closes all other open dropdowns when one is shown.
+         * @param {Event} event - The "shown.bs.dropdown" event.
+        */
+        onDropdownShown (event) {
+            const current = event.target;
+
+            document.querySelectorAll("[data-bs-toggle=\"dropdown\"].show").forEach(el => {
+                if (el === current) {
+                    return;
+                }
+
+                const instance = Dropdown.getOrCreateInstance(el);
+
+                instance.hide();
+            });
         }
     }
 };
@@ -1409,6 +1487,7 @@ export default {
                 @remove-all-data="removeAllData"
                 @remove-set="removeSet"
                 @update-active-set="updateActiveSet"
+                @subject-data-set="() => []"
             >
                 <template #top>
                     <AccessibilityAnalysisLegend
@@ -1423,6 +1502,43 @@ export default {
                         @export-geojson="downloadSet($event)"
                         @export-png="downloadScreenshot($event)"
                     />
+                </template>
+                <template #subjectData="{index}">
+                    <div
+                        class="dropdown-menu p-4"
+                        @click.stop
+                    >
+                        <div v-if="!cardDatasets[index].isSubjectDataArea">
+                            <h5 class="dropdown-heading">
+                                {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.overwriteSubjectData') }}
+                            </h5>
+                            <span class="my-3">
+                                {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.newSubjectDataNote') }}
+                            </span>
+                            <FlatButton
+                                class="mx-auto mt-3"
+                                icon="bi bi-check2"
+                                :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.confirmSubjectDataArea')"
+                                @click="confirmSubjectDataArea(index)"
+                            />
+                            <FlatButton
+                                class="mx-auto"
+                                icon="bi bi-x"
+                                :secondary="true"
+                                :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.cancelSubjectDataArea')"
+                                @click="closeDropdown"
+                            />
+                        </div>
+                        <div v-else>
+                            <h5 class="dropdown-heading">
+                                {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.activeSubjectDataArea') }}
+                            </h5>
+                            <span class="mb-3">
+                                {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.activeSubjectDataAreaText') }}
+                            </span>
+                            <div />
+                        </div>
+                    </div>
                 </template>
                 <template #after-card="{index}">
                     <AlertMessage
@@ -1456,6 +1572,16 @@ export default {
 
         .description {
             font-size: 0.9rem;
+        }
+
+        .dropdown-heading {
+            color: $secondary;
+        }
+
+        .dropdown-menu {
+            min-width: 220px;
+            max-width: 320px;
+            width: max-content;
         }
 
         font-family: $font_family_default;
