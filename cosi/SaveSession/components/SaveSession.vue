@@ -131,6 +131,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("Modules/About", ["version"]),
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Modules/SaveSession", Object.keys(getters)),
         // ...mapGetters("Modules/ScenarioBuilder", {simGuideLayer: "guideLayer"}),
@@ -182,10 +183,11 @@ export default {
     },
     methods: {
         ...mapActions("Maps", ["addNewLayerIfNotExists", "registerListener", "unregisterListener"]),
-        ...mapMutations("Modules/SaveSession", Object.keys(mutations)),
+        ...mapActions("Modules/About", ["currentMasterportalVersionNumber"]),
         ...mapActions("Modules/SaveSession", Object.keys(actions)),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapActions("Modules/DistrictSelector", ["setDistrictsByName"]),
+        ...mapMutations("Modules/SaveSession", Object.keys(mutations)),
         ...parseState,
         downloadJsonToFile,
 
@@ -210,6 +212,11 @@ export default {
             this.session.state = JSON.stringify(this.state);
             this.session.meta.created = new Date().toLocaleString();
             this.session.meta.date = new Date();
+
+            if (this.version) {
+                this.currentMasterportalVersionNumber();
+                this.session.meta.version = this.version;
+            }
         },
         /**
          * Saving the data in local storage
