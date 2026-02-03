@@ -23,9 +23,21 @@ export default {
             type: Boolean,
             required: false,
             default: false
+        },
+        showButtons: {
+            type: Object,
+            required: false,
+            default () {
+                return {
+                    georef: true,
+                    details: true,
+                    preview: false,
+                    download: false
+                };
+            }
         }
     },
-    emits: ["openDetails"],
+    emits: ["openDetails", "showPreview", "download"],
     data () {
         return {};
     },
@@ -72,20 +84,41 @@ export default {
 
                     <td>
                         <IconButton
+                            v-if="showButtons.georef && hasGeoRef"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.showPositionInMap')"
                             icon="bi-crosshair"
-                            :disabled="!hasGeoRef"
                             @click="showDatasetPositionInMap(dataset.instanceId)"
                         />
                     </td>
 
                     <td>
                         <IconButton
+                            v-if="showButtons.details"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.goToDetails')"
                             icon="bi-arrow-right-circle"
                             @click="$emit('openDetails', dataset.instanceId)"
+                        />
+                    </td>
+
+                    <td>
+                        <IconButton
+                            v-if="showButtons.preview && dataset.hasPreview"
+                            :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
+                            :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.showPreview')"
+                            icon="bi-image"
+                            @click="$emit('showPreview', dataset.instanceId)"
+                        />
+                    </td>
+
+                    <td>
+                        <IconButton
+                            v-if="showButtons.download"
+                            :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
+                            :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.download')"
+                            icon="bi-file-earmark-arrow-down"
+                            @click="$emit('download', dataset.instanceId)"
                         />
                     </td>
                 </tr>

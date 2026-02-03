@@ -20,6 +20,22 @@ const getters = {
         return "";
     },
     /**
+     * Returns the dataclass protection class for a given archive ID from the state's dataClassList.
+     * @param {Object} state - The Vuex state object.
+     * @returns {function(string): string} - A function that takes an archiveId and returns the corresponding dataclass protection class, or an empty string if not found.
+     */
+    dataProtectionClassForArchiveId: state => archiveId => {
+        const result = state.dataClassList?.filter((dataClass) => {
+            return dataClass.id === archiveId;
+        });
+
+        if (result && result.length === 1) {
+            return result[0].highestActiveDataclassVersion.dataProtectionClass;
+        }
+
+        return "";
+    },
+    /**
      * Checks if the archive with the given ID has georeference information (EPSG code).
      * @param {Object} state - The Vuex state object.
      * @returns {function(string): Boolean} - A function that takes an archiveId and returns true if the archive has an EPSG code, otherwise false.

@@ -8,7 +8,16 @@
             },
             "tabs": {
                 "tabDetails": {
-                    "label": "Details"
+                    "label": "Details",
+                    "title": "Detailinformationen",
+                    "datasetInfoTable": {
+                      "archive": "Archiv",
+                      "datasetProtectionClass": "Datenschutzklasse"
+                    },
+                    "numberOfResults": "Anzahl der gefundenen Datensätze:",
+                    "backButtonLabel": "Zurück",
+                    "loading": "Daten werden geladen...",
+                    "previewAltText": "Vorschaubild"
                 },
                 "tabSearch": {
                     "label": "Suche",
@@ -41,6 +50,8 @@
                     "table": {
                       "showPositionInMap": "Position des Datensatzes in der Karte anzeigen",
                       "goToDetails": "Details zum Datensatz anzeigen",
+                      "showPreview": "Vorschau anzeigen",
+                      "download": "Datensatz herunterladen",
                       "headers": {
                         "position": "Lage",
                         "details": "Details"

@@ -169,5 +169,87 @@ export default {
         commit("setSearchAttributeResponse", searchAttributeResponse);
 
         return response;
+    },
+    /**
+     * Request primarydata for a given archive and instance and add them to the store.
+     * @param {Object} context - Vuex action context (state, commit).
+     * @param {Object} payload
+     * @param {String} payload.archiveId - Archive identifier to request primarydata for.
+     * @param {String} payload.instanceId - Instance identifier to request primarydata for.
+     */
+    async fetchPrimarydata ({state, commit}, payload) {
+        const {archiveId, instanceId} = payload,
+            params = {
+                Token: Token,
+                f: "json",
+                preventCache: Date.now()
+            },
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}`, params),
+            response = await axios.get(url);
+
+        commit("addPrimaryDataToInstance", {
+            instanceId: instanceId,
+            primaryData: response?.data
+        });
+    },
+    /**
+     * Download the preview picture for a given primaryDataId and add it to the store.
+     * Return already stored preview picture if available for the given primaryDataId
+     * @param {Object} context - Vuex action context (state, commit).
+     * @param {Object} payload
+     * @param {String} payload.archiveId - Archive identifier to request preview for.
+     * @param {String} payload.instanceId - Instance identifier to request preview for.
+     * @param {String} payload.primaryDataId - Primary data identifier to request preview for.
+     */
+    async downloadPreview ({state}, payload) {
+        const {archiveId, instanceId, primaryDataId} = payload,
+            params = {
+                Token: Token,
+                f: "json",
+                preventCache: Date.now()
+            },
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}/${primaryDataId}/${params.preventCache}/contentpreview`, params),
+            existingInstanceData = state.searchAttributeResponse?.filter((datasets) => {
+                return datasets.instanceId === instanceId;
+            }),
+            existingPrimaryData = existingInstanceData ? existingInstanceData[0].primaryData?.filter((primary) => {
+                return primary.primaryDataId === primaryDataId;
+            }) : [];
+
+        if (existingPrimaryData && existingPrimaryData.length === 1 && existingPrimaryData[0].previewData) {
+            return existingPrimaryData[0].previewData;
+        }
+
+        const response = await axios.get(url, {responseType: "blob"}),
+            blobURL = window.URL.createObjectURL(response.data);
+
+        existingPrimaryData[0].previewData = blobURL;
+
+        return blobURL;
+    },
+    /**
+     * Download the dataset for a given primaryDataId and open the 'save' dialog.
+     * @param {Object} context - Vuex action context (state).
+     * @param {Object} payload
+     * @param {String} payload.archiveId - Archive identifier to download the dataset for.
+     * @param {String} payload.instanceId - Instance identifier to download the dataset for.
+     * @param {String} payload.primaryDataId - Primary data identifier to download the dataset for.
+     */
+    downloadDatafile ({state}, payload) {
+        const {archiveId, instanceId, primaryDataId} = payload,
+            params = {
+                Token: Token
+            },
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}/${primaryDataId}/content`, params);
+
+        // create an invisible link to open 'save' dialog on click
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = ""; // the browser uses the filename delivered by the server (Content-Disposition)
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 };

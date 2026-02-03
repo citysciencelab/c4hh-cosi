@@ -22,6 +22,20 @@ const mutations = {
             ...state.archiveYears,
             ...yearsListObj
         };
+    },
+    /**
+     * Adds the fetched primary data into the existing search response state.
+     * @param {Object} state - The current state object.
+     * @param {Object} primaryDataObj - The new data object to be added or updated.
+     */
+    addPrimaryDataToInstance (state, primaryDataObj) {
+        const instanceDataset = state.searchAttributeResponse?.filter((datasets) => {
+            return datasets.instanceId === primaryDataObj.instanceId;
+        });
+
+        if (instanceDataset && instanceDataset.length === 1) {
+            instanceDataset[0].primaryData = primaryDataObj.primaryData;
+        }
     }
 };
 

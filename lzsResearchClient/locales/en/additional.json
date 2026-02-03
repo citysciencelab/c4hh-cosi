@@ -8,7 +8,16 @@
             },
             "tabs": {
                 "tabDetails": {
-                    "label": "Details"
+                    "label": "Details",
+                    "title": "Detailinformation",
+                    "datasetInfoTable": {
+                      "archive": "Archive",
+                      "datasetProtectionClass": "Dataset protection class"
+                    },
+                    "numberOfResults": "Number of results:",
+                    "backButtonLabel": "Back",
+                    "loading": "Data is loading...",
+                    "previewAltText": "Preview"
                 },
                 "tabSearch": {
                     "label": "Search",
@@ -41,6 +50,8 @@
                     "table": {
                       "showPositionInMap": "Show position of dataset in map",
                       "goToDetails": "Show details for this dataset",
+                      "showPreview": "Show preview",
+                      "download": "Download dataset",
                       "headers": {
                         "position": "Position",
                         "details": "Details"

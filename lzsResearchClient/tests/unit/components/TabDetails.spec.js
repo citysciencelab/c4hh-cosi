@@ -21,7 +21,14 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                                 // to be used later
                             }),
                             getters: {
-                                getDetailsForSelectedInstanceId: () => "Details"
+                                getDetailsForSelectedInstanceId: () => "Details",
+                                nameForArchiveId: () => (id) => {
+                                    return id;
+                                },
+                                dataProtectionClassForArchiveId: () => (id) => {
+                                    return id + " Öffentlich";
+                                },
+                                selectedInstanceId: () => "abc"
                             }
                         }
                     }
