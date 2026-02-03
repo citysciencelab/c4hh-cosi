@@ -95,5 +95,7 @@ export default {
     },
     layerMapById: (state, {flatActiveLayerMapping}) => id => flatActiveLayerMapping.find(l => l.layerId === id),
     isFeatureDisabled: (state, {disabledFeatureItems}) => feature => disabledFeatureItems.filter(item => item.feature === feature).length > 0,
-    isFeatureActive: (state, {isFeatureDisabled}) => feature => (typeof feature.style_ === "object" || feature.style_ === null || feature.style_ === undefined) && !isFeatureDisabled(feature)
+    isFeatureActive: (state, {isFeatureDisabled}) => feature => {
+        return ((typeof feature.style_?.getImage() !== "undefined" && feature.style_?.getImage() !== null) || (typeof feature.style_?.getStroke() !== "undefined" && feature.style_?.getStroke() !== null) || (typeof feature.style_?.getFill() !== "undefined" && feature.style_?.getFill() !== null)) && !isFeatureDisabled(feature);
+    }
 };
