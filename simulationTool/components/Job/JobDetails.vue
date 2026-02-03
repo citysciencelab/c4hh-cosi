@@ -5,8 +5,8 @@ import DiagrammComponent from "../Diagramm/DiagrammComponent.vue";
 import AsyncWrapper from "../AsyncWrapper.vue";
 import CommentsPanel from "../Comments/CommentsPanel.vue";
 import SharingPanel from "../Sharing/SharingPanel.vue";
-import {and, equalTo} from "ol/format/filter";
-// import GeoJSON from "ol/format/GeoJSON";
+import {and, equalTo} from "ol/format/filter.js";
+// import GeoJSON from "ol/format/GeoJSON.js";
 
 export default {
     name: "JobDetails",

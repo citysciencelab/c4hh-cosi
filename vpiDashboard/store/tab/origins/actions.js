@@ -1,4 +1,4 @@
-import apiEndpointService from "../../apiEndpointService";
+import apiEndpointService from "../../apiEndpointService.js";
 
 const actions = {
     /**

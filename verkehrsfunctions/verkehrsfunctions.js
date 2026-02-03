@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import mapCollection from "../../src/core/maps/js/mapCollection";
+import mapCollection from "../../src/core/maps/js/mapCollection.js";
 import thousandsSeparator from "../../src/shared/js/utils/thousandsSeparator.js";
 
 /**

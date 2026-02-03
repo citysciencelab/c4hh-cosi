@@ -1,4 +1,4 @@
-import {ogcApiProcesses} from "@masterportal/masterportalapi";
+import {ogcApiProcesses} from "@masterportal/masterportalapi/src/index.js";
 
 const actions = {
 

@@ -1,14 +1,14 @@
 <script>
-import {Fill, Stroke, Style} from "ol/style";
-import {getCenter as getCenterOfExtent} from "ol/extent";
+import {Fill, Stroke, Style} from "ol/style.js";
+import {getCenter as getCenterOfExtent} from "ol/extent.js";
 import getters from "../store/gettersValuationPrint.js";
-import Feature from "ol/Feature";
+import Feature from "ol/Feature.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import mutations from "../store/mutationsValuationPrint";
-import {Select} from "ol/interaction";
-import {singleClick} from "ol/events/condition";
+import mutations from "../store/mutationsValuationPrint.js";
+import {Select} from "ol/interaction.js";
+import {singleClick} from "ol/events/condition.js";
 import ModalItem from "../../../src/shared/modules/modals/components/ModalItem.vue";
-import {unionFeatures} from "../js/unionFeatures";
+import {unionFeatures} from "../js/unionFeatures.js";
 import {createKnowledgeBase} from "../../shared/js/mapfishUtils/createKnowledgeBase.js";
 import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
 import axios from "axios";
@@ -23,7 +23,7 @@ import IconButton from "../../../src/shared/modules/buttons/components/IconButto
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import WfsSearch from "../../../src/modules/wfsSearch/components/WfsSearch.vue";
 import {uniqueId} from "../../../src/shared/js/utils/uniqueId.js";
-import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog";
+import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog.js";
 
 export default {
     name: "ValuationPrint",

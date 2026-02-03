@@ -1,9 +1,9 @@
 import {GeoJSON} from "ol/format.js";
 import isObject from "../../../src/shared/js/utils/isObject.js";
-import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEventCoordinates";
+import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEventCoordinates.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection.js";
-import ConvertStyle from "../js/convertStyle";
-import layerFactory from "../../../src/core/layers/js/layerFactory";
+import ConvertStyle from "../js/convertStyle.js";
+import layerFactory from "../../../src/core/layers/js/layerFactory.js";
 import {infrastructureLayerId} from "../layerIds.js";
 
 export default {

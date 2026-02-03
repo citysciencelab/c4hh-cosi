@@ -1,7 +1,7 @@
 import {expect} from "chai";
-import Polygon from "ol/geom/Polygon";
+import Polygon from "ol/geom/Polygon.js";
 import sinon from "sinon";
-import {bufferGeometry} from "../../bufferGeometry";
+import {bufferGeometry} from "../../bufferGeometry.js";
 
 describe("addons/shared/js/mapfishUtils/bufferGeometrie.js", () => {
     const polygon = new Polygon([[

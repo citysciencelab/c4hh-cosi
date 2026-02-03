@@ -1,6 +1,6 @@
 import {fetchRoutingOrsDirections} from "../../../../src/modules/routing/js/directions/routing-ors-directions.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
-import {getCenter as getCenterOfExtent} from "ol/extent";
+import {getCenter as getCenterOfExtent} from "ol/extent.js";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
 

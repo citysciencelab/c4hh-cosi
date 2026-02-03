@@ -1,7 +1,7 @@
-import getters from "./gettersVpiDashboard";
-import mutations from "./mutationsVpiDashboard";
-import actions from "./actionsVpiDashboard";
-import state from "./stateVpiDashboard";
+import getters from "./gettersVpiDashboard.js";
+import mutations from "./mutationsVpiDashboard.js";
+import actions from "./actionsVpiDashboard.js";
+import state from "./stateVpiDashboard.js";
 
 export default {
     namespaced: true,

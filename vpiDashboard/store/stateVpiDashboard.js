@@ -1,6 +1,6 @@
-import tabOriginsState from "./tab/origins/state";
-import tabAgeGroupsState from "./tab/age-groups/state";
-import tabGendersState from "./tab/gender/state";
+import tabOriginsState from "./tab/origins/state.js";
+import tabAgeGroupsState from "./tab/age-groups/state.js";
+import tabGendersState from "./tab/gender/state.js";
 import {Style, Fill, Stroke} from "ol/style.js";
 
 const state = {

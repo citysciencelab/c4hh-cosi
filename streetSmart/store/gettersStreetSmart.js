@@ -1,5 +1,5 @@
-import {generateSimpleGetters} from "../../../src/shared/js/utils/generators";
-import stateStreetSmart from "./stateStreetSmart";
+import {generateSimpleGetters} from "../../../src/shared/js/utils/generators.js";
+import stateStreetSmart from "./stateStreetSmart.js";
 
 const getters = {
     ...generateSimpleGetters(stateStreetSmart),

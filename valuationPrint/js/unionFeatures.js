@@ -1,4 +1,4 @@
-import {GeoJSON} from "ol/format";
+import {GeoJSON} from "ol/format.js";
 import union from "@turf/union";
 import {featureCollection as turfFeatureCollection} from "@turf/helpers";
 

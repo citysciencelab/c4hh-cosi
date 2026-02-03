@@ -1,11 +1,11 @@
 <script>
 
 import {mapGetters} from "vuex";
-import getters from "../../../../src/modules/getFeatureInfo/store/gettersGetFeatureInfo";
+import getters from "../../../../src/modules/getFeatureInfo/store/gettersGetFeatureInfo.js";
 import {isWebLink} from "../../../../src/shared/js/utils/urlHelper.js";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
-import localeCompare from "../../../../src/shared/js/utils/localeCompare";
-import {getCenter} from "ol/extent";
+import localeCompare from "../../../../src/shared/js/utils/localeCompare.js";
+import {getCenter} from "ol/extent.js";
 import TableComponent from "../../../../src/shared/modules/table/components/TableComponent.vue";
 
 export default {

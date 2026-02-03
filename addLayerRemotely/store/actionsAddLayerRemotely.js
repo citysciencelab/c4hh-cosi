@@ -1,5 +1,5 @@
 
-import {GeoJSON} from "ol/format";
+import {GeoJSON} from "ol/format.js";
 import {getFeatureIds, returnGeoJSONLayerObject, transformFeature} from "../js/addGeoJsonRemotely.js";
 import importLayers from "../js/addWMSRemotely.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";

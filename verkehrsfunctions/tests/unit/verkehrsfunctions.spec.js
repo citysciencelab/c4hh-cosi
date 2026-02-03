@@ -3,7 +3,7 @@ import {
     getAbsTrafficCount,
     getKfzTrafficCount,
     getPhenomenonTimeRange
-} from "../../verkehrsfunctions";
+} from "../../verkehrsfunctions.js";
 import dayjs from "dayjs";
 
 describe("ADDON: Verkehrsfunctions", () => {

@@ -1,5 +1,5 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
-import statePopulationRequest from "./statePopulationRequest";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import statePopulationRequest from "./statePopulationRequest.js";
 
 const mutations = {
     /**

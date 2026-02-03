@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import getters from "../../../store/gettersBoris";
-import stateBoris from "../../../store/stateBoris";
+import getters from "../../../store/gettersBoris.js";
+import stateBoris from "../../../store/stateBoris.js";
 
 
 describe("src/modules/tools/boris/store/gettersBoris.js", () => {

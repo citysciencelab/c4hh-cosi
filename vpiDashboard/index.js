@@ -1,5 +1,5 @@
 import VpiDashboard from "./components/VpiDashboard.vue";
-import VpiDashboardStore from "./store/indexVpiDashboard";
+import VpiDashboardStore from "./store/indexVpiDashboard.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

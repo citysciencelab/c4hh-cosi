@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import Feature from "ol/Feature";
-import Polygon from "ol/geom/Polygon";
+import Feature from "ol/Feature.js";
+import Polygon from "ol/geom/Polygon.js";
 import sinon from "sinon";
 import {unionFeatures} from "../../../js/unionFeatures.js";
 

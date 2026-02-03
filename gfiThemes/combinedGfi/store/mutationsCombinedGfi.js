@@ -1,5 +1,5 @@
-import state from "./stateCombinedGfi";
-import {generateSimpleMutations} from "../../../../src/shared/js/utils/generators";
+import state from "./stateCombinedGfi.js";
+import {generateSimpleMutations} from "../../../../src/shared/js/utils/generators.js";
 
 const mutations = {
     /**

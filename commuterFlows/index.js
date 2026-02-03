@@ -1,5 +1,5 @@
 import CommuterFlowsComponent from "./components/CommuterFlows.vue";
-import CommuterFlowsStore from "./store/indexCommuterFlows";
+import CommuterFlowsStore from "./store/indexCommuterFlows.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

@@ -1,7 +1,7 @@
-import actions from "./actionsPopulationRequest";
-import getters from "./gettersPopulationRequest";
-import mutations from "./mutationsPopulationRequest";
-import state from "./statePopulationRequest";
+import actions from "./actionsPopulationRequest.js";
+import getters from "./gettersPopulationRequest.js";
+import mutations from "./mutationsPopulationRequest.js";
+import state from "./statePopulationRequest.js";
 
 export default {
     namespaced: true,

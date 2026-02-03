@@ -1,5 +1,5 @@
 import BorisComponent from "./components/BorisComponent.vue";
-import BorisStore from "./store/indexBoris";
+import BorisStore from "./store/indexBoris.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

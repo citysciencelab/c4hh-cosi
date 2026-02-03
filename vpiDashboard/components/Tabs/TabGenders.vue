@@ -1,10 +1,10 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
-import getters from "../../store/gettersVpiDashboard";
-import actions from "../../store/actionsVpiDashboard";
+import getters from "../../store/gettersVpiDashboard.js";
+import actions from "../../store/actionsVpiDashboard.js";
 import dayjs from "dayjs";
-import {disabledDates} from "../../utils/dateHelpers";
-import apiEndpointService from "../../store/apiEndpointService";
+import {disabledDates} from "../../utils/dateHelpers.js";
+import apiEndpointService from "../../store/apiEndpointService.js";
 
 // Components Import
 import LinechartItem from "../../../../src/shared/modules/charts/components/LinechartItem.vue";

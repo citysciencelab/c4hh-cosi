@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {TrafficCountApi} from "../../../utils/trafficCountApi";
+import {TrafficCountApi} from "../../../utils/trafficCountApi.js";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import weekOfYear from "dayjs/plugin/weekOfYear";

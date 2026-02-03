@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import Feature from "ol/Feature";
-import Polygon from "ol/geom/Polygon";
+import Feature from "ol/Feature.js";
+import Polygon from "ol/geom/Polygon.js";
 import sinon from "sinon";
 import {createFeatureByCoordinate, collectFeaturesByCoordinates as collectFeatures, getFilter, getPropertyNames} from "../../collectFeatures.js";
 import getFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";

@@ -1,5 +1,5 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
-import stateSdpAddon from "./stateSdpDownload";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import stateSdpAddon from "./stateSdpDownload.js";
 
 const mutations = {
     /**

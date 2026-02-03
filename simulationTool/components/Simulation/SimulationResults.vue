@@ -1,24 +1,24 @@
 <script>
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import ConvertFeature from "../../js/convertFeatures";
-import ConvertStyle from "../../js/convertStyle";
-import CircleStyle from "ol/style/Circle";
-import {getMappedProperty} from "../shared/js/getMappedProperty";
+import ConvertFeature from "../../js/convertFeatures.js";
+import ConvertStyle from "../../js/convertStyle.js";
+import CircleStyle from "ol/style/Circle.js";
+import {getMappedProperty} from "../shared/js/getMappedProperty.js";
 import {Feature} from "ol";
 import FeaturesHandler from "../../../../src/modules/statisticDashboard/js/handleFeatures.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
-import Fill from "ol/style/Fill";
+import Fill from "ol/style/Fill.js";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
-import {LineString} from "ol/geom";
+import {LineString} from "ol/geom.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import {Select, Translate} from "ol/interaction";
-import {singleClick} from "ol/events/condition";
-import Stroke from "ol/style/Stroke";
-import Style from "ol/style/Style";
-import Text from "ol/style/Text";
+import {Select, Translate} from "ol/interaction.js";
+import {singleClick} from "ol/events/condition.js";
+import Stroke from "ol/style/Stroke.js";
+import Style from "ol/style/Style.js";
+import Text from "ol/style/Text.js";
 import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {

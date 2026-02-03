@@ -6,7 +6,7 @@ import {
     setLayers,
     getModelByLayerId,
     getLayerIdBlacklistFromAccordions
-} from "../../../js/observer/LayerObserver";
+} from "../../../js/observer/LayerObserver.js";
 
 
 describe("addons/sessionTool/js/observer/LayerObserver.js", () => {

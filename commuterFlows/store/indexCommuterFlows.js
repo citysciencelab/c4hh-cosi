@@ -1,6 +1,6 @@
-import getters from "./gettersCommuterFlows";
-import mutations from "./mutationsCommuterFlows";
-import state from "./stateCommuterFlows";
+import getters from "./gettersCommuterFlows.js";
+import mutations from "./mutationsCommuterFlows.js";
+import state from "./stateCommuterFlows.js";
 
 export default {
     namespaced: true,

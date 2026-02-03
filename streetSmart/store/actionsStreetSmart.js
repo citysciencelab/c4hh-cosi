@@ -1,5 +1,5 @@
-import mapCollection from "../../../src/core/maps/js/mapCollection";
-import loadPackage from "../js/loadPackage";
+import mapCollection from "../../../src/core/maps/js/mapCollection.js";
+import loadPackage from "../js/loadPackage.js";
 
 const actions = {
     /**

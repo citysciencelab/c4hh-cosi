@@ -1,4 +1,4 @@
-import * as verkehrsfunctions from "./verkehrsfunctions";
+import * as verkehrsfunctions from "./verkehrsfunctions.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

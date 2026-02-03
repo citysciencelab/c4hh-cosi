@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {changeDateFormat, disabledDates} from "../../utils/dateHelpers";
+import {changeDateFormat, disabledDates} from "../../utils/dateHelpers.js";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import duration from "dayjs/plugin/duration";

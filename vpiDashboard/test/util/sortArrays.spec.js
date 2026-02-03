@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import sortArrays from "../../utils/sortArrays";
+import sortArrays from "../../utils/sortArrays.js";
 
 describe("sortArrays", () => {
     it("should sort the dwell time array", () => {

@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import mutations from "../../../store/mutationsSdpDownload";
+import mutations from "../../../store/mutationsSdpDownload.js";
 
 
 describe("addons/sdpDownload/store/mutationsSdpDownload", function () {

@@ -1,5 +1,5 @@
 import {WMSCapabilities} from "ol/format.js";
-import {intersects} from "ol/extent";
+import {intersects} from "ol/extent.js";
 import crsModule from "@masterportal/masterportalapi/src/crs.js";
 import axios from "axios";
 import store from "../../../src/app-store/index.js";

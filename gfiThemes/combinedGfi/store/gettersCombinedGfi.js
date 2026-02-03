@@ -1,6 +1,6 @@
-import state from "./stateCombinedGfi";
-import {generateSimpleGetters} from "../../../../src/shared/js/utils/generators";
-import {formatJsonData} from "../utils/exportUtils";
+import state from "./stateCombinedGfi.js";
+import {generateSimpleGetters} from "../../../../src/shared/js/utils/generators.js";
+import {formatJsonData} from "../utils/exportUtils.js";
 
 
 const getters = {

@@ -4,7 +4,7 @@ import GraphicalSelect from "../../../src/shared/modules/graphicalSelect/compone
 import TableComponent from "../../../src/shared/modules/table/components/TableComponent.vue";
 import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
-import Polygon from "ol/geom/Polygon";
+import Polygon from "ol/geom/Polygon.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 
 export default {

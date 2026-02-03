@@ -1,5 +1,5 @@
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
-import {Polygon} from "ol/geom";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
+import {Polygon} from "ol/geom.js";
 import Feature from "ol/Feature.js";
 import {
     extractColumnsFromResults,
@@ -14,20 +14,20 @@ import {
     extractFeaturesFromOafJson,
     normalizeAttributes,
     getAllRequestLayers
-} from "../utils/gfiUtils";
+} from "../utils/gfiUtils.js";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
 import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
 import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";
-import {GeoJSON} from "ol/format";
-import {exportToDOC, exportToPDF, exportToJSON} from "../utils/exportUtils";
-import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses";
+import {GeoJSON} from "ol/format.js";
+import {exportToDOC, exportToPDF, exportToJSON} from "../utils/exportUtils.js";
+import OGCAPIProcesses from "@masterportal/masterportalapi/src/api/ogcApiProcesses.js";
 import OverlayOp from "jsts/org/locationtech/jts/operation/overlay/OverlayOp";
-import {Fill, Stroke, Style} from "ol/style";
+import {Fill, Stroke, Style} from "ol/style.js";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
-import {addExtentCoordinates, processPointResults} from "../utils/geometryUtils";
-import mapCollection from "@core/maps/js/mapCollection";
-import {loadModule} from "../utils/loadModule";
+import {addExtentCoordinates, processPointResults} from "../utils/geometryUtils.js";
+import mapCollection from "@core/maps/js/mapCollection.js";
+import {loadModule} from "../utils/loadModule.js";
 
 const actions = {
     /**

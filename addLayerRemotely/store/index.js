@@ -1,4 +1,4 @@
-import actions from "./actionsAddLayerRemotely";
+import actions from "./actionsAddLayerRemotely.js";
 
 export default {
     namespaced: true,

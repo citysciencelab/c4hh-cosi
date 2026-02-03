@@ -1,5 +1,5 @@
 import ObliqueViewerComponent from "./components/VcOblique.vue";
-import ObliqueViewerStore from "./store/indexVcOblique";
+import ObliqueViewerStore from "./store/indexVcOblique.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

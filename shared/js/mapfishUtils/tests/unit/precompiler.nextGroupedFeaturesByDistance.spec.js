@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import Feature from "ol/Feature";
-import Point from "ol/geom/Point";
+import Feature from "ol/Feature.js";
+import Point from "ol/geom/Point.js";
 import {
     nextGroupedFeaturesByDistance,
     groupFeaturesByPropertyName,

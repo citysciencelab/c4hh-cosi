@@ -3,7 +3,7 @@ import {mapGetters, mapActions, mapMutations} from "vuex";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import AccordionItem from "../../../../src/shared/modules/accordion/components/AccordionItem.vue";
 
-import {isUrl} from "../../../../src/shared/js/utils/urlHelper";
+import {isUrl} from "../../../../src/shared/js/utils/urlHelper.js";
 import ElevatedButton from "../../../../src/shared/modules/buttons/components/ElevatedButton.vue";
 import PaginationControl from "../../../../src/shared/modules/pagination/components/PaginationControl.vue";
 import DefaultTheme from "../../../../src/modules/getFeatureInfo/themes/default/components/DefaultTheme.vue";

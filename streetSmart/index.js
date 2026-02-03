@@ -1,5 +1,5 @@
 import StreetsmartComponent from "./components/StreetSmart.vue";
-import StreetsmartStore from "./store/indexStreetSmart";
+import StreetsmartStore from "./store/indexStreetSmart.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

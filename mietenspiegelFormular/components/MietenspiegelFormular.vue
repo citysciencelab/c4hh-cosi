@@ -1,12 +1,12 @@
 <script>
 import dayjs from "dayjs";
-import getters from "../store/gettersMietenspiegelFormular";
+import getters from "../store/gettersMietenspiegelFormular.js";
 import isObject from "../../../src/shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import mutations from "../store/mutationsMietenspiegelFormular";
+import mutations from "../store/mutationsMietenspiegelFormular.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {requestGfi} from "../../../src/shared/js/api/wmsGetFeatureInfo.js";
-import wfsRequest from "../../../src/shared/js/api/wfs/getFeature";
+import wfsRequest from "../../../src/shared/js/api/wfs/getFeature.js";
 import {WFS} from "ol/format.js";
 
 export default {

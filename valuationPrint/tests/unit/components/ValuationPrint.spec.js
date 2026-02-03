@@ -1,8 +1,8 @@
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import Feature from "ol/Feature";
-import Polygon from "ol/geom/Polygon";
-import {Select} from "ol/interaction";
+import Feature from "ol/Feature.js";
+import Polygon from "ol/geom/Polygon.js";
+import {Select} from "ol/interaction.js";
 import sinon from "sinon";
 import ValuationPrint from "../../../components/ValuationPrint.vue";
 import {createStore} from "vuex";

@@ -1,5 +1,5 @@
 import crs from "@masterportal/masterportalapi/src/crs.js";
-import mapMarker from "../../../src/core/maps/js/mapMarker";
+import mapMarker from "../../../src/core/maps/js/mapMarker.js";
 
 /**
  * Retrieves the vcs active map independent of VCMap version.

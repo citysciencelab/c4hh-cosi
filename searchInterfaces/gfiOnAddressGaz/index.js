@@ -1,4 +1,4 @@
-import gfiOnAddressGaz from "./js/searchInterfaceGfiOnAddressGaz";
+import gfiOnAddressGaz from "./js/searchInterfaceGfiOnAddressGaz.js";
 
 export default {
     gfiOnAddressGaz

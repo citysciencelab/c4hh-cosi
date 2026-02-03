@@ -17,7 +17,7 @@ dayjs.locale(de);
  * The TrafficCountApi uses SensorThingsHttp and SensorThingsMqtt to provide simple access to basic functions for the TrafficCount GFI Theme
  * Any subscription is handled by the TrafficCountApi.
  *
- * To import TrafficCountApi: import {TrafficCountApi} from "./trafficCountApi";
+ * To import TrafficCountApi: import {TrafficCountApi} from "./trafficCountApi.js";
  * create a new object:        const obj = new TrafficCountApi(...);
  * remember to unsubscribe:    obj.unsubscribeEverything();
  * </pre>

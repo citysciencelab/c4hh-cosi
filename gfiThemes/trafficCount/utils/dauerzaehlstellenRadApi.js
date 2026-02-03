@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import convertHttpLinkToSSL from "./../../../../src/shared/js/utils/convertHttpLinkToSSL";
+import convertHttpLinkToSSL from "./../../../../src/shared/js/utils/convertHttpLinkToSSL.js";
 import {getPublicHoliday} from "./../../../../src/shared/js/utils/calendar.js";
 import isoWeek from "dayjs/plugin/isoWeek";
 import advancedFormat from "dayjs/plugin/advancedFormat";

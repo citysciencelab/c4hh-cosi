@@ -1,6 +1,6 @@
 import {mount, shallowMount, config} from "@vue/test-utils";
 import SnippetFeatureInfo from "../../../components/SnippetFeatureInfo.vue";
-import Feature from "ol/Feature";
+import Feature from "ol/Feature.js";
 import {expect} from "chai";
 
 config.global.mocks.$t = key => key;

@@ -10,7 +10,7 @@ import DatePicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 import {addMissingDataDay} from "../utils/addMissingData.js";
 import {getPublicHoliday} from "../../../../src/shared/js/utils/calendar.js";
-import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi";
+import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi.js";
 import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(isSameOrBefore);

@@ -1,6 +1,6 @@
 
-import {generateSimpleGetters} from "../../../src/shared/js/utils/generators";
-import sdpAddonState from "./stateSdpDownload";
+import {generateSimpleGetters} from "../../../src/shared/js/utils/generators.js";
+import sdpAddonState from "./stateSdpDownload.js";
 
 const getters = {
     ...generateSimpleGetters(sdpAddonState),

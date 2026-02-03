@@ -2,11 +2,11 @@
 import {downloadBlobPerHTML5, downloadBlobPerNavigator} from "../../../src/shared/modules/buttons/js/exportButtonUtils.js";
 import isObject from "../../../src/shared/js/utils/isObject.js";
 import {mapGetters, mapMutations} from "vuex";
-import {register as registerMap} from "../js/observer/MapObserver";
-import {register as registerLayers} from "../js/observer/LayerObserver";
-import {register as registerFilter} from "../js/observer/FilterObserver";
-import {register as registerDraw} from "../js/observer/DrawObserver";
-import {register as registerModeler3D} from "../js/observer/Modeler3DObserver";
+import {register as registerMap} from "../js/observer/MapObserver.js";
+import {register as registerLayers} from "../js/observer/LayerObserver.js";
+import {register as registerFilter} from "../js/observer/FilterObserver.js";
+import {register as registerDraw} from "../js/observer/DrawObserver.js";
+import {register as registerModeler3D} from "../js/observer/Modeler3DObserver.js";
 
 export default {
     name: "SessionTool",

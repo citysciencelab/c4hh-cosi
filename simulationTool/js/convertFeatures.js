@@ -1,4 +1,4 @@
-import ConvertStyle from "./convertStyle";
+import ConvertStyle from "./convertStyle.js";
 import {GeoJSON} from "ol/format.js";
 
 const geoJsonParser = new GeoJSON();

@@ -1,5 +1,5 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
-import sessionToolState from "./stateSessionTool";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import sessionToolState from "./stateSessionTool.js";
 
 const mutations = {
     /**

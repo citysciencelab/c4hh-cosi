@@ -1,7 +1,7 @@
-import getters from "./gettersBimFactory";
-import state from "./stateBimFactory";
-import actions from "./actionsBimFactory";
-import mutations from "./mutationsBimFactory";
+import getters from "./gettersBimFactory.js";
+import state from "./stateBimFactory.js";
+import actions from "./actionsBimFactory.js";
+import mutations from "./mutationsBimFactory.js";
 
 export default {
     namespaced: true,

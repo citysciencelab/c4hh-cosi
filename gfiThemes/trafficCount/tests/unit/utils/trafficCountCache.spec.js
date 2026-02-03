@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {TrafficCountCache} from "../../../utils/trafficCountCache";
+import {TrafficCountCache} from "../../../utils/trafficCountCache.js";
 import de from "dayjs/locale/de";
 import dayjs from "dayjs";
 

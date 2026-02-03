@@ -1,7 +1,7 @@
-import actions from "./actionsExampleControl";
-import getters from "./gettersExampleControl";
-import mutations from "./mutationsExampleControl";
-import state from "./stateExampleControl";
+import actions from "./actionsExampleControl.js";
+import getters from "./gettersExampleControl.js";
+import mutations from "./mutationsExampleControl.js";
+import state from "./stateExampleControl.js";
 
 export default {
     namespaced: true,

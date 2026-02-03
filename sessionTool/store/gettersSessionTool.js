@@ -1,5 +1,5 @@
-import {generateSimpleGetters} from "../../../src/shared/js/utils/generators";
-import sessionToolState from "./stateSessionTool";
+import {generateSimpleGetters} from "../../../src/shared/js/utils/generators.js";
+import sessionToolState from "./stateSessionTool.js";
 
 const getters = {
     ...generateSimpleGetters(sessionToolState)

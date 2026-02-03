@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {getMappedProperty} from "../../../../../components/shared/js/getMappedProperty";
+import {getMappedProperty} from "../../../../../components/shared/js/getMappedProperty.js";
 import sinon from "sinon";
 
 describe("addons/SimulationTool/components/shared/js/getMappedProperty.js", () => {

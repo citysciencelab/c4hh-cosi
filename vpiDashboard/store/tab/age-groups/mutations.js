@@ -1,4 +1,4 @@
-import aggregateData from "../../../utils/aggregateData";
+import aggregateData from "../../../utils/aggregateData.js";
 
 const mutations = {
     /**

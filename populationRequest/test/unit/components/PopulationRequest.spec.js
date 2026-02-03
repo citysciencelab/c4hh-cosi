@@ -7,7 +7,7 @@ import {nextTick} from "vue";
 import Component from "../../../components/PopulationRequest.vue";
 import GraphicalSelectComponent from "../../../../../src/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import SwitchInputComponent from "../../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
-import PopulationRequest from "../../../store/indexPopulationRequest";
+import PopulationRequest from "../../../store/indexPopulationRequest.js";
 
 config.global.mocks.$t = key => key;
 

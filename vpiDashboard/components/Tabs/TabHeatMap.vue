@@ -1,7 +1,7 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import actions from "../../store/actionsVpiDashboard";
-import getters from "../../store/gettersVpiDashboard";
+import actions from "../../store/actionsVpiDashboard.js";
+import getters from "../../store/gettersVpiDashboard.js";
 
 export default {
     name: "TabHeatMap",

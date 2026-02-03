@@ -1,4 +1,4 @@
-import mutations from "../../../store/mutationsBimFactory";
+import mutations from "../../../store/mutationsBimFactory.js";
 import {expect} from "chai";
 
 describe("mutationsBimFactory", () => {

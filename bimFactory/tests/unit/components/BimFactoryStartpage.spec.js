@@ -3,7 +3,7 @@ import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 
 import Component from "../../../components/BimFactoryStartpage.vue";
-import BimFactory from "../../../store/indexBimFactory";
+import BimFactory from "../../../store/indexBimFactory.js";
 
 config.global.mocks.$t = key => key;
 

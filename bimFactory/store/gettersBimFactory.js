@@ -1,5 +1,5 @@
-import {generateSimpleGetters} from "../../../src/shared/js/utils/generators";
-import bimFactorystate from "./stateBimFactory";
+import {generateSimpleGetters} from "../../../src/shared/js/utils/generators.js";
+import bimFactorystate from "./stateBimFactory.js";
 
 const getters = {
     ...generateSimpleGetters(bimFactorystate),

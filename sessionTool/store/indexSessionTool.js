@@ -1,7 +1,7 @@
-import actions from "./actionsSessionTool";
-import getters from "./gettersSessionTool";
-import mutations from "./mutationsSessionTool";
-import state from "./stateSessionTool";
+import actions from "./actionsSessionTool.js";
+import getters from "./gettersSessionTool.js";
+import mutations from "./mutationsSessionTool.js";
+import state from "./stateSessionTool.js";
 
 export default {
     namespaced: true,

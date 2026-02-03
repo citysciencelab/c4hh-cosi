@@ -1,4 +1,4 @@
-import store from "../../src/app-store";
+import store from "../../src/app-store.js";
 
 let insp = null,
     lastRightPos = null;

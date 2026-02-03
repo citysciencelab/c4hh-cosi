@@ -3,7 +3,7 @@ import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import PlanningScenarioCreate from "../../../../components/PlanningScenario/PlanningScenarioCreate.vue";
-import {Polygon} from "ol/geom";
+import {Polygon} from "ol/geom.js";
 import sinon from "sinon";
 
 config.global.mocks.$t = key => key;

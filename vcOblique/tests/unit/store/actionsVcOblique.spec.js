@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import actions from "../../../store/actionsVcOblique";
+import actions from "../../../store/actionsVcOblique.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 
 

@@ -1,7 +1,7 @@
-import tabVisitorTypesActions from "./tab/origins/actions";
-import tabAgeGroupActions from "./tab/age-groups/actions";
-import TabGendersActions from "./tab/gender/actions";
-import apiEndpointService from "./apiEndpointService";
+import tabVisitorTypesActions from "./tab/origins/actions.js";
+import tabAgeGroupActions from "./tab/age-groups/actions.js";
+import TabGendersActions from "./tab/gender/actions.js";
+import apiEndpointService from "./apiEndpointService.js";
 
 const actions = {
     ...tabVisitorTypesActions,

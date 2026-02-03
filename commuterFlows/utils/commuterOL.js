@@ -1,6 +1,6 @@
 import {Circle, Fill, Style, Stroke, Text} from "ol/style.js";
 import {extend as olExpandExtent} from "ol/extent.js";
-import VectorLayer from "ol/layer/Vector";
+import VectorLayer from "ol/layer/Vector.js";
 import {Point} from "ol/geom.js";
 import Feature from "ol/Feature.js";
 import {uniqueId} from "../../../src/shared/js/utils/uniqueId.js";
@@ -15,7 +15,7 @@ import layerFactory from "../../../src/core/layers/js/layerFactory.js";
  * <pre>
  * CommuterOL provides easy access to OpenLayers
  *
- * To import CommuterOL: import {CommuterOL} from "./commuterOL";
+ * To import CommuterOL: import {CommuterOL} from "./commuterOL.js";
  * create a new object:        const obj = new CommuterOL(...);
  * </pre>
  * @class

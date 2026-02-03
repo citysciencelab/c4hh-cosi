@@ -3,7 +3,7 @@
  * Contains functions for loading print utils, sending print requests, and processing responses
  */
 
-import {loadModule} from "./loadModule";
+import {loadModule} from "./loadModule.js";
 
 /**
  * Sends the print request to the server

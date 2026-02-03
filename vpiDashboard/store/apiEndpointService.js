@@ -1,6 +1,6 @@
-import {Config} from "../config";
+import {Config} from "../config.js";
 import axios from "axios";
-import {buildEndpointUrl} from "../utils/buildEndpointUrl";
+import {buildEndpointUrl} from "../utils/buildEndpointUrl.js";
 import dayjs from "dayjs";
 
 const apiEndpointService = {

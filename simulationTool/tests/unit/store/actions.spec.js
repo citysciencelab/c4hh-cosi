@@ -1,5 +1,5 @@
-import actions from "../../../store/actions";
-import stateSimulationTool from "../../../store/state";
+import actions from "../../../store/actions.js";
+import stateSimulationTool from "../../../store/state.js";
 import testAction from "../../../../../devtools/tests/VueTestUtils.js";
 
 const {isFormatValid, parseScenarioFromImport} = actions;

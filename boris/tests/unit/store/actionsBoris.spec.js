@@ -1,10 +1,10 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import actions from "../../../store/actionsBoris";
-import stateBoris from "../../../store/stateBoris";
+import actions from "../../../store/actionsBoris.js";
+import stateBoris from "../../../store/stateBoris.js";
 import axios from "axios";
-import mapCollection from "../../../../../src/core/maps/js/mapCollection";
-import rawSources from "../../resources/rawSources";
+import mapCollection from "../../../../../src/core/maps/js/mapCollection.js";
+import rawSources from "../../resources/rawSources.js";
 import layerCollection from "../../../../../src/core/layers/js/layerCollection.js";
 
 import {addProjection} from "ol/proj.js";

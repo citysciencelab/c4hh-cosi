@@ -1,10 +1,10 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
-import getters from "../../store/gettersVpiDashboard";
-import actions from "../../store/actionsVpiDashboard";
-import mutations from "../../store/mutationsVpiDashboard";
-import {disabledDates} from "../../utils/dateHelpers";
-import apiEndpointService from "../../store/apiEndpointService";
+import getters from "../../store/gettersVpiDashboard.js";
+import actions from "../../store/actionsVpiDashboard.js";
+import mutations from "../../store/mutationsVpiDashboard.js";
+import {disabledDates} from "../../utils/dateHelpers.js";
+import apiEndpointService from "../../store/apiEndpointService.js";
 import dayjs from "dayjs";
 
 // Components Import

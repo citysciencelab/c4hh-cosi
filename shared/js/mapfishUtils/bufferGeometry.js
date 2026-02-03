@@ -1,6 +1,6 @@
 import buffer from "@turf/buffer";
-import {GeoJSON} from "ol/format";
-import SimpleGeometry from "ol/geom/SimpleGeometry";
+import {GeoJSON} from "ol/format.js";
+import SimpleGeometry from "ol/geom/SimpleGeometry.js";
 
 /**
  * Calculates a buffer for the passed geometry for a given radius.

@@ -1,5 +1,5 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
-import stateCommuterFlows from "./stateCommuterFlows";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import stateCommuterFlows from "./stateCommuterFlows.js";
 
 const mutations = {
     /**

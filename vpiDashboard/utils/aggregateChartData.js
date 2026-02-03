@@ -1,4 +1,4 @@
-import {changeDateFormat} from "./dateHelpers";
+import {changeDateFormat} from "./dateHelpers.js";
 
 /**
  * Aggregates visitor data by date and rounds the values up to the nearest 100.

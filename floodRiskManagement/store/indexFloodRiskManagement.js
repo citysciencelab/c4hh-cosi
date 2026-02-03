@@ -1,7 +1,7 @@
-import mutations from "./mutationsFloodRiskManagement";
-import getters from "./gettersFloodRiskManagement";
-import state from "./stateFloodRiskManagement";
-import actions from "./actionsFloodRiskManagement";
+import mutations from "./mutationsFloodRiskManagement.js";
+import getters from "./gettersFloodRiskManagement.js";
+import state from "./stateFloodRiskManagement.js";
+import actions from "./actionsFloodRiskManagement.js";
 
 export default {
     namespaced: true,

@@ -1,5 +1,5 @@
 import ValuationComponent from "./components/ValuationPrint.vue";
-import ValuationStore from "./store/indexValuationPrint";
+import ValuationStore from "./store/indexValuationPrint.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

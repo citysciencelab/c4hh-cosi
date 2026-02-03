@@ -1,5 +1,5 @@
 <script>
-import {getMappedProperty} from "../js/getMappedProperty";
+import {getMappedProperty} from "../js/getMappedProperty.js";
 import IconButton from "../../../../../src/shared/modules/buttons/components/IconButton.vue";
 import {mapGetters} from "vuex";
 import Style from "ol/style/Style.js";

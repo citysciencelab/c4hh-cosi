@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import aggregateChartData from "../../utils/aggregateChartData";
+import aggregateChartData from "../../utils/aggregateChartData.js";
 
 /**
  * Run only these tests via command:

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import {Config} from "../config";
+import {Config} from "../config.js";
 
 dayjs.extend(isBetween);
 

@@ -1,7 +1,7 @@
-import state from "./stateCombinedGfi";
-import actions from "./actionsCombinedGfi";
-import getters from "./gettersCombinedGfi";
-import mutations from "./mutationsCombinedGfi";
+import state from "./stateCombinedGfi.js";
+import actions from "./actionsCombinedGfi.js";
+import getters from "./gettersCombinedGfi.js";
+import mutations from "./mutationsCombinedGfi.js";
 
 export default {
     namespaced: true,

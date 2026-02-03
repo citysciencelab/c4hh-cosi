@@ -1,4 +1,4 @@
-import sortArrays from "./sortArrays";
+import sortArrays from "./sortArrays.js";
 import dayjs from "dayjs";
 import "dayjs/locale/de";
 

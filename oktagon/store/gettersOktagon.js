@@ -1,6 +1,6 @@
 
-import {generateSimpleGetters} from "../../../src/shared/js/utils/generators";
-import resetTreeState from "./stateOktagon";
+import {generateSimpleGetters} from "../../../src/shared/js/utils/generators.js";
+import resetTreeState from "./stateOktagon.js";
 
 const getters = {
     ...generateSimpleGetters(resetTreeState),

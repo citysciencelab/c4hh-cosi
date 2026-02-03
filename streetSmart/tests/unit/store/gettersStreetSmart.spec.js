@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import getters from "../../../store/gettersStreetSmart";
+import getters from "../../../store/gettersStreetSmart.js";
 
 describe.skip("addons/StreetSmart/store/gettersStreetSmart", function () {
     describe("currentLocale", function () {

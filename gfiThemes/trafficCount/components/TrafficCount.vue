@@ -2,15 +2,15 @@
 /* eslint-disable no-undef */
 import {mapGetters} from "vuex";
 import axios from "axios";
-import {TrafficCountCache} from "../utils/trafficCountCache";
-import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi";
+import {TrafficCountCache} from "../utils/trafficCountCache.js";
+import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi.js";
 import TrafficCountInfo from "./TrafficCountInfo.vue";
 import TrafficCountDay from "./TrafficCountDay.vue";
 import TrafficCountWeek from "./TrafficCountWeek.vue";
 import TrafficCountYear from "./TrafficCountYear.vue";
 import TrafficCountFooter from "./TrafficCountFooter.vue";
 import TrafficCountDownloads from "./TrafficCountDownloads.vue";
-import convertHttpLinkToSSL from "../../../../src/shared/js/utils/convertHttpLinkToSSL";
+import convertHttpLinkToSSL from "../../../../src/shared/js/utils/convertHttpLinkToSSL.js";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 
 export default {

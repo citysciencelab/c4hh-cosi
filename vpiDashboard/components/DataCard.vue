@@ -1,7 +1,7 @@
 <script>
 import {mapActions, mapGetters, mapState} from "vuex";
-import getters from "../store/gettersVpiDashboard";
-import actions from "../store/actionsVpiDashboard";
+import getters from "../store/gettersVpiDashboard.js";
+import actions from "../store/actionsVpiDashboard.js";
 import DataCardPaginator from "./DataCardPaginator.vue";
 
 export default {

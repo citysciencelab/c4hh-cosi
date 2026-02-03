@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import actions from "../../../store/actionsSdpDownload";
-import importedState from "../../../store/stateSdpDownload";
+import actions from "../../../store/actionsSdpDownload.js";
+import importedState from "../../../store/stateSdpDownload.js";
 import axios from "axios";
 import sinon from "sinon";
 

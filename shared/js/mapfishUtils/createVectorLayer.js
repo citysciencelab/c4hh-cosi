@@ -1,6 +1,6 @@
-import VectorLayer from "ol/layer/Vector";
-import VectorSource from "ol/source/Vector";
-import {Circle as CircleStyle, Fill, Stroke, Style} from "ol/style";
+import VectorLayer from "ol/layer/Vector.js";
+import VectorSource from "ol/source/Vector.js";
+import {Circle as CircleStyle, Fill, Stroke, Style} from "ol/style.js";
 
 /**
  * Creates a vector layer and adds the given feature.

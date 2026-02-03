@@ -1,6 +1,6 @@
 
 import Component from "./components/SimulationTool.vue";
-import Store from "./store/index";
+import Store from "./store/index.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

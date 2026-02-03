@@ -1,5 +1,5 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
-import state from "./stateVcOblique";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import state from "./stateVcOblique.js";
 
 const mutations = {
     /**

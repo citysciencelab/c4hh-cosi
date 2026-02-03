@@ -1,7 +1,7 @@
 <script>
-import getters from "../store/gettersVpiDashboard";
-import mutations from "../store/mutationsVpiDashboard";
-import actions from "../store/actionsVpiDashboard";
+import getters from "../store/gettersVpiDashboard.js";
+import mutations from "../store/mutationsVpiDashboard.js";
+import actions from "../store/actionsVpiDashboard.js";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import LoaderOverlay from "../utils/loaderOverlay.js";
 import {nextTick} from "vue";

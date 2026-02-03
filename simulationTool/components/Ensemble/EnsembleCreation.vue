@@ -2,7 +2,7 @@
 import { mapMutations, mapGetters, mapActions } from "vuex";
 import SectionHeader from "../SectionHeader.vue";
 import ProcessSelect from "../Process/ProcessSelect.vue";
-import Config from "../../../../portal/simulation/config";
+import Config from "../../../../portal/simulation/config.js";
 import EnsembleInput from "./EnsembleInput.vue";
 import AsyncWrapper from "../AsyncWrapper.vue";
 

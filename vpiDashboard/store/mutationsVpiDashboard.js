@@ -1,11 +1,11 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
-import stateVpiDashboard from "./stateVpiDashboard";
-import tabOriginsMutations from "./tab/origins/mutations";
-import tabAgeGroupsMutations from "./tab/age-groups/mutations";
-import tabGendersMutations from "./tab/gender/mutations";
-import {changeDateFormat} from "../utils/dateHelpers";
-import aggregateChartData from "../utils/aggregateChartData";
-import aggregateData from "../utils/aggregateData";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import stateVpiDashboard from "./stateVpiDashboard.js";
+import tabOriginsMutations from "./tab/origins/mutations.js";
+import tabAgeGroupsMutations from "./tab/age-groups/mutations.js";
+import tabGendersMutations from "./tab/gender/mutations.js";
+import {changeDateFormat} from "../utils/dateHelpers.js";
+import aggregateChartData from "../utils/aggregateChartData.js";
+import aggregateData from "../utils/aggregateData.js";
 
 const mutations = {
     ...generateSimpleMutations(stateVpiDashboard),

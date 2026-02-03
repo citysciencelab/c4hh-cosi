@@ -1,20 +1,20 @@
 <script>
-import {buffer} from "ol/extent";
-import ConvertStyle from "../../js/convertStyle";
+import {buffer} from "ol/extent.js";
+import ConvertStyle from "../../js/convertStyle.js";
 import DrawLayout from "../../../../src/shared/modules/draw/components/DrawLayout.vue";
 import DrawTypes from "../../../../src/shared/modules/draw/components/DrawTypes.vue";
 import Feature from "ol/Feature.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
-import {fromExtent} from "ol/geom/Polygon";
+import {fromExtent} from "ol/geom/Polygon.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import InputText from "../../../../src/shared/modules/inputs/components/InputText.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
+import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
 import SectionHeader from "../SectionHeader.vue";
-import convertFeatures from "../../js/convertFeatures";
-import {getDistance} from "ol/sphere";
+import convertFeatures from "../../js/convertFeatures.js";
+import {getDistance} from "ol/sphere.js";
 import {infrastructureLayerId} from "../../layerIds.js";
 
 export default {

@@ -1,6 +1,6 @@
 
-import {generateSimpleGetters} from "../../../src/shared/js/utils/generators";
-import stateFloodRiskManagement from "./stateFloodRiskManagement";
+import {generateSimpleGetters} from "../../../src/shared/js/utils/generators.js";
+import stateFloodRiskManagement from "./stateFloodRiskManagement.js";
 
 const getters = {
     ...generateSimpleGetters(stateFloodRiskManagement)

@@ -1,7 +1,7 @@
 <script>
 
 import {mapGetters, mapActions} from "vuex";
-import {createNewRowName, combineYearsData} from "../utils/helpers";
+import {createNewRowName, combineYearsData} from "../utils/helpers.js";
 import VerkehrsstaerkenThemeTable from "./VerkehrsstaerkenThemeTable.vue";
 import VerkehrsstaerkenThemeLineChart from "./VerkehrsstaerkenThemeLineChart.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";

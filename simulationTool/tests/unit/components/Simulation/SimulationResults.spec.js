@@ -4,13 +4,13 @@ import {createStore} from "vuex";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import layerCollection from "../../../../../../src/core/layers/js/layerCollection.js";
-import {Point, Polygon} from "ol/geom";
-import {Select} from "ol/interaction";
+import {Point, Polygon} from "ol/geom.js";
+import {Select} from "ol/interaction.js";
 import SimulationResults from "../../../../components/Simulation/SimulationResults.vue";
 import sinon from "sinon";
 import VectorSource from "ol/source/Vector.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
-import {Style} from "ol/style";
+import {Style} from "ol/style.js";
 
 config.global.mocks.$t = key => key;
 

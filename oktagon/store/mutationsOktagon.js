@@ -1,5 +1,5 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
-import stateOktagon from "./stateOktagon";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import stateOktagon from "./stateOktagon.js";
 
 const mutations = {
     /**

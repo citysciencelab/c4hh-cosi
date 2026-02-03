@@ -15,7 +15,7 @@ function getProxyUrl () {
  * <pre>
  * The CommuterApi provides access to the commuter wfs
  *
- * To import CommuterApi: import {CommuterApi} from "./commuterApi";
+ * To import CommuterApi: import {CommuterApi} from "./commuterApi.js";
  * create a new object:        const obj = new CommuterApi(...);
  * </pre>
  * @class

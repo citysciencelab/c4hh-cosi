@@ -1,4 +1,4 @@
-import helpers from "../../../js/helpers";
+import helpers from "../../../js/helpers.js";
 import {expect} from "chai";
 
 describe("boris helper functions", () => {

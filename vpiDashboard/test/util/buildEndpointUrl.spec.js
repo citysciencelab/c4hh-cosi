@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {buildEndpointUrl} from "../../utils/buildEndpointUrl";
+import {buildEndpointUrl} from "../../utils/buildEndpointUrl.js";
 
 /**
  * Run only these tests via command:

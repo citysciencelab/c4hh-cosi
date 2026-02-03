@@ -1,17 +1,17 @@
 <script>
-import ConvertFeature from "../../js/convertFeatures";
-import ConvertStyle from "../../js/convertStyle";
+import ConvertFeature from "../../js/convertFeatures.js";
+import ConvertStyle from "../../js/convertStyle.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
-import getBBOXGeometry from "../shared/js/getBBoxGeometry";
-import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature";
+import getBBOXGeometry from "../shared/js/getBBoxGeometry.js";
+import getOAFFeature from "../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 import ListGroup from "../shared/components/ListGroup.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
-import {Select} from "ol/interaction";
-import {singleClick} from "ol/events/condition";
+import {Select} from "ol/interaction.js";
+import {singleClick} from "ol/events/condition.js";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 import {infrastructureLayerId} from "../../layerIds.js";

@@ -2,7 +2,7 @@ import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
-import BimFactory from "../../../store/indexBimFactory";
+import BimFactory from "../../../store/indexBimFactory.js";
 
 import Component from "../../../components/BimFactory.vue";
 

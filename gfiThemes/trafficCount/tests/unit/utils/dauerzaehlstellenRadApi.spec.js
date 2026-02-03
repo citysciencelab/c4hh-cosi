@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {DauerzaehlstellenRadApi} from "../../../utils/dauerzaehlstellenRadApi";
+import {DauerzaehlstellenRadApi} from "../../../utils/dauerzaehlstellenRadApi.js";
 import de from "dayjs/locale/de";
 import dayjs from "dayjs";
 

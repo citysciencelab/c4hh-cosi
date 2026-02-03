@@ -2,21 +2,21 @@
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
 import {mapGetters, mapActions} from "vuex";
-import getOAFFeature from "../../../src/shared/js/api/oaf/getOAFFeature";
-import Point from "ol/geom/Point";
+import getOAFFeature from "../../../src/shared/js/api/oaf/getOAFFeature.js";
+import Point from "ol/geom/Point.js";
 import MultiPolygon from "ol/geom/MultiPolygon.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../src/core/layers/js/layerFactory.js";
 import {Fill, Stroke, Style} from "ol/style.js";
 import getWCSFeatures from "../js/getWCSFeatures.js";
-import spatialOperations from "../js/spatialOperations";
+import spatialOperations from "../js/spatialOperations.js";
 import isObject from "../../../src/shared/js/utils/isObject.js";
 import bbox from "@turf/bbox";
-import {GeoJSON} from "ol/format";
+import {GeoJSON} from "ol/format.js";
 import axios from "axios";
 import dayjs from "dayjs";
 import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
-import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog";
+import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog.js";
 
 export default {
     name: "WaterRiskCheck",

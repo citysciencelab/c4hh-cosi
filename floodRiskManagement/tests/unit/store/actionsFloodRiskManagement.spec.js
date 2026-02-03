@@ -1,5 +1,5 @@
 import testAction from "../../../../../devtools/tests/VueTestUtils.js";
-import actions from "../../../store/actionsFloodRiskManagement";
+import actions from "../../../store/actionsFloodRiskManagement.js";
 import sinon from "sinon";
 
 const {activatePrintStarted, createPrintJob, waitForPrintJob, waitForPrintJobSuccess} = actions;

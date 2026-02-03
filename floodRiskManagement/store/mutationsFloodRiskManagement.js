@@ -1,5 +1,5 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators";
-import stateFloodRiskManagement from "././stateFloodRiskManagement";
+import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import stateFloodRiskManagement from "././stateFloodRiskManagement.js";
 
 const mutations = {
     /**

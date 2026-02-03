@@ -1,6 +1,6 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
-import deepAssign from "@shared/js/utils/deepAssign";
+import deepAssign from "@shared/js/utils/deepAssign.js";
 import {translateKeyWithPlausibilityCheck} from "@shared/js/utils/translateKeyWithPlausibilityCheck.js";
 import BarchartItem from "@shared/modules/charts/components/BarchartItem.vue";
 

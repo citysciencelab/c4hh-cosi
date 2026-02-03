@@ -1,6 +1,6 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
-import mutationsObliqueViewer from "../store/mutationsVcOblique";
+import mutationsObliqueViewer from "../store/mutationsVcOblique.js";
 import iframeResizer from "iframe-resizer/js/iframeResizer";
 
 export default {

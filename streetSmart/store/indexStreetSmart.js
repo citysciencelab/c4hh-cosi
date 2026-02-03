@@ -1,7 +1,7 @@
-import actions from "./actionsStreetSmart";
-import mutations from "./mutationsStreetSmart";
-import getters from "./gettersStreetSmart";
-import state from "./stateStreetSmart";
+import actions from "./actionsStreetSmart.js";
+import mutations from "./mutationsStreetSmart.js";
+import getters from "./gettersStreetSmart.js";
+import state from "./stateStreetSmart.js";
 
 export default {
     namespaced: true,

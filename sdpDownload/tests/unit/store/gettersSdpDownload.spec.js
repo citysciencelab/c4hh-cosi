@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import stateSdpDownload from "../../../store/stateSdpDownload";
+import stateSdpDownload from "../../../store/stateSdpDownload.js";
 
 
 describe("addons/sdpDownload/store/gettersSdpDownload", function () {

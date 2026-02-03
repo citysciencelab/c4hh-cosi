@@ -1,5 +1,5 @@
 import PopulationRequestComponent from "./components/PopulationRequest.vue";
-import PopulationRequestStore from "./store/indexPopulationRequest";
+import PopulationRequestStore from "./store/indexPopulationRequest.js";
 import deLocale from "./locales/de/additional.json";
 import enLocale from "./locales/en/additional.json";
 

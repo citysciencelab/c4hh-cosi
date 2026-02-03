@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import actions from "../../../store/actionsStreetSmart";
-import state from "../../../store/stateStreetSmart";
+import actions from "../../../store/actionsStreetSmart.js";
+import state from "../../../store/stateStreetSmart.js";
 
 describe("addons/streetSmart/store/actionsStreetSmart", () => {
     const toggle3DCursorSpy = sinon.spy(),

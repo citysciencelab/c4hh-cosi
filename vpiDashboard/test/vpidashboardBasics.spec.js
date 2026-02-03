@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import getters from "../store/gettersVpiDashboard";
-import stateVpiDashboard from "../store/stateVpiDashboard";
+import getters from "../store/gettersVpiDashboard.js";
+import stateVpiDashboard from "../store/stateVpiDashboard.js";
 
 const {
     active,

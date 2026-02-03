@@ -1,5 +1,5 @@
-import {getCenter as getCenterOfExtent} from "ol/extent";
-import LineString from "ol/geom/LineString";
+import {getCenter as getCenterOfExtent} from "ol/extent.js";
+import LineString from "ol/geom/LineString.js";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 
 

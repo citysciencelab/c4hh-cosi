@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import getters from "../../../store/gettersOktagon";
+import getters from "../../../store/gettersOktagon.js";
 
 const {
     createSubmitURL,

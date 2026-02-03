@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import actions from "../../../store/actionsOktagon";
+import actions from "../../../store/actionsOktagon.js";
 
 const {
     addCoordinatesToSubmitObject,

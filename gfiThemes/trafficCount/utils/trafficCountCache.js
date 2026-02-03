@@ -1,4 +1,4 @@
-import {TrafficCountApi} from "./trafficCountApi";
+import {TrafficCountApi} from "./trafficCountApi.js";
 
 /**
  * TrafficCountCache is the layer between the trafficCountApi and the model of the TrafficCount GFI Theme
@@ -6,7 +6,7 @@ import {TrafficCountApi} from "./trafficCountApi";
  * The TrafficCountCache interfaces the TrafficCountApi to provide a simple access for the TrafficCount GFI Theme
  * The TrafficCountCache caches requests to the api and reacts to subscriptions.
  *
- * To import TrafficCountCache: import {TrafficCountCache} from "./trafficCountCache";
+ * To import TrafficCountCache: import {TrafficCountCache} from "./trafficCountCache.js";
  * create a new object:        const obj = new TrafficCountCache(...);
  * remember to only unsubscribe when gfi theme is closed:    obj.unsubscribeEverything();
  * unsubscribeEverything clears the cache!

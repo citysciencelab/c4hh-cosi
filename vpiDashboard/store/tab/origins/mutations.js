@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import weekOfYear from "dayjs/plugin/weekOfYear";
-import aggregateData from "../../../utils/aggregateData";
+import aggregateData from "../../../utils/aggregateData.js";
 
 dayjs.extend(weekOfYear);
 

@@ -1,5 +1,5 @@
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
-import {getCenter} from "ol/extent";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
+import {getCenter} from "ol/extent.js";
 import GeoJSONReader from "jsts/org/locationtech/jts/io/GeoJSONReader.js";
 import {BufferOp} from "jsts/org/locationtech/jts/operation/buffer";
 import GeoJSONWriter from "jsts/org/locationtech/jts/io/GeoJSONWriter.js";

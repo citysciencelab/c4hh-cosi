@@ -1,5 +1,5 @@
-import {generateSimpleGetters} from "../../../src/shared/js/utils/generators";
-import stateVpiDashboard from "./stateVpiDashboard";
+import {generateSimpleGetters} from "../../../src/shared/js/utils/generators.js";
+import stateVpiDashboard from "./stateVpiDashboard.js";
 
 const getters = {
     /**
