@@ -916,14 +916,6 @@ export default {
                     <li class="ps-4">
                         <button
                             class="dropdown-item"
-                            @click.stop="exportAsGeoJson(activeSet)"
-                        >
-                            GeoJSON
-                        </button>
-                    </li>
-                    <li class="ps-4">
-                        <button
-                            class="dropdown-item"
                             @click.stop="exportAsXlsx(activeSet)"
                         >
                             XLS
