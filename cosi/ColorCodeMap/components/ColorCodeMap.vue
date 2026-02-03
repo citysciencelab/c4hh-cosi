@@ -133,9 +133,6 @@ export default {
             this.generateGraphData();
             this.renderVisualization();
         },
-        showMapNames () {
-            this.renderVisualization();
-        },
         selectedYear () {
             this.renderVisualization();
         },
@@ -529,17 +526,6 @@ export default {
                 >
                     <v-icon>
                         mdi-poll
-                    </v-icon>
-                </button>
-                <button
-                    :disabled="!visualizationState"
-                    :class="{disabled: !visualizationState}"
-                    class="map_button"
-                    :title="visualizationState ? $t('additional:modules.tools.colorCodeMap.showDistrictNames') : $t('additional:modules.tools.colorCodeMap.needViz')"
-                    @click="setShowMapNames(!showMapNames)"
-                >
-                    <v-icon>
-                        mdi-map-marker
                     </v-icon>
                 </button>
                 <button

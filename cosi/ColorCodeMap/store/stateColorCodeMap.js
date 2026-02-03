@@ -6,8 +6,6 @@
  * @property {string} name displayed as title (config-param)
  * @property {string} icon icon next to title (config-param)
  * @property {boolean} renderToWindow if true, tool is rendered in a window, else in sidebar (config-param)
- * @property {boolean} resizableWindow if true, window is resizable (config-param)
- * @property {boolean} isVisibleInMenu if true, tool is selectable in menu (config-param)
  * @property {boolean} deactivateGFI flag if tool should deactivate gfi (config-param)
  * @todo the rest
  */
@@ -18,8 +16,6 @@ const state = {
     name: "ColorCodeMap",
     icon: "bi-map",
     renderToWindow: false,
-    resizableWindow: false,
-    isVisibleInMenu: false,
     deactivateGFI: false,
     minimized: true,
     yearSelector: "jahr_",
@@ -27,7 +23,6 @@ const state = {
     legendValues: [],
     colorScheme: "interpolateBlues",
     visualizationState: false,
-    showMapNames: false,
     playState: false,
     selectedFeature: "",
     selectedStatFeatures: [],

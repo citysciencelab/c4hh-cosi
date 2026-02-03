@@ -46,7 +46,28 @@ const actions = {
                     }
                     const styleArray = [],
                         match_props = matchResults.get(state.yearSelector + state.selectedYear),
-                        convertedColor = convertColor(colorScale.scale(match_props), "rgb");
+                        convertedColor = convertColor(colorScale.scale(match_props), "rgb"),
+                        headText = new Style({
+                            zIndex: 100,
+                            text: new Text({
+                                font: "16px Calibri, sans-serif",
+                                fill: new Fill({
+                                    color: [0, 0, 0]
+                                }),
+                                placement: "point",
+                                backgroundFill: new Fill({
+                                    color: [255, 255, 255]
+                                }),
+                                backgroundStroke: new Stroke({
+                                    color: [0, 0, 0],
+                                    width: 1
+                                }),
+                                padding: [5, 10, 5, 10],
+                                text: matchResults.get(rootGetters["Modules/DistrictSelector/keyOfAttrNameStats"]),
+                                offsetY: -35,
+                                overflow: true
+                            })
+                        });
 
                     getStyling.fill = match_props !== undefined ? new Fill({color: [...convertedColor, 0.75]}) : new Fill({color: "rgba(0, 0, 0, 0.75)"});
                     getStyling.zIndex = 1;
@@ -87,27 +108,8 @@ const actions = {
 
                         styleArray.push(additionalText);
                     }
-                    if (state.showMapNames) {
-                        const headText = new Style({
-                            zIndex: 100,
-                            text: new Text({
-                                font: "16px Calibri, sans-serif",
-                                fill: new Fill({
-                                    color: [0, 0, 0]
-                                }),
-                                placement: "point",
-                                backgroundFill: new Fill({
-                                    color: [255, 255, 255]
-                                }),
-                                padding: [5, 10, 5, 10],
-                                text: matchResults.get(rootGetters["Modules/DistrictSelector/keyOfAttrNameStats"]),
-                                offsetY: -35,
-                                overflow: true
-                            })
-                        });
 
-                        styleArray.push(headText);
-                    }
+                    styleArray.push(headText);
 
                     district.setStyle(styleArray);
                 }

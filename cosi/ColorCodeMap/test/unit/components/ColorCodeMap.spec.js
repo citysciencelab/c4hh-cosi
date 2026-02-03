@@ -148,15 +148,6 @@ describe("ColorCodeMap.vue", () => {
 
             const wrapper = await mount();
 
-            // wrapper.vm.setSelectedFeature("feature");
-            // wrapper.vm.setSelectedYear(2021);
-            // wrapper.vm.setShowMapNames(true);
-            // await wrapper.setData({
-            //     selectedFeature: "feature",
-            //     selectedYear: "2021",
-            //     showMapNames: true
-            // });
-
             expect(wrapper.find("#ccm").exists()).to.be.true;
             // expect(wrapper.find("#ccm").html()).to.not.be.empty;
 

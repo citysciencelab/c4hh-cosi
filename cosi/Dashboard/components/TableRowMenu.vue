@@ -40,13 +40,13 @@ export default {
         selectedMenuItem: null
     }),
     computed: {
-        ...mapGetters("Modules/ColorCodeMap", ["showMapNames", "playState"]),
+        ...mapGetters("Modules/ColorCodeMap", ["playState"]),
         _item () {
             return this.item;
         }
     },
     methods: {
-        ...mapMutations("Modules/ColorCodeMap", ["setShowMapNames", "setVisualizationState", "setPlayState", "setSelectedFeature"]),
+        ...mapMutations("Modules/ColorCodeMap", ["setVisualizationState", "setPlayState", "setSelectedFeature"]),
         ...mapActions("Modules/ColorCodeMap", ["renderVisualization"]),
         renderFeature () {
             if (!this._item.visualized) {
@@ -120,15 +120,6 @@ export default {
                         >
                             <v-icon>{{ playState ? 'mdi-pause' : 'mdi-play' }}</v-icon>
                             {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.visualize') }}
-                        </v-list-item>
-                        <v-list-item
-                            density="compact"
-                            :disabled="!_item.visualized"
-                            :title="!_item.visualized ? 'Visualisierung in der Karte muss aktiv sein.' : ''"
-                            @click="setShowMapNames(!showMapNames)"
-                        >
-                            <v-icon>mdi-map-marker</v-icon>
-                            {{ $t('additional:modules.tools.cosi.dashboard.tableRowMenu.districtName') }}
                         </v-list-item>
                     </div>
                     <v-tooltip left>
