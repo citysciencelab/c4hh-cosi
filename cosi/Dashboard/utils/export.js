@@ -85,7 +85,7 @@ export function prepareTableExportWithTimeline (data, districtNames, timestamps,
 
                     for (const col in el) {
                         if (typeof _item[col] === "object") {
-                            el[col] = getValue(item, {value: col}, timestamp, districts, timestampPrefix);
+                            el[col] = getValue(item, {value: col}, timestamp, districts, timestampPrefix, undefined, true);
                         }
                     }
 

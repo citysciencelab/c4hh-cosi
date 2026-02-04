@@ -12,9 +12,10 @@ import Feature from "ol/Feature";
  * @param {Object[]} districts - All districts of the current level.
  * @param {String} [timestampPrefix="jahr_"] - The string the timestamps start with (e.g. jahr_).
  * @param {String} [locale="de-DE"] The locale to be used for number formatting.
- * @returns {String} The value as String for the cell or "-" if no value is available.
+ * @param {Boolean} [raw=false] If true, returns the raw number instead of a localized string.
+ * @returns {String|Number} The value as String for the cell or "-" if no value is available. Number if raw=true.
  */
-export function getValue (item, header, timestamp, districts, timestampPrefix = "jahr_", locale = "de-DE") {
+export function getValue (item, header, timestamp, districts, timestampPrefix = "jahr_", locale = "de-DE", raw = false) {
     let val;
 
     if (!isObject(item)) {
@@ -25,7 +26,7 @@ export function getValue (item, header, timestamp, districts, timestampPrefix = 
         const parsedFloat = parseFloat(item[header.value][String(timestampPrefix) + timestamp]);
 
         if (Number.isFinite(parsedFloat)) {
-            val = parsedFloat.toLocaleString(locale, {maximumFractionDigits: 1});
+            val = raw ? parsedFloat : parsedFloat.toLocaleString(locale, {maximumFractionDigits: 1});
         }
     }
 
@@ -42,7 +43,7 @@ export function getValue (item, header, timestamp, districts, timestampPrefix = 
             divisor = Number(statFeature_B.get(String(timestampPrefix) + timestamp));
             result = mathutils[item.calculation.operation](dividend, divisor) * (item.calculation.modifier || 1);
             if (Number.isFinite(result)) {
-                val = result.toLocaleString(locale, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+                val = raw ? result : result.toLocaleString(locale, {minimumFractionDigits: 1, maximumFractionDigits: 1});
                 resultFeature.set(timestampPrefix + timestamp, val);
             }
             item[header.value].isCalculated = true;
