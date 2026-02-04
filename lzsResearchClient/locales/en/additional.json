@@ -6,6 +6,7 @@
             "loadingSpinnerText": {
                 "general": "Data is loading. Please wait..."
             },
+            "generalErrorMessage": "An unknown error has occured.",
             "tabs": {
                 "tabDetails": {
                     "label": "Details",

@@ -1,6 +1,7 @@
 <script>
 import {mapGetters, mapMutations} from "vuex";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import TabContainer from "./shared/TabContainer.vue";
 import TabDetails from "./TabDetails.vue";
 import TabResult from "./TabResult.vue";
@@ -11,12 +12,17 @@ export default {
     name: "LzsResearchClient",
     components: {
         SpinnerItem,
+        IconButton,
         TabContainer
     },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
-            "showLoadingSpinner"
+            "showLoadingSpinner",
+            "errorMessage"
         ]),
+        errorOccured () {
+            return this.errorMessage !== "";
+        },
         loadingSpinnerText () {
             return this.$t("additional:modules.lzsResearchClient.loadingSpinnerText.general");
         },
@@ -80,14 +86,32 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/LzsResearchClient", [
-            "setShowLoadingSpinner"
-        ])
+            "setShowLoadingSpinner",
+            "setErrorMessage"
+        ]),
+        hideErrorMessage () {
+            this.setErrorMessage("");
+        }
     }
 };
 </script>
 
 <template lang="html">
     <div id="lzsResearchClient">
+        <div
+            v-if="errorOccured"
+            class="alertError"
+        >
+            <span>{{ errorMessage }}</span>
+
+            <IconButton
+                :class-array="['btn-light', 'me-2', 'errorCloseButton']"
+                :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.goToDetails')"
+                icon="bi-x"
+                @click="hideErrorMessage"
+            />
+        </div>
+
         <div
             v-if="showLoadingSpinner"
             class="loadingSpinner"
@@ -116,6 +140,25 @@ export default {
 
     #lzsResearchClient{
         height: 100%;
+
+        div.alertError {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+            padding: 15px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            :deep(button.errorCloseButton) {
+                opacity: .5;
+            }
+        }
 
         div.loadingSpinner {
             position: absolute;

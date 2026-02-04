@@ -6,6 +6,7 @@
             "loadingSpinnerText": {
                 "general": "Daten werden geladen. Bitte warten..."
             },
+            "generalErrorMessage": "Es ist ein unbekannter Fehler aufgetreten.",
             "tabs": {
                 "tabDetails": {
                     "label": "Details",

@@ -7,85 +7,100 @@ const Token = "";
 export default {
     /**
      * Fetch the dataclass list from the API and store it in Vuex.
-     * @param {object} context - Vuex action context (state, commit).
+     * @param {object} context - Vuex action context (state, commit, dispatch).
      */
-    async fetchDataClassList ({state, commit}) {
+    async fetchDataClassList ({state, commit, dispatch}) {
         const params = {
                 Token: Token
             },
-            url = buildEndpointUrl(`${state.apiBasePath}/rest/dataclass/list`, params),
-            response = await axios.get(url, {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }
-            }),
-            archiveList = [];
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/dataclass/list`, params);
 
-        response.data.forEach(archive => {
-            archiveList.push({id: archive.id, name: archive.name});
+        await axios.get(url, {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        }).then(function (response) {
+            const archiveList = [];
+
+            response.data.forEach(archive => {
+                archiveList.push({id: archive.id, name: archive.name});
+            });
+
+            commit("setArchiveList", archiveList);
+            commit("setDataClassList", response.data);
+        }).catch(function (error) {
+            dispatch("axiosErrorHandling", error);
         });
-
-        commit("setArchiveList", archiveList);
-        commit("setDataClassList", response.data);
     },
     /**
      * Search dataclass instances by attribute payload and commit results.
-     * @param {object} context - Vuex action context (state, commit).
+     * @param {object} context - Vuex action context (state, commit, dispatch).
      * @param {object} payload - Search payload sent to the API.
      */
-    async searchByAttribute ({state, commit}, payload) {
+    async searchByAttribute ({state, commit, dispatch}, payload) {
         commit("setSearchAttributeResponse", []);
         const params = {
                 Token: Token,
                 f: "json",
                 preventCache: Date.now()
             },
-            url = buildEndpointUrl(`${state.apiBasePath}/rest/dataclassinstance/search`, params),
-            response = await axios.post(url, payload),
-            searchAttributeResponse = [];
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/dataclassinstance/search`, params);
 
-        response.data.forEach(element => {
-            searchAttributeResponse.push({
-                archiveId: element.dataclassId,
-                instanceId: element.dataclassinstanceId,
-                attributes: element.dataclassinstanceAttributeArr.filter(attr => attr.type !== "P")
+        await axios.post(url, payload)
+            .then(function (response) {
+                const searchAttributeResponse = [];
+
+                response.data.forEach(element => {
+                    searchAttributeResponse.push({
+                        archiveId: element.dataclassId,
+                        instanceId: element.dataclassinstanceId,
+                        attributes: element.dataclassinstanceAttributeArr.filter(attr => attr.type !== "P")
+                    });
+                });
+
+                commit("setSearchAttributeResponse", searchAttributeResponse);
+            }).catch(function (error) {
+                dispatch("axiosErrorHandling", error);
             });
-        });
-
-        commit("setSearchAttributeResponse", searchAttributeResponse);
     },
     /**
      * Load placeholder JSON file from portalconfigs and commit it to the store.
      * @param {object} context - Vuex action context (state, commit).
      */
-    async fetchPlaceholders ({state, commit}) {
-        const timestamp = Date.now(),
-            response = await axios.get(state.placeholderJsonPath + "?t=" + timestamp);
+    async fetchPlaceholders ({state, commit, dispatch}) {
+        const timestamp = Date.now();
 
-        commit("setPlaceholderDataClassList", response.data);
+        await axios.get(state.placeholderJsonPath + "?t=" + timestamp)
+            .then(function (response) {
+                commit("setPlaceholderDataClassList", response.data);
+            }).catch(function (error) {
+                dispatch("axiosErrorHandling", error);
+            });
     },
     /**
      * Request available years for a given archive and add them to the store.
-     * @param {object} context - Vuex action context (state, commit).
+     * @param {object} context - Vuex action context (state, commit, dispatch).
      * @param {string} archiveId - Archive identifier to request years for.
      */
-    async fetchYears ({state, commit}, archiveId) {
+    async fetchYears ({state, commit, dispatch}, archiveId) {
         const params = {
                 Token: Token,
                 f: "json",
                 preventCache: Date.now()
             },
-            url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/dataclass/computeyears`, params),
-            response = await axios.post(url, [archiveId]);
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/dataclass/computeyears`, params);
 
-        // response.data?.forEach(year => {
-        commit("addArchiveYear", {
-            [archiveId]: {
-                years: response?.data,
-                archiveName: (state.archiveList.find(a => a.id === archiveId) || {}).name
-            }
-        });
-        // });
+        await axios.post(url, [archiveId])
+            .then(function (response) {
+                commit("addArchiveYear", {
+                    [archiveId]: {
+                        years: response?.data,
+                        archiveName: (state.archiveList.find(a => a.id === archiveId) || {}).name
+                    }
+                });
+            }).catch(function (error) {
+                dispatch("axiosErrorHandling", error);
+            });
     },
     /**
      * Send a geometry-based search request.
@@ -93,60 +108,7 @@ export default {
      * @param {object} payload - Search payload including geometry and attributes.
      * @returns {Promise} Axios response from the search API.
      */
-    async searchByGeometry ({state, commit}, payload) {
-        // const payload = {
-        //     // These two will be selectedArchivIds from component.
-        //     // Conditional if there is a year selected or not.
-        //     "dataclassIdsWithJahrgang": [
-        //         "DKL_3DSTADT_LOD1",
-        //         "DKL_AFIS_EINZEL",
-        //         "DKL_ALKIS_GRAFIK"
-        //     ],
-        //     "dataclassIdsWithoutJahrgang": [],
-        //     "srs": 25832,
-        //     // feature geomerty here..
-        //     "featuregeometrie": {
-        //         "type": "Polygon",
-        //         "coordinates": [
-        //             [
-        //                 [
-        //                     534926.936499873,
-        //                     5921380.215985099
-        //                 ],
-        //                 [
-        //                     598427.063500127,
-        //                     5921380.215985099
-        //                 ],
-        //                 [
-        //                     598427.063500127,
-        //                     5950186.784014901
-        //                 ],
-        //                 [
-        //                     534926.936499873,
-        //                     5950186.784014901
-        //                 ],
-        //                 [
-        //                     534926.936499873,
-        //                     5921380.215985099
-        //                 ]
-        //             ]
-        //         ]
-        //     },
-        //     // years list in component will be here..
-        //     "featureDataclassAttribs": [
-        //         {
-        //             "id": "JAHRGANG",
-        //             "type": "I",
-        //             "value": "2022"
-        //         },
-        //         {
-        //             "id": "JAHRGANG",
-        //             "type": "I",
-        //             "value": "2023"
-        //         }
-        //     ]
-        // };
-
+    async searchByGeometry ({state, commit, dispatch}, payload) {
         commit("setSearchAttributeResponse", []);
 
         const params = {
@@ -154,54 +116,66 @@ export default {
                 f: "json",
                 preventCache: Date.now()
             },
-            url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/searchfeatures`, params),
-            response = await axios.post(url, payload),
-            searchAttributeResponse = [];
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/searchfeatures`, params);
 
-        response.data.foundItems.forEach(element => {
-            searchAttributeResponse.push({
-                archiveId: element.dklId,
-                attributes: element.dklAttributeList.filter(attr => attr.type !== "P"),
-                instanceId: element.dklInstanceId
+        await axios.post(url, payload)
+            .then(function (response) {
+                const searchAttributeResponse = [];
+
+                response.data.foundItems.forEach(element => {
+                    searchAttributeResponse.push({
+                        archiveId: element.dklId,
+                        attributes: element.dklAttributeList.filter(attr => attr.type !== "P"),
+                        instanceId: element.dklInstanceId
+                    });
+                });
+
+                commit("setSearchAttributeResponse", searchAttributeResponse);
+
+                return response;
+            }).catch(function (error) {
+                dispatch("axiosErrorHandling", error);
+
+                return null;
             });
-        });
-
-        commit("setSearchAttributeResponse", searchAttributeResponse);
-
-        return response;
     },
     /**
      * Request primarydata for a given archive and instance and add them to the store.
-     * @param {Object} context - Vuex action context (state, commit).
+     * @param {Object} context - Vuex action context (state, commit, dispatch).
      * @param {Object} payload
      * @param {String} payload.archiveId - Archive identifier to request primarydata for.
      * @param {String} payload.instanceId - Instance identifier to request primarydata for.
      */
-    async fetchPrimarydata ({state, commit}, payload) {
+    async fetchPrimarydata ({state, commit, dispatch}, payload) {
         const {archiveId, instanceId} = payload,
             params = {
                 Token: Token,
                 f: "json",
                 preventCache: Date.now()
             },
-            url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}`, params),
-            response = await axios.get(url);
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}`, params);
 
-        commit("addPrimaryDataToInstance", {
-            instanceId: instanceId,
-            primaryData: response?.data
-        });
+        await axios.get(url)
+            .then(function (response) {
+                commit("addPrimaryDataToInstance", {
+                    instanceId: instanceId,
+                    primaryData: response?.data
+                });
+            }).catch(function (error) {
+                dispatch("axiosErrorHandling", error);
+            });
     },
     /**
      * Download the preview picture for a given primaryDataId and add it to the store.
      * Return already stored preview picture if available for the given primaryDataId
-     * @param {Object} context - Vuex action context (state, commit).
+     * @param {Object} context - Vuex action context (state, dispatch).
      * @param {Object} payload
      * @param {String} payload.archiveId - Archive identifier to request preview for.
      * @param {String} payload.instanceId - Instance identifier to request preview for.
      * @param {String} payload.primaryDataId - Primary data identifier to request preview for.
+     * @returns {Binary} - preview picture or null
      */
-    async downloadPreview ({state}, payload) {
+    async downloadPreview ({state, dispatch}, payload) {
         const {archiveId, instanceId, primaryDataId} = payload,
             params = {
                 Token: Token,
@@ -220,12 +194,18 @@ export default {
             return existingPrimaryData[0].previewData;
         }
 
-        const response = await axios.get(url, {responseType: "blob"}),
-            blobURL = window.URL.createObjectURL(response.data);
+        return axios.get(url, {responseType: "blob"})
+            .then(function (response) {
+                const blobURL = window.URL.createObjectURL(response.data);
 
-        existingPrimaryData[0].previewData = blobURL;
+                existingPrimaryData[0].previewData = blobURL;
 
-        return blobURL;
+                return blobURL;
+            }).catch(function (error) {
+                dispatch("axiosErrorHandling", error);
+
+                return null;
+            });
     },
     /**
      * Download the dataset for a given primaryDataId and open the 'save' dialog.
@@ -251,5 +231,25 @@ export default {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    },
+    axiosErrorHandling ({state}, error) {
+        if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+            state.errorMessage = error.response.data?.error?.errorMessage ?? error.config.url + ": " + error.response.statusText;
+        }
+        else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+            state.errorMessage = error.request;
+        }
+        else if (error.message) {
+        // Something happened in setting up the request that triggered an Error
+            state.errorMessage = error.message;
+        }
+        else {
+            state.errorMessage = i18next.t("additional:modules.lzsResearchClient.generalErrorMessage");
+        }
     }
 };

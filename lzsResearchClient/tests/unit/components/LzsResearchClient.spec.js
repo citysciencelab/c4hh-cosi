@@ -21,7 +21,8 @@ describe("addons/lzsResearchClient/tests/unit/LzsResearchClient.spec.js", () => 
                                 showLoadingSpinner: false
                             }),
                             getters: {
-                                showLoadingSpinner: state => state.showLoadingSpinner
+                                showLoadingSpinner: state => state.showLoadingSpinner,
+                                errorMessage: () => ""
                             },
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {

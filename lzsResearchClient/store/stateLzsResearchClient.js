@@ -70,7 +70,8 @@ const state = {
     lzsSelectedDrawType: "",
     lzsSelectedInteraction: null,
     lzsDrawEdits: ["deleteAll"],
-    minScaleValue: 5000
+    minScaleValue: 5000,
+    errorMessage: ""
 };
 
 export default state;
