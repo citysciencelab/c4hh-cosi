@@ -107,7 +107,7 @@ export default {
          * @returns {void}
          */
         onGlobalKeyDown (event) {
-            if (!event.key === "Escape") {
+            if (event.key !== "Escape") {
                 return;
             }
             this.filterMenuDropdownInstance?.hide();
