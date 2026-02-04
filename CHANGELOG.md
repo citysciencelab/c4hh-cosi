@@ -3,16 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
-
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
+## 2026-02-04 v3.19.0
 
 ### Fixed
 - TrafficCount: Fixed bug that displayed the wrong calendarweek for the first calendarweek of each year and fixed tooltip label.
