@@ -38,23 +38,16 @@ export default {
                     "layerConfig"
                 ],
                 Maps: [
-                    // "layerIds",
-                    // "loadedLayers",
-                    // "view"
                     "center",
                     "zoom"
                 ],
-                // Tools: {
                 Modules: {
                     ChartGenerator: [
                         // "datasets",
                         // "chartConfigs"
                     ],
                     CalculateRatio: [
-                        "dataSets",
-                        "resultHeaders",
-                        "results",
-                        "active"
+                        "dataSets"
                     ],
                     ScenarioBuilder: [
                         // "scenarios",
@@ -67,18 +60,6 @@ export default {
                     ],
                     AccessibilityAnalysis: [
                         "dataSets"
-                        // "isochroneFeatures",
-                        // "rawGeoJson",
-                        // "mode",
-                        // "coordinate",
-                        // "clickCoordinate",
-                        // "selectedFacilityNames",
-                        // "useOuterBoundaries",
-                        // "transportType",
-                        // "scaleUnit",
-                        // "distance",
-                        // "steps",
-                        // "active"
                     ],
                     Dashboard: [
                         "calculations",
@@ -86,15 +67,8 @@ export default {
                         "timestamps",
                         "timestampsFiltered"
                     ],
-                    AreaSelector: [
-                        "geometry"
-                    ],
                     Draw: [
                         // "layer"
-                    ],
-                    QueryDistricts: [
-                        // "dataSets",
-                        // "propertiesMap"
                     ]
                 }
             },
