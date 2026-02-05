@@ -97,12 +97,78 @@ export default {
             handler (newCards) {
                 this.$emit("setCards", newCards);
             }
+        },
+        cardMapping: {
+            deep: true,
+            handler (newCardMapping) {
+                this.syncCardsWithMapping(newCardMapping);
+            }
         }
     },
     mounted () {
         this.initializeCards();
     },
     methods: {
+        /**
+         * Syncs the currently selected cards with the available card mapping.
+         * This is required because the internal `cards` array is initialized on mount,
+         * but the allowed `cardMapping` can change dynamically (e.g. legend becomes unavailable).
+         *
+         * Cards that are no longer part of the mapping will be removed while preserving
+         * the order and the user's remaining selections.
+         *
+         * @param {Object[]} newCardMapping - The updated card mapping.
+         * @returns {void}
+         */
+        syncCardsWithMapping (newCardMapping) {
+            if (!Array.isArray(newCardMapping)) {
+                return;
+            }
+
+            const allowedPairs = [];
+            let filteredCards = [];
+
+            newCardMapping.forEach(cardType => {
+                if (Array.isArray(cardType?.items)) {
+                    cardType.items.forEach(item => {
+                        allowedPairs.push({key: cardType.key, name: item?.inputs?.title});
+                    });
+                }
+                else {
+                    allowedPairs.push({key: cardType?.key, name: cardType?.name});
+                }
+            });
+
+            /**
+             * Checks whether a card is still allowed based on the current card mapping.
+             * Placeholder cards without a key are always allowed.
+             *
+             * @param {Object} card - The card to validate.
+             * @returns {boolean} True if the card is allowed, otherwise false.
+             */
+            function isAllowed (card) {
+                if (!card?.key && card?.name === null) {
+                    return true;
+                }
+
+                return allowedPairs.some(({key, name}) => {
+                    if (typeof key !== "undefined" && card?.key !== key) {
+                        return false;
+                    }
+                    if (typeof name === "undefined" || name === null) {
+                        return true;
+                    }
+                    return card?.name === name;
+                });
+            }
+
+            filteredCards = Array.isArray(this.cards) ? this.cards.filter(isAllowed) : [];
+
+            if (filteredCards.length !== this.cards.length) {
+                this.cards = filteredCards;
+            }
+        },
+
         /**
          * Adds a new card to the cards array.
          * @returns {void}

@@ -155,24 +155,6 @@ export default {
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
 
         /**
-         * Checks whether more than one area is currently selected.
-         * @returns {Boolean} True if multiple areas are selected.
-         */
-        hasMultipleSelectedAreas () {
-            return Array.isArray(this.selectedDistrictNames) && this.selectedDistrictNames.length > 1;
-        },
-
-        /**
-         * Gets whether areas should be summed up in the report.
-         * If only one area is selected, summing up is effectively disabled (and the "selected area" column is not shown).
-         * @returns {Boolean} True if areas should be summed up in the report.
-         */
-        shouldAreasBeSummedUpInReport () {
-            return this.shouldAreasSummedUp && this.hasMultipleSelectedAreas;
-        },
-
-
-        /**
          * Gets the category mapping defined in the assets file including the current accessibility analyses.
          * @returns {Object} The category mapping object including the analyses as items.
          */
@@ -255,6 +237,47 @@ export default {
                 && !this.dataSets?.length
                 && !this.featuresListItems?.length;
         },
+        /**
+         * Checks whether subject data are selected at all.
+         * @returns {Boolean} True if there are subject data features selected.
+         */
+        hasSubjectDataSelected () {
+            return Array.isArray(this.featuresListItems) && this.featuresListItems.length > 0;
+        },
+
+        /**
+         * Determines whether the subject data map is effectively selected and active.
+         * @returns {boolean} True if the subject data map is selected and active.
+         */
+        isSubjectDataMapSelected () {
+            return Array.isArray(this.subjectDataCards)
+                && this.subjectDataCards.some(card => card?.key === "subjectDataMap"
+                    && card?.active !== false
+                    && card?.value !== false
+                );
+        },
+
+        /**
+         * Legend (and the legend card in annex) should only be available if subject data are shown on the map.
+         * @returns {Boolean} True if legend should be included in the report.
+         */
+        shouldIncludeLegendInReport () {
+            return this.hasSubjectDataSelected && this.isSubjectDataMapSelected;
+        },
+
+        /**
+         * Gets the annex card mapping and removes the legend option if it must not be available.
+         * @returns {Object[]} The (optionally filtered) annex card mapping.
+         */
+        annexCardMapping () {
+            if (!Array.isArray(categoryMapping?.annex)) {
+                return [];
+            }
+
+            return this.shouldIncludeLegendInReport
+                ? categoryMapping.annex
+                : categoryMapping.annex.filter(cardType => cardType.key !== "legend");
+        },
 
         /**
          * Gets the selected front page item.
@@ -267,12 +290,9 @@ export default {
     watch: {
         featuresListItems: "preparesInfrastructureData",
         visibleSubjectDataLayerConfigs: "updateFeaturesList",
-        selectedDistrictNames: {
-            deep: true,
-            handler () {
-                if (this.selectedDistrictNames.length <= 1) {
-                    this.shouldAreasSummedUp = false;
-                }
+        shouldIncludeLegendInReport (newVal) {
+            if (!newVal && Array.isArray(this.annexCards) && this.annexCards.length) {
+                this.annexCards = this.annexCards.filter(card => card.key !== "legend");
             }
         }
     },
@@ -704,7 +724,9 @@ export default {
                 const card = cards[i];
 
                 if (card.key === "legend") {
-                    await this.addLegendFromStore();
+                    if (this.shouldIncludeLegendInReport) {
+                        await this.addLegendFromStore();
+                    }
                 }
 
                 if (card.key === "sources") {
@@ -851,7 +873,7 @@ export default {
                             value = statFeature.category;
                             pdf.addCell(row, value, alignment);
                         }
-                        else if (index === 1 && this.shouldAreasBeSummedUpInReport) {
+                        else if (index === 1 && this.shouldAreasSummedUp) {
                             value = this.getTotal(statFeature, selectedDistrictLabels, printedYear, "jahr_");
                             pdf.addCell(row, this.formatPdfCellValue(value, numberOptions), alignment);
                         }
@@ -1244,7 +1266,7 @@ export default {
             let refDistrictName, district;
 
             for (district of districts) {
-                if (this.selectedLevels.includes(districtLevel.label) || !this.shouldAreasBeSummedUpInReport) {
+                if (this.selectedLevels.includes(districtLevel.label) || !this.shouldAreasSummedUp) {
                     columns.push(district.getLabel());
                 }
 
@@ -1258,7 +1280,7 @@ export default {
                 this.getStatCols(districtLevel.referenceLevel, refDistrictNames, columns);
             }
 
-            if (this.shouldAreasBeSummedUpInReport) {
+            if (this.shouldAreasSummedUp) {
                 return [this.areaColumnName, ...columns];
             }
             return columns;
@@ -1801,7 +1823,7 @@ export default {
                     </v-stepper-window-item>
                     <v-stepper-window-item :value="5">
                         <ReportingToolStepItem
-                            :card-mapping="categoryMapping?.annex"
+                            :card-mapping="annexCardMapping"
                             :title="'5. ' + $t('additional:modules.cosi.reportingTool.annex')"
                             @set-cards="setAnnexCards"
                         />
