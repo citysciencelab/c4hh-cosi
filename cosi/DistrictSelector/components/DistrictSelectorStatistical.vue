@@ -47,8 +47,8 @@ export default {
     },
     data () {
         return {
-            // color for the drag box button
-            dragBoxButtonColor: "grey lighten-1",
+            // Indicates whether the drag box interaction is active or not.
+            isDragBoxActive: false,
             // Indicates whether this component is active
             isActive: false
         };
@@ -77,9 +77,14 @@ export default {
             return this.cardsSubject.find(card => card.status === "active");
         },
 
+        /**
+         * Determines whether the confirm button should be disabled.
+         * @returns {boolean} - Returns `true` if the button should be disabled, otherwise `false`.
+         */
         disableButton () {
-            return this.selectedDistrictNames.length === 0;
+            return this.selectedDistrictNames.length === 0 || !(this.selectedDistrictNames.length > 0 && !this.activeCard);
         },
+
         /**
          * Gets an array of district level labels with their corresponding values and selection status.
          * Each object in the returned array contains:
@@ -121,6 +126,14 @@ export default {
                     this.updateLayerBbox(bboxGeomWKT);
                 });
             }
+        },
+
+        /**
+         * Watches the isDragBoxActive property and activates or deactivates the drag box interaction.
+         * @returns {void}
+         */
+        isDragBoxActive () {
+            this.dragBox.setActive(this.isDragBoxActive);
         },
         /**
          * Every time the list of layers of the map changes the function prepareDistricts is called.
@@ -203,9 +216,9 @@ export default {
 
         this.isActive = false;
         this.select.setActive(false);
+        this.isDragBoxActive = false;
     },
     beforeUnmount () {
-        this.removeInteraction(this.dragBox);
         document.getElementById("mp-menu-secondaryMenu").style.width = this.sideMenuWidth;
 
         // remove overlay if no districts are selected at this point
@@ -296,14 +309,18 @@ export default {
         registerDragBoxListener (dragBox, featureCollection) {
             dragBox.on("boxend", (evt) => {
                 const extent = evt.target.getGeometry().getExtent(),
-                    source = this.getDistrictLevelById(this.selectedDistrictLevelId).layer.getSource();
+                    source = this.getDistrictLevelById(this.selectedDistrictLevelId).layer.getSource(),
+                    keyOfAttrName = this.selectedDistrictLevel.keyOfAttrName;
 
                 source.forEachFeatureIntersectingExtent(extent, (feature) => {
-                    featureCollection.push(feature);
+                    if (this.selectedDistrictLevel.filterableValues.includes(feature.get(keyOfAttrName))) {
+                        featureCollection.push(feature);
+                    }
                 });
+                this.isDragBoxActive = false;
             });
 
-            dragBox.on("boxstart", () => this.clearFeatures());
+            dragBox.on("boxstart", () => this.clearFeatures(), this.selectedDistrictNames = []);
         },
 
         /**
@@ -405,18 +422,11 @@ export default {
         },
 
         /**
-         * Activates/deactivates the dragbox interaction and toggles the css class for the drag box button.
+         * Toggles isDragBoxActive to control the drag box.
          * @returns {void}
          */
         toggleDragBox () {
-            if (this.dragBox.getActive()) {
-                this.dragBox.setActive(false);
-                this.dragBoxButtonColor = "grey lighten-1";
-            }
-            else {
-                this.dragBox.setActive(true);
-                this.dragBoxButtonColor = "primary";
-            }
+            this.isDragBoxActive = !this.isDragBoxActive;
         },
 
         /**
@@ -454,7 +464,7 @@ export default {
             const extent = calculateExtent(this.selectedFeatures, parseInt(0, 10)),
                 bboxGeom = getBoundingGeometry(this.selectedFeatures, 0);
 
-
+            this.isDragBoxActive = false;
             this.cards.push({
                 badgeList: [{
                     backgroundColor: "rgba(33, 132, 251, 1)",
@@ -642,11 +652,12 @@ export default {
             >
                 <div class="d-flex align-items-center">
                     <IconButton
-                        :id="'drawButton'"
+                        :id="'districtSelectorDragBox'"
                         :aria="'Rechteck zeichnen'"
-                        :class-array="['btn-primary', 'me-3', dragBox.getActive() ? 'active': '']"
+                        :class-array="['btn-primary', 'me-3', isDragBoxActive ? 'active': '']"
                         :icon="'bi bi-square'"
                         :interaction="() => toggleDragBox()"
+                        :label="'Rechteck'"
                     />
                 </div>
             </AccordionItem>
@@ -704,5 +715,10 @@ export default {
         background-color: rgba(255, 255, 255, 0.4);
         border-color: rgba(51, 153, 204, 1);
         border-width: 1.25
+    }
+
+    #districtSelectorDragBox.active {
+        background-color: $dark_blue;
+        color: rgba(255, 255, 255, 1);
     }
 </style>
