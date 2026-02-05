@@ -1,8 +1,8 @@
 {
     "modules": {
         "lzsResearchClient": {
-            "name": "Lzs Research Client",
-            "description": "Please insert a description.",
+            "name": "GeoDataDepot",
+            "description": "The tool for easy searching and access to geodata in long-term storage.",
             "loadingSpinnerText": {
                 "general": "Data is loading. Please wait..."
             },

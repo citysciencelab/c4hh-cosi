@@ -35,7 +35,7 @@ const state = {
     id: "lzsResearchClient",
     name: "additional:modules.lzsResearchClient.name",
     description: "additional:modules.lzsResearchClient.description",
-    icon: "bi-question-square",
+    icon: "bi-database-down",
     isVisibleInMenu: true,
     deactivateGFI: true,
     standAlonePortal: false,
