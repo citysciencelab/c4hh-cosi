@@ -200,8 +200,21 @@ export default {
         getBufferedFeature (wktFeature, buffer) {
             const feature = wktParser.decodeFeature(wktFeature),
                 geometryCollection = getBoundingGeometry([feature], buffer).getGeometries(),
-                geojsonPolygons = geometryCollection.map(polygon => turfPolygon(polygon.getCoordinates()));
+                geojsonPolygons = [];
 
+            geometryCollection.forEach(geometry => {
+                if (geometry.getType() === "Polygon") {
+                    geojsonPolygons.push(turfPolygon(geometry.getCoordinates()));
+                }
+                else if (geometry.getType() === "MultiPolygon") {
+                    geometry.getPolygons().forEach(polygon => {
+                        geojsonPolygons.push(turfPolygon(polygon.getCoordinates()));
+                    });
+                }
+                else {
+                    console.warn("Unexpected geometry type:", geometry.getType());
+                }
+            });
             this.setBoundingGeometry(geometryCollection);
 
             let merged = geojsonPolygons[0],
