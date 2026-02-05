@@ -75,7 +75,7 @@ export default {
             state: null,
             session: {
                 meta: {
-                    title: `${this.$t("additional:modules.tools.cosi.saveSession.newSession")}-${new Date().toLocaleString()}`,
+                    title: `${this.$t("additional:modules.cosi.saveSession.newSession")}-${new Date().toLocaleString()}`,
                     info: null,
                     created: null,
                     date: null
@@ -117,7 +117,7 @@ export default {
     },
     watch: {
         autoSave () {
-            this.successText = this.$t("additional:modules.tools.cosi.saveSession.settingsChanged");
+            this.successText = this.$t("additional:modules.cosi.saveSession.settingsChanged");
             this.successDialog = true;
 
             if (this.autoSave) {
@@ -221,7 +221,7 @@ export default {
                 request.onsuccess = () => {
                     this.latestDate = null;
                     this.confirmDialog = false;
-                    this.successText = this.$t("additional:modules.tools.cosi.saveSession.cleared");
+                    this.successText = this.$t("additional:modules.cosi.saveSession.cleared");
                     this.successDialog = true;
                 };
             }
@@ -240,20 +240,20 @@ export default {
                 request.onerror = (err) => {
                     console.error(err);
                     this.addSingleAlert({
-                        content: this.$t("additional:modules.tools.cosi.saveSession.saveToLocalStorageError"),
+                        content: this.$t("additional:modules.cosi.saveSession.saveToLocalStorageError"),
                         category: "Error",
                         displayClass: "error"
                     });
                 };
                 request.onsuccess = () => {
-                    this.successText = this.$t("additional:modules.tools.cosi.saveSession.success");
+                    this.successText = this.$t("additional:modules.cosi.saveSession.success");
                     this.successDialog = true;
                     this.latestDate = this.session.meta?.created;
                 };
             }
             else {
                 this.localStorage.setItem("cosi-state", JSON.stringify(this.session));
-                this.successText = this.$t("additional:modules.tools.cosi.saveSession.success");
+                this.successText = this.$t("additional:modules.cosi.saveSession.success");
                 this.successDialog = true;
                 this.latestDate = this.session.meta?.created;
             }
@@ -319,7 +319,7 @@ export default {
             catch (e) {
                 console.error(e);
                 this.addSingleAlert({
-                    content: this.$t("additional:modules.tools.cosi.saveSession.loadFromLocalStorageError"),
+                    content: this.$t("additional:modules.cosi.saveSession.loadFromLocalStorageError"),
                     category: "Error",
                     displayClass: "error"
                 });
@@ -501,28 +501,28 @@ export default {
         <ToolInfo
             :url="readmeUrl"
             :locale="currentLocale"
-            :summary="$t('additional:modules.tools.cosi.saveSession.localSaveDescription')"
+            :summary="$t('additional:modules.cosi.saveSession.localSaveDescription')"
         />
         <h5 class="mb-3">
-            {{ $t("additional:modules.tools.cosi.saveSession.currentWorkStatus") }}
+            {{ $t("additional:modules.cosi.saveSession.currentWorkStatus") }}
         </h5>
         <InputText
             id="session-name"
             v-model="session.meta.title"
             class="mb-3"
-            :placeholder="$t('additional:modules.tools.cosi.saveSession.sessionName')"
-            :label="$t('additional:modules.tools.cosi.saveSession.sessionName')"
+            :placeholder="$t('additional:modules.cosi.saveSession.sessionName')"
+            :label="$t('additional:modules.cosi.saveSession.sessionName')"
         />
         <FlatButton
             class="mx-auto"
             icon="bi bi-cloud-arrow-down"
             :disabled="session.meta.title.length === 0"
-            :text="$t('additional:modules.tools.cosi.saveSession.saveAsFile')"
+            :text="$t('additional:modules.cosi.saveSession.saveAsFile')"
             @click="saveMode = 'saveAs', onSavePrompt()"
         />
         <hr class="my-8">
         <h5 class="mb-3">
-            {{ $t("additional:modules.tools.cosi.saveSession.currentWorkStatusFromFile") }}
+            {{ $t("additional:modules.cosi.saveSession.currentWorkStatusFromFile") }}
         </h5>
         <FileUpload
             :id="'sessionUpload'"
@@ -533,7 +533,7 @@ export default {
         />
         <AlertMessage
             v-if="failedLoading"
-            :text="$t('additional:modules.tools.cosi.saveSession.sessionError')"
+            :text="$t('additional:modules.cosi.saveSession.sessionError')"
             type="error"
             :closeable="true"
         />
@@ -542,11 +542,11 @@ export default {
             class="mx-4 mt-5"
         >
             <h6 class="loaded-work-status">
-                {{ $t("additional:modules.tools.cosi.saveSession.loadedWorkingStatus") }}
+                {{ $t("additional:modules.cosi.saveSession.loadedWorkingStatus") }}
             </h6>
             <SimpleCard
                 icon="bi bi-file-earmark-text"
-                :label="$t('additional:modules.tools.cosi.saveSession.sessionName')"
+                :label="$t('additional:modules.cosi.saveSession.sessionName')"
                 :text="session.meta.title"
                 @click:close="''"
             />
@@ -557,7 +557,7 @@ export default {
             color="primary"
         >
             <span>
-                {{ $t("additional:modules.tools.cosi.saveSession.succesLoadingFile") + session.meta.title }}
+                {{ $t("additional:modules.cosi.saveSession.succesLoadingFile") + session.meta.title }}
             </span>
         </v-snackbar>
     </div>

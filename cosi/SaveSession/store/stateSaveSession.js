@@ -6,8 +6,6 @@
  * @property {String} [icon="bi-save"] - Bootstrap icon class (config-param).
  * @property {String} id - The id of the district selector component.
  * @property {String} [name="Sitzung speichern"] - The name of the tool (config-param).
- * @property {Boolean} [renderToWindow=true] - Renders tool in a window if true, otherwise in the sidebar (config-param).
- * @property {Boolean} [resizableWindow=false] - If True, window is resizable (config-param).
  * @property {String[]} defaultActiveLayerIds - the default active layer Ids in COSI.
  */
 const state = {
@@ -16,9 +14,7 @@ const state = {
     icon: "bi-save",
     id: "saveSession",
     isVisibleInMenu: true,
-    name: "Sitzung speichern",
-    renderToWindow: true,
-    resizableWindow: true,
+    name: "additional:modules.cosi.saveSession.title",
     sessionToLoad: null,
     readmeUrl: {
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/014savesession.md",
