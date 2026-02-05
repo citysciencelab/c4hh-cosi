@@ -1,11 +1,5 @@
 <script>
-import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
-import {mapGetters, mapActions, mapMutations} from "vuex";
-import {getTimestamps} from "../../utils/timeline";
-import getters from "../store/gettersDashboard.js";
-import mutations from "../store/mutationsDashboard.js";
 import actions from "../store/actionsDashboard.js";
-import TableRowMenu from "./TableRowMenu.vue";
 import {
     addCalculation,
     calculateAll,
@@ -19,15 +13,23 @@ import {
     deleteStats,
     getCalculationId
 } from "../utils/operations";
-import {generateChartForDistricts, generateChartForCorrelation, generateChartsForItems} from "../utils/chart";
-import {prepareTableExportWithTimeline} from "../utils/export";
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import composeFilename from "../../utils/composeFilename";
-import exportXlsx from "../../utils/exportXlsx";
 import DashboardChartView from "./DashboardChartView.vue";
 import DashboardToolbar from "./DashboardToolbar.vue";
-import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
-import TableCell from "./TableCell.vue";
+import exportXlsx from "../../utils/exportXlsx";
+import {generateChartForDistricts, generateChartForCorrelation, generateChartsForItems} from "../utils/chart";
+import getters from "../store/gettersDashboard.js";
+import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import isObject from "@shared/js/utils/isObject.js";
+import {getTimestamps} from "../../utils/timeline";
+import {mapActions, mapGetters, mapMutations} from "vuex";
+import mutations from "../store/mutationsDashboard.js";
+import {prepareTableExportWithTimeline} from "../utils/export";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
+import TableCell from "./TableCell.vue";
+import TableRowMenu from "./TableRowMenu.vue";
+import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {VApp} from "vuetify/components/VApp";
 import {VContainer, VRow} from "vuetify/components/VGrid";
 import {VDataTableVirtual} from "vuetify/components/VDataTable";
@@ -41,6 +43,7 @@ export default {
         AlertMessage,
         DashboardChartView,
         DashboardToolbar,
+        IconButton,
         TableCell,
         TableRowMenu,
         ToolInfo,
@@ -513,6 +516,43 @@ export default {
         },
 
         /**
+         * Starts a calculation from the toolbar
+         * @param {String} calculationName - the name of the new calculation
+         * @param {"add"|"subtract"|"multiply"|"divide"|"dividePercent"|"sumUpSelected"|"divideSelected"} operation - the mathmatical operation to execute
+         * @param {String} category_A - the first category
+         * @param {String} category_B - the second category
+         * @returns {void}
+         */
+        onStartCalculation (calculationName, operation, category_A, category_B) {
+            const calcName = calculationName || getCalculationId({operation, category_A, category_B}),
+                field_A = this.items.find(item => item.category === category_A),
+                field_B = this.items.find(item => item.category === category_B),
+                selectedItems = this.selectedItems.length > 0 ? this.selectedItems : this.items;
+
+            addCalculation.call(this, operation, {field_A, field_B, selectedItems}, calcName);
+
+            if (this.statsFeatureFilter.length > 0) {
+                this.statsFeatureFilter.push(calcName);
+            }
+        },
+
+        /**
+         * Opens the metadata for the given item (dataset).
+         * @param {Object} item - The item for (dataset) which the metadata should be opened.
+         * @returns {void}
+         */
+        openMetadata (item) {
+            const datasetConfig = rawLayerList.getLayerWhere({id: item.layerId})?.datasets[0];
+
+            if (typeof datasetConfig !== "undefined") {
+                window.open(datasetConfig.show_doc_url + datasetConfig.md_id);
+            }
+            else {
+                console.warn("No metadata info found for layer ID:", item.layerId);
+            }
+        },
+
+        /**
          * @description Sanitizes the export data. Removes excluded columns.
          * @param {Object[]} json - the array of objects
          * @param {String[]} exclude - the list of keys to exclude
@@ -624,27 +664,6 @@ export default {
         },
 
         /**
-         * Starts a calculation from the toolbar
-         * @param {String} calculationName - the name of the new calculation
-         * @param {"add"|"subtract"|"multiply"|"divide"|"dividePercent"|"sumUpSelected"|"divideSelected"} operation - the mathmatical operation to execute
-         * @param {String} category_A - the first category
-         * @param {String} category_B - the second category
-         * @returns {void}
-         */
-        onStartCalculation (calculationName, operation, category_A, category_B) {
-            const calcName = calculationName || getCalculationId({operation, category_A, category_B}),
-                field_A = this.items.find(item => item.category === category_A),
-                field_B = this.items.find(item => item.category === category_B),
-                selectedItems = this.selectedItems.length > 0 ? this.selectedItems : this.items;
-
-            addCalculation.call(this, operation, {field_A, field_B, selectedItems}, calcName);
-
-            if (this.statsFeatureFilter.length > 0) {
-                this.statsFeatureFilter.push(calcName);
-            }
-        },
-
-        /**
          * Updates the timestamps in the table based on the selected years.
          * @param {String[]} selectedYears - array of years to filter timestamps
          * @returns {void}
@@ -663,7 +682,6 @@ export default {
             });
             this.timestampSelected = this.items[0].years[0];
         }
-
     }
 };
 
@@ -763,6 +781,19 @@ export default {
                                     @renderGroupedChart="renderGroupedCharts"
                                     @delete="deleteStats"
                                 />
+                            </template>
+                            <template #[`item.category`]="{ item }">
+                                <div class="d-flex align-items-center">
+                                    {{ item.category }}
+                                    <IconButton
+                                        v-if="!item.calculation"
+                                        :id="item.id"
+                                        :class-array="['btn-light', 'fs-5', 'ms-1']"
+                                        :aria="$t('common:modules.layerTree.infosAndLegend')"
+                                        :icon="'bi-info-circle'"
+                                        :interaction="() => openMetadata(item)"
+                                    />
+                                </div>
                             </template>
                             <!-- Column Year-->
                             <template #[`item.years`]="{ item }">
