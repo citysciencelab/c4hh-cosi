@@ -82,7 +82,8 @@ const state = {
     linkText: "",
     questionLink: "",
     closeDropdownOnSelect: true,
-    shouldSubjectDataSelectedInTree: false
+    shouldSubjectDataSelectedInTree: false,
+    searchInMapExtentState: {}
 };
 
 export default state;
