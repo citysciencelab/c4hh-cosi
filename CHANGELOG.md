@@ -7,6 +7,7 @@
 ### __Breaking Changes__
 
 ### Added
+- GeoMarker: Added new addon to show and edit GeoMarkers. For internal usage only.
 
 ### Changed
 
