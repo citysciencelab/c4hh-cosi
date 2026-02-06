@@ -35,6 +35,8 @@ export default {
     data () {
         return {
             buffer: 0,
+            bufferMax: 50000,
+            bufferMin: -10000,
             cardCounter: 0,
             drawStyle: {
                 fillColor: [0, 0, 0],
@@ -192,48 +194,45 @@ export default {
         },
 
         /**
-         * Creates a buffered feature of the given features.
-         * @param {String|ol/Feature[]} wktFeature - The feature to be buffered as WKT.
-         * @param {Number} buffer - The buffer distance to apply around each feature.
-         * @returns {String} - The buffered feature as WKT.
+         * Creates a buffered feature of the given feature.
+         * @param {String} wktFeature - The feature to be buffered as WKT.
+         * @param {Number} buffer - The buffer distance to apply around the feature.
+         * @returns {String} The buffered feature encoded as WKT.
          */
         getBufferedFeature (wktFeature, buffer) {
-            const feature = typeof wktFeature === "string" ? [wktParser.decodeFeature(wktFeature)] : wktFeature,
-                geometryCollection = getBoundingGeometry(feature, buffer).getGeometries(),
-                geojsonPolygons = [];
+            const feature = wktParser.decodeFeature(wktFeature),
+                geometryCollection = getBoundingGeometry([feature], buffer).getGeometries(),
+                geojsonPolygons = geometryCollection.flatMap(geometry => {
+                    if (geometry.getType() === "Polygon") {
+                        return [turfPolygon(geometry.getCoordinates())];
+                    }
+                    if (geometry.getType() === "MultiPolygon") {
+                        return geometry.getPolygons().map(polygon => turfPolygon(polygon.getCoordinates())
+                        );
+                    }
+                    return [];
+                });
 
-            geometryCollection.forEach(geometry => {
-                if (geometry.getType() === "Polygon") {
-                    geojsonPolygons.push(turfPolygon(geometry.getCoordinates()));
-                }
-                else if (geometry.getType() === "MultiPolygon") {
-                    geometry.getPolygons().forEach(polygon => {
-                        geojsonPolygons.push(turfPolygon(polygon.getCoordinates()));
-                    });
-                }
-                else {
-                    console.warn("Unexpected geometry type:", geometry.getType());
-                }
-            });
             this.setBoundingGeometry(geometryCollection);
 
-            let merged = geojsonPolygons[0],
-                mergedPolygon = null;
+            let merged = geojsonPolygons[0];
 
             for (let i = 1; i < geojsonPolygons.length; i++) {
-                merged = turfUnion(truncate(merged, {precision: 3, mutate: true}), truncate(geojsonPolygons[i], {precision: 3, mutate: true}));
+                merged = turfUnion(
+                    truncate(merged, {precision: 3, mutate: true}),
+                    truncate(geojsonPolygons[i], {precision: 3, mutate: true})
+                );
             }
 
             if (merged.geometry.type === "Polygon") {
-                mergedPolygon = new Polygon(merged.geometry.coordinates);
-            }
-            else if (merged.geometry.type === "MultiPolygon") {
-                mergedPolygon = new MultiPolygon(merged.geometry.coordinates);
+                return wktParser.encodeFeature(
+                    new Feature({geometry: new Polygon(merged.geometry.coordinates)})
+                );
             }
 
-            return wktParser.encodeFeature(new Feature({
-                geometry: mergedPolygon
-            }));
+            return wktParser.encodeFeature(
+                new Feature({geometry: new MultiPolygon(merged.geometry.coordinates)})
+            );
         },
 
         /**
@@ -284,7 +283,7 @@ export default {
         reset () {
             this.selectedInteraction = "";
             this.activeCard.drawnFeatureWKT = null;
-            this.setBuffer(0);
+            this.setBuffer("0");
         },
 
         /**
@@ -306,41 +305,66 @@ export default {
         },
 
         /**
-         * Sets the buffer value.
-         * @param {Number} value - The buffer value to set.
-         * @return {void}
+         * Normalizes the given buffer value.
+         * @param {String} value - The user-provided buffer value.
+         * @returns {Number} The normalized buffer value.
          */
-        setBuffer (value) {
-            this.buffer = value;
-            this.activeCard.buffer = value;
-            this.activeCard.data[3].label = "Puffer " + value + " m";
-            if (this.activeCard?.drawnFeatureWKT !== null) {
-                this.setSubjectFeature(this.activeCard.drawnFeatureWKT, this.activeCard.buffer);
+        normalizeBufferValue (value) {
+            const raw = value === "" || value === null || typeof value === "undefined"
+                ? 0
+                : Number(value);
+
+            if (!Number.isFinite(raw)) {
+                return this.buffer;
             }
-            else {
-                this.setSubjectFeature(this.activeCard.statisticalFeatureWKT, this.activeCard.buffer);
-            }
+
+            return Math.min(this.bufferMax, Math.max(this.bufferMin, raw));
         },
 
         /**
-         * Sets the subject feature to the active card with an optional buffer.
-         * @param {String|ol/Feature[]} wktFeature - The feature as wkt string or normal features to set as the subject feature.
-         * @param {Number} buffer - The buffer value to apply to the feature.
+         * Sets the buffer value (validated and clamped).
+         * @param {String} value - The buffer value to set.
          * @return {void}
          */
-        setSubjectFeature (wktFeature, buffer) {
-            this.activeCard.subjectFeatureWKT = this.getBufferedFeature(wktFeature, buffer);
+        setBuffer (value) {
+            const nextVal = this.normalizeBufferValue(value),
+                sourceWkt = this.activeCard.drawnFeatureWKT || this.activeCard.statisticalFeatureWKT;
+
+            this.buffer = nextVal;
+            this.activeCard.buffer = nextVal;
+            this.activeCard.data[3].label = `Puffer ${nextVal} m`;
+
+            this.setSubjectFeature(sourceWkt, nextVal);
+        },
+
+        /**
+         * Sets the subject feature for the active card and applies the given buffer.
+         * @param {String} wktString - The feature as a WKT string.
+         * @param {Number} buffer - The buffer distance in meters.
+         * @returns {void}
+         */
+        setSubjectFeature (wktString, buffer) {
+            if (typeof wktString !== "string") {
+                return;
+            }
+
+            const bufferedWkt = this.getBufferedFeature(wktString, buffer);
+
+            this.activeCard.subjectFeatureWKT = bufferedWkt;
             this.updateMap(this.activeCard);
         },
 
         /**
          * Sets the subject feature from imported features and zooms to its extent.
          * @param {ol/Feature[]} features - The imported features to set as the subject feature.
+         * @returns {void}
          */
         setSubjectFeatureFromImport (features) {
-            const extent = wktParser.decodeFeature(this.activeCard.subjectFeatureWKT).getGeometry().getExtent();
+            const extent = wktParser.decodeFeature(this.activeCard.subjectFeatureWKT).getGeometry().getExtent(),
+                importedWkt = Array.isArray(features) && features[0] ? wktParser.encodeFeature(features[0]) : null;
 
-            this.setSubjectFeature(features, this.activeCard.buffer);
+            this.activeCard.drawnFeatureWKT = importedWkt;
+            this.setSubjectFeature(importedWkt, this.activeCard.buffer);
             this.zoomToExtent({extent: extent});
         },
 
@@ -486,7 +510,10 @@ export default {
             :model-value="buffer"
             :placeholder="'0'"
             :type="'number'"
+            :min="bufferMin"
+            :max="bufferMax"
             @update:modelValue="setBuffer"
+            @blur="setBuffer(buffer)"
         />
         <h5 class="mb-2">
             {{ $t("additional:modules.cosi.districtSelector.drawHeader") }}
