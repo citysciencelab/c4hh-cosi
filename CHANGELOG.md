@@ -19,6 +19,15 @@
 
 ---
 
+## 2025-02-06 v3.15.2 (LTS)
+
+### Fixed
+- Boris:
+    - Fixed incorrect Vuex dispatches caused by renamed actions and active buttons are now highlighted correctly on initial load.
+    - Fixed console error.
+
+---
+
 ## 2026-02-04 v3.19.0
 
 ### Fixed
