@@ -26,7 +26,6 @@ import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {VApp} from "vuetify/components/VApp";
 import {VDataTable} from "vuetify/components/VDataTable";
 import {VChip} from "vuetify/components/VChip";
-// import {onFeaturesLoaded, onResetFeatures, onShowFeaturesById, onShowAllFeatures} from "../../utils/radioBridge.js";
 
 export default {
     name: "FeaturesList",
@@ -43,6 +42,7 @@ export default {
     data () {
         return {
             search: "",
+            districtFilter: [],
             layerFilter: [],
             expanded: [],
             filterProps: {},
@@ -82,7 +82,14 @@ export default {
                 },
                 {
                     title: this.$t("additional:modules.tools.cosi.featuresList.colDistrict"),
-                    value: "district"
+                    value: "district",
+                    filter: value => {
+                        if (this.districtFilter.length < 1) {
+                            return true;
+                        }
+
+                        return this.districtFilter.includes(value);
+                    }
                 },
                 {
                     title: this.$t("additional:modules.tools.cosi.featuresList.colAddress"),
@@ -165,6 +172,16 @@ export default {
             }));
         },
 
+        /*
+        * Gets the unique district values from the features list to use as filter options.
+        * @returns {String[]} The district filter options.
+        */
+        districtItems () {
+            const districtItems = [...new Set(this.featuresListItems.map(item => item.district))];
+
+            return districtItems.sort();
+        },
+
         /**
          * Gets the column values which may not be deselected by the user because of their filter functinality.
          * @returns {String[]} The mandatory column titles.
@@ -211,23 +228,6 @@ export default {
             },
             deep: true
         },
-        /**
-         * Unselect the Menu item if the tool is deactivated
-         * @param {boolean} state - Defines if the tool is active.
-         * @returns {void}
-         */
-        active (state) {
-            if (!state) {
-                // const model = getComponent(this.id);
-
-                // if (model) {
-                //     model.set("isActive", false);
-                // }
-
-                this.removeHighlightFeature();
-                this.setShow(true);
-            }
-        },
 
         /**
          * Updates the feature highlighting on selection change
@@ -238,8 +238,6 @@ export default {
         selected (newValue) {
             this.removeHighlightFeature();
             newValue.forEach(item => {
-                console.log(item);
-
                 this.highlightVectorFeature(item.feature, item.layerId);
             });
             this.showDistanceScoreFeatures();
@@ -292,56 +290,15 @@ export default {
         layerFilter () {
             this.numericalColumns = this.getNumericalColumns();
             this.additionalColumns = this.getColumns(this.getActiveLayers(), "additionalValues");
-        },
-
-        show (val) {
-            if (val) {
-                this.$nextTick(() => {
-                    if (this.active) {
-                        this.$el.style.width = "inherit";
-                        this.$el.querySelector("#basic-resize-handle-sidebar").style.display = "inherit";
-                        mapCollection.getMap("2D").updateSize();
-                    }
-                });
-            }
-            else {
-                this.$nextTick(() => {
-                    if (this.active) {
-                        this.$el.style.width = "80px";
-                        this.$el.querySelector("#basic-resize-handle-sidebar").style.display = "none";
-                        mapCollection.getMap("2D").updateSize();
-                    }
-                });
-            }
         }
     },
     created () {
         this.resetColumns();
-        /**
-         * listens to the close event of the Tool Component
-         * @listens #close
-         */
-        // this.$on("close", () => {
-        //     this.setActive(false);
-        // });
-
-        // this.isTimeSeriesAnalyseShow = typeof this.$store.state.configJson.Portalconfig.menu.tools.children.timeSeriesAnalyse !== "undefined";
     },
     async mounted () {
         if (typeof this.selectedDistrictLevel !== "undefined") {
             this.updateFeaturesList();
         }
-
-        /**
-         * @description Listen to newly loaded VectorLayer Features to update the FeaturesList
-         * Doubles execution from the visibleLayerList listener, but necessary due to delay in features loaded
-         * @todo refactor to vuex, there should be an event on the map calling out loaded features
-         * @deprecated
-         */
-        // onFeaturesLoaded(this.updateFeaturesList);
-        // onResetFeatures(this.updateFeaturesList);
-        // onShowFeaturesById(this.updateFeaturesList);
-        // onShowAllFeatures(this.updateFeaturesList);
 
         // this.$root.$on("updateFeaturesList", this.updateFeaturesList);
 
@@ -706,19 +663,14 @@ export default {
         },
         highlightVectorFeature,
 
-        /**
-         * To show or hide the featureList tool
-         * @return {void}
-         */
-        toggleTool () {
-            this.setShow(!this.show);
-        },
-
         setLayerFilter (value) {
             this.layerFilter = value;
         },
         setSearch (value) {
             this.search = value;
+        },
+        setDistrictFilter (value) {
+            this.districtFilter = value;
         }
     }
 };
@@ -732,11 +684,11 @@ export default {
         />
         <v-app id="features-list-wrapper">
             <FeaturesListToolbar
-                v-model:setting-items="columns"
                 :filter-items="groupActiveLayer"
-                :mandatory-setting-items="mandatoryColumns"
+                :district-items="districtItems"
                 :show-dipas-button="dipasInFeaturesList"
                 @setLayerFilter="setLayerFilter"
+                @setDistrictFilter="setDistrictFilter"
                 @setSearch="setSearch"
                 @createCharts="createCharts"
                 @createDipasCharts="createDipasCharts"

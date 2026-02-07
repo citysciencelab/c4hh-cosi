@@ -60,7 +60,7 @@ export default {
         }
     },
     mounted () {
-        const toggleElement = document.getElementById(this.optionalButton.id),
+        const toggleElement = document.getElementById(this.optionalButton?.id),
             filterElement = document.getElementById(this.filterButtonId);
 
         if (filterElement) {

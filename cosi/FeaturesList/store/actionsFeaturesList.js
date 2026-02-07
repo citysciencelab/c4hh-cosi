@@ -127,13 +127,23 @@ const actions = {
 
             const features = getLayerSource(vectorLayer)?.getFeatures() || [],
                 // only features that can be seen on the map
-                visibleFeatures = features.filter(getters.isFeatureActive),
+                visibleFeatures = features.filter(feature => {
+                    const isActive = getters.isFeatureActive(feature, vectorLayer);
+
+                    return isActive;
+                }),
                 layerMap = getters.layerMapById(vectorLayer.get("id")),
                 layerStyleFunction = vectorLayer.getStyleFunction?.(),
+                selectedDistrictLevel = rootGetters["Modules/DistrictSelector/selectedDistrictLevel"],
                 disabledFeatures = getters.checkDisabledFeatures(vectorLayer);
+
+            let selectedDistricts = selectedDistrictLevel.districts.filter(dist => dist.isSelected === true);
 
             if (disabledFeatures.length > 0) {
                 commit("appendFeaturesListItems", ...disabledFeatures);
+            }
+            if (selectedDistricts.length === 0) {
+                selectedDistricts = selectedDistrictLevel.districts;
             }
             visibleFeatures.forEach(feature => {
                 /**
@@ -148,7 +158,7 @@ const actions = {
                     key: feature.getId(),
                     name: feature.get(layerMap.keyOfAttrName),
                     style: getFeatureStyle(feature, layerStyleFunction),
-                    district: getContainingDistrictForFeature(rootGetters["Modules/DistrictSelector/selectedDistrictLevel"], feature, false),
+                    district: getContainingDistrictForFeature(selectedDistricts, feature, false),
                     group: layerMap.group,
                     layerName: layerMap.id,
                     layerId: layerMap.layerId,

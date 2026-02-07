@@ -1,25 +1,31 @@
 <script>
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
 import {VBtn} from "vuetify/components/VBtn";
 import {VCheckbox} from "vuetify/components/VCheckbox";
 import {VCol, VRow} from "vuetify/components/VGrid";
 import {VIcon} from "vuetify/components/VIcon";
-import {VSelect} from "vuetify/components/VSelect";
-import {VTextField} from "vuetify/components/VTextField";
 
 export default {
     name: "FeaturesListToolbar",
     components: {
+        DropdownAutocomplete,
+        IconButton,
+        InputText,
         ToolBar,
         VBtn,
         VCheckbox,
         VCol,
         VIcon,
-        VRow,
-        VSelect,
-        VTextField
+        VRow
     },
     props: {
+        districtItems: {
+            type: Array,
+            required: true
+        },
         filterItems: {
             type: Array,
             required: true
@@ -29,9 +35,11 @@ export default {
             default: false
         }
     },
+    emits: ["setDistrictFilter", "setLayerFilter", "setSearch", "exportTable"],
     data () {
         return {
-            search: "",
+            searchString: "",
+            selectedDistrictItems: [],
             selectedLayerList: [],
             exportDetails: false,
             sumUpLayers: false
@@ -44,32 +52,76 @@ export default {
          * @returns {Object} The location score button definition.
          */
         locationScoreButton () {
-            return {
-                id: "location-score-button",
-                text: this.$t("additional:modules.tools.cosi.featuresList.titleLocationScore"),
-                icon: "bi bi-house-door",
-                closeOnOutside: true
-            };
+            return undefined;
+            // return {
+            //     id: "location-score-button",
+            //     text: this.$t("additional:modules.tools.cosi.featuresList.titleLocationScore"),
+            //     icon: "bi bi-house-door",
+            //     closeOnOutside: true
+            // };
         }
     },
     watch: {
+        searchString (value) {
+            this.$emit("setSearch", value);
+        },
+        /**
+         * Emits the selected district items to the parent component whenever they change.
+         */
+        selectedDistrictItems () {
+            this.$emit("setDistrictFilter", this.selectedDistrictItems);
+        },
         selectedLayerList (value) {
             this.$emit("setLayerFilter", value);
-        },
-        search (value) {
-            this.$emit("setSearch", value);
+        }
+    },
+    methods: {
+        /**
+         * Resets all active filters and related export options to their default state.
+         * @returns {void}
+         */
+        resetFilters () {
+            this.searchString = "";
+            this.selectedDistrictItems = [];
+            this.selectedLayerList = [];
         }
     }
 };
 </script>
 
 <template lang="html">
-    <ToolBar
-        :optional-button="locationScoreButton"
-        v-bind="$attrs"
-    >
+    <ToolBar :optional-button="locationScoreButton">
         <template #filterMenu>
-            Filter für Einrichtungsübersicht
+            <div
+                v-if="selectedLayerList.length > 0 || selectedDistrictItems.length > 0 || searchString !== ''"
+                class="mb-2 d-flex w-100 justify-content-end"
+            >
+                <IconButton
+                    :class-array="['btn-light']"
+                    icon="bi-arrow-clockwise"
+                    :aria="$t('additional:modules.tools.cosi.dashboard.resetFilter')"
+                    :interaction="resetFilters"
+                    :label="$t('additional:modules.tools.cosi.dashboard.resetFilter')"
+                />
+            </div>
+            <InputText
+                id="calculation-name-input"
+                v-model="searchString"
+                :label="'Tabelle druchsuchen'"
+                placeholder=""
+            />
+            <DropdownAutocomplete
+                v-model="selectedLayerList"
+                :items="filterItems"
+                label="Fachdaten"
+                multiple
+            />
+            <DropdownAutocomplete
+                v-model="selectedDistrictItems"
+                :items="districtItems"
+                label="Gebiete"
+                multiple
+            />
         </template>
         <template #optionalDropdown>
             Standortbewertung
@@ -77,20 +129,6 @@ export default {
     </ToolBar>
     <div id="features-list-toolbar">
         <v-row>
-            <v-col cols="8">
-                <v-select
-                    v-model="selectedLayerList"
-                    :items="filterItems"
-                    multiple
-                    dense
-                    outlined
-                    small-chips
-                    deletable-chips
-                    hide-details
-                    :menu-props="{ closeOnContentClick: true }"
-                    :label="$t('additional:modules.tools.cosi.featuresList.layerFilter')"
-                />
-            </v-col>
             <v-col class="border-style">
                 <v-btn
                     tile
@@ -126,19 +164,6 @@ export default {
                     hide-details
                     :label="$t('additional:modules.tools.cosi.featuresList.sumUpLayers')"
                     :title="$t('additional:modules.tools.cosi.featuresList.sumUpLayersTooltip')"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="8">
-                <v-text-field
-                    v-model="search"
-                    append-icon="mdi-magnify"
-                    :label="$t('additional:modules.tools.cosi.featuresList.search')"
-                    dense
-                    outlined
-                    hide-details
-                    clearable
                 />
             </v-col>
             <v-col class="border-style">

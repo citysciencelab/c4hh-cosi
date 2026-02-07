@@ -94,9 +94,14 @@ export default {
         }, []);
     },
     layerMapById: (state, {flatActiveLayerMapping}) => id => flatActiveLayerMapping.find(l => l.layerId === id),
+    // prüfen ob
     isFeatureDisabled: (state, {disabledFeatureItems}) => feature => disabledFeatureItems.filter(item => item.feature === feature).length > 0,
-    isFeatureActive: (state, {isFeatureDisabled}) => feature => {
-        const style = Array.isArray(feature.getStyle()) ? feature.getStyle()[0] : feature.getStyle();
+    isFeatureActive: (state, {isFeatureDisabled}) => (feature, layer) => {
+        let style = Array.isArray(feature.getStyle()) ? feature.getStyle()[0] : feature.getStyle();
+
+        if (typeof style === "undefined" || style === null && layer) {
+            style = layer.getStyleFunction()(feature);
+        }
 
         return ((typeof style?.getImage() !== "undefined" && style?.getImage() !== null) || (typeof style?.getStroke() !== "undefined" && style?.getStroke() !== null) || (typeof style?.getFill() !== "undefined" && style?.getFill() !== null)) && !isFeatureDisabled(feature);
     }

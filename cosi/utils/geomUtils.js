@@ -36,36 +36,27 @@ export function getAllContainingDistricts (districtLevels, feature, multiple = f
 }
 
 /**
- * Checks which district contains a given feature
- * @param {DistrictLevel} districtLevel - the districtLevel to check
- * @param {module:ol/Feature} feature - the feature to check against
- * @param {Boolean} [returnsFeature=true] - defines whether to return a String or the Feature Object
- * @param {Boolean} [multiple=false] - defines whether multiple results are possible, returns the first result if false
- * @returns {String|module:ol/Feature} the districts name or the district feature
+ * Checks which district contains the center of a given feature.
+ * @param {Object[]} districts - List of districts.
+ * @param {module:ol/Feature} feature - The feature to check against
+ * @returns {String} The name of the containing district.
  */
-export function getContainingDistrictForFeature (districtLevel, feature, returnsFeature = true, multiple = false) {
-    const containingDistricts = [];
+export function getContainingDistrictForFeature (districts, feature) {
+    const featureExtent = feature.getGeometry().getExtent(),
+        featureCenter = getCenter(featureExtent);
 
-    if (!districtLevel) {
-        return [];
-    }
-    for (const district of districtLevel.districts) {
-        const geom = district.adminFeature.getGeometry(),
-            featureExtent = feature.getGeometry().getExtent(),
-            featureCenter = getCenter(featureExtent);
+    let containingDistricts = "";
 
-        if (multiple) {
-            if (geom.intersectsExtent(featureExtent)) {
-                containingDistricts.push(returnsFeature ? district : district.getName());
-            }
-        }
-        else if (geom.intersectsCoordinate(featureCenter)) {
-            containingDistricts.push(returnsFeature ? district : district.getName());
+    for (const district of districts) {
+        const geom = district.adminFeature.getGeometry();
+
+        if (geom.intersectsCoordinate(featureCenter)) {
+            containingDistricts = district.getName();
             break;
         }
     }
 
-    return multiple ? containingDistricts : containingDistricts[0];
+    return containingDistricts;
 }
 
 /**

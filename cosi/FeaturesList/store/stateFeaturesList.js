@@ -6,18 +6,13 @@
  * @property {String} [icon="bi-apple"] - Bootstrap icon class (config-param).
  * @property {String} id - The id of the district selector component.
  * @property {String} [name=Einrichtungsübersicht] - The name of the tool (config-param).
- * @property {Boolean} [renderToWindow=true] - Renders tool in a window if true, otherwise in the sidebar (config-param).
- * @property {Boolean} [resizableWindow=false] - If True, window is resizable (config-param).
  */
 const state = {
-    active: false,
     deactivateGFI: false,
     icon: "bi-house-door",
     id: "featuresList",
     isVisibleInMenu: true,
     name: "Einrichtungsübersicht",
-    renderToWindow: false,
-    resizableWindow: true,
     width: 0.5,
     // FeaturesList State
     geomAttributes: {
@@ -52,8 +47,7 @@ const state = {
     readmeUrl: {
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/017featureslist.md",
         "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/017einrichtungsuebersicht.md"
-    },
-    show: true
+    }
 };
 
 export default state;
