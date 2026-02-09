@@ -58,7 +58,7 @@ pipelines:
                                 DEBUG: 'true'
                                 DELETE_FLAG: 'false'
             -   step:
-                    name: deploy on openCode
+                    name: deploy on openCode (also latest tag)
                     script:
                         - echo 'deply to opencode:'$BITBUCKET_TAG
                         - git fetch --all --tags
@@ -67,11 +67,36 @@ pipelines:
                         - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
                         - cd masterportal
                         - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
+
+                        - echo 'remove latest tag in openCode'
+                        - git fetch --all --tags
+                        - git checkout tags/latest
+                        - git push --delete https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git latest
+                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
+                        - cd masterportal
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
+
+                        - echo 'deply latest tag to openCode'
+                        - git fetch --all --tags
+                        - git checkout tags/latest
+                        - git push --delete https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git latest
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git latest
+                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
+                        - cd masterportal
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
         'lts': 
             -   step:
                         name: deploy lts on openCode
                         script:
-                            - echo 'deploy lts to opencode'
+                            - echo 'remove lts tag in openCode'
+                            - git fetch --all --tags
+                            - git checkout tags/lts
+                            - git push --delete https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git lts
+                            - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
+                            - cd masterportal
+                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
+
+                            - echo 'deploy lts to openCode'
                             - git fetch --all --tags
                             - git checkout tags/lts
                             - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git lts
@@ -87,12 +112,12 @@ pipelines:
                     script:
                         - npm install
                         - npm audit --json
-        deploy last tag on openCode:
+        deploy tag on openCode:
             - variables:
                 - name: BITBUCKET_TAG
                   description: tag to publish docs for, e.g. v3.1.0
             -   step:
-                    name: deploy last tag on openCode
+                    name: deploy tag on openCode
                     script:
                         - apt-get update && apt-get install -y curl wput jq
                         - git fetch --all --tags
@@ -201,14 +226,27 @@ pipelines:
                         - for zipFilePath in $(find dist -name \*.zip); do
                             curl -X POST --user "$bbapi_name:$bbapi_key" "https://api.bitbucket.org/2.0/repositories/geowerkstatt-hamburg/masterportal/downloads" --form files=@"$zipFilePath" --verbose;
                             done
-        tag to lts in OpenCode:
+        deploy lts tag to openCode:
             -   step:
                     name: deploy lts tag to openCode
                     script:
-                        - echo 'deploy lts to opencode'
+                        - echo 'deploy lts tag to openCode'
                         - git fetch --all --tags
                         - git checkout tags/lts
                         - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git lts
                         - git clone --single-branch --branch lts https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
                         - cd masterportal
                         - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git HEAD:refs/heads/lts -f
+        remove tag in openCode:
+            - variables:
+                    - name: BITBUCKET_TAG
+            -   step:
+                    name: remove tag in openCode
+                    script:
+                        - echo 'remove tag in openCodeL:'$BITBUCKET_TAG
+                        - git fetch --all --tags
+                        - git checkout tags/$BITBUCKET_TAG
+                        - git push --delete https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git $BITBUCKET_TAG
+                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
+                        - cd masterportal
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
