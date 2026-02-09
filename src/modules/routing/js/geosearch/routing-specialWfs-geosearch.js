@@ -14,6 +14,7 @@ async function fetchRoutingSpecialWfsGeosearch (search) {
         sendObject = {
             geometryName: state.geosearch.geometryName,
             propertyNames: state.geosearch.propertyNames,
+            labelProperty: state.geosearch.labelProperty,
             searchString: search,
             typeName: state.geosearch.typeName,
             url: serviceUrl
@@ -74,18 +75,12 @@ function buildWFSPostData (search) {
  * @returns {Object} searchResults
  */
 async function makeWFSRequest (serviceUrl, sendObject, postData) {
-    try {
-        const response = await axios.post(serviceUrl, postData, {
-                headers: {"Content-Type": "text/xml"}
-            }),
-            searchResults = await prepareValues(response.data, sendObject);
+    const response = await axios.post(serviceUrl, postData, {
+            headers: {"Content-Type": "text/xml"}
+        }),
+        searchResults = prepareValues(response.data, sendObject);
 
-        return searchResults;
-    }
-    catch (error) {
-        console.error(error);
-        throw error;
-    }
+    return searchResults;
 }
 
 /**
@@ -105,20 +100,26 @@ function prepareValues (data, definition) {
 
     for (let i = 0; i < elements.length; i++) {
         const element = elements[i],
-            identifierElement = element.getElementsByTagName("ms:LABEL_TEXT")[0],
-            geometryElement = element.getElementsByTagName("gml:Point")[0];
+            identifierElement = element.getElementsByTagName(definition.labelProperty ||
+                definition.propertyNames?.[0])?.[0],
+            geometryElement = element.getElementsByTagName("gml:Point")?.[0];
 
-        if (identifierElement && geometryElement) {
-            const identifier = identifierElement.textContent,
-                coordinatesText = geometryElement.getElementsByTagName("gml:pos")[0].textContent,
-                coordinates = coordinatesText.trim().split(" ").map(Number),
-                epsg = geometryElement.getAttribute("srsName");
+        if (!identifierElement) {
+            console.warn("Missing identifier property in SPECIALWFS response. Ignoring feature…");
+            continue;
+        }
 
-            resultList.push({identifier, coordinates, epsg});
+        if (!geometryElement) {
+            console.warn("Missing geometry property in SPECIALWFS response. Ignoring feature…");
+            continue;
         }
-        else {
-            console.error("Missing properties in specialWFS-Response. Ignoring Feature...");
-        }
+
+        const identifier = identifierElement.textContent,
+            coordinatesText = geometryElement.getElementsByTagName("gml:pos")[0].textContent,
+            coordinates = coordinatesText.trim().split(" ").map(Number),
+            epsg = geometryElement.getAttribute("srsName");
+
+        resultList.push({identifier, coordinates, epsg});
     }
 
     return resultList;

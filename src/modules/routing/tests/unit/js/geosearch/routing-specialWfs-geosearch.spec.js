@@ -77,14 +77,12 @@ describe("src/modules/routing/js/geosearch/routing-specialWfs-geosearch.js", () 
                         }
                     }
                 }),
-
                 expectedResult = [
                     new RoutingGeosearchResult([726717.541907, 5434034.009161], "Dachauplatz 8", "25832")
                 ];
 
             expect(result).deep.to.equal(expectedResult);
         });
-
 
         it("should throw error with status", async () => {
             sinon.stub(axios, "post").returns(
@@ -102,6 +100,42 @@ describe("src/modules/routing/js/geosearch/routing-specialWfs-geosearch.js", () 
             catch (error) {
                 expect(error.message).to.equal("testerror"); // Compare the error message
             }
+        });
+
+        it("should use labelProperty when defined (instead of first propertyName)", async () => {
+            const responseWithLabelProperty = `<?xml version='1.0' encoding="UTF-8"?>
+            <wfs:FeatureCollection
+               xmlns:ms="http://mapserver.gis.umn.edu/mapserver"
+               xmlns:gml="http://www.opengis.net/gml"
+               xmlns:wfs="http://www.opengis.net/wfs"
+               xmlns:ogc="http://www.opengis.net/ogc"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <gml:featureMember>
+                <ms:strasse_nr gml:id="strasse_nr.123">
+                  <ms:msGeometry>
+                    <gml:Point srsName="EPSG:25832">
+                      <gml:pos>726717.541907 5434034.009161</gml:pos>
+                    </gml:Point>
+                  </ms:msGeometry>
+                  <ms:LABEL_TEXT>First Property Value</ms:LABEL_TEXT>
+                  <ms:CUSTOM_LABEL>Custom Label Value</ms:CUSTOM_LABEL>
+                </ms:strasse_nr>
+              </gml:featureMember>
+            </wfs:FeatureCollection>`;
+
+            store.state.Modules.Routing.geosearch.labelProperty = "ms:CUSTOM_LABEL";
+            store.state.Modules.Routing.geosearch.propertyNames = ["ms:LABEL_TEXT", "ms:CUSTOM_LABEL"];
+
+            makeWFSRequestStub.resolves({
+                status: 200,
+                data: responseWithLabelProperty
+            });
+            sinon.stub(axios, "post").callsFake(makeWFSRequestStub);
+
+            const result = await fetchRoutingSpecialWfsGeosearch("testsearch");
+
+            expect(result).to.have.lengthOf(1);
+            expect(result[0].getDisplayName()).to.equal("Custom Label Value");
         });
     });
 });
