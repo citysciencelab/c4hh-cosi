@@ -100,13 +100,24 @@
                     "area": "Fläche",
                     "cardTitle": "Erreichbarkeit ",
                     "titleHint": "Hinweis: Sie können den Namen frei wählen. Wenn Sie keinen eingeben, wird automatisch ein Analyse-Name erstellt.",
-                    "overwriteSubjectData": "Fachdatengebiet überschreiben?",
-                    "newSubjectDataNote": "Sie erstetzen das aktuelle Fachdatengebiet durch das neu ausgewählte Gebiet. Das alte Gebiet wird gelöscht und kann danach nicht wiederhergestellt werden.",
-                    "confirmSubjectDataArea": "Ja, neues Gebiet verwenden",
-                    "cancelSubjectDataArea": "Nein, abbrechen.",
+                    "overwriteSubjectData": "Analyse für das Fachdatengebiet übernehmen",
+                    "newSubjectDataNote": "Mit der Übernahme wird die Analyse zu einem Fachdatengebiet, mit dem Sie im Portal weiterarbeiten können.",
+                    "newSubjectDataSelection": "Wie soll diese Erreichbarkeitsanalyse für das Fachdatengebiet verwendet werden?",
+                    "newSubjectDataInputOverwrite": "Analyse ersetzt das aktuelle Fachdatengebiet",
+                    "newSubjectDataInputMerge": "Analyse zum bestehenden Fachdatengebiet hinzufügen",
+                    "newSubjectDataMap": "Wie soll die Kartendarstellung aussehen?",
+                    "newSubjectDataMapAnalysis": "Kartenvisualisierung der Analyse übernehmen",
+                    "newSubjectDataMapOutlines": "Nur die Umrisse visualisieren",
+                    "confirmSubjectDataArea": "Ja, Analyse übernehmen",
+                    "cancelSubjectDataArea": "Abbrechen und nicht übernehmen",
+                    "cancel": "Abbrechen",
                     "currentSubjectDataArea": "aktuelles Fachdatengebiet",
                     "activeSubjectDataArea": "Fachdatengebiet ist bereits aktiv",
-                    "activeSubjectDataAreaText": "Die ausgewählte Erreichbarkeit ist bereits das Fachdatengebiet. Wählen Sie eine andere Erreichbarkeitsanalyse oder gehen Sie in die Gebietsauswahl um ein neues Fachdatengebiet festzulegen."
+                    "activeSubjectDataAreaText": "Die ausgewählte Erreichbarkeit ist als Fachdatengebiet festgelegt. Möchten Sie das Fachdatengebiet verwerfen?",
+                    "mapPreview": "Kartenvorschau",
+                    "discard": "Ja, Fachdatengebiet verwerfen",
+                    "subjectDataSuccess": "Das Fachdatengebiet aus der Analyse „{{title}}“ wurde erfolgreich erstellt.",
+                    "subjectDataReset": "Das Fachdatengebiet aus der Analyse „{{title}}“ wurde verworfen."
                 }
             }
         }

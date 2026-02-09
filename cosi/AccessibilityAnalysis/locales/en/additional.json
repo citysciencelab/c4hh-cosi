@@ -100,13 +100,24 @@
                     "area": "Area",
                     "cardTitle": "Accessibility ",
                     "titleHint": "Note: You can choose any name you like. If you do not enter a name, an analysis name will be created automatically.",
-                    "overwriteSubjectData": "Overwrite subject data area?",
-                    "newSubjectDataNote": "You replace the current subject area with the newly selected area. The old area is deleted and cannot be restored afterwards.",
-                    "confirmSubjectDataArea": "Yes, use new area",
-                    "cancelSubjectDataArea": "No, cancel",
+                    "overwriteSubjectData": "Apply analysis for the subject area",
+                    "newSubjectDataNote": "With the transfer, the analysis becomes a specialized data area that you can continue to work with in the portal.",
+                    "newSubjectDataSelection": "How should this accessibility analysis be used for the subject area?",
+                    "newSubjectDataInputOverwrite": "Analysis overwrites the current subject data area",
+                    "newSubjectDataInputMerge": "Add analysis to existing subject data area",
+                    "newSubjectDataMap": "What should the map display look like?",
+                    "newSubjectDataMapAnalysis": "Apply map visualization of the analysis",
+                    "newSubjectDataMapOutlines": "Visualize only the outlines",
+                    "confirmSubjectDataArea": "Yes, overwrite analysis",
+                    "cancelSubjectDataArea": "Cancel and do not overwrite",
+                    "cancel": "Cancel",
                     "currentSubjectDataArea": "current subject data area",
                     "activeSubjectDataArea": "Subject area is already active",
-                    "activeSubjectDataAreaText": "The selected accessibility is already the subject data area. Select a different accessibility analysis or go to the area selection to define a new subject data area."
+                    "activeSubjectDataAreaText": "The selected availability is defined as a subject data area. Do you want to discard the subject data area?",
+                    "mapPreview": "Map preview",
+                    "discard": "Yes, discard subject area data",
+                    "subjectDataSuccess": "The subject area from the analysis „{{title}}“ has been successfully created.",
+                    "subjectDataReset": "The subject area from the analysis „{{title}}“ was rejected."
                 }
             }
         }

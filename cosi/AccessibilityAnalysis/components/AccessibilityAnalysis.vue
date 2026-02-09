@@ -45,6 +45,7 @@ import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparat
 import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
 import uniq from "../../utils/array/uniq";
 import VectorLayer from "ol/layer/Vector.js";
+import {VSnackbar} from "vuetify/components/VSnackbar";
 import WPS from "@shared/js/api/wps.js";
 import {Polygon} from "ol/geom";
 
@@ -69,6 +70,7 @@ export default {
         TabBar,
         ToolInfo,
         VExpandTransition,
+        VSnackbar,
         VItem,
         VItemGroup
     },
@@ -150,7 +152,9 @@ export default {
             showErrorAlert: false,
             showSpinner: false,
             analysisName: "",
-            generatedName: ""
+            generatedName: "",
+            successSubjectData: false,
+            snackbarText: ""
         };
     },
     computed: {
@@ -182,9 +186,7 @@ export default {
                         subjectData: true,
                         isSubjectDataArea: set.inputs.isSubjectDataArea,
                         subjectDataDisabled: this.selectedDistrictNames.length > 0,
-                        badge: set.inputs.isSubjectDataArea
-                            ? this.getBadge()
-                            : []
+                        badge: set.inputs.isSubjectDataArea ? this.getSubjectDataBadge() : this.getMapPreviewBadge()
                     }
                 );
             });
@@ -1219,6 +1221,22 @@ export default {
             if (this.dataSets[index]) {
                 this.dataSets[index].inputs.isSubjectDataArea = true;
             }
+
+            this.showSnackbar(index, "confirm");
+        },
+
+        /**
+        * Resets the "subject data area" status
+         * @param {number} index - The index of data set.
+         */
+        resetSubjectDataArea (index) {
+            if (!this.dataSets[index]) {
+                return;
+            }
+
+            this.dataSets[index].inputs.isSubjectDataArea = false;
+
+            this.showSnackbar(index, "reset");
         },
 
         /**
@@ -1243,7 +1261,7 @@ export default {
          * Returns an array that shows that the subject area is set
          * @returns {Object[]} An array of badge objects.
          */
-        getBadge () {
+        getSubjectDataBadge () {
             return [
                 {
                     backgroundColor: "#EB8A3E",
@@ -1255,8 +1273,24 @@ export default {
         },
 
         /**
+         * Returns an array that shows that the analysis is only a preview.
+         * @returns {Object[]} An array of badge objects.
+         */
+        getMapPreviewBadge () {
+            return [
+                {
+                    backgroundColor: "#D9D9D9",
+                    color: "rgba(66, 66, 66, 1)",
+                    icon: "bi bi-layers",
+                    text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.mapPreview")
+                }
+            ];
+        },
+
+        /**
          * Closes all other open dropdowns when one is shown.
          * @param {Event} event - The "shown.bs.dropdown" event.
+         * @returns {void}
         */
         onDropdownShown (event) {
             const current = event.target;
@@ -1270,6 +1304,28 @@ export default {
 
                 instance.hide();
             });
+        },
+
+        /**
+         * Displays a snackbar notification for a specific dataset card.
+         * @param {number} index - The index of the dataset.
+         * @param {string} type - The type of action triggering the snackbar ("confirm" or "reset").
+         * @returns {void}
+        */
+        showSnackbar (index, type) {
+            const card = this.dataSets[index];
+
+            if (!card) {
+                return;
+            }
+
+            if (type === "confirm") {
+                this.snackbarText = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.subjectDataSuccess", {title: card.inputs.title});
+            }
+            else if (type === "reset") {
+                this.snackbarText = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.subjectDataReset", {title: card.inputs.title});
+            }
+            this.successSubjectData = true;
         }
     }
 };
@@ -1512,9 +1568,82 @@ export default {
                             <h5 class="dropdown-heading">
                                 {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.overwriteSubjectData') }}
                             </h5>
-                            <span class="my-3">
+                            <p class="my-3">
                                 {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.newSubjectDataNote') }}
-                            </span>
+                            </p>
+                            <p class="my-3">
+                                {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.newSubjectDataSelection') }}
+                            </p>
+                            <div class="d-flex flex-column gap-2 ms-3">
+                                <div class="form-check">
+                                    <input
+                                        id="overwrite-subject"
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="subjectData"
+                                        checked
+                                    >
+                                    <label
+                                        class="form-check-label"
+                                        for="overwrite-subject"
+                                    >
+                                        {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.newSubjectDataInputOverwrite') }}
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input
+                                        id="merge-subject"
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="subjectData"
+                                        disabled
+                                    >
+                                    <label
+                                        class="form-check-label"
+                                        for="merge-subject"
+                                    >
+                                        {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.newSubjectDataInputMerge') }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <p class="my-3">
+                                {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.newSubjectDataMap') }}
+                            </p>
+                            <div class="d-flex flex-column gap-2 ms-3 mt-3">
+                                <div class="form-check">
+                                    <input
+                                        id="overwrite-map"
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="subjectDataMap"
+                                        checked
+                                    >
+                                    <label
+                                        class="form-check-label"
+                                        for="overwrite-map"
+                                    >
+                                        {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.newSubjectDataMapAnalysis') }}
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input
+                                        id="merge-map"
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="subjectDataMap"
+                                        disabled
+                                    >
+                                    <label
+                                        class="form-check-label"
+                                        for="merge-map"
+                                    >
+                                        {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.newSubjectDataMapOutlines') }}
+                                    </label>
+                                </div>
+                            </div>
                             <FlatButton
                                 class="mx-auto mt-3"
                                 icon="bi bi-check2"
@@ -1536,8 +1665,29 @@ export default {
                             <span class="mb-3">
                                 {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.activeSubjectDataAreaText') }}
                             </span>
-                            <div />
+                            <FlatButton
+                                class="mx-auto mt-3"
+                                icon="bi bi-check2"
+                                :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.discard')"
+                                @click="() => resetSubjectDataArea(index)"
+                            />
+                            <FlatButton
+                                class="mx-auto"
+                                icon="bi bi-x"
+                                :secondary="true"
+                                :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.cancel')"
+                                @click="closeDropdown"
+                            />
                         </div>
+                        <v-snackbar
+                            v-model="successSubjectData"
+                            :timeout="6000"
+                            color="primary"
+                        >
+                            <span>
+                                {{ snackbarText }}
+                            </span>
+                        </v-snackbar>
                     </div>
                 </template>
                 <template #after-card="{index}">
@@ -1579,8 +1729,8 @@ export default {
         }
 
         .dropdown-menu {
-            min-width: 220px;
-            max-width: 320px;
+            min-width: 300px;
+            max-width: 420px;
             width: max-content;
         }
 
