@@ -122,6 +122,7 @@ export default {
                 });
             }
             catch (err) {
+                console.error("Error while fetching geosearch results: ", err);
                 dispatch("Alerting/addSingleAlert", {
                     category: "error",
                     title: i18next.t("common:modules.alerting.categories.error"),
