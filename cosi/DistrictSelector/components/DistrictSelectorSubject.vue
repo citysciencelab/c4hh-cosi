@@ -434,11 +434,39 @@ export default {
             }
         },
 
+        /**
+         * Handles the population response from the WPS service and updates the
+         * population label of the given card.
+         * @param {Object} resp - The raw WPS execute response.
+         * @param {Object} card - The report card to update.
+         * @returns {void}
+         */
         handlePopulationResponsee (resp, card) {
-            const parsedData = resp.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData.einwohner,
-                responseResult = JSON.parse(parsedData.ergebnis);
+            const result = resp?.ExecuteResponse?.ProcessOutputs?.Output?.Data?.ComplexData?.einwohner?.ergebnis,
+                trimmed = typeof result === "string" ? result.trim() : "",
+                fallbackLabel = "Einwohner: nicht verfügbar";
 
-            card.data[2].label = `Einwohner: ${thousandsSeparator(responseResult.einwohner_fhh)}`;
+            if (!trimmed) {
+                card.data[2].label = fallbackLabel;
+                return;
+            }
+
+            if (trimmed.startsWith("{")) {
+                try {
+                    const parsed = JSON.parse(trimmed);
+
+                    if (typeof parsed?.einwohner_fhh === "number") {
+                        card.data[2].label =
+                            `Einwohner: ${thousandsSeparator(parsed.einwohner_fhh)}`;
+                        return;
+                    }
+                }
+                catch (e) {
+                    console.warn("Population JSON parse failed:", e, trimmed);
+                }
+            }
+
+            card.data[2].label = fallbackLabel;
         }
     }
 };
