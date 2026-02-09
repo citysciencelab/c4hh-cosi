@@ -3755,7 +3755,8 @@ Routing-tool geosearch options.
 |serviceId|yes|String||Which service should be used for the geosearch.|false|
 |typeName|no|String||Type name for the specialWfs geosearch query.|false|
 |propertyNames|no|String[]||Names of properties to be included in the specialWfs geosearch.|false|
-|geometryNames|no|String||Name of the geometry field for specialWfs geosearch.|false|
+|geometryName|no|String||Name of the geometry field for specialWfs geosearch.|false|
+|labelProperty|no|String||(`SPECIALWFS` only) Name of the field from which the dropdown labels should be read. If not set, the first attribute from `propertyNames` is used.|false|
 |bbox|no|**[Bbox](#datatypesbbox)**||BBOX value according to the speedProfile. Coordinate system depends on the epsg parameter. Geosearch service must support bbox string.|false|
 |epsg|no|String|4326|Which EPSG code is used by the service (e.g. 4326, 25832).|false|
 |searchField|no|String||The path to the field to be searched for when using Elastic Search.|false|
