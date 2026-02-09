@@ -115,6 +115,7 @@
 ### Added
 - Architectural Decision Record **[ADR](./docs/Dev/Architecture_Decision_Record.md)**: Added documentation file for architectural decisions in the project.
 - Issue \#1377: GetFeatureInfo: Added page counter display showing current position and total count of GFI responses.
+- Issue \#1550: Support for configurable label property in routing geosearch of type `SPECIALWFS`.
 - LayerTree: The attribute `reverseLayer` can now be configured to reverse the layers behind the `addLayerButton`.
 - GetFeatureInfo: Added optional `gfiTitleAttribute` parameter to display a feature attribute value as GFI title instead of the layer name.
 - CoordToolkit: Added configurable parameter `keepMarkerVisible` to optionally keep the coordinate marker visible on the map after closing the tool (default: false).
