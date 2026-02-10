@@ -1274,22 +1274,41 @@ export default {
         },
 
         /**
-         * Runs recursively through the district levels to get the names of the higher level districts.
-         * @param {Object} districtLevel - The district level to which the district names belong.
-         * @param {String[]} districtNames - The names of the needed districts.
-         * @param {String[]} columns - The names of the columns.
-         * @returns {String[]} The names of the columns
+         * The method traverses through the given district level and all its
+         * reference levels to collect the required column names.
+         * @param {Object} districtLevel - The current district level object.
+         * @param {String[]} districtNames - The names of the selected districts for the current level.
+         * @param {String[]} columns - The accumulated column names.
+         * @param {Boolean} [isRoot=true] - Indicates whether this is the initial call (root level).
+         * @returns {String[]} The complete list of column headers for the export.
          */
-        getStatCols (districtLevel, districtNames, columns) {
+        getStatCols (districtLevel, districtNames, columns, isRoot = true) {
             const districts = districtLevel.displayAll
                     ? districtLevel.districts
                     : districtLevel.districts.filter(dist => districtNames.includes(dist.getName())),
                 refDistrictNames = [];
-            let refDistrictName, district;
 
-            for (district of districts) {
-                if (this.selectedLevels.includes(districtLevel.label) || !this.shouldAreasSummedUp) {
-                    columns.push(district.getLabel());
+            let refDistrictName;
+
+            for (const district of districts) {
+                const levelIsSelected = this.selectedLevels.includes(districtLevel.label);
+
+                let includeLevelCols;
+
+                if (this.shouldAreasSummedUp) {
+                    includeLevelCols = !isRoot && levelIsSelected;
+                }
+                else if (isRoot) {
+                    includeLevelCols = true;
+                }
+                else {
+                    includeLevelCols = levelIsSelected;
+                }
+
+                if (includeLevelCols) {
+                    const isSingleSelectionAtRoot = !this.shouldAreasSummedUp && isRoot && districts.length === 1;
+
+                    columns.push(isSingleSelectionAtRoot ? district.getName() : district.getLabel());
                 }
 
                 refDistrictName = district.getReferencDistrictName();
@@ -1298,13 +1317,15 @@ export default {
                     refDistrictNames.push(refDistrictName);
                 }
             }
+
             if (districtLevel.referenceLevel) {
-                this.getStatCols(districtLevel.referenceLevel, refDistrictNames, columns);
+                this.getStatCols(districtLevel.referenceLevel, refDistrictNames, columns, false);
             }
 
-            if (this.shouldAreasSummedUp) {
+            if (this.shouldAreasSummedUp && isRoot) {
                 return [this.areaColumnName, ...columns];
             }
+
             return columns;
         },
         getCulmulativeTotal,
