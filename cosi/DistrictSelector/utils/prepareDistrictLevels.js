@@ -89,13 +89,14 @@ export function getAllDistrictsWithoutLayer (districtLevels) {
  * @param {Object} districtLevel - The district level.
  * @param {module:ol/layer} districtLevel.layer - The layer of the district level.
  * @param {String} districtLevel.keyOfAttrName - The key for the attribute containing the name of the district.
+ * @param {String} districtLevel.keyOfAttrNumber - The key for the attribute containing the number of the district.
  * @param {String} districtLevel.label - The label of the district level.
  * @param {String[]|undefined} districtLevel.duplicateDistrictNames - Names of districts that trigger conflicts.
  * @param {Object} referenceLevel - The reference level from the district level.
  * @param {String} layerId - The id of the layer for the district level.
  * @returns {Object[]} The districts.
  */
-export function getDistricts ({layer, keyOfAttrName, label, duplicateDistrictNames, referenceLevel, layerId}) {
+export function getDistricts ({layer, keyOfAttrName, keyOfAttrNumber, label, duplicateDistrictNames, referenceLevel, layerId}) {
     if (typeof layer !== "object" || layer === null || Array.isArray(layer) || typeof keyOfAttrName !== "string" || typeof label !== "string") {
         console.error(`prepareDistrictLevels.getDistricts: ${layer} has to be defined and an object. ${keyOfAttrName} has to be defined and a string. ${label} has to be defined and a string`);
         return [];
@@ -137,6 +138,7 @@ export function getDistricts ({layer, keyOfAttrName, label, duplicateDistrictNam
                 }
                 return feature.get(keyOfAttrName);
             },
+            getNumber: () => feature.get(keyOfAttrNumber),
             // name of the reference (parent) district
             getReferencDistrictName: () => getReferencDistrictName(referenceLevel, feature, layerId),
             referencDistrictName: getReferencDistrictName(referenceLevel, feature, layerId)
