@@ -300,6 +300,9 @@ export default {
         this.infrastructureTableLimit = this.infrastructureTableLimitConfig;
         this.infrastructureTableLimitEnabled = this.infrastructureTableLimitEnabledConfig;
     },
+    mounted () {
+        this.switchThroughStepperItems();
+    },
     activated () {
         this.updateFeaturesList();
         this.preparesInfrastructureData();
@@ -1298,7 +1301,7 @@ export default {
 
             this.pdf.addChapter({text: "Auflistung", pageOrientation: "portrait"});
             this.pdf.addLineBreak();
-            Object.keys(groupedTopics).forEach(group => {
+            this.selectedInfrastructureData.forEach(group => {
                 const topicLength = groupedTopics[group].length,
                     columns = this.pdf.getColumns(["Typ der Einrichtung", "Name", "Adresse"], []),
                     body = [columns],
@@ -1554,6 +1557,7 @@ export default {
             this.page = 1;
             this.stepperRerenderKey++;
             this.printReportView = false;
+            this.switchThroughStepperItems();
         },
 
         /**
@@ -1563,6 +1567,26 @@ export default {
          */
         setStatisticalYear (year) {
             this.statisticalYear = year;
+        },
+
+        /**
+         * Switches through the steps awaiting the next tick after each switch.
+         * @returns {Promise<void>} Resolves once the stepper items have been switched through.
+         */
+        async switchThroughStepperItems () {
+            await this.$nextTick();
+            this.page = 1;
+            await this.$nextTick();
+            this.page = 2;
+            await this.$nextTick();
+            this.page = 3;
+            await this.$nextTick();
+            this.page = 4;
+            await this.$nextTick();
+            this.page = 5;
+            await this.$nextTick();
+            this.page = 1;
+            await this.$nextTick();
         },
 
         /**
