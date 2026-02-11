@@ -426,7 +426,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
 
 .selectableList {
     min-height: 15rem;

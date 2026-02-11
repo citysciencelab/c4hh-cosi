@@ -4,7 +4,7 @@ import TabNewContent from "./tabs/TabNewContent.vue";
 import TabListContent from "./tabs/TabListContent.vue";
 import TabFilterContent from "./tabs/TabFilterContent.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
-import layerCollection from "@core/layers/js/layerCollection";
+import layerCollection from "@core/layers/js/layerCollection.js";
 
 export default {
     name: "GeoMarker",

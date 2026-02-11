@@ -67,7 +67,6 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
                                 alternativeGeometry: () => false,
                                 alternativePolygonFeature: () => null,
                                 bufferDistances: () => [100, 500, 1000],
-                                bufferHint: () => "test",
                                 fileName: () => "test",
                                 columns: () => [],
                                 rows: () => [],

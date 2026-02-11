@@ -22,7 +22,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
 
 div.geoMarkerFormBox {
     border: 0.0625rem solid $light_blue;

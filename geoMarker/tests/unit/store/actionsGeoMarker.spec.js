@@ -33,7 +33,9 @@ describe("src/modules/wfst/store/actionsGeoMarker.js", () => {
         mapCollection.clear();
         mapCollection.addMap(map, "2D");
     });
-    afterEach(sinon.restore);
+    afterEach(() => {
+        sinon.restore();
+    });
 
     describe("setMapInteraction", () => {
         beforeEach(() => {

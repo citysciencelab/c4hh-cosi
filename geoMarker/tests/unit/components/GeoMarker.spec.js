@@ -27,7 +27,7 @@ describe("addons/geoMarker/components/GeoMarker.vue", () => {
                                 geoMarkerFeatureList: () => [],
                                 newGeoMarkerCreated: () => false,
                                 geoMarkerUpdateFeature: () => null,
-                                reloadIntervalId: () => 1
+                                reloadIntervalId: sinon.stub()
                             },
                             actions: {
                                 loadCategories: () => [],

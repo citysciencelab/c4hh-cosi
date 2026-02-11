@@ -143,7 +143,6 @@ export default {
 </template>
 
 <style lang="scss">
-@import "~variables";
 
 #geoMarker  {
     div.createScreenshotContainer {
