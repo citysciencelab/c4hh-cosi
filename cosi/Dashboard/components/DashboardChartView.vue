@@ -10,8 +10,16 @@ export default {
         AccordionItem,
         ChartItem
     },
+    data () {
+        return {
+            higherDistrictLevel: []
+        };
+    },
     computed: {
-        ...mapGetters("Modules/Dashboard", ["districtColumns", "items", "statsFeatureFilter", "timestampPrefix", "timestamps"]),
+        ...mapGetters("Modules/Dashboard", ["districtColumns", "items", "statsFeatureFilter", "timestampPrefix", "timestamps", "timestampsFiltered"]),
+        ...mapGetters(
+            "Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevelId"]
+        ),
 
         /**
          * Gets the items grouped by their group property.
@@ -48,6 +56,28 @@ export default {
         uniqueId,
 
         /**
+         * Checks whether the given district level is higher than the currently selected district level.
+         * @param {String} districtLevel - The district level to check.
+         * @returns {Boolean} Returns true if the given district level is above the selected one otherwise false.
+         */
+        isHigherDistrictLevel (districtLevel) {
+            const index = this.districtLevels.findIndex(
+                level => level.layerId === this.selectedDistrictLevelId
+            );
+
+            if (index === -1) {
+                return false;
+            }
+
+            for (let i = index + 1; i < this.districtLevels.length; i++) {
+                if (this.districtLevels[i].label === districtLevel) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
+        /**
          * Gets the barchart data for a given group.
          * @param {Object} group - The group to get data for
          * @param {Object[]} districtColumns - The district columns to use
@@ -58,10 +88,14 @@ export default {
         getBarchartDataForGroup (group, districtColumns, timestamp, timestampPrefix) {
             return group.map(item => ({
                 name: item.category,
+                title: "Statistische Daten: " + item.category + " für " + timestamp,
                 data: [
                     Object.fromEntries(districtColumns.map(column => [
                         column.value,
-                        item[column.value]?.[`${timestampPrefix}${timestamp}`]
+                        {
+                            value: item[column.value]?.[`${timestampPrefix}${timestamp}`],
+                            hidden: this.isHigherDistrictLevel(column.districtLevel) && item.valueType !== "relative"
+                        }
                     ]))
                 ]
             }));
@@ -77,14 +111,18 @@ export default {
         getLinechartDataForGroup (group, districtColumns, timestampPrefix) {
             return group.map(item => ({
                 name: item.category,
-                data: districtColumns.map(
-                    column => Object.fromEntries(item.years
-                        .filter(timestamp => typeof item[column.value]?.[`${timestampPrefix}${timestamp}`] !== "undefined") // Filtere nur gültige Werte
+                title: "Statistische Daten: " + item.category,
+                data: districtColumns.map(column => ({
+                    district: column.value,
+                    hidden: this.isHigherDistrictLevel(column.districtLevel) && item.valueType !== "relative",
+                    values: Object.fromEntries(item.years
+                        .filter(timestamp => typeof item[column.value]?.[`${timestampPrefix}${timestamp}`] !== "undefined")
                         .map(timestamp => [
                             timestamp,
                             item[column.value]?.[`${timestampPrefix}${timestamp}`]
-                        ]))
-                )
+                        ])
+                    )
+                }))
             }));
         },
 
@@ -155,6 +193,9 @@ export default {
             :data="getChartData(group, districtColumns)"
             :show-x-values-filter="getChartMode(group, districtColumns).type === 'line'"
             :x-values-filter-label="$t('additional:modules.tools.cosi.dashboard.year')"
+            :selection-mode="'dropdown'"
+            :selection-label="$t('additional:modules.tools.cosi.dashboard.datasetLabel')"
+            :show-legend="true"
         />
     </AccordionItem>
 </template>

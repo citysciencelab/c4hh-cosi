@@ -31,6 +31,7 @@
                     "titleForCalculatedStatistic": "Die mit rot gekennzeichneten Werte sind automatisch berechnet",
                     "tableDataParsingError": "Beim lesen der Daten ist ein Fehler aufgetreten",
                     "calculationHint": "Das Ergebnis finden Sie unten in der Tabelle in der Kategoriengruppe Berechnungen",
+                    "datasetLabel": "Datensatz",
                     "tableRowMenu": {
                         "expandTooltip": "Alle Jahre ein-/ausblenden",
                         "visualize": "In der Karte visualisieren",

@@ -28,6 +28,7 @@
                     "minimizeCol": "Hide column",
                     "createCalc": "Create calculation",
                     "nameCalc": "Name of the calculation",
+                    "datasetLabel": "Data set",
                     "titleForCalculatedStatistic": "The values marked in red are calculated automatically",
                     "tableDataParsingError": "An error occurred while reading the data",
                     "calculationHint": "You can find the result at the bottom of the table in the category group Berechnungen",

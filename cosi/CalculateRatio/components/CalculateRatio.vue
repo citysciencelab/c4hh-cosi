@@ -936,6 +936,8 @@ export default {
                 />
                 <ChartItem
                     v-if="tableOrChart === 'chart' && activeSet === index"
+                    :selection-label="$t('additional:modules.tools.cosi.calculateRatio.calculationType')"
+                    :show-legend="true"
                     class="mb-3"
                     :data="preparesChartData()"
                 />
