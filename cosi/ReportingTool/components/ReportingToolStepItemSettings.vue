@@ -134,7 +134,7 @@ export default {
         }
     },
     mounted () {
-        this.selectedYear = this.items[0].years.sort((a, b) => b - a)[0];
+        this.selectedYear = this.years[0]?.value;
     },
     methods: {
         uniqueId,
