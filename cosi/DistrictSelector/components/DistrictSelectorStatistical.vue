@@ -169,13 +169,11 @@ export default {
 
         visibleSubjectDataLayerConfigs: {
             handler () {
-                if (this.isActive) {
-                    if (typeof this.activeSubjectCard !== "undefined") {
-                        this.updateLayerBbox(this.activeSubjectCard.subjectFeatureWKT);
-                        return;
-                    }
-                    this.updateLayerBbox(this.activeCard?.bboxGeomWKT);
+                if (typeof this.activeSubjectCard !== "undefined") {
+                    this.updateLayerBbox(this.activeSubjectCard.subjectFeatureWKT);
+                    return;
                 }
+                this.updateLayerBbox(this.activeCard?.bboxGeomWKT);
             },
             deep: true
         }

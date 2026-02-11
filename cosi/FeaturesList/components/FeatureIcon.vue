@@ -3,16 +3,12 @@ import Icon from "ol/style/Icon";
 import CircleStyle from "ol/style/Circle";
 import {mapActions} from "vuex";
 import {buffer} from "ol/extent";
-import InlineSvg from "vue-inline-svg";
 
 /**
  * @todo Make a util to read the icon of a feature
  */
 export default {
     name: "FeatureIcon",
-    components: {
-        InlineSvg
-    },
     props: {
         item: {
             required: true,
@@ -31,20 +27,6 @@ export default {
          * @description
          * @returns {String | undefined} returns the source url of the img
          */
-        getSvgSrc () {
-            if (this.style?.getImage()?.constructor === Icon) {
-                const src = this.style.getImage().getSrc();
-
-                if (src.substring(src.length - 4) === ".svg") {
-                    return src;
-                }
-            }
-            return undefined;
-        },
-        /**
-         * @description
-         * @returns {String | undefined} returns the source url of the img
-         */
         getIconSrc () {
             if (this.style?.getImage()?.constructor === Icon) {
                 return this.style.getImage().getSrc();
@@ -59,13 +41,6 @@ export default {
                 return this.style.getImage();
             }
             return undefined;
-        },
-        /**
-         * @param {module:ol/Style} style - the style object to read
-         * @returns {String} the color
-         */
-        getSvgColor () {
-            return this.convertColor(this.style.getImage().getColor()) || "grey";
         },
         /**
          * @param {module:ol/Style} style - the style object to read
@@ -151,15 +126,8 @@ export default {
         @click="zoomToFeature"
         @keydown.enter="zoomToFeature"
     >
-        <InlineSvg
-            v-if="getSvgSrc()"
-            class="marker"
-            :src="getSvgSrc()"
-            :fill="getSvgColor()"
-            alt="no img"
-        />
         <img
-            v-else-if="getIconSrc()"
+            v-if="getIconSrc()"
             class="marker"
             :src="getIconSrc()"
             alt="no img"
