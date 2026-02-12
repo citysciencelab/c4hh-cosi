@@ -684,7 +684,9 @@ export default {
         />
         <v-app id="features-list-wrapper">
             <FeaturesListToolbar
+                v-model:setting-items="columns"
                 :filter-items="groupActiveLayer"
+                :mandatory-setting-items="mandatoryColumns"
                 :district-items="districtItems"
                 :show-dipas-button="dipasInFeaturesList"
                 @setLayerFilter="setLayerFilter"

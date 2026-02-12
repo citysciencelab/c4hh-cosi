@@ -90,7 +90,10 @@ export default {
 </script>
 
 <template lang="html">
-    <ToolBar :optional-button="locationScoreButton">
+    <ToolBar
+        :optional-button="locationScoreButton"
+        v-bind="$attrs"
+    >
         <template #filterMenu>
             <div
                 v-if="selectedLayerList.length > 0 || selectedDistrictItems.length > 0 || searchString !== ''"
