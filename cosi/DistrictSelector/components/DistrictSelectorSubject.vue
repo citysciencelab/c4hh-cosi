@@ -193,13 +193,13 @@ export default {
 
         /**
          * Creates a buffered feature of the given features.
-         * @param {String} wktFeature - The feature to be buffered as WKT.
+         * @param {String|ol/Feature[]} wktFeature - The feature to be buffered as WKT.
          * @param {Number} buffer - The buffer distance to apply around each feature.
          * @returns {String} - The buffered feature as WKT.
          */
         getBufferedFeature (wktFeature, buffer) {
-            const feature = wktParser.decodeFeature(wktFeature),
-                geometryCollection = getBoundingGeometry([feature], buffer).getGeometries(),
+            const feature = typeof wktFeature === "string" ? [wktParser.decodeFeature(wktFeature)] : wktFeature,
+                geometryCollection = getBoundingGeometry(feature, buffer).getGeometries(),
                 geojsonPolygons = [];
 
             geometryCollection.forEach(geometry => {
@@ -321,11 +321,12 @@ export default {
 
         /**
          * Sets the subject feature to the active card with an optional buffer.
-         * @param {String} wktString - The feature as wkt string to set as the subject feature.
+         * @param {String|ol/Feature[]} wktFeature - The feature as wkt string or normal features to set as the subject feature.
          * @param {Number} buffer - The buffer value to apply to the feature.
+         * @return {void}
          */
-        setSubjectFeature (wktString, buffer) {
-            this.activeCard.subjectFeatureWKT = this.getBufferedFeature(wktString, buffer);
+        setSubjectFeature (wktFeature, buffer) {
+            this.activeCard.subjectFeatureWKT = this.getBufferedFeature(wktFeature, buffer);
             this.updateMap(this.activeCard);
         },
 
