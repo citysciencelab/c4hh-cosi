@@ -112,6 +112,8 @@ export default {
             :data="timestampsToUse.length === 1
                 ? getBarchartDataForGroup(group, districtColumns, timestampsToUse, timestampPrefix)
                 : getLinechartDataForGroup(group, districtColumns, timestampsToUse, timestampPrefix)"
+            :show-x-values-filter="timestampsToUse.length > 1"
+            :x-values-filter-label="$t('additional:modules.tools.cosi.dashboard.year')"
         />
     </AccordionItem>
 </template>

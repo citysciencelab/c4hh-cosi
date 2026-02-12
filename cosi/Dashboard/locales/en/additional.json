@@ -11,6 +11,7 @@
                     "category": "Category",
                     "dietailView": "View in detail",
                     "timestamp": "Years",
+                    "year": "Year",
                     "addFilter": "Add filter",
                     "resetFilter": "reset",
                     "closeFilter": "Close",

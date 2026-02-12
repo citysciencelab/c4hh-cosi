@@ -198,7 +198,7 @@ export default {
                 <DropdownAutocomplete
                     id="selectedDistanceScoreLayers"
                     v-model="selectedLayerList"
-                    class="rounded-0"
+                    class="rounded-0 mb-3"
                     :items="layerList"
                     :label="$t('additional:modules.tools.cosi.featuresList.distanceScoreLayerLabel')"
                     outlined

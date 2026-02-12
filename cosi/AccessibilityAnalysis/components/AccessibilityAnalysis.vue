@@ -1368,6 +1368,7 @@ export default {
             </div>
             <Dropdown-Autocomplete
                 v-if="activeMode.type === 'facility'"
+                class="mb-3"
                 :items="facilityNames ? facilityNames : []"
                 :model-value="selectedFacilityNames ? selectedFacilityNames : []"
                 :select-all="true"

@@ -115,12 +115,14 @@ export default {
             />
             <DropdownAutocomplete
                 v-model="selectedLayerList"
+                class="mb-3"
                 :items="filterItems"
                 label="Fachdaten"
                 multiple
             />
             <DropdownAutocomplete
                 v-model="selectedDistrictItems"
+                class="mb-3"
                 :items="districtItems"
                 label="Gebiete"
                 multiple

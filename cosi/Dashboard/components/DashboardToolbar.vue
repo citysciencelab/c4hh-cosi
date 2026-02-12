@@ -187,18 +187,21 @@ export default {
             </div>
             <DropdownAutocomplete
                 v-model="selectedGroups"
+                class="mb-3"
                 :items="groups"
                 label="Gruppen"
                 multiple
             />
             <DropdownAutocomplete
                 v-model="_statsFeatureFilter"
+                class="mb-3"
                 :items="mapping"
                 item-title="value"
                 :label="$t('additional:modules.tools.cosi.dashboard.category')"
                 multiple
             />
             <DropdownAutocomplete
+                class="mb-3"
                 :items="sortedTimestamps"
                 :label="$t('additional:modules.tools.cosi.dashboard.timestamp')"
                 :model-value="timestampsFiltered"

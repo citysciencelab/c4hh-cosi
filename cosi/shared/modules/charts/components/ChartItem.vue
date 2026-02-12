@@ -22,6 +22,16 @@ export default {
         data: {
             type: Array,
             required: true
+        },
+        showXValuesFilter: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
+        xValuesFilterLabel: {
+            type: String,
+            required: false,
+            default: ""
         }
     },
     data () {
@@ -58,6 +68,7 @@ export default {
                 }
             },
             chartTitle: "",
+            selectedXValues: [],
             reloadChart: 1,
             tags: []
         };
@@ -65,11 +76,45 @@ export default {
 
     computed: {
         /**
+         * Returns all x values that are available in the data.
+         * @returns {Number[]|String[]} An array of all x values.
+         */
+        allXValues () {
+            const values = new Set();
+
+            this.data.forEach(dataset => {
+                dataset.data.forEach(dataEntry => {
+                    for (const key in dataEntry) {
+                        values.add(key);
+                    }
+                });
+            });
+            return [...values].sort().reverse();
+        },
+        /**
          * Returns the names of the charts that can be selected.
          * @returns {Array} An array of all dropdown options.
          */
         dropdownOptions () {
             return this.data.map(item => item.name);
+        },
+
+        /**
+         * Returns the data filtered by the selected x values.
+         * @returns {Object[]} The filtered data.
+         */
+        filteredData () {
+            if (this.selectedXValues.length === 0) {
+                return this.data;
+            }
+            return this.data.map(dataset => ({
+                ...dataset,
+                data: dataset.data.map(
+                    dataEntry => Object.fromEntries(Object.entries(dataEntry)
+                        .filter(([key]) => this.selectedXValues.includes(key))
+                    )
+                )
+            }));
         },
 
         /**
@@ -84,7 +129,7 @@ export default {
     },
 
     watch: {
-        data: "loadChartData"
+        filteredData: "loadChartData"
     },
 
     mounted () {
@@ -124,7 +169,7 @@ export default {
          * @returns {void}
          */
         loadChartData (selectedLabel) {
-            const entry = this.data.find(
+            const entry = this.filteredData.find(
                 item => item.name === selectedLabel && item.data
             );
 
@@ -133,7 +178,6 @@ export default {
                 this.loadInitialChart();
                 return;
             }
-            // eslint-disable-next-line one-var
             const labels = [... new Set(entry.data.flatMap(dataSet => Object.keys(dataSet)))],
                 datasets = entry.data.map(dataSet => ({
                     backgroundColor: "#3C5F94",
@@ -189,7 +233,10 @@ export default {
     <div
         class="row"
     >
-        <div v-if="data.length > 1">
+        <div
+            v-if="data.length > 1"
+            class="d-flex flex-wrap gap-3"
+        >
             <TagGroup
                 v-if="data.length < 6"
                 class="col mb-3 mt-2"
@@ -204,6 +251,13 @@ export default {
                 :label="$t('additional:modules.tools.cosi.calculateRatio.calculationType')"
                 :model-value="[selectedTagLabel]"
                 @update:model-value="loadChartData($event)"
+            />
+            <DropdownAutocomplete
+                v-if="showXValuesFilter"
+                v-model="selectedXValues"
+                :items="allXValues"
+                :label="xValuesFilterLabel"
+                multiple
             />
         </div>
         <BarchartItem
