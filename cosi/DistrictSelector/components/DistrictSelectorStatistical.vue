@@ -282,7 +282,7 @@ export default {
          * @returns {void}
          */
         exportFeature (val) {
-            downloadJsonToFile(featuresToGeoJsonCollection(val?.features), val?.districtLevelLabel + ".geojson");
+            downloadJsonToFile(featuresToGeoJsonCollection(wktParser.decodeFeatures(val?.features)), val?.districtLevelLabel + ".geojson");
         },
 
         /**
