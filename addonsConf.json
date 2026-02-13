@@ -139,6 +139,9 @@
   "addLayerRemotely": {
     "type": "tool"
   },
+  "dataNarrator": {
+    "type": "tool"
+  },
   "drawWithoutGui": {
     "type": "javascript"
    }
