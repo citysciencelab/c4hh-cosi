@@ -298,6 +298,9 @@ export default {
             this.setSelectedDistrictLevelId(this.cards[index].districtLevelId);
             this.$nextTick(() => {
                 this.updateSelectedFeatures(this.cards[index].districtNames);
+                const extent = wktParser.decodeFeature(this.cards[index].subjectFeatureWKT).getGeometry().getExtent();
+
+                this.zoomToExtent({extent});
             });
             this.updateMap(this.activeCard);
         },

@@ -42,14 +42,15 @@ export default {
     watch: {
         cards: {
             handler () {
-                if (this.cards.length > 0) {
+                if (this.cards.some(card => card?.status === "active")) {
                     this.tabItems[1].disabled = false;
                 }
                 else {
                     this.tabItems[1].disabled = true;
                 }
             },
-            deep: true
+            deep: true,
+            immediate: true
         }
     },
     created () {
@@ -58,9 +59,6 @@ export default {
         });
         if (!this.selectedTabItem) {
             this.setSelectedTabItem(this.tabItems[0]);
-        }
-        if (this.cards.length > 0) {
-            this.tabItems[1].disabled = false;
         }
     },
     activated: () => undefined,
@@ -72,28 +70,30 @@ export default {
 </script>
 
 <template lang="html">
-    <ToolInfo
-        :locale="currentLocale"
-        :loading="loading"
-        :summary="$t('additional:modules.cosi.districtSelector.description')"
-        :url="{}"
-    />
-    <hr class="my-4 mt-0 mx-0 text-black-50">
-    <TabBar
-        class="mb-4"
-        :active-item="selectedTabItem"
-        :items="tabItems"
-        :loading="loading"
-        @change="setSelectedTabItem"
-    />
-    <keep-alive>
-        <DistrictSelectorStatistical
-            v-if="selectedTabItem.type === 'statistic'"
+    <div>
+        <ToolInfo
+            :locale="currentLocale"
+            :loading="loading"
+            :summary="$t('additional:modules.cosi.districtSelector.description')"
+            :url="{}"
+        />
+        <hr class="my-4 mt-0 mx-0 text-black-50">
+        <TabBar
+            class="mb-4"
+            :active-item="selectedTabItem"
+            :items="tabItems"
+            :loading="loading"
+            @change="setSelectedTabItem"
+        />
+        <keep-alive>
+            <DistrictSelectorStatistical
+                v-if="selectedTabItem.type === 'statistic'"
+                :loading="loading"
+            />
+        </keep-alive>
+        <DistrictSelectorSubject
+            v-if="selectedTabItem.type === 'subject'"
             :loading="loading"
         />
-    </keep-alive>
-    <DistrictSelectorSubject
-        v-if="selectedTabItem.type === 'subject'"
-        :loading="loading"
-    />
+    </div>
 </template>
