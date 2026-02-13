@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "quickResponseCode": {
+            "name": "QR-Code",
+            "description": "Create a QR code for a position in the map.",
+            "text": "Click in the map to create the QR code",
+            "title": "QR-Code"
+        }
+    }
+}

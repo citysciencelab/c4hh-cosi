@@ -128,5 +128,8 @@
   "oktagonComponent": {
     "type": "tool",
     "path": "oktagon"
+  },
+  "quickResponseCode": {
+    "type": "tool"
   }
 }

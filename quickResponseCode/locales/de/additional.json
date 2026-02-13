@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "quickResponseCode": {
+            "name": "QR-Code",
+            "description": "Erzeugen eines QR-Codes für einen Punkt in der Karte.",
+            "text": "Klicken Sie in die Karte, um den QR-Code zu erstellen",
+            "title": "QR-Code"
+        }
+    }
+}
