@@ -70,7 +70,7 @@ export default {
         }
     },
     created () {
-        this.drawingLayer = getLayerById("district-selector");
+        this.drawingLayer = getLayerById("subject-area");
         this.drawingLayer.getLayer().setVisible(true);
 
         this.createCardsFromStatisticalCards(this.cardsStatistical, this.cards);
@@ -273,7 +273,6 @@ export default {
                 return;
             }
             this.activeCard.drawnFeatureWKT = null;
-            this.setSubjectFeature(this.activeCard.statisticalFeatureWKT, this.activeCard.buffer);
         },
 
         /**

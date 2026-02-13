@@ -211,6 +211,12 @@ export default {
         if (!this.activeCard) {
             this.clearFeatures();
         }
+        if (this.activeCard && this.selectedTabItem.type === "statistic") {
+            const bboxGeomWKT = this.activeCard.bboxGeomWKT,
+                decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
+
+            this.addSubjectAreaToLayer(decodedFeature);
+        }
 
         this.isActive = false;
         this.select.setActive(false);
