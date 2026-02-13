@@ -27,6 +27,18 @@
           "noLegendAvailable": "No legend available",
           "legendLoadFailed": "Legend could not be loaded.",
           "unknownLegendFormat": "Unknown legend format",
+          "frontPage": {
+            "withoutNeuwerk": {
+              "label": "Front page with map section"
+            },
+            "withNeuwerk": {
+              "label": "Front page with map section including Neuwerk",
+              "alert": "Neuwerk and Scharhörn are shown as separate maps."
+            },
+            "withoutFrontPage": {
+              "label": "No front page"
+            }
+          },
           "label": {
             "infrastructureTableLimitEnabled": "Should tables be excluded from the report if there are more than a certain number of institutions?",
             "infrastructureTableLimit": "Maximum number of institutions to be included",
@@ -47,7 +59,6 @@
             "down": "Move udown one position"
           },
           "alert": {
-            "infoFrontPage": "Neuwerk and Scharhörn are shown as separate maps.",
             "noDataAlert": "There is no data available to create a report.",
             "noStatisticalData": "There is no statistical data available for selection.",
             "noStatisticalDataSelected": "No content has been selected. The report contains no statistical data.",

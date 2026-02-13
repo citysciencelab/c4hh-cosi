@@ -87,25 +87,10 @@ export default {
         reportTitleMaxLength: 50,
         freeHeadline: "",
         freeText: "",
-        frontPageItems: [
-            {
-                alert: undefined,
-                label: "Titelseite mit Kartenausschnitt",
-                selected: true,
-                value: "withoutNeuwerk"
-            },
-            {
-                alert: "Achtung Achtung",
-                label: "Titelseite mit Kartenausschnitt inkl. Neuwerk",
-                selected: false,
-                value: "withNeuwerk"
-            },
-            {
-                alert: undefined,
-                label: "Keine Titelseite",
-                selected: false,
-                value: "withoutFrontPage"
-            }
+        frontPageOptions: [
+            {selected: true, value: "withoutNeuwerk"},
+            {selected: false, value: "withNeuwerk"},
+            {selected: false, value: "withoutFrontPage"}
         ],
         pdf: null,
         categoryInChart: [
@@ -154,6 +139,12 @@ export default {
         ...mapGetters(["restServiceById", "visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Maps", ["projection", "getCurrentExtent"]),
 
+        frontPageItems () {
+            return this.mapFrontPageOptions(this.frontPageOptions);
+        },
+        frontPageItemsForEmptySelection () {
+            return this.mapFrontPageOptions(this.frontPageItemsForEmptyDistrictSelection);
+        },
         /**
          * Gets the category mapping defined in the assets file including the current accessibility analyses.
          * @returns {Object} The category mapping object including the analyses as items.
@@ -181,7 +172,7 @@ export default {
          * @returns {Object[]} Array of frontpageitems.
          */
         frontPageItemsForEmptyDistrictSelection () {
-            return this.frontPageItems.map(item => ({
+            return this.frontPageOptions.map(item => ({
                 ...item,
                 selected: item.value === "withoutFrontPage"
             }));
@@ -284,7 +275,11 @@ export default {
          * @returns {Object} The selected front page item.
          */
         selectedFrontPageItem () {
-            return this.frontPageItems.find(item => item.selected === true);
+            const items = this.selectedDistrictNames.length > 0
+                ? this.frontPageItems
+                : this.frontPageItemsForEmptySelection;
+
+            return items.find(item => item.selected === true) || {};
         }
     },
     watch: {
@@ -316,6 +311,30 @@ export default {
     methods: {
         ...mapActions("Modules/FeaturesList", ["updateFeaturesList"]),
         ...mapMutations("Modules/ReportingTool", ["setReportLoader"]),
+
+        /**
+         * Maps the front page options to UI items with translated labels and optional alerts.
+         * @param {Object[]} options - Front page options.
+         * @returns {Object[]} UI items for TagGroup.
+         */
+        mapFrontPageOptions (options) {
+            if (!Array.isArray(options)) {
+                return [];
+            }
+
+            return options.map(option => {
+                const baseKey = "additional:modules.cosi.reportingTool.frontPage." + option.value,
+                    label = this.$t(baseKey + ".label"),
+                    alertKey = baseKey + ".alert",
+                    alert = option.value === "withNeuwerk" ? this.$t(alertKey) : undefined;
+
+                return {
+                    ...option,
+                    label,
+                    alert
+                };
+            });
+        },
 
         /**
          * Creates the PDF report and triggers the download.
@@ -1496,14 +1515,15 @@ export default {
          * @param {Object} frontPagelabel - The labels object containing information about front page items.
          * @returns {void}
          */
-        updateFrontPageItems (frontPagelabel) {
-            if (typeof frontPagelabel === "undefined") {
+        updateFrontPageItems (selectedItems) {
+            const selectedItem = Array.isArray(selectedItems) ? selectedItems[0] : selectedItems;
+
+            if (!selectedItem || typeof selectedItem.value === "undefined") {
                 return;
             }
-            const selectedFrontPageItem = this.frontPageItems.find(item => item.selected === true);
-
-            selectedFrontPageItem.selected = false;
-            frontPagelabel.selected = true;
+            this.frontPageOptions.forEach(item => {
+                item.selected = item.value === selectedItem.value;
+            });
         },
         /**
          * Prepares the statistical data depending on filtered data.
@@ -1745,12 +1765,12 @@ export default {
                             <TagGroup
                                 class="mb-3"
                                 :disabled="reportLoader || selectedDistrictNames.length === 0"
-                                :items="selectedDistrictNames.length > 0 ? frontPageItems : frontPageItemsForEmptyDistrictSelection"
+                                :items="selectedDistrictNames.length > 0 ? frontPageItems : frontPageItemsForEmptySelection"
                                 :label="$t('additional:modules.cosi.reportingTool.label.frontPage')"
                                 @update:selected-items="updateFrontPageItems"
                             />
                             <AlertMessage
-                                v-if="selectedFrontPageItem.alert"
+                                v-if="selectedFrontPageItem && selectedFrontPageItem.alert"
                                 :text="selectedFrontPageItem.alert"
                                 type="info"
                             />

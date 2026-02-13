@@ -27,6 +27,18 @@
             "noLegendAvailable": "Keine Legende verfügbar",
             "legendLoadFailed": "Legende kann nicht geladen werden",
             "unknownLegendFormat": "Unbekanntes Legendenformat",
+            "frontPage": {
+              "withoutNeuwerk": {
+                "label": "Titelseite mit Kartenausschnitt"
+              },
+              "withNeuwerk": {
+                "label": "Titelseite mit Kartenausschnitt inkl. Neuwerk",
+                "alert": "Neuwerk und Scharhörn werden als separate Karten dargestellt."
+              },
+              "withoutFrontPage": {
+                "label": "Keine Titelseite"
+              }
+            },
             "label": {
               "infrastructureTableLimitEnabled": "Sollen Tabellen ab einer bestimmten Anzahl von Einrichtungen vom Bericht ausgenommen werden?",
               "infrastructureTableLimit": "Maximale Anzahl an auszugebenen Einrichtungen",
@@ -47,7 +59,6 @@
               "down": "Eine Position nach unten verschieben"
             },
             "alert": {
-              "infoFrontPage": "Neuwerk und Scharhörn werden als separate Karten dargestellt.",
               "noDataAlert": "Es sind keine Daten zum Erstellen eines Berichts vorhanden.",
               "noStatisticalData": "Es sind keine statistischen Daten zum Auswählen vorhanden.",
               "noStatisticalDataSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine statistischen Daten.",
