@@ -329,7 +329,7 @@ export function getAverage (item, districtNames, timestamp, timestampPrefix) {
  * @param {Boolean} [simple=false] - get culmulative total if available
  * @returns {Number} the total
  */
-export function getTotal (item, districts, timestamp, timestampPrefix, simple = false) {
+export function getTotal (item, districts, timestamp, timestampPrefix = "jahr_", simple = false) {
     if (!simple && item?.calculation && item?.valueType === "relative") {
         return this.getCulmulativeTotal(item, districts, timestamp, timestampPrefix);
     }

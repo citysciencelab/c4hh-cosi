@@ -18,6 +18,7 @@ export default {
 
         commit("setItems", getters.getData);
         commit("setTimestamps", [...getTimestamps(state.items, state.timestampPrefix)]);
+        return getters.items;
     },
 
     /**

@@ -9,11 +9,11 @@ import {DragBox, Select} from "ol/interaction";
 import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
 import {Fill, Stroke, Style} from "ol/style.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
-import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
 import getFeature from "@shared/js/api/wfs/getFeature.js";
 import {getLayerById} from "../utils/getLayerById.js";
 import getMappingJson from "../../utils/getMappingJson.js";
+import {getTotal} from "../../Dashboard/utils/operations";
 import getters from "../store/gettersDistrictSelector.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
@@ -25,7 +25,6 @@ import {singleClick} from "ol/events/condition";
 import {styleSelectedDistrictLevels} from "../utils/styleSelectedDistrictLevels.js";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
-import WPS from "@shared/js/api/wps.js";
 import wktParser from "../../utils/wktParser";
 
 export default {
@@ -119,7 +118,7 @@ export default {
                 this.setSelectedDistrictLevelId(this.activeCard.districtLevelId);
                 this.$nextTick(() => {
                     this.updateSelectedFeatures(this.activeCard.selectedDistricts);
-                    this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts);
+                    this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts, this.activeCard);
                     this.allLayerConfigs.forEach(layerConfig => {
                         layerConfig.bboxGeometry = decodedFeature.getGeometry();
                     });
@@ -477,9 +476,9 @@ export default {
                     text: this.$t("additional:modules.cosi.districtSelector.statisticalData")
                 }],
                 data: [
-                    {value: "Bezugsebene: " + this.selectedDistrictLevel.label},
-                    {icon: "bi-map", label: "Gebiete: " + this.selectedDistrictNames},
-                    {icon: "bi-people", label: "Einwohner: Berechnung läuft..."}
+                    {value: this.$t("additional:modules.cosi.districtSelector.districtLevel") + ": " + this.selectedDistrictLevel.label},
+                    {icon: "bi-map", label: this.$t("additional:modules.cosi.districtSelector.selectedAreas") + ": " + this.selectedDistrictNames},
+                    {icon: "bi-people", label: this.$t("additional:modules.cosi.districtSelector.population") + ": Berechnung läuft..."}
                 ],
                 districtLevelId: this.selectedDistrictLevel.layerId,
                 districtLevelLabel: this.selectedDistrictLevel.label,
@@ -492,13 +491,12 @@ export default {
                 status: ""
             });
 
-            this.setPopulationSize(this.cards.at(-1));
             this.toggleCardStatus(this.cards.length - 1);
 
             if (extent) {
                 this.setBoundingGeometry(bboxGeom);
                 this.setFilterGeometry(bboxGeom);
-                this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts);
+                this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts, this.cards.at(-1));
             }
             else {
                 this.resetView();
@@ -568,13 +566,20 @@ export default {
          * @param {Object[]} selectedDistricts - Array of the selected districts.
          * @return {void}
          */
-        updateStatFeatures (selectedDistrictLevel, selectedDistricts) {
+        updateStatFeatures (selectedDistrictLevel, selectedDistricts, card) {
             this.loadStatFeatures({
                 districtLevel: selectedDistrictLevel,
                 getStatFeatures: getFeature.getFeaturePOST,
                 districts: selectedDistricts
             }).then(() => {
-                this.generateTable();
+                this.generateTable().then((dashboardItems) => {
+                    const foundItem = dashboardItems.find((item) => item.category === this.mapping[0].value),
+                        districtLabels = selectedDistricts.map(district => district.getLabel()),
+                        population = getTotal(foundItem, districtLabels, foundItem.years[0]);
+
+                    card.data[2].label = this.$t("additional:modules.cosi.districtSelector.population") + ": " + thousandsSeparator(population);
+                });
+
             });
         },
 
@@ -600,59 +605,6 @@ export default {
                 this.updateLayerBbox(this.cards[index].bboxGeomWKT);
                 this.zoomToExtent({extent: this.cards[index].extent, options: {}});
             });
-        },
-
-        setPopulationSize (card) {
-            const service = this.restServiceById(this.wpsServiceId);
-
-            if (service === undefined) {
-                console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");
-            }
-            else {
-                const geometry = wktParser.decodeGeometry(card.bboxGeomWKT),
-                    outerPolygon = geometryToGeoJson(geometry, false, "EPSG:25832", "EPSG:25832");
-
-                WPS.wpsRequest(service.id, service.url, this.wpsProcess, {
-                    "such_flaeche": JSON.stringify(outerPolygon)
-                },
-                (resp) => this.handlePopulationResponsee(resp, card)
-                );
-            }
-        },
-
-        /**
-         * Handles the population response from the WPS service and updates the
-         * population label of the given card.
-         * @param {Object} resp - The raw WPS execute response.
-         * @param {Object} card - The report card to update.
-         * @returns {void}
-         */
-        handlePopulationResponsee (resp, card) {
-            const result = resp?.ExecuteResponse?.ProcessOutputs?.Output?.Data?.ComplexData?.einwohner?.ergebnis,
-                trimmed = typeof result === "string" ? result.trim() : "",
-                fallbackLabel = "Einwohner: nicht verfügbar";
-
-            if (!trimmed) {
-                card.data[2].label = fallbackLabel;
-                return;
-            }
-
-            if (trimmed.startsWith("{")) {
-                try {
-                    const parsed = JSON.parse(trimmed);
-
-                    if (typeof parsed?.einwohner_fhh === "number") {
-                        card.data[2].label =
-                            `Einwohner: ${thousandsSeparator(parsed.einwohner_fhh)}`;
-                        return;
-                    }
-                }
-                catch (e) {
-                    console.warn("Population JSON parse failed:", e, trimmed);
-                }
-            }
-
-            card.data[2].label = fallbackLabel;
         }
     }
 };
