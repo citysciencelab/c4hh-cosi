@@ -31,7 +31,7 @@ export default {
             higherDistrictLevel: [],
             selectedAreasNameMaxLength: 50,
             selectedDistricts: [],
-            selectedYear: null,
+            selectedYear: undefined,
             stableSelectedDistrictNames: [],
             lastUserShouldAreasSummedUp: true,
             didInitialSummariseSync: false
@@ -39,9 +39,7 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/Dashboard", ["items"]),
-        ...mapGetters(
-            "Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevelId", "selectedStatFeatures", "selectedDistrictLevel", "selectedDistrictNames"]
-        ),
+        ...mapGetters("Modules/DistrictSelector", ["districtLevels", "selectedDistrictLevelId", "selectedStatFeatures", "selectedDistrictLevel", "selectedDistrictNames"]),
 
         /**
          * Determines whether the "summarise areas" controls must be disabled.
@@ -60,17 +58,28 @@ export default {
         },
 
         /**
-         * Gets the selectable years based on the selected statistical features.
-         * @returns {Object[]} An array of items for the year dropdown.
+         * Computes dropdown items for selectable reference years.
+         * @returns {Object[]} An array of dropdown items for the year selection.
          */
         years () {
-            const availableYears = utils.getAvailableYears(this.selectedStatFeatures),
-                items = availableYears.map(year => ({title: year, value: year}));
+            const availableYears = utils.getAvailableYears(this.selectedStatFeatures);
 
-            // if (items.length) {
-            //     items.unshift({title: this.$t("additional:modules.cosi.reportingTool.useMostRecentDataset"), value: "mostRecent"});
-            // }
-            return items;
+            return availableYears.map(y => ({title: y, value: Number(y)}));
+        },
+
+        /**
+         * Determines the default year for the dropdown.
+         * Prefers the greatest non-forecast year; falls back to the greatest available year.
+         * @returns {Number|undefined} The default year value or `undefined` if none exists.
+         */
+        defaultSelectedYear () {
+            const yearValues = this.years.map(i => i.value),
+                nonForecastYears = this.getNonForecastYears(yearValues),
+                candidates = nonForecastYears.length ? nonForecastYears : yearValues;
+
+            return candidates.length
+                ? Math.max(...candidates)
+                : undefined;
         },
 
         /**
@@ -100,10 +109,21 @@ export default {
         }
     },
     watch: {
+        defaultSelectedYear: {
+            immediate: true,
+            handler (val) {
+                if (val === undefined) {
+                    return;
+                }
+
+                if (this.selectedYear === undefined || this.selectedYear === null) {
+                    this.selectedYear = val;
+                }
+            }
+        },
         selectedYear (newVal) {
             this.$emit("update:statistical-year", newVal);
         },
-
         selectedDistrictNames: {
             immediate: true,
             deep: true,
@@ -133,11 +153,45 @@ export default {
             }
         }
     },
-    mounted () {
-        this.selectedYear = this.years[0]?.value;
-    },
     methods: {
         uniqueId,
+
+        /**
+         * Returns all years that exist as non-forecast data in the selected features.
+         * @param {Number[]} yearValues - Years available in the dropdown.
+         * @returns {Number[]} Non-forecast years.
+         */
+        getNonForecastYears (yearValues) {
+            if (!yearValues.length) {
+                return [];
+            }
+
+            const metaYears = Array.isArray(this.items) && this.items.length && Array.isArray(this.items[0]?.years)
+                ? this.items[0].years.map(y => Number(y)) : [];
+
+            if (metaYears.length) {
+                const metaSet = new Set(metaYears);
+
+                return yearValues.filter(y => metaSet.has(y));
+            }
+
+            return yearValues.filter(year => this.hasNonForecastYearKey(year));
+        },
+
+        /**
+         * Checks whether the selected features contain a non-forecast key for the given year.
+         * @param {Number} year - The year to check.
+         * @returns {boolean} True if at least one feature contains `jahr_YYYY`.
+         */
+        hasNonForecastYearKey (year) {
+            const key = `jahr_${year}`;
+
+            return this.selectedStatFeatures.some(feature => {
+                const props = feature.getProperties();
+
+                return Object.prototype.hasOwnProperty.call(props, key);
+            });
+        },
 
         /**
          * Toggles the "summarise areas" switch when the control is enabled.
@@ -155,7 +209,8 @@ export default {
 
         /**
          * Emits the updated name for selected areas.
-         * @param {String} evt - The new name for the selected areas.
+         *
+         * @param {String} name - The new name for the selected areas.
          * @returns {void}
          */
         emitSelectedAreasName (name) {
@@ -164,7 +219,9 @@ export default {
 
         /**
          * Sets the selected levels.
+         *
          * @param {Object[]} levels - An array of selected level.
+         * @returns {void}
          */
         setSelectedLevels (levels) {
             this.selectedLevels = levels.map(level => level.label);
@@ -209,9 +266,10 @@ export default {
                 @update:selected-items="setSelectedLevels"
             />
             <Dropdown-Autocomplete
-                v-model="selectedYear"
+                :model-value="selectedYear"
                 :items="years"
                 :label="$t('additional:modules.cosi.reportingTool.label.referenceYear')"
+                @update:model-value="selectedYear = $event"
             />
         </form>
     </AccordionItem>
