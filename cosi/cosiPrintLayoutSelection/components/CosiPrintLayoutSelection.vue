@@ -181,7 +181,7 @@ export default {
                 <i class="bi-info-circle" />
             </span>
             <div class="col font-size-sm ps-3">
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                {{ $t("additional:modules.vueComponents.cosiPrintLayoutSelection.infoText") }}
             </div>
         </div>
         <div class="form-floating">

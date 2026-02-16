@@ -4,7 +4,8 @@
             "cosiPrintLayoutSelection": {
                 "layoutVariant": "Layout variant",
                 "orientation": "Orientation",
-                "pageSize": "Page size"
+                "pageSize": "Page size",
+                "infoText": "The simple layout includes the fields title, subtitle, and author. The extended layout additionally provides a free-text field for individual additions as well as the display of sources."
             }
         }
     }
