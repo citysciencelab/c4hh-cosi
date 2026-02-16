@@ -20,6 +20,11 @@ export default {
         statsFeatureFilter: {
             type: Array,
             required: true
+        },
+        downloadDisabled: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     emits: ["exportTable", "reorderColumns", "setStatsFeatureFilter", "setTimestampsValues", "startCalculation", "toggleColumn"],
@@ -170,6 +175,7 @@ export default {
 <template>
     <ToolBar
         :optional-button="{text: $t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate'), icon: 'bi-plus-slash-minus', id: 'calculation-button', closeOnOutside: true}"
+        :download-disabled="downloadDisabled"
         @exportTable="$emit('exportTable', exportTimeline)"
     >
         <template #filterMenu>

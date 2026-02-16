@@ -14,6 +14,11 @@ export default {
         SwitchInput
     },
     props: {
+        downloadDisabled: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         itemTitle: {
             type: String,
             default: "title"
@@ -222,6 +227,7 @@ export default {
                 :text="$t('common:shared.modules.buttons.download')"
                 :title="$t('common:shared.modules.buttons.download')"
                 :icon="'bi-save'"
+                :disabled="downloadDisabled"
                 class="me-0 rounded-pill ms-auto"
                 @click.native="$emit('exportTable', true)"
             />

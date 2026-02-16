@@ -712,6 +712,7 @@ export default {
                         v-model:setting-items="valueColumns"
                         item-title="text"
                         :stats-feature-filter="statsFeatureFilter"
+                        :download-disabled="tableOrChart === 'chart'"
                         @setStatsFeatureFilter="setStatsFeatureFilter"
                         @exportTable="exportTable"
                         @showView="tableOrChart = $event"

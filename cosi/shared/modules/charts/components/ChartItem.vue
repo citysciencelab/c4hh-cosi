@@ -1,14 +1,17 @@
 <script>
 import BarchartItem from "@shared/modules/charts/components/BarchartItem.vue";
+import dayjs from "dayjs";
 import DropdownAutocomplete from "../../dropdown/components/DropdownAutocomplete.vue";
 import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 import TagGroup from "../../tags/components/TagGroup.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 
 export default {
     name: "ChartItem",
     components: {
         BarchartItem,
         DropdownAutocomplete,
+        IconButton,
         LinechartItem,
         TagGroup
     },
@@ -22,6 +25,11 @@ export default {
         data: {
             type: Array,
             required: true
+        },
+        downloadMode: {
+            type: Boolean,
+            required: false,
+            default: false
         },
         showXValuesFilter: {
             type: Boolean,
@@ -306,6 +314,35 @@ export default {
                 tag.selected = tag.label === newTag.label;
             });
             this.loadChartData(newTag.label);
+        },
+        /**
+         * Generates a filename based on the chart title and current date.
+         * @returns {string} The filename.
+         */
+        generateDownloadName () {
+            const title = this.chartOptions.plugins.title.text || "Statistikdaten-Diagramm",
+                adjustedTitle = title.toLowerCase().trim().replace(/[^a-z0-9äöüß\s-]/gi, "").replace(/\s+/g, "-"),
+                date = dayjs().format("YYYY-MM-DD");
+
+            return `${adjustedTitle}-${date}.png`;
+        },
+
+        /**
+         * Downloads the currently rendered chart as a PNG file.
+         * @returns {void}
+         */
+        downloadCurrentChart () {
+            const canvas = this.$el.querySelector("canvas");
+
+            canvas.toBlob((blob) => {
+                const link = document.createElement("a");
+
+                link.href = URL.createObjectURL(blob);
+                link.download = this.generateDownloadName();
+                link.click();
+
+                URL.revokeObjectURL(link.href);
+            }, "image/png");
         }
     }
 };
@@ -316,7 +353,7 @@ export default {
     >
         <div
             v-if="data.length > 1"
-            class="d-flex flex-wrap gap-3 mb-3"
+            class="d-flex flex-wrap gap-3 flex-nowrap mb-3"
         >
             <TagGroup
                 v-if="selectionMode === 'tags'"
@@ -339,6 +376,14 @@ export default {
                 :items="allXValues"
                 :label="xValuesFilterLabel"
                 multiple
+            />
+            <IconButton
+                v-if="downloadMode"
+                class="align-self-center ms-auto"
+                aria="Diagramm herunterladen"
+                icon="bi bi-download"
+                :interaction="() => downloadCurrentChart()"
+                :class-array="['btn-light', 'mb-0']"
             />
         </div>
         <BarchartItem

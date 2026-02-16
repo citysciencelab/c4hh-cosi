@@ -191,6 +191,7 @@ export default {
             class="mt-4 mb-5"
             :chart-mode="getChartMode(group, districtColumns, timestampPrefix).type"
             :data="getChartData(group, districtColumns)"
+            :download-mode="true"
             :show-x-values-filter="getChartMode(group, districtColumns).type === 'line'"
             :x-values-filter-label="$t('additional:modules.tools.cosi.dashboard.year')"
             :selection-mode="'dropdown'"
