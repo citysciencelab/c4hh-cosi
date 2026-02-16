@@ -156,6 +156,11 @@ export default {
             required: false,
             default: true
         },
+        unlockIsAdjusting: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         value: {
             type: Array,
             required: false,
@@ -297,6 +302,11 @@ export default {
                 return;
             }
             this.setInputUntil(value);
+        },
+        unlockIsAdjusting (val) {
+            if (val === true) {
+                this.isAdjusting = false;
+            }
         }
     },
     created () {

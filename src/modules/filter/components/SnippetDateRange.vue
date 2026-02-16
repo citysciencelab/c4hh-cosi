@@ -154,6 +154,11 @@ export default {
             required: false,
             default: true
         },
+        unlockIsAdjusting: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         value: {
             type: Array,
             required: false,
@@ -273,6 +278,11 @@ export default {
                     dayjs(this.initialDateRef[this.sliderFrom], this.internalFormat).format(this.getFormat("from")),
                     dayjs(this.initialDateRef[this.sliderUntil], this.internalFormat).format(this.getFormat("until"))
                 ]);
+            }
+        },
+        unlockIsAdjusting (val) {
+            if (val === true) {
+                this.isAdjusting = false;
             }
         }
     },

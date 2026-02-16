@@ -69,7 +69,8 @@ export default {
             mapMoveRegistered: false,
             isFilterActive: false,
             isFilterShown: false,
-            isGeometryFilterActive: false
+            isGeometryFilterActive: false,
+            runningMapMoveListeners: {}
         };
     },
     computed: {
@@ -532,18 +533,18 @@ export default {
          * @returns {void}
          */
         registerMapMoveListeners () {
-            this.registerListener({type: "loadstart", listener: this.executeListeners.bind(this), keyForBoundFunctions: this.executeListeners.toString() + "loadstart"});
-            this.registerListener({type: "loadend", listener: this.executeListeners.bind(this), keyForBoundFunctions: this.executeListeners.toString() + "loadend"});
-            this.registerListener({type: "moveend", listener: this.executeListeners.bind(this), keyForBoundFunctions: this.executeListeners.toString() + "moveend"});
+            this.registerListener({type: "loadstart", listener: this.executeMapMoveListeners.bind(this), keyForBoundFunctions: this.executeMapMoveListeners.toString() + "loadstart"});
+            this.registerListener({type: "loadend", listener: this.executeMapMoveListeners.bind(this), keyForBoundFunctions: this.executeMapMoveListeners.toString() + "loadend"});
+            this.registerListener({type: "moveend", listener: this.executeMapMoveListeners.bind(this), keyForBoundFunctions: this.executeMapMoveListeners.toString() + "moveend"});
         },
         /**
          * Unregistering this moveend, loadend and loadstart listener.
          * @returns {void}
          */
         unregisterMapMoveListeners () {
-            this.unregisterListener({type: "loadstart", listener: this.executeListeners.bind(this), keyForBoundFunctions: this.executeListeners.toString() + "loadstart"});
-            this.unregisterListener({type: "loadend", listener: this.executeListeners.bind(this), keyForBoundFunctions: this.executeListeners.toString() + "loadend"});
-            this.unregisterListener({type: "moveend", listener: this.executeListeners.bind(this), keyForBoundFunctions: this.executeListeners.toString() + "moveend"});
+            this.unregisterListener({type: "loadstart", listener: this.executeMapMoveListeners.bind(this), keyForBoundFunctions: this.executeMapMoveListeners.toString() + "loadstart"});
+            this.unregisterListener({type: "loadend", listener: this.executeMapMoveListeners.bind(this), keyForBoundFunctions: this.executeMapMoveListeners.toString() + "loadend"});
+            this.unregisterListener({type: "moveend", listener: this.executeMapMoveListeners.bind(this), keyForBoundFunctions: this.executeMapMoveListeners.toString() + "moveend"});
         },
         /**
          * Adds given listener callback to the mapMoveListeners list.
@@ -567,17 +568,23 @@ export default {
          * @param {Object} evt - Openlayers MapEvent.
          * @returns {void}
          */
-        executeListeners (evt) {
-            const runningLister = {};
+        executeMapMoveListeners (evt) {
 
             Object.entries(this.mapMoveListeners).forEach(([filterId, mapMoveListener]) => {
-                if (typeof mapMoveListener === "function") {
-                    if (runningLister[filterId]) {
-                        this.layerConfigs.layers[filterId].api.stop();
-                    }
-                    runningLister[filterId] = true;
-                    mapMoveListener(evt);
+                if (typeof mapMoveListener !== "function" || !this.hasUnfixedRules(this.rulesOfFilters[filterId])) {
+                    return;
                 }
+                if (this.runningMapMoveListeners[filterId]) {
+                    this.layerConfigs.layers[filterId].api.stop(() => {
+                        this.runningMapMoveListeners[filterId] = true;
+                        mapMoveListener(evt);
+                    }, error => {
+                        console.error("Error while stopping layer for map move listener with filterId " + filterId, error);
+                    });
+                    return;
+                }
+                this.runningMapMoveListeners[filterId] = true;
+                mapMoveListener(evt);
             });
         },
 

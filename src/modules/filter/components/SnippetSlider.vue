@@ -160,6 +160,11 @@ export default {
             required: false,
             default: 0
         },
+        unlockIsAdjusting: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         visible: {
             type: Boolean,
             required: false,
@@ -266,6 +271,11 @@ export default {
                 return;
             }
             this.setInput(value);
+        },
+        unlockIsAdjusting (val) {
+            if (val === true) {
+                this.isAdjusting = false;
+            }
         }
     },
     created () {

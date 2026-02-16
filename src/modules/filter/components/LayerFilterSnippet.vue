@@ -165,7 +165,8 @@ export default {
             "rulesOfFilters",
             "triggerAllTagsDeleted",
             "totalResults",
-            "searchInMapExtentState"
+            "searchInMapExtentState",
+            "filterOnMoveState"
         ]),
         labelFilterButton () {
             if (typeof this.layerConfig.labelFilterButton === "string") {
@@ -364,6 +365,9 @@ export default {
         if (this.layerConfig.searchInMapExtent && this.layerConfig.searchInMapExtentPreselected && this.searchInMapExtentState[this.layerConfig.filterId] !== false) {
             this.setSearchInMapExtent(true);
         }
+        if (this.layerConfig.filterOnMove === true) {
+            this.setIsFilterOnMove(true);
+        }
     },
     mounted () {
         this.$nextTick(() => {
@@ -451,7 +455,14 @@ export default {
 
                 this.$emit("registerMapMoveListener", {
                     filterId: this.layerConfig.filterId,
-                    listener: evt => this.updateSnippets(evt)
+                    listener: evt => {
+                        if (this.isFilterOnMove()) {
+                            if (this.mapHandler.isZooming) {
+                                return;
+                            }
+                            this.updateSnippets(evt);
+                        }
+                    }
                 });
                 this.$nextTick(() => {
                     if (!this.outOfZoom && !this.isExtern()) {
@@ -573,6 +584,21 @@ export default {
             return isObject(snippet) && typeof snippet.type === "string" && snippet.type === type;
         },
         /**
+         * Checking if the filterOnMoveState is true.
+         * @returns {Boolean} true if filterOnMoveState is true, false if not
+         */
+        isFilterOnMove () {
+            return this.filterOnMoveState[this.layerConfig.filterId] ?? false;
+        },
+        /**
+         * Sets the filterOnMoveState to the given value if filterOnMove is true in layerConfig, otherwise sets it to false.
+         * @param {Boolean} value The value to set.
+         * @returns {void}
+         */
+        setIsFilterOnMove (value) {
+            this.filterOnMoveState[this.layerConfig.filterId] = this.layerConfig.filterOnMove !== true ? false : value;
+        },
+        /**
          * Getter for searchInMapExtent.
          * @returns {Boolean} the value of searchInMapExtent
          */
@@ -653,6 +679,7 @@ export default {
                         finish,
                         adjust: isObject(adjustments[snippet.snippetId]) ? adjustments[snippet.snippetId] : false
                     };
+                    snippet.unlockIsAdjusting = false;
                 });
             }, onfinish, adjust, alterMap, rules, reset);
         },
@@ -1076,8 +1103,7 @@ export default {
                 return;
             }
             if (!this.mapHandler.isLayerActivated(this.layerConfig.filterId)) {
-                if (this.layerConfig.filterOnMove && (evt.type === "moveend")) {
-                    this.stopFilter();
+                if (this.isFilterOnMove() && (evt.type === "moveend")) {
                     this.updateSnippetUniqueValues();
                 }
                 return;
@@ -1119,6 +1145,10 @@ export default {
                     page: 0,
                     total: 0
                 };
+                this.isLockedHandleActiveStrategy = false;
+                this.snippets.forEach(snippet => {
+                    snippet.unlockIsAdjusting = true;
+                });
             },
             err => {
                 console.warn(err);
@@ -1324,7 +1354,7 @@ export default {
             <SpinnerItem />
         </div>
         <div
-            v-if="isLoading"
+            v-show="isLoading"
             class="d-flex justify-content-center"
         >
             <div
@@ -1334,7 +1364,7 @@ export default {
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <template v-else>
+        <div>
             <div
                 v-if="layerConfig.description"
                 class="layerInfoText"
@@ -1357,7 +1387,7 @@ export default {
                     :info="layerConfig.searchInMapExtentInfo"
                     :filter-id="layerConfig.filterId"
                     :preselected="getSearchInMapExtent()"
-                    @command-changed="setSearchInMapExtent"
+                    @command-changed="val => {setSearchInMapExtent(val); setIsFilterOnMove(val)}"
                 />
             </div>
             <div
@@ -1420,6 +1450,7 @@ export default {
                         :search-in-map-extent="getSearchInMapExtent()"
                         :snippet-id="snippet.snippetId"
                         :show-all-values="snippet.showAllValues"
+                        :unlock-is-adjusting="snippet.unlockIsAdjusting"
                         :value="snippet.value"
                         :visible="snippet.visible"
                         :options-limit="snippet.optionsLimit"
@@ -1476,6 +1507,7 @@ export default {
                         :prechecked="snippet.prechecked"
                         :fixed-rules="fixedRules"
                         :snippet-id="snippet.snippetId"
+                        :unlock-is-adjusting="snippet.unlockIsAdjusting"
                         :visible="snippet.visible"
                         :filter-geometry="filterGeometry"
                         :filter-geometry-name="layerConfig.geometryName"
@@ -1509,6 +1541,7 @@ export default {
                         :snippet-id="snippet.snippetId"
                         :timeout-slider="getTimeoutSlider(snippet)"
                         :timeout-input="getTimeoutInput(snippet)"
+                        :unlock-is-adjusting="snippet.unlockIsAdjusting"
                         :visible="snippet.visible"
                         :filter-geometry="filterGeometry"
                         :filter-geometry-name="layerConfig.geometryName"
@@ -1546,6 +1579,7 @@ export default {
                         :snippet-id="snippet.snippetId"
                         :timeout-slider="getTimeoutSlider(snippet)"
                         :timeout-input="getTimeoutInput(snippet)"
+                        :unlock-is-adjusting="snippet.unlockIsAdjusting"
                         :visible="snippet.visible"
                         :filter-geometry="filterGeometry"
                         :filter-geometry-name="layerConfig.geometryName"
@@ -1581,6 +1615,7 @@ export default {
                         :operator-for-attr-name="snippet.operatorForAttrName"
                         :operator="snippet.operator"
                         :out-of-zoom="outOfZoom"
+                        :unlock-is-adjusting="snippet.unlockIsAdjusting"
                         :visible="snippet.visible"
                         :value="snippet.value"
                         :filter-geometry="filterGeometry"
@@ -1658,7 +1693,7 @@ export default {
                     />
                 </div>
             </div>
-        </template>
+        </div>
     </div>
 </template>
 

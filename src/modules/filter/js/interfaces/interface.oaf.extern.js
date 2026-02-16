@@ -169,7 +169,7 @@ export default class InterfaceOafExtern {
      * @param {Boolean} [minOnly=false] if only min is of interest
      * @param {Boolean} [maxOnly=false] if only max is of interest
      * @param {Object} [filterQuestion={}] the filterQuestion to receive additional information like searchInMapExtent and srsName for fetching all properties if needed
-     * @returns {void}
+     * @returns {Promise<void>}
      */
     async getMinMax (service, attrName, onsuccess, onerror, minOnly = false, maxOnly = false, filterQuestion = {}) {
         if (Array.isArray(this.allFetchedProperties)) {
@@ -203,8 +203,10 @@ export default class InterfaceOafExtern {
                 }
             },
             onerror,
-            filterQuestion.commands.searchInMapExtent ? this.getCurrentExtent?.()?.join(",") : undefined,
-            epsgCodeToURI(filterQuestion.service.srsName),
+            {
+                bbox: filterQuestion.commands.searchInMapExtent ? this.getCurrentExtent?.()?.join(",") : undefined,
+                bboxCrs: epsgCodeToURI(filterQuestion.service.srsName)
+            },
             controller.signal,
             true);
         }
@@ -231,7 +233,7 @@ export default class InterfaceOafExtern {
     async getUniqueValues (service, attrName, onsuccess, onerror, filterQuestion) {
         if (Array.isArray(this.allFetchedProperties)) {
             if (typeof onsuccess === "function") {
-                const uniqueValue = getUniqueValuesFromFetchedFeatures(this.allFetchedProperties, attrName, false, filterQuestion);
+                const uniqueValue = getUniqueValuesFromFetchedFeatures(this.allFetchedProperties, attrName, false);
 
                 onsuccess(isObject(uniqueValue) ? Object.keys(uniqueValue) : []);
             }
@@ -260,8 +262,10 @@ export default class InterfaceOafExtern {
                 }
             },
             onerror,
-            filterQuestion.commands.searchInMapExtent ? this.getCurrentExtent?.()?.join(",") : undefined,
-            epsgCodeToURI(filterQuestion.service.srsName),
+            {
+                bbox: filterQuestion.commands.searchInMapExtent ? this.getCurrentExtent?.()?.join(",") : undefined,
+                bboxCrs: epsgCodeToURI(filterQuestion.service.srsName)
+            },
             controller.signal,
             true);
         }
@@ -272,7 +276,7 @@ export default class InterfaceOafExtern {
 
         this.waitingListForFeatures.push(() => {
             if (typeof onsuccess === "function") {
-                const uniqueValue = getUniqueValuesFromFetchedFeatures(this.allFetchedProperties, attrName, false, filterQuestion);
+                const uniqueValue = getUniqueValuesFromFetchedFeatures(this.allFetchedProperties, attrName, false);
 
                 onsuccess(isObject(uniqueValue) ? Object.keys(uniqueValue) : []);
             }
@@ -341,15 +345,6 @@ export default class InterfaceOafExtern {
             bbox,
             "bbox-crs": epsgCodeToURI(filterQuestion.service.srsName),
             limit: filterQuestion.service.limit
-        },
-        (nextUrl) => {
-            const u = new URL(nextUrl),
-                filterSearchParam = u.searchParams.get("filter");
-
-            if (filterSearchParam) {
-                u.searchParams.set("filter", filterSearchParam.replaceAll("+", " "));
-            }
-            return u.toString();
         },
         controller.signal,
         onerror,

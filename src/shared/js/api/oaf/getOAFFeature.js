@@ -136,12 +136,11 @@ async function oafRecursionHelper (result, url, signal) {
  * Fetches OAF features as a readable stream, following next links.
  * @param {String} url - The initial OAF endpoint URL.
  * @param {Object} searchParams - OAF-specific search parameters.
- * @param {Function} normalizeNextUrl - Function to normalize next link URLs.
  * @param {AbortSignal} [signal] - Optional AbortSignal to cancel requests.
  * @param {Boolean} getProgress - Whether to enqueue progress updates with loaded and total counts.
  * @returns {ReadableStream} - A readable stream of features.
  */
-function getOAFFeatureStream (url, searchParams, normalizeNextUrl, signal, getProgress = false) {
+function getOAFFeatureStream (url, searchParams, signal, getProgress = false) {
     const geoJSON = new GeoJSON();
 
     return new ReadableStream({
@@ -160,8 +159,10 @@ function getOAFFeatureStream (url, searchParams, normalizeNextUrl, signal, getPr
             params = temp;
             try {
                 while (nextUrl) {
-                    const response = Object.keys(params).length ? await axios.get(nextUrl, {params, signal}) : await axios.get(nextUrl, signal),
-                        nextLink = response.data.links?.find(link => link.rel === "next");
+                    const response = Object.keys(params).length ?
+                        await axios.get(nextUrl, {params, signal, paramsSerializer: getOafParamsSerialized})
+                        : await axios.get(nextUrl, signal);
+                    const nextLink = response.data.links?.find(link => link.rel === "next");
 
                     if (total === null && Number.isFinite(response.data.numberMatched)) {
                         total = response.data.numberMatched;
@@ -180,7 +181,6 @@ function getOAFFeatureStream (url, searchParams, normalizeNextUrl, signal, getPr
                         controller.enqueue({type: "progress", loaded, total});
                     }
                     nextUrl = nextLink ? nextLink.href : null;
-                    nextUrl = typeof normalizeNextUrl === "function" && nextUrl !== null ? normalizeNextUrl(nextUrl) : nextUrl;
                     params = {};
                 }
 
@@ -378,6 +378,34 @@ function getValuesFromEnum (properties, propertiesToGetValuesFor) {
     return result;
 }
 
+/**
+ * Gets the serialized parameters for an oaf request. It encodes the keys and values and joins array values with a comma.
+ * @param {Object} paramsToSerialize The params to serialize.
+ * @returns {String} the serialized parameters.
+ */
+function getOafParamsSerialized (paramsToSerialize) {
+    if (!isObject(paramsToSerialize)) {
+        return "";
+    }
+    let paramString = "";
+    const entries = Object.entries(paramsToSerialize);
+
+    entries.forEach(([key, value], entryIdx) => {
+        if (typeof value === "undefined" || value === null) {
+            return;
+        }
+        paramString += `${encodeURIComponent(key)}=`;
+        if (Array.isArray(value)) {
+            value.forEach((val, idx) => {
+                paramString += idx === value.length - 1 ? `${encodeURIComponent(val)}` : `${encodeURIComponent(val)},`;
+            });
+            return;
+        }
+        paramString += entryIdx === entries.length - 1 ? `${encodeURIComponent(value)}` : `${encodeURIComponent(value)}&`;
+    });
+    return paramString;
+}
+
 export default {
     getCollectionSchema,
     getOAFFeatureGet,
@@ -388,6 +416,7 @@ export default {
     getUniqueValuesFromCollection,
     getUniqueValuesByScheme,
     getOAFGeometryFilter,
+    getOafParamsSerialized,
     getTemporalExtent,
     getValuesFromEnum
 };

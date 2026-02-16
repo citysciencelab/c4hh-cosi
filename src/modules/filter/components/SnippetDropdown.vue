@@ -126,6 +126,11 @@ export default {
             required: false,
             default: "default"
         },
+        unlockIsAdjusting: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         filterId: {
             type: Number,
             required: false,
@@ -468,6 +473,11 @@ export default {
                     return;
                 }
                 this.dropdownSelected.splice(indexOfValue, 1);
+            }
+        },
+        unlockIsAdjusting (val) {
+            if (val === true) {
+                this.isAdjusting = false;
             }
         }
     },

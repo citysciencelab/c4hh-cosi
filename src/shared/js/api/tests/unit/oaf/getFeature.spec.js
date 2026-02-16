@@ -288,7 +288,6 @@ describe("src/shared/js/api/oaf", () => {
                 stream = getOAFFeature.getOAFFeatureStream(
                     "http://test",
                     {}, // no params
-                    undefined,
                     signal,
                     () => {
                         return {};
@@ -321,7 +320,6 @@ describe("src/shared/js/api/oaf", () => {
             const stream = getOAFFeature.getOAFFeatureStream(
                     "http://test",
                     {},
-                    undefined,
                     undefined,
                     () => {
                         return {};
@@ -363,7 +361,6 @@ describe("src/shared/js/api/oaf", () => {
                     "http://test",
                     {},
                     undefined,
-                    undefined,
                     () => {
                         return {};
                     },
@@ -394,7 +391,6 @@ describe("src/shared/js/api/oaf", () => {
             const stream = getOAFFeature.getOAFFeatureStream(
                 "http://test",
                 {},
-                undefined,
                 undefined,
                 onerror
             );
@@ -613,6 +609,79 @@ describe("src/shared/js/api/oaf", () => {
                 .to.deep.equal([[2000, 2001], [2023, 2024]]);
 
             sinon.restore();
+        });
+    });
+    describe("getOafParamsSerialized", () => {
+        it("should return an urlencoded serialized string for the given params object", () => {
+            const params = {
+                    limit: 10,
+                    offset: 20,
+                    filter: "foo='bar baz'",
+                    bbox: "1,2,3,4"
+                },
+                result = getOAFFeature.getOafParamsSerialized(params);
+
+            expect(result.includes("limit=10")).to.be.true;
+            expect(result.includes("offset=20")).to.be.true;
+            expect(result.includes("filter=foo%3D'bar%20baz'")).to.be.true;
+            expect(result.includes("bbox=1%2C2%2C3%2C4")).to.be.true;
+            expect(result.split("&")).to.have.length(4);
+        });
+
+        it("should return an empty string if params object is empty", () => {
+            const result = getOAFFeature.getOafParamsSerialized({});
+
+            expect(result).to.be.equal("");
+        });
+
+        it("should ignore undefined values", () => {
+            const params = {
+                    limit: 10,
+                    offset: undefined,
+                    bbox: "1,2,3,4"
+                },
+                result = getOAFFeature.getOafParamsSerialized(params);
+
+            expect(result).to.include("limit=10");
+            expect(result).to.include("bbox=1%2C2%2C3%2C4");
+            expect(result).to.not.include("offset=");
+            expect(result.split("&")).to.have.length(2);
+        });
+
+        it("should ignore null values", () => {
+            const params = {
+                    limit: 10,
+                    offset: null,
+                    bbox: "1,2,3,4"
+                },
+                result = getOAFFeature.getOafParamsSerialized(params);
+
+            expect(result).to.include("limit=10");
+            expect(result).to.include("bbox=1%2C2%2C3%2C4");
+            expect(result).to.not.include("offset=");
+            expect(result.split("&")).to.have.length(2);
+        });
+
+        it("should return an empty string if all values are undefined or null", () => {
+            const params = {
+                    limit: undefined,
+                    offset: null
+                },
+                result = getOAFFeature.getOafParamsSerialized(params);
+
+            expect(result).to.equal("");
+        });
+
+        it("should encode special characters correctly", () => {
+            const params = {
+                    filter: "name=Max Mustermann&status=aktiv",
+                    lang: "de-DE"
+                },
+                result = getOAFFeature.getOafParamsSerialized(params);
+
+            expect(result).to.include("filter=name%3DMax%20Mustermann%26status%3Daktiv");
+            expect(result).to.include("lang=de-DE");
+            expect(result.split("&")).to.have.length(2);
         });
     });
 });

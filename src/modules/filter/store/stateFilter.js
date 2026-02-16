@@ -83,7 +83,8 @@ const state = {
     questionLink: "",
     closeDropdownOnSelect: true,
     shouldSubjectDataSelectedInTree: false,
-    searchInMapExtentState: {}
+    searchInMapExtentState: {},
+    filterOnMoveState: {}
 };
 
 export default state;

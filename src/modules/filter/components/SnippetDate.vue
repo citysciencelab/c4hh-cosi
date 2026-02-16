@@ -144,6 +144,11 @@ export default {
             required: false,
             default: 0
         },
+        unlockIsAdjusting: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         visible: {
             type: Boolean,
             required: false,
@@ -234,6 +239,11 @@ export default {
         },
         disabled (value) {
             this.isInitializing = typeof value === "boolean" ? value : true;
+        },
+        unlockIsAdjusting (value) {
+            if (value === true) {
+                this.isAdjusting = false;
+            }
         }
     },
     mounted () {

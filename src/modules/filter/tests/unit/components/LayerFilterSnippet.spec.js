@@ -50,7 +50,8 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                                 totalResults: sinon.stub(),
                                 rulesOfFilters: () => [[{value: "rule2"}]],
                                 onValueDeselect: sinon.stub(),
-                                searchInMapExtentState: () => []
+                                searchInMapExtentState: () => [],
+                                filterOnMoveState: () => []
                             }
                         }
                     }
@@ -552,7 +553,9 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                                                 }
                                             ]
                                         ],
-                                        onValueDeselect: sinon.stub()
+                                        onValueDeselect: sinon.stub(),
+                                        searchInMapExtentState: () => [],
+                                        filterOnMoveState: () => []
                                     }
                                 }
                             }
