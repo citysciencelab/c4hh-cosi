@@ -169,9 +169,6 @@ export default {
     },
 
     mounted () {
-        if (this.configJs?.metaDataCatalogueId) {
-            this.setMetaDataCatalogueId(this.configJs.metaDataCatalogueId);
-        }
         this.createLegendForLayerInfo(this.layerInfo.id);
         if (!this.legendAvailable) {
             this.activeTab = "LayerInfoDataDownload";

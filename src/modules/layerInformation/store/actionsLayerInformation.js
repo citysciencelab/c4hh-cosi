@@ -19,10 +19,14 @@ export default {
      * @param {Object} layerConf the layer configuration
      * @returns {void}
      */
-    startLayerInformation ({commit, dispatch, rootGetters}, layerConf) {
+    startLayerInformation ({commit, dispatch, getters, rootGetters}, layerConf) {
         const mdid = layerConf?.datasets?.length > 0 ? layerConf.datasets[0].md_id : null,
             legendAvailable = layerConf.legendURL !== "ignore" && layerConf.legend !== "ignore" && layerConf.legend !== false;
         let name = null;
+
+        if (rootGetters.configJs?.metaDataCatalogueId && rootGetters.configJs.metaDataCatalogueId !== getters.metaDataCatalogueId) {
+            commit("setMetaDataCatalogueId", rootGetters.configJs.metaDataCatalogueId);
+        }
 
         if (layerConf?.datasets?.length > 0) {
             name = layerConf.datasets[0].md_name;
