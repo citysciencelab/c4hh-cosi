@@ -1,4 +1,5 @@
 <script>
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import Card from "../../shared/modules/cards/components/Card.vue";
 import {default as turfUnion} from "@turf/union";
 import DistrictSelectorSubjectImport from "./DistrictSelectorSubjectImport.vue";
@@ -26,6 +27,7 @@ import truncate from "@turf/truncate";
 export default {
     name: "DistrictSelectorSubject",
     components: {
+        AccordionItem,
         Card,
         DistrictSelectorSubjectImport,
         DrawTypes,
@@ -49,7 +51,8 @@ export default {
             drawTypes: ["polygon", "box", "circle"],
             selectedDrawTypeMain: "",
             selectedDrawType: "",
-            selectedInteraction: null
+            selectedInteraction: null,
+            importResetTrigger: 0
         };
     },
     computed: {
@@ -105,7 +108,7 @@ export default {
          * @returns {void}
          */
         addCard (wktFeature, buffer, districtNames, status, districtLevelId, districtLevelLabel) {
-            this.cards.push({
+            this.cards.unshift({
                 badgeList: this.getBadges(),
                 buffer,
                 data: [
@@ -121,7 +124,7 @@ export default {
                 icon: "bi bi-bounding-box-circles",
                 removable: false,
                 statisticalFeatureWKT: wktFeature,
-                status,
+                status: "",
                 subjectFeatureWKT: this.getBufferedFeature(wktFeature, buffer)
             });
         },
@@ -133,7 +136,7 @@ export default {
          * @param {Object[]} cards - An array to store the resulting card objects.
          */
         createCardsFromStatisticalCards (cardsStatistical, cards) {
-            cardsStatistical.forEach(card => {
+            [...cardsStatistical].reverse().forEach(card => {
                 const foundEqualObject = cards.find(existingCard => {
                     return existingCard.statisticalFeatureWKT === card.bboxGeomWKT;
                 });
@@ -144,6 +147,15 @@ export default {
 
                 this.addCard(card.bboxGeomWKT, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel);
             });
+            const activeStatIndex = cardsStatistical.findIndex(card => card.status === "active");
+
+            if (activeStatIndex !== -1) {
+                this.cards.forEach(card => {
+                    card.status = "";
+                });
+                this.cards[activeStatIndex].status = "active";
+                this.setActiveCard(activeStatIndex);
+            }
         },
 
         /**
@@ -493,6 +505,14 @@ export default {
             }
 
             card.data[2].label = fallbackLabel;
+        },
+
+        /**
+        * Increments the import reset counter to clear the alert message.
+        * @returns {void}
+        */
+        clearImportAlert () {
+            this.importResetTrigger++;
         }
     }
 };
@@ -500,53 +520,70 @@ export default {
 
 <template lang="html">
     <div class="district-selector-subject">
-        <h5 class="mb-2">
-            {{ $t("additional:modules.cosi.districtSelector.bufferHeader") }}
-        </h5>
-        <InputText
-            id="district-selector-buffer"
-            :label="$t('additional:modules.cosi.districtSelector.bufferLabel')"
-            :model-value="buffer"
-            :placeholder="'0'"
-            :type="'number'"
-            :min="bufferMin"
-            :max="bufferMax"
-            @update:modelValue="setBuffer"
-            @blur="setBuffer(buffer)"
-        />
-        <h5 class="mb-2">
-            {{ $t("additional:modules.cosi.districtSelector.drawHeader") }}
-        </h5>
-        <div class="d-flex w-25 mb-4">
-            <DrawTypes
-                :current-layout="drawStyle"
-                :draw-types="drawTypes"
-                :selected-draw-type="selectedDrawType"
-                :selected-draw-type-main="selectedDrawTypeMain"
-                :draw-type-labels="drawTypeLabels"
-                :selected-interaction="selectedInteraction"
-                :set-selected-draw-type="(value) => selectedDrawType = value"
-                :set-selected-draw-type-main="(value) => selectedDrawTypeMain = value"
-                :set-selected-interaction="(value) => selectedInteraction = value"
-                :source="drawingLayer.getLayerSource()"
-                @drawstart="removeDrawingFeature"
-                @drawend="onDrawEnd"
+        <AccordionItem
+            id="draw-area"
+            :is-open="true"
+            :icon="'bi bi-pencil'"
+            :title="$t('additional:modules.cosi.districtSelector.drawHeader')"
+        >
+            <div class="d-flex gap-4 mb-4 ms-3">
+                <DrawTypes
+                    :current-layout="drawStyle"
+                    :draw-types="drawTypes"
+                    :selected-draw-type="selectedDrawType"
+                    :selected-draw-type-main="selectedDrawTypeMain"
+                    :draw-type-labels="drawTypeLabels"
+                    :selected-interaction="selectedInteraction"
+                    :set-selected-draw-type="(value) => {selectedDrawType = value, clearImportAlert();}"
+                    :set-selected-draw-type-main="(value) => {selectedDrawTypeMain = value, clearImportAlert();}"
+                    :set-selected-interaction="(value) => {selectedInteraction = value, clearImportAlert();}"
+                    :source="drawingLayer.getLayerSource()"
+                    @drawstart="removeDrawingFeature"
+                    @drawend="onDrawEnd"
+                />
+            </div>
+        </AccordionItem>
+        <AccordionItem
+            id="set-buffer"
+            :is-open="false"
+            :icon="'bi bi-record-circle'"
+            :title="$t('additional:modules.cosi.districtSelector.bufferHeader')"
+        >
+            <InputText
+                id="district-selector-buffer"
+                class="mb-4 ms-3"
+                :label="$t('additional:modules.cosi.districtSelector.bufferLabel')"
+                :model-value="buffer"
+                :placeholder="'0'"
+                :type="'number'"
+                :min="bufferMin"
+                :max="bufferMax"
+                @update:modelValue="setBuffer"
+                @focus="clearImportAlert()"
+                @blur="setBuffer(buffer)"
             />
-        </div>
+        </AccordionItem>
         <DistrictSelectorSubjectImport
+            :reset-trigger="importResetTrigger"
             @set-imported-feature="setSubjectFeatureFromImport"
         />
         <FlatButton
             :aria="$t('additional:modules.cosi.districtSelector.resetArea')"
             :class-array="['btn-secondary']"
-            class="mx-auto"
+            class="mx-auto mt-4"
+            :icon="'bi bi-arrow-counterclockwise'"
             :text="$t('additional:modules.cosi.districtSelector.resetArea')"
-            :interaction="reset"
+            :interaction="() => { clearImportAlert(); reset(); }"
         />
-        <hr class="my-4 mx-0 text-black-50">
-        <h5>
-            {{ $t("additional:modules.cosi.districtSelector.selectedAreas") }}
-        </h5>
+        <div
+            v-if="cards.length"
+            class="mb-4"
+        >
+            <hr class="my-4 mx-0 text-black-50">
+            <h5>
+                {{ $t("additional:modules.cosi.districtSelector.selectedAreas") }}
+            </h5>
+        </div>
         <div
             v-for="(item, index) in cards"
             :key="item"
@@ -558,14 +595,14 @@ export default {
                 :icon="item.icon"
                 :removable="item.removable"
                 :status="item.status"
-                @click="toggleCardStatus(index)"
+                @click="() => {toggleCardStatus(index); clearImportAlert();}"
             >
                 <template #download-menu>
                     <ul class="dropdown-menu">
                         <li class="ps-4">
                             <button
                                 class="dropdown-item"
-                                @click.stop="exportFeature(item)"
+                                @click.stop="() => {exportFeature(item); clearImportAlert();}"
                             >
                                 GeoJSON
                             </button>
@@ -579,7 +616,7 @@ export default {
 
 <style lang="scss" scoped>
     .district-selector-subject {
-        h5 {
+        h6 {
            font-size: $font-size-big;
         }
 

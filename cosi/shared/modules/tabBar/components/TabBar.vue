@@ -44,7 +44,7 @@ export default {
         />
         <ul
             v-else
-            class="nav nav-fill fs-5 p-0"
+            class="nav nav-fill p-0"
         >
             <li
                 v-for="item in items"
@@ -74,6 +74,9 @@ export default {
 
 <style lang="scss">
     .tab-bar {
+        .nav {
+            font-size: $font_size_big;
+        }
         .nav-link {
             color: var(--bs-dark);
         }

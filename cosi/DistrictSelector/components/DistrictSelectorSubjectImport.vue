@@ -12,11 +12,23 @@ export default {
         AlertMessage,
         FileUpload
     },
+    props: {
+        resetTrigger: {
+            type: Number,
+            required: false,
+            default: 0
+        }
+    },
     emits: ["set-imported-feature"],
     data () {
         return {
             isFormatValid: true
         };
+    },
+    watch: {
+        resetTrigger () {
+            this.isFormatValid = true;
+        }
     },
     methods: {
         uniqueId,
@@ -111,6 +123,7 @@ export default {
     <AccordionItem
         :id="uniqueId()"
         :is-open="false"
+        :icon="'bi bi-arrow-bar-up'"
         :title="$t('additional:modules.cosi.districtSelector.importHeader')"
     >
         <FileUpload

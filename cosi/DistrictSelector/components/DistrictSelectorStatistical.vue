@@ -49,7 +49,8 @@ export default {
             // Indicates whether the drag box interaction is active or not.
             isDragBoxActive: false,
             // Indicates whether this component is active
-            isActive: false
+            isActive: false,
+            ignoreSelectionChange: false
         };
     },
     computed: {
@@ -158,6 +159,9 @@ export default {
          * @returns {void}
          */
         selectedDistrictNames () {
+            if (this.ignoreSelectionChange) {
+                return;
+            }
             if (this.isActive && this.activeCard && this.selectedDistrictNames.sort().toString() !== this.activeCard.selectedDistricts.sort().toString()) {
                 this.activeCard.status = "";
             }
@@ -468,7 +472,7 @@ export default {
                 bboxGeom = getBoundingGeometry(this.selectedFeatures, 0);
 
             this.isDragBoxActive = false;
-            this.cards.push({
+            this.cards.unshift({
                 badgeList: [{
                     backgroundColor: "rgba(33, 132, 251, 1)",
                     color: "rgba(255, 255, 255, 1)",
@@ -491,12 +495,12 @@ export default {
                 status: ""
             });
 
-            this.toggleCardStatus(this.cards.length - 1);
+            this.toggleCardStatus(0);
 
             if (extent) {
                 this.setBoundingGeometry(bboxGeom);
                 this.setFilterGeometry(bboxGeom);
-                this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts, this.cards.at(-1));
+                this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts, this.cards.at(0));
             }
             else {
                 this.resetView();
@@ -595,15 +599,22 @@ export default {
                 this.updateLayerBbox(this.cards[index].bboxGeomWKT);
                 return;
             }
-            if (activeIndex !== -1) {
+            if (activeIndex !== -1 && activeIndex !== index) {
                 this.cards[activeIndex].status = "";
             }
+
+            this.cards[index].status = "active";
             this.cards[index].status = "active";
             this.setSelectedDistrictLevelId(this.cards[index].districtLevelId);
+
+            this.ignoreSelectionChange = true;
+
             this.$nextTick(() => {
                 this.updateSelectedFeatures(this.cards[index].selectedDistricts);
                 this.updateLayerBbox(this.cards[index].bboxGeomWKT);
                 this.zoomToExtent({extent: this.cards[index].extent, options: {}});
+
+                this.ignoreSelectionChange = false;
             });
         }
     }
@@ -659,15 +670,21 @@ export default {
                 :interaction="updateExtent"
             />
         </template>
-        <hr class="my-4 mx-0 text-black-50">
-        <h5 class="mb-2">
-            {{ $t("additional:modules.cosi.districtSelector.selectedAreas") }}
-        </h5>
+        <div
+            v-if="cards.length"
+            class="mb-4"
+        >
+            <hr class="my-4 mx-0 text-black-50">
+            <h5>
+                {{ $t("additional:modules.cosi.districtSelector.selectedAreas") }}
+            </h5>
+        </div>
         <div
             v-for="(item, index) in cards"
             :key="item"
         >
             <Card
+                class="d-flex flex-column-reverse"
                 :badge-list="item.badgeList"
                 :data="item.data"
                 :downloadable="item.downloadable"
