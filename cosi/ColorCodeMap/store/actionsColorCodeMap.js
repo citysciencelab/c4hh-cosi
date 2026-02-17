@@ -119,7 +119,7 @@ const actions = {
             rootGetters["Modules/DistrictSelector/selectedFeatures"].forEach(district => {
                 const style = new Style({
                     fill: new Fill({color: "rgba(255, 255, 255, 0)"}),
-                    stroke: new Stroke({color: "#3399CC", width: 5})
+                    stroke: new Stroke({color: "rgba(33, 132, 251, 1)", width: 8})
                 });
 
                 district.setStyle(style);

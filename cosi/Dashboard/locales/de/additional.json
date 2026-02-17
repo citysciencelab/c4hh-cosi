@@ -32,6 +32,8 @@
                     "tableDataParsingError": "Beim lesen der Daten ist ein Fehler aufgetreten",
                     "calculationHint": "Das Ergebnis finden Sie unten in der Tabelle in der Kategoriengruppe Berechnungen",
                     "datasetLabel": "Datensatz",
+                    "startAnimation": "Kartenanimation starten",
+                    "stopAnimation": "Kartenanimation stoppen",
                     "tableRowMenu": {
                         "expandTooltip": "Alle Jahre ein-/ausblenden",
                         "visualize": "In der Karte visualisieren",

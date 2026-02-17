@@ -16,6 +16,7 @@ import {
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import composeFilename from "../../utils/composeFilename";
 import DashboardChartView from "./DashboardChartView.vue";
+import DashboardTimeline from "./DashboardTimeline.vue";
 import DashboardToolbar from "./DashboardToolbar.vue";
 import exportXlsx from "../../utils/exportXlsx";
 import {generateChartForDistricts, generateChartForCorrelation, generateChartsForItems} from "../utils/chart";
@@ -42,6 +43,7 @@ export default {
     components: {
         AlertMessage,
         DashboardChartView,
+        DashboardTimeline,
         DashboardToolbar,
         IconButton,
         TableCell,
@@ -57,6 +59,8 @@ export default {
     },
     data () {
         return {
+            animationState: false,
+            animationTimeout: null,
             dashboardOpen: false,
             baseColumns: [
                 {
@@ -166,6 +170,14 @@ export default {
                 average: "Durchschnitt",
                 orientationValue: this.getColumnHeader("orientationValue")
             };
+        },
+
+        /**
+         * Gets the item currently visualizted on the map,
+         * @returns {Object|undefined} The visualized item, or undefined if no item is visualized.
+         */
+        visualizedItem () {
+            return this.items.find(item => item.visualized === true);
         }
     },
 
@@ -199,10 +211,33 @@ export default {
         ...mapMutations("Modules/Dashboard", Object.keys(mutations)),
         ...mapActions("Modules/Dashboard", Object.keys(actions)),
         ...mapMutations("Modules/DistrictSelector", ["addCategoryToMapping", "removeCategoryFromMapping"]),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
         ...mapActions("Modules/DistrictSelector", ["updateDistricts"]),
-        ...mapMutations("Modules/ColorCodeMap", ["setSelectedYear"]),
+        ...mapMutations("Modules/ColorCodeMap", ["setSelectedYear", "setVisualizationState", "setSelectedFeature"]),
+        ...mapActions("Modules/ColorCodeMap", ["renderVisualization"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
+
+        /**
+         * Animates data for selected feature on the map over the available years.
+         * @param {Number} tempo - Value for animation playback speed in seconds.
+         * @returns {void}
+         */
+        animationOverYears (tempo = 1) {
+            if (this.animationState) {
+                let current = this.visuItemYears.indexOf(this.timestampSelected) - 1;
+
+                if (current < 0) {
+                    current = this.visuItemYears.length - 1;
+                }
+
+                this.animationTimeout = setTimeout(() => {
+                    window.requestAnimationFrame(() => {
+                        this.timestampSelected = this.visuItemYears[current];
+                        this.renderVisualization();
+                        this.animationOverYears(tempo);
+                    });
+                }, tempo * 1000);
+            }
+        },
 
         /**
          * Returns the labels of the selected districts.
@@ -309,6 +344,9 @@ export default {
         onVisualizationChanged () {
             let item;
 
+            if (this.animationState) {
+                this.stopAnimation();
+            }
             for (item of this.items) {
                 item.visualized = false;
             }
@@ -681,6 +719,42 @@ export default {
                 }
             });
             this.timestampSelected = this.items[0].years[0];
+        },
+
+        /**
+         * Starts the animation for a given item. If another item is currently visualized,
+         * it deactivates the previous item and updates the visualization state.
+         * @param {Object} item - The item to be animated.
+         * @returns {void}
+         */
+        startAnimation (item) {
+            if (this.visualizedItem && item.id !== this.visualizedItem.id) {
+                this.visualizedItem.visualized = false; // Deaktiviere das vorherige Item
+            }
+
+            this.setSelectedFeature(item.category);
+            item.visualized = true;
+            this.visuItemYears = item.years;
+
+            if (!this.animationState || (this.visualizedItem && item.id !== this.visualizedItem.id)) {
+                this.setVisualizationState(true);
+                this.animationState = true;
+                this.animationOverYears();
+            }
+        },
+
+        /**
+         * Stops the animation process for the animated item.
+         * @returns {void}
+         */
+        stopAnimation () {
+            this.animationState = false;
+            clearTimeout(this.animationTimeout);
+            this.animationTimeout = null;
+            this.timestampSelected = this.visualizedItem.years[0];
+            this.visualizedItem.visualized = false;
+            this.setVisualizationState(false);
+            this.renderVisualization();
         }
     }
 };
@@ -772,20 +846,14 @@ export default {
                             <template #[`item.menu`]="{ item }">
                                 <TableRowMenu
                                     :item="item"
-                                    :fields="fields"
-                                    :selected-items="selectedItems"
-                                    @setField="setField"
-                                    @resetFields="resetFields"
-                                    @correlate="renderScatterplot"
                                     @visualizationChanged="onVisualizationChanged"
-                                    @renderCharts="renderCharts"
-                                    @renderGroupedChart="renderGroupedCharts"
-                                    @delete="deleteStats"
                                 />
                             </template>
                             <template #[`item.category`]="{ item }">
-                                <div class="d-flex align-items-center">
-                                    {{ item.category }}
+                                <div class="d-flex align-items-center fs-6">
+                                    <span
+                                        :class="item.visualized ? 'is-selected' : ''"
+                                    >{{ item.category }}</span>
                                     <IconButton
                                         v-if="!item.calculation"
                                         :id="item.id"
@@ -795,6 +863,13 @@ export default {
                                         :interaction="() => openMetadata(item)"
                                     />
                                 </div>
+                                <DashboardTimeline
+                                    v-if="item.years.length > 1"
+                                    :item="item"
+                                    :animation-state="animationState"
+                                    @startAnimation="startAnimation"
+                                    @stopAnimation="stopAnimation"
+                                />
                             </template>
                             <!-- Column Year-->
                             <template #[`item.years`]="{ item }">
@@ -937,6 +1012,13 @@ export default {
             > table > thead > tr > th {
                 padding-left: 5px;
                 padding-right: 5px;
+            }
+        }
+        .v-data-table__td {
+            padding: map-get($spacers, 2);
+            .is-selected {
+                color: $secondary;
+                font-family: $font_family_accent;
             }
         }
 

@@ -32,6 +32,8 @@
                     "titleForCalculatedStatistic": "The values marked in red are calculated automatically",
                     "tableDataParsingError": "An error occurred while reading the data",
                     "calculationHint": "You can find the result at the bottom of the table in the category group Berechnungen",
+                    "startAnimation": "Start map animation",
+                    "stopAnimation": "Stop map animation",
                     "tableRowMenu": {
                         "expandTooltip": "Show/Hide all years",
                         "visualize": "Show on the map",
