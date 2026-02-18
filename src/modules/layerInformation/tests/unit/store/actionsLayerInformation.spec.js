@@ -156,6 +156,22 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
             expect(dispatch.thirdCall.args[1]).to.be.equals(layerConf.datasets[0].md_id);
             expect(dispatch.getCall(3).args[0]).to.equal("additionalSingleLayerInfo");
         });
+
+        it("should set metaDataCatalogueId from configJs before initialization", () => {
+            getters = {
+                metaDataCatalogueId: "old-id"
+            };
+            rootGetters.configJs = {
+                metaDataCatalogueId: "new-id"
+            };
+
+            startLayerInformation({commit, dispatch, getters, rootGetters}, layerConf);
+
+            expect(commit.callCount).to.be.gte(3);
+            expect(commit.firstCall.args[0]).to.equal("setMetaDataCatalogueId");
+            expect(commit.firstCall.args[1]).to.equal("new-id");
+        });
+
         it("should set the Meta Data URLs", done => {
             const metaId = "73A344E9-CDB5-4A17-89C1-05E202989755",
                 state = {
