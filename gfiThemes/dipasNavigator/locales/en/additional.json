@@ -1,12 +1,13 @@
 {
     "addons": {
         "gfiThemes": {
-            "dipasCockpit": {
+            "dipasNavigator": {
                 "themes": "Themes",
                 "initiators": "Sender/s",
                 "contributions": "Contributions",
                 "comments": "Comments",
-                "documentation": "Documentation"
+                "documentation": "Documentation",
+                "range": "Duration"
             }
         }
     }

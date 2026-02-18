@@ -49,8 +49,8 @@
     "path":"gfiThemes/dipas",
     "type": "gfiTheme"
   },
-  "dipasCockpit": {
-    "path":"gfiThemes/dipasCockpit",
+  "dipasNavigator": {
+    "path":"gfiThemes/dipasNavigator",
     "type": "gfiTheme"
   },
   "schulinfo": {
