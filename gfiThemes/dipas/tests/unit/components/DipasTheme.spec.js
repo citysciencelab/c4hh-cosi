@@ -14,10 +14,12 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
             }
         },
         getters = {
-            uiStyle: () => "DEFAULT"
+            uiStyle: () => "DEFAULT",
+            layerUrlParams: () => [{"id": "2431", "visibility": true}, {"id": "8712", "visibility": false}]
         },
         gettersTable = {
-            uiStyle: () => "TABLE"
+            uiStyle: () => "TABLE",
+            layerUrlParams: () => [{"id": "2431", "visibility": true}, {"id": "8712", "visibility": false}]
         };
     let wrapper,
         valueStyle = [],
@@ -31,7 +33,13 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
     function createWrapper (isTable) {
         store = createStore({
             modules: {
-                DipasTheme
+                DipasTheme,
+                Maps: {
+                    namespaced: true,
+                    getters: {
+                        urlParams: () => "MAPS={'center':[565874,5934140], 'zoom':4}"
+                    }
+                }
             },
             getters: isTable ? gettersTable : getters
         });
@@ -152,7 +160,7 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
 
             createWrapper(false);
 
-            const path = "https://localhost:9001/portalconfigs/dipas/#/contribution/5",
+            const path = "https://localhost:9001/portalconfigs/dipas/#/contribution/5?LAYERS=[{\"id\":\"2431\",\"visibility\":true}]&MAPS={'center':[565874,5934140], 'zoom':4}",
                 ret = wrapper.vm.modifyContributionLink(wrapper.vm.feature.getMappedProperties().link, wrapper.vm.feature.getMappedProperties().nid);
 
             expect(ret).to.equal(path);
@@ -163,7 +171,7 @@ describe("addons/dipas/components/DipasTheme.vue", () => {
 
             createWrapper(false);
 
-            const path = "https://localhost:9001/portalconfigs/dipas/#/contribution/5",
+            const path = "https://localhost:9001/portalconfigs/dipas/#/contribution/5?LAYERS=[{\"id\":\"2431\",\"visibility\":true}]&MAPS={'center':[565874,5934140], 'zoom':4}",
                 ret = wrapper.vm.modifyContributionLink(wrapper.vm.feature.getMappedProperties().link, wrapper.vm.feature.getMappedProperties().nid);
 
             expect(ret).to.equal(path);

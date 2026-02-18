@@ -11,7 +11,8 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["uiStyle"]),
+        ...mapGetters(["uiStyle", "layerUrlParams"]),
+        ...mapGetters("Maps", {mapsUrlParams: "urlParams"}),
         cssVars () {
             return {
                 "--buttonColor": this.feature.getMappedProperties().ButtonBackgroundColor,
@@ -66,8 +67,12 @@ export default {
                 contributionLink = "";
 
             if (!this.isTableStyle()) {
+                const urlParams = "?LAYERS=" + JSON.stringify(this.layerUrlParams.filter((layerParam) => {
+                    return layerParam.visibility;
+                })) + "&" + this.mapsUrlParams;
+
                 parentLocation = document.referrer.split("?")[0];
-                contributionLink = parentLocation.split("#")[0] + "#/contribution/" + nid;
+                contributionLink = parentLocation.split("#")[0] + "#/contribution/" + nid + urlParams;
             }
             else {
                 contributionLink = link;
@@ -111,9 +116,11 @@ export default {
                 alt="Icon"
             >
         </div>
+
         <div class="dipas-gfi-thema">
             {{ feature.getMappedProperties().Kategorie }}
         </div>
+
         <div
             v-if="!isTableStyle() && feature.getMappedProperties().link"
             class="dipas-gfi-name"
@@ -123,12 +130,14 @@ export default {
                 target="_top"
             >{{ feature.getMappedProperties().name }}</a>
         </div>
+
         <div
             v-else
             class="dipas-gfi-name"
         >
             {{ feature.getMappedProperties().name }}
         </div>
+
         <div
             v-for="(value, i) in getDescriptions(feature)"
             :key="i"
@@ -137,63 +146,66 @@ export default {
             {{ value }}
             <br>
         </div>
+
         <a
             v-if="!isTableStyle() && feature.getMappedProperties().link"
             class="dipas-gfi-more"
             :href="modifyContributionLink(feature.getMappedProperties().link, feature.getMappedProperties().nid)"
             target="_top"
-        >{{ $t("additional:addons.gfiThemes.dipas.moreLink") }}</a>
+        >
+            {{ $t("additional:addons.gfiThemes.dipas.moreLink") }}
+        </a>
     </div>
 </template>
 
 <style lang="scss" scoped>
-    @import "~variables";
+@import "~variables";
 
-    .dipas-gfi-content {
-        margin: 12px;
+.dipas-gfi-content {
+    margin: 12px;
+    font-family: $font_family_default;
+    .dipas-gfi-thema {
         font-family: $font_family_default;
-        .dipas-gfi-thema {
-            font-family: $font_family_default;
-            font-size: $font-size-base;
-            color: $dark_grey;
-            text-transform: uppercase;
-        }
-        .dipas-gfi-name {
-            font-family: $font_family_accent;
-            font-size: $font-size-lg;
-            padding-bottom: 16px;
+        font-size: $font-size-base;
+        color: $dark_grey;
+        text-transform: uppercase;
+    }
+    .dipas-gfi-name {
+        font-family: $font_family_accent;
+        font-size: $font-size-lg;
+        padding-bottom: 16px;
 
-            a {
-                color: $dark_blue;
+        a {
+            color: $dark_blue;
+        }
+    }
+    .dipas-gfi-description {
+        font-family: $font_family_default;
+        font-size: $font-size-base;
+        color: $dark_grey;
+    }
+
+    .dipas-gfi-icon img{
+        width: 30px;
+        float: left;
+        margin: 0px 10px 10px 0px;
+    }
+
+    a.dipas-gfi-more {
+        font-size:  $font-size-sm;
+        border-radius: 2px;
+        margin-top: 20px;
+        padding: 7px 8px 4px;
+        background-color: var(--buttonColor, #e10019);
+        color: var(--buttonFontColor, #ffffff);
+        font-family: $font_family_accent;
+        text-transform: uppercase;
+        display: inline-block;
+
+        &:hover {
+                background-color: var(--buttonHoverColor, #b4081b);
             }
-        }
-        .dipas-gfi-description {
-            font-family: $font_family_default;
-            font-size: $font-size-base;
-            color: $dark_grey;
-        }
-
-        .dipas-gfi-icon img{
-            width: 30px;
-            float: left;
-            margin: 0px 10px 10px 0px;
-        }
-
-        a.dipas-gfi-more {
-            font-size:  $font-size-sm;
-            border-radius: 2px;
-            margin-top: 20px;
-            padding: 7px 8px 4px;
-            background-color: var(--buttonColor, #e10019);
-            color: var(--buttonFontColor, #ffffff);
-            font-family: $font_family_accent;
-            text-transform: uppercase;
-            display: inline-block;
-
-            &:hover {
-                    background-color: var(--buttonHoverColor, #b4081b);
-                }
-        }
+    }
 }
 
 </style>
