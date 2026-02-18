@@ -37,6 +37,7 @@
 - Issue: \#1555: FeatureLister: Handle WFS with dynamic ids in `getSpatialSelection`.
 - Issue \#1556: Fixed an error, if using layers with `layerSequence` in Firefox.
 - Issue \#1557: WFSSearch: fixed selection bug with deeper nested options.
+- Issue \#1561: LayerInformation: Fixed `metaDataCatalogueId` initialization by ensuring it happens before the component is mounted.
 - WFS-T: Multi-update works correctly when multiple layers are configured in the WFS-T tool.
 - i18next: 
     - Updated local storage key for i18n to include a portal identifier, ensuring unique language settings for different portals on the same server.
