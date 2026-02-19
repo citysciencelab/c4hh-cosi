@@ -117,7 +117,9 @@
                     "mapPreview": "Map preview",
                     "discard": "Yes, discard subject area data",
                     "subjectDataSuccess": "The subject area from the analysis „{{title}}“ has been successfully created.",
-                    "subjectDataReset": "The subject area from the analysis „{{title}}“ was rejected."
+                    "subjectDataReset": "The subject area from the analysis „{{title}}“ was rejected.",
+                    "setSubjectDistrict": "Set subject district",
+                    "selectDistrict": "Please select an area first to specify a subject area."
                 }
             }
         }

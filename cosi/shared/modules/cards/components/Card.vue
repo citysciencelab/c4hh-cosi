@@ -64,7 +64,12 @@ export default {
             default: false
         }
     },
-    emits: ["downloadSet", "hideSet", "removeSet", "subjectDataSet"]
+    emits: ["downloadSet", "hideSet", "removeSet", "subjectDataSet"],
+    computed: {
+        subjectLabel () {
+            return this.subjectDataDisabled ? this.$t("additional:modules.tools.cosi.accessibilityAnalysis.setSubjectDistrict") : this.$t("additional:modules.tools.cosi.accessibilityAnalysis.selectDistrict");
+        }
+    }
 };
 </script>
 
@@ -156,11 +161,16 @@ export default {
                         <IconButton
                             class="p-1"
                             icon="bi bi-layers"
-                            :aria="'Fachdatengebiet setzen'"
+                            :aria="subjectLabel"
                             :disabled="!subjectDataDisabled"
                             :interaction="() => $emit('subjectDataSet')"
                             data-bs-toggle="dropdown"
                             data-bs-auto-close="outside"
+                        />
+                        <span
+                            v-if="!subjectDataDisabled"
+                            :title="subjectLabel"
+                            class="tool-tip"
                         />
                         <slot name="subjectData-menu" />
                     </div>
@@ -228,5 +238,14 @@ export default {
                 }
             }
         }
+    }
+
+    .tool-tip {
+        display: inline-block;
+        width: 100px;
+        height: 20px;
+        position: absolute;
+        top: 10px;
+        left: 0;
     }
 </style>

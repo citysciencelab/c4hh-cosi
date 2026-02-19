@@ -117,7 +117,9 @@
                     "mapPreview": "Kartenvorschau",
                     "discard": "Ja, Fachdatengebiet verwerfen",
                     "subjectDataSuccess": "Das Fachdatengebiet aus der Analyse „{{title}}“ wurde erfolgreich erstellt.",
-                    "subjectDataReset": "Das Fachdatengebiet aus der Analyse „{{title}}“ wurde verworfen."
+                    "subjectDataReset": "Das Fachdatengebiet aus der Analyse „{{title}}“ wurde verworfen.",
+                    "setSubjectDistrict": "Fachdatengebiet setzen",
+                    "selectDistrict": "Bitte wählen Sie zuerst ein Gebiet aus, um ein Fachdatengebiet festzulegen"
                 }
             }
         }
