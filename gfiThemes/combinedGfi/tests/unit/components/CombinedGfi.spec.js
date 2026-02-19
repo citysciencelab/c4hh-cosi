@@ -336,6 +336,43 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
         localWrapper.unmount();
     });
 
+    it("hides buffer selection when only one buffer is available", async () => {
+        const localWrapper = shallowMount({
+                ...CombinedGfi,
+                computed: {
+                    ...CombinedGfi.computed,
+                    hasSingleBufferDistance: () => true
+                }
+            }, {
+                global: {
+                    plugins: [store],
+                    mocks: {
+                        $t: (key) => key
+                    }
+                },
+                props: {
+                    feature: {
+                        getOlFeature: () => new Feature({
+                            geometry: new Point([565874, 5934140])
+                        }),
+                        getTheme: () => ({
+                            params: {
+                                layersToRequest: [],
+                                additionalRequests: [],
+                                showBuffer: true,
+                                bufferDistances: [100, 500, 1000]
+                            }
+                        })
+                    }
+                }
+            }),
+            bufferSelect = localWrapper.find("#bufferSelect");
+
+        expect(bufferSelect.exists()).to.be.false;
+
+        localWrapper.unmount();
+    });
+
     it("handles print functionality correctly", async () => {
         const fetchStub = sinon.stub(global, "fetch"),
             mockUtilsResponse = {

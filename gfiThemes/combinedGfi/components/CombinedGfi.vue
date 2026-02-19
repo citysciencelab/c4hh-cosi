@@ -62,6 +62,9 @@ export default {
             "printConfigPath",
             "printUtilsPath"
         ]),
+        hasSingleBufferDistance () {
+            return this.bufferDistances.length === 1;
+        },
         hasSelectedFeature () {
             return this.feature !== null;
         },
@@ -94,8 +97,11 @@ export default {
                 this.setPreviousGeometry(newCoordinates);
 
                 if (geometryProviderLayer) {
-                    this.$nextTick(() => {
-                        this.handleAlternativeGeometry({feature: newFeature, clickCoordinates: this.clickCoordinates});
+                    this.$nextTick(async () => {
+                        await this.handleAlternativeGeometry({feature: newFeature, clickCoordinates: this.clickCoordinates});
+                        if (this.hasSingleBufferDistance) {
+                            this.enlargePolygon(this.bufferDistances[0]);
+                        }
                     });
                 }
                 else if (newGeometry) {
@@ -444,7 +450,10 @@ export default {
                 </AccordionItem>
             </div>
             <template v-if="showBuffer">
-                <div class="form-floating mb-3">
+                <div
+                    v-if="!hasSingleBufferDistance"
+                    class="form-floating mb-3"
+                >
                     <select
                         id="bufferSelect"
                         v-model="bufferDistance"
@@ -467,11 +476,13 @@ export default {
                 <div class="button-group">
                     <ElevatedButton
                         :text="translate(isBufferLoading ? 'additional:modules.combinedGfi.queryingArea' : 'additional:modules.combinedGfi.queryArea')"
+                        :class="hasSingleBufferDistance ? 'w-100' : ''"
                         :disabled="!bufferedFeature || isLoading || isBufferLoading"
                         :interaction="handleQueryBufferedFeatures"
                         additional-css="btn-primary"
                     />
                     <ElevatedButton
+                        v-if="!hasSingleBufferDistance"
                         :text="translate('additional:modules.combinedGfi.removeBuffer')"
                         :disabled="!bufferedFeature"
                         :interaction="() => { resetBufferLayer(); bufferDistance = null; }"

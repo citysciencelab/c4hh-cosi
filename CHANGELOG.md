@@ -9,6 +9,7 @@
 ### Added
 
 ### Changed
+- gfiThemes: The GFI theme `combinedGfi` no longer displays the select element when exactly one option exists. In such cases, the singular option is automatically selected.
 
 ### Deprecated
 
@@ -16,6 +17,7 @@
 
 ### Fixed
 - vcOblique: Fixed Bugs of Marker setting and styling when using VCMap 6.
+- gfiThemes: The GFI theme `combinedGfi` threw errors for the buffer size 0. 0 now works as an option.
 
 ---
 

@@ -45,6 +45,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
             printUtilsPath: "/resources/printUtils.js",
             bufferedFeature: null,
             bufferedLayerResults: [],
+            bufferDistances: [100, 500],
             itemsPerPage: 5
         };
 
@@ -176,7 +177,7 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
 
         dispatch.resolves();
 
-        await actions.initCombinedGfi({dispatch, commit}, {feature, clickCoordinates: [1, 2]});
+        await actions.initCombinedGfi({dispatch, commit, state}, {feature, clickCoordinates: [1, 2]});
 
         expect(commit.calledWith("setLayersToRequest", [{id: "layer1"}])).to.be.true;
         expect(commit.calledWith("setAdditionalRequests", [])).to.be.true;
@@ -187,7 +188,33 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
         expect(commit.calledWith("setPrintServerUrl", "https://print-server.example.com")).to.be.true;
         expect(commit.calledWith("setPrintUtilsPath", "/resources/printUtils.js")).to.be.true;
         expect(commit.calledWith("setInitialized", true)).to.be.true;
+        expect(dispatch.calledWith("enlargePolygon")).to.be.false;
         expect(dispatch.calledWith("fetchGfiData")).to.be.true;
+    });
+
+    it("automatically enlarges a selected feature when only one buffer size is available", async () => {
+        const feature = {
+            getTheme: () => ({
+                params: {
+                    layersToRequest: [{id: "layer1"}],
+                    additionalRequests: [],
+                    showBuffer: true,
+                    bufferDistances: [100],
+                    printConfigPath: "/resources/printConfig.json",
+                    printServerUrl: "https://print-server.example.com",
+                    printUtilsPath: "/resources/printUtils.js"
+                }
+            }),
+            getOlFeature: () => new Feature({
+                geometry: new Polygon([[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]])
+            })
+        };
+
+        dispatch.resolves();
+
+        await actions.initCombinedGfi({dispatch, commit, state: {...state, bufferDistances: [100]}}, {feature, clickCoordinates: [1, 2]});
+
+        expect(dispatch.calledWith("enlargePolygon"), 100).to.be.true;
     });
 
     it("processes GFI results and commits layer results with layerId", async () => {

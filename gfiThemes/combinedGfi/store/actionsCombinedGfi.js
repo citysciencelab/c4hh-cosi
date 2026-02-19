@@ -41,7 +41,7 @@ const actions = {
      * @param {Object} payload.clickCoordinates - The coordinates where the user clicked.
      * @returns {Promise<void>} - A promise that resolves when the initialization is complete.
      */
-    async initCombinedGfi ({dispatch, commit}, {feature, clickCoordinates}) {
+    async initCombinedGfi ({dispatch, commit, state}, {feature, clickCoordinates}) {
         const themeParams = feature?.getTheme()?.params || {},
             geometry = feature.getOlFeature().getGeometry(),
             alternativeGeometryAvailable = themeParams.layersToRequest.find(layer => layer.geometryProvider),
@@ -80,6 +80,9 @@ const actions = {
             await dispatch("fetchGfiDataFromClickCoordinates", {clickCoordinates});
         }
         await dispatch("fetchAdditionalRequests", "init");
+        if (state.bufferDistances.length === 1) {
+            await dispatch("enlargePolygon", state.bufferDistances[0]);
+        }
         commit("setInitialized", true);
     },
 
@@ -1101,7 +1104,8 @@ const actions = {
         }
     },
     /**
-     * Enlarges a polygon by a specified buffer distance.
+     * Enlarges a polygon by a specified buffer distance. If the buffer distance is 0, no buffer
+     * will be shown, and the original feature geometry will be used as the "buffered" one.
      *
      * @param {Object} context - The Vuex action context.
      * @param {Function} context.commit - Vuex commit function.
@@ -1136,10 +1140,10 @@ const actions = {
                 geojson = geojsonFormat.writeGeometry(geometry),
                 reader = new GeoJSONReader(),
                 jstsGeom = reader.read(geojson),
-                buffered = BufferOp.bufferOp(jstsGeom, bufferDistance),
+                buffered = bufferDistance === 0 ? jstsGeom : BufferOp.bufferOp(jstsGeom, bufferDistance),
                 donutGeom = OverlayOp.difference(buffered, jstsGeom),
                 writer = new GeoJSONWriter(),
-                bufferedGeojson = writer.write(donutGeom);
+                bufferedGeojson = writer.write(bufferDistance === 0 ? jstsGeom : donutGeom);
 
             let coordinates;
 
@@ -1177,7 +1181,7 @@ const actions = {
                         id: "bufferedLayer",
                         source: vectorSource,
                         zIndex: 1000,
-                        style: new Style({
+                        style: bufferDistance === 0 ? null : new Style({
                             fill: new Fill({
                                 color: "rgba(255, 0, 0, 0.3)"
                             }),
