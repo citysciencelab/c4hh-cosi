@@ -198,7 +198,9 @@ export default {
 
             this.selectedXValues = this.selectedXValues.filter(year => availableYears.includes(year));
         },
-        filteredData: "loadChartData"
+        filteredData () {
+            this.loadChartData(this.selectedTagLabel);
+        }
     },
 
     mounted () {
@@ -353,7 +355,7 @@ export default {
     >
         <div
             v-if="data.length > 1"
-            class="d-flex flex-wrap gap-3 flex-nowrap mb-3"
+            class="d-flex flex-nowrap gap-3 align-items-start mb-3"
         >
             <TagGroup
                 v-if="selectionMode === 'tags'"
@@ -364,22 +366,23 @@ export default {
             />
             <Dropdown-Autocomplete
                 v-else
-                class="col"
+                :class="[showXValuesFilter ? 'col col-md-5' : '']"
                 :items="dropdownOptions"
                 :label="selectionLabel"
                 :model-value="[selectedTagLabel]"
-                @update:model-value="loadChartData($event)"
+                @update:model-value="updateSelectedTag({ label: $event })"
             />
             <DropdownAutocomplete
                 v-if="showXValuesFilter"
                 v-model="selectedXValues"
+                class="col col-md-auto"
                 :items="allXValues"
                 :label="xValuesFilterLabel"
                 multiple
             />
             <IconButton
                 v-if="downloadMode"
-                class="align-self-center ms-auto"
+                class="download col col-md-1 align-self-center ms-auto"
                 aria="Diagramm herunterladen"
                 icon="bi bi-download"
                 :interaction="() => downloadCurrentChart()"
@@ -401,4 +404,8 @@ export default {
     </div>
 </template>
 <style scoped lang="scss">
+.dropdown-autocomplete {
+    height: 38px;
+    overflow: hidden;
+}
 </style>
