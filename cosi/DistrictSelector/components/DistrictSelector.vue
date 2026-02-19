@@ -62,9 +62,11 @@ export default {
         }
     },
     activated: () => undefined,
-    deactivated: () => undefined,
+    deactivated () {
+        this.setSelectedInteraction("");
+    },
     methods: {
-        ...mapMutations("Modules/DistrictSelector", ["setSelectedTabItem"])
+        ...mapMutations("Modules/DistrictSelector", ["setSelectedInteraction", "setSelectedTabItem"])
     }
 };
 </script>

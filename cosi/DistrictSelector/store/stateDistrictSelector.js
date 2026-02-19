@@ -18,6 +18,7 @@
  * @property {module:ol/Collection} selectedDistrictsCollection - All districts of the current district level.
  * @property {String[]} selectedDistrictNames - All names of the selected districts.
  * @property {Object {String: String[]}} additionalInfoLayers - Additional Layers to display as guidance and information. Set as keys to display with lists of layerIds. (config-param).
+ * @property {Object} selectedInteraction - the selected interaction.
  * @property {String} toolToOpen - the tool to be open after this tool is closed.
  */
 const state = {
@@ -46,6 +47,7 @@ const state = {
     selectedTabItem: undefined,
     selectionCardsSubjectData: [],
     selectionCardsStatisticalData: [],
+    selectedInteraction: null,
     toolToOpen: undefined,
     wpsServiceId: "1001",
     wpsProcess: "einwohner_ermitteln.fmw"

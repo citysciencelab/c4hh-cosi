@@ -51,13 +51,12 @@ export default {
             drawTypes: ["polygon", "box", "circle"],
             selectedDrawTypeMain: "",
             selectedDrawType: "",
-            selectedInteraction: null,
             importResetTrigger: 0
         };
     },
     computed: {
         ...mapGetters(["allLayerConfigs", "restServiceById"]),
-        ...mapGetters("Modules/DistrictSelector", ["wpsProcess", "wpsServiceId", "keyOfAttrName"]),
+        ...mapGetters("Modules/DistrictSelector", ["selectedInteraction", "wpsProcess", "wpsServiceId", "keyOfAttrName"]),
         ...mapGetters("Modules/DistrictSelector", {
             cardsStatistical: "selectionCardsStatisticalData",
             cards: "selectionCardsSubjectData",
@@ -90,12 +89,12 @@ export default {
         this.createCircleOverlay();
     },
     beforeUnmount () {
-        this.selectedInteraction = "";
+        this.setSelectedInteraction("");
         mapCollection.getMap("2D").removeOverlay(this.circleOverlay);
     },
     methods: {
         ...mapActions("Maps", ["zoomToExtent"]),
-        ...mapMutations("Modules/DistrictSelector", ["setSelectedDistrictLevelId", "setBoundingGeometry"]),
+        ...mapMutations("Modules/DistrictSelector", ["setSelectedInteraction", "setSelectedDistrictLevelId", "setBoundingGeometry"]),
 
         /**
          * Adds a new card to the cards array with the provided parameters.
@@ -292,7 +291,7 @@ export default {
          * @return {void}
          */
         reset () {
-            this.selectedInteraction = "";
+            this.setSelectedInteraction("");
             this.activeCard.drawnFeatureWKT = null;
             this.setBuffer("0");
         },
@@ -536,7 +535,7 @@ export default {
                     :selected-interaction="selectedInteraction"
                     :set-selected-draw-type="(value) => {selectedDrawType = value, clearImportAlert();}"
                     :set-selected-draw-type-main="(value) => {selectedDrawTypeMain = value, clearImportAlert();}"
-                    :set-selected-interaction="(value) => {selectedInteraction = value, clearImportAlert();}"
+                    :set-selected-interaction="(value) => {setSelectedInteraction(value), clearImportAlert();}"
                     :source="drawingLayer.getLayerSource()"
                     @drawstart="removeDrawingFeature"
                     @drawend="onDrawEnd"
