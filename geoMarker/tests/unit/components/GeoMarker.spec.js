@@ -26,7 +26,8 @@ describe("addons/geoMarker/components/GeoMarker.vue", () => {
                                 rollbackGeoMarkerFeature: () => null,
                                 geoMarkerFeatureList: () => [],
                                 newGeoMarkerCreated: () => false,
-                                geoMarkerUpdateFeature: () => null
+                                geoMarkerUpdateFeature: () => null,
+                                reloadIntervalId: () => 1
                             },
                             actions: {
                                 loadCategories: () => [],
@@ -40,7 +41,8 @@ describe("addons/geoMarker/components/GeoMarker.vue", () => {
                                 setGeoMarkerActiveTab: sinon.stub(),
                                 setNewGeoMarkerFeature: sinon.stub(),
                                 setGeoMarkerUpdateFeature: sinon.stub(),
-                                setGeoMarkerFeatureSelected: sinon.stub()
+                                setGeoMarkerFeatureSelected: sinon.stub(),
+                                setReloadIntervalId: sinon.stub()
                             }
                         }
                     }

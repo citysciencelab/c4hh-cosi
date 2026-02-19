@@ -5,8 +5,8 @@ import GeoMarkerFormBox from "../../../components/GeoMarkerFormBox.vue";
 import {createStore} from "vuex";
 import sinon from "sinon";
 import dayjs from "dayjs";
-import departments from "../../../../../portalconfigs/geomarker/resources/departments.json";
-import categories from "../../../../../portalconfigs/geomarker/resources/categories.json";
+import departments from "../resources/departments.json";
+import categories from "../resources/categories.json";
 
 describe("addons/geoMarker/components/GeoMarkerForm.vue", () => {
     let wrapper,

@@ -1,0 +1,145 @@
+{
+  "departments": {
+    "alkis_geotopographie": {
+      "name": "Geotopographie",
+      "fields": {
+        "status": "sta_alkis_geotopographie",
+        "bemerkung": "bem_alkis_geotopographie",
+        "wiedervorlage": "wie_alkis_geotopographie",
+        "geschlossen": "ges_alkis_geotopographie"
+      },
+      "layerIds": {
+        "offen": "geomarker_alkis_geotopographie",
+        "geschlossen": "geomarker_alkis_geotopographie2",
+        "inaktiv": "geomarker_alkis_geotopographie3"
+      }
+    },
+    "alkis_liegenschaftsdaten": {
+      "name": "Liegenschaftsdaten",
+      "fields": {
+        "status": "sta_alkis_liegenschaftsdaten",
+        "bemerkung": "bem_alkis_liegenschaftsdaten",
+        "wiedervorlage": "wie_alkis_liegenschaftsdaten",
+        "geschlossen": "ges_alkis_liegenschaftsdaten"
+      },
+      "layerIds": {
+        "offen": "geomarker_alkis_liegenschaftsdaten",
+        "geschlossen": "geomarker_alkis_liegenschaftsdaten2",
+        "inaktiv": "geomarker_alkis_liegenschaftsdaten3"
+      }
+    },
+    "atkis": {
+      "name": "ATKIS",
+      "fields": {
+        "status": "sta_atkis",
+        "bemerkung": "bem_atkis",
+        "wiedervorlage": "wie_atkis",
+        "geschlossen": "ges_atkis"
+      },
+      "layerIds": {
+        "offen": "geomarker_atkis",
+        "geschlossen": "geomarker_atkis2",
+        "inaktiv": "geomarker_atkis3"
+      }
+    },
+    "fernerkundung": {
+      "name": "Fernerkundung",
+      "fields": {
+        "status": "sta_fernerkundung",
+        "bemerkung": "bem_fernerkundung",
+        "wiedervorlage": "wie_fernerkundung",
+        "geschlossen": "ges_fernerkundung"
+      },
+      "layerIds": {
+        "offen": "geomarker_fernerkundung",
+        "geschlossen": "geomarker_fernerkundung2",
+        "inaktiv": "geomarker_fernerkundung3"
+      }
+    },
+    "gebaeude": {
+      "name": "Gebäudeteam",
+      "fields": {
+        "status": "sta_gemis",
+        "bemerkung": "bem_gemis",
+        "wiedervorlage": "wie_gemis",
+        "geschlossen": "ges_gemis"
+      },
+      "layerIds": {
+        "offen": "geomarker_gebaeude",
+        "geschlossen": "geomarker_gebaeude2",
+        "inaktiv": "geomarker_gebaeude3"
+      }
+    },
+    "hh_sib": {
+      "name": "HH-SIB",
+      "fields": {
+        "status": "sta_hh_sib",
+        "bemerkung": "bem_hh_sib",
+        "wiedervorlage": "wie_hh_sib",
+        "geschlossen": "ges_hh_sib"
+      },
+      "layerIds": {
+        "offen": "geomarker_hh_sib",
+        "geschlossen": "geomarker_hh_sib2",
+        "inaktiv": "geomarker_hh_sib3"
+      }
+    },
+    "kartographie": {
+      "name": "Kartographie",
+      "fields": {
+        "status": "sta_kartographie",
+        "bemerkung": "bem_kartographie",
+        "wiedervorlage": "wie_kartographie",
+        "geschlossen": "ges_kartographie"
+      },
+      "layerIds": {
+        "offen": "geomarker_kartographie",
+        "geschlossen": "geomarker_kartographie2",
+        "inaktiv": "geomarker_kartographie3"
+      }
+    },
+    "photogrammetrie": {
+      "name": "Photogrammetrie",
+      "fields": {
+        "status": "sta_photogrammetrie",
+        "bemerkung": "bem_photogrammetrie",
+        "wiedervorlage": "wie_photogrammetrie",
+        "geschlossen": "ges_photogrammetrie"
+      },
+      "layerIds": {
+        "offen": "geomarker_photogrammetrie",
+        "geschlossen": "geomarker_photogrammetrie2",
+        "inaktiv": "geomarker_photogrammetrie3"
+      }
+    },
+    "steuerungsstelle": {
+      "name": "Steuerungsstelle",
+      "fields": {
+        "status": "sta_steuerungsstelle",
+        "bemerkung": "bem_steuerungsstelle",
+        "wiedervorlage": "wie_steuerungsstelle",
+        "geschlossen": "ges_steuerungsstelle"
+      },
+      "layerIds": {
+        "offen": "geomarker_steuerungsstelle",
+        "geschlossen": "geomarker_steuerungsstelle2",
+        "inaktiv": "geomarker_steuerungsstelle3"
+      }
+    },
+    "gemis": {
+      "name": "GEMIS",
+      "fields": {
+        "status": "sta_gemis",
+        "bemerkung": "bem_gemis",
+        "wiedervorlage": "wie_gemis",
+        "geschlossen": "ges_gemis"
+      },
+      "layerIds": {
+        "offen": "geomarker_gemis",
+        "geschlossen": "geomarker_gemis2",
+        "inaktiv": ""
+      },
+      "no_edit": true
+    }
+  }
+}

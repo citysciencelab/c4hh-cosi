@@ -2,8 +2,8 @@ import {expect} from "chai";
 import {mount} from "@vue/test-utils";
 import TabNewContent from "../../../../components/tabs/TabNewContent.vue";
 import {createStore} from "vuex";
-import departments from "../../../../../../portalconfigs/geomarker/resources/departments.json";
-import categories from "../../../../../../portalconfigs/geomarker/resources/categories.json";
+import departments from "../../resources/departments.json";
+import categories from "../../resources/categories.json";
 
 describe("addons/geoMarker/components/tabs/TabNewContent.vue", () => {
     let wrapper,
