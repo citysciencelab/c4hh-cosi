@@ -471,6 +471,13 @@ export default {
             const extent = calculateExtent(this.selectedFeatures, parseInt(0, 10)),
                 bboxGeom = getBoundingGeometry(this.selectedFeatures, 0);
 
+            if (this.cards.some(card => JSON.stringify(card.extent) === JSON.stringify(extent))) {
+                const index = this.cards.findIndex(card => JSON.stringify(card.extent) === JSON.stringify(extent));
+
+                this.toggleCardStatus(index);
+                return;
+            }
+
             this.isDragBoxActive = false;
             this.cards.unshift({
                 badgeList: [{
