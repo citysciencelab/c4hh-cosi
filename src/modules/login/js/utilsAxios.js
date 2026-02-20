@@ -4,18 +4,40 @@ import Cookie from "@modules/login/js/utilsCookies.js";
 /**
  * Adds interceptors to the different HTTP Get methods of javascript
  *
- * @param {string} interceptorUrlRegex regex to match the urls that shall be eqipped with the bearer token
+ * @param {string|RegExp} interceptorUrlRegex regex to match the urls that shall be equipped with the bearer token
  * @return {void}
  */
 function addInterceptor (interceptorUrlRegex) {
+    if (!interceptorUrlRegex) {
+        return;
+    }
+
     axios.interceptors.request.use(
         config => {
-            const configUrl = typeof config.url === "object" ? config.url.origin : config.url;
+            let configUrl = config.url;
 
-            if (!configUrl?.startsWith("http") || (interceptorUrlRegex && configUrl?.match(interceptorUrlRegex))) {
-                config.headers.Authorization = `Bearer ${Cookie.get("token")}`;
-                config.withCredentials = true;
+            if (typeof configUrl === "object" && configUrl !== null && typeof configUrl.toString === "function") {
+                configUrl = configUrl.toString();
             }
+
+            if (typeof configUrl !== "string" || !configUrl.match(interceptorUrlRegex)) {
+                return config;
+            }
+
+            const token = Cookie.get("token");
+
+            if (!token) {
+                console.warn("No authentication token found in cookies");
+                return config;
+            }
+
+            if (!config.headers) {
+                config.headers = {};
+            }
+
+            config.headers.Authorization = `Bearer ${token}`;
+            config.withCredentials = true;
+
             return config;
         },
         error => {
@@ -37,9 +59,24 @@ function addInterceptor (interceptorUrlRegex) {
 
         XMLHttpRequest.prototype.open = function (method, url, ...rest) {
             const opened = open.call(this, method, url, ...rest);
+            let href;
 
-            if (interceptorUrlRegex && url?.match(interceptorUrlRegex)) {
-                this.setRequestHeader("Authorization", `Bearer ${Cookie.get("token")}`);
+            if (typeof url === "string") {
+                href = url;
+            }
+            else if (url && typeof url.toString === "function") {
+                href = url.toString();
+            }
+
+            if (interceptorUrlRegex && typeof href === "string" && href.match(interceptorUrlRegex)) {
+                const token = Cookie.get("token");
+
+                if (!token) {
+                    console.warn("No authentication token found in cookies");
+                    return opened;
+                }
+
+                this.setRequestHeader("Authorization", `Bearer ${token}`);
                 this.withCredentials = true;
             }
 
@@ -55,10 +92,20 @@ function addInterceptor (interceptorUrlRegex) {
         let config = originalConfig;
 
         if (interceptorUrlRegex && href?.match(interceptorUrlRegex)) {
+            const token = Cookie.get("token");
+
+            if (!token) {
+                console.warn("No authentication token found in cookies");
+                return originalFetch(resource, config);
+            }
+
             config = {
                 ...originalConfig,
                 credentials: "include",
-                headers: {"Authorization": `Bearer ${Cookie.get("token")}`}
+                headers: {
+                    ...originalConfig?.headers,
+                    "Authorization": `Bearer ${token}`
+                }
             };
         }
 
