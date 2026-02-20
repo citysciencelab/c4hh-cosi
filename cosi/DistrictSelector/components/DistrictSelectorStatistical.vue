@@ -109,13 +109,10 @@ export default {
     watch: {
         cards () {
             if (!this.isActive && typeof this.activeCard !== "undefined") {
-                const bboxGeomWKT = this.activeSubjectCard?.subjectFeatureWKT || this.activeCard.bboxGeomWKT,
+                const bboxGeomWKT = this.activeCard.subjectFeatureWKT,
                     decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
 
-                if (this.activeSubjectCard) {
-                    this.addSubjectAreaToLayer(decodedFeature);
-                }
-
+                this.addSubjectAreaToLayer(decodedFeature);
                 this.setBoundingGeometry(decodedFeature.getGeometry());
                 this.setSelectedDistrictLevelId(this.activeCard.districtLevelId);
                 this.$nextTick(() => {
@@ -200,9 +197,8 @@ export default {
 
     },
     activated () {
-        this.clearSubjectAreaFromLayer();
-
         this.cardsSubject.forEach((card, index) => {
+            this.cards[index].subjectFeatureWKT = card.subjectFeatureWKT;
             if (card.status === "active") {
                 this.toggleCardStatus(index);
             }
@@ -214,12 +210,6 @@ export default {
     deactivated () {
         if (!this.activeCard) {
             this.clearFeatures();
-        }
-        if (this.activeCard && this.selectedTabItem.type === "statistic") {
-            const bboxGeomWKT = this.activeCard.bboxGeomWKT,
-                decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
-
-            this.addSubjectAreaToLayer(decodedFeature);
         }
 
         this.isActive = false;
@@ -381,6 +371,7 @@ export default {
             }
             else if (this.cards.length === 0) {
                 this.clearFeatures();
+                this.clearSubjectAreaFromLayer();
                 this.updateLayerBbox(undefined);
             }
         },
@@ -486,6 +477,12 @@ export default {
                     color: "rgba(255, 255, 255, 1)",
                     icon: "bi bi-bar-chart",
                     text: this.$t("additional:modules.cosi.districtSelector.statisticalData")
+                },
+                {
+                    backgroundColor: "#EB8A3E",
+                    color: "rgba(255, 255, 255, 1)",
+                    icon: "bi bi-layers",
+                    text: this.$t("additional:modules.cosi.districtSelector.subjectData")
                 }],
                 data: [
                     {value: this.$t("additional:modules.cosi.districtSelector.districtLevel") + ": " + this.selectedDistrictLevel.label},
@@ -500,7 +497,8 @@ export default {
                 bboxGeomWKT: wktParser.encodeGeometry(bboxGeom),
                 icon: "bi-image",
                 selectedDistricts: this.selectedDistrictNames,
-                status: ""
+                status: "",
+                subjectFeatureWKT: wktParser.encodeGeometry(bboxGeom)
             });
 
             this.toggleCardStatus(0);
@@ -601,17 +599,20 @@ export default {
          * @return {void}
          */
         toggleCardStatus (index) {
-            const activeIndex = this.cards.findIndex(card => card.status === "active");
+            const activeIndex = this.cards.findIndex(card => card.status === "active"),
+                subjectFeatureWKT = this.cards[index]?.subjectFeatureWKT,
+                subjectFeature = wktParser.decodeFeature(subjectFeatureWKT);
+
+            this.clearSubjectAreaFromLayer();
+            this.addSubjectAreaToLayer(subjectFeature);
 
             if (activeIndex === index) {
-                this.updateLayerBbox(this.cards[index].bboxGeomWKT);
+                this.updateLayerBbox(subjectFeatureWKT);
                 return;
             }
             if (activeIndex !== -1 && activeIndex !== index) {
                 this.cards[activeIndex].status = "";
             }
-
-            this.cards[index].status = "active";
             this.cards[index].status = "active";
             this.setSelectedDistrictLevelId(this.cards[index].districtLevelId);
 
@@ -619,7 +620,7 @@ export default {
 
             this.$nextTick(() => {
                 this.updateSelectedFeatures(this.cards[index].selectedDistricts);
-                this.updateLayerBbox(this.cards[index].bboxGeomWKT);
+                this.updateLayerBbox(subjectFeatureWKT);
                 this.zoomToExtent({extent: this.cards[index].extent, options: {}});
 
                 this.ignoreSelectionChange = false;
