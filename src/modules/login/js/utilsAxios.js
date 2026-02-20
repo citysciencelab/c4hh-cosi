@@ -20,7 +20,14 @@ function addInterceptor (interceptorUrlRegex) {
                 configUrl = configUrl.toString();
             }
 
-            if (typeof configUrl !== "string" || !configUrl.match(interceptorUrlRegex)) {
+            if (typeof configUrl !== "string") {
+                return config;
+            }
+
+            const isRelativeUrl = !configUrl.startsWith("http");
+            const isRegexMatch = interceptorUrlRegex && configUrl.match(interceptorUrlRegex);
+
+            if (!isRelativeUrl && !isRegexMatch) {
                 return config;
             }
 
