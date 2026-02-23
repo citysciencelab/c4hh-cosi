@@ -116,7 +116,7 @@ export default {
         selectedAreasName: "",
         transportTypeMapping: {
             "driving-car": "Auto",
-            "foot-walking": "zu Fuss",
+            "foot-walking": "Gehen",
             "cycling-regular": "Fahrrad",
             "wheelchair": "Rollstuhl"
         },
@@ -1698,7 +1698,7 @@ export default {
         <ToolInfo
             :url="readmeUrl"
             :locale="currentLocale"
-            summary="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum."
+            :summary="$t('additional:modules.cosi.reportingTool.toolInfoText')"
         />
         <div
             v-show="!printReportView && !noDataView"
@@ -1761,7 +1761,7 @@ export default {
                         {{ $t("additional:modules.cosi.reportingTool.annex") }}
                     </v-stepper-item>
                 </v-stepper-header>
-                <v-stepper-window class="ms-0 pe-0">
+                <v-stepper-window class="ms-3 pe-0">
                     <v-stepper-window-item :value="1">
                         <h5>
                             {{ "1. " + $t("additional:modules.cosi.reportingTool.generalReportInformation") }}
@@ -1839,24 +1839,6 @@ export default {
                         <template
                             v-if="featuresListItems?.length"
                         >
-                            <SwitchInput
-                                id="reporting-tool-infrastructure-limit-switch"
-                                class="mb-3"
-                                :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
-                                :aria="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
-                                :checked="infrastructureTableLimitEnabled"
-                                :interaction="evt => infrastructureTableLimitEnabled = evt.target.checked"
-                            />
-                            <InputText
-                                v-if="infrastructureTableLimitEnabled"
-                                id="infrastructure-table-limit-input"
-                                v-model="infrastructureTableLimit"
-                                :min="1"
-                                type="number"
-                                class="mb-3"
-                                :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
-                                :placeholder="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
-                            />
                             <ReportingToolStepItem
                                 :card-mapping="categoryMapping?.subjectData"
                                 :title="'3. ' + $t('additional:modules.cosi.reportingTool.subjectData')"
@@ -1864,7 +1846,33 @@ export default {
                                 :groups="selectedInfrastructureData"
                                 @set-cards="setSubjectDataCards"
                                 @set-order-of-cards="updateInfratsructureData"
-                            />
+                            >
+                                <template #additional-settings>
+                                    <div
+                                        v-if="subjectDataCards.length !== 0"
+                                        class="d-flex flex-column align-items-center mb-3"
+                                    >
+                                        <SwitchInput
+                                            id="reporting-tool-infrastructure-limit-switch"
+                                            class="mb-3"
+                                            :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
+                                            :aria="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimitEnabled')"
+                                            :checked="infrastructureTableLimitEnabled"
+                                            :interaction="evt => infrastructureTableLimitEnabled = evt.target.checked"
+                                        />
+                                        <InputText
+                                            v-if="infrastructureTableLimitEnabled"
+                                            id="infrastructure-table-limit-input"
+                                            v-model="infrastructureTableLimit"
+                                            :min="1"
+                                            type="number"
+                                            class="col-11 mb-3"
+                                            :label="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
+                                            :placeholder="$t('additional:modules.cosi.reportingTool.label.infrastructureTableLimit')"
+                                        />
+                                    </div>
+                                </template>
+                            </ReportingToolStepItem>
                         </template>
                         <AlertMessage
                             v-else
@@ -1937,9 +1945,10 @@ export default {
             type="noData"
         />
         <div v-if="printReportView">
-            <p>
-                {{ $t("additional:modules.cosi.reportingTool.infoText") }}
-            </p>
+            <h5>
+                {{ $t("additional:modules.cosi.reportingTool.finishingUpReport") }}
+            </h5>
+            <p v-html="$t('additional:modules.cosi.reportingTool.infoText')" />
             <div class="mt-5 d-flex flex-column align-items-center justify-content-center">
                 <FlatButton
                     id="download-report"

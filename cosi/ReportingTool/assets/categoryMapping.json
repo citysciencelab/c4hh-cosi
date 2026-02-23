@@ -20,12 +20,14 @@
       "expandable": true,
       "expandableLabelShow": "additional:modules.cosi.reportingTool.showStatisticalData",
       "expandableLabelHide": "additional:modules.cosi.reportingTool.hideStatisticalData",
-      "icon": "bi bi-bar-chart",
+      "icon": "bi bi-file-earmark-ruled",
       "key": "statDataOverview",
       "multiple": false,
       "name": "Statistische Datenübersicht",
       "tag": "Statistische Daten",
-      "tagColor": "#FFEAC3"
+      "tagBackgroundColor": "#008DCB",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-bar-chart"
     },
     {
       "expandable": false,
@@ -34,7 +36,9 @@
       "multiple": false,
       "name": "Datenvisualisierung",
       "tag": "Statistische Daten",
-      "tagColor": "#FFEAC3"
+      "tagBackgroundColor": "#008DCB",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-bar-chart"
     }
   ],
   "subjectData": [
@@ -58,11 +62,14 @@
       "expandable": true,
       "expandableLabelShow": "additional:modules.cosi.reportingTool.showSubjectData",
       "expandableLabelHide": "additional:modules.cosi.reportingTool.hideSubjectData",
-      "icon": "bi bi-table",
+      "icon": "bi bi-file-earmark-ruled",
       "key": "subjectDataTable",
       "multiple": false,
       "name": "Auflistung",
-      "tag": "Fachdaten"
+      "tag": "Fachdaten",
+      "tagBackgroundColor": "#EB8A3E",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-layers"
     },
     {
       "expandable": false,
@@ -70,7 +77,10 @@
       "key": "subjectDataMap",
       "multiple": false,
       "name": "Kartendarstellung",
-      "tag": "Fachdaten"
+      "tag": "Fachdaten",
+      "tagBackgroundColor": "#EB8A3E",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-layers"
     }
   ],
   "analyses": [
@@ -81,7 +91,10 @@
       "key": "accessibilityAnalyses",
       "multiple": false,
       "name": "Erreichbarkeitsanalysen",
-      "tag": "Erreichbarkeitsanalysen"
+      "tag": "Erreichbarkeitsanalysen",
+      "tagBackgroundColor": "#43A047",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-geo"
     },
     {
       "expandable": false,

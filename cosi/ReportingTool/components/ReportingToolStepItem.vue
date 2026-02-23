@@ -287,11 +287,13 @@ export default {
 
 </script>
 <template lang="html">
-    <h5>
+    <h5 class="pb-2">
         {{ title }}
     </h5>
+    <slot name="additional-settings" />
     <ReportingToolStepItemSettings
-        v-if="title.startsWith('2. ')"
+        v-if="title.startsWith('2. ') && !(cards.length === 0 && nothingSelectedText)"
+        class="pb-5"
         :selected-areas-name="selectedAreasName"
         @update:selected-areas-name="$emit('update:selected-areas-name', $event)"
         @update:statistical-year="$emit('update:statistical-year', $event)"
@@ -305,27 +307,30 @@ export default {
         <div
             v-for="(card, index) in cards"
             :key="card.id"
-            class="cards row align-items-center d-flex flex-nowrap"
+            class="cards row align-items-center d-flex flex-nowrap justify-content-center mb-3"
             :class="[cards.length > 1 ? 'justify-content-end' : 'justify-content-center']"
         >
             <div
                 v-if="cards.length > 1"
-                class="col col-auto d-flex flex-nowrap"
+                class="col-auto d-flex flex-nowrap me-2 me-md-3"
             >
-                <div class="row">
+                <div
+                    class="row d-flex justify-content-center gap-0 gap-sm-1 gap-md-2"
+                    :class="index === cards.length - 1 ? 'flex-row-reverse' : ''"
+                >
                     <IconButton
-                        class="order-button-up col col-md-auto col-sm-12 px-1"
+                        class="order-button-up col-auto p-0"
                         :aria="$t('additional:modules.cosi.reportingTool.label.up')"
                         :icon="'bi bi-arrow-up'"
                         :interaction="() => updateCardOrder(card.id, 'up')"
-                        :class-array="['btn-light', 'border border-dark-subtle', index == 0 ? 'd-none' : '']"
+                        :class-array="['btn-light', 'border border-dark-subtle', index == 0 ? 'invisible' : '']"
                     />
                     <IconButton
-                        class="order-button-down col col-md-auto col-sm-12 px-2"
+                        class="order-button-down col-auto p-0"
                         :aria="$t('additional:modules.cosi.reportingTool.label.down')"
                         :icon="'bi bi-arrow-down'"
                         :interaction="() => updateCardOrder(card.id, 'down')"
-                        :class-array="['btn-light', 'border border-dark-subtle', index == cards.length - 1 ? 'd-none' : '']"
+                        :class-array="['btn-light', 'border border-dark-subtle', index == cards.length - 1 ? 'invisible' : '']"
                     />
                 </div>
             </div>
@@ -340,8 +345,9 @@ export default {
                     v-if="card.tag"
                     class="mb-2 mt-1"
                     :text="card.tag"
-                    :background-color="card.tagColor"
-                    :icon="card.icon"
+                    :background-color="card.tagBackgroundColor"
+                    :color="card.tagFontColor"
+                    :icon="card.tagIcon"
                 />
                 <DropdownAutocomplete
                     :items="dropdownItems"
@@ -388,7 +394,7 @@ export default {
                 <div v-if="card.key === 'textArea'">
                     <InputText
                         id="customText"
-                        class="pt-0 mt-0"
+                        class="pt-3"
                         :label="$t('additional:modules.cosi.reportingTool.label.freetext')"
                         :placeholder="$t('additional:modules.cosi.reportingTool.label.freetext')"
                         html-type="textarea"
@@ -400,7 +406,7 @@ export default {
                 <div v-if="card.key === 'heading'">
                     <InputText
                         id="customHeading"
-                        class="pt-0"
+                        class="pt-3"
                         :label="$t('additional:modules.cosi.reportingTool.label.heading')"
                         :model-value="card.value"
                         :placeholder="$t('additional:modules.cosi.reportingTool.label.heading')"
