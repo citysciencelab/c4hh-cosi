@@ -1,6 +1,7 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import Card from "../../shared/modules/cards/components/Card.vue";
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import {default as turfUnion} from "@turf/union";
 import DistrictSelectorSubjectImport from "./DistrictSelectorSubjectImport.vue";
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
@@ -29,6 +30,7 @@ export default {
     name: "DistrictSelectorSubject",
     components: {
         AccordionItem,
+        AlertMessage,
         Card,
         DistrictSelectorSubjectImport,
         DrawTypes,
@@ -125,6 +127,8 @@ export default {
                 removable: false,
                 statisticalFeatureWKT: wktFeature,
                 status: "",
+                populationAlert: null,
+                populationAlertKey: 0,
                 subjectFeatureWKT: this.getBufferedFeature(wktFeature, buffer)
             });
         },
@@ -456,13 +460,26 @@ export default {
             }
         },
 
+        /**
+         * Requests the population size for the given subject card via WPS
+         * and updates the card accordingly.
+         * @param {Object} card - The subject report card containing the geometry and UI state.
+         * @returns {void}
+         */
         setPopulationSize (card) {
             const subjectFeature = wktParser.decodeFeature(card.subjectFeatureWKT),
                 service = this.restServiceById(this.wpsServiceId),
-                geometry = subjectFeature.getGeometry();
+                geometry = subjectFeature.getGeometry(),
+                populationLabel = this.$t("additional:modules.cosi.districtSelector.population"),
+                notAvailable = this.$t("additional:modules.cosi.districtSelector.populationNotAvailable");
 
             if (service === undefined) {
                 console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");
+                card.data[2].label = populationLabel + ": " + notAvailable;
+                card.populationAlert = {
+                    type: "error",
+                    text: notAvailable
+                };
             }
             else {
                 const outerPolygon = geometryToGeoJson(geometry, false, "EPSG:25832", "EPSG:25832");
@@ -470,9 +487,69 @@ export default {
                 WPS.wpsRequest(service.id, service.url, this.wpsProcess, {
                     "such_flaeche": JSON.stringify(outerPolygon)
                 },
-                (resp) => this.handlePopulationResponsee(resp, card)
+                (resp) => this.handlePopulationResponse(resp, card)
                 );
             }
+        },
+
+        /**
+         * Maps server error messages (area too small or too big) to user-friendly alert texts.
+         * @param {String} message - Message returned by the service (already trimmed).
+         * @returns {Object|null} alert object or null.
+         */
+        getPopulationAlertFromServerMessage (message) {
+            if (typeof message !== "string" || !message) {
+                return null;
+            }
+
+            const lower = message.toLowerCase();
+
+            if (lower.includes("zu klein") || lower.includes("minimal")) {
+                return {
+                    type: "error",
+                    text: this.$t("additional:modules.cosi.districtSelector.areaTooSmall")
+                };
+            }
+
+            if (lower.includes("zu groß")) {
+                return {
+                    type: "error",
+                    text: this.$t("additional:modules.cosi.districtSelector.areaTooBig")
+                };
+            }
+
+            if (
+                lower.includes("zu klein") ||
+                lower.includes("minimal") ||
+                lower.includes("mindestens 3 adressen") ||
+                (lower.includes("adressen") && lower.includes("vergrößern"))
+            ) {
+                return {
+                    type: "error",
+                    text: this.$t("additional:modules.cosi.districtSelector.areaTooFewAddresses")
+                };
+            }
+
+            return {
+                type: "warning",
+                text: message
+            };
+        },
+
+        /**
+         * Sets the population label and alert to a "not available" state.
+         * @param {Object} card - The report card to update.
+         * @param {String} type - Alert type ("error" | "warning").
+         * @param {String} alertText - The alert message text.
+         * @returns {void}
+         */
+        setPopulationNotAvailable (card, type, alertText) {
+            card.data[2].label = "-";
+            card.populationAlertKey += 1;
+            card.populationAlert = {
+                type,
+                text: alertText
+            };
         },
 
         /**
@@ -482,32 +559,58 @@ export default {
          * @param {Object} card - The report card to update.
          * @returns {void}
          */
-        handlePopulationResponsee (resp, card) {
+        handlePopulationResponse (resp, card) {
             const result = resp?.ExecuteResponse?.ProcessOutputs?.Output?.Data?.ComplexData?.einwohner?.ergebnis,
                 trimmed = typeof result === "string" ? result.trim() : "",
-                fallbackLabel = "Einwohner: nicht verfügbar";
+                populationLabel = this.$t("additional:modules.cosi.districtSelector.population"),
+                notAvailable = this.$t("additional:modules.cosi.districtSelector.populationNotAvailable"),
+                processingFailed = this.$t("additional:modules.cosi.districtSelector.populationProcessingFailed"),
+                mapped = trimmed ? this.getPopulationAlertFromServerMessage(trimmed) : undefined;
+
+            card.populationAlert = null;
 
             if (!trimmed) {
-                card.data[2].label = fallbackLabel;
+                this.setPopulationNotAvailable(
+                    card,
+                    "error",
+                    notAvailable
+                );
                 return;
             }
 
-            if (trimmed.startsWith("{")) {
+            if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
                 try {
-                    const parsed = JSON.parse(trimmed);
+                    const parsed = JSON.parse(trimmed),
+                        numericValue = Number(parsed?.einwohner_fhh);
 
-                    if (typeof parsed?.einwohner_fhh === "number") {
-                        card.data[2].label =
-                            `Einwohner: ${thousandsSeparator(parsed.einwohner_fhh)}`;
+                    if (Number.isFinite(numericValue)) {
+                        card.data[2].label = `${populationLabel}: ${thousandsSeparator(numericValue)}`;
                         return;
                     }
+
+                    this.setPopulationNotAvailable(
+                        card,
+                        "warning",
+                        processingFailed
+                    );
+                    return;
                 }
                 catch (e) {
-                    console.warn("Population JSON parse failed:", e, trimmed);
+                    this.setPopulationNotAvailable(
+                        card,
+                        "warning",
+                        processingFailed
+                    );
+                    return;
                 }
             }
 
-            card.data[2].label = fallbackLabel;
+            card.data[2].label = populationLabel + ": " + notAvailable;
+            card.populationAlertKey += 1;
+            card.populationAlert = mapped || {
+                type: "error",
+                text: notAvailable
+            };
         },
 
         /**
@@ -613,6 +716,15 @@ export default {
                     </ul>
                 </template>
             </Card>
+            <AlertMessage
+                v-if="item.populationAlert"
+                :key="item.populationAlertKey"
+                :text="item.populationAlert.text"
+                :type="item.populationAlert.type"
+                :closeable="true"
+                class="mb-3"
+                @close="() => { item.populationAlert = null; }"
+            />
         </div>
     </div>
 </template>
