@@ -115,8 +115,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    @import "~mixins";
-    @import "~variables";
 
     #quick-response-code-overlay-body {
         color: $black;
