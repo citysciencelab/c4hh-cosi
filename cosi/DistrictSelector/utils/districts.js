@@ -21,6 +21,20 @@ function getDistrictByName (districts, name) {
 }
 
 /**
+ * Gets the limited counts of value in array.
+ * @param {String[]} value - The original value in array.
+ * @param {Number} limit - The limit count.
+ * @returns {String[]} The limited value in array.
+ */
+function getLimitedDistictName (value, limit = 20) {
+    if (!Array.isArray(value) || value.length < limit) {
+        return value;
+    }
+
+    return [...value.slice(0, limit - 1), value[limit] + " ..."];
+}
+
+/**
  * Finds a statistic by the given category.
  * @param {Object} district - The district with its statistics.
  * @param {String} category - The category of the searched statistic.
@@ -45,5 +59,6 @@ function getStatisticByCategory (district, category) {
 
 export {
     getDistrictByName,
+    getLimitedDistictName,
     getStatisticByCategory
 };

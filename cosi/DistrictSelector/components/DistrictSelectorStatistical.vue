@@ -12,6 +12,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
 import getFeature from "@shared/js/api/wfs/getFeature.js";
 import {getLayerById} from "../utils/getLayerById.js";
+import {getLimitedDistictName} from "../utils/districts.js";
 import getMappingJson from "../../utils/getMappingJson.js";
 import {getTotal} from "../../Dashboard/utils/operations";
 import getters from "../store/gettersDistrictSelector.js";
@@ -488,7 +489,7 @@ export default {
                 }],
                 data: [
                     {value: this.$t("additional:modules.cosi.districtSelector.districtLevel") + ": " + this.selectedDistrictLevel.label},
-                    {icon: "bi-map", label: this.$t("additional:modules.cosi.districtSelector.selectedAreas") + ": " + this.selectedDistrictNames},
+                    {icon: "bi-map", label: this.$t("additional:modules.cosi.districtSelector.selectedAreas") + ": " + getLimitedDistictName(this.selectedDistrictNames)},
                     {icon: "bi-people", label: this.$t("additional:modules.cosi.districtSelector.population") + ": Berechnung läuft..."}
                 ],
                 districtLevelId: this.selectedDistrictLevel.layerId,

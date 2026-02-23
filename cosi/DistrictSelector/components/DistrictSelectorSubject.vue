@@ -12,6 +12,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
 import {getLayerById} from "../utils/getLayerById.js";
+import {getLimitedDistictName} from "../utils/districts.js";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import {mapActions, mapGetters, mapMutations} from "vuex";
@@ -112,7 +113,7 @@ export default {
                 buffer,
                 data: [
                     {value: "Bezugsebene: " + districtLevelLabel},
-                    {icon: "bi-map", label: "Gebiete: " + districtNames},
+                    {icon: "bi-map", label: "Gebiete: " + getLimitedDistictName(districtNames)},
                     {icon: "bi-people", label: "Einwohner: Berechnung läuft..."},
                     {icon: "bi-record-circle", label: "Puffer " + buffer + " m"}
                 ],

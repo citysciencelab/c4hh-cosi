@@ -66,8 +66,32 @@ export default {
     },
     emits: ["downloadSet", "hideSet", "removeSet", "subjectDataSet"],
     computed: {
+        /**
+         * Gets the label for the setSubject button.
+         * @returns {String} The label.
+         */
         subjectLabel () {
             return this.subjectDataDisabled ? this.$t("additional:modules.tools.cosi.accessibilityAnalysis.setSubjectDistrict") : this.$t("additional:modules.tools.cosi.accessibilityAnalysis.selectDistrict");
+        },
+
+        /**
+         * Gets the account of button.
+         * @returns {Number} The counts of button.
+         */
+        buttonCount () {
+            let count = 1;
+
+            if (this.visible) {
+                count++;
+            }
+            if (this.subjectData) {
+                count++;
+            }
+            if (this.removable) {
+                count++;
+            }
+
+            return count;
         }
     }
 };
@@ -87,10 +111,10 @@ export default {
             class="card card-hover shadow mb-3"
             :class="status === 'active' ? 'card-active' : ''"
         >
-            <div class="card-body d-flex align-items-center p-3">
+            <div class="card-body d-flex align-items-center p-3 flex-row">
                 <div
                     v-if="icon"
-                    class="ps-3 pe-5 fs-1"
+                    class="ps-3 pe-5 fs-1 col-md-2"
                 >
                     <i :class="icon" />
                 </div>
@@ -119,6 +143,7 @@ export default {
                 <div
                     v-else
                     class="flex-grow-1 list"
+                    :class="buttonCount > 2 ? 'col-md-4' : 'col-md-6'"
                 >
                     <div
                         v-if="badgeList"
@@ -153,7 +178,10 @@ export default {
                         </div>
                     </div>
                 </div>
-                <div class="d-flex align-self-center">
+                <div
+                    class="d-flex align-self-center justify-content-end"
+                    :class="buttonCount > 2 ? 'col-md-3' : 'col-md-2'"
+                >
                     <div
                         v-if="subjectData"
                         class="dropdown custom-dd"
