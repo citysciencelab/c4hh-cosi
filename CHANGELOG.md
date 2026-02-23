@@ -31,6 +31,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1515: Filter: saveTo: `url` was fixed. Now reads URL params properly and sets them.
 - Issue \#1535: LayerPreview: Fixed WMS GetMap request building for services with query parameters in URL. The preview now correctly uses `&` instead of `?` when the service URL already contains a `?`.
 - Issue \#1542: MenuContainer: Fixed inconsistent menu behavior between 576px and 768px. Secondary menu now opens in full-screen mode like the main menu.
 - Issue \#1552: Strip HTML tags from layer names in UI components other than layer tree.

@@ -273,6 +273,53 @@ describe("src/modules/filter/components/FilterGeneral.vue", () => {
                 expect(wrapper.vm.isFilterActive).to.be.true;
             });
         });
+        describe("getFilterUrlParams", () => {
+            it("should return parsed FILTER when FILTER is a string", () => {
+                const wrapper = shallowMount(FilterGeneral, {global: {plugins: [store]}}),
+                    expected = {foo: "bar", baz: 1},
+                    appStoreUrlParams = {
+                        FILTER: JSON.stringify(expected),
+                        MENU: JSON.stringify({
+                            any: {currentComponent: "filter", attributes: {shouldNot: "beUsed"}}
+                        })
+                    };
+
+                expect(wrapper.vm.getFilterUrlParams(appStoreUrlParams)).to.deep.equal(expected);
+            });
+
+            it("should return attributes from MENU when FILTER is not a string", () => {
+                const wrapper = shallowMount(FilterGeneral, {global: {plugins: [store]}}),
+                    expectedAttributes = {a: 1, b: "x"},
+                    appStoreUrlParams = {
+                        FILTER: {not: "a string"},
+                        MENU: JSON.stringify({
+                            foo: {currentComponent: "not-filter", attributes: {noop: true}},
+                            bar: {currentComponent: "filter", attributes: expectedAttributes}
+                        })
+                    };
+
+                expect(wrapper.vm.getFilterUrlParams(appStoreUrlParams)).to.deep.equal(expectedAttributes);
+            });
+
+            it("should return empty object if MENU is missing", () => {
+                const wrapper = shallowMount(FilterGeneral, {global: {plugins: [store]}}),
+                    result = wrapper.vm.getFilterUrlParams({});
+
+                expect(result).to.deep.equal({});
+            });
+
+            it("should return empty object if MENU has no filter entry", () => {
+                const wrapper = shallowMount(FilterGeneral, {global: {plugins: [store]}}),
+                    appStoreUrlParams = {
+                        MENU: JSON.stringify({
+                            foo: {currentComponent: "a", attributes: {x: 1}},
+                            bar: {currentComponent: "b", attributes: {y: 2}}
+                        })
+                    };
+
+                expect(wrapper.vm.getFilterUrlParams(appStoreUrlParams)).to.deep.equal({});
+            });
+        });
         describe("generateLayerRules  ", () => {
             it("should generate an empty array as layer rules if the filter is not active", async () => {
                 const wrapper = shallowMount(FilterGeneral, {global: {

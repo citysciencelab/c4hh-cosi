@@ -147,7 +147,7 @@ export default {
             this.setSelectedAccordions(this.transformLayerConfig([...this.layerConfigs.layers, ...this.flattenPreparedLayerGroups], selectedFilterIds));
         }
 
-        this.urlHandler.readFromUrlParams(this.appStoreUrlParams?.[this.type.toUpperCase()], this.layerConfigs, this.mapHandler, params => {
+        this.urlHandler.readFromUrlParams(this.getFilterUrlParams(this.appStoreUrlParams), this.layerConfigs, this.mapHandler, params => {
             this.handleStateForAlreadyActiveLayers(params);
             this.deserializeState({...params, setLateActive: true});
             this.addWatcherToWriteUrl();
@@ -233,6 +233,18 @@ export default {
             });
 
             this.layerRules = tmpRules;
+        },
+
+        /**
+         * Gets the filter url params from the app store url params.
+         * @param {Object} appStoreUrlParams The url params from the app store.
+         * @returns {Object} The filter url params.
+         */
+        getFilterUrlParams (appStoreUrlParams) {
+            if (typeof appStoreUrlParams?.FILTER === "string") {
+                return JSON.parse(appStoreUrlParams.FILTER);
+            }
+            return Object.values(JSON.parse(appStoreUrlParams?.MENU || "{}")).filter(value => value.currentComponent === "filter").map(obj => obj.attributes)[0] || {};
         },
 
         /**
