@@ -206,7 +206,9 @@ export default {
             }
         }
     },
-
+    mounted () {
+        this.$el.querySelector(".dashboard-table").style.height = window.innerHeight - 275 + "px";
+    },
     methods: {
         ...mapMutations("Modules/Dashboard", Object.keys(mutations)),
         ...mapActions("Modules/Dashboard", Object.keys(actions)),
@@ -799,7 +801,6 @@ export default {
                     >
                         <v-data-table-virtual
                             ref="dashboard-table"
-                            height="560"
                             :headers="columns"
                             :items="items"
                             :group-by="[{key: 'groupIndex', order: 'asc'}]"
@@ -999,6 +1000,12 @@ export default {
 <style lang="scss">
 
 #dashboard-wrapper {
+    .v-container {
+        padding: 0 16px;
+    }
+    .v-application__wrap {
+        min-height: inherit;
+    }
     .name-input {
         .v-snack__wrapper {
             min-width: 40vw;
