@@ -68,6 +68,7 @@
               "noSubjectDataSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Fachdaten.",
               "noAnalyses": "Es sind keine Analysen zum Auswählen vorhanden.",
               "noAnalysesSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Analysen.",
+              "noAnnexSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Legende und keine Quellenangaben.",
               "errorDuringPrinting": "Der Bericht konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
             },
             "button": {

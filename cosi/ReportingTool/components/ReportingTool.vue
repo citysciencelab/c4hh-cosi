@@ -726,6 +726,9 @@ export default {
          * @returns {void}
          */
         async addChapterAnnex (cards) {
+            if (cards.length === 0) {
+                return;
+            }
             const sortedItems = [];
 
             this.selectedStatGroups.forEach((group) => {
@@ -1897,6 +1900,7 @@ export default {
                     <v-stepper-window-item :value="5">
                         <ReportingToolStepItem
                             :card-mapping="annexCardMapping"
+                            :nothing-selected-text="$t('additional:modules.cosi.reportingTool.alert.noAnnexSelected')"
                             :title="'5. ' + $t('additional:modules.cosi.reportingTool.annex')"
                             @set-cards="setAnnexCards"
                         />

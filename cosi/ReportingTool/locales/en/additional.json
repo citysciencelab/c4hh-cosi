@@ -68,6 +68,7 @@
             "noSubjectDataSelected": "No content has been selected. The report contains no subject data.",
             "noAnalyses": "There are no analyses available for selection.",
             "noAnalysesSelected": "No content has been selected. The report contains no analyses.",
+            "noAnnexSelected": "No content has been selected. The report contains no legend source notes.",
             "errorDuringPrinting": "The report could not be generated. Please try again."
           },
            "button": {
