@@ -587,6 +587,7 @@ export default {
                         districtLabels = selectedDistricts.map(district => district.getLabel()),
                         population = getTotal(foundItem, districtLabels, foundItem.years[0]);
 
+                    card.population = thousandsSeparator(population);
                     card.data[2].label = this.$t("additional:modules.cosi.districtSelector.population") + ": " + thousandsSeparator(population);
                 });
 

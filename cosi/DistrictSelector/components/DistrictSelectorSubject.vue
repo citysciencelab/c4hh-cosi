@@ -102,19 +102,19 @@ export default {
          * @param {String} wktFeature - The feature as WKT string to be added to the card.
          * @param {Number} buffer - The buffer for the subject area(s).
          * @param {String[]} districtNames - The names of the selected districts.
-         * @param {String} status - The status of the card (e.g., "active").
+         * @param {String} population - The population of the selected districts as a formatted string.
          * @param {Number} districtLevelId - The ID of the district level.
          * @param {String} districtLevelLabel - The label of the district level.
          * @returns {void}
          */
-        addCard (wktFeature, buffer, districtNames, status, districtLevelId, districtLevelLabel) {
+        addCard (wktFeature, buffer, districtNames, population, districtLevelId, districtLevelLabel) {
             this.cards.unshift({
                 badgeList: this.getBadges(),
                 buffer,
                 data: [
                     {value: "Bezugsebene: " + districtLevelLabel},
                     {icon: "bi-map", label: "Gebiete: " + getLimitedDistictName(districtNames)},
-                    {icon: "bi-people", label: "Einwohner: Berechnung läuft..."},
+                    {icon: "bi-people", label: "Einwohner: " + population},
                     {icon: "bi-record-circle", label: "Puffer " + buffer + " m"}
                 ],
                 districtLevelId,
@@ -145,7 +145,7 @@ export default {
                     return;
                 }
 
-                this.addCard(card.bboxGeomWKT, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel);
+                this.addCard(card.bboxGeomWKT, this.buffer, card.selectedDistricts, card.population, card.districtLevelId, card.districtLevelLabel);
             });
             const activeStatIndex = cardsStatistical.findIndex(card => card.status === "active");
 
@@ -362,7 +362,7 @@ export default {
             const bufferedWkt = this.getBufferedFeature(wktString, buffer);
 
             this.activeCard.subjectFeatureWKT = bufferedWkt;
-            this.updateMap(this.activeCard);
+            this.updateMap(this.activeCard, true);
         },
 
         /**
@@ -412,16 +412,19 @@ export default {
         /**
          * Updates the map based on the active card.
          * @param {Object} card - The active card object.
+         * @param {Boolean} requestPopulation - Flag indicating whether to request population data from the WPS service.
          * @returns {void}
          */
-        updateMap (card) {
+        updateMap (card, requestPopulation = false) {
             const subjectFeature = wktParser.decodeFeature(card.subjectFeatureWKT);
 
             this.drawingLayer.getLayerSource().clear();
             this.drawingLayer.getLayerSource().addFeature(subjectFeature);
             this.setBoundingGeometry(subjectFeature.getGeometry());
             this.updateLayerBbox(subjectFeature.getGeometry());
-            this.setPopulationSize(card);
+            if (requestPopulation) {
+                this.setPopulationSize(card);
+            }
         },
 
         /**
