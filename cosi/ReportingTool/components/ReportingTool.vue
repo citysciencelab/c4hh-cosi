@@ -1,4 +1,7 @@
 <script>
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
+import axios from "axios";
+import {computed, markRaw} from "vue";
 import dayjs from "dayjs";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import PDFMaker from "../js/createPdf";
@@ -6,13 +9,13 @@ import {getTotal, getCulmulativeTotal} from "../../Dashboard/utils/operations";
 import {getCenter as getCenterOfExtent} from "ol/extent";
 import {startPrintProcess} from "../../../shared/js/mapfishUtils/startPrintProcess";
 import {unionFeatures} from "../../../valuationPrint/js/unionFeatures";
-import axios from "axios";
 import {baseProportionTemplate, baseFixedTemplateForHamburg, mapfishServerConfig} from "../js/mapfishUtils";
 import {Chart as ChartJS} from "chart.js";
 import isObject from "@shared/js/utils/isObject";
 import {fromExtent} from "ol/geom/Polygon";
 import Feature from "ol/Feature.js";
 import getBasicInfo from "../js/getBasicInfo";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import MapfishDialog from "../../../shared/js/mapfishUtils/mapfishDialog";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 import getCswRecordById from "@shared/js/api/getCswRecordById.js";
@@ -20,12 +23,10 @@ import FlatButton from "../../../../src/shared/modules/buttons/components/FlatBu
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
-import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import categoryMapping from "../assets/categoryMapping.json";
 import ReportingToolStepItem from "./ReportingToolStepItem.vue";
 import {VStepper, VStepperActions, VStepperItem, VStepperHeader, VStepperWindow, VStepperWindowItem} from "vuetify/components/VStepper";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
-import {computed, markRaw} from "vue";
 import {uniqueId} from "@shared/js/utils/uniqueId";
 
 export default {
@@ -1043,6 +1044,7 @@ export default {
             if (frontPageValue === "withoutFrontPage") {
                 return;
             }
+
             const imageName = "overviewMap",
                 feature = this.selectedFeatures.length > 1 ? unionFeatures(this.selectedFeatures) : this.selectedFeatures[0],
                 template = typeof feature !== "undefined" ?
@@ -1088,6 +1090,7 @@ export default {
          */
         async addOverViewPageMinimap (template, bbox, imageName, alignment) {
             template.baseLayer.map.proportion = 0.25;
+            template.baseLayer.map.style.color = [228, 26, 28, 1];
             const {downloadURL: minimapImageUrl} = await this.prepareImage(
                 new Feature({geometry: fromExtent(bbox)}),
                 template,
@@ -1127,7 +1130,7 @@ export default {
          */
         async addInfrastructureMapPageToReport (items) {
             const imageName = "infrastructureMap",
-                feature = this.selectedFeatures.length > 0 ? unionFeatures(this.selectedFeatures) : this.districtLevels[3].districts[0].adminFeature,
+                feature = layerCollection.getLayerById("subject-area").getLayerSource().getFeatures()[0],
                 template = typeof feature !== "undefined" ?
                     this.getObjectCopyWithoutReference(baseProportionTemplate) :
                     this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
@@ -1140,7 +1143,8 @@ export default {
                     template.baseLayer.map.layerIds.unshift(layerId);
                 }
             });
-            template.baseLayer.map.proportion = 0.99;
+
+            template.baseLayer.map.style.color = [235, 138, 62, 1];
             imageOptions = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, "A4 Hochformat", 1).catch(error => console.error(error));
 
             if (typeof imageOptions.downloadURL !== "string") {

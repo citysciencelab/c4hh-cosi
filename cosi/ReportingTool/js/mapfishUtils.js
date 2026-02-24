@@ -4,13 +4,8 @@ const baseProportionTemplate = {
                 type: "mapProportion",
                 proportion: 0.6,
                 style: {
-                    borderSize: 2,
-                    color: [
-                        228,
-                        26,
-                        28,
-                        1
-                    ]
+                    borderSize: 3,
+                    color: [0, 141, 203, 1]
                 },
                 layerIds: [
                     "33780"
