@@ -365,6 +365,26 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
             expect(result[0].name).to.equal("Test Feature");
         });
 
+        it("handles multiple values per attribute by collecting contents in an array", () => {
+            const mockXml = new DOMParser().parseFromString(
+                `<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:app="http://test.org/app">
+                    <gml:featureMember>
+                        <app:TestFeature>
+                            <app:x>5</app:x>
+                            <app:x>5</app:x>
+                            <app:x>5</app:x>
+                        </app:TestFeature>
+                    </gml:featureMember>
+                </wfs:FeatureCollection>`
+                , "application/xml");
+
+            const result = extractFeaturesFromWfsGml(mockXml, ["x"]);
+
+            expect(result).to.be.an("array");
+            expect(result.length).to.equal(1);
+            expect(result[0].x).to.eql(["5", "5", "5"]);
+        });
+
         it("handles multiple features", () => {
             const mockData = [
                     {name: "Feature 1", type: "Point"},

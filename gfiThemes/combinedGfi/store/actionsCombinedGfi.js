@@ -1,6 +1,8 @@
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {Polygon} from "ol/geom.js";
 import Feature from "ol/Feature.js";
+import WFS from "ol/format/WFS";
+import {intersects} from "ol/format/filter";
 import {
     extractColumnsFromResults,
     extractRowsFromResults,
@@ -217,19 +219,34 @@ const actions = {
                 coordinate: clickCoordinates,
                 resolution
             }),
-            coordinatesString = result[0][geometryProviderAttribute],
-            coordinatesArray = coordinatesString.split(" ").map(Number),
+            coordinatesRare = result[0][geometryProviderAttribute],
+            multiCoordinates = Array.isArray(coordinatesRare),
+            coordinatesArray = multiCoordinates
+                ? coordinatesRare.map((string) => string.split(" ").map(Number))
+                : coordinatesRare.split(" ").map(Number),
             coordinates = [];
 
         if (!geometryProviderLayerFromConfig) {
             return;
         }
 
-        for (let i = 0; i < coordinatesArray.length; i += 2) {
-            coordinates.push([coordinatesArray[i], coordinatesArray[i + 1]]);
+        if (multiCoordinates) {
+            coordinatesArray.forEach((coordinatesSubArray) => {
+                const subCoordinates = [];
+
+                for (let i = 0; i < coordinatesSubArray.length; i += 2) {
+                    subCoordinates.push([coordinatesSubArray[i], coordinatesSubArray[i + 1]]);
+                }
+                coordinates.push(subCoordinates);
+            });
+        }
+        else {
+            for (let i = 0; i < coordinatesArray.length; i += 2) {
+                coordinates.push([coordinatesArray[i], coordinatesArray[i + 1]]);
+            }
         }
         if (coordinates.length) {
-            const polygonFeature = new Feature({geometry: new Polygon([coordinates])}),
+            const polygonFeature = new Feature({geometry: new Polygon(multiCoordinates ? coordinates : [coordinates])}),
                 highlightObject = {
                     feature: polygonFeature,
                     layer: {id: geometryProvider.id},
@@ -674,33 +691,31 @@ const actions = {
         }
 
         if (shrunkenGeometry) {
-            const requestGeometry = shrunkenGeometry,
-                coords = requestGeometry.coordinates[0],
-                filter = `
-                        <fes:Filter xmlns:fes="http://www.opengis.net/fes/2.0">
-                            <fes:Intersects>
-                                <fes:ValueReference>${layerConfig.geometryAttribute}</fes:ValueReference>
-                                <gml:Polygon xmlns:gml="http://www.opengis.net/gml/3.2" srsName="${mapProjection}">
-                                    <gml:exterior>
-                                        <gml:LinearRing>
-                                            <gml:posList>${coords.map(coord => coord.join(" ")).join(" ")}</gml:posList>
-                                        </gml:LinearRing>
-                                    </gml:exterior>
-                                </gml:Polygon>
-                            </fes:Intersects>
-                        </fes:Filter>
-                    `,
-                wfsUrl = new URL(serviceUrl);
+            const wfsRequestBuilder = new WFS({version});
 
-            wfsUrl.searchParams.set("service", "WFS");
-            wfsUrl.searchParams.set("version", version);
-            wfsUrl.searchParams.set("request", "GetFeature");
-            wfsUrl.searchParams.set(typeNameParam, typeName);
-            wfsUrl.searchParams.set("filter", filter);
-            wfsUrl.searchParams.set("outputFormat", "text/xml; subtype=gml/3.2.1");
+            const requestBody = wfsRequestBuilder.writeGetFeature({
+                srsName: mapProjection,
+                featureNS: layer.featureNS,
+                featurePrefix: typeName.split(":")[0],
+                featureTypes: [typeName.split(":")[1]],
+                outputFormat: "text/xml; subtype=gml/3.2.1",
+                filter: intersects(
+                    layerConfig.geometryAttribute,
+                    new GeoJSON().readGeometry(shrunkenGeometry),
+                    mapProjection
+                )
+            });
 
             try {
-                const response = await fetch(wfsUrl.toString()),
+                const response = await fetch(
+                        new URL(serviceUrl).toString(),
+                        {
+                            method: "POST",
+                            headers: {"Content-Type": "text/xml"},
+                            body: new XMLSerializer().serializeToString(requestBody)
+                        }
+
+                    ),
                     text = await response.text(),
                     parsedResponse = new DOMParser().parseFromString(text, "application/xml");
 

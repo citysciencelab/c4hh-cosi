@@ -18,6 +18,8 @@
 ### Fixed
 - vcOblique: Fixed Bugs of Marker setting and styling when using VCMap 6.
 - gfiThemes: The GFI theme `combinedGfi` threw errors for the buffer size 0. 0 now works as an option.
+- gfiThemes: The GFI theme `combinedGfi` received `414 URI Too Long` from some services. This issue has been resolved by sending data via POST body rather than GET parameters for the failing scenario.
+- gfiThemes: The GFI theme `combinedGfi` handled polygons with holes in an erroneous fashion, and used the last present hole as the polygon. This has been resolved.
 
 ---
 

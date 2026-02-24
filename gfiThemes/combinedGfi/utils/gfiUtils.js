@@ -397,6 +397,8 @@ export function extractFeaturesFromWfsGml (parsedResponse, attributes, ignoredKe
             return;
         }
 
+        const multiElementCreatedAsArray = {};
+
         featureNode.querySelectorAll("*").forEach(attribute => {
             const localName = attribute.localName || attribute.tagName.match(namespaceRegex)?.[1];
 
@@ -408,7 +410,18 @@ export function extractFeaturesFromWfsGml (parsedResponse, attributes, ignoredKe
             }
             else if ((isObjectConfig && attributeList.some(attr => attr.name === localName)) ||
                     (!isObjectConfig && attributeList.includes(localName))) {
-                feature[localName] = attribute.textContent;
+                if (feature[localName]) {
+                    if (multiElementCreatedAsArray[localName]) {
+                        feature[localName].push(attribute.textContent);
+                    }
+                    else {
+                        feature[localName] = [feature[localName], attribute.textContent];
+                        multiElementCreatedAsArray[localName] = true;
+                    }
+                }
+                else {
+                    feature[localName] = attribute.textContent;
+                }
             }
         });
 

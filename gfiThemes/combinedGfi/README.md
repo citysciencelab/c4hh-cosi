@@ -648,7 +648,7 @@ Jeder Layer in `layersToRequest` kann folgende Parameter haben:
 | `hideEmptyAttributeValues` | Boolean | Wenn true, werden leere Attributwerte nicht angezeigt |
 | `geometryProvider` | Object | Konfiguration für die Geometrie-Bereitstellung |
 | `geometryAttribute` | String | Name des Geometrie-Attributs |
-| `featureType` | String | Feature-Typ des Layers |
+| `featureType` | String | Feature-Typ des Layers im Format `"namespace:FeatureName"` |
 | `gfiAttributes` | String/Object | GFI-Attribut-Konfiguration (wie bei Layer-Konfiguration): `"ignore"`, `"showAll"`, Objekt mit Schlüssel-Wert-Paaren |
 
 ### Attribut-Konfiguration
