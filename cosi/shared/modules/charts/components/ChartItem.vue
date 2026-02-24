@@ -58,6 +58,7 @@ export default {
             default: false
         }
     },
+    emits: ["legend-change"],
     data () {
         return {
             chartdata: {
@@ -71,6 +72,9 @@ export default {
                 }
             },
             chartOptions: {
+                responsive: true,
+                maintainAspectRatio: false,
+                resizeDelay: 0,
                 plugins: {
                     title: {
                         display: true,
@@ -95,6 +99,14 @@ export default {
                             pointStyle: "rectRounded",
                             boxWidth: 30,
                             padding: 15
+                        },
+                        onClick: (e, legendItem, legend) => {
+                            const index = legendItem.datasetIndex,
+                                chart = legend.chart,
+                                isVisible = chart.isDatasetVisible(index),
+                                newHiddenStatus = isVisible;
+
+                            this.$emit("legend-change", legendItem.text, newHiddenStatus);
                         }
                     }
                 }
@@ -193,10 +205,13 @@ export default {
     },
 
     watch: {
-        data () {
-            const availableYears = this.allXValues;
+        data: {
+            handler () {
+                const availableYears = this.allXValues;
 
-            this.selectedXValues = this.selectedXValues.filter(year => availableYears.includes(year));
+                this.selectedXValues = this.selectedXValues.filter(year => availableYears.includes(year));
+            },
+            deep: true
         },
         filteredData () {
             this.loadChartData(this.selectedTagLabel);
@@ -350,62 +365,94 @@ export default {
 };
 </script>
 <template lang="html">
-    <div
-        class="row"
-    >
+    <div class="row">
         <div
-            v-if="data.length > 1"
-            class="d-flex flex-nowrap gap-3 align-items-start mb-3"
+            v-if="data.length > 1 || (data.length === 1 && selectionMode === 'dropdown')"
+            class="d-flex flex-wrap align-items-end gap-2 mb-3 w-100"
         >
-            <TagGroup
-                v-if="selectionMode === 'tags'"
-                class="col mb-3 mt-2"
-                :items="tags"
-                :label="selectionLabel"
-                @update:selected-items="updateSelectedTag"
-            />
-            <Dropdown-Autocomplete
-                v-else
-                :class="[showXValuesFilter ? 'col col-md-5' : '']"
-                :items="dropdownOptions"
-                :label="selectionLabel"
-                :model-value="[selectedTagLabel]"
-                @update:model-value="updateSelectedTag({ label: $event })"
-            />
-            <DropdownAutocomplete
+            <div class="flex-grow-1 min-width-select">
+                <TagGroup
+                    v-if="selectionMode === 'tags'"
+                    class="mt-2"
+                    :items="tags"
+                    :label="selectionLabel"
+                    @update:selected-items="updateSelectedTag"
+                />
+                <Dropdown-Autocomplete
+                    v-else
+                    :items="dropdownOptions"
+                    :label="selectionLabel"
+                    :model-value="[selectedTagLabel]"
+                    @update:model-value="updateSelectedTag({ label: $event })"
+                />
+            </div>
+
+            <div
                 v-if="showXValuesFilter"
-                v-model="selectedXValues"
-                class="col col-md-auto"
-                :items="allXValues"
-                :label="xValuesFilterLabel"
-                multiple
-            />
-            <IconButton
+                class="min-width-filter"
+            >
+                <DropdownAutocomplete
+                    v-model="selectedXValues"
+                    :items="allXValues"
+                    :label="xValuesFilterLabel"
+                    multiple
+                />
+            </div>
+
+            <div
                 v-if="downloadMode"
-                class="download col col-md-1 align-self-center ms-auto"
-                aria="Diagramm herunterladen"
-                icon="bi bi-download"
-                :interaction="() => downloadCurrentChart()"
-                :class-array="['btn-light', 'mb-0']"
+                class="ms-auto pb-1"
+            >
+                <IconButton
+                    aria="Diagramm herunterladen"
+                    icon="bi bi-download"
+                    :interaction="() => downloadCurrentChart()"
+                    :class-array="['btn-light', 'mb-0']"
+                />
+            </div>
+        </div>
+
+        <div class="charts col-12">
+            <BarchartItem
+                v-if="effectiveChartMode === 'bar'"
+                :key="reloadChart"
+                :data="chartdata.bar"
+                :given-options="chartOptions"
+            />
+            <LinechartItem
+                v-if="effectiveChartMode === 'line'"
+                :key="reloadChart"
+                :given-options="chartOptions"
+                :data="chartdata.line"
             />
         </div>
-        <BarchartItem
-            v-if="effectiveChartMode === 'bar'"
-            :key="reloadChart"
-            :data="chartdata.bar"
-            :given-options="chartOptions"
-        />
-        <LinechartItem
-            v-if="effectiveChartMode === 'line'"
-            :key="reloadChart"
-            :given-options="chartOptions"
-            :data="chartdata.line"
-        />
     </div>
 </template>
 <style scoped lang="scss">
-.dropdown-autocomplete {
-    height: 38px;
-    overflow: hidden;
+.min-width-select {
+    min-width: 250px;
+}
+
+.min-width-filter {
+    min-width: 180px;
+}
+
+:deep(.dropdown-autocomplete) {
+    min-height: 38px;
+}
+
+.download {
+    display: inline-flex;
+    justify-content: center;
+}
+
+.charts {
+    position: relative;
+    min-width: 0;
+    display: block;
+    canvas {
+        width: 100%;
+        height: auto;
+    }
 }
 </style>

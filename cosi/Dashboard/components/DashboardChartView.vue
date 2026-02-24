@@ -12,7 +12,8 @@ export default {
     },
     data () {
         return {
-            higherDistrictLevel: []
+            higherDistrictLevel: [],
+            userHiddenStates: {}
         };
     },
     computed: {
@@ -78,6 +79,19 @@ export default {
         },
 
         /**
+         * Determines whether a specific district should be hidden.
+         * @param {Object} column - The district column object.
+         * @param {Object} item - The group object.
+         * @returns {Boolean} True if the district should be hidden, false otherwise.
+         */
+        isItemHidden (column, item) {
+            if (this.userHiddenStates[column.value] !== undefined) {
+                return this.userHiddenStates[column.value];
+            }
+            return this.isHigherDistrictLevel(column.districtLevel) && item.valueType !== "relative";
+        },
+
+        /**
          * Gets the barchart data for a given group.
          * @param {Object} group - The group to get data for
          * @param {Object[]} districtColumns - The district columns to use
@@ -94,7 +108,7 @@ export default {
                         column.value,
                         {
                             value: item[column.value]?.[`${timestampPrefix}${timestamp}`],
-                            hidden: this.isHigherDistrictLevel(column.districtLevel) && item.valueType !== "relative"
+                            hidden: this.isItemHidden(column, item)
                         }
                     ]))
                 ]
@@ -114,7 +128,7 @@ export default {
                 title: "Statistische Daten: " + item.category,
                 data: districtColumns.map(column => ({
                     district: column.value,
-                    hidden: this.isHigherDistrictLevel(column.districtLevel) && item.valueType !== "relative",
+                    hidden: this.isItemHidden(column, item),
                     values: Object.fromEntries(item.years
                         .filter(timestamp => typeof item[column.value]?.[`${timestampPrefix}${timestamp}`] !== "undefined")
                         .map(timestamp => [
@@ -174,6 +188,18 @@ export default {
             );
 
             return [...new Set(timestamps)];
+        },
+
+        /**
+         * Sets the visibility state for a specific legend item.
+         * @param {string} label - The legend item's label
+         * @param {boolean} hidden - Whether the legend item should be hidden
+         */
+        handleLegendChange (label, hidden) {
+            this.userHiddenStates = {
+                ...this.userHiddenStates,
+                [label]: hidden
+            };
         }
     }
 };
@@ -197,6 +223,7 @@ export default {
             :selection-mode="'dropdown'"
             :selection-label="$t('additional:modules.tools.cosi.dashboard.datasetLabel')"
             :show-legend="true"
+            @legend-change="(label, hidden) => handleLegendChange(label, hidden)"
         />
     </AccordionItem>
 </template>
