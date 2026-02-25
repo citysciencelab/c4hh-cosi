@@ -178,9 +178,10 @@ describe("src/modules/controls/startModule/store/actionsStartModule.js", () => {
 
             type = "selectFeatures";
 
-            onClick({commit, rootGetters}, {moduleState, menuSide});
+            onClick({commit, dispatch, rootGetters}, {moduleState, menuSide});
 
             expect(commit.calledOnce).to.be.true;
+            expect(dispatch.calledOnce).to.be.true;
             expect(commit.firstCall.args[0]).to.equals("Menu/switchToRoot");
             expect(commit.firstCall.args[1]).to.equals(menuSide);
         });
