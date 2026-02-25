@@ -95,7 +95,7 @@ export default class PDFMaker {
      * @returns {void}
      */
     addSubHeadline (text) {
-        this.content.push({text, fontSize: 11, bold: true, margin: [0, 0, 4, 0], color: "#3C5F94"});
+        this.content.push({text, fontSize: 10, bold: true, margin: [0, 3, 4, 0], color: "#3C5F94"});
     }
 
     /**

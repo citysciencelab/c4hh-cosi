@@ -643,27 +643,31 @@ export default {
          */
         addChapterStatisticalData (cards) {
             if (!cards.length) {
-                this.addStatsToReport(this.items);
-                this.addDiagram();
                 return;
             }
             if (this.getPageOrientation() === "portrait") {
                 this.pdf.addSectionHeadline("Statistische Daten");
             }
+            let contentAdded = false;
+
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
 
                 if (card.key === "statDataOverview") {
                     this.addStatsToReport(this.items);
+                    contentAdded = true;
                 }
                 else if (card.key === "statDataCharts") {
-                    this.addDiagram();
+                    this.addDiagram(contentAdded);
+                    contentAdded = true;
                 }
                 else if (card.key === "heading") {
                     this.pdf.addChapter(card.value);
+                    contentAdded = true;
                 }
                 else if (card.key === "textArea") {
                     this.pdf.addParagraph(card.value);
+                    contentAdded = true;
                 }
             }
         },
@@ -706,11 +710,17 @@ export default {
                 return;
             }
             this.pdf.addSectionHeadline("Analyse", {pageBreak: "before", pageOrientation: "portrait"});
+
+            let analysisCount = 0;
+
             cards.forEach(card => {
                 if (card.key === "accessibilityAnalyses") {
-                    const analysis = card.items.find(item => item.inputs.title === card.name);
+                    const analysis = card.items.find(item => item.inputs.title === card.name),
+                        needsPageBreak = analysisCount > 0;
 
-                    this.addAccessibilityAnalysis(analysis);
+                    this.addAccessibilityAnalysis(analysis, needsPageBreak);
+
+                    analysisCount++;
                 }
                 else if (card.key === "heading") {
                     this.pdf.addChapter(card.value);
@@ -770,9 +780,10 @@ export default {
         /**
          * Prepares the data of the accessibility analysis and adds it to the report.
          * @param {Object} analysis - Analysis from accessibility analysis component.
+         * @param {Boolean} needsPageBreak - Indicates whether a page break should be inserted before the chapter.
          * @returns {void}
          */
-        addAccessibilityAnalysis (analysis) {
+        addAccessibilityAnalysis (analysis, needsPageBreak) {
             const inputs = {"Verkehrsmittel": this.transportTypeMapping[analysis.inputs.transportType],
                 [analysis.inputs.scaleUnit === "time" ? "Zeit" : "Entfernung"]: analysis.inputs[analysis.inputs.scaleUnit] + " min",
                 ... analysis.inputs.useTravelTimeIndex && {
@@ -781,15 +792,22 @@ export default {
                 "Einwohner": analysis.inputs.einwohner
             };
 
-            this.pdf.addChapter("Erreichbarkeitsanalyse");
+            if (needsPageBreak) {
+                this.pdf.addChapter({text: "Erreichbarkeitsanalyse", pageBreak: "before"});
+            }
+            else {
+                this.pdf.addChapter("Erreichbarkeitsanalyse");
+            }
+
             this.pdf.addSubHeadline(analysis.inputs.title);
 
             this.pdf.addBoxLayout(this.addDetailAnalysisInfo(inputs));
             this.pdf.addLineBreak();
-            this.pdf.addHeadline("Erreichbarkeit ab " + this.modeMapping[analysis.inputs.mode]);
 
             if (analysis.inputs.mode === "facility") {
                 const text = analysis.inputs.selectionCards;
+
+                this.pdf.addHeadline("Erreichbarkeit ab " + this.modeMapping[analysis.inputs.mode]);
 
                 text.forEach(val => {
                     this.pdf.addBulletPoints(val.text);
@@ -797,11 +815,12 @@ export default {
             }
 
             if (typeof analysis.inputs.screenshot !== "undefined") {
-                this.pdf.addImageByUrl(analysis.inputs.screenshot, analysis.inputs.title, {fit: [500, 500], alignment: "left"}, null, false);
+                this.pdf.addImageByUrl(analysis.inputs.screenshot, analysis.inputs.title, {fit: [500, 500], alignment: "left"}, analysis.inputs.mode !== "facility" ? "Erreichbarkeit ab " + this.modeMapping[analysis.inputs.mode] : "");
             }
 
             if (typeof analysis.inputs.screenshotLegend !== "undefined") {
-                this.pdf.addImageByUrl(analysis.inputs.screenshotLegend, analysis.inputs.title + "-legend", {fit: [300, 300], alignment: "left"}, null, false);
+                this.pdf.addLineBreak();
+                this.pdf.addImageByUrl(analysis.inputs.screenshotLegend, analysis.inputs.title + "-legend", {width: 300, alignment: "left"}, null, false);
             }
 
         },
@@ -1052,7 +1071,8 @@ export default {
                     this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
                 {downloadURL: overviewImageUrl, bbox} = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, "A4 Hochformat").catch(error => console.error(error)),
                 headline = this.reportTitle ? this.reportTitle.trim() : "Übersichtskarte",
-                {imageHeight, imageWidth} = frontPageValue === "withNeuwerk" ? {imageHeight: 400, imageWidth: 500} : {imageHeight: 500, imageWidth: 500},
+                {imageHeight, imageWidth} = frontPageValue === "withNeuwerk" ? {imageHeight: 400, imageWidth: 510} : {imageHeight: 500, imageWidth: 500},
+                imageOptions = frontPageValue === "withNeuwerk" ? {width: imageWidth, height: imageHeight, alignment: "center"} : {fit: [imageWidth, imageHeight], alignment: "center"},
                 minimap = await this.addOverViewPageMinimap(template, bbox, "miniMap", "right"),
                 overviewInfos = this.addDetailViewToOverviewPage();
 
@@ -1061,10 +1081,10 @@ export default {
             }
             this.pdf.addMainHeading(headline);
             this.pdf.addLineBreak();
-            this.pdf.addImageByUrl(overviewImageUrl, imageName, {fit: [imageWidth, imageHeight], alignment: "center"});
+            this.pdf.addImageByUrl(overviewImageUrl, imageName, imageOptions);
             this.pdf.addLineBreak();
             if (frontPageValue === "withNeuwerk") {
-                this.pdf.addColumns([await this.addOverViewPageMinimap(template, [461000.14, 5973660.79, 468500.95, 5979481.62], "neuwerkMap", "left"), minimap]);
+                this.pdf.addColumns([await this.addOverViewPageMinimap(template, [461000.14, 5973660.79, 468500.95, 5979481.62], "neuwerkMap", "left"), minimap], 10);
                 this.pdf.addLineBreak();
                 this.pdf.addColumns([overviewInfos]);
             }
@@ -1378,9 +1398,10 @@ export default {
 
         /**
          * Add diagram to report
+         * @param {Boolean} [needsPageBreak = true] - Indicates whether a page break should be inserted before the chapter.
          * @returns {void}
          */
-        addDiagram () {
+        addDiagram (needsPageBreak = true) {
             const data = this.getChartData(this.items, this.selectedDistrictNames, this.areaColumnName, this.categoryInChart, this.initMapping),
                 imageArr = [];
 
@@ -1393,11 +1414,16 @@ export default {
             }
 
             if (imageArr.length) {
-                this.pdf.addChapter({text: "Datenvisualisierung", pageOrientation: "portrait", pageBreak: "before"});
+                const chapterConfig = {text: "Datenvisualisierung", pageOrientation: "portrait"};
+
+                if (needsPageBreak) {
+                    chapterConfig.pageBreak = "before";
+                }
+                this.pdf.addChapter(chapterConfig);
                 imageArr.forEach((image, index) => {
                     this.pdf.addHeadline(Object.keys(this.selectedCategoryInChart[index])[0]);
                     this.pdf.addParagraph(Object.values(this.selectedCategoryInChart[index])[0]);
-                    this.pdf.addImageByUrl(undefined, image, {width: 500, alignment: "center"});
+                    this.pdf.addImageByUrl(undefined, image, {width: 500, alignment: "center"}, null, false);
                     this.pdf.addLineBreak(5);
                 });
             }
