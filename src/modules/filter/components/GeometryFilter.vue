@@ -159,6 +159,17 @@ export default {
             }
             const selectedGeometry = this.getSelectedGeometry(newValue);
 
+            if (newValue >= 0) {
+                if (this.currentMouseMapInteractionsComponent !== this.type) {
+                    this.lastMouseMapInteractionsComponent = this.currentMouseMapInteractionsComponent;
+                }
+                this.setHasMouseMapInteractions(true);
+                this.setCurrentMouseMapInteractionsComponent(this.type);
+            }
+            else {
+                this.setHasMouseMapInteractions(false);
+                this.setCurrentMouseMapInteractionsComponent(this.lastMouseMapInteractionsComponent);
+            }
             if (this.draw) {
                 this.removeInteraction(this.draw);
             }
@@ -208,9 +219,6 @@ export default {
     created () {
         this.setNonReactiveData();
         this.initializeLayer(this.filterGeometry);
-        this.lastMouseMapInteractionsComponent = this.currentMouseMapInteractionsComponent;
-        this.setHasMouseMapInteractions(true);
-        this.changeCurrentMouseMapInteractionsComponent({type: this.type, side: this.menuSide});
         if (this.draw instanceof Draw && this.getSelectedGeometry(this.selectedGeometryIndex)?.type !== "additional") {
             this.draw.setActive(true);
         }
@@ -227,7 +235,7 @@ export default {
 
     methods: {
         ...mapActions("Maps", ["addInteraction", "removeInteraction", "addLayer"]),
-        ...mapActions("Menu", ["changeCurrentMouseMapInteractionsComponent"]),
+        ...mapMutations("Menu", ["setCurrentMouseMapInteractionsComponent"]),
         ...mapMutations("Modules/Filter", ["setHasMouseMapInteractions"]),
         translateKeyWithPlausibilityCheck,
 
@@ -570,6 +578,8 @@ export default {
          * @returns {void}
          */
         reset () {
+            this.setHasMouseMapInteractions(false);
+            this.setCurrentMouseMapInteractionsComponent(this.lastMouseMapInteractionsComponent);
             this.isGeometryVisible = false;
             this.isBufferInputVisible = false;
             this.selectedGeometryIndex = -1;
