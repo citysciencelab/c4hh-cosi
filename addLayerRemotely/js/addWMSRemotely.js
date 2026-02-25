@@ -12,9 +12,10 @@ import {treeSubjectsKey} from "../../../src/shared/js/utils/constants.js";
  * @param {Array} layersToLoad Array of Objects containing the name, title, style, layerOn information of the layers to be added from the WMS capabilities
  * @param {String} folderName Name of the folder in the layer tree
  * @param {Boolean} zoomTo Parameter to indicate whether the layer is turned on
+ * @param {Boolean} verbose Flag if there shall be an alert on successful adding the layer
  * @returns {void}
  */
-export default function importLayers (url, layersToLoad, folderName, zoomTo) {
+export default function importLayers (url, layersToLoad, folderName, zoomTo, verbose = false) {
 
     if (url.includes("http:")) {
         console.error("https required");
@@ -124,17 +125,20 @@ export default function importLayers (url, layersToLoad, folderName, zoomTo) {
                 folderToAdd = parentKey === "external_layers" ? subFolder : folder;
 
                 store.dispatch("addLayerToLayerConfig", {layerConfig: folderToAdd, parentKey: parentKey}, {root: true}).then((addedLayer) => {
-                    if (addedLayer) {
+                    if (verbose) {
+                        const category = addedLayer ? "success" : "warning",
+                            content = addedLayer
+                                ? i18next.t("additional:modules.addLayerRemotely.wms.completeMessage")
+                                : i18next.t("additional:modules.addLayerRemotely.wms.alreadyAdded"),
+                            title = addedLayer
+                                ? i18next.t("additional:modules.addLayerRemotely.wms.alertTitleSuccess")
+                                : i18next.t("additional:modules.addLayerRemotely.wms.errorTitle");
+
                         store.dispatch("Alerting/addSingleAlert", {
-                            content: i18next.t("additional:modules.addLayerRemotely.wms.completeMessage"),
-                            category: "success",
-                            title: i18next.t("additional:modules.addLayerRemotely.wms.alertTitleSuccess")});
-                    }
-                    else {
-                        store.dispatch("Alerting/addSingleAlert", {
-                            content: i18next.t("additional:modules.addLayerRemotely.wms.alreadyAdded"),
-                            category: "warning",
-                            title: i18next.t("additional:modules.addLayerRemotely.wms.errorTitle")});
+                            content: content,
+                            category: category,
+                            title: title
+                        });
                     }
                 });
 

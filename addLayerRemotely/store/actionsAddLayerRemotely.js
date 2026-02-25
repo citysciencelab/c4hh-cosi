@@ -19,9 +19,10 @@ export default {
      * @param {Number} clusterDistance distance in which features will be clustured if set
      * @param {String} gfiTheme name of the gfiTheme
      * @param {String} mouseHoverField name of the field to be shown on mouse hover
+     * @param {Boolean} verbose Flag if there shall be an alert on successful adding the layer
      * @returns {void}
      */
-    addGeoJson ({rootState, rootGetters}, {name, id, geoJSON, styleId, folderName, gfiAttributes, zoomTo = true, clusterDistance = undefined, gfiTheme = "default", mouseHoverField = undefined}) {
+    addGeoJson ({rootState, rootGetters}, {name, id, geoJSON, styleId, folderName, gfiAttributes, zoomTo = true, clusterDistance = undefined, gfiTheme = "default", mouseHoverField = undefined, verbose = false}) {
         const map = mapCollection.getMap("2D"),
             layer = map ? map.getLayers().getArray().find(l => {
                 return l.get("id") === id;
@@ -67,21 +68,24 @@ export default {
             }
 
             store.dispatch("addLayerToLayerConfig", {layerConfig: folderToAdd, parentKey: parentKey}, {root: true}).then((addedLayer) => {
-                if (addedLayer) {
-                    store.dispatch("Alerting/addSingleAlert", {
-                        content: i18next.t("additional:modules.addLayerRemotely.geojson.completeMessage"),
-                        category: "success",
-                        title: i18next.t("additional:modules.addLayerRemotely.geojson.alertTitleSuccess")});
-
-                    if (zoomTo) {
-                        store.dispatch("Maps/zoomToFilteredFeatures", {ids: getFeatureIds(id), layerId: id, zoomOptions: {duration: 0}});
-                    }
+                if (addedLayer && zoomTo) {
+                    store.dispatch("Maps/zoomToFilteredFeatures", {ids: getFeatureIds(id), layerId: id, zoomOptions: {duration: 0}});
                 }
-                else {
+
+                if (verbose) {
+                    const category = addedLayer ? "success" : "warning",
+                        content = addedLayer
+                            ? i18next.t("additional:modules.addLayerRemotely.geojson.completeMessage")
+                            : i18next.t("additional:modules.addLayerRemotely.geojson.alreadyAdded"),
+                        title = addedLayer
+                            ? i18next.t("additional:modules.addLayerRemotely.geojson.alertTitleSuccess")
+                            : i18next.t("additional:modules.addLayerRemotely.geojson.errorTitle");
+
                     store.dispatch("Alerting/addSingleAlert", {
-                        content: i18next.t("additional:modules.addLayerRemotely.geojson.alreadyAdded"),
-                        category: "warning",
-                        title: i18next.t("additional:modules.addLayerRemotely.geojson.errorTitle")});
+                        content: content,
+                        category: category,
+                        title: title
+                    });
                 }
             });
         }
@@ -101,9 +105,9 @@ export default {
             }
         }
 
-        if (mouseHoverField) {
-            rootState.MouseHover.mouseHoverLayers.push(geojsonLayer);
-            rootState.MouseHover.mouseHoverInfos.push({id: geojsonLayer.id, mouseHoverField: geojsonLayer.mouseHoverField});
+        if (mouseHoverField && rootState.Modules?.MouseHover) {
+            rootState.Modules?.MouseHover.mouseHoverLayers.push(geojsonLayer);
+            rootState.Modules?.MouseHover.mouseHoverInfos.push({id: geojsonLayer.id, mouseHoverField: geojsonLayer.mouseHoverField});
         }
 
         window.addEventListener("touchmove", () => {
@@ -126,10 +130,11 @@ export default {
      * @param {Array} layersToLoad Array of Objects containing the name, title, style, layerOn information of the layers to be added from the WMS capabilities
      * @param {String} folderName Name of the folder in the layer tree
      * @param {Boolean} zoomTo Parameter to indicate whether the layer is turned on
+     * @param {Boolean} verbose Flag if there shall be an alert on successful adding the layer
      * @returns {void}
      */
-    addWMS (context, {url, layersToLoad = undefined, folderName = "Externe Daten", zoomTo = false}) {
-        importLayers(url, layersToLoad, folderName, zoomTo);
+    addWMS (context, {url, layersToLoad = undefined, folderName = "Externe Daten", zoomTo = false, verbose = false}) {
+        importLayers(url, layersToLoad, folderName, zoomTo, verbose);
     },
 
     /**

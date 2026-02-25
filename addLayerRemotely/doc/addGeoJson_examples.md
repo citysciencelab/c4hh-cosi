@@ -293,6 +293,12 @@ var geojson = {
 }
 ```
 
+You can add
+```js
+verbose: true
+```
+to the args object to get an alerting after adding the GeoJSON.
+
 ## add geojson to map:
 
 ```js

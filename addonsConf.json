@@ -131,5 +131,8 @@
   },
   "quickResponseCode": {
     "type": "tool"
+  },
+  "addLayerRemotely": {
+    "type": "tool"
   }
 }

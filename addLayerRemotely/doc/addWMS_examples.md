@@ -1,7 +1,7 @@
 # Test via remoteInterface
 AddWMS can be called via the remoteInterface
 
-## addGeojson via remoteInterface
+## addWMS via remoteInterface
 Creates a wms layer with the layerid "krankenhaeuser"
 
 Example:
@@ -18,10 +18,16 @@ parent.postMessage({
             style: ""
         }],
         folderName: "externe Daten",
-        zoomTo :true
+        zoomTo: true
     }
 });
 ```
+
+You can add
+```js
+verbose: true
+```
+to the args object to get an alerting after adding the GeoJSON.
 
 ## Toggle visibility
 Toggle the visibility of the wms layer
@@ -53,10 +59,16 @@ window.postMessage({
             style: ""
         }],
         folderName: "externe Daten",
-        zoomTo :true
+        zoomTo: true
     }
 });
 ```
+
+You can add
+```js
+verbose: true
+```
+to the args object to get an alerting after adding the GeoJSON.
 
 ## Toggle visibility
 Toggle the visibility of the wms layer
