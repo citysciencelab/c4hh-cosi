@@ -85,6 +85,27 @@ export default {
     },
 
     /**
+     * Resets the component using mouse map interaction to the default one.
+     * Note: Only one such component can be active at the same time.
+     * If another one is switched on, the other one is closed and reset to "root";
+     * @param {Object} param store context
+     * @param {Object} param.commit the commit
+     * @param {Object} param.state the state
+     * @param {*} side secondary or main menu
+     */
+    resetCurrentMouseMapInteractionsComponent ({commit, state}, side) {
+        if (state.defaultComponent !== state.currentMouseMapInteractionsComponent) {
+            const otherSide = side === "mainMenu" ? "secondaryMenu" : "mainMenu";
+
+            if (state[otherSide].navigation.currentComponent.type === state.currentMouseMapInteractionsComponent) {
+                commit("switchToRoot", otherSide);
+            }
+
+            commit("setCurrentMouseMapInteractionsComponent", state.defaultComponent);
+        }
+    },
+
+    /**
      * Action triggered when a menu element has been clicked.
      * Add an entry to the navigation and, when the element
      * was a Folder, focus the first child-element.

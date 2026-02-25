@@ -39,6 +39,7 @@
 - Issue \#1556: Fixed an error, if using layers with `layerSequence` in Firefox.
 - Issue \#1557: WFSSearch: fixed selection bug with deeper nested options.
 - Issue \#1561: LayerInformation: Fixed `metaDataCatalogueId` initialization by ensuring it happens before the component is mounted.
+- Issue \#1562: Control: Fixed a bug where modules with mouse interactions used in control would block clicks on the map after being closed.
 - Issue \#1568: Filter - fixed a bug where the gfi didnt responded on feature click while filter module was active. 
 - WFS-T: Multi-update works correctly when multiple layers are configured in the WFS-T tool.
 - i18next: 

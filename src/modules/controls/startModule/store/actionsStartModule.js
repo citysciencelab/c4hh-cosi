@@ -75,6 +75,7 @@ const actions = {
         }
         else {
             commit("Menu/switchToRoot", menuSide, {root: true});
+            dispatch("Menu/resetCurrentMouseMapInteractionsComponent", menuSide, {root: true});
         }
     }
 };
