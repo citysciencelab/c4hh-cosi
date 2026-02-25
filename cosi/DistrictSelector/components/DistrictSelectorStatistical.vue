@@ -107,23 +107,28 @@ export default {
         }
     },
     watch: {
-        cards () {
-            if (!this.isActive && typeof this.activeCard !== "undefined") {
-                const bboxGeomWKT = this.activeCard.subjectFeatureWKT,
-                    decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
+        cards: {
+            handler (val) {
+                if (!this.isActive && typeof this.activeCard !== "undefined") {
+                    const bboxGeomWKT = this.activeCard.subjectFeatureWKT,
+                        decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
 
-                this.addSubjectAreaToLayer(decodedFeature);
-                this.setBoundingGeometry(decodedFeature.getGeometry());
-                this.setSelectedDistrictLevelId(this.activeCard.districtLevelId);
-                this.$nextTick(() => {
-                    this.updateSelectedFeatures(this.activeCard.selectedDistricts);
-                    this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts, this.activeCard);
-                    this.allLayerConfigs.forEach(layerConfig => {
-                        layerConfig.bboxGeometry = decodedFeature.getGeometry();
+                    this.addSubjectAreaToLayer(decodedFeature);
+                    this.setBoundingGeometry(decodedFeature.getGeometry());
+                    this.setSelectedDistrictLevelId(this.activeCard.districtLevelId);
+                    this.$nextTick(() => {
+                        this.updateSelectedFeatures(this.activeCard.selectedDistricts);
+                        this.updateStatFeatures(this.selectedDistrictLevel, this.selectedDistricts, this.activeCard);
+                        this.allLayerConfigs.forEach(layerConfig => {
+                            layerConfig.bboxGeometry = decodedFeature.getGeometry();
+                        });
+                        this.updateLayerBbox(bboxGeomWKT);
                     });
-                    this.updateLayerBbox(bboxGeomWKT);
-                });
-            }
+                }
+
+                this.createCardsFromStatisticalCards(val, this.cardsSubject);
+            },
+            deep: true
         },
 
         /**
@@ -277,12 +282,85 @@ export default {
         },
 
         /**
+         * Creates card objects from the provided statistical card data.
+         * @param {Object[]} cardsStatistical - An array of statistical card data used as input.
+         * @param {Object[]} cards - An array to store the resulting card objects.
+         */
+        createCardsFromStatisticalCards (cardsStatistical, cards) {
+            [...cardsStatistical].reverse().forEach(card => {
+                const foundEqualObject = cards.find(existingCard => {
+                    return JSON.stringify(existingCard.extent) === JSON.stringify(card.extent);
+                });
+
+                if (foundEqualObject) {
+                    return;
+                }
+
+                this.addCard(card.bboxGeomWKT, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel, card.extent);
+            });
+        },
+
+        /**
+         * Adds a new card to the cards array with the provided parameters.
+         * @param {String} wktFeature - The feature as WKT string to be added to the card.
+         * @param {Number} buffer - The buffer for the subject area(s).
+         * @param {String[]} districtNames - The names of the selected districts.
+         * @param {String} status - The status of the card (e.g., "active").
+         * @param {Number} districtLevelId - The ID of the district level.
+         * @param {String} districtLevelLabel - The label of the district level.
+         * @returns {void}
+         */
+        addCard (wktFeature, buffer, districtNames, status, districtLevelId, districtLevelLabel, extent) {
+            this.cardsSubject.unshift({
+                badgeList: this.getBadges(),
+                buffer,
+                data: [
+                    {value: "Bezugsebene: " + districtLevelLabel},
+                    {icon: "bi-map", label: "Gebiete: " + getLimitedDistictName(districtNames)},
+                    {icon: "bi-people", label: "Einwohner: Berechnung läuft..."},
+                    {icon: "bi-record-circle", label: "Puffer " + buffer + " m"}
+                ],
+                districtLevelId,
+                districtNames,
+                drawnFeatureWKT: null,
+                downloadable: false,
+                icon: "bi bi-bounding-box-circles",
+                removable: false,
+                statisticalFeatureWKT: wktFeature,
+                status: status,
+                subjectFeatureWKT: wktFeature,
+                extent: extent
+            });
+        },
+
+        /**
          * Downloads the feature in geojson file.
          * @param {Object} val - The item object.
          * @returns {void}
          */
         exportFeature (val) {
             downloadJsonToFile(featuresToGeoJsonCollection(wktParser.decodeFeatures(val?.features)), val?.districtLevelLabel + ".geojson");
+        },
+
+        /**
+         * Returns an array of badge objects representing subject and statistical data.
+         * @returns {Object[]} An array of badge objects.
+         */
+        getBadges () {
+            return [
+                {
+                    backgroundColor: "#EB8A3E",
+                    color: "rgba(255, 255, 255, 1)",
+                    icon: "bi bi-layers",
+                    text: this.$t("additional:modules.cosi.districtSelector.subjectData")
+                },
+                {
+                    backgroundColor: "#008DCB",
+                    color: "rgba(255, 255, 255, 1)",
+                    icon: "bi bi-bar-chart",
+                    text: this.$t("additional:modules.cosi.districtSelector.statisticalData")
+                }
+            ];
         },
 
         /**

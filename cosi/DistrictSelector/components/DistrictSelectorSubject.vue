@@ -13,7 +13,6 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
 import {getLayerById} from "../utils/getLayerById.js";
-import {getLimitedDistictName} from "../utils/districts.js";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import {mapActions, mapGetters, mapMutations} from "vuex";
@@ -74,11 +73,19 @@ export default {
             return this.cards.find(card => card.status === "active");
         }
     },
+    watch: {
+        cards: {
+            handler (val) {
+                this.toggleCardStatus(val.findIndex(card => card.status === "active"));
+            },
+            deep: true
+        }
+    },
     created () {
         this.drawingLayer = getLayerById("subject-area");
         this.drawingLayer.getLayer().setVisible(true);
 
-        this.createCardsFromStatisticalCards(this.cardsStatistical, this.cards);
+        this.setActiveCardsFromStatisticalCards(this.cardsStatistical);
 
         if (this.activeCard) {
             this.buffer = this.activeCard.buffer;
@@ -100,64 +107,17 @@ export default {
         ...mapMutations("Modules/DistrictSelector", ["setSelectedInteraction", "setSelectedDistrictLevelId", "setBoundingGeometry"]),
 
         /**
-         * Adds a new card to the cards array with the provided parameters.
-         * @param {String} wktFeature - The feature as WKT string to be added to the card.
-         * @param {Number} buffer - The buffer for the subject area(s).
-         * @param {String[]} districtNames - The names of the selected districts.
-         * @param {String} population - The population of the selected districts as a formatted string.
-         * @param {Number} districtLevelId - The ID of the district level.
-         * @param {String} districtLevelLabel - The label of the district level.
+         * set active card from the provided statistical card data.
+         * @param {Object[]} cardsStatistical - An array of statistical card data used as input.
          * @returns {void}
          */
-        addCard (wktFeature, buffer, districtNames, population, districtLevelId, districtLevelLabel) {
-            this.cards.unshift({
-                badgeList: this.getBadges(),
-                buffer,
-                data: [
-                    {value: "Bezugsebene: " + districtLevelLabel},
-                    {icon: "bi-map", label: "Gebiete: " + getLimitedDistictName(districtNames)},
-                    {icon: "bi-people", label: "Einwohner: " + population},
-                    {icon: "bi-record-circle", label: "Puffer " + buffer + " m"}
-                ],
-                districtLevelId,
-                districtNames,
-                drawnFeatureWKT: null,
-                downloadable: false,
-                icon: "bi bi-bounding-box-circles",
-                removable: false,
-                statisticalFeatureWKT: wktFeature,
-                status: "",
-                populationAlert: null,
-                populationAlertKey: 0,
-                subjectFeatureWKT: this.getBufferedFeature(wktFeature, buffer)
-            });
-        },
-
-
-        /**
-         * Creates card objects from the provided statistical card data.
-         * @param {Object[]} cardsStatistical - An array of statistical card data used as input.
-         * @param {Object[]} cards - An array to store the resulting card objects.
-         */
-        createCardsFromStatisticalCards (cardsStatistical, cards) {
-            [...cardsStatistical].reverse().forEach(card => {
-                const foundEqualObject = cards.find(existingCard => {
-                    return existingCard.statisticalFeatureWKT === card.bboxGeomWKT;
-                });
-
-                if (foundEqualObject) {
-                    return;
-                }
-
-                this.addCard(card.bboxGeomWKT, this.buffer, card.selectedDistricts, card.population, card.districtLevelId, card.districtLevelLabel);
-            });
+        setActiveCardsFromStatisticalCards (cardsStatistical) {
             const activeStatIndex = cardsStatistical.findIndex(card => card.status === "active");
 
             if (activeStatIndex !== -1) {
                 this.cards.forEach(card => {
                     card.status = "";
                 });
-                this.cards[activeStatIndex].status = "active";
                 this.setActiveCard(activeStatIndex);
             }
         },
@@ -392,7 +352,7 @@ export default {
             const activeIndex = this.cards.findIndex(card => card.status === "active");
 
             if (activeIndex === index) {
-                this.updateMap(this.activeCard);
+                this.setActiveCard(index);
                 return;
             }
             if (activeIndex !== -1) {

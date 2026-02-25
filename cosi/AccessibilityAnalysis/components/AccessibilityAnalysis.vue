@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import deepEqual from "deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import Feature from "ol/Feature";
 import {featureToGeoJson, featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geoJsonCollectionToFeatures} from "../../utils/features/convertFromGeoJson";
@@ -46,6 +47,7 @@ import travelTimeIndex from "../assets/inrix_traveltimeindex_2021.json";
 import uniq from "../../utils/array/uniq";
 import VectorLayer from "ol/layer/Vector.js";
 import {VSnackbar} from "vuetify/components/VSnackbar";
+import wktParser from "../../utils/wktParser";
 import WPS from "@shared/js/api/wps.js";
 import {Polygon} from "ol/geom";
 
@@ -162,7 +164,7 @@ export default {
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Maps", ["clickCoordinate", "getVisibleLayerList", "projectionCode"]),
         ...mapGetters("Modules/AccessibilityAnalysis", Object.keys(getters)),
-        ...mapGetters("Modules/DistrictSelector", ["boundingGeometry", "selectedDistrictNames"]),
+        ...mapGetters("Modules/DistrictSelector", ["boundingGeometry", "selectedDistrictNames", "selectionCardsStatisticalData", "selectionCardsSubjectData"]),
         ...mapGetters("Modules/Routing/Directions", ["directionsRouteSource", "directionsRouteLayer", "routingDirections", "settings"]),
         // ...mapGetters("Modules/FeaturesList", ["activeVectorLayerList", "isFeatureActive", "layerMapById"]),
 
@@ -171,7 +173,8 @@ export default {
          * @returns {Object[]} the datasets for card.
          */
         cardDatasets () {
-            const cardData = [];
+            const cardData = [],
+                activeSubCard = this.selectionCardsSubjectData.find(card => card.status === "active");
 
             this.dataSets.forEach(set => {
                 cardData.push(
@@ -184,9 +187,9 @@ export default {
                         title: set.inputs.title,
                         visible: true,
                         subjectData: true,
-                        isSubjectDataArea: set.inputs.isSubjectDataArea,
+                        isSubjectDataArea: set.inputs.isSubjectDataArea && set.inputs.subjectFeatureWKT === activeSubCard.subjectFeatureWKT,
                         subjectDataDisabled: this.selectedDistrictNames.length > 0,
-                        badge: set.inputs.isSubjectDataArea ? this.getSubjectDataBadge() : this.getMapPreviewBadge()
+                        badge: set.inputs.isSubjectDataArea && set.inputs.subjectFeatureWKT === activeSubCard.subjectFeatureWKT ? this.getSubjectDataBadge() : this.getMapPreviewBadge()
                     }
                 );
             });
@@ -326,6 +329,25 @@ export default {
             }
         },
 
+        cardDatasets: {
+            handler (newSets, oldSets) {
+                if (typeof oldSets === "undefined") {
+                    return;
+                }
+
+                if (!newSets.length || !newSets.some(set => set.isSubjectDataArea) && oldSets.some(set => set.isSubjectDataArea)) {
+                    const activeCard = this.selectionCardsStatisticalData.find(card => card.status === "active"),
+                        existedCard = this.selectionCardsSubjectData.find(existingCard => {
+                            return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
+                        });
+
+                    existedCard.subjectFeatureWKT = activeCard.bboxGeomWKT;
+                }
+            },
+            deep: true,
+            immediate: true
+        },
+
         /**
          * Forces the slider to rerender on scale unit change.
          * @returns {void}
@@ -402,6 +424,7 @@ export default {
         ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent", "clickCoordinate"]),
         ...mapMutations("Modules/AccessibilityAnalysis", Object.keys(mutations)),
         ...mapActions("Modules/AccessibilityAnalysis", ["getIsochrones"]),
+        ...mapMutations("Modules/DistrictSelector", ["setBoundingGeometry"]),
         ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "removePointMarkerFeature"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapActions("Modules/Routing/Directions", ["reset"]),
@@ -1213,7 +1236,16 @@ export default {
          * @param {index} Number - The index of data set.
          * @returns {void}
          */
-        confirmSubjectDataArea (index) {
+        async confirmSubjectDataArea (index) {
+            if (index !== this.activeSet) {
+                this.$nextTick(() => {
+                    this.setActiveSet(index);
+                });
+
+                await this.$nextTick();
+                await this.$nextTick();
+            }
+
             this.dataSets.forEach(set => {
                 set.inputs.isSubjectDataArea = false;
             });
@@ -1222,7 +1254,36 @@ export default {
                 this.dataSets[index].inputs.isSubjectDataArea = true;
             }
 
+            this.addCardToDistrictSelectorSubject(index);
             this.showSnackbar(index, "confirm");
+        },
+
+        /**
+         * Adds the current card to district selector subject.
+         * @returns {void}
+         */
+        addCardToDistrictSelectorSubject (index) {
+            const activeCard = this.selectionCardsStatisticalData.find(card => card.status === "active"),
+                existedCard = this.selectionCardsSubjectData.find(existingCard => {
+                    return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
+                }),
+                feature = wktParser.encodeFeature(new Feature({geometry: this.isochroneFeatures[0].getGeometry()}));
+
+            this.clearSubjectAreaFromLayer();
+            activeCard.subjectFeatureWKT = feature;
+            existedCard.subjectFeatureWKT = feature;
+            this.dataSets[index].inputs.subjectFeatureWKT = feature;
+        },
+
+        /**
+         * Clears the subject area from the subject-area layer.
+         * @returns {void}
+         */
+        clearSubjectAreaFromLayer () {
+            const layer = this.getLayerById("subject-area");
+
+            layer.getLayerSource().clear();
+            layer.getLayer().setVisible(false);
         },
 
         /**
@@ -1237,6 +1298,15 @@ export default {
             this.dataSets[index].inputs.isSubjectDataArea = false;
 
             this.showSnackbar(index, "reset");
+
+            const activeCard = this.selectionCardsStatisticalData.find(card => card.status === "active"),
+                existedCard = this.selectionCardsSubjectData.find(existingCard => {
+                    return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
+                });
+
+            this.clearSubjectAreaFromLayer();
+            activeCard.subjectFeatureWKT = activeCard.bboxGeomWKT;
+            existedCard.subjectFeatureWKT = activeCard.bboxGeomWKT;
         },
 
         /**
