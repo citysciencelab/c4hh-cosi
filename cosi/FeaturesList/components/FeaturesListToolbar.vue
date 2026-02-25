@@ -35,13 +35,12 @@ export default {
             default: false
         }
     },
-    emits: ["setDistrictFilter", "setLayerFilter", "setSearch", "exportTable"],
+    emits: ["setDistrictFilter", "setLayerFilter", "setSearch"],
     data () {
         return {
             searchString: "",
             selectedDistrictItems: [],
             selectedLayerList: [],
-            exportDetails: false,
             sumUpLayers: false
         };
     },
@@ -169,34 +168,6 @@ export default {
                     hide-details
                     :label="$t('additional:modules.tools.cosi.featuresList.sumUpLayers')"
                     :title="$t('additional:modules.tools.cosi.featuresList.sumUpLayersTooltip')"
-                />
-            </v-col>
-            <v-col class="border-style">
-                <v-btn
-                    id="export-table"
-                    tile
-                    depressed
-                    small
-                    color="grey lighten-1"
-                    :title="$t('additional:modules.tools.cosi.featuresList.exportTable')"
-                    @click="$emit('exportTable', exportDetails)"
-                >
-                    <v-icon
-                        small
-                        left
-                    >
-                        mdi-file-export
-                    </v-icon>
-                    {{ $t('additional:modules.tools.cosi.featuresList.exportTable') }}
-                </v-btn>
-                <br>
-                <v-checkbox
-                    id="export-details"
-                    v-model="exportDetails"
-                    dense
-                    hide-details
-                    :label="$t('additional:modules.tools.cosi.featuresList.exportDetails')"
-                    :title="$t('additional:modules.tools.cosi.featuresList.exportDetails')"
                 />
             </v-col>
         </v-row>

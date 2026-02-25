@@ -45,7 +45,6 @@ export default {
             districtFilter: [],
             layerFilter: [],
             expanded: [],
-            filterProps: {},
             filteredItems: [],
             excludedPropsForExport: [
                 "Icon",
@@ -407,13 +406,6 @@ export default {
             this.columns = [...this.defaultColumns];
         },
 
-        updateFilterProps (newFilterProps) {
-            this.filterProps = {
-                ...this.filterProps,
-                ...newFilterProps
-            };
-        },
-
         /**
          * @todo
          * @param {Object} item - the table item clicked
@@ -494,7 +486,7 @@ export default {
          */
         exportTable (withDetails) {
             const data = this.getActiveItems(),
-                exportData = withDetails ? prepareDetailsExport(data, this.filterProps) : prepareTableExport(data),
+                exportData = withDetails ? prepareDetailsExport(data, {}) : prepareTableExport(data),
                 filename = composeFilename(this.$t("additional:modules.tools.cosi.featuresList.exportFilename"));
 
             exportXlsx([], exportData, filename, {exclude: this.excludedPropsForExport});
@@ -694,7 +686,7 @@ export default {
                 @setSearch="setSearch"
                 @createCharts="createCharts"
                 @createDipasCharts="createDipasCharts"
-                @exportTable="exportTable"
+                @exportTable="exportTable(true)"
             />
             <v-divider />
             <div id="features-list">
@@ -709,7 +701,6 @@ export default {
                             :expanded.sync="expanded"
                             multi-sort
                             item-key="key"
-                            show-select
                             fixed-header
                             show-expand
                             :items-per-page="10"
@@ -721,16 +712,14 @@ export default {
                             @click:row="handleClickRow"
                             @current-items="setFilteredItems"
                         >
-                            <template #expanded-row="{ columns, item }">
+                            <template #expanded-row="{columns: {length: colspan}, item }">
                                 <td
                                     class="detail-view"
-                                    :colspan="columns.length"
+                                    :colspan
                                 >
                                     <DetailView
                                         :item="item"
                                         :prop-blacklist="propBlacklist"
-                                        :filter-props="filterProps"
-                                        @filterProps="updateFilterProps"
                                     />
                                 </td>
                             </template>
