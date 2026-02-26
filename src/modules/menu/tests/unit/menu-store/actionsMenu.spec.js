@@ -187,6 +187,21 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
             expect(commit.secondCall.args[0]).to.equals("setCurrentMouseMapInteractionsComponent");
             expect(commit.secondCall.args[1]).to.equals(type);
         });
+        it("should reset the current mouse map interaction component to default if it is set to another", () => {
+            Object.assign(state, {
+                currentMouseMapInteractionsComponent: "measure"
+            });
+            actions.resetCurrentMouseMapInteractionsComponent({commit, state}, "secondaryMenu");
+
+            expect(commit.calledOnce).to.be.true;
+            expect(commit.firstCall.args[0]).to.equals("setCurrentMouseMapInteractionsComponent");
+            expect(commit.firstCall.args[1]).to.equals(state.defaultComponent);
+        });
+        it("shouldn't do anything on resetCurrentMouseMapInteractionsComponent if the current mouse map interaction is the default one", () => {
+            actions.resetCurrentMouseMapInteractionsComponent({commit, state}, "secondaryMenu");
+
+            expect(commit.callCount).to.equals(0);
+        });
     });
 
     describe("clickedMenuElement", () => {
