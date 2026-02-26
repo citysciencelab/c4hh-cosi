@@ -220,6 +220,16 @@ export default {
         this.isActive = false;
         this.select.setActive(false);
         this.isDragBoxActive = false;
+
+        const activeStatIndex = this.cards.findIndex(card => card.status === "active");
+
+        if (activeStatIndex !== -1) {
+            this.cardsSubject.forEach(card => {
+                card.status = "";
+            });
+
+            this.cardsSubject[activeStatIndex].status = "active";
+        }
     },
     beforeUnmount () {
         document.getElementById("mp-menu-secondaryMenu").style.width = this.sideMenuWidth;

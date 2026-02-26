@@ -187,9 +187,9 @@ export default {
                         title: set.inputs.title,
                         visible: true,
                         subjectData: true,
-                        isSubjectDataArea: set.inputs.isSubjectDataArea && set.inputs.subjectFeatureWKT === activeSubCard.subjectFeatureWKT,
+                        isSubjectDataArea: set.inputs.subjectFeatureWKT === activeSubCard.subjectFeatureWKT,
                         subjectDataDisabled: this.selectedDistrictNames.length > 0,
-                        badge: set.inputs.isSubjectDataArea && set.inputs.subjectFeatureWKT === activeSubCard.subjectFeatureWKT ? this.getSubjectDataBadge() : this.getMapPreviewBadge()
+                        badge: set.inputs.subjectFeatureWKT === activeSubCard.subjectFeatureWKT ? this.getSubjectDataBadge() : this.getMapPreviewBadge()
                     }
                 );
             });
@@ -1247,7 +1247,9 @@ export default {
             }
 
             this.dataSets.forEach(set => {
-                set.inputs.isSubjectDataArea = false;
+                if (set.inputs.subjectFeatureWKT === this.selectionCardsSubjectData.find(card => card.status === "active").subjectFeatureWKT) {
+                    set.inputs.isSubjectDataArea = false;
+                }
             });
 
             if (this.dataSets[index]) {
