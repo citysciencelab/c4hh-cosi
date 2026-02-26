@@ -855,7 +855,7 @@ export default {
                 for (let i = 0; i < this.isochroneFeatures.length; i = i + this.steps.length) {
                     featureUnion = union(featureUnion, featureToGeoJson(this.isochroneFeatures[i]));
                 }
-                formattedFeature = geoJsonCollectionToFeatures(JSON.stringify(featureUnion));
+                formattedFeature = geoJsonCollectionToFeatures(featureUnion);
 
                 return geometryToGeoJson(formattedFeature[0].getGeometry());
             }
@@ -864,11 +864,32 @@ export default {
         },
 
         handlePopulationResponsee (resp) {
-            const parsedData = resp.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData.einwohner,
-                responseResult = JSON.parse(parsedData.ergebnis);
+            const einwohnerNode = resp?.ExecuteResponse?.ProcessOutputs?.Output?.Data?.ComplexData?.einwohner,
+                raw = typeof einwohnerNode?.ergebnis === "string"
+                    ? einwohnerNode.ergebnis.trim()
+                    : "";
 
-            this.dataSets[this.activeSet].inputs.einwohner = thousandsSeparator(responseResult.einwohner_fhh);
+            this.dataSets[this.activeSet].inputs.einwohner = "Nicht vorhanden";
 
+            if (!raw) {
+                return;
+            }
+
+            if (!(raw.startsWith("{") || raw.startsWith("["))) {
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(raw),
+                    value = Number(parsed?.einwohner_fhh);
+
+                if (Number.isFinite(value)) {
+                    this.dataSets[this.activeSet].inputs.einwohner = thousandsSeparator(value);
+                }
+            }
+            catch (e) {
+                console.warn(e);
+            }
         },
         exportAsGeoJson,
         /**
@@ -1124,7 +1145,7 @@ export default {
                 coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].text : "",
                 icon = data.inputs.selectionCards[0]?.icon,
                 population = data.inputs.einwohner,
-                areaInSqKm = data.inputs.areaInSqKm,
+                areaInSqKm = data?.inputs?.areaInSqKm || "-",
                 locale = this.currentLocale || "de-DE";
 
             result.push({label: name, value: title});
