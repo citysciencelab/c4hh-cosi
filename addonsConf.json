@@ -53,6 +53,10 @@
     "path":"gfiThemes/dipasNavigator",
     "type": "gfiTheme"
   },
+  "dipasAnalyticsInsights": {
+    "path":"gfiThemes/dipasAnalyticsInsights",
+    "type": "gfiTheme"
+  },
   "schulinfo": {
     "path":"gfiThemes/schulinfo",
     "type": "gfiTheme"
