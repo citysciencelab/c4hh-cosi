@@ -42,6 +42,9 @@ describe("src/modules/filter/components/GeometryFilter.vue", () => {
                     },
                     actions: {
                         changeCurrentMouseMapInteractionsComponent: stubChangeCurrentMouseMapInteractionsComponent
+                    },
+                    mutations: {
+                        setCurrentMouseMapInteractionsComponent: sinon.stub()
                     }
                 },
                 Modules: {
