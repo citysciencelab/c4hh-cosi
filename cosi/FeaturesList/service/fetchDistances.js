@@ -1,5 +1,4 @@
 import axios from "axios";
-import {getServiceUrl} from "../../utils/radioBridge.js";
 
 /**
  *
@@ -10,7 +9,7 @@ import {getServiceUrl} from "../../utils/radioBridge.js";
  * @param {String} fallbackId alternative routing service
  * @return {number[]} distances
  */
-async function fetchMatrix (sources, destinations, profile, serviceId, fallbackId) {
+async function fetchMatrix (sources, destinations, profile, serviceUrl, fallbackUrl) {
     if (sources.length === 0) {
         return [];
     }
@@ -21,11 +20,11 @@ async function fetchMatrix (sources, destinations, profile, serviceId, fallbackI
         return response;
     }, function (error) {
         const originalRequest = error.config,
-            bkg_url = getServiceUrl(serviceId);
+            bkg_url = serviceUrl;
 
         if (!(error.response?.status === 200) && originalRequest.url.indexOf(bkg_url) === 0 && !originalRequest._retry) {
             originalRequest._retry = true;
-            const uri = originalRequest.url.replace(bkg_url, getServiceUrl(fallbackId));
+            const uri = originalRequest.url.replace(bkg_url, fallbackUrl);
 
             return axios.post(uri, originalRequest.data,
                 {
@@ -34,7 +33,7 @@ async function fetchMatrix (sources, destinations, profile, serviceId, fallbackI
         }
         return Promise.reject(error);
     });
-    const baseUrl = getServiceUrl(serviceId) + "/v2/",
+    const baseUrl = serviceUrl + "/v2/",
         service = "matrix",
         uri = baseUrl + service + "/" + (profile || "foot-walking") + "/json",
         opts = {
@@ -99,15 +98,15 @@ function removeInvalidPoints (sources, destinations, msg) {
  * @param {String} fallbackId alternative routing service
  * @return {Object[]} score
  */
-export async function fetchDistances (sources, destinations, profile, serviceId, fallbackId) {
+export async function fetchDistances (sources, destinations, profile, serviceUrl, fallbackUrl) {
     try {
-        return await fetchMatrix(sources, destinations, profile, serviceId, fallbackId);
+        return await fetchMatrix(sources, destinations, profile, serviceUrl, fallbackUrl);
     }
     catch (err) {
         if (err?.response?.data?.error?.code === 6010) {
             const msg = err?.response?.data?.error.message,
                 ret = removeInvalidPoints(sources, destinations, msg),
-                dists = await fetchMatrix(ret[1], ret[2], profile, serviceId, fallbackId);
+                dists = await fetchMatrix(ret[1], ret[2], profile, serviceUrl, fallbackUrl);
 
             for (const i of ret[0]) {
                 dists.splice(i, 0, null);

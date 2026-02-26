@@ -1,7 +1,7 @@
 import {WFS, GeoJSON} from "ol/format.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
-import wfsRequest from "../../../../src/api/wfs/getFeature";
-import oafRequest from "../../../../src/api/oaf/getOAFFeature";
+import wfsRequest from "@shared/js/api/wfs/getFeature";
+import oafRequest from "@shared/js/api/oaf/getOAFFeature";
 import {transformExtent} from "ol/proj";
 import axios from "axios";
 

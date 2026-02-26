@@ -169,6 +169,10 @@
     "path":"cosi/FeaturesList",
     "type": "tool"
   },
+  "distanceScoreService": {
+    "path": "cosi/FeaturesList/service",
+    "type": "tool"
+  },
   "polygonStyler": {
     "path":"cosi/PolygonStyler",
     "type": "tool"

@@ -1,7 +1,7 @@
-import calculateExtent from "./calculateExtent";
+import {calculateExtent} from "./calculateExtent";
 import Feature from "ol/Feature";
 import utils from "./getFeatures";
-import isObject from "../../../../src/utils/isObject";
+import isObject from "@shared/js/utils/isObject.js";
 
 /**
  * Finds the nearest feature(s) around the passed feature. Use the extent of the feature plus a buffer.

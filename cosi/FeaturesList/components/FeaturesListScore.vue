@@ -8,7 +8,7 @@ import {mapGetters, mapActions} from "vuex";
 import deepEqual from "deep-equal";
 import {VBtn} from "vuetify/components/VBtn";
 import {VCard, VCardTitle, VCardText, VCardActions} from "vuetify/components/VCard";
-import {VIcon} from "vuetify/components/VIcon";
+// import {VIcon} from "vuetify/components/VIcon";
 import {VProgressLinear} from "vuetify/components/VProgressLinear";
 import {VRow} from "vuetify/components/VGrid";
 
@@ -23,7 +23,7 @@ export default {
         VCardActions,
         VCardText,
         VCardTitle,
-        VIcon,
+        // VIcon,
         VProgressLinear,
         VRow,
         Weights
@@ -235,6 +235,7 @@ export default {
             >
                 {{ $t('additional:modules.tools.cosi.featuresList.weighting') }}
             </v-btn>
+            <!--
             <v-btn
                 depressed
                 :disabled="scoringIsOngoing || disableChartButtons"
@@ -255,6 +256,7 @@ export default {
             >
                 <v-icon>mdi-chart-histogram</v-icon>
             </v-btn>
+            -->
         </v-card-actions>
         <Weights
             :is-visible="showWeightsDialog"

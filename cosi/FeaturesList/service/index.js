@@ -30,15 +30,15 @@ function getTransformedCoordinates (features, source, destination = "EPSG:4326")
  * @param {Number} initialBuffer initial buffer
  * @param {Number} bufferIncrement buffer increment
  * @param {String} portalCrs current CRS
- * @param {String} serviceId routing service
- * @param {String} fallbackId alternative routing service
+ * @param {String} serviceUrl routing service
+ * @param {String} fallbackUrl alternative routing service
  * @return {Number} score
  */
-async function layerScore (feature, layerId, initialBuffer, bufferIncrement, portalCrs, serviceId, fallbackId) {
+async function layerScore (feature, layerId, initialBuffer, bufferIncrement, portalCrs, serviceUrl, fallbackUrl) {
     const sourceCoordinates = getTransformedCoordinates([feature], portalCrs),
         features = await findNearestFeatures(layerId, feature, initialBuffer, bufferIncrement, 10, portalCrs),
         destinationCoordinates = getTransformedCoordinates(features, portalCrs),
-        dists = (await fetchDistances(sourceCoordinates, destinationCoordinates, undefined, serviceId, fallbackId))[0];
+        dists = (await fetchDistances(sourceCoordinates, destinationCoordinates, undefined, serviceUrl, fallbackUrl))[0];
 
     if (dists === null) {
         return null;
@@ -74,12 +74,20 @@ async function distanceScore ({getters, commit, rootGetters}, {feature, layers})
     };
 
     for (let j = 0; j < layers.length; j++) {
-        const id = feature.getId().toString() + layers[j].layerId.toString();
+        const id = feature.getId().toString() + layers[j].id;
 
         let mindist = getters.mindists[id];
 
         if (!mindist) {
-            mindist = await layerScore(feature, layers[j].layerId, getters.initialBuffer, getters.bufferIncrement, rootGetters["Maps/projectionCode"], getters.serviceId, getters.fallbackServiceId);
+            mindist = await layerScore(
+                feature,
+                layers[j].id,
+                getters.initialBuffer,
+                getters.bufferIncrement,
+                rootGetters["Maps/projectionCode"],
+                rootGetters.restServiceById(getters.serviceId)?.url,
+                rootGetters.restServiceById(getters.fallbackServiceId)?.url
+            );
             commit("setMindists", {...getters.mindists, [id]: mindist});
         }
 
@@ -91,10 +99,9 @@ async function distanceScore ({getters, commit, rootGetters}, {feature, layers})
             continue;
         }
 
-        // eslint-disable-next-line one-var
-        const value = layers[j].weighting * mindist.dist;
+        const value = (layers[j].weighting ?? 1) * mindist.dist;
 
-        ret.facilities[layers[j].layerId] = {
+        ret.facilities[layers[j].id] = {
             value,
             feature: mindist.feature,
             layerName: layers[j].id,
@@ -103,10 +110,10 @@ async function distanceScore ({getters, commit, rootGetters}, {feature, layers})
         };
 
         vsum += value;
-        wsum += layers[j].weighting;
+        wsum += layers[j].weighting ?? 1;
     }
 
-    ret.average = (vsum / wsum).toFixed(1);
+    ret.average = vsum / wsum;
 
     return ret;
 }
