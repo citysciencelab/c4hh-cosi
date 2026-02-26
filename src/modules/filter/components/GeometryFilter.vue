@@ -39,7 +39,7 @@ import sortBy from "@shared/js/utils/sortBy.js";
  * @vue-data {Boolean} isBufferInputVisible - Shows if buffer input is visible.
  * @vue-data {Boolean} isGeometryVisible - Shows if geometry input is visible.
  * @vue-data {Number} selectedGeometryIndex - The selected geometry Index.
- * @vue-data {String} lastMouseMapInteractionsComponent - The last mouse map interaction.
+ * @vue-data {String} initialMouseMapInteractionsComponent - The initial mouse map interaction.
  */
 export default {
     name: "GeometryFilter",
@@ -117,7 +117,7 @@ export default {
             isBufferInputVisible: false,
             isGeometryVisible: false,
             selectedGeometryIndex: this.initSelectedGeometryIndex === null ? 0 : this.initSelectedGeometryIndex,
-            lastMouseMapInteractionsComponent: "",
+            initialMouseMapInteractionsComponent: "",
             buttonGroupLevels: [
                 {name: translateKeyWithPlausibilityCheck("common:modules.filter.geometryFilter.geometries", key => this.$t(key))},
                 {name: translateKeyWithPlausibilityCheck("common:modules.filter.geometryFilter.regions", key => this.$t(key))}
@@ -160,15 +160,12 @@ export default {
             const selectedGeometry = this.getSelectedGeometry(newValue);
 
             if (newValue >= 0) {
-                if (this.currentMouseMapInteractionsComponent !== this.type) {
-                    this.lastMouseMapInteractionsComponent = this.currentMouseMapInteractionsComponent;
-                }
                 this.setHasMouseMapInteractions(true);
                 this.setCurrentMouseMapInteractionsComponent(this.type);
             }
             else {
                 this.setHasMouseMapInteractions(false);
-                this.setCurrentMouseMapInteractionsComponent(this.lastMouseMapInteractionsComponent);
+                this.setCurrentMouseMapInteractionsComponent(this.initialMouseMapInteractionsComponent);
             }
             if (this.draw) {
                 this.removeInteraction(this.draw);
@@ -219,6 +216,7 @@ export default {
     created () {
         this.setNonReactiveData();
         this.initializeLayer(this.filterGeometry);
+        this.initialMouseMapInteractionsComponent = this.currentMouseMapInteractionsComponent;
         if (this.draw instanceof Draw && this.getSelectedGeometry(this.selectedGeometryIndex)?.type !== "additional") {
             this.draw.setActive(true);
         }
@@ -579,7 +577,7 @@ export default {
          */
         reset () {
             this.setHasMouseMapInteractions(false);
-            this.setCurrentMouseMapInteractionsComponent(this.lastMouseMapInteractionsComponent);
+            this.setCurrentMouseMapInteractionsComponent(this.initialMouseMapInteractionsComponent);
             this.isGeometryVisible = false;
             this.isBufferInputVisible = false;
             this.selectedGeometryIndex = -1;
