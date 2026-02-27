@@ -14,6 +14,9 @@
 ### Deprecated
 
 ### Removed
+- The following packages have been removed:
+  - devDependencies:
+    - text-loader: ^0.0.1
 
 ### Fixed
 
