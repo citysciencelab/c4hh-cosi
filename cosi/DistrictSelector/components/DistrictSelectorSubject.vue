@@ -43,11 +43,9 @@ export default {
             bufferMin: -10000,
             cardCounter: 0,
             drawStyle: {
-                fillColor: [0, 0, 0],
-                fillTransparency: 100,
+                fillColor: [254, 110, 1, 0.2],
                 strokeColor: [254, 110, 1],
-                strokeWidth: 4,
-                polygonDash: [6, 6]
+                strokeWidth: 4
             },
             drawTypeLabels: [{type: "polygon", label: "Fläche"}, {type: "box", label: "Rechteck"}, {type: "circle", label: "Kreis"}],
             drawTypes: ["polygon", "box", "circle"],
@@ -84,21 +82,18 @@ export default {
     created () {
         this.drawingLayer = getLayerById("subject-area");
         this.drawingLayer.getLayer().setVisible(true);
-
+        this.setLayerStyle(this.drawingLayer.getLayer(), 0.2);
         this.setActiveCardsFromStatisticalCards(this.cardsStatistical);
-
-        if (this.activeCard) {
-            this.setBuffer(this.activeCard.buffer);
-        }
-        this.cardsStatistical.forEach((card, index) => {
-            if (card.status === "active") {
-                this.toggleCardStatus(index);
-            }
-        });
-
         this.createCircleOverlay();
     },
+    activated () {
+        this.setLayerStyle(this.drawingLayer.getLayer(), 0.2);
+    },
+    deactivated () {
+        this.setLayerStyle(this.drawingLayer.getLayer(), 0);
+    },
     beforeUnmount () {
+        this.setLayerStyle(this.drawingLayer.getLayer(), 0);
         this.setSelectedInteraction("");
         mapCollection.getMap("2D").removeOverlay(this.circleOverlay);
     },
@@ -115,7 +110,8 @@ export default {
             const activeStatIndex = cardsStatistical.findIndex(card => card.status === "active");
 
             if (activeStatIndex !== -1) {
-                this.cards.forEach(card => {
+                this.cards.forEach((card, index) => {
+                    card.subjectFeatureWKT = cardsStatistical[index].subjectFeatureWKT;
                     card.status = "";
                 });
                 this.setActiveCard(activeStatIndex);
@@ -310,6 +306,20 @@ export default {
             this.activeCard.data[3].label = `Puffer ${nextVal} m`;
 
             this.setSubjectFeature(sourceWkt, nextVal);
+        },
+
+        /**
+         * Sets the style for the given vector layer with the specified opacity for the fill color.
+         * @param {ol/layer/Vector} layer - The vector layer to set the style for.
+         * @param {number} opacity - The opacity value to set for the layer's fill color (between 0 and 1).
+         */
+        setLayerStyle (layer, opacity = 0) {
+            layer.setStyle(
+                {
+                    "fill-color": `rgba(235, 138, 62, ${opacity})`,
+                    "stroke-color": "#EB8A3E",
+                    "stroke-width": 4
+                });
         },
 
         /**

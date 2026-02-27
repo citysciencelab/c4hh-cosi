@@ -21,10 +21,9 @@ function getLayerById (id) {
 
     layer.getLayer().setStyle(
         {
-            "fill-color": "rgba(0, 0, 0, 0)",
+            "fill-color": "rgba(235, 138, 62, 0)",
             "stroke-color": "#EB8A3E",
-            "stroke-line-dash": [6, 6],
-            "stroke-width": 4
+            "stroke-width": 3
         }
     );
 

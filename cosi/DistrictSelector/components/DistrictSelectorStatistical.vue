@@ -142,6 +142,7 @@ export default {
         isDragBoxActive () {
             this.dragBox.setActive(this.isDragBoxActive);
         },
+
         /**
          * Every time the list of layers of the map changes the function prepareDistricts is called.
          * @param {module:ol/layer[]} newLayerList - An array of layers.
@@ -176,7 +177,16 @@ export default {
 
         selectedDistrictsCollection: "transferFeatures",
         selectedDistrictLevelId: ["clearFeatures", "changeSelectedDistrictLevel"],
-
+        selectedTabItem (newValue, oldValue) {
+            if (oldValue.type === "subject") {
+                this.cardsSubject.forEach((card, index) => {
+                    this.cards[index].subjectFeatureWKT = card.subjectFeatureWKT;
+                    if (card.status === "active") {
+                        this.toggleCardStatus(index);
+                    }
+                });
+            }
+        },
         visibleSubjectDataLayerConfigs: {
             handler () {
                 if (typeof this.activeSubjectCard !== "undefined") {
@@ -206,23 +216,19 @@ export default {
 
     },
     activated () {
-        this.cardsSubject.forEach((card, index) => {
-            this.cards[index].subjectFeatureWKT = card.subjectFeatureWKT;
-            if (card.status === "active") {
-                this.toggleCardStatus(index);
-            }
-        });
-
+        this.setSelectedFeatureStyle(this.select, 0.2);
         this.isActive = true;
         this.select.setActive(true);
     },
     deactivated () {
         if (!this.activeCard) {
             this.clearFeatures();
+            this.clearSubjectAreaFromLayer();
         }
 
         this.isActive = false;
         this.select.setActive(false);
+        this.setSelectedFeatureStyle(this.select, 0);
         this.isDragBoxActive = false;
 
         const activeStatIndex = this.cards.findIndex(card => card.status === "active");
@@ -303,7 +309,7 @@ export default {
         createCardsFromStatisticalCards (cardsStatistical, cards) {
             [...cardsStatistical].reverse().forEach(card => {
                 const foundEqualObject = cards.find(existingCard => {
-                    return JSON.stringify(existingCard.extent) === JSON.stringify(card.extent);
+                    return JSON.stringify(existingCard.districtNames.sort()) === JSON.stringify(card.selectedDistricts.sort());
                 });
 
                 if (foundEqualObject) {
@@ -499,6 +505,21 @@ export default {
         },
 
         /**
+         * Sets the style of the selected features of the select interaction.
+         * @param {ol/interaction/Select} selectInteraction - The select interaction containing the selected features to style.
+         * @param {number} opacity - The opacity value to set for the features fill color (between 0 and 1).
+         */
+        setSelectedFeatureStyle (selectInteraction, opacity = 0) {
+            selectInteraction.style_.fill_.color_ = `rgba(0, 141, 203, ${opacity})`;
+            selectInteraction.getFeatures().forEach(feature => {
+                feature.setStyle(new Style({
+                    fill: new Fill({color: `rgba(0, 141, 203, ${opacity})`}),
+                    stroke: new Stroke({color: "rgba(0, 141, 203, 1)", width: 8})
+                }));
+            });
+        },
+
+        /**
          * Sets all needed non reactive data.
          * @returns {void}
          */
@@ -529,8 +550,8 @@ export default {
                         return layer.get("id") === this.selectedDistrictLevelId && this.selectedDistrictLevel.filterableValues.includes(feature.get(keyOfAttrName));
                     },
                     style: new Style({
-                        fill: new Fill({color: "rgba(255, 255, 255, 0)"}),
-                        stroke: new Stroke({color: "rgba(33, 132, 251, 1)", width: 8})
+                        fill: new Fill({color: "rgba(0, 141, 203, 0.2)"}),
+                        stroke: new Stroke({color: "rgba(0, 141, 203, 1)", width: 8})
                     }),
                     addCondition: singleClick,
                     removeCondition: singleClick
@@ -585,8 +606,8 @@ export default {
             const extent = calculateExtent(this.selectedFeatures, parseInt(0, 10)),
                 bboxGeom = getBoundingGeometry(this.selectedFeatures, 0);
 
-            if (this.cards.some(card => JSON.stringify(card.extent) === JSON.stringify(extent))) {
-                const index = this.cards.findIndex(card => JSON.stringify(card.extent) === JSON.stringify(extent));
+            if (this.cards.some(card => JSON.stringify(card.selectedDistricts.sort()) === JSON.stringify(this.selectedDistrictNames.sort()))) {
+                const index = this.cards.findIndex(card => JSON.stringify(card.selectedDistricts.sort()) === JSON.stringify(this.selectedDistrictNames.sort()));
 
                 this.toggleCardStatus(index);
                 return;
@@ -595,7 +616,7 @@ export default {
             this.isDragBoxActive = false;
             this.cards.unshift({
                 badgeList: [{
-                    backgroundColor: "rgba(33, 132, 251, 1)",
+                    backgroundColor: "rgba(0, 141, 203, 1)",
                     color: "rgba(255, 255, 255, 1)",
                     icon: "bi bi-bar-chart",
                     text: this.$t("additional:modules.cosi.districtSelector.statisticalData")
