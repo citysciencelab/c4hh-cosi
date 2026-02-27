@@ -286,10 +286,26 @@ export default {
     watch: {
         featuresListItems: "preparesInfrastructureData",
         visibleSubjectDataLayerConfigs: "updateFeaturesList",
-        shouldIncludeLegendInReport (newVal) {
-            if (!newVal && Array.isArray(this.annexCards) && this.annexCards.length) {
-                this.annexCards = this.annexCards.filter(card => card.key !== "legend");
-            }
+        shouldIncludeLegendInReport: {
+            handler (newVal) {
+                if (!Array.isArray(this.annexCards)) {
+                    return;
+                }
+
+                const hasLegend = this.annexCards.some(c => c.key === "legend");
+
+                if (newVal && !hasLegend) {
+                    const mapping = categoryMapping.annex.find(c => c.key === "legend");
+
+                    if (mapping) {
+                        this.annexCards.unshift({...mapping, id: uniqueId("reporting-tool-card-")});
+                    }
+                }
+                else if (!newVal && hasLegend) {
+                    this.annexCards = this.annexCards.filter(c => c.key !== "legend");
+                }
+            },
+            immediate: true
         }
     },
     created () {
@@ -1869,9 +1885,7 @@ export default {
                         />
                     </v-stepper-window-item>
                     <v-stepper-window-item :value="3">
-                        <template
-                            v-if="featuresListItems?.length"
-                        >
+                        <div v-show="featuresListItems?.length">
                             <ReportingToolStepItem
                                 :card-mapping="categoryMapping?.subjectData"
                                 :title="'3. ' + $t('additional:modules.cosi.reportingTool.subjectData')"
@@ -1906,9 +1920,9 @@ export default {
                                     </div>
                                 </template>
                             </ReportingToolStepItem>
-                        </template>
+                        </div>
                         <AlertMessage
-                            v-else
+                            v-show="!featuresListItems?.length"
                             :text="$t('additional:modules.cosi.reportingTool.alert.noSubjectData')"
                             type="noData"
                         />
