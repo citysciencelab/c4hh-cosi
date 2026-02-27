@@ -29,7 +29,7 @@ const state = {
         "wheelchair": {},
         "default": {
             time: {
-                value: 20,
+                value: 10,
                 max: 120,
                 min: 0
             },
