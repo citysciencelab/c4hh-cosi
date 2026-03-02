@@ -9,7 +9,7 @@
                     "points": "Points",
                     "pointMode": "Accessibility from a reference point",
                     "facilityMode": "Accessibility from selected subject data",
-                    "pathMode": "Accessibility from a route",
+                    "routeMode": "Accessibility from a route",
                     "facilities": "Subject Data",
                     "referToPath": "To a path",
                     "onePoint": "Only one point",

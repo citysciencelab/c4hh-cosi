@@ -9,7 +9,7 @@
                     "points": "Punkte",
                     "pointMode": "Erreichbarkeit ab einem Referenzpunkt",
                     "facilityMode": "Erreichbarkeit ab ausgewählter Fachdaten",
-                    "pathMode": "Erreichbarkeit ab einer Route",
+                    "routeMode": "Erreichbarkeit ab einer Route",
                     "facilities": "Fachdaten",
                     "referToPath": "Route",
                     "onePoint": "Nur ein Punkt",

@@ -1575,7 +1575,7 @@ export default {
             @update:model-value="updateDistanceOrTime"
         />
         <div
-            v-if="transportType === 'driving-car' && scaleUnit === 'time' && mode === 'point'"
+            v-if="transportType === 'driving-car' && scaleUnit === 'time' && activeMode.type === 'point'"
             class="mb-3"
         >
             <SwitchInput
