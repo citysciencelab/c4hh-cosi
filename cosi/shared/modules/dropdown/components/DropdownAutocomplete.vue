@@ -2,6 +2,7 @@
 import {VAutocomplete} from "vuetify/components/VAutocomplete";
 import {VCheckboxBtn} from "vuetify/components/VCheckbox";
 import {VChip} from "vuetify/components/VChip";
+import {VDivider} from "vuetify/components/VDivider";
 import {VListItem, VListSubheader} from "vuetify/components/VList";
 import {VSkeletonLoader} from "vuetify/components/VSkeletonLoader";
 
@@ -11,6 +12,7 @@ export default {
         VAutocomplete,
         VCheckboxBtn,
         VChip,
+        VDivider,
         VListItem,
         VListSubheader,
         VSkeletonLoader

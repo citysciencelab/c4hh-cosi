@@ -25,6 +25,7 @@ import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import categoryMapping from "../assets/categoryMapping.json";
 import ReportingToolStepItem from "./ReportingToolStepItem.vue";
+import {VDivider} from "vuetify/components/VDivider";
 import {VStepper, VStepperActions, VStepperItem, VStepperHeader, VStepperWindow, VStepperWindowItem} from "vuetify/components/VStepper";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import {uniqueId} from "@shared/js/utils/uniqueId";
@@ -39,6 +40,7 @@ export default {
         SwitchInput,
         TagGroup,
         ToolInfo,
+        VDivider,
         VStepper,
         VStepperActions,
         VStepperItem,

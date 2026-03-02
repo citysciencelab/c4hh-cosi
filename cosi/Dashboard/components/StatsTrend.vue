@@ -1,10 +1,12 @@
 <script>
 import {getTrendStyle, getTrend} from "../utils/trends";
+import {VIcon} from "vuetify/components/VIcon";
 import {VTooltip} from "vuetify/components/VTooltip";
 
 export default {
     name: "StatsTrend",
     components: {
+        VIcon,
         VTooltip
     },
     props: {
