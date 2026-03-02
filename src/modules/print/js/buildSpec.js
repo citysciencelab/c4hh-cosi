@@ -1,6 +1,6 @@
 import Feature from "ol/Feature.js";
 import {GeoJSON} from "ol/format.js";
-import {Image, Tile, Vector} from "ol/layer.js";
+import {Image, Tile, Vector, Heatmap} from "ol/layer.js";
 import {MVTEncoder} from "@geoblocks/print";
 import Geometry from "ol/geom/Geometry.js";
 import {Point} from "ol/geom.js";
@@ -22,6 +22,7 @@ import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createSty
 import {getRulesForFeature} from "@masterportal/masterportalapi/src/vectorStyle/lib/getRuleForIndex.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {uniqueId} from "@shared/js/utils/uniqueId.js";
+import {buildHeatmapPng} from "../utils/buildHeatmapPng.js";
 
 const BuildSpecModel = {
     defaults: {
@@ -274,11 +275,27 @@ const BuildSpecModel = {
                 returnLayer = this.getDrawLayerInfo(layer, extent);
             }
             else if (layer instanceof Vector) {
-                features = source.getFeaturesInExtent(extent);
+                features = source.getFeaturesInExtent(this.lastPrintedExtent);
 
                 if (features.length > 0) {
-                    returnLayer = this.buildVector(layer, features, extent);
+                    returnLayer = this.buildVector(layer, features, this.lastPrintedExtent);
                 }
+            }
+            else if (layer instanceof Heatmap) {
+                await buildHeatmapPng(layer).then(async (heatmap) => {
+                    let heatmapImage = heatmap;
+
+                    if (heatmapImage.imageUrl === "empty") {
+                        heatmapImage = await buildHeatmapPng(layer);
+                    }
+
+                    returnLayer = {
+                        type: "image",
+                        opacity: 1,
+                        baseURL: heatmapImage.imageUrl,
+                        extent: heatmapImage.heatmapExtent
+                    };
+                });
             }
         }
 

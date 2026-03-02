@@ -8,6 +8,7 @@
 ### __Breaking Changes__
 
 ### Added
+- PrintMap: Heatmap layers are now included in the print.
 
 ### Changed
 
