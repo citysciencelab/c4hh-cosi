@@ -422,7 +422,8 @@ export default {
          * @todo Refactor to vue when MP Core is updated
          * @returns {Object} the layer model from the MP core
          */
-        initializeLayer (layerId) {
+        initializeLayer () {
+        // initializeLayer (layerId) {
             // if (!getModelByAttributes({id: layerId})) {
             //     addModelsByAttributes({id: layerId});
             // }

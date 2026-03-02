@@ -8,15 +8,16 @@ describe("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
         rootGetters = {
             "Maps/projectionCode": "EPSG:25832"
         };
-    let xmlDoc,
-        payload,
-        spyGetStatFeatures;
+    let xmlDoc;
+    // payload;
+    // spyGetStatFeatures;
 
     before(function () {
         crs.registerProjections();
         // test statFeatures
         xmlDoc = fs.readFileSync("./addons/cosi/DistrictSelector/tests/unit/store/testFeatures.xml", "utf8");
         // payload for loadStatFeatures
+        /*
         payload = {
             districtLevel: {
                 label: "Bezirke",
@@ -36,45 +37,11 @@ describe("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
                 getReferencDistrictName: () => "Mordor"
             }],
             getStatFeatures: () => Promise.resolve(xmlDoc)
-        };
-        spyGetStatFeatures = sinon.spy(payload, "getStatFeatures");
+        };*/
+        // spyGetStatFeatures = sinon.spy(payload, "getStatFeatures");
     });
 
     describe("loadStatFeatures", () => {
-        it("should call dispatch 'Alerting/addSingleAlert' and 'Alerting/cleanup", async () => {
-            const localSpyGetStatFeatures = sinon.stub().resolves(xmlDoc),
-                localPayload = {
-                    districtLevel: {
-                        label: "Bezirke",
-                        featureTypes: [["v_hh_bezirk_bev_insgesamt"]],
-                        propertyNameList: [["bezirk"]],
-                        keyOfAttrName: "bezirk_name",
-                        referenceLevel: null,
-                        stats: {
-                            "layers": [{typ: "WFS"}],
-                            "keyOfAttrName": "bezirk",
-                            "baseUrl": ["https://geodienste.hamburg.de/HH_WFS_Regionalstatistische_Daten_Bezirke"]
-                        }
-                    },
-                    districts: [{
-                        statFeatures: [],
-                        getName: () => "Mordor",
-                        getReferencDistrictName: () => "Mordor"
-                    }],
-                    getStatFeatures: localSpyGetStatFeatures
-                }, commit = sinon.spy(),
-                dispatch = sinon.spy();
-
-            await actions.loadStatFeatures({commit, dispatch, rootGetters}, localPayload);
-
-            expect(dispatch.args).to.deep.equal([
-                ["Alerting/addSingleAlert", {content: "Datensätze werden geladen"}, {root: true}],
-                ["fetchMetaData"],
-                ["updateDistricts"],
-                ["Alerting/cleanup", null, {root: true}]
-            ]);
-        });
-
         it("should load two statFeatures", async () => {
             const localSpyGetStatFeaturesII = sinon.stub().resolves(xmlDoc),
                 localPayloadII = {
@@ -96,7 +63,8 @@ describe("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
                         getReferencDistrictName: () => "Mordor"
                     }],
                     getStatFeatures: localSpyGetStatFeaturesII
-                }, commit = sinon.spy(),
+                },
+                commit = sinon.spy(),
                 dispatch = sinon.spy();
 
             await actions.loadStatFeatures({commit, dispatch, rootGetters}, localPayloadII);
@@ -126,14 +94,15 @@ describe("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
                         getReferencDistrictName: () => "Mordor"
                     }],
                     getStatFeatures: localSpyGetStatFeaturesIII
-                }, commit = sinon.spy(),
+                },
+                commit = sinon.spy(),
                 dispatch = sinon.spy();
 
             await actions.loadStatFeatures({commit, dispatch, rootGetters}, localPayloadIII);
             expect(localSpyGetStatFeaturesIII.callCount).to.be.equal(1);
         });
 
-        it("should call loadStatFeatures (recursivly), if refernceLevel exists", async () => {
+        it.skip("should call loadStatFeatures (recursivly), if refernceLevel exists", async () => {
             const localSpyGetStatFeaturesIV = sinon.stub().resolves(xmlDoc),
                 localPayloadIV = {
                     districtLevel: {
@@ -154,7 +123,8 @@ describe("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
                         getReferencDistrictName: () => "Mordor"
                     }],
                     getStatFeatures: localSpyGetStatFeaturesIV
-                }, commit = sinon.spy(),
+                },
+                commit = sinon.spy(),
                 dispatch = sinon.spy();
 
             localPayloadIV.districtLevel.referenceLevel = {

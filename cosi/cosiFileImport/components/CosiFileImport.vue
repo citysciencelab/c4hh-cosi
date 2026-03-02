@@ -17,6 +17,7 @@ import InlineSvg from "vue-inline-svg";
 export default {
     name: "CosiFileImport",
     components: {
+        InlineSvg,
         ToolInfo,
         VSelect,
         VBtn,
@@ -232,7 +233,7 @@ export default {
                         pointImages: this.pointImages,
                         textColors: this.textColors,
                         textSizes: this.textSizes
-                    }, { root: true });
+                    }, {root: true});
                 };
 
                 reader.readAsText(file);
@@ -254,7 +255,7 @@ export default {
             this.newLayer.style.svg = this.svgColor;
             this.newLayer.filterWhiteList = [...new Set([...this.filterWhiteList, this.searchField, ...this.numericalValues.map(x => x.id)])];
 
-            // eslint-disable-next-line one-var
+
             const model = await this.passLayer(this.newLayer);
 
             this.addVectorlayerToMapping(model.attributes);

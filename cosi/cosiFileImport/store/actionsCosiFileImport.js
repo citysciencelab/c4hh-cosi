@@ -3,8 +3,8 @@ import {uniqueId} from "@shared/js/utils/uniqueId.js";
 import layerCollection from "@core/layers/js/layerCollection";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
-import {Fill, Stroke, Style, Circle, Icon} from "ol/style.js";
-import {scaleLinear} from "d3-scale";
+// import {Fill, Stroke, Style, Circle, Icon} from "ol/style.js";
+// import {scaleLinear} from "d3-scale";
 import beautifyKey from "@shared/js/utils/beautifyKey";
 
 const supportedFormats = {
@@ -250,7 +250,7 @@ function addLayerToTree (newLayer) {
  * @param {Object} model - the layer from the imported file
  * @param {Object} attrs - the attrs to set
  * @returns {void}
- */
+
 function setLayerAttributes (model, attrs) {
     model.set({
         ol_uid: attrs.id,
@@ -268,13 +268,13 @@ function setLayerAttributes (model, attrs) {
         attributeWhiteList: attrs.filterWhiteList
     });
 }
+*/
 
 /**
  * Styles the new layer
  * @param {VectorBaseLayer} model - the layer model from the MP core
  * @param {{name: String, id: String, features: module:ol/Feature[]}} newLayer - the layer from the imported file
  * @returns {void}
- */
 function adjustLayerStyling (model, newLayer) {
     const
         layer = model.layer,
@@ -385,7 +385,7 @@ function adjustLayerStyling (model, newLayer) {
 
                 colorOpac.opacity = 0.6;
 
-                // eslint-disable-next-line one-var
+
                 const autoStyle = new Style({
                     fill: new Fill({
                         color: colorOpac.toString()
@@ -426,7 +426,7 @@ function adjustLayerStyling (model, newLayer) {
                 rainbowColor.opacity = 0.6;
                 colorOpac.opacity = 0.6;
 
-                // eslint-disable-next-line one-var
+
                 const autoStyle = new Style({
                     fill: new Fill({
                         color: newLayer.rainbow ? rainbowColor : colorOpac
@@ -444,6 +444,7 @@ function adjustLayerStyling (model, newLayer) {
         }
     }
 }
+ */
 
 /**
  * Checks for chunk of ten in int array
@@ -451,7 +452,6 @@ function adjustLayerStyling (model, newLayer) {
  * @param {Object} newLayer - imported layer
  * @param {Int} chunk - chunk size
  * @returns {void}
- * */
 function checkChunkNode (feature, newLayer, chunk) {
     for (let i = 1; i < 11; i++) {
         if (feature.get(newLayer.autoStyleValue) <= chunk * i) {
@@ -461,13 +461,13 @@ function checkChunkNode (feature, newLayer, chunk) {
 
     return 1;
 }
+*/
 
 /**
  * @description Generates colorScale for given length on base color.
  * @param {String} color color from which colorscale is generated
  * @param {Int} length Number of colors to be generated in colorscale.
  * @returns {Array} ColorScale Array.
- */
 function generateColorScale (color, length) {
     const hslColor = hsl(color),
         colorC = String(hslColor);
@@ -491,6 +491,7 @@ function generateColorScale (color, length) {
     range = [colorB, colorC, colorA];
     return scaleLinear().domain([0, length]).range(range);
 }
+ */
 
 export default {
     passLayer ({commit, dispatch, rootGetters}, newLayer) {

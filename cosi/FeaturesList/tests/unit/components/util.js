@@ -7,7 +7,10 @@ const namedProjections = [
     ["EPSG:4326", "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"]
 ];
 
-// eslint-disable-next-line require-jsdoc
+/**
+ * registerProjections
+ * @returns {void}
+ */
 export function registerProjections () {
     crs.registerProjections(namedProjections);
     i18next.init({

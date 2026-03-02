@@ -115,7 +115,7 @@ export async function updateStatFeaturesFromLTF (ltfFeatures, statFeatures) {
  * @returns {object} The mapping object.
  */
 export async function findMappingObjectByCategory (value, mappingJson) {
-    if (typeof value !== "string" || mappingJson === null) {
+    if (typeof value !== "string" || mappingJson === null || !Array.isArray(mappingJson)) {
         console.error(`prepareStatFeatures.findMappingObjectByCategory: ${value} has to be defined and a string.`);
         return undefined;
     }

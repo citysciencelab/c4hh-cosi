@@ -43,7 +43,6 @@ function mapVectorLayersInFolder (layers, condition, title) {
     // console.log(title);
 
 
-
     return layers.reduce((layerlist, layer) => {
         if (layer[condition]) {
             layerlist.push(createVectorLayerMappingObject(layer, title));
@@ -76,11 +75,13 @@ function flattenFolderLayers (folder, condition) {
  * @param {String} misc - the name to group ungrouped layers by
  * @returns {Object[]} the layer mapping array
  */
-export default function getVectorlayerMapping (topicsConfig, path = ["Fachdaten - Analyse / Simulation"], condition = "isFacility", misc = "Sonstiges") {
+// export default function getVectorlayerMapping (topicsConfig, path = ["Fachdaten - Analyse / Simulation"], condition = "isFacility", misc = "Sonstiges") {
+
+export default function getVectorlayerMapping (topicsConfig, condition = "isFacility", misc = "Sonstiges") {
     // console.log(topicsConfig);
 
     const mapping = [];
-    let vectorlayerHierarchy = topicsConfig.elements[0];
+    const vectorlayerHierarchy = topicsConfig.elements[0];
     // console.log(vectorlayerHierarchy);
 
     // follow the path down the folder structure to the destined folder containing the analysis layers

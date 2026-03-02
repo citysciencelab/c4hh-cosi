@@ -132,7 +132,6 @@ function serializeFeatures (val) {
  * Serialized features
  * @param {Object} state the state parameter
  * @returns {void}
- */
 function serializeScenarios (state) {
     const parser = new GeoJSON();
 
@@ -141,6 +140,7 @@ function serializeScenarios (state) {
                 scenario => serializeScenario(scenario, parser)
             );
 }
+ */
 
 /**
  * Serialized features
@@ -262,10 +262,10 @@ function serializeGeometry (geom) {
  * Serializes drawn features
  * @param {Object} state the state parameter
  * @returns {void}
- */
 function serializeDrawFeatures (state) {
     state.Tools.Draw.layer = serializeFeatures(state.Tools.Draw.layer?.getSource().getFeatures() || []);
 }
+*/
 
 /**
  * Serializes tool datasets

@@ -279,7 +279,7 @@ export default {
             const index = this.mapping.map(e => e.value).indexOf(this.selectedFeature) + value;
 
             if (index === -1) {
-                this.setSelectedFeature(this.mapping[mapping.length - 1].value);
+                this.setSelectedFeature(this.mapping[this.mapping.length - 1].value);
             }
             else if (index === this.mapping.length) {
                 this.setSelectedFeature(this.mapping[0].value);

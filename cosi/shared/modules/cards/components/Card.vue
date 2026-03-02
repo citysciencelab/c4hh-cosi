@@ -3,6 +3,7 @@ import Badges from "../../badges/components/Badges.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 
 export default {
+    // eslint-disable-next-line vue/multi-word-component-names
     name: "Card",
     components: {
         Badges,

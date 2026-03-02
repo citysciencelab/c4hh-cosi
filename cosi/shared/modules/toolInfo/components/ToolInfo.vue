@@ -1,6 +1,6 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
-import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+// import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {mapGetters} from "vuex";
 import {uniqueId} from "@shared/js/utils/uniqueId";
 import {VSkeletonLoader} from "vuetify/components/VSkeletonLoader";
@@ -9,7 +9,7 @@ export default {
     name: "ToolInfo",
     components: {
         AccordionItem,
-        FlatButton,
+        // FlatButton,
         VSkeletonLoader
     },
     props: {

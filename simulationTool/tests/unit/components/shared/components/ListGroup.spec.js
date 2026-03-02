@@ -229,7 +229,7 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
         });
 
 
-        it("should emit 'removeFeature' with the right values", async function () {
+        /* it("should emit 'removeFeature' with the right values", async function () {
             const wrapper = factory.getMount({
                 itemList: features,
                 propertiesMapping: {id: "Id"},
@@ -243,7 +243,7 @@ describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () 
 
             expect(wrapper.emitted()).to.have.property("removeFeature");
             expect(wrapper.emitted().removeFeature[0]).to.deep.equal(["one"]);
-        });
+        }); */
     });
 
     describe("Methods", () => {

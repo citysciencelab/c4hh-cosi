@@ -1,12 +1,6 @@
 <script>
-import {VCard, VCardText} from "vuetify/components/VCard";
-
 export default {
     name: "SimpleCard",
-    components: {
-        VCard,
-        VCardText
-    },
     props: {
         icon: {
             type: String,

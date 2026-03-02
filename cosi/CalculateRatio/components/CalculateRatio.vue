@@ -578,7 +578,7 @@ export default {
                         }
                     });
 
-                    // eslint-disable-next-line
+
                     const checkForLackingData = utils.compensateLackingData(this.featureVals);
 
                     if (checkForLackingData === "error") {

@@ -1,5 +1,5 @@
 
-import {generateSimpleGetters} from "../../../../src/app-store/utils/generators";
+import {generateSimpleGetters} from "../../../../src/shared/js/utils/generators";
 import chartGeneratorState from "./stateChartGenerator";
 
 const getters = {

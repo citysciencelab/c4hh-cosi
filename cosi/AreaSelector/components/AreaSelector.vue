@@ -1,15 +1,13 @@
 <script>
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
-import {mapGetters, mapMutations, mapActions} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import getters from "../store/gettersAreaSelector";
 import mutations from "../store/mutationsAreaSelector";
 import {geomPickerUnlisten, geomPickerSetGeometry, geomPickerGetFeature} from "../../utils/geomPickerHandler";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
 import GeometryPicker from "../../components/GeometryPicker.vue";
 import {Stroke, Style} from "ol/style.js";
-import {featureToGeoJson} from "../../utils/features/convertToGeoJson";
 import Feature from "ol/Feature";
-import {VBtn} from "vuetify/components/VBtn";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
 import GeometryCollection from "ol/geom/GeometryCollection";
@@ -20,8 +18,7 @@ export default {
     name: "AreaSelector",
     components: {
         ToolInfo,
-        GeometryPicker,
-        VBtn
+        GeometryPicker
     },
     data () {
         // non reactive data

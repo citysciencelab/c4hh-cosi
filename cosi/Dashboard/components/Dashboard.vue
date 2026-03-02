@@ -39,6 +39,7 @@ import {VMain} from "vuetify/components/VMain";
 import {VTooltip} from "vuetify/components/VTooltip";
 
 export default {
+    // eslint-disable-next-line vue/multi-word-component-names
     name: "Dashboard",
     components: {
         AlertMessage,
@@ -831,7 +832,12 @@ export default {
                                 </div>
                             </template>
                             <!-- Column Group -->
-                            <template #[`group-header`]="{ item, columns, toggleGroup, isGroupOpen }">
+                            <template
+                                #[`group-header`]="{ item,
+                                                     //eslint-disable-next-line vue/no-template-shadow
+                                                     columns ,
+                                                     toggleGroup, isGroupOpen }"
+                            >
                                 <tr>
                                     <th
                                         :colspan="columns.length"

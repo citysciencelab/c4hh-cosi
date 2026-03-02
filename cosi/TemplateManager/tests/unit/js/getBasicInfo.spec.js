@@ -1,4 +1,4 @@
-import getBasicInfo from "../../../js/getBasicInfo"
+import getBasicInfo from "../../../js/getBasicInfo";
 import sinon from "sinon";
 import {expect} from "chai/index";
 
@@ -12,14 +12,14 @@ describe("addons/cosi/TemplateManager/js/getBasicInfo", () => {
                             getGeometry: () => {
                                 return {
                                     getArea: () => 50000
-                                }
+                                };
                             }
                         }},
                         {getName: () => "foo1-from-level-z", isSelected: true, getReferencDistrictName: () => "foo1-parent", adminFeature: {
                             getGeometry: () => {
                                 return {
                                     getArea: () => 50000
-                                }
+                                };
                             }
                         }}
                     ]
@@ -51,6 +51,7 @@ describe("addons/cosi/TemplateManager/js/getBasicInfo", () => {
                 expected = [
                     {"level-z": {"foo-from-level-z": true}}
                 ];
+
             expect(getBasicInfo.getLevelInfos(selectedDistrictLevel, [])).to.deep.equal(expected);
         });
         it("should return an array with object which holds infos of child and matching parent infos and should ignore isSelected on parent", () => {

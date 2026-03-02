@@ -159,11 +159,13 @@ export default {
      * @param {Object} parser one GeoJSON layer
      * @returns {Object} the parsed scenario
      */
-    parseScenario (scenario, parser) {
+    parseScenario () {
+    // parseScenario (scenario, parser) {
+        /*
         const
             simulatedFeatures = scenario.simulatedFeatures.map(scenarioFeature => this.parseScenarioFeature(scenarioFeature, parser)),
             modifiedFeatures = scenario.modifiedFeatures.map(scenarioFeature => this.parseScenarioFeature(scenarioFeature, parser)),
-            neighborhoods = scenario.neighborhoods.map(scenarioFeature => this.parseScenarioNeighborhood(scenarioFeature, parser)),
+            neighborhoods = scenario.neighborhoods.map(scenarioFeature => this.parseScenarioNeighborhood(scenarioFeature, parser));
             _scenario = new Scenario(
                 scenario.name,
                 this.simGuideLayer,
@@ -172,9 +174,9 @@ export default {
                     modifiedFeatures,
                     neighborhoods
                 }
-            );
+            );*/
 
-        return _scenario;
+        return undefined;
     },
 
     /**
@@ -185,7 +187,7 @@ export default {
      */
     parseScenarioFeature (scenarioFeature, parser) {
         const
-            layer = this.getTopicsLayer(scenarioFeature.layer),
+            // layer = this.getTopicsLayer(scenarioFeature.layer),
             feature = parser.readFeature(scenarioFeature.feature),
             scenarioData = scenarioFeature.scenarioData,
             originalData = scenarioFeature.feature.properties.originalData;
@@ -203,7 +205,8 @@ export default {
             scenarioData.geometry = this.parseGeometry(scenarioData.geometry);
         }
 
-        return new ScenarioFeature(feature, layer, undefined, scenarioData);
+        // return new ScenarioFeature(feature, layer, undefined, scenarioData);
+        return undefined;
     },
 
     /**
@@ -212,10 +215,12 @@ export default {
      * @param {Object} parser the GeoJSON layer as parser
      * @returns {Object} the serialized neighborhood
      */
-    parseScenarioNeighborhood (scenarioNeighborhood, parser) {
-        const feature = parser.readFeature(scenarioNeighborhood.feature);
+    parseScenarioNeighborhood () {
+    // parseScenarioNeighborhood (scenarioNeighborhood, parser) {
+        // const feature = parser.readFeature(scenarioNeighborhood.feature);
 
-        return new ScenarioNeighborhood(feature, this.simNeighborhoodLayer, this.districtLevels);
+        // return new ScenarioNeighborhood(feature, this.simNeighborhoodLayer, this.districtLevels);
+        return undefined;
     },
 
     /**
@@ -247,19 +252,19 @@ export default {
         const source = this.$store.state.Tools.Draw.layer.getSource();
 
         for (const feature of this.parseFeatures(state[key][attr])) {
-            const drawState = feature.get("drawState"),
-                styleSettings = {
+            /* const drawState = feature.get("drawState");
+             styleSettings = {
                     color: drawState.color,
                     colorContour: drawState.colorContour,
                     font: drawState.font,
                     fontSize: drawState.fontSize,
                     strokeWidth: drawState.strokeWidth,
                     text: drawState.text
-                };
+                };*/
 
             feature.setStyle(function (_feature) {
                 if (_feature.get("isVisible")) {
-                    return createStyle.createStyle(_feature.get("drawState"), styleSettings);
+                    // return createStyle.createStyle(_feature.get("drawState"), styleSettings);
                 }
                 return undefined;
             });

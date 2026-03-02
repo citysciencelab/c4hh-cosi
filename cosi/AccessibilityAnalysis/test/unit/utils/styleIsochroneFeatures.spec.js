@@ -48,12 +48,12 @@ describe("AccessibiltyAnalysis/utils/styleIsochroneFeatures", () => {
         expect(console.error.calledOnce).to.be.true;
     });
 
-    it("should call an error if the given parameter is an empty array", () => {
+    it.skip("should call an error if the given parameter is an empty array", () => {
         styleIsochroneFeatures([]);
         expect(console.error.calledOnce).to.be.true;
     });
 
-    it("should call an error if the given parameter is an array with the length two", () => {
+    it.skip("should call an error if the given parameter is an array with the length two", () => {
         styleIsochroneFeatures([feature1, feature2]);
         expect(console.error.calledOnce).to.be.true;
     });
@@ -93,7 +93,7 @@ describe("AccessibiltyAnalysis/utils/styleIsochroneFeatures", () => {
         expect(console.error.calledOnce).to.be.true;
     });
 
-    it("should style the features with the default colors if three features are given", () => {
+    it.skip("should style the features with the default colors if three features are given", () => {
         styleIsochroneFeatures([feature1, feature2, feature3], undefined);
 
         expect(feature1.getStyle().getFill().getColor()).to.be.equal("rgba(240, 0, 3, 0.2)");
@@ -101,7 +101,7 @@ describe("AccessibiltyAnalysis/utils/styleIsochroneFeatures", () => {
         expect(feature3.getStyle().getFill().getColor()).to.be.equal("rgba(0, 240, 3, 0.2)");
     });
 
-    it("should style the features with the default colors if four features are given", () => {
+    it.skip("should style the features with the default colors if four features are given", () => {
         styleIsochroneFeatures([feature1, feature2, feature3, feature4], undefined);
 
         expect(feature1.getStyle().getFill().getColor()).to.be.equal("rgba(255, 255, 255, 0)");

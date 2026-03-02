@@ -13,17 +13,16 @@
 //     }
 // });
 
-import { createApp } from 'vue'
-import { createVuetify } from 'vuetify'
-import { VChip } from 'vuetify/components/VChip'
+import {createVuetify} from "vuetify";
+import {VChip} from "vuetify/components/VChip";
 // import { VRating } from 'vuetify/components/VRating'
 // import { VToolbar } from 'vuetify/components/VToolbar'
 // import { Ripple } from 'vuetify/directives'
 
 const vuetify = createVuetify({
-  components: {
-    VChip
-  }
-})
+    components: {
+        VChip
+    }
+});
 
-export default vuetify
+export default vuetify;

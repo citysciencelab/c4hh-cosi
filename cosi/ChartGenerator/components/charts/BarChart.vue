@@ -9,8 +9,8 @@ import {
     CategoryScale,
     LinearScale
 } from "chart.js";
-import beautifyKey from "../../../../../src/utils/beautifyKey";
-import deepAssign from "../../../../../src/utils/deepAssign";
+import beautifyKey from "../../../../../src/shared/js/utils/beautifyKey";
+import deepAssign from "../../../../../src/shared/js/utils/deepAssign";
 import fixColor from "../../utils/fixColor";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);

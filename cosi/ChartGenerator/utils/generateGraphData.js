@@ -1,6 +1,6 @@
 import {color} from "d3-color";
 import generateColorScale from "./generateColorScale";
-import beautifyKey from "../../../../src/utils/beautifyKey";
+import beautifyKey from "../../../../src/shared/js/utils/beautifyKey";
 
 /**
          * @description Generates the graph component and passes the data dynamically.

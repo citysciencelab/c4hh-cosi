@@ -10,18 +10,18 @@ import dayjs from "dayjs";
  */
 function getSvg (currentPage, pageCount, author, pageOrientation) {
     const footerObject = pageOrientation === "landscape" ? {
-            footerWidth: 845,
-            viewBox: 225.42708,
-            blueboxWidth: 225.43767,
-            pageTextWidth: 213.69656,
-            dateWidth: 114.322624
-        } : {
-            footerWidth: 595,
-            viewBox: 157.42708,
-            blueboxWidth: 157.43767,
-            pageTextWidth: 149.69656,
-            dateWidth: 82.322624
-        };
+        footerWidth: 845,
+        viewBox: 225.42708,
+        blueboxWidth: 225.43767,
+        pageTextWidth: 213.69656,
+        dateWidth: 114.322624
+    } : {
+        footerWidth: 595,
+        viewBox: 157.42708,
+        blueboxWidth: 157.43767,
+        pageTextWidth: 149.69656,
+        dateWidth: 82.322624
+    };
 
     return {
         svg: "<svg\n" +

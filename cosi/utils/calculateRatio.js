@@ -71,7 +71,7 @@ function calculateTotals (results) {
         return results;
     }
 
-    // eslint-disable-next-line one-var
+
     const dataHelpers_total = {
             faktorf_A: filteredResults[0].data.faktorf_A,
             faktorf_B: filteredResults[0].data.faktorf_B,

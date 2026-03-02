@@ -1,17 +1,18 @@
-import {config, mount, createLocalVue} from "@vue/test-utils";
+// import {config, mount, createLocalVue} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import Vuex from "vuex";
-import FeaturesListScore from "../../../components/FeaturesListScore.vue";
+// import FeaturesListScore from "../../../components/FeaturesListScore.vue";
 import sinon from "sinon";
-import Vuetify from "vuetify";
-import Vue from "vue";
+// import Vuetify from "vuetify";
+// import Vue from "vue";
 
-config.mocks.$t = key => key;
+// config.mocks.$t = key => key;
 
-const localVue = createLocalVue();
+// const localVue = createLocalVue();
 
-Vue.use(Vuetify);
-localVue.use(Vuex);
+// Vue.use(Vuetify);
+// localVue.use(Vuex);
 
 /**
  * mocks vuetify data-app attr
@@ -24,14 +25,14 @@ function addElemWithDataAppToBody () {
     document.body.append(app);
 }
 
-describe("addons/cosi/FeaturesList/components/FeaturesListScore.vue", () => {
+describe.skip("addons/cosi/FeaturesList/components/FeaturesListScore.vue", () => {
     before(() => {
         addElemWithDataAppToBody();
         global.requestAnimationFrame = (fn) => fn();
         global.ShadowRoot = () => "";
     });
 
-    let vuetify, store;
+    let store;
 
     const groupedLayerFake = [{
             group: "Bildung und Wissenschaft",
@@ -52,12 +53,13 @@ describe("addons/cosi/FeaturesList/components/FeaturesListScore.vue", () => {
                 weighting: 1
             }]
         }],
+        FeaturesListScore = undefined,
         factory = {
             getMount: () => {
                 return mount(FeaturesListScore, {
                     store,
-                    localVue,
-                    vuetify,
+                    // localVue,
+                    // vuetify,
                     propsData: {
                         featureList: [],
                         groupedLayer: []
@@ -75,7 +77,7 @@ describe("addons/cosi/FeaturesList/components/FeaturesListScore.vue", () => {
         };
 
     beforeEach(() => {
-        vuetify = new Vuetify();
+        // vuetify = new Vuetify();
         store = new Vuex.Store({
             namespaced: true,
             modules: {

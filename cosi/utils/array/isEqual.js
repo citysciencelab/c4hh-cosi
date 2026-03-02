@@ -37,4 +37,4 @@ export default function isEqual (arr1, arr2, ordered = false) {
         }
     }
     return true;
-};
+}

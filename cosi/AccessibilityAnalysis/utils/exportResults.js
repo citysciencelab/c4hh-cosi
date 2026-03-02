@@ -3,7 +3,7 @@ import {downloadJsonToFile} from "../../utils/download";
 import {Point} from "ol/geom.js";
 import Feature from "ol/Feature.js";
 import {filterAllFeatures} from "../../utils/layer/filterAllFeatures";
-import styleJson from '../assets/Erreichbarkeitsanalyse_style.json' assert { type: 'json' };
+// import styleJson from "../assets/Erreichbarkeitsanalyse_style.json" assert { type: "json" };
 
 /**
  * Prepares the export of the results of the supply analysis as geojson
@@ -77,5 +77,5 @@ export function exportAsGeoJson (mapLayer, projectionCode) {
  */
 export function downloadGeoJson (featureCollection) {
     downloadJsonToFile(featureCollection, "Erreichbarkeitsanalyse_CoSI.geojson");
-    downloadJsonToFile(styleJson, "Erreichbarkeitsanalyse_CoSI_styles.json");
+    // downloadJsonToFile(styleJson, "Erreichbarkeitsanalyse_CoSI_styles.json");
 }

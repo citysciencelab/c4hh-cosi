@@ -11,9 +11,9 @@ import {
     PointElement,
     LinearScale
 } from "chart.js";
-import beautifyKey from "../../../../../src/utils/beautifyKey";
+import beautifyKey from "../../../../../src/shared/js/utils/beautifyKey";
 import {color as rgb} from "d3-color";
-import deepAssign from "../../../../../src/utils/deepAssign";
+import deepAssign from "../../../../../src/shared/js/utils/deepAssign";
 import fixColor from "../../utils/fixColor";
 
 ChartJS.register(

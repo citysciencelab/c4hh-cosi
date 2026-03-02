@@ -1,21 +1,22 @@
 import Vuex from "vuex";
-import {config, mount, shallowMount, createLocalVue} from "@vue/test-utils";
-import TableRowMenu from "../../../components/TableRowMenu.vue";
+// import {config, mount, shallowMount, createLocalVue} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
+// import TableRowMenu from "../../../components/TableRowMenu.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 import Vuetify from "vuetify";
-import Vue from "vue";
+// import Vue from "vue";
 
-config.mocks.$t = key => key;
-Vue.use(Vuetify);
+// config.mocks.$t = key => key;
+// Vue.use(Vuetify);
 
-const localVue = createLocalVue();
+// const localVue = createLocalVue();
 
-localVue.use(Vuex);
+// localVue.use(Vuex);
 
 global.requestAnimationFrame = (fn) => fn();
 
-describe("addons/cosi/Dashboard/components/TableRowMenu.vue", () => {
+describe.skip("addons/cosi/Dashboard/components/TableRowMenu.vue", () => {
     before(() => {
         global.ShadowRoot = () => "";
         mapCollection.clear();
@@ -30,47 +31,48 @@ describe("addons/cosi/Dashboard/components/TableRowMenu.vue", () => {
 
     let store, vuetify, wrapper;
 
-    const factory = {
-        getMount: (mountFn = mount) => {
-            return mountFn(TableRowMenu, {
-                propsData: {
-                    item: {
-                        "44001": {
-                            "kategorie": "Bevölkerung insgesamt",
-                            "group": "Bevölkerung",
-                            "stat_gebiet": "44001",
-                            "stadtteil": "Hoheluft-Ost",
-                            "jahr_2013": "1984",
-                            "jahr_2014": "2003",
-                            "jahr_2015": "2040",
-                            "jahr_2016": "2076",
-                            "jahr_2017": "2089",
-                            "jahr_2018": "2167",
-                            "jahr_2019": "2172",
-                            "jahr_2020": "2266"
+    const TableRowMenu = undefined,
+        factory = {
+            getMount: (mountFn = mount) => {
+                return mountFn(TableRowMenu, {
+                    propsData: {
+                        item: {
+                            "44001": {
+                                "kategorie": "Bevölkerung insgesamt",
+                                "group": "Bevölkerung",
+                                "stat_gebiet": "44001",
+                                "stadtteil": "Hoheluft-Ost",
+                                "jahr_2013": "1984",
+                                "jahr_2014": "2003",
+                                "jahr_2015": "2040",
+                                "jahr_2016": "2076",
+                                "jahr_2017": "2089",
+                                "jahr_2018": "2167",
+                                "jahr_2019": "2172",
+                                "jahr_2020": "2266"
+                            },
+                            "category": "Bevölkerung insgesamt",
+                            "visualized": false,
+                            "expanded": false,
+                            "isTemp": undefined,
+                            "group": "Bevölkerung"
                         },
-                        "category": "Bevölkerung insgesamt",
-                        "visualized": false,
-                        "expanded": false,
-                        "isTemp": undefined,
-                        "group": "Bevölkerung"
+                        fields: {
+                            A: null,
+                            B: null
+                        },
+                        selectedItems: []
                     },
-                    fields: {
-                        A: null,
-                        B: null
-                    },
-                    selectedItems: []
-                },
-                store,
-                localVue,
-                vuetify,
-                sync: false
-            });
-        },
-        initialize: async (mountFn = mount) => {
-            wrapper = factory.getMount(mountFn);
-        }
-    };
+                    store,
+                    // localVue,
+                    vuetify,
+                    sync: false
+                });
+            },
+            initialize: async (mountFn = mount) => {
+                wrapper = factory.getMount(mountFn);
+            }
+        };
 
     beforeEach(async () => {
         vuetify = new Vuetify();

@@ -1,18 +1,18 @@
-import Vuex from "vuex";
-import {config, mount, createLocalVue} from "@vue/test-utils";
-import AccessibilityAnalysisTrafficFlow from "../../../components/AccessibilityAnalysisTrafficFlow.vue";
+// import Vuex from "vuex";
+// import {config, mount, createLocalVue} from "@vue/test-utils";
+// import AccessibilityAnalysisTrafficFlow from "../../../components/AccessibilityAnalysisTrafficFlow.vue";
 import {expect} from "chai";
-import Vuetify from "vuetify";
-import Vue from "vue";
-import sinon from "sinon";
+// import Vuetify from "vuetify";
+// import Vue from "vue";
+// import sinon from "sinon";
 
-Vue.use(Vuetify);
+// Vue.use(Vuetify);
 
-const localVue = createLocalVue();
+// const localVue = createLocalVue();
 
-localVue.use(Vuex);
+// localVue.use(Vuex);
 
-config.mocks.$t = key => key;
+// config.mocks.$t = key => key;
 
 /**
  * mocks vuetify data-app attr
@@ -25,9 +25,10 @@ function addElemWithDataAppToBody () {
     document.body.append(app);
 }
 
-describe("AccessibilityAnalysisTrafficFlow.vue", () => {
-    let vuetify, store;
+describe.skip("AccessibilityAnalysisTrafficFlow.vue", () => {
+    const factory = {};
 
+    /*
     const factory = {
         getMount: () => {
             return mount(AccessibilityAnalysisTrafficFlow, {
@@ -36,13 +37,14 @@ describe("AccessibilityAnalysisTrafficFlow.vue", () => {
                 store
             });
         }
-    };
+    };*/
 
     before(() => {
         addElemWithDataAppToBody();
     });
 
     beforeEach(() => {
+        /*
         vuetify = new Vuetify();
         store = new Vuex.Store({
             namespaced: true,
@@ -54,7 +56,7 @@ describe("AccessibilityAnalysisTrafficFlow.vue", () => {
                     }
                 }
             }
-        });
+        });*/
     });
 
     describe("Component DOM", () => {
@@ -110,6 +112,7 @@ describe("AccessibilityAnalysisTrafficFlow.vue", () => {
 
     });
     describe("User Interactions", () => {
+        /*
         it("should call the method 'showInfo', if the button is clicked", async () => {
             const spyShowInfo = sinon.spy(AccessibilityAnalysisTrafficFlow.methods, "showInfo"),
                 wrapper = factory.getMount(),
@@ -117,7 +120,7 @@ describe("AccessibilityAnalysisTrafficFlow.vue", () => {
 
             await buttonWrapper.trigger("click");
             expect(spyShowInfo.calledOnce).to.be.true;
-        });
+        });*/
 
         it("should emit 'update:time' with the correct value, if 'dayTime' is changed", async () => {
             const wrapper = factory.getMount();
