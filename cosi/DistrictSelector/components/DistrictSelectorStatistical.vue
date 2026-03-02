@@ -2,6 +2,8 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import {calculateExtent} from "../../utils/features/calculateExtent.js";
 import Card from "../../shared/modules/cards/components/Card.vue";
+import {geoJsonToFeature} from "../../utils/features/convertFromGeoJson.js";
+import {default as turfUnion} from "@turf/union";
 import DistrictSelectorFilter from "./DistrictSelectorFilter.vue";
 import DistrictSelectorStatisticalAdditionalLayer from "./DistrictSelectorStatisticalAdditionalLayer.vue";
 import {downloadJsonToFile} from "../../utils/download";
@@ -20,12 +22,14 @@ import IconButton from "../../../../src/shared/modules/buttons/components/IconBu
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import mutations from "../store/mutationsDistrictSelector.js";
+import {polygon as turfPolygon} from "@turf/helpers";
 import {prepareDistrictLevels} from "../utils/prepareDistrictLevels.js";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
 import {singleClick} from "ol/events/condition";
 import {styleSelectedDistrictLevels} from "../utils/styleSelectedDistrictLevels.js";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
+import truncate from "@turf/truncate";
 import wktParser from "../../utils/wktParser";
 
 export default {
@@ -385,6 +389,36 @@ export default {
         },
 
         /**
+         * Merges the passed geometries and creates a feature from them as WKT.
+         * @param {ol/Geometry[]} geometryCollection - An array of geometries.
+         * @returns {String} The merged feature encoded as WKT.
+         */
+        mergeGeometriesToWKT (geometryCollection) {
+            const geojsonPolygons = geometryCollection.flatMap(geometry => {
+                if (geometry.getType() === "Polygon") {
+                    return [turfPolygon(geometry.getCoordinates())];
+                }
+                if (geometry.getType() === "MultiPolygon") {
+                    return geometry.getPolygons().map(polygon => turfPolygon(polygon.getCoordinates()));
+                }
+                return [];
+            });
+
+            let mergedPolygons = geojsonPolygons[0];
+
+            for (let i = 1; i < geojsonPolygons.length; i++) {
+                mergedPolygons = turfUnion(
+                    truncate(mergedPolygons, {precision: 3, mutate: true}),
+                    truncate(geojsonPolygons[i], {precision: 3, mutate: true})
+                );
+            }
+
+            return wktParser.encodeFeature(
+                geoJsonToFeature(mergedPolygons, "EPSG:25832")
+            );
+        },
+
+        /**
          * Registers listener for drag box interaction events.
          * On "boxend" all features that intersect the box are added to the feature collection.
          * On "boxstart" calls the clearFeatures function.
@@ -586,7 +620,7 @@ export default {
                 icon: "bi-image",
                 selectedDistricts: this.selectedDistrictNames,
                 status: "",
-                subjectFeatureWKT: wktParser.encodeGeometry(bboxGeom)
+                subjectFeatureWKT: this.mergeGeometriesToWKT(bboxGeom.getGeometries())
             });
 
             this.toggleCardStatus(0);

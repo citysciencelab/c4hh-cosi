@@ -21,9 +21,9 @@ import Overlay from "ol/Overlay.js";
 import {polygon as turfPolygon} from "@turf/helpers";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
+import truncate from "@turf/truncate";
 import wktParser from "../../utils/wktParser";
 import WPS from "@shared/js/api/wps.js";
-import truncate from "@turf/truncate";
 
 export default {
     name: "DistrictSelectorSubject",
