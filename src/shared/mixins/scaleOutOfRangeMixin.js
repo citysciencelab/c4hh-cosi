@@ -29,8 +29,11 @@ export default (containerName) => ({
         rawLayersScaleBoundaries () {
             return this.rawLayers.reduce(
                 ([accumulatorMinScale, accumulatorMaxScale], current) => {
-                    const currentMinScale = parseInt(current.minScale, 10),
-                        currentMaxScale = parseInt(current.maxScale, 10);
+                    const conf = this.layerConfigById(current.id),
+                        minScale = conf ? conf.minScale : current.minScale,
+                        maxScale = conf ? conf.maxScale : current.maxScale,
+                        currentMinScale = parseInt(minScale, 10),
+                        currentMaxScale = parseInt(maxScale, 10);
 
                     return [
                         isNaN(currentMinScale)

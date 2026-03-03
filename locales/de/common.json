@@ -697,6 +697,7 @@
       "invisibleLayer": "Dieses Thema kann nur im Maßstab {{minScale}} - {{maxScale}} angezeigt werden",
       "invisibleLayerNoScale": "Dieses Thema kann in diesem Maßstab nicht angezeigt werden",
       "invisibleLayerMinScale": "Der Layer ist ab dem Maßstab {{minScale}} sichtbar.",
+      "invisibleLayerMaxScale": "Der Layer ist ab dem Maßstab {{maxScale}} sichtbar.",
       "noCategory": "Ohne Kategorie",
       "rootLayerPath": "Im Ordner anzeigen"
     },
@@ -708,7 +709,6 @@
     },
     "login": {
       "description": "Melden Sie sich mit Benutzernamen und Passwort an",
-      "descriptionLoggedIn": "Sie sind angemeldet",
       "login": "Login",
       "logout": "Logout",
       "progress": "Bitte melden Sie sich im geöffneten Popup an.",

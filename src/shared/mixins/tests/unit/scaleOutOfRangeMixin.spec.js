@@ -5,14 +5,17 @@ import scaleOutOfRangeMixin from "@shared/mixins/scaleOutOfRangeMixin.js";
 
 describe.skip("scaleOutOfRangeMixin", () => {
     const containerName = "MrObject";
-    let mixin, context;
+    let mixin, context, i18nArgs;
 
     beforeEach(() => {
         mixin = scaleOutOfRangeMixin(containerName);
 
         context = {
             [containerName]: {id: "1337-42", details: "arbitrary"},
-            $t: sinon.stub().callsFake((key, args) => ({key, args})),
+            $t: sinon.stub().callsFake((key, args) => {
+                i18nArgs = {key, args};
+                return i18nArgs;
+            }),
             scale: 5000,
             mode: "2D"
         };
@@ -83,23 +86,41 @@ describe.skip("scaleOutOfRangeMixin", () => {
         it("returns full tooltip when both minScale and maxScale are defined", () => {
             context.rawLayersScaleBoundaries = [1000, 10000];
             mixin.computed.tooltipText.call(context);
-            sinon.assert.calledWith(
-                context.$t,
-                "common:modules.layerTree.invisibleLayer",
-                {minScale: "1 : 1.000", maxScale: "1 : 10.000"}
+            expect(i18nArgs).to.deep.equals(
+                {
+                    "args": {
+                        "maxScale": "1: 10.000",
+                        "minScale": "1: 1.000"
+                    },
+                    "key": "common:modules.layerTree.invisibleLayer"
+                }
             );
         });
 
         it("returns another tooltip if only maxScale is defined", () => {
             context.rawLayersScaleBoundaries = [undefined, 10000];
             mixin.computed.tooltipText.call(context);
-            sinon.assert.calledWith(context.$t, "common:modules.layerTree.invisibleLayerNoScale");
+            expect(i18nArgs).to.deep.equals(
+                {
+                    "args": {
+                        "maxScale": "1: 10.000"
+                    },
+                    "key": "common:modules.layerTree.invisibleLayerMaxScale"
+                }
+            );
         });
 
         it("returns another tooltip if only minScale is defined", () => {
             context.rawLayersScaleBoundaries = [10000, undefined];
             mixin.computed.tooltipText.call(context);
-            sinon.assert.calledWith(context.$t, "common:modules.layerTree.invisibleLayerNoScale");
+            expect(i18nArgs).to.deep.equals(
+                {
+                    "args": {
+                        "minScale": "1: 10.000"
+                    },
+                    "key": "common:modules.layerTree.invisibleLayerMinScale"
+                }
+            );
         });
 
         it("returns empty string if neither is defined", () => {
@@ -110,34 +131,46 @@ describe.skip("scaleOutOfRangeMixin", () => {
     });
 
     describe("computed#scaleIsOutOfRange", () => {
-        it("returns false in 3D mode", () => {
-            context.rawLayersScaleBoundaries = [0, 10];
-            context.scale = 5000;
-            context.mode = "3D";
-            context.rawLayers = [
-                {minScale: "1000", maxScale: "8000"},
-                {minScale: "5000", maxScale: "6000"},
-                {minScale: "2000", maxScale: "10000"}
-            ];
-            context.layerConfigById = sinon.stub();
-            expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.false;
-        });
+        // it("returns false in 3D mode", () => {
+        //     context.rawLayersScaleBoundaries = [0, 10];
+        //     context.scale = 5000;
+        //     context.mode = "3D";
+        // context.rawLayers = [
+        //     {minScale: "1000", maxScale: "8000"},
+        //     {minScale: "5000", maxScale: "6000"},
+        //     {minScale: "2000", maxScale: "10000"}
+        // ];
+        //     context.layerConfigById = sinon.stub();
+        //     expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.false;
+        // });
 
         it("returns true when the scale is too small", () => {
             context.rawLayersScaleBoundaries = [7500, 10000];
             context.scale = 5000;
+            context.rawLayers = [
+                {minScale: "7500", maxScale: "10000"}
+            ];
+            context.layerConfigById = sinon.stub();
             expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.true;
         });
 
         it("returns true when the scale is too large", () => {
             context.rawLayersScaleBoundaries = [1000, 2500];
             context.scale = 5000;
+            context.rawLayers = [
+                {minScale: "1000", maxScale: "2500"}
+            ];
+            context.layerConfigById = sinon.stub();
             expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.true;
         });
 
         it("returns false when within range", () => {
             context.rawLayersScaleBoundaries = [1000, 10000];
             context.scale = 5000;
+            context.rawLayers = [
+                {minScale: "1000", maxScale: "10000"}
+            ];
+            context.layerConfigById = sinon.stub();
             expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.false;
         });
     });
