@@ -42,9 +42,29 @@ const actions = {
      * @returns {void}
      */
     sortLegend ({state, commit}) {
+        const groupLayerZIndex = {};
+
+        layerCollection.getLayers().forEach(layer => {
+            if (layer.get("typ") === "GROUP") {
+                const zIndex = layer.attributes.zIndex;
+
+                layer.getLayerSource().forEach(groupMemberLayer => {
+                    groupLayerZIndex[groupMemberLayer.attributes.id] = zIndex;
+                });
+            }
+        });
+
         const sorted = state.legends.sort(function (a, b) {
+            if (a.position === undefined) {
+                a.position = groupLayerZIndex[a.id] || 0;
+            }
+            if (b.position === undefined) {
+                b.position = groupLayerZIndex[b.id] || 0;
+            }
             return b.position - a.position;
         });
+
+        console.warn("sorted", sorted);
 
         commit("setLegends", sorted);
     },
