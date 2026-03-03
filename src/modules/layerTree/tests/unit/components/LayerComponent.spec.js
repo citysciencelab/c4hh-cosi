@@ -12,7 +12,6 @@ describe("src/modules/layerTree/components/LayerComponent.vue", () => {
     let store,
         wrapper,
         layer,
-        wmsLayer,
         propsData,
         mapMode,
         replaceByIdInLayerConfigSpy,
@@ -28,10 +27,6 @@ describe("src/modules/layerTree/components/LayerComponent.vue", () => {
             visibility: false,
             showInLayerTree: true
         };
-        wmsLayer = {
-            attributes: layer
-        };
-
         propsData = {
             conf: layer
         };
@@ -61,7 +56,7 @@ describe("src/modules/layerTree/components/LayerComponent.vue", () => {
             },
             getters: {
                 layerConfigById: () => () => {
-                    return wmsLayer;
+                    return layer;
                 }
             }
         });
