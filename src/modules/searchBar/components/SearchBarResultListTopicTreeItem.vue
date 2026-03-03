@@ -1,7 +1,8 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
+import {Tooltip} from "bootstrap";
 import ActionButton from "./ActionButton.vue";
-import scaleOutOfRangeMixin from "../js/scaleOutOfRangeMixin.js";
+import scaleOutOfRangeMixin from "@shared/mixins/scaleOutOfRangeMixin.js";
 
 /**
  * Searchbar - single item of a search result topic tree.
@@ -74,6 +75,7 @@ export default {
             else {
                 this.showInTree({layerId: this.searchResult.id});
             }
+            Tooltip.getInstance(this.$el.querySelector(".layer-checkbox-tooltip"))?.hide();
         }
 
     }
@@ -95,7 +97,6 @@ export default {
             >
                 <button
                     class="btn d-flex w-100 pe-2 p-1 btn-light search-bar-result-list-topic-tree-item-title"
-                    :disabled="scaleIsOutOfRange"
                     :title="searchResult.toolTip ? $t(searchResult.toolTip) : $t(searchResult.name)"
                     :aria-label="searchResult.toolTip ? $t(searchResult.toolTip) : $t(searchResult.name)"
                     @click="addOrRemoveLayer"

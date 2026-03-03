@@ -2,7 +2,7 @@ import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
-
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import layerTypes from "@core/layers/js/layerTypes.js";
 import LayerComponent from "@modules/layerTree/components/LayerComponent.vue";
 
@@ -12,6 +12,7 @@ describe("src/modules/layerTree/components/LayerComponent.vue", () => {
     let store,
         wrapper,
         layer,
+        wmsLayer,
         propsData,
         mapMode,
         replaceByIdInLayerConfigSpy,
@@ -26,6 +27,9 @@ describe("src/modules/layerTree/components/LayerComponent.vue", () => {
             typ: "WMS",
             visibility: false,
             showInLayerTree: true
+        };
+        wmsLayer = {
+            attributes: layer
         };
 
         propsData = {
@@ -54,10 +58,18 @@ describe("src/modules/layerTree/components/LayerComponent.vue", () => {
             },
             mutations: {
                 replaceByIdInLayerConfig: replaceByIdInLayerConfigSpy
+            },
+            getters: {
+                layerConfigById: () => () => {
+                    return wmsLayer;
+                }
             }
         });
         sinon.stub(LayerComponent.methods, "isLayerTree").callsFake(() => {
             return isLayerTree;
+        });
+        sinon.stub(rawLayerList, "getLayerWhere").callsFake(function () {
+            return layer;
         });
     });
 
@@ -254,109 +266,6 @@ describe("src/modules/layerTree/components/LayerComponent.vue", () => {
             const layerShallBeShown = wrapper.vm.show();
 
             expect(layerShallBeShown).to.be.true;
-        });
-        it("test method scaleIsOutOfRange, isLayerTree = false", () => {
-            isLayerTree = false;
-            wrapper = shallowMount(LayerComponent, {
-                global: {
-                    plugins: [store]
-                },
-                propsData
-            });
-
-            const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-            expect(scaleIsOutOfRange).to.be.false;
-        });
-        it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale not set", () => {
-            wrapper = shallowMount(LayerComponent, {
-                global: {
-                    plugins: [store]
-                },
-                propsData
-            });
-
-            const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-            expect(scaleIsOutOfRange).to.be.false;
-        });
-        it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale is set, is in scale", () => {
-            layer.maxScale = "100000";
-            layer.minScale = "0";
-            wrapper = shallowMount(LayerComponent, {
-                global: {
-                    plugins: [store]
-                },
-                propsData
-            });
-
-            const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-            expect(scaleIsOutOfRange).to.be.false;
-        });
-        it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale is set, is not in scale", () => {
-            layer.maxScale = "10000";
-            layer.minScale = "0";
-            wrapper = shallowMount(LayerComponent, {
-                global: {
-                    plugins: [store]
-                },
-                propsData
-            });
-
-            const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-            expect(scaleIsOutOfRange).to.be.true;
-        });
-        it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale is set, is mapMode = 3D, is layer visible, is not in scale", () => {
-            store = createStore({
-                modules: {
-                    Modules: {
-                        namespaced: true,
-                        modules: {
-                            namespaced: true,
-                            LayerComponent
-                        }
-                    },
-                    Maps: {
-                        namespaced: true,
-                        getters: {
-                            mode: () => "3D",
-                            scale: () => 20000,
-                            scales: () => [500, 1000, 10000, 20000, 100000]
-                        }
-                    }
-                },
-                mutations: {
-                    replaceByIdInLayerConfig: replaceByIdInLayerConfigSpy
-                }
-            });
-            layer.maxScale = "10000";
-            layer.minScale = "0";
-            wrapper = shallowMount(LayerComponent, {
-                global: {
-                    plugins: [store]
-                },
-                propsData
-            });
-
-            const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-            expect(scaleIsOutOfRange).to.be.true;
-        });
-        it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale is set, is mapMode = 3D, is layer visible, is in scale", () => {
-            layer.maxScale = "100000";
-            layer.minScale = "0";
-            wrapper = shallowMount(LayerComponent, {
-                global: {
-                    plugins: [store]
-                },
-                propsData
-            });
-
-            const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-            expect(scaleIsOutOfRange).to.be.false;
         });
     });
 });

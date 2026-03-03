@@ -2,7 +2,6 @@ import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
-
 import SearchBarResultListTopicTreeItemComponent from "@modules/searchBar/components/SearchBarResultListTopicTreeItem.vue";
 
 config.global.mocks.$t = key => key;
@@ -112,7 +111,8 @@ describe("src/modules/searchBar/components/SearchBarResultListTopicTreeItem.vue"
                 }
             },
             getters: {
-                visibleLayerConfigs: () => visibleLayerConfigs
+                visibleLayerConfigs: () => visibleLayerConfigs,
+                layerConfigById: () => sinon.stub()
             }
         });
     });

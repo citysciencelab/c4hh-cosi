@@ -135,6 +135,9 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
                         setNavigationHistoryBySide: setNavigationHistoryBySideSpy
                     }
                 }
+            },
+            getters: {
+                layerConfigById: () => sinon.stub()
             }
         });
     });

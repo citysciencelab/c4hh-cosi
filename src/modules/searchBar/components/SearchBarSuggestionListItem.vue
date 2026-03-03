@@ -1,6 +1,7 @@
 <script>
 import {mapActions} from "vuex";
-import scaleOutOfRangeMixin from "../js/scaleOutOfRangeMixin.js";
+import {Tooltip} from "bootstrap";
+import scaleOutOfRangeMixin from "@shared/mixins/scaleOutOfRangeMixin.js";
 
 /**
  * Searchbar - single item of a search suggestion.
@@ -24,6 +25,7 @@ export default {
         handleClick () {
             this.removeHighlight3DTile();
             this.activateActions({searchResult: this.searchSuggestion, actionType: "onClick"});
+            Tooltip.getInstance(this.$el.querySelector(".layer-checkbox-tooltip"))?.hide();
         }
     }
 };
@@ -42,7 +44,6 @@ export default {
                 <button
                     type="button"
                     class="btn btn-light d-flex"
-                    :disabled="scaleIsOutOfRange"
                     :title="searchSuggestion.toolTip ? $t(searchSuggestion.toolTip) : $t(searchSuggestion.name)"
                     :aria-label="searchSuggestion.toolTip ? $t(searchSuggestion.toolTip) : $t(searchSuggestion.name)"
                     @click="handleClick"

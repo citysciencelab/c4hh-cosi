@@ -172,7 +172,9 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
                 Maps: {
                     namespaced: true,
                     getters: {
-                        mode: () => mapMode
+                        mode: () => mapMode,
+                        scale: () => 500,
+                        scales: () => [500, 1000]
                     }
                 }
             },
@@ -200,7 +202,16 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
                     };
                 },
                 showLayerAddButton: () => addLayerButton.active,
-                showFolderPath: () => true
+                showFolderPath: () => true,
+                layerConfigById: () => (id) => {
+                    if (layersBG.find(layer => layer.id === id)) {
+                        return layersBG.find(layer => layer.id === id);
+                    }
+                    if (subjectDataLayers.find(layer => layer.id === id)) {
+                        return subjectDataLayers.find(layer => layer.id === id);
+                    }
+                    return undefined;
+                }
             }
         });
     });
@@ -447,7 +458,9 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
                     Maps: {
                         namespaced: true,
                         getters: {
-                            mode: () => mapMode
+                            mode: () => mapMode,
+                            scale: () => 500,
+                            scales: () => [500, 1000]
                         }
                     }
                 },
@@ -467,7 +480,16 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
                         }
                     }),
                     showLayerAddButton: () => addLayerButton.active,
-                    showFolderPath: () => true
+                    showFolderPath: () => true,
+                    layerConfigById: () => (id) => {
+                        if (layersBG.find(layer => layer.id === id)) {
+                            return layersBG.find(layer => layer.id === id);
+                        }
+                        if (subjectDataLayers.find(layer => layer.id === id)) {
+                            return subjectDataLayers.find(layer => layer.id === id);
+                        }
+                        return undefined;
+                    }
                 }
             });
 

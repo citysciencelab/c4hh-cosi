@@ -48,9 +48,13 @@ describe("src/modules/searchBar/components/SearchBarSuggestionListItem.vue", () 
                     namespaced: true,
                     getters: {
                         scale: () => 500,
+                        scales: () => [500, 1000],
                         mode: () =>"2D"
                     }
                 }
+            },
+            getters: {
+                layerConfigById: () => sinon.stub()
             }
         });
     });

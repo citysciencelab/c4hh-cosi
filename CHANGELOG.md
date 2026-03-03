@@ -52,6 +52,7 @@
 - FeatureLister: Use configured parameter `featurePrefix` if configured instead of fallback.
 - Legend: Removed fallback legend as it caused problems with other legends.
 - BufferAnalysis: Fixed applying values from URL. New and legacy format are now correctly parsed and applied.
+- Searchbar: Layers in search result are no longer disabled if they are scale-limited.
 
 ---
 

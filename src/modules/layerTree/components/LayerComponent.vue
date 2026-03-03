@@ -1,20 +1,18 @@
 <script>
 import {mapGetters} from "vuex";
 import layerTypes from "@core/layers/js/layerTypes.js";
-import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
 import LayerCheckBox from "./LayerCheckBox.vue";
 import LayerComponentIconFilter from "./LayerComponentIconFilter.vue";
 import LayerComponentIconInfo from "./LayerComponentIconInfo.vue";
 import LayerComponentIconCustom from "./LayerComponentIconCustom.vue";
 import LayerComponentIconSubMenu from "./LayerComponentIconSubMenu.vue";
 import LayerComponentSubMenu from "./LayerComponentSubMenu.vue";
-import layerCollection from "@core/layers/js/layerCollection.js";
+import scaleOutOfRangeMixin from "@shared/mixins/scaleOutOfRangeMixin.js";
 
 /**
  * Representation of a layer in layerTree.
  * @module modules/layerTree/components/LayerComponent
  * @vue-prop {Object} conf - The current layer configuration.
- * @vue-data {String} tooltipText - Contains information about scales, when the layer shall be disabled and is not shown in the map.
  */
 export default {
     name: "LayerComponent",
@@ -26,6 +24,7 @@ export default {
         LayerComponentIconSubMenu,
         LayerComponentSubMenu
     },
+    mixins: [scaleOutOfRangeMixin("conf")],
     props: {
         /** current layer configuration */
         conf: {
@@ -34,51 +33,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Maps", ["mode", "scale", "scales"]),
-
-        /**
-             * Tooltip text explaining why a layer is disabled due to scale restrictions.
-             * If both minScale and maxScale exist, it returns a formatted scale range explanation.
-             * If only one is present, a generic "invisible layer" text is returned.
-             * If no scale limits exist, an empty string is returned.
-             *
-             * @returns {String} The tooltip text for layers out of visible scale range.
-             */
-        tooltipText () {
-            const minScaleRaw = this.conf.minScale !== undefined
-                    ? parseInt(this.conf.minScale, 10)
-                    : null,
-
-                maxScale = this.conf.maxScale !== undefined
-                    ? parseInt(this.conf.maxScale, 10)
-                    : null,
-
-
-                minScale = minScaleRaw === 0
-                    ? this.scales[this.scales.length - 1]
-                    : minScaleRaw;
-
-            if (minScale && maxScale) {
-                return this.$t("common:modules.layerTree.invisibleLayer", {
-                    minScale: "1: " + thousandsSeparator(minScale),
-                    maxScale: "1: " + thousandsSeparator(maxScale)
-                });
-            }
-
-            if (minScale) {
-                return this.$t("common:modules.layerTree.invisibleLayerMinScale", {
-                    minScale: "1: " + thousandsSeparator(minScale)
-                });
-            }
-
-            if (maxScale) {
-                return this.$t("common:modules.layerTree.invisibleLayerMaxScale", {
-                    maxScale: "1: " + thousandsSeparator(maxScale)
-                });
-            }
-
-            return "";
-        }
+        ...mapGetters("Maps", ["mode", "scale", "scales"])
     },
     methods: {
         /**
@@ -100,38 +55,6 @@ export default {
          */
         isLayerTree () {
             return this.$parent.$options.name !== "LayerSelectionTreeNode";
-        },
-        /**
-         * Returns true, if this layer is not visible in the maps current scale. Returns false, if this is not the layerTree or mode is '3D'.
-         * @returns {Boolean}  true, if this layer is not visible in the maps current scale
-         */
-        scaleIsOutOfRange () {
-            if (this.conf.maxScale === undefined) {
-                return false;
-            }
-
-            const isOutOfRange = this.scale > parseInt(this.conf.maxScale, 10) || this.scale < parseInt(this.conf.minScale, 10),
-                layerEntry = layerCollection.getLayerById(this.conf.id);
-
-            if (this.mode === "3D" && this.conf.visibility === true && layerEntry && layerEntry.attributes && layerEntry.attributes.is3DLayer) {
-
-                if (isOutOfRange) {
-                    layerEntry.layer.setVisible(false, mapCollection.getMap("3D"), layerEntry.attributes);
-                }
-                else {
-                    layerEntry.layer.setVisible(true, mapCollection.getMap("3D"), layerEntry.attributes);
-                }
-            }
-            else if (this.mode === "3D" && this.conf.visibility === true && layerEntry && layerEntry.attributes) {
-                if (isOutOfRange) {
-                    layerEntry.layer.setVisible(false);
-                }
-                else {
-                    layerEntry.layer.setVisible(true);
-                }
-            }
-
-            return this.scale > parseInt(this.conf.maxScale, 10) || this.scale < parseInt(this.conf.minScale, 10);
         }
     }
 };
@@ -145,19 +68,17 @@ export default {
     >
         <div class="d-flex justify-content-between align-items-center handle-layer-component-drag">
             <span
+                :data-bs-toggle="scaleIsOutOfRange ? 'tooltip' : null"
+                data-bs-placement="bottom"
+                data-bs-custom-class="custom-tooltip"
+                :title="scaleIsOutOfRange ? tooltipText : ''"
                 class="layer-checkbox-tooltip"
             >
                 <LayerCheckBox
                     :conf="conf"
-                    :disabled="scaleIsOutOfRange()"
+                    :disabled="scaleIsOutOfRange"
                     :is-layer-tree="isLayerTree()"
                 />
-            </span>
-            <span
-                v-show="scaleIsOutOfRange()"
-                class="mp-tooltip"
-            >
-                {{ tooltipText }}
             </span>
             <div
                 class="d-flex"
