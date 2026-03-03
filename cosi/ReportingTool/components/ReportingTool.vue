@@ -761,7 +761,9 @@ export default {
             this.selectedStatGroups.forEach((group) => {
                 this.items.forEach(item => {
                     if (item.group === group) {
-                        sortedItems.push(item);
+                        if (this.statsFeatureFilter.length === 0 || this.statsFeatureFilter.includes(item.category)) {
+                            sortedItems.push(item);
+                        }
                     }
                 });
             });
