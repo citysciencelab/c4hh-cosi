@@ -310,7 +310,7 @@ export default {
                     return;
                 }
 
-                this.addCard(card.bboxGeomWKT, this.buffer, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel, card.extent);
+                this.addCard(card.bboxGeomWKT, 0, card.selectedDistricts, card.status, card.districtLevelId, card.districtLevelLabel, card.extent);
             });
         },
 

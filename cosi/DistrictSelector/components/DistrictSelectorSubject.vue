@@ -88,7 +88,7 @@ export default {
         this.setActiveCardsFromStatisticalCards(this.cardsStatistical);
 
         if (this.activeCard) {
-            this.buffer = this.activeCard.buffer;
+            this.setBuffer(this.activeCard.buffer);
         }
         this.cardsStatistical.forEach((card, index) => {
             if (card.status === "active") {
