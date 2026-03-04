@@ -19,6 +19,7 @@
     - text-loader: ^0.0.1
 
 ### Fixed
+- Min/MaxScale: The scale restriction for grouped layers has been fixed.
 
 ---
 
