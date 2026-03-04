@@ -3,19 +3,10 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2025-03-04 v3.20.0
 
 ### Added
 - GeoMarker: Added new addon to show and edit GeoMarkers. For internal usage only.
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ---
 
