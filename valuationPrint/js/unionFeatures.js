@@ -1,5 +1,6 @@
 import {GeoJSON} from "ol/format.js";
 import union from "@turf/union";
+import {featureCollection} from "@turf/helpers";
 
 /**
  * Takes a list of features and merge them to one feature.
@@ -17,7 +18,7 @@ export function unionFeatures (featureList) {
     let unionFeature = geojson.features[0];
 
     for (let i = 1; i < geojson.features.length; i++) {
-        unionFeature = union(unionFeature, geojson.features[i]);
+        unionFeature = union(featureCollection([unionFeature, geojson.features[i]]));
     }
 
     return parserGeoJson.readFeature(unionFeature);

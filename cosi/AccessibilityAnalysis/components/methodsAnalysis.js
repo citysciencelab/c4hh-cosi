@@ -5,7 +5,7 @@ import {
     lineString as turfLineString,
     featureCollection as turfFeatureCollection
 } from "@turf/helpers";
-import {default as turfBuffer} from "@turf/buffer";
+import {buffer as turfBuffer} from "@turf/buffer";
 import GeoJSON from "ol/format/GeoJSON";
 import {transformFeatures} from "../../utils/features/transform";
 import {styleIsochroneFeatures} from "../utils/styleIsochroneFeatures.js";

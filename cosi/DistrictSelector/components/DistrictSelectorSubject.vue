@@ -2,7 +2,7 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import Card from "../../shared/modules/cards/components/Card.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
-import {default as turfUnion} from "@turf/union";
+import {union as turfUnion} from "@turf/union";
 import DistrictSelectorSubjectImport from "./DistrictSelectorSubjectImport.vue";
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import {downloadJsonToFile} from "../../utils/download";
@@ -18,10 +18,10 @@ import layerCollection from "@core/layers/js/layerCollection";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import {MultiPolygon, Polygon} from "ol/geom";
 import Overlay from "ol/Overlay.js";
-import {polygon as turfPolygon} from "@turf/helpers";
+import {polygon as turfPolygon, featureCollection} from "@turf/helpers";
 import {setBBoxToGeom} from "../../utils/setBBoxToGeom.js";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
-import truncate from "@turf/truncate";
+import {truncate} from "@turf/truncate";
 import wktParser from "../../utils/wktParser";
 import WPS from "@shared/js/api/wps.js";
 
@@ -194,10 +194,10 @@ export default {
             let merged = geojsonPolygons[0];
 
             for (let i = 1; i < geojsonPolygons.length; i++) {
-                merged = turfUnion(
+                merged = turfUnion(featureCollection([
                     truncate(merged, {precision: 3, mutate: true}),
                     truncate(geojsonPolygons[i], {precision: 3, mutate: true})
-                );
+                ]));
             }
 
             if (merged.geometry.type === "Polygon") {

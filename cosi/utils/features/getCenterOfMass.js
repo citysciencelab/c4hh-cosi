@@ -1,4 +1,4 @@
-import centerOfMass from "@turf/center-of-mass";
+import {centerOfMass} from "@turf/center-of-mass";
 import Feature from "ol/Feature";
 import {GeoJSON} from "ol/format";
 import isObject from "../../../../src/utils/isObject";

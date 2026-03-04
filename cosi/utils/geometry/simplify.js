@@ -1,4 +1,4 @@
-import {default as turfSimplify} from "@turf/simplify";
+import {simplify as turfSimplify} from "@turf/simplify";
 import {polygon, multiPolygon, multiPoint} from "@turf/helpers";
 import GeoJSON from "ol/format/GeoJSON";
 import SimpleGeometry from "ol/geom/SimpleGeometry";

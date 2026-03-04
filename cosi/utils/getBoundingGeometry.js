@@ -1,4 +1,4 @@
-import {default as turfBuffer} from "@turf/buffer";
+import {buffer as turfBuffer} from "@turf/buffer";
 import GeoJSON from "ol/format/GeoJSON";
 import GeometryCollection from "ol/geom/GeometryCollection";
 

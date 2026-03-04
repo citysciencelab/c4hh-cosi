@@ -1,6 +1,7 @@
 import requestIsochrones from "./requestIsochrones";
 import {transformFeatures} from "../../utils/features/transform";
-import {default as turfUnion} from "@turf/union";
+import {union as turfUnion} from "@turf/union";
+import {featureCollection} from "@turf/helpers";
 import axios from "axios";
 import GeoJSON from "ol/format/GeoJSON";
 
@@ -171,7 +172,7 @@ async function createIsochronesPoints (args) {
 
             for (let j = 0; j < layeredList.length; j++) {
                 try {
-                    layerUnion = turfUnion(layerUnion, format.writeFeatureObject(layeredList[j]));
+                    layerUnion = turfUnion(featureCollection([layerUnion, format.writeFeatureObject(layeredList[j])]));
                 }
                 catch (e) {
                     console.error(e); // turf chokes one some resulting geometries

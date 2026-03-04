@@ -7,7 +7,8 @@ import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vu
 import {Dropdown} from "bootstrap";
 import ButtonGroup from "../../components/ButtonGroup.vue";
 import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
-import union from "@turf/union";
+import {union} from "@turf/union";
+import {featureCollection as turfFeatureCollection} from "@turf/helpers";
 import {VExpandTransition} from "vuetify/components/transitions";
 import {VItemGroup, VItem} from "vuetify/components/VItemGroup";
 import dayjs from "dayjs";
@@ -853,7 +854,7 @@ export default {
                     formattedFeature = [];
 
                 for (let i = 0; i < this.isochroneFeatures.length; i = i + this.steps.length) {
-                    featureUnion = union(featureUnion, featureToGeoJson(this.isochroneFeatures[i]));
+                    featureUnion = union(turfFeatureCollection([featureUnion, featureToGeoJson(this.isochroneFeatures[i])]));
                 }
                 formattedFeature = geoJsonCollectionToFeatures(featureUnion);
 

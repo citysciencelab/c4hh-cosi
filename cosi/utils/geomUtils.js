@@ -1,5 +1,6 @@
-import {default as turfUnion} from "@turf/union";
-import {default as turfIntersect} from "@turf/intersect";
+import {union as turfUnion} from "@turf/union";
+import {intersect as turfIntersect} from "@turf/intersect";
+import {featureCollection} from "@turf/helpers";
 import {GeoJSON} from "ol/format";
 import {getCenter, intersects} from "ol/extent";
 
@@ -116,7 +117,7 @@ export function union (features, resetProperties = false, returnsFeature = false
             }
         }
 
-        unionFeature = turfUnion(unionFeature, geojson.features[i]);
+        unionFeature = turfUnion(featureCollection([unionFeature, geojson.features[i]]));
     }
     // reset the feature's properties
     if (resetProperties) {
@@ -149,7 +150,7 @@ export function intersect (features, resetProperties = false, returnsFeature = f
 
     // intersect features
     for (let i = 1; i < geojson.features.length; i++) {
-        intersectionFeature = turfIntersect(intersectionFeature, geojson.features[i]);
+        intersectionFeature = turfIntersect(featureCollection([intersectionFeature, geojson.features[i]]));
     }
 
     if (intersectionFeature) {
