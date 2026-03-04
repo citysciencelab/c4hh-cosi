@@ -18,7 +18,7 @@
 
 ---
 
-## 2025-03-04 v3.20.0
+## 2026-03-04 v3.20.0
 
 ### Added
 - GeoMarker: Added new addon to show and edit GeoMarkers. For internal usage only.
