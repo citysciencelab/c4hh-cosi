@@ -175,24 +175,26 @@ export default {
          */
         cardDatasets () {
             const cardData = [],
-                activeSubCard = this.selectionCardsSubjectData.find(card => card.status === "active");
+                activeSubCard = this.selectionCardsSubjectData.find(card => card.status === "active"),
+                activeSubjectWKT = activeSubCard?.subjectFeatureWKT;
 
             this.dataSets.forEach(set => {
-                cardData.push(
-                    {
-                        data: this.getData(set),
-                        downloadable: true,
-                        icon: this.getIconByTransportType(set?.inputs?.transportType),
-                        removable: true,
-                        status: this.dataSets.indexOf(set) === this.activeSet ? "active" : "",
-                        title: set.inputs.title,
-                        visible: true,
-                        subjectData: true,
-                        isSubjectDataArea: set.inputs.subjectFeatureWKT === activeSubCard.subjectFeatureWKT,
-                        subjectDataDisabled: this.selectedDistrictNames.length > 0,
-                        badge: set.inputs.subjectFeatureWKT === activeSubCard.subjectFeatureWKT ? this.getSubjectDataBadge() : this.getMapPreviewBadge()
-                    }
-                );
+                const subjectWKT = set?.inputs?.subjectFeatureWKT,
+                    isSubject = activeSubjectWKT !== undefined && subjectWKT === activeSubjectWKT;
+
+                cardData.push({
+                    data: this.getData(set),
+                    downloadable: true,
+                    icon: this.getIconByTransportType(set?.inputs?.transportType),
+                    removable: true,
+                    status: this.dataSets.indexOf(set) === this.activeSet ? "active" : "",
+                    title: set?.inputs?.title,
+                    visible: true,
+                    subjectData: true,
+                    isSubjectDataArea: isSubject,
+                    subjectDataDisabled: this.selectedDistrictNames.length > 0,
+                    badge: isSubject ? this.getSubjectDataBadge() : this.getMapPreviewBadge()
+                });
             });
 
             return cardData;
