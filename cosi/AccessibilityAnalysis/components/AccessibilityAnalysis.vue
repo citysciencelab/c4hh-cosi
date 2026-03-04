@@ -1712,7 +1712,7 @@ export default {
                                         class="form-check-input"
                                         type="radio"
                                         name="subjectDataMap"
-                                        checked
+                                        disabled
                                     >
                                     <label
                                         class="form-check-label"
@@ -1728,7 +1728,7 @@ export default {
                                         class="form-check-input"
                                         type="radio"
                                         name="subjectDataMap"
-                                        disabled
+                                        checked
                                     >
                                     <label
                                         class="form-check-label"

@@ -107,7 +107,7 @@
                     "newSubjectDataInputMerge": "Add analysis to existing subject data area",
                     "newSubjectDataMap": "What should the map display look like?",
                     "newSubjectDataMapAnalysis": "Apply map visualization of the analysis",
-                    "newSubjectDataMapOutlines": "Visualize only the outlines",
+                    "newSubjectDataMapOutlines": "Visualize only the outline of the analysis",
                     "confirmSubjectDataArea": "Yes, overwrite analysis",
                     "cancelSubjectDataArea": "Cancel and do not overwrite",
                     "cancel": "Cancel",

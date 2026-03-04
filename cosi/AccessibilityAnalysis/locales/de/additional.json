@@ -107,7 +107,7 @@
                     "newSubjectDataInputMerge": "Analyse zum bestehenden Fachdatengebiet hinzufügen",
                     "newSubjectDataMap": "Wie soll die Kartendarstellung aussehen?",
                     "newSubjectDataMapAnalysis": "Kartenvisualisierung der Analyse übernehmen",
-                    "newSubjectDataMapOutlines": "Nur die Umrisse visualisieren",
+                    "newSubjectDataMapOutlines": "Nur den Umriss der Analyse visualisieren",
                     "confirmSubjectDataArea": "Ja, Analyse übernehmen",
                     "cancelSubjectDataArea": "Abbrechen und nicht übernehmen",
                     "cancel": "Abbrechen",
