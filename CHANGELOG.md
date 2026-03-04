@@ -4,6 +4,21 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
+## Unreleased - in development
+### __Breaking Changes__
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+---
+
 ## 2026-03-04 v3.20.0
 ### __Breaking Changes__
 - Bundler: From now on, we no longer support webpack; we use vite as our bundler. It is important for the portal configuration that `type="module"` must now be set in `index.html`. Information on this can be found [here](https://bitbucket.org/geowerkstatt-hamburg/masterportal/wiki/Vite%20and%20Vitest)
