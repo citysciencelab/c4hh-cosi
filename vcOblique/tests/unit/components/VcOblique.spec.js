@@ -34,6 +34,18 @@ describe("addons/vcOblique/components/VcOblique.vue", () => {
         VcOblique.actions.resetObliqueViewer = sinon.stub();
         createObliqueViewerURLOrig = VcOblique.actions.createObliqueViewerURL;
         VcOblique.actions.createObliqueViewerURL = sinon.stub();
+        const iframe = document.createElement("iframe");
+
+        iframe.id = "obliqueIframe";
+        Object.defineProperty(iframe, "contentWindow", {
+            value: {
+                vcs: {
+                    version: "4.0.0"
+                }
+            },
+            writable: false
+        });
+        document.body.appendChild(iframe);
 
         store = createStore({
             modules: {
@@ -75,6 +87,7 @@ describe("addons/vcOblique/components/VcOblique.vue", () => {
         VcOblique.actions.initObliqueView = initObliqueViewOrig;
         VcOblique.actions.resetObliqueViewer = initResetObliqueViewer;
         VcOblique.actions.createObliqueViewerURL = createObliqueViewerURLOrig;
+        document.getElementById("obliqueIframe")?.remove();
     });
     describe("VcOblique.vue watcher", () => {
         it("test watch on clickCoordinate should call action obliqueView", async () => {

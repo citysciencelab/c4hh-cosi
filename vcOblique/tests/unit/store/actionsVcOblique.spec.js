@@ -37,7 +37,8 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
                                 }
                                 return {};
                             },
-                            set: () => sinon.stub()
+                            set: () => sinon.stub(),
+                            changed: () => sinon.stub()
                         }];
                     }
                 };

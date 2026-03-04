@@ -35,7 +35,7 @@ function getViewpointConstructor (vcs) {
  * @returns {Promise<Viewpoint>} ViewPoint resp. Viewpoint
  */
 function getViewpointSync (map) {
-    return map.getViewPointSync ? map.getViewPointSync() : map.getViewpointSync();
+    return getIsVc4() ? map.getViewPointSync() : map.getViewpointSync();
 }
 
 /**
@@ -47,11 +47,19 @@ function getViewpointSync (map) {
  */
 function gotoViewpoint (map, viewpoint) {
     if (typeof viewpoint.groundPosition === "undefined") {
-        console.warn("VCMap is not initialized. Please click the VCMap's home button or change the VCMap's configuration to have an initial view.");
-
         return undefined;
     }
-    return map.gotoViewPoint ? map.gotoViewPoint(viewpoint) : map.gotoViewpoint(viewpoint);
+    return getIsVc4() ? map.gotoViewPoint(viewpoint) : map.gotoViewpoint(viewpoint);
+}
+
+/**
+ * Checks if the VCMap version in use is version 4 by checking the existence of the vcm key in the vcs object.
+ * @returns {Boolean} true if VCMap version 4 is in use, false otherwise
+ */
+function getIsVc4 () {
+    const iframe = document.getElementById("obliqueIframe");
+
+    return iframe?.contentWindow?.vcs?.vcm;
 }
 
 const actions = {
@@ -71,58 +79,65 @@ const actions = {
 
         iframe?.addEventListener("load", () => {
             const observer = new MutationObserver(() => {
-                const header = iframe.contentWindow.document.getElementById("header"),
-                    vc6Header = iframe.contentWindow.document.getElementsByTagName("header")[0],
-                    mapMenu = iframe.contentWindow.document.getElementsByClassName("vcm-btn-icon single-first maptool-btn vcm-btn-base-default vcm-btn-base-splash-hover vcm-border vcm-border-dye03 vcm-btn-icon-font-default vcm-btn-icon-font-dye01-hover vcm-no-select vcm-btn-map-Oblique")[0],
-                    overviewMap = iframe.contentWindow.document.getElementsByClassName("overview-map-wrap")[0],
-                    vcs = document.getElementById("obliqueIframe").contentWindow.vcs,
-                    map = getActiveMap(vcs),
+                const doc = iframe.contentWindow?.document,
+                    vcs = iframe.contentWindow.vcs,
+                    map = getActiveMap(vcs);
+
+                if (!doc || !iframe || !vcs || !map) {
+                    return;
+                }
+
+                const header = doc.getElementById("header"),
+                    mapMenu = doc.getElementsByClassName("vcm-btn-icon single-first maptool-btn vcm-btn-base-default vcm-btn-base-splash-hover vcm-border vcm-border-dye03 vcm-btn-icon-font-default vcm-btn-icon-font-dye01-hover vcm-no-select vcm-btn-map-Oblique")[0],
+                    overviewMap = doc.getElementsByClassName("overview-map-wrap")[0],
                     pixelCoordinate = mapCollection.getMap("2D").getPixelFromCoordinate(rootGetters["Maps/initialCenter"]),
-                    mapElements = iframe.contentWindow.document.getElementsByClassName("mapElement vcm-map-top");
+                    mapElements = doc.getElementsByClassName("mapElement vcm-map-top");
 
                 commit("Maps/setClickPixel", pixelCoordinate, {root: true});
 
-                if (map) {
-                    map.olMap.on("moveend", () => {
-                        const transformedCooridnates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
+                map.olMap.on("moveend", () => {
+                    const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
 
-                        transformedCooridnates.every((coordinate, index) => {
-                            if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
-                                dispatch("obliqueView", transformedCooridnates);
-                                return false;
-                            }
-                            return true;
-                        });
-                    });
-
-                    map.imageChanged.addEventListener(() => {
-                        const heading = getViewpointSync(map).heading,
-                            coordinates = rootGetters["Maps/clickCoordinate"] ? rootGetters["Maps/clickCoordinate"] : rootGetters["Maps/initialCenter"];
-
-                        if (heading !== getters.heading) {
-                            dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
+                    transformedCoordinates.every((coordinate, index) => {
+                        if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
+                            dispatch("obliqueView", transformedCoordinates);
+                            return false;
                         }
-                        commit("setHeading", heading);
+                        return true;
                     });
-                }
+                });
 
-                if (header) {
+                map.imageChanged.addEventListener(() => {
+                    const vp = getViewpointSync(map);
+
+                    if (!vp?.groundPosition) {
+                        return;
+                    }
+                    const heading = vp.heading,
+                        coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
+
+                    if (heading !== getters.heading) {
+                        dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
+                    }
+                    commit("setHeading", heading);
+                });
+
+                if (getIsVc4() && header) {
                     header.style.display = "none";
                     header.parentElement.style.display = "none";
 
                     for (const element of mapElements) {
                         element.style.top = 0;
                     }
-
-                    dispatch("obliqueView", rootGetters["Maps/center"]);
-                    observer.disconnect();
                 }
-                if (header || vc6Header) {
-                    mapMarker.getMapmarkerLayerById("marker_point_layer").get("styleId");
-                    commit("setDefaultMapMarkerStyleId", mapMarker.getMapmarkerLayerById("marker_point_layer").get("styleId"));
-                    if (getters.styleId) {
-                        mapMarker.getMapmarkerLayerById("marker_point_layer").set("styleId", getters.styleId);
-                    }
+                dispatch("obliqueView", rootGetters["Maps/center"]);
+                const layer = mapMarker.getMapmarkerLayerById("marker_point_layer");
+
+                if (!getters.defaultMapMarkerStyleId) {
+                    commit("setDefaultMapMarkerStyleId", layer.get("styleId"));
+                }
+                if (getters.styleId) {
+                    mapMarker.getMapmarkerLayerById("marker_point_layer").set("styleId", getters.styleId);
                 }
                 if (mapMenu) {
                     mapMenu.style.display = "none";
@@ -130,6 +145,7 @@ const actions = {
                 if (overviewMap) {
                     overviewMap.style.display = "none";
                 }
+                observer.disconnect();
             });
 
             observer.observe(iframe.contentDocument, {
@@ -148,7 +164,14 @@ const actions = {
     * @returns {void}
     */
     resetObliqueViewer ({dispatch, getters}) {
-        mapMarker.getMapmarkerLayerById("marker_point_layer").set("styleId", getters.defaultMapMarkerStyleId);
+        const layer = mapMarker.getMapmarkerLayerById("marker_point_layer");
+
+        if (layer) {
+            layer.set("styleId", getters.defaultMapMarkerStyleId || null);
+
+            layer.changed();
+        }
+
         dispatch("Maps/removePointMarker", null, {root: true});
     },
 

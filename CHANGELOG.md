@@ -15,6 +15,7 @@
 ### Removed
 
 ### Fixed
+- vcOblique: Fixed Bugs of Marker setting and styling when using VCMap 6.
 
 ---
 

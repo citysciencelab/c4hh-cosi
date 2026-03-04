@@ -7,10 +7,14 @@ export default {
     name: "VcOblique",
     directives: {
         resize: {
-            beforeMount: function (el, {value = {}}) {
-                el.addEventListener("load", () => iframeResizer(value, el));
+            beforeMount (el, {value = {}}) {
+                el.addEventListener("load", () => {
+                    if (!el.iFrameResizer) {
+                        iframeResizer({...value, warningTimeout: 0}, el);
+                    }
+                });
             },
-            beforeUnmount: function (el) {
+            beforeUnmount (el) {
                 el?.iFrameResizer?.removeListeners();
             }
         }},
