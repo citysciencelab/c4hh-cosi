@@ -3,6 +3,7 @@
         "tools": {
             "cosi": {
                 "accessibilityAnalysis": {
+                    "areaOutsideMRH": "Population cannot be calculated for this area. Please select an area within the Hamburg metropolitan region.",
                     "title": "Accessibility Analysis",
                     "description": "Displays an area on the map that can be reached from a selected point, along a route or from a facility within a specified distance. The distance can be specified in time or in meters. The accessibility is calculated depending on the means of transport.",
                     "dropdownInfo": "Please choose the mode you want to work with:",
@@ -74,6 +75,8 @@
                         "atTravelTimeIndex": "at travel time index",
                         "travelTimeIndexBase": "1.0"
                     },
+                    "populationNotAvailable": "Population data are not available.",
+                    "populationProcessingFailed": "Population data could not be processed.",
                     "paginationRemove": "Remove this result",
                     "paginationRemoveAll": "Remove all results in this tool",
                     "paginationDownloadAll": "Download all results as GeoJSON",

@@ -866,19 +866,52 @@ export default {
             return false;
         },
 
-        handlePopulationResponsee (resp) {
-            const einwohnerNode = resp?.ExecuteResponse?.ProcessOutputs?.Output?.Data?.ComplexData?.einwohner,
-                raw = typeof einwohnerNode?.ergebnis === "string"
-                    ? einwohnerNode.ergebnis.trim()
-                    : "";
+        /**
+         * Maps server error messages from the population service to user-friendly alert texts.
+         * @param {String} message - Message returned by the service.
+         * @returns {Object|null} Alert object or `null` if the message is invalid.
+         */
+        getPopulationAlertFromServerMessage (message) {
+            if (!message || typeof message !== "string") {
+                return null;
+            }
 
-            this.dataSets[this.activeSet].inputs.einwohner = "Nicht vorhanden";
+            const lower = message.toLowerCase();
+
+            if (lower.includes("metropolregion hamburg")) {
+                return {
+                    type: "warning",
+                    text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.areaOutsideMRH")
+                };
+            }
+
+            return {
+                type: "warning",
+                text: message
+            };
+        },
+
+        /**
+         * Processes the population WPS response and updates the population value
+         * and alert state of the active dataset.
+         * @param {Object} resp - Raw WPS ExecuteResponse returned by the service.
+         * @returns {void}
+         */
+        handlePopulationResponsee (resp) {
+            const node = resp?.ExecuteResponse?.ProcessOutputs?.Output?.Data?.ComplexData?.einwohner,
+                raw = typeof node?.ergebnis === "string" ? node.ergebnis.trim() : "",
+                hasError = String(node?.ErrorOccured).toLowerCase() === "yes",
+                set = this.dataSets[this.activeSet];
+
+            set.populationAlert = null;
+            set.inputs.einwohner = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.populationNotAvailable");
 
             if (!raw) {
                 return;
             }
 
-            if (!(raw.startsWith("{") || raw.startsWith("["))) {
+            if (hasError || !(raw.startsWith("{") || raw.startsWith("["))) {
+                set.populationAlert = this.getPopulationAlertFromServerMessage(raw);
                 return;
             }
 
@@ -887,13 +920,17 @@ export default {
                     value = Number(parsed?.einwohner_fhh);
 
                 if (Number.isFinite(value)) {
-                    this.dataSets[this.activeSet].inputs.einwohner = thousandsSeparator(value);
+                    set.inputs.einwohner = thousandsSeparator(value);
                 }
             }
             catch (e) {
-                console.warn(e);
+                set.populationAlert = {
+                    type: "warning",
+                    text: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.populationProcessingFailed")
+                };
             }
         },
+
         exportAsGeoJson,
         /**
          * Removes the set from data sets.
@@ -1792,6 +1829,15 @@ export default {
                         v-if="index === activeSet && dataSets[index].inputs.useTravelTimeIndex"
                         :text="$t('additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.warning')"
                         type="info"
+                    />
+                    <AlertMessage
+                        v-if="index === activeSet && dataSets[index].populationAlert"
+                        :key="dataSets[index].populationAlertKey"
+                        :text="dataSets[index].populationAlert.text"
+                        :type="dataSets[index].populationAlert.type"
+                        :closeable="true"
+                        class="mt-2"
+                        @close="dataSets[index].populationAlert = null"
                     />
                 </template>
             </ResultManagement>

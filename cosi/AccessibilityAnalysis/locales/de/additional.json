@@ -3,6 +3,7 @@
         "tools": {
             "cosi": {
                 "accessibilityAnalysis": {
+                    "areaOutsideMRH": "Für dieses Gebiet können keine Einwohner berechnet werden. Bitte wählen Sie ein Gebiet innerhalb der Metropolregion Hamburg.",
                     "title": "Erreichbarkeitsanalyse",
                     "description": "Zeigt ein Gebiet auf der Karte an, welches von einem ausgewählten Punkt, entlang einer Route oder ab einer Einrichtung innerhalb einer festgelegten Entfernung erreichbar ist. Die Entfernung kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit wird abhängig vom Verkehrsmittel berechnet.",
                     "dropdownInfo": "Bitte wählen Sie den Modus, in dem Sie arbeiten möchten",
@@ -74,6 +75,8 @@
                         "atTravelTimeIndex": "bei Reisezeitindex",
                         "travelTimeIndexBase": "1.0"
                     },
+                    "populationProcessingFailed": "Einwohnerdaten konnten nicht verarbeitet werden.",
+                    "populationNotAvailable": "Einwohnerdaten sind nicht verfügbar.",
                     "paginationRemove": "Dieses Ergebnis löschen",
                     "paginationRemoveAll": "Alle Ergebnisse in der Erreichbarkeitsanalyse löschen",
                     "paginationDownloadAll": "Alle Ergebnisse in der Erreichbarkeitsanalyse als Geodaten (GeoJSON) herunterladen",
