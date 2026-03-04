@@ -4,7 +4,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
+## 2026-03-04 v3.20.0
 ### __Breaking Changes__
 - Bundler: From now on, we no longer support webpack; we use vite as our bundler. It is important for the portal configuration that `type="module"` must now be set in `index.html`. Information on this can be found [here](https://bitbucket.org/geowerkstatt-hamburg/masterportal/wiki/Vite%20and%20Vitest)
 
@@ -26,10 +26,6 @@
 - The following packages have been updated:
     - devDependencies:
         - @masterportal/masterportalapi: 2.56.0 to 2.58.0 (This also raised ol to version 10.8.0)
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - Issue \#1515: Filter: saveTo: `url` was fixed. Now reads URL params properly and sets them.
