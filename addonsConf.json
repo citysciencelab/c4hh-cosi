@@ -138,5 +138,8 @@
   },
   "addLayerRemotely": {
     "type": "tool"
-  }
+  },
+  "drawWithoutGui": {
+    "type": "javascript"
+   }
 }
