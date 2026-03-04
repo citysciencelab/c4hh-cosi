@@ -14,7 +14,10 @@ import {initiateMatomo} from "./plugins/matomo.js";
 
 
 let app;
-const configPath = globalUrlParams.getConfigJsPath() === null ? window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1) + "config.js" : globalUrlParams.getConfigJsPath(),
+
+window.__appMounted = window.__appMounted || false;
+const isDev = import.meta.env.MODE === "development",
+    configPath = globalUrlParams.getConfigJsPath() === null ? window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1) + "config.js" : globalUrlParams.getConfigJsPath(),
     loadConfigJs = new Promise((resolve, reject) => {
         const script = document.createElement("script");
 
@@ -26,6 +29,13 @@ const configPath = globalUrlParams.getConfigJsPath() === null ? window.location.
     });
 
 loadConfigJs.then(() => {
+
+    // Reload protection in dev mode only – prevents double mounting
+    if (isDev && window.__appMounted) {
+        window.location.reload();
+        return;
+    }
+
     app = createApp(App);
 
     if (utilsLogin.handleLoginParameters()) {
@@ -49,6 +59,7 @@ loadConfigJs.then(() => {
         .then(() => {
             initiateVueI18Next(app);
             app.mount("#masterportal-root");
+            window.__appMounted = true;
         });
 });
 
