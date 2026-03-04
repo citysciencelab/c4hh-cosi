@@ -1,14 +1,16 @@
 import {expect} from "chai";
 import sinon from "sinon";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import scaleOutOfRangeMixin from "@shared/mixins/scaleOutOfRangeMixin.js";
 
-describe.skip("scaleOutOfRangeMixin", () => {
+describe("scaleOutOfRangeMixin", () => {
     const containerName = "MrObject";
-    let mixin, context, i18nArgs;
+    let mixin, context, i18nArgs, conf, setVisibleSpy;
 
     beforeEach(() => {
         mixin = scaleOutOfRangeMixin(containerName);
+        conf = {};
 
         context = {
             [containerName]: {id: "1337-42", details: "arbitrary"},
@@ -17,8 +19,18 @@ describe.skip("scaleOutOfRangeMixin", () => {
                 return i18nArgs;
             }),
             scale: 5000,
-            mode: "2D"
+            mode: "2D",
+            layerConfigById: sinon.stub().returns(conf)
         };
+        setVisibleSpy = sinon.spy();
+        sinon.stub(layerCollection, "getLayerById").callsFake(() => {
+            return {
+                layer: {
+                    setVisible: setVisibleSpy
+                },
+                attributes: {}
+            };
+        });
 
         sinon.stub(rawLayerList, "getLayerWhere");
     });
@@ -55,6 +67,7 @@ describe.skip("scaleOutOfRangeMixin", () => {
                 {minScale: "5000", maxScale: "6000"},
                 {minScale: "2000", maxScale: "10000"}
             ];
+            context.layerConfigById = sinon.stub().returns(null);
             expect(mixin.computed.rawLayersScaleBoundaries.call(context)).to.deep.equal([1000, 10000]);
         });
 
@@ -68,6 +81,7 @@ describe.skip("scaleOutOfRangeMixin", () => {
                 {minScale: "1000", maxScale: "10000"},
                 {}
             ];
+            context.layerConfigById = sinon.stub().returns(null);
             expect(mixin.computed.rawLayersScaleBoundaries.call(context)).to.deep.equal([500, 10000]);
         });
 
@@ -130,27 +144,13 @@ describe.skip("scaleOutOfRangeMixin", () => {
         });
     });
 
-    describe("computed#scaleIsOutOfRange", () => {
-        // it("returns false in 3D mode", () => {
-        //     context.rawLayersScaleBoundaries = [0, 10];
-        //     context.scale = 5000;
-        //     context.mode = "3D";
-        // context.rawLayers = [
-        //     {minScale: "1000", maxScale: "8000"},
-        //     {minScale: "5000", maxScale: "6000"},
-        //     {minScale: "2000", maxScale: "10000"}
-        // ];
-        //     context.layerConfigById = sinon.stub();
-        //     expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.false;
-        // });
-
+    describe("computed#scaleIsOutOfRange - 2D", () => {
         it("returns true when the scale is too small", () => {
             context.rawLayersScaleBoundaries = [7500, 10000];
             context.scale = 5000;
             context.rawLayers = [
                 {minScale: "7500", maxScale: "10000"}
             ];
-            context.layerConfigById = sinon.stub();
             expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.true;
         });
 
@@ -160,7 +160,6 @@ describe.skip("scaleOutOfRangeMixin", () => {
             context.rawLayers = [
                 {minScale: "1000", maxScale: "2500"}
             ];
-            context.layerConfigById = sinon.stub();
             expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.true;
         });
 
@@ -170,112 +169,76 @@ describe.skip("scaleOutOfRangeMixin", () => {
             context.rawLayers = [
                 {minScale: "1000", maxScale: "10000"}
             ];
-            context.layerConfigById = sinon.stub();
             expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.false;
         });
     });
 
-    // it("test method scaleIsOutOfRange, isLayerTree = false", () => {
-    //     isLayerTree = false;
-    //     wrapper = shallowMount(LayerComponent, {
-    //         global: {
-    //             plugins: [store]
-    //         },
-    //         propsData
-    //     });
+    describe("computed#scaleIsOutOfRange - 3D", () => {
+        it("conf.maxScale is set, is mapMode = 3D, is not in scale -> set 2D layer visible to false", () => {
+            conf.attributes = {};
+            conf.attributes.is3DLayer = false;
+            conf.visibility = true;
+            context.mode = "3D";
+            context.rawLayersScaleBoundaries = [0, 10000];
+            context.scales = [500, 1000, 10000, 20000, 100000];
+            context.scale = 20000;
+            context.rawLayers = [
+                {minScale: "0", maxScale: "10000"}
+            ];
+            expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.true;
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.false;
+        });
 
-    //     const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
+        it("conf.maxScale is set, is mapMode = 3D, is not in scale -> set 3D layer visible to false", () => {
+            conf.attributes = {};
+            conf.attributes.is3DLayer = true;
+            conf.visibility = true;
+            context.mode = "3D";
+            context.rawLayersScaleBoundaries = [0, 10000];
+            context.scales = [500, 1000, 10000, 20000, 100000];
+            context.scale = 20000;
+            context.rawLayers = [
+                {minScale: "0", maxScale: "10000"}
+            ];
+            expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.true;
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.false;
+        });
 
-    //     expect(scaleIsOutOfRange).to.be.false;
-    // });
-    // it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale not set", () => {
-    //     wrapper = shallowMount(LayerComponent, {
-    //         global: {
-    //             plugins: [store]
-    //         },
-    //         propsData
-    //     });
+        it("conf.maxScale is set, is mapMode = 3D, is in scale -> set 2D layer visible to true", () => {
+            conf.attributes = {};
+            conf.attributes.is3DLayer = false;
+            conf.visibility = true;
+            context.mode = "3D";
+            context.rawLayersScaleBoundaries = [0, 10000];
+            context.scales = [500, 1000, 10000, 20000, 100000];
+            context.scale = 5000;
+            context.rawLayers = [
+                {minScale: "0", maxScale: "10000"}
+            ];
+            expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.false;
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.true;
+        });
 
-    //     const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
+        it("conf.maxScale is set, is mapMode = 3D, is in scale -> set 3D layer visible to true", () => {
+            conf.attributes = {};
+            conf.attributes.is3DLayer = true;
+            conf.visibility = true;
+            context.mode = "3D";
+            context.rawLayersScaleBoundaries = [0, 10000];
+            context.scales = [500, 1000, 10000, 20000, 100000];
+            context.scale = 5000;
+            context.rawLayers = [
+                {minScale: "0", maxScale: "10000"}
+            ];
+            expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.false;
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.true;
+        });
 
-    //     expect(scaleIsOutOfRange).to.be.false;
-    // });
-    // it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale is set, is in scale", () => {
-    //     layer.maxScale = "100000";
-    //     layer.minScale = "0";
-    //     wrapper = shallowMount(LayerComponent, {
-    //         global: {
-    //             plugins: [store]
-    //         },
-    //         propsData
-    //     });
+    });
 
-    //     const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
 
-    //     expect(scaleIsOutOfRange).to.be.false;
-    // });
-    // it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale is set, is not in scale", () => {
-    //     layer.maxScale = "10000";
-    //     layer.minScale = "0";
-    //     wrapper = shallowMount(LayerComponent, {
-    //         global: {
-    //             plugins: [store]
-    //         },
-    //         propsData
-    //     });
-
-    //     const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-    //     expect(scaleIsOutOfRange).to.be.true;
-    // });
-    // it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale is set, is mapMode = 3D, is layer visible, is not in scale", () => {
-    //     store = createStore({
-    //         modules: {
-    //             Modules: {
-    //                 namespaced: true,
-    //                 modules: {
-    //                     namespaced: true,
-    //                     LayerComponent
-    //                 }
-    //             },
-    //             Maps: {
-    //                 namespaced: true,
-    //                 getters: {
-    //                     mode: () => "3D",
-    //                     scale: () => 20000,
-    //                     scales: () => [500, 1000, 10000, 20000, 100000]
-    //                 }
-    //             }
-    //         },
-    //         mutations: {
-    //             replaceByIdInLayerConfig: replaceByIdInLayerConfigSpy
-    //         }
-    //     });
-    //     layer.maxScale = "10000";
-    //     layer.minScale = "0";
-    //     wrapper = shallowMount(LayerComponent, {
-    //         global: {
-    //             plugins: [store]
-    //         },
-    //         propsData
-    //     });
-
-    //     const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-    //     expect(scaleIsOutOfRange).to.be.true;
-    // });
-    // it("test method scaleIsOutOfRange, isLayerTree = true, conf.maxScale is set, is mapMode = 3D, is layer visible, is in scale", () => {
-    //     layer.maxScale = "100000";
-    //     layer.minScale = "0";
-    //     wrapper = shallowMount(LayerComponent, {
-    //         global: {
-    //             plugins: [store]
-    //         },
-    //         propsData
-    //     });
-
-    //     const scaleIsOutOfRange = wrapper.vm.scaleIsOutOfRange();
-
-    //     expect(scaleIsOutOfRange).to.be.false;
-    // });
 });

@@ -13,14 +13,19 @@ export default (containerName) => ({
         ...mapGetters(["layerConfigById"]),
 
         /**
-         * @returns {object[]} raw layers of this item; empty if none
+         * @returns {object[]} raw layers of this item; if this item is a group layer with maxScale or minScale, only the group layer is returned.
          */
         rawLayers () {
+            if (this[containerName].typ === "GROUP" && (this[containerName].minScale || this[containerName].maxScale)) {
+                return [this[containerName]];
+            }
+
             const ids = (this[containerName].id ?? "").split("-");
 
             return ids
                 .map((id) => rawLayerList.getLayerWhere({id}) ?? null)
                 .filter((rawLayer) => Boolean(rawLayer));
+
         },
 
         /**
@@ -50,8 +55,7 @@ export default (containerName) => ({
 
         /**
          * Tooltip text explaining why a layer is disabled due to scale restrictions.
-         * If both minScale and maxScale exist, it returns a formatted scale range explanation.
-         * If only one is present, a generic "invisible layer" text is returned.
+         * Returns a formatted scale range explanation.
          * If no scale limits exist, an empty string is returned.
          *
          * @returns {String} The tooltip text for layers out of visible scale range.
@@ -104,24 +108,14 @@ export default (containerName) => ({
                 layerId = this.rawLayers.length > 0 ? this.rawLayers[0].id : null,
                 conf = this.layerConfigById(layerId);
 
-            if (conf) {
+            if (this.mode === "3D" && conf?.visibility === true) {
                 const layerEntry = layerCollection.getLayerById(layerId);
 
-                if (this.mode === "3D" && conf.visibility === true && layerEntry && layerEntry.attributes && layerEntry.attributes.is3DLayer) {
-                    if (isOutOfRange) {
-                        layerEntry.layer.setVisible(false, mapCollection.getMap("3D"), layerEntry.attributes);
-                    }
-                    else {
-                        layerEntry.layer.setVisible(true, mapCollection.getMap("3D"), layerEntry.attributes);
-                    }
+                if (layerEntry?.attributes?.is3DLayer) {
+                    layerEntry.layer.setVisible(!isOutOfRange, mapCollection.getMap("3D"), layerEntry.attributes);
                 }
-                else if (this.mode === "3D" && conf.visibility === true && layerEntry && layerEntry.attributes) {
-                    if (isOutOfRange) {
-                        layerEntry.layer.setVisible(false);
-                    }
-                    else {
-                        layerEntry.layer.setVisible(true);
-                    }
+                else if (layerEntry?.attributes) {
+                    layerEntry.layer.setVisible(!isOutOfRange);
                 }
             }
             return isOutOfRange;
