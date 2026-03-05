@@ -55,16 +55,8 @@ const actions = {
         });
 
         const sorted = state.legends.sort(function (a, b) {
-            if (a.position === undefined) {
-                a.position = groupLayerZIndex[a.id] || 0;
-            }
-            if (b.position === undefined) {
-                b.position = groupLayerZIndex[b.id] || 0;
-            }
-            return b.position - a.position;
+            return (b.position ?? (b.position = groupLayerZIndex[b.id] || 0)) - (a.position ?? (a.position = groupLayerZIndex[a.id] || 0));
         });
-
-        console.warn("sorted", sorted);
 
         commit("setLegends", sorted);
     },

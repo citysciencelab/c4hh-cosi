@@ -21,6 +21,7 @@
     - text-loader: ^0.0.1
 
 ### Fixed
+- Issue \#1563: Legend: Fixed sorting error of legend that would occur when using grouplayers.
 - Min/MaxScale: The scale restriction for grouped layers has been fixed.
 - Vite: 
     - Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
