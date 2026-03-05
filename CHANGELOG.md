@@ -20,6 +20,7 @@
 
 ### Fixed
 - Min/MaxScale: The scale restriction for grouped layers has been fixed.
+- UrlParams: Fixed an issue where old links with non-existent layers would fail to load by adding a fail-safe mechanism.
 
 ---
 
