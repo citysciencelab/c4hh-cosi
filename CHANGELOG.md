@@ -21,6 +21,7 @@
 ### Fixed
 - Min/MaxScale: The scale restriction for grouped layers has been fixed.
 - UrlParams: Fixed an issue where old links with non-existent layers would fail to load by adding a fail-safe mechanism.
+- Vite: Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
 
 ---
 

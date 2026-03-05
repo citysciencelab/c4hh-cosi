@@ -63,4 +63,11 @@ loadConfigJs.then(() => {
     });
 })();
 
+// Force reload on any HMR update
+if (import.meta.hot) {
+    import.meta.hot.on("vite:beforeUpdate", () => {
+        location.reload();
+    });
+}
+
 export default app;

@@ -102,7 +102,8 @@ export default function addonsFromJson (opts) {
                 // Optional: Full reload, if you need it
                 return [mod].filter(Boolean);
             }
-            return [];
+            // IMPORTANT: allow normal HMR for everything else
+            return ctx.modules;
         }
     };
 }

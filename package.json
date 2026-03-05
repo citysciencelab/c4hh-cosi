@@ -19,7 +19,7 @@
   "scripts": {
     "prestart": "node devtools/certificate/ensureDevCert.mjs",
     "start": "vite --config devtools/vite.config.js",
-    "startDebug": "vite --config devtools/vite.config.js  --debug plugin-transform",
+    "startDebug": "vite --debug hmr --debug plugin-transform --config devtools/vite.config.js",
     "test": "rm -rf node_modules/.vite && vitest run --config devtools/vitest.config.js",
     "test:watch": "rm -rf node_modules/.vite && vitest --config devtools/vitest.config.js --watch",
     "test:silent": "rm -rf node_modules/.vite && cross-env SILENT=true vitest  run --config devtools/vitest.config.js",

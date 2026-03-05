@@ -15,13 +15,17 @@ export const directoryListing = {
             if (fs.existsSync(requestedPath) && fs.statSync(requestedPath).isDirectory()) {
                 const files = fs.readdirSync(requestedPath).filter(file => !file.startsWith(".")),
                     currentDir = decodeURIComponent(req.url === "/" ? "/" : path.basename(req.url)),
-
                     html = generateHTML(currentDir, files, req.url);
 
                 res.setHeader("Content-Type", "text/html");
-                res.end(html);
+
+                server.transformIndexHtml(req.url, html).then(transformed => {
+                    res.end(transformed);
+                });
+
                 return;
             }
+
 
             next();
         });
