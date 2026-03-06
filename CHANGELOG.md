@@ -20,15 +20,17 @@
 
 ### Fixed
 - Min/MaxScale: The scale restriction for grouped layers has been fixed.
-- Vite: Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
+- Vite: 
+    - Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
+    - Masterportal starts and builds with and without addons.
 
 ---
 
 ## 2026-03-06 v3.20.1
 ### Fixed
 - UrlParams:
-  - Fixed an issue where old links with non-existent layers would fail to load by adding a fail-safe mechanism.
-  - Fixed WMS-Time layers not working with legacy URL parameters.
+    - Fixed an issue where old links with non-existent layers would fail to load by adding a fail-safe mechanism.
+    - Fixed WMS-Time layers not working with legacy URL parameters.
 
 ---
 

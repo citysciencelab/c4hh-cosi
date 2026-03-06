@@ -19,13 +19,16 @@ export default function addonsFromJson (opts) {
 
     /**
      * Reads the configuration from the JSON file
-     * @returns {Array} Array of [id, config] entries
+     * @returns {Array} Array of [id, config] entries, if config existst, else empty array
      */
     function readConfig () {
-        const raw = fs.readFileSync(configPath, "utf-8"),
-            data = JSON.parse(raw);
+        if (fs.existsSync(configPath)) {
+            const raw = fs.readFileSync(configPath, "utf-8"),
+                data = JSON.parse(raw);
 
-        return Object.entries(data);
+            return Object.entries(data);
+        }
+        return [];
     }
 
     /**

@@ -1,7 +1,26 @@
 import {defineConfig, mergeConfig} from "vitest/config";
 import viteConfig from "./vite.config.js";
 import {nodePolyfills} from "vite-plugin-node-polyfills";
-import addonModules from "./tasks/addon-modules-plugin.js";
+
+const addonsConf = {
+    exampleSearch: {
+        entry: "searchInterfaces/exampleSearch/index.js",
+        type: "searchInterface",
+        path: "searchInterfaces/exampleSearch"
+    },
+    exampleControl: {
+        entry: "controls/exampleControl/index.js",
+        path: "controls/exampleControl",
+        type: "control"
+    },
+    dataTable: {
+        entry: "gfiThemes/dataTable/index.js",
+        path: "gfiThemes/dataTable",
+        type: "gfiTheme"
+    },
+    populationRequest: {entry: "populationRequest/index.js", type: "tool"},
+    cesium3dTilesInspector: {entry: "cesium3dTilesInspector/index.js", type: "javascript"}
+};
 
 export default defineConfig(mode => mergeConfig(
     viteConfig(mode),
@@ -9,11 +28,6 @@ export default defineConfig(mode => mergeConfig(
         plugins: [
             nodePolyfills({
                 exclude: ["fs"]
-            }),
-            // todo: brauchen wir das beim Testen, z.B. für die addons.spec.js?
-            addonModules({
-                configPath: "addons/addonsConf.json",
-                baseDir: "addons"
             })
         ],
         css: false,
@@ -66,6 +80,12 @@ export default defineConfig(mode => mergeConfig(
                     "@cesium/widgets"
                 ]
             }
+        },
+        define: {
+            __VUE_OPTIONS_API__: true,
+            __VUE_PROD_DEVTOOLS__: false,
+            VUE_ADDONS: JSON.stringify(addonsConf),
+            MASTERPORTAL_BASE_PATH: JSON.stringify("/")
         }
     })
 ));
