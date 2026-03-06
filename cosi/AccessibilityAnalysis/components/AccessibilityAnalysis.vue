@@ -110,16 +110,6 @@ export default {
             mergePolygons: true,
             transportTypes: [
                 {
-                    type: "driving-car",
-                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.driving-car"),
-                    icon: "bi bi-car-front"
-                },
-                {
-                    type: "cycling-regular",
-                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.cycling-regular"),
-                    icon: "bi bi-bicycle"
-                },
-                {
                     type: "foot-walking",
                     name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.foot-walking"),
                     icon: "bi bi-person-walking"
@@ -128,6 +118,16 @@ export default {
                     type: "wheelchair",
                     name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.wheelchair"),
                     icon: "bi bi-person-wheelchair"
+                },
+                {
+                    type: "cycling-regular",
+                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.cycling-regular"),
+                    icon: "bi bi-bicycle"
+                },
+                {
+                    type: "driving-car",
+                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.driving-car"),
+                    icon: "bi bi-car-front"
                 }
             ],
             scaleUnits: [
