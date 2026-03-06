@@ -13,13 +13,19 @@
 
 ### Changed
 - Modeler3D: adapted no longer existsting `Cesium.defaultValue`.
+- The following packages have been updated:
+  - devDependencies:
+    - jsdom: 26.0.0 to 28.1.0
+    - shelljs: 0.8.5 to 0.10.0
 
 ### Deprecated
 
 ### Removed
 - The following packages have been removed:
   - devDependencies:
-    - text-loader: ^0.0.1
+    - text-loader: 0.0.1
+    - vite-plugin-html-purgecss: 0.1.1
+    - git-rev-sync: 3.0.2
 
 ### Fixed
 - Issue \#1563: Legend: Fixed sorting error of legend that would occur when using grouplayers.
