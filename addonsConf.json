@@ -18,6 +18,9 @@
   "populationRequest": {
     "type": "tool"
   },
+  "planParken": {
+    "type": "tool"
+  },
   "sdpDownload": {
     "type": "tool",
     "path": "sdpDownload"

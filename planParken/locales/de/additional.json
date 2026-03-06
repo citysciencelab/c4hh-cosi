@@ -1,0 +1,38 @@
+{
+  "modules": {
+    "planParken": {
+      "description": "Frage die Informationen zum öffentlichen und privaten Parken eines ausgewählten Gebietes in der Karte ab",
+      "name": "Flächenfilter",
+      "switchOffFilter": "Filter ausschalten",
+      "select": {
+        "info": "Abfrage der Informationen zum öffentlichen und privaten Parken in einem auszuwählenden Gebiet in der Freien und Hansestadt Hamburg",
+        "action": "Auswahl des Gebietes durch",
+        "showRasterLayer": "Raster Layer anzeigen (ab 1: 100.000)",
+        "showAlkisAdresses": "ALKIS Adressen anzeigen (ab 1: 10.000)"
+      },
+      "result": {
+        "confidentialityHint": "Unter Berücksichtigung des Datenschutzes wurden folgende Werte berechnet:",
+        "confidentialityHintSmallValues": "Aus Datenschutzgründen werden kleine Fallzahlen unter 3 verändert.",
+        "populationFHH": "Einwohnerzahl in Hamburg",
+        "populationMRH": "Einwohnerzahl in der Metropolregion ohne Hamburg",
+        "areaSize": "Größe der abgefragten Fläche",
+        "hint": "Hinweis",
+        "dataSourceKey": "Datenquelle",
+        "dataSourceValue": "Einwohner mit Hauptwohnsitz, Melderegister",
+        "dataSourceLinktext": "Weitere Informationen",
+        "dataSourceFHHKey": "Datenquelle Hamburg",
+        "dataSourceFHHValue": "Einwohner mit Hauptwohnsitz, Melderegister",
+        "dataSourceFHHLinktext": "Weitere Informationen",
+        "sourceAreaOutside": "Teile des Suchgebiets liegen außerhalb der Grenzen der Metropolregion Hamburg und wurden für die Ermittlung der Einwohnerzahl nicht berücksichtigt.",
+        "dataSourceMRHKey": "Datenquelle Metropolregion ohne Hamburg",
+        "dataSourceMRHValue": "Bevölkerung insgesamt im 100 Meter-Gitter.",
+        "dataSourceMRHLinktext": "Weitere Informationen"
+      },
+      "errors": {
+        "errorTitle": "Fehler",
+        "requestException": "Datenabfrage fehlgeschlagen. ",
+        "layerIdCantBeLoaded": "Der Layer mit der ID: {{layerId}} konnte nicht geladen werden, da dieser im Portal nicht zur Verfügung steht!"
+      }
+    }
+  }
+}
