@@ -21,6 +21,14 @@
 
 ---
 
+## 2026-03-06 v3.20.1
+### Fixed
+- UrlParams:
+  - Fixed an issue where old links with non-existent layers would fail to load by adding a fail-safe mechanism.
+  - Fixed WMS-Time layers not working with legacy URL parameters.
+
+---
+
 ## 2026-03-04 v3.20.0
 ### __Breaking Changes__
 - Bundler: From now on, we no longer support webpack; we use vite as our bundler. It is important for the portal configuration that `type="module"` must now be set in `index.html`. Information on this can be found [here](https://bitbucket.org/geowerkstatt-hamburg/masterportal/wiki/Vite%20and%20Vitest)
