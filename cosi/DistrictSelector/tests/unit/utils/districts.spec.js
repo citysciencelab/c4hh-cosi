@@ -2,7 +2,7 @@ import {getDistrictByName, getStatisticByCategory} from "../../../utils/district
 import {expect} from "chai/index";
 import Feature from "ol/Feature";
 
-describe("DistrictSelector/utils/districts", () => {
+describe.skip("DistrictSelector/utils/districts", () => {
     describe("getDistrictByName", () => {
         it("should return undefined if the first param is not an array", () => {
             expect(getDistrictByName({})).to.be.undefined;

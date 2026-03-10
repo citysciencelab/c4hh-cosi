@@ -24,6 +24,8 @@
 const state = {
     id: "districtSelector",
     type: "districtSelector",
+    description: "additional:modules.cosi.districtSelector.description",
+    active: false,
     hasMouseMapInteractions: true,
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D"],

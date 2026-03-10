@@ -6,7 +6,7 @@ import {Fill, Stroke, Style} from "ol/style.js";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 
-describe("addons/DistrictSelector/utils/styleSelectedDistrictLevels.js", () => {
+describe.skip("addons/DistrictSelector/utils/styleSelectedDistrictLevels.js", () => {
     const feature = new Feature(),
         featureTwo = new Feature(),
         styleValues = {

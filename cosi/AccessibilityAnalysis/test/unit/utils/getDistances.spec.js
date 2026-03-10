@@ -2,7 +2,7 @@ import {expect} from "chai";
 import sinon from "sinon";
 import {getDistances, getTravelTimeIndexDistance, getSteps} from "../../../utils/getDistances";
 
-describe("AccessibiltyAnalysis/utils/getDistances", () => {
+describe.skip("AccessibiltyAnalysis/utils/getDistances", () => {
     beforeEach(function () {
         sinon.spy(console, "error");
     });

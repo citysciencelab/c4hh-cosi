@@ -83,7 +83,7 @@ function addElemWithDataAppToBody () {
 }
 
 describe.skip("addons/cosi/FeaturesList/components/FeaturesList.vue", () => {
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
 
         const map = new Map();

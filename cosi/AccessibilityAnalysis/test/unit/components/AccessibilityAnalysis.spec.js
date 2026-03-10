@@ -25,7 +25,7 @@ import {
 
 // config.mocks.$t = key => key;
 
-before(() => {
+beforeAll(() => {
     registerProjections();
 });
 
@@ -73,7 +73,7 @@ describe.skip("AccessibilityAnalysis.vue", () => {
             }
         }];
 
-    before(() => {
+    beforeAll(() => {
         global.ShadowRoot = () => "";
         mapCollection.clear();
         const map = {

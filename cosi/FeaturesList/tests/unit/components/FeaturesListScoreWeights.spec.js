@@ -24,7 +24,7 @@ function addElemWithDataAppToBody () {
 }
 
 describe.skip("addons/cosi/FeaturesList/components/FeaturesListScoreWeights.vue", () => {
-    before(() => {
+    beforeAll(() => {
         addElemWithDataAppToBody();
     });
 

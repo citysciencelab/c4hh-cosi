@@ -26,7 +26,7 @@ function addElemWithDataAppToBody () {
 }
 
 describe.skip("addons/cosi/FeaturesList/components/FeaturesListScore.vue", () => {
-    before(() => {
+    beforeAll(() => {
         addElemWithDataAppToBody();
         global.requestAnimationFrame = (fn) => fn();
         global.ShadowRoot = () => "";

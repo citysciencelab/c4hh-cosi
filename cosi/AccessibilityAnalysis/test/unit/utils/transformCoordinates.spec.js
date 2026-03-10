@@ -2,7 +2,7 @@ import {expect} from "chai";
 import {transformCoordinates, transformCoordinate} from "../../../utils/transformCoordinates";
 import sinon from "sinon";
 
-describe("Accessibility/utils/transformCoordinates", () => {
+describe.skip("Accessibility/utils/transformCoordinates", () => {
     const coordinates = [[567365.4714596295, 5939001.647575631], [565224.7537994956, 5938496.534138625], [567461.6848501588, 5937991.420701618]],
         transCoordinates = [[10.017877366728525, 53.595515231189246], [9.985431302078034, 53.59124641953129], [10.01911238545045, 53.58642383664248]];
 

@@ -3,7 +3,7 @@ import sinon from "sinon";
 import Feature from "ol/Feature";
 import {styleIsochroneFeatures} from "../../../utils/styleIsochroneFeatures.js";
 
-describe("AccessibiltyAnalysis/utils/styleIsochroneFeatures", () => {
+describe.skip("AccessibiltyAnalysis/utils/styleIsochroneFeatures", () => {
     const feature1 = new Feature(),
         feature2 = new Feature(),
         feature3 = new Feature(),

@@ -17,7 +17,7 @@ import Vuetify from "vuetify";
 global.requestAnimationFrame = (fn) => fn();
 
 describe.skip("addons/cosi/Dashboard/components/StatsTrend.vue", () => {
-    before(() => {
+    beforeAll(() => {
         global.ShadowRoot = () => "";
         mapCollection.clear();
         const map = {

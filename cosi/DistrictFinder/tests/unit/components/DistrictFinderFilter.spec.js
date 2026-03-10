@@ -12,7 +12,7 @@ import Vuex from "vuex";
 
 // localVue.use(Vuex);
 
-before(() => {
+beforeAll(() => {
     sinon.stub(getMappingJsonJS, "getMappingJson").resolves([]);
 });
 

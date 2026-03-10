@@ -446,7 +446,7 @@ export default {
                 this.isDragBoxActive = false;
             });
 
-            dragBox.on("boxstart", () => this.clearFeatures(), this.selectedDistrictNames = []);
+            dragBox.on("boxstart", () => this.clearFeatures());
         },
 
         /**

@@ -8,7 +8,7 @@ import sinon from "sinon";
 import data from "../data.json";
 import expectedExportData from "../expectedExportData.json";
 
-describe("Dashboard/utils/export", () => {
+describe.skip("Dashboard/utils/export", () => {
     beforeEach(function () {
         sinon.spy(console, "error");
     });

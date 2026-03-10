@@ -39,7 +39,7 @@ describe.skip("AccessibilityAnalysisTrafficFlow.vue", () => {
         }
     };*/
 
-    before(() => {
+    beforeAll(() => {
         addElemWithDataAppToBody();
     });
 

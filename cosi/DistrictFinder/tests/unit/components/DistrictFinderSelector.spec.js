@@ -49,7 +49,7 @@ describe.skip("addons/cosi/DistrictFinder/components/DistrictFinderSelector.vue"
             }
         };
 
-    before(() => {
+    beforeAll(() => {
         window.requestAnimationFrame = sinon.stub();
     });
 

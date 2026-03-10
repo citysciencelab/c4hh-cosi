@@ -73,7 +73,7 @@ describe.skip("addons/cosi/DistrictSelector/components/DistrictSelector.vue", ()
             }
         };
 
-    before(() => {
+    beforeAll(() => {
         sinon.spy(layerOne.getSource(), "on");
         window.requestAnimationFrame = sinon.stub();
     });

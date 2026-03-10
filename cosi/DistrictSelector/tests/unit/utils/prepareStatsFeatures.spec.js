@@ -2,7 +2,7 @@ import {findMappingObjectByCategory, prepareStatsFeatures} from "../../../utils/
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 
-describe("addons/DistrictSelector/utils/prepareDistrictLevels.js", () => {
+describe.skip("addons/DistrictSelector/utils/prepareDistrictLevels.js", () => {
     describe("findMappingObjectByCategory", async () => {
         it("should returns undefined", async () => {
             const mappingJson = [

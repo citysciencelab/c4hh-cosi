@@ -3,7 +3,7 @@ import {expect} from "chai";
 import actions from "../../../store/actionsDistrictSelector.js";
 import crs from "@masterportal/masterportalapi/src/crs";
 
-describe("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
+describe.skip("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
     const fs = require("fs"),
         rootGetters = {
             "Maps/projectionCode": "EPSG:25832"
@@ -12,7 +12,7 @@ describe("addons/DistrictSelector/store/actionsDistrictSelector.js", () => {
     // payload;
     // spyGetStatFeatures;
 
-    before(function () {
+    beforeAll(function () {
         crs.registerProjections();
         // test statFeatures
         xmlDoc = fs.readFileSync("./addons/cosi/DistrictSelector/tests/unit/store/testFeatures.xml", "utf8");

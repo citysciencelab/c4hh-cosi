@@ -23,7 +23,7 @@ const rootGetters = {
 };
 */
 
-before(() => {
+beforeAll(() => {
     registerProjections();
     setWorkerFactory(() => new Worker());
 });

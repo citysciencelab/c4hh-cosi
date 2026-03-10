@@ -19,7 +19,7 @@ const
         "Maps/projectionCode": "EPSG:25832"
     };
 
-before(() => {
+beforeAll(() => {
     crs.registerProjections(namedProjections);
 
     i18next.init({

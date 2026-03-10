@@ -19,7 +19,7 @@ import mapping from "./mock.mapping.json";
 global.requestAnimationFrame = (fn) => fn();
 
 describe.skip("addons/cosi/Dashboard/components/DashboardToolbar.vue", () => {
-    before(() => {
+    beforeAll(() => {
         global.ShadowRoot = () => "";
         mapCollection.clear();
         const map = {
