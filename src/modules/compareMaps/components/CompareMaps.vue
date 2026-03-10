@@ -131,9 +131,6 @@ export default {
             const visibleLayers = layerConfigs.filter(layerConfig => layerConfig.typ === "WMS" || layerConfig.typ === "WFS");
 
             this.visibleLayers = visibleLayers.map(layerConfig => ({name: layerConfig.name, id: layerConfig.id}));
-
-            this.selectedLayer1 = this.visibleLayers.find(layer => layer.id === this.selectedLayer1Id) || null;
-            this.selectedLayer2 = this.visibleLayers.find(layer => layer.id === this.selectedLayer2Id) || null;
         },
 
         /**
