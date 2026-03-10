@@ -37,15 +37,7 @@ export default {
                 if (newValue) {
                     this.updateVisibleLayers(newValue);
 
-                    const comparisonLayer = newValue.filter(
-                        layerConfig => layerConfig.id === this.selectedLayer1Id || layerConfig.id === this.selectedLayer2Id
-                    );
-
-                    if (this.selectedLayer1Id && !comparisonLayer.some(layer => layer.id === this.selectedLayer1Id)) {
-                        this.resetSelection();
-                    }
-
-                    if (this.selectedLayer2Id && !comparisonLayer.some(layer => layer.id === this.selectedLayer2Id)) {
+                    if (!this.areSelectedLayersValid(newValue)) {
                         this.resetSelection();
                     }
                 }
@@ -78,7 +70,6 @@ export default {
         selectedLayer2Config (newValue, oldValue) {
             if (newValue) {
                 this.setSelectedLayer2Id(newValue.id);
-
                 this.updateCompareMaps();
             }
             if (oldValue) {
@@ -132,6 +123,18 @@ export default {
             const visibleLayers = layerConfigs.filter(layerConfig => layerConfig.typ === "WMS" || layerConfig.typ === "WFS");
 
             this.visibleLayers = visibleLayers.map(layerConfig => ({name: layerConfig.name, id: layerConfig.id}));
+        },
+
+        /**
+         * Checks if selected layers are still visible in the layer configs.
+         * @param {Array} layerConfigs - The layer configurations to check against.
+         * @returns {boolean} True if all selected layers are valid, false otherwise.
+         */
+        areSelectedLayersValid (layerConfigs) {
+            const visibleIds = new Set(layerConfigs.map(l => l.id));
+            const selectedIds = [this.selectedLayer1Id, this.selectedLayer2Id];
+
+            return selectedIds.every(id => !id || visibleIds.has(id));
         },
 
         /**
