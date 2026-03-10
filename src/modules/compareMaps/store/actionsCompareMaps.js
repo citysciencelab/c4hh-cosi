@@ -17,6 +17,11 @@ export default {
         const firstLayer = layerCollection.getLayers().find(layer => layer.get("id") === state.selectedLayer1Id),
             secondLayer = layerCollection.getLayers().find(layer => layer.get("id") === state.selectedLayer2Id);
 
+        if (!firstLayer || !secondLayer) {
+            console.error("Cannot activate swiper: One or both layers not found");
+            return;
+        }
+
         updateLayerId(firstLayer, false, rootGetters["Modules/WmsTime/layerAppendix"]);
         updateLayerId(secondLayer, true, rootGetters["Modules/WmsTime/layerAppendix"]);
 
