@@ -67,12 +67,12 @@ function updateLayerId (layer, shouldAppend, appendix) {
         return;
     }
 
-    const layerId = layer.getLayer().values_.id;
+    const layerId = layer.getLayer().get("id");
 
     if (shouldAppend && !layerId.endsWith(appendix)) {
-        layer.getLayer().values_.id = layerId + appendix;
+        layer.getLayer().set("id", layerId + appendix);
     }
     else if (!shouldAppend && layerId.endsWith(appendix)) {
-        layer.getLayer().values_.id = layerId.replace(appendix, "");
+        layer.getLayer().set("id", layerId.replace(appendix, ""));
     }
 }
