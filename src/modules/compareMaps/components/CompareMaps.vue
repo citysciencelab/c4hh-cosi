@@ -9,8 +9,8 @@ export default {
     data () {
         return {
             splitDirection: "vertical",
-            selectedLayer1: null,
-            selectedLayer2: null,
+            selectedLayer1Config: null,
+            selectedLayer2Config: null,
             visibleLayers: []
         };
     },
@@ -58,10 +58,10 @@ export default {
          * @param {Object} oldValue - The old value of the selected layer.
          * @returns {void}
          */
-        selectedLayer1 (newValue, oldValue) {
+        selectedLayer1Config (newValue, oldValue) {
             if (newValue) {
                 this.setSelectedLayer1Id(newValue.id);
-                if (this.selectedLayer2) {
+                if (this.selectedLayer2Config) {
                     this.updateCompareMaps();
                 }
             }
@@ -75,13 +75,14 @@ export default {
          * @param {Object} oldValue - The old value of the selected layer.
          * @returns {void}
          */
-        selectedLayer2 (newValue, oldValue) {
+        selectedLayer2Config (newValue, oldValue) {
             if (newValue) {
                 this.setSelectedLayer2Id(newValue.id);
 
                 this.updateCompareMaps();
             }
             if (oldValue) {
+
                 this.resetLayer(oldValue.id);
             }
         },
@@ -139,8 +140,8 @@ export default {
          */
         resetSelection () {
             this.deactivateSwiper();
-            this.selectedLayer1 = null;
-            this.selectedLayer2 = null;
+            this.selectedLayer1Config = null;
+            this.selectedLayer2Config = null;
             this.setSelectedLayer1Id("");
             this.setSelectedLayer2Id("");
             this.setLayerSwiperValueX(null);
@@ -153,7 +154,7 @@ export default {
          * @returns {void}
          */
         handleMapMove () {
-            if (this.selectedLayer2) {
+            if (this.selectedLayer2Config) {
                 this.setLayerSwiperActive(false);
                 this.updateCompareMaps();
             }
@@ -167,7 +168,7 @@ export default {
                 this.deactivateSwiper();
                 this.updateMap();
                 this.setSelectedLayer2Id("");
-                this.selectedLayer2 = null;
+                this.selectedLayer2Config = null;
                 return;
             }
             this.activateSwiper();
@@ -219,7 +220,7 @@ export default {
                 <div class="form-floating mb-3">
                     <select
                         id="module-compareMaps-select-layer1"
-                        v-model="selectedLayer1"
+                        v-model="selectedLayer1Config"
                         class="form-select"
                     >
                         <option
@@ -240,9 +241,9 @@ export default {
                 <div class="form-floating mb-3">
                     <select
                         id="module-compareMaps-select-layer2"
-                        v-model="selectedLayer2"
+                        v-model="selectedLayer2Config"
                         class="form-select"
-                        :disabled="!selectedLayer1"
+                        :disabled="!selectedLayer1Config"
                     >
                         <option
                             v-for="layer in selectionLayers"
@@ -256,7 +257,7 @@ export default {
                         id="module-compareMaps-select-label"
                         for="module-compareMaps-select-layer2"
                     >
-                        {{ !selectedLayer1 ? (splitDirection === "vertical" ? $t("common:modules.compareMaps.selectLeftLayerFirst") : $t("common:modules.compareMaps.selectUpperLayerFirst")) : (splitDirection === "vertical" ? $t("common:modules.compareMaps.rightLayer") : $t("common:modules.compareMaps.lowerLayer")) }}
+                        {{ !selectedLayer1Config ? (splitDirection === "vertical" ? $t("common:modules.compareMaps.selectLeftLayerFirst") : $t("common:modules.compareMaps.selectUpperLayerFirst")) : (splitDirection === "vertical" ? $t("common:modules.compareMaps.rightLayer") : $t("common:modules.compareMaps.lowerLayer")) }}
                     </label>
                 </div>
             </div>
