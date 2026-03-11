@@ -12,6 +12,7 @@
 - Style Configuration: Added parameter `polygonImage` to optionally style WFS polygons with centered icon and show this icon in legend and print
 
 ### Changed
+- Modeler3D: adapted no longer existsting `Cesium.defaultValue`.
 
 ### Deprecated
 

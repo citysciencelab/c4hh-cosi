@@ -264,7 +264,7 @@ export default {
             }
             const scene = mapCollection.getMap("3D").getCesiumScene(),
                 picked = scene.drillPick(event.endPosition).filter(pickedObj => !pickedObj?.id?.label && !pickedObj?.id?.outline),
-                entity = Cesium.defaultValue(picked[0]?.id, picked[0]?.primitive?.id);
+                entity = picked[0]?.id ?? picked[0]?.primitive?.id;
 
             if (Cesium.defined(entity) && entity instanceof Cesium.Entity) {
                 if (this.currentModelId && entity.id === this.currentModelId || entity.cylinder) {
@@ -297,7 +297,7 @@ export default {
                 const scene = mapCollection.getMap("3D").getCesiumScene(),
                     picked = scene.drillPick(event.position).filter(pickedObj => !pickedObj?.id?.label && !pickedObj?.id?.outline);
 
-                entity = Cesium.defaultValue(picked[0]?.id, picked[0]?.primitive?.id);
+                entity = picked[0]?.id ?? picked[0]?.primitive?.id;
             }
 
             if (entity instanceof Cesium.Entity || !event) {
@@ -365,7 +365,7 @@ export default {
             if (!Cesium.defined(picked[0])) {
                 return;
             }
-            entity = Cesium.defaultValue(picked[0]?.id, picked[0]?.primitive?.id);
+            entity = picked[0]?.id ?? picked[0]?.primitive?.id;
 
             if (entity instanceof Cesium.Entity && !entity.cylinder) {
                 this.setCurrentModelId(entity.id);

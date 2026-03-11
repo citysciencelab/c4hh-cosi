@@ -446,9 +446,8 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
             let currentModelId = "";
             const pickObject = new global.Cesium.Entity("entityId");
 
-            scene.drillPick = sinon.stub().returns([pickObject]);
+            scene.drillPick = sinon.stub().returns([{id: pickObject}]);
             global.Cesium.defined = sinon.stub().returns(true);
-            global.Cesium.defaultValue = sinon.stub().returns(pickObject);
 
             wrapper = shallowMount(Modeler3DComponent, {global: {
                 plugins: [store]
@@ -476,7 +475,6 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
 
             scene.drillPick = sinon.stub().returns([pickObject]);
             global.Cesium.defined = sinon.stub().returns(true);
-            global.Cesium.defaultValue = sinon.stub().returns(false);
             sinon.stub(getGfiFeaturesByTileFeatureModule, "getGfiFeaturesByTileFeature").returns([{
                 getProperties: () => ({
                     gmlid: "gmlId"
@@ -509,7 +507,6 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
 
             scene.drillPick = sinon.stub().returns([pickObject]);
             global.Cesium.defined = sinon.stub().returns(true);
-            global.Cesium.defaultValue = sinon.stub().returns(false);
             sinon.stub(getGfiFeaturesByTileFeatureModule, "getGfiFeaturesByTileFeature").returns([{
                 getProperties: () => ({
                     gmlid: "gmlId"
@@ -558,11 +555,12 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
             wrapper = shallowMount(Modeler3DComponent, {global: {
                 plugins: [store]
             }});
-            global.Cesium.defaultValue = () => {
-                return new global.Cesium.Entity("entityId");
-            };
             store.commit("Modules/Modeler3D/setCurrentModelId", "entityId");
             global.Cesium.defined = sinon.stub().returns(true);
+
+            const pickEntity = new global.Cesium.Entity("entityId");
+
+            scene.drillPick = sinon.stub().returns([{id: pickEntity}]);
 
             wrapper.vm.cursorCheck(event);
             expect(document.getElementById("map").style.cursor).to.equal("grab");
@@ -572,11 +570,13 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
             wrapper = shallowMount(Modeler3DComponent, {global: {
                 plugins: [store]
             }});
-            global.Cesium.defaultValue = () => {
-                return new global.Cesium.Entity("otherId");
-            };
+
             store.commit("Modules/Modeler3D/setCurrentModelId", "null");
             global.Cesium.defined = sinon.stub().returns(true);
+
+            const pickEntity = new global.Cesium.Entity("entityId");
+
+            scene.drillPick = sinon.stub().returns([{id: pickEntity}]);
 
             wrapper.vm.cursorCheck(event);
             expect(document.getElementById("map").style.cursor).to.equal("pointer");
