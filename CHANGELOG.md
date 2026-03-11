@@ -45,6 +45,7 @@
     - git-rev-sync: 3.0.2
 
 ### Fixed
+- Issue \#1472: Improve error handling and robustness of `addInterceptor`.
 - Issue \#1563: Legend: Fixed sorting error of legend that would occur when using grouplayers.
 - Issue \#1579: Fix OIDC login by preserving query parameters when processing portal URL redirects.
 - Issue \#1580: Prevent layer reset in CompareMaps by activating oder deactivating other layers in layer tree.
@@ -94,7 +95,6 @@
         - @masterportal/masterportalapi: 2.56.0 to 2.58.0 (This also raised ol to version 10.8.0)
 
 ### Fixed
-- Issue \#1472: Improve error handling and robustness of `addInterceptor`.
 - Issue \#1515: Filter: saveTo: `url` was fixed. Now reads URL params properly and sets them.
 - Issue \#1535: LayerPreview: Fixed WMS GetMap request building for services with query parameters in URL. The preview now correctly uses `&` instead of `?` when the service URL already contains a `?`.
 - Issue \#1542: MenuContainer: Fixed inconsistent menu behavior between 576px and 768px. Secondary menu now opens in full-screen mode like the main menu.
