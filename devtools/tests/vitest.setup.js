@@ -385,7 +385,6 @@ if (!globalThis.__vueTestUtilsSettings) {
     globalThis.__vueTestUtilsSettings = true;
 }
 
-
 globalThis.beforeAll(() => {
     expect(mapCollection.count()).to.be.equals(0);
 });
@@ -401,4 +400,3 @@ globalThis.afterAll(() => {
 globalThis.afterEach(() => {
     sinon.restore();
 });
-
