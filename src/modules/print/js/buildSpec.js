@@ -275,10 +275,10 @@ const BuildSpecModel = {
                 returnLayer = this.getDrawLayerInfo(layer, extent);
             }
             else if (layer instanceof Vector) {
-                features = source.getFeaturesInExtent(this.lastPrintedExtent);
+                features = source.getFeaturesInExtent(this.lastPrintedExtent || extent);
 
                 if (features.length > 0) {
-                    returnLayer = this.buildVector(layer, features, this.lastPrintedExtent);
+                    returnLayer = this.buildVector(layer, features, this.lastPrintedExtent || extent);
                 }
             }
             else if (layer instanceof Heatmap) {
