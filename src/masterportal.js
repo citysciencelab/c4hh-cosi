@@ -10,6 +10,8 @@ import store from "./app-store/index.js";
 import remoteInterface from "./plugins/remoteInterface.js";
 import utilsLogin from "../src/modules/login/js/utilsLogin.js";
 
+import {instantiateVuetify} from "./plugins/vuetify.js";
+
 
 let app;
 
@@ -59,6 +61,14 @@ loadConfigJs.then(() => {
             .catch(() => {
                 console.warn("Matomo blocked. Using fallback empty function.");
             });
+    }
+
+    if (Config.vuetifyFolder) {
+        instantiateVuetify().then(vuetify => {
+            if (vuetify) {
+                app.use(vuetify);
+            }
+        });
     }
 
     initLanguage(Config.portalLanguage || {}, Config.portalLocales)

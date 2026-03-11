@@ -13,6 +13,11 @@
 - GetFeatureInfo: In 3D mode, restored feature highlighting and GFI display via share link.
 - SearchBar: In 3D mode, added restoring of highlighted feature via share link.
 - 3D-GroupLayer: 3D-Layers can be grouped, like grouped layers in 2D.
+- Print: 
+    - New parameter legendLabel as the descriptive text for the legend print checkbox.
+    - Added support for custom layout selection component via config.json parameter `customLayoutSelectionComponent`.
+- InputText: new htmlType "textarea" in shared component InputText.
+- Filter: Adds parameter shouldSubjectDataSelectedInTree: Filters are only displayed when the respective layer is selected in the subject tree
 
 ### Changed
 - Modeler3D: adapted no longer existsting `Cesium.defaultValue`.
@@ -71,7 +76,6 @@
 - Calendar: Added women's day, liberation day and children day as holidays.
 - GetFeatureInfo: Added `stickyHeader` configuration option to keep GFI title and navigation arrows visible when scrolling through long content.
 - Menu: Added configuration parameter `closeOppositeMenu` to allow modules to close the opposite menu when opened.
-- Print: Added support for custom layout selection component via config.json parameter `customLayoutSelectionComponent`.
 
 ### Changed
 - WMS-Time:
@@ -143,8 +147,6 @@
 - WMS-Time:
     - The attributes `dimensionRange` and `dimensionRegex` can now be used to filter the values ​​that should be displayed in the time slider.
     - The attibute `staticDimensions` can now be configured and sent to the service when the WMS time layer is loaded.
-- WMS-Time: The attributes `dimensionRange` and `dimensionRegex` can now be used to filter the values ​​that should be displayed in the time slider.
-- CopyrightConstraints: Added Parameter `useLayerCswUrl` to use the CSW interface specified in the layers.
 - The following packages have been added:
   - devDependencies:
     - @vitejs/plugin-vue: ^6.0.3
@@ -161,7 +163,6 @@
     - vite-plugin-node-polyfills: ^0.24.0
     - vite-plugin-zip-pack: ^1.2.4
     - vitest: ^4.0.16
-- Filter: Adds parameter shouldSubjectDataSelectedInTree: Filters are only displayed when the respective layer is selected in the subject tree
 
 ### Changed
 - Issue \#1500: WfsSearch: Added multi-select functionality for search results with polygon markers on map and zoom to combined extent. Improved geometry extraction and row selection logic to prevent duplicate entries.
@@ -363,9 +364,6 @@
     - Adds parameter clearAll to enable to clear the layers for the whole filter.
     - New parameter icon to set an icon for the filter.
     - New parameter showCurrentlyActiveFilters to control the visibility of the active filter area
-- Print: 
-    - New parameter legendLabel as the descriptive text for the legend print checkbox.
-- InputText: new htmlType "textarea" in shared component InputText.
 
 ### Changed
 - The following packages have been updated:
