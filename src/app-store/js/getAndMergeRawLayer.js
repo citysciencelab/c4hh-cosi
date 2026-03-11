@@ -137,7 +137,7 @@ function mergeGroupedLayer (layerConf) {
         minScales = [];
     let rawLayer = {};
 
-    if (existingLayers.length !== ids.length || ids.length === 0) {
+    if (ids.length === 0) {
         return layerConf;
     }
     if (layerConf.typ === "GROUP") {
@@ -213,7 +213,7 @@ function checkIdArray (ids) {
             existingLayers.push(layer);
         }
         else {
-            console.warn(`Layer with id:${id} not found in services.json. The Layer with ids: ${ids} will not be displayed!`);
+            console.warn(`Layer with id:${id} not found in services.json. The Layer ${id} out of group layer with ids: ${ids} will not be displayed!`);
         }
     }
     return existingLayers;

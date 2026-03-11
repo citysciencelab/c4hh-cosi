@@ -9,7 +9,7 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
     let layerConfig,
         warnSpy;
 
-    before(() => {
+    beforeAll(() => {
         sinon.stub(layerTypes, "getLayerTypes3d").returns(["TERRAIN3D"]);
     });
 
@@ -426,6 +426,71 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
             expect(result[0].children[1].styleId).to.be.equals("styleId");
         });
 
+        it("should return a merged raw layer, if layer is grouped without children but one layer is missing in layerlist", () => {
+            layerConfig = {
+                [treeSubjectsKey]: {
+                    elements: [
+                        {
+                            name: "Gruppenlayer",
+                            type: "folder",
+                            elements: [
+                                {
+                                    id: ["682", "687", "1732"],
+                                    typ: "GROUP",
+                                    name: "Kita und Krankenhäuser",
+                                    styleId: "styleId"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            };
+            const simpleLayerList = [
+                {
+                    id: "682",
+                    name: "name682",
+                    maxScale: "10000",
+                    minScale: "100"
+                },
+                {
+                    id: "687",
+                    name: "name687",
+                    maxScale: "10000",
+                    minScale: "200"
+                },
+                {
+                    id: "1731",
+                    name: "name1731",
+                    maxScale: "20000"
+                }
+            ];
+            let result = null;
+
+            sinon.stub(rawLayerList, "getLayerWhere").callsFake(function (searchAttributes) {
+                return simpleLayerList.find(entry => Object.keys(searchAttributes).every(key => entry[key] === searchAttributes[key])) || null;
+            });
+            sinon.stub(rawLayerList, "getLayerList").returns(simpleLayerList);
+
+            result = getAndMergeRawLayer(layerConfig[treeSubjectsKey].elements[0].elements[0]);
+
+            expect(Array.isArray(result)).to.be.true;
+            expect(result.length).to.be.equals(1);
+            expect(result[0].id).to.be.equals("682-687-1732");
+            expect(result[0].name).to.be.equals("Kita und Krankenhäuser");
+            expect(result[0].typ).to.be.equals("GROUP");
+            expect(result[0].maxScale).to.be.equals(10000);
+            expect(result[0].minScale).to.be.equals(100);
+            expect(result[0].children).to.be.an("array");
+            expect(result[0].children.length).to.be.equals(2);
+            expect(result[0].children[0].id).to.be.equals("682");
+            expect(result[0].children[0].name).to.be.equals("name682");
+            expect(result[0].children[0].styleId).to.be.equals("styleId");
+            expect(result[0].children[1].id).to.be.equals("687");
+            expect(result[0].children[1].name).to.be.equals("name687");
+            expect(result[0].children[1].styleId).to.be.equals("styleId");
+            expect(warnSpy.calledOnce).to.be.true;
+        });
+
         it("should return a merged raw layer, if layer is grouped with children", () => {
             layerConfig = {
                 [treeSubjectsKey]: {
@@ -496,7 +561,7 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
     });
 
     describe("addAdditional", () => {
-        before(() => {
+        beforeAll(() => {
             resetZIndex();
         });
 

@@ -25,6 +25,7 @@
 - Vite: 
     - Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
     - Masterportal starts and builds with and without addons.
+- GroupLayer: Fixed bug if configuration contains wrong layer IDs.
 
 ---
 
