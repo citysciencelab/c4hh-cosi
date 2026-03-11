@@ -22,6 +22,7 @@
 
 ### Fixed
 - Issue \#1563: Legend: Fixed sorting error of legend that would occur when using grouplayers.
+- Issue \#1580: Prevent layer reset in CompareMaps by activating oder deactivating other layers in layer tree.
 - Min/MaxScale: The scale restriction for grouped layers has been fixed.
 - Vite: 
     - Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
