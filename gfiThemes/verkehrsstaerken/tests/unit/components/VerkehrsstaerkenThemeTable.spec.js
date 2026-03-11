@@ -16,7 +16,7 @@ describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThemeTabl
             props: {
                 rowNames: rowNames,
                 years: years,
-                dataset: dataset
+                tableData: dataset
             }
         });
     });

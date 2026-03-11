@@ -10,7 +10,7 @@ export default {
             type: Array,
             required: true
         },
-        dataset: {
+        tableData: {
             type: Array,
             required: true
         },
@@ -78,7 +78,7 @@ export default {
          * @returns {String} the data for the year
          */
         getYearData (year, rowName) {
-            const yearData = this.dataset.find(function (data) {
+            const yearData = this.tableData.find(function (data) {
                     return data.year === year;
                 }),
                 contained = yearData[rowName] !== undefined;

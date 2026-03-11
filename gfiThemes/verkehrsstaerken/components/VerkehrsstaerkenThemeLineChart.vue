@@ -6,7 +6,7 @@ export default {
     name: "VerkehrsstaerkenThemeLineChart",
     components: {},
     props: {
-        dataset: {
+        lineChartData: {
             type: Array,
             required: true
         },
@@ -41,11 +41,11 @@ export default {
             if (this.contentType === "bike") {
                 return false;
             }
-            return this.dataset.filter(data => Object.prototype.hasOwnProperty.call(data, "Schwerverkehrsanteil am DTVw")).length > 0;
+            return this.lineChartData.filter(data => Object.prototype.hasOwnProperty.call(data, "Schwerverkehrsanteil am DTVw")).length > 0;
         }
     },
     watch: {
-        dataset: {
+        lineChartData: {
             handler () {
                 this.drawChart();
             },
@@ -97,7 +97,7 @@ export default {
 
             this.chart = new Chart(ctx, {
                 type: this.chartType,
-                data: this.createChartData(this.dataset, this.category),
+                data: this.createChartData(this.lineChartData, this.category),
                 options: {
                     responsive: true,
                     scales: this.createChartScales(),
@@ -283,8 +283,8 @@ export default {
                         display: true,
                         text: this.$t("additional:modules.tools.gfi.themes.verkehrsstaerken.year")
                     },
-                    min: this.dataset[0].year,
-                    max: this.dataset[this.dataset.length - 1].year,
+                    min: this.lineChartData[0].year,
+                    max: this.lineChartData[this.lineChartData.length - 1].year,
                     gridLines: this.createGridLines()
                 },
                 y: {
@@ -320,7 +320,7 @@ export default {
 
 <template>
     <div
-        v-if="dataset"
+        v-if="lineChartData"
         id="verkehrsstaerken-line-chart"
         class="tab-pane"
     >

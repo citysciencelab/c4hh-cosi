@@ -263,14 +263,14 @@ export default {
                 :class="{ active: isActiveTab('table'), 'tab-pane': true }"
                 :row-names="rowNames"
                 :years="years"
-                :dataset="dataset"
+                :table-data="dataset"
                 :content-type="contentType"
                 :type="String('table')"
             />
             <VerkehrsstaerkenThemeLineChart
                 v-if="isActiveTab('diagram')"
                 :class="{ active: isActiveTab('diagram'), 'tab-pane': true }"
-                :dataset="dataset"
+                :line-chart-data="dataset"
                 :content-type="contentType"
                 :type="String('diagram')"
             />
