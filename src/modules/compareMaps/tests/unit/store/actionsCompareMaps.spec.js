@@ -16,8 +16,22 @@ describe("modules/compareMaps/store/actionsCompareMaps", () => {
         rootGetters = {
             "Modules/WmsTime/layerAppendix": "_appendix"
         };
-        const layer1 = {get: () => "layer1", getLayer: () => ({values_: {id: "layer1"}}), attributes: {id: "layer1"}},
-            layer2 = {get: () => "layer2", getLayer: () => ({values_: {id: "layer2"}}), attributes: {id: "layer2"}};
+        const layer1 = {
+                get: (key) => key === "id" ? "layer1" : undefined,
+                getLayer: () => ({
+                    get: (key) => key === "id" ? "layer1" : undefined,
+                    set: sinon.spy()
+                }),
+                attributes: {id: "layer1"}
+            },
+            layer2 = {
+                get: (key) => key === "id" ? "layer2" : undefined,
+                getLayer: () => ({
+                    get: (key) => key === "id" ? "layer2" : undefined,
+                    set: sinon.spy()
+                }),
+                attributes: {id: "layer2"}
+            };
 
         sinon.stub(layerCollection, "getLayers").returns([layer1, layer2]);
     });

@@ -123,8 +123,8 @@ describe("src/modules/compareMaps/components/CompareMaps.vue", () => {
 
         await wrapper.vm.resetSelection();
 
-        expect(wrapper.vm.selectedLayer1).to.be.null;
-        expect(wrapper.vm.selectedLayer2).to.be.null;
+        expect(wrapper.vm.selectedLayer1Config).to.be.null;
+        expect(wrapper.vm.selectedLayer2Config).to.be.null;
 
         expect(rootDispatchSpy.calledWith("Modules/CompareMaps/deactivateSwiper")).to.be.true;
         expect(rootCommitSpy.calledWith("Modules/CompareMaps/setSelectedLayer1Id", "", undefined)).to.be.true;
@@ -138,6 +138,7 @@ describe("src/modules/compareMaps/components/CompareMaps.vue", () => {
             }
         });
 
+        wrapper.vm.selectedLayer1Config = {name: "Layer 1", id: "layer1"};
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find("#module-compareMaps-select-layer1").element.labels[0].textContent).to.equal("common:modules.compareMaps.leftLayer");
@@ -152,6 +153,7 @@ describe("src/modules/compareMaps/components/CompareMaps.vue", () => {
         });
 
         wrapper.vm.splitDirection = "horizontal";
+        wrapper.vm.selectedLayer1Config = {name: "Layer 1", id: "layer1"};
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find("#module-compareMaps-select-layer1").element.labels[0].textContent).to.equal("common:modules.compareMaps.upperLayer");
