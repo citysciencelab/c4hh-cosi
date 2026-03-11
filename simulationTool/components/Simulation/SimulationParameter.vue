@@ -182,11 +182,11 @@ export default {
         /**
          * Split input mapping into nested and flat inputs by looking at their schema type.
          */
-        combinedInputs () {
+        combinedInputs (combinedInputs) {
             this.nestedInputs = {};
             this.flatInputs = {};
 
-            Object.entries(this.combinedInputs).forEach(([inputKey, input]) => {
+            Object.entries(combinedInputs).forEach(([inputKey, input]) => {
                 if (this.simulation?.inputs?.[inputKey]?.menu !== "nowhere" //
                     && !this.simulation?.inputs?.[inputKey]?.editable) {
                     switch (input.schema?.type) {
@@ -644,7 +644,7 @@ export default {
          * @returns {void}
          */
         initializeProcessHandlers () {
-            this.processHandlers = this.simulation.processes.map(
+            this.processHandlers = (this.simulation?.processes ?? []).map(
                 process => new OgcApiProcess(process.url, process.id)
             );
         },
@@ -829,6 +829,13 @@ export default {
             this.processDescriptions.forEach((description, index) => {
                 if (!description.inputs?.[inputKey]) {
                     return;
+                }
+
+                if (!this.requestBodies[index]) {
+                    this.requestBodies[index] = {inputs: {}};
+                }
+                if (!this.requestBodies[index].inputs) {
+                    this.requestBodies[index].inputs = {};
                 }
                 if (propertyKey === "") {
                     // top-level input

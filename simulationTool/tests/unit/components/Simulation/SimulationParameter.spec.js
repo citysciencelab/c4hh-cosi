@@ -1,3 +1,4 @@
+
 import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
@@ -8,11 +9,7 @@ import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature
 
 config.global.mocks.$t = key => key;
 
-afterEach(() => {
-    sinon.restore();
-});
-
-describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
+describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
     let consoleWarnSpy, store;
 
     const factory = {
@@ -138,6 +135,19 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
             expect(wrapper.exists()).to.be.true;
         });
 
+        it("should exist", () => {
+            const wrapper = factory.getMount({
+                props: {
+                    simulation: {
+                        id: "simulationId",
+                        inputs: {},
+                        processes: []
+                    }
+                }
+            });
+
+            expect(wrapper.exists()).to.be.true;
+        });
         it("should render SectionHeader component", () => {
             const wrapper = factory.getMount();
 
@@ -176,24 +186,39 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
 
     describe("Computed Properties", () => {
         it("outputOptions", async () => {
-            const wrapper = factory.getMount();
 
-            await wrapper.setData({
-                processDescriptions: [
-                    {outputs: {o1: {}, o2: {}}},
-                    {outputs: {o2: {}, o3: {}}}
-                ]
+            const wrapper = factory.getMount({
+                data () {
+                    return {
+                        processHandlers: []
+                    };
+                }
             });
 
-            expect(wrapper.vm.outputOptions).to.deep.equal(
-                [{code: "o2", name: "o2"}]
-            );
-        });
+            wrapper.vm.processDescriptions = [
+                {outputs: {o1: {}, o2: {}}},
+                {outputs: {o2: {}, o3: {}}}
+            ];
 
+            expect(wrapper.vm.outputOptions).to.deep.equal([
+                {code: "o2", name: "o2"}
+            ]);
+        });
         it("should return the correct value for 'objectTypeInputs'", async () => {
-            const wrapper = factory.getMount();
+            const wrapper = factory.getMount({
+                props: {
+                    simulation: {
+                        id: "simulationId",
+                        inputs: {
+                            objectType: {menu: "primary"},
+                            stringType: {menu: "primary"},
+                            otherType: {menu: "primary"}
+                        }
+                    }
+                }
+            });
 
-            await wrapper.setData({
+            wrapper.setData({
                 processDescriptions: [{
                     inputs: {
                         objectType: {schema: {type: "object"}},
@@ -204,27 +229,42 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
                 }]
             });
 
-            expect(wrapper.vm.nestedInputs).to.deep.equal({
-                objectType: {schema: {type: "object"}}
+            expect(wrapper.vm.combinedInputs).to.deep.equal({
+                objectType: {schema: {type: "object"}},
+                stringType: {schema: {type: "string"}},
+                otherType: {schema: {type: "geojson"}}
             });
         });
-
-        it("should return the correct value for 'stringTypeInputs'", async () => {
+        it("should return the correct value for 'stringTypeInputs'", () => {
             const wrapper = factory.getMount();
 
-            await wrapper.setData({
-                processDescriptions: [{
+            wrapper.vm.nestedInputs = {};
+            wrapper.vm.flatInputs = {};
+
+            Object.defineProperty(wrapper.vm, "simulation", {
+                value: {
+                    id: "simulationId",
                     inputs: {
-                        objectType: {schema: {type: "object"}},
-                        stringType: {schema: {type: "string"}},
-                        otherType: {schema: {type: "geojson"}}
-                    },
-                    outputs: {}
-                }]
+                        objectType: {menu: "primary"},
+                        stringType: {menu: "primary"},
+                        otherType: {menu: "primary"}
+                    }
+                },
+                configurable: true
+            });
+
+            wrapper.vm.$options.watch.combinedInputs.call(wrapper.vm, {
+                objectType: {schema: {type: "object"}},
+                stringType: {schema: {type: "string"}},
+                otherType: {schema: {type: "geojson"}}
             });
 
             expect(wrapper.vm.flatInputs).to.deep.equal({
                 stringType: {schema: {type: "string"}}
+            });
+
+            expect(wrapper.vm.nestedInputs).to.deep.equal({
+                objectType: {schema: {type: "object"}}
             });
         });
 
@@ -295,17 +335,33 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
                     };
 
                 await wrapper.setData({requestBodies: [{inputs: inputs}]});
-                expect(wrapper.vm.getRequestBodyInputByKey("key1", "key2", "value")).to.equal("result");
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", "key2", "result")).to.equal("result");
             });
-
-            it("should return the input object if propertyKey is an empty string", async () => {
+            it("should return the input object if propertyKey is an empty string", () => {
                 const wrapper = factory.getMount(),
                     inputs = {
-                        "key1": "result"
+                        key1: {
+                            value: "result",
+                            type: "string"
+                        }
                     };
 
-                await wrapper.setData({requestBodies: [{inputs: inputs}]});
-                expect(wrapper.vm.getRequestBodyInputByKey("key1", "", "value")).to.equal("result");
+                wrapper.vm.requestBodies = [{inputs}];
+
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", "", "val")).to.deep.equal({
+                    value: "result",
+                    type: "string"
+                });
+            });
+            it("should return the input value if propertyKey is an empty string", () => {
+                const wrapper = factory.getMount(),
+                    inputs = {
+                        key1: "result"
+                    };
+
+                wrapper.vm.requestBodies = [{inputs}];
+
+                expect(wrapper.vm.getRequestBodyInputByKey("key1", "", "val")).to.equal("result");
             });
         });
 
@@ -333,21 +389,51 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
         });
 
         describe("setRequestBodyInput", () => {
-            it("should not set value if the keys are not string", async () => {
+            it("should not set value if the key is null", async () => {
                 const wrapper = factory.getMount();
 
-                await wrapper.setData({requestBodies: [{inputs: {}}]});
+                wrapper.vm.requestBodies = [{inputs: {}}];
 
                 await wrapper.vm.setRequestBodyInput(null, "key2", "value");
                 expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({});
+            });
+            it("should not set value if the key is 0", async () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.requestBodies = [{inputs: {}}];
+
                 await wrapper.vm.setRequestBodyInput(0, "key2", "value");
                 expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({});
+            });
+            it("should not set value if the key is undefined", async () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.requestBodies = [{inputs: {}}];
+
                 await wrapper.vm.setRequestBodyInput(undefined, "key2", "value");
                 expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({});
+            });
+            it("should not set value if the key is true", async () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.requestBodies = [{inputs: {}}];
+
                 await wrapper.vm.setRequestBodyInput(true, "key2", "value");
                 expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({});
+            });
+            it("should not set value if the key is []", async () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.requestBodies = [{inputs: {}}];
+
                 await wrapper.vm.setRequestBodyInput([], "key2", "value");
                 expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({});
+            });
+            it("should not set value if the key is {}", async () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.requestBodies = [{inputs: {}}];
+
                 await wrapper.vm.setRequestBodyInput({}, "key2", "value");
                 expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({});
             });
@@ -359,10 +445,10 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
                     processDescriptions: [{inputs: {key1: {}}}],
                     requestBodies: [{inputs: {}}]
                 });
-                await wrapper.vm.$nextTick();
+                wrapper.vm.processDescriptions = [{inputs: {key1: {}}}];
+                wrapper.vm.requestBodies = [{inputs: {}}];
 
                 await wrapper.vm.setRequestBodyInput("key1", "", "value");
-                await wrapper.vm.$nextTick();
 
                 expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({
                     key1: "value"
@@ -372,14 +458,11 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
             it("should set value with only two level key", async () => {
                 const wrapper = factory.getMount();
 
-                await wrapper.setData({
-                    processDescriptions: [{inputs: {key1: {key2: {}}}}],
-                    requestBodies: [{inputs: {}}]
-                });
-                await wrapper.vm.$nextTick();
+                wrapper.vm.processDescriptions = [{inputs: {key1: {key2: {}}}}];
+                wrapper.vm.requestBodies = [{inputs: {}}];
+
 
                 await wrapper.vm.setRequestBodyInput("key1", "key2", "value");
-                await wrapper.vm.$nextTick();
 
                 expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({
                     key1: {
@@ -609,18 +692,16 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
                 });
             });
         });
-
         describe("toggleOptionalBBOXUrlInputs", () => {
-            it("should set input and set the correct value", async () => {
+            it("should call setRequestBodyInput with the correct bbox url when checkbox is checked", async () => {
                 const wrapper = factory.getShallowMount();
+                const spySetRequestBodyInput = sinon.spy(wrapper.vm, "setRequestBodyInput");
 
                 sinon.stub(wrapper.vm, "getOptionalBBOXUrlInputs").returns({
                     input1: "http://example.com/bbox"
                 });
 
                 await wrapper.setData({
-                    processDescriptions: [{inputs: {input1: {}}}],
-                    requestBodies: [{inputs: {}}],
                     currentPlanningScenario: {
                         scenarioFeature: {
                             features: [{
@@ -631,34 +712,55 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
                     }
                 });
 
-                wrapper.vm.toggleOptionalBBOXUrlInputs("input1", {target: {checked: true}});
+                await wrapper.vm.toggleOptionalBBOXUrlInputs("input1", {target: {checked: true}});
 
-                expect(wrapper.vm.requestBodies[0].inputs.input1).to.include("http://example.com/bbox/");
-                expect(wrapper.vm.requestBodies[0].inputs.input1).to.include("500x500.tif?coord_crs=epsg:25832");
+                expect(spySetRequestBodyInput.calledOnce).to.be.true;
+
+                const args = spySetRequestBodyInput.firstCall.args;
+
+                expect(args[0]).to.equal("input1");
+                expect(args[1]).to.equal("");
+                expect(args[2]).to.include("http://example.com/bbox/");
+                expect(args[2]).to.include("500x500.tif?coord_crs=epsg:25832");
+
+                spySetRequestBodyInput.restore();
             });
-            it("should set the input to undefined if the checkbox is unchecked", async () => {
+
+            it("should call setRequestBodyInput with undefined if the checkbox is unchecked", async () => {
                 const wrapper = factory.getShallowMount();
+                const spySetRequestBodyInput = sinon.spy(wrapper.vm, "setRequestBodyInput");
 
-                await wrapper.setData({
-                    processDescriptions: [{inputs: {input1: {}}}],
-                    requestBodies: [{inputs: {}}]
-                });
-                wrapper.vm.toggleOptionalBBOXUrlInputs("input1");
-                expect(wrapper.vm.requestBodies[0].inputs.input1).to.be.undefined;
+                await wrapper.vm.toggleOptionalBBOXUrlInputs("input1", {target: {checked: false}});
+
+                expect(spySetRequestBodyInput.calledOnce).to.be.true;
+
+                expect(spySetRequestBodyInput.firstCall.args).to.deep.equal([
+                    "input1",
+                    "",
+                    undefined
+                ]);
+
+                spySetRequestBodyInput.restore();
             });
-            it("should delete the property from requestBody if the checkbox is unchecked and it existed already", async () => {
+
+            it("should call setRequestBodyInput with undefined if checkbox event is missing", async () => {
                 const wrapper = factory.getShallowMount();
+                const spySetRequestBodyInput = sinon.spy(wrapper.vm, "setRequestBodyInput");
 
-                await wrapper.setData({
-                    processDescriptions: [{inputs: {input1: {}}}],
-                    requestBodies: [{inputs: {}}]
-                });
-                wrapper.vm.toggleOptionalBBOXUrlInputs("input1", {target: {checked: false}});
+                await wrapper.vm.toggleOptionalBBOXUrlInputs("input1");
 
-                expect(wrapper.vm.requestBodies[0].inputs.input1).to.be.undefined;
+                expect(spySetRequestBodyInput.calledOnce).to.be.true;
+
+                expect(spySetRequestBodyInput.firstCall.args).to.deep.equal([
+                    "input1",
+                    "",
+                    undefined
+                ]);
+
+                spySetRequestBodyInput.restore();
             });
+
         });
-
         describe("onOafSwitchChange", () => {
             it("should request the features if they do not exist in the scenario", async () => {
                 const wrapper = factory.getMount(),
@@ -681,29 +783,203 @@ describe.skip("addons/SimulationTool/components/Simulation/SimulationParameter.v
 
                 expect(getStub.called).to.be.false;
             });
-
-            it("should set the input in the requestBody", async () => {
+            it("should set a top-level input in the request body", () => {
                 const wrapper = factory.getMount();
 
-                wrapper.vm.currentPlanningScenario.inputs.anOafInput = "aValue";
-                await wrapper.setData({
-                    processDescriptions: [{inputs: {anOafInput: {}}}],
-                    requestBodies: [{inputs: {}}]
+                wrapper.vm.processDescriptions = [
+                    {inputs: {anInput: {}}}
+                ];
+                wrapper.vm.requestBodies = [
+                    {inputs: {}}
+                ];
+
+                wrapper.vm.setRequestBodyInput("anInput", "", "aValue");
+
+                expect(wrapper.vm.requestBodies[0].inputs.anInput).to.equal("aValue");
+            });
+            it("should set a nested property in the request body", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.processDescriptions = [
+                    {inputs: {anInput: {}}}
+                ];
+                wrapper.vm.requestBodies = [
+                    {inputs: {}}
+                ];
+
+                wrapper.vm.setRequestBodyInput("anInput", "aProperty", "aValue");
+
+                expect(wrapper.vm.requestBodies[0].inputs.anInput).to.deep.equal({
+                    aProperty: "aValue"
                 });
+            });
+            it("should create a request body entry if it does not exist", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.processDescriptions = [
+                    {inputs: {anInput: {}}}
+                ];
+                wrapper.vm.requestBodies = [];
+
+                wrapper.vm.setRequestBodyInput("anInput", "", "aValue");
+
+                expect(wrapper.vm.requestBodies[0]).to.deep.equal({
+                    inputs: {
+                        anInput: "aValue"
+                    }
+                });
+            });
+            it("should create inputs object if it does not exist", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.processDescriptions = [
+                    {inputs: {anInput: {}}}
+                ];
+                wrapper.vm.requestBodies = [{}];
+
+                wrapper.vm.setRequestBodyInput("anInput", "", "aValue");
+
+                expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({
+                    anInput: "aValue"
+                });
+            });
+            it("should update only the value of a top-level enum input", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.processDescriptions = [
+                    {inputs: {anInput: {}}}
+                ];
+                wrapper.vm.requestBodies = [{
+                    inputs: {
+                        anInput: {
+                            value: "oldValue",
+                            label: "Old Label"
+                        }
+                    }
+                }];
+
+                wrapper.vm.setRequestBodyInput("anInput", "", "newValue", true);
+
+                expect(wrapper.vm.requestBodies[0].inputs.anInput).to.deep.equal({
+                    value: "newValue",
+                    label: "Old Label"
+                });
+            });
+            it("should update only the value of a nested enum input", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.processDescriptions = [
+                    {inputs: {anInput: {}}}
+                ];
+                wrapper.vm.requestBodies = [{
+                    inputs: {
+                        anInput: {
+                            aProperty: {
+                                value: "oldValue",
+                                label: "Old Label"
+                            }
+                        }
+                    }
+                }];
+
+                wrapper.vm.setRequestBodyInput("anInput", "aProperty", "newValue", true);
+
+                expect(wrapper.vm.requestBodies[0].inputs.anInput.aProperty).to.deep.equal({
+                    value: "newValue",
+                    label: "Old Label"
+                });
+            });
+            it("should only update request bodies for matching process descriptions", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.processDescriptions = [
+                    {inputs: {otherInput: {}}},
+                    {inputs: {anInput: {}}}
+                ];
+                wrapper.vm.requestBodies = [
+                    {inputs: {}},
+                    {inputs: {}}
+                ];
+
+                wrapper.vm.setRequestBodyInput("anInput", "", "aValue");
+
+                expect(wrapper.vm.requestBodies[0].inputs).to.deep.equal({});
+                expect(wrapper.vm.requestBodies[1].inputs).to.deep.equal({
+                    anInput: "aValue"
+                });
+            });
+            it("should pass OAF input to setRequestBodyInput when switch is enabled", async () => {
+                const wrapper = factory.getMount(),
+                    spySetRequestBodyInput = sinon.spy(wrapper.vm, "setRequestBodyInput");
+
+                wrapper.vm.currentPlanningScenario.inputs.anOafInput = "aValue";
+
                 await wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
 
-                expect(wrapper.vm.requestBodies[0].inputs.anOafInput).to.deep.equal("aValue");
-            });
+                expect(spySetRequestBodyInput.calledOnce).to.be.true;
+                expect(spySetRequestBodyInput.firstCall.args).to.deep.equal([
+                    "anOafInput",
+                    "",
+                    "aValue"
+                ]);
 
-            it("should remove the input from the requestBody if the switch is unchecked", async () => {
+                spySetRequestBodyInput.restore();
+            });
+            it("should pass OAF input to setRequestBodyInput", async () => {
                 const wrapper = factory.getMount();
+                const spySetRequestBodyInput = sinon.spy(wrapper.vm, "setRequestBodyInput");
 
                 wrapper.vm.currentPlanningScenario.inputs.anOafInput = "aValue";
-                await wrapper.setData({
-                    processDescriptions: [{inputs: {anOafInput: {}}}],
-                    requestBodies: [{inputs: {}}]
-                });
+
+                await wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+
+                expect(spySetRequestBodyInput.calledOnce).to.be.true;
+                expect(spySetRequestBodyInput.firstCall.args).to.deep.equal([
+                    "anOafInput",
+                    "",
+                    "aValue"
+                ]);
+
+                spySetRequestBodyInput.restore();
+            });
+            it("should set the input in the requestBody", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.processDescriptions = [{inputs: {anOafInput: {}}}];
+                wrapper.vm.requestBodies = [{inputs: {}}];
+
+                wrapper.vm.setRequestBodyInput("anOafInput", "", "aValue");
+
+                expect(wrapper.vm.requestBodies[0].inputs.anOafInput).to.equal("aValue");
+            });
+            it("should call setRequestBodyInput with undefined when switch is unchecked", async () => {
+                const wrapper = factory.getMount();
+                const spySetRequestBodyInput = sinon.spy(wrapper.vm, "setRequestBodyInput");
+
+                wrapper.vm.currentPlanningScenario.inputs.anOafInput = "aValue";
+
                 await wrapper.vm.onOafSwitchChange({target: {checked: false}}, "anOafInput");
+
+                expect(spySetRequestBodyInput.calledOnce).to.be.true;
+                expect(spySetRequestBodyInput.firstCall.args).to.deep.equal([
+                    "anOafInput",
+                    "",
+                    undefined
+                ]);
+
+                spySetRequestBodyInput.restore();
+            });
+            it("should remove the input from the requestBody", () => {
+                const wrapper = factory.getMount();
+
+                wrapper.vm.processDescriptions = [{inputs: {anOafInput: {}}}];
+                wrapper.vm.requestBodies = [{
+                    inputs: {
+                        anOafInput: "aValue"
+                    }
+                }];
+
+                wrapper.vm.setRequestBodyInput("anOafInput", "", undefined);
 
                 expect(wrapper.vm.requestBodies[0].inputs.anOafInput).to.be.undefined;
             });
