@@ -105,7 +105,8 @@ function prepareValues (data, definition) {
             geometryElement = element.getElementsByTagName("gml:Point")?.[0];
 
         if (!identifierElement) {
-            console.warn("Missing identifier property in SPECIALWFS response. Ignoring feature…");
+            console.warn("Missing identifier property (labelProperty) in SPECIALWFS " +
+                "response. Ignoring feature…");
             continue;
         }
 
