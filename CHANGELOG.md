@@ -26,6 +26,7 @@
 - Vite: 
     - Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
     - Masterportal starts and builds with and without addons.
+    - Fixed `getMastercodeVersionFolderName` so release-tag builds no longer append `git_last_commit_at` to the mastercode folder name.
 - GroupLayer: Fixed bug if configuration contains wrong layer IDs.
 
 ---
