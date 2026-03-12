@@ -36,7 +36,9 @@ const actions = {
     },
 
     /**
-     * Sorts the Legend Entries by position descending
+     * Sorts the Legend Entries by position descending.
+     * For GroupLayers the zIndex of the children need to be checked.
+     * Sorting the legend according to the order in the list of active layers.
      * @param {Object} param.state the state
      * @param {Object} param.commit the commit
      * @returns {void}
