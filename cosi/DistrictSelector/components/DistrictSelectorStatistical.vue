@@ -482,6 +482,8 @@ export default {
                     return district.adminFeature.getId() === evt.element.getId();
                 });
 
+                // To ensure that the feature style is used for printing, the styleId attribute must be set to any value.
+                evt.element.set("styleId", "selected-district");
                 foundDistrict.isSelected = true;
             });
         },
@@ -510,11 +512,11 @@ export default {
          * @param {number} opacity - The opacity value to set for the features fill color (between 0 and 1).
          */
         setSelectedFeatureStyle (selectInteraction, opacity = 0) {
-            selectInteraction.style_.fill_.color_ = `rgba(0, 141, 203, ${opacity})`;
+            selectInteraction.style_.fill_.color_ = [0, 141, 203, opacity];
             selectInteraction.getFeatures().forEach(feature => {
-                feature.setStyle(new Style({
-                    fill: new Fill({color: `rgba(0, 141, 203, ${opacity})`}),
-                    stroke: new Stroke({color: "rgba(0, 141, 203, 1)", width: 8})
+                feature.setStyle(() => new Style({
+                    fill: new Fill({color: [0, 141, 203, opacity]}),
+                    stroke: new Stroke({color: [0, 141, 203, 1], width: 8})
                 }));
             });
         },
