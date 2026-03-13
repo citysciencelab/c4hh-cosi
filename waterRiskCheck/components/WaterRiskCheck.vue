@@ -94,6 +94,24 @@ export default {
                     geoJsonParcelFeatures: [],
                     values: undefined
                 },
+                hwrm_extrem_kw: {
+                    url: "https://api.hamburg.de/datasets/v1/hwrm_2_zyklus",
+                    collection: "cwlo_dehh_2hwrm_2019",
+                    geometryName: "geom",
+                    propertyToUse: "wassertiefe",
+                    geoJsonFeatures: [],
+                    geoJsonParcelFeatures: [],
+                    values: undefined
+                },
+                hwrm_middle_kw: {
+                    url: "https://api.hamburg.de/datasets/v1/hwrm_2_zyklus",
+                    collection: "cwme_dehh_2hwrm_2019",
+                    geometryName: "geom",
+                    propertyToUse: "wassertiefe",
+                    geoJsonFeatures: [],
+                    geoJsonParcelFeatures: [],
+                    values: undefined
+                },
                 uesg: {
                     url: "https://api.hamburg.de/datasets/v1/uesg",
                     collection: "ueberschwemmungsgebiete",
@@ -124,6 +142,8 @@ export default {
             fileprefix: "",
             middleFloodDepth: "",
             seldomFloodDepth: "",
+            middleFloodDepthKW: "",
+            extremFloodDepthKW: "",
             mapfishData: {},
             startBtnLabel: this.$t("additional:modules.waterRiskCheck.formStartButton"),
             finishBtnLabel: this.$t("additional:modules.waterRiskCheck.finishButton")
@@ -314,7 +334,9 @@ export default {
         pageNamesFromData () {
             return {
                 "K2": this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth,
-                "A2": this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth,
+                "K5_yellow": this.gridCode > 20,
+                "K5_blue": this.gridCode < 20,
+                "A2": this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth || this.middleFloodDepthKW || this.extremFloodDepthKW,
                 "K3": this.groundWaterWithin4m,
                 "A3_ja": this.groundWaterWithin4m,
                 "A3_wn": this.groundWaterWithin4m,
@@ -391,6 +413,9 @@ export default {
             handler (val) {
                 this.middleFloodDepth = this.getDeepFloodDepth(val, "hwrm_mittel");
                 this.seldomFloodDepth = this.getDeepFloodDepth(val, "hwrm_selten");
+                this.gridCode = parseInt(this.getDeepFloodDepth(val, "hwrm_extrem_kw", "gridcode"), 10);
+                this.extremFloodDepthKW = this.getDeepFloodDepth(val, "hwrm_extrem_kw");
+                this.middleFloodDepthKW = this.getDeepFloodDepth(val, "hwrm_mittel_km");
             },
             deep: true
         },
@@ -806,6 +831,8 @@ export default {
                 "K2.seltenes.wassertiefe": this.seldomFloodDepth || "-",
                 "K2.seltenes.uebersichtskarte": mapConf.hochwasser_binnenhw_seltenes_ereignis,
                 "K2.legend": legends.hochwasser_binnenhw,
+                "K5.extremes.wassertiefe": this.extremFloodDepthKW || "-",
+                "K5.mittleres.wassertiefe": this.middleFloodDepthKW || "-",
                 "K3.uebersichtskarte": mapConf.grundwasser_flurabstand_min,
                 "K3.minimaler_flurabstand": this.minimalGroundWaterDistance,
                 "K3.legend": legends.grundwasser_flurabstand_min,
@@ -949,9 +976,10 @@ export default {
          * Gets the deepest flood depth according to the flood type
          * @param {Object} data - the required and generated data for buildings.
          * @param {String} type - The flood type.
+         * @param {String} [propertyToUse] - The property to use for the flood depth.
          * @returns {String} the deepest depth.
          */
-        getDeepFloodDepth (data, type) {
+        getDeepFloodDepth (data, type, propertyToUse = false) {
             if (!isObject(data) || typeof type !== "string" || !Object.prototype.hasOwnProperty.call(data, type)) {
                 return "";
             }
@@ -961,7 +989,7 @@ export default {
             }
 
             const features = spatialOperations.intersect(data[type].geoJsonParcelFeatures, this.buildingsToUse[0]),
-                property = data[type].propertyToUse,
+                property = propertyToUse || data[type].propertyToUse,
                 floodDepth = [];
             let deepestFloodDepth = "";
 
