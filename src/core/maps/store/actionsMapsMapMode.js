@@ -1,4 +1,3 @@
-import {trackMatomo} from "@plugins/matomo";
 import proj4 from "proj4";
 
 /**
@@ -27,7 +26,7 @@ export default {
             }
         }
 
-        trackMatomo("MapMode", "Mapmode switched", "Mapmode switched to " + targetMode);
+        window.trackMatomo?.("MapMode", "Mapmode switched", "Mapmode switched to " + targetMode);
     },
 
     /**

@@ -10,8 +10,6 @@ import store from "./app-store/index.js";
 import remoteInterface from "./plugins/remoteInterface.js";
 import utilsLogin from "../src/modules/login/js/utilsLogin.js";
 
-import {initiateMatomo} from "./plugins/matomo.js";
-
 
 let app;
 
@@ -50,10 +48,18 @@ loadConfigJs.then(() => {
 
     app.use(store);
     store.$app = app;
-    if (Config.matomo) {
-        initiateMatomo(app);
-    }
 
+    window.trackMatomo = window.trackMatomo || undefined;
+    if (Config.matomo) {
+        import("./plugins/matomo.js")
+            .then(m => {
+                m.initiateMatomo(app);
+                window.trackMatomo = m.trackMatomo;
+            })
+            .catch(() => {
+                console.warn("Matomo blocked. Using fallback empty function.");
+            });
+    }
 
     initLanguage(Config.portalLanguage || {}, Config.portalLocales)
         .then(() => {

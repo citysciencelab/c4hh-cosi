@@ -2,7 +2,6 @@ import collectDataByFolderModule from "../js/collectDataByFolder.js";
 import baselayerHandler from "../js/handleSingleBaselayer.js";
 import sortBy from "@shared/js/utils/sortBy.js";
 import {treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js";
-import {trackMatomo} from "@plugins/matomo";
 import store from "@appstore/index.js";
 
 const actions = {
@@ -52,7 +51,7 @@ const actions = {
 
         dispatch("replaceByIdInLayerConfig", {layerConfigs}, {root: true});
 
-        trackMatomo("Layer", "Layer added via layertree", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
+        window.trackMatomo?.("Layer", "Layer added via layertree", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
     },
 
     /**

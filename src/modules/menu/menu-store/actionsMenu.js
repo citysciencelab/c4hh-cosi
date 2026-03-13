@@ -1,6 +1,5 @@
 import {nextTick} from "vue";
 import changeCase from "@shared/js/utils/changeCase.js";
-import {trackMatomo} from "@plugins/matomo";
 
 export default {
     /**
@@ -56,7 +55,7 @@ export default {
             commit("setCurrentComponentProps", {side, props});
         }
         if (type !== "getFeatureInfo" && type !== "searchBar" && type !== "layerSelection") {
-            trackMatomo("Menu", "Menuitem clicked", i18next.t(props.name));
+            window.trackMatomo?.("Menu", "Menuitem clicked", i18next.t(props.name));
         }
     },
 

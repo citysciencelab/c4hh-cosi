@@ -4,7 +4,6 @@ import WKTUtil from "@shared/js/utils/getWKTGeom.js";
 import wmsGFIUtil from "@shared/js/utils/getWmsFeaturesByMimeType.js";
 import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
-import {trackMatomo} from "@plugins/matomo";
 import mapMarker from "@core/maps/js/mapMarker.js";
 import calculateScreenPosition from "../../js/calculateScreenPosition.js";
 import addInitialTilesLoadedListener from "../../js/addInitialTilesLoadedListener.js";
@@ -106,12 +105,12 @@ export default {
                         content: i18next.t("common:modules.searchBar.layerResultNotShown")
                     }, {root: true});
                 }
-                trackMatomo("Layer", "Layer added via Search", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
+                window.trackMatomo?.("Layer", "Layer added via Search", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
             });
         }
         else {
             dispatch("activateLayerInTopicTree", {layerId, source});
-            trackMatomo("Layer", "Layer added via Search", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
+            window.trackMatomo?.("Layer", "Layer added via Search", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
         }
     },
 

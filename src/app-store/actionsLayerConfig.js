@@ -7,7 +7,6 @@ import {treeOrder, treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/co
 import layerCollection from "@core/layers/js/layerCollection.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
-import {trackMatomo} from "../plugins/matomo.js";
 
 /**
  * The root actions for layer configurations.
@@ -344,7 +343,7 @@ export default function getActionsLayerConfig () {
                 baselayerConfs: rootGetters.allLayerConfigsStructured(treeBaselayersKey)
             }, {root: true});
 
-            trackMatomo("Layer", "Layertree category switched", i18next.t(category.name));
+            window.trackMatomo?.("Layer", "Layertree category switched", i18next.t(category.name));
         },
 
         /**
