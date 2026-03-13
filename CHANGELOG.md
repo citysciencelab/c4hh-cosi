@@ -17,6 +17,9 @@
   - devDependencies:
     - jsdom: 26.0.0 to 28.1.0
     - shelljs: 0.8.5 to 0.10.0
+- The following packages have been updated:
+    - devDependencies:
+        - @masterportal/masterportalapi: 2.58.0 to 2.59.0
 
 ### Deprecated
 
