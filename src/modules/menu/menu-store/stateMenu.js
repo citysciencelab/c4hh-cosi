@@ -9,6 +9,7 @@
  * @property {Object} mainMenu the main menu settings.
  * @property {String[]} mainMenu.configPaths Path array of possible config locations. First one found will be used.
  * @property {Boolean} mainMenu.expanded Specifies whether the main menu is opened.
+ * @property {String} mainMenu.expandedTop The top position of the menu when expanded on mobile.q
  * @property {Object[]} mainMenu.sections The main menu sections.
  * @property {Boolean} mainMenu.showDescription If true, description will be shown in the mainMenu.
  * @property {Object} mainMenu.title The main menu title.
@@ -17,6 +18,7 @@
  * @property {Object} secondaryMenu the secondary menu settings.
  * @property {String[]} secondaryMenu.configPaths Path array of possible config locations. First one found will be used.
  * @property {Boolean} secondaryMenu.expanded Specifies whether the secondary menu is opened.
+ * @property {String} secondaryMenu.expandedTop The top position of the menu when expanded on mobile.
  * @property {Object[]} secondaryMenu.sections The secondary menu sections.
  * @property {Boolean} secondaryMenu.showDescription If true, description will be shown in the secondaryMenu.
  * @property {Object} secondaryMenu.title The secondary menu title.
@@ -32,6 +34,7 @@ export default {
     mainMenu: {
         configPaths: ["portalConfig.mainMenu.sections"],
         expanded: false,
+        expandedTop: "0%",
         width: "25%",
         currentComponent: "root",
         title: null,
@@ -50,6 +53,7 @@ export default {
     secondaryMenu: {
         configPaths: ["portalConfig.secondaryMenu.sections"],
         expanded: false,
+        expandedTop: "70%",
         width: "25%",
         currentComponent: "root",
         sections: [[]],

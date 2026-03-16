@@ -72,6 +72,13 @@ export default {
 
         expanded () {
             return this.side === "mainMenu" ? this.mainExpanded : this.secondaryExpanded;
+        },
+
+        menuInlineStyles () {
+            return {
+                width: this.expanded ? this.currentMenuWidth(this.side) : "0",
+                top: this.isMobile ? this[this.side]?.expandedTop : "0%"
+            };
         }
     },
     watch: {
@@ -179,7 +186,7 @@ export default {
             }
         ]"
         tabindex="-1"
-        :style="expanded ? 'width:' + currentMenuWidth(side) : 'width:0'"
+        :style="menuInlineStyles"
         :aria-label="titleBySide(side) ? titleBySide(side).text : null"
         @transitionend="onTransitionEnd"
     >
@@ -257,7 +264,6 @@ export default {
     transition: top 0.3s ease;
     &-expanded {
         height: 100%;
-        top: 70%;
     }
 }
 
