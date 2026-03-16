@@ -1,7 +1,7 @@
 <script>
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
-import {mapGetters, mapActions} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import getOAFFeature from "../../../src/shared/js/api/oaf/getOAFFeature.js";
 import Point from "ol/geom/Point.js";
 import MultiPolygon from "ol/geom/MultiPolygon.js";
@@ -164,6 +164,9 @@ export default {
         ...mapGetters(["restServiceById", "isMobile"]),
         ...mapGetters("Modules/SearchBar", [
             "searchResults"
+        ]),
+        ...mapGetters("Menu", [
+            "menuBySide"
         ]),
 
         /**
@@ -426,12 +429,19 @@ export default {
     },
     created () {
         this.createLayer();
+        if (this.isMobile) {
+            this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
+        }
+        if (!this.isMobile && window.innerWidth < 992) {
+            this.menuBySide("mainMenu").expanded = false;
+            this.menuBySide("secondaryMenu").width = "50%";
+        }
     },
     mounted () {
         this.questions = [...this.configuredQuestions];
         this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
-        if (!this.isMobile) {
-            document.getElementById("mp-menu-secondaryMenu").style.width = "37vw";
+        if (!this.isMobile && window.innerWidth < 992) {
+            this.menuBySide("secondaryMenu").width = "50%";
         }
         this.setConfig();
     },
@@ -445,6 +455,9 @@ export default {
         ]),
         ...mapActions("Menu", [
             "closeMenu"
+        ]),
+        ...mapMutations("Menu", [
+            "setExpandedBySide"
         ]),
 
         /**
