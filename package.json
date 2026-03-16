@@ -19,6 +19,7 @@
   "scripts": {
     "prestart": "node devtools/certificate/ensureDevCert.mjs",
     "start": "vite --config devtools/vite.config.js",
+    "start:localApi": "cross-env VITE_LOCAL_MASTERPORTALAPI=true vite --config devtools/vite.config.js",
     "startDebug": "vite --debug hmr --debug plugin-transform --config devtools/vite.config.js",
     "test": "rimraf node_modules/.vite && vitest run --config devtools/vitest.config.js",
     "test:watch": "rimraf node_modules/.vite && vitest --config devtools/vitest.config.js --watch",

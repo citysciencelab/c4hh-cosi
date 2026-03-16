@@ -49,7 +49,9 @@ const examplesOnly = process.env.EXAMPLES_ONLY === "true",
             : undefined
     },
     addonConfigPath = path.resolve(rootPath, "addons/addonsConf.json"),
-    hasAddonConfig = fs.existsSync(addonConfigPath);
+    hasAddonConfig = fs.existsSync(addonConfigPath),
+    localMasterportalApiPath = path.resolve(rootPath, "../masterportalapi"),
+    useLocalMasterportalApi = process.env.VITE_LOCAL_MASTERPORTALAPI === "true";
 
 let portalEntries = glob.sync(`${portalFolderName}/**/index.html`, { cwd: rootPath }).map(file => {
     const portalName = file.split("/").at(-2); // foldernames of portals
@@ -112,7 +114,12 @@ export default defineConfig(({ mode }) => {
                 "@core": path.resolve(rootPath, "src/core"),
                 "@modules": path.resolve(rootPath, "src/modules"),
                 "@plugins": path.resolve(rootPath, "src/plugins"),
-                "@devtools": path.resolve(rootPath, "devtools")
+                "@devtools": path.resolve(rootPath, "devtools"),
+                ...(useLocalMasterportalApi
+                    ? {
+                        "@masterportal/masterportalapi": localMasterportalApiPath
+                    }
+                    : {})
             },
             dedupe: ["jsts"]
         },
@@ -245,7 +252,8 @@ export default defineConfig(({ mode }) => {
                     path.resolve(rootPath, "src"),
                     path.resolve(rootPath, "addons"),
                     // todo vite: verallgemeinern! mit ${portalFolderName} oder brauchen wir das denn?
-                    path.resolve(rootPath, "portal/master")
+                    path.resolve(rootPath, "portal/master"),
+                    path.resolve(rootPath, "../masterportalapi")
                 ]
             },
             headers: {
