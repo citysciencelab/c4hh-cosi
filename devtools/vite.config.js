@@ -103,7 +103,8 @@ export default defineConfig(({ mode }) => {
                 "@modules": path.resolve(rootPath, "src/modules"),
                 "@plugins": path.resolve(rootPath, "src/plugins"),
                 "@devtools": path.resolve(rootPath, "devtools")
-            }
+            },
+            dedupe: ["jsts"]
         },
 
         plugins: [

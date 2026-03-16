@@ -39,6 +39,7 @@
     - Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
     - Masterportal starts and builds with and without addons.
     - Fixed `getMastercodeVersionFolderName` so release-tag builds no longer append `git_last_commit_at` to the mastercode folder name.
+    - Added "dedupe" configuration regarding library "jsts" to avoid conflicting instances.
 - GroupLayer: Fixed bug if configuration contains wrong layer IDs.
 - Matomo: Fixed a critical loading issue where the application would fail to mount if `matomo.js` was blocked (e.g., by Ad-blockers) or failed to load. The Matomo initialization is now non-blocking and provides a global polyfill for `trackMatomo` to ensure compatibility across all modules.
 
