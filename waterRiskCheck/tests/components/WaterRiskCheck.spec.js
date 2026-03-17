@@ -54,6 +54,9 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                         pdfPages: (state) => state.pdfPages,
                                         alwaysShow: (state) => state.alwaysShow,
                                         settings: (state) => state.settings
+                                    },
+                                    actions: {
+                                        setAddress: () => sinon.stub()
                                     }
                                 },
                                 SearchBar: {

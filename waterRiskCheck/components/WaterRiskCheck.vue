@@ -1,4 +1,5 @@
 <script>
+import AccordionItem from "../../../src/shared/modules/accordion/components/AccordionItem.vue";
 import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
@@ -21,6 +22,7 @@ import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog.js";
 export default {
     name: "WaterRiskCheck",
     components: {
+        AccordionItem,
         FlatButton,
         IconButton
     },
@@ -897,7 +899,7 @@ export default {
                 delete val.selectedAnswer;
             });
             if (address) {
-                this.layer.getLayerSource().clear();
+                this.layer?.getLayerSource()?.clear();
                 this.parcel = {};
                 this.buildings = [];
                 this.setAddress("", undefined);
@@ -1039,131 +1041,155 @@ export default {
         class="water-risk-check position-relative"
     >
         <div v-if="!formStarted && !formFinished">
-            <div
-                v-if="!enabledStart"
-                class="container pb-3"
-            >
-                <div class="row justify-content-md-center">
-                    <div class="col col-11">
-                        <div class="row border border-2 border-secondary rounded-2 justify-content-md-center my-3">
-                            <div class="col col-2 col-md-2 d-flex flex-wrap align-items-center">
-                                <img
-                                    class="header-logo pe-3"
-                                    :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
-                                    :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
-                                >
-                            </div>
-                            <p
-                                class="col address-hint text-secondary my-3"
-                            >
-                                {{ $t("additional:modules.waterRiskCheck.addressInput") }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <div class="d-flex align-items-center justify-content-between justify-content-md-start mb-2 mb-md-3">
+                <h6
+                    class="slogan mb-0"
+                    v-html="$t('additional:modules.waterRiskCheck.slogan')"
+                />
+                <img
+                    class="mobile-extra-logo d-md-none ms-2"
+                    :src="'https://geodienste.hamburg.de/lgv-config/img/hh-logo.png'"
+                    alt="Hamburg Logo"
+                >
             </div>
             <p
-                class="info-text ms-5"
+                class="info-text d-none d-md-block lh-base"
                 v-html="$t('additional:modules.waterRiskCheck.generelExplenationText')"
             />
+            <div class="row align-items-center justify-content-md-center my-2 my-md-4">
+                <div class="col-12 col-md-auto text-center mb-3 mb-md-0 px-md-3">
+                    <img
+                        class="header-logo img-fluid w-15 w-md-100"
+                        :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
+                        :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                    >
+                </div>
+                <div class="col-12 col-md-auto text-center mb-3 mb-md-0 px-md-3">
+                    <ul class="start-list d-inline-block text-start mb-0 lh-lg ps-0">
+                        <li><i class="check-icon bi bi-check-lg me-2" /> {{ $t('additional:modules.waterRiskCheck.duration') }}</li>
+                        <li><i class="check-icon bi bi-check-lg me-2" /> {{ $t('additional:modules.waterRiskCheck.address') }}</li>
+                        <li><i class="check-icon bi bi-check-lg me-2" /> {{ $t('additional:modules.waterRiskCheck.information') }}</li>
+                    </ul>
+                </div>
+            </div>
+            <AccordionItem
+                id="instructions-accordion"
+                class="d-none d-md-block"
+                :title="$t('additional:modules.waterRiskCheck.instructions')"
+                icon="bi bi-info-circle"
+            >
+                <p
+                    class="info-text lh-base"
+                    v-html="$t('additional:modules.waterRiskCheck.instructionsText')"
+                />
+            </AccordionItem>
+            <FlatButton
+                id="instructions-button"
+                class="d-md-none mb-3 btn-sm"
+                icon="bi-play-circle"
+                type="button"
+                :aria-label="$t('additional:modules.waterRiskCheck.infoButton')"
+                :text="$t('additional:modules.waterRiskCheck.infoButton')"
+            />
+            <div class="decorative-box d-flex w-100 px-4 mt-3">
+                <span class="ms-3 mt-4">
+                    {{ $t('additional:modules.waterRiskCheck.enterAddress') }}
+                </span>
+            </div>
             <div
                 v-if="enabledStart"
                 class="container mt-3"
             >
-                <div class="row justify-content-center pt-3">
-                    <div class="col-1 p-0">
-                        <i class="geo-icon bi-geo-alt-fill float-center me-1" />
-                    </div>
-                    <div class="address-container col-auto d-flex flex-column justify-content-center align-items-start m-0">
-                        <p class="current-address mb-2">
-                            {{ address }}
-                        </p>
-                        <div class="d-flex justify-content-center">
-                            <p>{{ $t("additional:modules.waterRiskCheck.districtLabel") }}</p>
-                            <p class="font-bold">
-                                {{ districtName }}
-                            </p>
+                <div class="info-card-white mx-auto p-4 mt-4">
+                    <div class="card-content d-flex align-items-center justify-content-center gap-3">
+                        <div class="icon-wrapper bg-white">
+                            <i class="geo-icon bi-geo-alt-fill" />
                         </div>
-                        <div class="d-flex justify-content-center">
-                            <p>{{ $t("additional:modules.waterRiskCheck.parcelLabel") }}</p>
-                            <p class="font-bold">
-                                {{ parcelNumber }}
+                        <div class="text-wrapper">
+                            <p class="current-address mb-1">
+                                {{ address }}
                             </p>
-                        </div>
-                        <div class="d-flex justify-content-center">
-                            <p>{{ $t("additional:modules.waterRiskCheck.buildingCountLabel") }}</p>
-                            <p class="font-bold">
-                                {{ countOfBuildings }}
+                            <p class="building-count mb-0">
+                                {{ countOfBuildings + " " + $t("additional:modules.waterRiskCheck.buildings") }}
                             </p>
                         </div>
                     </div>
+                    <div class="divider my-3 d-none d-md-block" />
+                    <button
+                        type="button"
+                        class="btn btn-link d-none d-md-block mx-auto mt-3 text-center"
+                        :aria-label="$t('additional:modules.waterRiskCheck.discardAddress')"
+                    >
+                        {{ $t('additional:modules.waterRiskCheck.discardAddress') }}
+                    </button>
                 </div>
-                <hr class="my-4">
-                <div class="row">
-                    <div class="info-icon col-1 d-flex align-items-center">
-                        <i class="bi-info-circle" />
-                    </div>
-                    <div class="col-11 d-flex align-items-center">
-                        <p class="fs-5">
-                            {{ $t("additional:modules.waterRiskCheck.informationTextIconLabel") }}
-                        </p>
-                        <div
-                            class="col pe-0"
-                        >
-                            <img
-                                class="header-logo float-end"
-                                :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
-                                :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
-                            >
-                        </div>
-                    </div>
+                <div class="d-flex flex-column align-items-center w-100 mt-4">
+                    <FlatButton
+                        id="start-form"
+                        class="w-100 mb-2"
+                        icon="bi-play-circle"
+                        type="button"
+                        :aria-label="startBtnLabel"
+                        :disabled="showSpinner"
+                        :text="startBtnLabel"
+                        :interaction="startForm"
+                        :spinner-trigger="showSpinner"
+                    />
+                    <FlatButton
+                        id="discard-adress"
+                        class="w-100 d-md-none"
+                        icon="bi bi-arrow-counterclockwise"
+                        type="button"
+                        :secondary="true"
+                        :aria-label="$t('additional:modules.waterRiskCheck.discardAddress')"
+                        :text="$t('additional:modules.waterRiskCheck.discardAddress')"
+                    />
                 </div>
-                <div class="row mb-3 mt-2">
+                <div class="mb-3 mt-2 d-none d-md-block">
+                    <p>
+                        {{ $t('additional:modules.waterRiskCheck.informationTextIconLabel') }}
+                    </p>
                     <p
-                        class="hint-text col offset-md-1"
+                        class="hint-text col"
                         v-html="$t('additional:modules.waterRiskCheck.informationText')"
                     />
                 </div>
-                <div class="row">
-                    <div class="col d-flex justify-content-center mt-3">
-                        <FlatButton
-                            id="start-form"
-                            icon="bi-play-circle"
-                            type="button"
-                            :aria-label="startBtnLabel"
-                            :disabled="showSpinner"
-                            :text="startBtnLabel"
-                            :interaction="startForm"
-                            :spinner-trigger="showSpinner"
-                        />
-                    </div>
-                </div>
+                <AccordionItem
+                    id="hint-information"
+                    class="d-md-none mt-4"
+                    :title="$t('additional:modules.waterRiskCheck.informationTextIconLabel')"
+                    icon="bi bi-info-circle"
+                >
+                    <p
+                        class="info-text lh-base"
+                        v-html="$t('additional:modules.waterRiskCheck.informationText')"
+                    />
+                </AccordionItem>
             </div>
         </div>
         <div v-else-if="formStarted && !formFinished && questions.length">
             <div class="container basic-infos">
-                <div class="info-header row">
-                    <div class="col-md-auto">
-                        <p>
+                <div class="info-header row align-items-center g-2">
+                    <div class="col col-md-auto d-flex flex-column justify-content-center">
+                        <p class="mb-0 small text-muted d-md-block lh-1">
                             {{ $t('additional:modules.waterRiskCheck.addressLabel') }}
                         </p>
-                        <p class="basic-infos-address">
-                            {{ address }}
-                        </p>
+                        <div class="d-flex align-items-center flex-nowrap mt-n1">
+                            <p class="basic-infos-address mb-0 text-truncate me-2">
+                                {{ address }}
+                            </p>
+                            <IconButton
+                                id="reset-button"
+                                :aria="$t('additional:modules.waterRiskCheck.reset')"
+                                :interaction="() => resetAll()"
+                                :class-array="['remove', 'btn-light', 'fs-6']"
+                                icon="bi bi-pencil-fill"
+                            />
+                        </div>
                     </div>
-                    <IconButton
-                        id="reset-button"
-                        :aria="$t('additional:modules.waterRiskCheck.reset')"
-                        :interaction="() => resetAll()"
-                        :class-array="['remove', 'btn-light', 'col', 'col-md-1', 'p-0', 'fs-5']"
-                        icon="bi bi-pencil-fill"
-                        class="col-md-1 p-0"
-                    />
-                    <div
-                        class="col pe-0"
-                    >
+                    <div class="col-auto ms-auto text-end">
                         <img
-                            class="header-logo float-end"
+                            class="header-logo"
                             :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
                             :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
                         >
@@ -1177,7 +1203,7 @@ export default {
                     </div>
                     <div class="progress p-0">
                         <div
-                            class="progress-bar bg-secondary"
+                            class="progress-bar"
                             role="progressbar"
                             :style="`width: ${calculatedPercentage}%`"
                             :aria-valuenow="calculatedPercentage"
@@ -1189,7 +1215,7 @@ export default {
                 <div class="question-section row mt-4 mb-5">
                     <div class="container d-flex flex-column">
                         <div class="d-flex flex-column align-items-start justify-content-center">
-                            <h5 class="text-secondary pt-3">
+                            <h5 class="question-headline pt-3">
                                 {{ questions[currentQuestionIdx].title }}
                             </h5>
                             <span class="mb-2">
@@ -1216,11 +1242,11 @@ export default {
                                 id="collapseInfo"
                                 class="collapse"
                             >
-                                <div class="card card-body p-4 border border-primary rounded">
+                                <div class="collapse-border card card-body p-4 border rounded">
                                     <div class="container p-0">
                                         <div class="row">
                                             <div class="col-12">
-                                                <h6 class="col-6 text-secondary">
+                                                <h6 class="question-headline col-6">
                                                     {{ questions[currentQuestionIdx].title }}
                                                 </h6>
                                                 <img
@@ -1298,82 +1324,77 @@ export default {
             </div>
         </div>
         <div v-else>
-            <div class="container">
-                <div class="d-flex flex-column mb-4">
-                    <p>
-                        {{ $t('additional:modules.waterRiskCheck.addressLabel') }}
-                    </p>
-                    <p class="font-bold">
-                        {{ address }}
-                    </p>
-                </div>
-                <div>
-                    <div class="row align-items-center mb-3">
-                        <h5 class="col col-md">
-                            {{ $t('additional:modules.waterRiskCheck.downloadPageTitle') }}
-                        </h5>
-                        <div
-                            class="col pe-4"
-                        >
-                            <img
-                                class="header-logo float-end"
-                                :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
-                                :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
-                            >
+            <div class="container basic-infos">
+                <div class="info-header row align-items-center g-2 mb-3">
+                    <div class="col col-md-auto d-flex flex-column justify-content-center">
+                        <p class="mb-0 small text-muted d-md-block lh-1">
+                            {{ $t('additional:modules.waterRiskCheck.addressLabel') }}
+                        </p>
+                        <div class="d-flex align-items-center flex-nowrap mt-n1">
+                            <p class="basic-infos-address mb-0 text-truncate me-2">
+                                {{ address }}
+                            </p>
                         </div>
                     </div>
-                    <p class="download-text">
-                        {{ $t('additional:modules.waterRiskCheck.downloadInformationText') }}
-                    </p>
-                    <div
-                        ref="downloadSection"
-                        class="mt-3"
-                    >
-                        <div class="container">
-                            <div class="row">
-                                <div
-                                    class="d-flex justify-content-center pt-2 pb-1 mb-1"
-                                >
-                                    <FlatButton
-                                        id="download-report"
-                                        aria-label="$t('additional:modules.waterRiskCheck.download')"
-                                        type="button"
-                                        :text="$t('additional:modules.waterRiskCheck.download')"
-                                        icon="bi-download"
-                                        class="mb-1"
-                                        :interaction="() => openWindow(downloadLink)"
-                                    />
-                                </div>
-                                <p class="download-text ps-0 pb-3">
+                    <div class="col-auto ms-auto text-end">
+                        <img
+                            class="header-logo"
+                            :src="'./assets/Logo-Wegweiser-Ueberflutungsvorsorge.png'"
+                            :alt="$t('additional:modules.waterRiskCheck.toolIconAltText')"
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="container mt-4">
+                <div class="row align-items-center mb-3">
+                    <h5 class="col col-md">
+                        {{ $t('additional:modules.waterRiskCheck.downloadPageTitle') }}
+                    </h5>
+                </div>
+                <div
+                    ref="downloadSection"
+                    class="mt-3"
+                >
+                    <div class="container">
+                        <div class="row flex-column gap-2">
+                            <div class="decorative-box d-flex flex-column p-3">
+                                <p class="download-text mb-2">
+                                    {{ $t('additional:modules.waterRiskCheck.downloadInformationText') }}
+                                </p>
+                                <FlatButton
+                                    id="download-report"
+                                    :aria-label="$t('additional:modules.waterRiskCheck.download')"
+                                    type="button"
+                                    :text="$t('additional:modules.waterRiskCheck.download')"
+                                    icon="bi-download"
+                                    :interaction="() => openWindow(downloadLink)"
+                                />
+                            </div>
+                            <div class="decorative-box d-flex flex-column p-3">
+                                <p class="download-text mb-2">
                                     {{ $t('additional:modules.waterRiskCheck.downloadInformationTextRestart') }}
                                 </p>
-                                <div
-                                    class="d-flex justify-content-center pt-1 pb-3"
-                                >
-                                    <FlatButton
-                                        id="reset"
-                                        aria-label="$t('additional:modules.waterRiskCheck.resetButton')"
-                                        type="button"
-                                        :text="$t('additional:modules.waterRiskCheck.resetButton')"
-                                        icon="bi bi-arrow-clockwise"
-                                        :interaction="() => resetAll()"
-                                    />
-                                </div>
-                                <p class="download-text ps-0 pb-3">
+                                <FlatButton
+                                    id="reset"
+                                    :aria-label="$t('additional:modules.waterRiskCheck.resetButton')"
+                                    type="button"
+                                    :text="$t('additional:modules.waterRiskCheck.resetButton')"
+                                    icon="bi bi-arrow-clockwise"
+                                    :interaction="() => resetAll()"
+                                />
+                            </div>
+                            <div class="decorative-box d-flex flex-column p-3">
+                                <p class="download-text mb-2">
                                     {{ $t('additional:modules.waterRiskCheck.sendFeedback') }}
                                 </p>
-                                <div
-                                    class="d-flex justify-content-center pt-1 pb-3"
-                                >
-                                    <FlatButton
-                                        id="reset"
-                                        aria-label="$t('additional:modules.waterRiskCheck.feedback')"
-                                        type="button"
-                                        :text="$t('additional:modules.waterRiskCheck.feedback')"
-                                        icon="bi bi-chat-right-text"
-                                        :interaction="() => openWindow(feedbackUrl)"
-                                    />
-                                </div>
+                                <FlatButton
+                                    id="feedback"
+                                    :aria-label="$t('additional:modules.waterRiskCheck.feedback')"
+                                    type="button"
+                                    :text="$t('additional:modules.waterRiskCheck.feedback')"
+                                    icon="bi bi-chat-right-text"
+                                    :interaction="() => openWindow(feedbackUrl)"
+                                />
                             </div>
                         </div>
                     </div>
@@ -1383,7 +1404,7 @@ export default {
         <div v-if="!formStarted || formFinished">
             <div class="row">
                 <div class="d-flex justify-content-center pt-4">
-                    <p class="hint-text">
+                    <p class="hint-text text-center">
                         {{ $t('additional:modules.waterRiskCheck.logoText') }}
                     </p>
                 </div>
@@ -1401,12 +1422,160 @@ export default {
 
 
 <style lang="scss" scoped>
+@media (max-width: 767px) {
+    .d-flex {
+        gap: 0.5rem;
+    }
+    #page-back ::v-deep(.btn),
+    #page-forward ::v-deep(.btn) {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+#page-back,
+#page-forward {
+    flex: 1 1 0;
+    min-width: 0;
+}
+#page-back ::v-deep(.btn),
+#page-forward ::v-deep(.btn) {
+    width: 100%;
+    max-width: 100%;
+}
+
+#page-back ::v-deep(.btn-texts),
+#page-forward ::v-deep(.btn-texts) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 #collapseHiddenButton {
     display: none;
 }
 #tool-waterRiskCheck {
     height: 100vh;
+}
+.mobile-extra-logo {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+}
+.slogan {
+    color: $secondary;
+    font-size: $font_size_big;
+    font-family: $font_family_accent;
+    flex: 1;
+    hyphens: auto;
+    word-break: break-word;
+    line-height: 1.2;
+    text-align: left;
+
+    @media (max-width: 767px) {
+        font-size: $font_size_sm;
+        letter-spacing: -0.02em;
+    }
+}
+.start-list {
+    list-style: none;
+    color: $secondary;
+    font-size: $font_size_base;
+    font-family: $font_family_accent;
+    @media (max-width: 767px) {
+        font-size: $font_size_sm;
+        line-height: 1.4;
+    }
+}
+.check-icon {
+    color: $secondary;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 4px;
+    width: 1.5rem;
+    margin-top: 5px;
+    @media (max-width: 767px) {
+        font-size: 0.85rem;
+        margin-top: 3px;
+    }
+}
+.decorative-box {
+    background-color: $primary;
+    height: auto;
+    width: 100%;
+    min-height: 100px;
+    border-radius: $badge-border-radius;
+}
+.info-card-white {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.card-content {
+    text-align: left;
+}
+.discard-address {
+    color: $link-color;
+    font-size: $font_size_sm;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.icon-wrapper {
+    background: rgba($secondary, 0.1);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.current-address {
+    font-family: $font_family_accent;
+    font-size: $font_size_base;
+    color: $dark_blue;
+    @media (max-width: 767px) {
+        .current-address {
+            font-size: 0.51rem; ;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+    }
+}
+.building-count {
+    font-size: 0.95rem;
+    color: rgba($dark_blue, 0.7);
+}
+.basic-infos {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    .info-header {
+        min-height: 60px;
+    }
+    .basic-infos-address {
+        font-family: $font_family_accent;
+        font-size: $font_size_base;
+        color: $dark_grey;
+        line-height: 1.2;
+        @media (max-width: 767px) {
+            font-size: 0.9rem;
+            max-width: 100%;
+        }
+        .header-logo {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+
+            @media (min-width: 767px) {
+                height: 60px;
+            }
+        }
+    }
+}
+.question-headline {
+    color: $secondary;
+    font-family: $font_family_accent;
 }
 .answer {
     width: 50%;
@@ -1430,6 +1599,7 @@ export default {
     font-size: 12px;
 }
 .progress-bar {
+    background: $secondary;
     border-radius: 10px;
     height: 100%;
 }
@@ -1444,12 +1614,18 @@ export default {
 .info-text, .download-text {
     font-size: $font-size-base;
 }
+.download-text {
+    color: $dark_blue;
+}
 .hint-text {
     font-size: $font_size_sm;
 }
 .selected-answer-icon {
     left: 15px;
     top: 9px;
+}
+.selected-answer-icon::before {
+    color: $secondary;
 }
 .answer:hover, .marked-answers{
     background-color: $primary;
@@ -1462,21 +1638,39 @@ export default {
 .geo-icon {
     color: $secondary;
     font-size: 40px;
-}
-.address-container p {
-    margin-right: 5px;
-}
-.current-address {
-    font-family: $font_family_accent;
-    font-size: 17px;
+    line-height: 1;
+    background-color: transparent;
 }
 .address-hint, .basic-infos-address, .text-secondary {
     font-family: $font_family_accent;
     font-size: $font_size_big;
 }
+.divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    width: 100%;
+}
+.discard-address-btn {
+    background: none;
+    border: none;
+    color: $secondary;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+}
 .header-logo {
-    width: 80px;
+    width: auto;
+    max-width: 100px;
+    min-width: 50px;
+    height: auto;
+    max-height: 80px;
     image-rendering: crisp-edges;
+
+    @media (max-width: 767px) {
+        max-width: 70px;
+        max-width: 50px;
+        margin-top: 0.5rem;
+    }
 }
 .info-icon {
     font-size: 18px;
@@ -1491,6 +1685,13 @@ export default {
 }
 .hamburg-logo {
     width: 200px;
+}
+.building-count {
+    color: $dark_blue;
+    line-height: 1.2;
+}
+.collapse-border {
+    border-color: $secondary;
 }
 
 </style>
