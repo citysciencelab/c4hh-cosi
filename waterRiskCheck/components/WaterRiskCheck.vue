@@ -848,6 +848,8 @@ export default {
                 "K2.legend": legends.hochwasser_binnenhw,
                 "K5.extremes.wassertiefe": this.extremFloodDepthKW || "-",
                 "K5.mittleres.wassertiefe": this.middleFloodDepthKW || "-",
+                "K5.extremes.uebersichtskarte": mapConf.hwrm_extrem_kw,
+                "K5.mittleres.uebersichtskarte": mapConf.hwrm_middle_kw,
                 "K3.uebersichtskarte": mapConf.grundwasser_flurabstand_min,
                 "K3.minimaler_flurabstand": this.minimalGroundWaterDistance,
                 "K3.legend": legends.grundwasser_flurabstand_min,
