@@ -62,7 +62,7 @@ describe("src/modules/print/utils/buildSpecbuildStyle", function () {
             type: "polygon"
         };
 
-    before(() => {
+    beforeAll(() => {
         buildSpec = BuildSpec;
         getStylingRules = buildSpec.getStylingRules;
         getFeatureStyle = buildSpec.getFeatureStyle;

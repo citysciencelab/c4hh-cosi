@@ -11,7 +11,7 @@ describe("src/core/js/layers/layer2d.js", () => {
     let warn,
         origDispatch;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

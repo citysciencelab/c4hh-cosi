@@ -23,7 +23,7 @@ describe.skip("src/utils/createLayerAddToTree.js", () => {
     describe("createLayerAddToTree", () => {
         let layerInCollection = false;
 
-        before(() => {
+        beforeAll(() => {
             i18next.init({
                 lng: "cimode",
                 debug: false

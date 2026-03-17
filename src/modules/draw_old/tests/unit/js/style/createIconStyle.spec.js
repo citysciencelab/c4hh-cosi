@@ -4,7 +4,7 @@ import {createIconStyle} from "@modules/draw_old/js/style/createIconStyle.js";
 describe("src/modules/draw_old/js/style/createIconStyle.js", () => {
     let iconPath;
 
-    before(function () {
+    beforeAll(function () {
         iconPath = "/test/unittests/resources/icons/";
     });
 

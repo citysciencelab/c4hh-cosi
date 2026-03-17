@@ -23,7 +23,7 @@ describe("src/core/js/layers/layer2dRasterWmts.js", () => {
         origin: [-20037508.3428, 20037508.3428]
     };
 
-    before(() => {
+    beforeAll(() => {
         fetch = global.fetch;
         global.fetch = sinon.spy(() => new Promise(r => r));
 
@@ -50,7 +50,7 @@ describe("src/core/js/layers/layer2dRasterWmts.js", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    after(() => {
+    afterAll(() => {
         global.fetch = fetch;
         sinon.restore();
     });

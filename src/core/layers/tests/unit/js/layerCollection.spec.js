@@ -9,7 +9,7 @@ describe("src/core/js/layers/layerCollection.js", () => {
         layer3,
         map;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         map = new Map();
         mapCollection.addMap(map, "2D");
@@ -68,7 +68,7 @@ describe("src/core/js/layers/layerCollection.js", () => {
         layerCollection.clear();
     });
 
-    after(() => {
+    afterAll(() => {
         layerCollection.clear();
     });
 

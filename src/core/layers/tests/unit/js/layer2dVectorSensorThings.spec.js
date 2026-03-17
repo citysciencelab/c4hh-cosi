@@ -23,7 +23,7 @@ describe("src/core/js/layers/layer2dVectorSensorThings.js", () => {
         createMqttConnectionToSensorThingsSpy,
         warnStub;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

@@ -27,7 +27,7 @@ describe("src/shared/js/utils/xml2json.js", () => {
                         </regal>`;
     let xmlDoc, json, funnyXmlDoc;
 
-    before(() => {
+    beforeAll(() => {
         const domParser = new DOMParser();
 
         xmlDoc = domParser.parseFromString(xmlString, "text/xml");
@@ -35,7 +35,7 @@ describe("src/shared/js/utils/xml2json.js", () => {
     });
 
     describe("xml2json with value and attributes", () => {
-        before(() => {
+        beforeAll(() => {
             json = xml2json(xmlDoc);
         });
 
@@ -78,7 +78,7 @@ describe("src/shared/js/utils/xml2json.js", () => {
     });
 
     describe("xml2json with values as strings", () => {
-        before(() => {
+        beforeAll(() => {
             json = xml2json(xmlDoc, false);
         });
 
@@ -96,7 +96,7 @@ describe("src/shared/js/utils/xml2json.js", () => {
     });
 
     describe("xml2json on name conflicts", () => {
-        before(() => {
+        beforeAll(() => {
             json = xml2json(funnyXmlDoc);
         });
 

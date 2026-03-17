@@ -125,7 +125,7 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
         updatePositionUISpy;
 
 
-    before(() => {
+    beforeAll(() => {
         if (!document.getElementById("map")) {
             document.body.innerHTML = `
               <div id="app"></div>
@@ -135,7 +135,7 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
         }
     });
 
-    after(() => {
+    afterAll(() => {
         document.body.innerHTML = "";
     });
 

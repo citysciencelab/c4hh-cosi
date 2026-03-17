@@ -11,7 +11,7 @@ describe("src/shared/js/utils/coordToPixel3D", () => {
     let fromDegrees,
         wgs84ToWindowCoordinates;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map3d = {
                 id: "1",

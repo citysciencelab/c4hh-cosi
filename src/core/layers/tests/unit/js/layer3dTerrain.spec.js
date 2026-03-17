@@ -10,7 +10,7 @@ describe("src/core/js/layers/layer3dTerrain.js", () => {
         map3d,
         warn;
 
-    before(() => {
+    beforeAll(() => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
 
@@ -56,7 +56,7 @@ describe("src/core/js/layers/layer3dTerrain.js", () => {
     describe("createLayer", () => {
         let checkLayer;
 
-        before(() => {
+        beforeAll(() => {
             /**
              * Checks the layer for attributes content.
              * @param {Object} layer the layer

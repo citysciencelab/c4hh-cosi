@@ -12,7 +12,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceOsmNominatim.js"
         searchResults,
         checkConfigSpy;
 
-    before(() => {
+    beforeAll(() => {
         checkConfigSpy = sinon.spy(SearchInterface.prototype, "checkConfig");
         SearchInterface1 = new SearchInterfaceOsmNominatim();
 

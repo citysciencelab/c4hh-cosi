@@ -18,7 +18,7 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
         applySelectedSourceLayerSpy,
         wrapper;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

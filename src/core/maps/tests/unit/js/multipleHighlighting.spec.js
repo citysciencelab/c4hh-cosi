@@ -13,7 +13,7 @@ import stateAlerting from "@modules/alerting/store/stateAlerting.js";
 describe("src/utils/multipleHighlighting.js", () => {
     let styleListStub, createStyleStub, mapOL, feature;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         mapOL = {
             id: "ol",

@@ -222,10 +222,10 @@ describe("src/modules/print/store/actionsPrint", function () {
     describe("waitForPrintJobSuccess", function () {
         let clock;
 
-        before(function () {
+        beforeAll(function () {
             clock = sinon.useFakeTimers();
         });
-        after(function () {
+        afterAll(function () {
             clock.restore();
         });
         it("is not done yet so it should start another print request", done => {

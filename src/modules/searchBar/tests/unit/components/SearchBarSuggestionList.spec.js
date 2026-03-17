@@ -68,7 +68,7 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
             currentShowAllList: searchResults
         };
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

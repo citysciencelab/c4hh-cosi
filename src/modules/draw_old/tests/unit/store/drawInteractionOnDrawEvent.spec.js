@@ -22,7 +22,7 @@ describe("src/modules/draw_old/store/actions/drawInteractionOnDrawEvent.js", () 
         calculateCircleStub,
         mockApp;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

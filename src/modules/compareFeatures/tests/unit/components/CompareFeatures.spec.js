@@ -37,7 +37,7 @@ describe("CompareFeatures.vue", () => {
             removeFeature: sinon.stub()
         };
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

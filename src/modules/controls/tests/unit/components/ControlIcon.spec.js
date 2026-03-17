@@ -13,7 +13,7 @@ afterEach(() => {
 describe("src/modules/controls/components/ControlIcon.vue", () => {
     let propsData;
 
-    before(() => {
+    beforeAll(() => {
         propsData = {
             iconName: "iconName",
             disabled: false,

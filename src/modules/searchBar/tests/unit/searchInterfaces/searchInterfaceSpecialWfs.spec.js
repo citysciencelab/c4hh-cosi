@@ -18,7 +18,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceSpecialWfs.js", 
             type: "common:modules.searchBar.specialWFS.ongoing"
         }];
 
-    before(() => {
+    beforeAll(() => {
         checkConfigSpy = sinon.spy(SearchInterface.prototype, "checkConfig");
         SearchInterface1 = new SearchInterfaceSpecialWfs();
 

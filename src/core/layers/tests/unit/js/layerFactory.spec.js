@@ -12,7 +12,7 @@ describe("src/core/js/layers/layerFactory.js", () => {
         warn,
         origGetters;
 
-    before(() => {
+    beforeAll(() => {
         origGetters = store.getters;
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
@@ -57,7 +57,7 @@ describe("src/core/js/layers/layerFactory.js", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    after(() => {
+    afterAll(() => {
         store.getters = origGetters;
         sinon.restore();
     });

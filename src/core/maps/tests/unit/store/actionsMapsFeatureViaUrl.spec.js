@@ -36,7 +36,7 @@ describe("src/core/maps/actionsMapsFeatureViaUrl", () => {
         spy.resetHistory();
     });
 
-    after(() => {
+    afterAll(() => {
         mapCollection.clear();
     });
 

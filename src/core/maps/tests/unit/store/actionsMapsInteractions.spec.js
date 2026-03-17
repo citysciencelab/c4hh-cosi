@@ -36,7 +36,7 @@ describe("src/core/maps/store/actionsMapsInteractions.js", () => {
         mapCollection.addMap(olMap, "2D");
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

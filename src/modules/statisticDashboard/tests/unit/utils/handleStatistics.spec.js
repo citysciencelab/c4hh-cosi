@@ -2,7 +2,7 @@ import {expect} from "chai";
 import StatisticHandler from "@modules/statisticDashboard/js/handleStatistics.js";
 
 describe("src/modules/statisticDashboard/utils/handleStatistics.js", () => {
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

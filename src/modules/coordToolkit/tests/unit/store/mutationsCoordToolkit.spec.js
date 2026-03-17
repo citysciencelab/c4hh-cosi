@@ -12,7 +12,7 @@ const {setProjections, setExample} = mutations,
 
 describe("src/modules/coordToolkit/store/mutationsCoordToolkit.js", () => {
 
-    before(() => {
+    beforeAll(() => {
         crs.registerProjections(namedProjections);
     });
 

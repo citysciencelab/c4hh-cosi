@@ -10,7 +10,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceLocationFinder.j
         SearchInterface1 = null,
         checkConfigSpy;
 
-    before(() => {
+    beforeAll(() => {
         checkConfigSpy = sinon.spy(SearchInterface.prototype, "checkConfig");
         SearchInterface1 = new SearchInterfaceLocationFinder();
 

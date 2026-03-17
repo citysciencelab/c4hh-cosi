@@ -8,7 +8,7 @@ import layerCollection from "@core/layers/js/layerCollection.js";
 describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
     let commit, dispatch, getters, rootGetters, state, map;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         map = {
             id: "ol",

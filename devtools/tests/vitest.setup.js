@@ -386,11 +386,11 @@ if (!globalThis.__vueTestUtilsSettings) {
 }
 
 
-globalThis.before(() => {
+globalThis.beforeAll(() => {
     expect(mapCollection.count()).to.be.equals(0);
 });
 
-globalThis.after(() => {
+globalThis.afterAll(() => {
     mapCollection.clear();
 
     // hier auch folgendes zurücksetzen?

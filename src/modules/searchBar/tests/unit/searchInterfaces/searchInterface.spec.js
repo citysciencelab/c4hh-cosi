@@ -6,7 +6,7 @@ import sinon from "sinon";
 describe("src/modules/searchBar/searchInterfaces/searchInterface.js", () => {
     let SearchInterface1 = null;
 
-    before(() => {
+    beforeAll(() => {
         SearchInterface1 = new SearchInterface();
     });
 

@@ -24,7 +24,7 @@ const props = {
     ]
 };
 
-before(() => {
+beforeAll(() => {
     i18next.init({
         lng: "cimode",
         debug: false

@@ -5,7 +5,7 @@ import globalUrlParams from "../../../js/globalUrlParams.js";
 describe("src/core/urlParams/js/globalUrlParams.js", () => {
     let origWindow;
 
-    before(() => {
+    beforeAll(() => {
         origWindow = global.window;
     });
 

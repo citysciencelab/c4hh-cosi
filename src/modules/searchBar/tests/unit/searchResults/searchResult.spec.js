@@ -4,7 +4,7 @@ import SearchHitResult from "@modules/searchBar/searchResults/searchResult.js";
 describe("src/modules/searchBar/searchHits/searchResult.js", () => {
     let SearchHitResult1 = null;
 
-    before(() => {
+    beforeAll(() => {
         SearchHitResult1 = new SearchHitResult();
     });
 

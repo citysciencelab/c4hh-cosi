@@ -12,7 +12,7 @@ const {setProjections} = mutations,
 
 describe("src/modules/tools/modeler3D/store/mutationsModeler3D.js", () => {
 
-    before(() => {
+    beforeAll(() => {
         crs.registerProjections(namedProjections);
     });
 

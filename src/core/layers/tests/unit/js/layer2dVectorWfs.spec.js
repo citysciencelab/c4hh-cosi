@@ -12,7 +12,7 @@ describe("src/core/js/layers/layer2dVectorWfs.js", () => {
     let attributes,
         warn;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

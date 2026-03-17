@@ -17,7 +17,7 @@ describe("src/core/maps/js/mapUrlParams.js", () => {
         origGetters,
         styleListLoaded;
 
-    before(() => {
+    beforeAll(() => {
         origGetters = store.getters;
         origDispatch = store.dispatch;
     });

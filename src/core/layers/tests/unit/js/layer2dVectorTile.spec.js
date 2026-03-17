@@ -39,7 +39,7 @@ describe("src/core/js/layers/layer2dVectorTile.js", () => {
         error,
         warn;
 
-    before(() => {
+    beforeAll(() => {
         error = sinon.spy();
         sinon.stub(console, "error").callsFake(error);
         warn = sinon.spy();

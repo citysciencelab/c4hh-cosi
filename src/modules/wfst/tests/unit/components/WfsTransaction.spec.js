@@ -17,7 +17,7 @@ describe("src/modules/modules/wfst/components/WfsTransaction.vue", () => {
         exampleLayerOne,
         exampleLayerTwo;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

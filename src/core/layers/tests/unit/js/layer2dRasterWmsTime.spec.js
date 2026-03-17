@@ -14,7 +14,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
         warnSpy;
 
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

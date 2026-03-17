@@ -48,7 +48,7 @@ describe("src/modules/Print/components/PrintMap.vue", () => {
         setIsIncreased3DResolutionSelectedSpy,
         updateCanvasByFeaturesLoadendSpy;
 
-    before(() => {
+    beforeAll(() => {
         map = {
             id: "ol",
             mode: "2D",

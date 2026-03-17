@@ -5,7 +5,7 @@ import createStyleModule from "@modules/draw_old/js/style/createStyle.js";
 describe("src/modules/draw/js/style/createStyle.js", () => {
     let iconPath;
 
-    before(() => {
+    beforeAll(() => {
         iconPath = "/test/unittests/resources/icons/";
     });
 

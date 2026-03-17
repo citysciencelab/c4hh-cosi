@@ -44,11 +44,11 @@ describe("src/modules/LayerPills.vue", () => {
         });
     }
 
-    before(() => {
+    beforeAll(() => {
         resizeObserver = global.resizeObserver;
     });
 
-    after(() => {
+    afterAll(() => {
         global.resizeObserver = resizeObserver;
     });
 

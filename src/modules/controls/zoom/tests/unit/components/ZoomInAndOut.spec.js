@@ -51,7 +51,7 @@ describe("src/modules/controls/zoom/components/ZoomInAndOut.vue", () => {
         });
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

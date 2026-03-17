@@ -11,7 +11,7 @@ describe("src/core/js/maps/maps.js", () => {
     let load3DScriptSpy,
         origGetters;
 
-    before(() => {
+    beforeAll(() => {
         origGetters = store.getters;
     });
 

@@ -66,7 +66,7 @@ describe("src/modules/print/js/buildSpec", function () {
         originWindow = window,
         originalStyle = style;
 
-    before(() => {
+    beforeAll(() => {
         buildSpec = BuildSpec;
         buildSpec.setAttributes(attr);
         originalGetStyleModel = buildSpec.getStyleModel;
@@ -103,7 +103,7 @@ describe("src/modules/print/js/buildSpec", function () {
         sinon.restore();
         global.window = localWindow;
     });
-    after(() => {
+    afterAll(() => {
         global.window = originWindow;
     });
 

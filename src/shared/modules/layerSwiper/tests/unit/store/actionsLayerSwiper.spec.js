@@ -7,7 +7,7 @@ import layerCollection from "@core/layers/js/layerCollection.js";
 describe("actions", () => {
     let commit, dispatch, state, rootGetters, jsdom, map, originalDocument, originalWindow, originalKeyboardEvent, originalPointerEvent;
 
-    before(() => {
+    beforeAll(() => {
         originalDocument = global.document;
         originalWindow = global.window;
         originalKeyboardEvent = global.KeyboardEvent;

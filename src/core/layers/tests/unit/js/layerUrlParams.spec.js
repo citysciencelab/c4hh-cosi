@@ -10,7 +10,7 @@ describe("src/core/layers/js/layerUrlParams.js", () => {
         origGetters,
         origDispatch;
 
-    before(() => {
+    beforeAll(() => {
         origGetters = store.getters;
         origDispatch = store.dispatch;
     });

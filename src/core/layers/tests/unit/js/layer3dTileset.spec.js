@@ -14,7 +14,7 @@ describe("src/core/js/layers/layer3dTileset.js", () => {
         origDispatch,
         style;
 
-    before(() => {
+    beforeAll(() => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
         origGetters = store.getters;
@@ -58,7 +58,7 @@ describe("src/core/js/layers/layer3dTileset.js", () => {
     describe("createLayer", () => {
         let checkLayer;
 
-        before(() => {
+        beforeAll(() => {
             /**
              * Checks the layer for attributes content.
              * @param {Object} layer the layer

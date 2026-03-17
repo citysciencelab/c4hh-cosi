@@ -13,7 +13,7 @@ describe("src/core/js/layers/layer2dVector.js", () => {
         styleListStub,
         origGetters;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

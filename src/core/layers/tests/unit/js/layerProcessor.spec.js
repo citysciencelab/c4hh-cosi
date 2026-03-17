@@ -13,7 +13,7 @@ describe("src/core/js/layers/layerProcessor.js", () => {
         warn,
         origGetters;
 
-    before(() => {
+    beforeAll(() => {
         origGetters = store.getters;
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);

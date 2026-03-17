@@ -22,7 +22,7 @@ describe("src/core/maps/store/gettersMap.js", () => {
         layer3,
         olMap;
 
-    before(() => {
+    beforeAll(() => {
         layer1 = new VectorLayer({
             id: "1",
             name: "layer1",

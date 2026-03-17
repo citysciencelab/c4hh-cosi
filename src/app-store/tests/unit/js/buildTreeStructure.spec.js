@@ -50,7 +50,7 @@ describe("src/app-store/js/buildTreeStructure.js", () => {
     let layerList,
         layerConfig;
 
-    before(() => {
+    beforeAll(() => {
         layerList = fs.readFileSync("src/app-store/tests/unit/js/servicesMasterAuto.json", "utf8");
         layerList = JSON.parse(layerList);
 

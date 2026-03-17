@@ -12,7 +12,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceElasticSearch.js
         checkConfigSpy;
 
 
-    before(() => {
+    beforeAll(() => {
         store.getters = {
             restServiceById: () => {
                 return {

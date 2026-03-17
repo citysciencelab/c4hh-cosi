@@ -36,7 +36,7 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardControls.
 
     let store;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

@@ -16,7 +16,7 @@ describe("src/shared/js/utils/getWmsFeaturesByMimeType.js", () => {
     let layer = null,
         aFeature = null;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

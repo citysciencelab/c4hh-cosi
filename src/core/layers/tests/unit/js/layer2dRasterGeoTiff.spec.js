@@ -11,7 +11,7 @@ describe("src/core/js/layers/layer2dRasterGeoTiff.js", () => {
         styleListStub,
         origGetters;
 
-    before(() => {
+    beforeAll(() => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
         mapCollection.clear();
@@ -36,7 +36,7 @@ describe("src/core/js/layers/layer2dRasterGeoTiff.js", () => {
         origGetters = store.getters;
     });
 
-    after(() => {
+    afterAll(() => {
         global.fetch = fetch;
         styleListStub.restore();
         sinon.restore();

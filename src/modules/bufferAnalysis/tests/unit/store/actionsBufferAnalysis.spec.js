@@ -19,7 +19,7 @@ describe("src/modules/bufferAnalysis/store/actionsBufferAnalysis.js", () => {
 
     const defaultState = {...stateBufferAnalysis};
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

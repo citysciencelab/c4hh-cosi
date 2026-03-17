@@ -15,7 +15,7 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
     let attributes,
         warn;
 
-    before(() => {
+    beforeAll(() => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
 

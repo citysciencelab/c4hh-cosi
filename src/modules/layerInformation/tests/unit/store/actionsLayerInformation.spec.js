@@ -13,7 +13,7 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
         commit,
         dispatch;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

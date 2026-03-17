@@ -6,7 +6,7 @@ describe("src/core/js/layers/layer2dRasterStaticImage.js", () => {
     let attributes,
         warn;
 
-    before(() => {
+    beforeAll(() => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
         mapCollection.clear();
@@ -35,7 +35,7 @@ describe("src/core/js/layers/layer2dRasterStaticImage.js", () => {
         };
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

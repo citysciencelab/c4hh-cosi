@@ -4,11 +4,11 @@ import {expect} from "chai";
 describe("src/shared/js/utils/isMobile.js", () => {
     let localWindow;
 
-    before(() => {
+    beforeAll(() => {
         localWindow = global.window;
     });
 
-    after(() => {
+    afterAll(() => {
         global.window = localWindow;
     });
 

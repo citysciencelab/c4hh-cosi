@@ -12,7 +12,7 @@ describe("src/modules/wfst/store/actionsWfst.js", () => {
         getters,
         rootGetters;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

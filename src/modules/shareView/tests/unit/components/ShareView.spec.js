@@ -31,7 +31,7 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
         store,
         wrapper;
 
-    before(() => {
+    beforeAll(() => {
         defaultState = {...ShareView.state};
     });
 
@@ -86,7 +86,7 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
         sinon.restore();
     });
 
-    after(() => {
+    afterAll(() => {
         ShareView.state = defaultState;
     });
 
@@ -106,7 +106,7 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
         let localWindow,
             localNavigator;
 
-        before(() => {
+        beforeAll(() => {
             localWindow = global.window;
             localNavigator = global.navigator;
         });

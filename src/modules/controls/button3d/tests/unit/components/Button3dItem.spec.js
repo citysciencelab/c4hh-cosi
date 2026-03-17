@@ -11,7 +11,7 @@ describe("src/modules/controls/button3d/components/Button3dItem.vue", () => {
     const changeMapModeSpy = sinon.spy();
     let store;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false
@@ -47,7 +47,7 @@ describe("src/modules/controls/button3d/components/Button3dItem.vue", () => {
         });
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

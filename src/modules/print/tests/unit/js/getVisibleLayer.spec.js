@@ -11,7 +11,7 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
         origCommit,
         origDispatch;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

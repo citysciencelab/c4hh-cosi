@@ -16,11 +16,11 @@ describe("src/core/js/layers/layer2dVectorOaf.js", () => {
         warn,
         origGetters;
 
-    before(() => {
+    beforeAll(() => {
         origGetters = store.getters;
     });
 
-    before(() => {
+    beforeAll(() => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
 

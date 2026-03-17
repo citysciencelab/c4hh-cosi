@@ -66,7 +66,7 @@ describe("src/core/maps/store/actionsMapsAttributesMapper.js", () => {
         map2d,
         mapDiv;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

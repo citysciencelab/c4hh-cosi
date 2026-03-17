@@ -13,7 +13,7 @@ describe("src/modules/shadowTool/components/ShadowTool.vue", () => {
     let map3D,
         store;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
 
         global.Cesium = {};

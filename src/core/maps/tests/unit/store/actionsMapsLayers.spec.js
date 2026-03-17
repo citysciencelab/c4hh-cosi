@@ -19,7 +19,7 @@ describe("src/core/maps/store/actionsMapsLayers.js", () => {
         map,
         warn;
 
-    before(() => {
+    beforeAll(() => {
         layer1 = new VectorLayer({
             id: "Donald",
             name: "Duck1",

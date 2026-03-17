@@ -13,7 +13,7 @@ import definitionsGraphicalSelect from "@shared/modules/graphicalSelect/js/defin
 describe("src/share-components/graphicalSelect/store/actionsGraphicalSelect", () => {
     let commit, dispatch, context;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

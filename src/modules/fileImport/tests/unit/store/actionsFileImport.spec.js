@@ -33,7 +33,7 @@ let dispatch,
     test2KML,
     commit;
 
-before(() => {
+beforeAll(() => {
     crs.registerProjections(namedProjections);
 
     i18next.init({

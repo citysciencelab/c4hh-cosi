@@ -27,7 +27,7 @@ describe("src/core/maps/store/actionsMapsInteractions.js", () => {
         let olMap,
             payload;
 
-        before(() => {
+        beforeAll(() => {
             olMap = new Map();
             payload = {
                 type: "pointermove",
@@ -38,7 +38,7 @@ describe("src/core/maps/store/actionsMapsInteractions.js", () => {
             mapCollection.addMap(olMap, "2D");
         });
 
-        after(() => {
+        afterAll(() => {
             sinon.restore();
         });
 

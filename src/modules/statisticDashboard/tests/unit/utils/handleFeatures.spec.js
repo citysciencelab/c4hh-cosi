@@ -3,7 +3,7 @@ import FeatureHandler from "@modules/statisticDashboard/js/handleFeatures.js";
 import Feature from "ol/Feature.js";
 
 describe("src/modules/statisticDashboard/utils/handleFeatures.js", () => {
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

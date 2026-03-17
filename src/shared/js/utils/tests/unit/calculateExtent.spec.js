@@ -6,7 +6,7 @@ import calculateExtent from "@shared/js/utils/calculateExtent.js";
 describe("src/shared/js/utils/calculateExtent.js", () => {
     const features = [];
 
-    before(() => {
+    beforeAll(() => {
         features.push(new Feature({
             id: "Thor"
         }));

@@ -38,7 +38,7 @@ describe("src/modules/routing/components/Isochrones/IsochronesItem.vue", () => {
         store,
         wrapper;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",
@@ -114,7 +114,7 @@ describe("src/modules/routing/components/Isochrones/IsochronesItem.vue", () => {
         sinon.restore();
     });
 
-    after(() => {
+    afterAll(() => {
         mapCollection.clear();
     });
 

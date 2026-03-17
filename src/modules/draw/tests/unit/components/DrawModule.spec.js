@@ -13,7 +13,7 @@ describe("src/modules/draw/components/DrawModule.vue", () => {
         store,
         wrapper;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

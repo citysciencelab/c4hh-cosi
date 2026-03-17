@@ -13,7 +13,7 @@ describe("src/modules/contact/js/getSystemInfo", function () {
             }};
     });
 
-    after(() => {
+    afterAll(() => {
         global.window = originWindow;
     });
 

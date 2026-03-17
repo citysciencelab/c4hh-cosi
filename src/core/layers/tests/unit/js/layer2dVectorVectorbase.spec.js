@@ -7,7 +7,7 @@ describe("src/core/js/layers/layer2dVectorVectorbase.js", () => {
     let attributes,
         warn;
 
-    before(() => {
+    beforeAll(() => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
 

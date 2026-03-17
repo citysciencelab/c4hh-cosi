@@ -50,7 +50,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
             name: "feature123"
         });
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

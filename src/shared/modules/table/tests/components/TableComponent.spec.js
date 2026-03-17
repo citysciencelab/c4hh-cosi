@@ -28,7 +28,7 @@ describe("src/shared/modules/table/components/TableComponent.vue", () => {
         });
     }
 
-    before(function () {
+    beforeAll(function () {
         i18next.init({
             lng: "cimode",
             debug: false

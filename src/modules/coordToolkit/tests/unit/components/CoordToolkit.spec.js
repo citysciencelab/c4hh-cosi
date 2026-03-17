@@ -295,7 +295,7 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
         });
 
         describe("createInteraction for 3D", () => {
-            before(() => {
+            beforeAll(() => {
                 global.Cesium = {};
                 global.Cesium.ScreenSpaceEventHandler = function () {
                     return {
@@ -309,7 +309,7 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
                 };
             });
 
-            after(() => {
+            afterAll(() => {
                 store.commit("Maps/setMode", "2D");
             });
 

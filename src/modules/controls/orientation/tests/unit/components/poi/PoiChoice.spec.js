@@ -47,7 +47,7 @@ describe("src/modules/controls/orientation/components/PoiChoice.vue", () => {
         });
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

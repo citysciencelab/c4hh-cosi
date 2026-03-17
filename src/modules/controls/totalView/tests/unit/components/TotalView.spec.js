@@ -42,7 +42,7 @@ describe("src/modules/controls/totalView/components/TotalView.vue", () => {
         });
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

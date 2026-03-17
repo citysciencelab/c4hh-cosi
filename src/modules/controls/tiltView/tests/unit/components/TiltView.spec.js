@@ -13,7 +13,7 @@ describe("src/modules/controls/button3d/components/TiltView.vue", () => {
         map3d,
         store;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false
@@ -65,7 +65,7 @@ describe("src/modules/controls/button3d/components/TiltView.vue", () => {
         });
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

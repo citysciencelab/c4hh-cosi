@@ -21,7 +21,7 @@ describe("src/modules/controls/rotation/components/RotationItem.vue", () => {
         moveLeftSpy,
         moveDownSpy;
 
-    before(() => {
+    beforeAll(() => {
         const map3d = {
             id: "olcs",
             mode: "3D",

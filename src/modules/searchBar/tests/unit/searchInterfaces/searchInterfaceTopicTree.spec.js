@@ -8,7 +8,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceTopicTree.js", (
     let SearchInterface1 = null,
         checkConfigSpy;
 
-    before(() => {
+    beforeAll(() => {
         checkConfigSpy = sinon.spy(SearchInterface.prototype, "checkConfig");
         SearchInterface1 = new SearchInterfaceTopicTree();
 

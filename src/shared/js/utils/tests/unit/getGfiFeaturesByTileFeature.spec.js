@@ -3,7 +3,7 @@ import {expect} from "chai";
 import getGfiFeatureProvider from "@shared/js/utils/getGfiFeaturesByTileFeature.js";
 import store from "@appstore/index.js";
 
-before(function () {
+beforeAll(function () {
     i18next.init({
         lng: "cimode",
         debug: false

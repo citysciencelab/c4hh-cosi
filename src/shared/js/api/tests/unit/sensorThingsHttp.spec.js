@@ -21,7 +21,7 @@ describe("src/shared/js/api/sensorThingsHttp.js", () => {
         lastError = error;
     }
 
-    before(() => {
+    beforeAll(() => {
         crs.registerProjections(namedProjections);
     });
 

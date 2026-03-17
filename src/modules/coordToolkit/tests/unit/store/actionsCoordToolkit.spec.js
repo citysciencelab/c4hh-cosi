@@ -14,7 +14,7 @@ describe("src/modules/coord/store/actionsCoordToolkit.js", () => {
         ["EPSG:4326", "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"]
     ];
 
-    before(() => {
+    beforeAll(() => {
         crs.registerProjections(namedProjections);
     });
 
@@ -44,7 +44,7 @@ describe("src/modules/coord/store/actionsCoordToolkit.js", () => {
         sinon.restore();
     });
 
-    after(() => {
+    afterAll(() => {
         // remove additional projection 25833 from registered ones
         crs.getProjection("EPSG:25833").masterportal = false;
     });

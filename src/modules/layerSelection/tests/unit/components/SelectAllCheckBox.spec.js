@@ -16,7 +16,7 @@ describe("src/modules/layerTree/components/SelectAllCheckBox.vue", () => {
         propsData,
         changeVisibilitySpy;
 
-    before(function () {
+    beforeAll(function () {
         i18next.init({
             lng: "cimode",
             debug: false

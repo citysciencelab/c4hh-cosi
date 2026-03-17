@@ -12,7 +12,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceGazetteer.js", (
     let SearchInterface1 = null,
         checkConfigSpy;
 
-    before(() => {
+    beforeAll(() => {
         store.getters = {
             restServiceById: () => sinon.stub(),
             "Maps/projection": {getCode: () => "EPSG:4326"}

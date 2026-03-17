@@ -37,7 +37,7 @@ describe("src/core/maps/store/actionsMapsInteractionsZoom.js", () => {
         mapCollection.addMap(map2d, "2D");
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

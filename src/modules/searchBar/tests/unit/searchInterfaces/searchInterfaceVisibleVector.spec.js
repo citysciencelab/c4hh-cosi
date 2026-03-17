@@ -21,7 +21,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js
         coordinates,
         checkConfigSpy;
 
-    before(() => {
+    beforeAll(() => {
         checkConfigSpy = sinon.spy(SearchInterface.prototype, "checkConfig");
         SearchInterface1 = new SearchInterfaceVisibleVector();
     });
