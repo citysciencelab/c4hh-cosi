@@ -11,6 +11,7 @@ function addInterceptor (interceptorUrlRegex) {
     if (!interceptorUrlRegex) {
         return;
     }
+    const noTokenFoundWarning = "No authentication token found in cookies";
 
     axios.interceptors.request.use(
         config => {
@@ -34,7 +35,7 @@ function addInterceptor (interceptorUrlRegex) {
             const token = Cookie.get("token");
 
             if (!token) {
-                console.warn("No authentication token found in cookies");
+                console.warn(noTokenFoundWarning);
                 return config;
             }
 
@@ -79,7 +80,7 @@ function addInterceptor (interceptorUrlRegex) {
                 const token = Cookie.get("token");
 
                 if (!token) {
-                    console.warn("No authentication token found in cookies");
+                    console.warn(noTokenFoundWarning);
                     return opened;
                 }
 
@@ -102,7 +103,7 @@ function addInterceptor (interceptorUrlRegex) {
             const token = Cookie.get("token");
 
             if (!token) {
-                console.warn("No authentication token found in cookies");
+                console.warn(noTokenFoundWarning);
                 return originalFetch(resource, config);
             }
 
@@ -110,7 +111,6 @@ function addInterceptor (interceptorUrlRegex) {
                 ...originalConfig,
                 credentials: "include",
                 headers: {
-                    ...originalConfig?.headers,
                     "Authorization": `Bearer ${token}`
                 }
             };
