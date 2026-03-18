@@ -16,7 +16,7 @@ config.global.mocks.$t = key => key;
 describe.skip("addons/vpiDashboard/test/ visitors tab component", () => {
     let wrapper = null;
 
-    before(() => {
+    beforeAll(() => {
         const store = new Vuex.Store({
             state: {},
             modules: {

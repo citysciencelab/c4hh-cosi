@@ -36,7 +36,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         map = null,
         error;
 
-    before(() => {
+    beforeAll(() => {
         const proj = new Projection({
             code: "EPSG:25832",
             units: "m",

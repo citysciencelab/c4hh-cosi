@@ -14,7 +14,7 @@ config.global.mocks.$t = key => key;
 describe("addons/vpiDashboard/test/ compare dashboard tab component", () => {
     let wrapper = null;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const store = new Vuex.Store({
             state: {},

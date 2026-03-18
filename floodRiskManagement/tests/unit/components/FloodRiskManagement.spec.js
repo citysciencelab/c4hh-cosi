@@ -340,7 +340,7 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
         wrapper,
         map = null;
 
-    before(() => {
+    beforeAll(() => {
         map = {
             id: "ol",
             mode: "2D",

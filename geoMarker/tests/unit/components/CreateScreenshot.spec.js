@@ -5,7 +5,7 @@ import CreateScreenshot from "../../../components/CreateScreenshot.vue";
 config.global.mocks.$t = key => key;
 
 describe("CreateScreenshot.vue", () => {
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

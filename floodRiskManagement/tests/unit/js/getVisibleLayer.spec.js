@@ -11,7 +11,7 @@ describe("addons/floodRiskManagement/js/getVisibleLayer.js", function () {
         origCommit,
         origDispatch;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

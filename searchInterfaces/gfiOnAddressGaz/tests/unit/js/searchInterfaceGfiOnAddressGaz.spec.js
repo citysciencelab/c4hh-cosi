@@ -11,7 +11,7 @@ afterEach(() => {
 describe("addons/searchInterfaces/exampleSearch/searchInterfaceGfiOnAddressGaz.js", () => {
     let searchInterface = null;
 
-    before(() => {
+    beforeAll(() => {
         store.getters = {
             restServiceById: () => sinon.stub()
         };

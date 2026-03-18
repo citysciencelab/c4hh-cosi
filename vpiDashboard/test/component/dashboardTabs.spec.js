@@ -19,7 +19,7 @@ describe("addons/vpiDashboard/test/ DashboardTabs", () => {
         ],
         spySetCurrentTabIndex = sinon.spy();
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",

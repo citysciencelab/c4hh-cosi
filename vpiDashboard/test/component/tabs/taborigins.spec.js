@@ -13,7 +13,7 @@ config.global.mocks.$t = key => key;
 describe("addons/vpiDashboard/test/ origins tab component", () => {
     let wrapper = null;
 
-    before(() => {
+    beforeAll(() => {
         const store = new Vuex.Store({
             state: {},
             modules: {
@@ -56,7 +56,7 @@ describe("addons/vpiDashboard/test/ origins tab component", () => {
         });
     });
 
-    after(() => {
+    afterAll(() => {
         sinon.restore();
     });
 

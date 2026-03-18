@@ -5,7 +5,7 @@ import searchInterfaceExampleSearch from "../../../js/searchInterfaceExampleSear
 describe("addons/searchInterfaces/exampleSearch/searchInterfaceExampleSearch.js", () => {
     let SearchInterface1 = null;
 
-    before(() => {
+    beforeAll(() => {
         SearchInterface1 = new searchInterfaceExampleSearch();
     });
 

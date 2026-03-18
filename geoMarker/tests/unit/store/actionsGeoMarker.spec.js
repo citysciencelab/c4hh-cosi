@@ -10,7 +10,7 @@ describe("src/modules/wfst/store/actionsGeoMarker.js", () => {
         getters,
         rootGetters;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

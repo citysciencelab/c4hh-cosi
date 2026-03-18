@@ -30,7 +30,7 @@ describe("addons/quickResponseCode/components/QuickResponseCodeOverlay.vue", () 
         wrapper = null,
         map = null;
 
-    before(() => {
+    beforeAll(() => {
         map = {
             id: "ol",
             mode: "2D",

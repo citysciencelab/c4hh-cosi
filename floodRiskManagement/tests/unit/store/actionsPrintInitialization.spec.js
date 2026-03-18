@@ -29,7 +29,7 @@ describe("addons/floodRiskManagement/store/actionsPrintInitialization.js", () =>
         getters,
         rootGetters;
 
-    before(() => {
+    beforeAll(() => {
         map = {
             id: "ol",
             mode: "2D",
@@ -262,7 +262,7 @@ describe("addons/floodRiskManagement/store/actionsPrintInitialization.js", () =>
                 {type: "setEventListener", payload: "postrender", commit: true}
             ], {}, done);
         });
-        after(function () {
+        afterAll(function () {
             sinon.restore();
         });
     });

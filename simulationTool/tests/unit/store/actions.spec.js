@@ -4,7 +4,7 @@ import testAction from "../../../../../devtools/tests/VueTestUtils.js";
 
 const {isFormatValid, parseScenarioFromImport} = actions;
 
-before(() => {
+beforeAll(() => {
     i18next.init({
         lng: "cimode",
         debug: false

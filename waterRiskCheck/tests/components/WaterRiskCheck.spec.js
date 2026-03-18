@@ -88,7 +88,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
         ];
     let stubSetConfig;
 
-    before(() => {
+    beforeAll(() => {
         crs.registerProjections(namedProjections);
     });
 

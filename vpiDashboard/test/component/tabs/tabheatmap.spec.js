@@ -16,7 +16,7 @@ describe("addons/vpiDashboard/test/ heatmap tab component", () => {
 
     const toggleLayerSpy = sinon.spy();
 
-    before(() => {
+    beforeAll(() => {
         const store = new Vuex.Store({
             state: {},
             modules: {

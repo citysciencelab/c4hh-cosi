@@ -13,7 +13,7 @@ config.global.mocks.$t = key => key;
 describe("addons/vpiDashboard/test/ gender tab component", () => {
     let wrapper = null;
 
-    before(() => {
+    beforeAll(() => {
         const store = new Vuex.Store({
             state: {},
             modules: {

@@ -8,7 +8,7 @@ describe("addons/streetSmart/store/actionsStreetSmart", () => {
         toggleAddressesVisibleSpy = sinon.spy();
     let commit, dispatch, rootGetters, getters, rootState;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

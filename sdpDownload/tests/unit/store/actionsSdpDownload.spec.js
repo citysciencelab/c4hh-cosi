@@ -8,7 +8,7 @@ import sinon from "sinon";
 describe("addons/sdpDownload/store/actionsSdpDownload", () => {
     let commit, dispatch, context, getters, rootState;
 
-    before(() => {
+    beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false

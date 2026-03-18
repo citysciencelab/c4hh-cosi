@@ -13,7 +13,7 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
     ];
     let commit, dispatch, rootGetters, getters;
 
-    before(() => {
+    beforeAll(() => {
         mapCollection.clear();
         const map = {
             id: "ol",
