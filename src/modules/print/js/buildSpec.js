@@ -23,7 +23,6 @@ import {getRulesForFeature} from "@masterportal/masterportalapi/src/vectorStyle/
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {uniqueId} from "@shared/js/utils/uniqueId.js";
 import {buildHeatmapPng} from "../utils/buildHeatmapPng.js";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 
 const BuildSpecModel = {
     defaults: {
@@ -1419,7 +1418,7 @@ const BuildSpecModel = {
                     const legendContainsPdf = this.legendContainsPdf(legendObj.legend);
 
                     if (isMetaDataAvailable) {
-                        metaDataLayerList.push(legendObj.name);
+                        metaDataLayerList.push(legendObj.id);
                     }
                     if (legendContainsPdf) {
                         store.dispatch("Alerting/addSingleAlert", {
@@ -1447,8 +1446,8 @@ const BuildSpecModel = {
         this.setLegend(legendObject);
 
         if (isMetaDataAvailable && metaDataLayerList.length > 0) {
-            metaDataLayerList.forEach((layerName) => {
-                this.getMetaData(layerName, getResponse, index);
+            metaDataLayerList.forEach((layerId) => {
+                this.getMetaData(layerId, getResponse, index);
             });
         }
         else {
@@ -1628,20 +1627,20 @@ const BuildSpecModel = {
     },
     /**
      * Requests the metadata for given layer name
-     * @param {String} layerName name of current layer
+     * @param {String} layerId id of current layer
      * @param {Function} getResponse the function to start axios request
      * @param {Number} index The print index
      * @returns {void}
      */
-    getMetaData: function (layerName, getResponse, index) {
-        const metadataLayer = rawLayerList.getLayerWhere({name: layerName}),
+    getMetaData: function (layerId, getResponse, index) {
+        const metadataLayer = store.getters.layerConfigById(layerId),
             metaId = metadataLayer.datasets && metadataLayer.datasets[0] ? metadataLayer.datasets[0].md_id : null,
             uniqueIdRes = uniqueId(),
             cswObj = {};
 
         if (metaId !== null) {
             this.defaults.uniqueIdList.push(uniqueIdRes);
-            cswObj.layerName = layerName;
+            cswObj.layerName = metadataLayer.name;
             cswObj.metaId = metaId;
             cswObj.keyList = ["date", "orgaOwner", "address", "email", "tel", "url"];
             cswObj.uniqueId = uniqueIdRes;

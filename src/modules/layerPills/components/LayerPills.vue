@@ -155,12 +155,13 @@ export default {
 
             if (mapMode === "2D") {
                 const layerTypes3d = layerTypes.getLayerTypes3d(),
-                    visible2DLayers = visibleLayers.filter(layer => !layerTypes3d.includes(layer.typ?.toUpperCase()));
+                    visible2DLayers = visibleLayers.filter(layer => !layerTypes3d.includes(layer.typ?.toUpperCase())
+                        && !layer.isNeverVisibleInTree);
 
                 this.setVisibleSubjectDataLayers(visible2DLayers);
             }
             else {
-                this.setVisibleSubjectDataLayers(visibleLayers);
+                this.setVisibleSubjectDataLayers(visibleLayers.filter(layer => !layer.isNeverVisibleInTree));
             }
             this.setToggleButtonVisibility();
         },
@@ -239,34 +240,30 @@ export default {
             @after-enter="setToggleButtonVisibility"
             @after-leave="setToggleButtonVisibility"
         >
-            <template
+            <li
                 v-for="(layer) in visibleSubjectDataLayers"
                 :key="layer.id"
+                class="nav-item shadow"
             >
-                <li
-                    v-if="!layer.isNeverVisibleInTree"
-                    class="nav-item shadow"
+                <button
+                    class="nav-link"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="bottom"
+                    data-bs-custom-class="custom-tooltip"
+                    :title="$t(layer.name)"
+                    :class="layer.datasets ? 'nav-link-hover' : ''"
+                    @click="showLayerInformationInMenu(layer)"
+                    @keydown="showLayerInformationInMenu(layer)"
                 >
-                    <button
-                        class="nav-link"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="bottom"
-                        data-bs-custom-class="custom-tooltip"
-                        :title="$t(layer.name)"
-                        :class="layer.datasets ? 'nav-link-hover' : ''"
-                        @click="showLayerInformationInMenu(layer)"
-                        @keydown="showLayerInformationInMenu(layer)"
-                    >
-                        {{ $t(layer.name) }}
-                    </button>
-                    <IconButton
-                        :aria="$t('common:modules.layerPills.remove')"
-                        :class-array="['btn-light', 'layerpillsbutton', 'close-button']"
-                        :icon="'bi-x-lg'"
-                        :interaction="() => removeLayerFromVisibleLayers(layer)"
-                    />
-                </li>
-            </template>
+                    {{ $t(layer.name) }}
+                </button>
+                <IconButton
+                    :aria="$t('common:modules.layerPills.remove')"
+                    :class-array="['btn-light', 'layerpillsbutton', 'close-button']"
+                    :icon="'bi-x-lg'"
+                    :interaction="() => removeLayerFromVisibleLayers(layer)"
+                />
+            </li>
         </TransitionGroup>
         <div
             key="more-pill"

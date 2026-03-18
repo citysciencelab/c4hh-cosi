@@ -48,6 +48,7 @@ describe("src/plugins/addons.js", () => {
             stubLoadGfiThemes,
             stubLoadSearchInterfaces,
             stubLoadToolAddons,
+            stubLoadVueComponentAddons,
             stubLoadJavascriptAddons;
 
         beforeEach(async () => {
@@ -55,6 +56,7 @@ describe("src/plugins/addons.js", () => {
             stubLoadGfiThemes = await sinon.stub(addons, "loadGfiThemes");
             stubLoadSearchInterfaces = await sinon.stub(addons, "loadSearchInterfaces");
             stubLoadToolAddons = await sinon.stub(addons, "loadToolAddons");
+            stubLoadVueComponentAddons = await sinon.stub(addons, "loadVueComponentAddons");
             stubLoadJavascriptAddons = await sinon.stub(addons, "loadJavascriptAddons");
         });
 
@@ -64,6 +66,7 @@ describe("src/plugins/addons.js", () => {
             expect(await stubLoadGfiThemes.notCalled).to.be.true;
             expect(await stubLoadSearchInterfaces.notCalled).to.be.true;
             expect(await stubLoadToolAddons.notCalled).to.be.true;
+            expect(await stubLoadVueComponentAddons.notCalled).to.be.true;
             expect(await stubLoadJavascriptAddons.notCalled).to.be.true;
         });
         it("load addon control", async () => {
@@ -76,6 +79,7 @@ describe("src/plugins/addons.js", () => {
             expect(stubLoadGfiThemes.notCalled).to.be.true;
             expect(stubLoadSearchInterfaces.notCalled).to.be.true;
             expect(stubLoadToolAddons.notCalled).to.be.true;
+            expect(stubLoadVueComponentAddons.notCalled).to.be.true;
             expect(stubLoadJavascriptAddons.notCalled).to.be.true;
         });
         it("load addon gfiTheme", async () => {
@@ -123,6 +127,19 @@ describe("src/plugins/addons.js", () => {
             expect(stubLoadGfiThemes.notCalled).to.be.true;
             expect(stubLoadSearchInterfaces.notCalled).to.be.true;
             expect(stubLoadToolAddons.notCalled).to.be.true;
+        });
+
+        it("load addon vueComponent", async () => {
+            const config = ["exampleVueComponent"];
+
+            await addons.loadAddons(mockApp, config);
+            expect(stubLoadVueComponentAddons.calledOnce).to.be.true;
+            expect(stubLoadVueComponentAddons.firstCall.args[0]).to.be.equals("exampleVueComponent");
+            expect(stubLoadControls.notCalled).to.be.true;
+            expect(stubLoadGfiThemes.notCalled).to.be.true;
+            expect(stubLoadSearchInterfaces.notCalled).to.be.true;
+            expect(stubLoadToolAddons.notCalled).to.be.true;
+            expect(stubLoadJavascriptAddons.notCalled).to.be.true;
         });
     });
     describe("loadControls", () => {
@@ -197,5 +214,17 @@ describe("src/plugins/addons.js", () => {
         });
     });
 
+    describe("loadVueComponentAddons", () => {
+        it("load addon type vueComponent", async () => {
+            await addons.loadVueComponentAddons("VueComponentAddon", mockApp);
+
+            expect(loadAddonStub.calledOnce).to.be.true;
+            expect(loadAddonStub.firstCall.args[0]).to.be.equals("VueComponentAddon");
+            expect(store.commit.notCalled).to.be.true;
+            expect(store.registerModule.calledOnce).to.be.true;
+            expect(store.registerModule.firstCall.args[0]).to.be.deep.equals(["Modules", "Component"]);
+            expect(store.registerModule.firstCall.args[1]).to.be.deep.equals(store);
+        });
+    });
 
 });

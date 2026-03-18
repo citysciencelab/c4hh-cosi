@@ -3437,13 +3437,13 @@ Druckmodul. Konfigurierbar für 2 Druckdienste: den High Resolution PlotService 
 |additionalLayers|nein|**[additionalLayers](#portalconfigmenusectionsmodulesprintadditionallayers)**||Definiert Layer die über Checkbox gesteuert zusätzlich gedruckt werden können.|false|
 |capabilitiesFilter|nein|**[capabilitiesFilter](#portalconfigmenusectionsmodulesprintcapabilitiesfilter)**||Filterung der Capabilities vom Druckdienst. Mögliche Parameter sind layouts und outputFormats.|false|
 |currentLayoutName|nein|String|"A4 Hochformat"|Legt fest, welches Layout als Standardwert beim Öffnen des Druckwerkzeuges ausgewählt sein soll. Zum Beispiel "A4 Hochformat". Wenn das angegebene Layout nicht vorhanden ist oder keins angegeben wurde, dann wird das erste Layout der Capabilities verwendet.|false|
-|customLayoutSelectionComponent|nein|String||Ermöglicht die Angabe einer benutzerdefinierten Komponente zur Layoutauswahl, die die Standard-Dropdown-Auswahl im Druckdialog ersetzt.|false|
+|customLayoutSelectionComponent|nein|String||Ermöglicht die Angabe eines Addons zur Layoutauswahl, die die Standard-Dropdown-Auswahl im Druckdialog ersetzt.|false|
 |defaultCapabilitiesFilter|nein|**[capabilitiesFilter](#portalconfigmenusectionsmodulesprintcapabilitiesfilter)**||Ist für ein Attribut kein Filter in capabilitiesFilter gesetzt, wird der Wert aus diesem Objekt genommen.|false|
-|legendText|nein|String|"Mit Legende"|Beschreibender Text für die printLegend-Checkbox.|false|
 |dpiForPdf|nein|Number|200|Auflösung der Karte im PDF.|false|
 |filename|nein|String|"report"|Dateiname des Druckergebnisses.|false|
 |icon|nein|String|"bi-printer"|Icon das im Menü vor dem Modulnamen angezeigt wird. Zur Auswahl siehe **[Bootstrap Icons](https://icons.getbootstrap.com/)**|false|
 |isLegendSelected|nein|Boolean|false|Gibt an, ob die Checkbox, zum Legende mitdrucken, aktiviert sein soll. Wird nur angezeigt wenn der Druckdienst (Mapfish Print 3) das Drucken der Legende unterstützt.|false|
+|legendLabel|nein|String|"Mit Legende"|Beschreibender Text für die printLegend-Checkbox.|false|
 |name|nein|String|"common:modules.print.name"|Name des Moduls im Menü.|false|
 |overviewmapLayerId|nein|String||Über den Parameter layerId kann ein anderer Layer für die Overviewmap verwendet werden. Wird keine Id angegeben, wird der erste Layer der ausgewählten Hintergundkarten verwendet.|false|
 |printAppCapabilities|nein|String|"capabilities.json"|Pfad unter welcher die Konfiguration des Druckdienstes zu finden ist.|false|

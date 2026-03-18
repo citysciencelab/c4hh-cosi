@@ -18,6 +18,7 @@ const addonsConf = {
         path: "gfiThemes/dataTable",
         type: "gfiTheme"
     },
+    exampleVueComponent: {type: "vueComponent"},
     populationRequest: {entry: "populationRequest/index.js", type: "tool"},
     cesium3dTilesInspector: {entry: "cesium3dTilesInspector/index.js", type: "javascript"}
 };

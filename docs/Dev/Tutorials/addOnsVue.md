@@ -66,6 +66,7 @@ These add-on types are supported:
 * JavaScript (`"type": "javascript"`)
 * SearchInterface (`"type": "searchInterface"`)
 * FilterSnippet (`"type": "filterSnippet"`)
+* Vue components (`"type": "vueComponent"`)
 
 All entries in `addonsConf.json` defined by an object are expected to be written in Vue or plain JavaScript.
 

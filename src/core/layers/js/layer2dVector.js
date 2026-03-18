@@ -137,7 +137,7 @@ Layer2dVector.prototype.loadingParams = function (attributes) {
         xhrParameters: attributes.isSecured ? {credentials: "include"} : undefined,
         propertyname: this.propertyNames(attributes) || undefined,
         // only used if loading strategy is all
-        bbox: attributes.bboxGeometry ? attributes.bboxGeometry.getExtent().toString() : undefined
+        bbox: attributes.bboxGeometry?.getExtent?.()?.toString()
     };
 
     return loadingParams;

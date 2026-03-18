@@ -13,11 +13,13 @@
 - GetFeatureInfo: In 3D mode, restored feature highlighting and GFI display via share link.
 - SearchBar: In 3D mode, added restoring of highlighted feature via share link.
 - 3D-GroupLayer: 3D-Layers can be grouped, like grouped layers in 2D.
-- Print: 
-    - New parameter legendLabel as the descriptive text for the legend print checkbox.
-    - Added support for custom layout selection component via config.json parameter `customLayoutSelectionComponent`.
-- InputText: new htmlType "textarea" in shared component InputText.
-- Filter: Adds parameter shouldSubjectDataSelectedInTree: Filters are only displayed when the respective layer is selected in the subject tree
+- Print:
+    - Added config.json parameter `legendLabel` as the descriptive text for the legend print checkbox.
+    - Added config.json parameter `customLayoutSelectionComponent` to specify an addon to replace the default layout selection within the print module.
+- InputText: Added prop `htmlType` with alternative value "textarea" in shared component InputText.
+- Addons of type `vueComponent` can be loaded.
+- Added config.js parameter `vuetifyFolder`: Folder name used as `../../addons/${Config.vuetifyFolder}/plugins/vuetify/index.js` to load an optional vuetify instance.
+- Filter: Added config.json parameter `shouldSubjectDataSelectedInTree` to display filters only when the respective layer is selected in the subject tree.
 
 ### Changed
 - Modeler3D: adapted no longer existsting `Cesium.defaultValue`.

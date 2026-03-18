@@ -32,7 +32,8 @@ describe("src/modules/filter/components/FilterList.vue", () => {
                         Filter: {
                             namespaced: true,
                             getters: {
-                                rulesOfFilters: () => []
+                                rulesOfFilters: () => [],
+                                shouldSubjectDataSelectedInTree: () => false
                             }
                         }
                     }

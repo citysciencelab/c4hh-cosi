@@ -620,6 +620,36 @@ describe("src/modules/print/js/buildSpec", function () {
         });
     });
 
+    describe("getMetaData", function () {
+        it("should request metadata for given layer id", function () {
+            const layerConfig = {
+                    name: "dataset1",
+                    datasets: [{
+                        name: "dataset1",
+                        md_id: "metadataId"
+                    }]
+                },
+                originalGetters = store.getters,
+                dispatchStub = sinon.stub(store, "dispatch");
+
+            store.getters = {
+                layerConfigById: sinon.stub().returns(layerConfig)
+            };
+
+            buildSpec.getMetaData("layerId");
+
+            expect(dispatchStub.calledOnce).to.be.true;
+            expect(dispatchStub.firstCall.args[0]).to.equal("Modules/Print/getMetaDataForPrint");
+            expect(dispatchStub.firstCall.args[1]).to.deep.include({
+                metaId: "metadataId",
+                layerName: "dataset1"
+            });
+
+            store.getters = originalGetters;
+        });
+    });
+
+
     describe("prepareGfiAttributes", function () {
         it("should create gfi attributes array", function () {
             const gfiAttributes = {

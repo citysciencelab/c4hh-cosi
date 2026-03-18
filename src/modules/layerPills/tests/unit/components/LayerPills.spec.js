@@ -258,6 +258,23 @@ describe("src/modules/LayerPills.vue", () => {
                 {id: 3, name: "layer4", typ: "WFS"}]
             );
         });
+        it("setVisibleLayers does not set layers that are never visible in tree", () => {
+            const visibleLayers3D2D = [
+                {id: 0, name: "layer1", isNeverVisibleInTree: true},
+                {id: 1, name: "layer2", isNeverVisibleInTree: false},
+                {id: 2, name: "layer3", isNeverVisibleInTree: true},
+                {id: 3, name: "layer4", isNeverVisibleInTree: false}
+            ];
+
+            wrapper = createWrapper();
+            wrapper.vm.setVisibleLayers(visibleLayers3D2D);
+
+            expect(setVisibleSubjectDataLayersSpy.calledTwice).to.be.true;
+            expect(setVisibleSubjectDataLayersSpy.secondCall.args[1]).to.deep.equal([
+                {id: 1, name: "layer2", isNeverVisibleInTree: false},
+                {id: 3, name: "layer4", isNeverVisibleInTree: false}]
+            );
+        });
 
         it("removeLayerFromVisibleLayers shall call replaceByIdInLayerConfig", () => {
             wrapper = createWrapper();

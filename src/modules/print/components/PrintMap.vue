@@ -743,7 +743,6 @@ export default {
                 <div class="form-check form-switch mb-3 d-flex align-items-center">
                     <SwitchInput
                         :id="'printLegend'"
-                        :key="legendLabel"
                         :aria="legendLabel"
                         :interaction="($event) => setIsLegendSelected($event.target.checked)"
                         :label="legendLabel"

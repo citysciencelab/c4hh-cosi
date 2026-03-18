@@ -64,6 +64,11 @@ export default {
         commit("setCurrentMarker");
     },
 
+    /**
+     * Removes a specific marker from the map marker layer.
+     * @param {Object} context - the vuex context
+     * @param {Array<Number>} coord - the coordinates of the marker to be removed.
+     */
     removePointMarkerFeature (context, coord) {
         mapMarker.removeFeatureByCoord("marker_point_layer", coord);
     },
