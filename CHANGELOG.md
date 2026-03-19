@@ -20,6 +20,9 @@
 - Addons of type `vueComponent` can be loaded.
 - Added config.js parameter `vuetifyFolder`: Folder name used as `../../addons/${Config.vuetifyFolder}/plugins/vuetify/index.js` to load an optional vuetify instance.
 - Filter: Added config.json parameter `shouldSubjectDataSelectedInTree` to display filters only when the respective layer is selected in the subject tree.
+- The following packages have been added:
+    - dependencies:
+        -    rimraf: 6.1.3
 
 ### Changed
 - Modeler3D: adapted no longer existsting `Cesium.defaultValue`.

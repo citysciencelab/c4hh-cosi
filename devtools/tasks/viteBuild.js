@@ -22,7 +22,7 @@ rl.question(question, (folder) => {
         }
         console.log("\nUsing folder:", folder);
     }
-    const command = `cross-env PORTAL_FOLDER=${folder} vite build --config devtools/vite.config.js && rm -rf dist/${folder}`;
+    const command = `cross-env PORTAL_FOLDER=${folder} vite build --config devtools/vite.config.js && rimraf dist/${folder}`;
 
     console.log("\n🚀 Starting build...\n", command);
 
