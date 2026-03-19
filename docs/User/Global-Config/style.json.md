@@ -592,13 +592,13 @@ With the example style above, the following patterns are rendered, where `patter
 
 |`polygonFillHatch` override|Result|
 |-|-|
-|`{"patternCode": "rectangle", "lineWidth": 2}`|![Polygon Fill Rectangle Hatch Pattern Example](media/style.rectangle.png)|
-|`{"patternCode": "triangle", "lineWidth": 1}`|![Polygon Fill Triangle Hatch Pattern Example](media/style.triangle.png)|
-|`{"patternCode": "diamond", "lineWidth": 1}`|![Polygon Fill Diamond Hatch Pattern Example](media/style.diamond.png)|
-|`{"patternCode": "circle", "lineWidth": 2}`|![Polygon Fill Circle Hatch Pattern Example](media/style.circle.png)|
-|`{"patternCode": "circle", "lineWidth": 10}`|![Polygon Fill Filled Circle Hatch Pattern Example](media/style.filledcircle.png)|
-|`{"patternCode": "diagonal", "lineWidth": 10}`|![Polygon Fill Diagonal Hatch Pattern Example](media/style.diagonal.png)|
-|`{"patternCode": "zig-line", "lineWidth": 10}`|![Polygon Fill Zig-Line Hatch Pattern Example](media/style.zigline.png)|
+|`{"pattern": "rectangle", "lineWidth": 2}`|![Polygon Fill Rectangle Hatch Pattern Example](media/style.rectangle.png)|
+|`{"pattern": "triangle", "lineWidth": 1}`|![Polygon Fill Triangle Hatch Pattern Example](media/style.triangle.png)|
+|`{"pattern": "diamond", "lineWidth": 1}`|![Polygon Fill Diamond Hatch Pattern Example](media/style.diamond.png)|
+|`{"pattern": "circle", "lineWidth": 2}`|![Polygon Fill Circle Hatch Pattern Example](media/style.circle.png)|
+|`{"pattern": "circle", "lineWidth": 10}`|![Polygon Fill Filled Circle Hatch Pattern Example](media/style.filledcircle.png)|
+|`{"pattern": "diagonal", "lineWidth": 10}`|![Polygon Fill Diagonal Hatch Pattern Example](media/style.diagonal.png)|
+|`{"pattern": "zig-line", "lineWidth": 10}`|![Polygon Fill Zig-Line Hatch Pattern Example](media/style.zigline.png)|
 
 The alternatives `"zig-line-horizontal"` and `"diagonal-right"` match the above patterns rotated by 90°.
 
