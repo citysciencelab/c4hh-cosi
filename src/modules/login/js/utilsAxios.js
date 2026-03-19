@@ -1,5 +1,5 @@
 import axios from "axios";
-import Cookie from "@modules/login/js/utilsCookies.js";
+import utilsUrl from "@modules/login/js/utilsUrl.js";
 
 /**
  * Adds interceptors to the different HTTP Get methods of javascript
@@ -11,42 +11,14 @@ function addInterceptor (interceptorUrlRegex) {
     if (!interceptorUrlRegex) {
         return;
     }
-    const noTokenFoundWarning = "No authentication token found in cookies";
 
     axios.interceptors.request.use(
         config => {
-            let configUrl = config.url;
-
-            if (typeof configUrl === "object" && configUrl !== null && typeof configUrl.toString === "function") {
-                configUrl = configUrl.toString();
-            }
-
-            if (typeof configUrl !== "string") {
+            if (!utilsUrl.shouldAddToken(config.url, interceptorUrlRegex)) {
                 return config;
             }
 
-            const isRelativeUrl = !configUrl.startsWith("http");
-            const isRegexMatch = interceptorUrlRegex && configUrl.match(interceptorUrlRegex);
-
-            if (!isRelativeUrl && !isRegexMatch) {
-                return config;
-            }
-
-            const token = Cookie.get("token");
-
-            if (!token) {
-                console.warn(noTokenFoundWarning);
-                return config;
-            }
-
-            if (!config.headers) {
-                config.headers = {};
-            }
-
-            config.headers.Authorization = `Bearer ${token}`;
-            config.withCredentials = true;
-
-            return config;
+            return utilsUrl.getAuthToken(config);
         },
         error => {
             return Promise.reject(error);
@@ -67,24 +39,15 @@ function addInterceptor (interceptorUrlRegex) {
 
         XMLHttpRequest.prototype.open = function (method, url, ...rest) {
             const opened = open.call(this, method, url, ...rest);
-            let href;
 
-            if (typeof url === "string") {
-                href = url;
-            }
-            else if (url && typeof url.toString === "function") {
-                href = url.toString();
+            if (!utilsUrl.shouldAddToken(url, interceptorUrlRegex)) {
+                return opened;
             }
 
-            if (interceptorUrlRegex && typeof href === "string" && href.match(interceptorUrlRegex)) {
-                const token = Cookie.get("token");
+            const tokenHeader = utilsUrl.getTokenHeader();
 
-                if (!token) {
-                    console.warn(noTokenFoundWarning);
-                    return opened;
-                }
-
-                this.setRequestHeader("Authorization", `Bearer ${token}`);
+            if (tokenHeader) {
+                this.setRequestHeader("Authorization", tokenHeader);
                 this.withCredentials = true;
             }
 
@@ -95,26 +58,15 @@ function addInterceptor (interceptorUrlRegex) {
     const {fetch: originalFetch} = window;
 
     window.fetch = async (resource, originalConfig) => {
-        const href = typeof resource !== "string" ? resource.toString() : resource;
-
-        let config = originalConfig;
-
-        if (interceptorUrlRegex && href?.match(interceptorUrlRegex)) {
-            const token = Cookie.get("token");
-
-            if (!token) {
-                console.warn(noTokenFoundWarning);
-                return originalFetch(resource, config);
-            }
-
-            config = {
-                ...originalConfig,
-                credentials: "include",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            };
+        if (!utilsUrl.shouldAddToken(resource, interceptorUrlRegex)) {
+            return originalFetch(resource, originalConfig);
         }
+
+        const config = utilsUrl.getAuthToken({
+            ...originalConfig,
+            credentials: "include",
+            headers: originalConfig?.headers || {}
+        });
 
         return originalFetch(resource, config);
     };
