@@ -18,13 +18,15 @@ import axios from "axios";
 import dayjs from "dayjs";
 import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
 import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog.js";
+import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
 
 export default {
     name: "WaterRiskCheck",
     components: {
         AccordionItem,
         FlatButton,
-        IconButton
+        IconButton,
+        ModalItem
     },
     data () {
         return {
@@ -35,6 +37,7 @@ export default {
             currentQuestionIdx: 0,
             downloadLink: "",
             infoBoxOpen: false,
+            instructionBoxOpen: false,
             isCreatingPDF: false,
             calculatedPercentage: 0,
             parcel: [],
@@ -876,6 +879,13 @@ export default {
             this.infoBoxOpen = !this.infoBoxOpen;
         },
         /**
+         * Toggles the instruction flag.
+         * @returns {void}
+         */
+        toggleInstruction () {
+            this.instructionBoxOpen = !this.instructionBoxOpen;
+        },
+        /**
          * Calculates the percentage of the progress bar.
          * Use finish as parameter to create a last finishing step.
          * @param {Number|String} pageIndex The page index or 'finish' if last page.
@@ -1092,10 +1102,36 @@ export default {
                 type="button"
                 :aria-label="$t('additional:modules.waterRiskCheck.infoButton')"
                 :text="$t('additional:modules.waterRiskCheck.infoButton')"
+                :interaction="() => toggleInstruction()"
             />
+            <ModalItem
+                :show-modal="instructionBoxOpen"
+                modal-inner-wrapper-style="background-color: #f6f9ff"
+                @modalHid="toggleInstruction"
+            >
+                <div class="mobile card card-body">
+                    <div class="container p-0">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="question-headline pt-4 pb-2">
+                                    {{ $t("additional:modules.waterRiskCheck.instructions") }}
+                                </h5>
+                                <p
+                                    class="info-text d-md-block lh-base pb-4"
+                                    v-html="$t('additional:modules.waterRiskCheck.generelExplenationText')"
+                                />
+                                <p
+                                    class="info-text lh-base"
+                                    v-html="$t('additional:modules.waterRiskCheck.instructionsText')"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ModalItem>
             <div class="decorative-box d-flex w-100 px-4 mt-3">
                 <span class="ms-3 mt-4">
-                    {{ $t('additional:modules.waterRiskCheck.enterAddress') }}
+                    {{ $t("additional:modules.waterRiskCheck.enterAddress") }}
                 </span>
             </div>
             <div
@@ -1122,7 +1158,7 @@ export default {
                         class="btn btn-link d-none d-md-block mx-auto mt-3 text-center"
                         :aria-label="$t('additional:modules.waterRiskCheck.discardAddress')"
                     >
-                        {{ $t('additional:modules.waterRiskCheck.discardAddress') }}
+                        {{ $t("additional:modules.waterRiskCheck.discardAddress") }}
                     </button>
                 </div>
                 <div class="d-flex flex-column align-items-center w-100 mt-4">
@@ -1241,6 +1277,7 @@ export default {
                                 {{ infoBoxOpen ? $t('additional:modules.waterRiskCheck.closeInfoButton') : $t('additional:modules.waterRiskCheck.infoButton') }}
                             </button>
                             <div
+                                v-if="!isMobile"
                                 id="collapseInfo"
                                 class="collapse"
                             >
@@ -1264,6 +1301,32 @@ export default {
                                     </div>
                                 </div>
                             </div>
+                            <ModalItem
+                                v-else
+                                :show-modal="infoBoxOpen"
+                                modal-inner-wrapper-style="background-color: #f6f9ff"
+                                @modalHid="toggleInfoBox"
+                            >
+                                <div class="mobile card card-body">
+                                    <div class="container p-0">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h5 class="question-headline pt-4 pb-2">
+                                                    {{ questions[currentQuestionIdx].title }}
+                                                </h5>
+                                                <p
+                                                    v-html="questions[currentQuestionIdx].info.text"
+                                                />
+                                                <img
+                                                    class="information-image img-fluid"
+                                                    :src="questions[currentQuestionIdx].info.image"
+                                                    :alt="questions[currentQuestionIdx].info.alt"
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ModalItem>
                         </div>
                         <div class="answer-container d-flex flex-column align-items-center">
                             <div
@@ -1609,9 +1672,16 @@ export default {
     width: 50%;
     z-index: 20;
 }
-.information-image:hover {
-    transform: scale(1.5) translateX(-11%) translateY(+5%);
-    width: 75%;
+@media (min-width: 768px) {
+    .information-image:hover {
+        transform: scale(1.5) translateX(-11%) translateY(+5%);
+        width: 75%;
+    }
+}
+@media (max-width: 767px) {
+    .information-image {
+        width: 100%;
+    }
 }
 .info-text, .download-text {
     font-size: $font-size-base;
@@ -1696,4 +1766,12 @@ export default {
     border-color: $secondary;
 }
 
+</style>
+<style lang="scss">
+.modal-rounded-dialog {
+    button.btn {
+        position: absolute;
+        right: 5px;
+    }
+}
 </style>
