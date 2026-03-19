@@ -423,7 +423,7 @@ export default {
                 this.seldomFloodDepth = this.getDeepFloodDepth(val, "hwrm_selten");
                 this.gridCode = parseInt(this.getDeepFloodDepth(val, "hwrm_extrem_kw", "gridcode"), 10);
                 this.extremFloodDepthKW = this.getDeepFloodDepth(val, "hwrm_extrem_kw");
-                this.middleFloodDepthKW = this.getDeepFloodDepth(val, "hwrm_mittel_km");
+                this.middleFloodDepthKW = this.getDeepFloodDepth(val, "hwrm_middle_kw");
             },
             deep: true
         },
