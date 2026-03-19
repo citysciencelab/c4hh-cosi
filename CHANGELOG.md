@@ -10,6 +10,8 @@
 ### Added
 - PrintMap: Heatmap layers are now included in the print.
 - Style Configuration: Added parameter `polygonImage` to optionally style WFS polygons with centered icon and show this icon in legend and print
+- GetFeatureInfo: In 3D mode, restored feature highlighting and GFI display via share link.
+- SearchBar: In 3D mode, added restoring of highlighted feature via share link.
 
 ### Changed
 - Modeler3D: adapted no longer existsting `Cesium.defaultValue`.

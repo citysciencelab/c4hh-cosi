@@ -4,11 +4,11 @@ import {getWmsFeaturesByMimeType} from "@shared/js/utils/getWmsFeaturesByMimeTyp
 import {getVisibleWmsLayersAtResolution} from "../js/getLayers.js";
 import store from "@appstore/index.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
-import transformer from "@shared/js/utils/coordToPixel3D.js";
 import changeCase from "@shared/js/utils/changeCase.js";
 import get3DHighlightColor from "@shared/js/utils/get3DHighlightColor.js";
 import applyTileStyle from "@shared/js/utils/applyTileStyle.js";
 import remove3DFeatureHighlight from "@shared/js/utils/remove3DFeatureHighlight.js";
+import {waitForFeatureReady, waitForRenderComplete, getClickPixel} from "@shared/js/utils/sceneRenderUtils.js";
 
 /**
  * The actions for the getFeatureInfo.
@@ -264,23 +264,30 @@ export default {
      * @param {Object} attributes of urlParams
      * @returns {void}
      */
-    handleRestore3D ({dispatch, rootGetters}, {attributes, componentName, clickCoordinates}) {
-        const visibleTerrainLayers = rootGetters.visibleLayerConfigs.filter(config => config.typ.toUpperCase() === "TERRAIN3D");
+    async handleRestore3D ({dispatch, commit, rootGetters}, {attributes, componentName, clickCoordinates}) {
+        const visibleTerrainLayers = rootGetters.visibleLayerConfigs.filter(c => c.typ.toUpperCase() === "TERRAIN3D");
 
-        // the feature can only be found in 'collectGfiFeatures' if terrain is visible
-        if (visibleTerrainLayers.length > 0) {
-            const clickPixel = transformer.coordToPixel3D(clickCoordinates),
-                scene = mapCollection.getMap("3D").getCesiumScene();
+        if (visibleTerrainLayers.length === 0) {
+            return;
+        }
+        if (!attributes.lastPickedFeatureId) {
+            return;
+        }
 
-            scene.globe.tileLoadProgressEvent.addEventListener(function () {
-                if (scene.globe.tilesLoaded) {
-                    dispatch("restoreGFI", {attributes, componentName, clickCoordinates, clickPixel});
-                }
-            });
-        }
-        else {
-            console.warn("A terrain is not available, GFI cannot be restored!");
-        }
+        const scene = mapCollection.getMap("3D").getCesiumScene();
+
+        await waitForFeatureReady(scene, attributes.lastPickedFeatureId, attributes.coloredHighlighting3D?.color);
+
+        let clickPixel = getClickPixel(clickCoordinates);
+
+        dispatch("restoreGFI", {attributes, componentName, clickCoordinates, clickPixel});
+
+        await waitForRenderComplete(scene);
+
+        // Re-collect GFI features after the scene is fully rendered to ensure all 3D features are captured
+        clickPixel = getClickPixel(clickCoordinates);
+        commit("Maps/setClickPixel", clickPixel, {root: true});
+        dispatch("Modules/GetFeatureInfo/collectGfiFeatures", null, {root: true});
     },
 
     /**

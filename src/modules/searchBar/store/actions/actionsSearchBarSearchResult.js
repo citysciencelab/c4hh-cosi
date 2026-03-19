@@ -7,7 +7,7 @@ import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.j
 import mapMarker from "@core/maps/js/mapMarker.js";
 import calculateScreenPosition from "../../js/calculateScreenPosition.js";
 import addInitialTilesLoadedListener from "../../js/addInitialTilesLoadedListener.js";
-import find3DPickedFeature from "@shared/js/utils/find3DPickedFeature.js";
+import find3DPickedFeatureProvider from "@shared/js/utils/find3DPickedFeature.js";
 import get3DHighlightColor from "@shared/js/utils/get3DHighlightColor.js";
 import applyTileStyle from "@shared/js/utils/applyTileStyle.js";
 import remove3DFeatureHighlight from "@shared/js/utils/remove3DFeatureHighlight.js";
@@ -425,7 +425,7 @@ export default {
     async detectAndHighlight3DTile ({state, dispatch, commit}, {scene, cartesian}) {
         try {
             if (state.lastPickedFeatureId) {
-                const pickedFeature = await find3DPickedFeature(scene, state.lastPickedFeatureId);
+                const pickedFeature = await find3DPickedFeatureProvider.find3DPickedFeature(scene, state.lastPickedFeatureId);
 
                 if (pickedFeature) {
                     dispatch("highlightPickedFeature", {

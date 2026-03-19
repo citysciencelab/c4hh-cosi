@@ -54,3 +54,4 @@ function isValidColor (color) {
 
     return nameColorRegex.test(color) || rgbaColorRegex.test(color) || rgbColorRegex.test(color) || hexColorRegex.test(color);
 }
+
