@@ -10,6 +10,10 @@ import Cookie from "@modules/login/js/utilsCookies.js";
 function isUrlMatchingRegex (url, pattern) {
     const urlString = typeof url === "string" ? url : url.toString();
 
+    if (!pattern || pattern === "") {
+        return false;
+    }
+
     try {
         return urlString.match(pattern) !== null;
     }
@@ -95,6 +99,7 @@ function getAuthToken (config) {
 
 export default {
     isUrlMatchingRegex,
+    isAbsoluteUrl,
     shouldAddToken,
     getAuthToken,
     getTokenHeader
