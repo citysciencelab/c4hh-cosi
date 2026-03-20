@@ -10,7 +10,7 @@ import Cookie from "@modules/login/js/utilsCookies.js";
 function isUrlMatchingRegex (url, pattern) {
     const urlString = typeof url === "string" ? url : url.toString();
 
-    if (!pattern || pattern === "") {
+    if (!pattern) {
         return false;
     }
 
