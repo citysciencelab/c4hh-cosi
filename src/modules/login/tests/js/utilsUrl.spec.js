@@ -81,6 +81,7 @@ describe("src/modules/login/js/utilsUrl", () => {
 
         it("should return null when token not available", () => {
             vi.spyOn(Cookie, "get").mockReturnValue(null);
+            vi.spyOn(console, "warn").mockImplementation(() => { /* empty */ });
 
             expect(utilsUrl.getTokenHeader()).toBeNull();
         });
@@ -106,6 +107,7 @@ describe("src/modules/login/js/utilsUrl", () => {
 
         it("should return config unchanged when no token available", () => {
             vi.spyOn(Cookie, "get").mockReturnValue(null);
+            vi.spyOn(console, "warn").mockImplementation(() => { /* empty */ });
             const config = {headers: {}, someKey: "value"};
 
             const result = utilsUrl.getAuthToken(config);
