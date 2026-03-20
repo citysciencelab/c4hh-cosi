@@ -125,7 +125,7 @@ function mergeRawLayer (layerConf, rawLayer) {
 
 /**
  * Merges layer configuration with layer defined as array of Ids with or without typ GROUP.
- * If typ is GROUP, a grouped layer is created else the layer is replaced by the first layer of the group
+ * If typ is GROUP or GROUP3D, a grouped layer is created else the layer is replaced by the first layer of the group
  * and gets the attribute 'layers' of all depending layers.
  * @param {Object} layerConf configuartion of layer like in the config.json with ids in an array
  * @returns {Object|undefined} the merged raw layer or undefined if layer cannot be merged
@@ -140,14 +140,17 @@ function mergeGroupedLayer (layerConf) {
     if (ids.length === 0) {
         return layerConf;
     }
-    if (layerConf.typ === "GROUP") {
+    if (layerConf.typ?.startsWith("GROUP")) {
         rawLayer = {...layerConf};
         rawLayer.id = ids.join("-");
         if (layerConf.children) {
             layerConf.children.forEach(groupedLayerConf => {
                 const rawGroupedLayerIndex = existingLayers.findIndex(layer => layer.id === groupedLayerConf.id);
 
-                if (rawGroupedLayerIndex > -1) {
+                if (ids.indexOf(groupedLayerConf.id) === -1) {
+                    console.warn(`Configuration of group layer contains id ${groupedLayerConf.id} in children, that is not contained in group layer ids [${layerConf.id}]. Layer will not be displayed correctly.`);
+                }
+                else if (rawGroupedLayerIndex > -1) {
                     const rawGroupedLayer = Object.assign({}, existingLayers[rawGroupedLayerIndex], groupedLayerConf);
 
                     if (!groupedLayerConf.maxScale && layerConf.maxScale) {
@@ -156,7 +159,7 @@ function mergeGroupedLayer (layerConf) {
                     existingLayers.splice(rawGroupedLayerIndex, 1, rawGroupedLayer);
                 }
                 else {
-                    console.warn(`Configuration of group layer contains id ${groupedLayerConf.id} in children, that is not contained in group layer ids [${layerConf.id}]. Layer will not be displayed correctly.`);
+                    existingLayers.push(groupedLayerConf);
                 }
             });
         }

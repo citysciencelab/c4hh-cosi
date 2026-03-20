@@ -41,12 +41,15 @@ export default {
 
         /**
          * Indicates if the layer type supports transparency settings.
-         * NOte: The type Tileset3D is supported.
+         * Note: The type Tileset3D is supported.
          * @returns {Boolean} Supports transparency.
          */
         supportedTransparency () {
             const unSupportedLayerTypes = layerTypes.getLayerTypes3d().filter(layerType => layerType !== "TILESET3D");
 
+            if (this.layerConf.typ?.toUpperCase() === "GROUP3D") {
+                return this.layerConf.children.every(conf => conf.typ?.toUpperCase() === "TILESET3D");
+            }
             return !unSupportedLayerTypes.includes(this.layerConf.typ?.toUpperCase());
         },
         /**

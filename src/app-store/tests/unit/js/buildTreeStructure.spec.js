@@ -41,6 +41,29 @@ describe("src/app-store/js/buildTreeStructure.js", () => {
                             "id": "12884",
                             "name": "3D-Gebäudemodell (LoD2- DE)",
                             "visibility": false
+                        },
+                        {
+                            "id": [
+                                "16101",
+                                "16100"
+                            ],
+                            "typ": "GROUP3D",
+                            "name": "Gruppe 3D",
+                            "visibility": true,
+                            "children": [
+                                {
+                                    "id": "16101",
+                                    "name": "Brückenflächen HH",
+                                    "typ": "TileSet3D",
+                                    "visibility": true
+                                },
+                                {
+                                    "id": "12884",
+                                    "name": "Gebäude LoD2",
+                                    "typ": "TileSet3D",
+                                    "visibility": true
+                                }
+                            ]
                         }
                     ]
                 }
@@ -234,9 +257,14 @@ describe("src/app-store/js/buildTreeStructure.js", () => {
             expect(filteredResult.indexOf("12884")).not.to.be.equals(-1);
             expect(result.elements[0].name).to.be.equals("3D Daten");
             expect(result.elements[0].elements).to.be.an("array").to.have.lengthOf(1);
-            expect(result.elements[0].elements[0].elements).to.be.an("array").to.have.lengthOf(2);
+            expect(result.elements[0].elements[0].elements).to.be.an("array").to.have.lengthOf(3);
             expect(result.elements[0].elements[0].elements[0].id).to.be.equals("12883");
             expect(result.elements[0].elements[0].elements[1].id).to.be.equals("12884");
+            expect(result.elements[0].elements[0].elements[2].id).to.be.deep.equals([
+                "16101",
+                "16100"
+            ]);
+            expect(result.elements[0].elements[0].elements[2].children.length).to.be.equals(2);
             expect(result.elements[1].name).to.be.equals("Sonstiges");
             expect(result.elements[2].name).to.be.equals("Umwelt und Klima");
             expect(result.elements[1].elements[2].elements[0].id).to.be.equals("21999");

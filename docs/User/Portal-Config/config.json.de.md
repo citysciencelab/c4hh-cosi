@@ -6163,6 +6163,50 @@ Hier werden Entities3D Einheiten typische Attribute aufgelistet.
 ```
 ***
 
+#### layerConfig.elements.layers.Group3D {data-toc-label='Group 3D'}
+
+[inherits]: # (layerConfig.elements.layers)
+[type:children]: # (layerConfig.elements.layers)
+
+Es wird ein 3D Gruppenlayer erzeugt, der alle Layer der angegeben ids enthält.
+
+|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
+|----|-------------|---|-------|------------|------|
+|id|ja|String[]||Ids der zu gruppierenden Layer, diese können in der **[services.json](../Global-Config/services.json.md)** enthalten sein. Sie können unterschiedliche Typen haben (Attribut `typ`).|false|
+|typ|ja|String|"GROUP3D"|Setzt den Layertypen auf GROUP3D, welcher Layer gruppieren kann.|false|
+|children|ja|**[children](#layerconfigelementslayers)**[]||Liste der zu gruppierenden Layer. In `children` können Attribute an den gruppierten Layern überschrieben werden. Ausnahme: `visibility` wird nicht überschrieben. Alle ids im id-Array müssen eine Entsprechung in den `children` haben. |false|
+
+
+
+**Beispiel**
+
+```json
+{
+    "id": [ "1000", "2000", "3000"],
+    "typ": "GROUP3D",
+    "name": "Gruppe 3D",
+    "visibility": false,
+    "children" :[
+        {
+            "id": "1000",
+            "styleId": "1000",
+            "typ": "TileSet3D"
+        },
+        {
+            "id": "2000",
+            "name": "3D-Entities",
+            "typ": "Entities3D",
+        },
+        {
+            "id": "3000",
+            "typ": "TileSet3D"
+        }
+    ]
+}
+```
+
+***
+
 ## Datatypes
 
 Die folgenden Datentypen können in der Config verwendet werden.

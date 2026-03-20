@@ -14,6 +14,7 @@ import Layer2dGroup from "./layer2dGroup.js";
 import Layer3dEntities from "./layer3dEntities.js";
 import Layer3dTerrain from "./layer3dTerrain.js";
 import Layer3dTileset from "./layer3dTileset.js";
+import Layer3dGroup from "./layer3dGroup.js";
 
 const layerTypes2d = {
         GEOJSON: Layer2dVectorGeojson,
@@ -32,7 +33,8 @@ const layerTypes2d = {
     layerTypes3d = {
         ENTITIES3D: Layer3dEntities,
         TERRAIN3D: Layer3dTerrain,
-        TILESET3D: Layer3dTileset
+        TILESET3D: Layer3dTileset,
+        GROUP3D: Layer3dGroup
     };
 
 /**
@@ -55,7 +57,7 @@ function createLayer (layerConf, mapMode) {
         layer = new layerTypes2d[typ](layerConf, typ === "GROUP" ? this : undefined);
     }
     else if (mapMode === "3D" && layerTypes3d[typ]) {
-        layer = new layerTypes3d[typ](layerConf);
+        layer = new layerTypes3d[typ](layerConf, typ === "GROUP3D" ? this : undefined);
     }
 
     return layer;

@@ -6178,6 +6178,50 @@ Entities3D entities typical attributes are listed here.
 ```
 ***
 
+#### layerConfig.elements.layers.Group3D {data-toc-label='Group 3D'}
+
+[inherits]: # (layerConfig.elements.layers)
+[type:children]: # (layerConfig.elements.layers)
+
+A 3D group layer is created that contains all layers with the specified Ids.
+
+|Name|Required|Type|Default|Description|Expert|
+|----|-------------|---|-------|------------|------|
+|id|yes|String[]||These are the layers to be grouped; they can be listed in the **[services.json](../Global-Config/services.json.md)**. They can have different types (the `typ` attribute).|false|
+|typ|yes|String|"GROUP3D"|Sets the layer type to GROUP3D, which allows layers to be grouped.|false|
+|children|yes|**[children](#layerconfigelementslayers)**[]||List of layers to be grouped. Attributes of the grouped layers can be overridden in `children`. Exception: `visibility` is not overridden. All IDs in the id array must have a corresponding entry in `children`. |false|
+
+
+
+**Example**
+
+```json
+{
+    "id": [ "1000", "2000", "3000"],
+    "typ": "GROUP3D",
+    "name": "Gruppe 3D",
+    "visibility": false,
+    "children" :[
+        {
+            "id": "1000",
+            "styleId": "1000",
+            "typ": "TileSet3D"
+        },
+        {
+            "id": "2000",
+            "name": "3D-Entities",
+            "typ": "Entities3D",
+        },
+        {
+            "id": "3000",
+            "typ": "TileSet3D"
+        }
+    ]
+}
+```
+
+***
+
 ## Datatypes
 
 ### Datatypes.Coordinate {data-toc-label='Coordinate'}

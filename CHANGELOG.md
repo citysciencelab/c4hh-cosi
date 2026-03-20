@@ -12,6 +12,7 @@
 - Style Configuration: Added parameter `polygonImage` to optionally style WFS polygons with centered icon and show this icon in legend and print
 - GetFeatureInfo: In 3D mode, restored feature highlighting and GFI display via share link.
 - SearchBar: In 3D mode, added restoring of highlighted feature via share link.
+- 3D-GroupLayer: 3D-Layers can be grouped, like grouped layers in 2D.
 
 ### Changed
 - Modeler3D: adapted no longer existsting `Cesium.defaultValue`.

@@ -178,7 +178,7 @@ function getId () {
  * @returns {Boolean} true, if all layers are 3D-layer.
  */
 function containsOnly3DLayer (layers) {
-    return layers.every(conf => layerTypes.getLayerTypes3d().includes(rawLayerList.getLayerWhere({id: conf.id})?.typ.toUpperCase()));
+    return get3DLayersWithGrouped(layers).every(conf => layerTypes.getLayerTypes3d().includes(rawLayerList.getLayerWhere({id: conf.id})?.typ.toUpperCase()));
 }
 /**
  * Returns all 3D-layers with typ contained in layerTypes.getLayerTypes3d().
@@ -186,7 +186,23 @@ function containsOnly3DLayer (layers) {
  * @returns {Array} all 3D-layers
  */
 function get3DLayers (layers) {
-    return layers.filter(conf => layerTypes.getLayerTypes3d().includes(rawLayerList.getLayerWhere({id: conf.id})?.typ.toUpperCase()));
+    return get3DLayersWithGrouped(layers).filter(conf => layerTypes.getLayerTypes3d().includes(rawLayerList.getLayerWhere({id: conf.id})?.typ.toUpperCase()));
+}
+
+/**
+ * Returns all 3D layers inculding children of grouped layers.
+ * @param {Array} layers containing layer configurations
+ * @returns {Array} all 3D layers
+ */
+function get3DLayersWithGrouped (layers) {
+    const grouped = layers.filter(conf => conf.typ === "GROUP3D"),
+        notGrouped = layers.filter(conf => conf.typ !== "GROUP3D");
+
+    grouped.forEach(group => {
+        notGrouped.concat(group.children);
+    });
+
+    return notGrouped;
 }
 
 /**

@@ -24,7 +24,8 @@ function getLayerTypes2d () {
 function getLayerTypes3d () {
     return ["ENTITIES3D",
         "TERRAIN3D",
-        "TILESET3D"];
+        "TILESET3D",
+        "GROUP3D"];
 }
 
 /**

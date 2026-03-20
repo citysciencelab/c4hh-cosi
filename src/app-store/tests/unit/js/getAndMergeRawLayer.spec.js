@@ -558,6 +558,74 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
             expect(result[0].children[1].styleId).to.be.equals("1731");
             expect(result[0].children[1].maxScale).to.be.equals("20000");
         });
+
+        it("should return a merged raw layer, if 3D layer is grouped with children", () => {
+            layerConfig = {
+                [treeSubjectsKey]: {
+                    elements: [
+                        {
+                            name: "Gruppenlayer 3D",
+                            type: "folder",
+                            elements: [
+                                {
+                                    "id": [
+                                        "16101",
+                                        "12884"
+                                    ],
+                                    "typ": "GROUP3D",
+                                    "name": "Gruppe 3D",
+                                    "visibility": true,
+                                    "children": [
+                                        {
+                                            "id": "16101",
+                                            "name": "Brückenflächen HH",
+                                            "typ": "TileSet3D",
+                                            "visibility": true
+                                        },
+                                        {
+                                            "id": "12884",
+                                            "name": "Gebäude LoD2",
+                                            "typ": "TileSet3D",
+                                            "visibility": true
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            };
+
+            const simpleLayerList = [
+                {
+                    "id": "16101",
+                    "name": "Brückenflächen HH"
+                },
+                {
+                    "id": "12884",
+                    "name": "Gebäude LoD2"
+                }
+            ];
+
+            sinon.stub(rawLayerList, "getLayerWhere").callsFake(function (searchAttributes) {
+                return simpleLayerList.find(entry => Object.keys(searchAttributes).every(key => entry[key] === searchAttributes[key])) || null;
+            });
+            sinon.stub(rawLayerList, "getLayerList").returns(simpleLayerList);
+
+            const result = getAndMergeRawLayer(layerConfig[treeSubjectsKey].elements[0].elements[0]);
+
+            expect(Array.isArray(result)).to.be.true;
+            expect(result.length).to.be.equals(1);
+            expect(result[0].id).to.be.equals("16101-12884");
+            expect(result[0].name).to.be.equals("Gruppe 3D");
+            expect(result[0].typ).to.be.equals("GROUP3D");
+            expect(result[0].children).to.be.an("array");
+            expect(result[0].children.length).to.be.equals(2);
+            expect(result[0].children[0].id).to.be.equals("16101");
+            expect(result[0].children[0].name).to.be.equals("Brückenflächen HH");
+            expect(result[0].children[1].id).to.be.equals("12884");
+            expect(result[0].children[1].name).to.be.equals("Gebäude LoD2");
+        });
     });
 
     describe("addAdditional", () => {
