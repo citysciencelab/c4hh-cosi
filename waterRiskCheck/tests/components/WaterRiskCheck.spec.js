@@ -53,13 +53,14 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                         answersLogic: (state) => state.answersLogic,
                                         pdfPages: (state) => state.pdfPages,
                                         alwaysShow: (state) => state.alwaysShow,
+                                        searchBarConfig: (state) => state.searchBarConfig,
                                         settings: (state) => state.settings
                                     },
                                     actions: {
                                         setAddress: () => sinon.stub()
                                     }
                                 },
-                                SearchBar: {
+                                WaterRiskCheckSearchBar: {
                                     namespaced: true,
                                     getters: {
                                         searchResults: () => [{

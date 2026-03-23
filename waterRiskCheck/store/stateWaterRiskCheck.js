@@ -27,7 +27,8 @@ const state = {
     alwaysShow: [],
     alkisBaseUrl: "https://api.hamburg.de/datasets/v1/alkis_vereinfacht",
     reportPath: "config.valuation.json",
-    feedbackUrl: "https://forms.office.com/e/NxRfFHzj9S"
+    feedbackUrl: "https://forms.office.com/e/NxRfFHzj9S",
+    searchBarConfig: {}
 };
 
 export default state;

@@ -208,5 +208,8 @@
   "cosiPrintLayoutSelection": {
     "path": "cosi/cosiPrintLayoutSelection",
     "type": "vueComponent"
-  }
+  },
+   "waterRiskCheckSearchBar": {
+    "type": "vueComponent",
+    "path": "waterRiskCheck/searchBar"}
 }

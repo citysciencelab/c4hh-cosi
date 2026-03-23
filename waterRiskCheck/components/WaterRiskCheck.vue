@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
 import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog.js";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
+import WaterRiskCheckSearchBar from "../searchBar/components/WaterRiskCheckSearchBar.vue";
 
 export default {
     name: "WaterRiskCheck",
@@ -26,7 +27,8 @@ export default {
         AccordionItem,
         FlatButton,
         IconButton,
-        ModalItem
+        ModalItem,
+        WaterRiskCheckSearchBar
     },
     data () {
         return {
@@ -164,10 +166,11 @@ export default {
             "alwaysShow",
             "alkisBaseUrl",
             "reportPath",
-            "feedbackUrl"
+            "feedbackUrl",
+            "searchBarConfig"
         ]),
         ...mapGetters(["restServiceById", "isMobile"]),
-        ...mapGetters("Modules/SearchBar", [
+        ...mapGetters("Modules/WaterRiskCheckSearchBar", [
             "searchResults"
         ]),
         ...mapGetters("Menu", [
@@ -1129,10 +1132,11 @@ export default {
                     </div>
                 </div>
             </ModalItem>
-            <div class="decorative-box d-flex w-100 px-4 mt-3">
+            <div class="decorative-box d-flex flex-column w-100 px-4 mt-3">
                 <span class="ms-3 mt-4">
                     {{ $t("additional:modules.waterRiskCheck.enterAddress") }}
                 </span>
+                <WaterRiskCheckSearchBar :config="searchBarConfig" />
             </div>
             <div
                 v-if="enabledStart"
