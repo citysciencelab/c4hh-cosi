@@ -17,7 +17,8 @@ let app;
 
 window.__appMounted = window.__appMounted || false;
 const isDev = import.meta.env.MODE === "development",
-    configPath = globalUrlParams.getConfigJsPath() === null ? window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1) + "config.js" : globalUrlParams.getConfigJsPath(),
+    // GET parameters need to be there for a reason - do not drop them!
+    configPath = globalUrlParams.getConfigJsPath() === null ? window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1) + "config.js" + window.location.search : globalUrlParams.getConfigJsPath(),
     loadConfigJs = new Promise((resolve, reject) => {
         const script = document.createElement("script");
 
