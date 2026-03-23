@@ -383,6 +383,9 @@ describe("src/core/layers/js/layerUrlParams.js", () => {
     });
 
     describe("addLayerToLayerTree", () => {
+        beforeEach(() => {
+            sinon.stub(window, "location").value({search: ""});
+        });
         it("should add all layers", () => {
             const layers = [
                 {
@@ -494,6 +497,93 @@ describe("src/core/layers/js/layerUrlParams.js", () => {
                 transparency: 0,
                 showInLayerTree: true,
                 zIndex: 1,
+                time: undefined
+            });
+        });
+        it("should respect exact URL order when LAYERS param is present (baselayer not forced to bottom)", () => {
+            sinon.stub(window, "location").value({
+                search: "?LAYERS=%5B%7B%22id%22%3A%22layer1%22%7D%5D"
+            });
+
+            const layers = [
+                {id: "layer2", baselayer: false},
+                {id: "layer3", baselayer: false},
+                {id: "layer1", baselayer: true} // baselayer is last in URL → should stay last
+            ];
+
+            store.getters = {
+                layerConfigById: (id) => layers.find(layer => layer.id === id)
+            };
+
+            layerUrlParams.addLayerToLayerTree(layers);
+
+            expect(dispatchCalls.length).to.equals(3);
+            expect(dispatchCalls[0].addOrReplaceLayer).to.deep.equals({
+                layerId: "layer2",
+                visibility: true,
+                transparency: 0,
+                showInLayerTree: true,
+                zIndex: 0,
+                time: undefined
+            });
+            expect(dispatchCalls[1].addOrReplaceLayer).to.deep.equals({
+                layerId: "layer3",
+                visibility: true,
+                transparency: 0,
+                showInLayerTree: true,
+                zIndex: 1,
+                time: undefined
+            });
+            expect(dispatchCalls[2].addOrReplaceLayer).to.deep.equals({
+                layerId: "layer1",
+                visibility: true,
+                transparency: 0,
+                showInLayerTree: true,
+                zIndex: 2,
+                time: undefined
+            });
+        });
+
+        it("should respect exact URL order when baselayer is first in LAYERS param", () => {
+            sinon.stub(window, "location").value({
+                search: "?LAYERS=%5B%7B%22id%22%3A%22layer1%22%7D%5D"
+            });
+
+            const layers = [
+                {id: "layer1", baselayer: true}, // baselayer first in URL → should stay first
+                {id: "layer2", baselayer: false},
+                {id: "layer3", baselayer: false}
+            ];
+
+            store.getters = {
+                layerConfigById: (id) => layers.find(layer => layer.id === id)
+            };
+
+            layerUrlParams.addLayerToLayerTree(layers);
+
+            expect(dispatchCalls.length).to.equals(3);
+            expect(dispatchCalls[0].addOrReplaceLayer).to.deep.equals({
+                layerId: "layer1",
+                visibility: true,
+                transparency: 0,
+                showInLayerTree: true,
+                zIndex: 0,
+                time: undefined
+            });
+            expect(dispatchCalls[1].addOrReplaceLayer).to.deep.equals({
+                layerId: "layer2",
+                visibility: true,
+                transparency: 0,
+                showInLayerTree: true,
+                zIndex: 1,
+                time: undefined
+            });
+            expect(dispatchCalls[2].addOrReplaceLayer).to.deep.equals({
+                layerId: "layer3",
+                visibility: true,
+                transparency: 0,
+                showInLayerTree: true,
+                zIndex: 2,
                 time: undefined
             });
         });

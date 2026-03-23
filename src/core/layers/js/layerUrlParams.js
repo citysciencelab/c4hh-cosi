@@ -148,6 +148,9 @@ function removeCurrentLayerFromLayerTree () {
  * @returns {void}
  */
 function addLayerToLayerTree (layers) {
+    // Determine if this call comes from a URL restore (LAYERS param) by checking if the URL has a LAYERS param not from mdid
+    const urlHasLayersParam = window.location?.search?.toUpperCase().includes("LAYERS=");
+
     layers.forEach((layer, index) => {
         let isBaseLayer = false,
             time;
@@ -161,18 +164,21 @@ function addLayerToLayerTree (layers) {
 
         let zIndex;
 
-        if (isBaseLayer) {
+        if (urlHasLayersParam) {
+            zIndex = index;
+        }
+        else if (isBaseLayer) {
             if (!baselayerExists) {
                 baselayerIndex = 0;
                 baselayerExists = true;
             }
             zIndex = baselayerIndex;
             baselayerIndex++;
-
         }
         else {
             zIndex = index + baselayerIndex;
         }
+
 
         store.dispatch("addOrReplaceLayer", {
             layerId: layer.id,
