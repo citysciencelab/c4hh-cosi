@@ -36,8 +36,7 @@ function vmShimPlugin() {
 };
 
 let proxyConfig = {},
-    { vueAddons } = await collectAddons(),
-    base;
+    { vueAddons } = await collectAddons();
 const examplesOnly = process.env.EXAMPLES_ONLY === "true",
     portalFolderName = process.env.PORTAL_FOLDER || "portal",
     rootPath = path.resolve(__dirname, "../"),
@@ -74,14 +73,24 @@ else if (fs.existsSync("./devtools/proxyconf_example.json")) {
 const FORCE_HTTPS = process.env.VITE_FORCE_HTTPS === "true";
 
 export default defineConfig(({ mode }) => {
-    const isProd = mode === "production";
+    const isProd = mode === "production",
+          buildBase = isProd
+    ? `mastercode/${mastercodeVersionFolderName}`
+    : "",
 
-    base = isProd
-        ? `mastercode/${mastercodeVersionFolderName}`
-        : "/";
+    runtimeBase = isProd
+    ? (examplesOnly
+        ? `./mastercode/${mastercodeVersionFolderName}`
+        : `/mastercode/${mastercodeVersionFolderName}`)
+    : "/",
+    viteBase = isProd
+    ? (examplesOnly ? "./" : "/")
+    : "/";
 
     console.log("mode", mode);
-    console.log("base:", base);
+    console.log("viteBase:", viteBase);
+    console.log("runtimeBase:", runtimeBase);
+    console.log("buildBase:", buildBase);
     if (isProd) {
         console.log("portals folder ", portalFolderName);
         console.log("portalEntries", Object.fromEntries(portalEntries));
@@ -89,6 +98,7 @@ export default defineConfig(({ mode }) => {
 
     return {
         root: rootPath,
+        base: viteBase,
         logLevel: "info",
 
         resolve: {
@@ -117,12 +127,13 @@ export default defineConfig(({ mode }) => {
                 rootDir: __dirname
             }),
             directoryListing,
-            hasAddonConfig
-            ? addonModules({
+            // Disable addons for examples build to avoid heavy dependencies
+            (examplesOnly || !hasAddonConfig)
+            ? emptyAddonModulesPlugin()
+            : addonModules({
                 configPath: addonConfigPath,
                 baseDir: path.resolve(rootPath, "addons")
-              })
-            : emptyAddonModulesPlugin(),
+            }),
             {
                 name: "remove-crossorigin",
                 apply: "build",
@@ -135,12 +146,12 @@ export default defineConfig(({ mode }) => {
                 transformIndexHtml(html) {
                     return html
                         .replace(
-                            /src="\/mastercode\/([^"]+)\/js\/[^"]+"/,
-                            'src="/mastercode/$1/js/masterportal.js"'
+                            /src="(?:\.\.\/)*mastercode\/([^"]+)\/js\/[^"]+"/,
+                            'src="./mastercode/$1/js/masterportal.js"'
                         )
                         .replace(
-                            /href="\/mastercode\/([^"]+)\/css\/[^"]+"/,
-                            'href="/mastercode/$1/css/masterportal.css"'
+                            /href="(?:\.\.\/)*mastercode\/([^"]+)\/css\/[^"]+"/,
+                            'href="./mastercode/$1/css/masterportal.css"'
                         );
                 }
             },
@@ -183,15 +194,15 @@ export default defineConfig(({ mode }) => {
                     },
                     {
                         src: `./dist/mastercode/${mastercodeVersionFolderName}`,
-                        dest: `dist/examples_${mastercodeVersionFolderName}/mastercode/${mastercodeVersionFolderName}`
+                        dest: `dist/examples_${mastercodeVersionFolderName}/basic/mastercode/${mastercodeVersionFolderName}`
                     },
                     {
                         src: "./src/assets/img",
-                        dest: `dist/examples_${mastercodeVersionFolderName}/mastercode/${mastercodeVersionFolderName}/img`
+                        dest: `dist/examples_${mastercodeVersionFolderName}/basic/mastercode/${mastercodeVersionFolderName}/img`
                     },
                     {
                         src: "./locales",
-                        dest: `dist/examples_${mastercodeVersionFolderName}/mastercode/${mastercodeVersionFolderName}/locales`
+                        dest: `dist/examples_${mastercodeVersionFolderName}/basic/mastercode/${mastercodeVersionFolderName}/locales`
                     }
                 ]
             }),
@@ -271,27 +282,27 @@ export default defineConfig(({ mode }) => {
                               isCss = /css/i.test(extType);
 
                         if (isProd && examplesOnly && isCss && name.includes("portal-basic")) {
-                            return `${base}/css/masterportal.[ext]`;
+                            return `${buildBase}/css/masterportal.[ext]`;
                         }
 
                         let folderName = "js";
                         if (isCss) {
                             folderName = "css";
                         }
-                        return `${base}/${folderName}/[name].[ext]`;
+                        return `${buildBase}/${folderName}/[name].[ext]`;
                     },
                     entryFileNames: (entry) => {
                         if (entry.name && entry.name.startsWith("addon-")) {
-                            return `${base}/addons/${entry.name.substring(6)}.js`;
+                            return `${buildBase}/addons/${entry.name.substring(6)}.js`;
                         }
 
                         if (isProd && examplesOnly && entry.name === "portal-basic") {
-                            return `${base}/js/masterportal.js`;
+                            return `${buildBase}/js/masterportal.js`;
                         }
 
-                        return `${base}/js/[name].js`;
+                        return `${buildBase}/js/[name].js`;
                     },
-                    chunkFileNames: `${base}/js/[name].js`
+                    chunkFileNames: `${buildBase}/js/[name].js`
                 },
                 external(id) {
                     const pid = slash(id);
@@ -317,11 +328,7 @@ export default defineConfig(({ mode }) => {
             __VUE_OPTIONS_API__: true,
             __VUE_PROD_DEVTOOLS__: false,
             VUE_ADDONS: JSON.stringify(vueAddons),
-            MASTERPORTAL_BASE_PATH: JSON.stringify(
-                isProd
-                    ? `/${base}`
-                    : "/"
-            )
+            MASTERPORTAL_BASE_PATH: JSON.stringify(runtimeBase)
         },
 
         optimizeDeps: {

@@ -56,6 +56,7 @@
     - Masterportal starts and builds with and without addons.
     - Fixed `getMastercodeVersionFolderName` so release-tag builds no longer append `git_last_commit_at` to the mastercode folder name.
     - Added "dedupe" configuration regarding library "jsts" to avoid conflicting instances.
+    - BuildExamples: Stabilized the examples build by fixing multiple issues.
 - GroupLayer: Fixed bug if configuration contains wrong layer IDs.
 - Matomo: Fixed a critical loading issue where the application would fail to mount if `matomo.js` was blocked (e.g., by Ad-blockers) or failed to load. The Matomo initialization is now non-blocking and provides a global polyfill for `trackMatomo` to ensure compatibility across all modules.
 - GFI: In the gfiTheme `Default`, line breaks have been optimised and the size of the content changes when the sidebar is resized.
