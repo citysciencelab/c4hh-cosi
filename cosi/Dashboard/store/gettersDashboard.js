@@ -36,11 +36,12 @@ export default {
                 districtStats[col.value] = statFeature.getProperties();
             }
         }
+
         if (state.timestampsFiltered.length > 0) {
             districtStats.years = state.timestampsFiltered;
         }
         else {
-            districtStats.years = [...getTimestamps(districtStats, state.timestampPrefix)];
+            districtStats.years = [...getTimestamps(districtStats, state.timestampPrefix)].sort((a, b) => b - a);
         }
 
         districtStats.id = districtStats.category + districtStats.groupIndex;
