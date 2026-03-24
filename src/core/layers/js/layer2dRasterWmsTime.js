@@ -536,6 +536,15 @@ Layer2dRasterWmsTimeLayer.prototype.setIsVisibleInMap = function (newValue) {
 };
 
 /**
+ * Sets values to the ol layer.
+ * @param {Object} attributes The new attributes.
+ * @returns {void}
+ */
+Layer2dRasterWmsTimeLayer.prototype.updateLayerValues = function (attributes) {
+    Layer2dRaster.prototype.updateLayerValues.call(this, {...attributes, visibility: false});
+};
+
+/**
  * Updates the time parameter of the WMS-T if the id of the layer is correct.
  * @param {String} id Unique Id of the layer to update.
  * @param {String} newValue New TIME value of the WMS-T.

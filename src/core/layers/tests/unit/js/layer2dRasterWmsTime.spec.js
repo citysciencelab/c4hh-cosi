@@ -159,6 +159,19 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
         expect(rawAttributes.TIME).to.be.a("Promise");
     });
 
+    it("updateLayerValues: should update layer values and set always visibility to false", () => {
+        const localAttributes = {
+                zIndex: 2,
+                visibility: true
+            },
+            wmsLayer = new Layer2dRasterWmsTime(attributes);
+
+        wmsLayer.updateLayerValues(localAttributes);
+
+        expect(wmsLayer.layer.get("zIndex")).to.be.equals(localAttributes.zIndex);
+        expect(wmsLayer.layer.get("visible")).to.be.false;
+    });
+
     it("extractExtentValues - extract an object that contains the time range", function () {
         const wmsTimeLayer = new Layer2dRasterWmsTime(attributes),
             extent = {
