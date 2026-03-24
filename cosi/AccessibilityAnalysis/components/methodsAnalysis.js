@@ -97,6 +97,16 @@ export default {
         this.setIsochroneAsBbox();
     },
 
+    /**
+     * Renders the direction features on the map.
+     * @param {ol/Feature[]} newFeatures - The direction features to be rendered.
+     * @returns {void}
+     */
+    renderDirections (newFeatures) {
+        this.getLayerById("accessibility-directions").getLayer().getSource().clear();
+        this.getLayerById("accessibility-directions").getLayer().getSource().addFeatures(newFeatures);
+    },
+
     createBufferFromDirections: function () {
         let bufferFeatures;
         const

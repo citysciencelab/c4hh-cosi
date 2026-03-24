@@ -316,6 +316,8 @@ export default {
 
             this.setIsochroneFeatures(geoJsonCollectionToFeatures(this.dataSets[index].resultsGeoJSON));
             this.renderIsochrones(this.isochroneFeatures);
+            this.setDirectionFeatures(geoJsonCollectionToFeatures(this.dataSets[index].directionResultsGeoJSON));
+            this.renderDirections(this.directionFeatures);
         },
 
         /**
@@ -772,6 +774,11 @@ export default {
                 this.showSpinner = true;
                 this.showErrorAlert = false;
                 await this.createIsochrones();
+                this.setDirectionFeatures(this.activeMode.type === "route"
+                    ? this.directionsRouteSource.getFeatures().map(feature => feature.clone())
+                    : []
+                );
+
             }
             catch (error) {
                 this.showSpinner = false;
@@ -792,6 +799,8 @@ export default {
 
                 analysisSet.results = this.isochroneFeatures;
                 analysisSet.resultsGeoJSON = featuresToGeoJsonCollection(this.isochroneFeatures);
+                analysisSet.directionResults = this.directionFeatures;
+                analysisSet.directionResultsGeoJSON = featuresToGeoJsonCollection(this.directionFeatures);
                 analysisSet.inputs = {
                 // These lines have been changed back and forth so arguing my case for checking first if the value is undefined
                 // JSON.parse throws error on undefined
@@ -818,6 +827,7 @@ export default {
                 this.dataSets.unshift(analysisSet);
                 this.setActiveSet(0);
                 this.renderIsochrones(this.isochroneFeatures);
+                this.renderDirections(this.directionFeatures);
                 this.dataSets[this.activeSet].geojson = this.exportAsGeoJson(this.getLayerById("accessibility-analysis"), this.projectionCode);
                 this.setPopulationSize();
                 this.setCoordinate([]);
@@ -961,6 +971,8 @@ export default {
             this.setSteps([0, 0, 0]);
             this.setIsochroneFeatures([]);
             this.getLayerById("accessibility-analysis").getLayer().getSource().clear();
+            this.setDirectionFeatures([]);
+            this.getLayerById("accessibility-directions").getLayer().getSource().clear();
         },
 
         /**

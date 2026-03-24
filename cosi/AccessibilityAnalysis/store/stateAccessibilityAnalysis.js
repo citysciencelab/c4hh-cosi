@@ -5,6 +5,7 @@
  * @property {string} id id of the VueAddon component
  * @property {string} name displayed as title (config-param)
  * @property {string} icon icon next to title (config-param)
+ * @property {ol/Feature[]} directionFeatures - features for the direction layer.
  * @property {String[]} isochroneColors - colors for the isochrone features.
  * @property {Number} cardCounter - counter for cards.
  */
@@ -18,6 +19,7 @@ const state = {
     icon: "bi-geo",
     isochroneFeatures: [],
     isochroneColors: undefined,
+    directionFeatures: [],
     coordinate: [],
     selectedFacilityNames: [],
     useOuterBoundaries: false,
