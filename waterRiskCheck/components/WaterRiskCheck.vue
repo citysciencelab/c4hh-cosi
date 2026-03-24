@@ -394,18 +394,26 @@ export default {
                 this.closeMenu("mainMenu");
             }
         },
-
-        isCreatingPDF () {
-            if (this.isCreatingPDF) {
+        /**
+         * Setting the finished button label according to cearted process.
+         * @param {Boolean} val - true if the pdf is in creating process.
+         * @returns {void}
+         */
+        isCreatingPDF (val) {
+            if (val) {
                 this.finishBtnLabel = this.$t("additional:modules.waterRiskCheck.waitingLabel");
             }
             else {
                 this.finishBtnLabel = this.$t("additional:modules.waterRiskCheck.finishButton");
             }
         },
-
-        showSpinner () {
-            if (this.showSpinner) {
+        /**
+         * Setting the stared button label according to the visibility of spinner.
+         * @param {Boolean} val - true if the spinner is showing.
+         * @returns {void}
+         */
+        showSpinner (val) {
+            if (val) {
                 this.startBtnLabel = this.$t("additional:modules.waterRiskCheck.waitingLabel");
             }
             else {
@@ -1161,6 +1169,8 @@ export default {
                         type="button"
                         class="btn btn-link d-none d-md-block mx-auto mt-3 text-center"
                         :aria-label="$t('additional:modules.waterRiskCheck.discardAddress')"
+                        :disabled="showSpinner"
+                        @click="resetAll"
                     >
                         {{ $t("additional:modules.waterRiskCheck.discardAddress") }}
                     </button>
@@ -1184,7 +1194,9 @@ export default {
                         type="button"
                         :secondary="true"
                         :aria-label="$t('additional:modules.waterRiskCheck.discardAddress')"
+                        :disabled="showSpinner"
                         :text="$t('additional:modules.waterRiskCheck.discardAddress')"
+                        :interaction="() => resetAll()"
                     />
                 </div>
                 <div class="mb-3 mt-2 d-none d-md-block">
