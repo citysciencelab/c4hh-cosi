@@ -888,6 +888,9 @@
       "headline": "News",
       "name": "News"
     },
+    "tutorialAndTips": {
+      "name": "Tutorials and tips"
+    },
     "openConfig": {
       "explanation": "Open a map that you have saved as a local configuration file.",
       "loadFileFailed": "The <b>{{targetFileName}}</b> configuration file was not loaded. The file format <b>{{targetFileFormat}}</b> is not supported. Please load a file in the <b>json</b> file format.",

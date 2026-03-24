@@ -891,6 +891,9 @@
       "headline": "Neuigkeiten",
       "name": "Neuigkeiten"
     },
+    "tutorialAndTips": {
+      "name": "Tutorials und Tipps"
+    },
     "openConfig": {
       "explanation": "Öffnen Sie eine Karte, die Sie als lokale Konfigurationsdatei abgespeichert haben.",
       "loadFileFailed": "Die Konfigurationsdatei <b>{{targetFileName}}</b> wurde nicht geladen. Das Dateiformat <b>{{targetFileFormat}}</b> wird nicht unterstützt. Bitte laden Sie eine Datei im Dateiformat <b>json</b>.",
