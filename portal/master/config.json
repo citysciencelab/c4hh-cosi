@@ -680,7 +680,8 @@
             "qrShare": true
           },
           {
-            "type": "measure"
+            "type": "measure",
+            "enableUndoRedo": true
           },
           {
             "type": "styleVT"
