@@ -3250,6 +3250,7 @@ Mit dem Messwerkzeug können Strecken und Flächen gemessen werden.
 |----|-------------|---|-------|------------|------|
 |color|nein|Number[]|[255, 127, 0, 1.0]|Gibt an, in welcher Farbe die gemessenen Strecken/Flächen angezeigt werden.|false|
 |earthRadius|nein|Number|6378137|Erdradius in Metern. Bitte beachten Sie, dass der Erdradius in Abhängigkeit zum Bezugsellipsoiden gewählt werden sollte. Für ETRS89 (EPSG:25832) ist dies beispielsweise GRS80.|false|
+|enableUndoRedo|nein|Boolean|false|Aktiviert die Messungsliste mit punktgenauem Undo/Redo für aktive Skizzen und abgeschlossene Messungen. Im 3D-Modus nicht verfügbar.|false|
 |icon|nein|String|"bi-arrows-angle-expand"|Icon das im Menü vor dem Modulnamen angezeigt wird. Zur Auswahl siehe **[Bootstrap Icons](https://icons.getbootstrap.com/)**|false|
 |lineStringUnits|nein|String[]|["m", "km"]|Gibt an, welche Einheiten für Streckenberechnungen ausgewählt werden können. Unterstützt werden "m" (Meter), "nm" (Seemeile), "km" (Kilometer).|false|
 |measurementAccuracy|nein|String|"meter"|Gibt an, wie genau das Messergebnis für "m", "nm", "m²", "ha" angezeigt wird. Die möglichen Optionen sind "decimeter" für eine Nachkommastelle. "meter" für keine Nachkommastelle. "dynamic" für eine Nachkommastelle bei Ergebnissen kleiner als 10 und keine Nachkommastelle bei Ergebnissen größer oder gleich 10 der entsprechenden Einheit.|false|
