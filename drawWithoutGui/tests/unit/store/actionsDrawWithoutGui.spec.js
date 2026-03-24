@@ -108,7 +108,7 @@ describe("actionsDrawWithoutGui", () => {
             mockDispatch2 = vi.fn(() => Promise.resolve([1, 2])),
             result = await actionsDrawWithoutGui.addCenterPoint({dispatch: mockDispatch2}, {feature: mockFeature, targetProjection: undefined, geoJSON});
 
-        expect(result.features[0].properties.centerPoint).toEqual([1, 2]);
+        expect(result.features[0].properties.centerPoint.coordinates).toEqual([1, 2]);
     });
 
     it("finalizeAndSendGeoJSON calls dispatch and removes interaction", async () => {

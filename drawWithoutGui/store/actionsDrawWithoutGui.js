@@ -254,7 +254,7 @@ export default {
                 geoJSONAddCenter.features[0].properties = {};
             }
 
-            geoJSONAddCenter.features[0].properties.centerPoint = centerPoint;
+            geoJSONAddCenter.features[0].properties.centerPoint = {type: "Point", coordinates: centerPoint};
 
             return geoJSONAddCenter;
         });
