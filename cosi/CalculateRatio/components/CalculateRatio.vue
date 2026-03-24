@@ -368,13 +368,13 @@ export default {
 
                         if (findGrp) {
                             this.featuresList.push({value: attr.value, title: attr.value});
-                            this.featuresListNew.push(attr.value);
                         }
                         else {
                             this.featuresList.push({type: "subheader", title: attr.group});
-                            // this.featuresList.push({value: attr.value, title: attr.value});
-                            this.featuresListNew.push(attr.value);
+                            this.featuresList.push({value: attr.value, title: attr.value});
                         }
+
+                        this.featuresListNew.push(attr.value);
                     }
                 });
             }
