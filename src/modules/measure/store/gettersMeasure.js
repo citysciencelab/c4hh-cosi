@@ -65,6 +65,36 @@ const simpleGetters = {
         };
 
         return JSON.stringify(params);
+    },
+
+    /**
+     * Returns a unified list of all completed measurements with metadata.
+     * @param {Object} state measure store state
+     * @param {Object} getters measure store getters
+     * @returns {Array<Object>} List of measurements with id, type, displayValue, and customName
+     */
+    measurementList: ({lines, polygons, customNames}, getters) => {
+        const measurements = [];
+
+        Object.keys(lines).forEach(featureId => {
+            measurements.push({
+                id: featureId,
+                type: "LineString",
+                displayValue: getters.lineLengths[featureId] || "",
+                customName: customNames[featureId] || null
+            });
+        });
+
+        Object.keys(polygons).forEach(featureId => {
+            measurements.push({
+                id: featureId,
+                type: "Polygon",
+                displayValue: getters.polygonAreas[featureId] || "",
+                customName: customNames[featureId] || null
+            });
+        });
+
+        return measurements;
     }
 };
 

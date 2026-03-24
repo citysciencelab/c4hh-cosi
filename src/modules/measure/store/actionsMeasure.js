@@ -2,6 +2,7 @@ import source from "../js/measureSource.js";
 import makeDraw2d from "../js/measureDraw.js";
 import makeDraw3d from "../js/measureDraw3d.js";
 import changeCase from "@shared/js/utils/changeCase.js";
+import {normalizeFeatureId, deepCloneCoords} from "../js/measureUtils.js";
 
 export default {
     /**
@@ -85,5 +86,238 @@ export default {
         Object.keys(params).forEach(key => {
             commit(`set${changeCase.upperFirst(key)}`, params[key]);
         });
+    },
+
+    /**
+     * Removes tooltip/label features from the source for a given measurement.
+     * @param {Object} _ - unused vuex context
+     * @param {String|Number} featureId - The ol_uid of the measurement feature
+     * @returns {void}
+     */
+    removeTooltipForFeature (_, featureId) {
+        const normalizedId = normalizeFeatureId(featureId),
+            featuresToRemove = [];
+
+        source.forEachFeature(f => {
+            const tooltipId = f.get("featureId");
+
+            if (tooltipId !== undefined && normalizeFeatureId(tooltipId) === normalizedId) {
+                featuresToRemove.push(f);
+            }
+        });
+        featuresToRemove.forEach(f => source.removeFeature(f));
+    },
+
+    /**
+     * Updates the tooltip position for a feature to reflect its last coordinate.
+     * Also syncs tooltipCoord in the store so that MeasureInMapTooltip's watcher
+     * does not override the updated position on reactive recalculation.
+     * @param {Object} context - vuex action context
+     * @param {module:ol/Feature} feature - The measurement feature
+     * @returns {void}
+     */
+    updateTooltipPositionForFeature ({state, commit}, feature) {
+        const normalizedFeatureId = normalizeFeatureId(feature.ol_uid),
+            geometry = feature.getGeometry(),
+            geometryType = geometry.getType();
+        let newCoord = null;
+
+        if (geometryType === "LineString") {
+            newCoord = geometry.getLastCoordinate();
+        }
+        else if (geometryType === "Polygon") {
+            const coordinates = geometry.getCoordinates()[0];
+
+            newCoord = coordinates[coordinates.length - 2];
+        }
+
+        if (!newCoord) {
+            return;
+        }
+
+        source.forEachFeature(f => {
+            const tooltipFeatureId = f.get("featureId");
+
+            if (tooltipFeatureId !== undefined && normalizeFeatureId(tooltipFeatureId) === normalizedFeatureId) {
+                const tooltipGeometry = f.getGeometry();
+
+                if (tooltipGeometry && tooltipGeometry.getType() === "Point") {
+                    tooltipGeometry.setCoordinates(newCoord);
+                }
+            }
+        });
+
+        // If this feature is the last drawn feature tracked by MeasureInMapTooltip
+        // via currentTextPoint, we must also update tooltipCoord so that the
+        // setValueAtTooltipLayer watcher does not move the tooltip back to its
+        // old position when lineLengths/polygonAreas recompute.
+        if (normalizeFeatureId(state.featureId) === normalizedFeatureId) {
+            commit("setTooltipCoord", newCoord);
+        }
+    },
+
+    /**
+     * Deletes a single measurement feature from the source and the store.
+     * Also removes the associated tooltip and custom name.
+     * @param {Object} context - vuex action context
+     * @param {String|Number} featureId - The ol_uid of the feature to delete
+     * @returns {void}
+     */
+    deleteSingleFeature ({commit, dispatch}, featureId) {
+        const normalizedId = normalizeFeatureId(featureId),
+            allFeatures = source.getFeatures(),
+            feature = allFeatures.find(f => {
+                const isTooltip = f.get("featureId") !== undefined;
+
+                return !isTooltip && normalizeFeatureId(f.ol_uid) === normalizedId;
+            });
+
+        if (feature) {
+            dispatch("removeTooltipForFeature", featureId);
+            source.removeFeature(feature);
+            commit("removeFeature", feature.ol_uid);
+        }
+    },
+
+    /**
+     * Undoes a point addition on a completed feature.
+     * Removes the last point from the geometry; deletes the feature if too few points remain.
+     * @param {Object} context - vuex action context
+     * @param {Object} payload - {feature: ol/Feature, historyEntry: Object}
+     * @returns {void}
+     */
+    undoPointOnFeature ({commit, dispatch}, {feature, historyEntry}) {
+        const {geometryType} = historyEntry.data,
+            geometry = feature.getGeometry(),
+            featureId = feature.ol_uid;
+
+        if (geometryType === "LineString") {
+            const coordinates = geometry.getCoordinates();
+
+            if (coordinates.length > 1) {
+                coordinates.pop();
+                if (coordinates.length === 1) {
+                    dispatch("deleteSingleFeature", featureId);
+                    return;
+                }
+                geometry.setCoordinates(coordinates);
+            }
+        }
+        else if (geometryType === "Polygon") {
+            const coordinates = geometry.getCoordinates()[0];
+
+            if (coordinates.length > 3) {
+                coordinates.splice(coordinates.length - 2, 1);
+                if (coordinates.length < 4) {
+                    dispatch("deleteSingleFeature", featureId);
+                    return;
+                }
+                geometry.setCoordinates([coordinates]);
+            }
+            else {
+                dispatch("deleteSingleFeature", featureId);
+                return;
+            }
+        }
+
+        commit("addFeature", feature);
+        dispatch("updateTooltipPositionForFeature", feature);
+    },
+
+    /**
+     * Redoes a point addition on a completed feature.
+     * Adds back a previously removed point to the geometry.
+     * @param {Object} context - vuex action context
+     * @param {Object} payload - {feature: ol/Feature, historyEntry: Object}
+     * @returns {void}
+     */
+    redoPointOnFeature ({commit, dispatch}, {feature, historyEntry}) {
+        const {point, geometryType} = historyEntry.data,
+            geometry = feature.getGeometry();
+
+        if (geometryType === "LineString") {
+            const coordinates = geometry.getCoordinates();
+
+            coordinates.push(point);
+            geometry.setCoordinates(coordinates);
+        }
+        else if (geometryType === "Polygon") {
+            const coordinates = geometry.getCoordinates()[0];
+
+            coordinates.splice(coordinates.length - 1, 0, point);
+            geometry.setCoordinates([coordinates]);
+        }
+
+        commit("addFeature", feature);
+        dispatch("updateTooltipPositionForFeature", feature);
+    },
+
+    /**
+     * Undoes a coordinate modification by restoring the previous coordinates.
+     * @param {Object} context - vuex action context
+     * @param {Object} payload - {feature: ol/Feature, historyEntry: Object}
+     * @returns {void}
+     */
+    undoModifyCoordinates ({commit, dispatch}, {feature, historyEntry}) {
+        const {previousCoordinates, geometryType} = historyEntry.data,
+            geometry = feature.getGeometry();
+
+        if (geometryType === "LineString") {
+            geometry.setCoordinates(previousCoordinates);
+        }
+        else if (geometryType === "Polygon") {
+            geometry.setCoordinates([previousCoordinates]);
+        }
+
+        commit("addFeature", feature);
+        dispatch("updateTooltipPositionForFeature", feature);
+    },
+
+    /**
+     * Redoes a coordinate modification by applying the new coordinates.
+     * @param {Object} context - vuex action context
+     * @param {Object} payload - {feature: ol/Feature, historyEntry: Object}
+     * @returns {void}
+     */
+    redoModifyCoordinates ({commit, dispatch}, {feature, historyEntry}) {
+        const {newCoordinates, geometryType} = historyEntry.data,
+            geometry = feature.getGeometry();
+
+        if (geometryType === "LineString") {
+            geometry.setCoordinates(newCoordinates);
+        }
+        else if (geometryType === "Polygon") {
+            geometry.setCoordinates([newCoordinates]);
+        }
+
+        commit("addFeature", feature);
+        dispatch("updateTooltipPositionForFeature", feature);
+    },
+
+    /**
+     * Records the pre-modification coordinates of a feature before a modify interaction starts.
+     * @param {Object} _ - unused vuex context
+     * @param {module:ol/Feature} feature - The feature about to be modified
+     * @returns {void}
+     */
+    capturePreModifyCoords (_, feature) {
+        const geometry = feature.getGeometry(),
+            geometryType = geometry.getType();
+        let coords;
+
+        if (geometryType === "LineString") {
+            coords = geometry.getCoordinates();
+        }
+        else if (geometryType === "Polygon") {
+            coords = geometry.getCoordinates()[0];
+        }
+
+        try {
+            feature.set("_beforeModifyCoords", deepCloneCoords(coords));
+        }
+        catch (error) {
+            console.warn("[Measure] Failed to clone coordinates on modifystart:", error);
+            feature.set("_beforeModifyCoords", coords);
+        }
     }
 };

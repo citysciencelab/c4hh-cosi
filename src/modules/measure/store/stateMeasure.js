@@ -21,7 +21,8 @@ import source from "../js/measureSource.js";
  * @property {String} selectedGeometry Selected geometry value for measurement
  * @property {String} selectedLineStringUnit Selected unit by stringified index ("0"/"1").
  * @property {String} selectedPolygonUnit Selected unit by stringified index ("0"/"1").
- * @property {function[]} unlisteners unlisten methods to execute before source clear
+ * @property {Boolean} enableUndoRedo Enables the undo/redo feature and measurement list. When false, the tool behaves as before (config-param).
+ * @property {Object} customNames Custom display names for measurements, keyed by feature ol_uid
  * @property {(module:ol/Interaction|MeasureDraw3d)} interaction current interaction on map or 3d model, if any
  * @property {module:ol/vector/Source} source draw layer source
  * @property {module:ol/vector/Layer} layer draw layer
@@ -53,6 +54,12 @@ const state = {
     selectedPolygonUnit: "0",
     unlisteners: [],
     isDrawing: false,
+
+    // config-param: enables undo/redo and measurement list
+    enableUndoRedo: false,
+
+    // custom names for measurements (key = feature ol_uid as string)
+    customNames: {},
 
     // measure layer and ol
     color: [255, 127, 0, 1.0],

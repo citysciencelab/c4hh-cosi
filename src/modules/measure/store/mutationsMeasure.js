@@ -12,11 +12,55 @@ const mutations = {
      * @returns {void}
      */
     addFeature (state, payload) {
-        const key = state.selectedGeometry === "LineString" ? "lines" : "polygons";
+        const geometryType = payload.getGeometry ? payload.getGeometry().getType() : state.selectedGeometry,
+            key = geometryType === "LineString" ? "lines" : "polygons";
 
         state[key] = {
             ...state[key],
             [payload.ol_uid]: payload
+        };
+    },
+    /**
+     * Removes a feature from both lines and polygons objects.
+     * Also removes any associated custom name.
+     * @param {Object} state vuex state
+     * @param {String|Number} featureId - The ol_uid of the feature to remove
+     * @returns {void}
+     */
+    removeFeature (state, featureId) {
+        const normalizedId = String(featureId);
+
+        if (state.lines[normalizedId]) {
+            const newLines = {...state.lines};
+
+            delete newLines[normalizedId];
+            state.lines = newLines;
+        }
+        if (state.polygons[normalizedId]) {
+            const newPolygons = {...state.polygons};
+
+            delete newPolygons[normalizedId];
+            state.polygons = newPolygons;
+        }
+        if (state.customNames[normalizedId]) {
+            const newCustomNames = {...state.customNames};
+
+            delete newCustomNames[normalizedId];
+            state.customNames = newCustomNames;
+        }
+    },
+    /**
+     * Sets a custom display name for a measurement feature.
+     * @param {Object} state vuex state
+     * @param {Object} payload - {featureId: String|Number, name: String}
+     * @returns {void}
+     */
+    setCustomName (state, payload) {
+        const normalizedId = String(payload.featureId);
+
+        state.customNames = {
+            ...state.customNames,
+            [normalizedId]: payload.name
         };
     },
     /**
