@@ -1,3 +1,6 @@
+import i18next from "i18next";
+import {formatMeasurementNumber} from "./measureCalculation.js";
+
 let pinPositions = [],
     currentPosition = {x: 0, y: 0, z: 0},
     firstPosition = null;
@@ -80,7 +83,7 @@ export function onClick () {
         entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
         cartographic = scene.globe.ellipsoid.cartesianToCartographic(currentPosition) ?? new Cesium.Cartographic(),
         height = cartographic.height - scene.globe.getHeight(cartographic),
-        heightLabel = createLabelEntity("Höhe:\n" + height.toFixed(1) + "m", currentPosition);
+        heightLabel = createLabelEntity(i18next.t("common:modules.measure.height3d") + ":\n" + formatMeasurementNumber(height, 1) + "m", currentPosition);
     let positionAbove,
         pin = null;
 
@@ -102,7 +105,7 @@ export function onClick () {
         let distanceLabel = null;
 
         Cesium.Cartesian3.midpoint(firstPosition, currentPosition, middlePosition);
-        distanceLabel = createLabelEntity("Entfernung:\n" + distance.toFixed(1) + "m", middlePosition);
+        distanceLabel = createLabelEntity(i18next.t("common:modules.measure.distance3d") + ":\n" + formatMeasurementNumber(distance, 1) + "m", middlePosition);
 
         entities.add(distanceLine);
         entities.add(distanceLabel);

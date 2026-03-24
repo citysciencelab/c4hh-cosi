@@ -100,6 +100,7 @@
 ## 2026-04-01 v3.21.0
 
 ### Added
+- Measure: Added undo/redo functionality and a configurable measurement list (point-level undo/redo for active sketches and completed measurements). Enable with `enableUndoRedo: true` in the tool configuration.
 - PrintMap: Heatmap layers are now included in the print.
 - Style Configuration: Added parameter `polygonImage` to optionally style WFS polygons with centered icon and show this icon in legend and print
 - GetFeatureInfo: In 3D mode, restored feature highlighting and GFI display via share link.
