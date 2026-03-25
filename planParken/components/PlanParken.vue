@@ -16,7 +16,12 @@ export default {
     data () {
         return {
             isLoading: false,
-            activeTooltip: null
+            activeTooltip: null,
+            tooltipText: "",
+            tooltipStyle: {},
+            tooltipArrowStyle: {},
+            tooltipTargetEl: null,
+            tooltipPlacement: "top"
         };
     },
     computed: {
@@ -86,14 +91,17 @@ export default {
             console.warn("PlanParken - Layer raster with id ", this.alkisAdressLayerId, " is not avilable. Check your services.json!");
         }
         document.addEventListener("click", this.handleOutSideClick);
+        document.addEventListener("scroll", this.closeTooltip, true);
     },
     unmounted () {
         // forced delete of tooltip overlay
-        if (document.getElementById("tooltip-overlay")) {
-            document.getElementById("tooltip-overlay").remove();
+        if (document.getElementById("tooltip-overlay-plan-parken")) {
+            document.getElementById("tooltip-overlay-plan-parken").remove();
         }
+
     },
     beforeUnmount () {
+        document.removeEventListener("scroll", this.closeTooltip);
         document.removeEventListener("click", this.handleOutSideClick);
         if (this.$refs.graphicalSelection) {
             this.$refs.graphicalSelection.setStatus(false);
@@ -140,15 +148,105 @@ export default {
         ...mapActions("Modules/PlanParken", ["fetchOAP"]),
 
         handleOutSideClick (evt) {
-            if (this.activeTooltip && !evt.target.closest(".info-btn.opened")) {
+            if (this.activeTooltip) {
+                this.closeTooltip();
+            }
+            const clickedInsideButton = evt.target.closest(".info-btn");
+            const clickedInsideTooltip = evt.target.closest(".tooltip-box");
+
+            if (!clickedInsideButton && !clickedInsideTooltip) {
                 this.closeTooltip();
             }
         },
-        toggleTooltip (id) {
-            this.activeTooltip = this.activeTooltip === id ? null : id;
+        toggleTooltip (event, id, text) {
+            if (this.activeTooltip === id) {
+                this.closeTooltip();
+                return;
+            }
+
+            this.activeTooltip = id;
+            this.tooltipText = text;
+            this.tooltipTargetEl = event.currentTarget;
+
+            this.$nextTick(() => {
+                this.positionTooltip();
+            });
         },
         closeTooltip () {
+            this.tooltipArrowStyle = {};
             this.activeTooltip = null;
+            this.tooltipText = "";
+            this.tooltipStyle = {};
+            this.tooltipTargetEl = null;
+            this.tooltipPlacement = "top";
+
+        },
+        positionTooltip () {
+            if (!this.tooltipTargetEl) {
+                return;
+            }
+
+            const tooltipEl = document.getElementById("tooltip-overlay-plan-parken"),
+                rect = this.tooltipTargetEl.getBoundingClientRect(),
+                tooltipWidth = tooltipEl?.offsetWidth || 200,
+                spacing = 8,
+                arrowSize = 7,
+                sidePadding = 8;
+
+            const buttonCenterX = rect.left + rect.width / 2;
+
+            let left = buttonCenterX - tooltipWidth / 2;
+            const minLeft = sidePadding;
+            const maxLeft = window.innerWidth - tooltipWidth - sidePadding;
+
+            if (left < minLeft) {
+                left = minLeft;
+            }
+            else if (left > maxLeft) {
+                left = maxLeft;
+            }
+
+            let arrowLeft = buttonCenterX - left;
+            const minArrowLeft = 12;
+            const maxArrowLeft = tooltipWidth - 12;
+
+            if (arrowLeft < minArrowLeft) {
+                arrowLeft = minArrowLeft;
+            }
+            else if (arrowLeft > maxArrowLeft) {
+                arrowLeft = maxArrowLeft;
+            }
+
+            const tooltipHeight = tooltipEl?.offsetHeight || 90;
+            const canOpenTop = rect.top - tooltipHeight - spacing - arrowSize > 8;
+
+            if (canOpenTop) {
+                this.tooltipPlacement = "top";
+                this.tooltipStyle = {
+                    position: "fixed",
+                    left: `${left}px`,
+                    top: `${rect.top - spacing - arrowSize}px`,
+                    transform: "translateY(-100%)",
+                    zIndex: 99999
+                };
+
+                this.tooltipArrowStyle = {
+                    left: `${arrowLeft}px`
+                };
+            }
+            else {
+                this.tooltipPlacement = "bottom";
+                this.tooltipStyle = {
+                    position: "fixed",
+                    left: `${left}px`,
+                    top: `${rect.bottom + spacing + arrowSize}px`,
+                    zIndex: 99999
+                };
+
+                this.tooltipArrowStyle = {
+                    left: `${arrowLeft}px`
+                };
+            }
         },
 
         /**
@@ -367,16 +465,8 @@ export default {
                                                 :aria-label="key + ': ' + valueObj.info"
                                                 aria-haspopup="true"
                                                 :aria-expanded="activeTooltip === `${section}-${key}`"
-                                                @click.prevent.stop="toggleTooltip(`${section}-${key}`)"
-                                            >
-                                                <span
-                                                    v-if="activeTooltip === `${section}-${key}`"
-                                                    class="tooltip-box"
-                                                    role="tooltip"
-                                                >
-                                                    {{ valueObj.info }}
-                                                </span>
-                                            </button>
+                                                @click.prevent.stop="toggleTooltip($event, `${section}-${key}`, valueObj.info)"
+                                            />
                                         </div>
                                     </div>
                                     <div class="value">
@@ -395,12 +485,29 @@ export default {
                 </div>
             </div>
         </form>
+        <Teleport to="body">
+            <div
+                v-if="activeTooltip && tooltipText"
+                id="tooltip-overlay-plan-parken"
+                :class="`tooltip-overlay-plan-parken--${tooltipPlacement}`"
+                :style="tooltipStyle"
+                role="tooltip"
+            >
+                {{ tooltipText }}
+                <div
+                    class="tooltip-arrow"
+                    :style="tooltipArrowStyle"
+                />
+            </div>
+        </Teleport>
     </div>
 </template>
 
 <style lang="scss" scoped>
 @import 'variables';
 .plan-parken {
+    position: relative;
+    overflow-y: visible;
     .disabled {
         pointer-events: none;
         opacity: 0.6;
@@ -549,10 +656,6 @@ export default {
         color: lighten($dark_grey, 15%);
     }
     .tooltip-box {
-        position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
     background: #0f2c44;
     color: #fff;
     font-size: 12px;
@@ -563,19 +666,14 @@ export default {
     white-space: normal;
     width: 220px;
     text-align: left;
-    pointer-events: none;
-    z-index: 9999;
+    box-sizing: border-box;
+    pointer-events: auto;
+}
 
-        &::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 5px solid transparent;
-            border-top-color: #0f2c44;
-        }
-    }
+.tooltip-box--fixed {
+    position: fixed;
+    z-index: 99999;
+}
 }
 
 
@@ -583,12 +681,37 @@ export default {
 
 <style lang="scss">
 
-#tooltip-overlay {
-    position: relative;
+#tooltip-overlay-plan-parken {
+    position: fixed;
     background: $accent_active;
     color: $white;
-    max-width: 200px;
-    padding: 4px 8px;
+    width: 200px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    z-index: 99999;
+    pointer-events: auto;
+}
+
+#tooltip-overlay-plan-parken .tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+}
+
+#tooltip-overlay-plan-parken.tooltip-overlay-plan-parken--top .tooltip-arrow {
+    top: 100%;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 7px solid $accent_active;
+}
+
+#tooltip-overlay-plan-parken.tooltip-overlay-plan-parken--bottom .tooltip-arrow {
+    bottom: 100%;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid $accent_active;
 }
 
 #circle-overlay {
