@@ -109,6 +109,8 @@ export default defineConfig(({ mode }) => {
                 "mixins": path.resolve(rootPath, "src/assets/css/mixins.scss"),
                 "variables": path.resolve(rootPath, "src/assets/css/variables.scss"),
                 "olcs": path.resolve(rootPath, "node_modules/olcs"),
+                "ol": path.resolve(rootPath, "node_modules/ol"),
+                "proj4": path.resolve(rootPath, "node_modules/proj4"),
                 "@appstore": path.resolve(rootPath, "src/app-store"),
                 "@shared": path.resolve(rootPath, "src/shared"),
                 "@core": path.resolve(rootPath, "src/core"),
@@ -121,7 +123,7 @@ export default defineConfig(({ mode }) => {
                     }
                     : {})
             },
-            dedupe: ["jsts"]
+            dedupe: ["jsts","ol","proj4"]
         },
 
         plugins: [
