@@ -216,7 +216,13 @@ export default {
                     :key="measurement.id"
                     class="measure-list-item"
                     :class="{ 'selected': Number(selectedFeatureId) === Number(measurement.id) }"
-                    role="listitem"
+                    role="button"
+                    tabindex="0"
+                    @mouseenter="$emit('highlight-feature', measurement.id)"
+                    @mouseleave="$emit('unhighlight-feature', measurement.id)"
+                    @focus="$emit('highlight-feature', measurement.id)"
+                    @blur="$emit('unhighlight-feature', measurement.id)"
+                    @keydown.enter.self="$emit('highlight-feature', measurement.id)"
                 >
                     <div class="measure-item-info">
                         <span
