@@ -210,6 +210,11 @@
     "type": "vueComponent"
   },
    "waterRiskCheckSearchBar": {
-    "type": "vueComponent",
-    "path": "waterRiskCheck/searchBar"}
+    "path": "waterRiskCheck/searchBar",
+    "type": "vueComponent"
+  },
+  "potentialDamagedBuilding": {
+    "path": "potentialDamagedBuilding",
+    "type": "tool"
+  }
 }
