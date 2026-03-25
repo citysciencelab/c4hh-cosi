@@ -60,6 +60,7 @@
 ### Fixed
 - Issue \#1472: Improve error handling and robustness of `addInterceptor`.
 - Issue \#1563: Legend: Fixed sorting error of legend that would occur when using grouplayers.
+- Issue \#1577: PortalFooter: Fixed About-Module detection to search in all menu sections instead of only the first one.
 - Issue \#1579: Fix OIDC login by preserving query parameters when processing portal URL redirects.
 - Issue \#1580: Prevent layer reset in CompareMaps by activating oder deactivating other layers in layer tree.
 - Issue \#1581: UrlParams: Fixed layer order in layerTree not being preserved when restoring from a share link containing the LAYERS parameter.
