@@ -10,9 +10,6 @@ export default {
         ...mapGetters(["isMobile"]),
         ...mapGetters("Modules/Login", ["loggedIn", "screenName", "email", "iconLogin", "iconLogged"])
     },
-    created () {
-        Config.overwriteWmsLoadfunction = true;
-    },
     async mounted () {
         if (!await this.isLoggedIn()) {
             this.openLoginWindow();
