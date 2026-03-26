@@ -21,7 +21,11 @@ export default {
             return this.item.visualized && this.animationState;
         }
     },
-
+    unmounted () {
+        if (this.isAnimationRunning) {
+            this.$emit("stopAnimation");
+        }
+    },
     methods: {
         /**
          * Emits either a "stopAnimation" or "startAnimation" event based on the current state of the animation.
