@@ -12,7 +12,6 @@
  * @property {Number} [timeout=5000] Timeout for request to a search interface.
  * @property {String} [type="searchBar"] Id of the SearchBar component.
  * @property {Number} [zoomLevel=7] Defines the zoom level to use on zooming to a result.
- *
  * @property {String} [currentAvailableCategories=""] The current available categories.
  * @property {String} [currentActionEvent=""] Name of the last activated action event e.g. "showLayerInfo".
  * @property {String} [currentSearchInputValue=""] Current value of the search.
@@ -35,17 +34,52 @@
 */
 const state = {
     coloredHighlighting3D: {},
-    configPaths: ["portalConfig.mainMenu.searchBar", "portalConfig.secondaryMenu.searchBar"],
-    currentSide: "mainMenu",
+    configPaths: [],
+    currentSide: "secondaryMenu",
     minCharacters: 3,
     placeholder: "common:modules.searchBar.placeholder.address",
     globalPlaceholder: "common:modules.searchBar.placeholder.address",
-    searchInterfaces: [],
+    searchInterfaces: [
+        {
+            "type": "waterRiskCheckSearch",
+            "serviceId": "elastic_address",
+            "requestType": "POST",
+            "epsg": "EPSG:4326",
+            "searchStringAttribute": "query_str",
+            "hitType": "_source.properties.type",
+            "payload": {
+                "id": "addr_search",
+                "params": {
+                    "query_str": ""
+                }
+            },
+            "responseEntryPath": "hits.hits",
+            "hitMap": {
+                "name": "_source.properties.searchfield",
+                "id": "_source.id",
+                "coordinate": "_source.geometry.coordinates",
+                "type": "_source.properties.type"
+            },
+            "resultEvents": {
+                "onClick": [
+                    "setMarker",
+                    "zoomToResult",
+                    "Modules/WaterRiskCheck/updateAddress"
+                ],
+                "onHover": [
+                    "setMarker"
+                ],
+                "buttons": [
+                    "setMarker",
+                    "zoomToResult"
+                ]
+            }
+        }
+    ],
     suggestionListLength: 5,
     timeout: 5000,
     type: "searchBar",
-    zoomLevel: 7,
-
+    zoomLevel: 10,
     currentAvailableCategories: "",
     currentActionEvent: "",
     currentSearchInputValue: "",

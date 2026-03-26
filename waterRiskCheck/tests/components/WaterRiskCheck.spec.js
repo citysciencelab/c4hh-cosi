@@ -57,7 +57,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
                                         settings: (state) => state.settings
                                     },
                                     actions: {
-                                        setAddress: () => sinon.stub()
+                                        updateAddress: () => sinon.stub()
                                     }
                                 },
                                 WaterRiskCheckSearchBar: {
@@ -124,7 +124,7 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
         });
         it("should find not a start button", () => {
             const store = factory.createVuexStore({
-                    address: "Test Address"
+                    address: ""
                 }),
                 wrapper = shallowMount(WaterRiskCheck, {
                     global: {
@@ -561,30 +561,31 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
     describe("Watcher", () => {
         it("should call walkTroughToFetchAndAdd, if the address watcher triggers", () => {
             const stubWalkTroughToFetchAndAdd = sinon.stub(WaterRiskCheck.methods, "walkTroughToFetchAndAdd"),
-                store = factory.createVuexStore(),
-                wrapper = shallowMount(WaterRiskCheck, {
-                    global: {
-                        plugins: [store]
-                    }
-                });
+                store = factory.createVuexStore();
 
-            wrapper.vm.$options.watch.address.call(wrapper.vm, [true]);
+            shallowMount(WaterRiskCheck, {
+                global: {
+                    plugins: [store]
+                }
+            });
+
             expect(stubWalkTroughToFetchAndAdd.calledOnce).to.be.true;
         });
         it("should call resetAll, if the address was changed when form is started", () => {
             const stubResetAll = sinon.stub(WaterRiskCheck.methods, "resetAll"),
                 store = factory.createVuexStore({
                     address: "Test Address"
-                }),
-                wrapper = shallowMount(WaterRiskCheck, {
-                    global: {
-                        plugins: [store]
-                    }
                 });
 
-            wrapper.vm.formStarted = true;
+            shallowMount(WaterRiskCheck, {
+                data: () => ({
+                    formStarted: true
+                }),
+                global: {
+                    plugins: [store]
+                }
+            });
 
-            wrapper.vm.$options.watch.address.call(wrapper.vm, [true]);
             expect(stubResetAll.calledOnce).to.be.true;
         });
     });

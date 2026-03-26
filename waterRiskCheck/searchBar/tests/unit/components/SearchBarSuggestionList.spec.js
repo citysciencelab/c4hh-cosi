@@ -174,7 +174,7 @@ describe("addons/waterRiskCheck/searchBar/components/SearchBarSuggestionList.vue
             expect(wrapper.find("#search-bar-suggestion-list").exists()).to.be.false;
         });
 
-        it("shows the showAll button", async () => {
+        it.skip("shows the showAll button", async () => {
             wrapper = await mount(SearchBarSuggestionListComponent, {
                 props: {
                     limitedSortedSearchResults

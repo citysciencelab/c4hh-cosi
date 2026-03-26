@@ -1,7 +1,6 @@
 <script>
 import {mapGetters, mapMutations} from "vuex";
 import SearchBarResultListGeneral from "./SearchBarResultListGeneral.vue";
-import SearchBarResultListTopicTree from "./SearchBarResultListTopicTree.vue";
 
 /**
  * Searchbar result list to show the categorized overview or single search results.
@@ -12,8 +11,7 @@ import SearchBarResultListTopicTree from "./SearchBarResultListTopicTree.vue";
 export default {
     name: "SearchBarResultList",
     components: {
-        SearchBarResultListGeneral,
-        SearchBarResultListTopicTree
+        SearchBarResultListGeneral
     },
     props: {
         limitedSortedSearchResults: {
@@ -96,10 +94,6 @@ export default {
                 />
                 {{ currentAvailableCategories + ": " + limitedSortedSearchResults?.results[currentAvailableCategories + "Count"] + "    " + $t("common:modules.searchBar.searchResults") }}
             </h5>
-            <SearchBarResultListTopicTree
-                v-if="hitTemplate === 'layer'"
-                :result-items="resultItems"
-            />
             <SearchBarResultListGeneral
                 v-else
                 :result-items="resultItems"

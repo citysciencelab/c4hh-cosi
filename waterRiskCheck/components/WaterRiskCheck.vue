@@ -166,8 +166,7 @@ export default {
             "alwaysShow",
             "alkisBaseUrl",
             "reportPath",
-            "feedbackUrl",
-            "searchBarConfig"
+            "feedbackUrl"
         ]),
         ...mapGetters(["restServiceById", "isMobile"]),
         ...mapGetters("Modules/WaterRiskCheckSearchBar", [
@@ -373,25 +372,22 @@ export default {
          * @returns {Boolean} true to show the start button.
          */
         enabledStart () {
-            if (Array.isArray(this.searchResults) && this.searchResults.length && this.address) {
-                return this.searchResults.some(result => result?.category === "Adresse" && result?.name === this.address);
-            }
-
-            return false;
+            return Boolean(this.address);
         }
     },
     watch: {
         /**
-         * Listen to the mutation "modules/WaterRiskCheck/setAddress".
+         * Listen to changes in "modules/WaterRiskCheck/address".
          * @returns {void}
          */
-        address () {
-            if (this.formStarted && this.address !== "" || this.formFinished) {
-                this.resetAll(false);
-            }
-            this.walkTroughToFetchAndAdd();
-            if (this.isMobile) {
-                this.closeMenu("mainMenu");
+        address: {
+            immediate: true,
+            handler () {
+                this.createLayer();
+                if ((this.formStarted && this.address !== "") || this.formFinished) {
+                    this.resetAll(false);
+                }
+                this.walkTroughToFetchAndAdd();
             }
         },
         /**
@@ -444,7 +440,6 @@ export default {
         }
     },
     created () {
-        this.createLayer();
         if (this.isMobile) {
             this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
         }
@@ -456,18 +451,20 @@ export default {
     mounted () {
         this.questions = [...this.configuredQuestions];
         this.sideMenuWidth = document.getElementById("mp-menu-secondaryMenu").style.width;
+        document.getElementById("mp-body-secondaryMenu")?.classList?.add("overflow-scroll");
         if (!this.isMobile && window.innerWidth < 992) {
             this.menuBySide("secondaryMenu").width = "50%";
         }
         this.setConfig();
     },
     unmounted () {
-        this.resetAll();
+        this.resetAll(false);
         document.getElementById("mp-menu-secondaryMenu").style.width = this.sideMenuWidth;
+        document.getElementById("mp-body-secondaryMenu")?.classList?.remove("overflow-scroll");
     },
     methods: {
         ...mapActions("Modules/WaterRiskCheck", [
-            "setAddress"
+            "updateAddress"
         ]),
         ...mapActions("Menu", [
             "closeMenu"
@@ -925,7 +922,7 @@ export default {
                 this.layer?.getLayerSource()?.clear();
                 this.parcel = {};
                 this.buildings = [];
-                this.setAddress("", undefined);
+                this.updateAddress({name: "", type: "Address"});
             }
         },
         /**
@@ -1140,11 +1137,11 @@ export default {
                     </div>
                 </div>
             </ModalItem>
-            <div class="decorative-box d-flex flex-column w-100 px-4 mt-3">
+            <div class="decorative-box d-flex flex-column w-100 px-4 mt-3 pb-3">
                 <span class="ms-3 mt-4">
                     {{ $t("additional:modules.waterRiskCheck.enterAddress") }}
                 </span>
-                <WaterRiskCheckSearchBar :config="searchBarConfig" />
+                <WaterRiskCheckSearchBar :disabled="showSpinner" />
             </div>
             <div
                 v-if="enabledStart"

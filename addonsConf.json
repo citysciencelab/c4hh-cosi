@@ -211,7 +211,7 @@
   },
    "waterRiskCheckSearchBar": {
     "path": "waterRiskCheck/searchBar",
-    "type": "vueComponent"
+    "type": "tool"
   },
   "potentialDamagedBuilding": {
     "path": "potentialDamagedBuilding",

@@ -136,6 +136,7 @@ describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue
                 }
             },
             getters: {
+                isMobile: () => false,
                 portalConfig: sinon.stub()
             },
             actions: {
@@ -157,8 +158,8 @@ describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue
             });
             wrapper.vm.setCurrentSide("root");
             await wrapper.vm.$nextTick();
-            expect(wrapper.find("#search-bar").exists()).to.be.true;
-            expect(wrapper.find("#search-button").exists()).to.be.true;
+            expect(wrapper.find("#water-risk-check-search-bar").exists()).to.be.true;
+            expect(wrapper.find("#water-risk-check-search-button").exists()).to.be.true;
             expect(wrapper.find("input").exists()).to.be.true;
             expect(wrapper.vm.currentSide).to.eql("mainMenu");
             expect(wrapper.vm.currentComponentSide).to.be.undefined;
@@ -176,7 +177,7 @@ describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue
 
             const startSearchSpy = sinon.spy(wrapper.vm, "startSearch");
 
-            await wrapper.find("#search-button").trigger("click");
+            await wrapper.find("#water-risk-check-search-button").trigger("click");
 
             expect(startSearchSpy.calledOnce).to.be.true;
         });
@@ -308,21 +309,6 @@ describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue
 
             wrapper.vm.checkCurrentComponent("someModule");
             expect(startSearchSpy.called).to.be.true;
-        });
-        it("startSearch is executed for layerSelection", async () => {
-            searchInputValue = "";
-            wrapper = await mount(SearchBarComponent, {
-                global: {
-                    plugins: [store]
-                }
-            });
-            const startSearchSpy = sinon.spy(wrapper.vm, "startSearch");
-
-            wrapper.vm.checkCurrentComponent("layerSelection");
-
-            expect(startSearchSpy.called).to.be.true;
-            expect(searchBarActionsSpy.startLayerSelectionSearch.called).to.be.true;
-            expect(menuActionsSpy.navigateBack.called).to.be.true;
         });
     });
 

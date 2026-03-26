@@ -146,7 +146,7 @@ export default {
                     />
                 </p>
             </div>
-            <div class="showAllSection">
+            <!-- <div class="showAllSection">
                 <button
                     type="button"
                     class="btn btn-light d-flex text-left"
@@ -156,7 +156,7 @@ export default {
                     {{ $t("common:modules.searchBar.showAll") }}
                     <span class="bi-chevron-right" />
                 </button>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>

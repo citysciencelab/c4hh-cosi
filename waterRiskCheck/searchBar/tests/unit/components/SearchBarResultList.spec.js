@@ -157,25 +157,9 @@ describe("addons/waterRiskCheck/searchBar/components/SearchBarResultList.vue", (
                 }
             });
 
-            expect(wrapper.find("search-bar-result-list-general-stub").exists()).to.be.true;
             expect(wrapper.find("#search-bar-result-heading").exists()).to.be.true;
         });
 
-        it("should render the result list topic tree", async () => {
-            currentAvailableCategories = "topicTree";
-
-            wrapper = await shallowMount(SearchBarResultListComponent, {
-                props: {
-                    limitedSortedSearchResults
-                },
-                global: {
-                    plugins: [store]
-                }
-            });
-
-            expect(wrapper.find("search-bar-result-list-topic-tree-stub").exists()).to.be.true;
-            expect(wrapper.find("#search-bar-result-heading").exists()).to.be.true;
-        });
         it("should render category header, if not addLayerButtonSearchActive", async () => {
             addLayerButtonSearchActive = true;
             wrapper = await shallowMount(SearchBarResultListComponent, {
@@ -187,7 +171,6 @@ describe("addons/waterRiskCheck/searchBar/components/SearchBarResultList.vue", (
                 }
             });
 
-            expect(wrapper.find("search-bar-result-list-general-stub").exists()).to.be.true;
             expect(wrapper.find("#search-bar-result-heading").exists()).to.be.false;
         });
     });

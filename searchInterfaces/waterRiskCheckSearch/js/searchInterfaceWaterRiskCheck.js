@@ -1,5 +1,6 @@
 import crs from "@masterportal/masterportalapi/src/crs.js";
-import SearchInterfaceElasticSearch from "../../../../src/modules/searchBar/searchInterfaces/searchInterfaceElasticSearch.js";
+import SearchInterface from "@modules/searchBar/searchInterfaces/searchInterface.js";
+import SearchInterfaceElasticSearch from "@modules/searchBar/searchInterfaces/searchInterfaceElasticSearch.js";
 
 /**
  * The search interface to the water risk check.
@@ -28,9 +29,29 @@ import SearchInterfaceElasticSearch from "../../../../src/modules/searchBar/sear
  * @returns {void}
  */
 export default function SearchInterfaceWaterRiskCheck ({hitMap, serviceId, epsg, hitIcon, hitTemplate, hitType, payload, responseEntryPath, resultEvents, searchInterfaceId, searchStringAttribute, requestType} = {}) {
-    SearchInterfaceElasticSearch.call(this,
-        {hitMap, serviceId, epsg, hitIcon, hitTemplate, hitType, payload, responseEntryPath, resultEvents, searchInterfaceId, searchStringAttribute, requestType}
+    const resultEventsDefault = {
+            onClick: ["Modules/WaterRiskCheck/updateAddress"],
+            buttons: []
+        },
+        resultEventsSupported = ["setMarker", "zoomToResult", "Modules/WaterRiskCheck/updateAddress"];
+
+    this.checkConfig(resultEvents, resultEventsSupported, searchInterfaceId);
+    SearchInterface.call(this,
+        "request",
+        searchInterfaceId || "elasticSearch",
+        resultEvents || resultEventsDefault,
+        hitTemplate
     );
+
+    this.hitMap = hitMap;
+    this.serviceId = serviceId;
+    this.epsg = epsg || "EPSG:25832";
+    this.hitIcon = hitIcon || "bi-list-ul";
+    this.hitType = hitType || "common:modules.searchBar.type.subject";
+    this.payload = payload || {};
+    this.responseEntryPath = responseEntryPath || "";
+    this.searchStringAttribute = searchStringAttribute || "searchString";
+    this.requestType = requestType || "POST";
 }
 
 SearchInterfaceWaterRiskCheck.prototype = Object.create(SearchInterfaceElasticSearch.prototype);
@@ -55,9 +76,10 @@ SearchInterfaceWaterRiskCheck.prototype.createPossibleActions = function (search
         zoomToResult: {
             coordinates: coordinates
         },
-        "Modules/WaterRiskCheck/setAddress": {
+        "Modules/WaterRiskCheck/updateAddress": {
             rootAction: true,
             name: this.getResultByPath(searchResult, this.hitMap?.name),
+            type: this.getResultByPath(searchResult, this.hitMap?.type),
             coordinates
         }
     };

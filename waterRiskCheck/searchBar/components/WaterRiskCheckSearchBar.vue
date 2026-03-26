@@ -1,4 +1,5 @@
 <script>
+import debounce from "@shared/js/utils/debounce";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import SearchBarSuggestionList from "./SearchBarSuggestionList.vue";
 import SearchBarResultList from "./SearchBarResultList.vue";
@@ -21,9 +22,9 @@ export default {
             default: undefined,
             required: false
         },
-        config: {
-            type: Object,
-            default: () => ({searchInterfaces: [], placeholder: "", zoomLevel: 10}),
+        disabled: {
+            type: Boolean,
+            default: false,
             required: false
         }
     },
@@ -42,6 +43,7 @@ export default {
             "searchInput",
             "searchInterfaceInstances",
             "searchResults",
+            "searchResultsActive",
             "showAllResults",
             "suggestionListLength",
             "addLayerButtonSearchActive",
@@ -53,6 +55,7 @@ export default {
             previousNavigationEntryText: "previousNavigationEntryText"
         }),
         ...mapGetters([
+            "isMobile",
             "portalConfig"
         ]),
         /**
@@ -145,6 +148,14 @@ export default {
             });
 
             return {results: results, currentShowAllList: currentShowAllList};
+        },
+
+        /**
+         * Controls visibility of the Bootstrap dropdown menu with search results.
+         * @returns {Boolean} True if the dropdown should be shown.
+         */
+        showSearchDropdown () {
+            return this.searchActivated && this.searchResultsActive && this.searchResults?.length > 0;
         }
     },
     watch: {
@@ -196,6 +207,16 @@ export default {
             this.layerSelectionPlaceHolder = newValue;
         }
     },
+    created () {
+        this.debouncedSearch = debounce((searchInput) => {
+            const minimumCharacters = parseInt(this.minCharacters, 10);
+
+            if (!searchInput || searchInput !== this.searchInputValue || searchInput.length < minimumCharacters) {
+                return;
+            }
+            this.search({searchInput});
+        }, 250);
+    },
     updated () {
         this.$nextTick(() => {
             if (this.searchInput !== "") {
@@ -204,13 +225,8 @@ export default {
         });
     },
     mounted () {
-        this.setZoomLevel(this.config.zoomLevel);
-        this.setPlaceholder(this.config.placeholder);
-        this.setSearchInterfaces(this.config.searchInterfaces);
-
         this.checkLayerSelectionSearchConfig();
-        this.setCurrentSide(this.portalConfig?.mainMenu?.searchBar !== undefined ? "mainMenu" : "secondaryMenu");
-        // this.currentComponentSide = this.menuCurrentComponent(this.currentSide).type;
+        this.currentComponentSide = this.menuCurrentComponent(this.currentSide).type;
         this.initializeModule({configPaths: this.configPaths, type: this.type});
         this.overwriteDefaultValues();
         this.instantiateSearchInterfaces(this.$searchInterfaceAddons);
@@ -246,7 +262,7 @@ export default {
             "switchToRoot",
             "switchToPreviousComponent",
             "setCurrentComponentBySide",
-            "setCurrentComponentPropsName"
+            "setCurrentComponentPropsName", "setNavigationCurrentComponentBySide", "setNavigationHistoryBySide"
         ]),
         /**
          * Starts the search in searchInterfaces, if min characters are introduced, updates the result list.
@@ -255,11 +271,25 @@ export default {
          */
         startSearch (currentComponentSide) {
             if (this.searchActivated) {
-                if (currentComponentSide === "root") {
+                if (currentComponentSide === "waterRiskCheck") {
                     this.clickAction();
                 }
+                if (this.isMobile) {
+                    this.setNavigationCurrentComponentBySide({
+                        side: this.currentSide,
+                        newComponent: {props: {name: "Suchübersicht"}, type: "waterRiskCheckSearchBar"}
+                    });
+                    this.setCurrentComponentBySide({side: this.currentSide, type: "waterRiskCheckSearchBar"});
+                    this.setNavigationHistoryBySide({
+                        side: this.currentSide,
+                        newHistory: [{type: "waterRiskCheck", props: {name: "Wegweiser Überflutungsvorsorge"}}]
+                    });
+                    const searchInput = this.searchInput;
+
+                    this.$nextTick(() => this.setSearchInput(searchInput));
+                }
                 this.setSearchResultsActive(true);
-                this.search({searchInput: this.searchInputValue});
+                this.debouncedSearch(this.searchInputValue);
             }
         },
         /**
@@ -268,20 +298,8 @@ export default {
          * @returns {void}
          */
         checkCurrentComponent (currentComponentType) {
-            if (currentComponentType === "root") {
-                this.clickAction();
+            if (currentComponentType === "waterRiskCheck") {
                 if (this.searchInputValue.length >= this.minCharacters) {
-                    this.startSearch();
-                }
-            }
-            else if (currentComponentType === "layerSelection") {
-                if (this.searchInputValue?.length === 0) {
-                    this.navigateBack(this.currentSide);
-                    this.startLayerSelectionSearch(this.currentSide);
-                    this.startSearch();
-                }
-                if (this.searchInputValue.length >= this.minCharacters) {
-                    this.startLayerSelectionSearch(this.currentSide);
                     this.startSearch();
                 }
             }
@@ -320,14 +338,15 @@ export default {
 </script>
 
 <template lang="html">
-    <div id="search-bar">
-        <div class="input-group mb-3">
+    <div id="water-risk-check-search-bar">
+        <div class="input-group">
             <input
                 id="searchInput"
                 ref="searchInput"
                 v-model="searchInputValue"
                 type="search"
                 class="form-control"
+                :disabled
                 :placeholder="$t(layerSelectionPlaceHolder)"
                 :aria-label="$t(layerSelectionPlaceHolder)"
                 @keydown.enter="zoomToAndMarkSearchResult(searchInputValue), checkCurrentComponent(currentComponentSide)"
@@ -342,7 +361,7 @@ export default {
                 <i class="bi-x-lg fs-6" />
             </button>
             <button
-                id="search-button"
+                id="water-risk-check-search-button"
                 class="btn btn-primary"
                 :disabled="!searchActivated"
                 :aria-label="$t(placeholder)"
@@ -355,14 +374,34 @@ export default {
                 />
             </button>
         </div>
-        <SearchBarSuggestionList
-            v-if="!showAllResults"
-            :limited-sorted-search-results="limitedSortedSearchResults"
-        />
-        <SearchBarResultList
-            v-else-if="showAllResults"
-            :limited-sorted-search-results="limitedSortedSearchResults"
-        />
+        <template v-if="isMobile">
+            <SearchBarSuggestionList
+                v-if="!showAllResults"
+                :limited-sorted-search-results="limitedSortedSearchResults"
+            />
+            <SearchBarResultList
+                v-else-if="showAllResults"
+                :limited-sorted-search-results="limitedSortedSearchResults"
+            />
+        </template>
+        <div
+            v-else
+            class="dropdown"
+        >
+            <div
+                v-show="showSearchDropdown"
+                class="dropdown-menu show w-100 p-3"
+            >
+                <SearchBarSuggestionList
+                    v-if="!showAllResults"
+                    :limited-sorted-search-results="limitedSortedSearchResults"
+                />
+                <SearchBarResultList
+                    v-else-if="showAllResults"
+                    :limited-sorted-search-results="limitedSortedSearchResults"
+                />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -370,13 +409,28 @@ export default {
     .input-group {
         position: relative;
     }
-    #search-bar {
-        #search-button {
+    #water-risk-check-search-bar {
+        #water-risk-check-search-button {
             border-top-right-radius: 5px;
             border-bottom-right-radius: 5px;
         }
         .input-label {
             color: $placeholder-color;
+        }
+
+        .dropdown {
+            position: relative;
+            overflow-anchor: none;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 0.25rem);
+            left: 0;
+            right: 0;
+            max-height: min(24rem, 50vh);
+            overflow-y: auto;
+            z-index: 20;
         }
     }
     input[type="search"] {
