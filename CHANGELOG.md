@@ -62,6 +62,7 @@
 - Matomo: Fixed a critical loading issue where the application would fail to mount if `matomo.js` was blocked (e.g., by Ad-blockers) or failed to load. The Matomo initialization is now non-blocking and provides a global polyfill for `trackMatomo` to ensure compatibility across all modules.
 - GFI: In the gfiTheme `Default`, line breaks have been optimised and the size of the content changes when the sidebar is resized.
 - WMS-Time: Only valid time attributes will now be appended to the request when the layer is turned on.
+- Print: Fixed print layer sorting for grouped layers without zIndex.
 
 ---
 
