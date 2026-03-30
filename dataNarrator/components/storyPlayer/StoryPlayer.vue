@@ -230,22 +230,21 @@ export default {
                     const map = mapCollection.getMap("2D"),
                         mapView = typeof map?.getView === "function" ? map.getView() : undefined;
 
-                    setTimeout(() => {
-                        mapView.setRotation(0);
+                    if (mapView) {
+                        setTimeout(() => {
+                            const adjustedCenter = this.getCenterOfVisibleMap();
 
-                        const onMoveEnd = () => {
-                            const adjustedCenter = this.getCenterOfVisibleMap(this.currentStep.centerCoordinate);
+                            mapView.animate({
+                                center: adjustedCenter,
+                                zoom: this.currentStep.zoomLevel,
+                                duration: 1000,
+                                rotation: 0
+                            });
 
-                            mapView.setCenter(adjustedCenter);
-                            map.un("moveend", onMoveEnd);
-                        };
+                            this.isChangeFrom3D = false;
 
-                        map.on("moveend", onMoveEnd);
-                        mapView.setZoom(this.currentStep.zoomLevel);
-
-                        this.isChangeFrom3D = false;
-
-                    }, this.isChangeFrom3D ? 1500 : 0);
+                        }, this.isChangeFrom3D ? 1500 : 0);
+                    }
                 }
             }
 
@@ -335,20 +334,22 @@ export default {
          * @returns {Array} shiftedCoordinate The adjusted center position so that the set center coordinates
          *  are centered within the visible part of the map.
          */
-        getCenterOfVisibleMap (centerCoordinate) {
+        getCenterOfVisibleMap () {
             const map = mapCollection.getMap("2D"),
-                pixelAtCoordinates = map?.getPixelFromCoordinate(centerCoordinate),
+                mapView = map?.getView(),
+                targetResolution = mapView?.getResolutionForZoom(this.currentStep.zoomLevel),
                 rightPadding = this.expanded("secondaryMenu")
                     ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
                     : 20,
                 leftPadding = this.expanded("mainMenu")
                     ? document.getElementById("mp-menu-mainMenu").offsetWidth
                     : 20,
-                offset = (rightPadding - leftPadding) / 2,
-                shiftedPixelX = [pixelAtCoordinates[0] + offset, pixelAtCoordinates[1]],
-                shiftedCoordinate = map.getCoordinateFromPixel(shiftedPixelX);
+                offsetPixels = (rightPadding - leftPadding) / 2,
+                offsetMeters = offsetPixels * targetResolution,
+                center = this.currentStep.centerCoordinate,
+                adjustedCenter = [center[0] + offsetMeters, center[1]];
 
-            return shiftedCoordinate;
+            return adjustedCenter;
         },
         /**
          * Gets the URL of a story.json from the URL parameter 'story'
