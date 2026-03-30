@@ -580,9 +580,6 @@ Bei allen GFI-Abfragen, außer dem direkten Beziehen von HTML, welches durch das
         },
         "stroke": {
             "width": 4
-        },
-        "text": {
-            "scale": 2
         }
     },
     "showPolygonMarkerForWMS": true,
@@ -634,23 +631,7 @@ Hinweis: Das Highlighting funktioniert nur, wenn der Layer in der config.json ü
 |fill|nein|**[Fill](#datatypesfill)**|[255, 255, 255, 0.5]|Mögliche Einstellung: `color`|false|
 |image|nein|**[Image](#datatypesimage)**|1|Mögliche Einstellung: `scale`|false|
 |stroke|nein|**[Stroke](#datatypesstroke)**|1|Mögliche Einstellung: `width`|false|
-|text|nein|**[text](#portalconfigmapgetfeatureinfohighlightvectorrulestext)**||Mögliche Einstellung: `scale`|false|
 
-
-***
-
-###### portalConfig.map.getFeatureInfo.highlightVectorRules.text {data-toc-label='Text'}
-|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
-|----|-------------|---|-------|------------|------|
-|scale|nein|Float|1|Mögliche Einstellung: scale|false|
-
-**Beispiel**
-
-```json
-"text": {
-    "scale": 2
-}
-```
 
 ***
 

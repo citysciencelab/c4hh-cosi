@@ -43,6 +43,7 @@
     - text-loader: 0.0.1
     - vite-plugin-html-purgecss: 0.1.1
     - git-rev-sync: 3.0.2
+- Issue \#1575: Documentation: Removed non-functional text scale option from highlightVectorRules.
 
 ### Fixed
 - Issue \#1472: Improve error handling and robustness of `addInterceptor`.

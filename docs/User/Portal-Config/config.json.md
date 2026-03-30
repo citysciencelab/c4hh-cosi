@@ -579,9 +579,6 @@ On all GFI request types except directly fetching HTML, which is done by using `
         },
         "stroke": {
             "width": 4
-        },
-        "text": {
-            "scale": 2
         }
     },
     "showPolygonMarkerForWMS": true,
@@ -634,22 +631,6 @@ Hint: highlighting only works if there is a styleId in config.json configured fo
 |fill|no|**[fill](#datatypesfill)**|[255, 255, 255, 0.5]|Settable field: `color`|false|
 |image|no|**[image](#datatypesimage)**|1|Settable field: `scale`|false|
 |stroke|no|**[stroke](#datatypesstroke)**|1|Settable field: `width`|false|
-|text|no|**[text](#portalconfigmapgetfeatureinfohighlightvectorrulestext)**||Settable field: `scale`|false|
-
-***
-
-###### portalConfig.map.getFeatureInfo.highlightVectorRules.text {data-toc-label='Text'}
-|Name|Required|Type|Default|Description|Expert|
-|----|--------|----|-------|-----------|------|
-|scale|no|Float|1|Text scale number|false|
-
-**Example**
-
-```json
-"text": {
-    "scale": 2
-}
-```
 
 ***
 
