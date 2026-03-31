@@ -67,9 +67,13 @@ export default {
                 contributionLink = "";
 
             if (!this.isTableStyle()) {
-                const urlParams = "?LAYERS=" + JSON.stringify(this.layerUrlParams.filter((layerParam) => {
-                    return layerParam.visibility;
-                })) + "&" + this.mapsUrlParams;
+                const layerIDs = this.layerUrlParams.map(param => {
+                        return param.id;
+                    }),
+                    layerVisibility = this.layerUrlParams.map(param => {
+                        return param.visibility;
+                    }),
+                    urlParams = `?MAP/LAYERIDS=${layerIDs.join(",")}&VISIBILITY=${layerVisibility.join(",")}&${this.mapsUrlParams}`;
 
                 parentLocation = document.referrer.split("?")[0];
                 contributionLink = parentLocation.split("#")[0] + "#/contribution/" + nid + urlParams;
