@@ -33,6 +33,8 @@ export default {
 
     /**
      * Load the config.json, check/adapt for proxy configs.
+     * There is an additional check for URL parameters preservation in the URL of the config.json
+     * which is important for certain tools.
      * @param {Object} context the vue context
      * @param {Object} context.commit the commit
      * @param {Object} context.state the state
@@ -43,6 +45,9 @@ export default {
         let targetPath = "config.json";
 
         if (state.configJs?.portalConf?.slice(-5) === format) {
+            targetPath = state.configJs.portalConf;
+        }
+        else if (state.configJs?.portalConf?.slice(-5) !== format && state.configJs?.portalConf?.includes(format) && state.configJs?.portalConf?.includes("?")) {
             targetPath = state.configJs.portalConf;
         }
 

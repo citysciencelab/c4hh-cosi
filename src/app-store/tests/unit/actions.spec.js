@@ -66,6 +66,18 @@ describe("src/app-store/actions.js", () => {
             expect(axiosMock.calledWith("config.json")).to.be.true;
             expect(dispatch.calledWith("processLayerNamesHtmlTags")).to.be.true;
         });
+        it("loadConfigJson - portalConf with query params './config.json?abc=xyz' should preserve URL parameters", async () => {
+            const getters = {
+                isMobile: false
+            };
+
+            state.configJs.portalConf = "./config.json?abc=xyz";
+
+            await actions.loadConfigJson({commit, state, dispatch, getters});
+
+            expect(axiosMock.calledOnce).to.be.true;
+            expect(axiosMock.calledWith("./config.json?abc=xyz")).to.be.true;
+        });
         it("loadRestServicesJson", () => {
             actions.loadRestServicesJson({commit, state});
 

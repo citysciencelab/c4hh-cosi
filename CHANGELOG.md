@@ -40,6 +40,7 @@
 - The following packages have been added:
     - dependencies:
         -    rimraf: 6.1.3
+- Check for URL Parameters on config.json URL and make sure they are not cut off
 
 ### Changed
 - Modeler3D: adapted no longer existsting `Cesium.defaultValue`.
