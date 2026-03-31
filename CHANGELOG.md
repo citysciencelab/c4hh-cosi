@@ -7,6 +7,8 @@
 ### __Breaking Changes__
 
 ### Added
+- PlanParken: Added a new addon `planParken` to analyze parking spaces in an area.
+- GFI - `parking`: Added a new gfi to match the visual style of the `planParken` addon.
 
 ### Changed
 

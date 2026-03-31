@@ -3,7 +3,6 @@ import {mapGetters, mapMutations, mapActions} from "vuex";
 import GraphicalSelect from "../../../src/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 import WPS from "../../../src/shared/js/api/wps.js";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import isObject from "@shared/js/utils/isObject";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 
@@ -26,28 +25,20 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/PlanParken", [
-            "name",
-            "id",
-            "icon",
             "hasMouseMapInteractions",
-            "rasterActive",
-            "alkisAdressesActive",
-            "populationReqServiceId",
             "wpsId",
             "serviceId",
             "fmwProcess",
-            "processName",
             "processData",
-            "rasterLayerId",
-            "alkisAdressLayerId",
             "secret",
-            "baseUrl"
+            "baseUrl",
+            "formatValueOfKeys"
         ]),
         ...mapGetters("Modules/GraphicalSelect", [
             "selectedAreaGeoJson"
         ]),
         ...mapGetters("Maps", ["scale"]),
-        ...mapGetters(["restServiceById", "visibleLayerConfigs"]),
+        ...mapGetters(["restServiceById"]),
         /**
          * The service object from rest-services.json
          * @returns {Object} service
@@ -59,94 +50,36 @@ export default {
     watch: {
         selectedAreaGeoJson (newValue) {
             this.makeRequest(newValue);
-        },
-        visibleLayerConfigs: {
-            handler (newLayerConfigs, oldLayerConfigs) {
-                if (newLayerConfigs?.find(conf => conf.id === this.rasterLayerId)) {
-                    this.setRasterActive(true);
-                }
-                else if (oldLayerConfigs?.find(conf => conf.id === this.rasterLayerId)) {
-                    this.setRasterActive(false);
-                }
-                if (newLayerConfigs?.find(conf => conf.id === this.alkisAdressLayerId)) {
-                    this.setAlkisAdressesActive(true);
-                }
-                else if (oldLayerConfigs?.find(conf => conf.id === this.alkisAdressLayerId)) {
-                    this.setAlkisAdressesActive(false);
-                }
-            },
-            deep: true
         }
     },
     mounted () {
-        const service = this.restServiceById(this.populationReqServiceId);
-
-        if (service === undefined) {
-            console.error("PlanParken - Rest Service with the ID " + this.populationReqServiceId + " is not configured in rest-services.json!");
-        }
-        if (!rawLayerList.getLayerWhere({id: this.alkisAdressLayerId})) {
-            console.warn("PlanParken - Layer ALKIS Adresses with id ", this.alkisAdressLayerId, " is not avilable. Check your services.json!");
-        }
-        if (!rawLayerList.getLayerWhere({id: this.rasterLayerId})) {
-            console.warn("PlanParken - Layer raster with id ", this.alkisAdressLayerId, " is not avilable. Check your services.json!");
-        }
         document.addEventListener("click", this.handleOutSideClick);
         document.addEventListener("scroll", this.closeTooltip, true);
     },
     unmounted () {
-        // forced delete of tooltip overlay
         if (document.getElementById("tooltip-overlay-plan-parken")) {
             document.getElementById("tooltip-overlay-plan-parken").remove();
         }
-
     },
     beforeUnmount () {
         document.removeEventListener("scroll", this.closeTooltip);
         document.removeEventListener("click", this.handleOutSideClick);
-        if (this.$refs.graphicalSelection) {
+        if (this.$refs.graphicalSelection && typeof this.$refs.graphicalSelection.setStatus === "function" && typeof this.$refs.graphicalSelection.resetView === "function") {
             this.$refs.graphicalSelection.setStatus(false);
-            this.$refs.graphicalSelection.resetView();
-        }
-
-        if (this.alkisAdressesActive) {
-            const rawLayer = rawLayerList.getLayerWhere({id: this.alkisAdressLayerId});
-
-            if (rawLayer) {
-                this.replaceByIdInLayerConfig({
-                    layerConfigs: [{
-                        id: this.alkisAdressLayerId,
-                        layer: {
-                            visibility: false
-                        }
-                    }]
-                });
-            }
-        }
-        if (this.rasterActive) {
-            const rawLayer = rawLayerList.getLayerWhere({id: this.rasterLayerId});
-
-            if (rawLayer) {
-                this.replaceByIdInLayerConfig({
-                    layerConfigs: [{
-                        id: this.rasterLayerId,
-                        layer: {
-                            visibility: false
-                        }
-                    }]
-                });
-            }
+            this.resetView();
         }
     },
     methods: {
         ...mapMutations("Modules/PlanParken", [
-            "setAlkisAdressesActive",
-            "setRasterActive",
             "setProcessData"
         ]),
-        ...mapActions(["addLayerToLayerConfig", "replaceByIdInLayerConfig", "addOrReplaceLayer"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
-        ...mapActions("Modules/PlanParken", ["fetchOAP"]),
 
+        /**
+         * Handles clicks outside of the tooltip and info buttons to close the tooltip when clicking elsewhere on the document.
+         * @param {MouseEvent} evt The click event
+         * @returns {void}
+         */
         handleOutSideClick (evt) {
             if (this.activeTooltip) {
                 this.closeTooltip();
@@ -158,6 +91,13 @@ export default {
                 this.closeTooltip();
             }
         },
+        /**
+         * Toggles the tooltip visibility for a given element.
+         * @param {MouseEvent} event The click event.
+         * @param {String} id The ID of the tooltip.
+         * @param {String} text The text to display in the tooltip.
+         * @returns {void}
+         */
         toggleTooltip (event, id, text) {
             if (this.activeTooltip === id) {
                 this.closeTooltip();
@@ -172,6 +112,10 @@ export default {
                 this.positionTooltip();
             });
         },
+        /**
+         * Closes the tooltip and resets related data properties.
+         * @returns {void}
+         */
         closeTooltip () {
             this.tooltipArrowStyle = {};
             this.activeTooltip = null;
@@ -179,8 +123,11 @@ export default {
             this.tooltipStyle = {};
             this.tooltipTargetEl = null;
             this.tooltipPlacement = "top";
-
         },
+        /**
+         * Positions the tooltip based on the target element's position and available space.
+         * @returns {void}
+         */
         positionTooltip () {
             if (!this.tooltipTargetEl) {
                 return;
@@ -233,20 +180,19 @@ export default {
                 this.tooltipArrowStyle = {
                     left: `${arrowLeft}px`
                 };
+                return;
             }
-            else {
-                this.tooltipPlacement = "bottom";
-                this.tooltipStyle = {
-                    position: "fixed",
-                    left: `${left}px`,
-                    top: `${rect.bottom + spacing + arrowSize}px`,
-                    zIndex: 99999
-                };
+            this.tooltipPlacement = "bottom";
+            this.tooltipStyle = {
+                position: "fixed",
+                left: `${left}px`,
+                top: `${rect.bottom + spacing + arrowSize}px`,
+                zIndex: 99999
+            };
 
-                this.tooltipArrowStyle = {
-                    left: `${arrowLeft}px`
-                };
-            }
+            this.tooltipArrowStyle = {
+                left: `${arrowLeft}px`
+            };
         },
 
         /**
@@ -254,27 +200,26 @@ export default {
          * @param  {Object} geoJson GeoJSON to get selected area from
          * @returns {void}
          */
-        makeRequest: function (geoJson) {
+        makeRequest (geoJson) {
             this.setProcessData(undefined);
 
             const service = this.service;
 
             if (typeof service === "undefined") {
                 console.warn("Rest Service with the ID " + (this.serviceId ?? this.wpsId) + " is not configured in rest-services.json!");
+                return;
             }
-            else {
-                this.isLoading = true;
-                WPS.wpsRequest(this.wpsId, this.baseUrl, this.fmwProcess, {
-                    "such_flaeche": JSON.stringify(geoJson),
-                    "uuid": this.secret
-                }, this.handleResponse.bind(this));
-            }
+            this.isLoading = true;
+            WPS.wpsRequest(this.wpsId, this.baseUrl, this.fmwProcess, {
+                "such_flaeche": JSON.stringify(geoJson),
+                "uuid": this.secret
+            }, this.handleResponse.bind(this));
         },
         /**
          * Resets the GraphicalSelect.
          * @returns {void}
          */
-        resetView: function () {
+        resetView () {
             this.$refs.graphicalSelection.resetView();
         },
         /**
@@ -283,7 +228,7 @@ export default {
          * @param  {Number} status the HTTPStatusCode
          * @returns {void}
          */
-        handleResponse: function (response, status) {
+        handleResponse (response, status) {
             this.isLoading = false;
             let parsedData = null;
 
@@ -305,7 +250,7 @@ export default {
          * @param  {String} response received by service
          * @returns {void}
          */
-        handleServiceError: function (response) {
+        handleServiceError (response) {
             let content = this.translate("additional:modules.planParken.errors.requestException");
 
             if (response?.ergebnis) {
@@ -323,13 +268,13 @@ export default {
          * @param  {String} response received by wps
          * @returns {void}
          */
-        handleSuccess: function (response) {
+        handleSuccess (response) {
             try {
                 const parsedData = JSON.parse(response);
 
                 for (const category in parsedData) {
                     for (const key in parsedData[category]) {
-                        parsedData[category][key].value = key.trim() === "Suchfläche" ? this.chooseUnitAndThousandsSeparator(parsedData[category][key].value, 2) :
+                        parsedData[category][key].value = this.formatValueOfKeys.includes(key.trim()) ? this.chooseUnitAndThousandsSeparator(parsedData[category][key].value, 2) :
                             thousandsSeparator(parsedData[category][key].value);
                     }
                 }
@@ -342,7 +287,6 @@ export default {
                     title: this.translate("additional:modules.planParken.errors.errorTitle")
                 });
                 this.resetView();
-                (console.error || console.warn).call(console, e.stack || e);
             }
         },
         /**
@@ -351,52 +295,16 @@ export default {
          * @param  {Number} maxDecimals decimals are cut after maxlength chars
          * @returns {String} unit
          */
-        chooseUnitAndThousandsSeparator: function (value, maxDecimals) {
+        chooseUnitAndThousandsSeparator (value, maxDecimals) {
             const isKm = value >= 1000000;
             const num = isKm ? value / 1000000 : value;
             const unit = isKm ? " km²" : " m²";
 
             return thousandsSeparator(parseFloat(num.toFixed(maxDecimals))) + unit;
         },
-        /**
-         * Sets the state regarding the RasterLayer
-         * @param {Boolean} value flag if Raster is to be set
-         * @returns {void}
-         */
-        triggerRaster (value) {
-            this.setRasterActive(value);
-            this.addOrReplaceLayer({layerId: this.rasterLayerId, visibility: value});
-        },
-        /**
-         * Sets the state regarding the alkisAdresses Layer
-         * @param {Boolean} value flag if alkisAdresses is to be set
-         * @returns {void}
-         */
-        triggerAlkisAdresses (value) {
-            this.setAlkisAdressesActive(value);
-            this.addOrReplaceLayer({layerId: this.alkisAdressLayerId, visibility: value});
-        },
 
         /**
-         * Returns true, if layer is in scale.
-         * @param {String} id of the layer to check
-         * @returns {Boolean}  true, if layer is in scale
-         */
-        isInScale (id) {
-            if (id === this.alkisAdressLayerId) {
-                if (this.scale > 10000) {
-                    return true;
-                }
-            }
-            else if (id === this.rasterLayerId) {
-                if (this.scale > 100000) {
-                    return true;
-                }
-            }
-            return false;
-        },
-        /**
-         * translates the given key, checkes if the key exists and throws a console warning if not
+         * Translates the given key, checks if the key exists and throws a console warning if not
          * @param {String} key the key to translate
          * @param {Object} [options=null] for interpolation, formating and plurals
          * @returns {String} the translation or the key itself on error
@@ -437,7 +345,7 @@ export default {
                     class="result"
                 >
                     <div class="heading additional-text">
-                        {{ translate("additional:modules.planParken.result.confidentialityHint") }}:
+                        {{ translate("additional:modules.planParken.result.confidentialityHint") }}
                     </div>
                     <div class="stats-card">
                         <section
@@ -514,25 +422,24 @@ export default {
     }
     .stats-card {
         width: 100%;
-        max-width: 420px;
         background: #fff;
         border-radius: 6px;
-        overflow: visible;
+        overflow: hidden;
         border: 1px solid #e6eaf0;
-        }
+    }
 
-        .stats-section.mt {
+    .stats-section.mt {
         margin-top: 10px;
-        }
+    }
 
-        .section-header {
+    .section-header {
         position: relative;
         background: #eef3f7;
         padding: 10px 12px 10px 16px;
         border-bottom: 1px solid #dfe6ee;
-        }
+    }
 
-        .section-header::before {
+    .section-header::before {
         content: "";
         position: absolute;
         left: 8px;
@@ -541,47 +448,47 @@ export default {
         width: 4px;
         border-radius: 2px;
         background: #0b5aa2;
-        }
+    }
 
-        .section-title {
+    .section-title {
         font-weight: 700;
         font-size: 14px;
         color: #0f2c44;
-        }
+    }
 
-        .rows {
+    .rows {
         background: #fff;
-        }
+    }
 
-        .row {
+    .row {
         display: grid;
         grid-template-columns: 1fr auto;
         gap: 12px;
         padding: 10px 12px;
         border-bottom: 1px solid #edf1f6;
         align-items: center;
-        }
+    }
 
-        .row:last-child {
+    .row:last-child {
         border-bottom: 0;
-        }
+    }
 
-        .label {
-            font-size: 13px;
-            color: #1d2b36;
-            line-height: 1.2;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    .label {
+        font-size: 13px;
+        color: #1d2b36;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-        .value {
+    .value {
         font-size: 13px;
         font-weight: 700;
         color: #0b0f14;
         text-align: right;
         min-width: 64px;
-        }
+    }
     .form-horizontal {
         & > * {
             padding-right: 15px;
@@ -607,25 +514,6 @@ export default {
 
                 & > :not(:first-child) {
                     border-top: 0 solid currentColor;
-                }
-            }
-        }
-    }
-
-    .checkbox-container {
-        .form-inline {
-            font-size: 15px;
-
-            @media (max-width: 767px) {
-                font-size: 12px;
-            }
-
-            .title-checkbox {
-                width: 100%;
-
-                label {
-                    white-space: normal;
-                    padding-left:5px;
                 }
             }
         }
@@ -656,26 +544,25 @@ export default {
         color: lighten($dark_grey, 15%);
     }
     .tooltip-box {
-    background: #0f2c44;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.5;
-    padding: 8px 12px;
-    border-radius: 4px;
-    white-space: normal;
-    width: 220px;
-    text-align: left;
-    box-sizing: border-box;
-    pointer-events: auto;
-}
+        background: #0f2c44;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.5;
+        padding: 8px 12px;
+        border-radius: 4px;
+        white-space: normal;
+        width: 220px;
+        text-align: left;
+        box-sizing: border-box;
+        pointer-events: auto;
+    }
 
-.tooltip-box--fixed {
-    position: fixed;
-    z-index: 99999;
+    .tooltip-box--fixed {
+        position: fixed;
+        z-index: 99999;
+    }
 }
-}
-
 
 </style>
 
@@ -712,14 +599,5 @@ export default {
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
     border-bottom: 7px solid $accent_active;
-}
-
-#circle-overlay {
-    position: relative;
-    top: -20px;
-    background: $accent_active;
-    color: $white;
-    max-width: 70px;
-    padding: 4px 8px;
 }
 </style>

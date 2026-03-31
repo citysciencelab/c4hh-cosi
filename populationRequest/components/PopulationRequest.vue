@@ -232,8 +232,7 @@ export default {
         handleResponse: function (response, status) {
             let parsedData = null;
 
-            console.log(response);
-            parsedData = response.masterplanparken.ergebnis;
+            parsedData = response.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData.einwohner;
             if (status === 200) {
                 if (parsedData.ErrorOccured === "yes") {
                     this.handleServiceError(parsedData);
@@ -274,8 +273,7 @@ export default {
             const processData = {};
 
             try {
-                responseResult = JSON.parse(response);
-                console.log(responseResult);
+                responseResult = JSON.parse(response?.ergebnis);
                 if (responseResult?.einwohner_fhh) {
                     processData.inhabitantsFHHNum = responseResult.einwohner_fhh;
                     processData.inhabitantsFHH = thousandsSeparator(responseResult.einwohner_fhh);
