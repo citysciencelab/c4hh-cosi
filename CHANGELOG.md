@@ -49,8 +49,6 @@
         - @masterportal/masterportalapi: 2.58.0 to 2.59.0
 - Tests: Resolved Deprecation Warnings for before and after hook.
 
-### Deprecated
-
 ### Removed
 - The following packages have been removed:
   - devDependencies:
