@@ -265,6 +265,19 @@ export default {
             "setCurrentComponentPropsName", "setNavigationCurrentComponentBySide", "setNavigationHistoryBySide"
         ]),
         /**
+         * Handles search submit: selects a matching result or triggers a new search.
+         * @returns {void}
+         */
+        handleSearchSubmit () {
+            const matched = this.tryToMarkAddressResult(this.searchInputValue);
+
+            if (!matched) {
+                this.setSearchResultsActive(true);
+                this.setShowAllResults(false);
+                this.checkCurrentComponent(this.currentComponentSide);
+            }
+        },
+        /**
          * Starts the search in searchInterfaces, if min characters are introduced, updates the result list.
          * @param {String} currentComponentSide Current component type
          * @returns {void}
@@ -308,26 +321,44 @@ export default {
             }
         },
         /**
-         * Zooms to and sets a marker at the given search result
-         * @param {String} searchInputValue the input value
-         * @returns {void}
+         * Verifies if the search input matches an address result and, if so,
+         * triggers the zoom action and marks the location.
+         * @param {String} searchInputValue - The current value of the search input field.
+         * @returns {Boolean} Returns true if an address match was found and the zoom was triggered; otherwise false.
          */
-        zoomToAndMarkSearchResult (searchInputValue) {
-            if (searchInputValue !== undefined) {
-                this.removePointMarker();
-                this.searchResults.forEach(searchResult => {
-                    const category = searchResult.category.toLowerCase(),
-                        name = searchResult.name.toLowerCase();
+        tryToMarkAddressResult (searchInputValue) {
+            let matched = false;
 
-                    if (category.includes("adresse") ||
+            if (searchInputValue?.trim()) {
+                const normalizedInput = searchInputValue.trim().toLowerCase();
+
+                this.removePointMarker();
+
+                for (const searchResult of this.searchResults) {
+                    const category = searchResult.category.toLowerCase(),
+                        name = (searchResult.name || "").toLowerCase().trim();
+
+                    if (
+                        category.includes("adresse") ||
                         category.includes("address") ||
-                        category.includes("straße")) {
-                        if (searchInputValue.toLowerCase() === name) {
+                        category.includes("straße")
+                    ) {
+                        if (normalizedInput === name) {
                             this.activateActions({searchResult, actionType: "onClick"});
+                            matched = true;
+                            break;
                         }
                     }
-                });
+                }
+
+                if (matched) {
+                    this.setSearchResultsActive(false);
+                    this.setShowAllResults(false);
+                    this.setShowSearchResultsInTree(false);
+                }
             }
+
+            return matched;
         },
         clearSearch () {
             this.searchInputValue = "";
@@ -349,7 +380,7 @@ export default {
                 :disabled
                 :placeholder="$t(layerSelectionPlaceHolder)"
                 :aria-label="$t(layerSelectionPlaceHolder)"
-                @keydown.enter="zoomToAndMarkSearchResult(searchInputValue), checkCurrentComponent(currentComponentSide)"
+                @keydown.enter="tryToMarkAddressResult(searchInputValue), checkCurrentComponent(currentComponentSide)"
             >
             <button
                 v-if="searchInputValue"
@@ -366,7 +397,8 @@ export default {
                 :disabled="!searchActivated"
                 :aria-label="$t(placeholder)"
                 type="button"
-                @click="zoomToAndMarkSearchResult(searchInputValue), checkCurrentComponent(currentComponentSide)"
+                @click="handleSearchSubmit"
+                @keydown.enter="handleSearchSubmit"
             >
                 <i
                     class="bi-search"
@@ -374,7 +406,7 @@ export default {
                 />
             </button>
         </div>
-        <template v-if="isMobile">
+        <template v-if="isMobile && showSearchDropdown">
             <SearchBarSuggestionList
                 v-if="!showAllResults"
                 :limited-sorted-search-results="limitedSortedSearchResults"

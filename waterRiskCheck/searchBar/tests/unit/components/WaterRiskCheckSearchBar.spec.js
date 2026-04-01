@@ -312,7 +312,7 @@ describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue
         });
     });
 
-    describe("zoomToAndMarkSearchResult", () => {
+    describe("tryToMarkAddressResult", () => {
         it("zooms to and sets a marker at a given searchResult", () => {
             searchResults = [
                 {
@@ -350,7 +350,7 @@ describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue
 
             const activateActionsSpy = sinon.spy(wrapper.vm, "activateActions");
 
-            wrapper.vm.zoomToAndMarkSearchResult("neuenfelder Straße 19");
+            wrapper.vm.tryToMarkAddressResult("neuenfelder Straße 19");
             expect(activateActionsSpy.called).to.be.true;
         });
         it("does not zoom to a given searchResult if not category address or street search", () => {
@@ -391,7 +391,7 @@ describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue
 
             const activateActionsSpy = sinon.spy(wrapper.vm, "activateActions");
 
-            wrapper.vm.zoomToAndMarkSearchResult("Staatliche Schulen Hamburg");
+            wrapper.vm.tryToMarkAddressResult("Staatliche Schulen Hamburg");
             expect(activateActionsSpy.called).not.to.be.true;
         });
 
