@@ -1787,4 +1787,11 @@ export default {
         right: 5px;
     }
 }
+#modal-1-container {
+    #modal-1-overlay {
+        @media (max-width: 767px) {
+            bottom: -30%;
+        }
+    }
+}
 </style>
