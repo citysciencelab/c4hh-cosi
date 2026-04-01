@@ -4,8 +4,22 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## 2026-04-01 v3.21.0
+## Unreleased - in development
 ### __Breaking Changes__
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+---
+
+## 2026-04-01 v3.21.0
 
 ### Added
 - PrintMap: Heatmap layers are now included in the print.
