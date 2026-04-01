@@ -20,14 +20,8 @@
 
 ## 2026-04-01 v3.21.0
 
-### Added
-
 ### Changed
 - gfiThemes: The GFI theme `combinedGfi` no longer displays the select element when exactly one option exists. In such cases, the singular option is automatically selected.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - vcOblique: Fixed Bugs of Marker setting and styling when using VCMap 6.
