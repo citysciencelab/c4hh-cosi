@@ -162,17 +162,17 @@ export default {
                 const reader = new FileReader();
 
                 reader.onload = async f => {
-                    this.addLayerConfig()
-                        .then(layer => {
+                    this.addLayerConfig(file.name)
+                        .then(({layer, layerId}) => {
                             if (layer) {
                                 const fileNameSplit = file.name.split("."),
                                     fileExtension = fileNameSplit.length > 0 ? fileNameSplit[fileNameSplit.length - 1].toLowerCase() : "";
 
                                 if (fileExtension === "geojson" || fileExtension === "json") {
-                                    this.importGeoJSON({raw: f.target.result, layer: layer.layer, filename: file.name});
+                                    this.importGeoJSON({raw: f.target.result, layer: layer.layer, filename: file.name, layerId});
                                 }
                                 else {
-                                    this.importFile({raw: f.target.result, layer: layer.layer, filename: file.name});
+                                    this.importFile({raw: f.target.result, layer: layer.layer, filename: file.name, layerId});
                                 }
                             }
                         });

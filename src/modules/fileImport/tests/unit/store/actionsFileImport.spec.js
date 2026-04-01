@@ -61,6 +61,12 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
         sinon.restore();
     });
 
+    describe("state defaults", () => {
+        it("useDifferentLayers defaults to false", () => {
+            expect(importedState.useDifferentLayers).to.equal(false);
+        });
+    });
+
     describe("file import - file should add some features to the current draw layer", () => {
         it("preset \"auto\", correct kml file, correct filename", async () => {
             const payload = {
@@ -493,6 +499,56 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
                 },
                 parentKey: treeSubjectsKey
             })).to.be.true;
+        });
+
+        it("useDifferentLayers true: dispatches with per-file layerId derived from filename", done => {
+            const state = {
+                layerId: "importDrawLayer",
+                useDifferentLayers: true
+            };
+
+            testAction(addLayerConfig, "meine daten!.kml", state, {}, [
+                {
+                    type: "addLayerToLayerConfig",
+                    payload: {
+                        layerConfig: {
+                            id: "importDrawLayer_meine-daten-",
+                            name: "importDrawLayer (meine daten!)",
+                            showInLayerTree: true,
+                            typ: "VECTORBASE",
+                            type: "layer",
+                            visibility: true
+                        },
+                        parentKey: treeSubjectsKey
+                    },
+                    dispatch: true
+                }
+            ], {}, done);
+        });
+
+        it("useDifferentLayers true: plain filename without special chars", done => {
+            const state = {
+                layerId: "importDrawLayer",
+                useDifferentLayers: true
+            };
+
+            testAction(addLayerConfig, "meine-daten.kml", state, {}, [
+                {
+                    type: "addLayerToLayerConfig",
+                    payload: {
+                        layerConfig: {
+                            id: "importDrawLayer_meine-daten",
+                            name: "importDrawLayer (meine-daten)",
+                            showInLayerTree: true,
+                            typ: "VECTORBASE",
+                            type: "layer",
+                            visibility: true
+                        },
+                        parentKey: treeSubjectsKey
+                    },
+                    dispatch: true
+                }
+            ], {}, done);
         });
     });
 

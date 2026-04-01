@@ -11,6 +11,7 @@
 ### Added
 - Added CONTRIBUTING.md file.
 - NavTab: Added new prop `icon` to shared component NavTab to optionally display an icon in the tab.
+- FileImport: Added config.json parameter `useDifferentLayers` to place each imported file into its own separate layer.
 
 ### Changed
 - Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) besides Version **23** and npm fom **10.9.3** up to smaller than **12** are now supported.
@@ -57,7 +58,7 @@
 ### Removed
 
 ### Fixed
-- Issue \#1591: Draw/FileImport: fixed KML export and KML import of symbols.    
+- Issue \#1591: Draw/FileImport: fixed KML export and KML import of symbols.
 - Issue \#1592: FileImport/Draw: Fixed label text offset not being restored when importing a drawn GeoJSON file.
 - Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset.
 - Issue \#1606: proxyAgent: Restored proxy agent support in the Vite development server, so external web resources can be accessed again from localhost through a corporate proxy.

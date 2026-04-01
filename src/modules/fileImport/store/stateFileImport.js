@@ -19,6 +19,7 @@
  * @property {Number}   geojsonFeatureId - Id of the last added feeature of a GeoJson.
  * @property {Boolean}  showConfirmation - If true, a confirmation window will be shown.
  * @property {String}   openDrawMenuSide - Controls the menuSide in which the Draw Module is opened in.
+ * @property {Boolean}  useDifferentLayers - If true, imported features are added to separate layers per file.
  */
 
 export default {
@@ -39,5 +40,6 @@ export default {
     customAttributeStyles: {},
     geojsonFeatureId: 0,
     showConfirmation: true,
-    openDrawMenuSide: "secondaryMenu"
+    openDrawMenuSide: "secondaryMenu",
+    useDifferentLayers: false
 };

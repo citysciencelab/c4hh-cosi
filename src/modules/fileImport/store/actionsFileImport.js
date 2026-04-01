@@ -47,6 +47,16 @@ const defaultFont = "16px Arial",
     };
 
 /**
+ * Strips the file extension and replaces non-alphanumeric characters (except hyphens) with hyphens.
+ * Used to derive a stable layer ID from a filename.
+ * @param {String} fileName - The original file name, e.g. "meine daten!.kml"
+ * @returns {String} Sanitized string, e.g. "meine-daten-"
+ */
+function sanitizeFileName (fileName) {
+    return fileName.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-]/g, "-");
+}
+
+/**
  * Checks given file suffix for any defined Format. Default mappings are defined in state and may be
  * overridden in config.
  * @param {String} filename - Name of the given file.
@@ -804,7 +814,7 @@ export default {
 
             dispatch("replaceByIdInLayerConfig", {
                 layerConfigs: [{
-                    id: state.layerId,
+                    id: datasrc.layerId || state.layerId,
                     layer: state.gfiAttributes
                 }]
             }, {root: true});
@@ -840,17 +850,31 @@ export default {
     },
 
     /**
-     * Adds a layer Config to app-store layerConfigs
+     * Adds a layer config to app-store layerConfigs.
+     * When state.useDifferentLayers is true, a separate layer is created per file,
+     * identified by a sanitized version of the fileName.
      * @param {Object} param.dispatch the dispatch
      * @param {Object} param.state the state
-     * @returns {ol/layer} The created layer.
+     * @param {String|null} fileName - The name of the file being imported (used when useDifferentLayers is true).
+     * @returns {Promise<{layer: ol/layer, layerId: String}>} The created/existing layer and its ID.
      */
-    async addLayerConfig ({dispatch, state}) {
-        if (!layerCollection.getLayerById(state.layerId)) {
+    async addLayerConfig ({dispatch, state}, fileName) {
+        let layerId = state.layerId,
+            layerName = "importDrawLayer";
+
+        if (state.useDifferentLayers && fileName) {
+            const sanitized = sanitizeFileName(fileName),
+                nameWithoutExt = fileName.replace(/\.[^.]+$/, "");
+
+            layerId = `importDrawLayer_${sanitized}`;
+            layerName = `importDrawLayer (${nameWithoutExt})`;
+        }
+
+        if (!layerCollection.getLayerById(layerId)) {
             await dispatch("addLayerToLayerConfig", {
                 layerConfig: {
-                    id: state.layerId,
-                    name: "importDrawLayer",
+                    id: layerId,
+                    name: layerName,
                     showInLayerTree: true,
                     typ: "VECTORBASE",
                     type: "layer",
@@ -860,7 +884,10 @@ export default {
             }, {root: true});
         }
 
-        return layerCollection.getLayerById(state.layerId);
+        return {
+            layer: layerCollection.getLayerById(layerId),
+            layerId
+        };
     },
 
     /**
