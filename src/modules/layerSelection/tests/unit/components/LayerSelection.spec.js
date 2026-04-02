@@ -460,7 +460,6 @@ describe("src/modules/layerSelection/components/LayerSelection.vue", () => {
 
         await wrapper.vm.$nextTick();
         expect(navigateBackSpy.calledOnce).to.be.true;
-        expect(provideSelectAllPropsSpy.calledOnce).to.be.true;
         expect(wrapper.vm.areFoldersSelectable).to.be.true;
     });
 

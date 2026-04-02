@@ -8,6 +8,7 @@
 ### __Breaking Changes__
 
 ### Added
+- SearchBar: Added a checkbox to select all subcategories when opening a folder.
 
 ### Changed
 

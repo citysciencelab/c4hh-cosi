@@ -138,6 +138,10 @@ export default {
             this.rootFolderCount = rootFolders.length;
             this.areFoldersSelectable = Boolean(rootFolders.find(rootFolder => rootFolder.isFolderSelectable));
         }
+        this.$nextTick(() => {
+            this.provideSelectAllProps();
+        });
+
     },
 
     unmounted () {
