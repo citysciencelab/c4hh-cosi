@@ -455,6 +455,9 @@ export default {
         if (!this.isMobile && window.innerWidth < 992) {
             this.menuBySide("secondaryMenu").width = "50%";
         }
+        if (this.isMobile) {
+            this.setNavigationHistoryBySide({side: "secondaryMenu", newHistory: [{type: "root", props: []}]});
+        }
         this.setConfig();
     },
     unmounted () {
@@ -470,7 +473,8 @@ export default {
             "closeMenu"
         ]),
         ...mapMutations("Menu", [
-            "setExpandedBySide"
+            "setExpandedBySide",
+            "setNavigationHistoryBySide"
         ]),
 
         /**
