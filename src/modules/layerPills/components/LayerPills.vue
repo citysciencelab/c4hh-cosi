@@ -190,7 +190,7 @@ export default {
          * @returns {void}
          */
         showLayerInformationInMenu (layerConf) {
-            if (layerConf.datasets) {
+            if (layerConf.datasets || layerConf.typ?.startsWith("GROUP")) {
                 this.startLayerInformation(layerConf);
             }
         },

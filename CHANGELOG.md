@@ -17,6 +17,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
 
 ---
 
