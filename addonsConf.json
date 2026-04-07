@@ -129,6 +129,10 @@
     "path": "controls/exampleControl",
     "type": "control"
   },
+  "toggleMouseHover": {
+    "path": "controls/toggleMouseHover",
+    "type": "control"
+  },
   "oktagonComponent": {
     "type": "tool",
     "path": "oktagon"
