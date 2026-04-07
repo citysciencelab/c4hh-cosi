@@ -1,7 +1,4 @@
 /* eslint-disable */
-// 24.10.2025:
-// the changes from Innoq are integrated here
-// see https://github.com/micha149/lgv-masterportal/compare/vite-dev...build-setup-enhancements
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "path";
@@ -13,6 +10,7 @@ import htmlExtFallback from "./tasks/html-ext-fallback-plugin.js";
 import { directoryListing } from "./tasks/directory-listing-plugin.js";
 import addonModules from "./tasks/addon-modules-plugin.js";
 import emptyAddonModulesPlugin from "./tasks/empty-addon-modules-plugin.js";
+// import { analyzer } from "vite-bundle-analyzer";// Do not delete, comment in for analyzing bundle content and before install: npm install vite-bundle-analyzer --save-dev
 import getMastercodeVersionFolderName from "./tasks/getMastercodeVersionFolderName.mjs";
 import zipPack from "vite-plugin-zip-pack";
 
@@ -245,7 +243,8 @@ export default defineConfig(({ mode }) => {
                 outDir: "dist",
                 outFileName: `examples-${mastercodeVersionFolderName}.zip`,
                 pathPrefix: ""
-            })
+            }),
+            // analyzer(), //Do not delete, comment in for analyzing bundle content  - start 'npm run buildPortal', results on http://localhost:8888
         ].filter(Boolean),
 
         css: {
