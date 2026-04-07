@@ -83,7 +83,7 @@ export default defineConfig(({ mode }) => {
     runtimeBase = isProd
     ? (examplesOnly
         ? `./mastercode/${mastercodeVersionFolderName}`
-        : `/mastercode/${mastercodeVersionFolderName}`)
+        : `../mastercode/${mastercodeVersionFolderName}`)
     : "/",
     viteBase = isProd
     ? (examplesOnly ? "./" : "/")
@@ -102,6 +102,12 @@ export default defineConfig(({ mode }) => {
         root: rootPath,
         base: viteBase,
         logLevel: "info",
+        // see https://vite.dev/guide/build#advanced-base-options
+        experimental: {
+            renderBuiltUrl() {
+               return { relative: true };
+            }
+        },
 
         resolve: {
             alias: {
@@ -150,8 +156,9 @@ export default defineConfig(({ mode }) => {
                     return html.replaceAll(" crossorigin", "");
                 }
             },
-            isProd && examplesOnly && {
+            examplesOnly && {
                 name: "fix-index-for-examples",
+                apply: "build",
                 transformIndexHtml(html) {
                     return html
                         .replace(
@@ -164,7 +171,24 @@ export default defineConfig(({ mode }) => {
                         );
                 }
             },
-
+            !examplesOnly && {
+                name: "fix-index-paths-for-portals",
+                apply: "build",
+                transformIndexHtml: {
+                    order: "post",
+                    handler (html) {
+                        return html
+                            .replace(
+                                /src="\/mastercode\/([^"]+)\/js\/([^"]+)"/g,
+                                'src="../mastercode/$1/js/$2"'
+                            )
+                            .replace(
+                                /href="\/mastercode\/([^"]+)\/css\/([^"]+)"/g,
+                                'href="../mastercode/$1/css/$2"'
+                            );
+                    }
+                }
+            },
             isProd && !examplesOnly && cp({
                 // copy all besides modified index.html files
                 targets: [

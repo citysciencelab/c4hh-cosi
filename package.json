@@ -30,7 +30,7 @@
     "migrateConfig": "node devtools/tasks/migrator/migrate.js",
     "build": "node devtools/tasks/viteBuild.js",
     "buildPortal": "vite build --config devtools/vite.config.js && rimraf dist/portal",
-    "buildExamples": "cross-env EXAMPLES_ONLY=true vite build --config devtools/vite.config.js --mode production && rimraf dist/portal dist/build dist/examples_*",
+    "buildExamples": "cross-env EXAMPLES_ONLY=true vite build --config devtools/vite.config.js --mode production && rimraf dist/portal && rimraf --glob \"dist/examples_*\"",
     "buildJsDoc": "node devtools/tasks/buildJsDoc.js",
     "versionHotfix": "npm version patch && npm run versionLatest && git tag -d lts && git push --tags -f --no-verify",
     "versionMinor": "npm version minor && npm run versionLatest && git tag -d lts && git push --tags -f --no-verify",
