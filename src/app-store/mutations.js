@@ -31,6 +31,16 @@ export default {
     },
 
     /**
+     * Returns the configured value for mouseHover.
+     * @param {Object} state - The state of the app-store.
+     * @param {Boolean|Object} value - The value to set for mouseHover.
+     * @returns {void}
+     */
+    setMouseHover (state, value) {
+        state.portalConfig.map.mouseHover = value;
+    },
+
+    /**
      * Sets the given urlParams to state.urlParams.
      * @param {Object} state store state
      * @param {Object} payload the payload
