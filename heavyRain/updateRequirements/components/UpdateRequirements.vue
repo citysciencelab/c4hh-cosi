@@ -1,12 +1,19 @@
 <script>
+import HrHeader from "../../shared/components/HrHeader.vue";
 
 export default {
-    name: "UpdateRequirements"
+    name: "UpdateRequirements",
+    components: {
+        HrHeader
+    }
 };
 </script>
 
 <template lang="html">
-    <div>Aktualisierungsbedarfe</div>
+    <HrHeader
+        :text="$t('additional:modules.updateRequirements.description')"
+        :button-text="$t('additional:modules.updateRequirements.createMessage')"
+    />
 </template>
 
 <style lang="scss" scoped>
