@@ -14,9 +14,7 @@ const {
     unregisterMapListener,
     setInitialAttributes,
     updateAttributesByChangeSize,
-    updateAttributesByClick,
-    updateAttributesByMoveend,
-    updateAttributesByChangeResolution
+    updateAttributesByClick
 } = actions;
 
 describe("src/core/maps/store/actionsMapsAttributesMapper.js", () => {
@@ -64,7 +62,8 @@ describe("src/core/maps/store/actionsMapsAttributesMapper.js", () => {
         dispatch,
         getters,
         map2d,
-        mapDiv;
+        mapDiv,
+        mockApp;
 
     beforeAll(() => {
         i18next.init({
@@ -97,6 +96,14 @@ describe("src/core/maps/store/actionsMapsAttributesMapper.js", () => {
 
         document.body.innerHTML = "<div id=\"map\"></div>";
         mapDiv = document.getElementById("map");
+
+        mockApp = {
+            config: {
+                globalProperties: {
+                    $remoteInterface: null
+                }
+            }
+        };
     });
 
     afterEach(() => {
@@ -258,17 +265,37 @@ describe("src/core/maps/store/actionsMapsAttributesMapper.js", () => {
 
     describe("updateAttributesByMoveend", () => {
         it("Should update attributes by moveend event", () => {
-            updateAttributesByMoveend({commit});
+            actions.updateAttributesByMoveend.call({$app: mockApp}, {commit});
 
             expect(commit.callCount).to.equals(2);
             expect(commit.firstCall.args).to.deep.equals(["setCenter", [10, 20]]);
             expect(commit.secondCall.args).to.deep.equals(["setExtent", [-56.145797614602614, -46.145797614602614, 76.14579761460261, 86.14579761460261]]);
         });
+
+        it("Should update attributes by moveend event and send message to remoteInterface", () => {
+            const sendMessageSpy = sinon.spy();
+
+            mockApp.config.globalProperties.$remoteInterface = {
+                sendMessage: sendMessageSpy
+            };
+
+            actions.updateAttributesByMoveend.call({$app: mockApp}, {commit});
+
+            expect(commit.callCount).to.equals(2);
+            expect(commit.firstCall.args).to.deep.equals(["setCenter", [10, 20]]);
+            expect(commit.secondCall.args).to.deep.equals(["setExtent", [-56.145797614602614, -46.145797614602614, 76.14579761460261, 86.14579761460261]]);
+
+            expect(sendMessageSpy.callCount).to.equals(2);
+            expect(sendMessageSpy.firstCall.args[0]).to.deep.equal({centerPosition: [10, 20]});
+            expect(sendMessageSpy.secondCall.args[0]).to.deep.equal({currentExtent: [-56.145797614602614, -46.145797614602614, 76.14579761460261, 86.14579761460261]});
+
+            mockApp.config.globalProperties.$remoteInterface = null;
+        });
     });
 
     describe("updateAttributesByChangeResolution", () => {
         it("Should update attributes by change resolution event", () => {
-            updateAttributesByChangeResolution({commit});
+            actions.updateAttributesByChangeResolution.call({$app: mockApp}, {commit});
 
             expect(commit.callCount).to.equals(5);
             expect(commit.firstCall.args).to.deep.equals(["setMaxZoom", 5]);
@@ -276,6 +303,28 @@ describe("src/core/maps/store/actionsMapsAttributesMapper.js", () => {
             expect(commit.thirdCall.args).to.deep.equals(["setResolution", 2.6458319045841048]);
             expect(commit.getCall(3).args).to.deep.equals(["setScale", 10000]);
             expect(commit.getCall(4).args).to.deep.equals(["setZoom", 5]);
+        });
+
+        it("Should update attributes by change resolution event and send message to remoteInterface", () => {
+            const sendMessageSpy = sinon.spy();
+
+            mockApp.config.globalProperties.$remoteInterface = {
+                sendMessage: sendMessageSpy
+            };
+
+            actions.updateAttributesByChangeResolution.call({$app: mockApp}, {commit});
+
+            expect(commit.callCount).to.equals(5);
+            expect(commit.firstCall.args).to.deep.equals(["setMaxZoom", 5]);
+            expect(commit.secondCall.args).to.deep.equals(["setMinZoom", 0]);
+            expect(commit.thirdCall.args).to.deep.equals(["setResolution", 2.6458319045841048]);
+            expect(commit.getCall(3).args).to.deep.equals(["setScale", 10000]);
+            expect(commit.getCall(4).args).to.deep.equals(["setZoom", 5]);
+
+            expect(sendMessageSpy.calledOnce).to.be.true;
+            expect(sendMessageSpy.firstCall.args[0]).to.deep.equal({zoomLevel: 5});
+
+            mockApp.config.globalProperties.$remoteInterface = null;
         });
     });
     describe("oneFingerDragMessage", () => {

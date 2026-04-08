@@ -39,3 +39,8 @@ store.dispatch(
     { root: true }
 );
 ```
+
+### Automatic output
+
+When the remote interface is configured in config.js, some map parameters are sent to it on each zoom and movement of the map.
+The sent parameters are 'centerPosition', 'currentExtent' and 'zoomLevel'.

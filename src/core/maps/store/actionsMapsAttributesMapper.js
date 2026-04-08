@@ -189,17 +189,26 @@ export default {
     },
 
     /**
-     * Updates map attributes by moveend.
+     * Updates map attributes by moveend and send them to remoteInterface if configured.
      * @param {Object} param store context
      * @param {Object} param.commit the commit
      * @returns {Function} update function for state parts to update onmoveend
      */
     updateAttributesByMoveend ({commit}) {
         const map = mapCollection.getMap("2D"),
-            mapView = mapCollection.getMapView("2D");
+            mapView = mapCollection.getMapView("2D"),
+            mapCenter = mapView.getCenter(),
+            currentMapExtent = mapView.calculateExtent(map.getSize());
 
-        commit("setCenter", mapView.getCenter());
-        commit("setExtent", mapView.calculateExtent(map.getSize()));
+        commit("setCenter", mapCenter);
+        commit("setExtent", currentMapExtent);
+
+        this.$app.config.globalProperties.$remoteInterface?.sendMessage({
+            "centerPosition": mapCenter
+        });
+        this.$app.config.globalProperties.$remoteInterface?.sendMessage({
+            "currentExtent": currentMapExtent
+        });
     },
 
     /**
@@ -231,7 +240,7 @@ export default {
     },
 
     /**
-     * Updates map attributes by change resolution.
+     * Updates map attributes by change resolution and send current zoom to remoteInterface if configured.
      * @param {Object} param store context
      * @param {Object} param.commit the commit
      * @returns {void}
@@ -247,6 +256,10 @@ export default {
         commit("setResolution", mapView.getResolution());
         commit("setScale", options?.scale);
         commit("setZoom", mapView.getZoom());
+
+        this.$app.config.globalProperties.$remoteInterface?.sendMessage({
+            "zoomLevel": mapView.getZoom()
+        });
     },
 
     /**
