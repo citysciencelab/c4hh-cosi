@@ -22,10 +22,12 @@
 
 ### Fixed
 - Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
-- Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
-- Issue \#1590: Vite build - corrected path to mastercode folder in index.html.
-- GroupLayer: Fixed grouped layers, using layerIDsToStyle, were not shown. 
 - Issue \#1576: BackForward control was not working inside expandable controls until opened.
+- Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
+- Issue \#1590: Vite 
+    - build: corrected path to mastercode folder in index.html.
+    - buildExamples: corrected name and content of zip-files.
+- GroupLayer: Fixed grouped layers, using layerIDsToStyle, were not shown. 
 
 ---
 

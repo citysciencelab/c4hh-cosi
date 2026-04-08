@@ -1,41 +1,26 @@
-/* eslint-disable */
-import { defineConfig } from "vite";
+/* eslint-disable no-console */
+/* eslint-disable no-shadow */
+/* eslint-disable n/no-process-env */
+/* eslint-disable func-style */
+import {defineConfig} from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "path";
 import glob from "fast-glob";
 import fs from "fs";
-import { nodePolyfills } from "vite-plugin-node-polyfills";
+import {nodePolyfills} from "vite-plugin-node-polyfills";
 import cp from "vite-plugin-cp";
 import htmlExtFallback from "./tasks/html-ext-fallback-plugin.js";
-import { directoryListing } from "./tasks/directory-listing-plugin.js";
+import {directoryListing} from "./tasks/directory-listing-plugin.js";
 import addonModules from "./tasks/addon-modules-plugin.js";
 import emptyAddonModulesPlugin from "./tasks/empty-addon-modules-plugin.js";
 // import { analyzer } from "vite-bundle-analyzer";// Do not delete, comment in for analyzing bundle content and before install: npm install vite-bundle-analyzer --save-dev
+import vmShimPlugin from "./tasks/vm-shim-plugin.js";
+// eslint-disable-next-line no-restricted-syntax
 import getMastercodeVersionFolderName from "./tasks/getMastercodeVersionFolderName.mjs";
 import zipPack from "vite-plugin-zip-pack";
 
-// Shim for the Node.js "vm" module to avoid Vite build warnings/errors.
-// Some dependencies reference "vm", which is not available in the browser.
-// This replaces the module with an empty stub, as it is not used at runtime.
-const VM_SHIM_ID = "\0vm-shim";
-function vmShimPlugin() {
-  return {
-    name: "vm-shim",
-    enforce: "pre",
-    resolveId(source) {
-      if (source === "vm") return VM_SHIM_ID;
-      return null;
-    },
-    load(id) {
-      if (id !== VM_SHIM_ID) return null;
-      return "export default {};";
-    }
-  };
-};
-
-let proxyConfig = {},
-    { vueAddons } = await collectAddons();
-const examplesOnly = process.env.EXAMPLES_ONLY === "true",
+const {vueAddons} = await collectAddons(),
+    examplesOnly = process.env.EXAMPLES_ONLY === "true",
     portalFolderName = process.env.PORTAL_FOLDER || "portal",
     rootPath = path.resolve(__dirname, "../"),
     httpsConfig = {
@@ -49,46 +34,38 @@ const examplesOnly = process.env.EXAMPLES_ONLY === "true",
     addonConfigPath = path.resolve(rootPath, "addons/addonsConf.json"),
     hasAddonConfig = fs.existsSync(addonConfigPath),
     localMasterportalApiPath = path.resolve(rootPath, "../masterportalapi"),
-    useLocalMasterportalApi = process.env.VITE_LOCAL_MASTERPORTALAPI === "true";
+    useLocalMasterportalApi = process.env.VITE_LOCAL_MASTERPORTALAPI === "true",
+    mastercodeVersionFolderName = process.env.MASTERCODE_VERSION_FOLDER || getMastercodeVersionFolderName(),
+    isWin = process.platform === "win32",
+    // eslint-disable-next-line no-nested-ternary
+    slash = (p) => typeof p === "string" ? isWin ? p.replace(/\\/g, "/") : p : String(p || ""),
+    FORCE_HTTPS = process.env.VITE_FORCE_HTTPS === "true";
 
-let portalEntries = glob.sync(`${portalFolderName}/**/index.html`, { cwd: rootPath }).map(file => {
-    const portalName = file.split("/").at(-2); // foldernames of portals
-    return [`portal-${portalName}`, path.resolve(rootPath, file)];
-});
+let portalEntries = glob.sync(`${portalFolderName}/**/index.html`, {cwd: rootPath}).map(file => {
+        const portalName = file.split("/").at(-2); // foldernames of portals
+
+        return [`portal-${portalName}`, path.resolve(rootPath, file)];
+    }),
+    examplesZipName = "",
+    proxyConfig = {};
 
 if (examplesOnly) {
     portalEntries = portalEntries.filter(([name]) => name === "portal-basic");
+    examplesZipName = mastercodeVersionFolderName.indexOf("git_last_commit_at") === 1 ? `examples-${mastercodeVersionFolderName.replaceAll("_", ".")}.zip` : `examples-${mastercodeVersionFolderName}.zip`;
 }
-
-const mastercodeVersionFolderName = process.env.MASTERCODE_VERSION_FOLDER || getMastercodeVersionFolderName(),
-    isWin = process.platform === "win32",
-    slash = (p) => typeof p === "string" ? isWin ? p.replace(/\\/g, "/") : p : String(p || "");
-
 if (fs.existsSync("./devtools/proxyconf.json")) {
     proxyConfig = JSON.parse(fs.readFileSync("./devtools/proxyconf.json", "utf-8"));
 }
 else if (fs.existsSync("./devtools/proxyconf_example.json")) {
     proxyConfig = JSON.parse(fs.readFileSync("./devtools/proxyconf_example.json", "utf-8"));
 }
-const FORCE_HTTPS = process.env.VITE_FORCE_HTTPS === "true";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({mode}) => {
     const isProd = mode === "production",
-          buildBase = isProd
-    ? `mastercode/${mastercodeVersionFolderName}`
-    : "",
-
-    runtimeBase = isProd
-    ? (examplesOnly
-        ? `./mastercode/${mastercodeVersionFolderName}`
-        : `../mastercode/${mastercodeVersionFolderName}`)
-    : "/",
-    viteBase = isProd
-    ? (examplesOnly ? "./" : "/")
-    : "/";
+        buildBase = isProd ? `mastercode/${mastercodeVersionFolderName}` : "",
+        runtimeBase = isProd ? `../mastercode/${mastercodeVersionFolderName}` : "/";
 
     console.log("mode", mode);
-    console.log("viteBase:", viteBase);
     console.log("runtimeBase:", runtimeBase);
     console.log("buildBase:", buildBase);
     if (isProd) {
@@ -98,12 +75,13 @@ export default defineConfig(({ mode }) => {
 
     return {
         root: rootPath,
-        base: viteBase,
+        base: "/",
         logLevel: "info",
         // see https://vite.dev/guide/build#advanced-base-options
+        // build option used to control how asset URLs are written in generated files,  it is useful when output is deployed in a non-standard folder structure
         experimental: {
-            renderBuiltUrl() {
-               return { relative: true };
+            renderBuiltUrl () {
+                return {relative: true};
             }
         },
 
@@ -121,13 +99,13 @@ export default defineConfig(({ mode }) => {
                 "@modules": path.resolve(rootPath, "src/modules"),
                 "@plugins": path.resolve(rootPath, "src/plugins"),
                 "@devtools": path.resolve(rootPath, "devtools"),
-                ...(useLocalMasterportalApi
+                ...useLocalMasterportalApi
                     ? {
                         "@masterportal/masterportalapi": localMasterportalApiPath
                     }
-                    : {})
+                    : {}
             },
-            dedupe: ["jsts","ol","proj4"]
+            dedupe: ["jsts", "ol", "proj4"]
         },
 
         plugins: [
@@ -141,35 +119,20 @@ export default defineConfig(({ mode }) => {
             }),
             directoryListing,
             // Disable addons for examples build to avoid heavy dependencies
-            (examplesOnly || !hasAddonConfig)
-            ? emptyAddonModulesPlugin()
-            : addonModules({
-                configPath: addonConfigPath,
-                baseDir: path.resolve(rootPath, "addons")
-            }),
+            examplesOnly || !hasAddonConfig
+                ? emptyAddonModulesPlugin()
+                : addonModules({
+                    configPath: addonConfigPath,
+                    baseDir: path.resolve(rootPath, "addons")
+                }),
             {
                 name: "remove-crossorigin",
                 apply: "build",
-                transformIndexHtml(html) {
+                transformIndexHtml (html) {
                     return html.replaceAll(" crossorigin", "");
                 }
             },
-            examplesOnly && {
-                name: "fix-index-for-examples",
-                apply: "build",
-                transformIndexHtml(html) {
-                    return html
-                        .replace(
-                            /src="(?:\.\.\/)*mastercode\/([^"]+)\/js\/[^"]+"/,
-                            'src="./mastercode/$1/js/masterportal.js"'
-                        )
-                        .replace(
-                            /href="(?:\.\.\/)*mastercode\/([^"]+)\/css\/[^"]+"/,
-                            'href="./mastercode/$1/css/masterportal.css"'
-                        );
-                }
-            },
-            !examplesOnly && {
+            {
                 name: "fix-index-paths-for-portals",
                 apply: "build",
                 transformIndexHtml: {
@@ -178,73 +141,93 @@ export default defineConfig(({ mode }) => {
                         return html
                             .replace(
                                 /src="\/mastercode\/([^"]+)\/js\/([^"]+)"/g,
-                                'src="../mastercode/$1/js/$2"'
+                                "src=\"../mastercode/$1/js/$2\""
                             )
                             .replace(
                                 /href="\/mastercode\/([^"]+)\/css\/([^"]+)"/g,
-                                'href="../mastercode/$1/css/$2"'
+                                "href=\"../mastercode/$1/css/$2\""
                             );
                     }
                 }
             },
-            isProd && !examplesOnly && cp({
-                // copy all besides modified index.html files
-                targets: [
-                    {
-                        src: `./${portalFolderName}`,
-                        dest: "dist",
-                        copyOptions: {
-                            filter: (src) => !src.endsWith("/index.html")
-                        }
-                    },
-                    // copy modified index.html files
-                    { src: `./dist/${portalFolderName}`, dest: "dist" }
-                ]
-            }),
-
-            isProd && cp({
-                targets: [
-                    { src: "./src/assets/img", dest: `dist/mastercode/${mastercodeVersionFolderName}/img` },
-                    { src: "./locales", dest: `dist/mastercode/${mastercodeVersionFolderName}/locales` }
-                ]
-            }),
-
-            isProd && examplesOnly && cp({
-                targets: [
-                    { src: "./dist/portal/basic/index.html", dest: `dist/examples_${mastercodeVersionFolderName}/basic` },
-
-                    {
-                        src: "./portal/basic",
-                        dest: `dist/examples_${mastercodeVersionFolderName}/basic`,
-                        copyOptions: {
-                            filter: (src) => {
-                                const p = slash(src);
-                                return !p.endsWith("/index.html");
+            !examplesOnly && {
+                ...cp({
+                    hook: "writeBundle",
+                    targets: [
+                        {
+                            src: `./${portalFolderName}`,
+                            dest: "dist",
+                            copyOptions: {
+                                filter: (src) => !src.endsWith("/index.html")
                             }
-                        }
-                    },
-                    {
-                        src: `./dist/mastercode/${mastercodeVersionFolderName}`,
-                        dest: `dist/examples_${mastercodeVersionFolderName}/basic/mastercode/${mastercodeVersionFolderName}`
-                    },
-                    {
-                        src: "./src/assets/img",
-                        dest: `dist/examples_${mastercodeVersionFolderName}/basic/mastercode/${mastercodeVersionFolderName}/img`
-                    },
-                    {
-                        src: "./locales",
-                        dest: `dist/examples_${mastercodeVersionFolderName}/basic/mastercode/${mastercodeVersionFolderName}/locales`
-                    }
-                ]
-            }),
+                        },
+                        {src: `./dist/${portalFolderName}`, dest: "dist"}
+                    ]
+                }),
+                apply: "build"
+            },
+            {
+                ...cp({
+                    hook: "writeBundle",
+                    targets: [
+                        {src: "./src/assets/img", dest: `dist/mastercode/${mastercodeVersionFolderName}/img`},
+                        {src: "./locales", dest: `dist/mastercode/${mastercodeVersionFolderName}/locales`}
+                    ]
+                }),
+                apply: "build"
+            },
+            examplesOnly && {
+                ...cp({
+                    hook: "writeBundle",
+                    targets: [
+                        {src: "./dist/portal/basic/index.html", dest: `dist/examples_${mastercodeVersionFolderName}/basic`},
 
-            isProd && examplesOnly && zipPack({
-                inDir: `dist/examples_${mastercodeVersionFolderName}`,
-                outDir: "dist",
-                outFileName: `examples-${mastercodeVersionFolderName}.zip`,
-                pathPrefix: ""
-            }),
-            // analyzer(), //Do not delete, comment in for analyzing bundle content  - start 'npm run buildPortal', results on http://localhost:8888
+                        {
+                            src: "./portal/basic",
+                            dest: `dist/examples_${mastercodeVersionFolderName}/basic`,
+                            copyOptions: {
+                                filter: (src) => {
+                                    const p = slash(src);
+
+                                    return !p.endsWith("/index.html");
+                                }
+                            }
+                        },
+                        {
+                            src: "./dist/mastercode",
+                            dest: `dist/examples_${mastercodeVersionFolderName}/mastercode`
+                        },
+                        {
+                            src: "./src/assets/img",
+                            dest: `dist/examples_${mastercodeVersionFolderName}/mastercode/${mastercodeVersionFolderName}/img`
+                        },
+                        {
+                            src: "./locales",
+                            dest: `dist/examples_${mastercodeVersionFolderName}/mastercode/${mastercodeVersionFolderName}/locales`
+                        }
+                    ]
+                }),
+                apply: "build"
+            },
+            examplesOnly && {
+                ...zipPack({
+                    inDir: `dist/examples_${mastercodeVersionFolderName}`,
+                    outDir: "dist",
+                    outFileName: examplesZipName,
+                    pathPrefix: ""
+                }),
+                apply: "build"
+            },
+            examplesOnly && {
+                ...zipPack({
+                    inDir: `dist/examples_${mastercodeVersionFolderName}`,
+                    outDir: "dist",
+                    outFileName: "examples.zip",
+                    pathPrefix: ""
+                }),
+                apply: "build"
+            }
+            // ,analyzer() //Do not delete, comment in for analyzing bundle content  - start 'npm run buildPortal', results on http://localhost:8888
         ].filter(Boolean),
 
         css: {
@@ -311,14 +294,15 @@ export default defineConfig(({ mode }) => {
                 output: {
                     assetFileNames: (entry) => {
                         const name = String(entry?.name || ""),
-                              extType = name.split(".").at(1),
-                              isCss = /css/i.test(extType);
+                            extType = name.split(".").at(1),
+                            isCss = (/css/i).test(extType);
 
                         if (isProd && examplesOnly && isCss && name.includes("portal-basic")) {
                             return `${buildBase}/css/masterportal.[ext]`;
                         }
 
                         let folderName = "js";
+
                         if (isCss) {
                             folderName = "css";
                         }
@@ -337,7 +321,7 @@ export default defineConfig(({ mode }) => {
                     },
                     chunkFileNames: `${buildBase}/js/[name].js`
                 },
-                external(id) {
+                external (id) {
                     const pid = slash(id);
 
                     if (pid.includes("/node_modules/")) {
@@ -389,9 +373,9 @@ export default defineConfig(({ mode }) => {
 
 /**
  * Collects addons from 'addonsConf.json'.
- * @returns both Vue and plain addons to mimic Webpack's DefinePlugin(ADDONS, VUE_ADDONS).
+ * @returns {Object} both Vue and plain addons to mimic Webpack's DefinePlugin(ADDONS, VUE_ADDONS).
  */
-async function collectAddons() {
+async function collectAddons () {
     const rootPath = path.resolve(__dirname, "../"),
         addonBasePath = path.resolve(rootPath, "addons"),
         addonConfigPath = path.resolve(addonBasePath, "addonsConf.json"),
@@ -399,7 +383,7 @@ async function collectAddons() {
 
     if (!fs.existsSync(addonConfigPath)) {
         console.warn("NOTICE: " + addonConfigPath + " not found. Skipping all addons.");
-        return { vueAddons };
+        return {vueAddons};
     }
 
     const data = fs.readFileSync(addonConfigPath, "utf8"),
@@ -439,7 +423,7 @@ async function collectAddons() {
         }
 
         if (isVueAddon) {
-            vueAddons[addonName] = Object.assign({ "entry": addonCombinedRelpath }, addonEntryPoints[addonName]);
+            vueAddons[addonName] = Object.assign({"entry": addonCombinedRelpath}, addonEntryPoints[addonName]);
         }
         else {
             console.warn("Detected addon, that does not follow the rules for addons:", addonName);
@@ -447,5 +431,5 @@ async function collectAddons() {
         }
     }
     console.info("provided addons:", JSON.stringify(Object.keys(vueAddons)) + "\n");
-    return { vueAddons };
+    return {vueAddons};
 }

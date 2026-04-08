@@ -38,7 +38,14 @@ export const directoryListing = {
 function generateHTML (currentDir, files, baseUrl) {
     const fileListHTML = files
         .map(file => {
-            const filePath = path.join(baseUrl, file, "/");
+            let filePath;
+
+            if (file.toLocaleLowerCase().startsWith("index.htm")) {
+                filePath = path.join(baseUrl, file);
+            }
+            else {
+                filePath = path.join(baseUrl, file, "/");
+            }
 
             return `<li data-name="${file.toLowerCase()}"><a href="${filePath}">${file}</a></li>`;
         })
