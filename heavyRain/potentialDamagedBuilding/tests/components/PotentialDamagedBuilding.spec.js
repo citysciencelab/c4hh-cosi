@@ -4,7 +4,7 @@ import PotentialDamagedBuilding from "../../components/PotentialDamagedBuilding.
 
 config.global.mocks.$t = key => key;
 
-describe("addons/waterRiskCheck/components/PotentialDamagedBuilding.vue", () => {
+describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedBuilding.vue", () => {
     describe("Component DOM", () => {
         it("should exist", () => {
             const wrapper = shallowMount(PotentialDamagedBuilding, {});

@@ -1,4 +1,4 @@
-import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.js";
+import {generateSimpleMutations} from "@shared/js/utils/generators.js";
 import statePotentialDamagedBuilding from "./statePotentialDamagedBuilding.js";
 
 const mutations = {

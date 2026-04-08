@@ -218,7 +218,15 @@
     "type": "tool"
   },
   "potentialDamagedBuilding": {
-    "path": "potentialDamagedBuilding",
+    "path": "heavyRain/potentialDamagedBuilding",
+    "type": "tool"
+  },
+  "updateRequirements": {
+    "path": "heavyRain/updateRequirements",
+    "type": "tool"
+  },
+  "projects": {
+    "path": "heavyRain/projects",
     "type": "tool"
   }
 }
