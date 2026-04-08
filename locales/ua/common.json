@@ -1215,7 +1215,8 @@
         "addressTopic": "Пошук адреси, район, тема",
         "addressOrTopic": "Пошук адрес або тем",
         "addressTopicParcel": "Пошук адреси, район, тема, земельна ділянка",
-        "startWithAddress": "Почніть тут з адреси!"
+        "startWithAddress": "Почніть тут з адреси!",
+        "topicOnly": "Пошук за темами"
       },
       "showAllResults": "показати всі результати",
       "searchResults": "Результати пошуку",

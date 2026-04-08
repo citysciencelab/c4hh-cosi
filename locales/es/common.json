@@ -1215,7 +1215,8 @@
         "addressTopic": "Buscar dirección, barrio, tema",
         "addressOrTopic": "Buscar direcciones o temas",
         "addressTopicParcel": "Buscar dirección, barrio, tema, parcela",
-        "startWithAddress": "¡Empiece aquí con una dirección!"
+        "startWithAddress": "¡Empiece aquí con una dirección!",
+        "topicOnly": "Buscar temas"
       },
       "showAllResults": "mostrar todos los resultados",
       "searchResults": "Resultados de búsqueda",

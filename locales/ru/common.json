@@ -1215,7 +1215,8 @@
         "addressTopic": "Поиск адреса, района, темы",
         "addressOrTopic": "Поиск адресов или тем",
         "addressTopicParcel": "Поиск адреса, района, темы, участка",
-        "startWithAddress": "Начните с ввода адреса!"
+        "startWithAddress": "Начните с ввода адреса!",
+        "topicOnly": "Поиск по темам"
       },
       "showAllResults": "Показать все результаты",
       "searchResults": "Результаты поиска",

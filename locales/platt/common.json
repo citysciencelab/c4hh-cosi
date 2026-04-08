@@ -1215,7 +1215,8 @@
         "addressTopic": "Söök Adress, Stadtdeel, Thema",
         "addressOrTopic": "Söök na Adressen oder Themen",
         "addressTopicParcel": "Söök Adress, Stadtdeel, Thema, Flörstück",
-        "startWithAddress": "Hier mit Adress anfangen!"
+        "startWithAddress": "Hier mit Adress anfangen!",
+        "topicOnly": "Sök na Themen"
       },
       "showAllResults": "all Resultaten wiesen",
       "searchResults": "Söökresultaten",

@@ -1215,7 +1215,8 @@
         "addressTopic": "Adres, semt, konu ara",
         "addressOrTopic": "Adres veya konu ara",
         "addressTopicParcel": "Adres, semt, konu, parsel ara",
-        "startWithAddress": "Buradan adresle başla!"
+        "startWithAddress": "Buradan adresle başla!",
+        "topicOnly": "Konular ara"
       },
       "showAllResults": "tüm sonuçları göster",
       "searchResults": "Arama sonuçları",

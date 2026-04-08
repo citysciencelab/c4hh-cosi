@@ -1215,7 +1215,8 @@
         "addressTopic": "Suche Adresse, Stadtteil, Thema",
         "addressOrTopic": "Suche nach Adressen oder Themen",
         "addressTopicParcel": "Suche Adresse, Stadtteil, Thema, Flurstück",
-        "startWithAddress": "Hier mit Adresse starten!"
+        "startWithAddress": "Hier mit Adresse starten!",
+        "topicOnly": "Cerca temi"
       },
       "showAllResults": "alle Ergebnisse anzeigen",
       "searchResults": "Suchergebnisse",

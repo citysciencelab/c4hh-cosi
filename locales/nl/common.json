@@ -1040,7 +1040,8 @@
         "addressDistrict": "Zoekadres, wijk",
         "addressHospitalBplan": "Zoek op adres/ziekenhuis/B-plan",
         "addressTopic": "Zoek adres, wijk, onderwerp",
-        "addressTopicParcel": "Zoek adres, wijk, onderwerp, perceel"
+        "addressTopicParcel": "Zoek adres, wijk, onderwerp, perceel",
+        "topicOnly": "Zoek naar onderwerpen"
       },
       "showAllResults": "laat alle resultaten zien",
       "searchResults": "Zoekresultaten",
