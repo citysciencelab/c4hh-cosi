@@ -18,6 +18,7 @@
  * @property {Object}   customAttributeStyles - All custom styles set by the user.
  * @property {Number}   geojsonFeatureId - Id of the last added feeature of a GeoJson.
  * @property {Boolean}  showConfirmation - If true, a confirmation window will be shown.
+ * @property {String}   openDrawMenuSide - Controls the menuSide in which the Draw Module is opened in.
  */
 
 export default {
@@ -37,5 +38,6 @@ export default {
     gfiAttributes: {},
     customAttributeStyles: {},
     geojsonFeatureId: 0,
-    showConfirmation: true
+    showConfirmation: true,
+    openDrawMenuSide: "secondaryMenu"
 };

@@ -834,8 +834,8 @@ export default {
      * Opens the draw tool in the secondary Menu
      * @returns {void}
      */
-    openDrawTool ({dispatch, rootGetters}) {
-        const menuSide = "secondaryMenu",
+    openDrawTool ({state, dispatch, rootGetters}) {
+        const menuSide = ["mainMenu", "secondaryMenu"].includes(state.openDrawMenuSide) ? state.openDrawMenuSide : "secondaryMenu",
             menuExpanded = "Menu/expanded";
 
         dispatch("Menu/changeCurrentComponent", {type: "draw_old", side: menuSide, props: {name: i18next.t("common:modules.draw_old.name")}}, {root: true});

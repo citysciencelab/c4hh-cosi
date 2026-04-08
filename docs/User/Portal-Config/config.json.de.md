@@ -2834,6 +2834,7 @@ Angabe der Füll-Farbe und -Strichstärke für das Hervorheben von Polygonen sow
 |type|nein|String|"fileImport"|Der type des Moduls. Definiert welches Modul konfiguriert ist.|false|
 |customStylingOption|nein|Boolean|false|Legt fest, ob eine Stylingoption für GeoJson angezeigt wird.|false|
 |showConfirmation|nein|Boolean|true|Legt fest, ob ein Bestätigungsfenster, nach einem Upload, angezeigt wird.|false|
+|openDrawMenuSide|nein|String|"secondaryMenu"|Legt fest, in welchem Menü das Draw Modul geöffnet wird.|false|
 
 **Beispiel**
 

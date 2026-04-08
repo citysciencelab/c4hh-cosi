@@ -9,6 +9,7 @@
 
 ### Added
 - SearchBar: Added a checkbox to select all subcategories when opening a folder.
+- FileImport: Added config.json property `openDrawMenuSide` to set the menu side in which the draw module opens.
 
 ### Changed
 
@@ -72,7 +73,7 @@
 - Issue \#1581: UrlParams: Fixed layer order in layerTree not being preserved when restoring from a share link containing the LAYERS parameter.
 - Issue \#1588: Login: The fetch method for WMS layer ist always overwritten, if login module is available.
 - Min/MaxScale: The scale restriction for grouped layers has been fixed.
-- Vite: 
+- Vite:
     - Hot module replacement (HMR) works. It reloads whole app on HMR update, because the state persists between hot updates, which leaeds to errors.
     - Masterportal starts and builds with and without addons.
     - Fixed `getMastercodeVersionFolderName` so release-tag builds no longer append `git_last_commit_at` to the mastercode folder name.
@@ -127,9 +128,9 @@
 - Issue \#1557: WFSSearch: fixed selection bug with deeper nested options.
 - Issue \#1561: LayerInformation: Fixed `metaDataCatalogueId` initialization by ensuring it happens before the component is mounted.
 - Issue \#1562: Control: Fixed a bug where modules with mouse interactions used in control would block clicks on the map after being closed.
-- Issue \#1568: Filter - fixed a bug where the gfi didnt responded on feature click while filter module was active. 
+- Issue \#1568: Filter - fixed a bug where the gfi didnt responded on feature click while filter module was active.
 - WFS-T: Multi-update works correctly when multiple layers are configured in the WFS-T tool.
-- i18next: 
+- i18next:
     - Updated local storage key for i18n to include a portal identifier, ensuring unique language settings for different portals on the same server.
     - Switching language no longer throws a 404-Error in console.
 - SearchInterfaceSpecialWfs: Improved namespace handling and coordinate transformation. Fixed issues with WFS servers using different namespace prefixes and EPSG:4326 point coordinates.
@@ -214,7 +215,7 @@
 - The `authenticationUrl` attribute has been removed from the documentation, as it is no longer used.
 - The following packages have been removed:
   - dependencies:
-    - url-parse  
+    - url-parse
   - devDependencies:
     - css-loader
     - eslint-plugin-mocha
