@@ -161,7 +161,7 @@ export default {
                 class="btn-group-vertical"
                 role="group"
             >
-                <div v-if="activatedExpandable">
+                <div v-show="activatedExpandable">
                     <div
                         v-for="(control, index) in categorizedControls.expandable"
                         :key="index"
