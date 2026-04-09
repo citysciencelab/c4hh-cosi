@@ -10,6 +10,7 @@
 ### Added
 - SearchBar: Added a checkbox to select all subcategories when opening a folder.
 - FileImport: Added config.json property `openDrawMenuSide` to set the menu side in which the draw module opens.
+- UrlParams: Added GeoJSON layer support for ZOOMTOGEOMETRY.
 
 ### Changed
 - The following packages have been updated:

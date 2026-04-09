@@ -1,6 +1,6 @@
 import axios from "axios";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
-import {WFS} from "ol/format.js";
+import {GeoJSON, WFS} from "ol/format.js";
 import handleAxiosResponse from "@shared/js/utils/handleAxiosResponse.js";
 
 /**
@@ -23,14 +23,28 @@ function escape (value) {
  * @param {String} layerId Id of the layer to retrieve the features from.
  * @param {String} property Property to filter.
  * @param {String[]} values Array of allowed values.
+ * @param {String} options.featureProjection Projection of the map.
  * @returns {Promise<Feature[]>} If resolved, returns an array of features.
  */
-async function getAndFilterFeatures (layerId, property, values) {
+async function getAndFilterFeatures (layerId, property, values, options = {}) {
     const layer = rawLayerList.getLayerWhere({id: layerId}),
         filter = createFilter(layer?.featureNS, layer?.featurePrefix, layer?.version, property, values);
 
     if (layer === null) {
         return new Promise((_, reject) => reject(`The layer with the id ${layerId} could not be found.`));
+    }
+
+    if (layer.typ?.toUpperCase() === "GEOJSON") {
+        return axios
+            .get(layer.url)
+            .then(response => handleAxiosResponse(response, "utils/zoomTo/actionsZoomTo/zoomToFeatures"))
+            .then(data => new GeoJSON().readFeatures(data, {featureProjection: options.featureProjection}))
+            .then(features => features.filter(feature => {
+                if (!feature.getKeys().includes(property)) {
+                    return false;
+                }
+                return values.includes(feature.get(property).toUpperCase().trim());
+            }));
     }
 
     return axios

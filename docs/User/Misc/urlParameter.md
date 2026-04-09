@@ -30,7 +30,7 @@ List of URL parameters with examples.
 |SECONDARYCLOSED|Closes the secondary menu on initial load if set to true|`&SECONDARYCLOSED=true`|
 |ZOOMTOEXTENT|Zooms to an extent. May be combined with projection.|`&ZOOMTOEXTENT=510000,5850000,625000,6000000`|
 |ZOOMTOFEATUREID|Zooms to the features of a WFS configured via **[config.zoomTo](../Portal-Config/config.js.md)**.|`&ZOOMTOFEATUREID=18,26`|
-|ZOOMTOGEOMETRY|Zooms to a feature requested from a WFS. Allowed parameters depend on **[config.zoomTo](../Portal-Config/config.js.md)**. As an alternative to the feature name, features may also be addressed by their `geometries` array index, starting at 1.|`&ZOOMTOGEOMETRY=bergedorf`|
+|ZOOMTOGEOMETRY|Zooms to a feature requested from a WFS or GeoJSON. Allowed parameters depend on **[config.zoomTo](../Portal-Config/config.js.md)**. As an alternative to the feature name, features may also be addressed by their `geometries` array index, starting at 1.|`&ZOOMTOGEOMETRY=bergedorf`|
 
 ***
 

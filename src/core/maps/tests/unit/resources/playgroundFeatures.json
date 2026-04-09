@@ -1,0 +1,1747 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_101",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.779032563485975,
+          53.57867803073994
+        ]
+      },
+      "properties": {
+        "name": "Spielpark Rissener Kuhle",
+        "beschreibung": "Kletterparcours, große Grill- und Skateanlage",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/rissener-kuhle-279336",
+        "bild": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/rissener-kuhle-279336",
+        "anbindung": "S-Bahnhof Sülldorf, Rissen"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_102",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.902806486224442,
+          53.58063951682369
+        ]
+      },
+      "properties": {
+        "name": "Waldspielplatz Altonaer Volkspark",
+        "beschreibung": "Wasserspielbereich, Tischtennis, Kletterturm mit Rutsche",
+        "anbindung": "Bushaltestelle Am Volkspark, Lurup"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_103",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.887094328985738,
+          53.58993410281288
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Vorhornweg",
+        "beschreibung": "Boulderturm, Spielturm mit Rutsche",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/vorhornweg-279458",
+        "bild": "https://www.hamburg.de/resource/image/279446/landscape_ratio16x9/714/402/35e8d1eb6a24799e01e196ec519ab389/14F0F5B43697CA64AEC499DE09624741/18-vorhornweg-02.jpg",
+        "anbindung": "Bushaltestelle Vorhornweg, Lurup"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_104",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.845895987192845,
+          53.59371170663895
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Bornpark",
+        "beschreibung": "Rodelbahn, Calisthenics, Grillplatz",
+        "anbindung": "Bushaltestelle Schenefelder Platz, Osdorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_105",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.876136175123527,
+          53.5912603446232
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Lüttkamp\n",
+        "beschreibung": "Turmrutsche, Bolzplatz",
+        "anbindung": "Bushaltestelle Eckhoffplatz (Lurup Center), Lurup"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_106",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.899079309066991,
+          53.55162445912863
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Holmbrook im Grothpark",
+        "beschreibung": "Kletterschiff und Schatzkiste, Karussell, Wassermatschbereich",
+        "anbindung": "Bushaltestelle AK Altona (Eingang), Othmarschen"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_107",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.920279357339659,
+          53.547906240043034
+        ]
+      },
+      "properties": {
+        "name": "Spielplätze im Fischerspark",
+        "beschreibung": "Wasserspielbereich, Planschbecken, Basketball, Tischtennis",
+        "anbindung": "Bushaltestelle Fischers Allee, Ottensen"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_108",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.945563350679056,
+          53.559436936144266
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Zeiseweg",
+        "beschreibung": "Kletterparcours, Planschbecken, Wassermatschanlage",
+        "anbindung": "Bushaltestelle Max-Brauer-Allee (Mitte), Altona-Nord"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_109",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.942628884654038,
+          53.54763963237099
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Behnstraße",
+        "beschreibung": "Klettergeräte, Wasserspiel, Karussell",
+        "anbindung": "S-Bahnhof Königstraße, Altona-Altstadt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_110",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.952474401381105,
+          53.552559486931315
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Unzerstraße",
+        "beschreibung": "Rundbahn für Rollsport, Seilbahn, Hangrutsche, Planschbecken",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/spielplatz-unzerstrasse-1045824",
+        "bild": "https://www.hamburg.de/resource/image/1045678/landscape_ratio16x9/714/402/ca0ee4f8eabab43787667a4df9a355cf/C52C2515E5797D95CBB4F25FF014C81A/01-unzer-strasse-02.jpg",
+        "anbindung": "Bushaltestelle Paul-Roosen-Straße, Altona-Altstadt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_111",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.971363275981712,
+          53.56607833200173
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Sternschanzenpark",
+        "beschreibung": "Großer Kletterturm mit Rutsche, Spielhäuser",
+        "anbindung": "S-Bahnhof Sternschanze, Sternschanze"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_112",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.95627050226651,
+          53.64320914669612
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Märkerweg",
+        "beschreibung": "Große Wasserspielanlage mit Feuerwehrauto",
+        "anbindung": "Bushaltestelle Pommernweg, Niendorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_113",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.022664736712873,
+          53.67137080934705
+        ]
+      },
+      "properties": {
+        "name": "Spielplätze Hohe Liedt",
+        "beschreibung": "Rutschentürme, Picknickmöglichkeiten, Skateelemente",
+        "anbindung": "Bushaltestelle Hohe Liedt, Langenhorn"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_114",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.037873977835757,
+          53.63178776448945
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Alsterwiesen am Alsterwanderweg",
+        "beschreibung": "Kletterparcours entlang von Bäumen, Holztiere",
+        "anbindung": "U-Bahnhof Klein Borstel, Ohlsdorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_115",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.022169801484978,
+          53.597108806497886
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Hamburger Stadtpark",
+        "beschreibung": "3.000 m² großes Planschbecken mit Sandstrand, riesige Tarzanschaukel, weitläufige Wiese, Doppelseilbahn",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/stadtpark-279422",
+        "bild": "https://www.hamburg.de/resource/image/1043588/landscape_ratio16x9/714/402/a2954d69dc2c6c523843b7068a23eaa5/911BBED57CC934A76B887970A1D34004/02-stadtpark.jpg",
+        "anbindung": "S-Bahnhof Alte Wöhr (Stadtpark), Winterhude"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_116",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.005207413488506,
+          53.594223235600225
+        ]
+      },
+      "properties": {
+        "name": "Waldspielplatz im Stadtpark",
+        "beschreibung": "3.000 m² großes Planschbecken mit Sandstrand, riesige Tarzanschaukel, weitläufige Wiese, Doppelseilbahn",
+        "anbindung": "U-Bahnhof Sierichstraße, Winterhude"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_117",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.214620844174153,
+          53.489498083825204
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Schlosspark Bergedorf",
+        "beschreibung": "Liebevolle Nachbildung des Bergedorfer Schlosses mit Wippferden und Thron",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/schlosspark-bergedorf-279386",
+        "bild": "https://www.hamburg.de/resource/image/1043636/landscape_ratio16x9/714/402/24369e998f2ba14b3a31b3df7e7599ea/AEF18A05AE8C51F245F01913A7E7C3F6/02-schlossspielplatz-01.jpg",
+        "anbindung": "S-Bahnhof Bergedorf, Bergedorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_118",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.193410273956298,
+          53.47918534250657
+        ]
+      },
+      "properties": {
+        "name": "Drachen-Spielplatzim Katendeich",
+        "beschreibung": "Großer Kletter-Drache, Seilbahn, lange Tunnelrutsche",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/katendeich-279166",
+        "bild": "https://www.hamburg.de/resource/image/37018/landscape_ratio16x9/714/402/867ca96cc7512e641dfdb2c942b47fbb/CF4E5323E2BA6DF2C352499E0EB59824/07-katendeich-01.jpg",
+        "anbindung": "Bushaltestelle Heulandhagen, Nettelnburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_119",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.183426314013976,
+          53.476183337672566
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Ameisweg",
+        "beschreibung": "Riesige Dinosaurier-Kletterburg und Babydinosaurier",
+        "anbindung": "Bushaltestelle Ameisweg, Nettelnburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_120",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.148184092529299,
+          53.485741119274294
+        ]
+      },
+      "properties": {
+        "name": "Piratenspielplatz in der Hainbuchenallee",
+        "beschreibung": "Großes Piratenschiff, Stelzenhaus mit Klettertunnel",
+        "anbindung": "Bushaltestelle Adolf-Köster-Damm, Allermöhe-West"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_121",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.161110265129112,
+          53.48389928719749
+        ]
+      },
+      "properties": {
+        "name": "Wasserspielplatz im Wilhelm-Osterhold-Stieg",
+        "beschreibung": "Wasserspielbereich mit Pumpe, Inkulsionsbereich mit Karussel und Trampolin",
+        "anbindung": "Bushaltestelle Wilhelm-Osterhold-Stieg, Allermöhe-West"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_122",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.171952532524898,
+          53.476476203290524
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz am Randfleet im Anna-von-Gierke-Ring",
+        "beschreibung": "Tarzanschaukel, Skateanlage, Hangrutsche",
+        "anbindung": "Bushaltestelle Jeanette-Wolff-Ring, Neu-Allermöhe"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_123",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.983619404798441,
+          53.57812369519423
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Parkallee",
+        "beschreibung": "Wasserspielbereich, Liegewiese mit Picknickmöglichkeit",
+        "anbindung": "U-Bahnhof Emilienstraße, Eimsbüttel"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_124",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.91818078540973,
+          53.645323072265214
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Königskinder im Wassermannspark",
+        "beschreibung": "Kletterburg, Seilbahn, Kleinkindbereich mit Rutsche, große Netzschaukel, Picknicktische",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/spielplatz-koenigskinder-279144",
+        "bild": "https://www.hamburg.de/resource/image/1043444/landscape_ratio16x9/714/402/b88a9d003c3276e286171935e4b28e7/1D15E62531C1272438DC35FC37F36553/03-koenigskinder.jpg",
+        "anbindung": "Bushaltestelle Eisenhansweg, Schnelsen"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_125",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.907041135104258,
+          53.6041672986916
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Wiebelstraße",
+        "beschreibung": "Doppelseilbahn, anspruchsvolle Kletterstangen, Drehscheiben, Spielhäuser, behindertengerechtes Spielangebot, Boulebahn",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/wiebelstrasse-279504",
+        "bild": "https://www.hamburg.de/resource/image/279496/landscape_ratio16x9/714/402/919340a260d0c239760d6a0c87ee6cde/9603F0289599CC93BA3ECA8EDFF2BCFF/20-wiebelstrasse-06.jpg",
+        "anbindung": "Bushaltestelle Mühlenauweg, Eidelstedt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_126",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.964727511302518,
+          53.589540649972335
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Grandweg",
+        "beschreibung": "Wasserpumpe, Kletterlandschaften, Seilzirkus mit Ausguck, Spielschiff, Röhrenrutsche",
+        "anbindung": "Bushaltestelle Veilchenweg (Ost), Lokstedt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_127",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.957469907069008,
+          53.581266227072625
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Eidelstedter Weg",
+        "beschreibung": "Wassermatschanlage, Graffitigalerie, anspruchsvolle Kletterlandschaft mit Röhrenrutsche",
+        "anbindung": "Bushaltestelle Eidelstedter Weg, Lokstedt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_128",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.136133911337716,
+          53.55251988964437
+        ]
+      },
+      "properties": {
+        "name": "Spielplätze im Öjendorfer Park/Süd",
+        "beschreibung": "Seilkletterparcours, Wasserpumpenanlage mit Rinnensystem",
+        "anbindung": "Bushaltestelle Fuchsbergweg Öjendorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_129",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.146440319763915,
+          53.560206109154535
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Öjendorfer Park/Nord",
+        "beschreibung": "Leuchtturm zum Klettern, Wipp-Schiff, Wassermatschanlage mit Pumpe, Spielangebote Park-SportInsel e.V.",
+        "anbindung": "Bushaltestelle Salomon-Petri-Ring, Öjendorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_130",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.11005765650663,
+          53.55686378917929
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Schiffbeker Moor",
+        "beschreibung": "Piratenschiff, Hangrutsche",
+        "anbindung": "Bushaltestelle Prinzenweg, Horn"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_131",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.07645034096088,
+          53.55200225604863
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Blohms Park",
+        "beschreibung": "Kleinkindspielbereich mit Bühne, Löwenskulptur, anspruchsvoller Kletterparcours „Hammer Turm\"",
+        "anbindung": "U-Bahnhof Horner Rennbahn, Horn"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_132",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.974288681576056,
+          53.55437563532709
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Große Wallanlagen",
+        "beschreibung": "Seilzirkus, Tunnelrutschen, Wasserspielbereich mit Flusslauf",
+        "anbindung": "U-Bahnhof St.Pauli, Neustadt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_133",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.982125130295653,
+          53.5605715538019
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Bullerberge in Planten un Blomen",
+        "beschreibung": "Kletteranlage „Buller-Berge\", riesiger Wasserspielplatz mit Wasserspritzen, separater Kleinkinderspielplatz",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/planten-un-blomen-279250",
+        "bild": "https://www.hamburg.de/resource/image/1043530/landscape_ratio16x9/714/402/a793f06aa5f58053dba1d3388f143ec5/B8DA876E11D44DFC915ECA3C04B725FD/07-pb-bullerberge.jpg",
+        "anbindung": "S-Bahnhof Dammtor, St. Pauli"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_134",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.003629585007472,
+          53.49379329027721
+        ]
+      },
+      "properties": {
+        "name": "Skatepark im Inselpark",
+        "beschreibung": "Großer Skatepark mit Flutlichtschalter, Bewegungsgärten, Beachvolleyball, Basketball, Fußball, Spielangebote Park-Sport-Insel e.V.",
+        "anbindung": "Bushaltestelle Inselpark, Wilhelmsburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_135",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.996035510292794,
+          53.494218568440154
+        ]
+      },
+      "properties": {
+        "name": "Wasserspielplatz Windflüchter im Inselpark",
+        "beschreibung": "Planschbecken, Wasserpumpen, Geysir, Nebelwald",
+        "anbindung": "Bushaltestelle Inselpark, Wilhelmsburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_136",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.989495524521068,
+          53.596259851996734
+        ]
+      },
+      "properties": {
+        "name": "Spielplätze im Hayns Park",
+        "beschreibung": "Großes Kinderplanschbecken, Spielhäuser",
+        "anbindung": "Bushaltestelle Eppendorfer Marktplatz, Eppendorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_137",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.993308517872233,
+          53.492701941817025
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Geheimnisvolle Insel im Inselpark",
+        "beschreibung": "Große Schaukeln, Stangenwald als Parcours, riesiger Vulkan als Kletter- und Rutschturm",
+        "anbindung": "Bushaltestelle Trettaustraße Wilhelmsburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_138",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.116248849121604,
+          53.542585415002556
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Archenholzstraße",
+        "beschreibung": "Turmrutsche, Streetballskulptur, Kunststoffbolzplatz",
+        "anbindung": "Bushaltestelle Schleemer Weg (Nord), Billstedt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_139",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.058731661772384,
+          53.54667713011025
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Osterbrookplatz",
+        "beschreibung": "Kletterkuppel, Kleinkindspielbereich mit Sonnenschutz",
+        "anbindung": "Bushaltestelle Osterbrookplatz, Hamm-Süd"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_140",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.995188298212005,
+          53.54013946297824
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Grasbrookpark",
+        "beschreibung": "Spielschiffe, Palmeninsel zum Klettern, große Wassermatschanlage",
+        "anbindung": "U-Bahnhof Überseequartier, HafenCity"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_141",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.969094380595639,
+          53.549279832193136
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Alter Elbpark",
+        "beschreibung": "Trampolin, Wassermatschanlage mit Sonnenschutz, Ausguck, hölzerne Spieltiere",
+        "anbindung": "U-Bahnhof St.Pauli, St. Pauli"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_142",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.962932646989355,
+          53.55444432434747
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Paulinenplatz",
+        "beschreibung": "Wassermatschanlage, Seilzirkus, Karussell, Spielhäuser",
+        "anbindung": "Bushaltestelle Paulinenstraße, St. Pauli"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_143",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.989723108158215,
+          53.510916554111084
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Rotenhäuser Feld",
+        "beschreibung": "Riesige Turmrutsche, Skateanlage mit großer Rampe, Beachvolleyball, Basketball",
+        "anbindung": "Bushaltestelle Neuhöfer Straße (Ost), Wilhelmsburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_144",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.011583120034599,
+          53.48469219799746
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Otto-Brenner-Straße",
+        "beschreibung": "Hangrutsche, Netzschaukel, Seilzirkus, Basketball, Fußball",
+        "anbindung": "Bushaltestelle Stübenhofer Weg, Kirchdorf-Süd"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_145",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.859909010919681,
+          53.53597517999742
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz am Rüschpark",
+        "beschreibung": "Turmrutsche, Reifenschaukel, BMX-Fahrbahn, große Skaterrampe",
+        "anbindung": "Bushaltestelle Neßpriel, Finkenwerder"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_146",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.207079594886475,
+          53.50843394643267
+        ]
+      },
+      "properties": {
+        "name": "Grünes Zentrum Lohbrügge, mehrere Spielplätze um den Ziegelteich",
+        "beschreibung": "Kran als Rutsche, Seilbahn, große Kletterburg, Vogelvoliere, Original-Barkasse zum Spielen",
+        "anbindung": "Bushaltestelle Perelsstraße, Lohbrügge"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_147",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.213778643285066,
+          53.49959259894308
+        ]
+      },
+      "properties": {
+        "name": "Wikingerspielplatz an der Bille",
+        "beschreibung": "Riesiges Wikingerschiff aus Holz, Rastplatz für Kanufahrer",
+        "anbindung": "Bushaltestelle Lohbrügger Markt, Lohbrügge"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_148",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.191253728543128,
+          53.49848881107171
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Sander Tannen im Walter-Hammer-Weg",
+        "beschreibung": "Kletterparcours im Wald, große Spiel-Pferdekutsche, Picknickplätze",
+        "anbindung": "Bushaltestelle Richard-Linde-Weg, Lohbrügge"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_149",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.99667629760081,
+          53.66954946222386
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz in der Duisburger Straße",
+        "beschreibung": "Kletterkugel, Riesenwippe, Wassermatschanlage mit Pumpe, Rutschen",
+        "anbindung": "Bushaltestelle Klinikum Nord (Ochsenzoll), Langenhorn"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_150",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.01332954166673,
+          53.67029959542579
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Hammenmacherstieg",
+        "beschreibung": "Kletter- und Balancierparcours, Basketballfeld, Riesenwippe, Bolzplatz, Skateelemente",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/essener-strasse-279076",
+        "bild": "https://www.hamburg.de/resource/image/279068/landscape_ratio16x9/714/402/ff6e9c5d0c08729bf5e1760ca515589e/3C913A1C686420AA88ADBE5682945845/03-essener-strasse-01.jpg",
+        "anbindung": "U-Bahnhof Kiwittsmoor, Langenhorn"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_151",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.990928014208084,
+          53.58838268511354
+        ]
+      },
+      "properties": {
+        "name": "Kelle Skatepark",
+        "beschreibung": "1.300 m² große Skateanlage mit Bowl",
+        "anbindung": "U-Bahnhof Kellinghusenstraße, Eppendorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_152",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.99200221565435,
+          53.60005938779473
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Meenkwiese am Alsterwanderweg",
+        "beschreibung": "Wassermatschanlage, Kletterhügel mit Rutschenturm, Seilparcours, Bolzplatz",
+        "anbindung": "U-Bahnhof Lattenkamp, Winterhude"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_153",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.010558219332944,
+          53.58417346346287
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Schinkelstraße",
+        "beschreibung": "Planschbecken, Spielhäuser, lange Tunnelrutsche",
+        "anbindung": "Bushaltestelle Gertigstraße, Winterhude"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_154",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.033335930860172,
+          53.58097657905404
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Biedermannplatz",
+        "beschreibung": "Inklusionsspielplatz, Planschbecken, Wasserspiel, Strandbuden, hoher Rutschenturm, großes Seilklettergerät",
+        "anbindung": "Bushaltestelle Biedermannplatz, Barmbek-Süd"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_155",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.048956853127176,
+          53.59997816994293
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Langenfort (vor dem Spielhaus Langenfort)",
+        "beschreibung": "Bagger, Nestschaukel, Spielhäuser, Kletterburg",
+        "anbindung": "Bushaltestelle Langenfort, Barmbek-Nord"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_156",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.050384698134728,
+          53.574077367720555
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Friedrichsbergerpark",
+        "beschreibung": "Turmrutsche mit Kletterwand, Seilzirkus, Karussell, Spielhäuser, Wetterschutzhütte",
+        "anbindung": "Bushaltestelle Holsteinischer Kamp, Eilbek"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_157",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.221389896530306,
+          53.40189084544864
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Feuerwehr",
+        "beschreibung": "Großes Feuerwehrauto, Kletterturm mit Rutsche",
+        "anbindung": "Bushaltestelle West-Kraueler Bogen, Kirchwerder"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_158",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.973254731647355,
+          53.44832596444279
+        ]
+      },
+      "properties": {
+        "name": "Wasserspielplatz Zündschnurweg im Harburger Stadtpark",
+        "beschreibung": "Planschbecken, großer Kletterturm als Wasserspielbereich, Riesenwippe",
+        "anbindung": "Bushaltestelle Marmstorfer Weg (Nord), Wilstorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_159",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.986475474537286,
+          53.46976444759615
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Gebrüder-Cohen-Park auf der Harburger Schlossinsel",
+        "beschreibung": "Fischernetz-Reusenparcours, Fässer zum Balancieren und Klettern, Hängematte, Nestschaukel",
+        "anbindung": "Bushaltestelle Zitadellenstraße, Harburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_160",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.983466491327794,
+          53.4556044308438
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Bunatwiete",
+        "beschreibung": "Seilzirkus, große Röhrenrutsche, Kunststoffbolzplatz",
+        "anbindung": "S-Bahnhof Hamburg-Harburg, Harburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_161",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.984040316084245,
+          53.45306477256111
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Beckerberg",
+        "beschreibung": "Spiellandschaft mit Häuschen zum Thema „Wald\", Rutschen, Balancierflächen",
+        "anbindung": "S-Bahnhof Hamburg-Harburg, Harburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_162",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.87275142715617,
+          53.474406585705815
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Mehrgenerationen im Rehrstieg",
+        "beschreibung": "Seilzirkus, Tarzanschaukel, Spielloop, große Skateanlage",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/rehrstieg-279302",
+        "bild": "https://www.hamburg.de/resource/image/279286/landscape_ratio16x9/714/402/62d5c5de9b54ff826722356eb504b1df/2CE9557A563E5C0E8E7050A27911514A/b-3-rehrstieg.jpg",
+        "anbindung": "S-Bahnhof Neuwiedenthal, Neuwiedenthal"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_163",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.856990203760533,
+          53.46687100971524
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Fischbeker Holtweg am Brunnenschutzgebiet Ostheide/Nordheide",
+        "beschreibung": "Kletterparcours, Wasserspiel, Matschtische",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/regenspielplatz-279276",
+        "bild": "https://www.hamburg.de/resource/image/279254/landscape_ratio16x9/714/402/29171029046bf15287e900fd66f412de/7D44C3BBE1F158DAF4C2F6D8F1E90965/b-4-regenspielplatz.jpg",
+        "anbindung": "Bushaltestelle Fischbeker Holtweg, Fischbek"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_164",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.940347600620077,
+          53.4685183224435
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Meyers Park",
+        "beschreibung": "Spielplatz mitten im Wald, Ponyreiten in der Nähe, Grillanlagen mit Schutzhütten",
+        "anbindung": "Bushaltestelle Krankenhaus Mariahilf, Heimfeld"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_165",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.063754899037422,
+          53.61876031149473
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Borchertring",
+        "beschreibung": "Riesenrutsche, Tarzanschaukel, Spielhäuser, Spielschiff",
+        "anbindung": "Bushaltestelle Borchertring, Steilshoop"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_166",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.052068728592147,
+          53.604795901639804
+        ]
+      },
+      "properties": {
+        "name": "Dschungelspielplatz Steilhooper Straße",
+        "beschreibung": "Giraffen-Rutsche, Dschungelpfad, Basketball, Fußball",
+        "anbindung": "Bushaltestelle Richeystraße, Steilshoop"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_167",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.059106026087694,
+          53.60517428358047
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Appelhofweiher",
+        "beschreibung": "Spielgerät zum Thema Apfelhof u.a. Traktor, Pferdewagen, Kaufmannsladen, Beachvolleyball, Bewegungsparcours, Picknickplätze mit Grill",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/appelhoffweiher-279042",
+        "bild": "https://www.hamburg.de/resource/image/1043614/landscape_ratio16x9/714/402/4f3f36affdc5cbad742ce72e15baaa96/20BBF008E03365A95FEC07B838F445A4/02-appelhofweiher-01.jpg",
+        "anbindung": "Bushaltestelle Schwarzer Weg, Alt-Steilshoop"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_168",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.145313653572549,
+          53.5833278568473
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Haus am See",
+        "beschreibung": "Wassermatschanlage, Bolzplatz, Spielhäuser",
+        "anbindung": "Bushaltestelle Berliner Platz, Rahlstedt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_169",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.847424931314588,
+          53.585324781824276
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Achtern Born",
+        "beschreibung": "Spielbereiche zum Thema Forschen, große Kletterlandschaft, Wasserspielbereich",
+        "anbindung": "Bushaltestelle Immenbusch, Osdorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_170",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.927155267359238,
+          53.54883599391108
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Boninstraße",
+        "beschreibung": "Holztiere und Spielhäuser",
+        "anbindung": "Bushaltestelle Bahrenfelder Straße, Ottensen"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_171",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.948402916426007,
+          53.572639059799116
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Fruchtallee",
+        "beschreibung": "Individuell gestaltete Skaterbowl",
+        "anbindung": "U-Bahnhof Emilienstraße, Eimsbüttel"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_172",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.923770534654548,
+          53.60392905484153
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Wegenkamp",
+        "beschreibung": "Steile Hangrutsche, Spielgeräte in Form von Obst und Gemüse, kleine Skateanlage",
+        "anbindung": "Bushaltestelle Oldenburger Straße, Stellingen, A7 Deckel"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_173",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.940823942417564,
+          53.61628303420764
+        ]
+      },
+      "properties": {
+        "name": "Waldspielplatz Niendorfer Gehege",
+        "beschreibung": "Holztiere, Rutsche, großer Holzunterstand, Lage im Wald, Wildgehege in der Nähe",
+        "anbindung": "U-Bahnhof Niendorf Markt, Niendorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_174",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.901058851245937,
+          53.62239599274076
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Brummerskamp",
+        "beschreibung": "Piraten-Holzschiff, Seeräuber- Strand, Bolzplatz",
+        "anbindung": "Bushaltestelle Wietersheim, Eidelstedt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_175",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.970435388606065,
+          53.63150004279519
+        ]
+      },
+      "properties": {
+        "name": "Pilzspielplatz im Teutonenweg",
+        "beschreibung": "Bienenschwarm aus Wipptieren, Kindersitzgruppen mit Fliegenpilzdächern, Klettertürme als Baumhäuser, Wackelbrücken",
+        "anbindung": "Bushaltestelle Langobardenweg, Niendorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_176",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.976254404062118,
+          53.603526229128164
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Gert-Marcus-Straße",
+        "beschreibung": "Spielhäuser, hoher Kletterturm mit Rutsche, Schaukeln",
+        "anbindung": "Bushaltestelle Köppenstraße / Nedderfeld, Groß Borstel"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_177",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.038585126323632,
+          53.59083489741156
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Rübenkamp",
+        "beschreibung": "Skatepark, Pumptrack",
+        "anbindung": "S-Bahnhof Barmbek, Barmbek-Nord"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_178",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.056925612831385,
+          53.57496448850238
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Eilbeker Drache im Wandse-Grünzug",
+        "beschreibung": "Imposanter Drache zum Klettern, Balancieren und Calistenics, Boule, Basketball, Fußball",
+        "anbindung": "S-Bahnhof Friedrichsberg, Eilbek"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_179",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.082497389831051,
+          53.568416831522
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Jüthornstraße",
+        "beschreibung": "Anspruchsvoller Kletterparcours aus Holz, Stehwippe, Trampolin, Tischtennis",
+        "anbindung": "Bushaltestelle Bovestraße, Wandsbek"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_180",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.125238048053713,
+          53.60952738768172
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Im Wiesengrund im Grünzug Berner Au",
+        "beschreibung": "Turmrutsche, Kleinkindspielbereich, Streetball, Picknick-Tische",
+        "anbindung": "U-Bahnhof Farmsen, Oldenfelde"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_181",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.123692536408477,
+          53.576840700790214
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Jenfelder Moorpark",
+        "beschreibung": "Großer Spielbagger, Kleinkinderspielbereich mit demThema „Hühnerhof“, Kletterwald, Balancierpfad",
+        "anbindung": "Bushaltestelle Albert-Schweitzer-Ring, Jenfeld"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_182",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.979379454065668,
+          53.5518710187412
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Markusstraße",
+        "beschreibung": "Inklusionsspielplatz, Trampoline, Karussel, Netzschaukel, Kletteranlage",
+        "anbindung": "S-Bahnhof Stadthausbrücke, Neustadt"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_183",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.023076778836906,
+          53.55471600188107
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Lohmühlenpark am Berliner Tor",
+        "beschreibung": "Kleinkinderspielbereich, Kletterelemente",
+        "anbindung": "S-Bahnhof Berliner Tor, St. Georg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_184",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.045595804167597,
+          53.55693490328601
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Thörls Park",
+        "beschreibung": "Balancier-Route, Doppelwippe, große Holzliegen zum Fledermäuse beobachten",
+        "anbindung": "U-Bahnhof Burgstraße, Hamm"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_185",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.043606279861702,
+          53.53071663920789
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Traunspark",
+        "beschreibung": "Vogelnestschaukel, Kleinkindspielbereich, Tischtennis",
+        "anbindung": "Bushaltestelle Entenwerder Stieg, Rothenburgsort"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_186",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.061032074472868,
+          53.55762545275923
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz im Hammer Park",
+        "beschreibung": "Wassermatschanlage, Babyschaukel, Kletterkuppel, Spielangebote ParkSportInsel e.V.",
+        "anbindung": "U-Bahnhof Rauhes Haus, Hamm"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_187",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.142013930387654,
+          53.531486427666536
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Kollwitzring 135",
+        "beschreibung": "Kletteranlage",
+        "anbindung": "Bushaltestelle Max-Klinger-Straße, Öjendorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_188",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.996729236791307,
+          53.496032602971695
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Wüstenwellen im Inselpark",
+        "beschreibung": "Kletterlandschaft mit Hügeln und großer Rutsche, Trampolin",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/spielplaetze-inselpark-1043692",
+        "bild": "https://www.hamburg.de/resource/image/1043696/landscape_ratio16x9/714/402/f442bda9b95382192b86592dab418663/9DCF55EC3AB6A0574791771BBE3BF27B/01-wilhelmsburger-inselpark-01.jpg",
+        "anbindung": "Bushaltestelle Rathaus Wilhelmsburg, Wilhelmsburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_189",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.850668391061228,
+          53.47516647875378
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Vogelkamp",
+        "beschreibung": "Spielhäuser, Balancierparcours, Stehwippe, Beachvolleyball, Basketball, Tischtennis",
+        "anbindung": "S-Bahnhof Neugraben, Neugraben-Fischbek"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_190",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.95168341391943,
+          53.46442396238608
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Kiefernberg",
+        "beschreibung": "Elefantenspielfigur, Spielturm, Wassermatschtisch mit Wasserpumpe, Kletterparcours",
+        "anbindung": "Bushaltestelle Eißendorfer Pferdeweg (Mitte), Heimfeld"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_191",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.971722114148072,
+          53.442192197181946
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz am Nymphenweg im Harburger Stadtpark",
+        "beschreibung": "Wellenrutsche, viele Klettermöglichkeiten",
+        "anbindung": "Bushaltestelle Nymphenweg, Wilstorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_192",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.974949377174937,
+          53.45096256307571
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Schulgarten im Harburger Stadtpark",
+        "beschreibung": "Wackelbrücke, in wunderschöner historischer Gartenanlage gelegen",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/marmsdorfer-weg-279224",
+        "bild": "https://www.hamburg.de/resource/image/279204/landscape_ratio16x9/714/402/bfadc467c92598a9a179d7970b2ece77/CCDB9FA49A9D95DA8288DBC8BDB52062/10-marmstorfer-weg-01.jpg",
+        "anbindung": "Bushaltestelle Marmstorfer Weg (Nord), Wilstorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_193",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.06332181926693,
+          53.584075705303235
+        ]
+      },
+      "properties": {
+        "name": "Spielplätze im Grünzug Dulsberg",
+        "beschreibung": "Klettertürme, Spielschiff, Seilbahn, Rollerbahn",
+        "anbindung": "U-Bahnhof Alter Teichweg, Dulsberg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_194",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.97070926098709,
+          53.454899742581894
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Steinikestraße im Göhlbachtal",
+        "beschreibung": "Anspruchsvolle Kletterlandschaft und Hangrutsche, großes Trampolin, Nestschaukel",
+        "anbindung": "Bushaltestelle Dempwolffstraße, Harburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_195",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.147847046174459,
+          53.646136905212714
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Schemmannstraße",
+        "beschreibung": "Klettergerüst, Karussell, Grill- und Picknickmöglichkeiten, Burganlage",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/schemmannstrasse-279376",
+        "bild": "https://www.hamburg.de/resource/image/279374/landscape_ratio16x9/714/402/8461b0757d04a2adba6ed95443362209/C69AC25507E5B4E84663618D74FDA5C1/14-schemmannstrasse-08.jpg",
+        "anbindung": "Bushaltestelle Eulenkrugstraße, Volksdorf"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_196",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.015882402970954,
+          53.5592558689339
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Lohmühlenpark in der Bülaustraße",
+        "beschreibung": "Seilzirkus, Rutschenturm, Spielangebote ParkSportInsel e.V.",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/lohmuehlenpark-279200",
+        "bild": "https://www.hamburg.de/resource/image/279190/landscape_ratio16x9/714/402/2e99a017d09ee17c46e5a62787fdff4d/53A2A35013B0317457604DC27FC1DC03/09-lohmuehlenpark-02.jpg",
+        "anbindung": "Bushaltestelle AK St. Georg, St. Georg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_197",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.984178690912808,
+          53.51569056281446
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Sanitasstraße",
+        "beschreibung": "Kletterhügel, Hangrutsche, Seilzirkus",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/sanitasstrasse-279356",
+        "bild": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/sanitasstrasse-279356",
+        "anbindung": "Bushaltestelle Mannesallee, Wilhelmsburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_198",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.025540975820336,
+          53.582194242008626
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Johannes-Prassek-Park",
+        "beschreibung": "Balancierpfad, Kletternetz, Rollerbahn",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/weidestrasse-279482",
+        "bild": "https://www.hamburg.de/resource/image/279470/landscape_ratio16x9/714/402/16d6a24f181ccb29c2822e86d3fd116c/108E577C79BCA16FB84AE1250BBD930F/19-weidestrasse-05.jpg",
+        "anbindung": "Bushaltestelle Flotowstraße, Barmbek-Süd"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_199",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.979800474906751,
+          53.458600960953106
+        ]
+      },
+      "properties": {
+        "name": "Spielplatz Harburger Rathausplatz",
+        "beschreibung": "Spielgeräte in Anlehnung an das Archeologische Museum direkt nebenan: Ausgrabungsstätte, riesiges Mammut aus Holz mit Rutsche",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/harburger-rathausplatz-279112",
+        "bild": "https://www.hamburg.de/resource/image/279104/landscape_ratio16x9/714/402/818748a69436715fab1666955b4e38fd/F7A83D59EFE7F9C4F12D0A0AFB77B6B7/05-harburger-rathausplatz-03.jpg",
+        "anbindung": "Bushaltestelle Harburg Rathaus, Harburg"
+      },
+      "srsName": "EPSG:4326"
+    },
+    {
+      "type": "Feature",
+      "id": "DE.HH.UP_SPIELPLAETZE_HH_200",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.876628258486072,
+          53.479016539651326
+        ]
+      },
+      "properties": {
+        "name": "Drachenthal Spielplatz",
+        "beschreibung": "Imposanter Drache mit Rutsche, Basketball, Fußball",
+        "link": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/hamburgs-gruen/spielplaetze/drachenthal-279064",
+        "bild": "https://www.hamburg.de/resource/image/1040750/landscape_ratio16x9/714/402/885949d73f5b023cc00c7d7b5a11849f/31CC70254E863A8B02962F845A0F2E9F/03-drachenthal-01.jpg",
+        "anbindung": "S-Bahnhof Neuwiedenthal, Neuwiedenthal"
+      },
+      "srsName": "EPSG:4326"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import featureProvider from "@core/maps/js/zoomToGetAndFilterFeatures.js";
 import fs from "fs";
 
 const exampleFeatureCollection = fs.readFileSync("./src/core/maps/tests/unit/resources/featureCollection.xml", "utf8");
+const exampleGeojson = fs.readFileSync("./src/core/maps/tests/unit/resources/playgroundFeatures.json", "utf8");
 
 describe("src/core/maps/js/zoomToGetAndFilterFeatures.js", () => {
     const id = "someId",
@@ -32,7 +33,7 @@ describe("src/core/maps/js/zoomToGetAndFilterFeatures.js", () => {
             });
     });
 
-    it("should call the axois request, if layer exists", () => {
+    it("should call the axios request, if layer exists", () => {
         const axiosSpy = sinon.stub(axios, "get").callsFake(() => new Promise(resolve => resolve({status: 200, statusText: "OK", data: exampleFeatureCollection}))),
             layer = {
                 id: "id",
@@ -45,6 +46,21 @@ describe("src/core/maps/js/zoomToGetAndFilterFeatures.js", () => {
 
         featureProvider.getAndFilterFeatures(id, property, values);
         expect(axiosSpy.calledOnce).to.be.true;
+    });
+
+    it("should call the url without parameters for geojson layer", () => {
+        const axiosSpy = sinon.stub(axios, "get").callsFake(() => new Promise(resolve => resolve({status: 200, statusText: "OK", data: exampleGeojson}))),
+            layer = {
+                id: "id",
+                url: "https://geodaten.de/file.json",
+                typ: "GeoJSON"
+            };
+
+        sinon.stub(rawLayerList, "getLayerWhere").returns(layer);
+
+        featureProvider.getAndFilterFeatures(id, property, values);
+        expect(axiosSpy.calledOnce).to.be.true;
+        expect(axiosSpy.firstCall.args[0]).to.equal("https://geodaten.de/file.json");
     });
 
     it("should return a Promise which resolves to Feature[] only including features including an allowed value for the given property", () => {
@@ -62,6 +78,18 @@ describe("src/core/maps/js/zoomToGetAndFilterFeatures.js", () => {
                 expect(features.length).to.equal(1);
             });
     });
+
+    it("should return a Promise which resolves to Feature[] only including features including an allowed value for the given property of geojson layer", () => {
+        sinon.stub(rawLayerList, "getLayerWhere").returns({id: "id", url: "https://geodaten.de",
+            typ: "GeoJSON"});
+        sinon.stub(axios, "get").callsFake(() => new Promise(resolve => resolve({status: 200, statusText: "OK", data: exampleGeojson})));
+
+        featureProvider.getAndFilterFeatures(id, "name", ["SPIELPARK RISSENER KUHLE"])
+            .then(features => {
+                expect(features.length).to.equal(1);
+            });
+    });
+
     describe("createUrl", () => {
         it("test params", () => {
             const url = "https://geodienste.hamburg.de/",
