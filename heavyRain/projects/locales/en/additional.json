@@ -3,7 +3,9 @@
     "projects": {
       "title": "Heavy Rain Projects",
       "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
-      "createProject": "Create New Project"
+      "createProject": "Create New Project",
+      "cancelButtonLabel": "Cancel",
+      "saveButtonLabel": "Save"
     }
   }
 }

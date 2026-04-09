@@ -3,7 +3,9 @@
     "updateRequirements": {
       "title": "Update Requirements",
       "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
-      "createMessage": "Create New Message"
+      "createMessage": "Create New Message",
+      "cancelButtonLabel": "Cancel",
+      "saveButtonLabel": "Save"
     }
   }
 }

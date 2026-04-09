@@ -3,7 +3,9 @@
     "updateRequirements": {
       "title": "Aktualisierungsbedarfe",
       "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
-      "createMessage": "Neue Meldung erstellen"
+      "createMessage": "Neue Meldung erstellen",
+      "cancelButtonLabel": "Vorgang abbrechen",
+      "saveButtonLabel": "Meldung speichern"
     }
   }
 }
