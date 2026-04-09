@@ -183,7 +183,14 @@ export default {
          * @returns {void}
          */
         async loadStoryContents (htmlFile) {
-            if (htmlFile) {
+            if (this.storyConf.htmlFolder && htmlFile) {
+                const storybasepath = this.storyConfPath.endsWith("/") ? this.storyConfPath : this.storyConfPath + "/",
+                    response = await axios.get(storybasepath + this.storyConf.htmlFolder + "/" + htmlFile),
+                    data = await response.data;
+
+                return data;
+            }
+            else if (htmlFile) {
                 return axios.get("./assets/steps/" + htmlFile)
                     .then(response => {
                         if (!response || !response.data) {
