@@ -311,6 +311,82 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
                 expect(layer.legendURL).to.be.equals(layers[0].legendURL[i]);
             }
         });
+        it("should respect layerIDsToStyle with grouped layers", () => {
+            const simpleLayerList = [
+                    {
+                        id: "1935",
+                        name: "Normalfahrplan1935",
+                        layers: "geofox_workspace:geofoxdb_strecken_normal"
+                    },
+                    {
+                        id: "1933",
+                        name: "Haltestellen1933",
+                        layers: "geofox_workspace:geofoxdb_stations"
+                    }
+                ],
+                layerIDsToStyle = [
+                    {
+                        id: "1935",
+                        styles: [
+                            "geofox_Faehre",
+                            "geofox-bahn",
+                            "geofox-bus",
+                            "geofox_BusName"
+                        ],
+                        name: [
+                            "Fährverbindungen",
+                            "Bahnlinien",
+                            "Buslinien",
+                            "Busliniennummern"
+                        ],
+                        legendURL: [
+                            "https://legendURL/hvv-faehre.png",
+                            "https://legendURL/hvv-bahn.png",
+                            "https://legendURL/hvv-bus.png",
+                            "https://legendURL/hvv-bus.png"
+                        ]
+                    },
+                    {
+                        id: "1933",
+                        styles: "geofox_stations",
+                        name: "Haltestellen",
+                        legendURL: "https://legendURL/hvv-bus.png"
+                    }
+                ],
+                layers = [
+                    {
+                        id: ["1933", "1935"],
+                        typ: "GROUP",
+                        visibility: true,
+                        name: "hvv Verbindungen"
+                    }
+                ];
+            let result = null;
+
+            layerConfig = {
+                [treeSubjectsKey]: {
+                    elements: layers
+                }
+            };
+            sinon.stub(rawLayerList, "getLayerWhere").callsFake(function (searchAttributes) {
+                return simpleLayerList.find(entry => Object.keys(searchAttributes).every(key => entry[key] === searchAttributes[key])) || null;
+            });
+            sinon.stub(rawLayerList, "getLayerList").returns(simpleLayerList);
+            result = getAndMergeRawLayer(layerConfig[treeSubjectsKey].elements[0], true, layerIDsToStyle);
+
+            expect(Array.isArray(result)).to.be.true;
+            expect(result.length).to.be.equals(1);
+            expect(Array.isArray(result[0].children)).to.be.true;
+            expect(result[0].children.length).to.be.equals(2);
+            for (let i = 0; i < result[0].children.length; i++) {
+                const child = result[0].children[i],
+                    styleConfig = layerIDsToStyle.find(item => item.id === child.id),
+                    styleLength = Array.isArray(styleConfig.styles) ? styleConfig.styles.length : 1;
+
+                expect(child.layers.split(",").length).to.be.equals(styleLength);
+                expect(child.styles.split(",").length).to.be.equals(styleLength);
+            }
+        });
         it("should respect layerIDsToStyle with one style", () => {
             const simpleLayerList = [
                     {

@@ -967,7 +967,7 @@
           "styleId": "4515",
           "visibility": true,
           "showInLayerTree": true
-        },       
+        },
         {
           "id": "34406",
           "styleId": "47",
@@ -1117,16 +1117,14 @@
           ]
         },
         {
-          "name": "HVV",
-          "type": "folder",
-          "elements": [
-            {
-              "id": "1935"
-            },
-            {
-              "id": "1933"
-            }
-          ]
+          "id": [
+            "1933",
+            "1935"
+          ],
+          "typ": "GROUP",
+          "showInLayerTree": false,
+          "visibility": false,
+          "name": "hvv Streckennetz für Bahn-, Bus- und Fährlinien Hamburg"
         },
         {
           "id": "1711",

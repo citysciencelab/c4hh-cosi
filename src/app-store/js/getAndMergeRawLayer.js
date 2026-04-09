@@ -337,7 +337,9 @@ function removeFromLayerList (ids = [], layerList = []) {
     });
 }
 /**
- * Properties in 'layerIDsToStyle'are are assigned to dedicated layers. If an entry has more than one style, new layers are created for each style.
+ * Properties in 'layerIDsToStyle'are are assigned to dedicated layers.
+ * If an entry has more than one style, new layers are created for each style.
+ * If a group layer is configured, count of styles and count of layers must match.
  * Ids are composed by origin id and styles value.
  * @param  {Array} layerIDsToStyle contains style configurations
  * @param  {Object} layer raw layer from services.json
@@ -345,10 +347,36 @@ function removeFromLayerList (ids = [], layerList = []) {
  * @returns {void}
  */
 function styleAndMergeLayers (layerIDsToStyle, layer, layerList) {
-    const styleConfig = layerIDsToStyle.find(item => item.id === layer.id),
-        rawLayer = Object.assign(layer, styleConfig);
+    let styleConfig = layerIDsToStyle.find(item => item.id === layer.id);
+    const rawLayer = Object.assign(layer, styleConfig);
 
-    if (rawLayer.typ === "WMS" && Array.isArray(rawLayer.styles) && rawLayer.styles.length > 1) {
+    if (rawLayer.typ === "GROUP" && Array.isArray(rawLayer.children)) {
+        styleConfig = layerIDsToStyle.filter(function (item) {
+            return rawLayer.children.map(child => child.id).includes(item.id);
+        });
+
+        rawLayer.children.forEach(child => {
+            const childStyle = styleConfig.find(item => item.id === child.id),
+                singleLayer = child.layers;
+
+            if (childStyle) {
+                child.styles = Array.isArray(childStyle.styles) ? childStyle.styles.join(",") : childStyle.styles;
+
+                if (Array.isArray(childStyle.styles) && childStyle.styles.length > 1) {
+                    const parts = singleLayer.split(",");
+
+                    while (parts.length < childStyle.styles.length) {
+                        parts.push(parts[0]);
+                    }
+
+                    child.layers = parts.join(",");
+                }
+            }
+        });
+
+        layerList.push(rawLayer);
+    }
+    else if (rawLayer.typ === "WMS" && Array.isArray(rawLayer.styles) && rawLayer.styles.length > 1) {
         rawLayer.styles.forEach(function (style, index) {
             const cloneObj = Object.assign({}, rawLayer);
 
