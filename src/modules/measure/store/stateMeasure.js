@@ -15,7 +15,6 @@ import source from "../js/measureSource.js";
  * @property {object<String, module:ol/Feature>} lines line features by ol_uid
  * @property {object<String, module:ol/Feature>} polygons polygon features by ol_uid
  * @property {String[]} geometryValues Available geometry values for measurement selection
- * @property {String[]} geometryValues3d Available geometry values for measurement selection in 3D mode
  * @property {String[]} lineStringUnits Available units for line measurement
  * @property {String[]} polygonUnits Available units for polygon measurement
  * @property {String} selectedGeometry Selected geometry value for measurement

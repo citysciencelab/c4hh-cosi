@@ -21,6 +21,7 @@ export default {
 
         commit("setLines", {});
         commit("setPolygons", {});
+        commit("setCustomNames", {});
         commit("setUnlisteners", []);
     },
     /**
@@ -187,27 +188,30 @@ export default {
      * @returns {void}
      */
     undoPointOnFeature ({commit, dispatch}, {feature, historyEntry}) {
-        const {geometryType} = historyEntry.data,
+        const {geometryType, pointIndex} = historyEntry.data,
             geometry = feature.getGeometry(),
             featureId = feature.ol_uid;
 
         if (geometryType === "LineString") {
             const coordinates = geometry.getCoordinates();
 
-            if (coordinates.length > 1) {
-                coordinates.pop();
+            if (coordinates.length > 1 && pointIndex >= 0 && pointIndex < coordinates.length) {
+                coordinates.splice(pointIndex, 1);
                 if (coordinates.length === 1) {
                     dispatch("deleteSingleFeature", featureId);
                     return;
                 }
                 geometry.setCoordinates(coordinates);
             }
+            else {
+                return;
+            }
         }
         else if (geometryType === "Polygon") {
             const coordinates = geometry.getCoordinates()[0];
 
-            if (coordinates.length > 3) {
-                coordinates.splice(coordinates.length - 2, 1);
+            if (coordinates.length > 3 && pointIndex >= 0 && pointIndex < coordinates.length - 1) {
+                coordinates.splice(pointIndex, 1);
                 if (coordinates.length < 4) {
                     dispatch("deleteSingleFeature", featureId);
                     return;
@@ -315,8 +319,7 @@ export default {
         try {
             feature.set("_beforeModifyCoords", deepCloneCoords(coords));
         }
-        catch (error) {
-            console.warn("[Measure] Failed to clone coordinates on modifystart:", error);
+        catch {
             feature.set("_beforeModifyCoords", coords);
         }
     }
