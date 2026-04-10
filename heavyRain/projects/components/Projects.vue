@@ -10,6 +10,33 @@ export default {
         HrCard,
         HrFooter,
         HrHeader
+    },
+    data () {
+        return {
+            showSnackbar: false,
+            snackbarMessage: "",
+            snackbarColor: "success"
+        };
+    },
+    methods: {
+        /**
+         * Handles the save action.
+         * @returns {void}
+         */
+        onSave () {
+            this.showSnackbarMessage("Projekt wurde erfolgreich gespeichert.");
+        },
+        /**
+         * Shows a snackbar message.
+         * @param {String} message the message to display
+         * @param {String} color the snackbar color
+         * @returns {void}
+         */
+        showSnackbarMessage (message, color = "success") {
+            this.snackbarMessage = message;
+            this.snackbarColor = color;
+            this.showSnackbar = true;
+        }
     }
 };
 </script>
@@ -150,12 +177,15 @@ export default {
             </section>
         </HrCard>
         <HrFooter
+            v-model:snackbar-visible="showSnackbar"
             :cancel-text="$t('additional:modules.projects.cancelButtonLabel')"
             :save-text="$t('additional:modules.projects.saveButtonLabel')"
+            :snackbar-message="snackbarMessage"
+            :snackbar-color="snackbarColor"
+            @click:save="onSave"
         />
     </div>
 </template>
 
 <style lang="scss" scoped>
 </style>
-

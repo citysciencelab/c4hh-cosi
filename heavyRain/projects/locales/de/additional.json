@@ -6,6 +6,9 @@
       "createProject": "Neues Projekt anlegen",
       "cancelButtonLabel": "Vorgang abbrechen",
       "saveButtonLabel": "Meldung speichern"
+    },
+    "snackbar": {
+      "close": "Schließen"
     }
   }
 }

@@ -6,6 +6,9 @@
       "createProject": "Create New Project",
       "cancelButtonLabel": "Cancel",
       "saveButtonLabel": "Save"
+    },
+    "snackbar": {
+      "close": "Close"
     }
   }
 }
