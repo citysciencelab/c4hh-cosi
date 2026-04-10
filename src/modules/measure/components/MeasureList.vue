@@ -209,7 +209,6 @@ export default {
             </h6>
             <div
                 class="measure-list"
-                role="list"
             >
                 <div
                     v-for="measurement in measurementList"
@@ -218,11 +217,13 @@ export default {
                     :class="{ 'selected': Number(selectedFeatureId) === Number(measurement.id) }"
                     role="button"
                     tabindex="0"
+                    :aria-label="getDisplayName(measurement) + ' – ' + measurement.displayValue"
                     @mouseenter="$emit('highlight-feature', measurement.id)"
                     @mouseleave="$emit('unhighlight-feature', measurement.id)"
                     @focus="$emit('highlight-feature', measurement.id)"
                     @blur="$emit('unhighlight-feature', measurement.id)"
                     @keydown.enter.self="$emit('highlight-feature', measurement.id)"
+                    @keydown.space.self.prevent="$emit('highlight-feature', measurement.id)"
                 >
                     <div class="measure-item-info">
                         <span
@@ -233,6 +234,7 @@ export default {
                             :title="$t('common:modules.measure.edit.renameHint')"
                             @click="startEditingName(measurement)"
                             @keydown.enter="startEditingName(measurement)"
+                            @keydown.space.prevent="startEditingName(measurement)"
                         >
                             <i :class="getTypeIcon(measurement.type)" />
                             <span class="measure-item-name">{{ getDisplayName(measurement) }}</span>
@@ -311,9 +313,9 @@ export default {
         justify-content: space-between;
         align-items: center;
         padding: 0.75rem;
-        border: 2px solid #001B3D;
+        border: 2px solid $dark_blue;
         border-radius: 6px;
-        background-color: lighten(#001B3D, 70%);
+        background-color: lighten($dark_blue, 70%);
 
         .active-measurement-info {
             display: flex;
@@ -331,14 +333,14 @@ export default {
 
                 i {
                     font-size: 1rem;
-                    color: #001B3D;
+                    color: $dark_blue;
                 }
             }
 
             .active-measurement-value {
                 font-weight: bold;
                 font-size: 1rem;
-                color: #001B3D;
+                color: $dark_blue;
             }
         }
 
@@ -410,7 +412,7 @@ export default {
                 .edit-icon {
                     font-size: 0.75rem;
                     opacity: 0;
-                    color: #666;
+                    color: $dark_grey;
                 }
 
                 &:hover {
@@ -423,7 +425,7 @@ export default {
                 }
 
                 &:focus {
-                    outline: 2px solid #001B3D;
+                    outline: 2px solid $dark_blue;
                     outline-offset: 2px;
                 }
             }
@@ -446,11 +448,11 @@ export default {
 
             :deep(.btn-modify-active) {
                 --bs-btn-color: #ffffff;
-                --bs-btn-bg: #001B3D;
-                --bs-btn-border-color: #001B3D;
+                --bs-btn-bg: $dark_blue;
+                --bs-btn-border-color: $dark_blue;
                 --bs-btn-hover-color: #ffffff;
-                --bs-btn-hover-bg: #3C5F94;
-                --bs-btn-hover-border-color: #3C5F94;
+                --bs-btn-hover-bg: #{$secondary};
+                --bs-btn-hover-border-color: #{$secondary};
             }
         }
     }

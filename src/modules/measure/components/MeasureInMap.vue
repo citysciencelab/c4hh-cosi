@@ -1,6 +1,7 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import {getArea, getLength} from "ol/sphere.js";
+import {unByKey} from "ol/Observable.js";
 import {Collection} from "ol";
 import {Modify} from "ol/interaction.js";
 import {pointerMove} from "ol/events/condition.js";
@@ -168,13 +169,16 @@ export default {
          * @returns {void}
          */
         measurementList (newList) {
+            const updatedHistories = {...this.featureHistories};
+
             newList.forEach(measurement => {
                 const normalizedId = normalizeFeatureId(measurement.id);
 
-                if (!this.featureHistories[normalizedId]) {
-                    this.featureHistories[normalizedId] = {undo: [], redo: []};
+                if (!updatedHistories[normalizedId]) {
+                    updatedHistories[normalizedId] = {undo: [], redo: []};
                 }
             });
+            this.featureHistories = updatedHistories;
         },
         /**
          * Reacts to the draw interaction being replaced.
@@ -261,7 +265,6 @@ export default {
         ...mapActions("Modules/Measure", [
             "deleteFeatures",
             "createDrawInteraction",
-            "removeIncompleteDrawing",
             "removeDrawInteraction",
             "deleteSingleFeature",
             "removeTooltipForFeature",
@@ -470,7 +473,7 @@ export default {
             const normalizedId = normalizeFeatureId(featureId);
 
             if (!this.featureHistories[normalizedId]) {
-                this.featureHistories[normalizedId] = {undo: [], redo: []};
+                this.featureHistories = {...this.featureHistories, [normalizedId]: {undo: [], redo: []}};
             }
             return this.featureHistories[normalizedId];
         },
@@ -549,10 +552,14 @@ export default {
                             const featureId = evt.selected[0].ol_uid;
 
                             this.deleteSingleFeature(featureId);
-                            delete this.featureHistories[normalizeFeatureId(featureId)];
+                            const deletedId = normalizeFeatureId(featureId),
+                                remaining = {...this.featureHistories};
+
+                            delete remaining[deletedId];
+                            this.featureHistories = remaining;
                             this.$nextTick(() => {
                                 this.setMode("DRAW");
-                                selectInter.un("select", removeHandler);
+                                unByKey(removeHandler);
                             });
                         }
                     });
@@ -591,7 +598,6 @@ export default {
                 const feature = this.getFeatureById(featureId);
 
                 if (!feature) {
-                    console.warn("[Measure] Feature not found for modification:", featureId);
                     return;
                 }
                 this.currentModifyInteraction = new Modify({features: new Collection([feature])});
@@ -629,8 +635,8 @@ export default {
                         });
                         history.redo = [];
                     }
-                    catch (error) {
-                        console.warn("[Measure] Failed to record undo history on modifyend:", error);
+                    catch {
+                        // deepClone failed; modification will not be undoable
                     }
 
                     feature.unset("_beforeModifyCoords");
@@ -819,8 +825,8 @@ export default {
                     this.drawingPointHistory.push({type: "point", coord: removedPoint});
                 }
             }
-            catch (error) {
-                console.warn("[Measure] Could not remove last point:", error);
+            catch {
+                // ignore
             }
         },
 
@@ -847,8 +853,8 @@ export default {
                     this.interaction.appendCoordinates([lastEntry.coord]);
                     return;
                 }
-                catch (error) {
-                    console.warn("[Measure] appendCoordinates failed, using manual fallback:", error);
+                catch {
+                    // appendCoordinates not available on this OL version; fall through to manual path
                 }
             }
 
@@ -882,8 +888,8 @@ export default {
                 try {
                     this.interaction.abortDrawing();
                 }
-                catch (error) {
-                    console.warn("[Measure] Could not abort drawing:", error);
+                catch {
+                    // ignore
                 }
             }
             this.currentSketch = null;
@@ -918,7 +924,11 @@ export default {
          */
         handleDeleteMeasurement (featureId) {
             this.deleteSingleFeature(featureId);
-            delete this.featureHistories[normalizeFeatureId(featureId)];
+            const deletedId = normalizeFeatureId(featureId),
+                remaining = {...this.featureHistories};
+
+            delete remaining[deletedId];
+            this.featureHistories = remaining;
             if (this.selectedEditInteraction === "modify") {
                 this.setMode("DRAW");
             }
@@ -977,7 +987,6 @@ export default {
                 id="measure-tool-geometry-select"
                 ref="measure-tool-geometry-select"
                 class="form-select"
-                aria-label="..."
                 :disabled="is3DMode()"
                 :value="selectedGeometry"
                 @change="setSelectedGeometry($event.target.value)"
@@ -1005,7 +1014,6 @@ export default {
                 ref="measure-tool-unit-select"
                 class="form-select"
                 :disabled="is3DMode()"
-                aria-label="..."
                 :value="selectedGeometry === 'LineString' ? selectedLineStringUnit : selectedPolygonUnit"
                 @change="setSelectedUnit($event.target.value)"
             >
