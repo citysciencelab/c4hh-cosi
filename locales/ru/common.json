@@ -716,7 +716,7 @@
     },
     "measure": {
       "area": "Площадь",
-      "deleteMeasurements": "Удалить измерения",
+      "deleteAll": "Удалить все измерения",
       "description": "Измерьте расстояние или площадь",
       "finishWithDoubleClick": "Завершить двойным щелчком",
       "geometry": "Геометрия",

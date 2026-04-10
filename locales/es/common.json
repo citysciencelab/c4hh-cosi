@@ -716,7 +716,7 @@
     },
     "measure": {
       "area": "Área",
-      "deleteMeasurements": "Eliminar mediciones",
+      "deleteAll": "Eliminar todas las mediciones",
       "description": "Mida una distancia o un área",
       "finishWithDoubleClick": "Finalizar con doble clic",
       "geometry": "Geometría",

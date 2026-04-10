@@ -716,7 +716,7 @@
     },
     "measure": {
       "area": "Flach",
-      "deleteMeasurements": "Maaten löschen",
+      "deleteAll": "Alle Maaten löschen",
       "description": "Maat en Streek oder en Flach",
       "finishWithDoubleClick": "Afsluten mit Dubbelklick",
       "geometry": "Geometrie",

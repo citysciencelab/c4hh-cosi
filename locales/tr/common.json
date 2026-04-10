@@ -716,7 +716,7 @@
     },
     "measure": {
       "area": "Alan",
-      "deleteMeasurements": "Ölçümleri sil",
+      "deleteAll": "Tüm ölçümleri sil",
       "description": "Bir mesafe veya alan ölçün",
       "finishWithDoubleClick": "Çift tıklama ile bitir",
       "geometry": "Geometri",
