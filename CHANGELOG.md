@@ -12,6 +12,9 @@
 - FileImport: Added config.json property `openDrawMenuSide` to set the menu side in which the draw module opens.
 
 ### Changed
+- The following packages have been updated:
+    - devDependencies:
+        - @masterportal/masterportalapi: 2.59.0 to 2.60.0
 
 ### Deprecated
 
