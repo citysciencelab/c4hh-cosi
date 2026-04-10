@@ -1,20 +1,17 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import {getArea, getLength} from "ol/sphere.js";
 import {unByKey} from "ol/Observable.js";
-import {Collection} from "ol";
-import {Modify} from "ol/interaction.js";
-import {pointerMove} from "ol/events/condition.js";
 import VectorLayer from "ol/layer/Vector.js";
 import selectInteraction from "@masterportal/masterportalapi/src/maps/interactions/selectInteraction.js";
-import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
 import MeasureInMapTooltip from "./MeasureInMapTooltip.vue";
 import MeasureList from "./MeasureList.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import source from "../js/measureSource.js";
 import getStyle from "../js/measureStyle.js";
-import {formatMeasurementNumber} from "../js/measureCalculation.js";
-import {normalizeFeatureId, deepCloneCoords, findRemovedPoint} from "../js/measureUtils.js";
+import {formatLiveSketchValue} from "../js/measureCalculation.js";
+import {normalizeFeatureId, findRemovedPoint} from "../js/measureUtils.js";
+import {isFeatureGeometryValid, canUndoFeature, canRedoFeature, buildDrawEndHistory, createSyntheticUndoEntry} from "../js/measureHistory.js";
+import {createSelectInteractions, createMeasureModifyInteraction} from "../js/measureInteractions.js";
 
 /**
  * Measurement tool to measure lines and areas in the map.
@@ -84,7 +81,7 @@ export default {
                     }
                     return normalizeFeatureId(measurement.id) !== normalizeFeatureId(this.currentSketch.ol_uid);
                 })
-                .filter(measurement => this.isMeasurementValid(measurement.id));
+                .filter(measurement => isFeatureGeometryValid(this.getFeatureById(measurement.id)));
         },
 
         /**
@@ -95,8 +92,8 @@ export default {
             this.geometryUpdateTrigger;
             return this.filteredMeasurementList.map(measurement => ({
                 ...measurement,
-                canUndo: this.getMeasurementCanUndo(measurement.id),
-                canRedo: this.getMeasurementCanRedo(measurement.id)
+                canUndo: canUndoFeature(this.featureHistories, measurement.id, this.getFeatureById(measurement.id)),
+                canRedo: canRedoFeature(this.featureHistories, measurement.id)
             }));
         },
 
@@ -116,7 +113,7 @@ export default {
             }
             const type = geometry.getType();
 
-            return {type, displayValue: this.formatLiveSketchValue(geometry, type)};
+            return {type, displayValue: formatLiveSketchValue(geometry, type, this.projection.getCode(), this.lineStringUnits, this.selectedLineStringUnit, this.polygonUnits, this.selectedPolygonUnit)};
         },
 
         /**
@@ -206,28 +203,10 @@ export default {
 
             newInteraction.on("drawend", evt => {
                 const featureId = evt.feature.ol_uid,
-                    geometry = evt.feature.getGeometry(),
-                    geometryType = geometry.getType(),
-                    history = this.getFeatureHistory(featureId);
-                let coordinates;
+                    history = this.getFeatureHistory(featureId),
+                    entries = buildDrawEndHistory(evt.feature);
 
-                if (geometryType === "LineString") {
-                    coordinates = geometry.getCoordinates();
-                }
-                else if (geometryType === "Polygon") {
-                    coordinates = geometry.getCoordinates()[0].slice(0, -1);
-                }
-
-                if (coordinates && coordinates.length > 2) {
-                    for (let i = 2; i < coordinates.length; i++) {
-                        history.undo.push({
-                            mode: "addPoint",
-                            timestamp: Date.now(),
-                            data: {point: coordinates[i], pointIndex: i, geometryType}
-                        });
-                    }
-                }
-
+                entries.forEach(entry => history.undo.push(entry));
                 history.redo = [];
                 this.currentSketch = null;
                 this.drawingPointHistory = [];
@@ -339,132 +318,6 @@ export default {
         },
 
         /**
-         * Formats the live display value of the active sketch geometry.
-         * @param {module:ol/geom/Geometry} geometry - The sketch geometry
-         * @param {String} type - Geometry type ("LineString" or "Polygon")
-         * @returns {String} Formatted measurement value with unit
-         */
-        formatLiveSketchValue (geometry, type) {
-            if (type === "LineString") {
-                return this.formatLineLengthValue(geometry);
-            }
-            if (type === "Polygon") {
-                return this.formatPolygonAreaValue(geometry);
-            }
-            return "";
-        },
-
-        /**
-         * Formats a line length for live display during drawing.
-         * @param {module:ol/geom/LineString} geometry - The line geometry
-         * @returns {String} Formatted length with unit
-         */
-        formatLineLengthValue (geometry) {
-            const length = getLength(geometry, {projection: this.projection.getCode()}),
-                unit = this.lineStringUnits[this.selectedLineStringUnit];
-
-            if (unit === "m") {
-                return `${formatMeasurementNumber(length, length < 10 ? 1 : 0)} m`;
-            }
-            if (unit === "km") {
-                return `${formatMeasurementNumber(length / 1000, 1)} km`;
-            }
-            if (unit === "nm") {
-                return `${formatMeasurementNumber(length / 1852, 1)} nm`;
-            }
-            return "";
-        },
-
-        /**
-         * Formats a polygon area for live display during drawing.
-         * @param {module:ol/geom/Polygon} geometry - The polygon geometry
-         * @returns {String} Formatted area with unit
-         */
-        formatPolygonAreaValue (geometry) {
-            const area = getArea(geometry, {projection: this.projection.getCode()}),
-                unit = this.polygonUnits[this.selectedPolygonUnit];
-
-            if (unit === "m²") {
-                return `${formatMeasurementNumber(area, area < 10 ? 1 : 0)} m²`;
-            }
-            if (unit === "ha") {
-                return `${formatMeasurementNumber(area / 10000, 2)} ha`;
-            }
-            if (unit === "km²") {
-                return `${formatMeasurementNumber(area / 1000000, 2)} km²`;
-            }
-            return "";
-        },
-
-        /**
-         * Checks whether a measurement feature has enough coordinates to be displayed.
-         * @param {String} featureId - The ol_uid of the feature
-         * @returns {Boolean} True if the feature is valid
-         */
-        isMeasurementValid (featureId) {
-            const feature = this.getFeatureById(featureId);
-
-            if (!feature) {
-                return false;
-            }
-            const geometry = feature.getGeometry();
-
-            if (!geometry) {
-                return false;
-            }
-            const type = geometry.getType();
-
-            if (type === "LineString") {
-                return geometry.getCoordinates().length >= 2;
-            }
-            if (type === "Polygon") {
-                return (geometry.getCoordinates()[0] || []).length >= 4;
-            }
-            return true;
-        },
-
-        /**
-         * Returns whether a completed measurement can be undone.
-         * @param {String} featureId - The feature ID
-         * @returns {Boolean} True if undo is possible
-         */
-        getMeasurementCanUndo (featureId) {
-            const normalizedId = normalizeFeatureId(featureId),
-                history = this.featureHistories[normalizedId];
-
-            if (history && history.undo.length > 0) {
-                return true;
-            }
-            const feature = this.getFeatureById(featureId);
-
-            if (!feature) {
-                return false;
-            }
-            const geometry = feature.getGeometry(),
-                type = geometry.getType();
-
-            if (type === "LineString") {
-                return geometry.getCoordinates().length > 1;
-            }
-            if (type === "Polygon") {
-                return (geometry.getCoordinates()[0] || []).length > 3;
-            }
-            return false;
-        },
-
-        /**
-         * Returns whether a completed measurement can be redone.
-         * @param {String} featureId - The feature ID
-         * @returns {Boolean} True if redo is possible
-         */
-        getMeasurementCanRedo (featureId) {
-            const normalizedId = normalizeFeatureId(featureId),
-                history = this.featureHistories[normalizedId];
-
-            return Boolean(history && history.redo.length > 0);
-        },
-
-        /**
          * Gets or creates the undo/redo history for a feature.
          * @param {String|Number} featureId - The feature ol_uid
          * @returns {{undo: Array, redo: Array}} The history stacks
@@ -544,7 +397,7 @@ export default {
         setupDeleteInteraction () {
             this.currentSelectInteractions.forEach(inter => this.removeInteraction(inter));
             this.$nextTick(() => {
-                this.currentSelectInteractions = this.createSelectInteractions(this.layer);
+                this.currentSelectInteractions = createSelectInteractions(this.layer);
 
                 const selectInter = this.currentSelectInteractions[0],
                     removeHandler = selectInter.on("select", evt => {
@@ -570,18 +423,6 @@ export default {
         },
 
         /**
-         * Creates a pair of OL select interactions for the given layer.
-         * @param {module:ol/layer/Vector} layer - The measurement vector layer
-         * @returns {module:ol/interaction/Select[]} The created select interactions
-         */
-        createSelectInteractions (layer) {
-            return [
-                selectInteraction.createSelectInteraction(layer),
-                selectInteraction.createSelectInteraction(layer, pointerMove)
-            ];
-        },
-
-        /**
          * Creates an OL modify interaction, optionally restricted to one feature.
          * Records pre-modification coordinates to enable undo.
          * @param {String|Number|null} [featureId=null] - The feature to restrict modification to
@@ -594,60 +435,28 @@ export default {
                 this.removeInteraction(this.currentModifyInteraction);
             }
 
-            if (featureId) {
-                const feature = this.getFeatureById(featureId);
-
-                if (!feature) {
-                    return;
-                }
-                this.currentModifyInteraction = new Modify({features: new Collection([feature])});
-            }
-            else {
-                this.currentModifyInteraction = modifyInteraction.createModifyInteraction(source);
-            }
-
-            this.currentModifyInteraction.on("modifystart", event => {
-                event.features.forEach(feature => this.capturePreModifyCoords(feature));
-            });
-
-            this.currentModifyInteraction.on("modifyend", event => {
-                event.features.forEach(feature => {
-                    const modFeatureId = feature.ol_uid,
-                        geometry = feature.getGeometry(),
-                        geometryType = geometry.getType(),
-                        beforeCoords = feature.get("_beforeModifyCoords");
-                    let afterCoords;
-
-                    if (geometryType === "LineString") {
-                        afterCoords = geometry.getCoordinates();
-                    }
-                    else if (geometryType === "Polygon") {
-                        afterCoords = geometry.getCoordinates()[0];
-                    }
-
-                    try {
-                        const history = this.getFeatureHistory(modFeatureId);
+            this.currentModifyInteraction = createMeasureModifyInteraction(
+                featureId,
+                this.getFeatureById,
+                {
+                    onModifyStart: feature => this.capturePreModifyCoords(feature),
+                    onModifyEnd: (feature, beforeCoords, afterCoords, geometryType) => {
+                        const history = this.getFeatureHistory(feature.ol_uid);
 
                         history.undo.push({
                             mode: "modifyCoordinates",
                             timestamp: Date.now(),
-                            data: {previousCoordinates: beforeCoords, newCoordinates: deepCloneCoords(afterCoords), geometryType}
+                            data: {previousCoordinates: beforeCoords, newCoordinates: afterCoords, geometryType}
                         });
                         history.redo = [];
+                        this.$store.commit("Modules/Measure/addFeature", feature);
                     }
-                    catch {
-                        // deepClone failed; modification will not be undoable
-                    }
-
-                    feature.unset("_beforeModifyCoords");
-                    this.$store.commit("Modules/Measure/addFeature", feature);
-                });
-
-                if (event.mapBrowserEvent) {
-                    event.mapBrowserEvent.stopPropagation();
                 }
-            });
+            );
 
+            if (!this.currentModifyInteraction) {
+                return;
+            }
             this.addInteraction(this.currentModifyInteraction);
         },
 
@@ -710,37 +519,11 @@ export default {
          * @returns {void}
          */
         undoInitialPoint (feature, normalizedId) {
-            const geometry = feature.getGeometry(),
-                geometryType = geometry.getType(),
-                history = this.getFeatureHistory(normalizedId);
-            let syntheticEntry;
-
-            if (geometryType === "LineString") {
-                const coordinates = geometry.getCoordinates();
-
-                if (coordinates.length <= 1) {
-                    return;
-                }
-                syntheticEntry = {
-                    mode: "addPoint",
-                    timestamp: Date.now(),
-                    data: {point: coordinates[coordinates.length - 1], pointIndex: coordinates.length - 1, geometryType}
-                };
-            }
-            else if (geometryType === "Polygon") {
-                const coordinates = geometry.getCoordinates()[0];
-
-                if (coordinates.length <= 3) {
-                    return;
-                }
-                syntheticEntry = {
-                    mode: "addPoint",
-                    timestamp: Date.now(),
-                    data: {point: coordinates[coordinates.length - 2], pointIndex: coordinates.length - 2, geometryType}
-                };
-            }
+            const syntheticEntry = createSyntheticUndoEntry(feature);
 
             if (syntheticEntry) {
+                const history = this.getFeatureHistory(normalizedId);
+
                 this.undoPointOnFeature({feature, historyEntry: syntheticEntry});
                 history.redo.push(syntheticEntry);
             }
