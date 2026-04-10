@@ -537,6 +537,12 @@ Layer2dVector.prototype.filterUniqueLegendInfo = function (features, rules, lege
         }
 
         if (!attrName) {
+            if (typeof rule?.style?.legendValue === "string" && rule.style.legendValue.length > 0) {
+                li = legendMap.get(rule.style.legendValue);
+                if (li && !uniqueLegendInformation.includes(li)) {
+                    uniqueLegendInformation.push(li);
+                }
+            }
             continue;
         }
 

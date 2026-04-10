@@ -21,6 +21,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1452: layer2dVector: Legend now shows entries with no matching condition attribute.
 - Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
 - Issue \#1576: BackForward control was not working inside expandable controls until opened.
 - Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
