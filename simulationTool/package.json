@@ -3,7 +3,9 @@
     "private": true,
     "version": "0.0.1",
     "dependencies": {
-        "lodash": "^4.17.21",
-        "plotly.js-dist": "^2.35.2"
+        "lodash": "^4.17.21"
+    },
+    "temporaryDisabled": {
+      "plotly.js-dist": "^2.35.2"
     }
 }

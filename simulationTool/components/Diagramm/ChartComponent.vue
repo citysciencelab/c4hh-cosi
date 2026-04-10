@@ -1,5 +1,5 @@
 <script>
-import Plotly from "plotly.js-dist";
+// import Plotly from "plotly.js-dist";
 import {mapGetters} from "vuex";
 
 export default {
@@ -36,10 +36,12 @@ export default {
         this.drawChart(this.chartData);
     },
     methods: {
+        /**
         drawChart () {
             if (!this.$refs.plotlyChart) {
                 return;
             }
+
             const config = {
                     displayModeBar: false
                 },
@@ -48,6 +50,7 @@ export default {
 
             Plotly.newPlot(this.$refs.plotlyChart, plotlyData, layout, config);
         },
+        */
         guessLayoutByData () {
             const firstConfig = this.chartConfigs[Object.keys(this.chartConfigs)[0]];
 
