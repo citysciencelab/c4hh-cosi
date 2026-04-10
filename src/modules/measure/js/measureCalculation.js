@@ -106,3 +106,72 @@ export function calculatePolygonAreas (projection, polygons, radius, accuracy, s
     }
     return {};
 }
+
+/**
+ * Formats a line geometry's length for live display during active drawing.
+ * @param {module:ol/geom/LineString} geometry - The line geometry
+ * @param {String} projectionCode - The map projection code
+ * @param {String[]} lineStringUnits - Available units array
+ * @param {String} selectedLineStringUnit - Selected unit index as string
+ * @returns {String} Formatted length with unit
+ */
+export function formatLineLength (geometry, projectionCode, lineStringUnits, selectedLineStringUnit) {
+    const length = getLength(geometry, {projection: projectionCode}),
+        unit = lineStringUnits[selectedLineStringUnit];
+
+    if (unit === "m") {
+        return `${formatMeasurementNumber(length, length < 10 ? 1 : 0)} m`;
+    }
+    if (unit === "km") {
+        return `${formatMeasurementNumber(length / 1000, 1)} km`;
+    }
+    if (unit === "nm") {
+        return `${formatMeasurementNumber(length / 1852, 1)} nm`;
+    }
+    return "";
+}
+
+/**
+ * Formats a polygon geometry's area for live display during active drawing.
+ * @param {module:ol/geom/Polygon} geometry - The polygon geometry
+ * @param {String} projectionCode - The map projection code
+ * @param {String[]} polygonUnits - Available units array
+ * @param {String} selectedPolygonUnit - Selected unit index as string
+ * @returns {String} Formatted area with unit
+ */
+export function formatPolygonArea (geometry, projectionCode, polygonUnits, selectedPolygonUnit) {
+    const area = getArea(geometry, {projection: projectionCode}),
+        unit = polygonUnits[selectedPolygonUnit];
+
+    if (unit === "m²") {
+        return `${formatMeasurementNumber(area, area < 10 ? 1 : 0)} m²`;
+    }
+    if (unit === "ha") {
+        return `${formatMeasurementNumber(area / 10000, 2)} ha`;
+    }
+    if (unit === "km²") {
+        return `${formatMeasurementNumber(area / 1000000, 2)} km²`;
+    }
+    return "";
+}
+
+/**
+ * Formats the live measurement value for the currently active sketch geometry.
+ * @param {module:ol/geom/Geometry} geometry - The sketch geometry
+ * @param {String} type - "LineString" or "Polygon"
+ * @param {String} projectionCode - The map projection code
+ * @param {String[]} lineStringUnits - Available line units
+ * @param {String} selectedLineStringUnit - Selected line unit index
+ * @param {String[]} polygonUnits - Available polygon units
+ * @param {String} selectedPolygonUnit - Selected polygon unit index
+ * @returns {String} Formatted measurement value with unit
+ */
+export function formatLiveSketchValue (geometry, type, projectionCode, lineStringUnits, selectedLineStringUnit, polygonUnits, selectedPolygonUnit) {
+    if (type === "LineString") {
+        return formatLineLength(geometry, projectionCode, lineStringUnits, selectedLineStringUnit);
+    }
+    if (type === "Polygon") {
+        return formatPolygonArea(geometry, projectionCode, polygonUnits, selectedPolygonUnit);
+    }
+    return "";
+}
