@@ -18,6 +18,7 @@
 
 ### Fixed
 - Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
+- Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
 - Issue \#1590: Vite build - corrected path to mastercode folder in index.html.
 
 ---
