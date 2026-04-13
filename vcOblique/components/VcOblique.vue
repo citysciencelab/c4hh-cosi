@@ -26,7 +26,7 @@ export default {
             "name",
             "obliqueViewerURL"
         ]),
-        ...mapGetters("Maps", ["clickCoordinate", "initialCenter"])
+        ...mapGetters("Maps", ["center", "clickCoordinate", "initialCenter"])
     },
     watch: {
         clickCoordinate: {
@@ -46,7 +46,7 @@ export default {
     mounted () {
         this.setActive(true);
         this.$nextTick(() => {
-            this.createObliqueViewerURL(this.initialCenter);
+            this.createObliqueViewerURL(this.center || this.initialCenter);
             this.initObliqueView();
         });
     },

@@ -95,32 +95,73 @@ const actions = {
 
                 commit("Maps/setClickPixel", pixelCoordinate, {root: true});
 
-                map.olMap.on("moveend", () => {
-                    const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
+                if (getIsVc4()) {
+                    map.imageChanged.addEventListener(() => {
+                        const vp = getViewpointSync(map);
 
-                    transformedCoordinates.every((coordinate, index) => {
-                        if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
-                            dispatch("obliqueView", transformedCoordinates);
-                            return false;
+                        if (!vp?.groundPosition) {
+                            return;
                         }
-                        return true;
+                        const heading = vp.heading,
+                            coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
+
+                        if (heading !== getters.heading) {
+                            dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
+                        }
+                        commit("setHeading", heading);
                     });
-                });
 
-                map.imageChanged.addEventListener(() => {
-                    const vp = getViewpointSync(map);
+                    dispatch("obliqueView", rootGetters["Maps/center"] || rootGetters["Maps/initialCenter"])
+                        .then(() => {
+                            map.olMap.on("moveend", () => {
+                                const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
 
-                    if (!vp?.groundPosition) {
-                        return;
-                    }
-                    const heading = vp.heading,
-                        coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
+                                transformedCoordinates.every((coordinate, index) => {
+                                    if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
+                                        dispatch("obliqueView", transformedCoordinates);
+                                        return false;
+                                    }
+                                    return true;
+                                });
+                            });
+                        });
+                }
+                else {
+                    let isFirstImageChange = true;
 
-                    if (heading !== getters.heading) {
-                        dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
-                    }
-                    commit("setHeading", heading);
-                });
+                    map.imageChanged.addEventListener(() => {
+                        const vp = getViewpointSync(map);
+
+                        if (!vp?.groundPosition) {
+                            return;
+                        }
+                        if (isFirstImageChange) {
+                            isFirstImageChange = false;
+                            dispatch("obliqueView", rootGetters["Maps/center"] || rootGetters["Maps/initialCenter"])
+                                .then(() => {
+                                    map.olMap.on("moveend", () => {
+                                        const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
+
+                                        transformedCoordinates.every((coordinate, index) => {
+                                            if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
+                                                dispatch("obliqueView", transformedCoordinates);
+                                                return false;
+                                            }
+                                            return true;
+                                        });
+                                    });
+                                });
+                            return;
+                        }
+                        const heading = vp.heading,
+                            coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
+
+                        if (heading !== getters.heading) {
+                            dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
+                        }
+                        commit("setHeading", heading);
+                    });
+                }
 
                 if (getIsVc4() && header) {
                     header.style.display = "none";
@@ -130,7 +171,7 @@ const actions = {
                         element.style.top = 0;
                     }
                 }
-                dispatch("obliqueView", rootGetters["Maps/center"]);
+
                 const layer = mapMarker.getMapmarkerLayerById("marker_point_layer");
 
                 if (!getters.defaultMapMarkerStyleId) {
@@ -203,8 +244,8 @@ const actions = {
                 });
             }
 
-            await gotoViewpoint(map, viewPoint);
             commit("Maps/setClickCoordinate", coordinates, {root: true});
+            await gotoViewpoint(map, viewPoint);
             dispatch("Maps/placingPointMarker", {rotation: getters.heading, coordinates}, {root: true});
         }
         else {
