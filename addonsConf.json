@@ -201,6 +201,10 @@
     "path": "cosi/CalculateRatio",
     "type": "tool"
   },
+  "dipasProjects": {
+    "path": "cosi/DipasProjects",
+    "type": "tool"
+  },
   "reportingTool": {
     "path": "cosi/ReportingTool",
     "type": "tool"

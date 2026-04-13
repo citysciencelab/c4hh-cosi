@@ -63,9 +63,14 @@ export default {
             type: Boolean,
             required: false,
             default: false
+        },
+        linkTo: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
-    emits: ["downloadSet", "hideSet", "removeSet", "subjectDataSet"],
+    emits: ["downloadSet", "hideSet", "linkOpened", "removeSet", "subjectDataSet"],
     computed: {
         /**
          * Gets the label for the setSubject button.
@@ -214,6 +219,13 @@ export default {
                         />
                         <slot name="download-menu" />
                     </div>
+                    <IconButton
+                        v-if="linkTo"
+                        class="p-1"
+                        :aria="'Externen Link öffnen'"
+                        icon="bi bi-link-45deg"
+                        :interaction="() => $emit('linkOpened')"
+                    />
                     <IconButton
                         v-if="visible"
                         class="p-1"

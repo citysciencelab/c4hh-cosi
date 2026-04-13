@@ -109,6 +109,7 @@ export default {
                     :key="idx"
                     :closable="closeable"
                     :value="item"
+                    :style="{'--selected-chip-color': item.color}"
                     filter
                 >
                     {{ item.label }}
@@ -132,7 +133,7 @@ export default {
             }
         }
         .v-chip--selected {
-            background-color: $dark_blue;
+            background-color: var(--selected-chip-color, #{$dark_blue});
             color: white;
         }
         .v-chip__overlay {
