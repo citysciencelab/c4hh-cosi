@@ -117,6 +117,28 @@ pipelines:
                     script:
                         - npm install
                         - npm audit --json
+        osv scan (security):
+            -   step:
+                    name: OSV scan + create Jira ticket (security)
+                    caches:
+                        - node
+                    script:
+                        - npm install
+                        - curl -sSL -o /usr/local/bin/osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner_linux_amd64
+                        - chmod +x /usr/local/bin/osv-scanner
+                        - /usr/local/bin/osv-scanner scan -r . --format json > osv-result.json || true
+                        - node -e "const r=require('./osv-result.json'); console.log('OSV scan finished'); console.log('Results:', r.results?.length || 0);"
+                        - export JIRA_PROJECT_KEY="BG"
+                        - export JIRA_BASE_URL="https://lgv-hamburg.atlassian.net"
+                        - export JIRA_ISSUE_TYPE="Task"
+                        - export JIRA_USER_EMAIL="geodatenanwendungen@gv.hamburg.de"
+                        - echo 'JIRA_PROJECT_KEY='$JIRA_PROJECT_KEY
+                        - echo 'JIRA_BASE_URL='$JIRA_BASE_URL
+                        - echo 'JIRA_ISSUE_TYPE='$JIRA_ISSUE_TYPE
+                        - echo 'JIRA_USER_EMAIL='$JIRA_USER_EMAIL
+                        - node devtools/security/createJiraTicketFromOsv.mjs
+                    artifacts:
+                        - osv-result.json
         deploy tag on openCode:
             - variables:
                 - name: BITBUCKET_TAG

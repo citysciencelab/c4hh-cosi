@@ -33,6 +33,7 @@
     - dependencies:
         - @stylistic/eslint-plugin: ^5.10.0
 - WFS-T: possibility to set default values for WFS feature properties
+- Security: Added automated Jira ticket creation for OSV vulnerabilities above a configurable CVSS threshold.
 
 ### Changed
 - The following packages have been updated:
