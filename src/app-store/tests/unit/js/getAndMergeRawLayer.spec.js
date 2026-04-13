@@ -567,6 +567,57 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
             expect(warnSpy.calledOnce).to.be.true;
         });
 
+        it("should return an empty raw layer, if layer is grouped but all layers are missing in layerlist", () => {
+            layerConfig = {
+                [treeSubjectsKey]: {
+                    elements: [
+                        {
+                            name: "Gruppenlayer",
+                            type: "folder",
+                            elements: [
+                                {
+                                    id: ["682", "687", "1732"],
+                                    typ: "GROUP",
+                                    name: "Kita und Krankenhäuser",
+                                    styleId: "styleId"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            };
+            const simpleLayerList = [
+                {
+                    id: "123",
+                    name: "name682",
+                    maxScale: "10000",
+                    minScale: "100"
+                },
+                {
+                    id: "234",
+                    name: "name687",
+                    maxScale: "10000",
+                    minScale: "200"
+                }
+            ];
+            let result = null;
+
+            sinon.stub(rawLayerList, "getLayerWhere").callsFake(function (searchAttributes) {
+                return simpleLayerList.find(entry => Object.keys(searchAttributes).every(key => entry[key] === searchAttributes[key])) || null;
+            });
+            sinon.stub(rawLayerList, "getLayerList").returns(simpleLayerList);
+
+            result = getAndMergeRawLayer(layerConfig[treeSubjectsKey].elements[0].elements[0]);
+
+            expect(Array.isArray(result)).to.be.true;
+            expect(result.length).to.be.equals(1);
+            expect(result[0].id).to.be.equals("682-687-1732");
+            expect(result[0].name).to.be.equals("WARN: Kita und Krankenhäuser");
+            expect(result[0].typ).to.be.equals("GROUP");
+            expect(result[0].children).to.be.an("array");
+            expect(result[0].children.length).to.be.equals(0);
+        });
+
         it("should return a merged raw layer, if layer is grouped with children", () => {
             layerConfig = {
                 [treeSubjectsKey]: {
@@ -633,6 +684,65 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
             expect(result[0].children[1].name).to.be.equals("name1731");
             expect(result[0].children[1].styleId).to.be.equals("1731");
             expect(result[0].children[1].maxScale).to.be.equals("20000");
+        });
+
+        it("should return an empty raw layer, if layer is grouped with children but all layers are missing in layerlist", () => {
+            layerConfig = {
+                [treeSubjectsKey]: {
+                    elements: [
+                        {
+                            name: "Gruppenlayer",
+                            type: "folder",
+                            elements: [
+                                {
+                                    id: ["682", "1731"],
+                                    typ: "GROUP",
+                                    name: "Gruppe",
+                                    "children": [
+                                        {
+                                            "id": "682",
+                                            "styleId": "682"
+                                        },
+                                        {
+                                            "id": "1731",
+                                            "styleId": "1731"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            };
+            const simpleLayerList = [
+                {
+                    id: "682123",
+                    name: "name682",
+                    maxScale: "10000",
+                    minScale: "100"
+                },
+                {
+                    id: "1731123",
+                    name: "name1731",
+                    maxScale: "20000"
+                }
+            ];
+            let result = null;
+
+            sinon.stub(rawLayerList, "getLayerWhere").callsFake(function (searchAttributes) {
+                return simpleLayerList.find(entry => Object.keys(searchAttributes).every(key => entry[key] === searchAttributes[key])) || null;
+            });
+            sinon.stub(rawLayerList, "getLayerList").returns(simpleLayerList);
+
+            result = getAndMergeRawLayer(layerConfig[treeSubjectsKey].elements[0].elements[0]);
+
+            expect(Array.isArray(result)).to.be.true;
+            expect(result.length).to.be.equals(1);
+            expect(result[0].id).to.be.equals("682-1731");
+            expect(result[0].name).to.be.equals("WARN: Gruppe");
+            expect(result[0].typ).to.be.equals("GROUP");
+            expect(result[0].children).to.be.an("array");
+            expect(result[0].children.length).to.be.equals(0);
         });
 
         it("should return a merged raw layer, if 3D layer is grouped with children", () => {

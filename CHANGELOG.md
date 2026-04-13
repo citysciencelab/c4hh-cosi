@@ -31,7 +31,9 @@
 - Issue \#1590: Vite 
     - build: corrected path to mastercode folder in index.html.
     - buildExamples: corrected name and content of zip-files.
-- GroupLayer: Fixed grouped layers, using layerIDsToStyle, were not shown. 
+- GroupLayer: 
+    - Fixed grouped layers, using layerIDsToStyle, were not shown. 
+    - Fixed bug if configuration contains only wrong layer IDs.
 
 ---
 

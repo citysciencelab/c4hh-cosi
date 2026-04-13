@@ -140,6 +140,18 @@ function mergeGroupedLayer (layerConf) {
     if (ids.length === 0) {
         return layerConf;
     }
+    else if (existingLayers.length === 0) {
+        console.warn(`Configuration of group layer '${layerConf.name}' contains no child that is available in services.json.`);
+        rawLayer = {...layerConf};
+        rawLayer.id = ids.join("-");
+        rawLayer.name = `WARN: ${layerConf.name}`;
+        rawLayer.htmlName = `WARN: ${layerConf.name}`;
+        if (layerConf.typ?.startsWith("GROUP")) {
+            rawLayer.children = [];
+        }
+
+        return rawLayer;
+    }
     if (layerConf.typ?.startsWith("GROUP")) {
         rawLayer = {...layerConf};
         rawLayer.id = ids.join("-");
