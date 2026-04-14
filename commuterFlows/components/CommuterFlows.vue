@@ -3,7 +3,7 @@ import {mapGetters, mapMutations} from "vuex";
 import getters from "../store/gettersCommuterFlows.js";
 import mutations from "../store/mutationsCommuterFlows.js";
 import {CommuterApi} from "../utils/commuterApi.js";
-import {CommuterOL} from "../utils/CommuterOL.js";
+import {CommuterOL} from "../utils/commuterOL.js";
 import {convertColor} from "../../../src/shared/js/utils/convertColor.js";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 import SwitchInput from "../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
