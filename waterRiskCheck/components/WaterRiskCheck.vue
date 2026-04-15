@@ -327,7 +327,7 @@ export default {
          */
         floodingDepthInSri07 () {
             return this.data.sri07_wassertiefe.value?.properties?.value
-                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "-";
+                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "0 cm";
         },
         /**
          * Gets the water depth around the building in case of flooding due to SRI 12 rain.
@@ -335,7 +335,7 @@ export default {
          */
         floodingDepthInSri12 () {
             return this.data.sri12_wassertiefe.value?.properties?.value
-                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "-";
+                ?.toLocaleString("de-DE", {style: "unit", unit: "centimeter"}) ?? "0 cm";
         },
         /**
          * Gets the pages that depend on the data.
@@ -855,14 +855,14 @@ export default {
                 "K1.extremes.uebersichtskarte": mapConf.starkregengefahrenkarte_extrem,
                 "K2.uesg": this.isParcelInUesg,
                 "K2.mittleres.gebaeude": "Gebäude (1)",
-                "K2.mittleres.wassertiefe": this.middleFloodDepth || "-",
+                "K2.mittleres.wassertiefe": this.middleFloodDepth || "0 m",
                 "K2.mittleres.uebersichtskarte": mapConf.hochwasser_binnenhw_mittleres_ereignis,
                 "K2.seltenes.gebaeude": "Gebäude (1)",
-                "K2.seltenes.wassertiefe": this.seldomFloodDepth || "-",
+                "K2.seltenes.wassertiefe": this.seldomFloodDepth || "0 m",
                 "K2.seltenes.uebersichtskarte": mapConf.hochwasser_binnenhw_seltenes_ereignis,
                 "K2.legend": legends.hochwasser_binnenhw,
-                "K5.extremes.wassertiefe": this.extremFloodDepthKW || "-",
-                "K5.mittleres.wassertiefe": this.middleFloodDepthKW || "-",
+                "K5.extremes.wassertiefe": this.extremFloodDepthKW || "0 m",
+                "K5.mittleres.wassertiefe": this.middleFloodDepthKW || "0 m",
                 "K5.extremes.uebersichtskarte": mapConf.hwrm_extrem_kw,
                 "K5.mittleres.uebersichtskarte": mapConf.hwrm_middle_kw,
                 "K3.uebersichtskarte": mapConf.grundwasser_flurabstand_min,
