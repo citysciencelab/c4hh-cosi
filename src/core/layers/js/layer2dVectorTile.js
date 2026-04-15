@@ -46,7 +46,7 @@ Layer2dVectorTile.prototype.createLayer = function (attributes) {
     const rawLayerAttributes = this.getRawLayerAttributes(attributes),
         layerParams = this.getLayerParams(attributes);
 
-    this.setLayer(vectorTile.createLayer(rawLayerAttributes, {layerParams}));
+    this.setLayer(vectorTile.createLayer(rawLayerAttributes, {layerParams, options: {readStyleFromUrl: false}}));
     store.dispatch("Maps/registerListener", {type: "loadend", listener: () => {
         if (typeof this.layer.getSource !== "function" || typeof this.layer.getSource()?.getFeaturesInExtent !== "function") {
             return;
@@ -196,12 +196,12 @@ Layer2dVectorTile.prototype.setStyleByDefinition = function ({id, url, resolutio
 
                 this.fetchSpriteData(spriteDataUrl)
                     .then(spriteData => {
-                        vectorTile.setStyle(this.getLayer(), style, {options: {resolutions: resolutions, spriteData: spriteData, spriteImageUrl: spriteImageUrl, getFonts: addMpFonts}}, url);
+                        vectorTile.setStyle(this.getLayer(), style, {options: {readStyleFromUrl: false, resolutions: resolutions, spriteData: spriteData, spriteImageUrl: spriteImageUrl, getFonts: addMpFonts}}, url);
                         this.set("selectedStyleID", id);
                     });
             }
             else {
-                vectorTile.setStyle(this.getLayer(), style, {resolutions: resolutions, getFonts: addMpFonts}, url);
+                vectorTile.setStyle(this.getLayer(), style, {options: {readStyleFromUrl: false, resolutions: resolutions, getFonts: addMpFonts}}, url);
                 this.set("selectedStyleID", id);
             }
         });
