@@ -71,6 +71,125 @@ const mutations = {
      */
     addUnlistener (state, payload) {
         state.unlisteners = [...state.unlisteners, payload];
+    },
+
+    // ── Feature-history mutations ──────────────────────────────────────────────
+
+    /**
+     * Ensures a history entry exists for the given normalizedId.
+     * @param {Object} state vuex state
+     * @param {Number} normalizedId - normalizeFeatureId() result
+     * @returns {void}
+     */
+    initFeatureHistory (state, normalizedId) {
+        if (!state.featureHistories[normalizedId]) {
+            state.featureHistories = {
+                ...state.featureHistories,
+                [normalizedId]: {undo: [], redo: []}
+            };
+        }
+    },
+
+    /**
+     * Removes the history entry for the given normalizedId.
+     * @param {Object} state vuex state
+     * @param {Number} normalizedId - normalizeFeatureId() result
+     * @returns {void}
+     */
+    removeFeatureHistory (state, normalizedId) {
+        const remaining = {...state.featureHistories};
+
+        delete remaining[normalizedId];
+        state.featureHistories = remaining;
+    },
+
+    /**
+     * Deletes all feature history entries.
+     * @param {Object} state vuex state
+     * @returns {void}
+     */
+    clearAllFeatureHistories (state) {
+        state.featureHistories = {};
+    },
+
+    /**
+     * Pushes an entry onto the undo stack for the given feature.
+     * @param {Object} state vuex state
+     * @param {Object} payload - {normalizedId: Number, entry: Object}
+     * @returns {void}
+     */
+    pushUndoEntry (state, {normalizedId, entry}) {
+        const history = state.featureHistories[normalizedId];
+
+        if (history) {
+            history.undo = [...history.undo, entry];
+        }
+    },
+
+    /**
+     * Removes the last entry from the undo stack for the given feature.
+     * @param {Object} state vuex state
+     * @param {Number} normalizedId - normalizeFeatureId() result
+     * @returns {void}
+     */
+    popUndoEntry (state, normalizedId) {
+        const history = state.featureHistories[normalizedId];
+
+        if (history && history.undo.length > 0) {
+            history.undo = history.undo.slice(0, -1);
+        }
+    },
+
+    /**
+     * Pushes an entry onto the redo stack for the given feature.
+     * @param {Object} state vuex state
+     * @param {Object} payload - {normalizedId: Number, entry: Object}
+     * @returns {void}
+     */
+    pushRedoEntry (state, {normalizedId, entry}) {
+        const history = state.featureHistories[normalizedId];
+
+        if (history) {
+            history.redo = [...history.redo, entry];
+        }
+    },
+
+    /**
+     * Removes the last entry from the redo stack for the given feature.
+     * @param {Object} state vuex state
+     * @param {Number} normalizedId - normalizeFeatureId() result
+     * @returns {void}
+     */
+    popRedoEntry (state, normalizedId) {
+        const history = state.featureHistories[normalizedId];
+
+        if (history && history.redo.length > 0) {
+            history.redo = history.redo.slice(0, -1);
+        }
+    },
+
+    /**
+     * Clears the redo stack for the given feature.
+     * @param {Object} state vuex state
+     * @param {Number} normalizedId - normalizeFeatureId() result
+     * @returns {void}
+     */
+    clearRedoForFeature (state, normalizedId) {
+        const history = state.featureHistories[normalizedId];
+
+        if (history) {
+            history.redo = [];
+        }
+    },
+
+    /**
+     * Increments geometryUpdateTrigger to force reactive recomputation of
+     * geometry-dependent getters when OL geometry changes non-reactively.
+     * @param {Object} state vuex state
+     * @returns {void}
+     */
+    incrementGeometryUpdateTrigger (state) {
+        state.geometryUpdateTrigger++;
     }
 };
 

@@ -66,7 +66,25 @@ const state = {
     source,
     layer: null,
     featureId: null,
-    tooltipCoord: []
+    tooltipCoord: [],
+
+    // interaction lifecycle — moved from MeasureInMap.vue data()
+    /** @type {Object} per-feature undo/redo history stacks, keyed by normalizedId */
+    featureHistories: {},
+    /** @type {module:ol/Feature|null} OL feature currently being drawn */
+    currentSketch: null,
+    /** @type {Array} redo stack for points removed from the active sketch */
+    drawingPointHistory: [],
+    /** @type {String|Number|null} ol_uid of the feature currently in modify mode */
+    currentlyModifyingFeatureId: null,
+    /** @type {String|null} name of the active edit-mode button ("modify"|"delete"|""|null) */
+    selectedEditInteraction: null,
+    /** @type {module:ol/interaction/Select[]} active OL select interactions */
+    currentSelectInteractions: [],
+    /** @type {module:ol/interaction/Modify|null} active OL modify interaction */
+    currentModifyInteraction: null,
+    /** @type {Number} incremented to force recomputation of geometry-dependent getters */
+    geometryUpdateTrigger: 0
 };
 
 export default state;

@@ -1,30 +1,18 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import {unByKey} from "ol/Observable.js";
 import VectorLayer from "ol/layer/Vector.js";
-import selectInteraction from "@masterportal/masterportalapi/src/maps/interactions/selectInteraction.js";
 import MeasureInMapTooltip from "./MeasureInMapTooltip.vue";
 import MeasureList from "./MeasureList.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import source from "../js/measureSource.js";
 import getStyle from "../js/measureStyle.js";
-import {formatLiveSketchValue} from "../js/measureCalculation.js";
-import {normalizeFeatureId, findRemovedPoint} from "../js/measureUtils.js";
-import {isFeatureGeometryValid, canUndoFeature, canRedoFeature, buildDrawEndHistory, createSyntheticUndoEntry} from "../js/measureHistory.js";
-import {createSelectInteractions, createMeasureModifyInteraction} from "../js/measureInteractions.js";
 
 /**
  * Measurement tool to measure lines and areas in the map.
+ * Interaction lifecycle, undo/redo orchestration and computed measurement data
+ * are managed by the Vuex store (actionsMeasure.js / gettersMeasure.js).
+ * This component is responsible only for rendering and delegating user events.
  * @module modules/MeasureInMap
- * @vue-data {String} deleteIcon - The icon for the delete button.
- * @vue-data {Object[]} currentSelectInteractions - Active OL select interactions.
- * @vue-data {module:ol/interaction/Modify} currentModifyInteraction - Active OL modify interaction.
- * @vue-data {module:ol/Feature} currentSketch - The feature currently being drawn.
- * @vue-data {Object[]} drawingPointHistory - Redo stack for points removed during active drawing.
- * @vue-data {Object} featureHistories - Per-feature undo/redo history stacks.
- * @vue-data {String|Number|null} currentlyModifyingFeatureId - ID of the feature currently in modify mode.
- * @vue-data {String|null} selectedEditInteraction - Name of the active edit mode button.
- * @vue-data {Number} geometryUpdateTrigger - Incremented to force reactivity on geometry changes.
  */
 export default {
     name: "MeasureInMap",
@@ -35,15 +23,7 @@ export default {
     },
     data () {
         return {
-            deleteIcon: "bi-trash",
-            currentSelectInteractions: [],
-            currentModifyInteraction: null,
-            selectedEditInteraction: null,
-            currentSketch: null,
-            drawingPointHistory: [],
-            featureHistories: {},
-            currentlyModifyingFeatureId: null,
-            geometryUpdateTrigger: 0
+            deleteIcon: "bi-trash"
         };
     },
     computed: {
@@ -64,86 +44,16 @@ export default {
             "selectedPolygonUnit",
             "currentUnits",
             "enableUndoRedo",
-            "measurementList"
+            "measurementList",
+            "currentlyModifyingFeatureId",
+            "selectedEditInteraction",
+            "enrichedMeasurementList",
+            "activeMeasurementInfo",
+            "canUndoCurrentSketch",
+            "canRedoCurrentSketch"
         ]),
         ...mapGetters(["uiStyle"]),
-        ...mapGetters("Maps", ["mode", "projection"]),
-
-        /**
-         * Filters the measurement list to exclude the active sketch and geometrically invalid features.
-         * @returns {Array} Filtered measurement list
-         */
-        filteredMeasurementList () {
-            return this.measurementList
-                .filter(measurement => {
-                    if (!this.currentSketch) {
-                        return true;
-                    }
-                    return normalizeFeatureId(measurement.id) !== normalizeFeatureId(this.currentSketch.ol_uid);
-                })
-                .filter(measurement => isFeatureGeometryValid(this.getFeatureById(measurement.id)));
-        },
-
-        /**
-         * Enriches the filtered measurement list with per-feature canUndo/canRedo flags.
-         * @returns {Array} Measurement list with canUndo/canRedo properties
-         */
-        enrichedMeasurementList () {
-            this.geometryUpdateTrigger;
-            return this.filteredMeasurementList.map(measurement => ({
-                ...measurement,
-                canUndo: canUndoFeature(this.featureHistories, measurement.id, this.getFeatureById(measurement.id)),
-                canRedo: canRedoFeature(this.featureHistories, measurement.id)
-            }));
-        },
-
-        /**
-         * Returns info about the measurement currently being drawn, or null if not drawing.
-         * @returns {Object|null} {type, displayValue} or null
-         */
-        activeMeasurementInfo () {
-            this.geometryUpdateTrigger;
-            if (!this.currentSketch) {
-                return null;
-            }
-            const geometry = this.currentSketch.getGeometry();
-
-            if (!geometry) {
-                return null;
-            }
-            const type = geometry.getType();
-
-            return {type, displayValue: formatLiveSketchValue(geometry, type, this.projection.getCode(), this.lineStringUnits, this.selectedLineStringUnit, this.polygonUnits, this.selectedPolygonUnit)};
-        },
-
-        /**
-         * Whether undo is possible during active drawing.
-         * @returns {Boolean} True if at least one point has been placed
-         */
-        canUndoCurrentSketch () {
-            if (!this.currentSketch) {
-                return false;
-            }
-            const geometry = this.currentSketch.getGeometry();
-
-            if (!geometry) {
-                return false;
-            }
-            const geometryType = geometry.getType(),
-                coords = geometryType === "LineString"
-                    ? geometry.getCoordinates()
-                    : geometry.getCoordinates()[0];
-
-            return coords.length > 0;
-        },
-
-        /**
-         * Whether redo is possible during active drawing.
-         * @returns {Boolean} True if there are points in the drawing redo stack
-         */
-        canRedoCurrentSketch () {
-            return this.currentSketch !== null && this.drawingPointHistory.length > 0;
-        }
+        ...mapGetters("Maps", ["mode", "projection"])
     },
     watch: {
         mode () {
@@ -151,66 +61,12 @@ export default {
             this.createDrawInteraction();
             this.setFocusToFirstControl();
         },
-        /**
-         * Recreates the draw interaction when the geometry type changes.
-         * Cleans up any active edit mode first.
-         * @returns {void}
-         */
         selectedGeometry () {
             this.cleanupAllInteractions();
             this.createDrawInteraction();
         },
-        /**
-         * Ensures all new measurements have an entry in the local featureHistories.
-         * @param {Array} newList - Updated measurement list
-         * @returns {void}
-         */
         measurementList (newList) {
-            const updatedHistories = {...this.featureHistories};
-
-            newList.forEach(measurement => {
-                const normalizedId = normalizeFeatureId(measurement.id);
-
-                if (!updatedHistories[normalizedId]) {
-                    updatedHistories[normalizedId] = {undo: [], redo: []};
-                }
-            });
-            this.featureHistories = updatedHistories;
-        },
-        /**
-         * Reacts to the draw interaction being replaced.
-         * Registers drawstart/drawend listeners on the new interaction.
-         * @param {module:ol/interaction/Draw} newInteraction - The new draw interaction
-         * @returns {void}
-         */
-        interaction (newInteraction) {
-            if (!newInteraction || !newInteraction.on) {
-                return;
-            }
-            newInteraction.on("drawstart", evt => {
-                this.currentSketch = evt.feature;
-                this.drawingPointHistory = [];
-                this.geometryUpdateTrigger++;
-
-                const geometry = evt.feature.getGeometry();
-
-                if (geometry) {
-                    geometry.on("change", () => {
-                        this.geometryUpdateTrigger++;
-                    });
-                }
-            });
-
-            newInteraction.on("drawend", evt => {
-                const featureId = evt.feature.ol_uid,
-                    history = this.getFeatureHistory(featureId),
-                    entries = buildDrawEndHistory(evt.feature);
-
-                entries.forEach(entry => history.undo.push(entry));
-                history.redo = [];
-                this.currentSketch = null;
-                this.drawingPointHistory = [];
-            });
+            this.syncFeatureHistories(newList);
         }
     },
     created () {
@@ -233,28 +89,35 @@ export default {
     },
     unmounted () {
         this.removeIncompleteDrawing();
-        this.removeDrawInteraction();
-        this.currentSelectInteractions.forEach(inter => this.removeInteraction(inter));
-        if (this.currentModifyInteraction) {
-            this.removeInteraction(this.currentModifyInteraction);
-        }
+        this.cleanupAllInteractions();
     },
     methods: {
-        ...mapMutations("Modules/Measure", ["setSelectedGeometry", "setSelectedLineStringUnit", "setSelectedPolygonUnit", "setLayer", "setCustomName"]),
+        ...mapMutations("Modules/Measure", [
+            "setSelectedGeometry",
+            "setSelectedLineStringUnit",
+            "setSelectedPolygonUnit",
+            "setLayer",
+            "setCustomName"
+        ]),
         ...mapActions("Modules/Measure", [
-            "deleteFeatures",
             "createDrawInteraction",
             "removeDrawInteraction",
+            "deleteFeatures",
             "deleteSingleFeature",
-            "removeTooltipForFeature",
-            "updateTooltipPositionForFeature",
-            "undoPointOnFeature",
-            "redoPointOnFeature",
-            "undoModifyCoordinates",
-            "redoModifyCoordinates",
-            "capturePreModifyCoords"
+            "cleanupAllInteractions",
+            "setInteractionMode",
+            "regulateDeleteAll",
+            "regulateUndo",
+            "regulateRedo",
+            "undoLastPointInSketch",
+            "redoLastPointInSketch",
+            "removeIncompleteDrawing",
+            "syncFeatureHistories",
+            "handleModifyMeasurement",
+            "handleDeleteMeasurement",
+            "highlightFeature",
+            "unhighlightFeature"
         ]),
-        ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
 
         /**
          * Sets focus to the first interactive control of the tool.
@@ -269,22 +132,6 @@ export default {
                     this.$refs["measure-tool-unit-select"].focus();
                 }
             });
-        },
-
-        /**
-         * Removes the last drawing if it has not been completed.
-         * @returns {void}
-         */
-        removeIncompleteDrawing () {
-            const feature = this.lines[this.featureId] || this.polygons[this.featureId];
-
-            if (feature && feature.get("isBeingDrawn")) {
-                const layerSource = this.layer.getSource();
-
-                if (layerSource.getFeatures().length > 0) {
-                    layerSource.removeFeature(layerSource.getFeatures().slice(-1)[0]);
-                }
-            }
         },
 
         /**
@@ -314,447 +161,6 @@ export default {
             }
             else {
                 this.setSelectedPolygonUnit(value);
-            }
-        },
-
-        /**
-         * Gets or creates the undo/redo history for a feature.
-         * @param {String|Number} featureId - The feature ol_uid
-         * @returns {{undo: Array, redo: Array}} The history stacks
-         */
-        getFeatureHistory (featureId) {
-            const normalizedId = normalizeFeatureId(featureId);
-
-            if (!this.featureHistories[normalizedId]) {
-                this.featureHistories = {...this.featureHistories, [normalizedId]: {undo: [], redo: []}};
-            }
-            return this.featureHistories[normalizedId];
-        },
-
-        /**
-         * Finds a measurement feature in the OL source by its ol_uid.
-         * @param {String|Number} featureId - The feature's ol_uid
-         * @returns {module:ol/Feature|undefined} The feature or undefined
-         */
-        getFeatureById (featureId) {
-            const normalizedId = normalizeFeatureId(featureId);
-
-            return source.getFeatures().find(f => {
-                return f.get("featureId") === undefined && normalizeFeatureId(f.ol_uid) === normalizedId;
-            });
-        },
-
-        /**
-         * Switches between DRAW, MODIFY, DELETE and IDLE interaction modes.
-         * @param {String} mode - One of: "DRAW", "MODIFY", "DELETE", "IDLE"
-         * @param {String|Number|null} [targetFeatureId=null] - For MODIFY: the feature to restrict editing to
-         * @returns {void}
-         */
-        setMode (mode, targetFeatureId = null) {
-            this.cleanupAllInteractions();
-
-            if (mode === "DRAW") {
-                this.selectedEditInteraction = "";
-                this.createDrawInteraction();
-            }
-            else if (mode === "MODIFY") {
-                this.selectedEditInteraction = "modify";
-                this.currentlyModifyingFeatureId = targetFeatureId;
-                this.setupModifyInteraction(targetFeatureId);
-            }
-            else if (mode === "DELETE") {
-                this.selectedEditInteraction = "delete";
-                this.setupDeleteInteraction();
-            }
-            else if (mode === "IDLE") {
-                this.selectedEditInteraction = "";
-            }
-        },
-
-        /**
-         * Removes all active OL interactions and resets the interaction state.
-         * @returns {void}
-         */
-        cleanupAllInteractions () {
-            if (this.interaction) {
-                this.removeDrawInteraction();
-            }
-            if (this.currentModifyInteraction) {
-                this.removeInteraction(this.currentModifyInteraction);
-                this.currentModifyInteraction = null;
-            }
-            this.currentSelectInteractions.forEach(inter => this.removeInteraction(inter));
-            this.currentSelectInteractions = [];
-            this.selectedEditInteraction = null;
-            this.currentlyModifyingFeatureId = null;
-        },
-
-        /**
-         * Creates OL select interactions for delete mode and adds them to the map.
-         * Clicking a feature deletes it; hovering highlights it.
-         * @returns {void}
-         */
-        setupDeleteInteraction () {
-            this.currentSelectInteractions.forEach(inter => this.removeInteraction(inter));
-            this.$nextTick(() => {
-                this.currentSelectInteractions = createSelectInteractions(this.layer);
-
-                const selectInter = this.currentSelectInteractions[0],
-                    removeHandler = selectInter.on("select", evt => {
-                        if (evt.selected.length > 0) {
-                            const featureId = evt.selected[0].ol_uid;
-
-                            this.deleteSingleFeature(featureId);
-                            const deletedId = normalizeFeatureId(featureId),
-                                remaining = {...this.featureHistories};
-
-                            delete remaining[deletedId];
-                            this.featureHistories = remaining;
-                            this.$nextTick(() => {
-                                this.setMode("DRAW");
-                                unByKey(removeHandler);
-                            });
-                        }
-                    });
-
-                selectInteraction.removeSelectedFeature(selectInter, source);
-                this.currentSelectInteractions.forEach(inter => this.addInteraction(inter));
-            });
-        },
-
-        /**
-         * Creates an OL modify interaction, optionally restricted to one feature.
-         * Records pre-modification coordinates to enable undo.
-         * @param {String|Number|null} [featureId=null] - The feature to restrict modification to
-         * @returns {void}
-         */
-        setupModifyInteraction (featureId = null) {
-            this.currentlyModifyingFeatureId = featureId;
-
-            if (this.currentModifyInteraction) {
-                this.removeInteraction(this.currentModifyInteraction);
-            }
-
-            this.currentModifyInteraction = createMeasureModifyInteraction(
-                featureId,
-                this.getFeatureById,
-                {
-                    onModifyStart: feature => this.capturePreModifyCoords(feature),
-                    onModifyEnd: (feature, beforeCoords, afterCoords, geometryType) => {
-                        const history = this.getFeatureHistory(feature.ol_uid);
-
-                        history.undo.push({
-                            mode: "modifyCoordinates",
-                            timestamp: Date.now(),
-                            data: {previousCoordinates: beforeCoords, newCoordinates: afterCoords, geometryType}
-                        });
-                        history.redo = [];
-                        this.$store.commit("Modules/Measure/addFeature", feature);
-                    }
-                }
-            );
-
-            if (!this.currentModifyInteraction) {
-                return;
-            }
-            this.addInteraction(this.currentModifyInteraction);
-        },
-
-        /**
-         * Clears all measurements and resets all undo/redo history.
-         * @returns {void}
-         */
-        regulateDeleteAll () {
-            this.cleanupAllInteractions();
-            this.featureHistories = {};
-            this.currentSketch = null;
-            this.drawingPointHistory = [];
-            this.deleteFeatures();
-            this.createDrawInteraction();
-        },
-
-        /**
-         * Handles the undo action for a specific measurement.
-         * During active drawing, undoes the last drawn point.
-         * For completed features, reverts the last history entry.
-         * @param {String} featureId - The feature ID to undo
-         * @returns {void}
-         */
-        regulateUndo (featureId) {
-            if (this.currentSketch && normalizeFeatureId(this.currentSketch.ol_uid) === normalizeFeatureId(featureId)) {
-                this.undoLastPointInSketch();
-                return;
-            }
-
-            const normalizedId = normalizeFeatureId(featureId),
-                history = this.featureHistories[normalizedId],
-                feature = this.getFeatureById(featureId);
-
-            if (!feature) {
-                return;
-            }
-
-            if (!history || history.undo.length === 0) {
-                this.undoInitialPoint(feature, normalizedId);
-                return;
-            }
-
-            const historyEntry = history.undo.pop();
-
-            if (historyEntry.mode === "addPoint") {
-                this.undoPointOnFeature({feature, historyEntry});
-            }
-            else if (historyEntry.mode === "modifyCoordinates") {
-                this.undoModifyCoordinates({feature, historyEntry});
-            }
-
-            history.redo.push(historyEntry);
-        },
-
-        /**
-         * Undoes the initial point of a feature that has no explicit history entry.
-         * Synthesizes a history entry from the current geometry state.
-         * @param {module:ol/Feature} feature - The feature to undo
-         * @param {Number} normalizedId - The normalized feature ID
-         * @returns {void}
-         */
-        undoInitialPoint (feature, normalizedId) {
-            const syntheticEntry = createSyntheticUndoEntry(feature);
-
-            if (syntheticEntry) {
-                const history = this.getFeatureHistory(normalizedId);
-
-                this.undoPointOnFeature({feature, historyEntry: syntheticEntry});
-                history.redo.push(syntheticEntry);
-            }
-        },
-
-        /**
-         * Handles the redo action for a specific measurement.
-         * During active drawing, redoes the last undone point.
-         * For completed features, reapplies the last undone history entry.
-         * @param {String} featureId - The feature ID to redo
-         * @returns {void}
-         */
-        regulateRedo (featureId) {
-            if (this.currentSketch && normalizeFeatureId(this.currentSketch.ol_uid) === normalizeFeatureId(featureId)) {
-                this.redoLastPointInSketch();
-                return;
-            }
-
-            const normalizedId = normalizeFeatureId(featureId),
-                history = this.featureHistories[normalizedId],
-                feature = this.getFeatureById(featureId);
-
-            if (!feature || !history || history.redo.length === 0) {
-                return;
-            }
-
-            const historyEntry = history.redo.pop();
-
-            if (historyEntry.mode === "addPoint") {
-                this.redoPointOnFeature({feature, historyEntry});
-            }
-            else if (historyEntry.mode === "modifyCoordinates") {
-                this.redoModifyCoordinates({feature, historyEntry});
-            }
-
-            history.undo.push(historyEntry);
-        },
-
-        /**
-         * Removes the last point from the active sketch using the OL Draw interaction.
-         * Aborts the drawing if too few points remain.
-         * @returns {void}
-         */
-        undoLastPointInSketch () {
-            if (!this.currentSketch || !this.interaction) {
-                return;
-            }
-            const geometry = this.currentSketch.getGeometry();
-
-            if (!geometry) {
-                return;
-            }
-            const geometryType = geometry.getType(),
-                coordinatesBefore = geometryType === "LineString"
-                    ? geometry.getCoordinates()
-                    : geometry.getCoordinates()[0],
-                minPoints = geometryType === "LineString" ? 1 : 2;
-
-            if (coordinatesBefore.length <= minPoints) {
-                this.drawingPointHistory.push({type: "point", coord: coordinatesBefore[0]});
-                this.abortCurrentDrawing();
-                return;
-            }
-
-            try {
-                this.interaction.removeLastPoint();
-                const coordinatesAfter = geometryType === "LineString"
-                        ? geometry.getCoordinates()
-                        : geometry.getCoordinates()[0],
-                    minValidPoints = geometryType === "LineString" ? 2 : 3;
-
-                if (coordinatesAfter.length <= minValidPoints) {
-                    this.removeTooltipForFeature(this.currentSketch.ol_uid);
-                    coordinatesAfter.forEach(coord => this.drawingPointHistory.push({type: "point", coord}));
-                    this.abortCurrentDrawing();
-                    return;
-                }
-
-                const removedPoint = findRemovedPoint(coordinatesBefore, coordinatesAfter);
-
-                if (removedPoint) {
-                    this.drawingPointHistory.push({type: "point", coord: removedPoint});
-                }
-            }
-            catch {
-                // ignore
-            }
-        },
-
-        /**
-         * Re-adds the last undone point to the active sketch.
-         * Uses the OL Draw interaction's appendCoordinates when available.
-         * @returns {void}
-         */
-        redoLastPointInSketch () {
-            if (!this.currentSketch || !this.interaction || this.drawingPointHistory.length === 0) {
-                return;
-            }
-            const lastEntry = this.drawingPointHistory.pop();
-
-            if (!lastEntry || lastEntry.type !== "point") {
-                return;
-            }
-
-            const geometry = this.currentSketch.getGeometry(),
-                geometryType = geometry.getType();
-
-            if (typeof this.interaction.appendCoordinates === "function") {
-                try {
-                    this.interaction.appendCoordinates([lastEntry.coord]);
-                    return;
-                }
-                catch {
-                    // appendCoordinates not available on this OL version; fall through to manual path
-                }
-            }
-
-            if (geometryType === "LineString") {
-                const coordinates = geometry.getCoordinates();
-
-                coordinates.push(lastEntry.coord);
-                geometry.setCoordinates(coordinates);
-            }
-            else if (geometryType === "Polygon") {
-                const coordinates = geometry.getCoordinates()[0];
-
-                coordinates.splice(coordinates.length - 1, 0, lastEntry.coord);
-                geometry.setCoordinates([coordinates]);
-            }
-
-            geometry.changed();
-        },
-
-        /**
-         * Aborts the current drawing and removes the incomplete sketch from the source.
-         * @returns {void}
-         */
-        abortCurrentDrawing () {
-            if (this.currentSketch) {
-                this.removeTooltipForFeature(this.currentSketch.ol_uid);
-                source.removeFeature(this.currentSketch);
-                this.$store.commit("Modules/Measure/removeFeature", this.currentSketch.ol_uid);
-            }
-            if (this.interaction) {
-                try {
-                    this.interaction.abortDrawing();
-                }
-                catch {
-                    // ignore
-                }
-            }
-            this.currentSketch = null;
-            this.drawingPointHistory = [];
-        },
-
-        /**
-         * Toggles modify mode for a list item.
-         * Exits modify mode if the feature is already being modified.
-         * @param {String} featureId - The feature ID to toggle modification for
-         * @returns {void}
-         */
-        handleModifyMeasurement (featureId) {
-            const normalizedTarget = normalizeFeatureId(featureId),
-                normalizedCurrent = this.currentlyModifyingFeatureId
-                    ? normalizeFeatureId(this.currentlyModifyingFeatureId)
-                    : null;
-
-            if (this.selectedEditInteraction === "modify" && normalizedCurrent === normalizedTarget) {
-                this.handleUnhighlightFeature(featureId);
-                this.setMode("DRAW");
-            }
-            else {
-                this.setMode("MODIFY", featureId);
-            }
-        },
-
-        /**
-         * Deletes a specific measurement and exits modify mode if it was active.
-         * @param {String} featureId - The feature ID to delete
-         * @returns {void}
-         */
-        handleDeleteMeasurement (featureId) {
-            this.deleteSingleFeature(featureId);
-            const deletedId = normalizeFeatureId(featureId),
-                remaining = {...this.featureHistories};
-
-            delete remaining[deletedId];
-            this.featureHistories = remaining;
-            if (this.selectedEditInteraction === "modify") {
-                this.setMode("DRAW");
-            }
-        },
-
-        /**
-         * Saves a new custom name for a measurement.
-         * @param {Object} payload - {featureId: String, name: String}
-         * @returns {void}
-         */
-        handleRenameMeasurement (payload) {
-            this.setCustomName(payload);
-        },
-
-        /**
-         * Highlights a measurement feature on the map when hovered in the list.
-         * @param {String} featureId - The feature ID to highlight
-         * @returns {void}
-         */
-        handleHighlightFeature (featureId) {
-            const feature = this.getFeatureById(featureId);
-
-            if (feature && !feature.get("_isHighlighted")) {
-                feature.set("_originalStyle", feature.getStyle());
-                feature.set("_isHighlighted", true);
-                feature.setStyle(getStyle([0, 89, 255, 1]));
-            }
-        },
-
-        /**
-         * Removes the highlight from a measurement feature.
-         * @param {String} featureId - The feature ID to unhighlight
-         * @returns {void}
-         */
-        handleUnhighlightFeature (featureId) {
-            const feature = this.getFeatureById(featureId);
-
-            if (feature && feature.get("_isHighlighted")) {
-                const originalStyle = feature.get("_originalStyle");
-
-                feature.setStyle(originalStyle || getStyle(this.color));
-                feature.unset("_originalStyle");
-                feature.unset("_isHighlighted");
             }
         }
     }
@@ -825,9 +231,9 @@ export default {
             @delete-measurement="handleDeleteMeasurement"
             @undo-action="regulateUndo"
             @redo-action="regulateRedo"
-            @highlight-feature="handleHighlightFeature"
-            @unhighlight-feature="handleUnhighlightFeature"
-            @rename-measurement="handleRenameMeasurement"
+            @highlight-feature="highlightFeature"
+            @unhighlight-feature="unhighlightFeature"
+            @rename-measurement="setCustomName"
             @undo-active-sketch="undoLastPointInSketch"
             @redo-active-sketch="redoLastPointInSketch"
         />
