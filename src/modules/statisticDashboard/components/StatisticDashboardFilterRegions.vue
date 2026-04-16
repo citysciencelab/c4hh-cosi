@@ -470,50 +470,51 @@ export default {
     </div>
 </template>
 
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+
 <style lang="scss">
-
-    .region-filter {
-        .btn-light {
-            background: $light_blue;
-            &:hover {
-                background: $dark_blue;
-                color: $white;
-            }
-            &:active {
-                background: $dark_blue;
-            }
-        }
-        .active-button {
+.region-filter {
+    .btn-light {
+        background: $light_blue;
+        &:hover {
             background: $dark_blue;
             color: $white;
         }
-
-        .multiselect .multiselect__spinner:after, .multiselect__spinner:before {
-            position: absolute;
-            content: "";
-            top: 50%;
-            left: 50%;
-            margin: -8px 0 0 -8px;
-            width: 16px;
-            height: 16px;
-            border-radius: 100%;
-            border: 2px solid transparent;
-            border-top-color: $dark_grey;
-            box-shadow: 0 0 0 1px transparent;
-        }
-        .multiselect .multiselect__tag {
-            background: $light_blue;
-            padding: 4px 10px 4px 10px;
-            border-radius: 50px;
-            border: none;
-        }
-        .multiselect .multiselect__tag:hover {
+        &:active {
             background: $dark_blue;
-            color: $white;
-        }
-        .multiselect .multiselect__tag i::before {
-            vertical-align: middle;
         }
     }
+    .active-button {
+        background: $dark_blue;
+        color: $white;
+    }
+
+    .multiselect .multiselect__spinner:after, .multiselect__spinner:before {
+        position: absolute;
+        content: "";
+        top: 50%;
+        left: 50%;
+        margin: -8px 0 0 -8px;
+        width: 16px;
+        height: 16px;
+        border-radius: 100%;
+        border: 2px solid transparent;
+        border-top-color: $dark_grey;
+        box-shadow: 0 0 0 1px transparent;
+    }
+    .multiselect .multiselect__tag {
+        background: $light_blue;
+        padding: 4px 10px 4px 10px;
+        border-radius: 50px;
+        border: none;
+    }
+    .multiselect .multiselect__tag:hover {
+        background: $dark_blue;
+        color: $white;
+    }
+    .multiselect .multiselect__tag i::before {
+        vertical-align: middle;
+    }
+}
 </style>
 

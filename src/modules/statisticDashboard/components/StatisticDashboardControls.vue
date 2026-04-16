@@ -1020,9 +1020,9 @@ export default {
     </div>
 </template>
 
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+
 <style lang="scss" scoped>
-
-
 .dashboard-controls {
     .description {
         margin-top: 25px;

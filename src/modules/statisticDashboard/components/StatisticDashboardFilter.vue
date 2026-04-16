@@ -497,6 +497,9 @@ export default {
         </div>
     </div>
 </template>
+
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+
 <style lang="scss" scoped>
 .stretched {
     position: relative

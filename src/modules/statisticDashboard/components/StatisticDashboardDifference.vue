@@ -222,9 +222,9 @@ export default {
     </div>
 </template>
 
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+
 <style lang="scss" scoped>
-
-
 .bootstrap-icon {
     position: absolute;
     right: 10px;
