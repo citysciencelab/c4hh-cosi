@@ -34,6 +34,7 @@
 - GroupLayer: 
     - Fixed grouped layers, using layerIDsToStyle, were not shown. 
     - Fixed bug if configuration contains only wrong layer IDs.
+- build: Fixed incorrect asset path for logo in production environment.
 
 ---
 

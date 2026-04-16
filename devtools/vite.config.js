@@ -345,7 +345,12 @@ export default defineConfig(({mode}) => {
             __VUE_OPTIONS_API__: true,
             __VUE_PROD_DEVTOOLS__: false,
             VUE_ADDONS: JSON.stringify(vueAddons),
-            MASTERPORTAL_BASE_PATH: JSON.stringify(runtimeBase)
+            MASTERPORTAL_BASE_PATH: JSON.stringify(runtimeBase),
+            MASTERPORTAL_ASSETS_PATH: JSON.stringify(
+                isProd
+                    ? `../mastercode/${mastercodeVersionFolderName}/img`
+                    : "/src/assets/img"
+            )
         },
 
         optimizeDeps: {

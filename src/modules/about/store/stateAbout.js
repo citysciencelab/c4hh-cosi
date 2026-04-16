@@ -39,7 +39,7 @@ export default {
     abstractText: "",
     contact: null,
     cswUrl: "",
-    logo: "../../src/assets/img/Logo_Masterportal.svg",
+    logo: `${MASTERPORTAL_ASSETS_PATH}/Logo_Masterportal.svg`,
     logoLink: "https://masterportal.org",
     logoText: "Masterportallogo",
     metaDataCatalogueId: "2",

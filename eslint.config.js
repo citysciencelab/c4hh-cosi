@@ -27,7 +27,8 @@ export default [
                 mapCollection: true,
                 moduleCollection: true,
                 StreetSmartApi: true,
-                MASTERPORTAL_BASE_PATH: true
+                MASTERPORTAL_BASE_PATH: true,
+                MASTERPORTAL_ASSETS_PATH: true
             }
         },
         plugins: {
