@@ -7,8 +7,7 @@ import getCswRecordById from "@shared/js/api/getCswRecordById.js";
 import layerProvider from "../js/getVisibleLayer.js";
 import omit from "@shared/js/utils/omit.js";
 import changeCase from "@shared/js/utils/changeCase.js";
-import {takeScreenshot} from "olcs/lib/olcs/print/takeCesiumScreenshot.js";
-import {computeRectangle} from "olcs/lib/olcs/print/computeRectangle.js";
+import {takeScreenshot, computeRectangle} from "olcs";
 
 const actions = {
     ...actionsPrintInitialization,

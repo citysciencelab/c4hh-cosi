@@ -105,7 +105,7 @@ export default defineConfig(({mode}) => {
                     }
                     : {}
             },
-            dedupe: ["jsts", "ol", "proj4"]
+            dedupe: ["jsts", "ol", "proj4", "olcs"]
         },
 
         plugins: [

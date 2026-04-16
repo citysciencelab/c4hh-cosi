@@ -301,7 +301,7 @@ export default [
 
                 // 3) OpenLayers subpaths must end with .js (exclude bare 'ol')
                 {
-                    selector: "ImportDeclaration[source.value=/^ol/]:not([source.value='ol']):not([source.value=/\\.js$/])",
+                    selector: "ImportDeclaration[source.value=/^ol(?:\\/|$)/]:not([source.value='ol']):not([source.value=/\\.js$/])",
                     message: "OpenLayers subpath imports must end with .js (e.g. ol/interaction/Draw.js)."
                 },
 

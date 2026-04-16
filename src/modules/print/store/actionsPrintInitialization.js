@@ -7,8 +7,7 @@ import BuildSpec from "../js/buildSpec.js";
 import Canvas from "../js/buildCanvas.js";
 import layerProvider from "../js/getVisibleLayer.js";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
-import {autoDrawMask} from "olcs/lib/olcs/print/drawCesiumMask.js";
-import {computeRectangle} from "olcs/lib/olcs/print/computeRectangle.js";
+import {autoDrawMask, computeRectangle} from "olcs";
 
 export default {
     /**

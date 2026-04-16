@@ -20,8 +20,7 @@
 - The following packages have been updated:
     - dependencies:
         - axios: 1.12.2 to 1.15.0
-    - devDependencies:
-        - @masterportal/masterportalapi: 2.59.0 to 2.60.0
+        - @masterportal/masterportalapi: 2.59.0 to 2.61.0 (This also raised ol to version 10.9.0)
 - Menu: Secondary menu is now only rendered if it contains menu entries. Empty configurations no longer render the secondary menu in the UI.
 - Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) and npm fom **10.9.3** up to smnaller than **12** are now supported.
 

@@ -44,7 +44,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@masterportal/masterportalapi": "^2.60.0",
+    "@masterportal/masterportalapi": "^2.61.0",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.15.0",
     "bootstrap": "^5.3.8",
