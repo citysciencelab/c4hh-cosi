@@ -19,7 +19,8 @@
       },
       "drawHeading": "Änderungen einzeichnen",
       "cancelButtonLabel": "Vorgang abbrechen",
-      "saveButtonLabel": "Meldung speichern"
+      "saveButtonLabel": "Meldung speichern",
+      "geometryEdit": "Geometrie bearbeiten"
     }
   }
 }

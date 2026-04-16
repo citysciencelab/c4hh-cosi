@@ -19,7 +19,8 @@
       },
       "drawHeading": "Draw changes",
       "cancelButtonLabel": "Cancel",
-      "saveButtonLabel": "Save"
+      "saveButtonLabel": "Save",
+      "geometryEdit": "Edit geometry"
     }
   }
 }
