@@ -97,8 +97,19 @@ export default {
                 transformFeature(feature, projCode);
             });
 
-            layer.getSource().clear();
-            layer.getSource().addFeatures(features);
+            const source = layer.getSource();
+
+            // Handle cluster sources: clear and update the underlying vector source
+            const vectorSource = source.getSource ? source.getSource() : source;
+
+            vectorSource.clear();
+            vectorSource.addFeatures(features);
+
+            // If it's a cluster source, also refresh it
+            if (source.getSource) {
+                source.clear();
+                source.refresh();
+            }
 
             if (zoomTo) {
                 store.dispatch("Maps/zoomToFilteredFeatures", {ids: getFeatureIds(id), layerId: id, zoomOptions: {duration: 0}});
