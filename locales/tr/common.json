@@ -889,6 +889,9 @@
       "headline": "Haberler",
       "name": "Haberler"
     },
+    "tutorialAndTips": {
+      "name": "Eğitimler ve ipuçları"
+    },    
     "openConfig": {
       "explanation": "Yerel yapılandırma dosyası olarak kaydettiğiniz bir haritayı açın.",
       "loadFileFailed": "Yapılandırma dosyası <b>{{targetFileName}}</b> yüklenemedi. <b>{{targetFileFormat}}</b> dosya formatı desteklenmiyor. Lütfen <b>json</b> formatında bir dosya yükleyin.",

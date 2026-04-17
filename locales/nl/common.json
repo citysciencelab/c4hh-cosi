@@ -796,6 +796,9 @@
       "headline": "nieuws",
       "name": "nieuws"
     },
+    "tutorialAndTips": {
+      "name": "Handleidingen en tips"
+    },
     "openConfig": {
       "explanation": "Open een kaart die u hebt opgeslagen als lokaal configuratiebestand.",
       "loadFileFailed": "Het configuratiebestand <b>{{targetFileName}}</b> werd niet geladen.  <b>{{targetFileFormat}}</b> wordt niet ondersteund.  <b>json</b>.",

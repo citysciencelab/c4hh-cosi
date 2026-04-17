@@ -889,6 +889,9 @@
       "headline": "Novedades",
       "name": "Novedades"
     },
+    "tutorialAndTips": {
+      "name": "Tutoriales y consejos"
+    },       
     "openConfig": {
       "explanation": "Abra un mapa que haya guardado como archivo de configuración local.",
       "loadFileFailed": "El archivo de configuración <b>{{targetFileName}}</b> no se pudo cargar. El formato de archivo <b>{{targetFileFormat}}</b> no es compatible. Por favor, cargue un archivo en formato <b>json</b>.",

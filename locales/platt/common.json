@@ -889,6 +889,9 @@
       "headline": "Neeigkeiten",
       "name": "Neeigkeiten"
     },
+    "tutorialAndTips": {
+      "name": "Tutorials un Tipps"
+    },    
     "openConfig": {
       "explanation": "Maak en Koort op, de du as lokale Konfiguratschoonsdatei speichert hest.",
       "loadFileFailed": "De Konfiguratschoonsdatei <b>{{targetFileName}}</b> kunn nich laden warrn. Dat Dateiformat <b>{{targetFileFormat}}</b> warrt nich ünnerstütt. Bidde laad en Datei in’t Format <b>json</b>.",
