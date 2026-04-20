@@ -17,7 +17,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Menu", ["mainExpanded", "secondaryExpanded", "mainToggleButtonIcon", "secondaryToggleButtonIcon"]),
+        ...mapGetters("Menu", ["mainExpanded", "secondaryExpanded", "mainToggleButtonIcon", "secondaryToggleButtonIcon", "secondaryMenuEnabled"]),
         /**
          * @returns {String} iconClass to be used depending on the side this button is used for.
          */
@@ -32,6 +32,16 @@ export default {
             }
 
             return icon;
+        },
+        /**
+         * @returns {Boolean} True if the toggle button should be shown.
+         */
+        showButton () {
+            if (this.side === "mainMenu") {
+                return true;
+            }
+
+            return this.secondaryMenuEnabled;
         }
     },
     methods: {
@@ -42,11 +52,16 @@ export default {
 
 <template>
     <button
+        v-if="showButton"
         :id="side + '-toggle-button'"
         class="btn btn-light bootstrap-icon shadow menu-toggle-button"
         :class="[
             'toggle-button-' + side,
-            {'expanded': mainExpanded && side === 'mainMenu' || secondaryExpanded && side === 'secondaryMenu'}
+            {
+                expanded:
+                    (mainExpanded && side === 'mainMenu') ||
+                    (secondaryExpanded && side === 'secondaryMenu')
+            }
         ]
         "
         type="button"

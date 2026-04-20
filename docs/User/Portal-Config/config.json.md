@@ -30,7 +30,7 @@ The configuration options listed in the following table exist:
 |mainMenu|no|**[menu](#portalconfigmenu)**||Menu entries in main menu and their order are configured in this entry. The order of modules corresponds to the order in the object specifying them; see **[Modules](#portalconfigmenusectionsmodules)**.|false|
 |map|no|**[map](#portalconfigmap)**||Configuration of the map and elements placed on it.|false|
 |portalFooter|no|**[portalFooter](#portalconfigportalfooter)**||Possibility to configure the content of the portal footer.|false| xxx
-|secondaryMenu|no|**[menu](#portalconfigmenu)**||Menu entries in secondary menu and their order are configured in this entry. The order of modules corresponds to the order in the object specifying them; see **[Modules](#portalconfigmenusectionsmodules)**.|false|
+|secondaryMenu|no|**[menu](#portalconfigmenu)**||Menu entries in secondary menu and their order are configured in this entry. The order of modules corresponds to the order in the object specifying them; see **[Modules](#portalconfigmenusectionsmodules)**. <br><br> If no menu entries are defined, the secondary menu will not be rendered in the UI.|false|
 |tree|no|**[tree](#portalconfigtree)**||Configuration of the topic selection tree.|false|
 
 **Example**

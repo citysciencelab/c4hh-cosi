@@ -548,4 +548,86 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
             });
         });
     });
+
+    describe("secondaryMenuEnabled", () => {
+        it("should return false if secondaryMenu.sections is undefined", () => {
+            state = {
+                secondaryMenu: {}
+            };
+
+            const result = gettersMenu.secondaryMenuEnabled(state);
+
+            expect(result).to.be.false;
+        });
+
+        it("should return false if sections is not an array", () => {
+            state = {
+                secondaryMenu: {
+                    sections: null
+                }
+            };
+
+            const result = gettersMenu.secondaryMenuEnabled(state);
+
+            expect(result).to.be.false;
+        });
+
+        it("should return false if sections is an empty array", () => {
+            state = {
+                secondaryMenu: {
+                    sections: []
+                }
+            };
+
+            const result = gettersMenu.secondaryMenuEnabled(state);
+
+            expect(result).to.be.false;
+        });
+
+        it("should return false if sections contain empty arrays", () => {
+            state = {
+                secondaryMenu: {
+                    sections: [
+                        [],
+                        []
+                    ]
+                }
+            };
+
+            const result = gettersMenu.secondaryMenuEnabled(state);
+
+            expect(result).to.be.false;
+        });
+
+        it("should return true if at least one section contains items", () => {
+            state = {
+                secondaryMenu: {
+                    sections: [
+                        [],
+                        ["item1"],
+                        []
+                    ]
+                }
+            };
+
+            const result = gettersMenu.secondaryMenuEnabled(state);
+
+            expect(result).to.be.true;
+        });
+
+        it("should return false if sections contain non-array values", () => {
+            state = {
+                secondaryMenu: {
+                    sections: [
+                        null,
+                        "not-an-array"
+                    ]
+                }
+            };
+
+            const result = gettersMenu.secondaryMenuEnabled(state);
+
+            expect(result).to.be.false;
+        });
+    });
 });

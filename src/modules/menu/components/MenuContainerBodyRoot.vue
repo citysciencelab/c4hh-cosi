@@ -63,7 +63,6 @@ export default {
                 :side="side"
                 :path="path(key)"
             />
-            <hr>
         </template>
     </div>
 </template>

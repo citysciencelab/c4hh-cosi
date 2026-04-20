@@ -62,7 +62,8 @@ describe("src/modules/menu/MenuContainer.vue", () => {
                         mainExpanded: () => mainExpanded,
                         secondaryExpanded: () => secondaryExpanded,
                         titleBySide: () => () => true,
-                        currentComponent: () => () => "root"
+                        currentComponent: () => () => "root",
+                        secondaryMenuEnabled: () => true
                     },
                     mutations: {
                         collapseMenues: collapseMenuesSpy,
@@ -369,5 +370,68 @@ describe("src/modules/menu/MenuContainer.vue", () => {
             expect(footerMock.style.display).to.equal("none");
         });
     });
+    describe("secondaryMenuEnabled", () => {
+        /**
+         * Creates a Vuex store specifically for testing the `secondaryMenuEnabled` behavior
+         *
+         * @param {Object} params
+         * @param {boolean} [params.enabled=true] - Whether the secondary menu is enabled
+         * @returns {import("vuex").Store} Vuex store instance configured for MenuContainer tests
+         */
+        function createSecondaryMenuEnabledStore (enabled = true) {
+            return createStore({
+                modules: {
+                    Menu: {
+                        namespaced: true,
+                        getters: {
+                            defaultComponent: () => defaultComponent,
+                            secondaryMenu: () => secondaryMenu,
+                            mainMenu: () => mainMenu,
+                            currentMenuWidth: () => currentMenuWidth,
+                            mainExpanded: () => mainExpanded,
+                            secondaryExpanded: () => secondaryExpanded,
+                            titleBySide: () => () => true,
+                            currentComponent: () => () => "root",
+                            secondaryMenuEnabled: () => enabled
+                        },
+                        mutations: {
+                            collapseMenues: collapseMenuesSpy,
+                            mergeMenuState: mergeMenuStateSpy,
+                            setCurrentMenuWidth: sinon.spy()
+                        },
+                        actions: {
+                            closeMenu: closeMenuSpy,
+                            toggleMenu: sinon.spy()
+                        }
+                    }
+                },
+                getters: {
+                    menuFromConfig: () => () => "menuFromConfig",
+                    isMobile: () => isMobile,
+                    uiStyle: () => uiStyle
+                }
+            });
+        }
+        it("should NOT render secondaryMenu if disabled", () => {
+            store = createSecondaryMenuEnabledStore(false);
 
+            wrapper = shallowMount(MenuContainer, {
+                global: {plugins: [store]},
+                propsData: {side: "secondaryMenu"}
+            });
+
+            expect(wrapper.find("#mp-menu-secondaryMenu").exists()).to.be.false;
+        });
+
+        it("should render secondaryMenu if enabled", () => {
+            store = createSecondaryMenuEnabledStore(true);
+
+            wrapper = shallowMount(MenuContainer, {
+                global: {plugins: [store]},
+                propsData: {side: "secondaryMenu"}
+            });
+
+            expect(wrapper.find("#mp-menu-secondaryMenu").exists()).to.be.true;
+        });
+    });
 });

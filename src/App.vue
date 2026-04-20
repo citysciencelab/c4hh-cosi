@@ -41,7 +41,8 @@ export default {
             "mainExpanded",
             "mainMenu",
             "secondaryExpanded",
-            "secondaryMenu"
+            "secondaryMenu",
+            "secondaryMenuEnabled"
         ]),
         ...mapGetters("Modules", [
             "componentMap"
@@ -207,6 +208,7 @@ export default {
             </div>
             <div
                 class="controls-element"
+                :class="{'me-5': !secondaryMenuEnabled}"
             >
                 <ControlBar
                     class="controls"

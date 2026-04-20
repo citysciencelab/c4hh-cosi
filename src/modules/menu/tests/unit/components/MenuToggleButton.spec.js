@@ -6,6 +6,43 @@ import MenuToggleButton from "@modules/menu/components/MenuToggleButton.vue";
 
 config.global.mocks.$t = key => key;
 
+/**
+ * Factory to create a Vuex store for Menu module tests
+ *
+ * @typedef {Object} MenuStoreOptions
+ * @property {boolean} [mainExpanded=false]
+ * @property {boolean} [secondaryExpanded=false]
+ * @property {boolean} [secondaryMenuEnabled=true]
+ * @property {Function} [toggleMenuSpy]
+ *
+ * @param {MenuStoreOptions} [options]
+ * @returns {import("vuex").Store} Vuex store instance configured for Menu module tests
+ */
+function createMenuStore ({
+    mainExpanded = false,
+    secondaryExpanded = false,
+    secondaryMenuEnabled = true,
+    toggleMenuSpy = sinon.spy()
+} = {}) {
+    return createStore({
+        modules: {
+            Menu: {
+                namespaced: true,
+                getters: {
+                    mainExpanded: () => mainExpanded,
+                    secondaryExpanded: () => secondaryExpanded,
+                    mainToggleButtonIcon: () => "bi-list",
+                    secondaryToggleButtonIcon: () => "bi-tools",
+                    secondaryMenuEnabled: () => secondaryMenuEnabled
+                },
+                actions: {
+                    toggleMenu: toggleMenuSpy
+                }
+            }
+        }
+    });
+}
+
 describe("src/modules/menu/MenuToggleButton.vue", () => {
     let store,
         side,
@@ -15,22 +52,8 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
     beforeEach(() => {
         side = "mainMenu";
         toggleMenuSpy = sinon.spy();
-        store = createStore({
-            modules: {
-                Menu: {
-                    namespaced: true,
-                    getters: {
-                        mainExpanded: sinon.stub(),
-                        secondaryExpanded: sinon.stub(),
-                        mainToggleButtonIcon: () => "bi-list",
-                        secondaryToggleButtonIcon: () => "bi-tools"
-                    },
-                    actions: {
-                        toggleMenu: toggleMenuSpy
-                    }
-                }
-            }
-        });
+
+        store = createMenuStore({toggleMenuSpy});
     });
 
     afterEach(() => {
@@ -101,5 +124,34 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
         expect(toggleMenuSpy.calledOnce).to.be.true;
         expect(toggleMenuSpy.firstCall.args[1]).to.be.equals("secondaryMenu");
 
+    });
+    describe("showButton", () => {
+        it("should NOT render secondary button if disabled", () => {
+            store = createMenuStore({
+                secondaryMenuEnabled: false,
+                toggleMenuSpy
+            });
+
+            wrapper = mount(MenuToggleButton, {
+                global: {plugins: [store]},
+                propsData: {side: "secondaryMenu"}
+            });
+
+            expect(wrapper.find("#secondaryMenu-toggle-button").exists()).to.be.false;
+        });
+
+        it("should render secondary button if enabled", () => {
+            store = createMenuStore({
+                secondaryMenuEnabled: true,
+                toggleMenuSpy
+            });
+
+            wrapper = mount(MenuToggleButton, {
+                global: {plugins: [store]},
+                propsData: {side: "secondaryMenu"}
+            });
+
+            expect(wrapper.find("#secondaryMenu-toggle-button").exists()).to.be.true;
+        });
     });
 });

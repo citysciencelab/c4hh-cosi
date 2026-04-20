@@ -18,6 +18,7 @@
         - axios: 1.12.2 to 1.15.0
     - devDependencies:
         - @masterportal/masterportalapi: 2.59.0 to 2.60.0
+- Menu: Secondary menu is now only rendered if it contains menu entries. Empty configurations no longer render the secondary menu in the UI.
 
 ### Deprecated
 

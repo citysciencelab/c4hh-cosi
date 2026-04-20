@@ -29,7 +29,7 @@ Es existieren die im Folgenden aufgelisteten Konfigurationen:
 |----|-------------|---|-------|------------|------|
 |map|nein|**[map](#portalconfigmap)**||MKonfiguration der Karte und darauf platzierter Elemente.|false|
 |mainMenu|nein|**[menu](#portalconfigmenu)**||Hier können die Menüeinträge im Mainmenu und deren Anordnung konfiguriert werden. Die Reihenfolge der Module ist identisch mit der Reihenfolge in der config.json (siehe **[Modules](#portalconfigmenusectionsmodules)**).|false|
-|secondaryMenu|nein|**[menu](#portalconfigmenu)**||Hier können die Menüeinträge im Secondarymenu und deren Anordnung konfiguriert werden. Die Reihenfolge der Module ist identisch mit der Reihenfolge in der config.json (siehe **[Modules](#portalconfigmenusectionsmodules)**).|false|
+|secondaryMenu|nein|**[menu](#portalconfigmenu)**||Hier können die Menüeinträge im Secondarymenu und deren Anordnung konfiguriert werden. Die Reihenfolge der Module ist identisch mit der Reihenfolge in der config.json (siehe **[Modules](#portalconfigmenusectionsmodules)**). <br><br> Wenn keine Menüeinträge definiert sind, wird das Secondarymenu nicht im UI gerendert.|false|
 |portalFooter|nein|**[portalFooter](#portalconfigportalfooter)**||Möglichkeit den Inhalt der Fußzeile des Portals zu konfigurieren.|false|
 |tree|nein|**[tree](#portalconfigtree)**||Möglichkeit um Einstellungen für den Themenbaum vorzunehmen.|false|
 

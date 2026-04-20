@@ -42,7 +42,8 @@ export default {
             "secondaryExpanded",
             "titleBySide",
             "currentComponent",
-            "defaultComponent"
+            "defaultComponent",
+            "secondaryMenuEnabled"
         ]),
         /**
          * @returns {Object} Menu configuration for the given menu.
@@ -176,6 +177,7 @@ export default {
 
 <template>
     <div
+        v-if="side === 'mainMenu' || secondaryMenuEnabled"
         :id="'mp-menu-' + side"
         class="mp-menu shadow d-flex"
         :class="[

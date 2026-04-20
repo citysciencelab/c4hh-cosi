@@ -280,6 +280,17 @@ const menuGetters = {
      */
     menuBySide: (state) => side => {
         return state[side];
+    },
+
+    /**
+     * @param {MenuState} state Local vuex state.
+     * @returns {Boolean} Whether the secondary menu is enabled.
+     */
+    secondaryMenuEnabled: (state) => {
+        const sections = state.secondaryMenu?.sections;
+
+        return Array.isArray(sections) &&
+            sections.some(section => Array.isArray(section) && section.length > 0);
     }
 };
 
