@@ -11,11 +11,16 @@
          "lastUpdated": "Last updated",
          "comment": "Comment",
          "potentialDamagedInformation": "Information on the potential for damage - ",
+         "potentialDamagedClass": "Schadenpotenzialklasse",
          "buildingFunction": "Building function",
          "additionalBuildingFunction": "additional building function",
          "additionalInformation": "additional Information"
       },
       "label": {
+        "potentialDamagedClassCount": "The current risk of damage to this building is estimated at",
+        "potentialDamagedClassUpdate": "Last updated on",
+        "potentialDamagedClassDerive": "Derived from ALKIS",
+        "potentialDamagedClassLastEntry": "The last entry for the adjusted damage potential class is",
         "buildingKey": "the ALKIS building ID is:",
         "builingFunction": "the ALKIS building key is:",
         "additionalBuilingKey": "the additional ALKIS building ID is:",

@@ -19,7 +19,7 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
         it("should find overview cards", () => {
             const wrapper = shallowMount(PotentialDamagedBuilding, {});
 
-            expect(wrapper.findAll(".overview-card")).lengthOf(3);
+            expect(wrapper.findAll(".overview-card")).lengthOf(2);
         });
         it("should find cards", () => {
             const wrapper = shallowMount(PotentialDamagedBuilding, {});

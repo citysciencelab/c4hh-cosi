@@ -11,11 +11,16 @@
          "lastUpdated": "Angepasstes Änderungsdatum",
          "comment": "Kommentar",
          "potentialDamagedInformation": "Informationen zum Schadenpotenzial - ",
+         "potentialDamagedClass": "Schadenpotenzialklasse",
          "buildingFunction": "Gebäudefunktion",
          "additionalBuildingFunction": "weitere Gebäudefunktion",
          "additionalInformation": "weitere Informationen"
       },
       "label": {
+        "potentialDamagedClassCount": "bei diesem Gebäude wird das aktuelle Schadenspotenzial eingeschätzt auf eine",
+        "potentialDamagedClassUpdate": "die letzte Aktualisierung erfolgte am",
+        "potentialDamagedClassDerive": "ALKIS-basiert abgeleitet",
+        "potentialDamagedClassLastEntry": "die letzte Eingabe der angepassten Schadenpotenzialklasse ist",
         "buildingKey": "der Gebäudeschlüssel aus ALKIS ist",
         "builingFunction": "der Gebäudeschlüssel aus ALKIS ist",
         "additionalBuilingKey": "der weitere Gebäudeschlüssel aus ALKIS ist",

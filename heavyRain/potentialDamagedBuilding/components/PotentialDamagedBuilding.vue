@@ -40,7 +40,7 @@ export default {
     <h5 class="mt-5">
         {{ $t("additional:modules.potentialDamagedBuilding.headline.buildingOverview") }}
     </h5>
-    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+    <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
         <div class="col">
             <div class="overview-card rounded p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center">
                 <span class="value fs-4 d-block text-truncate-custom">3</span>
@@ -72,24 +72,6 @@ export default {
                     data-bs-placement="bottom"
                     data-bs-trigger="focus"
                     :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.updateDate')"
-                >
-                    <i class="bi bi-info-circle" />
-                </button>
-            </div>
-        </div>
-        <div class="col">
-            <div class="overview-card rounded p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center">
-                <span class="value fs-4 d-block text-truncate-custom">4</span>
-                <span class="box-label d-block lh-sm mb-1">{{ $t("additional:modules.potentialDamagedBuilding.damagePotentialClass") }}</span>
-                <span class="comment d-block small">ALKIS-basiert abgeleitet  </span>
-                <button
-                    type="button"
-                    class="btn btn-link p-0 text-dark border-0"
-                    tabindex="0"
-                    data-bs-toggle="popover"
-                    data-bs-placement="bottom"
-                    data-bs-trigger="focus"
-                    :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.damagePotentialClassALKIS')"
                 >
                     <i class="bi bi-info-circle" />
                 </button>
@@ -174,6 +156,72 @@ export default {
     <div class="mb-4">
         <div class="d-flex align-items-center mb-2">
             <h6 class="headline-group mb-2">
+                {{ $t("additional:modules.potentialDamagedBuilding.headline.potentialDamagedClass") }}
+            </h6>
+            <button
+                type="button"
+                class="btn btn-link p-0 text-dark border-0"
+                tabindex="0"
+                data-bs-toggle="popover"
+                data-bs-placement="bottom"
+                data-bs-trigger="focus"
+                :data-bs-content="$t('additional:modules.potentialDamagedBuilding.description')"
+            >
+                <i class="ms-2 bi bi-info-circle" />
+            </button>
+        </div>
+        <div class="row g-0 mb-1 ms-4">
+            <div class="col-4 col-md-8">
+                {{ $t("additional:modules.potentialDamagedBuilding.label.potentialDamagedClassCount") }}
+            </div>
+            <div class="col text-muted">
+                3
+            </div>
+        </div>
+        <div class="row g-0 mb-1 ms-4">
+            <div class="col-4 col-md-8">
+                {{ $t("additional:modules.potentialDamagedBuilding.label.potentialDamagedClassUpdate") }}
+            </div>
+            <div class="col text-muted">
+                10.03.2025
+            </div>
+        </div>
+        <div class="row g-0 mb-1 ms-4">
+            <div class="col-4 col-md-8">
+                {{ $t("additional:modules.potentialDamagedBuilding.label.potentialDamagedClassDerive") }}
+            </div>
+            <div class="col text-muted">
+                4
+            </div>
+        </div>
+        <div class="row g-0 mb-1 ms-4">
+            <div class="col-4 col-md-8">
+                {{ $t("additional:modules.potentialDamagedBuilding.label.potentialDamagedClassLastEntry") }}
+            </div>
+            <div class="col text-muted">
+                3
+            </div>
+        </div>
+        <div class="row g-0 mb-1 ms-4">
+            <div class="col-4 col-md-8">
+                {{ $t("additional:modules.potentialDamagedBuilding.label.potentialDamagedClassUpdate") }}
+            </div>
+            <div class="col text-muted">
+                20.03.2026
+            </div>
+        </div>
+        <div class="row g-0 mb-1 ms-4">
+            <div class="col-4 col-md-8">
+                {{ $t("additional:modules.potentialDamagedBuilding.headline.comment") }}
+            </div>
+            <div class="col text-muted">
+                {{ $t("additional:modules.potentialDamagedBuilding.description") }}
+            </div>
+        </div>
+    </div>
+    <div class="mb-4">
+        <div class="d-flex align-items-center mb-2">
+            <h6 class="headline-group mb-2">
                 {{ $t("additional:modules.potentialDamagedBuilding.headline.buildingFunction") }}
             </h6>
             <button
@@ -230,7 +278,6 @@ export default {
                 10600123
             </div>
         </div>
-
         <div class="row g-0 ms-4">
             <div class="col-4 col-md-8">
                 {{ $t("additional:modules.potentialDamagedBuilding.label.additionalBuilingFunction") }}
