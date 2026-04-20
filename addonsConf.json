@@ -232,5 +232,8 @@
   "geoAnalyze": {
     "path": "geoAnalyze",
     "type": "tool"
+  },
+  "tacticalMark": {
+    "type": "tool"
   }
 }
