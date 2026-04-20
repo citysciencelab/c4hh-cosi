@@ -61,14 +61,14 @@ export default (containerName) => ({
          * @returns {String} The tooltip text for layers out of visible scale range.
          */
         tooltipText () {
-            const [minScaleLayer, maxScaleLayer] = this.rawLayersScaleBoundaries;
-            const minScaleRaw = minScaleLayer !== undefined
-                    ? parseInt(minScaleLayer, 10)
-                    : null,
+            const [fallbackMinScale, fallbackMaxScale] = this.rawLayersScaleBoundaries || [],
+                minScaleRaw = this.conf?.minScale !== undefined
+                    ? parseInt(this.conf.minScale, 10)
+                    : fallbackMinScale ?? null,
 
-                maxScale = maxScaleLayer !== undefined
-                    ? parseInt(maxScaleLayer, 10)
-                    : null,
+                maxScale = this.conf?.maxScale !== undefined
+                    ? parseInt(this.conf.maxScale, 10)
+                    : fallbackMaxScale ?? null,
 
 
                 minScale = minScaleRaw === 0
@@ -103,12 +103,21 @@ export default (containerName) => ({
          * @returns {Boolean}  true, if this layer is not visible in the maps current scale
          */
         scaleIsOutOfRange () {
-            const [minScale, maxScale] = this.rawLayersScaleBoundaries,
-                isOutOfRange = this.scale < parseInt(minScale, 10) || this.scale > parseInt(maxScale, 10),
-                layerId = this.rawLayers.length > 0 ? this.rawLayers[0].id : null,
+            const rawLayer = this.rawLayers.length > 0 ? this.rawLayers[0] : null,
+                minScale = this.conf?.minScale ?? rawLayer?.minScale,
+                maxScale = this.conf?.maxScale ?? rawLayer?.maxScale;
+
+            if (maxScale === undefined) {
+                return false;
+            }
+
+            const isOutOfRange =
+                    this.scale > parseInt(maxScale, 10) ||
+                    this.scale < parseInt(minScale, 10),
+                layerId = rawLayer?.id ?? null,
                 conf = this.layerConfigById(layerId);
 
-            if (this.mode === "3D" && conf?.visibility === true) {
+            if (this.mode === "3D" && conf?.visibility !== false) {
                 const layerEntry = layerCollection.getLayerById(layerId);
 
                 if (layerEntry?.attributes?.is3DLayer) {

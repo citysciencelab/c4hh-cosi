@@ -39,6 +39,7 @@
 - build: Fixed incorrect asset path for logo in production environment.
 - Routing: Fixed bug where restricted areas (Sperrflächen) couldn't be selected.
 - GFI: Avoid errors collecting data, if clicked coordinates are null.
+- Issue \#1593: Min/MaxScale: Fixed a bug where layers were not correctly grayed out or stayed active when the scale was outside the defined range.
 
 ---
 

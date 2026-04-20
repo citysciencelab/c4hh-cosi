@@ -20,6 +20,7 @@ describe("scaleOutOfRangeMixin", () => {
             }),
             scale: 5000,
             mode: "2D",
+            conf,
             layerConfigById: sinon.stub().returns(conf)
         };
         setVisibleSpy = sinon.spy();
@@ -142,6 +143,23 @@ describe("scaleOutOfRangeMixin", () => {
             expect(mixin.computed.tooltipText.call(context)).to.equal("");
             expect(context.$t.called).to.be.false;
         });
+
+        it("returns tooltip from conf minScale/maxScale if rawLayersScaleBoundaries are not available", () => {
+            conf.minScale = "1000";
+            conf.maxScale = "10000";
+            context.rawLayersScaleBoundaries = [undefined, undefined];
+            context.scales = [500, 1000, 10000, 20000, 100000];
+
+            mixin.computed.tooltipText.call(context);
+
+            expect(i18nArgs).to.deep.equals({
+                args: {
+                    minScale: "1: 1.000",
+                    maxScale: "1: 10.000"
+                },
+                key: "common:modules.layerTree.invisibleLayer"
+            });
+        });
     });
 
     describe("computed#scaleIsOutOfRange - 2D", () => {
@@ -170,6 +188,17 @@ describe("scaleOutOfRangeMixin", () => {
                 {minScale: "1000", maxScale: "10000"}
             ];
             expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.false;
+        });
+
+        it("uses conf minScale/maxScale if rawLayers do not contain scale boundaries", () => {
+            conf.minScale = "1000";
+            conf.maxScale = "2500";
+            context.scale = 5000;
+            context.rawLayers = [
+                {id: "1337"}
+            ];
+
+            expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.true;
         });
     });
 
@@ -238,6 +267,21 @@ describe("scaleOutOfRangeMixin", () => {
             expect(setVisibleSpy.firstCall.args[0]).to.be.true;
         });
 
+    });
+
+    it("in 3D sets visibility even if conf.visibility is undefined", () => {
+        conf.minScale = "0";
+        conf.maxScale = "10000";
+        conf.attributes = {is3DLayer: false};
+        context.mode = "3D";
+        context.scale = 20000;
+        context.rawLayers = [
+            {id: "1337", minScale: "0", maxScale: "10000"}
+        ];
+
+        expect(mixin.computed.scaleIsOutOfRange.call(context)).to.be.true;
+        expect(setVisibleSpy.calledOnce).to.be.true;
+        expect(setVisibleSpy.firstCall.args[0]).to.be.false;
     });
 
 
