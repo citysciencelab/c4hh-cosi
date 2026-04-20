@@ -15,7 +15,7 @@
 ### Removed
 
 ### Fixed
-- vcOblique: Fixed Marker and image appearing at the map's initial position instead of the current map position when opening vcOblique after panning. This issue only occurred in VC Map 6.
+- vcOblique: Fixed an issue with VC Map 6 where markers and images appeared at the initial map position instead of the current view when opening vcOblique after panning.
 
 ---
 
