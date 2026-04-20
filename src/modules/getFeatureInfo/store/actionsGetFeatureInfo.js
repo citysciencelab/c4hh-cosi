@@ -99,6 +99,11 @@ export default {
                 return layer.get("gfiAttributes") !== "ignore";
             });
 
+        if (!clickCoordinate) {
+            console.warn("No click coordinate set for GetFeatureInfo.");
+            return null;
+        }
+
         if (getters.menuExpandedBeforeGfi === null) {
             commit("setMenuExpandedBeforeGfi", rootGetters["Menu/expanded"](getters.menuSide));
         }

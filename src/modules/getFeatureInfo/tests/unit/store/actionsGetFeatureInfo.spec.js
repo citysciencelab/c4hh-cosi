@@ -333,5 +333,19 @@ describe("src/modules/getFeatureInfo/store/actionsGetFeatureInfo.js", () => {
             expect(commit.calledWith("Menu/setExpandedBySide", {expanded: false, side: getters.menuSide}, {root: true})).to.be.true;
             expect(commit.calledWith("setMenuExpandedBeforeGfi", null)).to.be.true;
         });
+
+        it("should return early and not throw if coordinates are null", async () => {
+            rootGetters = {
+                ...rootGetters,
+                "Maps/clickCoordinate": null
+            };
+
+            const result = await actions.collectGfiFeatures({getters, commit, dispatch, rootGetters});
+
+            expect(result).to.be.null;
+            expect(commit.called).to.be.false;
+            expect(consoleWarnSpy.called).to.be.true;
+            expect(consoleWarnSpy.calledWith("No click coordinate set for GetFeatureInfo.")).to.be.true;
+        });
     });
 });

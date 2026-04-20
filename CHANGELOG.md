@@ -38,6 +38,7 @@
     - Fixed bug if configuration contains only wrong layer IDs.
 - build: Fixed incorrect asset path for logo in production environment.
 - Routing: Fixed bug where restricted areas (Sperrflächen) couldn't be selected.
+- GFI: Avoid errors collecting data, if clicked coordinates are null.
 
 ---
 
