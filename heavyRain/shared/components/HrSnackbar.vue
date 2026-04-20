@@ -129,10 +129,7 @@ export default {
 
 <style lang="scss" scoped>
 .hr-snackbar {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    position: relative;
     width: 100%;
     z-index: 2000;
     display: flex;

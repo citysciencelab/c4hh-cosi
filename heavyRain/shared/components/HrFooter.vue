@@ -1,12 +1,10 @@
 <script>
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
-import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 
 export default {
     name: "HrFooter",
     components: {
-        FlatButton,
-        HrSnackbar
+        FlatButton
     },
     props: {
         cancelText: {
@@ -16,26 +14,9 @@ export default {
         saveText: {
             type: String,
             default: "Save"
-        },
-        snackbarVisible: {
-            type: Boolean,
-            default: false
-        },
-        snackbarMessage: {
-            type: String,
-            default: ""
-        },
-        snackbarColor: {
-            type: String,
-            default: "success"
         }
     },
-    emits: ["click:cancel", "click:save", "update:snackbarVisible"],
-    methods: {
-        updateVisible (val) {
-            this.$emit("update:snackbarVisible", val);
-        }
-    }
+    emits: ["click:cancel", "click:save"]
 };
 </script>
 
@@ -51,13 +32,6 @@ export default {
             :text="saveText"
             :interaction="() => $emit('click:save')"
             icon="bi-save"
-        />
-        <HrSnackbar
-            :model-value="snackbarVisible"
-            :message="snackbarMessage"
-            :color="snackbarColor"
-            :closable="true"
-            @update:model-value="updateVisible"
         />
     </div>
 </template>
