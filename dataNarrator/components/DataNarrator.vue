@@ -10,7 +10,8 @@ export default {
     data () {
         return {
             storyList: {},
-            toolBodyScrollTop: 0
+            toolBodyScrollTop: 0,
+            isActive: false
         };
     },
     computed: {
@@ -22,8 +23,18 @@ export default {
             "uiStyle",
             "configJs"
         ]),
+        ...mapGetters("Menu", [
+            "secondaryExpanded"
+        ]),
         storyMode () {
             return this.storyConf?.displayType ? this.storyConf.displayType : "dipas";
+        }
+    },
+    watch: {
+        secondaryExpanded (expanded) {
+            if (!expanded && this.isActive) {
+                document.getElementById("secondaryMenu-toggle-button")?.firstChild?.classList?.replace("bi-tools", "bi-book");
+            }
         }
     },
     /**
@@ -34,9 +45,11 @@ export default {
      */
     activated () {
         // Handle KeepAlive visibility. Triggered if component is activated
+        this.isActive = true;
     },
     deactivated () {
         // Handle KeepAlive visibility. Triggered if component is deactivated
+        this.isActive = false;
     },
     methods: {
         ...mapMutations("Modules/DataNarrator", [

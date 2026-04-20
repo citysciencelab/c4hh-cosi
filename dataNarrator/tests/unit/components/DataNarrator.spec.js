@@ -14,6 +14,20 @@ describe("addons/dataNarrator/tests/unit/DataNarrator.spec.js", () => {
         store = createStore({
             modules: {
                 namespaced: true,
+                Menu: {
+                    namespaced: true,
+                    state: () => ({
+                        secondaryExpanded: true
+                    }),
+                    getters: {
+                        secondaryExpanded: state => state.secondaryExpanded
+                    },
+                    mutations: {
+                        setSecondaryExpanded (state, payload) {
+                            state.secondaryExpanded = payload;
+                        }
+                    }
+                },
                 Modules: {
                     namespaced: true,
                     modules: {
@@ -71,6 +85,28 @@ describe("addons/dataNarrator/tests/unit/DataNarrator.spec.js", () => {
 
     it("DataNarrator should exist", () => {
         expect(wrapper.exists()).to.be.true;
+    });
+
+    it("should replace icon class when secondaryExpanded becomes false and component is active", async () => {
+        const btn = document.createElement("button"),
+            icon = document.createElement("i");
+
+        btn.id = "secondaryMenu-toggle-button";
+        icon.classList.add("bi-tools");
+        btn.appendChild(icon);
+        document.body.appendChild(btn);
+
+        wrapper.vm.isActive = true;
+        await wrapper.vm.$nextTick();
+
+        store.commit("Menu/setSecondaryExpanded", false);
+        await wrapper.vm.$nextTick();
+
+        expect(icon.classList.contains("bi-book")).to.be.true;
+        expect(icon.classList.contains("bi-tools")).to.be.false;
+
+        // Cleanup DOM
+        btn.remove();
     });
 
     it("should render StoryPlayer component", () => {
