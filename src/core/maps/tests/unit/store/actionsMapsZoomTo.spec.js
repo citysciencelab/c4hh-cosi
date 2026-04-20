@@ -82,6 +82,7 @@ describe("src/core/maps/store/actionsMapsZoomTo.js", () => {
 
         expect(dispatch.firstCall.args[0]).to.equal("Maps/addLayer");
         expect(dispatch.firstCall.args[1]).to.be.instanceOf(VectorLayer);
+        expect(dispatch.firstCall.args[1].get("alwaysOnTop")).to.be.true;
 
         const addedFeatures = dispatch.firstCall.args[1].getSource().getFeatures();
 

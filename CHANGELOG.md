@@ -10,7 +10,11 @@
 ### Added
 - SearchBar: Added a checkbox to select all subcategories when opening a folder.
 - FileImport: Added config.json property `openDrawMenuSide` to set the menu side in which the draw module opens.
-- UrlParams: Added GeoJSON layer support for ZOOMTOGEOMETRY.
+- UrlParams:
+    - ZOOMTOGEOMETRY: Added GeoJSON layer support for ZOOMTOGEOMETRY.
+    - ZOOMTOFEATUREID:
+        - An attribute `centerOfExtent` has been added to control whether a point geometry is set to the extent of the respective feature or whether the feature itself is displayed in its geometry.
+        - WFS versions 1.0.0, 1.1.0, and 2.0.0 are now compatible.
 
 ### Changed
 - The following packages have been updated:
@@ -19,7 +23,7 @@
     - devDependencies:
         - @masterportal/masterportalapi: 2.59.0 to 2.60.0
 - Menu: Secondary menu is now only rendered if it contains menu entries. Empty configurations no longer render the secondary menu in the UI.
-- Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) and npm fom **10.9.3** up to smnaller than **12** are now supported.         
+- Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) and npm fom **10.9.3** up to smnaller than **12** are now supported.
 
 ### Deprecated
 
@@ -30,16 +34,19 @@
 - Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
 - Issue \#1576: BackForward control was not working inside expandable controls until opened.
 - Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
-- Issue \#1590: Vite 
+- Issue \#1590: Vite
+- Issue \#1593: Min/MaxScale: Fixed a bug where layers were not correctly grayed out or stayed active when the scale was outside the defined range.
     - build: corrected path to mastercode folder in index.html.
     - buildExamples: corrected name and content of zip-files.
-- GroupLayer: 
-    - Fixed grouped layers, using layerIDsToStyle, were not shown. 
+- GroupLayer:
+    - Fixed grouped layers, using layerIDsToStyle, were not shown.
     - Fixed bug if configuration contains only wrong layer IDs.
 - build: Fixed incorrect asset path for logo in production environment.
 - Routing: Fixed bug where restricted areas (Sperrflächen) couldn't be selected.
 - GFI: Avoid errors collecting data, if clicked coordinates are null.
-- Issue \#1593: Min/MaxScale: Fixed a bug where layers were not correctly grayed out or stayed active when the scale was outside the defined range.
+- URLParams:
+    -  ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
+    -  Links to other config files have been corrected in the `urlParameter` documentation.
 
 ---
 
