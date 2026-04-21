@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import getters from "../../../store/gettersStreetSmart.js";
 
-describe.skip("addons/StreetSmart/store/gettersStreetSmart", function () {
+describe("addons/StreetSmart/store/gettersStreetSmart", function () {
     describe("currentLocale", function () {
 
         it("returns 'de' if currentLocale is 'de'", function () {

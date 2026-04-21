@@ -146,7 +146,7 @@ export default {
         }
     },
     beforeUnmount () {
-        if (this.$refs.graphicalSelection) {
+        if (this.$refs.graphicalSelection && typeof this.$refs.graphicalSelection.setStatus === "function") {
             this.$refs.graphicalSelection.setStatus(false);
             this.$refs.graphicalSelection.resetView();
         }

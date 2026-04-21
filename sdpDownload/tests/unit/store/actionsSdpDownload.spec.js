@@ -102,8 +102,8 @@ describe("addons/sdpDownload/store/actionsSdpDownload", () => {
         actions.checkRasterNamesAmount({getters, dispatch});
         expect(actions.checkRasterNamesAmount({getters, dispatch})).to.be.true;
     });
-    it.skip("checkRasterNamesAmount returns false with rasternames > selectedRasterLimit", () => {
-        getters = {rasterNames: ["650330", "650331", "650332"], selectedRasterLimit: 1};
+    it("checkRasterNamesAmount returns false with rasternames > selectedRasterLimit", () => {
+        getters = {rasterNames: ["650330", "650331", "650332"], selectedRasterLimit: 1, tooManyTilesSelected: "tooManyTilesSelectedKey"};
         actions.checkRasterNamesAmount({getters, dispatch});
         expect(actions.checkRasterNamesAmount({getters, dispatch})).to.be.false;
     });

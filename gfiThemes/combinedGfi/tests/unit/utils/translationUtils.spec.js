@@ -31,11 +31,11 @@ describe("addons/gfiThemes/combinedGfi/utils/translationUtils.js", () => {
         global.i18next = originalI18next;
     });
 
-    describe.skip("translateKeyIfPossible", () => {
+    describe("translateKeyIfPossible", () => {
         it("translates a valid translation key", () => {
             const result = translateKeyIfPossible("common:test.key");
 
-            expect(result).to.equal("test.key");
+            expect(result).to.equal("Test Key");
         });
 
         it("returns the part after colon for unknown keys", () => {

@@ -1,9 +1,7 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
-import {nextTick} from "vue";
-
 import Component from "../../../components/PopulationRequest.vue";
 import GraphicalSelectComponent from "../../../../../src/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import SwitchInputComponent from "../../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
@@ -29,6 +27,25 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
         spySetRasterActive,
         spySetAlkisAdressesActive,
         layerConfigById;
+
+    beforeAll(() => {
+        mapCollection.clear();
+        const map = {
+            id: "ol",
+            mode: "2D",
+            removeOverlay: sinon.stub(),
+            removeLayer: sinon.stub(),
+            getLayers: () => {
+                return {
+                    getArray: () => {
+                        return [];
+                    }
+                };
+            }
+        };
+
+        mapCollection.addMap(map, "2D");
+    });
 
     beforeEach(() => {
         const warnSpy = sinon.spy(),
@@ -64,7 +81,8 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
                                 setCurrentValue: sinon.stub(),
                                 setDrawInteraction: sinon.stub(),
                                 setDefaultSelection: sinon.stub(),
-                                resetGeographicSelection: sinon.stub()
+                                resetGeographicSelection: sinon.stub(),
+                                setActive: sinon.stub()
                             }
                         }
                     }
@@ -78,7 +96,8 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
                     actions: {
                         addInteraction: sinon.stub(),
                         registerListener: sinon.stub(),
-                        addLayerOnTop: sinon.stub()
+                        addLayerOnTop: sinon.stub(),
+                        removeInteraction: sinon.stub()
                     },
                     getters: {
                         scale: sinon.stub()
@@ -124,32 +143,25 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
         expect(wrapper.find("div.result").exists()).to.be.false;
         expect(wrapper.find("div.checkbox").exists()).to.be.true;
     });
-    describe.skip("skipped", () => {
-        it("should call triggerRaster if Raster Checkbox is changed", () => {
-            const spyRaster = sinon.spy(Component.methods, "triggerRaster"),
-                wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"GraphicalSelect": GraphicalSelectComponent}}),
-                rasterComponent = wrapper.find("#rasterCheckBox");
+    it("should call triggerRaster if Raster Checkbox is changed", async () => {
+        const spyRaster = sinon.spy(Component.methods, "triggerRaster"),
+            wrapper = mount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
+            rasterComponent = wrapper.find("#rasterCheckBox");
 
-            rasterComponent.trigger("click");
+        rasterComponent.trigger("change");
+        await wrapper.vm.$nextTick();
+        expect(spyRaster.calledOnce).to.be.true;
 
-            nextTick(() => {
-                expect(spyRaster.calledOnce).to.be.true;
-            });
+    });
 
-        });
+    it("should call triggerAlkisAdresses if alkisAdresses Checkbox is changed", async () => {
+        const spyAlkisAdresses = sinon.spy(Component.methods, "triggerAlkisAdresses"),
+            wrapper = mount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
+            alkisAdressesComponent = wrapper.find("#alkisAdressesCheckBox");
 
-        it("should call triggerAlkisAdresses if alkisAdresses Checkbox is changed", () => {
-            const spyAlkisAdresses = sinon.spy(Component.methods, "triggerAlkisAdresses"),
-                wrapper = shallowMount(Component, {global: {plugins: [store]}, stubs: {"SwitchInput": SwitchInputComponent, "GraphicalSelect": GraphicalSelectComponent}}),
-                alkisAdressesComponent = wrapper.find("#alkisAdressesCheckBox");
-
-            alkisAdressesComponent.trigger("click");
-
-            nextTick(() => {
-                expect(spyAlkisAdresses.calledOnce).to.be.true;
-            });
-
-        });
+        alkisAdressesComponent.trigger("change");
+        await wrapper.vm.$nextTick();
+        expect(spyAlkisAdresses.calledOnce).to.be.true;
     });
 
     describe("chooseUnitAndThousandsSeparator", function () {

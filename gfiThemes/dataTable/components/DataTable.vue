@@ -227,22 +227,6 @@ export default {
         },
 
         /**
-         * Sets the order and sorts the table by the given column.
-         * Sorting by a new column resets the order of the old column.
-         * @param {Object} column - The column to sort by.
-         * @returns {void}
-         */
-        runSorting (column) {
-            const oldColumn = this.getOldSortedColumn(this.columns, column.index);
-
-            if (oldColumn) {
-                oldColumn.order = "origin";
-            }
-            column.order = this.getSortOrder(column.order);
-            this.rows = this.getSortedRows(this.originFilteredRows ? this.originFilteredRows : this.rows, column.order, column.name);
-        },
-
-        /**
          * Gets the unique values for given column name.
          * @param {String} columnName The column name.
          * @param {Object[]} originRows The rows to iterate.
@@ -332,21 +316,6 @@ export default {
                 });
                 return filterHit;
             });
-        },
-        /**
-         * Resets the table data to original data and also reset the stored filtered parameter
-         * @returns {void}
-         */
-        resetAll () {
-            this.filterObject = {};
-            this.dropdownSelected = {};
-            if (this.sortingColumn) {
-                this.columns.forEach(col => {
-                    col.order = "origin";
-                });
-            }
-            this.rows = this.originRows;
-            this.columns = this.getColumns(this.feature.getAttributesToShow());
         },
         /**
          * Gets the css z-index for the column header.

@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {shallowMount, mount, config} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
 import DataTableTheme from "../../../components/DataTable.vue";
 import sinon from "sinon";
@@ -7,9 +7,7 @@ import sinon from "sinon";
 config.global.mocks.$t = key => key;
 
 describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () => {
-    let wrapper,
-        spyRunSorting,
-        spyResetAll;
+    let wrapper;
 
     const featureData = {
             getTheme: () => {
@@ -113,8 +111,6 @@ describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () =>
                 feature: featureData
             }
         });
-        spyRunSorting = sinon.spy(DataTableTheme.methods, "runSorting");
-        spyResetAll = sinon.spy(DataTableTheme.methods, "resetAll");
     });
 
     afterEach(() => {
@@ -128,38 +124,6 @@ describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () =>
 
         it("The enableDownload in computed section should be true", () => {
             expect(wrapper.vm.enableDownload).to.be.true;
-        });
-    });
-    // see https://lgv-hamburg.atlassian.net/browse/BG-5580
-    describe.skip("User Interactions", () => {
-        it("should call 'runSorting' when the icon is clicked", async () => {
-            wrapper = mount(DataTableTheme, {
-                global: {
-                    plugins: [store]
-                },
-                props: {
-                    feature: featureData
-                }
-            });
-            const icon = wrapper.find(".bootstrap-icon");
-
-            await icon.trigger("click");
-            expect(spyRunSorting.calledOnce).to.be.true;
-        });
-        // see: https://lgv-hamburg.atlassian.net/browse/BG-5580
-        it("should call 'resetAll' when the resetAll button is clicked", async () => {
-            wrapper = mount(DataTableTheme, {
-                global: {
-                    plugins: [store]
-                },
-                props: {
-                    feature: featureData
-                }
-            });
-            const button = wrapper.find(".reset");
-
-            await button.trigger("click");
-            expect(spyResetAll.calledOnce).to.be.true;
         });
     });
 
@@ -402,30 +366,6 @@ describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () =>
             });
         });
 
-        describe("runSorting", () => {
-            it("should set the sort order for the columns correctly", () => {
-                wrapper.vm.runSorting(wrapper.vm.columns[0]);
-
-                expect(wrapper.vm.columns[0].order).to.be.equal("asc");
-                expect(wrapper.vm.columns[1].order).to.be.equal("origin");
-            });
-
-            it("should set the sort order for the columns correctly", () => {
-                wrapper.vm.columns[1].order = "asc";
-                wrapper.vm.runSorting(wrapper.vm.columns[0]);
-
-                expect(wrapper.vm.columns[0].order).to.be.equal("asc");
-                expect(wrapper.vm.columns[1].order).to.be.equal("origin");
-            });
-
-            it("should set the sort order for the columns correctly", () => {
-                wrapper.vm.columns[1].order = "asc";
-                wrapper.vm.runSorting(wrapper.vm.columns[1]);
-
-                expect(wrapper.vm.columns[0].order).to.be.equal("origin");
-                expect(wrapper.vm.columns[1].order).to.be.equal("desc");
-            });
-        });
 
         describe("getUniqueValuesByColumnName", () => {
             it("should return an empty array if first param is not a string", () => {
@@ -566,55 +506,6 @@ describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () =>
                     ];
 
                 expect(wrapper.vm.getFilteredRows(filterObject, rows)).to.be.an("array").and.to.be.empty;
-            });
-        });
-        describe("resetAll", () => {
-            it("should reset the data to original data", () => {
-                const originRows = [{"Entnahme Datum": "2019",
-                        "OHG in Meter": "0.10",
-                        "UHG in Meter": "0.35",
-                        "Arsen": "15,9",
-                        "Cadmium": "1,38",
-                        "Chrom": "21,6",
-                        "Kupfer": "290,0",
-                        "Quecksilber": "0,285",
-                        "Nickel": "24,9",
-                        "Blei": "289,0",
-                        "Thallium": "---",
-                        "Zink": "393,0",
-                        "Molybdän": "4,53",
-                        "Einheit": "mg/kg TM"}, {
-                        "Entnahme Datum": "2019",
-                        "OHG in Meter": "0.00",
-                        "UHG in Meter": "0.10",
-                        "Arsen": "14,7",
-                        "Cadmium": "1,34",
-                        "Chrom": "40,5",
-                        "Kupfer": "774,0",
-                        "Quecksilber": "0,346",
-                        "Nickel": "22,9",
-                        "Blei": "209,0",
-                        "Thallium": "---",
-                        "Zink": "568,0",
-                        "Molybdän": "19,8",
-                        "Einheit": "mg/kg TM"
-                    }],
-                    originColumns = [{
-                        "index": 0,
-                        "name": "Entnahme Datum",
-                        "order": "origin"
-                    },
-                    {
-                        "index": 1,
-                        "name": "OHG in Meter",
-                        "order": "origin"
-                    }];
-
-                wrapper.vm.resetAll();
-                expect(wrapper.vm.filterObject).to.deep.equal({});
-                expect(wrapper.vm.dropdownSelected).to.deep.equal({});
-                expect(wrapper.vm.rows).to.deep.equal(originRows);
-                expect(wrapper.vm.columns).to.deep.equal(originColumns);
             });
         });
     });

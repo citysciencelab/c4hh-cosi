@@ -11,7 +11,7 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
         ["EPSG:8395", "+title=ETRS89/Gauß-Krüger 3 +proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=3500000 +y_0=0 +ellps=GRS80 +datum=GRS80 +units=m +no_defs"],
         ["EPSG:4326", "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"]
     ];
-    let commit, dispatch, rootGetters, getters;
+    let commit, dispatch, rootGetters, getters, originalDocument;
 
     beforeAll(() => {
         mapCollection.clear();
@@ -55,6 +55,7 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
     });
 
     beforeEach(() => {
+        originalDocument = global.document;
         commit = sinon.spy();
         dispatch = sinon.spy();
         getters = sinon.spy();
@@ -68,6 +69,7 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
     });
     afterEach(() => {
         sinon.restore();
+        global.document = originalDocument;
     });
 
     describe("resetObliqueViewer", () => {
@@ -120,7 +122,7 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
 
         });
     });
-    describe.skip("createObliqueViewerURL", () => {
+    describe("createObliqueViewerURL", () => {
         it("createObliqueViewerURL shall do nothing, if coordinates are null", () => {
             const initialCenter = null;
 
@@ -160,6 +162,11 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
         it("createObliqueViewerURL shall commit the oblique url", () => {
             const initialCenter = [565874, 5934140];
 
+            global.document = {
+                location: {
+                    hostname: "hostname"
+                }
+            };
             actions.createObliqueViewerURL({commit, dispatch, getters, rootGetters}, initialCenter);
 
             expect(dispatch.calledOnce).to.be.true;
@@ -180,11 +187,16 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
         });
     });
 
-    describe.skip("obliqueViewerURLWithReplacedHostname", () => {
+    describe("obliqueViewerURLWithReplacedHostname", () => {
         it("should replace the ", () => {
             const urlParts = ["geoportal-example.de", "examplePortal"],
                 startCoordinates = "9.99431966511419, 53.55201216725377";
 
+            global.document = {
+                location: {
+                    hostname: ""
+                }
+            };
             actions.obliqueViewerURLWithReplacedHostname({commit}, {urlParts, startCoordinates});
 
             expect(commit.calledOnce).to.be.true;
