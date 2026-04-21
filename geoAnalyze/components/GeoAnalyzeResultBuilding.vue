@@ -76,12 +76,11 @@ export default {
 
 <template lang="html">
     <div>
-        <p>
+        <p class="mb-3">
             <span>Einwohnerzahl Hauptsitz gesamt: {{ calculateResidentSum("ew_haupt") }}</span>
             <br>
             <span>Einwohnerzahl Nebensitz gesamt: {{ calculateResidentSum("ew_neben") }}</span>
         </p>
-        <hr>
         <table class="table table-bordered">
             <tbody>
                 <tr
@@ -104,10 +103,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    hr {
-        margin-top: 10px;
-        margin-bottom: 15px;
-    }
     span, th {
         font-family: "MasterPortalFont Bold", "Arial Narrow", Arial, sans-serif;
     }

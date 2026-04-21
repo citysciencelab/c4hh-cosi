@@ -1,22 +1,24 @@
 <script>
-import {mapGetters, mapMutations, mapActions} from "vuex";
-import getters from "../store/gettersGeoAnalyze";
-import mutations from "../store/mutationsGeoAnalyze";
 import BaseLayer from "ol/layer/Base";
 import {Draw, Select} from "ol/interaction";
-import VectorLayer from "ol/layer/Vector.js";
-import VectorSource from "ol/source/Vector.js";
-import GeoJSON from "ol/format/GeoJSON";
-import Point from "ol/geom/Point";
-import SimpleGeometry from "ol/geom/SimpleGeometry";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {fromCircle} from "ol/geom/Polygon";
-import {requestAnalyze} from "../api/analyze";
 import GeoAnalyzeResultBuilding from "./GeoAnalyzeResultBuilding.vue";
 import GeoAnalyzeResultGeometry from "./GeoAnalyzeResultGeometry.vue";
+import GeoJSON from "ol/format/GeoJSON";
+import getters from "../store/gettersGeoAnalyze";
+import {mapGetters, mapMutations, mapActions} from "vuex";
+import mutations from "../store/mutationsGeoAnalyze";
+import Point from "ol/geom/Point";
+import {requestAnalyze} from "../api/analyze";
+import SimpleGeometry from "ol/geom/SimpleGeometry";
+import VectorLayer from "ol/layer/Vector.js";
+import VectorSource from "ol/source/Vector.js";
 
 export default {
     name: "GeoAnalyze",
     components: {
+        FlatButton,
         GeoAnalyzeResultBuilding,
         GeoAnalyzeResultGeometry
     },
@@ -299,61 +301,39 @@ export default {
 
 <template lang="html">
     <div>
-        <form>
-            <div class="form-floating">
-                <select
-                    id="geo-analyze-mode"
-                    v-model="selectedOption"
-                    class="form-select"
+        <div class="form-floating mb-2">
+            <select
+                id="geo-analyze-mode"
+                v-model="selectedOption"
+                class="form-select"
+            >
+                <option
+                    v-for="(label, value) in options"
+                    :key="value"
+                    :value="value"
                 >
-                    <option
-                        v-for="(label, value) in options"
-                        :key="value"
-                        :value="value"
-                    >
-                        {{ label }}
-                    </option>
-                </select>
-                <label for="geo-analyze-mode">
-                    Analysemodus
-                </label>
-            </div>
-        </form>
+                    {{ label }}
+                </option>
+            </select>
+            <label for="geo-analyze-mode">
+                Analysemodus
+            </label>
+        </div>
         <template v-if="Object.keys(result).length > 0">
-            <hr>
-            <p>
+            <p class="mb-3">
                 <small>Aus Datenschutzgründen wird bei Einwohnerzahlen kleiner 4 die Zahl drei oder null verwendet.</small>
             </p>
-            <hr>
             <component
                 :is="currentResultComponent"
                 :results="result"
+                class="mb-3"
             />
-            <hr>
-            <form class="d-flex justify-content-end">
-                <button
-                    class="btn btn-primary"
-                    type="button"
-                    @click="getAnalyzeData(geometry, true)"
-                >
-                    Details nach Excel exportieren
-                </button>
-            </form>
+            <FlatButton
+                v-if="selectedOption === 'click'"
+                :interaction="() => getAnalyzeData(geometry, true)"
+                :text="'Details nach Excel exportieren'"
+                :icon="'bi bi-download'"
+            />
         </template>
     </div>
 </template>
-
-<style lang="scss" scoped>
-    hr {
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
-    .dl-horizontal {
-        dd {
-            margin-left: 240px;
-        }
-        dt {
-           width: 220px;
-        }
-    }
-</style>

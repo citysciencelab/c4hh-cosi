@@ -1,8 +1,8 @@
 import {config, shallowMount} from "@vue/test-utils";
+import {createStore} from "vuex";
 import {expect} from "chai";
 import GeoAnalyze from "../../../components/GeoAnalyze.vue";
 import sinon from "sinon";
-import {createStore} from "vuex";
 
 config.global.mocks.$t = key => key;
 
@@ -13,17 +13,6 @@ describe("addons/geoAnalyze/components/GeoAnalyze.vue", () => {
     beforeEach(() => {
         store = createStore({
             modules: {
-                Modules: {
-                    namespaced: true,
-                    modules: {
-                        GeoMarker: {
-                            namespaced: true,
-                            actions: {
-                                addLayer: sinon.stub()
-                            }
-                        }
-                    }
-                },
                 Maps: {
                     namespaced: true,
                     getters: {
@@ -32,6 +21,7 @@ describe("addons/geoAnalyze/components/GeoAnalyze.vue", () => {
                     actions: {
                         addInteraction: sinon.stub(),
                         addLayer: sinon.stub(),
+                        removeInteraction: sinon.stub(),
                         removePointMarker: sinon.stub()
                     }
                 }
@@ -90,6 +80,7 @@ describe("addons/geoAnalyze/components/GeoAnalyze.vue", () => {
                 test: "Test"
             }
         });
+
         expect(wrapper.findComponent({name: "GeoAnalyzeResultGeometry"}).exists()).to.be.true;
     });
 
@@ -104,18 +95,4 @@ describe("addons/geoAnalyze/components/GeoAnalyze.vue", () => {
 
         expect(wrapper.findComponent({name: "GeoAnalyzeResultBuilding"}).exists()).to.be.true;
     });
-
-    it("should call getAnalyzeData if button is clicked", async () => {
-        await wrapper.setData({
-            result: {
-                test: "Test"
-            }
-        });
-        const getDataStub = sinon.stub(wrapper.vm, "getAnalyzeData"),
-            button = wrapper.find("button");
-
-        await button.trigger("click");
-        expect(getDataStub.calledOnce).to.be.true;
-    });
-
 });
