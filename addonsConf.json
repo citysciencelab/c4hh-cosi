@@ -228,5 +228,9 @@
   "projects": {
     "path": "heavyRain/projects",
     "type": "tool"
+  },
+  "geoAnalyze": {
+    "path": "geoAnalyze",
+    "type": "tool"
   }
 }
