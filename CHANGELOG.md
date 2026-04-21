@@ -46,6 +46,7 @@
 - URLParams:
     -  ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
     -  Links to other config files have been corrected in the `urlParameter` documentation.
+- WMS-Time: Fixed WMS-T layers being set to `visibility: false` when comparing time or moving in layer tree.
 
 ---
 
