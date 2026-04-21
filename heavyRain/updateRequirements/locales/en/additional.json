@@ -15,7 +15,8 @@
         "contact": "Contact person",
         "commentOptional": "Comment/ description (optional)",
         "infolinkOptional": "Info link (optional)",
-        "uploadOptional": "Upload image (optional)"
+        "uploadOptional": "Upload image (optional)",
+        "pleaseSelect": "Please select"
       },
       "drawHeading": "Draw changes",
       "cancelButtonLabel": "Cancel",

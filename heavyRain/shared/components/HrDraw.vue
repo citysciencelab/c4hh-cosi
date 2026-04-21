@@ -1,5 +1,6 @@
 <script>
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
+import {Fill, Stroke, Style} from "ol/style.js";
 import GeoJSON from "ol/format/GeoJSON.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
@@ -19,15 +20,20 @@ export default {
         heading: {
             type: String,
             default: ""
+        },
+        strokeColor: {
+            type: Array,
+            required: false,
+            default: () => [0, 85, 164]
         }
     },
     emits: ["update:drawn-geojson-feature"],
     data () {
         return {
             currentLayout: {
-                fillColor: [202, 116, 251],
+                fillColor: [255, 255, 255],
                 fillTransparency: 50,
-                strokeColor: [255, 2, 2],
+                strokeColor: this.strokeColor,
                 strokeWidth: 2
             },
             currentModifyInteraction: null,
@@ -61,6 +67,35 @@ export default {
                 this.removeInteraction(this.currentModifyInteraction);
                 this.currentModifyInteraction = null;
             }
+        },
+
+        /**
+         * Changes the draw style.
+         * @param {Number[]} val the stroke color.
+         */
+        strokeColor: {
+            handler (val) {
+                this.currentLayout.strokeColor = val;
+
+                if (!this.source?.getFeatures().length) {
+                    return;
+                }
+
+                const style = new Style({
+                    stroke: new Stroke({
+                        color: val,
+                        width: this.currentLayout.strokeWidth
+                    }),
+                    fill: new Fill({
+                        color: [255, 255, 255, 0.5]
+                    })
+                });
+
+
+                this.source?.getFeatures()[0].setStyle(style);
+            },
+            deep: true,
+            immediate: true
         }
     },
     created () {
@@ -172,6 +207,7 @@ export default {
         </h5>
         <div class="d-flex align-items-start gap-3">
             <DrawTypes
+                :key="strokeColor"
                 :current-layout="currentLayout"
                 :draw-types="['polygon', 'box', 'circle']"
                 :draw-type-labels="drawTypeLabels"

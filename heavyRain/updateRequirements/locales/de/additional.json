@@ -15,7 +15,8 @@
         "contact": "Ansprechpartner",
         "commentOptional": "Kommentar/ Beschreibung (optional)",
         "infolinkOptional": "Infolink (optional)",
-        "uploadOptional": "Bild hochladen (optional)"
+        "uploadOptional": "Bild hochladen (optional)",
+        "pleaseSelect": "Bitte wählen"
       },
       "drawHeading": "Änderungen einzeichnen",
       "cancelButtonLabel": "Vorgang abbrechen",

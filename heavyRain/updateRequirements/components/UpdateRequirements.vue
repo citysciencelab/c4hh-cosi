@@ -1,10 +1,12 @@
 <script>
+import {convertColor} from "@shared/js/utils/convertColor";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import HrCard from "../../shared/components/HrCard.vue";
 import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
+import {mapGetters} from "vuex";
 
 export default {
     name: "UpdateRequirements",
@@ -18,8 +20,23 @@ export default {
     },
     data () {
         return {
-            currentView: "main"
+            currentView: "main",
+            currentOpinion: undefined
         };
+    },
+    computed: {
+        ...mapGetters("Modules/UpdateRequirements", ["informationType"]),
+
+        /**
+         * Gets the stroke color for draw style.
+         * @returns {Number[]} the rgb color code.
+         */
+        strokeColor () {
+            return convertColor(this.currentOpinion?.color, "rgb");
+        }
+    },
+    mounted () {
+        this.currentOpinion = this.informationType[0];
     }
 };
 </script>
@@ -52,10 +69,16 @@ export default {
                             style="object-fit: cover;"
                         >
                     </div>
-                    <div class="d-flex flex-column justify-content-end align-items-center gap-2">
-                        <small class="text-body-secondary">Aktualisierungsbedarf</small>
-                        <span class="badge rounded-pill text-bg-primary fw-normal px-3 py-2">
-                            Gefaehrdungsanalyse
+                    <div
+                        v-if="typeof currentOpinion !== 'undefined'"
+                        class="d-flex flex-column justify-content-end align-items-center gap-2"
+                    >
+                        <small class="text-body-secondary">{{ currentOpinion.cat }}</small>
+                        <span
+                            class="badge rounded-pill fw-normal px-3 py-2"
+                            :style="{background: currentOpinion.color}"
+                        >
+                            {{ currentOpinion.name }}
                         </span>
                     </div>
                 </template>
@@ -106,6 +129,7 @@ export default {
             <HrDraw
                 class="mb-4"
                 :heading="$t('additional:modules.updateRequirements.drawHeading')"
+                :stroke-color="strokeColor"
                 @update:drawn-geojson-feature="drawnGeojsonFeature = $event"
             />
             <InputText
@@ -121,8 +145,17 @@ export default {
             <div class="form-floating mb-3">
                 <select
                     id="update-requirements-type"
+                    v-model="currentOpinion"
                     class="form-select"
-                />
+                >
+                    <option
+                        v-for="(data, key) in informationType"
+                        :key="key"
+                        :value="data"
+                    >
+                        {{ data.cat + " " + data.name }}
+                    </option>
+                </select>
                 <label for="update-requirements-type">
                     {{ $t('additional:modules.updateRequirements.form.typeOptional') }}
                 </label>
