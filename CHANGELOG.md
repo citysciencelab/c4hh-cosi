@@ -21,8 +21,14 @@
     - dependencies:
         - axios: 1.12.2 to 1.15.0
         - @masterportal/masterportalapi: 2.59.0 to 2.61.0 (This also raised ol to version 10.9.0)
+    - devDependencies:
         - vite: 7.3.0 to 8.0.9
-        - vite-plugin-node-polyfills": "0.24.0 to 0.26.0
+        - vite-plugin-node-polyfills": 0.24.0 to 0.26.0
+        - vitest: 4.0.16 to 4.1.5
+        - @vitejs/plugin-vue: 6.0.3 to 6.0.6,
+        - @vitest/eslint-plugin: 1.6.6 to 1.6.16,
+        - @vitest/ui: 4.0.16 to 4.1.5,
+        - @vitest/web-worker: 4.0.16 to 4.1.5
 - Menu: Secondary menu is now only rendered if it contains menu entries. Empty configurations no longer render the secondary menu in the UI.
 - Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) and npm fom **10.9.3** up to smnaller than **12** are now supported.
 
