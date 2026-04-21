@@ -180,8 +180,8 @@ export default {
                         <button
                             class="multiselect__tag pe-1"
                             :class="option"
-                            @click="selectedDate='', updateSelectedReferenceData('date')"
-                            @keypress="selectedDate='', updateSelectedReferenceData('date')"
+                            @mousedown.stop.prevent="selectedDate='', updateSelectedReferenceData('date')"
+                            @keydown.enter.prevent="selectedDate='', updateSelectedReferenceData('date')"
                         >
                             {{ option.label }}
                             <i class="bi bi-x" />
@@ -209,8 +209,8 @@ export default {
                         <button
                             class="multiselect__tag pe-1"
                             :class="option"
-                            @click="selectedRegion='', updateSelectedReferenceData('region')"
-                            @keypress="selectedRegion='', updateSelectedReferenceData('region')"
+                            @mousedown.stop.prevent="selectedRegion='', updateSelectedReferenceData('region')"
+                            @keydown.enter.prevent="selectedRegion='', updateSelectedReferenceData('region')"
                         >
                             {{ option }}
                             <i class="bi bi-x" />
