@@ -439,7 +439,7 @@ export default {
          * @returns {Boolean} True if there are visible features otherwise false.
          */
         isFromDrawTool () {
-            const visibleFeatures = this.getLayer()?.getSource()?.getFeatures()?.filter(feature => feature.get("masterportal_attributes").fromDrawTool &&
+            const visibleFeatures = this.getLayer()?.getSource()?.getFeatures()?.filter(feature => feature.get("masterportal_attributes")?.fromDrawTool &&
                 feature.get("masterportal_attributes").isVisible
             );
 

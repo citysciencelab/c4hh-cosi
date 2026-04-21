@@ -139,7 +139,7 @@ function setDownloadFeatures ({state, commit, dispatch, rootGetters}) {
             geometry = feature.getGeometry();
 
         // If the feature is invisible from filter, the style will be reset by printing.
-        if (!feature.get("masterportal_attributes").isVisible && feature.get("masterportal_attributes").invisibleStyle) {
+        if (!feature.get("masterportal_attributes")?.isVisible && feature.get("masterportal_attributes")?.invisibleStyle) {
             feature.setStyle(feature.get("masterportal_attributes").invisibleStyle);
         }
 
