@@ -12,7 +12,7 @@ import {expect} from "chai";
 import fs from "fs";
 
 const
-    {addLayerConfig, importGeoJSON, importFile, setFeatureExtents} = actions,
+    {addLayerConfig, checkAndReplaceSymbolUrls, importGeoJSON, importFile, setFeatureExtents} = actions,
     namedProjections = [
         ["EPSG:31467", "+title=Bessel/Gauß-Krüger 3 +proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=3500000 +y_0=0 +ellps=bessel +datum=potsdam +units=m +no_defs"],
         ["EPSG:25832", "+title=ETRS89/UTM 32N +proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"],
@@ -31,7 +31,8 @@ const
 let dispatch,
     test1KML,
     test2KML,
-    commit;
+    commit,
+    warn;
 
 beforeAll(() => {
     crs.registerProjections(namedProjections);
@@ -44,13 +45,17 @@ beforeAll(() => {
     test2KML = fs.readFileSync("./src/modules/fileImport/tests/resources/test2.kml", "utf8");
 });
 
+
 describe("src/modules/fileImport/store/actionsFileImport.js", () => {
+
     beforeEach(() => {
         mapCollection.clear();
         resetUniqueId();
         dispatch = sinon.spy();
         layer.getSource().getFeatures().forEach(feature => layer.getSource().removeFeature(feature));
         commit = sinon.spy();
+        warn = sinon.spy();
+        sinon.stub(console, "warn").callsFake(warn);
     });
 
     afterEach(() => {
@@ -511,6 +516,43 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
                     dispatch: true
                 }
             ], {}, done);
+        });
+    });
+
+    describe("checkAndReplaceSymbolUrls", () => {
+        let assetsPath,
+            assetsPathOrig;
+
+        beforeEach(() => {
+            assetsPathOrig = global.MASTERPORTAL_ASSETS_PATH;
+            assetsPath = "/src/assets/img";
+            global.MASTERPORTAL_ASSETS_PATH = assetsPath;
+        });
+
+        afterEach(() => {
+            global.MASTERPORTAL_ASSETS_PATH = assetsPathOrig;
+        });
+
+        it("check and replace server-url", () => {
+            const url = "https://geoportal-hamburg.de/src/assets/img/tools/draw/circle_red.svg",
+                rawSource = `<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/kml/2.2 https://developers.google.com/kml/schema/kml22gx.xsd"> <Placemark> <Style> <IconStyle> <scale>0.5</scale> <Icon> <href>${url}</href> </Icon> </IconStyle> </Style> <ExtendedData> <Data name="attributes"/> <Data name="drawState"/> <Data name="fromDrawTool"> <value>true</value> </Data> <Data name="invisibleStyle"/> <Data name="isOuterCircle"> <value>false</value> </Data> <Data name="isVisible"> <value>true</value> </Data> <Data name="masterportal_attributes"/> <Data name="styleId"> <value>1</value> </Data> </ExtendedData> <Point> <coordinates>10.00528192286842,53.56293203636361</coordinates> </Point> </Placemark> </kml>`,
+                result = checkAndReplaceSymbolUrls(rawSource),
+                expectedUrl = `${window.location.origin}${MASTERPORTAL_ASSETS_PATH}/tools/draw/circle_red.svg`;
+
+            expect(result.includes(expectedUrl)).to.be.true;
+            expect(warn.calledOnce).to.be.true;
+        });
+
+        it("check and replace build assets path", () => {
+            assetsPath = "/mastercode/1.2.3/img";
+
+            const url = "https://localhost:9001/src/assets/img/tools/draw/circle_red.svg",
+                rawSource = `<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/kml/2.2 https://developers.google.com/kml/schema/kml22gx.xsd"> <Placemark> <Style> <IconStyle> <scale>0.5</scale> <Icon> <href>${url}</href> </Icon> </IconStyle> </Style> <ExtendedData> <Data name="attributes"/> <Data name="drawState"/> <Data name="fromDrawTool"> <value>true</value> </Data> <Data name="invisibleStyle"/> <Data name="isOuterCircle"> <value>false</value> </Data> <Data name="isVisible"> <value>true</value> </Data> <Data name="masterportal_attributes"/> <Data name="styleId"> <value>1</value> </Data> </ExtendedData> <Point> <coordinates>10.00528192286842,53.56293203636361</coordinates> </Point> </Placemark> </kml>`,
+                result = checkAndReplaceSymbolUrls(rawSource),
+                expectedUrl = `${window.location.origin}${MASTERPORTAL_ASSETS_PATH}/tools/draw/circle_red.svg`;
+
+            expect(result.includes(expectedUrl)).to.be.true;
+            expect(warn.calledOnce).to.be.true;
         });
     });
 });

@@ -42,6 +42,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1591: Draw/FileImport: fixed KML export and KML import of symbols.    
 - Issue \#1592: FileImport/Draw: Fixed label text offset not being restored when importing a drawn GeoJSON file.
 - Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset.
 - Issue \#1606: proxyAgent: Restored proxy agent support in the Vite development server, so external web resources can be accessed again from localhost through a corporate proxy.
