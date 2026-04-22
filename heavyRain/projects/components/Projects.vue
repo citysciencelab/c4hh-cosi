@@ -2,8 +2,9 @@
 import HrCard from "../../shared/components/HrCard.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
-import ProjectsEdit from "./ProjectsEdit.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
+import {mapGetters} from "vuex";
+import ProjectsEdit from "./ProjectsEdit.vue";
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
@@ -20,10 +21,36 @@ export default {
             currentView: "main",
             showSnackbar: false,
             snackbarMessage: "",
-            snackbarColor: "success"
+            snackbarColor: "success",
+            chosenCriteria: []
         };
     },
+    computed: {
+        ...mapGetters("Modules/Projects", ["criteria"])
+    },
+    mounted () {
+        this.chosenCriteria = [this.criteria[1], this.criteria[0]];
+    },
     methods: {
+        /**
+         * Gets the background color.
+         * @param {Object[]} val the chosen criteria.
+         * @returns {String} the hex color.
+         */
+        getBgcolor (val) {
+            if (!Array.isArray(val) || !val.length) {
+                return this.criteria[0].color;
+            }
+
+            const index = [];
+
+            val.forEach(chosenCri => {
+                index.push(this.criteria.findIndex(cri => cri.name === chosenCri.name));
+            });
+
+            return this.criteria[Math.min(...index)].color;
+        },
+
         /**
          * Handles the save action.
          * @returns {void}
@@ -32,6 +59,7 @@ export default {
             this.showSnackbarMessage("Projekt wurde erfolgreich gespeichert.");
             this.currentView = "main";
         },
+
         /**
          * Shows a snackbar message.
          * @param {String} message the message to display
@@ -62,11 +90,13 @@ export default {
             >
                 <template #above-title>
                     <div class="d-flex flex-wrap gap-2">
-                        <span class="badge rounded-pill text-bg-primary fw-normal px-3 py-2">
-                            Bauprojekte (Umsetzungsmassnahmen)
-                        </span>
-                        <span class="badge rounded-pill text-bg-primary fw-normal px-3 py-2">
-                            Bereiche aus Postfach
+                        <span
+                            v-for="(cri, index) in chosenCriteria"
+                            :key="index"
+                            :style="{background: getBgcolor(chosenCriteria)}"
+                            class="badge rounded-pill fw-normal px-3 py-2"
+                        >
+                            {{ cri.name }}
                         </span>
                     </div>
                 </template>
