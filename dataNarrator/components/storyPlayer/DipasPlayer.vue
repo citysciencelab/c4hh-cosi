@@ -655,8 +655,8 @@ export default {
 }
 
 #dipasplayer {
-    --h1Size: 2rem;
-    --h2Size: 1.625rem;
+    --h1Size: 1.875rem;
+    --h2Size: 1.5rem;
     --pSize: 1rem;
 
     width: var(--initialToolWidth);
@@ -692,7 +692,7 @@ export default {
             padding: 20px;
             color: var(--DipasColorsFont, #212529);
             font-size: var(--h1Size);
-            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         p {
@@ -732,7 +732,7 @@ export default {
             font-size: var(--h2Size);
             text-transform: none;
             font-weight: bold;
-            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         &.lastStep{
