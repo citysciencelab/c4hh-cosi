@@ -239,5 +239,8 @@
   },
   "tacticalMark": {
     "type": "tool"
+  },
+  "fileImportAddon": {
+    "type": "tool"
   }
 }
