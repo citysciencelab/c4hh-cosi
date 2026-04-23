@@ -515,7 +515,6 @@ export default {
          */
         setPopulationNotAvailable (card, type, alertText) {
             card.data[2].label = "-";
-            card.populationAlertKey += 1;
             card.populationAlert = {
                 type,
                 text: alertText
@@ -576,7 +575,6 @@ export default {
             }
 
             card.data[2].label = populationLabel + ": " + notAvailable;
-            card.populationAlertKey += 1;
             card.populationAlert = mapped || {
                 type: "error",
                 text: notAvailable
@@ -687,8 +685,7 @@ export default {
                 </template>
             </Card>
             <AlertMessage
-                v-if="item.populationAlert"
-                :key="item.populationAlertKey"
+                v-if="item.populationAlert && item.status === 'active'"
                 :text="item.populationAlert.text"
                 :type="item.populationAlert.type"
                 :closeable="true"
