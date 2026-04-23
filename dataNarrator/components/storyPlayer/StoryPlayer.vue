@@ -10,6 +10,12 @@ export default {
     components: {
         DipasPlayer
     },
+    props: {
+        isMobileDevice: {
+            type: Boolean,
+            default: false
+        }
+    },
     data () {
         return {
             currentStepIndex: 0,
@@ -92,6 +98,9 @@ export default {
             }
 
             return "";
+        },
+        isMobilePortrait () {
+            return this.isMobileDevice && screen.orientation?.type.startsWith("portrait");
         }
     },
     watch: {
@@ -140,6 +149,7 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/DataNarrator", Object.keys(mutations)),
+        ...mapMutations("Menu", ["setExpandedBySide"]),
         ...mapActions("Maps", ["changeMapMode"]),
         ...mapActions(["replaceByIdInLayerConfig"]),
         ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
@@ -154,6 +164,7 @@ export default {
                 module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
                 name = module && module.name ? module.name : toolKey;
 
+            this.setExpandedBySide({expanded: true, side: toolMenuSide});
             this.changeCurrentComponent({type: toolId, side: toolMenuSide, props: {name}});
         },
         /**
@@ -162,6 +173,8 @@ export default {
          */
         deactivateTool () {
             const toolMenuSide = this.dataNarratorMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu";
+
+            this.setExpandedBySide({expanded: false, side: toolMenuSide});
 
             this.resetMenu(toolMenuSide);
         },
@@ -337,6 +350,7 @@ export default {
         getCenterOfVisibleMap () {
             const map = mapCollection.getMap("2D"),
                 mapView = map?.getView(),
+                projection = mapView?.getProjection(),
                 targetResolution = mapView?.getResolutionForZoom(this.currentStep.zoomLevel),
                 rightPadding = this.expanded("secondaryMenu")
                     ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
@@ -345,11 +359,27 @@ export default {
                     ? document.getElementById("mp-menu-mainMenu").offsetWidth
                     : 20,
                 offsetPixels = (rightPadding - leftPadding) / 2,
-                offsetMeters = offsetPixels * targetResolution,
-                center = this.currentStep.centerCoordinate,
-                adjustedCenter = [center[0] + offsetMeters, center[1]];
+                center = this.currentStep.centerCoordinate;
 
-            return adjustedCenter;
+            if (this.isMobilePortrait) {
+                const bottomPadding = document.getElementById("mp-menu-secondaryMenu").offsetHeight,
+                    mapHeight = map.getTargetElement().clientHeight,
+                    verticalOffsetPixels = (mapHeight - bottomPadding) / 2,
+                    offsetY = verticalOffsetPixels * targetResolution;
+
+                return [center[0], center[1] + offsetY];
+            }
+
+            let offsetX = offsetPixels * targetResolution;
+
+            // For geographic projections (degrees), account for cos(latitude) to normalize
+            if (projection && projection.getUnits() === "degrees") {
+                const latRad = (center[1] * Math.PI) / 180;
+
+                offsetX = offsetX / Math.cos(latRad);
+            }
+
+            return [center[0] + offsetX, center[1]];
         },
         /**
          * Gets the URL of a story.json from the URL parameter 'story'
@@ -375,6 +405,7 @@ export default {
             :story-conf-path="storyConfPath"
             :steps="steps"
             :steps-objects="stepsCopy"
+            :is-mobile-device="isMobileDevice"
             @change="currentStepIndex = $event"
         />
 

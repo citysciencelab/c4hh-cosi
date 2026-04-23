@@ -61,7 +61,8 @@ describe("addons/dataNarrator/tests/unit/DataNarrator.spec.js", () => {
                 }
             },
             getters: {
-                configJs: state => state.configJs
+                configJs: state => state.configJs,
+                isMobile: () => false
             }
         });
 

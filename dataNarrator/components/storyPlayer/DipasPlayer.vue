@@ -23,6 +23,10 @@ export default {
         stepsObjects: {
             type: Array,
             default: null
+        },
+        isMobileDevice: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -60,7 +64,8 @@ export default {
             toolBodyScrollTop: 0,
             originalToolBodyStyle: "",
             dipasPlayerHeadingStyle: "display: none;",
-            dipasPlayerToolBodyStyle: "background-color: transparent !important; -ms-overflow-style: none; overflow: overlay; max-height: 100%; padding: 0.25rem;"
+            dipasPlayerToolBodyStyle: "background-color: transparent !important; -ms-overflow-style: none; overflow-y: auto; max-height: 100%; padding: 0.25rem;",
+            currentOrientationType: screen.orientation?.type || ""
         };
     },
     computed: {
@@ -72,26 +77,24 @@ export default {
         ...mapGetters("Menu", [
             "mainMenu",
             "secondaryMenu",
-            "secondaryExpanded"
+            "secondaryExpanded",
+            "menuBySide"
         ]),
         cssVars () {
             return {
                 "--rotate-right": this.rotateRight + "deg",
                 "--rotate-left": this.rotateLeft + "deg",
                 "--tool-width": this.toolWidth,
-                "--tool-header": this.secondaryExpanded ? "flex" : "none"
+                "--tool-header": this.secondaryExpanded ? "flex" : "none",
+                "--tob-button-top": this.isMobilePortrait || (window.matchMedia("(max-width: 768px)").matches && this.currentOrientationType.startsWith("landscape")) ? "9%" : "12%",
+                "--progress-bottom": this.isMobilePortrait || (window.matchMedia("(max-width: 768px)").matches && this.currentOrientationType.startsWith("landscape")) ? "12px" : "8px"
             };
         },
         showDipasLogo () {
             return this.storyConf?.showDipasLogo !== false; // Show DIPAS logo by default, unless explicitly set to false
         },
-        isMobileDevice () {
-            const userAgentCheck = (/Mobi|Android|iPhone|iPad|iPod|Windows Phone/i).test(navigator.userAgent),
-                touchCheck = "ontouchstart" in window || navigator.maxTouchPoints > 0,
-                screenSizeCheck = this.isMobile,
-                orientationCheck = screen.orientation?.type.startsWith("portrait");
-
-            return userAgentCheck || (touchCheck && screenSizeCheck && orientationCheck);
+        isMobilePortrait () {
+            return this.isMobileDevice && this.currentOrientationType.startsWith("portrait");
         }
     },
     created () {
@@ -102,6 +105,43 @@ export default {
                 console.error(err);
             });
         });
+
+        const MOBILE = "Mobile",
+            DESKTOP = "Desktop",
+            breakpoint = "(max-width: 768px)",
+            mediaQuery = window.matchMedia(breakpoint),
+            isMobile = mediaQuery.matches,
+            orientationCheck = screen.orientation?.type.startsWith("landscape");
+
+        if (isMobile && orientationCheck) {
+            this.setDeviceMode(DESKTOP);
+        }
+
+        this.orientationChangeHandler = (event) => {
+            this.currentOrientationType = event.target.type;
+
+            if (mediaQuery.matches && this.currentOrientationType.startsWith("landscape")) {
+                this.setDeviceMode(DESKTOP);
+
+                this.$nextTick(() => {
+                    this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
+                    this.menuBySide("secondaryMenu").width = "40%";
+                });
+            }
+            else if (mediaQuery.matches && !screen.orientation?.type.startsWith("landscape")) {
+                this.setDeviceMode(MOBILE);
+
+                const secondaryMenu = document.getElementById("mp-menu-secondaryMenu");
+
+                secondaryMenu.style.removeProperty("left");
+
+                this.$nextTick(() => {
+                    this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
+                });
+            }
+        };
+
+        screen.orientation?.addEventListener("change", this.orientationChangeHandler);
     },
     mounted () {
         if (this.storyConf.styleCSS) {
@@ -113,6 +153,12 @@ export default {
             document.getElementsByTagName("head")[0].appendChild(element);
         }
 
+        this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
+
+        if (window.matchMedia("(max-width: 768px)").matches && !this.isMobilePortrait) {
+            this.menuBySide("secondaryMenu").width = "40%";
+        }
+
         const heading = document.getElementById("mp-menu-navigation-secondaryMenu"),
             toolBody = document.getElementById("mp-body-secondaryMenu"),
             positionFix = this.storyConf.showHomeButton ? 250 : 190,
@@ -121,6 +167,20 @@ export default {
 
                 this.rightButtonsPositionLeft = entry.contentRect.width - positionFix + "px";
                 this.toolWidth = toolBody.clientWidth + "px";
+
+                if (window.matchMedia("(max-width: 768px)").matches && !this.isMobilePortrait) {
+                    document.getElementById("secondaryMenu-toggle-button").style.right = document.getElementById("mp-menu-secondaryMenu").clientWidth - 15 + "px";
+                    document.getElementById("mp-menu-secondaryMenu").style.removeProperty("left");
+                    document.getElementsByClassName("btn-group-controls")[0].style.right = document.getElementById("mp-menu-secondaryMenu").clientWidth + 10 + "px";
+                }
+                else if (window.matchMedia("(max-width: 768px)").matches && this.isMobilePortrait) {
+                    document.getElementsByClassName("btn-group-controls")[0].style.removeProperty("right");
+                    this.addSingleAlert({
+                        content: this.$t("additional:modules.dataNarrator.dipasPlayer.mobilePortraitMessage"),
+                        category: "info",
+                        once: true
+                    });
+                }
             });
 
         this.rightButtonsPositionLeft = toolBody.clientWidth - positionFix + "px";
@@ -132,9 +192,9 @@ export default {
             toolBody.style.minWidth = "250px";
         }
 
-        heading.style = this.dipasPlayerHeadingStyle;
-        this.originalToolBodyStyle = toolBody.style;
-        toolBody.style = this.dipasPlayerToolBodyStyle;
+        heading.setAttribute("style", this.dipasPlayerHeadingStyle);
+        this.originalToolBodyStyle = toolBody.getAttribute("style");
+        toolBody.setAttribute("style", this.dipasPlayerToolBodyStyle);
 
         this.scrollerSetup();
 
@@ -148,9 +208,9 @@ export default {
         const heading = document.getElementById("mp-menu-navigation-secondaryMenu"),
             toolBody = document.getElementById("mp-body-secondaryMenu");
 
-        heading.style = this.dipasPlayerHeadingStyle;
-        this.originalToolBodyStyle = toolBody.style;
-        toolBody.style = this.dipasPlayerToolBodyStyle;
+        heading.setAttribute("style", this.dipasPlayerHeadingStyle);
+        this.originalToolBodyStyle = toolBody.getAttribute("style");
+        toolBody.setAttribute("style", this.dipasPlayerToolBodyStyle);
 
         this.$nextTick(() => {
             if (toolBody && this.toolBodyScrollTop > 0) {
@@ -166,8 +226,8 @@ export default {
         const heading = document.getElementById("mp-menu-navigation-secondaryMenu"),
             toolBody = document.getElementById("mp-body-secondaryMenu");
 
-        heading.style.removeProperty("display");
-        toolBody.style = this.originalToolBodyStyle;
+        heading?.style?.removeProperty("display");
+        toolBody.setAttribute("style", this.originalToolBodyStyle || "");
 
         // Remove scroll event listener
         if (toolBody) {
@@ -176,7 +236,12 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/DataNarrator", Object.keys(mutations)),
+        ...mapMutations("Menu", ["setExpandedBySide"]),
         ...mapActions("Menu", ["changeCurrentComponent"]),
+        ...mapMutations([
+            "setDeviceMode"
+        ]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
         /**
          * Updates the step html content
          * @param {Object} htmlFile name of the html file to load
@@ -396,7 +461,6 @@ export default {
 
 <template>
     <div
-        v-if="!isMobile"
         class="d-flex w-100"
     >
         <div
@@ -426,6 +490,12 @@ export default {
         </div>
         <div class="d-flex w-100">
             <div class="storyToolHeader">
+                <div
+                    v-if="isMobilePortrait"
+                    class="drag-indicator"
+                >
+                    <span /><span /><span />
+                </div>
                 <a
                     v-if="showDipasLogo"
                     class="dipasLogo"
@@ -573,22 +643,12 @@ export default {
             </div>
         </div>
     </div>
-    <div
-        v-else
-        class="mobileMessage"
-    >
-        {{
-            isMobileDevice
-                ? $t("additional:modules.dataNarrator.dipasPlayer.mobileMessage")
-                : $t("additional:modules.dataNarrator.dipasPlayer.screenToSmallMessage")
-        }}
-    </div>
 </template>
 
 <style lang="scss" scoped>
 
 .table-of-contents {
-    position: fixed;
+    position: absolute;
     background-color: white;
     border: 1px lightgray;
     height: calc(100vh - 115px);
@@ -638,7 +698,24 @@ export default {
     width: 97%;
     padding: 5px;
     top: 0;
-    left: 8px;
+    left: 0;
+
+    .drag-indicator {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 5px;
+
+        span {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: block;
+        }
+    }
 
     .headerTitle {
         padding: 5px 0 0 10px;
@@ -744,7 +821,6 @@ export default {
             padding: 0.625rem 1.25rem;
 
             :deep() {
-
                 .paragraph {
                     padding-bottom: 10px;
                 }
@@ -844,7 +920,7 @@ export default {
 }
 
 .toolbar {
-    position: absolute;
+    position: fixed;
     height: 70px;
     bottom: 0;
     background-color: white;
@@ -876,7 +952,7 @@ export default {
                 background: none;
                 position: relative;
                 margin-right: 8px;
-                bottom: 8px;
+                bottom: var(--progress-bottom, 8px);
 
                 &::after {
                     content: "";
@@ -938,7 +1014,7 @@ export default {
                     border: none;
                     background: transparent;
                     left: 50%;
-                    top: 12%;
+                    top: var(--tob-button-top, 12%);
                     transform: translateX(-50%);
                     z-index: 1000;
                 }

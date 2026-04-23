@@ -48,12 +48,12 @@ export default {
 
             this.$emit("close-toc");
 
-            this.$nextTick(() => {
+            setTimeout(() => {
                 if (!this.$parent.$refs.stepper || this.$parent.$refs.stepper?.length === 0) {
                     return;
                 }
 
-                const el = this.$parent.$refs.stepper[scrollToStepIndex];
+                const stepDiv = this.$parent.$refs.stepper[scrollToStepIndex];
 
                 // if the event is triggered by keyboard interaction, the default behavior of the key press
                 // needs to be prevented for the story to be scrolled to the correct position
@@ -61,8 +61,19 @@ export default {
                     evt.preventDefault();
                 }
 
-                el.scrollIntoView({block: "start"});
-            });
+                const container = document.getElementById("mp-body-secondaryMenu");
+
+                if (container) {
+                    const containerRect = container.getBoundingClientRect(),
+                        stepElRect = stepDiv.getBoundingClientRect(),
+                        scrollTop = container.scrollTop + stepElRect.top - containerRect.top - 40;
+
+                    container.scrollTo({top: scrollTop, behavior: "smooth"});
+                }
+                else {
+                    stepDiv.scrollIntoView({block: "start"});
+                }
+            }, 300);
 
             // as the nested list elements also trigger the click events of the parent list element
             // the events of the parent elements need to be stopped from executing

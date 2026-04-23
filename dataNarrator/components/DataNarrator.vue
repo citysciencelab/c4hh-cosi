@@ -17,23 +17,36 @@ export default {
     computed: {
         ...mapGetters("Modules/DataNarrator", [
             "autoplay",
-            "storyConfJson"
+            "storyConfJson",
+            "icon"
         ]),
         ...mapGetters([
             "uiStyle",
-            "configJs"
+            "configJs",
+            "isMobile"
         ]),
         ...mapGetters("Menu", [
             "secondaryExpanded"
         ]),
         storyMode () {
             return this.storyConf?.displayType ? this.storyConf.displayType : "dipas";
+        },
+        isMobileDevice () {
+            const userAgentCheck = (/Mobi|Android|iPhone|iPad|iPod|Windows Phone/i).test(navigator.userAgent),
+                touchCheck = "ontouchstart" in window || navigator.maxTouchPoints > 0,
+                screenSizeCheck = this.isMobile,
+                orientationCheck = screen.orientation?.type.startsWith("portrait");
+
+            return userAgentCheck || (touchCheck && screenSizeCheck && orientationCheck);
+        },
+        isMobilePortrait () {
+            return this.isMobileDevice && screen.orientation?.type.startsWith("portrait");
         }
     },
     watch: {
         secondaryExpanded (expanded) {
             if (!expanded && this.isActive) {
-                document.getElementById("secondaryMenu-toggle-button")?.firstChild?.classList?.replace("bi-tools", "bi-book");
+                document.getElementById("secondaryMenu-toggle-button")?.firstChild?.classList?.replace("bi-tools", this.icon);
             }
         }
     },
@@ -51,6 +64,13 @@ export default {
         // Handle KeepAlive visibility. Triggered if component is deactivated
         this.isActive = false;
     },
+    mounted () {
+        if (this.isMobilePortrait) {
+            if (!this.secondaryExpanded) {
+                document.getElementById("secondaryMenu-toggle-button")?.firstChild?.classList?.replace("bi-tools", this.icon);
+            }
+        }
+    },
     methods: {
         ...mapMutations("Modules/DataNarrator", [
             "setStoryConf",
@@ -62,7 +82,9 @@ export default {
 
 <template lang="html">
     <div id="dataNarrator">
-        <StoryPlayer />
+        <StoryPlayer
+            :is-mobile-device="isMobileDevice"
+        />
     </div>
 </template>
 

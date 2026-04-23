@@ -129,6 +129,11 @@ describe("addons/dataNarrator/tests/unit/components/StoryPlayer.spec.js", () => 
                         mainMenu: () => ({sections: []}),
                         secondaryMenu: () => ({sections: []}),
                         expanded: () => sinon.stub()
+                    },
+                    mutations: {
+                        setExpandedBySide: (state, {expanded, side}) => {
+                            state[`${side}Expanded`] = expanded;
+                        }
                     }
                 }
             },

@@ -4,6 +4,7 @@ import {createStore} from "vuex";
 import {vi, beforeEach, afterEach, describe, it} from "vitest";
 import DipasPlayer from "../../../components/storyPlayer/DipasPlayer.vue";
 
+
 describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
     let steps;
     let store;
@@ -17,7 +18,7 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
      * @param {Object} storyConfOverride - Optional override for storyConf
      * @returns {Object} Vuex store
      */
-    function createTestStore (storyConfOverride = null) {
+    function createTestStore (storyConfOverride = null, isMobile = false) {
         const conf = storyConfOverride || {
             title: "Geschichten mit Karten erzählen",
             showDipasLogo: true,
@@ -55,18 +56,30 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
                     state: () => ({
                         mainMenu: {sections: []},
                         secondaryMenu: {sections: []},
-                        secondaryExpanded: true
+                        secondaryExpanded: true,
+                        menuBySide: "40%"
                     }),
                     getters: {
                         mainMenu: state => state.mainMenu,
                         secondaryMenu: state => state.secondaryMenu,
-                        secondaryExpanded: state => state.secondaryExpanded
+                        secondaryExpanded: state => state.secondaryExpanded,
+                        menuBySide: state => side => state[side] || {}
+                    },
+                    mutations: {
+                        setExpandedBySide: (state, {expanded, side}) => {
+                            state[`${side}Expanded`] = expanded;
+                        }
                     }
                 }
             },
             getters: {
-                isMobile: () => false,
+                isMobile: () => isMobile,
                 uiStyle: () => "DEFAULT"
+            },
+            mutations: {
+                setDeviceMode (state, mode) {
+                    state.deviceMode = mode;
+                }
             }
         });
     }
@@ -76,12 +89,13 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
      * @param {Object} storeInstance - Vuex store instance
      * @returns {Object} Vue wrapper
      */
-    function mountComponent (storeInstance) {
+    function mountComponent (storeInstance, isMobileDevice = false) {
         return shallowMount(DipasPlayer, {
             props: {
                 steps,
                 stepsobjects: [],
-                storyConfPath: ""
+                storyConfPath: "",
+                isMobileDevice
             },
             global: {
                 plugins: [storeInstance],
@@ -93,6 +107,56 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
                     TableOfContents: true
                 }
             }
+        });
+    }
+
+    /**
+     * Helper to mock matchMedia
+     * @param {boolean} matches - whether media query matches
+     * @returns {void}
+     */
+    function mockMatchMedia (matches) {
+        vi.stubGlobal("matchMedia", (query) => ({
+            matches,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn()
+        }));
+    }
+
+    /**
+     * Helper to mock screen orientation
+     * @param {string} type - orientation type e.g. "portrait-primary" or "landscape-primary"
+     * @returns {void}
+     */
+    function mockScreenOrientation (type) {
+        Object.defineProperty(screen, "orientation", {
+            value: {
+                type,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn()
+            },
+            configurable: true,
+            writable: true
+        });
+    }
+
+    /**
+     * Helper to mock navigator.userAgent for mobile
+     * @param {boolean} isMobile - whether to simulate mobile user agent
+     * @returns {void}
+     */
+    function mockUserAgent (isMobile) {
+        Object.defineProperty(navigator, "userAgent", {
+            value: isMobile
+                ? "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)"
+                : "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+            configurable: true,
+            writable: true
         });
     }
 
@@ -345,5 +409,115 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
 
         await tocButton.trigger("click");
         expect(wrapper.find(".table-of-contents").exists()).to.be.false;
+    });
+
+    // ── Mobile / Orientation Tests ──────────────────────────────────────────
+
+    describe("mobile portrait mode", () => {
+        beforeEach(() => {
+            mockUserAgent(true);
+            mockMatchMedia(true); // max-width: 768px matches
+            mockScreenOrientation("portrait-primary");
+
+            wrapper.unmount();
+            store = createTestStore(storyConf, true);
+            wrapper = mountComponent(store, true);
+        });
+
+        it("renders drag-indicator in mobile portrait mode", () => {
+            expect(wrapper.find(".drag-indicator").exists()).to.be.true;
+        });
+
+        it("isMobilePortrait computed is true when userAgent is mobile and orientation is portrait", () => {
+            expect(wrapper.vm.isMobilePortrait).to.be.true;
+        });
+
+        it("cssVars uses portrait tob-button-top value (9%) in mobile portrait", () => {
+            expect(wrapper.vm.cssVars["--tob-button-top"]).to.equal("9%");
+        });
+
+        it("cssVars uses portrait progress-bottom value (12px) in mobile portrait", () => {
+            expect(wrapper.vm.cssVars["--progress-bottom"]).to.equal("12px");
+        });
+
+        it("still renders all stepper elements in mobile portrait mode", () => {
+            expect(wrapper.findAll(".stepper").length).to.equal(steps.length);
+        });
+
+        it("still renders navigation buttons in mobile portrait mode", () => {
+            expect(wrapper.find(".nav-buttons").exists()).to.be.true;
+        });
+
+        it("still renders tob-button in mobile portrait mode", () => {
+            expect(wrapper.find(".tob-button").exists()).to.be.true;
+        });
+    });
+
+    describe("mobile landscape mode", () => {
+        beforeEach(() => {
+            mockUserAgent(true);
+            mockMatchMedia(true); // max-width: 768px matches
+            mockScreenOrientation("landscape-primary");
+
+            wrapper.unmount();
+            store = createTestStore(storyConf, true);
+            wrapper = mountComponent(store, true);
+        });
+
+        it("does NOT render drag-indicator in mobile landscape mode", () => {
+            expect(wrapper.find(".drag-indicator").exists()).to.be.false;
+        });
+
+        it("isMobilePortrait computed is false in landscape orientation", () => {
+            expect(wrapper.vm.isMobilePortrait).to.be.false;
+        });
+
+        it("cssVars uses default tob-button-top value (9%) in mobile landscape", () => {
+            expect(wrapper.vm.cssVars["--tob-button-top"]).to.equal("9%");
+        });
+
+        it("cssVars uses 12px progress-bottom in mobile landscape", () => {
+            expect(wrapper.vm.cssVars["--progress-bottom"]).to.equal("12px");
+        });
+
+        it("still renders stepper elements in mobile landscape mode", () => {
+            expect(wrapper.findAll(".stepper").length).to.equal(steps.length);
+        });
+
+        it("still renders home button in mobile landscape mode when showHomeButton is true", () => {
+            expect(wrapper.find(".home-button").exists()).to.be.true;
+        });
+    });
+
+    describe("desktop (non-mobile) mode", () => {
+        beforeEach(() => {
+            mockUserAgent(false);
+            mockMatchMedia(false); // max-width: 768px does NOT match
+            mockScreenOrientation("landscape-primary");
+
+            wrapper.unmount();
+            store = createTestStore(storyConf);
+            wrapper = mountComponent(store);
+        });
+
+        it("does NOT render drag-indicator on desktop", () => {
+            expect(wrapper.find(".drag-indicator").exists()).to.be.false;
+        });
+
+        it("isMobilePortrait is false on desktop", () => {
+            expect(wrapper.vm.isMobilePortrait).to.be.false;
+        });
+
+        it("isMobileDevice is false on desktop with desktop user agent", () => {
+            expect(wrapper.vm.isMobileDevice).to.be.false;
+        });
+
+        it("cssVars uses default tob-button-top (12%) on desktop", () => {
+            expect(wrapper.vm.cssVars["--tob-button-top"]).to.equal("12%");
+        });
+
+        it("cssVars uses default progress-bottom (8px) on desktop", () => {
+            expect(wrapper.vm.cssVars["--progress-bottom"]).to.equal("8px");
+        });
     });
 });
