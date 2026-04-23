@@ -7,15 +7,19 @@ import {Draw, Select, Modify} from "ol/interaction.js";
 import {fromCircle} from "ol/geom/Polygon.js";
 import getters from "../store/gettersTacticalMark";
 import Icon from "ol/style/Icon";
-import {mapGetters, mapMutations, mapActions} from "vuex";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
+import {mapGetters, mapMutations, mapActions} from "vuex";
 import mutations from "../store/mutationsTacticalMark";
 import {Style, Text} from "ol/style.js";
 import {uniqueId} from "@shared/js/utils/uniqueId.js";
 
 export default {
     name: "TacticalMark",
+    components: {
+        FlatButton
+    },
     data () {
         return {
             disableFileDownload: true,
@@ -247,8 +251,6 @@ export default {
          * @returns {valueControlsoid}  -
          */
         deleteIcon () {
-            const ref = this.$refs.delete;
-
             if (this.selectedBtn !== "delete") {
                 Object.keys(this.$refs).forEach(rf => {
                     if (Array.isArray(this.$refs[rf]) && this.$refs[rf][0] && this.$refs[rf][0].style) {
@@ -258,7 +260,6 @@ export default {
                         this.$refs[rf].style.backgroundColor = "#F2F2F2";
                     }
                 });
-                ref.style.backgroundColor = "#CDCDCD";
 
                 this.removeInteractionFromMap(this.interaction);
 
@@ -283,8 +284,6 @@ export default {
                 this.selectedBtn = "delete";
             }
             else {
-                ref.style.backgroundColor = "#F2F2F2";
-
                 this.removeInteractionFromMap(this.interaction);
                 this.resetCanvasCursor();
                 this.selectedBtn = "";
@@ -296,8 +295,6 @@ export default {
          * @returns {void}  -
          */
         modifyIcon () {
-            const ref = this.$refs.modify;
-
             if (this.selectedBtn !== "modify") {
                 Object.keys(this.$refs).forEach(rf => {
                     if (Array.isArray(this.$refs[rf]) && this.$refs[rf][0] && this.$refs[rf][0].style) {
@@ -307,7 +304,6 @@ export default {
                         this.$refs[rf].style.backgroundColor = "#F2F2F2";
                     }
                 });
-                ref.style.backgroundColor = "#CDCDCD";
 
                 this.removeInteractionFromMap(this.interaction);
 
@@ -321,8 +317,6 @@ export default {
                 this.selectedBtn = "modify";
             }
             else {
-                ref.style.backgroundColor = "#F2F2F2";
-
                 this.removeInteractionFromMap(this.interaction);
                 this.resetCanvasCursor();
                 this.selectedBtn = "";
@@ -461,13 +455,20 @@ export default {
         async startDownload (downloadFeatures) {
             if (downloadFeatures.length > 0) {
 
-                const dataString = await convertFeaturesToKml(downloadFeatures);
+                const dataString = await convertFeaturesToKml(downloadFeatures),
+                    link = document.createElement("a");
 
                 this.file = this.prepareFileName(this.filename);
 
                 if (this.file && this.file !== "") {
                     this.prepareDownload(dataString);
                 }
+
+                link.href = this.fileUrl;
+                link.download = this.file;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         },
 
@@ -630,52 +631,31 @@ export default {
         </div>
         <div class="tm-container">
             <div class="tm-item">
-                <div
-                    ref="modify"
-                    class="tm-btn"
-                    role="button"
-                    tabindex="0"
-                    @click="modifyIcon();"
-                    @keydown.enter="modifyIcon();"
-                >
-                    <div class="tm-btn-txt">
-                        <span>
-                            {{ $t("additional:modules.tools.tacticalMark.iconEdit") }}
-                        </span>
-                    </div>
-                </div>
+                <FlatButton
+                    :aria="$t('additional:modules.tools.tacticalMark.iconEdit')"
+                    icon="bi-wrench"
+                    :title="$t('additional:modules.tools.tacticalMark.iconEdit')"
+                    :interaction="() => modifyIcon()"
+                    :text="$t('additional:modules.tools.tacticalMark.iconEdit')"
+                />
             </div>
             <div class="tm-item">
-                <div
-                    ref="delete"
-                    class="tm-btn"
-                    role="button"
-                    tabindex="0"
-                    @click="deleteIcon();"
-                    @keydown.enter="deleteIcon();"
-                >
-                    <div class="tm-btn-txt">
-                        <span>
-                            {{ $t("additional:modules.tools.tacticalMark.iconDelete") }}
-                        </span>
-                    </div>
-                </div>
+                <FlatButton
+                    :aria="$t('additional:modules.tools.tacticalMark.iconDelete')"
+                    icon="bi-trash"
+                    :title="$t('additional:modules.tools.tacticalMark.iconDelete')"
+                    :interaction="() => deleteIcon()"
+                    :text="$t('additional:modules.tools.tacticalMark.iconDelete')"
+                />
             </div>
             <div class="tm-item">
-                <div
-                    ref="download"
-                    class="tm-btn"
-                    role="button"
-                    tabindex="0"
-                    @click="download();"
-                    @keydown.enter="download();"
-                >
-                    <div class="tm-btn-txt">
-                        <span>
-                            {{ $t("additional:modules.tools.tacticalMark.iconDownload") }}
-                        </span>
-                    </div>
-                </div>
+                <FlatButton
+                    :aria="$t('additional:modules.tools.tacticalMark.iconDownload')"
+                    icon="bi-save"
+                    :title="$t('additional:modules.tools.tacticalMark.iconDownload')"
+                    :interaction="() => download()"
+                    :text="$t('additional:modules.tools.tacticalMark.iconDownload')"
+                />
             </div>
         </div>
         <div
@@ -712,23 +692,14 @@ export default {
                         class="col-md-5 col-sm-5 control-label"
                         for="tool-tacticalmark-download-file"
                     />
-                    <a
-                        id="tool-tacticalmark-download-file"
-                        class="downloadFile"
-                        :href="fileUrl"
-                        :download="file"
-                    >
-                        <button
-                            class="btn btn-sm btn-block btn-secondary"
-                            type="button"
-                            :disabled="disableFileDownload"
-                            @click="setDownloadFeatures"
-                        >
-                            <span>
-                                {{ $t("additional:modules.tools.tacticalMark.saveFile") }}
-                            </span>
-                        </button>
-                    </a>
+                    <FlatButton
+                        :aria="$t('additional:modules.tools.tacticalMark.saveFile')"
+                        :disabled="disableFileDownload"
+                        icon="bi-save"
+                        :title="$t('additional:modules.tools.tacticalMark.saveFile')"
+                        :interaction="() => setDownloadFeatures()"
+                        :text="$t('additional:modules.tools.tacticalMark.saveFile')"
+                    />
                 </form>
             </div>
         </div>
@@ -746,11 +717,6 @@ export default {
     .btn-secondary {
         float: right;
         width: 206px;
-    }
-    button {
-        border-radius: 3px;
-        background-color: $secondary_table_style;
-        border: 1px solid $light_grey;
     }
     .button:hover {
         background-color: $white;

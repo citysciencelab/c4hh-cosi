@@ -6,8 +6,8 @@ import TacticalMarkComponent from "../../../components/TacticalMark.vue";
 import TacticalMark from "../../../store/indexTacticalMark";
 
 config.global.mocks.$t = key => key;
-describe("addons/tacticalMark/components/TacticalMark.vue", () => {
 
+describe("addons/tacticalMark/components/TacticalMark.vue", () => {
     const mockMapGetters = {
             map: () => sinon.stub()
         },
@@ -108,215 +108,222 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
 
     sinon.stub(TacticalMarkComponent, "created");
 
-    it("wrapper should exist", () => {
-        expect(wrapper.exists()).to.be.true;
-    });
-
-    it("renders TacticalMark", () => {
-        expect(wrapper.find("#tacticalMark").exists()).to.be.true;
-    });
-
-    it("Element should exists", () => {
-        wrapper = shallowMount(TacticalMarkComponent, {
-            global: {plugins: [store]},
-            data () {
-                return {
-                    mapElement: {
-                        style: {
-                            cursor: "",
-                            onmousedown: "",
-                            onmouseup: ""
-                        }
-                    }
-                };
-            },
-            computed: {
-                isLayerVisible: () => true,
-                hasTacticalFeatures: () => true,
-                hasVisibleFeatures: () => true
-            },
-            setCanvasCursor: sinon.stub(),
-            resetCanvasCursor: sinon.stub()
+    describe("Component DOM", () => {
+        it("wrapper should exist", () => {
+            expect(wrapper.exists()).to.be.true;
         });
 
-        expect(wrapper.find("#dmg").exists()).to.be.true;
-        expect(wrapper.find("#rsc").exists()).to.be.true;
-        expect(wrapper.find("#dma").exists()).to.be.true;
-    });
-
-
-    it("check if buttons, images and texts exists in dmg container", () => {
-        wrapper = shallowMount(TacticalMarkComponent, {
-            global: {plugins: [store]},
-            data () {
-                return {
-                    mapElement: {
-                        style: {
-                            cursor: "",
-                            onmousedown: "",
-                            onmouseup: ""
-                        }
-                    }
-                };
-            },
-            computed: {
-                isLayerVisible: () => true,
-                hasTacticalFeatures: () => true,
-                hasVisibleFeatures: () => true
-            },
-            setCanvasCursor: sinon.stub(),
-            resetCanvasCursor: sinon.stub()
+        it("renders TacticalMark", () => {
+            expect(wrapper.find("#tacticalMark").exists()).to.be.true;
         });
 
-        const elements = wrapper.findAll("#dmg .tm-container");
+        it("Element should exists", () => {
+            wrapper = shallowMount(TacticalMarkComponent, {
+                global: {plugins: [store]},
+                data () {
+                    return {
+                        mapElement: {
+                            style: {
+                                cursor: "",
+                                onmousedown: "",
+                                onmouseup: ""
+                            }
+                        }
+                    };
+                },
+                computed: {
+                    isLayerVisible: () => true,
+                    hasTacticalFeatures: () => true,
+                    hasVisibleFeatures: () => true
+                },
+                setCanvasCursor: sinon.stub(),
+                resetCanvasCursor: sinon.stub()
+            });
 
-        elements.forEach(tr => {
-            const tds = tr.findAll(".tm-item");
+            expect(wrapper.find("#dmg").exists()).to.be.true;
+            expect(wrapper.find("#rsc").exists()).to.be.true;
+            expect(wrapper.find("#dma").exists()).to.be.true;
+        });
 
-            tds.forEach(tts => {
-                const txt = tts.find(".tm-btn-txt"),
-                    img = tts.find("img");
+        it("check if buttons, images and texts exists in dmg container", () => {
+            wrapper = shallowMount(TacticalMarkComponent, {
+                global: {plugins: [store]},
+                data () {
+                    return {
+                        mapElement: {
+                            style: {
+                                cursor: "",
+                                onmousedown: "",
+                                onmouseup: ""
+                            }
+                        }
+                    };
+                },
+                computed: {
+                    isLayerVisible: () => true,
+                    hasTacticalFeatures: () => true,
+                    hasVisibleFeatures: () => true
+                },
+                setCanvasCursor: sinon.stub(),
+                resetCanvasCursor: sinon.stub()
+            });
 
-                expect(txt.exists()).to.be.true;
-                expect(img.exists()).to.be.true;
+            const elements = wrapper.findAll("#dmg .tm-container");
+
+            elements.forEach(tr => {
+                const tds = tr.findAll(".tm-item");
+
+                tds.forEach(tts => {
+                    const txt = tts.find(".tm-btn-txt"),
+                        img = tts.find("img");
+
+                    expect(txt.exists()).to.be.true;
+                    expect(img.exists()).to.be.true;
+                });
             });
         });
-    });
 
-    it("check if buttons, images and texta exists in rsc container", () => {
-        wrapper = shallowMount(TacticalMarkComponent, {
-            global: {plugins: [store]},
-            data () {
-                return {
-                    mapElement: {
-                        style: {
-                            cursor: "",
-                            onmousedown: "",
-                            onmouseup: ""
+        it("check if buttons, images and texta exists in rsc container", () => {
+            wrapper = shallowMount(TacticalMarkComponent, {
+                global: {plugins: [store]},
+                data () {
+                    return {
+                        mapElement: {
+                            style: {
+                                cursor: "",
+                                onmousedown: "",
+                                onmouseup: ""
+                            }
                         }
-                    }
-                };
-            },
-            computed: {
-                isLayerVisible: () => true,
-                hasTacticalFeatures: () => true,
-                hasVisibleFeatures: () => true
-            }
-        });
+                    };
+                },
+                computed: {
+                    isLayerVisible: () => true,
+                    hasTacticalFeatures: () => true,
+                    hasVisibleFeatures: () => true
+                }
+            });
 
-        const elements = wrapper.findAll("#rsc .tm-container");
+            const elements = wrapper.findAll("#rsc .tm-container");
 
-        elements.forEach(tr => {
-            const tds = tr.findAll(".tm-item");
+            elements.forEach(tr => {
+                const tds = tr.findAll(".tm-item");
 
-            tds.forEach(tts => {
-                const txt = tts.find(".tm-btn-txt"),
-                    img = tts.find("img");
+                tds.forEach(tts => {
+                    const txt = tts.find(".tm-btn-txt"),
+                        img = tts.find("img");
 
-                expect(txt.exists()).to.be.true;
-                expect(img.exists()).to.be.true;
+                    expect(txt.exists()).to.be.true;
+                    expect(img.exists()).to.be.true;
+                });
             });
         });
-    });
 
-    it("check if buttons, images and texta exists in dma container", () => {
-        wrapper = shallowMount(TacticalMarkComponent, {
-            global: {plugins: [store]},
-            data () {
-                return {
-                    mapElement: {
-                        style: {
-                            cursor: "",
-                            onmousedown: "",
-                            onmouseup: ""
+        it("check if buttons, images and texta exists in dma container", () => {
+            wrapper = shallowMount(TacticalMarkComponent, {
+                global: {plugins: [store]},
+                data () {
+                    return {
+                        mapElement: {
+                            style: {
+                                cursor: "",
+                                onmousedown: "",
+                                onmouseup: ""
+                            }
                         }
-                    }
-                };
-            },
-            computed: {
-                isLayerVisible: () => true,
-                hasTacticalFeatures: () => true,
-                hasVisibleFeatures: () => true
-            }
-        });
+                    };
+                },
+                computed: {
+                    isLayerVisible: () => true,
+                    hasTacticalFeatures: () => true,
+                    hasVisibleFeatures: () => true
+                }
+            });
 
-        const elements = wrapper.findAll("#dma .tm-container");
+            const elements = wrapper.findAll("#dma .tm-container");
 
-        elements.forEach(tr => {
-            const tds = tr.findAll(".tm-item");
+            elements.forEach(tr => {
+                const tds = tr.findAll(".tm-item");
 
-            tds.forEach(tts => {
-                const txt = tts.find(".tm-btn-txt"),
-                    img = tts.find("img");
+                tds.forEach(tts => {
+                    const txt = tts.find(".tm-btn-txt"),
+                        img = tts.find("img");
 
-                expect(txt.exists()).to.be.true;
-                expect(img.exists()).to.be.true;
+                    expect(txt.exists()).to.be.true;
+                    expect(img.exists()).to.be.true;
+                });
             });
         });
+
+        it("should render FlatButton component", () => {
+            expect(wrapper.findAllComponents({name: "FlatButton"}).length).to.be.equal(4);
+        });
     });
 
-    it("check getIconPath function", () => {
-        const iPath = wrapper.vm.getIconPath("Vorlage_Dammbalken.jpg");
+    describe("Methods", () => {
+        it("check getIconPath function", () => {
+            const iPath = wrapper.vm.getIconPath("Vorlage_Dammbalken.jpg");
 
-        expect(iPath).to.equal("https://geodienste.hamburg.de/lgv-config/img/Vorlage_Dammbalken.jpg");
-    });
-
-    it("check prepareFileName function with suffix", () => {
-        const res = wrapper.vm.prepareFileName("filename.kml");
-
-        expect(res).to.equal("filename.kml");
-    });
-
-    it("check prepareFileName function without suffix", () => {
-        const res = wrapper.vm.prepareFileName("filename");
-
-        expect(res).to.equal("filename.kml");
-    });
-
-    it("check download function if showDownload is false", () => {
-        wrapper.vm.showDownload = false;
-        wrapper.vm.download();
-
-        expect(wrapper.vm.showDownload).to.equal(true);
-    });
-
-    it("check download function if showDownload is true", () => {
-        wrapper.vm.showDownload = true;
-        wrapper.vm.download();
-
-        expect(wrapper.vm.showDownload).to.equal(false);
-    });
-
-    it("check enableDownloadBtn function with filename ", () => {
-        wrapper = shallowMount(TacticalMarkComponent, {
-            global: {plugins: [store]},
-            data () {
-                return {
-                    mapElement: {
-                        style: {
-                            cursor: "",
-                            onmousedown: "",
-                            onmouseup: ""
-                        }
-                    }
-                };
-            },
-            computed: {
-                isLayerVisible: () => true,
-                hasTacticalFeatures: () => true,
-                hasVisibleFeatures: () => true
-            }
+            expect(iPath).to.equal("https://geodienste.hamburg.de/lgv-config/img/Vorlage_Dammbalken.jpg");
         });
 
-        wrapper.vm.layer = {
-            layerSource: {
-                getFeatures: () => ({getFeatures})
-            }
-        };
+        it("check prepareFileName function with suffix", () => {
+            const res = wrapper.vm.prepareFileName("filename.kml");
 
-        wrapper.vm.filename = "test";
-        wrapper.vm.enableDownloadBtn();
+            expect(res).to.equal("filename.kml");
+        });
 
-        expect(wrapper.vm.disableFileDownload).to.equal(true);
+        it("check prepareFileName function without suffix", () => {
+            const res = wrapper.vm.prepareFileName("filename");
+
+            expect(res).to.equal("filename.kml");
+        });
+
+        it("check download function if showDownload is false", () => {
+            wrapper.vm.showDownload = false;
+            wrapper.vm.download();
+
+            expect(wrapper.vm.showDownload).to.equal(true);
+        });
+
+        it("check download function if showDownload is true", () => {
+            wrapper.vm.showDownload = true;
+            wrapper.vm.download();
+
+            expect(wrapper.vm.showDownload).to.equal(false);
+        });
+
+        it("check enableDownloadBtn function with filename ", () => {
+            wrapper = shallowMount(TacticalMarkComponent, {
+                global: {plugins: [store]},
+                data () {
+                    return {
+                        mapElement: {
+                            style: {
+                                cursor: "",
+                                onmousedown: "",
+                                onmouseup: ""
+                            }
+                        }
+                    };
+                },
+                computed: {
+                    isLayerVisible: () => true,
+                    hasTacticalFeatures: () => true,
+                    hasVisibleFeatures: () => true
+                }
+            });
+
+            wrapper.vm.layer = {
+                layerSource: {
+                    getFeatures: () => ({getFeatures})
+                }
+            };
+
+            wrapper.vm.filename = "test";
+            wrapper.vm.enableDownloadBtn();
+
+            expect(wrapper.vm.disableFileDownload).to.equal(true);
+        });
     });
 });
