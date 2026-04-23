@@ -307,7 +307,7 @@ Layer2dRasterWmsTimeLayer.prototype.getIncrementsFromResolution = function (reso
 
 /**
  * Gets additional layer params.
- * Note: The layer's visibility is initially turned off (and thus the loading of the tiles is disabled) because the TIME attribute is filled too late for layer processing due to asynchronous loading of getCapabilities.
+ * Note: The layer's visibility is initially turned off (and thus the loading of the tiles is disabled) because the dimension attribute is filled too late for layer processing due to asynchronous loading of getCapabilities.
  * @param {Object} attrs The attributes of the layer configuration.
  * @returns {Obeject} The layer params.
  */
@@ -316,9 +316,9 @@ Layer2dRasterWmsTimeLayer.prototype.getLayerParams = function (attrs) {
 };
 
 /**
- * Overrides the parent to block OL visibility until the correct TIME parameter has been
+ * Overrides the parent to block OL visibility until the correct dimension parameter has been
  * installed by prepareTimeSliderObject (i.e. GetCapabilities has resolved).
- * This prevents TileLoadErrors caused by tile requests with no or invalid—TIME value.
+ * This prevents TileLoadErrors caused by tile requests with no or invalid—dimension value.
  * @param {Object} attributes The new attributes.
  * @returns {void}
  */
@@ -330,12 +330,14 @@ Layer2dRasterWmsTimeLayer.prototype.updateLayerValues = function (attributes) {
 };
 
 /**
- * Gets raw level attributes from parent extended by an attribute TIME.
+ * Gets raw level attributes from parent extended by an dimension attribute (such as TIME).
  * @param {Object} attrs Params of the raw layer.
- * @returns {Object} The raw layer attributes with TIME.
+ * @returns {Object} The raw layer attributes with dimension.
  */
 Layer2dRasterWmsTimeLayer.prototype.getRawLayerAttributes = function (attrs) {
-    return Object.assign({TIME: this.prepareTime(attrs)}, WMSLayer.prototype.getRawLayerAttributes.call(this, attrs));
+    this.prepareTime(attrs);
+
+    return WMSLayer.prototype.getRawLayerAttributes.call(this, attrs);
 };
 
 /**
@@ -456,18 +458,21 @@ Layer2dRasterWmsTimeLayer.prototype.prepareTimeSliderObject = function (time, fi
         timeData = {
             defaultValue: defaultValue,
             defaultValueEnd: defaultValueEnd,
+            dimensionName: time.dimensionName.toUpperCase(),
             step: step,
             timeRange: filtereTimeRangeByRegex,
             staticDimensions: staticDimensionsWithDefaultValue,
             dualRangeSlider: time.dualRangeSlider || false
-        };
+        },
+        params = {};
 
     attrs.time = {...time, ...timeData};
     timeData.layerId = attrs.id;
     store.commit("Modules/WmsTime/addTimeSliderObject", {keyboardMovement: attrs.keyboardMovement, ...timeData});
+    params[timeData.dimensionName] = defaultValue;
 
     this._timeInitialized = true;
-    this.getLayerSource().updateParams({"TIME": defaultValue});
+    this.getLayerSource().updateParams(params);
     this.getLayer().setVisible(this.get("visibility") === true);
 
     return defaultValue;
@@ -556,17 +561,18 @@ Layer2dRasterWmsTimeLayer.prototype.setIsVisibleInMap = function (newValue) {
 /**
  * Updates the time parameter of the WMS-T if the id of the layer is correct.
  * @param {String} id Unique Id of the layer to update.
- * @param {String} newValue New TIME value of the WMS-T.
+ * @param {String} dimensionName The name of the dimension.
+ * @param {String} newValue New dimension value of the WMS-T.
  * @param {Object} [staticDimensions={}] The static dimensions.
  * @returns {void}
  */
-Layer2dRasterWmsTimeLayer.prototype.updateTime = function (id, newValue, newValueEnd = null, staticDimensions = {}) {
+Layer2dRasterWmsTimeLayer.prototype.updateTime = function (id, dimensionName, newValue, newValueEnd = null, staticDimensions = {}) {
     if (id === this.get("id")) {
-        const value = newValueEnd !== null ? newValue + "/" + newValueEnd : newValue,
-            dimensionParams = {
-                "TIME": value,
-                ...staticDimensions
-            };
+        const dimensionParams = {
+            ...staticDimensions
+        };
+
+        dimensionParams[dimensionName] = newValueEnd !== null ? newValue + "/" + newValueEnd : newValue;
 
         this.getLayerSource().updateParams(dimensionParams);
         this.getLayer().setVisible(true);

@@ -156,7 +156,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
         expect(rawAttributes.tilesize).to.be.equals(localAttributes.tilesize);
         expect(rawAttributes.transparent).to.be.equals("100");
         expect(rawAttributes.version).to.be.equals(localAttributes.version);
-        expect(rawAttributes.TIME).to.be.a("Promise");
+        expect(rawAttributes.TIME).to.be.undefined;
     });
 
     it("updateLayerValues: should update layer values and set always visibility to false", () => {
@@ -663,7 +663,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
         it("should return the configured default value for input time and trigger addTimeSliderObject action without static dimensions", () => {
             const time = {
                     default: "2003",
-                    dimensionName: "time",
+                    dimensionName: "elevation",
                     extentName: "time"
                 },
                 filteredTimeRange = ["2001", "2002", "2003", "2004", "2005"],
@@ -689,6 +689,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     keyboardMovement: undefined,
                     defaultValue: "2003",
                     defaultValueEnd: null,
+                    dimensionName: "ELEVATION",
                     dualRangeSlider: false,
                     step: {
                         year: "1"
@@ -728,6 +729,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     keyboardMovement: undefined,
                     defaultValue: "2005",
                     defaultValueEnd: null,
+                    dimensionName: "TIME",
                     dualRangeSlider: false,
                     step: {
                         year: "1"
@@ -781,6 +783,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     keyboardMovement: undefined,
                     defaultValue: "2005",
                     defaultValueEnd: null,
+                    dimensionName: "TIME",
                     dualRangeSlider: false,
                     step: {
                         year: "1"
@@ -824,6 +827,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     keyboardMovement: undefined,
                     defaultValue: "2005",
                     defaultValueEnd: null,
+                    dimensionName: "TIME",
                     dualRangeSlider: true,
                     step: {
                         year: "1"
@@ -865,6 +869,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     keyboardMovement: undefined,
                     defaultValue: "2002",
                     defaultValueEnd: "2004",
+                    dimensionName: "TIME",
                     dualRangeSlider: true,
                     step: {
                         year: "1"
@@ -906,6 +911,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     keyboardMovement: undefined,
                     defaultValue: "2002",
                     defaultValueEnd: null,
+                    dimensionName: "TIME",
                     dualRangeSlider: false,
                     step: {
                         year: "1"
@@ -1058,6 +1064,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
     describe("updateTime", () => {
         it("should update the params TIME and staticDimension in layerSource", () => {
             const id = "Icon-eu_reg00625_fd_gl_T_3",
+                dimensionName = "TIME",
                 newValue = "2026-01-12T11:00:00.000Z",
                 newValueEnd = null,
                 staticDimensions = {
@@ -1068,7 +1075,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                 updateParamsSpy = sinon.spy(wmsTimeLayer.getLayerSource(), "updateParams"),
                 setVisibleSpy = sinon.spy(wmsTimeLayer.getLayer(), "setVisible");
 
-            wmsTimeLayer.updateTime(id, newValue, newValueEnd, staticDimensions);
+            wmsTimeLayer.updateTime(id, dimensionName, newValue, newValueEnd, staticDimensions);
 
             expect(updateParamsSpy.calledOnce).to.be.true;
             expect(updateParamsSpy.firstCall.args[0]).to.deep.equals(
@@ -1084,17 +1091,18 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
 
         it("should update the params TIME without staticDimension in layerSource, if staticDimensions were not passed", () => {
             const id = "Icon-eu_reg00625_fd_gl_T_3",
+                dimensionName = "REFERENCE_TIME",
                 newValue = "2026-01-12T11:00:00.000Z",
                 wmsTimeLayer = new Layer2dRasterWmsTime({...attributes, id}),
                 updateParamsSpy = sinon.spy(wmsTimeLayer.getLayerSource(), "updateParams"),
                 setVisibleSpy = sinon.spy(wmsTimeLayer.getLayer(), "setVisible");
 
-            wmsTimeLayer.updateTime(id, newValue);
+            wmsTimeLayer.updateTime(id, dimensionName, newValue);
 
             expect(updateParamsSpy.calledOnce).to.be.true;
             expect(updateParamsSpy.firstCall.args[0]).to.deep.equals(
                 {
-                    TIME: "2026-01-12T11:00:00.000Z"
+                    REFERENCE_TIME: "2026-01-12T11:00:00.000Z"
                 }
             );
             expect(setVisibleSpy.calledOnce).to.be.true;
@@ -1103,13 +1111,14 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
 
         it("should update the params TIME without staticDimension in layerSource and with TIME end value", () => {
             const id = "Icon-eu_reg00625_fd_gl_T_3",
+                dimensionName = "TIME",
                 newValue = "2026-01-12T11:00:00.000Z",
                 newValueEnd = "2026-01-13T12:00:00.000Z",
                 wmsTimeLayer = new Layer2dRasterWmsTime({...attributes, id}),
                 updateParamsSpy = sinon.spy(wmsTimeLayer.getLayerSource(), "updateParams"),
                 setVisibleSpy = sinon.spy(wmsTimeLayer.getLayer(), "setVisible");
 
-            wmsTimeLayer.updateTime(id, newValue, newValueEnd);
+            wmsTimeLayer.updateTime(id, dimensionName, newValue, newValueEnd);
 
             expect(updateParamsSpy.calledOnce).to.be.true;
             expect(updateParamsSpy.firstCall.args[0]).to.deep.equals(

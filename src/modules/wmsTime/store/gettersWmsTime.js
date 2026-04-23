@@ -14,6 +14,9 @@ const getters = {
     defaultValueEnd (_, {currentTimeSliderObject}) {
         return currentTimeSliderObject.defaultValueEnd;
     },
+    defaultDimensionName (_, {currentTimeSliderObject}) {
+        return currentTimeSliderObject.dimensionName || "TIME";
+    },
     dualRangeSlider (_, {currentTimeSliderObject}) {
         return currentTimeSliderObject?.dualRangeSlider || false;
     },

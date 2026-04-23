@@ -76,8 +76,8 @@
     - buildExamples: corrected name and content of zip-files.
 - Issue \#1596: Documentation: Fixed broken link to config.js example file in config.js.md.
 - Issue \#1599: About: Fixed attempted to load CSW metadata even without a configured cswUrl.
-- GroupLayer: 
-    - Fixed grouped layers, using layerIDsToStyle, were not shown. 
+- GroupLayer:
+    - Fixed grouped layers, using layerIDsToStyle, were not shown.
     - Fixed bug if configuration contains only wrong layer IDs.
 - build: Fixed incorrect asset path for logo in production environment.
 - GFI: Avoid errors collecting data, if clicked coordinates are null.
@@ -91,8 +91,10 @@
 
 ### Fixed
 - Routing: Fixed bug where restricted areas (Sperrflächen) couldn't be selected.
-- WMS-Time: Fixed WMS-T layers being set to `visibility: false` when comparing time or moving in layer tree.
 - LayerSelection: Fixed breadcrumb being overlapped by layer entries.
+- WMS-Time:
+    - Fixed WMS-T layers being set to `visibility: false` when comparing time or moving in layer tree.
+    - The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 
 ---
 

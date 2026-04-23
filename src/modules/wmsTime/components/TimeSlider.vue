@@ -42,7 +42,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/WmsTime", ["defaultValue", "defaultValueEnd", "dualRangeSlider", "minWidth", "staticDimensions", "timeRange", "timeSlider"]),
+        ...mapGetters("Modules/WmsTime", ["defaultValue", "defaultValueEnd", "defaultDimensionName", "dualRangeSlider", "minWidth", "staticDimensions", "timeRange", "timeSlider"]),
         ...mapGetters("Modules/LayerSwiper", {
             layerSwiperActive: "active"
         }),
@@ -241,7 +241,7 @@ export default {
                 targetTimeEnd = this.dualRangeSlider ? this.timeRange[this.sliderValueEnd] : null;
 
             if (layer) {
-                layer.updateTime(this.layerId, targetTime, targetTimeEnd, this.staticDimensions);
+                layer.updateTime(this.layerId, this.defaultDimensionName, targetTime, targetTimeEnd, this.staticDimensions);
                 if (this.layerSwiperActive) {
                     this.updateMap();
                 }

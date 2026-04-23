@@ -12,11 +12,13 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
     let store,
         timeSliderActive,
         winWidth,
+        defaultDimension,
         dualRangeSlider,
         defaultValueEnd,
         timeRange;
 
     beforeEach(() => {
+        defaultDimension = "TIME";
         dualRangeSlider = false;
         timeRange = ["2020-01-01"];
         defaultValueEnd = null;
@@ -38,6 +40,7 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
                                 },
                                 defaultValue: () => sinon.stub(),
                                 defaultValueEnd: () => defaultValueEnd,
+                                defaultDimensionName: () => defaultDimension,
                                 dualRangeSlider: () => dualRangeSlider,
                                 timeSlider: () => {
                                     return {
@@ -241,9 +244,10 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
 
             expect(updateTimeSpy.called).to.be.true;
             expect(updateTimeSpy.firstCall.args[0]).to.equals("1");
-            expect(updateTimeSpy.firstCall.args[1]).to.equals("2020-01-01");
-            expect(updateTimeSpy.firstCall.args[2]).to.be.null;
-            expect(updateTimeSpy.firstCall.args[3]).to.deep.equals({
+            expect(updateTimeSpy.firstCall.args[1]).to.equals("TIME");
+            expect(updateTimeSpy.firstCall.args[2]).to.equals("2020-01-01");
+            expect(updateTimeSpy.firstCall.args[3]).to.be.null;
+            expect(updateTimeSpy.firstCall.args[4]).to.deep.equals({
                 elevation: true,
                 REFERENCE_TIME: true
             });
@@ -501,9 +505,10 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
 
             expect(updateTimeSpy.called).to.be.true;
             expect(updateTimeSpy.firstCall.args[0]).to.equals("1");
-            expect(updateTimeSpy.firstCall.args[1]).to.equals("2020-01-01");
-            expect(updateTimeSpy.firstCall.args[2]).to.be.null;
-            expect(updateTimeSpy.firstCall.args[3]).to.deep.equals({
+            expect(updateTimeSpy.firstCall.args[1]).to.equals("TIME");
+            expect(updateTimeSpy.firstCall.args[2]).to.equals("2020-01-01");
+            expect(updateTimeSpy.firstCall.args[3]).to.be.null;
+            expect(updateTimeSpy.firstCall.args[4]).to.deep.equals({
                 elevation: true,
                 REFERENCE_TIME: true
             });
@@ -524,9 +529,10 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
 
             expect(updateTimeSpy.called).to.be.true;
             expect(updateTimeSpy.firstCall.args[0]).to.equals("1");
-            expect(updateTimeSpy.firstCall.args[1]).to.equals("2020-01-01");
-            expect(updateTimeSpy.firstCall.args[2]).to.equals("2021-01-01");
-            expect(updateTimeSpy.firstCall.args[3]).to.deep.equals({
+            expect(updateTimeSpy.firstCall.args[1]).to.equals("TIME");
+            expect(updateTimeSpy.firstCall.args[2]).to.equals("2020-01-01");
+            expect(updateTimeSpy.firstCall.args[3]).to.equals("2021-01-01");
+            expect(updateTimeSpy.firstCall.args[4]).to.deep.equals({
                 elevation: true,
                 REFERENCE_TIME: true
             });
