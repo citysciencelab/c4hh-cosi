@@ -6,7 +6,7 @@ import state from "../../../store/stateStreetSmart.js";
 describe("addons/streetSmart/store/actionsStreetSmart", () => {
     const toggle3DCursorSpy = sinon.spy(),
         toggleAddressesVisibleSpy = sinon.spy();
-    let commit, dispatch, rootGetters, getters, rootState;
+    let commit, dispatch, rootGetters, getters, rootState, warn;
 
     beforeAll(() => {
         i18next.init({
@@ -16,6 +16,8 @@ describe("addons/streetSmart/store/actionsStreetSmart", () => {
     });
 
     beforeEach(() => {
+        warn = sinon.spy();
+        sinon.stub(console, "warn").callsFake(warn);
         mapCollection.clear();
         const map = {
             id: "ol",
@@ -143,6 +145,7 @@ describe("addons/streetSmart/store/actionsStreetSmart", () => {
             expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.args[0][0]).to.equal("Alerting/addSingleAlert");
             expect(commit.notCalled).to.be.true;
+            expect(warn.calledOnce).to.be.true;
         });
 
         it("initApi without service shall call dispatch once", async () => {
@@ -164,6 +167,7 @@ describe("addons/streetSmart/store/actionsStreetSmart", () => {
                 checked = true;
             });
             expect(checked).to.be.true;
+            expect(warn.calledOnce).to.be.true;
         });
     });
 
