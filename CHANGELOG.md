@@ -49,12 +49,10 @@
     - Fixed grouped layers, using layerIDsToStyle, were not shown.
     - Fixed bug if configuration contains only wrong layer IDs.
 - build: Fixed incorrect asset path for logo in production environment.
-- Routing: Fixed bug where restricted areas (Sperrflächen) couldn't be selected.
 - GFI: Avoid errors collecting data, if clicked coordinates are null.
 - URLParams:
     -  ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
     -  Links to other config files have been corrected in the `urlParameter` documentation.
-- WMS-Time: Fixed WMS-T layers being set to `visibility: false` when comparing time or moving in layer tree.
 
 ---
 
