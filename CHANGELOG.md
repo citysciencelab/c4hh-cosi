@@ -15,21 +15,6 @@
 ### Removed
 
 ### Fixed
-
----
-
-## 2026-04-01 v3.21.0
-### __Breaking Changes__
-
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
 - vcOblique: Fixed an issue with VC Map 6 where markers and images appeared at the initial map position instead of the current view when opening vcOblique after panning.
 
 ---
