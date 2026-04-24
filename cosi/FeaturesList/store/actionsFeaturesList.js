@@ -1,9 +1,11 @@
+import Cluster from "ol/source/Cluster";
 import {getContainingDistrictForFeature} from "../../utils/geomUtils";
 import getFeatureStyle from "../../utils/features/getFeatureStyle";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import getVectorlayerMapping, {createVectorLayerMappingObject} from "../utils/getVectorlayerMapping";
 import layerCollection from "@core/layers/js/layerCollection";
 import setGeomAttributes from "../../utils/features/setGeomAttributes";
+import {toRaw} from "vue";
 
 const actions = {
     /**
@@ -16,7 +18,7 @@ const actions = {
      */
     toggleFeatureDisabled ({dispatch, commit, rootGetters}, featureItem) {
         const layer = layerCollection.getLayerById(featureItem.layerId),
-            source = getLayerSource(layer.layer);
+            source = layer.layerSource.constructor === Cluster ? layer.layerSource.getSource() : layer.layerSource;
 
         // remove all highlightings to avoid undefined errors on the map
         dispatch("Maps/removeHighlightFeature", null, {root: true});
@@ -32,7 +34,7 @@ const actions = {
                     scenarioFeature.hideFeature();
                 }
                 else {
-                    source.removeFeature(featureItem.feature);
+                    source.removeFeature(toRaw(featureItem.feature));
                 }
 
                 commit("addDisabledFeatureItem", featureItem);
@@ -42,7 +44,7 @@ const actions = {
                     scenarioFeature.renderFeature();
                 }
                 else {
-                    source.addFeature(featureItem.feature);
+                    source.addFeature(toRaw(featureItem.feature));
                 }
                 commit("removeDisabledFeatureItem", featureItem);
             }
@@ -140,7 +142,11 @@ const actions = {
             let selectedDistricts = selectedDistrictLevel.districts.filter(dist => dist.isSelected === true);
 
             if (disabledFeatures.length > 0) {
-                commit("appendFeaturesListItems", ...disabledFeatures);
+                disabledFeatures.forEach(feature => {
+                    if (state.featuresListItems.find(item => item.getId() !== feature.getId())) {
+                        commit("appendFeaturesListItems", feature);
+                    }
+                });
             }
             if (selectedDistricts.length === 0) {
                 selectedDistricts = selectedDistrictLevel.districts;

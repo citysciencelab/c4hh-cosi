@@ -25,7 +25,9 @@ import Feature from "ol/Feature";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {VApp} from "vuetify/components/VApp";
 import {VDataTable} from "vuetify/components/VDataTable";
+import {VDivider} from "vuetify/components/VDivider";
 import {VChip} from "vuetify/components/VChip";
+import {VIcon} from "vuetify/components/VIcon";
 
 export default {
     name: "FeaturesList",
@@ -37,7 +39,9 @@ export default {
         FeaturesListToolbar,
         VApp,
         VChip,
-        VDataTable
+        VDivider,
+        VDataTable,
+        VIcon
     },
     data () {
         return {
