@@ -97,7 +97,7 @@ export default {
     created () {
         this.steps.forEach((step) => {
             this.loadStoryContents(step.htmlFile).then(data => {
-                step.loadedContent = data;
+                step.loadedContent = data?.replace(/<a(?![^>]*\btarget=)([^>]*)>/gi, "<a$1 target=\"_blank\">");
             }).catch(err => {
                 console.error(err);
             });
