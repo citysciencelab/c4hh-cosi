@@ -53,6 +53,7 @@
 ### Fixed
 - Routing: Fixed bug where restricted areas (Sperrflächen) couldn't be selected.
 - WMS-Time: Fixed WMS-T layers being set to `visibility: false` when comparing time or moving in layer tree.
+- LayerSelection: Fixed breadcrumb being overlapped by layer entries.
 
 ---
 

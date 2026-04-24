@@ -382,7 +382,7 @@ export default {
                     <nav
                         v-if="lastFolderNames.length > 1"
                         aria-label="breadcrumb"
-                        class="position-sticky top-0 bg-white py-3"
+                        class="nav-breadcrumb position-sticky top-0 bg-white py-3"
                     >
                         <ol
                             class="breadcrumb mb-0"
@@ -454,7 +454,9 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
+.nav-breadcrumb{
+    z-index: 1;
+}
 
 .breadcrumb-item + .breadcrumb-item::before{
     font-weight: bold;
