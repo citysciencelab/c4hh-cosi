@@ -51,7 +51,7 @@ let portalEntries = glob.sync(`${portalFolderName}/**/index.html`, {cwd: rootPat
 
 if (examplesOnly) {
     portalEntries = portalEntries.filter(([name]) => name === "portal-basic");
-    examplesZipName = mastercodeVersionFolderName.indexOf("git_last_commit_at") === 1 ? `examples-${mastercodeVersionFolderName.replaceAll("_", ".")}.zip` : `examples-${mastercodeVersionFolderName}.zip`;
+    examplesZipName = mastercodeVersionFolderName.indexOf("git_last_commit_at") === -1 ? `examples-${mastercodeVersionFolderName.replaceAll("_", ".")}.zip` : `examples-${mastercodeVersionFolderName}.zip`;
 }
 if (fs.existsSync("./devtools/proxyconf.json")) {
     proxyConfig = JSON.parse(fs.readFileSync("./devtools/proxyconf.json", "utf-8"));
