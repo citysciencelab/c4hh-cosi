@@ -37,8 +37,9 @@
 - Issue \#1593: Min/MaxScale: Fixed a bug where layers were not correctly grayed out or stayed active when the scale was outside the defined range.
     - build: corrected path to mastercode folder in index.html.
     - buildExamples: corrected name and content of zip-files.
-- GroupLayer:
-    - Fixed grouped layers, using layerIDsToStyle, were not shown.
+- Issue \#1596: Documentation: Fixed broken link to config.js example file in config.js.md.
+- GroupLayer: 
+    - Fixed grouped layers, using layerIDsToStyle, were not shown. 
     - Fixed bug if configuration contains only wrong layer IDs.
 - build: Fixed incorrect asset path for logo in production environment.
 - GFI: Avoid errors collecting data, if clicked coordinates are null.
