@@ -81,7 +81,7 @@ export default {
             }
         })
             .then(res => {
-                this.iconSettings = res.data;
+                this.iconSettings = res?.data;
 
             })
             .catch(error => {

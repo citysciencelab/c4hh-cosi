@@ -24,7 +24,7 @@ export default {
     },
     data () {
         return {
-            result: {},
+            result: [],
             selectedOption: "draw",
             options: {
                 "draw": "Polygon zeichnen",
@@ -242,7 +242,7 @@ export default {
             }
             this.removeInteractions();
             this.selectedOption = "draw";
-            this.result = {};
+            this.result = [];
         },
 
         /**
@@ -283,7 +283,7 @@ export default {
          * @returns {void}
          */
         toggleInteraction (newValue, oldValue) {
-            this.result = {};
+            this.result = [];
             if (newValue === "click") {
                 this.deactivateInteraction(oldValue);
             }

@@ -52,7 +52,7 @@ describe("addons/geoAnalyze/components/GeoAnalyzeResultBuilding.vue", () => {
         spyDestroy,
         wrapper;
 
-    before(() => {
+    beforeAll(() => {
         spy = sinon.spy(GeoAnalyzeResultGeometry.methods, "markAndZoomToBuilding");
         spyDestroy = sinon.spy(GeoAnalyzeResultGeometry.methods, "removePolygonMarker");
         wrapper = shallowMount(GeoAnalyzeResultGeometry, {

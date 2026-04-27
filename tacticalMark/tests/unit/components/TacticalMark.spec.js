@@ -1,3 +1,4 @@
+import axios from "axios";
 import {config, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
@@ -57,6 +58,9 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
     });
 
     beforeEach(() => {
+        sinon.stub(axios, "get").resolves({
+            data: {icon: "test"}
+        });
         store = createStore({
             namespaced: true,
             modules: {
@@ -106,6 +110,10 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
     });
 
+    beforeEach(() => {
+        sinon.restore();
+    });
+
     sinon.stub(TacticalMarkComponent, "created");
 
     describe("Component DOM", () => {
@@ -118,6 +126,9 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
 
         it("Element should exists", () => {
+            sinon.stub(axios, "get").resolves({
+                data: {icon: "test"}
+            });
             wrapper = shallowMount(TacticalMarkComponent, {
                 global: {plugins: [store]},
                 data () {
@@ -146,6 +157,9 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
 
         it("check if buttons, images and texts exists in dmg container", () => {
+            sinon.stub(axios, "get").resolves({
+                data: {icon: "test"}
+            });
             wrapper = shallowMount(TacticalMarkComponent, {
                 global: {plugins: [store]},
                 data () {
@@ -184,6 +198,9 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
 
         it("check if buttons, images and texta exists in rsc container", () => {
+            sinon.stub(axios, "get").resolves({
+                data: {icon: "test"}
+            });
             wrapper = shallowMount(TacticalMarkComponent, {
                 global: {plugins: [store]},
                 data () {
@@ -220,6 +237,9 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
 
         it("check if buttons, images and texta exists in dma container", () => {
+            sinon.stub(axios, "get").resolves({
+                data: {icon: "test"}
+            });
             wrapper = shallowMount(TacticalMarkComponent, {
                 global: {plugins: [store]},
                 data () {
@@ -294,6 +314,9 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
 
         it("check enableDownloadBtn function with filename ", () => {
+            sinon.stub(axios, "get").resolves({
+                data: {icon: "test"}
+            });
             wrapper = shallowMount(TacticalMarkComponent, {
                 global: {plugins: [store]},
                 data () {
