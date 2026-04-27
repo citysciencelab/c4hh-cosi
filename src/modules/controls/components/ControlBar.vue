@@ -215,9 +215,12 @@ export default {
     @include media-breakpoint-down(sm) {
         .btn-group-controls {
             display: block;
-            bottom: 10rem;
+            bottom: 5rem;
             top: unset;
             right: 2rem;
+        }
+        .masterportal-container:has(.toggle-button-secondaryMenu) .controls-element .btn-group-controls {
+            bottom: 10rem;
         }
     }
 

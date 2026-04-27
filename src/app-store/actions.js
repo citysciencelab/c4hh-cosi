@@ -77,11 +77,15 @@ export default {
      * @returns {void}
      */
     moveStartModuleControls ({getters, state}, side) {
+        if (!state.portalConfig[side]) {
+            return;
+        }
+
         if (getters.controlsConfig?.startModule) {
             const modules = [].concat(getters.controlsConfig.startModule[side]);
 
             modules.forEach(module => {
-                if (module && !state.portalConfig[side].sections[0].find(conf => conf.type === module.type)) {
+                if (module && !state.portalConfig[side]?.sections[0].find(conf => conf.type === module.type)) {
                     state.portalConfig[side].sections[0].push(module);
                 }
             });

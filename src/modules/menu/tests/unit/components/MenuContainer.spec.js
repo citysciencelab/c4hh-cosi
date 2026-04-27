@@ -412,15 +412,18 @@ describe("src/modules/menu/MenuContainer.vue", () => {
                 }
             });
         }
-        it("should NOT render secondaryMenu if disabled", () => {
+        it("should render secondaryMenu but hide it when disabled", () => {
             store = createSecondaryMenuEnabledStore(false);
 
             wrapper = shallowMount(MenuContainer, {
                 global: {plugins: [store]},
-                propsData: {side: "secondaryMenu"}
+                props: {side: "secondaryMenu"}
             });
 
-            expect(wrapper.find("#mp-menu-secondaryMenu").exists()).to.be.false;
+            const menu = wrapper.find("#mp-menu-secondaryMenu");
+
+            expect(menu.exists()).to.be.true;
+            expect(menu.classes()).to.include("hidden");
         });
 
         it("should render secondaryMenu if enabled", () => {

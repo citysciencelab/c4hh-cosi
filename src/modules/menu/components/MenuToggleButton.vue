@@ -101,12 +101,16 @@ export default {
 
 @include media-breakpoint-down(sm) {
     .toggle-button-mainMenu {
-        bottom: 8rem;
+        bottom: 3rem;
         top: unset;
     }
     .toggle-button-secondaryMenu {
         bottom: 3rem;
         top: unset;
+    }
+
+    .masterportal-container:has(.toggle-button-secondaryMenu) .toggle-button-mainMenu {
+        bottom: 8rem;
     }
 }
 @include media-breakpoint-up(sm) {

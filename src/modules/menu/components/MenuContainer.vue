@@ -177,14 +177,14 @@ export default {
 
 <template>
     <div
-        v-if="side === 'mainMenu' || secondaryMenuEnabled"
         :id="'mp-menu-' + side"
         class="mp-menu shadow d-flex"
         :class="[
             'mp-' + side,
             {
                 'mp-menu-table': uiStyle === 'TABLE',
-                'mp-secondaryMenu-expanded': secondaryExpanded && side === 'secondaryMenu'
+                'mp-secondaryMenu-expanded': secondaryExpanded && side === 'secondaryMenu',
+                hidden: !secondaryMenuEnabled && side === 'secondaryMenu'
             }
         ]"
         tabindex="-1"
@@ -251,7 +251,11 @@ export default {
     background-color: $menu-background-color;
     transition: width 0.3s ease;
     z-index: 4;
-    flex-direction: column
+    flex-direction: column;
+
+    &.hidden {
+        display: none;
+    }
 }
 
 .mp-mainMenu {
