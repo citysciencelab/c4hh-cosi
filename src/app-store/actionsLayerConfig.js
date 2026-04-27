@@ -104,7 +104,7 @@ export default function getActionsLayerConfig () {
                     layerCollection.getLayerById(id)?.visibilityChanged(replacement.visibility);
                 }
 
-                if (getters["Maps/mode"] === "2D" && !config.layer.is3DLayer || getters["Maps/mode"] === "3D") {
+                if (!trigger && (getters["Maps/mode"] === "2D" && !config.layer.is3DLayer || getters["Maps/mode"] === "3D")) {
                     dispatch("showLayerAttributions", config.layer);
                 }
             });

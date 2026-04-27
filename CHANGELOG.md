@@ -34,6 +34,7 @@
 - Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
 - Issue \#1576: BackForward control was not working inside expandable controls until opened.
 - Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
+- Issue \#1584: LayerConfig: Fixed issue where layer attribution was shown multiple times after reordering layers.
 - Issue \#1590: Vite
 - Issue \#1593: Min/MaxScale: Fixed a bug where layers were not correctly grayed out or stayed active when the scale was outside the defined range.
     - build: corrected path to mastercode folder in index.html.

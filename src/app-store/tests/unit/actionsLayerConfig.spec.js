@@ -681,7 +681,7 @@ describe("src/app-store/actionsLayerConfig.js", () => {
 
                 state.layerConfig = layerConfig;
 
-                getActionsLayerConfig().replaceByIdInLayerConfig({dispatch, getters, state}, {layerConfigs: [{layer: toReplace, id: "453"}]});
+                getActionsLayerConfig().replaceByIdInLayerConfig({dispatch, getters, state}, {layerConfigs: [{layer: toReplace, id: "453"}], trigger: false});
 
                 expect(state.layerConfig[treeBaselayersKey].elements).to.be.an("array");
                 expect(state.layerConfig[treeBaselayersKey].elements.length).to.be.equals(2);
@@ -726,7 +726,7 @@ describe("src/app-store/actionsLayerConfig.js", () => {
 
                 state.layerConfig = layerConfig;
 
-                getActionsLayerConfig().replaceByIdInLayerConfig({dispatch, getters, state}, {layerConfigs: [{layer: toReplace, id: "453"}]});
+                getActionsLayerConfig().replaceByIdInLayerConfig({dispatch, getters, state}, {layerConfigs: [{layer: toReplace, id: "453"}], trigger: false});
 
                 expect(state.layerConfig[treeBaselayersKey].elements).to.be.an("array");
                 expect(state.layerConfig[treeBaselayersKey].elements.length).to.be.equals(2);
@@ -774,6 +774,37 @@ describe("src/app-store/actionsLayerConfig.js", () => {
                 getActionsLayerConfig().replaceByIdInLayerConfig({dispatch, getters, state}, {layerConfigs: [{layer: toReplace, id: "unknown"}]});
                 expect(state).to.be.deep.equals(stateCopy);
                 expect(determineZIndexSpy.calledOnce).to.be.true;
+            });
+
+            it("replaceByIdInLayerConfig with trigger:true (e.g. drag-and-drop reorder) does NOT re-show layerAttributions for already-visible layers", () => {
+                const layer1 = {
+                        id: "453",
+                        visibility: true,
+                        layerAttribution: "<span>Some attribution</span>"
+                    },
+                    layer2 = {
+                        id: "1132",
+                        visibility: true,
+                        layerAttribution: "<span>Other attribution</span>"
+                    };
+
+                getters = {
+                    layerConfigById: (id) => ({id, visibility: true, layerAttribution: "<span>Some attribution</span>"}),
+                    determineZIndex: sinon.spy(),
+                    "Maps/mode": "2D"
+                };
+
+                state.layerConfig = layerConfig;
+
+                getActionsLayerConfig().replaceByIdInLayerConfig({dispatch, getters, state}, {
+                    layerConfigs: [
+                        {layer: layer1, id: "453"},
+                        {layer: layer2, id: "1132"}
+                    ],
+                    trigger: true
+                });
+
+                expect(dispatch.called).to.be.false;
             });
 
             it("replaceByIdInLayerConfig toReplace-layer is undefined", () => {
