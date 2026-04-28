@@ -40,6 +40,7 @@
     - build: corrected path to mastercode folder in index.html.
     - buildExamples: corrected name and content of zip-files.
 - Issue \#1596: Documentation: Fixed broken link to config.js example file in config.js.md.
+- Issue \#1599: About: Fixed attempted to load CSW metadata even without a configured cswUrl.
 - GroupLayer: 
     - Fixed grouped layers, using layerIDsToStyle, were not shown. 
     - Fixed bug if configuration contains only wrong layer IDs.

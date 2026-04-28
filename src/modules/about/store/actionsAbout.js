@@ -18,24 +18,34 @@ export default {
     async initializeAboutInfo ({commit, dispatch, state, rootGetters}) {
         let metadata;
 
-        if (state.cswUrl !== null && state.cswUrl !== "" && typeof state.metaId !== "undefined") {
-            metadata = await getCswRecordById.getRecordById(state.cswUrl, state.metaId);
+        if (state.cswUrl && state.metaId) {
+            try {
+                metadata = await getCswRecordById.getRecordById(state.cswUrl, state.metaId);
+            }
+            catch (e) {
+                console.warn("CSW request failed:", e);
+            }
         }
         // use default csw_url from rest-services.json if csw_url not stated in the specific service
-        else if (Config.cswId !== null && typeof Config.cswId !== "undefined") {
+        else if (Config.cswId && typeof state.metaId !== "undefined") {
             const service = rootGetters.restServiceById(Config.cswId);
             let metaURL = "";
 
             commit("setCustomText", null);
-            if (service === undefined) {
+            if (!service) {
                 console.warn("Rest Service with the ID " + Config.cswId + " is not configured in rest-services.json!");
             }
             else {
                 metaURL = service.url;
             }
 
-            if (metaURL !== "" && typeof state.metaId !== "undefined") {
-                metadata = await getCswRecordById.getRecordById(metaURL, state.metaId);
+            if (metaURL && state.metaId) {
+                try {
+                    metadata = await getCswRecordById.getRecordById(metaURL, state.metaId);
+                }
+                catch (e) {
+                    console.warn("CSW fallback request failed:", e);
+                }
             }
         }
 
