@@ -73,11 +73,12 @@ export default {
      * @param {Object} context the vuex context
      * @param {Object} context.commit the commit
      * @param {Object} context.state the state
+     * @param {Object} context.getters the getters
      * @param {Object} context.dispatch the dispatch
      * @param {String} id Id of the Layer that should be toggled.
      * @returns {void}
      */
-    async toggleSwiper ({commit, state, dispatch, rootGetters}, id) {
+    async toggleSwiper ({commit, state, getters, dispatch, rootGetters}, id) {
         commit("Modules/LayerSwiper/setActive", !rootGetters["Modules/LayerSwiper/active"], {root: true});
 
         const secondId = id.endsWith(state.layerAppendix) ? id : id + state.layerAppendix,
@@ -134,11 +135,11 @@ export default {
 
             // If the button of the "original" window is clicked, it is assumed, that the time value selected in the added window is desired to be further displayed.
             if (!id.endsWith(state.layerAppendix)) {
-                const {TIME} = layer.getLayerSource().params_,
+                const dimensionValue = layer.getLayerSource().getParams()[getters.defaultDimensionName],
                     {transparency} = layer.attributes,
                     origLayer = layerCollection.getLayerById(id);
 
-                origLayer.updateTime(id, TIME);
+                origLayer.updateTime(id, getters.defaultDimensionName, dimensionValue);
 
                 dispatch("replaceByIdInLayerConfig", {
                     layerConfigs: [{
@@ -149,7 +150,7 @@ export default {
                         }
                     }]
                 }, {root: true});
-                commit("setTimeSliderDefaultValue", TIME);
+                commit("setTimeSliderDefaultValue", dimensionValue);
             }
             dispatch("replaceByIdInLayerConfig", {
                 layerConfigs: [{
