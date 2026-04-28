@@ -13,7 +13,7 @@ import {Fill, Stroke, Style} from "ol/style.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
 import getFeature from "@shared/js/api/wfs/getFeature.js";
-import {getLayerById} from "../utils/getLayerById.js";
+import {getLayerById} from "../../utils/layer/getLayerById.js";
 import {getLimitedDistictName} from "../utils/districts.js";
 import getMappingJson from "../../utils/getMappingJson.js";
 import {getTotal} from "../../Dashboard/utils/operations";
@@ -264,7 +264,11 @@ export default {
          * @returns {void}
          */
         addSubjectAreaToLayer (feature) {
-            const layer = getLayerById("subject-area");
+            const layer = getLayerById("subject-area", {
+                "fill-color": "rgba(235, 138, 62, 0)",
+                "stroke-color": "#EB8A3E",
+                "stroke-width": 3
+            });
 
             layer.getLayerSource().addFeature(feature);
             layer.getLayer().setVisible(true);
@@ -295,7 +299,11 @@ export default {
          * @returns {void}
          */
         clearSubjectAreaFromLayer () {
-            const layer = getLayerById("subject-area");
+            const layer = getLayerById("subject-area", {
+                "fill-color": "rgba(235, 138, 62, 0)",
+                "stroke-color": "#EB8A3E",
+                "stroke-width": 3
+            });
 
             layer.getLayerSource().clear();
             layer.getLayer().setVisible(false);

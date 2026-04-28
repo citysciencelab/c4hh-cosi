@@ -1,8 +1,13 @@
 <script>
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import Badges from "../../shared/modules/badges/components/Badges.vue";
+import {Circle, Fill, Stroke, Style} from "ol/style.js";
 import dayjs from "dayjs";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {getLayerById} from "../../utils/layer/getLayerById.js";
+import {mapActions} from "vuex";
+import {pointerMove} from "ol/events/condition";
+import {Select} from "ol/interaction";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import {VExpansionPanels, VExpansionPanel, VExpansionPanelTitle, VExpansionPanelText} from "vuetify/components/VExpansionPanel";
 
@@ -31,8 +36,6 @@ export default {
     emits: ["back"],
     data () {
         return {
-            isProjectExpanded: false,
-            selectedCategories: this.project.categories,
             colors: [
                 "#005D00",
                 "#075798",
@@ -47,19 +50,12 @@ export default {
                 "#D55E00",
                 "#512DA8"
             ],
-            openedPanel: undefined
+            isProjectExpanded: false,
+            openedPanel: undefined,
+            selectedCategories: this.project.categories
         };
     },
     computed: {
-        /**
-         * Filters the project contributions based on the selected categories.
-         * @returns {Object[]} An array of filtered contribution property objects.
-         */
-        contributions () {
-            const contributions = this.items.map(feature => feature.getProperties());
-
-            return contributions.filter(k => this.selectedCategories.includes(k.category));
-        },
         /**
          * Generates a mapping of project categories to specific colors.
          * @returns {Object} the mapped category colours.
@@ -82,33 +78,130 @@ export default {
                 selected: this.selectedCategories.includes(cat),
                 color: this.categoryColors[cat]
             }));
+        },
+        /**
+         * Filters the project contributions based on the selected categories.
+         * @returns {Object[]} An array of filtered contribution property objects.
+         */
+        contributions () {
+            const contributions = this.items.map(feature => {
+                feature.set("isSelected", false);
+                return feature.getProperties();
+            });
+
+            return contributions.filter(k => this.selectedCategories.includes(k.category));
         }
+    },
+    watch: {
+        openedPanel () {
+            const extent = this.items[this.openedPanel]?.getGeometry().getExtent();
+
+            if (extent) {
+                this.zoomToExtent({extent: extent, options: {padding: [10, 10, 10, 10]}});
+                this.updateHoverFeatureCollection(this.items[this.openedPanel], true);
+            }
+        }
+    },
+    created () {
+        this.selectedCategories = this.project.categories;
+        this.createSelectInteraction();
+        this.createHoverInteraction();
+        this.contributionsLayer = getLayerById("dipas-contributions").getLayer();
     },
     mounted () {
-        const element = document.getElementById("contributions");
-
-        if (element) {
-            element.scrollIntoView({behavior: "instant"});
-        }
+        this.scrollToContributionPanel("contributions");
+        this.contributionsLayer.setStyle(this.getContributionColorByCategory);
+        this.addFeaturesToLayer(this.items, this.contributionsLayer);
+        this.select.setActive(true);
+    },
+    unmounted () {
+        this.select.setActive(false);
+        this.hover.setActive(false);
+        this.contributionsLayer.getSource().clear();
     },
     methods: {
+        ...mapActions("Maps", ["zoomToExtent", "addInteraction"]),
+
         /**
-         * Updates the list of selected categories based on the provided tags.
-         * @param {Object[]} tag the selected tags.
+         * Adds multiple features to a specified layer and makes the layer visible.
+         * @param {ol/Feature[]} features - The features to be added to the layer.
+         * @param {ol/layer/Vector} layer - The layer to which the features should be added.
          * @returns {void}
          */
-        updateCategory (tag) {
-            this.selectedCategories = tag.map(v => v.label);
-            this.openedPanel = undefined;
+        addFeaturesToLayer (features, layer) {
+            if (layer) {
+                const source = layer.getSource();
+
+                source.clear();
+                source.addFeatures(features);
+                layer.setVisible(true);
+            }
         },
+
+        createHoverInteraction () {
+            this.hover = new Select({
+                condition: (evt) => pointerMove(evt),
+                filter: (feature, layer) => {
+                    return layer.get("id") === "dipas-contributions";
+                },
+                style: (feature) => this.getContributionStyle(feature.get("category"), true)
+            });
+            this.hover.set("id", "dipas-contributions-hover");
+            this.hover.getFeatures().on("add", this.setFeatureIsSelected);
+            this.hover.getFeatures().on("remove", this.setFeatureIsSelected);
+            this.addInteraction(this.hover);
+        },
+
+        createSelectInteraction () {
+            this.select = new Select({
+                filter: (feature, layer) => {
+                    return layer.get("id") === "dipas-contributions";
+                },
+                style: (feature) => this.getContributionStyle(feature.get("category"), true)
+            });
+            this.select.set("id", "dipas-contributions-select");
+            this.select.on("select", this.handleMapSelect);
+            this.select.getFeatures().on("add", this.setFeatureIsSelected);
+            this.select.getFeatures().on("remove", this.setFeatureIsSelected);
+            this.addInteraction(this.select);
+        },
+
+
         /**
-         * Updates the list of selected categories based on the provided tags.
-         * @param {String} category the name of the category.
-         * @returns {String} The color from the category mapping.
+         * Generates a style for a contribution feature based on its category and whether it is highlighted.
+         * @param {String} category - The category of the contribution, used to determine the fill color.
+         * @param {Boolean} isHighlighted - A flag indicating whether the contribution is highlighted, affecting the radius and stroke of the style.
+         * @returns {ol/style/Style} The generated style for the contribution feature.
          */
-        getCategoryColor (category) {
-            return this.categoryColors[category];
+        getContributionStyle (category, isHighlighted = false) {
+            const colorByCategory = this.categoryColors[category];
+
+            return new Style({
+                image: new Circle({
+                    radius: isHighlighted ? 10 : 5,
+                    fill: new Fill({color: colorByCategory}),
+                    stroke: new Stroke({
+                        color: isHighlighted ? "#fff" : colorByCategory,
+                        width: isHighlighted ? 1.5 : 1
+                    })
+                })
+            });
         },
+
+        /**
+         * Returns the style for a contribution feature based on its category if that category is selected.
+         * @param {ol/Feature} feature - The contribution feature whose category is used to determine the style.
+         * @returns {ol/style/Style|null} The style for the contribution feature, or null if its category is not selected.
+         */
+        getContributionColorByCategory (feature) {
+            const category = feature.get("category");
+
+            if (!this.selectedCategories.includes(category)) {
+                return null;
+            }
+            return this.getContributionStyle(category, feature.get("isSelected"));
+        },
+
         /**
          * Formats a given date string into a localized date format.
          * @param {String} date the given date.
@@ -117,6 +210,7 @@ export default {
         getDate (date) {
             return dayjs(date).format("DD.MM.YYYY");
         },
+
         /**
          * Opens a given URL in a new browser tab.
          * @param {String} url - the web address to be opened.
@@ -125,6 +219,86 @@ export default {
         handleLinkClick (url) {
             if (url) {
                 window.open(url, "_blank", "noopener,noreferrer");
+            }
+        },
+
+        /**
+         * Handles the selection of a feature on the map and updates the opened panel accordingly.
+         * @param {ol/interaction/SelectEvent} evt - The event triggered by selecting a feature on the map.
+         * @returns {void}
+         */
+        handleMapSelect (evt) {
+            const selectedFeature = evt.selected?.[0];
+
+            if (!selectedFeature) {
+                return;
+            }
+
+            const id = selectedFeature.get("id"),
+                index = this.items.findIndex(item => item.get("id") === id);
+
+            this.openedPanel = index;
+            this.scrollToContributionPanel(`contribution-panel-${id}`);
+        },
+
+        /**
+         * Scrolls the view to a specific contribution panel based on its ID.
+         * @param {String} id - The ID of the contribution panel to scroll to.
+         * @returns {void}
+         */
+        scrollToContributionPanel (id) {
+            this.$nextTick(() => {
+                const element = document.getElementById(id);
+
+                if (element) {
+                    element.scrollIntoView({behavior: "instant"});
+                }
+            });
+        },
+
+        /**
+         * Sets the isSelected attribute of a feature
+         * @param {ol/CollectionEvent} evt - Openlayers collection event object.
+         */
+        setFeatureIsSelected (evt) {
+            if (evt.type === "add") {
+                evt.element.set("isSelected", true);
+            }
+            else {
+                evt.element.set("isSelected", false);
+            }
+        },
+
+        /**
+         * Updates the list of selected categories based on the provided tags.
+         * @param {Object[]} tag the selected tags.
+         * @returns {void}
+         */
+        updateCategory (tag) {
+            this.selectedCategories = tag.map(v => v.label);
+            this.openedPanel = undefined;
+            this.contributionsLayer.getSource().changed();
+        },
+
+        /**
+         * Updates the style of a contribution feature on the map.
+         * @param {Object} item - The contribution item used to identify the feature and its category.
+         * @param {Boolean} isSelected - Indicates whether the highlighted style should be applied.
+         * @returns {void}
+         */
+        updateHoverFeatureCollection (item, isSelected = false) {
+            const features = this.contributionsLayer.getSource().getFeatures(),
+                foundFeature = features.find(feature => feature.get("id") === item.id);
+
+            if (!foundFeature) {
+                return;
+            }
+
+            if (isSelected) {
+                this.hover.getFeatures().push(foundFeature);
+            }
+            else {
+                this.hover.getFeatures().remove(foundFeature);
             }
         }
     }
@@ -192,7 +366,12 @@ export default {
             >
                 <v-expansion-panel
                     v-for="i in contributions"
+                    :id="`contribution-panel-${i.id}`"
                     :key="i.id"
+                    @mouseover="updateHoverFeatureCollection(i, true)"
+                    @focus="updateHoverFeatureCollection(i, true)"
+                    @mouseleave="updateHoverFeatureCollection(i, false)"
+                    @blur="updateHoverFeatureCollection(i, false)"
                 >
                     <v-expansion-panel-title>
                         <hr>
@@ -200,7 +379,7 @@ export default {
                             <div class="d-flex align-center text-start">
                                 <i
                                     class="bi bi-circle-fill me-3 category-icon"
-                                    :style="{ color: getCategoryColor(i.category) }"
+                                    :style="{ color: categoryColors[i.category] }"
                                 />
 
                                 <div class="d-flex flex-column">
@@ -217,7 +396,7 @@ export default {
                                     class="mb-2 mt-1"
                                     :color="'#FFFFFF'"
                                     :text="i.category"
-                                    :background-color="getCategoryColor(i.category)"
+                                    :background-color="categoryColors[i.category]"
                                 />
                             </div>
                         </div>

@@ -6,9 +6,10 @@ import layerFactory from "@core/layers/js/layerFactory";
  * it creates a new vector-based layer with the specified id, adds it to the layer collection,
  * and then returns the newly created layer.         *
  * @param {string} id - The unique identifier of the layer to get or create.
+ * @param {Object} [styleOptions] - Optional style options to apply to the layer if it is created.
  * @returns {Object} The layer object corresponding to the given id.
  */
-function getLayerById (id) {
+function getLayerById (id, styleOptions) {
     if (typeof layerCollection.getLayerById(id) !== "undefined") {
         return layerCollection.getLayerById(id);
     }
@@ -19,13 +20,9 @@ function getLayerById (id) {
         alwaysOnTop: true
     });
 
-    layer.getLayer().setStyle(
-        {
-            "fill-color": "rgba(235, 138, 62, 0)",
-            "stroke-color": "#EB8A3E",
-            "stroke-width": 3
-        }
-    );
+    if (styleOptions) {
+        layer.getLayer().setStyle(styleOptions);
+    }
 
     layerCollection.addLayer(layer);
     return layer;

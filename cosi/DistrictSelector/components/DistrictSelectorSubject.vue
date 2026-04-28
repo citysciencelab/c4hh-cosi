@@ -12,7 +12,7 @@ import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
-import {getLayerById} from "../utils/getLayerById.js";
+import {getLayerById} from "../../utils/layer/getLayerById.js";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import {mapActions, mapGetters, mapMutations} from "vuex";

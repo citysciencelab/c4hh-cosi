@@ -1,5 +1,5 @@
 import {generateSimpleMutations} from "@shared/js/utils/generators";
-import stateVueAddon from "./stateDipasProjects";
+import stateDipasProjects from "./stateDipasProjects";
 
 const mutations = {
     /**
@@ -8,19 +8,7 @@ const mutations = {
      * {setKey:   (state, payload) => *   state[key] = payload * }
      * will be returned.
      */
-    ...generateSimpleMutations(stateVueAddon),
-
-    /**
-     * If name from config.json starts with "translate#", the corrected key is set to name here.
-     * @param {object} state of this component
-     * @param {string} payload name of this component
-     * @returns {void}
-     */
-    applyTranslationKey: (state, payload) => {
-        if (payload && payload.indexOf("translate#") > -1) {
-            state.name = payload.substring("translate#".length);
-        }
-    }
+    ...generateSimpleMutations(stateDipasProjects)
 };
 
 export default mutations;

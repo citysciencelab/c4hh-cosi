@@ -1,8 +1,8 @@
 import {generateSimpleGetters} from "../../../../src/shared/js/utils/generators";
-import vueAddonState from "./stateDipasProjects";
+import stateDipasProjects from "./stateDipasProjects";
 
 const getters = {
-    ...generateSimpleGetters(vueAddonState)
+    ...generateSimpleGetters(stateDipasProjects)
 };
 
 export default getters;

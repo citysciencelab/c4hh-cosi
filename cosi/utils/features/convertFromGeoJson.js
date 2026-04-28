@@ -31,7 +31,7 @@ function geoJsonToFeature (geoJson, sourceCrs = "EPSG:4326", targetCrs = "EPSG:2
  * @param {GeoJSON} geoJson - The GeoJSON to convert.
  * @param {String} [sourceCrs="EPSG:4326"] - The CRS of the input.
  * @param {String} [targetCrs="EPSG:25832"] - The CRS of the output.
- * @returns {ol/Feature|Boolean} The converted features. False if the converting fails.
+ * @returns {ol/Feature[]|Boolean} The converted features. False if the converting fails.
  */
 function geoJsonCollectionToFeatures (geoJson, sourceCrs = "EPSG:4326", targetCrs = "EPSG:25832") {
     if (!isObject(geoJson)) {
