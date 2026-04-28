@@ -423,7 +423,7 @@ Layer2dRasterWmsTimeLayer.prototype.prepareTime = function (attrs) {
                 timeSource = extent ? extent : dimension;
 
             if (!timeSource) {
-                throw Error(i18next.t("common:modules.core.modelList.layer.wms.invalidTimeLayer", {id: this.id}));
+                throw Error(i18next.t("common:modules.wmsTime.layer.invalidTimeLayer", {id: this.id}));
             }
             else if (dimension && dimension.units !== "ISO8601") {
                 throw Error(`WMS-T layer ${this.id} specifies time dimension in unit ${dimension.units}. Only ISO8601 is supported.`);
