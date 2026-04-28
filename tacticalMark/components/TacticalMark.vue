@@ -7,21 +7,26 @@ import {Draw, Select, Modify} from "ol/interaction.js";
 import {fromCircle} from "ol/geom/Polygon.js";
 import getters from "../store/gettersTacticalMark";
 import Icon from "ol/style/Icon";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import layerCollection from "@core/layers/js/layerCollection";
 import layerFactory from "@core/layers/js/layerFactory";
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import mutations from "../store/mutationsTacticalMark";
+import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 import {Style, Text} from "ol/style.js";
 import {uniqueId} from "@shared/js/utils/uniqueId.js";
 
 export default {
     name: "TacticalMark",
     components: {
-        FlatButton
+        IconButton,
+        FlatButton,
+        NavTab
     },
     data () {
         return {
+            activeTab: "dmg",
             disableFileDownload: true,
             format: "kml",
             filename: "",
@@ -31,6 +36,7 @@ export default {
             imagePath: Config.wfsImgPath,
             mapElement: document.getElementById("map"),
             showDownload: false,
+            showVisibleFeatures: true,
             tacticalFeatures: []
         };
     },
@@ -38,36 +44,11 @@ export default {
         ...mapGetters("Modules/TacticalMark", Object.keys(getters)),
 
         /**
-         * Checks if there are visible features.
-         * @returns {Boolean} True if there are visible features otherwise false.
-         */
-        hasVisibleFeatures () {
-            const features = this.layer.layerSource.getFeatures();
-            let visibleFeatures = [];
-
-            visibleFeatures = features.filter(feature => feature.get("drawState").drawType.isTacticalMark && feature.get("isVisible"));
-
-            return visibleFeatures.length > 0;
-        },
-
-        /**
          * Checks if the layer has tactical features.
          * @returns {boolean} Returns true if the layer has features, otherwise false.
          */
         hasTacticalFeatures () {
             return this.tacticalFeatures.length > 0;
-        },
-
-        /**
-         * Returns options for category selectbox
-         * @returns {Array} The array of options with name and id.
-         */
-        options: function () {
-            return [
-                {name: this.$t("additional:modules.tools.tacticalMark.damageImage"), id: "dmg"},
-                {name: this.$t("additional:modules.tools.tacticalMark.resources"), id: "rsc"},
-                {name: this.$t("additional:modules.tools.tacticalMark.damageAccounts"), id: "dma"}
-            ];
         }
     },
 
@@ -88,6 +69,10 @@ export default {
                 console.error(error);
             });
     },
+
+    activated: () => undefined,
+
+    deactivated: () => undefined,
 
     unmounted () {
         this.resetCanvasCursor();
@@ -324,13 +309,10 @@ export default {
         },
 
         /**
-         * Selects and sets the category of icons from the pull down
-         * @param {Event} event changed selection event
+         * Removes the interaction upon selecting another icon category.
          * @returns {void}
          */
-        selectIconCat (event) {
-            document.getElementById(event.target.value).style.display = "block";
-
+        selectIconCat () {
             this.removeInteractionFromMap(this.interaction);
             this.resetCanvasCursor();
             this.selectedBtn = "";
@@ -345,19 +327,6 @@ export default {
                     this.$refs[rf].value = null;
                 }
             });
-
-            if (event.target.value === "rsc") {
-                document.getElementById("dmg").style.display = "none";
-                document.getElementById("dma").style.display = "none";
-            }
-            if (event.target.value === "dmg") {
-                document.getElementById("rsc").style.display = "none";
-                document.getElementById("dma").style.display = "none";
-            }
-            if (event.target.value === "dma") {
-                document.getElementById("dmg").style.display = "none";
-                document.getElementById("rsc").style.display = "none";
-            }
         },
 
         /**
@@ -500,162 +469,186 @@ export default {
 
 <template lang="html">
     <div id="tacticalMark">
-        <div
-            v-if="hasTacticalFeatures"
-            class="checkbox"
+        <ul
+            id="tactical-mark-tabs"
+            class="nav nav-tabs nav-justified mb-4"
+            role="tablist"
         >
-            <label>
-                <input
-                    type="checkbox"
-                    :checked="hasVisibleFeatures"
-                    @change="setVisibility($event.target.checked)"
-                > {{ $t("additional:modules.tools.tacticalMark.title") }}
-            </label>
-        </div>
-        <label for="tacticalMark-category">
-            {{ $t("additional:modules.tools.tacticalMark.category") }}
-        </label>
-        <select
-            id="tacticalMark-category"
-            class="form-control input-sm"
-            @change="selectIconCat($event)"
-        >
-            <option
-                v-for="option in options"
-                :key="'draw-drawType-' + option.id"
-                :value="option.id"
-            >
-                {{ option.name }}
-            </option>
-        </select>
+            <NavTab
+                :id="'tactical-mark-dmg-label'"
+                :active="activeTab === 'dmg'"
+                target="#dmg"
+                :label="'additional:modules.tools.tacticalMark.damageImage'"
+                icon="bi-exclamation-diamond"
+                :interaction="() => { activeTab = 'dmg'; selectIconCat(); }"
+            />
+            <NavTab
+                :id="'tactical-mark-rsc-label'"
+                :active="activeTab === 'rsc'"
+                target="#rsc"
+                :label="'additional:modules.tools.tacticalMark.resources'"
+                icon="bi-flag"
+                :interaction="() => { activeTab = 'rsc'; selectIconCat(); }"
+            />
+            <NavTab
+                :id="'tactical-mark-dma-label'"
+                :active="activeTab === 'dma'"
+                target="#dma"
+                :label="'additional:modules.tools.tacticalMark.damageAccounts'"
+                icon="bi-exclamation-triangle"
+                :interaction="() => { activeTab = 'dma'; selectIconCat(); }"
+            />
+        </ul>
 
-        <div id="dmg">
-            <div class="tm-container">
-                <div
-                    v-for="obj in iconSettings.dmg"
-                    :key="obj.icon"
-                    class="tm-item"
-                >
-                    <div
-                        :ref="obj.icon.slice(0, -4)"
-                        class="tm-btn"
-                        role="button"
-                        tabindex="0"
-                        @click="setIcon(obj.icon);"
-                        @keydown.enter="setIcon(obj.icon);"
-                    >
-                        <div class="tm-btn-img pull-left">
-                            <img
-                                :alt="obj.text"
-                                :src="$t(getIconPath(obj.iconSmall))"
-                            >
-                        </div>
-                        <div class="tm-btn-txt">
-                            <span>
-                                {{ obj.text }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="rsc">
-            <div class="tm-container">
-                <div
-                    v-for="obj in iconSettings.rsc"
-                    :key="obj.icon"
-                    class="tm-item"
-                >
-                    <div
-                        :ref="obj.icon.slice(0, -4)"
-                        class="tm-btn"
-                        role="button"
-                        tabindex="0"
-                        @click="setIcon(obj.icon);"
-                        @keydown.enter="setIcon(obj.icon);"
-                    >
-                        <div class="tm-btn-img pull-left">
-                            <img
-                                :alt="obj.text"
-                                :src="$t(getIconPath(obj.iconSmall))"
-                            >
-                        </div>
-                        <div class="tm-btn-txt">
-                            <span>
-                                {{ obj.text }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="dma">
-            <div class="tm-container">
-                <div
-                    v-for="obj in iconSettings.dma"
-                    :key="obj.icon"
-                    class="tm-item"
-                >
-                    <label for="dma_number">{{ $t("additional:modules.tools.tacticalMark.damageAccount") }} (0-99):</label>
-                    <input
-                        id="dma_number"
-                        ref="dma_number"
-                        type="number"
-                        min="0"
-                        max="99"
-                        @change="changeDmaNr"
-                    >
-                    <div
-                        :ref="obj.icon.slice(0, -4)"
-                        class="tm-btn"
-                        role="button"
-                        tabindex="0"
-                        @click="setIcon(obj.icon, 'dmaNumber');"
-                        @keydown.enter="setIcon(obj.icon, 'dmaNumber');"
-                    >
-                        <div class="tm-btn-img pull-left">
-                            <img
-                                :alt="obj.text"
-                                :src="$t(getIconPath(obj.iconSmall))"
-                            >
-                        </div>
-                        <div class="tm-btn-txt">
-                            <span>
-                                {{ obj.text }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="tm-container">
-            <div class="tm-item">
-                <FlatButton
-                    :aria="$t('additional:modules.tools.tacticalMark.iconEdit')"
-                    icon="bi-wrench"
-                    :title="$t('additional:modules.tools.tacticalMark.iconEdit')"
+        <h5>
+            {{ $t("additional:modules.tools.tacticalMark.edit") }}
+        </h5>
+        <div class="d-flex justify-content-between mb-3">
+            <div class="d-flex gap-4 ms-3">
+                <IconButton
+                    :class-array="['btn-primary']"
+                    :aria="$t('additional:modules.tools.tacticalMark.iconMove')"
+                    icon="bi-arrows-move"
+                    :title="$t('additional:modules.tools.tacticalMark.iconMove')"
                     :interaction="() => modifyIcon()"
-                    :text="$t('additional:modules.tools.tacticalMark.iconEdit')"
+                    :label="$t('additional:modules.tools.tacticalMark.iconMove')"
                 />
-            </div>
-            <div class="tm-item">
-                <FlatButton
+                <IconButton
+                    :class-array="['btn-primary']"
                     :aria="$t('additional:modules.tools.tacticalMark.iconDelete')"
                     icon="bi-trash"
                     :title="$t('additional:modules.tools.tacticalMark.iconDelete')"
                     :interaction="() => deleteIcon()"
-                    :text="$t('additional:modules.tools.tacticalMark.iconDelete')"
+                    :label="$t('additional:modules.tools.tacticalMark.iconDelete')"
+                />
+                <IconButton
+                    v-if="hasTacticalFeatures"
+                    :class-array="['btn-primary']"
+                    :aria="$t('additional:modules.tools.tacticalMark.iconToggleAllVisibility')"
+                    :icon="'bi-eye'"
+                    :title="$t('additional:modules.tools.tacticalMark.iconToggleAllVisibility')"
+                    :label="$t('additional:modules.tools.tacticalMark.iconToggleAllVisibility')"
+                    :interaction="() => { showVisibleFeatures = !showVisibleFeatures; setVisibility(showVisibleFeatures); }"
                 />
             </div>
-            <div class="tm-item">
-                <FlatButton
-                    :aria="$t('additional:modules.tools.tacticalMark.iconDownload')"
-                    icon="bi-save"
-                    :title="$t('additional:modules.tools.tacticalMark.iconDownload')"
-                    :interaction="() => download()"
-                    :text="$t('additional:modules.tools.tacticalMark.iconDownload')"
-                />
+            <FlatButton
+                :aria="$t('additional:modules.tools.tacticalMark.iconDownload')"
+                icon="bi-cloud-arrow-down-fill"
+                :title="$t('additional:modules.tools.tacticalMark.iconDownload')"
+                :interaction="() => download()"
+                :text="$t('additional:modules.tools.tacticalMark.iconDownload')"
+            />
+        </div>
+
+        <div class="tab-content">
+            <div
+                id="dmg"
+                :class="['tab-pane', { 'active': activeTab === 'dmg' }]"
+            >
+                <div class="tm-container">
+                    <div
+                        v-for="obj in iconSettings.dmg"
+                        :key="obj.icon"
+                        class="tm-item"
+                    >
+                        <div
+                            :ref="obj.icon.slice(0, -4)"
+                            class="tm-btn"
+                            role="button"
+                            tabindex="0"
+                            @click="setIcon(obj.icon);"
+                            @keydown.enter="setIcon(obj.icon);"
+                        >
+                            <div class="tm-btn-img pull-left">
+                                <img
+                                    :alt="obj.text"
+                                    :src="$t(getIconPath(obj.iconSmall))"
+                                >
+                            </div>
+                            <div class="tm-btn-txt">
+                                <span>
+                                    {{ obj.text }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                id="rsc"
+                :class="['tab-pane', { 'active': activeTab === 'rsc' }]"
+            >
+                <div class="tm-container">
+                    <div
+                        v-for="obj in iconSettings.rsc"
+                        :key="obj.icon"
+                        class="tm-item"
+                    >
+                        <div
+                            :ref="obj.icon.slice(0, -4)"
+                            class="tm-btn"
+                            role="button"
+                            tabindex="0"
+                            @click="setIcon(obj.icon);"
+                            @keydown.enter="setIcon(obj.icon);"
+                        >
+                            <div class="tm-btn-img pull-left">
+                                <img
+                                    :alt="obj.text"
+                                    :src="$t(getIconPath(obj.iconSmall))"
+                                >
+                            </div>
+                            <div class="tm-btn-txt">
+                                <span>
+                                    {{ obj.text }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                id="dma"
+                :class="['tab-pane', { 'active': activeTab === 'dma' }]"
+            >
+                <div class="tm-container">
+                    <div
+                        v-for="obj in iconSettings.dma"
+                        :key="obj.icon"
+                        class="tm-item"
+                    >
+                        <label for="dma_number">{{ $t("additional:modules.tools.tacticalMark.damageAccount") }} (0-99):</label>
+                        <input
+                            id="dma_number"
+                            ref="dma_number"
+                            type="number"
+                            min="0"
+                            max="99"
+                            @change="changeDmaNr"
+                        >
+                        <div
+                            :ref="obj.icon.slice(0, -4)"
+                            class="tm-btn"
+                            role="button"
+                            tabindex="0"
+                            @click="setIcon(obj.icon, 'dmaNumber');"
+                            @keydown.enter="setIcon(obj.icon, 'dmaNumber');"
+                        >
+                            <div class="tm-btn-img pull-left">
+                                <img
+                                    :alt="obj.text"
+                                    :src="$t(getIconPath(obj.iconSmall))"
+                                >
+                            </div>
+                            <div class="tm-btn-txt">
+                                <span>
+                                    {{ obj.text }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div
@@ -707,6 +700,9 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+    .btn-wrapper {
+        width: unset;
+    }
     input[type="checkbox"] {
         margin-top: 0;
     }
@@ -773,11 +769,7 @@ export default {
     .tool-window-vue {
         max-width: 680px;
     }
-    #rsc {
-        display: none;
-    }
     #dma {
-        display: none;
         .tm-container {
             .tm-item {
                 label {

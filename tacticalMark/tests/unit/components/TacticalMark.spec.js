@@ -104,8 +104,7 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
             resetCanvasCursor: sinon.stub(),
             computed: {
                 isLayerVisible: () => true,
-                hasTacticalFeatures: () => true,
-                hasVisibleFeatures: () => true
+                hasTacticalFeatures: () => true
             }
         });
     });
@@ -144,8 +143,7 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
                 },
                 computed: {
                     isLayerVisible: () => true,
-                    hasTacticalFeatures: () => true,
-                    hasVisibleFeatures: () => true
+                    hasTacticalFeatures: () => true
                 },
                 setCanvasCursor: sinon.stub(),
                 resetCanvasCursor: sinon.stub()
@@ -175,8 +173,7 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
                 },
                 computed: {
                     isLayerVisible: () => true,
-                    hasTacticalFeatures: () => true,
-                    hasVisibleFeatures: () => true
+                    hasTacticalFeatures: () => true
                 },
                 setCanvasCursor: sinon.stub(),
                 resetCanvasCursor: sinon.stub()
@@ -216,8 +213,7 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
                 },
                 computed: {
                     isLayerVisible: () => true,
-                    hasTacticalFeatures: () => true,
-                    hasVisibleFeatures: () => true
+                    hasTacticalFeatures: () => true
                 }
             });
 
@@ -255,8 +251,7 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
                 },
                 computed: {
                     isLayerVisible: () => true,
-                    hasTacticalFeatures: () => true,
-                    hasVisibleFeatures: () => true
+                    hasTacticalFeatures: () => true
                 }
             });
 
@@ -276,7 +271,14 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
 
         it("should render FlatButton component", () => {
-            expect(wrapper.findAllComponents({name: "FlatButton"}).length).to.be.equal(4);
+            expect(wrapper.findAllComponents({name: "FlatButton"}).length).to.be.equal(2);
+        });
+
+        it("should render IconButton component", () => {
+            expect(wrapper.findAllComponents({name: "IconButton"}).length).to.be.equal(3);
+        });
+        it("should render NavTab components", () => {
+            expect(wrapper.findAllComponents({name: "NavTab"}).length).to.be.equal(3);
         });
     });
 
@@ -332,8 +334,7 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
                 },
                 computed: {
                     isLayerVisible: () => true,
-                    hasTacticalFeatures: () => true,
-                    hasVisibleFeatures: () => true
+                    hasTacticalFeatures: () => true
                 }
             });
 
