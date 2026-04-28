@@ -13,6 +13,28 @@
 
 ### Changed
 - Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) besides Version **23** and npm fom **10.9.3** up to smaller than **12** are now supported.
+- The following packages have been updated:
+    - dependencies:
+        - axios: 1.15.0 to 1.15.2
+        - chart.js: ^4.5.0 to ^4.5.1
+        - i18next-browser-languagedetector: ^8.2.0 to ^8.2.1
+        - i18next-http-backend: ^3.0.2 to ^3.0.6
+        - mqtt: ^5.14.1 to ^5.15.1
+        - vue: ^3.5.22 to ^3.5.33
+        - vue-multiselect: 3.2.0 to 3.5.0
+    - devDependencies:
+        - @vitejs/plugin-vue: ^6.0.3 to ^6.0.6
+        - @vitest/eslint-plugin: ^1.6.6 to ^1.6.16
+        - @vue/compiler-sfc: 3.5.22 to 3.5.33
+        - @vue/server-renderer: 3.5.22 to 3.5.33
+        - @vue/test-utils: ^2.4.6 to ^2.4.9
+        - canvas: ^3.2.0 to ^3.2.3
+        - esbuild-loader: ^4.4.2 to ^4.4.3
+        - eslint-plugin-vuejs-accessibility: 2.4.1 to 2.5.0
+        - eslint-plugin-n: 17.10.2 to 17.24.0
+        - fs-extra: ^11.3.0 to ^11.3.4
+        - jsdoc: 4.0.4 to 4.0.5
+        - replace-in-file: 8.3.0 to 8.4.0
 
 
 ### Deprecated
