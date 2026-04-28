@@ -15,6 +15,7 @@
     - ZOOMTOFEATUREID:
         - An attribute `centerOfExtent` has been added to control whether a point geometry is set to the extent of the respective feature or whether the feature itself is displayed in its geometry.
         - WFS versions 1.0.0, 1.1.0, and 2.0.0 are now compatible.
+- WfsSearch: fullViewEnabled can be configured in wfsSearch.
 
 ### Changed
 - The following packages have been updated:

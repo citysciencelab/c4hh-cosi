@@ -20,6 +20,7 @@
  * @property {Number} zoomLevel zoom level to switch to on focusing a result
  * @property {Number} resultsPerPage used for pagination
  * @property {Boolean} multiSelect whether multiple result list entries may be selected
+ * @property {Boolean} fullViewEnabled Whether the result table can be expanded to a full view by the user.
  * @property {String[]} supportedDevices Devices on which the module is displayed.
  * @property {String[]} supportedMapModes Map mode in which this module can be used.
  */
@@ -44,6 +45,7 @@ const state = {
     zoomLevel: 5,
     resultsPerPage: 0,
     multiSelect: false,
+    fullViewEnabled: false,
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D", "3D"]
 };
