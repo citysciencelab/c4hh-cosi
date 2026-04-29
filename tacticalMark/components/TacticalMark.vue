@@ -14,6 +14,7 @@ import layerFactory from "@core/layers/js/layerFactory";
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import mutations from "../store/mutationsTacticalMark";
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {Style, Text} from "ol/style.js";
 import {uniqueId} from "@shared/js/utils/uniqueId.js";
 
@@ -22,7 +23,8 @@ export default {
     components: {
         IconButton,
         FlatButton,
-        NavTab
+        NavTab,
+        InputText
     },
     data () {
         return {
@@ -33,8 +35,10 @@ export default {
             fileUrl: "",
             file: "",
             iconSettings: [],
+            dmaNumber: "",
             imagePath: Config.wfsImgPath,
             mapElement: document.getElementById("map"),
+            selectedBtn: "",
             showDownload: false,
             showVisibleFeatures: true,
             tacticalFeatures: []
@@ -54,7 +58,6 @@ export default {
 
     async created () {
         this.interaction = "";
-        this.selectedBtn = "";
         this.layer = this.getLayerById("importDrawLayer");
         await axios.get("assets/iconSettings.json", {
             headers: {
@@ -91,7 +94,7 @@ export default {
          */
         changeDmaNr () {
             if (this.selectedBtn !== null && this.selectedBtn === "damage_account.jpg") {
-                this.setIcon("damage_account.jpg", "dma_number", "dmaChg");
+                this.setIcon("damage_account.jpg", "dmaChg");
             }
         },
 
@@ -129,60 +132,30 @@ export default {
         /**
          * Sets the selected icon to mark on the map
          * @param {String} iconName the filename of the icon
-         * @param {String} [dmaNumber=null] the given number of the damage account
          * @param {String} [dmaChg=null] is setted if the function called by onChange in damage account
          * @returns {void} -
          */
-        setIcon (iconName, dmaNumber = null, dmaChg = null) {
-            const ref = this.$refs[iconName.slice(0, -4)][0];
-            let style,
-                number = "";
-
+        setIcon (iconName, dmaChg = null) {
             if (this.selectedBtn === null || this.selectedBtn !== iconName || dmaChg !== null) {
-                Object.keys(this.$refs).forEach(rf => {
-                    if (Array.isArray(this.$refs[rf]) && this.$refs[rf][0] && this.$refs[rf][0].style) {
-                        this.$refs[rf][0].style.backgroundColor = "#F2F2F2";
-                    }
-                    else {
-                        this.$refs[rf].style.backgroundColor = "#F2F2F2";
-                    }
-                });
-                ref.style.backgroundColor = "#CDCDCD";
-
                 this.selectedBtn = iconName;
 
                 this.setCanvasCursor();
 
-                if (typeof dmaNumber !== "undefined" && this.$refs.dma_number[0].value !== "undefined") {
-                    number = this.$refs.dma_number[0].value;
-
-                    style = new Style({
-                        text: new Text({
-                            text: number,
-                            textAlign: "center",
-                            textBaseline: "middle",
-                            offsetY: 7,
-                            font: "12px sans-serif"
-                        }),
-                        image: new Icon({
-                            src: this.imagePath + iconName,
-                            scale: 1,
-                            opacity: 1
-                        }),
-                        zIndex: 0
-                    });
-                }
-                else {
-                    style = new Style({
-
-                        image: new Icon({
-                            src: this.imagePath + iconName,
-                            scale: 1,
-                            opacity: 1
-                        }),
-                        zIndex: 0
-                    });
-                }
+                const style = new Style({
+                    text: new Text({
+                        text: this.activeTab === "dma" ? this.dmaNumber : "",
+                        textAlign: "center",
+                        textBaseline: "middle",
+                        offsetY: 7,
+                        font: "12px sans-serif"
+                    }),
+                    image: new Icon({
+                        src: this.imagePath + iconName,
+                        scale: 1,
+                        opacity: 1
+                    }),
+                    zIndex: 0
+                });
 
                 this.removeInteractionFromMap(this.interaction);
                 this.interaction = new Draw({
@@ -223,8 +196,6 @@ export default {
                 this.addInteractionToMap(this.interaction);
             }
             else {
-                ref.style.backgroundColor = "#F2F2F2";
-
                 this.removeInteractionFromMap(this.interaction);
                 this.resetCanvasCursor();
                 this.selectedBtn = "";
@@ -475,35 +446,21 @@ export default {
             role="tablist"
         >
             <NavTab
-                :id="'tactical-mark-dmg-label'"
-                :active="activeTab === 'dmg'"
-                target="#dmg"
-                :label="'additional:modules.tools.tacticalMark.damageImage'"
-                icon="bi-exclamation-diamond"
-                :interaction="() => { activeTab = 'dmg'; selectIconCat(); }"
-            />
-            <NavTab
-                :id="'tactical-mark-rsc-label'"
-                :active="activeTab === 'rsc'"
-                target="#rsc"
-                :label="'additional:modules.tools.tacticalMark.resources'"
-                icon="bi-flag"
-                :interaction="() => { activeTab = 'rsc'; selectIconCat(); }"
-            />
-            <NavTab
-                :id="'tactical-mark-dma-label'"
-                :active="activeTab === 'dma'"
-                target="#dma"
-                :label="'additional:modules.tools.tacticalMark.damageAccounts'"
-                icon="bi-exclamation-triangle"
-                :interaction="() => { activeTab = 'dma'; selectIconCat(); }"
+                v-for="(tab, tabKey) in iconSettings"
+                :id="`tactical-mark-${tabKey}-label`"
+                :key="tabKey"
+                :active="activeTab === tabKey"
+                :target="`#${tabKey}`"
+                :icon="tab.icon"
+                :label="`additional:modules.tools.tacticalMark.tabs.${tabKey}`"
+                :interaction="() => { activeTab = tabKey; selectIconCat(); }"
             />
         </ul>
 
         <h5>
             {{ $t("additional:modules.tools.tacticalMark.edit") }}
         </h5>
-        <div class="d-flex justify-content-between mb-3">
+        <div class="d-flex justify-content-between mb-5">
             <div class="d-flex gap-4 ms-3">
                 <IconButton
                     :class-array="['btn-primary']"
@@ -542,122 +499,65 @@ export default {
 
         <div class="tab-content">
             <div
-                id="dmg"
-                :class="['tab-pane', { 'active': activeTab === 'dmg' }]"
+                v-for="(tab, tabKey) in iconSettings"
+                :id="tabKey"
+                :key="tabKey"
+                :class="['tab-pane', { 'active': activeTab === tabKey }]"
             >
-                <div class="tm-container">
-                    <div
-                        v-for="obj in iconSettings.dmg"
-                        :key="obj.icon"
-                        class="tm-item"
-                    >
+                <h5 class="mb-4">
+                    {{ $t(`additional:modules.tools.tacticalMark.tabs.${tabKey}`) }}
+                </h5>
+                <div
+                    v-for="(group, groupKey) in tab.marks"
+                    :key="groupKey"
+                >
+                    <h6 v-if="groupKey !== 'noGroupHeader'">
+                        {{ $t(`additional:modules.tools.tacticalMark.groups.${groupKey}`) }}
+                    </h6>
+                    <div class="d-flex flex-wrap gap-3 mb-5">
                         <div
-                            :ref="obj.icon.slice(0, -4)"
-                            class="tm-btn"
-                            role="button"
-                            tabindex="0"
-                            @click="setIcon(obj.icon);"
-                            @keydown.enter="setIcon(obj.icon);"
+                            v-for="obj in group"
+                            :key="obj.icon"
+                            class="tactical-icon-cell"
                         >
-                            <div class="tm-btn-img pull-left">
-                                <img
-                                    :alt="obj.text"
-                                    :src="$t(getIconPath(obj.iconSmall))"
+                            <div class="d-flex flex-column align-items-center text-center">
+                                <div
+                                    class="p-2 tactical-icon-btn"
+                                    :class="{'selected': obj.icon === selectedBtn}"
+                                    role="button"
+                                    tabindex="0"
+                                    @click="setIcon(obj.icon);"
+                                    @keydown.enter="setIcon(obj.icon);"
                                 >
-                            </div>
-                            <div class="tm-btn-txt">
-                                <span>
-                                    {{ obj.text }}
-                                </span>
+                                    <img
+                                        :alt="obj.text"
+                                        :src="getIconPath(obj.iconSmall)"
+                                        class="tactical-icon-image"
+                                    >
+                                </div>
+                                <span class="mt-2 lh-sm tactical-icon-label">{{ obj.text }}</span>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div
-                id="rsc"
-                :class="['tab-pane', { 'active': activeTab === 'rsc' }]"
-            >
-                <div class="tm-container">
-                    <div
-                        v-for="obj in iconSettings.rsc"
-                        :key="obj.icon"
-                        class="tm-item"
-                    >
-                        <div
-                            :ref="obj.icon.slice(0, -4)"
-                            class="tm-btn"
-                            role="button"
-                            tabindex="0"
-                            @click="setIcon(obj.icon);"
-                            @keydown.enter="setIcon(obj.icon);"
-                        >
-                            <div class="tm-btn-img pull-left">
-                                <img
-                                    :alt="obj.text"
-                                    :src="$t(getIconPath(obj.iconSmall))"
-                                >
-                            </div>
-                            <div class="tm-btn-txt">
-                                <span>
-                                    {{ obj.text }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                id="dma"
-                :class="['tab-pane', { 'active': activeTab === 'dma' }]"
-            >
-                <div class="tm-container">
-                    <div
-                        v-for="obj in iconSettings.dma"
-                        :key="obj.icon"
-                        class="tm-item"
-                    >
-                        <label for="dma_number">{{ $t("additional:modules.tools.tacticalMark.damageAccount") }} (0-99):</label>
-                        <input
+                        <InputText
+                            v-if="tabKey === 'dma'"
                             id="dma_number"
-                            ref="dma_number"
+                            v-model="dmaNumber"
+                            class="flex-grow-1"
                             type="number"
-                            min="0"
-                            max="99"
-                            @change="changeDmaNr"
-                        >
-                        <div
-                            :ref="obj.icon.slice(0, -4)"
-                            class="tm-btn"
-                            role="button"
-                            tabindex="0"
-                            @click="setIcon(obj.icon, 'dmaNumber');"
-                            @keydown.enter="setIcon(obj.icon, 'dmaNumber');"
-                        >
-                            <div class="tm-btn-img pull-left">
-                                <img
-                                    :alt="obj.text"
-                                    :src="$t(getIconPath(obj.iconSmall))"
-                                >
-                            </div>
-                            <div class="tm-btn-txt">
-                                <span>
-                                    {{ obj.text }}
-                                </span>
-                            </div>
-                        </div>
+                            :label="$t('additional:modules.tools.tacticalMark.damageAccount') + ' (0-99)'"
+                            :placeholder="$t('additional:modules.tools.tacticalMark.damageAccount')"
+                            :min="0"
+                            :max="99"
+                            :on-change="() => changeDmaNr()"
+                        />
                     </div>
                 </div>
             </div>
         </div>
         <div
             v-show="showDownload"
-            class="tm-container download-container"
         >
-            <div class="tm-item" />
-            <div class="tm-item" />
-            <div class="tm-item">
+            <div>
                 <form
                     id="tool-tacticalmark-download"
                     role="form"
@@ -719,39 +619,6 @@ export default {
         color: $black;
         border: 1px solid $secondary_table_style;
     }
-    .tm-container {
-        display: grid;
-        grid-template-columns: auto auto auto;
-        padding: 5px 0;
-        .tm-item {
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 0px 1px;
-            font-size: 12px;
-            text-align: center;
-            .tm-btn {
-                border-radius: 3px;
-                background-color: $secondary_table_style;
-                color: $black;
-                padding: 2px;
-                font-size: 12px;
-                cursor: pointer;
-                text-align: center;
-                border: 1px solid #cdcdcd;
-                width: 215px;
-                &:hover {
-                    background-color: $white;
-                    color: $black;
-                    border: 1px solid $secondary_table_style;
-                }
-                &:active {
-                    background-color: lighten($secondary_table_style, 15%);
-                }
-                .tm-btn-img {
-                    float: left;
-                }
-            }
-        }
-    }
     .form-horizontal {
         .form-group {
             label {
@@ -769,16 +636,35 @@ export default {
     .tool-window-vue {
         max-width: 680px;
     }
-    #dma {
-        .tm-container {
-            .tm-item {
-                label {
-                    margin-bottom: 10px;
-                }
-            }
-        }
-    }
     .checkbox {
         margin: 0 0 5px 0;
+    }
+
+    .tactical-icon-cell {
+        width: 92px;
+    }
+
+    .tactical-icon-btn {
+        width: 57px;
+        height: 49px;
+        outline: 0.5px solid #DEE2E6;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &.selected {
+            outline-color: $secondary;
+            outline-width: 2px;
+        }
+    }
+
+    .tactical-icon-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .tactical-icon-label {
+        font-size: $font_size_sm;
     }
 </style>

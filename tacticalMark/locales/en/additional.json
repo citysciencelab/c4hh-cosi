@@ -19,7 +19,24 @@
                 "filenameLabel": "Filename",
                 "saveFile": "Save",
                 "setFileName": "Please set file name",
-                "category": "Category"
+                "category": "Category",
+                "tabs": {
+                    "dmg": "Damage Images",
+                    "rsc": "Resources",
+                    "dma": "Damage Accounts"
+                },
+                "groups": {
+                    "danger": "Danger",
+                    "person": "Person",
+                    "damage": "Damage",
+                    "animal": "Animal",
+                    "unit": "Unit",
+                    "task": "Task",
+                    "command": "Command",
+                    "logistics": "Logistics",
+                    "measure": "Measure",
+                    "location": "Location"
+                }
             }
         }
     }

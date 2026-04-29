@@ -19,7 +19,24 @@
                 "filenameLabel": "Dateiname",
                 "saveFile": "Speichern",
                 "setFileName": "Bitte Dateiname angeben",
-                "category": "Kategorie"
+                "category": "Kategorie",
+                "tabs": {
+                    "dmg": "Schadensbilder",
+                    "rsc": "Ressourcen",
+                    "dma": "Damage Accounts"
+                },
+                "groups": {
+                    "danger": "Gefahr",
+                    "person": "Person",
+                    "damage": "Schaden",
+                    "animal": "Tier",
+                    "unit": "Einheit",
+                    "task": "Fachaufgabe",
+                    "command": "Führung",
+                    "logistics": "Logistik",
+                    "measure": "Maßnahme",
+                    "location": "Stelle"
+                }
             }
         }
     }
