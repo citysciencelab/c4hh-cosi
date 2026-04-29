@@ -216,6 +216,7 @@ export default defineConfig(({mode}) => {
                     outFileName: examplesZipName,
                     pathPrefix: ""
                 }),
+                name: "zip-pack-versioned",
                 apply: "build"
             },
             examplesOnly && {
@@ -225,6 +226,7 @@ export default defineConfig(({mode}) => {
                     outFileName: "examples.zip",
                     pathPrefix: ""
                 }),
+                name: "zip-pack-examples",
                 apply: "build"
             }
             // ,analyzer() //Do not delete, comment in for analyzing bundle content  - start 'npm run buildPortal', results on http://localhost:8888
