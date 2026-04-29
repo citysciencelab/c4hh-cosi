@@ -65,6 +65,10 @@ export default {
             dashboardOpen: false,
             baseColumns: [
                 {
+                    key: "data-table-group",
+                    title: this.$t("additional:modules.tools.cosi.dashboard.groupCol")
+                },
+                {
                     value: "category",
                     text: this.$t("additional:modules.tools.cosi.dashboard.category"),
                     sortable: false,
