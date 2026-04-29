@@ -1,6 +1,8 @@
 <script>
 import BaseLayer from "ol/layer/Base";
-import {Draw, Select} from "ol/interaction";
+import {Select} from "ol/interaction";
+import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {fromCircle} from "ol/geom/Polygon";
 import GeoAnalyzeResultBuilding from "./GeoAnalyzeResultBuilding.vue";
@@ -19,6 +21,8 @@ export default {
     name: "GeoAnalyze",
     components: {
         FlatButton,
+        DrawTypes,
+        IconButton,
         GeoAnalyzeResultBuilding,
         GeoAnalyzeResultGeometry
     },
@@ -27,10 +31,24 @@ export default {
             result: [],
             selectedOption: "draw",
             options: {
-                "draw": "Polygon zeichnen",
-                "select": "Geometrie wählen",
-                "click": "Gebäude auswerten"
-            }
+                draw: {text: "Polygon zeichnen", icon: "bi bi-pencil"},
+                select: {text: "Geometrie wählen", icon: "bi bi-pentagon"},
+                click: {text: "Gebäude auswerten", icon: "bi bi-building"}
+            },
+            currentLayout: {
+                fillColor: [255, 255, 255],
+                fillTransparency: 50,
+                strokeColor: [60, 95, 148],
+                strokeWidth: 2
+            },
+            drawTypeLabels: [
+                {type: "polygon", label: "common:shared.modules.draw.drawTypes.polygon"},
+                {type: "box", label: "common:shared.modules.draw.drawTypes.box"},
+                {type: "circle", label: "common:shared.modules.draw.drawTypes.circle"}
+            ],
+            selectedDrawType: "Polygon",
+            selectedDrawTypeMain: "Polygon",
+            selectedInteraction: null
         };
     },
     computed: {
@@ -46,12 +64,55 @@ export default {
             if (this.selectedOption === "click") {
                 return "GeoAnalyzeResultBuilding";
             }
-            return "GeoAnalyzeResultGeometry";
+            if (this.selectedOption === "select" || this.selectedOption === "draw") {
+                return "GeoAnalyzeResultGeometry";
+            }
+            return null;
+        },
+        /**
+         * Gets the heading text based on the currently selected option.
+         * @returns {String} The heading title corresponding to 'draw', 'select', or 'click'.
+         */
+        headingText () {
+            const titles = {
+                draw: "Auswertung der eingezeichneten Fläche",
+                select: "Auswertung der ausgewählten Geometrie",
+                click: "Gebäude auswerten"
+            };
+
+            return titles[this.selectedOption];
+        },
+        /**
+         * Gets the alert message when no result is available for the current mode.
+         * @returns {String} The empty-state message.
+         */
+        noResultAlertText () {
+            const messages = {
+                draw: "Es wurde noch kein Polygon eingezeichnet, das ausgewertet werden kann.",
+                select: "Es wurde noch keine Geometrie ausgewählt, die ausgewertet werden kann.",
+                click: "Bitte klicken Sie auf ein Gebäude in der Karte, um die Auswertung zu starten."
+            };
+
+            return messages[this.selectedOption];
         }
     },
     watch: {
         clickCoordinate: "createAnalyzeGeometry",
-        selectedOption: "toggleInteraction"
+        selectedOption: "toggleInteraction",
+
+        /**
+         * Updates the drawing interaction type when the draw mode is active.
+         * @param {string} newType - The geometry type
+         * @returns {void}
+         */
+        selectedDrawType (newType) {
+            if (this.selectedOption === "draw" && this.draw) {
+                this.draw.setActive(false);
+                this.draw.set("type", newType);
+                this.draw.setActive(true);
+                this.layer.getSource().clear();
+            }
+        }
     },
     created () {
         this.setNonReactiveData();
@@ -59,7 +120,9 @@ export default {
     mounted () {
         this.addLayer(this.layer);
         this.addInteractions();
-        this.activateInteraction(this.selectedOption);
+        if (this.selectedOption === "select") {
+            this.activateInteraction("select");
+        }
     },
     unmounted () {
         this.removeLayerFromMap(this.layer);
@@ -79,7 +142,6 @@ export default {
          */
         addInteractions () {
             this.addInteraction(this.select);
-            this.addInteraction(this.draw);
         },
 
         /**
@@ -88,7 +150,9 @@ export default {
          * @returns {void}
          */
         activateInteraction (name) {
-            this[name].setActive(true);
+            if (name === "select" && this.select) {
+                this.select.setActive(true);
+            }
         },
 
         /**
@@ -109,7 +173,9 @@ export default {
          * @returns {void}
          */
         deactivateInteraction (name) {
-            this[name].setActive(false);
+            if (name === "select" && this.select) {
+                this.select.setActive(false);
+            }
         },
 
         /**
@@ -170,6 +236,31 @@ export default {
         },
 
         /**
+         * Handles the end of a drawing interaction and converts circle geometries to polygons.
+         * @param {Object} event - The OpenLayers drawend event.
+         * @returns {void}
+         */
+        onDrawEnd (evt) {
+            let geometry = evt.feature.getGeometry();
+
+            if (geometry.getType() === "Circle") {
+                geometry = fromCircle(geometry);
+            }
+            this.geometry = geometry;
+            this.getAnalyzeData(this.geometry);
+        },
+
+        /**
+         * Clears the layer, interactions and results.
+         * @returns {void}
+         */
+        resetAll () {
+            this.layer.getSource().clear();
+            this.removeInteractions();
+            this.result = [];
+        },
+
+        /**
          * Registers listener for draw interaction events.
          * On "drawstart" all features are removed from the source of the given layer.
          * On "drawend" the geometry of the feature is send to the api.
@@ -213,7 +304,6 @@ export default {
          */
         removeInteractions () {
             this.removeInteraction(this.select);
-            this.removeInteraction(this.draw);
         },
 
         /**
@@ -257,14 +347,6 @@ export default {
                 alwaysOnTop: true
             });
 
-            // createBox() and type: 'Circle' return a box instead of a circle geometry
-            this.draw = new Draw({
-                source: this.layer.getSource(),
-                type: "Polygon"
-            });
-            this.registerDrawListener(this.draw, this.layer, this.geojsonFormat);
-
-            // for drawn features on the map
             this.select = new Select({
                 filter: this.filterForSelect
             });
@@ -284,15 +366,13 @@ export default {
          */
         toggleInteraction (newValue, oldValue) {
             this.result = [];
-            if (newValue === "click") {
-                this.deactivateInteraction(oldValue);
+            if (newValue === "select") {
+                this.activateInteraction("select");
+                this.layer.getSource().clear();
             }
-            else if (oldValue === "click") {
-                this.activateInteraction(newValue);
-            }
-            else {
-                this.deactivateInteraction(oldValue);
-                this.activateInteraction(newValue);
+            else if (oldValue === "select") {
+                this.deactivateInteraction("select");
+                this.layer.getSource().clear();
             }
         }
     }
@@ -301,39 +381,124 @@ export default {
 
 <template lang="html">
     <div>
-        <div class="form-floating mb-2">
-            <select
-                id="geo-analyze-mode"
-                v-model="selectedOption"
-                class="form-select"
+        <div class="tab-bar pb-4">
+            <ul
+                class="nav nav-fill p-0"
             >
-                <option
-                    v-for="(label, value) in options"
-                    :key="value"
-                    :value="value"
+                <li
+                    v-for="(item, key) in options"
+                    :key="'nav-item-' + key"
+                    class="nav-item"
+                    role="presentation"
                 >
-                    {{ label }}
-                </option>
-            </select>
-            <label for="geo-analyze-mode">
-                Analysemodus
-            </label>
+                    <button
+                        class="nav-link p-2 d-flex flex-column align-items-center justify-content-center text-wrap"
+                        :class="{ active: selectedOption === key }"
+                        type="button"
+                        @click="selectedOption = key"
+                    >
+                        <i
+                            :class="[item.icon, 'me-2']"
+                        />
+                        {{ $t(item.text) }}
+                    </button>
+                </li>
+            </ul>
         </div>
-        <template v-if="Object.keys(result).length > 0">
-            <p class="mb-3">
-                <small>Aus Datenschutzgründen wird bei Einwohnerzahlen kleiner 4 die Zahl drei oder null verwendet.</small>
-            </p>
-            <component
-                :is="currentResultComponent"
-                :results="result"
-                class="mb-3"
-            />
-            <FlatButton
-                v-if="selectedOption === 'click'"
-                :interaction="() => getAnalyzeData(geometry, true)"
-                :text="'Details nach Excel exportieren'"
-                :icon="'bi bi-download'"
-            />
-        </template>
+        <div class="tab-content mt-3">
+            <div
+                v-if="selectedOption === 'draw'"
+            >
+                <h5 class="px-3">
+                    Zeichnen
+                </h5>
+                <div
+                    class="d-flex align-items-start justify-content-between w-100 mb-3"
+                >
+                    <DrawTypes
+                        :current-layout="currentLayout"
+                        :draw-types="['polygon', 'box', 'circle']"
+                        :draw-type-labels="drawTypeLabels"
+                        :selected-draw-type="selectedDrawType"
+                        :selected-draw-type-main="selectedDrawTypeMain"
+                        :source="layer.getSource()"
+                        :set-selected-draw-type="value => selectedDrawType = value"
+                        :set-selected-draw-type-main="value => selectedDrawTypeMain = value"
+                        @drawstart="resetAll"
+                        @drawend="onDrawEnd"
+                    />
+                    <IconButton
+                        :class-array="['btn-primary']"
+                        aria="Löschen"
+                        icon="bi bi-trash"
+                        :interaction="resetAll"
+                        label="Löschen"
+                    />
+                </div>
+                <hr>
+            </div>
+            <template v-if="result && Object.keys(result).length > 0">
+                <div class="stats-wrapper py-2">
+                    <h5 class="mb-3">
+                        {{ headingText }}
+                    </h5>
+                    <p class="mb-3 text-muted d-flex align-items-start">
+                        <i class="bi bi-info-circle me-2 mt-1" />
+                        <small>Aus Datenschutzgründen wird bei Einwohnerzahlen kleiner 4 die Zahl drei oder null verwendet.</small>
+                    </p>
+                    <div
+                        v-if="selectedOption === 'click'"
+                        class="d-flex justify-content-end mt-2"
+                    >
+                        <FlatButton
+                            :interaction="() => getAnalyzeData(geometry, true)"
+                            text="Alle Daten exportieren"
+                            :icon="'bi bi-download'"
+                        />
+                    </div>
+                    <component
+                        :is="currentResultComponent"
+                        :results="result"
+                        class="mb-3"
+                    />
+                </div>
+            </template>
+            <template v-else>
+                <div
+                    class="alert alert-info border-1 d-flex align-items-center pt-3"
+                    role="alert"
+                >
+                    <i class="alert-icon bi bi-info-circle me-4 mt-1" />
+                    <div>
+                        {{ noResultAlertText }}
+                    </div>
+                </div>
+            </template>
+        </div>
     </div>
 </template>
+<style lang="scss" scoped>
+ .tab-bar {
+        .nav-link {
+            color: $dark_blue;
+            line-height: 1.2;
+        }
+        .active {
+            font-family: $font_family_accent;
+            border-bottom: 2px solid $secondary;
+            color: $secondary;
+        }
+        li:has(button:disabled) {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    }
+    .alert-info {
+        background-color: rgba($light-blue, 0.7);
+        border-color: $secondary;
+        color: $secondary;
+    }
+    .alert-icon {
+        font-size: $icon_length_small;
+    }
+</style>

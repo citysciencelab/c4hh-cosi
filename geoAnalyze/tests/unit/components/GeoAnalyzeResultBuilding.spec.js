@@ -75,53 +75,55 @@ describe("addons/geoAnalyze/components/GeoAnalyzeResultBuilding.vue", () => {
     });
 
     it("should render the correct values of the population", () => {
-        const spanElements = wrapper.findAll("span");
+        const population = wrapper.findAll(".population dd");
 
-        expect(spanElements.at(0).text()).to.equal("Einwohnerzahl Hauptsitz gesamt: 65");
-        expect(spanElements.at(1).text()).to.equal("Einwohnerzahl Nebensitz gesamt: 3");
+        expect(population.at(0).text().trim()).to.equal("65");
+        expect(population.at(1).text().trim()).to.equal("3");
     });
 
-    it("should render a table", () => {
-        expect(wrapper.find("table").exists()).to.be.true;
+    it("should render the results-grid with cards", () => {
+        expect(wrapper.find(".results-grid").exists()).to.be.true;
+        expect(wrapper.findAll(".card").length).to.equal(results.length);
     });
 
-    it("should render a table with the bootstrap css classes table and table-borderd", () => {
-        expect(wrapper.find("table").classes("table")).to.be.true;
-        expect(wrapper.find("table").classes("table-bordered")).to.be.true;
+    it("should render the correct labels in the info rows", () => {
+        const firstCardLabels = wrapper.findAll(".card").at(0).findAll("dt");
+
+        expect(firstCardLabels.at(0).text().trim()).to.equal("Einwohnerzahl Hauptsitz");
+        expect(firstCardLabels.at(1).text().trim()).to.equal("Einwohnerahl Nebensitz");
+        expect(firstCardLabels.at(2).text().trim()).to.equal("Obergeschosse");
+        expect(firstCardLabels.at(3).text().trim()).to.equal("Erdgeschosse");
+        expect(firstCardLabels.at(4).text().trim()).to.equal("Bauweise");
+        expect(firstCardLabels.at(5).text().trim()).to.equal("Gebäudefunktion");
+        expect(firstCardLabels.at(6).text().trim()).to.equal("Dachform");
     });
 
-    it("should render the correct table header values", () => {
-        const thElements = wrapper.findAll("th");
+    it("should render the correct values in the first card", () => {
+        const firstCard = wrapper.findAll(".card").at(0),
+            values = firstCard.findAll("dd");
 
-        expect(thElements.at(0).text()).to.equal("Adresse");
-        expect(thElements.at(1).text()).to.equal("Einwohnerzahl Hauptsitz");
-        expect(thElements.at(2).text()).to.equal("Einwohnerahl Nebensitz");
-        expect(thElements.at(3).text()).to.equal("Obergeschosse");
-        expect(thElements.at(4).text()).to.equal("Erdgeschosse");
-        expect(thElements.at(5).text()).to.equal("Bauweise");
-        expect(thElements.at(6).text()).to.equal("Gebäudefunktion");
-        expect(thElements.at(7).text()).to.equal("Dachform");
+        expect(firstCard.find(".card-title").text().trim()).to.equal(results[0].adresse);
+        expect(values.at(0).text().trim()).to.equal(results[0].ew_haupt.toString());
+        expect(values.at(1).text().trim()).to.equal(results[0].ew_neben.toString());
+        expect(values.at(2).text().trim()).to.equal(results[0].anzahlobergeschosse.toString());
+        expect(values.at(3).text().trim()).to.equal(results[0].anzahluntergeschosse.toString());
+        expect(values.at(4).text().trim()).to.equal(results[0].bauweise);
+        expect(values.at(5).text().trim()).to.equal(results[0].gebaeudefunktion);
+        expect(values.at(6).text().trim()).to.equal(results[0].dachform);
     });
 
-    it("should render the correct table cell values", () => {
-        const tdElements = wrapper.findAll("td");
+    it("should render the correct values in the second card", () => {
+        const secondCard = wrapper.findAll(".card").at(1),
+            values = secondCard.findAll("dd");
 
-        expect(tdElements.at(0).text()).to.equal(results[0].adresse);
-        expect(tdElements.at(1).text()).to.equal(results[1].adresse);
-        expect(tdElements.at(2).text()).to.equal(results[0].ew_haupt.toString());
-        expect(tdElements.at(3).text()).to.equal(results[1].ew_haupt.toString());
-        expect(tdElements.at(4).text()).to.equal(results[0].ew_neben.toString());
-        expect(tdElements.at(5).text()).to.equal(results[1].ew_neben.toString());
-        expect(tdElements.at(6).text()).to.equal(results[0].anzahlobergeschosse.toString());
-        expect(tdElements.at(7).text()).to.equal(results[1].anzahlobergeschosse.toString());
-        expect(tdElements.at(8).text()).to.equal(results[0].anzahluntergeschosse.toString());
-        expect(tdElements.at(9).text()).to.equal(results[1].anzahluntergeschosse.toString());
-        expect(tdElements.at(10).text()).to.equal(results[1].bauweise);
-        expect(tdElements.at(11).text()).to.equal(results[0].bauweise);
-        expect(tdElements.at(12).text()).to.equal(results[1].gebaeudefunktion);
-        expect(tdElements.at(13).text()).to.equal(results[0].gebaeudefunktion);
-        expect(tdElements.at(14).text()).to.equal(results[1].dachform);
-        expect(tdElements.at(15).text()).to.equal(results[0].dachform);
+        expect(secondCard.find(".card-title").text().trim()).to.equal(results[1].adresse);
+        expect(values.at(0).text().trim()).to.equal(results[1].ew_haupt.toString());
+        expect(values.at(1).text().trim()).to.equal(results[1].ew_neben.toString());
+        expect(values.at(2).text().trim()).to.equal(results[1].anzahlobergeschosse.toString());
+        expect(values.at(3).text().trim()).to.equal(results[1].anzahluntergeschosse.toString());
+        expect(values.at(4).text().trim()).to.equal(results[1].bauweise);
+        expect(values.at(5).text().trim()).to.equal(results[1].gebaeudefunktion);
+        expect(values.at(6).text().trim()).to.equal(results[1].dachform);
     });
 
     it("should call the function 'removePolygonMarker before component destroyed", async () => {

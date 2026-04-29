@@ -42,22 +42,11 @@ describe("addons/geoAnalyze/components/GeoAnalyze.vue", () => {
         expect(wrapper.exists()).to.be.true;
     });
 
-    it("should activate the draw interaction initially", () => {
-        expect(wrapper.vm.draw.getActive()).to.be.true;
-    });
-
     it("should activate select interaction if data 'selectedOption' is set to 'select'", async () => {
         await wrapper.setData({
             selectedOption: "select"
         });
         expect(wrapper.vm.select.getActive()).to.be.true;
-    });
-
-    it("should deactivate draw interaction if data 'selectedOption' is set to 'select'", async () => {
-        await wrapper.setData({
-            selectedOption: "select"
-        });
-        expect(wrapper.vm.draw.getActive()).to.be.false;
     });
 
     it("should set currentResultComponent to 'GeoAnalyzeResultGeometry' if data 'selectedOption' is set to 'select'", async () => {

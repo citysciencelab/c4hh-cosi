@@ -43,78 +43,87 @@ export default {
 </script>
 
 <template lang="html">
-    <div>
-        <dl class="dl-horizontal row">
-            <dt class="col-6 d-flex justify-content-end">
-                Einwohnerzahl Hauptsitz gesamt:
+    <div class="stats-wrapper py-2 ps-4">
+        <dl class="row g-2">
+            <dt class="col-sm-7 text-muted">
+                Einwohnerzahl Hauptsitz gesamt
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 text-muted">
                 {{ sum_ew_haupt }}
             </dd>
-            <dt class="col-6 d-flex justify-content-end">
-                Einwohnerzahl Nebensitz gesamt:
+
+            <dt class="col-sm-7 text-muted">
+                Einwohnerzahl Nebensitz gesamt
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 mb-3 text-muted">
                 {{ sum_ew_neben }}
             </dd>
-        </dl>
-        <hr>
-        <dl class="dl-horizontal row">
-            <dt class="col-6 d-flex justify-content-end">
-                Summe der Schulen:
+
+            <div class="col-12">
+                <hr class="my-2">
+            </div>
+            <dt class="col-sm-7 text-muted">
+                Summe der Schulen
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 text-muted">
                 {{ schools_sum }}
             </dd>
-            <dt class="col-6 d-flex justify-content-end">
-                Summe der Schüler:
+
+            <dt class="col-sm-7 text-muted">
+                Summe der Schüler
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 mb-3 text-muted">
                 {{ students_sum }}
             </dd>
-        </dl>
-        <hr>
-        <dl class="dl-horizontal row">
-            <dt class="col-6 d-flex justify-content-end">
+
+            <div class="col-12">
+                <hr class="my-2">
+            </div>
+            <dt class="col-sm-7 text-muted">
                 Summe der Kitas:
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 text-muted">
                 {{ sum_kita }}
             </dd>
-            <dt class="col-6 d-flex justify-content-end">
-                Summe der Kinder:
+
+            <dt class="col-sm-7 text-muted">
+                Summe der Kinder
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 mb-3 text-muted">
                 {{ sum_children }}
             </dd>
-        </dl>
-        <hr>
-        <dl class="dl-horizontal row">
-            <dt class="col-6 d-flex justify-content-end">
-                Summe der Krankenhäuser:
+
+            <div class="col-12">
+                <hr class="my-2">
+            </div>
+            <dt class="col-sm-7 text-muted">
+                Summe der Krankenhäuser
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 text-muted">
                 {{ sum_hospitals }}
             </dd>
-            <dt class="col-6 d-flex justify-content-end">
-                Summe der Planbetten:
+
+            <dt class="col-sm-7 text-muted">
+                Summe der Planbetten
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 mb-3 text-muted">
                 {{ sum_hospitals_beds }}
             </dd>
-        </dl>
-        <hr>
-        <dl class="dl-horizontal row">
-            <dt class="col-6 d-flex justify-content-end">
-                Summe der Pflegeeinrichtungen:
+
+            <div class="col-12">
+                <hr class="my-2">
+            </div>
+            <dt class="col-sm-7 text-muted">
+                Summe der Pflegeeinrichtungen
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 text-muted">
                 {{ sum_care_facility }}
             </dd>
-            <dt class="col-6 d-flex justify-content-end">
-                Summe der Pflegeplätze:
+
+            <dt class="col-sm-7 text-muted">
+                Summe der Pflegeplätze
             </dt>
-            <dd class="col-6">
+            <dd class="col-sm-5 border-start-sm ps-sm-3 text-muted">
                 {{ sum_care_places }}
             </dd>
         </dl>
@@ -125,13 +134,5 @@ export default {
     hr {
         margin-top: 10px;
         margin-bottom: 10px;
-    }
-    .dl-horizontal {
-        dd {
-            margin-bottom: 0;
-        }
-        dt {
-            font-family: "MasterPortalFont Bold", "Arial Narrow", Arial, sans-serif;
-        }
     }
 </style>
