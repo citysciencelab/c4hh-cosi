@@ -458,7 +458,7 @@ Layer2dRasterWmsTimeLayer.prototype.prepareTimeSliderObject = function (time, fi
         timeData = {
             defaultValue: defaultValue,
             defaultValueEnd: defaultValueEnd,
-            dimensionName: time.dimensionName.toUpperCase(),
+            dimensionName: time.dimensionName,
             step: step,
             timeRange: filtereTimeRangeByRegex,
             staticDimensions: staticDimensionsWithDefaultValue,
