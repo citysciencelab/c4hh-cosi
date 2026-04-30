@@ -19,7 +19,7 @@ setTimeout(() => {
             });
         });
     }
-}, 200);
+}, 500);
 
 /**
  * Setting the attributes in feature for mouseHover
@@ -37,8 +37,6 @@ function updateMouseHoverAttribute (feature) {
     let phenomenonTime = "",
         phenomenonTimeRange = "invalid date",
         absTrafficCount = "",
-        absTrafficCarCount = "",
-        absTrafficSVCount = "",
         direction = "";
 
     if (feature.get("Datastreams") && Array.isArray(feature.get("Datastreams")) && feature.get("Datastreams").length
@@ -66,10 +64,8 @@ function updateMouseHoverAttribute (feature) {
         else if (layerName.includes("Anzahl_Kfz") && layerName.indexOf(" | ") === -1 && absTrafficCount.indexOf(" | ") === -1) {
             absTrafficCount = carsHeaderSuffix + ": " + thousandsSeparator(absTrafficCount) + " " + direction;
         }
-        else if (layerName.includes("Anzahl_SV") && layerName.indexOf(" | ") > -1 && absTrafficCount.indexOf(" | ") > -1) {
-            absTrafficCarCount = getKfzTrafficCount(absTrafficCount, layerName, "Anzahl_Kfz");
-            absTrafficSVCount = getKfzTrafficCount(absTrafficCount, layerName, "Anzahl_SV");
-            absTrafficCount = carsHeaderSuffix + ": " + thousandsSeparator(absTrafficCarCount) + " " + direction + "<br><span class='title'>" + trucksHeaderSuffix + ": " + thousandsSeparator(absTrafficSVCount) + "</span>";
+        else if (layerName.includes("Anzahl_Schwerverkehr")) {
+            absTrafficCount = trucksHeaderSuffix + ": " + thousandsSeparator(absTrafficCount) + " " + direction;
         }
     }
 
