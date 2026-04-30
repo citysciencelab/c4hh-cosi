@@ -23,9 +23,13 @@ const {
 } = actions;
 
 describe("src/modules/measure/store/actionsMeasureUndoRedo", function () {
-    let commit, dispatch, state, getters;
+    let commit, dispatch, state, getters, warn, error;
 
     beforeEach(() => {
+        warn = sinon.spy();
+        sinon.stub(console, "warn").callsFake(warn);
+        error = sinon.spy();
+        sinon.stub(console, "error").callsFake(error);
         commit = sinon.spy();
         dispatch = sinon.spy();
         state = {
