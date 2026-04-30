@@ -214,7 +214,7 @@ export default {
                     v-for="measurement in measurementList"
                     :key="measurement.id"
                     class="measure-list-item"
-                    :class="{ 'selected': Number(selectedFeatureId) === Number(measurement.id) }"
+                    :class="{ 'modifying': isModifying(measurement.id) }"
                     role="button"
                     tabindex="0"
                     :aria-label="getDisplayName(measurement) + ' – ' + measurement.displayValue"
@@ -278,7 +278,7 @@ export default {
                         <IconButton
                             :id="'measure-item-modify-' + measurement.id"
                             :aria="getModifyButtonText(measurement.id)"
-                            :class-array="['btn-sm', isModifying(measurement.id) ? 'btn-modify-active' : 'btn-light']"
+                            :class-array="['btn-sm', 'btn-light', isModifying(measurement.id) ? 'active' : '']"
                             :interaction="() => $emit('modify-measurement', measurement.id)"
                             icon="bi-tools"
                             :title="getModifyButtonText(measurement.id)"
@@ -288,7 +288,7 @@ export default {
                             :aria="$t('common:modules.measure.edit.delete')"
                             :class-array="['btn-sm', 'btn-light']"
                             :interaction="() => $emit('delete-measurement', measurement.id)"
-                            icon="bi-eraser-fill"
+                            icon="bi-trash"
                             :title="$t('common:modules.measure.edit.delete')"
                         />
                     </div>
@@ -379,8 +379,7 @@ export default {
             border-bottom: none;
         }
 
-        &:hover,
-        &.selected {
+        &:hover {
             background-color: $light_blue;
         }
 
@@ -445,15 +444,11 @@ export default {
         .measure-item-actions {
             display: flex;
             gap: 0.25rem;
+        }
 
-            :deep(.btn-modify-active) {
-                --bs-btn-color: #ffffff;
-                --bs-btn-bg: $dark_blue;
-                --bs-btn-border-color: $dark_blue;
-                --bs-btn-hover-color: #ffffff;
-                --bs-btn-hover-bg: #{$secondary};
-                --bs-btn-hover-border-color: #{$secondary};
-            }
+        &.modifying {
+            border-left: 3px solid $dark_blue;
+            background-color: lighten($dark_blue, 65%);
         }
     }
 }
