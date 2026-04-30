@@ -1,10 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import sinon from "sinon";
 import MeasureList from "@modules/measure/components/MeasureList.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-
-config.global.mocks.$t = key => key;
 
 describe("src/modules/measure/components/MeasureList.vue", function () {
     const defaultMeasurement = {
@@ -26,9 +23,6 @@ describe("src/modules/measure/components/MeasureList.vue", function () {
             props: {
                 measurementList: [defaultMeasurement],
                 ...propsData
-            },
-            global: {
-                mocks: {$t: key => key}
             }
         });
     }
@@ -45,10 +39,6 @@ describe("src/modules/measure/components/MeasureList.vue", function () {
 
         return btn ? btn.props("interaction") : null;
     }
-
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("rendering", function () {
         it("renders a list item for each measurement", function () {
