@@ -84,6 +84,7 @@
 - URLParams:
     -  ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
     -  Links to other config files have been corrected in the `urlParameter` documentation.
+- WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 
 ---
 
@@ -91,10 +92,8 @@
 
 ### Fixed
 - Routing: Fixed bug where restricted areas (Sperrflächen) couldn't be selected.
+- WMS-Time: Fixed WMS-T layers being set to `visibility: false` when comparing time or moving in layer tree.
 - LayerSelection: Fixed breadcrumb being overlapped by layer entries.
-- WMS-Time:
-    - Fixed WMS-T layers being set to `visibility: false` when comparing time or moving in layer tree.
-    - The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 
 ---
 
