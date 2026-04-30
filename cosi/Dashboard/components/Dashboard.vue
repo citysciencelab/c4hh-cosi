@@ -599,6 +599,15 @@ export default {
         },
 
         /**
+         * Checks if there is meta data existed in item.
+         * @param {Object} item - The item for (dataset) which the metadata should be opened.
+         * @returns {Boolean} True if it has meta data
+         */
+        checkMetadata (item) {
+            return typeof rawLayerList.getLayerWhere({id: item.layerId})?.datasets[0] !== "undefined";
+        },
+
+        /**
          * @description Sanitizes the export data. Removes excluded columns.
          * @param {Object[]} json - the array of objects
          * @param {String[]} exclude - the list of keys to exclude
@@ -867,7 +876,7 @@ export default {
                                         :class="item.visualized ? 'is-selected' : ''"
                                     >{{ item.category }}</span>
                                     <IconButton
-                                        v-if="!item.calculation"
+                                        v-if="checkMetadata(item)"
                                         :id="item.id"
                                         :class-array="['btn-light', 'fs-5', 'ms-1']"
                                         :aria="$t('common:modules.layerTree.infosAndLegend')"
