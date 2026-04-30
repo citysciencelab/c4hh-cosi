@@ -100,8 +100,6 @@ const simpleGetters = {
         return measurements;
     },
 
-    // ── Interaction-lifecycle getters (moved from MeasureInMap.vue computed) ──────
-
     /**
      * Returns a function that finds a measurement feature in the OL source by ol_uid.
      * Reading geometryUpdateTrigger ensures this getter recomputes when OL geometry changes.

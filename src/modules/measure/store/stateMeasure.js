@@ -27,9 +27,17 @@ import source from "../js/measureSource.js";
  * @property {module:ol/vector/Layer} layer draw layer
  * @property {String} featureId ol_uid of the current feature
  * @property {Number[]} tooltipCoord coordinates to show the tooltip at
- */
+ * @property {Object} featureHistories per-feature undo/redo history stacks, keyed by normalizedId
+ * @property {module:ol/Feature|null} currentSketch OL feature currently being drawn
+ * @property {Array} drawingPointHistory redo stack for points removed from the active sketch
+ * @property {String|Number|null} currentlyModifyingFeatureId ol_uid of the feature currently in modify mode
+ * @property {String|null} selectedEditInteraction name of the active edit-mode button ("modify"|"delete"|""|null)
+ * @property {module:ol/interaction/Select[]} currentSelectInteractions active OL select interactions
+ * @property {module:ol/interaction/Modify|null} currentModifyInteraction active OL modify interaction
+ * @property {Number} geometryUpdateTrigger incremented to force recomputation of geometry-dependent getters
+**/
+
 const state = {
-    // defaults for config.json tool parameters
     description: "common:modules.measure.description",
     name: "common:modules.measure.name",
     hasMouseMapInteractions: true,
@@ -37,12 +45,8 @@ const state = {
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D", "3D"],
     type: "measure",
-
-    // tool-specific config.json parameters
     earthRadius: 6378137,
     measurementAccuracy: "meter",
-
-    // measure form state and UI
     lines: {},
     polygons: {},
     geometryValues: ["LineString", "Polygon"],
@@ -53,37 +57,21 @@ const state = {
     selectedPolygonUnit: "0",
     unlisteners: [],
     isDrawing: false,
-
-    // config-param: enables undo/redo and measurement list
     enableUndoRedo: false,
-
-    // custom names for measurements (key = feature ol_uid as string)
     customNames: {},
-
-    // measure layer and ol
     color: [255, 127, 0, 1.0],
     interaction: null,
     source,
     layer: null,
     featureId: null,
     tooltipCoord: [],
-
-    // interaction lifecycle — moved from MeasureInMap.vue data()
-    /** @type {Object} per-feature undo/redo history stacks, keyed by normalizedId */
     featureHistories: {},
-    /** @type {module:ol/Feature|null} OL feature currently being drawn */
     currentSketch: null,
-    /** @type {Array} redo stack for points removed from the active sketch */
     drawingPointHistory: [],
-    /** @type {String|Number|null} ol_uid of the feature currently in modify mode */
     currentlyModifyingFeatureId: null,
-    /** @type {String|null} name of the active edit-mode button ("modify"|"delete"|""|null) */
     selectedEditInteraction: null,
-    /** @type {module:ol/interaction/Select[]} active OL select interactions */
     currentSelectInteractions: [],
-    /** @type {module:ol/interaction/Modify|null} active OL modify interaction */
     currentModifyInteraction: null,
-    /** @type {Number} incremented to force recomputation of geometry-dependent getters */
     geometryUpdateTrigger: 0
 };
 
