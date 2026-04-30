@@ -57,6 +57,7 @@
         - An attribute `centerOfExtent` has been added to control whether a point geometry is set to the extent of the respective feature or whether the feature itself is displayed in its geometry.
         - WFS versions 1.0.0, 1.1.0, and 2.0.0 are now compatible.
 - WfsSearch: fullViewEnabled can be configured in wfsSearch.
+- Measure: Added undo/redo functionality and a configurable measurement list (point-level undo/redo for active sketches and completed measurements). Enable with `enableUndoRedo: true` in the module configuration.
 
 ### Changed
 - The following packages have been updated:
@@ -100,7 +101,6 @@
 ## 2026-04-01 v3.21.0
 
 ### Added
-- Measure: Added undo/redo functionality and a configurable measurement list (point-level undo/redo for active sketches and completed measurements). Enable with `enableUndoRedo: true` in the tool configuration.
 - PrintMap: Heatmap layers are now included in the print.
 - Style Configuration: Added parameter `polygonImage` to optionally style WFS polygons with centered icon and show this icon in legend and print
 - GetFeatureInfo: In 3D mode, restored feature highlighting and GFI display via share link.
