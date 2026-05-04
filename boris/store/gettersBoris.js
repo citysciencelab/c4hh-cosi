@@ -1,5 +1,5 @@
 import {generateSimpleGetters} from "../../../src/shared/js/utils/generators.js";
-import state from "./stateBoris.js";
+import initialState from "./stateBoris.js";
 
 const getters = {
     /**
@@ -11,12 +11,12 @@ const getters = {
      * @param {object} state state to generate getters for
      * @returns {object.<string, function>} object of getters
      */
-    ...generateSimpleGetters(state),
+    ...generateSimpleGetters(initialState),
     /**
      * Gets the landuse by brwId if parametric URL is being used
      * @returns {String} returns the landuse of the selected feature
      */
-    findLanduseByBrwId () {
+    findLanduseByBrwId: state => {
         if (state.selectedPolygon !== undefined) {
             const landuseList = state.selectedPolygon.get("nutzungsart"),
                 brwId = state.paramUrlParams.brwId,
@@ -39,7 +39,7 @@ const getters = {
      * @param  {Backbone.Model[]} filteredLayerList List of all selected WMS Layers
      * @returns {String} layername which is used as date
      */
-    getDateBySelectedLayerName () {
+    getDateBySelectedLayerName: state => {
         let date = "";
         const selectedLayer = state.filteredLayerList.find(layer => layer.visibility === true);
 
@@ -47,6 +47,32 @@ const getters = {
             date = selectedLayer.name;
         }
         return date;
+    },
+    /**
+     * Provides state for urlParams.
+     * @param {Object} state state of the app-store.
+     * @returns {Object} state for urlParams
+     */
+    urlParams: (state) => {
+        const urlParamsState = Object.assign({}, state, {
+            brwFeatures: [],
+            selectedBrwFeature: {},
+            selectedLanduse: "",
+            selectedPolygon: null,
+            selectedLayer: null,
+            filteredLayerList: [],
+            isAreaLayer: true,
+            isStripesLayer: false,
+            selectedLayerName: "01.01.2022",
+            textIds: [],
+            convertedBrw: "",
+            isProcessFromParametricUrl: false,
+            paramUrlParams: {},
+            selectedBuildDesign: "",
+            selectedPositionToStreet: "F Frontlage"
+        });
+
+        return urlParamsState;
     }
 };
 

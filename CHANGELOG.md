@@ -17,6 +17,7 @@
 
 ### Fixed
 - vcOblique: Fixed an issue with VC Map 6 where markers and images appeared at the initial map position instead of the current view when opening vcOblique after panning.
+- Boris: Set state in urlParams to provide open boris by shareView without selection.
 
 ---
 

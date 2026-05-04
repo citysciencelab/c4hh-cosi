@@ -57,6 +57,9 @@ const actions = {
             dispatch("Maps/setCenter", center, {root: true});
             dispatch("requestGFI", {processFromParametricUrl, center});
         }
+        else if (rootState.urlParams.LAYERS) {
+            dispatch("initialize");
+        }
     },
     /**
      * Simulates landuse selection when parametric URL is being used

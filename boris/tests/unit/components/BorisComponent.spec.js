@@ -97,9 +97,12 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
                     }
                 }
             },
-            getters: {mobile: () => false},
+            getters: {
+                mobile: () => false
+            },
             state: {
-                configJson: mockConfigJson
+                configJson: mockConfigJson,
+                urlParams: {}
             }
         });
     });
