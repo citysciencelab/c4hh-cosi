@@ -242,5 +242,8 @@
   },
   "fileImportAddon": {
     "type": "tool"
+  },
+  "storySelector": {
+    "type": "tool"
   }
 }

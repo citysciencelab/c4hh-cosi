@@ -1,0 +1,10 @@
+{
+  "modules": {
+      "storySelector": {
+        "text": "Auf eine Story klicken um diese zu öffnen",
+        "title": "Story Auswahl",
+        "openStoryButton": "zur Story",
+        "noStoriesAvailable": "Keine Stories verfügbar"
+      }
+  }
+}

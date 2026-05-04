@@ -33,7 +33,7 @@ The main attributes of the story.json configuration file are the follwing:
 7. "coverImageCopyright" - The copyright of the cover image
 8. "displayType" - The display type defining the player used. At this stage only "dipas" is available
 9. "showHomeButton" - Boolean value to define if the button to get to the overview of all available stories is shown.
-                        Note, the addon dipasStorySelecter must be configured to be able to show the overview of all stories.
+                        Note, the addon storySelector must be configured to be able to show the overview of all stories.
 10. "styleCSS" - The path to a css style sheet which overwrites some colors
 11. "showDipasLogo" - Boolean value to define if the DIPAS_stories logo at the top shall be shown. Default is true.
 12. "steps" - Array of the story steps
