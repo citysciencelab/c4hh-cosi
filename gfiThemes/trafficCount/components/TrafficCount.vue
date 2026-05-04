@@ -92,14 +92,16 @@ export default {
         typeAssoc: function () {
             return {
                 Anzahl_Kfz: this.$t("additional:modules.tools.gfi.themes.trafficCount.infraredsensor"),
-                Anzahl_Fahrraeder: this.$t("additional:modules.tools.gfi.themes.trafficCount.infraredsensor")
+                Anzahl_Fahrraeder: this.$t("additional:modules.tools.gfi.themes.trafficCount.infraredsensor"),
+                Anzahl_Schwerverkehr: this.$t("additional:modules.tools.gfi.themes.trafficCount.infraredsensor")
             };
         },
 
         meansOfTransportAssoc: function () {
             return {
                 Anzahl_Kfz: this.$t("additional:modules.tools.gfi.themes.trafficCount.carLabel"),
-                Anzahl_Fahrraeder: this.$t("additional:modules.tools.gfi.themes.trafficCount.bicycleLabel")
+                Anzahl_Fahrraeder: this.$t("additional:modules.tools.gfi.themes.trafficCount.bicycleLabel"),
+                Anzahl_Schwerverkehr: this.$t("additional:modules.tools.gfi.themes.trafficCount.carLabel")
             };
         },
 

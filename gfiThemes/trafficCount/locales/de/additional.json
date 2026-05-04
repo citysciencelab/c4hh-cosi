@@ -63,7 +63,11 @@
                             "monthsShort": ["Jan", "Feb", "März", "Apr", "Mai", "Juni", "Juli", "Aug", "Sep", "Okt", "Nov", "Dez"],
                             "weekdays": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
                             "weekdaysShort": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
-                        }
+                        },
+                        "heavyTraffic": "(Schwerverkehr)",
+                        "isHeavyTrafficAvailableDesc": "Schwerverkehr vorhanden",
+                        "available": "Ja",
+                        "inavailable": "Nein"
                     }
                 }
             }
