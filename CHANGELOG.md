@@ -95,6 +95,7 @@
 - URLParams:
     -  ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
     -  Links to other config files have been corrected in the `urlParameter` documentation.
+- ShareView: Deleted addon specific string and fixed handling of urlParams in addon.
 
 ---
 
