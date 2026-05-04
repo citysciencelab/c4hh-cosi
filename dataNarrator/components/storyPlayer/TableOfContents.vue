@@ -29,12 +29,38 @@ export default {
         }
     },
     emits: ["close-toc"],
+    data () {
+        return {
+            tocMaxHeight: "80dvh"
+        };
+    },
     computed: {
-        ...mapGetters("Tools/StoryTellingTool", Object.keys(getters)),
+        ...mapGetters("Modules/DataNarrator", Object.keys(getters)),
         ...mapGetters(["uiStyle"]),
         activeStepTitle () {
             return this.steps[this.currentStep] ? this.steps[this.currentStep].title : 0;
         }
+    },
+    mounted () {
+        this.updateMaxHeight();
+
+        if (this.dataNarratorMenuSide === "secondaryMenu") {
+            this.parentContainer = document.getElementById("mp-body-secondaryMenu");
+        }
+        else if (this.dataNarratorMenuSide === "mainMenu") {
+            this.parentContainer = document.getElementById("mp-body-mainMenu");
+        }
+
+        if (this.parentContainer) {
+            this.parentContainer.addEventListener("scroll", this.updateMaxHeight);
+        }
+        window.addEventListener("resize", this.updateMaxHeight);
+    },
+    beforeUnmount () {
+        if (this.parentContainer) {
+            this.parentContainer.removeEventListener("scroll", this.updateMaxHeight);
+        }
+        window.removeEventListener("resize", this.updateMaxHeight);
     },
     methods: {
         scrollToStep (evt, stepTitle, isKeyboard = false) {
@@ -61,7 +87,14 @@ export default {
                     evt.preventDefault();
                 }
 
-                const container = document.getElementById("mp-body-secondaryMenu");
+                let container;
+
+                if (this.dataNarratorMenuSide === "secondaryMenu") {
+                    container = document.getElementById("mp-body-secondaryMenu");
+                }
+                else if (this.dataNarratorMenuSide === "mainMenu") {
+                    container = document.getElementById("mp-body-mainMenu");
+                }
 
                 if (container) {
                     const containerRect = container.getBoundingClientRect(),
@@ -83,19 +116,35 @@ export default {
             if (event.key === "Enter" || event.key === " ") {
                 this.scrollToStep(event, stepTitle, true);
             }
+        },
+        updateMaxHeight () {
+            this.$nextTick(() => {
+                const tocEl = this.$el;
+
+                if (tocEl) {
+                    const rect = tocEl.getBoundingClientRect(),
+                        availableHeight = window.innerHeight - rect.top - 20;
+
+                    this.tocMaxHeight = `${Math.max(availableHeight, 150)}px`;
+                }
+            });
         }
     }
 };
 </script>
 
 <template>
-    <div class="toc">
-        <h1>
-            {{ storyTitle }}
-        </h1>
+    <div
+        class="toc"
+        :style="{ maxHeight: tocMaxHeight }"
+    >
         <div
             class="tob-list"
         >
+            <h1>
+                {{ storyTitle }}
+            </h1>
+
             <ul
                 class="list-unstyled step-list"
                 :class="{tableList: uiStyle.toUpperCase() === 'TABLE'}"
@@ -169,15 +218,21 @@ h1 {
 }
 
 .toc {
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
     .tob-list {
         opacity: 0.99;
         background-color: white;
         z-index: 1;
-        height: 100%;
         display: flex;
+        flex-direction: column;
         margin: 15px 20px 10px 10px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        flex: 1 1 auto;
+        min-height: 0;  // important: allows flex child to shrink below its content size
 
         ul.step-list {
             cursor: pointer;

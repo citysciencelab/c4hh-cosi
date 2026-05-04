@@ -66,8 +66,6 @@ export default {
             dipasPlayerHeadingStyle: "display: none;",
             dipasPlayerToolBodyStyle: "background-color: transparent !important; -ms-overflow-style: none; overflow-y: auto; max-height: 100%; padding: 0.25rem;",
             currentOrientationType: screen.orientation?.type || ""
-            dipasPlayerToolBodyStyle: "background-color: transparent !important; -ms-overflow-style: none; overflow-y: auto; max-height: 100%; padding: 0.25rem;",
-            currentOrientationType: screen.orientation?.type || ""
         };
     },
     computed: {

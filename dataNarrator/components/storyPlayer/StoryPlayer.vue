@@ -69,36 +69,6 @@ export default {
         stepsCopy () {
             return JSON.parse(JSON.stringify(this.storyConf.steps));
         },
-        /**
-         * Determines on which menu side the dataNarrator is located.
-         * @returns {String} "mainMenu", "secondaryMenu" or "" depending on where the tool is located
-         */
-        dataNarratorMenuSide () {
-            let isInMainMenu = false,
-                isInSecondaryMenu = false;
-
-            this.mainMenu.sections.forEach((section) => {
-                isInMainMenu = section.find(m => {
-                    return m.type === this.type;
-                });
-            });
-
-            if (isInMainMenu) {
-                return "mainMenu";
-            }
-
-            this.secondaryMenu.sections.forEach((section) => {
-                isInSecondaryMenu = section.find(m => {
-                    return m.type === this.type;
-                });
-            });
-
-            if (isInSecondaryMenu) {
-                return "secondaryMenu";
-            }
-
-            return "";
-        },
         isMobilePortrait () {
             return this.isMobileDevice && screen.orientation?.type.startsWith("portrait");
         }

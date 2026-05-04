@@ -97,7 +97,8 @@ describe("addons/dataNarrator/tests/unit/components/StoryPlayer.spec.js", () => 
                                 autoplay: state => state.autoplay,
                                 storyConf: state => state.storyConf,
                                 mode: state => state.mode,
-                                storyConfJson: state => state.storyConfJson
+                                storyConfJson: state => state.storyConfJson,
+                                dataNarratorMenuSide: () => "secondaryMenu"
                             },
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {

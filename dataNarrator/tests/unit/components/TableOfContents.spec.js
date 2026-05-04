@@ -4,7 +4,6 @@ import {expect} from "chai";
 import {createStore} from "vuex";
 import TableOfContents from "../../../components/storyPlayer/TableOfContents.vue";
 
-
 describe("addons/dataNarrator/tests/unit/TableOfContents.spec.js", () => {
     let steps;
     let stepsObjects;
@@ -38,14 +37,23 @@ describe("addons/dataNarrator/tests/unit/TableOfContents.spec.js", () => {
         // Minimal Vuex store mock for required getters
         store = createStore({
             modules: {
-                Tools: {
+                Modules: {
                     namespaced: true,
                     modules: {
-                        StoryTellingTool: {
+                        DataNarrator: {
                             namespaced: true,
-                            state: () => ({}),
+                            state: () => ({
+                                showLoadingSpinner: false,
+                                autoplay: false,
+                                storyConf: {
+                                    title: "Test Story Title"
+                                }
+                            }),
                             getters: {
-                                // Provide all getters from ../../store/gettersDataNarrator as stubs
+                                showLoadingSpinner: state => state.showLoadingSpinner,
+                                autoplay: state => state.autoplay,
+                                storyConf: state => state.storyConf,
+                                dataNarratorMenuSide: () => "secondaryMenu"
                             }
                         }
                     }
