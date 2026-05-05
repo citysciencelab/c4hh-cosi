@@ -36,12 +36,14 @@ describe("addons/dataNarrator/tests/unit/DataNarrator.spec.js", () => {
                             state: () => ({
                                 showLoadingSpinner: false,
                                 autoplay: true,
-                                storyConfJson: "mockConfigJsStoryConf.json"
+                                storyConfJson: "mockConfigJsStoryConf.json",
+                                icon: "bi-book"
                             }),
                             getters: {
                                 showLoadingSpinner: state => state.showLoadingSpinner,
                                 autoplay: state => state.autoplay,
-                                storyConfJson: state => state.storyConfJson
+                                storyConfJson: state => state.storyConfJson,
+                                icon: state => state.icon
                             },
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {
