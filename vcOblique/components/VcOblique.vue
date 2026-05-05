@@ -1,23 +1,14 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import mutationsObliqueViewer from "../store/mutationsVcOblique.js";
-import iframeResizer from "iframe-resizer/js/iframeResizer";
 
 export default {
     name: "VcOblique",
-    directives: {
-        resize: {
-            beforeMount (el, {value = {}}) {
-                el.addEventListener("load", () => {
-                    if (!el.iFrameResizer) {
-                        iframeResizer({...value, warningTimeout: 0}, el);
-                    }
-                });
-            },
-            beforeUnmount (el) {
-                el?.iFrameResizer?.removeListeners();
-            }
-        }},
+        data () {
+        return {
+            resizeObserver: null
+        };
+    },
     computed: {
         ...mapGetters("Modules/VcOblique", [
             "active",
@@ -49,6 +40,8 @@ export default {
         this.$nextTick(() => {
             this.createObliqueViewerURL(this.center || this.initialCenter);
             this.initObliqueView();
+
+            this.initializeResizer();
         });
     },
     beforeUnmount () {
@@ -61,10 +54,32 @@ export default {
             "initObliqueView",
             "resetObliqueViewer",
             "obliqueView",
-            "createObliqueViewerURL"])
+            "createObliqueViewerURL"
+        ]),
+
+        /**
+         * Initialize the iframe resizer for the oblique viewer iframe.
+         * @returns {void}
+         */
+        initializeResizer () {
+                        const container = document.getElementById("obliqueViewer"),
+                iframe = this.$refs.iframeContent;
+
+            if (container && iframe) {
+                this.resizeObserver = new ResizeObserver((entries) => {
+                    for (const entry of entries) {
+                        const {height, width} = entry.contentRect;
+
+                        iframe.style.height = `${height}px`;
+                        iframe.style.width = `${width}px`;
+                    }
+                });
+
+                this.resizeObserver.observe(container);
+            }
+        }
     }
 };
-
 </script>
 
 <template lang="html">
@@ -75,11 +90,8 @@ export default {
         <iframe
             id="obliqueIframe"
             ref="iframeContent"
-            v-resize="{}"
             title="ObliqueIframe"
-            width="100%"
-            height="100%"
-            frameboarder="0"
+            style="border: 0; display: block;"
             :src="obliqueViewerURL"
         />
         <div
@@ -112,4 +124,3 @@ export default {
     }
 }
 </style>
-

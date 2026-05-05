@@ -18,6 +18,7 @@
       - sdpDownload: 
         - @turf/helpers": ^7.2.0 to ^7.3.5
         - @turf/intersect": ^7.2.0 to ^7.3.5
+- vcOblique: Replaced iframe-resizer package with the native ResizeObserver API due to its license change to GPL.
 
 ### Deprecated
 
