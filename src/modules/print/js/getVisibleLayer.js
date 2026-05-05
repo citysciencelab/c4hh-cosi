@@ -1,5 +1,6 @@
 import {Group as LayerGroup} from "ol/layer.js";
 import store from "@appstore/index.js";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
 /**
  * Collects all visible ol layers, including layers of groups.
  * @param {Boolean} [printMapMarker=false] whether layer "markerPoint" should be filtered out
@@ -99,34 +100,7 @@ function checkLayersInResolution (visibleLayerList) {
     });
     store.commit("Modules/Print/setInvisibleLayer", invisibleLayer);
     store.commit("Modules/Print/setInvisibleLayerNames", invisibleLayerNames);
-    sortVisibleLayerListByZindex(newVisibleLayer);
-}
-
-/**
- * sorts the visible layer list by zIndex from layer
- * layers without zIndex keep their original relative order
- * @param {array} visibleLayerList with visible layer
- * @returns {void}
- */
-function sortVisibleLayerListByZindex (visibleLayerList) {
-    const sortedVisibleLayerList = [...visibleLayerList]
-        .map((layer, index) => ({
-            layer,
-            index,
-            zIndex: typeof layer?.getZIndex === "function" ? layer.getZIndex() : undefined
-        }))
-        .sort((a, b) => {
-            const aHasZIndex = a.zIndex !== undefined;
-            const bHasZIndex = b.zIndex !== undefined;
-
-            if (aHasZIndex && bHasZIndex && a.zIndex !== b.zIndex) {
-                return a.zIndex - b.zIndex;
-            }
-            return a.index - b.index;
-        })
-        .map(item => item.layer);
-
-    store.dispatch("Modules/Print/setVisibleLayerList", sortedVisibleLayerList);
+    store.dispatch("Modules/Print/setVisibleLayerList", zIndexManager.sortVisibleLayerListByZindexBeforePrint(newVisibleLayer));
 }
 
 export default {getVisibleLayer, getGroupedLayers, getVisibleLayerList, revertLayerOpacity};

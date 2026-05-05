@@ -1,4 +1,5 @@
 import layerCollection from "@core/layers/js/layerCollection.js";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 import store from "@appstore/index.js";
 import {resetRenderListeners} from "@shared/js/utils/resetRenderListeners.js";
@@ -91,7 +92,7 @@ export default {
                 secondLayerZIndex = typeof originalZIndex === "number" ? originalZIndex + 1 : undefined;
 
             if (typeof secondLayerZIndex === "number") {
-                const allLayerConfigs = rootGetters.allLayerConfigs.filter(config => Object.prototype.hasOwnProperty.call(config, "zIndex") && typeof config.zIndex === "number");
+                const allLayerConfigs = rootGetters.allLayerConfigs.filter(config => zIndexManager.hasNumericZIndex(config));
 
                 dispatch("updateLayerConfigZIndex", {
                     layerContainer: allLayerConfigs,
@@ -143,7 +144,8 @@ export default {
                         layer: {
                             id: secondId,
                             visibility: true,
-                            showInLayerTree: true
+                            showInLayerTree: true,
+                            zIndex: secondLayerZIndex
                         }
                     }]
                 }, {root: true});

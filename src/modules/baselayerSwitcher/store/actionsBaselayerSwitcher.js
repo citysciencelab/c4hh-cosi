@@ -1,4 +1,5 @@
 import baselayerHandler from "../../layerSelection/js/handleSingleBaselayer.js";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
 
 const actions = {
     /**
@@ -13,10 +14,9 @@ const actions = {
      */
     updateLayerVisibilityAndZIndex ({dispatch, rootGetters}, layerId) {
         const layerConfigs = [],
-            maxBaselayerZIndex = Math.max(...rootGetters.layerConfigsByAttributes({
-                baselayer: true,
-                showInLayerTree: true
-            }).map(layer => layer.zIndex));
+            maxBaselayerZIndex = zIndexManager.getLayerWithMaxZIndex(
+                rootGetters.layerConfigsByAttributes({baselayer: true, showInLayerTree: true})
+            )?.zIndex ?? -Infinity;
         let baselayerZIndex = maxBaselayerZIndex + 1,
             zIndex = rootGetters.determineZIndex(layerId);
 

@@ -109,23 +109,6 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
             expect(store.commit.secondCall.args[1]).to.equals("- maybeInvisible<br>");
         });
 
-        it("getVisibleLayer return visible layer sorted by zIndex - no groups, no invisible layers", function () {
-            layer1.getZIndex = () => 5;
-            layer2.getZIndex = () => 4;
-            layers.push(layer1);
-            layers.push(layer2);
-            layerProvider.getVisibleLayer();
-
-            expect(store.dispatch.calledOnce).to.be.true;
-            expect(store.dispatch.firstCall.args[0]).to.equals("Modules/Print/setVisibleLayerList");
-            expect(store.dispatch.firstCall.args[1]).to.deep.equals([layer2, layer1]);
-            expect(store.commit.calledTwice).to.be.true;
-            expect(store.commit.firstCall.args[0]).to.equals("Modules/Print/setInvisibleLayer");
-            expect(store.commit.firstCall.args[1]).to.deep.equals([]);
-            expect(store.commit.secondCall.args[0]).to.equals("Modules/Print/setInvisibleLayerNames");
-            expect(store.commit.secondCall.args[1]).to.equals("");
-        });
-
         it("getVisibleLayer return visible layer include groups, no invisible layers", function () {
             const layer3 = {
                     id: "3",
@@ -162,41 +145,6 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
             expect(store.commit.secondCall.args[1]).to.equals("");
         });
 
-        it("getVisibleLayer keeps original order if layers have no getZIndex function", function () {
-            delete layer1.getZIndex;
-            delete layer2.getZIndex;
-            layers.push(layer1);
-            layers.push(layer2);
-            layerProvider.getVisibleLayer();
-
-            expect(store.dispatch.calledOnce).to.be.true;
-            expect(store.dispatch.firstCall.args[0]).to.equals("Modules/Print/setVisibleLayerList");
-            expect(store.dispatch.firstCall.args[1]).to.deep.equals([layer1, layer2]);
-        });
-
-        it("getVisibleLayer keeps original order if layers have the same zIndex", function () {
-            layer1.getZIndex = () => 5;
-            layer2.getZIndex = () => 5;
-            layers.push(layer1);
-            layers.push(layer2);
-            layerProvider.getVisibleLayer();
-
-            expect(store.dispatch.calledOnce).to.be.true;
-            expect(store.dispatch.firstCall.args[0]).to.equals("Modules/Print/setVisibleLayerList");
-            expect(store.dispatch.firstCall.args[1]).to.deep.equals([layer1, layer2]);
-        });
-
-        it("getVisibleLayer keeps original order if one layer has zIndex and the other does not", function () {
-            layer1.getZIndex = () => 5;
-            delete layer2.getZIndex;
-            layers.push(layer1);
-            layers.push(layer2);
-            layerProvider.getVisibleLayer();
-
-            expect(store.dispatch.calledOnce).to.be.true;
-            expect(store.dispatch.firstCall.args[0]).to.equals("Modules/Print/setVisibleLayerList");
-            expect(store.dispatch.firstCall.args[1]).to.deep.equals([layer1, layer2]);
-        });
     });
 
     describe("revertLayerOpacity", () => {

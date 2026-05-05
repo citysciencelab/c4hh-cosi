@@ -422,20 +422,6 @@ describe("src/app-store/actionsLayerConfig.js", () => {
         });
     });
 
-    describe("updateLayerConfigZIndex", () => {
-        it("Should set new zindex for layer with zIndex greater than maxZIndex", () => {
-            const layerContainer = layerList.slice(0, 5),
-                maxZIndex = 2,
-                resultZIndex = [1, 2, 4, 5, 6];
-
-            getActionsLayerConfig().updateLayerConfigZIndex({}, {layerContainer, maxZIndex});
-
-            layerContainer.forEach((layerContainerConf, index) => {
-                expect(layerContainerConf.zIndex).to.equals(resultZIndex[index]);
-            });
-        });
-    });
-
     describe("extendLayers", () => {
         beforeEach(() => {
             getters = {

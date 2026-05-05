@@ -1,6 +1,7 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import LayerPreview from "@shared/modules/layerPreview/components/LayerPreview.vue";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
 
 export default {
     name: "BaselayerSwitcher",
@@ -30,26 +31,12 @@ export default {
         visibleBaselayerConfigs: {
             handler (newVal) {
                 const baselayerConfigs = Object.values(this.allBaselayerConfigs),
-                    zIndex = [];
-                let maxZIndex = null,
-                    topLayer = null;
+                    topLayer = zIndexManager.getLayerWithMaxZIndex(newVal);
 
-                newVal.forEach((val) => {
-                    zIndex.push(val.zIndex);
-                });
+                if (topLayer?.id !== undefined) {
+                    const baselayers = baselayerConfigs.filter(layer => layer.id !== topLayer.id);
 
-                maxZIndex = Math.max(...zIndex);
-                topLayer = newVal.filter(layer =>layer.zIndex === maxZIndex);
-
-                if (topLayer[0]?.id !== undefined) {
-                    const baselayers = [];
-
-                    baselayerConfigs.forEach((layer) => {
-                        if (layer.id !== topLayer[0].id) {
-                            baselayers.push(layer);
-                        }
-                    });
-                    this.setTopBaselayer(topLayer[0]);
+                    this.setTopBaselayer(topLayer);
                     this.setBaselayers(baselayers);
                 }
                 else {
@@ -70,19 +57,10 @@ export default {
             });
 
         if (baselayers.length > 1) {
-            const zIndex = [];
-            let max = null,
-                layerWithMaxZIndex = null;
+            const layerWithMaxZIndex = zIndexManager.getLayerWithMaxZIndex(baselayers);
 
-            baselayers.forEach((layer) => {
-                zIndex.push(layer.zIndex);
-            });
-
-            max = Math.max(...zIndex);
-            layerWithMaxZIndex = baselayers.filter(layer => layer.zIndex === max);
-
-            if (layerWithMaxZIndex[0]) {
-                this.setTopBaselayer(layerWithMaxZIndex[0]);
+            if (layerWithMaxZIndex) {
+                this.setTopBaselayer(layerWithMaxZIndex);
             }
         }
         else if (baselayers.length === 0) {

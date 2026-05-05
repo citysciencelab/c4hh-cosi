@@ -2,11 +2,11 @@ import buildTreeStructure from "./js/buildTreeStructure.js";
 import getNestedValues from "@shared/js/utils/getNestedValues.js";
 import replacer from "@shared/js/utils/replaceInNestedValues.js";
 import {getAndMergeAllRawLayers, getAndMergeRawLayer} from "./js/getAndMergeRawLayer.js";
-import {sortObjects} from "@shared/js/utils/sortObjects.js";
-import {treeOrder, treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js";
+import {treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
 
 /**
  * The root actions for layer configurations.
@@ -25,23 +25,10 @@ export default function getActionsLayerConfig () {
      */
     return {
         addLayerToLayerConfig ({dispatch, getters, state}, {layerConfig, parentKey}) {
-            let maxZIndex = -Infinity,
-                configsByParentKey = [];
-            const layerContainer = getters.allLayerConfigs.filter(config => Object.prototype.hasOwnProperty.call(config, "zIndex") && typeof config.zIndex === "number"),
-                matchingLayer = layerContainer.find(layer =>layer.id === layerConfig.id);
+            const layerContainer = getters.allLayerConfigs.filter(zIndexManager.hasNumericZIndex),
+                matchingLayer = layerContainer.find(layer =>layer.id === layerConfig.id),
+                maxZIndex = zIndexManager.getMaxZIndexForParentKey(state, getters, parentKey);
 
-            if (state.layerConfig[parentKey]) {
-                configsByParentKey = getters.allLayerConfigsByParentKey(parentKey).filter(config => Object.prototype.hasOwnProperty.call(config, "zIndex") && typeof config.zIndex === "number");
-            }
-            else {
-                configsByParentKey = getters.visibleSubjectDataLayerConfigs.filter(config => Object.prototype.hasOwnProperty.call(config, "zIndex") && typeof config.zIndex === "number");
-            }
-            if (configsByParentKey.length === 0) {
-                maxZIndex = Math.max(...layerContainer.map(layerConf => layerConf.zIndex));
-            }
-            else {
-                maxZIndex = Math.max(...configsByParentKey.map(layerConf => layerConf.zIndex));
-            }
             dispatch("updateLayerConfigZIndex", {layerContainer, maxZIndex});
 
             if (matchingLayer === undefined) {
@@ -198,43 +185,9 @@ export default function getActionsLayerConfig () {
             }
         },
 
-        /**
-     * Updates the zindex of the layer configs by increasing the zindex of the layer configs
-     * that have a zindex greater than the max zindex by 1.
-     * @param {Object} context the vue context
-     * @param {Object} payload the payload
-     * @param {Object} payload.layerContainer The layer container of layer configs.
-     * @param {Object} payload.maxZIndex The max zIndex of the layer configs.
-     * @returns {void}
-     */
-        updateLayerConfigZIndex (context, {layerContainer, maxZIndex}) {
-            sortObjects(layerContainer, "zIndex");
+        updateLayerConfigZIndex: zIndexManager.updateLayerConfigZIndex,
 
-            layerContainer.forEach(layerConf => {
-                if (layerConf.zIndex > maxZIndex) {
-                    layerConf.zIndex = layerConf.zIndex + 1;
-                }
-            });
-        },
-
-        /**
-     * Updates the zIndexes of all layerConfigs shown in tree, starts with 0.
-     * @param {Object} context the vue context
-     * @param {Object} context.getters the getters
-     * @returns {void}
-     */
-        updateAllZIndexes ({getters}) {
-            let startZIndex = 1;
-
-            treeOrder.forEach(parentKey => {
-                const configsByParentKey = getters.allLayerConfigsByParentKey(parentKey).filter(config => Object.prototype.hasOwnProperty.call(config, "zIndex") && typeof config.zIndex === "number");
-
-                sortObjects(configsByParentKey, "zIndex");
-                configsByParentKey.forEach(layerConf => {
-                    layerConf.zIndex = startZIndex++;
-                });
-            });
-        },
+        updateAllZIndexes: zIndexManager.updateAllZIndexes,
 
         /**
      * Extends all layers of config.json with the attributes of the layer in services.json.

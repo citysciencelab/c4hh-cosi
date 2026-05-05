@@ -4,6 +4,7 @@ import searchInTree from "@shared/js/utils/searchInTree.js";
 import {sortObjects} from "@shared/js/utils/sortObjects.js";
 import stateAppStore from "./state.js";
 import {treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
 
 /**
  * The root getters.
@@ -200,55 +201,9 @@ export default {
         return content;
     },
 
-    /**
-     * Returns the max zIndex of layer configs by parentKey.
-     * @param {Object} state state of the app-store.
-     * @param {Object} getters getters of the app-store.
-     * @param {String} parentKey key of the parent
-     * @returns {Number} the max zIndex
-     */
-    maxZIndexOfLayerConfigsByParentKey: (state, getters) => (parentKey) => {
-        let maxZIndex = -1;
-        const layerConfigs = getters.allLayerConfigsByParentKey(parentKey).filter(config => Object.prototype.hasOwnProperty.call(config, "zIndex") && typeof config.zIndex === "number");
+    maxZIndexOfLayerConfigsByParentKey: zIndexManager.maxZIndexOfLayerConfigsByParentKey,
 
-        if (layerConfigs.length > 0) {
-            maxZIndex = Math.max(...layerConfigs.map(conf => conf.zIndex));
-        }
-        return maxZIndex;
-    },
-
-    /**
-     * Returns the zIndex for the given layerConfig. If zIndex already exists at layerConfig, it is returned.
-     * @param {Object} state state of the app-store.
-     * @param {Object} getters getters of the app-store.
-     * @param {String} id id of the layer
-     * @returns {Number|null} the zIndex for the given layerConfig or null if layerConfig is not available
-     */
-    determineZIndex: (state, getters) => (id) => {
-        const layerConf = getters.layerConfigById(id);
-
-        if (layerConf) {
-            if (Object.prototype.hasOwnProperty.call(layerConf, "zIndex") && typeof layerConf.zIndex === "number") {
-                return layerConf.zIndex;
-            }
-            let maxZIndex = -1;
-            const isBaselayer = Object.prototype.hasOwnProperty.call(layerConf, "baselayer") && layerConf.baselayer,
-                parentKey = isBaselayer ? treeBaselayersKey : treeSubjectsKey;
-
-            maxZIndex = getters.maxZIndexOfLayerConfigsByParentKey(parentKey);
-            if (maxZIndex === -1) {
-                if (isBaselayer) {
-                    maxZIndex = getters.maxZIndexOfLayerConfigsByParentKey(treeSubjectsKey);
-                }
-                else {
-                    maxZIndex = getters.maxZIndexOfLayerConfigsByParentKey(treeBaselayersKey);
-                }
-            }
-
-            return maxZIndex + 1;
-        }
-        return null;
-    },
+    determineZIndex: zIndexManager.determineZIndex,
 
     /**
      * Return the featureViaURL configuartion in config.json.
