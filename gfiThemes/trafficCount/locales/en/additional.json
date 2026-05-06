@@ -32,6 +32,7 @@
                         "inductionLoop": "Induction loop",
                         "carLabel": "Car",
                         "bicycleLabel": "Bicycle",
+                        "heavyTrafficLabel": "Heavy traffic",
                         "idLabel": "ID:",
                         "typeLabel": "Type:",
                         "meansOfTransportLabel": "Transportation:",

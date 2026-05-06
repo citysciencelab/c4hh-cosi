@@ -16,6 +16,13 @@ export default {
             type: Array,
             required: true
         },
+        /**
+         * The current meansOfTransport
+         */
+        currentMeansOfTransport: {
+            type: String,
+            required: true
+        },
 
         /**
          * sets the tooltip if the mouse hovers over a point
@@ -206,47 +213,53 @@ export default {
             if (!Array.isArray(apiData) || apiData.length === 0 || typeof apiData[0] !== "object" || apiData[0] === null || Object.keys(apiData[0]).length === 0) {
                 return [];
             }
-            const meansOfTransportKey = Object.keys(apiData[0])[0],
+
+            const meansOfTransportKey = Object.keys(apiData[0]),
                 labelsXAxis = [],
                 datasets = [],
-                keysOfFirstDataset = Object.keys(apiData[0][meansOfTransportKey]);
+                keysOfFirstDataset = Object.keys(apiData[0][meansOfTransportKey[0]]);
 
             keysOfFirstDataset.forEach(datetime => {
                 labelsXAxis.push(datetime);
             });
 
             apiData.forEach((dataObj, idx) => {
-                if (!Object.prototype.hasOwnProperty.call(dataObj, meansOfTransportKey)) {
+                if (!Object.prototype.hasOwnProperty.call(dataObj, meansOfTransportKey[0])) {
                     return;
                 }
-                const datetimes = Object.keys(dataObj[meansOfTransportKey]),
-                    holidayData = {
+
+                meansOfTransportKey.forEach((meansOfTransport) => {
+                    const datetimes = typeof dataObj[meansOfTransport] !== "undefined" ? Object.keys(dataObj[meansOfTransport]) : [],
+                        svPostfix = meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz" ? " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic") : "",
+                        holidayData = {
+                            borderColor: Array.isArray(colors) ? colors[idx] : "",
+                            fill: false,
+                            label: this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign") + svPostfix,
+                            pointBorderColor: Array.isArray(colors) ? colors[idx] : "",
+                            pointBackgroundColor: Array.isArray(colors) ? colors[idx] : "",
+                            pointRadius: 3,
+                            pointStyle: "star"
+                        };
+
+                    datasets.push({
+                        label: datetimes.length > 0 && typeof callbackRenderLabelLegend === "function" ? callbackRenderLabelLegend(datetimes[0]) + svPostfix : "",
+                        data: typeof dataObj[meansOfTransport] !== "undefined" ? Object.values(dataObj[meansOfTransport]) : [],
+                        backgroundColor: Array.isArray(colors) ? colors[idx] : "",
                         borderColor: Array.isArray(colors) ? colors[idx] : "",
+                        spanGaps: false,
                         fill: false,
-                        label: this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign"),
-                        pointBorderColor: Array.isArray(colors) ? colors[idx] : "",
-                        pointBackgroundColor: Array.isArray(colors) ? colors[idx] : "",
-                        pointRadius: 3,
-                        pointStyle: "star"
-                    };
+                        borderWidth: 1,
+                        pointRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
+                        pointHoverRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
+                        pointStyle: datetimes.length > 0 && typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(datetimes) : "",
+                        datetimes,
+                        isSVAvailable: meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz"
+                    });
 
-                datasets.push({
-                    label: datetimes.length > 0 && typeof callbackRenderLabelLegend === "function" ? callbackRenderLabelLegend(datetimes[0]) : "",
-                    data: Object.values(dataObj[meansOfTransportKey]),
-                    backgroundColor: Array.isArray(colors) ? colors[idx] : "",
-                    borderColor: Array.isArray(colors) ? colors[idx] : "",
-                    spanGaps: false,
-                    fill: false,
-                    borderWidth: 1,
-                    pointRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
-                    pointHoverRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
-                    pointStyle: datetimes.length > 0 && typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(datetimes) : "",
-                    datetimes
+                    if (datetimes.length > 0 && typeof callbackRenderPointStyle === "function" && callbackRenderPointStyle(datetimes).includes("star")) {
+                        datasets.push(holidayData);
+                    }
                 });
-
-                if (datetimes.length > 0 && typeof callbackRenderPointStyle === "function" && callbackRenderPointStyle(datetimes).includes("star")) {
-                    datasets.push(holidayData);
-                }
             });
 
             return {labels: labelsXAxis, datasets};
@@ -292,9 +305,9 @@ export default {
                         },
                         legend: {
                             display: true,
-                            onClick: (e) => {
-                                if (typeof e.stopPropagation === "function") {
-                                    e.stopPropagation();
+                            onClick: (e, legendItem, legend) => {
+                                if (Object.keys(this.apiData[0]).includes("Anzahl_Kfz") && Object.keys(this.apiData[0]).includes("Anzahl_Schwerverkehr")) {
+                                    ChartJs.defaults.plugins.legend.onClick(e, legendItem, legend);
                                 }
                             },
                             labels: {

@@ -65,8 +65,13 @@ export default {
             setTooltipValue: (tooltipItem) => {
                 // add 3 days to match thursdays
                 const objMoment = dayjs(tooltipItem.datetime, "YYYY-MM-DD HH:mm:ss").add(3, "day");
+                let svPostfix = "";
 
-                return this.$t("additional:modules.tools.gfi.themes.trafficCount.calendarweek") + " " + objMoment.format("WW") + " / " + objMoment.format("YYYY") + ": " + thousandsSeparator(tooltipItem.raw);
+                if (tooltipItem?.dataset?.isSVAvailable) {
+                    svPostfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+                }
+
+                return this.$t("additional:modules.tools.gfi.themes.trafficCount.calendarweek") + " " + objMoment.format("WW") + " / " + objMoment.format("YYYY") + ": " + thousandsSeparator(tooltipItem.raw) + svPostfix;
             },
             yAxisTicks: 8,
             renderLabelXAxis: (datetime) => {
@@ -315,6 +320,7 @@ export default {
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
                 :active-tab="activeTab"
+                :current-means-of-transport="meansOfTransport"
             />
         </div>
         <TrafficCountCheckbox

@@ -101,7 +101,7 @@ export default {
             return {
                 Anzahl_Kfz: this.$t("additional:modules.tools.gfi.themes.trafficCount.carLabel"),
                 Anzahl_Fahrraeder: this.$t("additional:modules.tools.gfi.themes.trafficCount.bicycleLabel"),
-                Anzahl_Schwerverkehr: this.$t("additional:modules.tools.gfi.themes.trafficCount.carLabel")
+                Anzahl_Schwerverkehr: this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTrafficLabel")
             };
         },
 

@@ -32,6 +32,7 @@
                         "inductionLoop": "Induktionsschleife",
                         "carLabel": "KFZ",
                         "bicycleLabel": "Fahrrad",
+                        "heavyTrafficLabel": "Schwerverkehr",
                         "idLabel": "ID:",
                         "typeLabel": "Art: ",
                         "meansOfTransportLabel": "Verkehrsmittel: ",

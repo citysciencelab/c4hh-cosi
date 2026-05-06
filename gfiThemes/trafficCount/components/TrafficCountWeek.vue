@@ -61,7 +61,13 @@ export default {
 
             // props for diagram
             setTooltipValue: (tooltipItem) => {
-                return dayjs(tooltipItem.datetime, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY") + ": " + thousandsSeparator(tooltipItem.raw);
+                let svPostfix = "";
+
+                if (tooltipItem?.dataset?.isSVAvailable) {
+                    svPostfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+                }
+
+                return dayjs(tooltipItem.datetime, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY") + ": " + thousandsSeparator(tooltipItem.raw) + svPostfix;
             },
             yAxisTicks: 8,
             renderLabelXAxis: (datetime) => {
@@ -350,6 +356,7 @@ export default {
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
                 :active-tab="activeTab"
+                :current-means-of-transport="meansOfTransport"
             />
         </div>
         <TrafficCountCheckbox
