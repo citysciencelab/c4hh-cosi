@@ -4711,7 +4711,7 @@ Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Featu
 |type|nein|String|"wfst"|Der type des Moduls. Definiert welches Modul konfiguriert ist.|false|
 |update|nein|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Legt fest, welche der zu `layerIds` zugehörigen Layer das Bearbeiten von Geometrien erlauben.|false|
 |multiUpdate|nein|[multiUpdate](#portalconfigmenusectionsmoduleswfstmultiupdate)[]|[]|Definiert, für welche Layer die gleichzeitige Aktualisierung mehrerer Features möglich ist.|false|
-|featurePropertiesValues|nein|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfstfeaturepropertiesvalues)[]|[]|Defaultwerte für die Properties der Features das WFS setzen.|false|
+|featurePropertiesValues|nein|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfsttransactionconfig)[]|[]|Defaultwerte für die Properties der Features das WFS setzen.|false|
 
 **Beispiel**
 
