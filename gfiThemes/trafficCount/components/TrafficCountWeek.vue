@@ -120,18 +120,11 @@ export default {
                 txt += "/" + dayjs(datetime, "YYYY-MM-DD HH:mm:ss").add(3, "day").format("YYYY");
                 txt += " (" + dayjs(datetime, "YYYY-MM-DD HH:mm:ss").format("dd, DD.MM.YYYY") + ")";
 
-                switch (meansOfTransports) {
-                    // search for "trafficCountSVAktivierung" to find all lines of code to switch Kfz to Kfz + SV
-                    // use this code to enable Kfz + SV
-                    /*
-                    case "Anzahl_Kfz":
-                        return txt + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.carsHeaderSuffix");
-                    case "Anzahl_SV":
-                        return txt + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.trucksHeaderSuffix");
-                    */
-                    default:
-                        return txt;
+                if (meansOfTransports === "Anzahl_Schwerverkehr" && this.meansOfTransport === "Anzahl_Kfz") {
+                    return txt + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
                 }
+
+                return txt;
             },
             setFieldValue: value => {
                 return thousandsSeparator(value);
@@ -222,6 +215,22 @@ export default {
                 });
 
                 api.updateDataset(thingId, meansOfTransport, timeSettings, datasets => {
+                    if (meansOfTransport === "Anzahl_Kfz") {
+                        api.updateDataset(thingId, "Anzahl_Schwerverkehr", timeSettings, svDatasets => {
+                            if (Array.isArray(svDatasets)) {
+                                svDatasets.forEach((transportData, idx) => {
+                                    const from = typeof timeSettings[idx] === "object" && dayjs(timeSettings[idx].from).isValid() ? timeSettings[idx].from + " 00:00:00" : "";
+
+                                    Object.keys(transportData).forEach(transportKey => {
+                                        datasets[idx][transportKey] = addMissingDataWeek(from, svDatasets[idx][transportKey]);
+                                    });
+                                });
+                            }
+                        }, errormsg => {
+                            console.warn("The data of schwerlastverkehr received from api are incomplete:", errormsg);
+                        });
+                    }
+
                     if (Array.isArray(datasets)) {
                         datasets.forEach((transportData, idx) => {
                             const from = typeof timeSettings[idx] === "object" && dayjs(timeSettings[idx].from).isValid() ? timeSettings[idx].from + " 00:00:00" : "";
