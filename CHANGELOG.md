@@ -4,8 +4,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-05-06 v3.22.0
 
 ### Added
 - SearchBar: Added a checkbox to select all subcategories when opening a folder.
@@ -23,7 +22,7 @@
         - axios: 1.12.2 to 1.15.0
         - @masterportal/masterportalapi: 2.59.0 to 2.61.0 (This also raised ol to version 10.9.0)
 - Menu: Secondary menu is now only rendered if it contains menu entries. Empty configurations no longer render the secondary menu in the UI.
-- Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) and npm fom **10.9.3** up to smnaller than **12** are now supported.
+- Changed Node.js and npm support: Versions from Node.js **22.19.0** up to (but not including) **25** (LTS 24.15.0) and npm from **10.9.3** up to (but not including) **12** are now supported.
 
 ### Deprecated
 
@@ -31,7 +30,7 @@
 
 ### Fixed
 - Issue \#1452: layer2dVector: Legend now shows entries with no matching condition attribute.
-- Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
+- Issue \#1573: LayerPills: On-click shows layerinformation for groups, too.
 - Issue \#1576: BackForward control was not working inside expandable controls until opened.
 - Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
 - Issue \#1584: LayerConfig: Fixed issue where layer attribution was shown multiple times after reordering layers.
