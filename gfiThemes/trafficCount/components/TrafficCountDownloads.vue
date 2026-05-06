@@ -89,7 +89,7 @@ export default {
          * @returns {Boolean|Function} false if downloadUrl is false or return a function
          */
         getDownloadHandler: function (interval, meansOfTransport) {
-            const meansOfTransportSV = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_SV" : "";
+            const meansOfTransportSV = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "";
 
             if (typeof this.downloadUrl === "string") {
                 return false;
@@ -98,11 +98,30 @@ export default {
             return onsuccess => {
                 if (interval === "15-Min") {
                     this.downloadDataMin(this.thingId, meansOfTransport, result => {
-                        const dataAnzahlSV = meansOfTransportSV === "Anzahl_SV" ? result.data[meansOfTransportSV] : false,
-                            jsonData = this.prepareDataForDownload(meansOfTransport, result.data[meansOfTransport], dataAnzahlSV, interval, this.holidays);
+                        const nonSVData = result.data[meansOfTransport];
+                        let jsonData;
 
-                        if (typeof onsuccess === "function") {
-                            onsuccess(jsonData);
+                        if (meansOfTransportSV === "Anzahl_Schwerverkehr") {
+                            this.downloadDataMin(this.thingId, meansOfTransportSV, svResult => {
+                                jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, svResult.data[meansOfTransportSV], interval, this.holidays);
+
+                                if (typeof onsuccess === "function") {
+                                    onsuccess(jsonData);
+                                }
+                            }, error => {
+                                console.warn("error", "downloadDataDay", error);
+                                jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, false, interval, this.holidays);
+                                if (typeof onsuccess === "function") {
+                                    onsuccess(jsonData);
+                                }
+                            });
+                        }
+                        else {
+                            jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, false, interval, this.holidays);
+
+                            if (typeof onsuccess === "function") {
+                                onsuccess(jsonData);
+                            }
                         }
                     }, error => {
                         console.warn("error", "downloadDataDay", error);
@@ -111,11 +130,30 @@ export default {
                 }
                 else if (interval === "1-Stunde") {
                     this.downloadDataHour(this.thingId, this.meansOfTransport, result => {
-                        const dataAnzahlSV = meansOfTransportSV === "Anzahl_SV" ? result.data[meansOfTransportSV] : false,
-                            jsonData = this.prepareDataForDownload(meansOfTransport, result.data[meansOfTransport], dataAnzahlSV, interval, this.holidays);
+                        const nonSVData = result.data[meansOfTransport];
+                        let jsonData;
 
-                        if (typeof onsuccess === "function") {
-                            onsuccess(jsonData);
+                        if (meansOfTransportSV === "Anzahl_Schwerverkehr") {
+                            this.downloadDataHour(this.thingId, meansOfTransportSV, svResult => {
+                                jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, svResult.data[meansOfTransportSV], interval, this.holidays);
+
+                                if (typeof onsuccess === "function") {
+                                    onsuccess(jsonData);
+                                }
+                            }, error => {
+                                console.warn("error", "downloadDataDay", error);
+                                jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, false, interval, this.holidays);
+                                if (typeof onsuccess === "function") {
+                                    onsuccess(jsonData);
+                                }
+                            });
+                        }
+                        else {
+                            jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, false, interval, this.holidays);
+
+                            if (typeof onsuccess === "function") {
+                                onsuccess(jsonData);
+                            }
                         }
                     }, error => {
                         console.warn("error", "downloadDataWeek", error);
@@ -124,11 +162,30 @@ export default {
                 }
                 else if (interval === "1-Tag") {
                     this.downloadDataDay(this.thingId, this.meansOfTransport, result => {
-                        const dataAnzahlSV = meansOfTransportSV === "Anzahl_SV" ? result.data[meansOfTransportSV] : false,
-                            jsonData = this.prepareDataForDownload(meansOfTransport, result.data[meansOfTransport], dataAnzahlSV, interval, this.holidays);
+                        const nonSVData = result.data[meansOfTransport];
+                        let jsonData;
 
-                        if (typeof onsuccess === "function") {
-                            onsuccess(jsonData);
+                        if (meansOfTransportSV === "Anzahl_Schwerverkehr") {
+                            this.downloadDataDay(this.thingId, meansOfTransportSV, svResult => {
+                                jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, svResult.data[meansOfTransportSV], interval, this.holidays);
+
+                                if (typeof onsuccess === "function") {
+                                    onsuccess(jsonData);
+                                }
+                            }, error => {
+                                console.warn("error", "downloadDataDay", error);
+                                jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, false, interval, this.holidays);
+                                if (typeof onsuccess === "function") {
+                                    onsuccess(jsonData);
+                                }
+                            });
+                        }
+                        else {
+                            jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, false, interval, this.holidays);
+
+                            if (typeof onsuccess === "function") {
+                                onsuccess(jsonData);
+                            }
                         }
                     }, error => {
                         console.warn("error", "downloadDataWeek", error);
@@ -137,11 +194,30 @@ export default {
                 }
                 else if (interval === "1-Woche") {
                     this.downloadDataWeek(this.thingId, this.meansOfTransport, result => {
-                        const dataAnzahlSV = meansOfTransportSV === "Anzahl_SV" ? result.data[meansOfTransportSV] : false,
-                            jsonData = this.prepareDataForDownload(meansOfTransport, result.data[meansOfTransport], dataAnzahlSV, interval, this.holidays);
+                        const nonSVData = result.data[meansOfTransport];
+                        let jsonData;
 
-                        if (typeof onsuccess === "function") {
-                            onsuccess(jsonData);
+                        if (meansOfTransportSV === "Anzahl_Schwerverkehr") {
+                            this.downloadDataWeek(this.thingId, meansOfTransportSV, svResult => {
+                                jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, svResult.data[meansOfTransportSV], interval, this.holidays);
+
+                                if (typeof onsuccess === "function") {
+                                    onsuccess(jsonData);
+                                }
+                            }, error => {
+                                console.warn("error", "downloadDataDay", error);
+                                jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, false, interval, this.holidays);
+                                if (typeof onsuccess === "function") {
+                                    onsuccess(jsonData);
+                                }
+                            });
+                        }
+                        else {
+                            jsonData = this.prepareDataForDownload(meansOfTransport, nonSVData, false, interval, this.holidays);
+
+                            if (typeof onsuccess === "function") {
+                                onsuccess(jsonData);
+                            }
                         }
                     }, error => {
                         console.warn("error", "downloadDataYear", error);
@@ -248,8 +324,15 @@ export default {
          * @returns {Object[]} objArr - converted data
          */
         prepareDataForDownload: function (meansOfTransport, data, dataAnzahlSV, interval, holidays) {
-            const objArr = [],
-                countHeader = meansOfTransport === "Anzahl_Kfz" ? "Anzahl KFZ" : "Anzahl";
+            const objArr = [];
+            let countHeader = "Anzahl";
+
+            if (meansOfTransport === "Anzahl_Kfz") {
+                countHeader = "Anzahl KFZ";
+            }
+            else if (meansOfTransport === "Anzahl_Schwerverkehr") {
+                countHeader = "Anzahl SV";
+            }
 
             for (const key in data) {
                 const obj = {},
@@ -260,7 +343,7 @@ export default {
                     obj["Uhrzeit von"] = date[1].slice(0, -3);
                     obj[countHeader] = data[key];
                     if (dataAnzahlSV) {
-                        obj["Anzahl SV"] = dataAnzahlSV[key];
+                        obj["Anzahl SV"] = typeof dataAnzahlSV[key] !== "undefined" ? dataAnzahlSV[key] : "";
                     }
                     obj.Feiertag = getPublicHoliday(date[0], holidays, "YYYY-MM-DD") ? "Ja" : "";
                 }
@@ -269,7 +352,7 @@ export default {
                     obj["Uhrzeit von"] = date[1].slice(0, -3);
                     obj[countHeader] = data[key];
                     if (dataAnzahlSV) {
-                        obj["Anzahl SV"] = dataAnzahlSV[key];
+                        obj["Anzahl SV"] = typeof dataAnzahlSV[key] !== "undefined" ? dataAnzahlSV[key] : "";
                     }
                     obj.Feiertag = getPublicHoliday(date[0], holidays, "YYYY-MM-DD") ? "Ja" : "";
                 }
@@ -277,7 +360,7 @@ export default {
                     obj.Datum = date[0];
                     obj[countHeader] = data[key];
                     if (dataAnzahlSV) {
-                        obj["Anzahl SV"] = dataAnzahlSV[key];
+                        obj["Anzahl SV"] = typeof dataAnzahlSV[key] !== "undefined" ? dataAnzahlSV[key] : "";
                     }
                     obj.Feiertag = getPublicHoliday(date[0], holidays, "YYYY-MM-DD") ? "Ja" : "";
                 }
@@ -285,7 +368,7 @@ export default {
                     obj["Kalenderwoche ab"] = date[0];
                     obj[countHeader] = data[key];
                     if (dataAnzahlSV) {
-                        obj["Anzahl SV"] = dataAnzahlSV[key];
+                        obj["Anzahl SV"] = typeof dataAnzahlSV[key] !== "undefined" ? dataAnzahlSV[key] : "";
                     }
                     obj.Feiertag = hasHolidayInWeek(date[0], holidays, "YYYY-MM-DD") ? "Ja" : "";
                 }
