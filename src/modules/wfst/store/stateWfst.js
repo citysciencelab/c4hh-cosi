@@ -24,6 +24,7 @@
  * @property {Number} currentLayerIndex Index of the currently selected layer.
  * @property {FeatureProperty[]} featureProperties Possible properties to be set on a feature for the current layer.
  * @property {featurePropertiesBatch[]} featurePropertiesBatch Feature properties for all selected Objects.
+ * @property {featurePropertiesValues[]} featurePropertiesValues used to set default value for feature property
  * @property {Object} anyInputValue Values of inputs for multiupdate edit from user.
  * @property {TransactionLayer[]} layerInformation Information about the different WFS-T layers configured for the tool.
  * @property {("LineString"|"Point"|"Polygon"|"delete"|"updated"|"selectedUpdate"|null)} selectedInteraction Which selection is currently active, if any.
@@ -60,6 +61,7 @@ const state = {
     currentLayerIndex: -1,
     featureProperties: [],
     featurePropertiesBatch: [],
+    featurePropertiesValues: [],
     anyInputValue: {},
     layerInformation: [],
     selectedInteraction: null,

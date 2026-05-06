@@ -1009,7 +1009,7 @@ const actions = {
      * @param {Object} getters - The getters object.
      * @returns {void}
      */
-    async setFeatureProperties ({commit, getters: {currentLayerIndex, layerInformation, useProxy}}) {
+    async setFeatureProperties ({commit, getters: {currentLayerIndex, layerInformation, featurePropertiesValues}}) {
         if (currentLayerIndex === -1) {
             commit("setFeatureProperties", i18next.t("common:modules.wfst.error.allLayersNotSelected"));
             return;
@@ -1024,7 +1024,7 @@ const actions = {
             commit("setFeatureProperties", i18next.t("common:modules.wfst.error.layerNotSelected"));
             return;
         }
-        commit("setFeatureProperties", await prepareFeaturePropertiesModule.prepareFeatureProperties(layer, useProxy));
+        commit("setFeatureProperties", await prepareFeaturePropertiesModule.prepareFeatureProperties(layer, featurePropertiesValues));
     }
 };
 

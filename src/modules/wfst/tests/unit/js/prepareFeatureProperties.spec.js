@@ -52,6 +52,53 @@ const exampleLayerInformation = {
             type: "geometry",
             value: null
         }
+    ],
+    featurePropertiesValues = [
+        {
+            key: "datum",
+            value: "1.1.2026"
+        },
+        {
+            key: "bemerkung",
+            value: "Ich gebe eine Bemerkung an"
+        }
+    ],
+    examplePropertiesWithDefaultValues = [
+        {
+            key: "name",
+            label: "name",
+            required: false,
+            type: "string",
+            value: null
+        },
+        {
+            key: "nummer",
+            label: "nummer",
+            required: false,
+            type: "integer",
+            value: null
+        },
+        {
+            key: "bemerkung",
+            label: "bemerkung",
+            required: false,
+            type: "string",
+            value: "Ich gebe eine Bemerkung an"
+        },
+        {
+            key: "datum",
+            label: "datum",
+            required: false,
+            type: "date",
+            value: "1.1.2026"
+        },
+        {
+            key: "geom",
+            label: "geom",
+            required: false,
+            type: "geometry",
+            value: null
+        }
     ];
 
 describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
@@ -73,7 +120,7 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         exampleLayerInformation.gfiAttributes = "showAll";
         receivePossiblePropertiesStub.resolves(exampleProperties);
 
-        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, false);
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation);
 
         expect(Array.isArray(properties)).to.be.true;
         expect(properties).to.deep.equal(exampleProperties);
@@ -85,13 +132,22 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         };
         receivePossiblePropertiesStub.resolves(exampleProperties);
 
-        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, false);
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation);
 
         expect(Array.isArray(properties)).to.be.true;
         expect(properties.length).to.equal(3);
         expect(properties.find(({key}) => key === "name").label).to.equal("Name");
         expect(properties.find(({key}) => key === "datum").label).to.equal("Datum");
         expect(properties.find(({type}) => type === "geometry")).to.exist;
+    });
+    it("should set default values", async () => {
+        exampleLayerInformation.gfiAttributes = "showAll";
+        receivePossiblePropertiesStub.resolves(exampleProperties);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, featurePropertiesValues);
+
+        expect(Array.isArray(properties)).to.be.true;
+        expect(properties).to.deep.equal(examplePropertiesWithDefaultValues);
     });
     it("should throw an Error if the masterportalapi call receivePossibleProperties fails", async () => {
         const expectedError = new Error("Error");
@@ -101,7 +157,7 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         receivePossiblePropertiesStub.rejects(expectedError);
 
         consoleErrorStub = sinon.stub(console, "error");
-        properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, false);
+        properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation);
 
         expect(properties).to.be.an("array").that.is.empty;
         expect(consoleErrorStub.calledOnce).to.be.true;

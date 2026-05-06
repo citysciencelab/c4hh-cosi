@@ -8,7 +8,7 @@ import wfs from "@masterportal/masterportalapi/src/layer/wfs.js";
  * @param {TransactionLayer} layer Layer to retrieve information for.
  * @returns {FeatureProperty[]} If layer.gfiAttributes !== "ignore", then an array of prepared feature properties; else and empty array.
  */
-async function prepareFeatureProperties (layer) {
+async function prepareFeatureProperties (layer, featurePropertiesValues) {
     const isGfiAttributesIgnore = layer.gfiAttributes === "ignore",
         isGfiAttributesShowAll = layer.gfiAttributes === "showAll",
         isGfiAttributesNestedObject = Object?.values(layer.gfiAttributes)?.find(gfiAttr => typeof gfiAttr === "object" && gfiAttr !== null && !Array.isArray(gfiAttr)),
@@ -56,6 +56,17 @@ async function prepareFeatureProperties (layer) {
                 : array,
             []);
     }
+
+    if (Array.isArray(featurePropertiesValues)) {
+        preparedProperties.forEach((preparedProperty) => {
+            featurePropertiesValues.forEach((featurePropertiesValue) => {
+                if (featurePropertiesValue.key === preparedProperty.key) {
+                    preparedProperty.value = featurePropertiesValue.value;
+                }
+            });
+        });
+    }
+
     return preparedProperties;
 }
 
