@@ -4711,7 +4711,7 @@ Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Featu
 |type|nein|String|"wfst"|Der type des Moduls. Definiert welches Modul konfiguriert ist.|false|
 |update|nein|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Legt fest, welche der zu `layerIds` zugehörigen Layer das Bearbeiten von Geometrien erlauben.|false|
 |multiUpdate|nein|[multiUpdate](#portalconfigmenusectionsmoduleswfstmultiupdate)[]|[]|Definiert, für welche Layer die gleichzeitige Aktualisierung mehrerer Features möglich ist.|false|
-|featurePropertiesValues|nein|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfsttransactionconfig)[]|[]|Defaultwerte für die Properties der Features das WFS setzen.|false|
+|featurePropertiesValues|nein|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfstfeaturepropertiesvalues)[]|[]|Defaultwerte für die Properties der Features das WFS setzen.|false|
 
 **Beispiel**
 
@@ -4770,6 +4770,30 @@ Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Featu
         }
     ]
 }
+```
+
+***
+
+###### portalConfig.menu.sections.modules.wfst.featurePropertiesValues {data-toc-label='featurePropertiesValues'}
+
+[inherits]: # (portalConfig.menu.sections.modules.wfst)
+
+Definiert die Konfiguration für die Defaultwerte der Feature Properties.
+
+|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
+|----|-------------|---|-------|------------|------|
+|key|nein|String||key der WFS Feature Property.|false|
+|value|nein|String||Defaultwert, der im Eingabefeld des Formulars für das mit key spezifizierte Feature Property vorbelegt wird.|false|
+
+**Beispiele**
+
+```json
+"featurePropertiesValues": [
+    {
+        "key":"kategorie",
+        "value":"meine Kategorie"
+    }
+]
 ```
 
 ***

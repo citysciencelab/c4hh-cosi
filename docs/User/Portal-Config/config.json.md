@@ -4724,7 +4724,7 @@ When editing properties of a feature / adding properties to a new feature, the a
 |type|no|String|"wfst"|The type of the module. Defines which module is configured.|false|
 |update|no|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Defines which layers of `layerIds` allow update transactions.|false|
 |multiUpdate|no|[multiUpdate](#portalconfigmenusectionsmoduleswfstmultiupdate)[]|[]|Defines which layers allow multiple features to be updated at once.|false|
-|featurePropertiesValues|no|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfsttransactionconfig)[]|[]|Set default value for properties of WFS features.|false|
+|featurePropertiesValues|no|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfstfeaturepropertiesvalues)[]|[]|Set default value for properties of WFS features.|false|
 
 **Example**
 
@@ -4783,6 +4783,30 @@ When editing properties of a feature / adding properties to a new feature, the a
         }
     ]
 }
+```
+
+***
+
+###### portalConfig.menu.sections.modules.wfst.featurePropertiesValues {data-toc-label='featurePropertiesValues'}
+
+[inherits]: # (portalConfig.menu.sections.modules.wfst)
+
+Defines the configuration for feature property default values.
+
+|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
+|----|-------------|---|-------|------------|------|
+|key|no|String||key of WFS feature property.|false|
+|value|no|String||default value for feature property.|false|
+
+**Example**
+
+```json
+"featurePropertiesValues": [
+    {
+        "key":"category",
+        "value":"my category"
+    }
+]
 ```
 
 ***

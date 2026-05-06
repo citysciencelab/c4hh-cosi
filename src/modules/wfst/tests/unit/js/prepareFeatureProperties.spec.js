@@ -61,7 +61,8 @@ const exampleLayerInformation = {
         {
             key: "bemerkung",
             value: "Ich gebe eine Bemerkung an"
-        }
+        },
+        {}
     ],
     examplePropertiesWithDefaultValues = [
         {
