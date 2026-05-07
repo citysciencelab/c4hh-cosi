@@ -42,6 +42,7 @@
 ### Removed
 
 ### Fixed
+- WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 
 ---
 
@@ -84,7 +85,6 @@
 - URLParams:
     -  ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
     -  Links to other config files have been corrected in the `urlParameter` documentation.
-- WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 
 ---
 
