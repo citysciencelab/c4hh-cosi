@@ -1,3 +1,4 @@
+import Cluster from "ol/source/Cluster";
 import dayjs from "dayjs";
 import mapCollection from "../../src/core/maps/js/mapCollection.js";
 import thousandsSeparator from "../../src/shared/js/utils/thousandsSeparator.js";
@@ -14,7 +15,14 @@ setTimeout(() => {
         map.on("pointermove", (evt) => {
             map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
                 if (layer && layer.get("gfiTheme") === "trafficCount") {
-                    updateMouseHoverAttribute(feature);
+                    if (layer.getSource().constructor === Cluster) {
+                        feature.values_.features.forEach(childFeature => {
+                            updateMouseHoverAttribute(childFeature);
+                        });
+                    }
+                    else {
+                        updateMouseHoverAttribute(feature);
+                    }
                 }
             });
         });
