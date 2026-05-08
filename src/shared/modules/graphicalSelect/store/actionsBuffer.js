@@ -72,9 +72,9 @@ export const actionsBuffer = {
                 source.clear();
                 source.addFeature(lineFeature);
                 source.addFeature(polygonFeature);
-                commit("setSelectedAreaGeoJson", polygonGeoJson);
 
                 if (triggerEvent) {
+                    commit("setSelectedAreaGeoJson", polygonGeoJson);
                     commit("setDrawEndData", polygonGeoJson);
                 }
             }

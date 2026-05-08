@@ -73,8 +73,7 @@ describe("src/shared/modules/graphicalSelect/store/actionsBuffer.js", () => {
                 {geometry, layer, bufferDistance, triggerEvent: false}
             );
 
-            expect(commit.calledOnce).to.be.true;
-            expect(commit.firstCall.args[0]).to.equal("setSelectedAreaGeoJson");
+            expect(commit.called).to.be.false;
         });
     });
 });

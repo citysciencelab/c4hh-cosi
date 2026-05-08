@@ -18,6 +18,7 @@ import Feature from "ol/Feature.js";
  * @vue-prop {String} description The description over the select
  * @vue-prop {Object} startGeometry Use existing geometry
  * @vue-prop {Number} bufferDistance Buffer distance for line geometries in meters
+ * @vue-prop {Number} sliderInputTimeout Time in ms for debounce of slider input
  */
 export default {
     name: "GraphicalSelect",
@@ -60,6 +61,11 @@ export default {
             type: Number,
             required: false,
             default: 100
+        },
+        sliderInputTimeout: {
+            type: Number,
+            required: false,
+            default: 800
         }
     },
     data () {
@@ -78,7 +84,6 @@ export default {
             "active",
             "geographicValues",
             "selectionElements"
-
         ]),
         optionsValue: function () {
             return this.options ? this.options : {
@@ -406,6 +411,19 @@ export default {
                 return "LineString";
             }
             return drawtype;
+        },
+
+        /**
+         * Handles changes to the buffer distance slider, updating the buffer in real-time and finalizing it on change.
+         * @returns {void}
+         */
+        handleRangeChange () {
+            if (this.rangeTimeout) {
+                clearTimeout(this.rangeTimeout);
+            }
+            this.rangeTimeout = setTimeout(() => {
+                this.finalizeBufferDistance();
+            }, this.sliderInputTimeout);
         }
     }
 };
@@ -461,7 +479,7 @@ export default {
                 :value="bufferDistanceData"
                 style="flex-grow: 1;"
                 @input="updateBufferDistance"
-                @change="finalizeBufferDistance"
+                @change="handleRangeChange"
             >
             <input
                 type="number"
@@ -471,7 +489,7 @@ export default {
                 :value="bufferDistanceData"
                 style="width: 80px;"
                 @input="updateBufferDistance"
-                @change="finalizeBufferDistance"
+                @change="handleRangeChange"
             >
         </div>
     </div>
