@@ -48,6 +48,7 @@
 - WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 - Fix package-lock.json for node version 24.15.0.
 - Print: Fixed print mask disappearing after toggling a layer via LayerPills or switching the base layer via BaseLayerSwitcher.
+- WMS-Time: Activating time comparison placed the second WMS-Time layer at the top of the layerTree, causing it to cover other layers. The fix places the comparison layer directly above the original layer.
 
 ---
 
