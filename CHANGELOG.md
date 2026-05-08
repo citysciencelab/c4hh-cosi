@@ -44,6 +44,7 @@
 ### Fixed
 - Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset. 
 - WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
+- Fix package-lock.json for node version 24.15.0.
 
 ---
 
