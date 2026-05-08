@@ -57,12 +57,14 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
                         mainMenu: {sections: []},
                         secondaryMenu: {sections: []},
                         secondaryExpanded: true,
+                        mainExpanded: false,
                         menuBySide: "40%"
                     }),
                     getters: {
                         mainMenu: state => state.mainMenu,
                         secondaryMenu: state => state.secondaryMenu,
                         secondaryExpanded: state => state.secondaryExpanded,
+                        mainExpanded: state => state.mainExpanded,
                         menuBySide: state => side => state[side] || {}
                     },
                     mutations: {
@@ -161,6 +163,9 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
     }
 
     beforeEach(() => {
+        vi.useFakeTimers();
+        vi.stubGlobal("scrollTo", vi.fn());
+
         // Use vi.stubGlobal for proper cleanup
         vi.stubGlobal("IntersectionObserver", class {
             /**
@@ -289,6 +294,9 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
             wrapper.unmount();
             wrapper = null;
         }
+
+        vi.runAllTimers();
+        vi.useRealTimers();
 
         // Clean up DOM elements
         const existingToolDiv = document.getElementById("mp-body-secondaryMenu");

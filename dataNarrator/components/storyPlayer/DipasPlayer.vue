@@ -78,6 +78,7 @@ export default {
             "mainMenu",
             "secondaryMenu",
             "secondaryExpanded",
+            "mainExpanded",
             "menuBySide"
         ]),
         cssVars () {
@@ -97,6 +98,23 @@ export default {
             return this.isMobileDevice && this.currentOrientationType.startsWith("portrait");
         }
     },
+    watch: {
+        secondaryExpanded (expanded) {
+            if (expanded) {
+                if (this.isMobilePortrait) {
+                    this.applyMobilePortraitLayout();
+                }
+            }
+        },
+        mainExpanded (expanded) {
+            if (!expanded && this.isMobilePortrait) {
+                this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
+            }
+            else if (expanded && !this.isMobilePortrait) {
+                this.menuBySide("mainMenu").width = "40%";
+            }
+        }
+    },
     created () {
         this.steps.forEach((step) => {
             this.loadStoryContents(step.htmlFile).then(data => {
@@ -106,38 +124,23 @@ export default {
             });
         });
 
-        const MOBILE = "Mobile",
-            DESKTOP = "Desktop",
-            breakpoint = "(max-width: 768px)",
+        const breakpoint = "(max-width: 768px)",
             mediaQuery = window.matchMedia(breakpoint),
             isMobile = mediaQuery.matches,
             orientationCheck = screen.orientation?.type.startsWith("landscape");
 
         if (isMobile && orientationCheck) {
-            this.setDeviceMode(DESKTOP);
+            this.applyMobileLandscapeLayout();
         }
 
         this.orientationChangeHandler = (event) => {
             this.currentOrientationType = event.target.type;
 
             if (mediaQuery.matches && this.currentOrientationType.startsWith("landscape")) {
-                this.setDeviceMode(DESKTOP);
-
-                this.$nextTick(() => {
-                    this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
-                    this.menuBySide("secondaryMenu").width = "40%";
-                });
+                this.applyMobileLandscapeLayout();
             }
-            else if (mediaQuery.matches && !screen.orientation?.type.startsWith("landscape")) {
-                this.setDeviceMode(MOBILE);
-
-                const secondaryMenu = document.getElementById("mp-menu-secondaryMenu");
-
-                secondaryMenu.style.removeProperty("left");
-
-                this.$nextTick(() => {
-                    this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
-                });
+            else if (!screen.orientation?.type.startsWith("landscape")) {
+                this.applyMobilePortraitLayout();
             }
         };
 
@@ -183,6 +186,10 @@ export default {
                 }
             });
 
+        if (this.isMobilePortrait) {
+            this.applyMobilePortraitLayout();
+        }
+
         this.rightButtonsPositionLeft = toolBody.clientWidth - positionFix + "px";
         this.toolWidth = toolBody.clientWidth + "px";
 
@@ -220,6 +227,10 @@ export default {
                 toolBody.addEventListener("scroll", this.handleToolBodyScroll);
             }
         });
+
+        if (this.isMobilePortrait) {
+            this.applyMobilePortraitLayout();
+        }
     },
     deactivated () {
         // Handle KeepAlive visibility. Triggered if component is deactivated
@@ -454,6 +465,48 @@ export default {
         },
         handleToolBodyScroll (event) {
             this.toolBodyScrollTop = event.target.scrollTop;
+        },
+        applyMobileLandscapeLayout () {
+            this.setDeviceMode("Desktop");
+            this.$nextTick(() => {
+                this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
+                this.menuBySide("secondaryMenu").width = "40%";
+            });
+        },
+        applyMobilePortraitLayout () {
+            if (matchMedia("(max-width: 768px)").matches) {
+                this.setDeviceMode("Mobile");
+
+                const secondaryMenu = document.getElementById("mp-menu-secondaryMenu");
+
+                secondaryMenu?.style.removeProperty("left");
+            }
+
+            this.$nextTick(() => {
+                this.setExpandedBySide({expanded: true, side: "secondaryMenu"});
+
+                const menuPanel = document.getElementById("mp-menu-secondaryMenu");
+
+                // Use setTimeout to wait for the browser to complete orientation reflow
+                setTimeout(() => {
+                    if (menuPanel) {
+                        menuPanel.style.transition = "top 0.3s ease";
+                        menuPanel.style.top = "85%";
+                    }
+
+                    const scrollTarget = document.documentElement.scrollHeight > document.documentElement.clientHeight
+                        ? document.documentElement
+                        : document.body;
+
+                    scrollTarget.scrollTop = scrollTarget.scrollHeight * 0.21;
+
+                    if (scrollTarget.scrollTop === 0) {
+                        window.scrollTo(0, document.body.scrollHeight * 0.21);
+                    }
+
+                    document.getElementById("mainMenu-toggle-button")?.setAttribute("style", "position: absolute;");
+                }, 100);
+            });
         }
     }
 };
