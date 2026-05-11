@@ -2,6 +2,8 @@ import {expect} from "chai";
 import sinon from "sinon";
 import Layer from "ol/layer/Layer.js";
 import TileWMS from "ol/source/TileWMS.js";
+import Cluster from "ol/source/Cluster.js";
+import VectorSource from "ol/source/Vector.js";
 import store from "@appstore/index.js";
 import Layer2d from "@core/layers/js/layer2d.js";
 import axios from "axios";
@@ -151,6 +153,60 @@ describe("src/core/js/layers/layer2d.js", () => {
 
             expect(stopAutoRefreshSpy.calledOnce).to.be.true;
             expect(layer2d.getIntervalAutoRefresh()).is.undefined;
+        });
+    });
+
+    describe("startAutoRefresh - source resolution", () => {
+        let clock, layer2d;
+
+        beforeEach(() => {
+            clock = sinon.useFakeTimers();
+            layer2d = new Layer2d({});
+        });
+
+        afterEach(() => {
+            layer2d.stopAutoRefresh();
+            sinon.restore();
+        });
+
+        it("should call refresh on the plain ol source from getLayer().getSource(), not on getLayerSource()", () => {
+            const refreshSpy = sinon.spy(),
+                liveSource = {refresh: refreshSpy};
+
+            layer2d.getLayer = () => ({getSource: () => liveSource});
+            layer2d.setLayerSource({refresh: sinon.spy()});
+
+            layer2d.startAutoRefresh(100);
+            clock.tick(100);
+
+            expect(refreshSpy.calledOnce).to.be.true;
+        });
+
+        it("should call refresh on the inner source when the ol source is a Cluster layer", () => {
+            const innerSource = new VectorSource(),
+                innerRefreshSpy = sinon.spy(innerSource, "refresh"),
+                clusterSource = new Cluster({source: innerSource, distance: 40});
+
+            layer2d.getLayer = () => ({getSource: () => clusterSource});
+
+            layer2d.startAutoRefresh(100);
+            clock.tick(100);
+
+            expect(innerRefreshSpy.calledOnce).to.be.true;
+        });
+
+        it("should NOT call refresh on the stale getLayerSource() when getLayer().getSource() is a different object", () => {
+            const staleRefreshSpy = sinon.spy(),
+                liveRefreshSpy = sinon.spy();
+
+            layer2d.getLayer = () => ({getSource: () => ({refresh: liveRefreshSpy})});
+            layer2d.setLayerSource({refresh: staleRefreshSpy});
+
+            layer2d.startAutoRefresh(100);
+            clock.tick(100);
+
+            expect(staleRefreshSpy.called).to.be.false;
+            expect(liveRefreshSpy.calledOnce).to.be.true;
         });
     });
 

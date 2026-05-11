@@ -26,6 +26,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1608: Fixed autoRefresh by reading source from OL Layer instead of cached layerSource to prevent stale source.
 - Issue \#1610: Menu/PortalFooter: Fixed navigation behavior for secondary GFI without a configured secondary menu and corrected footer layout offsets for small desktop breakpoints.
 - Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
 - Issue \#1620: Adapted vite build to respect new created heads (clone with --branch).
