@@ -446,10 +446,7 @@ export default {
                         <i class="bi bi-info-circle me-2 mt-1" />
                         <small>Aus Datenschutzgründen wird bei Einwohnerzahlen kleiner 4 die Zahl drei oder null verwendet.</small>
                     </p>
-                    <div
-                        v-if="selectedOption === 'click'"
-                        class="d-flex justify-content-end mt-2"
-                    >
+                    <div class="d-flex justify-content-end mt-2">
                         <FlatButton
                             :interaction="() => getAnalyzeData(geometry, true)"
                             text="Alle Daten exportieren"
