@@ -167,7 +167,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
+//@import "~variables";
 
 .InputText {
     margin-bottom: 1rem;

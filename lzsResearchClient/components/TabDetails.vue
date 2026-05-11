@@ -259,7 +259,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "~variables";
+//@import "~variables";
 
 #TabDetails {
     margin-top: 1rem;
