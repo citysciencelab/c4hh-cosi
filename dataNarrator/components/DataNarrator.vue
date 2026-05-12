@@ -11,7 +11,8 @@ export default {
         return {
             storyList: {},
             toolBodyScrollTop: 0,
-            isActive: false
+            isActive: false,
+            currentOrientationType: screen.orientation?.type
         };
     },
     computed: {
@@ -34,13 +35,12 @@ export default {
         isMobileDevice () {
             const userAgentCheck = (/Mobi|Android|iPhone|iPad|iPod|Windows Phone/i).test(navigator.userAgent),
                 touchCheck = "ontouchstart" in window || navigator.maxTouchPoints > 0,
-                screenSizeCheck = this.isMobile,
-                orientationCheck = screen.orientation?.type.startsWith("portrait");
+                screenSizeCheck = this.isMobile;
 
-            return userAgentCheck || (touchCheck && screenSizeCheck && orientationCheck);
+            return userAgentCheck || (touchCheck && screenSizeCheck);
         },
         isMobilePortrait () {
-            return this.isMobileDevice && screen.orientation?.type.startsWith("portrait");
+            return this.isMobileDevice && this.currentOrientationType.startsWith("portrait");
         }
     },
     watch: {
@@ -64,6 +64,13 @@ export default {
         // Handle KeepAlive visibility. Triggered if component is deactivated
         this.isActive = false;
     },
+    created () {
+        this.orientationChangeHandler = (event) => {
+            this.currentOrientationType = event.target.type;
+        };
+
+        screen.orientation?.addEventListener("change", this.orientationChangeHandler);
+    },
     mounted () {
         if (this.isMobilePortrait) {
             if (!this.secondaryExpanded) {
@@ -84,6 +91,7 @@ export default {
     <div id="dataNarrator">
         <StoryPlayer
             :is-mobile-device="isMobileDevice"
+            :screen-orientation-type="currentOrientationType"
         />
     </div>
 </template>
