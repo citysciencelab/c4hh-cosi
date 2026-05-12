@@ -1037,7 +1037,7 @@ export default {
             if (cswUrl && mdId) {
                 try {
                     const metadata = await getCswRecordById.getRecordById(cswUrl, mdId),
-                        provider = metadata?.getPublisher() || metadata?.getOwner(),
+                        provider = metadata?.getContact() || metadata?.getOwner() || metadata?.getPublisher(),
                         providerName = provider?.name || "-",
                         date = this.formatAsOf(metadata?.getRevisionDate());
 
