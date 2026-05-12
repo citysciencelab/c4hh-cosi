@@ -14,7 +14,7 @@
 - The following packages have been added:
     - dependencies:
         -     @stylistic/eslint-plugin: ^5.10.0
-- WFST-Tool: possibility to set default values for WFS feature properties
+- WFS-T: possibility to set default values for WFS feature properties
 
 ### Changed
 - The following packages have been updated:
