@@ -64,6 +64,7 @@ export default {
             cards: "selectionCardsStatisticalData",
             cardsSubject: "selectionCardsSubjectData"
         }),
+        ...mapGetters("Menu", ["zoomToExtentPadding"]),
         ...mapGetters(["allLayerConfigs", "restServiceById", "visibleSubjectDataLayerConfigs"]),
 
         /**
@@ -775,7 +776,7 @@ export default {
             this.$nextTick(() => {
                 this.updateSelectedFeatures(this.cards[index].selectedDistricts);
                 this.updateLayerBbox(subjectFeatureWKT);
-                this.zoomToExtent({extent: this.cards[index].extent, options: {}});
+                this.zoomToExtent({extent: this.cards[index].extent, options: {padding: this.zoomToExtentPadding}});
 
                 this.ignoreSelectionChange = false;
             });

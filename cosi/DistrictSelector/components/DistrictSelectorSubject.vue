@@ -56,6 +56,7 @@ export default {
     },
     computed: {
         ...mapGetters(["allLayerConfigs", "restServiceById"]),
+        ...mapGetters("Menu", ["zoomToExtentPadding"]),
         ...mapGetters("Modules/DistrictSelector", ["selectedInteraction", "wpsProcess", "wpsServiceId", "keyOfAttrName"]),
         ...mapGetters("Modules/DistrictSelector", {
             cardsStatistical: "selectionCardsStatisticalData",
@@ -270,7 +271,7 @@ export default {
                 this.updateSelectedFeatures(this.cards[index].districtNames);
                 const extent = wktParser.decodeFeature(this.cards[index].subjectFeatureWKT).getGeometry().getExtent();
 
-                this.zoomToExtent({extent});
+                this.zoomToExtent({extent, options: {padding: this.zoomToExtentPadding}});
             });
             this.updateMap(this.activeCard);
         },
@@ -350,7 +351,7 @@ export default {
 
             this.activeCard.drawnFeatureWKT = importedWkt;
             this.setSubjectFeature(importedWkt, this.activeCard.buffer);
-            this.zoomToExtent({extent: extent});
+            this.zoomToExtent({extent: extent, options: {padding: this.zoomToExtentPadding}});
         },
 
         /**

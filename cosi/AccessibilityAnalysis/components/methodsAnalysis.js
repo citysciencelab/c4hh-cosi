@@ -93,7 +93,13 @@ export default {
         styleIsochroneFeatures(newFeatures, this.isochroneColors);
         this.getLayerById("accessibility-analysis").getLayer().getSource().addFeatures(newFeatures);
         // Removing the delay of zoomtiextent so that the full content of canvas for screenshot will be got.
-        this.zoomToExtent({extent: this.getLayerById("accessibility-analysis").getLayer().getSource().getExtent(), options: {duration: 0}});
+        this.zoomToExtent({
+            extent: this.getLayerById("accessibility-analysis").getLayer().getSource().getExtent(),
+            options: {
+                duration: 0,
+                padding: this.zoomToExtentPadding
+            }
+        });
         this.setIsochroneAsBbox();
     },
 

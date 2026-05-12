@@ -162,6 +162,7 @@ export default {
     },
     computed: {
         ...mapGetters(["allLayerConfigs", "restServiceById", "visibleSubjectDataLayerConfigs"]),
+        ...mapGetters("Menu", ["zoomToExtentPadding"]),
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Maps", ["clickCoordinate", "getVisibleLayerList", "projectionCode"]),
         ...mapGetters("Modules/AccessibilityAnalysis", Object.keys(getters)),

@@ -1,7 +1,7 @@
 <script>
 import Icon from "ol/style/Icon";
 import CircleStyle from "ol/style/Circle";
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 import {buffer} from "ol/extent";
 
 /**
@@ -16,6 +16,8 @@ export default {
         }
     },
     computed: {
+        ...mapGetters("Menu", ["zoomToExtentPadding"]),
+
         style () {
             return Array.isArray(this.item.style) ? this.item.style[0] : this.item.style;
         }
@@ -81,7 +83,7 @@ export default {
             const extent = this.item.feature.getGeometry().getExtent(),
                 buffered = buffer(extent, 500);
 
-            this.zoomToExtent({extent: buffered, options: {}});
+            this.zoomToExtent({extent: buffered, options: {padding: this.zoomToExtentPadding}});
 
             if (!this.item.enabled) {
                 this.addSingleAlert({
