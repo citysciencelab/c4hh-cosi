@@ -148,7 +148,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
         expect(wrapper.vm.activeTab).to.be.equals("layerinfo-legend");
         expect(wrapper.find(".bi-x-lg")).to.exist;
         expect(wrapper.find("#layerinfo-legend")).to.exist;
-        expect(wrapper.findAll("li > a")[0].attributes().href).to.be.equals("#layerinfo-legend");
+        expect(wrapper.findAll("li")[0].attributes().value).to.be.equals("layerinfo-legend");
     });
 
     it("if legendAvailable is false: 'LayerInfoDataDownload' is active tab", () => {
@@ -162,7 +162,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
 
         expect(wrapper.findAll("#layerinfo-legend").length).to.be.equals(0);
         expect(wrapper.vm.activeTab).to.be.equals("LayerInfoDataDownload");
-        expect(wrapper.findAll("li > a")[0].attributes().href).to.be.equals("#LayerInfoDataDownload");
+        expect(wrapper.findAll("li")[0].attributes().value).to.be.equals("LayerInfoDataDownload");
     });
 
     it("should check if dropdown for group layer to not exists", () => {

@@ -3,6 +3,7 @@ import LegendSingleLayer from "../../legend/components/LegendSingleLayer.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import {isWebLink} from "@shared/js/utils/urlHelper.js";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
+import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 import {buildMetaURLs} from "@shared/js/utils/metaUrlHelper.js";
 import LayerInfoContactButton from "../../layerTree/components/LayerInfoContactButton.vue";
 
@@ -29,7 +30,8 @@ export default {
     components: {
         LegendSingleLayer,
         AccordionItem,
-        LayerInfoContactButton
+        LayerInfoContactButton,
+        NavTab
     },
     data () {
         return {
@@ -246,21 +248,31 @@ export default {
         /**
          * checks if the given tab name is currently active
          * @param {String} tab the tab name
-         * @returns {Boolean}  true if the given tab name is active
+         * @returns {true || null}  true if the given tab name is active
          */
         isActiveTab (tab) {
             return this.activeTab === tab ? true : null;
         },
+
         /**
          * set the current tab id after clicking.
          * @param {Object[]} evt the target of current click event
          * @returns {void}
          */
         setActiveTab (evt) {
-            if (evt && evt.target && evt.target.hash) {
-                this.activeTab = evt.target.hash.substring(1);
+            if (!evt || !evt.target) {
+                return;
             }
+
+            const activeTab = evt.target.parentElement.getAttribute("value");
+
+            if (!activeTab) {
+                return;
+            }
+
+            this.activeTab = activeTab;
         },
+
         /**
          * returns the classnames for the tab
          * @param {String} tab name of the tab depending on property activeTab
@@ -434,46 +446,37 @@ export default {
         </template>
         <hr>
         <nav role="navigation">
-            <ul class="nav nav-tabs">
-                <li
+            <ul
+                class="nav nav-tabs"
+                role="tablist"
+            >
+                <NavTab
                     v-if="legendAvailable"
+                    id="layerinfo-legend-tab"
+                    target=""
                     value="layerinfo-legend"
-                    class="nav-item"
-                >
-                    <a
-                        href="#layerinfo-legend"
-                        class="nav-link"
-                        :class="{active: isActiveTab('layerinfo-legend') }"
-                        @click="setActiveTab"
-                    >{{ $t("common:modules.layerInformation.legend") }}
-                    </a>
-                </li>
-                <li
+                    :active="isActiveTab('layerinfo-legend') || false"
+                    :interaction="setActiveTab"
+                    :label="$t('common:modules.layerInformation.legend')"
+                />
+                <NavTab
                     v-if="showDownloadLinks"
+                    id="layerinfo-data-download-tab"
+                    target=""
                     value="LayerInfoDataDownload"
-                    class="nav-item"
-                >
-                    <a
-                        href="#LayerInfoDataDownload"
-                        class="nav-link"
-                        :class="{active: isActiveTab('LayerInfoDataDownload') }"
-                        @click="setActiveTab"
-                    >{{ $t("common:modules.layerInformation.downloadDataset") }}
-                    </a>
-                </li>
-                <li
+                    :active="isActiveTab('LayerInfoDataDownload') || false"
+                    :interaction="setActiveTab"
+                    :label="$t('common:modules.layerInformation.downloadDataset')"
+                />
+                <NavTab
                     v-if="showUrl"
+                    id="layerinfo-url-tab"
+                    target=""
                     value="url"
-                    class="nav-item"
-                >
-                    <a
-                        href="#url"
-                        class="nav-link"
-                        :class="{active: isActiveTab('url') }"
-                        @click.prevent="setActiveTab"
-                    >{{ layerTyp }}
-                    </a>
-                </li>
+                    :active="isActiveTab('url') || false"
+                    :interaction="setActiveTab"
+                    :label="layerTyp"
+                />
             </ul>
         </nav>
 
@@ -609,6 +612,7 @@ export default {
     }
 
     .nav-tabs {
+        border-bottom: 0;
         display: flex;
         flex-wrap: nowrap;
         >li {

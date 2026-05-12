@@ -8,6 +8,7 @@
  * @vue-prop {String} icon - optional bootstrap icon class suffix (e.g. 'bi-geo-alt') shown before the label.
  * @vue-prop {Boolean} active - whether the tab is currently active.
  * @vue-prop {String} target - used to specify the id of the element shown by the navTab button (i.e. '#section-1').
+ * @vue-prop {String} value - optional value attribute for the list element (e.g. <li value="my-value">)
  * @vue-prop {Function} interaction - can be used to bind a function to an interaction with the navTab-button, to be executed on click.
  */
 export default {
@@ -34,6 +35,11 @@ export default {
             type: String,
             required: true
         },
+        value: {
+            type: String,
+            required: false,
+            default: undefined
+        },
         interaction: {
             type: Function,
             required: false,
@@ -49,6 +55,7 @@ export default {
     <li
         class="nav-item"
         role="presentation"
+        :value="value"
     >
         <button
             :id="id"

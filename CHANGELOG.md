@@ -52,6 +52,8 @@
 - CoordToolkit: Replaced custom accordion button with accordion-component for information-dropdown.
 - Measure: Replaced custom accordion button with accordion-component for information-dropdown.
 - CompareMaps: The restriction of layer types is extended to all types without GROUP Layers.
+- LayerInformation: replaced "nav-item"-links with NavTab-component.
+- Tabs: extended NavTab-component with additional "value"-prop.
 
 ### Deprecated
 
