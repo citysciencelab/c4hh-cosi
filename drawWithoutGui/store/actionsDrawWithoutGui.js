@@ -250,6 +250,10 @@ export default {
         return dispatch("createCenterPoint", {feature: feature, targetProjection: targetProjection}).then(centerPoint => {
             const geoJSONAddCenter = geoJSON;
 
+            if (geoJSONAddCenter.features.length === 0) {
+                return geoJSON;
+            }
+
             if (geoJSONAddCenter.features[0].properties === null) {
                 geoJSONAddCenter.features[0].properties = {};
             }
@@ -283,7 +287,10 @@ export default {
             dispatch("downloadFeaturesWithoutGUI", {prmObject: {targetProjection}, currentFeature: feature})
                 .then(geoJSON => dispatch("addCenterPoint", {feature, targetProjection, geoJSON}))
                 .then(geoJSONwithCenter => {
-                    if (this.$app.config.globalProperties.$remoteInterface) {
+                    if (
+                        this.$app.config.globalProperties.$remoteInterface &&
+                        geoJSONwithCenter?.features[0]?.properties?.centerPoint
+                    ) {
                         this.$app.config.globalProperties.$remoteInterface.sendMessage({
                             "drawEnd": JSON.stringify(geoJSONwithCenter)
                         });
