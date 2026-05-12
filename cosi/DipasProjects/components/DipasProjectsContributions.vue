@@ -94,11 +94,18 @@ export default {
     },
     watch: {
         openedPanel () {
-            const extent = this.items[this.openedPanel]?.getGeometry().getExtent();
+            this.select.getFeatures().clear();
+            if (typeof this.openedPanel === "undefined") {
+                return;
+            }
+
+            const contribution = this.contributions[this.openedPanel],
+                foundFeature = this.items.find(feature => feature.get("id") === contribution.id),
+                extent = foundFeature.getGeometry().getExtent();
 
             if (extent) {
+                this.select.getFeatures().push(foundFeature);
                 this.zoomToExtent({extent: extent, options: {padding: [10, 10, 10, 10]}});
-                this.updateHoverFeatureCollection(this.items[this.openedPanel], true);
             }
         }
     },
@@ -199,6 +206,7 @@ export default {
             if (!this.selectedCategories.includes(category)) {
                 return null;
             }
+
             return this.getContributionStyle(category, feature.get("isSelected"));
         },
 
@@ -235,7 +243,7 @@ export default {
             }
 
             const id = selectedFeature.get("id"),
-                index = this.items.findIndex(item => item.get("id") === id);
+                index = this.contributions.findIndex(item => item.id === id);
 
             this.openedPanel = index;
             this.scrollToContributionPanel(`contribution-panel-${id}`);
@@ -275,8 +283,10 @@ export default {
          * @returns {void}
          */
         updateCategory (tag) {
+            this.select.getFeatures().clear();
             this.selectedCategories = tag.map(v => v.label);
             this.openedPanel = undefined;
+
             this.contributionsLayer.getSource().changed();
         },
 
