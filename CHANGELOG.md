@@ -43,7 +43,8 @@
 
 ### Fixed
 - Issue \#1592: FileImport/Draw: Fixed label text offset not being restored when importing a drawn GeoJSON file.
-- Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset. 
+- Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset.
+- Issue \#1606: proxyAgent: Restored proxy agent support in the Vite development server, so external web resources can be accessed again from localhost through a corporate proxy.
 - WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 - Fix package-lock.json for node version 24.15.0.
 - Print: Fixed print mask disappearing after toggling a layer via LayerPills or switching the base layer via BaseLayerSwitcher.
