@@ -5,6 +5,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
+
 /**
  * The Contact Form
  * @module modules/ContactFormular

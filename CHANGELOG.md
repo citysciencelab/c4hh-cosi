@@ -34,8 +34,9 @@
         - eslint-plugin-n: 17.10.2 to 17.24.0
         - fs-extra: ^11.3.0 to ^11.3.4
         - jsdoc: 4.0.4 to 4.0.5
-        - replace-in-file: 8.3.0 to 8.4.0
-- Replaced specific accordion-button with AccordionItem-component for Contact-Dropdown and extended the AccordionItem-component such that it can handle headings (h1,...,h6).
+         - replace-in-file: 8.3.0 to 8.4.0
+- ContactFormular: Replaced custom accordion button with `AccordionItem` component for Contact dropdown.
+- AccordionItem: Extended component to support heading elements (`h1`–`h6`).
 
 ### Deprecated
 
