@@ -243,7 +243,13 @@ export default {
         // Remove scroll event listener
         if (toolBody) {
             toolBody.removeEventListener("scroll", this.handleToolBodyScroll);
+
+            toolBody.scrollTop = 0;
         }
+
+        // remove the close button if GFI is opened
+        document.getElementById("mp-menu-header-close-button-secondaryMenu")?.setAttribute("style", "display: none;");
+        document.getElementById("mp-menu-navigation-reset-button-secondaryMenu")?.setAttribute("style", "display: none;");
     },
     methods: {
         ...mapMutations("Modules/DataNarrator", Object.keys(mutations)),
