@@ -42,6 +42,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1592: FileImport/Draw: Fixed label text offset not being restored when importing a drawn GeoJSON file.
 - Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset. 
 - WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 - Fix package-lock.json for node version 24.15.0.
@@ -75,10 +76,10 @@
 - Issue \#1576: BackForward control was not working inside expandable controls until opened.
 - Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
 - Issue \#1584: LayerConfig: Fixed issue where layer attribution was shown multiple times after reordering layers.
-- Issue \#1590: Vite
-- Issue \#1593: Min/MaxScale: Fixed a bug where layers were not correctly grayed out or stayed active when the scale was outside the defined range.
+- Issue \#1590: Vite:
     - build: corrected path to mastercode folder in index.html.
     - buildExamples: corrected name and content of zip-files.
+- Issue \#1593: Min/MaxScale: Fixed a bug where layers were not correctly grayed out or stayed active when the scale was outside the defined range.
 - Issue \#1596: Documentation: Fixed broken link to config.js example file in config.js.md.
 - Issue \#1599: About: Fixed attempted to load CSW metadata even without a configured cswUrl.
 - GroupLayer:
