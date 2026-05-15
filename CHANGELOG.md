@@ -64,6 +64,7 @@
 - Print: Fixed print mask disappearing after toggling a layer via LayerPills or switching the base layer via BaseLayerSwitcher.
 - WMS-Time: Activating time comparison placed the second WMS-Time layer at the top of the layerTree, causing it to cover other layers. The fix places the comparison layer directly above the original layer.
 - SelectFeatures: Fixed console error and missing results in the list for OAF layers.
+- i18next: Fix language-code-detection (e.g. "de-DE" -> "de").
 
 ---
 

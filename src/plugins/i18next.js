@@ -141,6 +141,8 @@ export function initLanguage (portalLanguageConfig, portalLocales) {
             }
         })
         .then(() => {
+            normalizeLanguageCode(portalLanguage);
+
             if (portalLocales) {
                 Object.entries(portalLocales).forEach(([language, languageEntries]) => Object.entries(languageEntries).forEach(([namespace, resources]) => i18next.addResourceBundle(
                     language,
@@ -151,4 +153,26 @@ export function initLanguage (portalLanguageConfig, portalLocales) {
                 )));
             }
         });
+}
+
+/**
+ * Normalizes a detected language code that contains a region suffix (e.g. "en-US")
+ * to its base language code (e.g. "en"). If the base language is not among the
+ * supported languages, the fallback language is used instead.
+ * Nothing is changed if the detected language code contains no region suffix.
+ * @param {Object} portalLanguage - The portal language configuration.
+ * @param {String} portalLanguage.fallbackLanguage - The language to fall back to if the base language is not supported.
+ * @param {Object} portalLanguage.languages - Supported languages as `{code: label}` pairs (e.g. `{en: "english"}`).
+ * @returns {void}
+ */
+export function normalizeLanguageCode ({fallbackLanguage, languages}) {
+    const detectedLanguageCode = i18next.language;
+
+    if (detectedLanguageCode.includes("-")) {
+        const language = detectedLanguageCode.split("-")[0];
+
+        i18next.changeLanguage(
+            languages[language] ? language : fallbackLanguage
+        );
+    }
 }
