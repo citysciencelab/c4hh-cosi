@@ -97,8 +97,7 @@ describe("addons/dataNarrator/tests/unit/DipasPlayer.spec.js", () => {
                 steps,
                 stepsobjects: [],
                 storyConfPath: "",
-                isMobileDevice,
-                screenOrientationType: screen.orientation?.type || "portrait-primary"
+                isMobileDevice
             },
             global: {
                 plugins: [storeInstance],

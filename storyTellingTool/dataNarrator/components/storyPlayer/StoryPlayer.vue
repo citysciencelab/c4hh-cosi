@@ -14,10 +14,6 @@ export default {
         isMobileDevice: {
             type: Boolean,
             default: false
-        },
-        screenOrientationType: {
-            type: String,
-            default: screen.orientation?.type
         }
     },
     data () {
@@ -74,7 +70,7 @@ export default {
             return JSON.parse(JSON.stringify(this.storyConf.steps));
         },
         isMobilePortrait () {
-            return this.isMobileDevice && this.screenOrientationType.startsWith("portrait");
+            return this.isMobileDevice && screen.orientation?.type.startsWith("portrait");
         }
     },
     watch: {
@@ -133,10 +129,6 @@ export default {
          * @returns {void}
          */
         activateTool (toolId) {
-            if (this.isMobilePortrait) {
-                return;
-            }
-
             const toolMenuSide = this.dataNarratorMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu",
                 toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
                 module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
@@ -219,8 +211,7 @@ export default {
                 }
                 else {
                     const map = mapCollection.getMap("2D"),
-                        mapView = typeof map?.getView === "function" ? map.getView() : undefined,
-                        zoomLevel = this.isMobilePortrait ? this.currentStep.zoomLevel - 1 : this.currentStep.zoomLevel;
+                        mapView = typeof map?.getView === "function" ? map.getView() : undefined;
 
                     if (mapView) {
                         setTimeout(() => {
@@ -228,7 +219,7 @@ export default {
 
                             mapView.animate({
                                 center: adjustedCenter,
-                                zoom: zoomLevel,
+                                zoom: this.currentStep.zoomLevel,
                                 duration: 1000,
                                 rotation: 0
                             });
@@ -329,14 +320,8 @@ export default {
         getCenterOfVisibleMap () {
             const map = mapCollection.getMap("2D"),
                 mapView = map?.getView(),
-                projection = mapView?.getProjection();
-
-            if (projection && projection.getUnits() === "degrees") {
-                return this.currentStep.centerCoordinate;
-            }
-
-            const zoomLevel = this.isMobilePortrait ? this.currentStep.zoomLevel - 1 : this.currentStep.zoomLevel,
-                targetResolution = mapView?.getResolutionForZoom(zoomLevel),
+                projection = mapView?.getProjection(),
+                targetResolution = mapView?.getResolutionForZoom(this.currentStep.zoomLevel),
                 rightPadding = this.expanded("secondaryMenu")
                     ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
                     : 20,
@@ -347,14 +332,22 @@ export default {
                 center = this.currentStep.centerCoordinate;
 
             if (this.isMobilePortrait) {
-                const mapHeight = map.getTargetElement().getBoundingClientRect().top,
-                    verticalOffsetPixels = (mapHeight / 2) + 50,
+                const bottomPadding = document.getElementById("mp-menu-secondaryMenu").offsetHeight,
+                    mapHeight = map.getTargetElement().clientHeight,
+                    verticalOffsetPixels = (mapHeight - bottomPadding) / 2,
                     offsetY = verticalOffsetPixels * targetResolution;
 
-                return [center[0], center[1] - offsetY];
+                return [center[0], center[1] + offsetY];
             }
 
-            const offsetX = offsetPixels * targetResolution;
+            let offsetX = offsetPixels * targetResolution;
+
+            // For geographic projections (degrees), account for cos(latitude) to normalize
+            if (projection && projection.getUnits() === "degrees") {
+                const latRad = (center[1] * Math.PI) / 180;
+
+                offsetX = offsetX / Math.cos(latRad);
+            }
 
             return [center[0] + offsetX, center[1]];
         },
@@ -383,7 +376,6 @@ export default {
             :steps="steps"
             :steps-objects="stepsCopy"
             :is-mobile-device="isMobileDevice"
-            :screen-orientation-type="screenOrientationType"
             @change="currentStepIndex = $event"
         />
 

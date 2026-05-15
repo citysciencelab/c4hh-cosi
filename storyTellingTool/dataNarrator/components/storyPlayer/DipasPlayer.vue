@@ -27,10 +27,6 @@ export default {
         isMobileDevice: {
             type: Boolean,
             default: false
-        },
-        screenOrientationType: {
-            type: String,
-            default: screen.orientation?.type
         }
     },
     data () {
@@ -68,7 +64,8 @@ export default {
             toolBodyScrollTop: 0,
             originalToolBodyStyle: "",
             dipasPlayerHeadingStyle: "display: none;",
-            dipasPlayerToolBodyStyle: "background-color: transparent !important; -ms-overflow-style: none; overflow-y: auto; max-height: 100%; padding: 0.25rem;"
+            dipasPlayerToolBodyStyle: "background-color: transparent !important; -ms-overflow-style: none; overflow-y: auto; max-height: 100%; padding: 0.25rem;",
+            currentOrientationType: screen.orientation?.type || ""
         };
     },
     computed: {
@@ -90,15 +87,15 @@ export default {
                 "--rotate-left": this.rotateLeft + "deg",
                 "--tool-width": this.toolWidth,
                 "--tool-header": this.secondaryExpanded ? "flex" : "none",
-                "--tob-button-top": this.isMobilePortrait || (window.matchMedia("(max-width: 768px)").matches && this.screenOrientationType.startsWith("landscape")) ? "9%" : "12%",
-                "--progress-bottom": this.isMobilePortrait || (window.matchMedia("(max-width: 768px)").matches && this.screenOrientationType.startsWith("landscape")) ? "12px" : "8px"
+                "--tob-button-top": this.isMobilePortrait || (window.matchMedia("(max-width: 768px)").matches && this.currentOrientationType.startsWith("landscape")) ? "9%" : "12%",
+                "--progress-bottom": this.isMobilePortrait || (window.matchMedia("(max-width: 768px)").matches && this.currentOrientationType.startsWith("landscape")) ? "12px" : "8px"
             };
         },
         showDipasLogo () {
             return this.storyConf?.showDipasLogo !== false; // Show DIPAS logo by default, unless explicitly set to false
         },
         isMobilePortrait () {
-            return this.isMobileDevice && this.screenOrientationType.startsWith("portrait");
+            return this.isMobileDevice && this.currentOrientationType.startsWith("portrait");
         }
     },
     watch: {
@@ -116,16 +113,6 @@ export default {
             else if (expanded && !this.isMobilePortrait) {
                 this.menuBySide("mainMenu").width = "40%";
             }
-        },
-        screenOrientationType (newType) {
-            const mediaQuery = window.matchMedia("(max-width: 768px)");
-
-            if (mediaQuery.matches && newType.startsWith("landscape")) {
-                this.applyMobileLandscapeLayout();
-            }
-            else if (!newType.startsWith("landscape")) {
-                this.applyMobilePortraitLayout();
-            }
         }
     },
     created () {
@@ -140,11 +127,24 @@ export default {
         const breakpoint = "(max-width: 768px)",
             mediaQuery = window.matchMedia(breakpoint),
             isMobile = mediaQuery.matches,
-            orientationCheck = this.screenOrientationType.startsWith("landscape");
+            orientationCheck = screen.orientation?.type.startsWith("landscape");
 
         if (isMobile && orientationCheck) {
             this.applyMobileLandscapeLayout();
         }
+
+        this.orientationChangeHandler = (event) => {
+            this.currentOrientationType = event.target.type;
+
+            if (mediaQuery.matches && this.currentOrientationType.startsWith("landscape")) {
+                this.applyMobileLandscapeLayout();
+            }
+            else if (!screen.orientation?.type.startsWith("landscape")) {
+                this.applyMobilePortraitLayout();
+            }
+        };
+
+        screen.orientation?.addEventListener("change", this.orientationChangeHandler);
     },
     mounted () {
         if (this.storyConf.styleCSS) {

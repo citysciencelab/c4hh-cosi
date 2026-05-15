@@ -143,9 +143,6 @@
   "addLayerRemotely": {
     "type": "tool"
   },
-  "dataNarrator": {
-    "type": "tool"
-  },
   "drawWithoutGui": {
     "type": "javascript"
    },
@@ -243,7 +240,16 @@
   "fileImportAddon": {
     "type": "tool"
   },
+  "dataNarrator": {
+    "path": "storyTellingTool/dataNarrator",
+    "type": "tool"
+  },
   "storySelector": {
+    "path": "storyTellingTool/storySelector",
+    "type": "tool"
+  },
+  "storyCreator": {
+    "path": "storyTellingTool/storyCreator",
     "type": "tool"
   }
 }
