@@ -240,12 +240,13 @@ export default class MapHandler {
      * @returns {void}
      */
     setObserverAutoInterval (filterId, handler) {
-        const layerModel = this.getLayerModelByFilterId(filterId);
+        const layerModel = this.getLayerModelByFilterId(filterId),
+            layerFromLayerCollection = layerCollection.getLayerById(layerModel?.id);
 
-        if (!isObject(layerModel)) {
+        if (!isObject(layerFromLayerCollection)) {
             return;
         }
-        layerModel.setObserverAutoInterval(handler);
+        layerFromLayerCollection.setObserverAutoInterval(handler);
     }
 
     /**

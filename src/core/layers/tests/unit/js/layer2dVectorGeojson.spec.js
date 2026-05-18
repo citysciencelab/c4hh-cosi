@@ -174,6 +174,82 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
         });
     });
 
+    describe("startAutoRefresh", () => {
+        it("should register featuresloadend, refresh layer source and notify observers", () => {
+            const geojsonLayer = new Layer2dVectorGeojson(attributes),
+                layerSource = {
+                    once: sinon.stub(),
+                    refresh: sinon.spy()
+                },
+                features = [
+                    new Feature()
+                ],
+                observerSpy = sinon.spy(),
+                clock = sinon.useFakeTimers();
+
+            geojsonLayer.setLayerSource(layerSource);
+            geojsonLayer.layer = {
+                getSource: () => {
+                    return {
+                        getFeatures: () => features
+                    };
+                }
+            };
+            sinon.stub(geojsonLayer, "afterLoading");
+            geojsonLayer.setObserverAutoInterval(observerSpy);
+
+            geojsonLayer.startAutoRefresh(10);
+            clock.tick(10);
+            layerSource.once.firstCall.args[1]();
+
+            expect(layerSource.once.calledOnceWithExactly("featuresloadend", sinon.match.func)).to.be.true;
+            expect(layerSource.refresh.calledOnce).to.be.true;
+            expect(geojsonLayer.afterLoading.calledOnceWithExactly(geojsonLayer.attributes, features)).to.be.true;
+            expect(observerSpy.calledOnce).to.be.true;
+
+            geojsonLayer.stopAutoRefresh();
+            clock.restore();
+        });
+
+        it("should use wrapped vector source when layer source is a cluster", () => {
+            const geojsonLayer = new Layer2dVectorGeojson(attributes),
+                wrappedSource = {
+                    once: sinon.stub(),
+                    refresh: sinon.spy()
+                },
+                clusterSource = new Cluster({
+                    source: new VectorSource(),
+                    distance: 10
+                }),
+                observerSpy = sinon.spy(),
+                clock = sinon.useFakeTimers();
+
+            sinon.stub(clusterSource, "getSource").returns(wrappedSource);
+            geojsonLayer.setLayerSource(clusterSource);
+            geojsonLayer.layer = {
+                getSource: () => {
+                    return {
+                        getFeatures: () => []
+                    };
+                }
+            };
+            sinon.stub(geojsonLayer, "afterLoading");
+            geojsonLayer.setObserverAutoInterval(observerSpy);
+
+            geojsonLayer.startAutoRefresh(10);
+            clock.tick(10);
+            wrappedSource.once.firstCall.args[1]();
+
+            expect(wrappedSource.once.calledOnceWithExactly("featuresloadend", sinon.match.func)).to.be.true;
+            expect(wrappedSource.refresh.calledOnce).to.be.true;
+            expect(geojsonLayer.afterLoading.calledOnce).to.be.true;
+            expect(observerSpy.calledOnce).to.be.true;
+
+            geojsonLayer.stopAutoRefresh();
+            clock.restore();
+        });
+    });
+
     describe("Use WebGL renderer", () => {
         it("Should create the layer with WebGL methods, if renderer: \"webgl\" is set", function () {
             const vectorLayer = new Layer2dVectorGeojson({...attributes, renderer: "webgl"}),
