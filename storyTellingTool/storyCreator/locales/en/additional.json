@@ -36,6 +36,18 @@
         "zoomLevel": "Zoom level",
         "save": "Save chapter",
         "cancel": "Cancel"
+      },
+      "addElementDropdown": {
+        "categories": {
+          "elements": "Elements",
+          "media": "Media"
+        },
+        "items": {
+          "text": "Text",
+          "separator": "Separator",
+          "image": "Image",
+          "video": "Video"
+        }
       }
     }
   }

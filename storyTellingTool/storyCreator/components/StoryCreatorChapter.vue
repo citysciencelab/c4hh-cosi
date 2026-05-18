@@ -1,5 +1,6 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
+import AddElementDropdown from "../shared/modules/addElementDropdown/components/AddElementDropdown.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
@@ -11,6 +12,7 @@ export default {
     name: "StoryCreatorChapter",
     components: {
         AccordionItem,
+        AddElementDropdown,
         FlatButton,
         Multiselect
     },
@@ -35,6 +37,9 @@ export default {
         ...mapMutations("Modules/StoryCreator", [
             "setCurrentView"
         ]),
+        handleAction (type) {
+            console.warn("Aktion im StoryCreator ausgelöst. Ausgewähltes Element:", type);
+        },
         /**
          * Gets the current position and zoom level of map and set it into parameter.
          * @returns {void}
@@ -115,9 +120,7 @@ export default {
                     v-if="coordinate !== '' && zoomlevel !== ''"
                     class="p-2 d-flex flex-row align-center"
                 >
-                    <div
-                        class="p-1 fs-3"
-                    >
+                    <div class="p-1 fs-3">
                         <i class="bi bi-geo-alt-fill" />
                     </div>
                     <div class="ps-4 py-1 flex-grow-1">
@@ -184,6 +187,10 @@ export default {
                 </Multiselect>
             </div>
         </AccordionItem>
+        <AddElementDropdown
+            :allowed-actions="['text', 'image']"
+            @action-triggered="handleAction"
+        />
         <div class="d-flex flex-column align-items-center pt-3">
             <FlatButton
                 id="save"
@@ -208,7 +215,7 @@ export default {
 </style>
 
 <style lang="scss">
-.chapter .multiselect__strong{
+.chapter .multiselect__strong {
     font-family: "MasterPortalFont Bold";
 }
 
@@ -265,4 +272,3 @@ export default {
     }
 }
 </style>
-

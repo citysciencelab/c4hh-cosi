@@ -36,6 +36,18 @@
         "zoomLevel": "Zoomstufe",
         "save": "Kapitel speichern",
         "cancel": "abbrechen"
+      },
+      "addElementDropdown": {
+        "categories": {
+          "elements": "Elemente",
+          "media": "Medien"
+        },
+        "items": {
+          "text": "Text",
+          "separator": "Trennlinie",
+          "image": "Bild",
+          "video": "Video"
+        }
       }
     }
   }
