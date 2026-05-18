@@ -36,7 +36,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/FileImport", ["importedFileNames", "enableZoomToExtend", "featureExtents", "customStylingOption"]),
+        ...mapGetters("Modules/FileImport", ["importedFileNames", "enableZoomToExtend", "featureExtents", "customStylingOption", "useDifferentLayers"]),
 
         dropZoneAdditionalClass: function () {
             return this.dzIsDropHovering ? "dzReady" : "";
@@ -345,20 +345,22 @@ export default {
                     </li>
                 </ul>
             </div>
-            <div class="h-seperator" />
-            <p
-                class="mb-3 introDrawTool"
-                v-html="$t('common:modules.fileImport.captions.introDrawTool')"
-            />
-            <div
-                class="d-flex justify-content-center"
-            >
-                <FlatButton
-                    aria-label="$t('common:modules.fileImport.captions.drawTool')"
-                    :interaction="openDrawTool"
-                    :text="$t('common:modules.fileImport.captions.drawTool')"
-                    :icon="'bi-pencil-fill'"
+            <div v-if="!useDifferentLayers">
+                <div class="h-seperator" />
+                <p
+                    class="mb-3 introDrawTool"
+                    v-html="$t('common:modules.fileImport.captions.introDrawTool')"
                 />
+                <div
+                    class="d-flex justify-content-center"
+                >
+                    <FlatButton
+                        aria-label="$t('common:modules.fileImport.captions.drawTool')"
+                        :interaction="openDrawTool"
+                        :text="$t('common:modules.fileImport.captions.drawTool')"
+                        :icon="'bi-pencil-fill'"
+                    />
+                </div>
             </div>
         </div>
     </div>

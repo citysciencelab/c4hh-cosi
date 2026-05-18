@@ -2837,7 +2837,7 @@ Angabe der Füll-Farbe und -Strichstärke für das Hervorheben von Polygonen sow
 |customStylingOption|nein|Boolean|false|Legt fest, ob eine Stylingoption für GeoJson angezeigt wird.|false|
 |showConfirmation|nein|Boolean|true|Legt fest, ob ein Bestätigungsfenster, nach einem Upload, angezeigt wird.|false|
 |openDrawMenuSide|nein|String|"secondaryMenu"|Legt fest, in welchem Menü das Draw Modul geöffnet wird.|false|
-|useDifferentLayers|nein|Boolean|false|Legt fest, ob jede importierte Datei in einem eigenen Layer abgelegt wird. Name und ID des Layers werden aus dem Dateinamen abgeleitet.|false|
+|useDifferentLayers|nein|Boolean|false|Legt fest, ob jede importierte Datei in einem eigenen Layer abgelegt wird. Name und ID des Layers werden aus dem Dateinamen abgeleitet. Das Bearbeiten und Löschen von importierten Layern über das Draw-Modul ist bei dieser Option nicht möglich.|false|
 
 **Beispiel**
 
