@@ -1,12 +1,16 @@
 <script>
+import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
 
 export default {
     name: "StoryCreator",
     components: {
+        AddCardButton,
         FileUpload,
+        FlatButton,
         InputText,
         StoryCreatorChapter
     },
@@ -18,6 +22,11 @@ export default {
             imageSource: "Max Mustermann / Getty Images",
             selectedFile: null
         };
+    },
+    methods: {
+        addCard () {
+            // console.log("add chapter");
+        }
     }
 };
 </script>
@@ -65,6 +74,30 @@ export default {
             class="mb-3"
         />
         <StoryCreatorChapter />
+        <h5 class="pt-4 pb-2">
+            {{ $t("additional:modules.storyCreator.chapterTitle") }}
+        </h5>
+        <AddCardButton
+            :text="$t('additional:modules.storyCreator.addChapter')"
+            @click="addCard"
+        />
+        <div class="d-flex flex-column align-items-center pt-3">
+            <FlatButton
+                :icon="'bi-collection-play'"
+                :aria-label="$t('additional:modules.storyCreator.preview')"
+                :text="$t('additional:modules.storyCreator.preview')"
+            />
+            <FlatButton
+                :icon="'bi-cloud-arrow-down'"
+                :aria-label="$t('additional:modules.storyCreator.downloadStory')"
+                :text="$t('additional:modules.storyCreator.downloadStory')"
+            />
+            <FlatButton
+                :icon="'bi-x-circle'"
+                :aria-label="$t('additional:modules.storyCreator.discardStory')"
+                :text="$t('additional:modules.storyCreator.discardStory')"
+            />
+        </div>
     </div>
 </template>
 <style lang="scss" scoped>

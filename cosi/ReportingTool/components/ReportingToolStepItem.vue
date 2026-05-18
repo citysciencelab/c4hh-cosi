@@ -1,9 +1,9 @@
 <script>
+import AddCardButton from "../../shared/modules/cards/components/AddCardButton.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import Badges from "../../shared/modules/badges/components/Badges.vue";
 import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
-import ReportingToolStepItemAddCard from "./ReportingToolStepItemAddCard.vue";
 import ReportingToolStepItemSettings from "./ReportingToolStepItemSettings.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
@@ -13,11 +13,11 @@ import {VueDraggableNext} from "vue-draggable-next";
 export default {
     name: "ReportingToolStepItem",
     components: {
+        AddCardButton,
         AlertMessage,
         Badges,
         CustomCard,
         DropdownAutocomplete,
-        ReportingToolStepItemAddCard,
         ReportingToolStepItemSettings,
         IconButton,
         InputText,
@@ -416,7 +416,7 @@ export default {
             </CustomCard>
         </div>
     </div>
-    <ReportingToolStepItemAddCard
+    <AddCardButton
         class="pt-5 ps-5 pe-2"
         @click="addCard"
     />

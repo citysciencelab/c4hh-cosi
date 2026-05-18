@@ -1,4 +1,5 @@
 <script>
+
 import {mapGetters, mapMutations} from "vuex";
 import StoryPlayer from "./storyPlayer/StoryPlayer.vue";
 
@@ -95,4 +96,3 @@ export default {
         />
     </div>
 </template>
-

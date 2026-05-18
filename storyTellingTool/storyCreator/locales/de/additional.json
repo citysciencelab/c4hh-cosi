@@ -1,7 +1,12 @@
 {
   "modules": {
     "storyCreator": {
-      "title": "Story Telling Tool",
+      "title": "Story Creator",
+      "addChapter": "Kapitel hinzufügen",
+      "chapterTitle": "Übersicht der Kapitel",
+      "downloadStory": "Story herunterladen",
+      "preview": "Vorschau",
+      "discardStory": "Story verwerfen",
       "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
       "labels": {
         "storyName": "Story-Namen eingeben",
