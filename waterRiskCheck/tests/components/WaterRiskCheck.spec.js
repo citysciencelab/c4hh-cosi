@@ -530,6 +530,54 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
 
             expect(wrapper.vm.minimalGroundWaterDistance).to.equal("1,0 bis 2,0");
         });
+        it("should return only boolean values for pageNamesFromData", async () => {
+            const store = factory.createVuexStore(),
+                wrapper = shallowMount(WaterRiskCheck, {
+                    global: {
+                        plugins: [store]
+                    }
+                });
+
+            await wrapper.setData({
+                data: {
+                    uesg: {
+                        geoJsonParcelFeatures: []
+                    },
+                    sri07_wassertiefe: {
+                        value: {
+                            properties: {
+                                value: 0
+                            }
+                        }
+                    },
+                    sri12_wassertiefe: {
+                        value: {
+                            properties: {
+                                value: 1
+                            }
+                        }
+                    },
+                    infiltration: {
+                        values: {
+                            möglich_area: 0,
+                            wahrscheinlich_area: 0
+                        },
+                        geoJsonParcelFeatures: []
+                    }
+                },
+                parcel: [],
+                middleFloodDepth: "",
+                seldomFloodDepth: "",
+                middleFloodDepthKW: "",
+                extremFloodDepthKW: "",
+                gridCode: 0
+            });
+
+            const allValuesAreBoolean = Object.values(wrapper.vm.pageNamesFromData)
+                .every(value => typeof value === "boolean");
+
+            expect(allValuesAreBoolean).to.be.true;
+        });
     });
 
     describe("Hook", () => {

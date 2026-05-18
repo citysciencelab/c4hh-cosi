@@ -343,10 +343,10 @@ export default {
          */
         pageNamesFromData () {
             return {
-                "K2": this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth,
+                "K2": Boolean(this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth),
                 "K5_yellow": this.gridCode > 20,
                 "K5_blue": this.gridCode < 20,
-                "A2": this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth || this.middleFloodDepthKW || this.extremFloodDepthKW,
+                "A2": Boolean(this.isParcelInUesg || this.seldomFloodDepth || this.middleFloodDepth || this.middleFloodDepthKW || this.extremFloodDepthKW),
                 "K3": this.groundWaterWithin4m,
                 "A3_ja": this.groundWaterWithin4m,
                 "A3_wn": this.groundWaterWithin4m,
