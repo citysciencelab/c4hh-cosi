@@ -1,7 +1,16 @@
 {
   "modules": {
     "storyCreator": {
-      "title": "Story Creator"
+      "title": "Story Creator",
+      "chapter": {
+        "editChapter": "Edit chapter",
+        "mapTool": "Map settings and tools",
+        "mapPosition": "Apply map position",
+        "currentPosition": "Current map position",
+        "layerList": "Layers to include (Optional)",
+        "toolList": "Tool to open (Optional)",
+        "zoomLevel": "Zoom level"
+      }
     }
   }
 }

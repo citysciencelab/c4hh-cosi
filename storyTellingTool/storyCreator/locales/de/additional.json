@@ -1,7 +1,16 @@
 {
   "modules": {
     "storyCreator": {
-      "title": "Story Creator"
+      "title": "Story Creator",
+      "chapter": {
+        "editChapter": "Kapitel bearbeiten",
+        "mapTool": "Karteneinstellungen und Werkzeuge",
+        "mapPosition": "Kartenposition übernehmen",
+        "currentPosition": "Aktuelle Position auf der Karte",
+        "layerList": "Fachdaten einbinden (Optional)",
+        "toolList": "Werkzeug öffnen (Optional)",
+        "zoomLevel": "Zoomstufe"
+      }
     }
   }
 }

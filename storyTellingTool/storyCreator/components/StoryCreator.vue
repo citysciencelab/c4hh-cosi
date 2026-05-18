@@ -1,13 +1,17 @@
 <script>
+import StoryCreatorChapter from "./StoryCreatorChapter.vue";
 
 export default {
-    name: "StoryCreator"
+    name: "StoryCreator",
+    components: {
+        StoryCreatorChapter
+    }
 };
 </script>
 
 <template lang="html">
     <div>
-        eine Test
+        <StoryCreatorChapter />
     </div>
 </template>
 
