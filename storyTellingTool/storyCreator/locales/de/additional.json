@@ -1,7 +1,16 @@
 {
   "modules": {
     "storyCreator": {
-      "title": "Story Creator",
+      "title": "Story Telling Tool",
+      "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
+      "labels": {
+        "storyName": "Story-Namen eingeben",
+        "storyDescription": "Beschreibung der Story",
+        "fileDrop": "Datei hier ablegen",
+        "fileSelect": "oder Datei auswählen",
+        "altText": "Text für Barrierefreiheit",
+        "imageSource": "Fotograf / Bildquelle"
+      },
       "chapter": {
         "editChapter": "Kapitel bearbeiten",
         "mapTool": "Karteneinstellungen und Werkzeuge",
