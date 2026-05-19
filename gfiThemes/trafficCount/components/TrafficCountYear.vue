@@ -87,13 +87,16 @@ export default {
             renderLabelLegend: (datetime) => {
                 return dayjs(datetime, "YYYY-MM-DD HH:mm:ss").add(4, "day").format("YYYY");
             },
-            renderPointStyle: (datetime) => {
+            renderPointStyle: (meansOfTransports, datetime) => {
                 const pointStyle = [],
                     format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (hasHolidayInWeek(datetime[i], this.holidays, format)) {
                         pointStyle.push("star");
+                    }
+                    else if (meansOfTransports === "Anzahl_Schwerverkehr" && this.meansOfTransport === "Anzahl_Kfz") {
+                        pointStyle.push("triangle");
                     }
                     else {
                         pointStyle.push("circle");

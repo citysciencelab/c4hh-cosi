@@ -251,12 +251,12 @@ export default {
                         borderWidth: 1,
                         pointRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
                         pointHoverRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
-                        pointStyle: datetimes.length > 0 && typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(datetimes) : "",
+                        pointStyle: datetimes.length > 0 && typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(meansOfTransport, datetimes) : "",
                         datetimes,
                         isSVAvailable: meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz"
                     });
 
-                    if (datetimes.length > 0 && typeof callbackRenderPointStyle === "function" && callbackRenderPointStyle(datetimes).includes("star")) {
+                    if (datetimes.length > 0 && typeof callbackRenderPointStyle === "function" && callbackRenderPointStyle(meansOfTransport, datetimes).includes("star")) {
                         datasets.push(holidayData);
                     }
                 });
@@ -320,7 +320,7 @@ export default {
                                                 backgroundColor: dataset.backgroundColor,
                                                 borderColor: dataset.borderColor,
                                                 borderWidth: dataset.borderWidth,
-                                                pointStyle: dataset.pointStyle,
+                                                pointStyle: Array.isArray(dataset.pointStyle) ? dataset.pointStyle.find(style => style !== "star") : dataset.pointStyle,
                                                 pointRadius: dataset.pointRadius,
                                                 pointHoverRadius: dataset.pointHoverRadius,
                                                 strokeStyle: dataset.borderColor,
