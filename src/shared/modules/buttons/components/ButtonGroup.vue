@@ -55,7 +55,7 @@ export default {
     },
     data () {
         return {
-            precheckedIndex: 0,
+            precheckedIndex: this.getPrecheckedIndex(this.buttons, this.selectedValue),
             showLoadSpinner: false
         };
     },

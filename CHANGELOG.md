@@ -29,6 +29,7 @@
 - Gazetteer: Restored correct display of geographicalIdentifier as search result, if available.
 - SearchBar: Fixed unstable highlighting of 3D tiles at address coordinates.
 - LayerPills: The tooltip is always removed when a LayerPill is closed and no longer stays open on mouse click.
+- ButtonGroup: Fixed `precheckedIndex` not reflecting the initial `selectedValue` on component creation.
 
 ---
 
