@@ -9,6 +9,7 @@
 
 ### Added
 - Vue-directive: Added a vue-directive "bs-tooltip.js" to handle Bootstrap-Tooltips.
+- TabContainer: Added new shared component `TabContainer` for reusable, state-independent tab navigation.
 
 ### Changed
 - The following packages have been updated:
