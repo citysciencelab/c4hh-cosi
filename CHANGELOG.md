@@ -38,6 +38,7 @@
          - replace-in-file: 8.3.0 to 8.4.0
 - ContactFormular: Replaced custom accordion button with `AccordionItem` component for Contact dropdown.
 - AccordionItem: Extended component to support heading elements (`h1`–`h6`).
+- CompareMaps: The restriction of layer types is extended to all types without GROUP Layers.
 
 ### Deprecated
 
