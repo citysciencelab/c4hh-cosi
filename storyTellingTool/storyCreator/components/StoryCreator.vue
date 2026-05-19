@@ -60,8 +60,8 @@ export default {
         <InputText
             id="imageSource"
             v-model="imageSource"
-            :label="$t('additional:modules.storyCreator.labels.imageSource')"
-            :placeholder="$t('additional:modules.storyCreator.labels.imageSource')"
+            :label="$t('additional:modules.storyCreator.labels.photoCredit')"
+            :placeholder="$t('additional:modules.storyCreator.labels.photoCredit')"
             class="mb-3"
         />
         <StoryCreatorChapter />

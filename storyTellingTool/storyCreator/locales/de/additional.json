@@ -9,7 +9,13 @@
         "fileDrop": "Datei hier ablegen",
         "fileSelect": "oder Datei auswählen",
         "altText": "Text für Barrierefreiheit",
-        "imageSource": "Fotograf / Bildquelle"
+        "photoCredit": "Fotograf / Bildquelle"
+      },
+      "buttons": {
+          "add": "Hinzufügen"
+      },
+      "headlines": {
+        "addImages": "Neues Bild hinzufügen"
       },
       "chapter": {
         "editChapter": "Kapitel bearbeiten",

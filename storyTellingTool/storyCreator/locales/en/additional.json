@@ -9,7 +9,13 @@
         "fileDrop": "Drop file here",
         "fileSelect": "or select file",
         "altText": "Accessibility text",
-        "imageSource": "Photographer / Image source"
+        "photoCredit": "Photo credit"
+      },
+      "buttons": {
+          "add": "Hinzufügen"
+      },
+      "headlines": {
+        "addImages": "Add new image"
       },
       "chapter": {
         "editChapter": "Edit chapter",
