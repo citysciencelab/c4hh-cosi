@@ -10,6 +10,7 @@
 
 ### Added
 - Added CONTRIBUTING.md file.
+- NavTab: Added new prop `icon` to shared component NavTab to optionally display an icon in the tab.
 
 ### Changed
 - Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) besides Version **23** and npm fom **10.9.3** up to smaller than **12** are now supported.
