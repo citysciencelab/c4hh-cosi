@@ -85,11 +85,12 @@ export default {
         /**
          * Gets the download handler with different interval and meansOfTransport
          * @param {String} interval the interval to get different type of data
-         * @param {String} meansOfTransport the means of transportation
+         * @param {String} originMeansOfTransport the original means of transportation.
          * @returns {Boolean|Function} false if downloadUrl is false or return a function
          */
-        getDownloadHandler: function (interval, meansOfTransport) {
-            const meansOfTransportSV = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "";
+        getDownloadHandler: function (interval, originMeansOfTransport) {
+            const meansOfTransport = originMeansOfTransport !== "Anzahl_Fahrraeder" ? "Anzahl_Kfz" : originMeansOfTransport,
+                meansOfTransportSV = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "";
 
             if (typeof this.downloadUrl === "string") {
                 return false;
@@ -129,7 +130,7 @@ export default {
                     });
                 }
                 else if (interval === "1-Stunde") {
-                    this.downloadDataHour(this.thingId, this.meansOfTransport, result => {
+                    this.downloadDataHour(this.thingId, meansOfTransport, result => {
                         const nonSVData = result.data[meansOfTransport];
                         let jsonData;
 
@@ -161,7 +162,7 @@ export default {
                     });
                 }
                 else if (interval === "1-Tag") {
-                    this.downloadDataDay(this.thingId, this.meansOfTransport, result => {
+                    this.downloadDataDay(this.thingId, meansOfTransport, result => {
                         const nonSVData = result.data[meansOfTransport];
                         let jsonData;
 
@@ -193,7 +194,7 @@ export default {
                     });
                 }
                 else if (interval === "1-Woche") {
-                    this.downloadDataWeek(this.thingId, this.meansOfTransport, result => {
+                    this.downloadDataWeek(this.thingId, meansOfTransport, result => {
                         const nonSVData = result.data[meansOfTransport];
                         let jsonData;
 
