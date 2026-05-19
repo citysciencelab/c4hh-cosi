@@ -1,5 +1,11 @@
 <script>
+import {mapActions, mapGetters} from "vuex";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import VectorLayer from "ol/layer/Vector.js";
+import VectorSource from "ol/source/Vector.js";
+import {Style, Stroke, Fill, Circle} from "ol/style";
+import {MultiPolygon, Polygon, LineString, Point} from "ol/geom.js";
+import Feature from "ol/Feature.js";
 
 export default {
     name: "TabResultTable",
@@ -37,26 +43,184 @@ export default {
             }
         }
     },
-    emits: ["openDetails", "showPreview", "download"],
+    emits: ["openDetails", "showPreview", "download", "clearOtherGeom"],
     data () {
         return {
             currentSorting: {
                 index: 0,
                 asc: true
-            }
+            },
+            geomLayerId: "lzsGeorefLayer",
+            currentlyShownGeorefId: null
         };
     },
     computed: {
+        ...mapGetters("Modules/LzsResearchClient", [
+            "lzsGeomLayout"
+        ]),
         sortedData () {
             return this.getSortedData(this.tableDatasets, this.currentSorting.index, this.currentSorting.asc);
         },
         sortableHeaderCount () {
             return this.tableDatasets[0]?.attributes.length || 0;
+        },
+        cssVars () {
+            return {
+                "--geomIndicatorFillColor": this.lzsGeomLayout.fillColor.join(","),
+                "--geomIndicatorStrokeColor": this.lzsGeomLayout.strokeColor.join(",")
+            };
         }
     },
     methods: {
-        showDatasetPositionInMap (datasetInstanceId) {
-            console.warn(datasetInstanceId + " noch nicht implementiert!");
+        ...mapActions("Modules/LzsResearchClient", [
+            "fetchGeometryForInstanceId"
+        ]),
+        /**
+         * Toggles the dataset's geometry on the map and marks it as currently shown if it was not before.
+         * Emits "showGeom" to notify parents.
+         * If the dataset already contains geometry it is shown immediately, otherwise the geometry is fetched first.
+         * @param {Object} dataset - Dataset object containing instanceId, archiveId and optional geom.
+         * @returns {void}
+         */
+        toggleDatasetPositionInMap (dataset) {
+            if (this.currentlyShownGeorefId === dataset.instanceId) {
+                this.clearGeomIndicators();
+                this.clearGeom();
+                return;
+            }
+
+            this.currentlyShownGeorefId = dataset.instanceId;
+            this.$emit("clearOtherGeom");
+
+            if (dataset.geom) {
+                this.showGeomOnLayer(dataset.geom);
+            }
+            else {
+                this.fetchGeometryForInstanceId({
+                    "dataclassId": dataset.archiveId,
+                    "dataclassInstanceId": dataset.instanceId,
+                    "srs": 25832
+                }).then(() => {
+                    const geom = this.tableDatasets.filter((datasets) => {
+                        return datasets.instanceId === dataset.instanceId;
+                    })[0].geom;
+
+                    this.showGeomOnLayer(geom);
+                });
+            }
+        },
+        /**
+         * Creates a vector layer for the provided geometry and adds it to the map.
+         * Removes any existing layer with the configured geomLayerId before adding the new one.
+         * Fits the map view to the geometry extent and validates the extent values.
+         * @param {Object} geom - Geometry object in GeoJSON-like format ({ type: "Point"|"LineString"|"Polygon", coordinates: [...] }).
+         * @returns {void}
+         */
+        showGeomOnLayer (geom) {
+            const map = mapCollection.getMap("2D"),
+                newFeature = this.createNewVectorFeature(geom);
+
+            this.clearGeom();
+
+            if (newFeature) {
+                const vectorSource = new VectorSource({
+                        features: [newFeature]
+                    }),
+                    vectorLayer = new VectorLayer({
+                        alwaysOnTop: true,
+                        id: this.geomLayerId,
+                        source: vectorSource,
+                        zIndex: 1000,
+                        style: new Style({
+                            fill: new Fill({
+                                color: this.lzsGeomLayout.fillColor
+                            }),
+                            stroke: new Stroke({
+                                color: this.lzsGeomLayout.strokeColor,
+                                width: this.lzsGeomLayout.strokeWidth
+                            }),
+                            image: new Circle({
+                                radius: this.lzsGeomLayout.circleRadius,
+                                fill: new Fill({
+                                    color: this.lzsGeomLayout.circleFillColor
+                                }),
+                                stroke: new Stroke({
+                                    color: this.lzsGeomLayout.circleStrokeColor,
+                                    width: this.lzsGeomLayout.strokeWidth
+                                })
+                            })
+                        })
+                    }),
+                    extent = newFeature.getGeometry().getExtent();
+
+                map.addLayer(vectorLayer);
+
+                if (extent.some(coord => isNaN(coord))) {
+                    console.error("Invalid extent:", extent);
+                    return;
+                }
+
+                map.getView().fit(extent, {
+                    duration: 1000,
+                    maxZoom: 16,
+                    padding: [150, 150, 150, 150]
+                });
+            }
+        },
+        /**
+         * Creates an OpenLayers Feature from a GeoJSON-like geometry object.
+         * Supports Point, LineString and Polygon.
+         * @param {Object} geom - Geometry object ({ type: string, coordinates: Array }).
+         * @returns {Feature|null} The created Feature or null if geometry type is unsupported.
+         */
+        createNewVectorFeature (geom) {
+            let newFeature = null;
+
+            switch (geom.type) {
+                case "Point":
+                    newFeature = new Feature({
+                        geometry: new Point(geom.coordinates)
+                    });
+                    break;
+                case "LineString":
+                    newFeature = new Feature({
+                        geometry: new LineString(geom.coordinates)
+                    });
+                    break;
+                case "Polygon":
+                    newFeature = new Feature({
+                        geometry: new Polygon(geom.coordinates)
+                    });
+                    break;
+                case "MultiPolygon":
+                    newFeature = new Feature({
+                        geometry: new MultiPolygon(geom.coordinates)
+                    });
+                    break;
+                default:
+                    break;
+            }
+
+            return newFeature;
+        },
+        /**
+         * Clear the marker for which dataset is currently shown (does not remove vector from map).
+         * @returns {void}
+         */
+        clearGeomIndicators () {
+            this.currentlyShownGeorefId = null;
+        },
+        /**
+         * Remove the geometry layer from the map if present.
+         * @returns {void}
+         */
+        clearGeom () {
+            const map = mapCollection.getMap("2D"),
+                existingLayer = map.getLayers().getArray().find(layer => layer.get("id") === this.geomLayerId);
+
+            if (existingLayer) {
+                map.removeLayer(existingLayer);
+            }
         },
         /**
          * Gets a specific icon class for the sorting of the given column index.
@@ -194,10 +358,18 @@ export default {
                     <td>
                         <IconButton
                             v-if="showButtons.georef && hasGeoRef"
-                            :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
+                            :class-array="[
+                                'btn-light',
+                                'me-2',
+                                'listAction',
+                                'georefButton',
+                                datasetIndex % 2 !== 0 ? 'button-dark-background' : '',
+                                dataset.instanceId === currentlyShownGeorefId ? 'isShownGeometry' : ''
+                            ]"
+                            :style="cssVars"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.showPositionInMap')"
                             icon="bi-crosshair"
-                            @click="showDatasetPositionInMap(dataset.instanceId)"
+                            @click="toggleDatasetPositionInMap(dataset)"
                         />
                     </td>
 
@@ -237,7 +409,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-//@import "~variables";
 
 .TabResultTable {
     table {
@@ -278,6 +449,11 @@ export default {
     :deep(button.button-dark-background) {
         background-color: $light_grey_hover;
         border-color: $light_grey_hover;
+    }
+
+    :deep(button.isShownGeometry) {
+        background-color: rgb(var(--geomIndicatorFillColor));
+        border-color: rgb(var(--geomIndicatorStrokeColor));
     }
 }
 </style>

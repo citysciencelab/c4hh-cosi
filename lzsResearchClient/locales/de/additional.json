@@ -55,7 +55,7 @@
                     "groupByLabel": "Gruppieren nach",
                     "selectOptionLabel": "Option selektieren",
                     "table": {
-                      "showPositionInMap": "Position des Datensatzes in der Karte anzeigen",
+                      "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
                       "goToDetails": "Details zum Datensatz anzeigen",
                       "showPreview": "Vorschau anzeigen",
                       "download": "Datensatz herunterladen",

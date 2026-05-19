@@ -76,6 +76,36 @@ export default {
             ];
         }
     },
+    watch: {
+        /**
+         * This watcher is neccessary to wait for the rendering of the TabContainer component
+         * activates a watcher on the activeTabIdLocal of the TabContainer to react on tab change
+         * @param {String} val - request token for requests to the backend
+         */
+        async requestToken (val) {
+            if (!val) {
+                return;
+            }
+
+            // wait until the rendering of tabContainer is finished to access the $ref
+            const waitForRef = async (name, timeout = 1000, interval = 50) => {
+                const start = Date.now();
+
+                while (!this.$refs[name] && Date.now() - start < timeout) {
+                    await new Promise(r => setTimeout(r, interval));
+                }
+                return this.$refs[name];
+            };
+
+            const tabContainerRef = await waitForRef("tabContainer");
+
+            tabContainerRef?.$watch("activeTabIdLocal", (newVal) => {
+                if (newVal !== "tabResult") {
+                    tabContainerRef.$refs.tabResult[0].clearGeomAndGeomIndicators();
+                }
+            });
+        }
+    },
     /**
      * KeepAlive: This addon uses the Masterportal module caching feature,
      * see docs/Dev/vueComponents/ModuleCaching.md
@@ -140,6 +170,7 @@ export default {
 
         <template v-else-if="requestToken">
             <TabContainer
+                ref="tabContainer"
                 :tabs="tabs"
                 initial-active-tab-id="tabSearch"
             />

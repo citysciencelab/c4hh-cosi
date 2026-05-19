@@ -1,6 +1,7 @@
 import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
+import sinon from "sinon";
 
 import Component from "../../../components/TabResultTable.vue";
 
@@ -24,7 +25,17 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
                     value: "Z Item",
                     id: "BESCHREIBUNG"
                 }
-            ]
+            ],
+            geom: {
+                coordinates: [
+                    [0, 1],
+                    [1, 1],
+                    [1, 0],
+                    [0, 0],
+                    [0, 1]
+                ],
+                type: "Polygon"
+            }
         },
         {
             instanceId: "dataset2",
@@ -41,11 +52,31 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
                     value: "A Item",
                     id: "BESCHREIBUNG"
                 }
-            ]
+            ],
+            geom: {
+                coordinates: [0, 1],
+                type: "Point"
+            }
         }
     ];
 
     const tableHeader = ["JAHRGANG", "KACHELNUMMER", "BESCHREIBUNG"];
+
+    const fakeLayer = {
+            get: () => "lzsGeorefLayer"
+        },
+        fakeFunctionGetLayers = sinon.fake.returns({
+            getArray: () => [fakeLayer]
+        }),
+        fakeFunctionGetView = sinon.fake.returns({
+            fit: () => null
+        }),
+        fakeFunctionGetMap = sinon.fake.returns({
+            getLayers: fakeFunctionGetLayers,
+            removeLayer: sinon.fake.returns(null),
+            addLayer: sinon.fake.returns(null),
+            getView: fakeFunctionGetView
+        });
 
     beforeEach(() => {
         store = createStore({
@@ -60,7 +91,19 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
                                 // to be used later
                             }),
                             getters: {
-                                // to be used later
+                                lzsGeomLayout: () => {
+                                    return {
+                                        fillColor: [50, 168, 149, 0.3],
+                                        strokeColor: [50, 168, 149],
+                                        strokeWidth: 2,
+                                        circleFillColor: [50, 168, 149, 0.5],
+                                        circleStrokeColor: [50, 168, 149],
+                                        circleRadius: 10
+                                    };
+                                }
+                            },
+                            actions: {
+                                fetchGeometryForInstanceId: () => Promise.resolve()
                             }
                         }
                     }
@@ -68,11 +111,14 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
             }
         });
 
+        sinon.stub(mapCollection, "getMap").callsFake(fakeFunctionGetMap);
+
         wrapper = shallowMount(Component, {
             props: {
                 tableIndex: "tableIndex-1",
                 tableHeader,
-                tableDatasets
+                tableDatasets,
+                hasGeoRef: true
             },
             global: {
                 mocks: {
@@ -87,6 +133,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         if (wrapper) {
             wrapper.unmount();
         }
+
+        sinon.restore();
+        sinon.resetHistory();
     });
 
     it("should exist", () => {
@@ -157,5 +206,46 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         expect(wrapper.findAll("tbody tr")[1].find("td.td-item-JAHRGANG").text()).to.equal("2017");
         expect(wrapper.findAll("tbody tr")[1].find("td.td-item-KACHELNUMMER").text()).to.equal("6");
         expect(wrapper.findAll("tbody tr")[1].find("td.td-item-BESCHREIBUNG").text()).to.equal("Z Item");
+    });
+
+    it("shows georef button and calls function to show geometry on click", async () => {
+        const iconButtons = wrapper.findAllComponents({name: "IconButton"});
+
+        expect(iconButtons).to.be.an("array").with.lengthOf(4);
+        expect(iconButtons[0].vm.icon).to.equal("bi-crosshair");
+        expect(iconButtons[1].vm.icon).to.equal("bi-arrow-right-circle");
+        expect(iconButtons[2].vm.icon).to.equal("bi-crosshair");
+        expect(iconButtons[3].vm.icon).to.equal("bi-arrow-right-circle");
+
+        iconButtons[0].trigger("click");
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.currentlyShownGeorefId).to.equal("dataset2");
+        expect(iconButtons[0].vm.classArray).to.include("isShownGeometry");
+
+        wrapper.vm.clearGeomIndicators();
+        expect(wrapper.vm.currentlyShownGeorefId).to.equal(null);
+    });
+
+    it("create correct featues from geometry", async () => {
+        const pointVectorFeature = wrapper.vm.createNewVectorFeature({type: "Point", coordinates: [0, 1]}),
+            lineVectorFeature = wrapper.vm.createNewVectorFeature({type: "LineString", coordinates: [[0, 1], [1, 1], [1, 0]]}),
+            polygonVectorFeature = wrapper.vm.createNewVectorFeature({type: "Polygon", coordinates: [[[0, 1], [1, 1], [1, 0], [0, 1]]]}),
+            brokenVectorFeature1 = wrapper.vm.createNewVectorFeature({type: "broken", coordinates: [[[0, 1], [1, 1], [1, 0], [0, 1]]]}),
+            brokenVectorFeature2 = wrapper.vm.createNewVectorFeature({coordinates: [[0, 1], [1, 1], [1, 0], [0, 1]]}),
+            brokenVectorFeature3 = wrapper.vm.createNewVectorFeature({type: "broken"}),
+            brokenVectorFeature4 = wrapper.vm.createNewVectorFeature({});
+
+        expect(pointVectorFeature).to.be.an("object");
+        expect(pointVectorFeature.getGeometry().getCoordinates()).to.deep.equal([0, 1]);
+        expect(lineVectorFeature).to.be.an("object");
+        expect(lineVectorFeature.getGeometry().getCoordinates()).to.deep.equal([[0, 1], [1, 1], [1, 0]]);
+        expect(polygonVectorFeature).to.be.an("object");
+        expect(polygonVectorFeature.getGeometry().getCoordinates()).to.deep.equal([[[0, 1], [1, 1], [1, 0], [0, 1]]]);
+        expect(brokenVectorFeature1).to.be.null;
+        expect(brokenVectorFeature2).to.be.null;
+        expect(brokenVectorFeature3).to.be.null;
+        expect(brokenVectorFeature4).to.be.null;
     });
 });

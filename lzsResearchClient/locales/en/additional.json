@@ -55,7 +55,7 @@
                     "groupByLabel": "Group by",
                     "selectOptionLabel": "Select option",
                     "table": {
-                      "showPositionInMap": "Show position of dataset in map",
+                      "showPositionInMap": "Show / Hide position of dataset in map",
                       "goToDetails": "Show details for this dataset",
                       "showPreview": "Show preview",
                       "download": "Download dataset",

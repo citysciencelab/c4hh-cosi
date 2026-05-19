@@ -21,7 +21,8 @@ export default {
     data () {
         return {
             groupByReRenderKey: 0,
-            openAllAccordions: true
+            openAllAccordions: true,
+            geomIsShownBy: null
         };
     },
     computed: {
@@ -168,6 +169,53 @@ export default {
         },
         returnToSearchTab () {
             this.setCurrentTab("tabSearch");
+        },
+        /**
+         * Hides geometry indicators on all result tables except an optional table to skip,
+         * and optionally remove the geometry layer from the map for all tables.
+         *
+         * Iterates over child refs that start with "result-table-" and calls clearGeomIndicators()
+         * on each table component except the one specified by tableToSkip. If tableToSkip is null,
+         * also calls clearGeom() on each table to remove the geometry layer from the map.
+         *
+         * @param {String|null} tableToSkip - Ref name of the table to skip (e.g. "result-table-0-1"), or null to affect all tables.
+         * @returns {void}
+         */
+        clearGeomAndGeomIndicators (tableToSkip = null) {
+            this.geomIsShownBy = tableToSkip;
+
+            Object.keys(this.$refs).forEach((refTable) => {
+                if (this.$refs[refTable] && typeof this.$refs[refTable] === "object") {
+                    if (refTable.startsWith("result-table-") && refTable !== tableToSkip) {
+                        this.$refs[refTable][0]?.clearGeomIndicators();
+                    }
+
+                    if (tableToSkip === null) {
+                        this.$refs[refTable][0]?.clearGeom();
+                    }
+                }
+            });
+        },
+        /**
+         * Called after selecting a new option to group the tables by
+         * updates the render key to rerender the tables and removes geometry and geometry indicators from map and table
+         * @returns {void}
+         */
+        changeGroupBy (index) {
+            this.groupByReRenderKey++;
+
+            if (this.geomIsShownBy.startsWith(`result-table-${index}`)) {
+                Object.keys(this.$refs).forEach((refTable) => {
+                    if (
+                        this.$refs[refTable] &&
+                        typeof this.$refs[refTable] === "object" &&
+                        refTable.startsWith(`result-table-${index}`)
+                    ) {
+                        this.$refs[refTable][0]?.clearGeomIndicators();
+                        this.$refs[refTable][0]?.clearGeom();
+                    }
+                });
+            }
         }
     }
 };
@@ -195,7 +243,7 @@ export default {
             <AccordionItem
                 v-for="(step, index) in searchAttributesArchives"
                 :id="`result-item-${index}`"
-                :key="index + groupByReRenderKey"
+                :key="index"
                 class="archive-step"
                 :title="nameForArchiveId(step.archiveId)"
                 :is-open="openAllAccordions"
@@ -227,7 +275,7 @@ export default {
                                 :close-on-select="true"
                                 :clear-on-select="false"
                                 :internal-search="false"
-                                @select="groupByReRenderKey++"
+                                @select="changeGroupBy(index)"
                             >
                                 <template #singleLabel="props">
                                     <span>{{ props.option }}</span>
@@ -245,29 +293,33 @@ export default {
                     <AccordionItem
                         v-for="(groupValue, groupIndex) in groupsForArchive(step)"
                         :id="`year-item-${index}-${groupIndex}`"
-                        :key="groupIndex"
+                        :key="groupIndex + groupByReRenderKey"
                         class="group-step"
                         :title="step.attributeToGroupBy + ' ' + groupValue"
                         :is-open="openAllAccordions"
                         :coloured-header="true"
                     >
                         <TabResultTable
+                            :ref="`result-table-${index}-${groupIndex}`"
                             :table-index="`result-table-${index}-${groupIndex}`"
                             :table-header="getTableHeaders(step, groupValue)"
                             :table-datasets="resultsForGroupsForArchive(step, groupValue)"
                             :has-geo-ref="archiveHasGeoref(step.archiveId)"
                             @openDetails="openDetails"
+                            @clearOtherGeom="clearGeomAndGeomIndicators(`result-table-${index}-${groupIndex}`)"
                         />
                     </AccordionItem>
                 </div>
 
                 <div v-else>
                     <TabResultTable
+                        :ref="`result-table-${index}`"
                         :table-index="`result-table-${index}`"
                         :table-header="getTableHeaders(step)"
                         :table-datasets="resultsForGroupsForArchive(step)"
                         :has-geo-ref="archiveHasGeoref(step.archiveId)"
                         @openDetails="openDetails"
+                        @clearOtherGeom="clearGeomAndGeomIndicators(`result-table-${index}`)"
                     />
                 </div>
             </AccordionItem>

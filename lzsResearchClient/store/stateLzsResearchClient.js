@@ -29,6 +29,7 @@
  * @property {Object} lzsCurrentLayout - Current layout settings for the drawn features in the draw component
  * @property {Object} lzsDrawIcons - Icons used in the draw component
  * @property {String[]} lzsDrawTypes - Draw types available in the draw component
+ * @property {Object} lzsGeomLayout - Layout settings for the shown geometry feature in the map, also used for indication in the table
  */
 
 const state = {
@@ -62,7 +63,7 @@ const state = {
 
     // Draw component
     lzsCurrentLayout: {
-        fillColor: [148, 10, 65, 0.5],
+        fillColor: [148, 10, 65, 0.2],
         strokeColor: [148, 10, 65],
         strokeWidth: 3,
         circleStrokeColor: [148, 10, 65]
@@ -78,6 +79,14 @@ const state = {
     lzsSelectedDrawType: "",
     lzsSelectedInteraction: null,
     lzsDrawEdits: ["deleteAll"],
+    lzsGeomLayout: {
+        fillColor: [50, 168, 149, 0.3],
+        strokeColor: [50, 168, 149],
+        strokeWidth: 2,
+        circleFillColor: [50, 168, 149, 0.5],
+        circleStrokeColor: [50, 168, 149],
+        circleRadius: 10
+    },
     minScaleValue: 5000,
     errorMessage: ""
 };

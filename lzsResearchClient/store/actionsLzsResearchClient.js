@@ -76,7 +76,8 @@ export default {
                         instanceId: element.dataclassinstanceId,
                         attributes: element.dataclassinstanceAttributeArr
                             .filter(attr => attr.type !== "P")
-                            .map(attr => ({...attr, id: attr.name}))
+                            .map(attr => ({...attr, id: attr.name})),
+                        geom: null
                     });
                 });
 
@@ -150,7 +151,8 @@ export default {
                         instanceId: element.dklInstanceId,
                         attributes: element.dklAttributeList
                             .filter(attr => attr.type !== "P")
-                            .map(attr => ({...attr, name: attr.id}))
+                            .map(attr => ({...attr, name: attr.id})),
+                        geom: element.featuregeometrie?.features[0]?.geometry
                     });
                 });
 
@@ -255,6 +257,38 @@ export default {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    },
+    /**
+     *
+     * @param {Object} context - Vuex action context (state).
+     * @param {Object} payload
+     * @param {String} payload.dataclassId - Archive identifier to download the dataset for.
+     * @param {String} payload.dataclassInstanceId - Instance identifier to download the dataset for.
+     * @param {String} payload.srs - CRS to get the geometry.
+     * @returns {Object} - information on the geometry of the instance, containing coordinates, type and crs
+     */
+    async fetchGeometryForInstanceId ({state, dispatch}, payload) {
+        const params = {
+                Token: state.requestToken,
+                f: "json",
+                preventCache: Date.now()
+            },
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/dataclassinstance/computeenvelope`, params);
+
+        await axios.post(url, payload)
+            .then(function (response) {
+                const existingInstanceData = state.searchAttributeResponse?.filter((datasets) => {
+                    return datasets.instanceId === payload.dataclassInstanceId;
+                });
+
+                if (existingInstanceData) {
+                    existingInstanceData[0].geom = response.data;
+                }
+
+                return response.data;
+            }).catch(function (error) {
+                dispatch("axiosErrorHandling", error);
+            });
     },
     axiosErrorHandling ({state}, error) {
         if (error.response) {
