@@ -253,7 +253,7 @@ export default {
 
                 if (meansOfTransport === "Anzahl_Kfz") {
                     api.updateDay(thingId, "Anzahl_Schwerverkehr", dayjs().subtract(1, "day").format("YYYY-MM-DD"), (_, svValue) => {
-                        this.lastDayHeavTraffic = svValue;
+                        this.lastDayHeavTraffic = thousandsSeparator(svValue);
                     }, errormsg => {
                         this.lastDayHeavTraffic = undefined;
                         console.warn("The last update last day of heavy traffic is incomplete:", errormsg);
