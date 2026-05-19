@@ -258,8 +258,9 @@ export default {
     </div>
 </template>
 
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+
 <style lang="scss" scoped>
-//@import "~variables";
 
 #TabResult {
     div.tabResultHeaderLine {

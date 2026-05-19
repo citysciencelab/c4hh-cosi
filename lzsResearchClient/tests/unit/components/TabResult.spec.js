@@ -29,6 +29,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
                                 searchAttributeResponse: () => mockSearchAttributeResponse,
                                 nameForArchiveId: () => (id) => {
                                     return id;
+                                },
+                                archiveHasGeoref: () => (id) => {
+                                    return id === "test";
                                 }
                             }
                         }
