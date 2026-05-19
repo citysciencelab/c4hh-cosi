@@ -54,7 +54,9 @@ export default {
                     searchAttributeResponse.push({
                         archiveId: element.dataclassId,
                         instanceId: element.dataclassinstanceId,
-                        attributes: element.dataclassinstanceAttributeArr.filter(attr => attr.type !== "P")
+                        attributes: element.dataclassinstanceAttributeArr
+                            .filter(attr => attr.type !== "P")
+                            .map(attr => ({...attr, id: attr.name}))
                     });
                 });
 
@@ -125,8 +127,10 @@ export default {
                 response.data.foundItems.forEach(element => {
                     searchAttributeResponse.push({
                         archiveId: element.dklId,
-                        attributes: element.dklAttributeList.filter(attr => attr.type !== "P"),
-                        instanceId: element.dklInstanceId
+                        instanceId: element.dklInstanceId,
+                        attributes: element.dklAttributeList
+                            .filter(attr => attr.type !== "P")
+                            .map(attr => ({...attr, name: attr.id}))
                     });
                 });
 
