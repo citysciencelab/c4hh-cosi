@@ -2,7 +2,7 @@
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "./shared/InputText.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
-import ButtonGroup from "@shared/modules/buttons/components/ButtonGroup.vue";
+import ButtonGroup from "./shared/ButtonGroup.vue";
 import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import DrawEdit from "@shared/modules/draw/components/DrawEdit.vue";
@@ -107,6 +107,11 @@ export default {
             });
 
             return Object.values(yearsList).sort((a, b) => a.year - b.year);
+        },
+        selectedSpatialButtonName () {
+            return this.selectedButtonGroup === "geometry"
+                ? this.buttonGroupLevels[1].name
+                : this.buttonGroupLevels[0].name;
         },
         isSpatialSearchFormValid () {
             if (this.selectedArchiveIds.length === 0) {
@@ -719,6 +724,7 @@ export default {
                             :pre-checked-value="selectedButtonGroup"
                             group="spatialSelectionGroups"
                             class="level-switch"
+                            :selected-value="selectedSpatialButtonName"
                             @set-selected-button="setSelectedButtonGroup"
                         />
 

@@ -8,6 +8,7 @@
             },
             "generalErrorMessage": "An unknown error has occured.",
             "tabs": {
+                "backToSearchButtonLabel": "Back to search",
                 "tabDetails": {
                     "label": "Details",
                     "title": "Detailinformation",

@@ -165,6 +165,9 @@ export default {
         openDetails (datasetInstanceId) {
             this.setSelectedInstanceId(datasetInstanceId);
             this.setCurrentTab("tabDetails");
+        },
+        returnToSearchTab () {
+            this.setCurrentTab("tabSearch");
         }
     }
 };
@@ -255,6 +258,12 @@ export default {
                 </div>
             </AccordionItem>
         </div>
+
+        <FlatButton
+            :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
+            :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
+            @click="returnToSearchTab()"
+        />
     </div>
 </template>
 

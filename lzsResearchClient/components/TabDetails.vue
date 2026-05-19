@@ -72,6 +72,10 @@ export default {
             this.setSelectedInstanceId(null);
             this.setCurrentTab("tabResult");
         },
+        returnToSearchTab () {
+            this.setSelectedInstanceId(null);
+            this.setCurrentTab("tabSearch");
+        },
         /**
          * Returns the table headers for the result table
          * removes attributes, that are already available at dataset instance
@@ -240,6 +244,12 @@ export default {
             :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
             :text="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
             @click="returnToResultTab()"
+        />
+
+        <FlatButton
+            :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
+            :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
+            @click="returnToSearchTab()"
         />
 
         <ModalItem
