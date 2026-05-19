@@ -41,11 +41,11 @@ export default {
             lastYearValue: "",
             lastDayDesc: "",
             lastDayValue: "",
-            lastDayHeavTraffic: undefined,
+            lastDayValueSecond: undefined,
             workingDayAverageDesc: "",
             workingDayAverageValue: "",
-            workingDayAverageDescHeavyTraffic: undefined,
-            workingDayAverageValueHeavyTraffic: undefined,
+            workingDayAverageDescSecond: undefined,
+            workingDayAverageValueSecond: undefined,
             highestWorkloadDayDesc: "",
             highestWorkloadDayValue: "",
             highestWorkloadWeekDesc: "",
@@ -86,11 +86,27 @@ export default {
          * @returns {String} the description.
          */
         onThePreviousDay: function () {
-            if (typeof this.lastDayHeavTraffic !== "undefined") {
-                return this.$t("additional:modules.tools.gfi.themes.trafficCount.onThePreviousDay") + "<br>" + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+            let description = this.$t("additional:modules.tools.gfi.themes.trafficCount.onThePreviousDay");
+
+            if (this.meansOfTransport === "Anzahl_Kfz" && typeof this.lastDayValueSecond !== "undefined") {
+                description += "<br>" + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+            }
+            else if (this.meansOfTransport === "Anzahl_Schwerverkehr" && typeof this.lastDayValueSecond !== "undefined") {
+                description += "<br>" + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
+            }
+            return description;
+        },
+
+        /**
+         * Returns the value of row onThePreviousDay including comparison value.
+         * @returns {String} the value.
+         */
+        lastDayValueDetailed: function () {
+            if (typeof this.lastDayValueSecond !== "undefined") {
+                return this.lastDayValue + "<br>(" + this.lastDayValueSecond + ")";
             }
 
-            return this.$t("additional:modules.tools.gfi.themes.trafficCount.onThePreviousDay");
+            return this.lastDayValue;
         },
 
         /**
@@ -98,11 +114,39 @@ export default {
          * @returns {String} the description.
          */
         workingDayAverage: function () {
-            if (typeof this.lastDayHeavTraffic !== "undefined") {
-                return this.$t("additional:modules.tools.gfi.themes.trafficCount.workingDayAverage") + "<br>" + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+            let description = this.$t("additional:modules.tools.gfi.themes.trafficCount.workingDayAverage");
+
+            if (this.meansOfTransport === "Anzahl_Kfz" && typeof this.workingDayAverageValueSecond !== "undefined") {
+                description += "<br>" + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+            }
+            else if (this.meansOfTransport === "Anzahl_Schwerverkehr" && typeof this.workingDayAverageValueSecond !== "undefined") {
+                description += "<br>" + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
+            }
+            return description;
+        },
+
+        /**
+         * Returns the description of row workingDayAverage including comparison value.
+         * @returns {String} the value.
+         */
+        workingDayAverageDescDetailed: function () {
+            if (typeof this.workingDayAverageDescSecond !== "undefined" && this.workingDayAverageDesc !== "") {
+                return this.workingDayAverageDesc + "<br>(" + this.workingDayAverageDescSecond + ")";
             }
 
-            return this.$t("additional:modules.tools.gfi.themes.trafficCount.workingDayAverage");
+            return this.workingDayAverageDesc;
+        },
+
+        /**
+         * Returns the value of row workingDayAverage including comparison value.
+         * @returns {String} the value.
+         */
+        workingDayAverageValueDetailed: function () {
+            if (typeof this.workingDayAverageValueSecond !== "undefined" && this.workingDayAverageDesc !== "") {
+                return this.workingDayAverageValue + "<br>(" + this.workingDayAverageValueSecond + ")";
+            }
+
+            return this.workingDayAverageValue;
         },
 
         highestDay: function () {
@@ -126,7 +170,10 @@ export default {
          * @returns {String} the value.
          */
         isHeavyTrafficAvailableValue: function () {
-            return typeof this.lastDayHeavTraffic !== "undefined" ? this.$t("additional:modules.tools.gfi.themes.trafficCount.available") : this.$t("additional:modules.tools.gfi.themes.trafficCount.inavailable");
+            if (this.meansOfTransport !== "Anzahl_Kfz") {
+                return "";
+            }
+            return typeof this.lastDayValueSecond !== "undefined" ? this.$t("additional:modules.tools.gfi.themes.trafficCount.available") : this.$t("additional:modules.tools.gfi.themes.trafficCount.inavailable");
         },
 
         /**
@@ -162,42 +209,6 @@ export default {
         activeTab () {
             if (this.activeTab && this.activeTabId !== "info") {
                 this.setActiveTabId("info");
-            }
-        },
-
-        /**
-         * If it contains heavy traffic data of last day, the value will be updated.
-         * @returns {void}
-         */
-        lastDayHeavTraffic (val) {
-            if (typeof val !== "undefined") {
-                const value = this.lastDayValue + "<br>(" + val + ")";
-
-                this.setLastDayValue(value);
-            }
-        },
-
-        /**
-         * If it contains heavy traffic data of average working day date, the value will be updated.
-         * @returns {void}
-         */
-        workingDayAverageDescHeavyTraffic (val) {
-            if (typeof val !== "undefined" && this.workingDayAverageDesc !== "") {
-                const value = this.workingDayAverageDesc + "<br>(" + val + ")";
-
-                this.setWorkingDayAverageDesc(value);
-            }
-        },
-
-        /**
-         * If it contains heavy traffic data of average working day value, the value will be updated.
-         * @returns {void}
-         */
-        workingDayAverageValueHeavyTraffic (val) {
-            if (typeof val !== "undefined" && this.workingDayAverageDesc !== "") {
-                const value = this.workingDayAverageValue + "<br>(" + val + ")";
-
-                this.setWorkingDayAverageValue(value);
             }
         }
     },
@@ -251,12 +262,14 @@ export default {
                 this.setLastDayDesc(typeof date === "string" ? dayjs(date, "YYYY-MM-DD").format("DD.MM.YYYY") : "");
                 this.setLastDayValue(thousandsSeparator(value));
 
-                if (meansOfTransport === "Anzahl_Kfz") {
-                    api.updateDay(thingId, "Anzahl_Schwerverkehr", dayjs().subtract(1, "day").format("YYYY-MM-DD"), (_, svValue) => {
-                        this.lastDayHeavTraffic = thousandsSeparator(svValue);
+                if (meansOfTransport === "Anzahl_Kfz" || meansOfTransport === "Anzahl_Schwerverkehr") {
+                    const meansOfTransportSecond = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "Anzahl_Kfz";
+
+                    api.updateDay(thingId, meansOfTransportSecond, dayjs().subtract(1, "day").format("YYYY-MM-DD"), (_, secondValue) => {
+                        this.lastDayValueSecond = thousandsSeparator(secondValue);
                     }, errormsg => {
-                        this.lastDayHeavTraffic = undefined;
-                        console.warn("The last update last day of heavy traffic is incomplete:", errormsg);
+                        this.lastDayValueSecond = undefined;
+                        console.warn("The last update last day of traffic is incomplete:", errormsg);
                     });
                 }
             }, errormsg => {
@@ -270,13 +283,16 @@ export default {
                 this.setWorkingDayAverageDesc(typeof date === "string" ? dayjs(date, "YYYY-MM-DD").format("DD.MM.YYYY") : "");
                 this.setWorkingDayAverageValue(thousandsSeparator(value));
 
-                if (meansOfTransport === "Anzahl_Kfz") {
-                    api.updateWorkingDayAverage(thingId, "Anzahl_Schwerverkehr", this.rangeOfWorkingDayAverage, this.holidays, (svDate, svValue) => {
-                        this.workingDayAverageDescHeavyTraffic = typeof svDate === "string" ? dayjs(svDate, "YYYY-MM-DD").format("DD.MM.YYYY") : "";
-                        this.workingDayAverageValueHeavyTraffic = thousandsSeparator(svValue);
+                if (meansOfTransport === "Anzahl_Kfz" || meansOfTransport === "Anzahl_Schwerverkehr") {
+                    const meansOfTransportSecond = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "Anzahl_Kfz";
+
+                    api.updateWorkingDayAverage(thingId, meansOfTransportSecond, this.rangeOfWorkingDayAverage, this.holidays, (secondDate, secondValue) => {
+                        this.workingDayAverageDescSecond = typeof secondDate === "string" ? dayjs(secondDate, "YYYY-MM-DD").format("DD.MM.YYYY") : "";
+                        this.workingDayAverageValueSecond = thousandsSeparator(secondValue);
                     }, errormsg => {
-                        this.lastDayHeavTraffic = undefined;
-                        console.warn("The last update Working day average of heavy traffic is incomplete:", errormsg);
+                        this.workingDayAverageDescSecond = undefined;
+                        this.workingDayAverageValueSecond = undefined;
+                        console.warn("The last update Working day average of second traffic is incomplete:", errormsg);
                     });
                 }
             }, errormsg => {
@@ -480,10 +496,10 @@ export default {
                         <td class="bold">
                         &nbsp;
                         </td>
-                        <td class="bold">
+                        <td class="bold text-end">
                             {{ period }}
                         </td>
-                        <td class="bold">
+                        <td class="bold text-end">
                             {{ number }}
                         </td>
                     </tr>
@@ -526,19 +542,19 @@ export default {
                             v-html="onThePreviousDay"
                         />
                         <td
-                            :style="isHeavyTrafficAvailable? 'vertical-align: middle' : ''"
+                            class="align-middle"
                         >
                             {{ lastDayDesc }}
                         </td>
-                        <td v-html="lastDayValue" />
+                        <td v-html="lastDayValueDetailed" />
                     </tr>
                     <tr colspan="3">
                         <td
                             class="bold"
                             v-html="workingDayAverage"
                         />
-                        <td v-html="workingDayAverageDesc" />
-                        <td v-html="workingDayAverageValue" />
+                        <td v-html="workingDayAverageDescDetailed" />
+                        <td v-html="workingDayAverageValueDetailed" />
                     </tr>
                     <tr colspan="3">
                         <td class="bold">

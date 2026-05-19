@@ -66,6 +66,7 @@
                             "weekdaysShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
                         },
                         "heavyTraffic": "(heavy traffic)",
+                        "totalTraffic": "(total motor vehicles)",
                         "isHeavyTrafficAvailableDesc": "Heavy traffic available",
                         "available": "Yes",
                         "inavailable": "No"
