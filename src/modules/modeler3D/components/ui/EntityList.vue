@@ -1,6 +1,7 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 /**
  * The component to display the drawn entities as list.
  * @module modules/modeler3D/components/ui/EntityList
@@ -14,7 +15,8 @@ import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 export default {
     name: "EntityList",
     components: {
-        SwitchInput
+        SwitchInput,
+        InputText
     },
     props: {
         objects: {
@@ -114,17 +116,18 @@ export default {
                         label=""
                         @change="$event.target.checked ? setCurrentModelId(object.id) : setCurrentModelId(null)"
                     />
-                    <input
+                    <InputText
                         v-if="entity && object.edit"
                         :id="`input-${object.id}`"
                         v-model="object.name"
                         class="input-name editable"
                         label=""
                         placeholder=""
-                        @input="$emit('update-object-name', {index, value: object.name })"
+                        :floating-label="false"
+                        :on-input="() => $emit('update-object-name', {index, value: object.name })"
                         @blur="object.edit = false"
                         @keyup.enter="object.edit = false"
-                    >
+                    />
                     <span
                         v-else-if="entity && !object.edit"
                         role="button"

@@ -99,6 +99,10 @@ export default {
             type: String,
             default: null,
             required: false
+        },
+        floatingLabel: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update:modelValue", "focus", "blur", "click"],
@@ -117,7 +121,7 @@ export default {
 </script>
 
 <template>
-    <div class="form-floating mb-3">
+    <div :class="{'form-floating mb-3': floatingLabel}">
         <component
             :is="htmlType"
             :id="id"
@@ -143,6 +147,7 @@ export default {
             @click="$emit('click', $event)"
         />
         <label
+            v-if="floatingLabel"
             class="input-label"
             :for="id"
         >{{ $t(label) }}</label>

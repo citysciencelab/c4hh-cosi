@@ -5,6 +5,7 @@ import openlayerFunctions from "../utils/openlayerFunctions.js";
 import isObject from "@shared/js/utils/isObject.js";
 import {GeoJSON} from "ol/format.js";
 import Feature from "ol/Feature.js";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 
 /**
 * Snippet Download
@@ -22,7 +23,8 @@ export default {
     name: "SnippetDownload",
     components: {
         ExportButtonCSV,
-        ExportButtonGeoJSON
+        ExportButtonGeoJSON,
+        InputText
     },
     props: {
         outOfZoom: {
@@ -145,21 +147,15 @@ export default {
             {{ $t("common:modules.filter.download.label") }}
         </h6>
         <div class="form-group row">
-            <div class="form-floating col-md-6">
-                <input
+            <div class="col-md-6">
+                <InputText
                     id="tool-filter-download-filename"
                     v-model="filename"
-                    class="form-control"
                     type="text"
+                    label="common:modules.filter.download.filename"
                     :placeholder="$t('common:modules.filter.download.filename')"
-                    @keyup="enableDownloadBtn"
-                >
-                <label
-                    for="tool-filter-download-filename"
-                    class="form-label ms-2"
-                >
-                    {{ $t('common:modules.filter.download.filename') }}
-                </label>
+                    :on-input="enableDownloadBtn"
+                />
             </div>
             <div class="form-floating col-md-6">
                 <select
@@ -223,7 +219,9 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
+#tool-filter-download-filename{
+    background:red;
+}
 
 form {
 

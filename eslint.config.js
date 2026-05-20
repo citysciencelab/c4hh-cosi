@@ -354,12 +354,6 @@ export default [
         }
     },
     {
-        files: ["**/DrawItem.vue", "**/SnippetDownload.vue", "**/EntityAttributeSlider.vue", "**/EntityList.vue", "**/RoutingExportAvoidAreas.vue"],
-        rules: {
-            "vue/no-restricted-syntax": "off"
-        }
-    },
-    {
         files: ["**/*.spec.js"],
         plugins: {vitest},
         languageOptions: {

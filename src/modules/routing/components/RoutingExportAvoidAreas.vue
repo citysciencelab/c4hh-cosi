@@ -3,6 +3,7 @@ import {mapGetters, mapActions} from "vuex";
 import {Modal} from "bootstrap";
 import GeoJSON from "ol/format/GeoJSON.js";
 import convertFeaturesToKml from "../../../shared/js/utils/convertFeaturesToKml.js";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 
 /**
  * RoutingExportAvoidAreas
@@ -15,6 +16,9 @@ import convertFeaturesToKml from "../../../shared/js/utils/convertFeaturesToKml.
  */
 export default {
     name: "RoutingExportAvoidAreas",
+    components: {
+        InputText
+    },
     data () {
         return {
             avoidPolygons: {type: "MultiPolygon", coordinates: []},
@@ -288,14 +292,14 @@ export default {
                         </b></label>
 
                         <div class="col-md-8">
-                            <input
+                            <InputText
                                 id="routing-download-filename"
                                 v-model="filename"
                                 type="text"
-                                class="form-control"
                                 :placeholder="$t('common:modules.routing.exportAvoidAreas.filenamePlaceholder')"
+                                :floating-label="false"
                                 @keyup.enter="filename ? submitDownload() : _"
-                            >
+                            />
                         </div>
                     </div>
                     <hr>
@@ -319,6 +323,9 @@ export default {
 
 
 <style>
+#routing-download-filename{
+    color:red;
+}
 .hidden {
     display: none;
 }

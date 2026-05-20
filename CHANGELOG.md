@@ -18,6 +18,7 @@
         - eslint-plugin-n: 17.24.0 to 18.0.1
         - eslint-plugin-jsdoc": 50.6.3 to 63.0.1
         - eslint-plugin-vue": 9.32.0 to 10.9.1
+- Replaced native text input elements with the custom `InputText` component in selected modules without changing the user-facing behavior.
 
 ### Deprecated
 

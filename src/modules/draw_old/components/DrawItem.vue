@@ -818,15 +818,16 @@ export default {
                     {{ $t('common:modules.draw_old.areaLabel') }}
                 </label>
                 <div class="col-md-7">
-                    <input
+                    <InputText
                         id="tool-draw-area"
                         v-model="areaComputed"
-                        class="form-control form-control-sm"
-                        :style="{borderColor: innerBorderColor}"
-                        type="text"
-                        :placeholder="$t('common:modules.draw_old.areaPlaceholder')"
+                        placeholder=""
+                        label=""
                         :disabled="true"
-                    >
+                        type="text"
+                        :floating-label="false"
+                        :class-obj="['form-control-sm']"
+                    />
                 </div>
             </div>
             <div
@@ -900,38 +901,34 @@ export default {
                     {{ $t('common:modules.draw_old.areaLabel') }}
                 </label>
                 <div class="col-md-7">
-                    <input
+                    <InputText
                         id="tool-draw-squareArea"
                         v-model="squareAreaComputed"
-                        class="form-control form-control-sm"
-                        :style="{borderColor: innerBorderColor}"
-                        type="number"
-                        step="1"
+                        :label="$t('common:modules.draw_old.areaLabel')"
                         :placeholder="$t('common:modules.draw_old.squareAreaPlaceholder')"
                         :disabled="drawSquareMethods"
-                        min="0"
-                    >
+                        type="number"
+                        :min="0"
+                        :step="1"
+                        :class-obj="['form-control-sm']"
+                        :style="{borderColor: innerBorderColor}"
+                    />
                 </div>
             </div>
             <div
                 v-if="drawType.id === 'drawSquare'"
                 class="form-group form-group-sm row"
             >
-                <label
-                    class="col-md-5 col-form-label"
-                    for="tool-draw-squareSideLength"
-                >
-                    {{ $t('common:modules.draw_old.squareSideLengthLabel') }}
-                </label>
                 <div class="col-md-7">
-                    <input
+                    <InputText
                         id="tool-draw-squareSideLength"
-                        :value="squareSideLengthComputed"
-                        class="form-control form-control-sm"
-                        :style="{borderColor: innerBorderColor}"
-                        type="text"
+                        :model-value="squareSideLengthComputed"
+                        :label="$t('common:modules.draw_old.squareSideLengthLabel')"
+                        placeholder=""
                         :disabled="true"
-                    >
+                        type="text"
+                        :class-obj="['form-control-sm']"
+                    />
                 </div>
             </div>
 
@@ -968,47 +965,35 @@ export default {
                 v-if="drawType.id === 'drawCircle' || drawType.id === 'drawDoubleCircle'"
                 class="form-group form-group-sm row"
             >
-                <label
-                    class="col-md-5 col-form-label"
-                    for="tool-draw-circleRadius"
-                >
-                    {{ innerRadiusLabelComputed }}
-                </label>
                 <div class="col-md-7">
-                    <input
+                    <InputText
                         id="tool-draw-circleRadius"
                         v-model="circleRadiusComputed"
+                        :label="innerRadiusLabelComputed"
                         :disabled="drawCircleMethods"
-                        class="form-control form-control-sm"
-                        :style="{borderColor: innerBorderColor}"
                         type="number"
-                        step="1"
+                        :min="0"
+                        :step="1"
                         :placeholder="$t('common:modules.draw_old.doubleCirclePlaceholder')"
-                        min="0"
-                    >
+                        :class-obj="['form-control-sm']"
+                    />
                 </div>
             </div>
             <div
                 v-if="drawType.id === 'drawDoubleCircle'"
                 class="form-group form-group-sm row"
             >
-                <label
-                    class="col-md-5 col-form-label"
-                    for="tool-draw-circleOuterRadius"
-                >
-                    {{ $t("common:modules.draw_old.outerRadius") }}
-                </label>
                 <div class="col-md-7">
-                    <input
+                    <InputText
                         id="tool-draw-circleOuterRadius"
                         v-model="circleOuterRadiusComputed"
+                        :label="$t('common:modules.draw_old.outerRadius')"
                         :disabled="drawCircleMethods"
-                        class="form-control form-control-sm"
-                        :style="{borderColor: outerBorderColor}"
                         type="number"
+                        :min="0"
                         :placeholder="$t('common:modules.draw_old.doubleCirclePlaceholder')"
-                        min="0"
-                    >
+                        :class-obj="['form-control-sm']"
+                    />
                 </div>
             </div>
             <div
@@ -1149,21 +1134,16 @@ export default {
                 v-if="drawType.id === 'drawLine'"
                 class="form-group form-group-sm row"
             >
-                <label
-                    class="col-md-5 col-form-label"
-                    for="tool-draw-lineLength"
-                >
-                    {{ $t('common:modules.draw_old.lineLengthLabel') }}
-                </label>
                 <div class="col-md-7">
-                    <input
+                    <InputText
                         id="tool-draw-lineLength"
-                        :value="lineLengthComputed"
-                        class="form-control form-control-sm"
-                        :style="{borderColor: innerBorderColor}"
-                        type="text"
+                        :model-value="lineLengthComputed"
+                        :label="$t('common:modules.draw_old.lineLengthLabel')"
+                        placeholder=""
                         :disabled="true"
-                    >
+                        type="text"
+                        :class-obj="['form-control-sm']"
+                    />
                 </div>
             </div>
             <div

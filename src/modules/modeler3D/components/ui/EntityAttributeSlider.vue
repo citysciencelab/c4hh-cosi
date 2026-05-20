@@ -1,4 +1,5 @@
 <script>
+import InputText from "@shared/modules/inputs/components/InputText.vue";
 /**
  * The EntityAttributeSlider component.
  * @module modules/modeler3D/components/ui/EntityAttributeSlider
@@ -11,6 +12,9 @@
  */
 export default {
     name: "EntityAttributeSlider",
+    components: {
+        InputText
+    },
     props: {
         title: {
             type: String,
@@ -74,12 +78,15 @@ export default {
                         {{ valueLabel }}
                     </label>
                     <div class="col-5 px-0">
-                        <input
+                        <InputText
                             :id="title + '-field'"
-                            class="form-control form-control-sm"
-                            :value="value"
-                            @input="$emit('input', $event.target.value)"
-                        >
+                            :model-value="value"
+                            type="text"
+                            :label="valueLabel"
+                            :floating-label="false"
+                            :placeholder="valueLabel"
+                            :on-input="value => $emit('input', value)"
+                        />
                     </div>
                 </div>
                 <div class="col col-sm px-0">

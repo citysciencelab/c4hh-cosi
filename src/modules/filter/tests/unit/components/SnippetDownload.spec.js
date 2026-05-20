@@ -87,17 +87,18 @@ describe("src/modules/filter/components/SnippetDownload.vue", () => {
             await wrapper.vm.$nextTick();
             expect(wrapper.vm.enableFileDownload).to.equal(false);
         });
-        it("should call enableDownloadBtn when a keyup event is fired", async () => {
+        it("should enable download button when input event is fired", async () => {
             await wrapper.setData(
                 {
-                    showDownload: true
+                    filename: "name",
+                    selectedFormat: "CSV"
                 }
             );
-            const filenameInput = wrapper.find("#tool-filter-download-filename");
+            const filenameInput = wrapper.findComponent({name: "InputText"});
 
-            filenameInput.trigger("keyup");
+            filenameInput.props("onInput")({target: {value: "name"}});
             await wrapper.vm.$nextTick();
-            expect(wrapper.vm.enableDownloadBtn.calledOnce).to.be.true;
+            expect(wrapper.vm.enableFileDownload).to.be.true;
         });
     });
 
