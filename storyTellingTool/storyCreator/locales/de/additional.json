@@ -3,24 +3,26 @@
     "storyCreator": {
       "title": "Story Creator",
       "addChapter": "Kapitel hinzufügen",
-      "chapterTitle": "Übersicht der Kapitel",
       "downloadStory": "Story herunterladen",
       "preview": "Vorschau",
       "discardStory": "Story verwerfen",
       "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
+      "noSettings": "Keine Fachdaten oder Ansichten festgelegt",
       "labels": {
         "storyName": "Story-Namen eingeben",
         "storyDescription": "Beschreibung der Story",
         "fileDrop": "Datei hier ablegen",
         "fileSelect": "oder Datei auswählen",
         "altText": "Text für Barrierefreiheit",
-        "photoCredit": "Fotograf / Bildquelle"
+        "photoCredit": "Fotograf / Bildquelle",
+        "deleteChapter": "Kapitel löschen"
       },
       "buttons": {
           "add": "Hinzufügen"
       },
       "headlines": {
-        "addImages": "Neues Bild hinzufügen"
+        "addImages": "Neues Bild hinzufügen",
+        "chapterList": "Übersicht der Kapitel"
       },
       "chapter": {
         "editChapter": "Kapitel bearbeiten",

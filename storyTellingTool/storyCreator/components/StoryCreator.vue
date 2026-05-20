@@ -4,6 +4,7 @@ import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
+import StoryCreatorChapterCard from "./StoryCreatorChapterCard.vue";
 
 export default {
     name: "StoryCreator",
@@ -12,7 +13,8 @@ export default {
         FileUpload,
         FlatButton,
         InputText,
-        StoryCreatorChapter
+        StoryCreatorChapter,
+        StoryCreatorChapterCard
     },
     data () {
         return {
@@ -21,7 +23,23 @@ export default {
             altText: "Blick über die Hamburger Elbphilharmonie",
             imageSource: "Max Mustermann / Getty Images",
             selectedFile: null,
-            currentView: "story"
+            currentView: "story",
+            chapterContent: [
+                {title: "Dies ist ein Titel",
+                    text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum",
+                    image: "https://www.hamburg.de/resource/image/1173902/landscape_ratio16x9/1300/731/59436f59c7c0b46a07676bff0913e36d/D4C3C6D304E3E543EF78A67BE4C173EF/eine-visualisierung-eines-radrennens-in-der-hafen-city.png",
+                    photoCredit: "neuland concerts",
+                    altText: "Eine Visualisierung eines Radrennens in der Hafen City",
+                    chapterItems: {subject: "4 Fachdaten", map: "Position", tool: "Strecke/Fläche messen"}
+                },
+                {title: "Dies ist ein zweiter Titel",
+                    text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr",
+                    image: "",
+                    photoCredit: "",
+                    altText: "",
+                    chapterItems: {}
+                }
+            ]
         };
     },
     methods: {
@@ -101,13 +119,27 @@ export default {
                 :placeholder="$t('additional:modules.storyCreator.labels.photoCredit')"
                 class="mb-3"
             />
-
-            <h5 class="pt-4 pb-2">
-                {{ $t("additional:modules.storyCreator.chapterTitle") }}
+            <hr>
+            <h5 class="py-3">
+                {{ $t('additional:modules.storyCreator.headlines.chapterList') }}
             </h5>
-
+            <div
+                v-for="(chapter, index) in chapterContent"
+                :key="index"
+            >
+                <StoryCreatorChapterCard
+                    :chapter-title="chapter.title"
+                    :chapter-text="chapter.text"
+                    :chapter-image="chapter.image"
+                    :photo-credit="chapter.photoCredit"
+                    :alt-text="chapter.altText"
+                    :chapter-items="chapter.chapterItems"
+                    @delete="() => ''"
+                />
+            </div>
             <AddCardButton
                 :text="$t('additional:modules.storyCreator.addChapter')"
+                class="pt-4"
                 @click="openChapter"
             />
 
@@ -124,6 +156,7 @@ export default {
                 />
                 <FlatButton
                     :icon="'bi-x-circle'"
+                    :secondary="true"
                     :aria-label="$t('additional:modules.storyCreator.discardStory')"
                     :text="$t('additional:modules.storyCreator.discardStory')"
                 />

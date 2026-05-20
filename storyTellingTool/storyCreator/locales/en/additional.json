@@ -3,24 +3,26 @@
     "storyCreator": {
       "title": "Story Creator",
       "addChapter": "Add Chapter",
-      "chapterTitle": "Chapter Overview",
       "downloadStory": "Download Story",
       "preview": "Preview",
       "discardStory": "Discard Story",
       "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
+      "noSettings": "No technical data or map positions have been defined",
       "labels": {
         "storyName": "Enter story name",
         "storyDescription": "Story description",
         "fileDrop": "Drop file here",
         "fileSelect": "or select file",
         "altText": "Accessibility text",
-        "photoCredit": "Photo credit"
+        "photoCredit": "Photo credit",
+        "deleteChapter": "Delete chapter "
       },
       "buttons": {
           "add": "Hinzufügen"
       },
       "headlines": {
-        "addImages": "Add new image"
+        "addImages": "Add new image",
+        "chapterList": "List of Chapters"
       },
       "chapter": {
         "editChapter": "Edit chapter",
