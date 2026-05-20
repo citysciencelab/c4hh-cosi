@@ -6,6 +6,7 @@ import {initiateVueI18Next, initLanguage} from "./plugins/i18next.js";
 import globalUrlParams from "../src/core/urlParams/js/globalUrlParams.js";
 import {createApp} from "vue";
 import App from "./App.vue";
+import bsTooltipDirective from "./directives/bs-tooltip.js";
 import store from "./app-store/index.js";
 import remoteInterface from "./plugins/remoteInterface.js";
 import utilsLogin from "../src/modules/login/js/utilsLogin.js";
@@ -48,6 +49,8 @@ loadConfigJs.then(() => {
     if (Object.prototype.hasOwnProperty.call(Config, "remoteInterface")) {
         app.use(remoteInterface, Config.remoteInterface);
     }
+
+    app.directive("bs-tooltip", bsTooltipDirective);
 
     app.use(store);
     store.$app = app;

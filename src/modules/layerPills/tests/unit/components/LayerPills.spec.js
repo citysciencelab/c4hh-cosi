@@ -5,6 +5,7 @@ import {expect} from "chai";
 import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
+config.global.directives = {"bs-tooltip": {mounted: () => { /* stub */ }}};
 
 let observeSpy, disconnectSpy, ResizeObserverStub;
 
@@ -388,13 +389,30 @@ describe("src/modules/LayerPills.vue", () => {
 
     describe("tooltip of anchor", () => {
         it("anchors should have the correct tooltip", () => {
-            wrapper = createWrapper();
+            const bsTooltipStub = {mounted: sinon.stub()};
 
-            wrapper.findAll("li.nav-item button").forEach((element, index) => {
-                expect(element.attributes()).to.own.include({"data-bs-toggle": "tooltip"});
-                expect(element.attributes()).to.own.include({"data-bs-placement": "bottom"});
-                expect(element.attributes()).to.own.include({"data-bs-custom-class": "custom-tooltip"});
-                expect(element.attributes()).to.own.include({"title": visibleLayers[index].name});
+            wrapper = shallowMount(LayerPillsComponent, {
+                components: {
+                    IconButton: {
+                        name: "IconButton",
+                        template: "<button>Hier</button>"
+                    }
+                },
+                global: {
+                    plugins: [store],
+                    directives: {"bs-tooltip": bsTooltipStub}
+                }
+            });
+
+            wrapper.findAll("li.nav-item button.nav-link").forEach((element, index) => {
+                expect(element.attributes("title")).to.equal(visibleLayers[index].name);
+            });
+
+            expect(bsTooltipStub.mounted.callCount).to.equal(visibleSubjectDataLayers.length);
+            expect(bsTooltipStub.mounted.firstCall.args[1].value).to.deep.equal({
+                customClass: "custom-tooltip",
+                placement: "bottom",
+                trigger: "hover"
             });
         });
     });

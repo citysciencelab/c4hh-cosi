@@ -246,10 +246,8 @@ export default {
                 class="nav-item shadow"
             >
                 <button
+                    v-bs-tooltip="{ customClass: 'custom-tooltip', placement: 'bottom', trigger: 'hover' }"
                     class="nav-link"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="bottom"
-                    data-bs-custom-class="custom-tooltip"
                     :title="$t(layer.name)"
                     :class="layer.datasets ? 'nav-link-hover' : ''"
                     @click="showLayerInformationInMenu(layer)"
