@@ -3,6 +3,7 @@ import {Pointer} from "ol/interaction.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import mutations from "../store/mutationsCoordToolkit.js";
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
@@ -17,6 +18,7 @@ import initProjections from "@shared/js/utils/initProjections.js";
 export default {
     name: "CoordToolkit",
     components: {
+        AccordionItem,
         NavTab,
         InputText,
         FlatButton
@@ -629,61 +631,39 @@ export default {
             <div
                 v-if="isDefaultStyle()"
             >
-                <div
-                    id="accordionFlushCoord"
-                    class="accordion accordion-flush"
+                <AccordionItem
+                    id="coord-toolkit-accordion"
+                    font-size="font-size-base"
+                    heading-level="h2"
+                    icon="bi-info-circle-fill"
+                    icon-margin-end="me-2"
+                    :title="$t('common:modules.coordToolkit.info')"
+                    :use-indentation="true"
                 >
-                    <div class="accordion-item">
-                        <h2
-                            id="flush-heading-coord"
-                            class="accordion-header"
+                    <span v-if="isEnabled('supply') && (heightLayer !== null || mapMode === '3D') && isHeightLayerInfo()">
+                        <span v-if="heightLayer !== null && mapMode === '2D'">
+                            {{ heightLayerInfo }}
+                            <br>
+                        </span>
+                        <hr>
+                    </span>
+                    {{ $t("common:modules.coordToolkit.influenceFactors") }}
+                    <div
+                        v-if="isCoordInfo()"
+                    >
+                        <hr>
+                        <p class="mb-2">
+                            {{ coordInfo?.title + ":" }}
+                        </p>
+                        <li
+                            v-for="explanation in coordInfo?.explanations"
+                            :key="explanation"
                         >
-                            <button
-                                class="accordion-button collapsed"
-                                type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#collapse-coord"
-                                aria-expanded="false"
-                                aria-controls="collapse-coord"
-                            >
-                                <i class="bi-info-circle-fill me-2" />
-                                {{ $t("common:modules.coordToolkit.info") }}
-                            </button>
-                        </h2>
-                        <div
-                            id="collapse-coord"
-                            class="accordion-collapse collapse"
-                            aria-labelledby="flush-headingOne"
-                            data-bs-parent="#accordionFlushExample"
-                        >
-                            <div class="accordion-body">
-                                <span v-if="isEnabled('supply') && (heightLayer !== null || mapMode === '3D') && isHeightLayerInfo()">
-                                    <span v-if="heightLayer !== null && mapMode === '2D'">
-                                        {{ heightLayerInfo }}
-                                        <br>
-                                    </span>
-                                    <hr>
-                                </span>
-                                {{ $t("common:modules.coordToolkit.influenceFactors") }}
-                                <div
-                                    v-if="isCoordInfo()"
-                                >
-                                    <hr>
-                                    <p class="mb-2">
-                                        {{ coordInfo?.title + ":" }}
-                                    </p>
-                                    <li
-                                        v-for="explanation in coordInfo?.explanations"
-                                        :key="explanation"
-                                    >
-                                        {{ explanation }}
-                                    </li>
-                                    <br>
-                                </div>
-                            </div>
-                        </div>
+                            {{ explanation }}
+                        </li>
+                        <br>
                     </div>
-                </div>
+                </AccordionItem>
             </div>
         </form>
         <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">

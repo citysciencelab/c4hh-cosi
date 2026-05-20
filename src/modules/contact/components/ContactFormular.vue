@@ -311,7 +311,7 @@ export default {
                     id="contact-file-upload"
                     :title="$t('common:modules.contact.addFileButton')"
                     icon="bi-paperclip"
-                    font-size="font-size-basic"
+                    font-size="font-size-base"
                     heading-level="h2"
                     :use-indentation="true"
                     icon-margin-end="me-2"

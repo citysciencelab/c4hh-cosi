@@ -3,6 +3,7 @@ import {expect} from "chai";
 import sinon from "sinon";
 import {config, shallowMount, mount} from "@vue/test-utils";
 import crs from "@masterportal/masterportalapi/src/crs.js";
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import CoordToolkitComponent from "@modules/coordToolkit/components/CoordToolkit.vue";
 import CoordToolkit from "@modules/coordToolkit/store/indexCoordToolkit.js";
 import actions from "@modules/coordToolkit/store/actionsCoordToolkit.js";
@@ -72,6 +73,7 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
     let store,
         wrapper,
         isMobile,
+        uiStyle,
         text = "",
         copyStub,
         validateInputSpy,
@@ -81,6 +83,7 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
 
     beforeEach(() => {
         isMobile = false;
+        uiStyle = "";
 
         validateInputSpy = sinon.spy();
         initHeightLayerSpy = sinon.stub().returns();
@@ -120,7 +123,7 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
                 }
             },
             getters: {
-                uiStyle: () => "",
+                uiStyle: () => uiStyle,
                 isMobile: () => isMobile,
                 namedProjections: () => namedProjections
             },
@@ -623,6 +626,76 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
             wrapper.vm.changeMode("search");
             wrapper.vm.$options.watch.clickCoordinate.handler.call(wrapper.vm, [10, 20]);
             expect(positionClickedSpy.notCalled).to.be.true;
+        });
+    });
+
+    describe("CoordToolkit.vue - AccordionItem", () => {
+        it("renders AccordionItem when uiStyle is default", () => {
+            wrapper = shallowMount(CoordToolkitComponent, {
+                global: {
+                    plugins: [store]
+                }
+            });
+            expect(wrapper.findComponent(AccordionItem).exists()).to.be.true;
+        });
+
+        it("does not render AccordionItem when uiStyle is 'SIMPLE'", () => {
+            uiStyle = "SIMPLE";
+            wrapper = shallowMount(CoordToolkitComponent, {
+                global: {
+                    plugins: [store]
+                }
+            });
+            expect(wrapper.findComponent(AccordionItem).exists()).to.be.false;
+        });
+
+        it("does not render AccordionItem when uiStyle is 'TABLE'", () => {
+            uiStyle = "TABLE";
+            wrapper = shallowMount(CoordToolkitComponent, {
+                global: {
+                    plugins: [store]
+                }
+            });
+            expect(wrapper.findComponent(AccordionItem).exists()).to.be.false;
+        });
+
+        it("renders heightLayerInfo inside AccordionItem in supply mode with heightLayer set", async () => {
+            store.state.Modules.CoordToolkit.heightLayer = {id: "someLayerId"};
+            store.state.Modules.CoordToolkit.heightLayerInfo = "Height layer information text";
+            wrapper = mount(CoordToolkitComponent, {
+                global: {
+                    plugins: [store]
+                }
+            });
+            await wrapper.vm.$nextTick();
+            expect(wrapper.text()).to.include("Height layer information text");
+        });
+
+        it("renders coordInfo title and explanations inside AccordionItem", async () => {
+            store.state.Modules.CoordToolkit.coordInfo = {
+                title: "CRS Title",
+                explanations: ["First explanation", "Second explanation"]
+            };
+            wrapper = mount(CoordToolkitComponent, {
+                global: {
+                    plugins: [store]
+                }
+            });
+            await wrapper.vm.$nextTick();
+            expect(wrapper.text()).to.include("CRS Title:");
+            expect(wrapper.text()).to.include("First explanation");
+            expect(wrapper.text()).to.include("Second explanation");
+        });
+
+        it("does not render coordInfo block when coordInfo is null", async () => {
+            store.state.Modules.CoordToolkit.coordInfo = null;
+            wrapper = mount(CoordToolkitComponent, {
+                global: {
+                    plugins: [store]
+                }
+            });
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.isCoordInfo()).to.be.false;
         });
     });
 });

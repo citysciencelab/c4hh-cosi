@@ -3,6 +3,7 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import VectorLayer from "ol/layer/Vector.js";
 import MeasureInMapTooltip from "./MeasureInMapTooltip.vue";
 import MeasureList from "./MeasureList.vue";
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import source from "../js/measureSource.js";
 import getStyle from "../js/measureStyle.js";
@@ -17,6 +18,7 @@ import getStyle from "../js/measureStyle.js";
 export default {
     name: "MeasureInMap",
     components: {
+        AccordionItem,
         MeasureInMapTooltip,
         MeasureList,
         FlatButton
@@ -250,46 +252,24 @@ export default {
         </div>
 
         <div v-if="isDefaultStyle()">
-            <div
-                id="accordionFlushExample"
-                class="accordion accordion-flush"
+            <AccordionItem
+                id="measure-information"
+                font-size="font-size-base"
+                heading-level="h2"
+                icon="bi-info-circle-fill"
+                icon-margin-end="me-2"
+                :title="$t('common:modules.coordToolkit.info')"
+                :use-indentation="true"
             >
-                <div class="accordion-item">
-                    <h2
-                        id="flush-headingOne"
-                        class="accordion-header"
-                    >
-                        <button
-                            class="accordion-button collapsed"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#flush-collapseOne"
-                            aria-expanded="false"
-                            aria-controls="flush-collapseOne"
-                        >
-                            <i class="bi-info-circle-fill me-2" />
-                            {{ $t("common:modules.coordToolkit.info") }}
-                        </button>
-                    </h2>
-                    <div
-                        id="flush-collapseOne"
-                        class="accordion-collapse collapse"
-                        aria-labelledby="flush-headingOne"
-                        data-bs-parent="#accordionFlushExample"
-                    >
-                        <div class="accordion-body inaccuracy-list">
-                            {{ $t("common:modules.measure.influenceFactors") }}
-                            <ul>
-                                <li>{{ $t("common:modules.measure.scale") }}</li>
-                                <li>{{ $t("common:modules.measure.resolution") }}</li>
-                                <li>{{ $t("common:modules.measure.screenResolution") }}</li>
-                                <li>{{ $t("common:modules.measure.inputAccuracy") }}</li>
-                                <li>{{ $t("common:modules.measure.measureDistance") }}</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {{ $t("common:modules.measure.influenceFactors") }}
+                <ul class="inaccuracy-list">
+                    <li>{{ $t("common:modules.measure.scale") }}</li>
+                    <li>{{ $t("common:modules.measure.resolution") }}</li>
+                    <li>{{ $t("common:modules.measure.screenResolution") }}</li>
+                    <li>{{ $t("common:modules.measure.inputAccuracy") }}</li>
+                    <li>{{ $t("common:modules.measure.measureDistance") }}</li>
+                </ul>
+            </AccordionItem>
         </div>
     </div>
 </template>

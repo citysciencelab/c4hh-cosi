@@ -26,20 +26,14 @@ describe("src/modules/measure/components/MeasureInMap.vue", () => {
         }
     };
 
-    beforeEach(() => {
-
-        mapCollection.clear();
-
-        origcreateDrawInteraction = MeasureModule.actions.createDrawInteraction;
-        origdeleteFeatures = MeasureModule.actions.deleteFeatures;
-        MeasureModule.actions.createDrawInteraction = sinon.spy();
-        MeasureModule.actions.deleteFeatures = sinon.spy();
-        MeasureModule.actions.removeIncompleteDrawing = sinon.spy();
-        MeasureModule.mutations.setSelectedGeometry = sinon.spy();
-        MeasureModule.mutations.setSelectedLineStringUnit = sinon.spy();
-        MeasureModule.mutations.setSelectedPolygonUnit = sinon.spy();
-
-        store = createStore({
+    /**
+     * Creates a Vuex store for testing with the given uiStyle value.
+     * Must be called after the sinon spies have been set up in beforeEach.
+     * @param {String} [uiStyle=""] - The uiStyle value to use
+     * @returns {import('vuex').Store} The Vuex store instance
+     */
+    function createTestStore (uiStyle = "") {
+        return createStore({
             modules: {
                 namespaced: true,
                 Modules: {
@@ -73,9 +67,25 @@ describe("src/modules/measure/components/MeasureInMap.vue", () => {
                 configJson: mockConfigJson
             },
             getters: {
-                uiStyle: () => ""
+                uiStyle: () => uiStyle
             }
         });
+    }
+
+    beforeEach(() => {
+
+        mapCollection.clear();
+
+        origcreateDrawInteraction = MeasureModule.actions.createDrawInteraction;
+        origdeleteFeatures = MeasureModule.actions.deleteFeatures;
+        MeasureModule.actions.createDrawInteraction = sinon.spy();
+        MeasureModule.actions.deleteFeatures = sinon.spy();
+        MeasureModule.actions.removeIncompleteDrawing = sinon.spy();
+        MeasureModule.mutations.setSelectedGeometry = sinon.spy();
+        MeasureModule.mutations.setSelectedLineStringUnit = sinon.spy();
+        MeasureModule.mutations.setSelectedPolygonUnit = sinon.spy();
+
+        store = createTestStore();
     });
 
     afterEach(() => {
@@ -163,5 +173,32 @@ describe("src/modules/measure/components/MeasureInMap.vue", () => {
         wrapper.vm.setFocusToFirstControl();
         await wrapper.vm.$nextTick();
         expect(wrapper.find("#measure-tool-geometry-select").element).to.equal(document.activeElement);
+    });
+
+    it("renders the AccordionItem with measure information in default ui style", () => {
+        wrapper = shallowMount(MeasureInMapComponent, {
+            global: {
+                plugins: [store]
+            }
+        });
+        expect(wrapper.find("#measure-information").exists()).to.be.true;
+    });
+
+    it("does not render the AccordionItem when uiStyle is 'SIMPLE'", () => {
+        wrapper = shallowMount(MeasureInMapComponent, {
+            global: {
+                plugins: [createTestStore("SIMPLE")]
+            }
+        });
+        expect(wrapper.find("#measure-information").exists()).to.be.false;
+    });
+
+    it("does not render the AccordionItem when uiStyle is 'TABLE'", () => {
+        wrapper = shallowMount(MeasureInMapComponent, {
+            global: {
+                plugins: [createTestStore("TABLE")]
+            }
+        });
+        expect(wrapper.find("#measure-information").exists()).to.be.false;
     });
 });

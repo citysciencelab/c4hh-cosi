@@ -46,8 +46,10 @@
         - replace-in-file: 8.3.0 to 8.4.0
         - sinon": 19.0.2 to 22.0.0
         - sinon-chai: ^4.0.0 to ^4.0.1
-- ContactFormular: Replaced custom accordion button with `AccordionItem` component for Contact dropdown.
-- AccordionItem: Extended component to support heading elements (`h1`–`h6`).
+- Accordion: Extended component to support heading elements (`h1`–`h6`).
+- Contact: Replaced custom accordion button with accordion-component for dropdown.
+- CoordToolkit: Replaced custom accordion button with accordion-component for information-dropdown.
+- Measure: Replaced custom accordion button with accordion-component for information-dropdown.
 - CompareMaps: The restriction of layer types is extended to all types without GROUP Layers.
 
 ### Deprecated
