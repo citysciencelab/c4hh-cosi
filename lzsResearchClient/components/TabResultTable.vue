@@ -74,11 +74,12 @@ export default {
                     :data-dataset-index="datasetIndex"
                 >
                     <td
-                        v-for="attrName in tableDatasets[0].attributes.map(a => a.name)"
+                        v-for="attrName in tableDatasets[0].attributes.map(a => a.id || a.name)"
                         :key="attrName"
+                        :class="`td-item-${attrName}`"
                     >
                         {{
-                            (dataset.attributes.find(a => a.name === attrName) || {}).value || ''
+                            (dataset.attributes.find(a => (a.id || a.name) === attrName) || {}).value || ''
                         }}
                     </td>
 
