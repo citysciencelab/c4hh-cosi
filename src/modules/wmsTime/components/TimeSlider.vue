@@ -1,5 +1,9 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import dayjs from "dayjs";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import dayjsTimezone from "dayjs/plugin/timezone";
+import de from "dayjs/locale/de";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
@@ -7,6 +11,13 @@ import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import isMobile from "@shared/js/utils/isMobile.js";
 import SliderDualRange from "@shared/modules/slider/components/SliderDualRange.vue";
 import SliderItem from "@shared/modules/slider/components/SliderItem.vue";
+
+dayjs.extend(dayjsTimezone);
+dayjs.extend(localizedFormat);
+
+if (dayjs.locale() !== "de") {
+    dayjs.locale(de);
+}
 
 /**
  * TimeSlider component: The timeslider wor wms-time layers.
@@ -42,7 +53,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/WmsTime", ["defaultValue", "defaultValueEnd", "defaultDimensionName", "dualRangeSlider", "minWidth", "staticDimensions", "timeRange", "timeSlider"]),
+        ...mapGetters("Modules/WmsTime", ["defaultValue", "defaultValueEnd", "defaultDimensionName", "dualRangeSlider", "minWidth", "staticDimensions", "timeRange", "timeSlider", "displayFormat", "displayTimezone"]),
         ...mapGetters("Modules/LayerSwiper", {
             layerSwiperActive: "active"
         }),
@@ -246,6 +257,26 @@ export default {
                     this.updateMap();
                 }
             }
+        },
+
+        /*
+         * formats the current timestamp for the label.
+         * @param {String} timestamp the current timestamp.
+         * @returns {String} the formatted timestamp or the original timestamp if no format is configured.
+         */
+        formatLabel (timestamp) {
+            if (this.displayFormat) {
+                try {
+                    const date = dayjs.utc(timestamp);
+
+                    return this.displayTimezone ? date.tz(this.displayTimezone).format(this.displayFormat) : date.format(this.displayFormat);
+                }
+                catch (e) {
+                    console.error(e);
+                }
+            }
+
+            return timestamp;
         }
     }
 };
@@ -304,7 +335,7 @@ export default {
             :id="'timeSlider-input-range-' + layerId"
             ref="timeSliderInputs"
             :aria="$t('common:modules.wmsTime.timeSlider.inputRangeLabel')"
-            :label="selectedTime + ' / ' + selectedTimeEnd"
+            :label="formatLabel(selectedTime) + ' / ' + formatLabel(selectedTimeEnd)"
             :values="[sliderValue, sliderValueEnd]"
             :min="0"
             :max="sliderOptionCount"
@@ -317,7 +348,7 @@ export default {
             ref="timeSliderInput"
             :aria="$t('common:modules.wmsTime.timeSlider.inputRangeLabel')"
             :class-array="['timeSlider-input-range-label-input']"
-            :label="selectedTime"
+            :label="formatLabel(selectedTime)"
             :value="sliderValue"
             :min="0"
             :max="sliderOptionCount"

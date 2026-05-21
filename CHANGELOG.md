@@ -10,6 +10,7 @@
 ### Added
 - Vue-directive: Added a vue-directive "bs-tooltip.js" to handle Bootstrap-Tooltips.
 - TabContainer: Added new shared component `TabContainer` for reusable, state-independent tab navigation.
+- WMS-Time: Added Parameters `displayFormat` and `displayTimezone` to format the timestamp label in the TimeSlider.
 
 ### Changed
 - The following packages have been updated:

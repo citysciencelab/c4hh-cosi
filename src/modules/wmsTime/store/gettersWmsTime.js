@@ -37,6 +37,12 @@ const getters = {
     },
     timeRange (_, {currentTimeSliderObject}) {
         return currentTimeSliderObject?.timeRange || [];
+    },
+    displayFormat (_, {currentTimeSliderObject}) {
+        return currentTimeSliderObject?.displayFormat;
+    },
+    displayTimezone (_, {currentTimeSliderObject}) {
+        return currentTimeSliderObject?.displayTimezone;
     }
 };
 

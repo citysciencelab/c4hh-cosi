@@ -462,7 +462,9 @@ Layer2dRasterWmsTimeLayer.prototype.prepareTimeSliderObject = function (time, fi
             step: step,
             timeRange: filtereTimeRangeByRegex,
             staticDimensions: staticDimensionsWithDefaultValue,
-            dualRangeSlider: time.dualRangeSlider || false
+            dualRangeSlider: time.dualRangeSlider || false,
+            displayFormat: time.displayFormat,
+            displayTimezone: time.displayTimezone
         },
         params = {};
 

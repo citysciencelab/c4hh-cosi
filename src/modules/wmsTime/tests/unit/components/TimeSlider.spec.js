@@ -15,13 +15,17 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
         defaultDimension,
         dualRangeSlider,
         defaultValueEnd,
-        timeRange;
+        timeRange,
+        displayFormat,
+        displayTimezone;
 
     beforeEach(() => {
         defaultDimension = "TIME";
         dualRangeSlider = false;
         timeRange = ["2020-01-01"];
         defaultValueEnd = null;
+        displayFormat = null;
+        displayTimezone = null;
 
         store = createStore({
             modules: {
@@ -42,6 +46,8 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
                                 defaultValueEnd: () => defaultValueEnd,
                                 defaultDimensionName: () => defaultDimension,
                                 dualRangeSlider: () => dualRangeSlider,
+                                displayFormat: () => displayFormat,
+                                displayTimezone: () => displayTimezone,
                                 timeSlider: () => {
                                     return {
                                         active: timeSliderActive,
@@ -212,6 +218,56 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
         expect(wrapper.find("#timeSlider-activate-layerSwiper-layerId").exists()).to.be.true;
         expect(wrapper.find("#timeSlider-activate-layerSwiper-layerId").element.tagName).to.equal("FLAT-BUTTON-STUB");
         expect(wrapper.find("#timeSlider-activate-layerSwiper-layerId").attributes("text")).to.equal("common:modules.wmsTime.timeSlider.buttons.deactivateLayerSwiper");
+    });
+
+    it("should format the current timestamp", async () => {
+        timeRange = ["2020-01-01T10:12:34.567Z"];
+        displayFormat = "DD.MM.YYYY HH:mm";
+        timeSliderActive = true;
+        store.commit("Modules/LayerSwiper/setActive", true);
+        const wrapper = shallowMount(TimeSlider, {
+            global: {
+                plugins: [store]
+            },
+            propsData: {layerId: "layerId"}
+        });
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find("#timeSlider-input-range-layerId").attributes().label).to.be.equals("01.01.2020 10:12");
+    });
+
+    it("should keep the timestamp without format", async () => {
+        timeRange = ["2020-01-01T10:12:34.567Z"];
+        timeSliderActive = true;
+        store.commit("Modules/LayerSwiper/setActive", true);
+        const wrapper = shallowMount(TimeSlider, {
+            global: {
+                plugins: [store]
+            },
+            propsData: {layerId: "layerId"}
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find("#timeSlider-input-range-layerId").attributes().label).to.be.equals("2020-01-01T10:12:34.567Z");
+    });
+
+    it("should transform timestamp to timezone", async () => {
+        timeRange = ["2020-01-01T10:12:34.567Z"];
+        displayFormat = "DD.MM.YYYY HH:mm";
+        displayTimezone = "Europe/Berlin";
+        timeSliderActive = true;
+        store.commit("Modules/LayerSwiper/setActive", true);
+        const wrapper = shallowMount(TimeSlider, {
+            global: {
+                plugins: [store]
+            },
+            propsData: {layerId: "layerId"}
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find("#timeSlider-input-range-layerId").attributes().label).to.be.equals("01.01.2020 11:12");
     });
 
     describe("watcher sliderValue", () => {

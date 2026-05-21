@@ -689,6 +689,8 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     defaultValue: "2003",
                     defaultValueEnd: null,
                     dimensionName: "elevation",
+                    displayFormat: undefined,
+                    displayTimezone: undefined,
                     dualRangeSlider: false,
                     step: {
                         year: "1"
@@ -729,6 +731,8 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     defaultValue: "2005",
                     defaultValueEnd: null,
                     dimensionName: "time",
+                    displayFormat: undefined,
+                    displayTimezone: undefined,
                     dualRangeSlider: false,
                     step: {
                         year: "1"
@@ -783,6 +787,8 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     defaultValue: "2005",
                     defaultValueEnd: null,
                     dimensionName: "time",
+                    displayFormat: undefined,
+                    displayTimezone: undefined,
                     dualRangeSlider: false,
                     step: {
                         year: "1"
@@ -827,6 +833,8 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     defaultValue: "2005",
                     defaultValueEnd: null,
                     dimensionName: "time",
+                    displayFormat: undefined,
+                    displayTimezone: undefined,
                     dualRangeSlider: true,
                     step: {
                         year: "1"
@@ -869,6 +877,8 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     defaultValue: "2002",
                     defaultValueEnd: "2004",
                     dimensionName: "time",
+                    displayFormat: undefined,
+                    displayTimezone: undefined,
                     dualRangeSlider: true,
                     step: {
                         year: "1"
@@ -911,6 +921,8 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                     defaultValue: "2002",
                     defaultValueEnd: null,
                     dimensionName: "time",
+                    displayFormat: undefined,
+                    displayTimezone: undefined,
                     dualRangeSlider: false,
                     step: {
                         year: "1"
