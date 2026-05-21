@@ -62,13 +62,16 @@ export default {
 
             // props for diagram
             setTooltipValue: (tooltipItem) => {
-                let svPostfix = "";
+                let postfix = "";
 
                 if (tooltipItem?.dataset?.isSVAvailable) {
-                    svPostfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+                    postfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+                }
+                else if (tooltipItem?.dataset?.isKFZAvailable) {
+                    postfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
                 }
 
-                return dayjs(tooltipItem.datetime, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY, HH:mm") + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.clockLabel") + ": " + thousandsSeparator(tooltipItem.raw) + svPostfix;
+                return dayjs(tooltipItem.datetime, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY, HH:mm") + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.clockLabel") + ": " + thousandsSeparator(tooltipItem.raw) + postfix;
             },
             xAxisTicks: 12,
             yAxisTicks: 8,
@@ -82,7 +85,10 @@ export default {
             renderLabelLegend: (datetime) => {
                 return dayjs(datetime, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY");
             },
-            renderPointStyle: (meansOfTransports, datetime) => {
+            renderPointStyle: (meansOfTransports, datetime, forLegend = false) => {
+                if (forLegend) {
+                    return meansOfTransports === "Anzahl_Schwerverkehr" ? "triangle" : "circle";
+                }
                 const pointStyle = [],
                     format = "YYYY-MM-DD";
 
@@ -90,7 +96,7 @@ export default {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
                         pointStyle.push("star");
                     }
-                    else if (meansOfTransports === "Anzahl_Schwerverkehr" && this.meansOfTransport === "Anzahl_Kfz") {
+                    else if (meansOfTransports === "Anzahl_Schwerverkehr") {
                         pointStyle.push("triangle");
                     }
                     else {
@@ -125,6 +131,9 @@ export default {
 
                 if (meansOfTransports === "Anzahl_Schwerverkehr" && this.meansOfTransport === "Anzahl_Kfz") {
                     return txt + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+                }
+                else if (meansOfTransports === "Anzahl_Kfz" && this.meansOfTransport === "Anzahl_Schwerverkehr") {
+                    return txt + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
                 }
 
                 return txt;
@@ -203,19 +212,21 @@ export default {
                 });
 
                 api.updateDataset(thingId, meansOfTransport, timeSettings, datasets => {
-                    if (meansOfTransport === "Anzahl_Kfz") {
-                        api.updateDataset(thingId, "Anzahl_Schwerverkehr", timeSettings, svDatasets => {
-                            if (Array.isArray(svDatasets)) {
-                                svDatasets.forEach((transportData, idx) => {
+                    if (meansOfTransport === "Anzahl_Schwerverkehr" || meansOfTransport === "Anzahl_Kfz") {
+                        const otherTransport = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "Anzahl_Kfz";
+
+                        api.updateDataset(thingId, otherTransport, timeSettings, otherDatasets => {
+                            if (Array.isArray(otherDatasets)) {
+                                otherDatasets.forEach((transportData, idx) => {
                                     const from = typeof timeSettings[idx] === "object" ? timeSettings[idx].from + " 00:00:00" : "";
 
                                     Object.keys(transportData).forEach(transportKey => {
-                                        datasets[idx][transportKey] = addMissingDataDay(from, svDatasets[idx][transportKey], minutesForMissingData);
+                                        datasets[idx][transportKey] = addMissingDataDay(from, otherDatasets[idx][transportKey], minutesForMissingData);
                                     });
                                 });
                             }
                         }, errormsg => {
-                            console.warn("The data of schwerlastverkehr received from api are incomplete:", errormsg);
+                            console.warn("The data received from api are incomplete:", errormsg);
                         });
                     }
 

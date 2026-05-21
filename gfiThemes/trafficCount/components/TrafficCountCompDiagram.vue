@@ -229,20 +229,27 @@ export default {
                 }
 
                 meansOfTransportKey.forEach((meansOfTransport) => {
+                    let postfix = "";
+
+                    if (meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz") {
+                        postfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+                    }
+                    else if (meansOfTransport === "Anzahl_Kfz" && this.currentMeansOfTransport === "Anzahl_Schwerverkehr") {
+                        postfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
+                    }
                     const datetimes = typeof dataObj[meansOfTransport] !== "undefined" ? Object.keys(dataObj[meansOfTransport]) : [],
-                        svPostfix = meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz" ? " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic") : "",
                         holidayData = {
                             borderColor: Array.isArray(colors) ? colors[idx] : "",
                             fill: false,
-                            label: this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign") + svPostfix,
+                            label: this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign") + postfix,
                             pointBorderColor: Array.isArray(colors) ? colors[idx] : "",
                             pointBackgroundColor: Array.isArray(colors) ? colors[idx] : "",
                             pointRadius: 3,
-                            pointStyle: "star"
+                            pointStyleLegend: "star"
                         };
 
                     datasets.push({
-                        label: datetimes.length > 0 && typeof callbackRenderLabelLegend === "function" ? callbackRenderLabelLegend(datetimes[0]) + svPostfix : "",
+                        label: datetimes.length > 0 && typeof callbackRenderLabelLegend === "function" ? callbackRenderLabelLegend(datetimes[0]) + postfix : "",
                         data: typeof dataObj[meansOfTransport] !== "undefined" ? Object.values(dataObj[meansOfTransport]) : [],
                         backgroundColor: Array.isArray(colors) ? colors[idx] : "",
                         borderColor: Array.isArray(colors) ? colors[idx] : "",
@@ -252,8 +259,10 @@ export default {
                         pointRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
                         pointHoverRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
                         pointStyle: datetimes.length > 0 && typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(meansOfTransport, datetimes) : "",
+                        pointStyleLegend: typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(meansOfTransport, [], true) : "",
                         datetimes,
-                        isSVAvailable: meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz"
+                        isSVAvailable: meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz",
+                        isKFZAvailable: meansOfTransport === "Anzahl_Kfz" && this.currentMeansOfTransport === "Anzahl_Schwerverkehr"
                     });
 
                     if (datetimes.length > 0 && typeof callbackRenderPointStyle === "function" && callbackRenderPointStyle(meansOfTransport, datetimes).includes("star")) {
@@ -320,7 +329,7 @@ export default {
                                                 backgroundColor: dataset.backgroundColor,
                                                 borderColor: dataset.borderColor,
                                                 borderWidth: dataset.borderWidth,
-                                                pointStyle: Array.isArray(dataset.pointStyle) ? dataset.pointStyle.find(style => style !== "star") : dataset.pointStyle,
+                                                pointStyle: dataset.pointStyleLegend,
                                                 pointRadius: dataset.pointRadius,
                                                 pointHoverRadius: dataset.pointHoverRadius,
                                                 strokeStyle: dataset.borderColor,
