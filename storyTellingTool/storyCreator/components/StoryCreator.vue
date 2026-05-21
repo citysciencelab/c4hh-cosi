@@ -3,6 +3,7 @@ import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCard
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
+import {mapGetters, mapMutations} from "vuex";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
 import StoryCreatorChapterCard from "./StoryCreatorChapterCard.vue";
 
@@ -23,7 +24,6 @@ export default {
             altText: "Blick über die Hamburger Elbphilharmonie",
             imageSource: "Max Mustermann / Getty Images",
             selectedFile: null,
-            currentView: "story",
             chapterContent: [
                 {title: "Dies ist ein Titel",
                     text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum",
@@ -42,12 +42,28 @@ export default {
             ]
         };
     },
+    computed: {
+        ...mapGetters("Modules/StoryCreator", [
+            "currentView"
+        ])
+    },
     methods: {
-        openChapter () {
-            this.currentView = "chapter";
+        ...mapMutations("Modules/StoryCreator", [
+            "setCurrentView"
+        ]),
+        /**
+         * Adds a new chapter.
+         * @returns {void}
+         */
+        addChapter () {
+            this.setCurrentView("chapter");
         },
-        goBackToStory () {
-            this.currentView = "story";
+        /**
+         * Goes to home page of story creator.
+         * @returns {void}
+         */
+        goToStory () {
+            this.setCurrentView("story");
         }
     }
 };
@@ -65,16 +81,16 @@ export default {
                     <a
                         href="#"
                         class="breadcrumb-link"
-                        @click.prevent="goBackToStory"
+                        @click.prevent="goToStory"
                     >
-                        Story
+                        {{ $t("additional:modules.storyCreator.storyNav") }}
                     </a>
                 </li>
                 <li
                     class="breadcrumb-item active"
                     aria-current="page"
                 >
-                    Kapitel
+                    {{ $t("additional:modules.storyCreator.chapterNav") }}
                 </li>
             </ol>
         </nav>
@@ -139,8 +155,7 @@ export default {
             </div>
             <AddCardButton
                 :text="$t('additional:modules.storyCreator.addChapter')"
-                class="pt-4"
-                @click="openChapter"
+                @click="addChapter"
             />
 
             <div class="d-flex flex-column align-items-center pt-3">
@@ -162,7 +177,6 @@ export default {
                 />
             </div>
         </div>
-
         <div v-else-if="currentView === 'chapter'">
             <StoryCreatorChapter />
         </div>

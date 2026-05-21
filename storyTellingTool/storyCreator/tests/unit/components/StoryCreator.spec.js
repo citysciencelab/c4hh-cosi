@@ -1,13 +1,46 @@
 import {config, shallowMount} from "@vue/test-utils";
+import {createStore} from "vuex";
 import {expect} from "chai";
 import StoryCreator from "../../../components/StoryCreator.vue";
 
 config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/storyCreator.vue", () => {
-    describe("Component DOM", () => {
-        const wrapper = shallowMount(StoryCreator);
+    let store, wrapper;
 
+    beforeEach(() => {
+        store = createStore({
+            namespaced: true,
+            modules: {
+                Modules: {
+                    namespaced: true,
+                    modules: {
+                        StoryCreator: {
+                            namespaced: true,
+                            getters: {
+                                currentView: (state) => state.currentView
+                            },
+                            mutations: {
+                                setCurrentView (state, value) {
+                                    state.currentView = value;
+                                }
+                            },
+                            state: {
+                                currentView: "story"
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        wrapper = shallowMount(StoryCreator, {
+            global: {
+                plugins: [store]
+            }
+        });
+    });
+
+    describe("Component DOM", () => {
         it("should exist", () => {
             expect(wrapper.exists()).to.be.true;
         });

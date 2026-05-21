@@ -1,6 +1,8 @@
 {
   "modules": {
     "storyCreator": {
+      "storyNav": "Story",
+      "chapterNav": "Chapter",
       "title": "Story Creator",
       "addChapter": "Add Chapter",
       "downloadStory": "Download Story",
@@ -31,7 +33,9 @@
         "currentPosition": "Current map position",
         "layerList": "Layers to include (Optional)",
         "toolList": "Tool to open (Optional)",
-        "zoomLevel": "Zoom level"
+        "zoomLevel": "Zoom level",
+        "save": "Save chapter",
+        "cancel": "Cancel"
       }
     }
   }

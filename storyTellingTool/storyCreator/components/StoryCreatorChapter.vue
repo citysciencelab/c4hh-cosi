@@ -1,7 +1,7 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {sort} from "@shared/js/utils/sort.js";
@@ -32,6 +32,9 @@ export default {
         this.toolList = this.getToolList(this.configuredModules);
     },
     methods: {
+        ...mapMutations("Modules/StoryCreator", [
+            "setCurrentView"
+        ]),
         /**
          * Gets the current position and zoom level of map and set it into parameter.
          * @returns {void}
@@ -181,6 +184,21 @@ export default {
                 </Multiselect>
             </div>
         </AccordionItem>
+        <div class="d-flex flex-column align-items-center pt-3">
+            <FlatButton
+                id="save"
+                :icon="'bi-save'"
+                :aria-label="$t('additional:modules.storyCreator.chapter.save')"
+                :text="$t('additional:modules.storyCreator.chapter.save')"
+            />
+            <FlatButton
+                id="cancel"
+                :icon="'bi-x-lg'"
+                :aria-label="$t('additional:modules.storyCreator.chapter.cancel')"
+                :text="$t('additional:modules.storyCreator.chapter.cancel')"
+                :interaction="() => setCurrentView('story')"
+            />
+        </div>
     </div>
 </template>
 

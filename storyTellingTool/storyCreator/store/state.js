@@ -5,12 +5,14 @@
  * @property {String} type - type of the component.
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
+ * @property {String} currentView - The current view tab.
  */
 const state = {
     id: "storyCreator",
     type: "storyCreator",
     name: "additional:modules.storyCreator.title",
-    icon: "bi-file-plus"
+    icon: "bi-file-plus",
+    currentView: "story"
 };
 
 export default state;

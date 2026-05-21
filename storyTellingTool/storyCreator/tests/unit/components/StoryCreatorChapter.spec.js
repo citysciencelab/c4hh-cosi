@@ -3,12 +3,13 @@ import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import StoryCreatorChapter from "../../../components/StoryCreatorChapter.vue";
+import indexStoryCreatorChapter from "../../../store/index.js";
 import store from "@appstore/index.js";
 
 config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
-    let localStore, wrapper;
+    let localStore, map, wrapper;
 
     beforeAll(() => {
         i18next.init({
@@ -20,6 +21,14 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
     beforeEach(() => {
         localStore = createStore({
             namespaced: true,
+            modules: {
+                Modules: {
+                    namespaced: true,
+                    modules: {
+                        StoryCreator: indexStoryCreatorChapter
+                    }
+                }
+            },
             getters: {
                 configuredModules: () => sinon.stub()
             }
@@ -34,6 +43,18 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             "common:modules.contact.name": () => "Contact",
             "common:modules.print.name": () => "Print"
         };
+        mapCollection.clear();
+        map = {
+            id: "ol",
+            mode: "2D",
+            getView: () => {
+                return {
+                    getZoom: () => sinon.stub(),
+                    getCenter: () => []
+                };
+            }
+        };
+        mapCollection.addMap(map, "2D");
     });
 
     afterEach(() => {
@@ -47,28 +68,12 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
         it("should find shared component FlatButton", () => {
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
+            expect(wrapper.findAllComponents({name: "FlatButton"})).to.be.lengthOf(3);
         });
 
         it("should find vue multiselect component", () => {
             expect(wrapper.findComponent({name: "Multiselect"}).exists()).to.be.true;
             expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(2);
-
-        });
-    });
-
-    describe("Component DOM", () => {
-        it("should exist", () => {
-            expect(wrapper.exists()).to.be.true;
-        });
-
-        it("should find shared component FlatButton", () => {
-            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
-        });
-
-        it("should find vue multiselect component", () => {
-            expect(wrapper.findComponent({name: "Multiselect"}).exists()).to.be.true;
-            expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(2);
-
         });
     });
 

@@ -1,6 +1,8 @@
 {
   "modules": {
     "storyCreator": {
+      "storyNav": "Story",
+      "chapterNav": "Kapitel",
       "title": "Story Creator",
       "addChapter": "Kapitel hinzufügen",
       "downloadStory": "Story herunterladen",
@@ -31,7 +33,9 @@
         "currentPosition": "Aktuelle Position auf der Karte",
         "layerList": "Fachdaten einbinden (Optional)",
         "toolList": "Werkzeug öffnen (Optional)",
-        "zoomLevel": "Zoomstufe"
+        "zoomLevel": "Zoomstufe",
+        "save": "Kapitel speichern",
+        "cancel": "abbrechen"
       }
     }
   }
