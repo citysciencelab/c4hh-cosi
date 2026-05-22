@@ -3,12 +3,11 @@ import sinon from "sinon";
 import {generateColorRange, getLighterShade, normalizeValues, assignColors} from "@shared/js/utils/colorRange.js";
 
 describe("src/shared/js/utils/colorRange.js", () => {
+
     beforeEach(() => {
         sinon.stub(console, "warn").callsFake(sinon.spy());
     });
-    afterEach(() => {
-        sinon.restore();
-    });
+
     it("should not generate a range of colors if the starting color is not a hex value", () => {
         expect(generateColorRange("abc")).to.equal(false);
         expect(generateColorRange(1234)).to.equal(false);
