@@ -8,6 +8,7 @@ import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
 import TipTapEditor from "../shared/modules/tipTapEditor/components/TipTapEditor.vue";
+import {Toast} from "bootstrap";
 
 export default {
     name: "StoryCreatorChapter",
@@ -22,18 +23,79 @@ export default {
         return {
             coordinate: "",
             zoomlevel: "",
+            confirmedCoordinate: "",
+            confirmedZoomlevel: "",
             layerList: [],
             toolList: [],
             selectedLayer: [],
-            selectedTool: ""
+            selectedTool: "",
+            showAlert: false
         };
     },
     computed: {
-        ...mapGetters(["configuredModules"])
+        ...mapGetters(["configuredModules"]),
+
+        /**
+         * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
+         * @returns {Boolean} True if position or zoom has changed, otherwise false.
+         */
+        positionChanged () {
+            if (!this.confirmedCoordinate || !this.confirmedZoomlevel) {
+                return false;
+            }
+            return (
+                this.coordinate !== this.confirmedCoordinate || this.zoomlevel !== this.confirmedZoomlevel
+            );
+        },
+        /**
+         * Returns true if the button should be disabled. Disabled if confirmed values exist and nothing has changed.
+         * @returns {Boolean} True if the button should be disabled, otherwise false.
+         */
+        isButtonDisabled () {
+            if (!this.confirmedCoordinate || !this.confirmedZoomlevel) {
+                return false;
+            }
+            return this.coordinate === this.confirmedCoordinate && this.zoomlevel === this.confirmedZoomlevel;
+        }
+    },
+    watch: {
+        /**
+         * Initializes and displays the Bootstrap Toast. The toast will automatically hide after 4 seconds.
+         * @param {Boolean} newVal - The new value of showAlert.
+         */
+        showAlert (newVal) {
+            if (newVal) {
+                this.$nextTick(() => {
+                    const toastEl = this.$refs.toast;
+
+                    if (toastEl) {
+                        const toast = new Toast(toastEl);
+
+                        toast.show();
+                        setTimeout(() => {
+                            this.showAlert = false;
+                        }, 4000);
+                    }
+                });
+            }
+        }
     },
     mounted () {
         this.layerList = this.getLayerList(rawLayerList.getLayerList());
         this.toolList = this.getToolList(this.configuredModules);
+
+        const map = mapCollection.getMap("2D");
+
+        if (map) {
+            map.on("moveend", this.updatePositionFromMap);
+        }
+    },
+    beforeUnmount () {
+        const map = mapCollection.getMap("2D");
+
+        if (map) {
+            map.un("moveend", this.updatePositionFromMap);
+        }
     },
     methods: {
         ...mapMutations("Modules/StoryCreator", [
@@ -42,15 +104,6 @@ export default {
         handleAction (type) {
             console.warn("Aktion im StoryCreator ausgelöst. Ausgewähltes Element:", type);
         },
-        /**
-         * Gets the current position and zoom level of map and set it into parameter.
-         * @returns {void}
-         */
-        getMapPosition () {
-            this.zoomlevel = mapCollection.getMapView("2D").getZoom();
-            this.coordinate = mapCollection.getMapView("2D").getCenter().join(", ");
-        },
-
         /**
          * Returns a list of layer names.
          * @param {Object[]} layerList - list of layer objects
@@ -74,6 +127,19 @@ export default {
         },
 
         /**
+         * Confirms the current map position and zoom level.
+         * @returns {void}
+         */
+        getMapPosition () {
+            this.updatePositionFromMap();
+
+            this.confirmedCoordinate = this.coordinate;
+            this.confirmedZoomlevel = this.zoomlevel;
+
+            this.showAlert = true;
+        },
+
+        /**
          * Gets all the tools from Masterportal filtered by the configured list of tools.
          * @param {Object[]} modules - list of strings where each string represent tool key
          * @returns {Object[]} the tool list with the key and the title as label
@@ -93,7 +159,27 @@ export default {
 
             toolList = sort("", toolList, "label");
             return toolList;
+        },
+
+        /**
+         * Updates the current zoom level and coordinate from the map view.
+         * @returns {void}
+         */
+        updatePositionFromMap () {
+            const mapView = mapCollection.getMapView("2D");
+
+            if (!mapView) {
+                return;
+            }
+
+            if (this.showAlert) {
+                this.showAlert = false;
+            }
+
+            this.zoomlevel = mapView.getZoom();
+            this.coordinate = mapView.getCenter().join(", ");
         }
+
     }
 };
 </script>
@@ -113,13 +199,14 @@ export default {
                     class="float-left"
                     icon="bi bi-play-circle"
                     :text="$t('additional:modules.storyCreator.chapter.mapPosition')"
+                    :disabled="isButtonDisabled"
                     @click.native="getMapPosition()"
                 />
-                <div v-if="coordinate !== '' && zoomlevel !== ''">
+                <div v-if="confirmedCoordinate !== '' && confirmedZoomlevel !== ''">
                     {{ $t("additional:modules.storyCreator.chapter.currentPosition") }}
                 </div>
                 <div
-                    v-if="coordinate !== '' && zoomlevel !== ''"
+                    v-if="confirmedCoordinate !== '' && confirmedZoomlevel !== ''"
                     class="p-2 d-flex flex-row align-center"
                 >
                     <div class="p-1 fs-3">
@@ -127,11 +214,36 @@ export default {
                     </div>
                     <div class="ps-4 py-1 flex-grow-1">
                         <div class="label">
-                            {{ coordinate }}
+                            {{ confirmedCoordinate }}
                         </div>
                         <div class="text">
-                            {{ $t("additional:modules.storyCreator.chapter.zoomLevel") }} {{ zoomlevel }}
+                            {{ $t("additional:modules.storyCreator.chapter.zoomLevel") }} {{ confirmedZoomlevel }}
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-if="positionChanged"
+                class="position-hint ps-3"
+            >
+                <i class="fs-4 bi bi-exclamation-circle pe-2" />
+                {{ $t("additional:modules.storyCreator.chapter.positionChangedHint") }}
+            </div>
+            <div
+                v-if="showAlert"
+                ref="toast"
+                class="toast align-items-center border-0"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+            >
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i
+                            class="bi bi-check-lg me-2 toast-icon"
+                            aria-hidden="true"
+                        />
+                        {{ $t('additional:modules.storyCreator.chapter.successAlert') }}
                     </div>
                 </div>
             </div>
@@ -205,6 +317,7 @@ export default {
                 :icon="'bi-x-lg'"
                 :aria-label="$t('additional:modules.storyCreator.chapter.cancel')"
                 :text="$t('additional:modules.storyCreator.chapter.cancel')"
+                :secondary="true"
                 :interaction="() => setCurrentView('story')"
             />
         </div>
@@ -215,6 +328,18 @@ export default {
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss" scoped>
+.toast {
+    background-color: $secondary;
+    color: $white;
+    .toast-icon {
+        font-size: 1.15rem;
+        color: $white;
+        line-height: 1;
+    }
+}
+.position-hint {
+    color: $secondary;
+}
 </style>
 
 <style lang="scss">

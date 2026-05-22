@@ -47,6 +47,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         map = {
             id: "ol",
             mode: "2D",
+            on: sinon.stub(),
+            un: sinon.stub(),
             getView: () => {
                 return {
                     getZoom: () => sinon.stub(),
@@ -74,6 +76,71 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         it("should find vue multiselect component", () => {
             expect(wrapper.findComponent({name: "Multiselect"}).exists()).to.be.true;
             expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(2);
+        });
+
+        it("shows the position hint if positionChanged is true", async () => {
+            await wrapper.setData({
+                coordinate: "1,2",
+                zoomlevel: "5",
+                confirmedCoordinate: "3,4",
+                confirmedZoomlevel: "5"
+            });
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find(".position-hint").exists()).to.be.true;
+        });
+
+        it("disables the FlatButton if isButtonDisabled is true", async () => {
+            await wrapper.setData({
+                coordinate: "1,2",
+                zoomlevel: "5",
+                confirmedCoordinate: "1,2",
+                confirmedZoomlevel: "5"
+            });
+            await wrapper.vm.$nextTick();
+            const btn = wrapper.findComponent({name: "FlatButton"});
+
+            expect(btn.attributes("disabled")).to.not.be.undefined;
+        });
+    });
+
+    describe("Computed", () => {
+        describe("positionChanged", () => {
+            it("returns false if no confirmed values", () => {
+                wrapper.setData({coordinate: "", zoomlevel: "", confirmedCoordinate: "", confirmedZoomlevel: ""});
+                expect(wrapper.vm.positionChanged).to.be.false;
+            });
+
+            it("returns true if coordinate or zoomlevel changed", () => {
+                wrapper.setData({coordinate: "1,2", zoomlevel: "5", confirmedCoordinate: "3,4", confirmedZoomlevel: "5"});
+                expect(wrapper.vm.positionChanged).to.be.true;
+            });
+
+            it("returns false if coordinate and zoomlevel are unchanged", () => {
+                wrapper.setData({coordinate: "1,2", zoomlevel: "5", confirmedCoordinate: "1,2", confirmedZoomlevel: "5"});
+                expect(wrapper.vm.positionChanged).to.be.false;
+            });
+
+            it("returns false if no confirmed values", () => {
+                wrapper.setData({coordinate: "", zoomlevel: "", confirmedCoordinate: "", confirmedZoomlevel: ""});
+                expect(wrapper.vm.isButtonDisabled).to.be.false;
+            });
+        });
+
+        describe("isButtonDisabled", () => {
+            it("returns false if no confirmed values", () => {
+                wrapper.setData({coordinate: "", zoomlevel: "", confirmedCoordinate: "", confirmedZoomlevel: ""});
+                expect(wrapper.vm.isButtonDisabled).to.be.false;
+            });
+
+            it("returns true if coordinate and zoomlevel are unchanged", () => {
+                wrapper.setData({coordinate: "1,2", zoomlevel: "5", confirmedCoordinate: "1,2", confirmedZoomlevel: "5"});
+                expect(wrapper.vm.isButtonDisabled).to.be.true;
+            });
+
+            it("isButtonDisabled returns false if coordinate or zoomlevel changed", () => {
+                wrapper.setData({coordinate: "1,2", zoomlevel: "6", confirmedCoordinate: "1,2", confirmedZoomlevel: "5"});
+                expect(wrapper.vm.isButtonDisabled).to.be.false;
+            });
         });
     });
 

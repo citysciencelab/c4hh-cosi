@@ -35,7 +35,9 @@
         "toolList": "Tool to open (Optional)",
         "zoomLevel": "Zoom level",
         "save": "Save chapter",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "successAlert": "The map position has been successfully saved!",
+        "positionChangedHint": "The location does not match the current view of the map."
       },
       "addElementDropdown": {
         "categories": {

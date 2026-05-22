@@ -35,7 +35,9 @@
         "toolList": "Werkzeug öffnen (Optional)",
         "zoomLevel": "Zoomstufe",
         "save": "Kapitel speichern",
-        "cancel": "abbrechen"
+        "cancel": "abbrechen",
+        "successAlert": "Die Kartenposition wurde erfolgreich übernommen!",
+        "positionChangedHint": "Die Position entspricht nicht der aktuellen Ansicht der Karte."
       },
       "addElementDropdown": {
         "categories": {
