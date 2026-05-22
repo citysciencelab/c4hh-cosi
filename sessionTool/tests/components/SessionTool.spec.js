@@ -34,6 +34,7 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
                 plugins: [store]
             }
         });
+        sinon.stub(console, "warn").callsFake(sinon.spy());
     });
 
 

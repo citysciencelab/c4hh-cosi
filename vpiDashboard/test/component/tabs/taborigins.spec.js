@@ -1,4 +1,5 @@
 import TabOriginsComponent from "../../../components/Tabs/TabOrigins.vue";
+import axios from "axios";
 import sinon from "sinon";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
@@ -6,11 +7,7 @@ import Vuex from "vuex";
 
 config.global.mocks.$t = key => key;
 
-/**
- * Run only these tests via command:
- * npm run test:watch -- --grep="addons/vpiDashboard/test/ origins tab component"
- */
-describe("addons/vpiDashboard/test/ origins tab component", () => {
+describe("addons/vpiDashboard/components/Tabs/TabOrigins.vue", () => {
     let wrapper = null;
 
     beforeAll(() => {
@@ -49,6 +46,8 @@ describe("addons/vpiDashboard/test/ origins tab component", () => {
             }
         });
 
+        sinon.stub(axios, "get").resolves({status: 200, data: {}});
+        sinon.stub(axios, "post").resolves({status: 200, data: {}});
         wrapper = shallowMount(TabOriginsComponent, {
             global: {
                 plugins: [store]
@@ -69,20 +68,18 @@ describe("addons/vpiDashboard/test/ origins tab component", () => {
         expect(wrapper.find(".chartDataSelection").exists()).to.be.true;
 
     });
-    describe.skip("skipped", () => {
-        it("sets the correct charttype", () => {
-            wrapper.vm.setChartType("bar");
+    it.skip("sets the correct charttype", () => {
+        wrapper.vm.setChartType("bar");
 
-            expect(wrapper.vm.chartType).to.equal("bar");
-            expect(wrapper.find(".bar").exists()).to.be.true;
-            expect(wrapper.find(".line").exists()).to.be.false;
+        expect(wrapper.vm.chartType).to.equal("bar");
+        expect(wrapper.find(".bar").exists()).to.be.true;
+        expect(wrapper.find(".line").exists()).to.be.false;
 
-            wrapper.vm.setChartType("line");
-            wrapper.vm.$nextTick(() => {
-                expect(wrapper.vm.chartType).to.equal("line");
-                expect(wrapper.find(".bar").exists()).to.be.false;
-                expect(wrapper.find(".line").exists()).to.be.true;
-            });
+        wrapper.vm.setChartType("line");
+        wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.chartType).to.equal("line");
+            expect(wrapper.find(".bar").exists()).to.be.false;
+            expect(wrapper.find(".line").exists()).to.be.true;
         });
     });
 

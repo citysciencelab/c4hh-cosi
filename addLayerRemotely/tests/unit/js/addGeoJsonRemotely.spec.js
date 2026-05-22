@@ -76,6 +76,7 @@ describe("ADDON: addGeoJsonRemotely - getFeatureIds", function () {
 
     beforeEach(function () {
         sinon.stub(mapCollection, "getMap").callsFake(fakeFunctionGetMap);
+        sinon.stub(console, "warn").callsFake(sinon.spy());
     });
     it("addGeoJsonRemotely should return an array of feature Ids if the layer was found", function () {
         expect(getFeatureIds(correctId)).to.eql(["66", "89"]);

@@ -374,10 +374,7 @@ const actions = {
             </wfs:Query>
         </GetFeature>`;
 
-        axios({
-            method: "post",
-            url: url + "/HH_WFS_Bodenrichtwerte",
-            data: wfsString,
+        axios.post(url + "/HH_WFS_Bodenrichtwerte", wfsString, {
             headers: {"Content-Type": "text/xml"}
         }).then((response) => {
             if (response.status === 200) {

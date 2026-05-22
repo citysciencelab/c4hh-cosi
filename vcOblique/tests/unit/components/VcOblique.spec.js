@@ -59,7 +59,8 @@ describe("addons/vcOblique/components/VcOblique.vue", () => {
                     namespaced: true,
                     getters: {
                         clickCoordinate: () => [100, 200],
-                        initialCenter: () => [565874, 5934140]
+                        initialCenter: () => [565874, 5934140],
+                        center: () => [565874, 5934140]
                     }
                 }
             },

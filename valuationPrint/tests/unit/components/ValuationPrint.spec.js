@@ -43,7 +43,8 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
             })
         ],
         mockMapActions = {
-            addInteraction: sinon.spy()
+            addInteraction: sinon.spy(),
+            removeInteraction: sinon.spy()
         },
         store = createStore({
             modules: {
@@ -529,7 +530,6 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
                 wrapper.vm.setParcelData([features[0]]);
 
                 expect(wrapper.vm.parcelData).to.have.all.keys("center", "geometry", "extent", "feature", "featureList");
-                sinon.restore();
             });
             it("should not set the parcelData object", () => {
                 const wrapper = factory.getShallowMount({});

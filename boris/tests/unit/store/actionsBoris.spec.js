@@ -34,7 +34,9 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         rootGetters,
         state,
         map = null,
-        error;
+        error,
+        axiosGetStub,
+        axiosPostStub;
 
     beforeAll(() => {
         const proj = new Projection({
@@ -94,6 +96,7 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         state = {...stateBoris};
         error = sinon.spy();
         sinon.stub(console, "error").callsFake(error);
+        sinon.stub(console, "warn").callsFake(sinon.spy());
 
         const attribute1 = {
                 "name": "31.12.2022",
@@ -115,6 +118,8 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
             attribute1,
             attribute2
         ];
+        axiosGetStub = sinon.stub(axios, "get").resolves({status: 200, data: {}});
+        axiosPostStub = sinon.stub(axios, "post").resolves({status: 200, data: {}});
     });
 
     afterEach(() => {
@@ -350,26 +355,20 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
     });
     describe("requestGFI", () => {
         it("requests GFI", async () => {
-            sinon.stub(layerCollection, "getLayerById").returns(
-                {
-                    layerSource: {
-                        getFeatureInfoUrl: () =>{
-                            const url = "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5781983&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=508&J=91&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316";
-
-                            return url;
-                        }
+            sinon.stub(layerCollection, "getLayerById").returns({
+                layerSource: {
+                    getFeatureInfoUrl: () => {
+                        return "https://geodienste.hamburg.de/HH_WMS_Bodenrichtwerte?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true&QUERY_LAYERS=v_brw_zonen_geom_flaeche_2022&CACHEID=5781983&LAYERS=v_brw_zonen_geom_flaeche_2022&SINGLETILE=false&WIDTH=512&HEIGHT=512&I=508&J=91&CRS=EPSG%3A25832&STYLES=&BBOX=565397.2671308091%2C5933629.266033529%2C565735.9336145959%2C5933967.932517316";
                     }
                 }
-            );
+            });
             state.active = true;
+            axiosGetStub.resolves({status: 200});
 
-            const axiosStub = sinon.stub(axios, "get").returns(Promise.resolve({status: 200})),
-                url = layerCollection.getLayerById().layerSource.getFeatureInfoUrl(),
-                processFromParametricUrl = "",
-                center = "";
+            const url = layerCollection.getLayerById().layerSource.getFeatureInfoUrl();
 
-            await actions.requestGFI({rootGetters, state, dispatch}, {processFromParametricUrl, center});
-            expect(axiosStub.calledWith(url)).to.be.true;
+            await actions.requestGFI({rootGetters, state, dispatch}, {processFromParametricUrl: "", center: ""});
+            expect(axiosGetStub.calledWith(url)).to.be.true;
         });
     });
     describe("handleGfiResponse", () => {
@@ -425,18 +424,19 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         });
     });
     describe("getFeatureRequestById", () => {
-        it("gets feature request by id", () => {
+        it("gets feature request by id", async () => {
             Config.layerConf = "https://geodienste.hamburg.de/services-internet.json";
 
             const featureId = "APP_V_BRW_ZONEN_GEOM_FLAECHE_2022_1393260",
                 featureYear = "2022",
                 url = "https://geodienste.hamburg.de",
                 urlParams = "typeNameapp:v_brw_zonen_geom_flaeche_2022&featureID=APP_V_BRW_ZONEN_GEOM_FLAECHE_2022_1393260",
-                responseData = rawSources.featureRequestResponse,
-                axiosStub = sinon.stub(axios, "get").returns(Promise.resolve({status: 200, data: responseData}));
+                responseData = rawSources.featureRequestResponse;
 
-            actions.getFeatureRequestById({dispatch}, {featureId, featureYear});
-            expect(axiosStub.calledWith(url + "/HH_WFS_Bodenrichtwerte?service=WFS&version=1.1.0&request=GetFeature&" + urlParams)).to.be.true;
+            axiosGetStub.resolves({status: 200, data: responseData});
+
+            await actions.getFeatureRequestById({dispatch}, {featureId, featureYear});
+            expect(axiosGetStub.calledWith(url + "/HH_WFS_Bodenrichtwerte?service=WFS&version=1.1.0&request=GetFeature&" + urlParams)).to.be.true;
         });
     });
     describe("matchPolygonFeatureWithLanduse", () => {
@@ -502,26 +502,16 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         });
     });
     describe("postFeatureRequestByBrwNumber", () => {
-        it("posts feature request", () => {
+        it("posts feature request", async () => {
             Config.layerConf = "https://geodienste.hamburg.de/services-fhhnet-ALL.json";
 
             const brwNumber = "09310239",
-                featureYear = "2022",
-                typeName = "lgv_brw_zoniert_alle",
-                wfsString = `<GetFeature version='1.1.0' xmlns:wfs='http://www.opengis.net/wfs'>
-                            <wfs:Query typeName='${typeName}'>
-                                <Filter xmlns='http://www.opengis.net/ogc'>
-                                    <PropertyIsEqualTo>
-                                        <PropertyName>richtwertnummer</PropertyName>
-                                        <Literal>${brwNumber}</Literal>
-                                    </PropertyIsEqualTo>
-                                </Filter>
-                            </wfs:Query>
-                        </GetFeature>`,
-                axiosStub = sinon.stub(axios, "post").returns(Promise.resolve({status: 200}));
+                featureYear = "2022";
 
-            actions.postFeatureRequestByBrwNumber({dispatch}, {brwNumber, featureYear});
-            expect(axiosStub.calledWith("post", "https://geodienste.hamburg.de/HH_WFS_Bodenrichtwerte", wfsString, {"Content-Type": "text/xml"}));
+            axiosPostStub.resolves({status: 200});
+
+            await actions.postFeatureRequestByBrwNumber({dispatch}, {brwNumber, featureYear});
+            expect(axiosPostStub.called).to.be.true;
         });
     });
     describe("handleGetFeatureResponse", () => {

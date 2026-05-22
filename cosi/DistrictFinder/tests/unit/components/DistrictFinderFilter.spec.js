@@ -16,7 +16,7 @@ beforeAll(() => {
     sinon.stub(getMappingJsonJS, "getMappingJson").resolves([]);
 });
 
-after(() => {
+afterAll(() => {
     sinon.restore();
 });
 
