@@ -17,9 +17,6 @@ describe("src/modules/tools/boris/store/gettersBoris.js", () => {
         stateBoris.selectedPolygon = stateOrig.selectedPolygon;
         stateBoris.paramUrlParams = stateOrig.paramUrlParams;
     });
-    beforeEach(() => {
-        sinon.stub(console, "warn").callsFake(sinon.spy());
-    });
 
     describe("Boris getters", () => {
         it("findLanduseByBrwId", () => {
