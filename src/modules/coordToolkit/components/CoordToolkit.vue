@@ -730,7 +730,7 @@ export default {
         top: 0;
         right: 0;
         height: 100%;
-        border: none;
+         border: none;
         box-shadow: none;
         color: $black;
     }
@@ -738,6 +738,7 @@ export default {
         border: none;
         box-shadow: none;
         color: $black;
+
     }
     .fade-enter-active, .fade-leave-active {
         transition: opacity .5s;
