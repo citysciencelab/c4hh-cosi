@@ -1,6 +1,5 @@
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
-import testAction from "@devtools/tests/VueTestUtils.js";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 import actions from "@modules/fileImport/store/actionsFileImport.js";
 import importedState from "@modules/fileImport/store/stateFileImport.js";
@@ -63,7 +62,7 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
     });
 
     describe("file import - file should add some features to the current draw layer", () => {
-        it("preset \"auto\", correct kml file, correct filename", done => {
+        it("preset \"auto\", correct kml file, correct filename", async () => {
             const payload = {
                 raw: rawSources[0],
                 layer: {
@@ -76,57 +75,48 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
                 },
                 filename: "TestFile1.kml"};
 
-            testAction(importFile, payload, importedState, {}, [
-                {
-                    type: "Alerting/addSingleAlert",
-                    payload: {
-                        category: "success",
-                        content: i18next.t("common:modules.fileImport.alertingMessages.success", {filename: payload.filename})},
-                    dispatch: true
-                }
-            ], {}, done, {"Maps/projectionCode": "EPSG:25832"});
+            importFile({state: importedState, dispatch, commit, rootGetters: {"Maps/projectionCode": "EPSG:25832"}}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "success",
+                content: i18next.t("common:modules.fileImport.alertingMessages.success", {filename: payload.filename})
+            })).to.be.true;
         });
 
-        it("preset \"auto\", correct kml file, wrong filename", done => {
+        it("preset \"auto\", correct kml file, wrong filename", async () => {
             const payload = {raw: rawSources[0], filename: "bogus_file.bog"};
 
-            testAction(importFile, payload, importedState, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("common:modules.fileImport.alertingMessages.missingFormat")
-                },
-                dispatch: true
-            }], {}, done);
+            importFile({state: importedState, dispatch, commit, rootGetters: {}}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("common:modules.fileImport.alertingMessages.missingFormat")
+            })).to.be.true;
         });
 
-        it("preset \"auto\", broken kml file, correct filename", done => {
+        it("preset \"auto\", broken kml file, correct filename", async () => {
             const payload = {raw: rawSources[1], filename: "TestFile1.kml"};
 
-            testAction(importFile, payload, importedState, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("common:modules.fileImport.alertingMessages.missingFileContent")
-                },
-                dispatch: true
-            }], {}, done);
+            importFile({state: importedState, dispatch, commit, rootGetters: {}}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("common:modules.fileImport.alertingMessages.missingFileContent")
+            })).to.be.true;
         });
 
-        it("preset \"auto\", empty kml file, correct filename", done => {
+        it("preset \"auto\", empty kml file, correct filename", async () => {
             const payload = {raw: "", filename: "TestFile1.kml"};
 
-            testAction(importFile, payload, importedState, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("common:modules.fileImport.alertingMessages.missingFileContent")
-                },
-                dispatch: true
-            }], {}, done);
+            importFile({state: importedState, dispatch, commit, rootGetters: {}}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("common:modules.fileImport.alertingMessages.missingFileContent")
+            })).to.be.true;
         });
 
-        it("preset \"auto\", correct gpx file, correct filename", done => {
+        it("preset \"auto\", correct gpx file, correct filename", async () => {
             const payload = {
                 raw: rawSources[2],
                 layer: {
@@ -140,18 +130,15 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
                 filename: "TestFile1.gpx"
             };
 
-            testAction(importFile, payload, importedState, {}, [
-                {
-                    type: "Alerting/addSingleAlert",
-                    payload: {
-                        category: "success",
-                        content: i18next.t("common:modules.fileImport.alertingMessages.success", {filename: payload.filename})},
-                    dispatch: true
-                }
-            ], {}, done, {"Maps/projectionCode": "EPSG:25832"});
+            importFile({state: importedState, dispatch, commit, rootGetters: {"Maps/projectionCode": "EPSG:25832"}}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "success",
+                content: i18next.t("common:modules.fileImport.alertingMessages.success", {filename: payload.filename})
+            })).to.be.true;
         });
 
-        it("preset \"auto\", correct geojson file, correct filename", done => {
+        it("preset \"auto\", correct geojson file, correct filename", async () => {
             const payload = {
                 raw: rawSources[3],
                 layer: {
@@ -165,29 +152,25 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
                 filename: "TestFile1.json"
             };
 
-            testAction(importFile, payload, importedState, {}, [
-                {
-                    type: "Alerting/addSingleAlert",
-                    payload: {
-                        category: "success",
-                        content: i18next.t("common:modules.fileImport.alertingMessages.success", {filename: payload.filename})},
-                    dispatch: true
-                }
-            ], {}, done, {"Maps/projectionCode": "EPSG:25832"});
+            importFile({state: importedState, dispatch, commit, rootGetters: {"Maps/projectionCode": "EPSG:25832"}}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "success",
+                content: i18next.t("common:modules.fileImport.alertingMessages.success", {filename: payload.filename})
+            })).to.be.true;
         });
 
-        it("preset \"gpx\", correct kml file, correct filename", done => {
+        it("preset \"gpx\", correct kml file, correct filename", async () => {
             const
                 payload = {raw: rawSources[3], filename: "TestFile1.json"},
                 tmpState = {...importedState, ...{selectedFiletype: "gpx"}};
 
-            testAction(importFile, payload, tmpState, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("common:modules.fileImport.alertingMessages.missingFileContent")},
-                dispatch: true
-            }], {}, done);
+            importFile({state: tmpState, dispatch, commit, rootGetters: {}}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("common:modules.fileImport.alertingMessages.missingFileContent")
+            })).to.be.true;
         });
 
         it("should not show a confirmation message", () => {
@@ -324,17 +307,16 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
             expect(layer.getSource().getFeatures()[0].getStyle().getText().getText()).to.equal("Mein Schatzzzz");
         });
 
-        it("Sets empty feature extent", done => {
+        it("Sets empty feature extent", async () => {
             const payload = {features: [], fileName: "file1"},
                 tmpState = {...importedState};
 
-            testAction(setFeatureExtents, payload, tmpState, {}, [{
-                type: "setFeatureExtents",
-                payload: {file1: [Infinity, Infinity, -Infinity, -Infinity]}
-            }], {}, done);
+            setFeatureExtents({state: tmpState, dispatch, commit, rootGetters: {}}, payload);
+
+            expect(commit.calledWith("setFeatureExtents", {file1: [Infinity, Infinity, -Infinity, -Infinity]})).to.be.true;
         });
 
-        it("Sets feature extent", done => {
+        it("Sets feature extent", async () => {
             const payload = {features: [{
                     getGeometry: () => sinon.spy({
                         getExtent: () => [10, 10, 10, 10]
@@ -342,10 +324,9 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
                 }], fileName: "file2"},
                 tmpState = {...importedState, ...{featureExtents: {"file1": [100, 100, 100, 100]}}};
 
-            testAction(setFeatureExtents, payload, tmpState, {}, [{
-                type: "setFeatureExtents",
-                payload: {"file1": [100, 100, 100, 100], "file2": [10, 10, 10, 10]}
-            }], {}, done);
+            setFeatureExtents({state: tmpState, dispatch, commit, rootGetters: {}}, payload);
+
+            expect(commit.calledWith("setFeatureExtents", {"file1": [100, 100, 100, 100], "file2": [10, 10, 10, 10]})).to.be.true;
         });
 
         it("adds a geojson file with gfiAttributes from draw old export structure", () => {
@@ -494,28 +475,24 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
     });
 
     describe("addLayerConfig", () => {
-        it("add layer config", done => {
+        it("add layer config", async () => {
             const state = {
                 layerId: "importDrawLayer"
             };
 
-            testAction(addLayerConfig, null, state, {}, [
-                {
-                    type: "addLayerToLayerConfig",
-                    payload: {
-                        layerConfig: {
-                            id: state.layerId,
-                            name: "importDrawLayer",
-                            showInLayerTree: true,
-                            typ: "VECTORBASE",
-                            type: "layer",
-                            visibility: true
-                        },
-                        parentKey: treeSubjectsKey
-                    },
-                    dispatch: true
-                }
-            ], {}, done);
+            addLayerConfig({state, dispatch, commit, rootGetters: {}}, null);
+
+            expect(dispatch.calledWith("addLayerToLayerConfig", {
+                layerConfig: {
+                    id: state.layerId,
+                    name: "importDrawLayer",
+                    showInLayerTree: true,
+                    typ: "VECTORBASE",
+                    type: "layer",
+                    visibility: true
+                },
+                parentKey: treeSubjectsKey
+            })).to.be.true;
         });
     });
 
