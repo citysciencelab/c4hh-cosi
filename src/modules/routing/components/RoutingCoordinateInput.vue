@@ -69,6 +69,39 @@ export default {
          */
         waypointDisplayName () {
             return this.waypoint.getDisplayName();
+        },
+        /**
+         * Computed value to determine whether the waypoint has valid coordinates set
+         * @returns {Boolean} true if waypoint contains exactly two coordinate values
+         */
+        isWaypointSet () {
+            return this.waypoint.coordinates.length === 2;
+        },
+        /**
+         * Computed value to determine whether delete button should be shown for this waypoint
+         * @returns {Boolean} true if waypoint is set or if more than two waypoints exist and this one is empty
+         */
+        showDeleteWaypoint () {
+            return this.isWaypointSet
+            || (this.countWaypoints > 2 && this.waypoint.coordinates.length === 0);
+        },
+        /**
+         * Computed value to determine whether move-up button should be shown for this waypoint
+         * @returns {Boolean} true if waypoint is set, routing option is not TSR, and waypoint is not first
+         */
+        showMoveWaypointUp () {
+            return this.isWaypointSet
+            && this.activeRoutingToolOption !== "TSR"
+            && this.waypoint.index !== 0;
+        },
+        /**
+         * Computed value to determine whether move-down button should be shown for this waypoint
+         * @returns {Boolean} true if waypoint is set, routing option is not TSR, and waypoint is not last
+         */
+        showMoveWaypointDown () {
+            return this.isWaypointSet
+            && this.activeRoutingToolOption !== "TSR"
+            && this.waypoint.index !== this.countWaypoints - 1;
         }
     },
     watch: {
@@ -293,7 +326,7 @@ export default {
             <div class="d-flex">
                 <div class="justify-content-between">
                     <div
-                        v-show="activeRoutingToolOption !== 'TSR' ? waypoint.index !== 0 : false"
+                        v-if="showMoveWaypointUp"
                         class="h-50"
                     >
                         <IconButton
@@ -304,7 +337,7 @@ export default {
                         />
                     </div>
                     <div
-                        v-show="activeRoutingToolOption !== 'TSR' ? waypoint.index !== countWaypoints - 1 : false"
+                        v-if="showMoveWaypointDown"
                         class="h-50"
                     >
                         <IconButton
@@ -318,6 +351,7 @@ export default {
                     </div>
                 </div>
                 <IconButton
+                    v-if="showDeleteWaypoint"
                     :aria="$t('common:modules.routing.deleteWaypoint')"
                     :class-array="['btn-light', 'm-1']"
                     :icon="'bi-x-lg fs-6'"

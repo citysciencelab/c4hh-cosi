@@ -47,6 +47,21 @@ export default {
                 return true;
             }
         }
+    },
+    methods: {
+        onkeydown (event) {
+            const step = {ArrowLeft: -1, ArrowRight: 1}[event.key];
+
+            if (step === undefined) {
+                return;
+            }
+            event.preventDefault();
+            const tabs = [...event.currentTarget.closest("[role=tablist]").querySelectorAll("[role=tab]")],
+                next = tabs[(tabs.indexOf(event.currentTarget) + step + tabs.length) % tabs.length];
+
+            next?.focus();
+            next?.click();
+        }
     }
 };
 </script>
@@ -65,10 +80,12 @@ export default {
             :data-bs-target="target"
             type="button"
             role="tab"
+            :tabindex="active ? 0 : -1"
             :aria-controls="target"
-            aria-selected="true"
+            :aria-selected="active"
             :aria-label="label"
             @click="interaction"
+            @keydown="onkeydown"
         >
             <i
                 v-if="icon"

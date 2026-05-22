@@ -144,10 +144,6 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
         copyStub = sinon.stub(navigator.clipboard, "writeText").resolves(text);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     it("renders CoordToolkit without height field", () => {
         wrapper = shallowMount(CoordToolkitComponent, {
             global: {

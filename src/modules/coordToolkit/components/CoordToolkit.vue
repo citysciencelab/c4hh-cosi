@@ -446,14 +446,14 @@ export default {
             >
                 <NavTab
                     :id="'supply-coord-tab'"
-                    :active="true"
+                    :active="mode === 'supply'"
                     :target="'#supply-coord-pane'"
                     :label="'common:modules.coordToolkit.supply'"
                     :interaction="() => changeMode('supply')"
                 />
                 <NavTab
                     :id="'search-by-coord-tab'"
-                    :active="false"
+                    :active="mode === 'search'"
                     :target="'#search-by-coord-pane'"
                     :label="'common:modules.coordToolkit.search'"
                     :interaction="() => changeMode('search')"

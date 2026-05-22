@@ -72,6 +72,12 @@
 - WMS-Time: Activating time comparison placed the second WMS-Time layer at the top of the layerTree, causing it to cover other layers. The fix places the comparison layer directly above the original layer.
 - SelectFeatures: Fixed console error and missing results in the list for OAF layers.
 - i18next: Fix language-code-detection (e.g. "de-DE" -> "de").
+- CoordToolkit: Fixed navigation tabs not reflecting the active mode by binding the `:active` prop to the current mode state.
+- BufferAnalysis: Improved usability — the reset button is now disabled when neither a source layer nor a target layer is selected.
+- LayerCheckBox: Improved keyboard accessibility — the layer checkbox can now be toggled using the Space key in addition to Enter, and both keys prevent default browser behavior such as page scrolling.
+- LayerSlider: Fixed tab focus management — removed unnecessary focus attribute from the handle tab pane.
+- NavTab: Improved keyboard accessibility — added arrow key navigation support for switching between tabs.
+- Routing/RoutingCoordinateInput: Optimized button visibility — the delete waypoint, move up, and move down buttons are now only rendered when applicable based on waypoint state.
 
 ---
 

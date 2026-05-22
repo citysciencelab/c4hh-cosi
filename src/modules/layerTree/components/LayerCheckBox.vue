@@ -142,11 +142,15 @@ export default {
     <button
         v-else
         :id="'layer-checkbox-' + escapeId(conf.id)"
+        role="checkbox"
+        :aria-checked="isLayerVisible"
+        :aria-label="$t(layerName)"
         :disabled="disabled"
         class="btn d-flex w-100 layer-tree-layer-title pe-2 p-1 btn-light"
         :title="$t(layerName)"
         @click="clicked()"
-        @keydown.enter="clicked()"
+        @keydown.enter.prevent="clicked()"
+        @keydown.space.prevent="clicked()"
     >
         <span
             :id="'layer-tree-layer-checkbox-' + conf.id"
@@ -166,9 +170,6 @@ export default {
         />
         <span
             :class="['layer-tree-layer-label', 'mt-0 d-flex flex-column align-self-start', isBold ? 'font-bold' : '']"
-            :for="'layer-tree-layer-checkbox-' + conf.id"
-            tabindex="0"
-            :aria-label="$t(layerName)"
         >
             <span
                 v-html="$t(conf.shortname || conf.htmlName || conf.name)"

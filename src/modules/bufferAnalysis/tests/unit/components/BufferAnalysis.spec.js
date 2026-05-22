@@ -45,6 +45,11 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
                         namespaced: true,
                         BufferAnalysis: {
                             namespaced: true,
+                            state: {
+                                selectedSourceLayer: null,
+                                selectedTargetLayer: null,
+                                selectOptions: []
+                            },
                             actions: {
                                 checkIntersection: checkIntersectionSpy,
                                 applyBufferRadius: applyBufferRadiusSpy,
@@ -56,6 +61,12 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
                             mutations: {
                                 setSelectOptions: (state, options) => {
                                     state.selectOptions = options;
+                                },
+                                setSelectedSourceLayer: (state, layer) => {
+                                    state.selectedSourceLayer = layer;
+                                },
+                                setSelectedTargetLayer: (state, layer) => {
+                                    state.selectedTargetLayer = layer;
                                 }
                             },
                             getters: {
@@ -82,7 +93,6 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
 
         mapCollection.clear();
         mapCollection.addMap(map, "2D");
-        sinon.restore();
     });
 
     it("renders the bufferAnalysis", () => {
@@ -121,6 +131,30 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
         options = wrapper.findAll("option");
         expect(options.length).to.equals(8); // 2 * 3 (selectOptions) + 2 (resultType)
     });
+
+    it("disables reset button when neither source nor target layer is set", () => {
+        wrapper = shallowMount(BufferAnalysisComponent, {
+            global: {
+                plugins: [store]
+            }
+        });
+
+        expect(wrapper.findComponent({name: "FlatButton"}).props("disabled")).to.be.true;
+    });
+
+    it("enables reset button when source layer is selected and no target layer exists", async () => {
+        wrapper = shallowMount(BufferAnalysisComponent, {
+            global: {
+                plugins: [store]
+            }
+        });
+
+        await store.commit("Modules/BufferAnalysis/setSelectedSourceLayer", {id: "layer1"});
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findComponent({name: "FlatButton"}).props("disabled")).to.be.false;
+    });
+
     describe.skip("skipped", () => {
         it("sets a value on the range when source is chosen", async () => {
             wrapper = shallowMount(BufferAnalysisComponent, {

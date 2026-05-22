@@ -76,10 +76,6 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     it("renders the layer given as property to the component", () => {
         wrapper = shallowMount(LayerCheckBox, {
             global: {
@@ -115,6 +111,9 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
         checkbox = wrapper.find("#layer-checkbox-" + propsData.conf.id);
 
         expect(checkbox.exists()).to.be.true;
+        expect(checkbox.attributes("role")).to.equal("checkbox");
+        expect(checkbox.attributes("aria-checked")).to.equal("false");
+        expect(checkbox.attributes("aria-label")).to.equal(propsData.conf.name);
         expect(checkbox.attributes().disabled).to.be.undefined;
         expect(wrapper.findAll(".layer-tree-layer-checkbox").length).to.be.equals(1);
         expect(wrapper.find(".layer-tree-layer-checkbox pe-2 bi-check2-square").exists()).to.be.false;
@@ -215,6 +214,7 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
 
         expect(wrapper.find("#layer-checkbox-" + propsData.conf.id).exists()).to.be.true;
         expect(wrapper.find("#layer-checkbox-" + propsData.conf.id).attributes("title")).to.not.be.undefined;
+        expect(wrapper.find("#layer-checkbox-" + propsData.conf.id).attributes("aria-checked")).to.equal("true");
         expect(wrapper.findAll(".layer-tree-layer-checkbox").length).to.be.equals(1);
         expect(wrapper.find(".bi-check-square").exists()).to.be.true;
         expect(wrapper.find(".layer-tree-layer-label").text()).to.equal(propsData.conf.name);
@@ -362,6 +362,60 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
 
         checkbox = wrapper.find(".layer-tree-layer-checkbox");
         checkbox.trigger("click");
+        await wrapper.vm.$nextTick();
+
+        expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
+        expect(replaceByIdInLayerConfigSpy.firstCall.args[1]).to.be.deep.equals(spyArg);
+    });
+
+    it("layerTree: keydown space on checkbox triggers clicked behavior", async () => {
+        const spyArg = {
+            layerConfigs: [{
+                id: layer.id,
+                layer: {
+                    id: layer.id,
+                    visibility: true
+                }
+            }]
+        };
+        let checkbox = null;
+
+        wrapper = shallowMount(LayerCheckBox, {
+            global: {
+                plugins: [store]
+            },
+            propsData
+        });
+
+        checkbox = wrapper.find("#layer-checkbox-" + propsData.conf.id);
+        await checkbox.trigger("keydown.space");
+        await wrapper.vm.$nextTick();
+
+        expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
+        expect(replaceByIdInLayerConfigSpy.firstCall.args[1]).to.be.deep.equals(spyArg);
+    });
+
+    it("layerTree: keydown enter on checkbox triggers clicked behavior", async () => {
+        const spyArg = {
+            layerConfigs: [{
+                id: layer.id,
+                layer: {
+                    id: layer.id,
+                    visibility: true
+                }
+            }]
+        };
+        let checkbox = null;
+
+        wrapper = shallowMount(LayerCheckBox, {
+            global: {
+                plugins: [store]
+            },
+            propsData
+        });
+
+        checkbox = wrapper.find("#layer-checkbox-" + propsData.conf.id);
+        await checkbox.trigger("keydown.enter");
         await wrapper.vm.$nextTick();
 
         expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;

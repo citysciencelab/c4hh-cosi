@@ -15,6 +15,11 @@ export default {
         LayerSliderPlayer,
         NavTab
     },
+    data () {
+        return {
+            activeTab: "handle"
+        };
+    },
     computed: {
         ...mapGetters("Modules/LayerSlider", [
             "activeLayer",
@@ -41,7 +46,10 @@ export default {
             "addInformationToLayerIds",
             "checkIfAllLayersAvailable",
             "sendModification"
-        ])
+        ]),
+        changeTab (tabName) {
+            this.activeTab = tabName;
+        }
     }
 };
 </script>
@@ -58,15 +66,17 @@ export default {
         >
             <NavTab
                 :id="'handle-tab'"
-                :active="true"
+                :active="activeTab === 'handle'"
                 :target="'#handle-tab-pane'"
                 :label="'common:modules.layerSlider.sliderTypeHandle'"
+                :interaction="() => changeTab('handle')"
             />
             <NavTab
                 :id="'player-tab'"
-                :active="false"
+                :active="activeTab === 'player'"
                 :target="'#player-tab-pane'"
                 :label="'common:modules.layerSlider.sliderTypePlayer'"
+                :interaction="() => changeTab('player')"
             />
         </ul>
         <div
@@ -78,7 +88,6 @@ export default {
                 class="tab-pane fade show active"
                 role="tabpanel"
                 aria-labelledby="handle-tab"
-                tabindex="0"
             >
                 <LayerSliderHandle />
             </div>

@@ -13,9 +13,11 @@ config.global.mocks.$t = key => key;
 describe("src/modules/routing/components/RoutingCoordinateInput.vue", () => {
     let store,
         wrapper,
-        props;
+        props,
+        activeRoutingToolOptionStub;
 
     beforeEach(() => {
+        activeRoutingToolOptionStub = sinon.stub();
         store = createStore({
             modules: {
                 Modules: {
@@ -26,7 +28,7 @@ describe("src/modules/routing/components/RoutingCoordinateInput.vue", () => {
                             mutations: mutations,
                             actions: actions,
                             getters: {
-                                activeRoutingToolOption: sinon.stub()
+                                activeRoutingToolOption: activeRoutingToolOptionStub
                             },
                             modules: {
                                 Directions: {
@@ -61,7 +63,6 @@ describe("src/modules/routing/components/RoutingCoordinateInput.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
         }
@@ -78,13 +79,16 @@ describe("src/modules/routing/components/RoutingCoordinateInput.vue", () => {
     });
 
     it("emits moveWaypointUp", async () => {
+        props.waypoint.setIndex(1);
+        props.waypoint.setCoordinates([1, 2]);
+        props.countWaypoints = 2;
         wrapper = mount(RoutingCoordinateInputComponent, {
             global: {
                 plugins: [store]
             },
             props: props
         });
-        const button = wrapper.find("button");
+        const button = wrapper.find(".button-up");
 
         button.trigger("click");
         await wrapper.vm.$nextTick();
@@ -93,6 +97,8 @@ describe("src/modules/routing/components/RoutingCoordinateInput.vue", () => {
     });
 
     it("emits moveWaypointDown", async () => {
+        props.waypoint.setCoordinates([1, 2]);
+        props.countWaypoints = 3;
         wrapper = mount(RoutingCoordinateInputComponent, {
             global: {
                 plugins: [store]
@@ -107,6 +113,7 @@ describe("src/modules/routing/components/RoutingCoordinateInput.vue", () => {
     });
 
     it("emits removeWaypoint", async () => {
+        props.waypoint.setCoordinates([1, 2]);
         wrapper = mount(RoutingCoordinateInputComponent, {
             global: {
                 plugins: [store]
@@ -276,6 +283,168 @@ describe("src/modules/routing/components/RoutingCoordinateInput.vue", () => {
             wrapper.vm.resetInput();
             expect(wrapper.vm.search).equal("waypointnametest");
             expect(wrapper.vm.searchResults.length).equal(0);
+        });
+    });
+    describe("test computed properties", () => {
+        it("'isWaypointSet' should be true if waypoint has 2 coordinates", async () => {
+            props.waypoint.setCoordinates([8, 52]);
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.isWaypointSet).to.be.true;
+        });
+
+        it("'isWaypointSet' should be false if waypoint has no coordinates", async () => {
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.isWaypointSet).to.be.false;
+        });
+
+        it("'showDeleteWaypoint' should be true if waypoint is set", async () => {
+            props.waypoint.setCoordinates([8, 52]);
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showDeleteWaypoint).to.be.true;
+        });
+
+        it("'showDeleteWaypoint' should be true if countWaypoints > 2 and waypoint has no coordinates", async () => {
+            props.countWaypoints = 3;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showDeleteWaypoint).to.be.true;
+        });
+
+        it("'showDeleteWaypoint' should be false if countWaypoints <= 2 and waypoint has no coordinates", async () => {
+            props.countWaypoints = 2;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showDeleteWaypoint).to.be.false;
+        });
+
+        it("'showMoveWaypointUp' should be true if waypoint is set, index !== 0, and activeRoutingToolOption !== 'TSR'", async () => {
+            activeRoutingToolOptionStub.returns("AS");
+            props.waypoint.setIndex(1);
+            props.waypoint.setCoordinates([8, 52]);
+            props.countWaypoints = 3;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showMoveWaypointUp).to.be.true;
+        });
+
+        it("'showMoveWaypointUp' should be false if index === 0", async () => {
+            props.waypoint.setIndex(0);
+            props.waypoint.setCoordinates([8, 52]);
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showMoveWaypointUp).to.be.false;
+        });
+
+        it("'showMoveWaypointUp' should be false if activeRoutingToolOption === 'TSR'", async () => {
+            activeRoutingToolOptionStub.returns("TSR");
+            props.waypoint.setIndex(1);
+            props.waypoint.setCoordinates([8, 52]);
+            props.countWaypoints = 3;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showMoveWaypointUp).to.be.false;
+        });
+
+        it("'showMoveWaypointUp' should be false if waypoint has no coordinates", async () => {
+            activeRoutingToolOptionStub.returns("AS");
+            props.waypoint.setIndex(1);
+            props.countWaypoints = 3;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showMoveWaypointUp).to.be.false;
+        });
+
+        it("'showMoveWaypointDown' should be true if waypoint is set, index !== lastIndex, and activeRoutingToolOption !== 'TSR'", async () => {
+            activeRoutingToolOptionStub.returns("AS");
+            props.waypoint.setIndex(0);
+            props.waypoint.setCoordinates([8, 52]);
+            props.countWaypoints = 3;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showMoveWaypointDown).to.be.true;
+        });
+
+        it("'showMoveWaypointDown' should be false if index === lastIndex", async () => {
+            props.waypoint.setIndex(2);
+            props.waypoint.setCoordinates([8, 52]);
+            props.countWaypoints = 3;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showMoveWaypointDown).to.be.false;
+        });
+
+        it("'showMoveWaypointDown' should be false if activeRoutingToolOption === 'TSR'", async () => {
+            activeRoutingToolOptionStub.returns("TSR");
+            props.waypoint.setIndex(0);
+            props.waypoint.setCoordinates([8, 52]);
+            props.countWaypoints = 3;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showMoveWaypointDown).to.be.false;
+        });
+
+        it("'showMoveWaypointDown' should be false if waypoint has no coordinates", async () => {
+            activeRoutingToolOptionStub.returns("AS");
+            props.waypoint.setIndex(0);
+            props.countWaypoints = 3;
+            wrapper = shallowMount(RoutingCoordinateInputComponent, {
+                global: {
+                    plugins: [store]
+                },
+                props: props
+            });
+            expect(wrapper.vm.showMoveWaypointDown).to.be.false;
         });
     });
     describe("test watcher", () => {

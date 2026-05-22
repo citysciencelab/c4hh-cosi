@@ -39,10 +39,6 @@ describe("src/modules/coord/store/actionsCoordToolkit.js", () => {
         getters = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     afterAll(() => {
         // remove additional projection 25833 from registered ones
         crs.getProjection("EPSG:25833").masterportal = false;

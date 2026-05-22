@@ -250,6 +250,7 @@ export default {
                 :interaction="resetModule"
                 :text="$t('common:modules.bufferAnalysis.clearButton')"
                 :icon="'bi-x-circle'"
+                :disabled="selectedSourceLayer === null && selectedTargetLayer === null"
             />
         </div>
     </div>
