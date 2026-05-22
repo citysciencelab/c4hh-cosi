@@ -15,13 +15,13 @@ describe("src/core/js/layers/layer3dTileset.js", () => {
         style;
 
     beforeAll(() => {
-        warn = sinon.spy();
-        sinon.stub(console, "warn").callsFake(warn);
         origGetters = store.getters;
         origDispatch = store.dispatch;
     });
 
     beforeEach(() => {
+        warn = sinon.spy();
+        sinon.stub(console, "warn").callsFake(warn);
         style = {};
         attributes = {
             id: "id",

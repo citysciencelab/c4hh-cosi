@@ -1,10 +1,27 @@
 import {expect} from "chai";
 import actions from "@modules/print/store/actionsPrint.js";
+import getCswRecordById from "@shared/js/api/getCswRecordById.js";
 import VectorLayer from "ol/layer/Vector.js";
 import sinon from "sinon";
 
 const {activatePrintStarted, getMetaDataForPrint, createPrintJob, migratePayload, waitForPrintJob, waitForPrintJobSuccess, downloadFile} = actions;
 
+beforeEach(() => {
+    const cswReturn = {
+        getTitle: () => "name",
+        getAbstract: () => "abstract",
+        getRevisionDate: () => undefined,
+        getPublicationDate: () => undefined,
+        getCreationDate: () => undefined,
+        getFrequenzy: () => "",
+        getPublisher: () => {
+            return {name: "name"};
+        }
+    };
+
+    sinon.stub(getCswRecordById, "getRecordById").returns(cswReturn);
+    sinon.stub(console, "error").callsFake(sinon.spy());
+});
 afterEach(() => {
     sinon.restore();
 });

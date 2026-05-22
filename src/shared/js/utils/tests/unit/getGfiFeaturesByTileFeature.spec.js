@@ -1,5 +1,6 @@
 
 import {expect} from "chai";
+import sinon from "sinon";
 import getGfiFeatureProvider from "@shared/js/utils/getGfiFeaturesByTileFeature.js";
 import store from "@appstore/index.js";
 
@@ -23,6 +24,7 @@ describe("src/shared/js/utils/getGfiFeaturesByTileFeature.js", () => {
                 };
             }
         };
+        sinon.stub(console, "warn").callsFake(sinon.spy());
     });
 
     afterEach(() => {

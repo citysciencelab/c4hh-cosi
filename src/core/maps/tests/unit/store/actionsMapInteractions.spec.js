@@ -21,6 +21,7 @@ describe("src/core/maps/store/actionsMapsInteractions.js", () => {
             },
             layerConfigById: () => ({})
         };
+        sinon.stub(console, "warn").callsFake(sinon.spy());
     });
 
     describe("registerlistener and unregisterlistener", () => {

@@ -1,4 +1,5 @@
 import {expect} from "chai";
+import sinon from "sinon";
 import {
     createGfiFeature,
     openFeaturesInNewWindow,
@@ -56,6 +57,7 @@ describe("src/shared/js/utils/getWmsFeaturesByMimeType.js", () => {
             getProperties: () => "featureProperties",
             getId: () => "id"
         };
+        sinon.stub(console, "warn").callsFake(sinon.spy());
     });
 
 

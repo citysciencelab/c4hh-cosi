@@ -72,6 +72,7 @@ describe("src/core/maps/store/actionsMapsAttributesMapper.js", () => {
         });
     });
     beforeEach(() => {
+        sinon.stub(console, "warn").callsFake(sinon.spy());
         commit = sinon.spy();
         dispatch = sinon.spy();
         getters = {

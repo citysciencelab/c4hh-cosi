@@ -37,13 +37,7 @@ if (!globalThis.ResizeObserver) {
 }
 
 globalThis.fetch = async (url) => {
-    console.warn("⚠️  MUST BE FIXED WARNING: fetch shall be mocked in tests: ", url);
-    return {
-        ok: true,
-        status: 200,
-        json: async () => ({ /* your mock data here */ }),
-        text: async () => ""
-    };
+    throw new Error(`⚠️  MUST BE FIXED WARNING: fetch shall be mocked in tests: ${url}`);
 };
 
 globalThis.XMLHttpRequest = class {
@@ -51,7 +45,7 @@ globalThis.XMLHttpRequest = class {
      *
      */
     open () {
-        console.warn("⚠️  MUST BE FIXED WARNING: XMLHttpRequest shall be mocked in tests!");
+        throw new Error("⚠️  MUST BE FIXED WARNING:  XMLHttpRequest shall be mocked in tests!");
     }
     /**
      *

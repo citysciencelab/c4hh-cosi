@@ -1,4 +1,5 @@
 import {expect} from "chai";
+import sinon from "sinon";
 import {
     convertColor,
     isRgbArray,
@@ -23,6 +24,13 @@ import {
 } from "@shared/js/utils/convertColor.js";
 
 describe("src/shared/js/utils/convertColor.js", () => {
+    beforeEach(() => {
+        sinon.stub(console, "warn").callsFake(sinon.spy());
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    });
     describe("isRgbArray", () => {
         it("should return false if the given array is anything but an array of 3 numbers", () => {
             expect(isRgbArray(undefined)).to.be.false;

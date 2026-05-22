@@ -1,4 +1,5 @@
 import {expect} from "chai";
+import sinon from "sinon";
 import {SensorThingsMqttConnector} from "../../sensorThingsMqttConnector.js";
 
 describe("src/shared/js/api/sensorThingsMqttConnector.js", () => {
@@ -6,6 +7,7 @@ describe("src/shared/js/api/sensorThingsMqttConnector.js", () => {
 
     beforeEach(() => {
         mqttClient = new SensorThingsMqttConnector();
+        sinon.stub(console, "error").callsFake(sinon.spy());
     });
 
     describe("constructor", () => {

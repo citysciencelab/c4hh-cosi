@@ -240,6 +240,7 @@ describe("src/app-store/actionsLayerConfig.js", () => {
         setIdsAtFoldersSpy = sinon.spy(buildTreeStructure, "setIdsAtFolders");
         buildSpy = sinon.spy(buildTreeStructure, "build");
         replaceInNestedValuesSpy = sinon.spy(replaceInNestedValuesModule, "replaceInNestedValues");
+        sinon.stub(console, "warn").callsFake(sinon.spy());
     });
 
     afterEach(() => {

@@ -41,10 +41,6 @@ describe("src/core/js/layers/layer2dVectorTile.js", () => {
         warn;
 
     beforeAll(() => {
-        error = sinon.spy();
-        sinon.stub(console, "error").callsFake(error);
-        warn = sinon.spy();
-        sinon.stub(console, "warn").callsFake(warn);
         mapCollection.clear();
 
         const map = {
@@ -73,6 +69,10 @@ describe("src/core/js/layers/layer2dVectorTile.js", () => {
     });
 
     beforeEach(() => {
+        error = sinon.spy();
+        sinon.stub(console, "error").callsFake(error);
+        warn = sinon.spy();
+        sinon.stub(console, "warn").callsFake(warn);
         attributes = {
             id: "911",
             maxScale: "1000000",

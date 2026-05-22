@@ -26,9 +26,6 @@ describe("src/core/js/layers/layer2dRasterWmts.js", () => {
     beforeAll(() => {
         fetch = global.fetch;
         global.fetch = sinon.spy(() => new Promise(r => r));
-
-        warn = sinon.spy();
-        sinon.stub(console, "warn").callsFake(warn);
     });
 
     beforeEach(() => {
@@ -48,6 +45,9 @@ describe("src/core/js/layers/layer2dRasterWmts.js", () => {
         };
 
         mapCollection.addMap(map, "2D");
+        warn = sinon.spy();
+        sinon.stub(console, "warn").callsFake(warn);
+        sinon.stub(console, "error").callsFake(sinon.spy());
     });
 
     afterAll(() => {

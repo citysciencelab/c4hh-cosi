@@ -8,6 +8,7 @@ import sinon from "sinon";
 import VectorSource from "ol/source/Vector.js";
 
 import layerCollection from "@core/layers/js/layerCollection.js";
+import wfs from "@masterportal/masterportalapi/src/layer/wfs.js";
 import SearchInterface from "@modules/searchBar/searchInterfaces/searchInterface.js";
 import SearchInterfaceVisibleVector from "@modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js";
 
@@ -27,6 +28,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js
     });
 
     beforeEach(() => {
+        sinon.stub(wfs, "loadFeaturesManually");
         coordinates = [[
             [10, 10, 0],
             [10, 20, 0],
