@@ -230,6 +230,8 @@ export default {
                             placeholder: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.PLACEHOLDER || "",
                             label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`),
                             pattern: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.PATTERN || "",
+                            errorKey: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.ERROR_KEY,
+                            errorParams: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.ERROR_PARAMS || {},
                             errorMessage: ""
                         }));
 
@@ -241,6 +243,8 @@ export default {
                         label: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount"),
                         pattern: "[0-9]{1,4}",
                         placeholder: "10",
+                        errorKey: "patternError",
+                        errorParams: {digitNumber: 4},
                         errorMessage: ""
                     }
                 ];
@@ -303,8 +307,8 @@ export default {
                     const regex = new RegExp(`^${attribute.pattern}$`);
 
                     if (!regex.test(String(attribute.value))) {
-                        attribute.errorMessage = this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.patternError",
-                            {digitNumber: attribute.placeholder.length}
+                        attribute.errorMessage = this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.errorKey}`,
+                            attribute.errorParams
                         );
                         this.isAttributeSearchFormValid = false;
                     }

@@ -36,6 +36,7 @@
                     "kachelnummer": "Kachelnummer",
                     "maxValueCount": "Max. Trefferanzahl",
                     "patternError": "Bitte eine Zahl mit {{ digitNumber }} Ziffern eingeben.",
+                    "patternErrorRange": "Bitte eine Zahl mit {{ minDigits }} bis {{ maxDigits }} Ziffern eingeben.",
                     "spatialSelectionGroup": {
                         "geometries": "eingezeichneten Gebiet",
                         "extent": "Kartenausschnitt"
