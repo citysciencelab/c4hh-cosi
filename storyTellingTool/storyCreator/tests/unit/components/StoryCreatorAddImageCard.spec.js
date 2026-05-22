@@ -12,19 +12,14 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.exists()).to.be.true;
         });
 
-        it("should render the card when showCard is true", () => {
-            const wrapper = shallowMount(StoryCreatorAddImageCard);
+        it("should emit 'click:close' event when the close button is clicked", async () => {
+            const wrapper = shallowMount(StoryCreatorAddImageCard),
+                closeBtn = wrapper.find(".btn-close");
 
-            expect(wrapper.find(".card").exists()).to.be.true;
+            await closeBtn.trigger("click");
+
+            expect(wrapper.emitted()).to.have.property("click:close");
         });
-
-        it("should hide the card when showCard is false", async () => {
-            const wrapper = shallowMount(StoryCreatorAddImageCard);
-
-            await wrapper.setData({showCard: false});
-            expect(wrapper.find(".card").exists()).to.be.false;
-        });
-
         it("should render the headline", () => {
             const wrapper = shallowMount(StoryCreatorAddImageCard);
 

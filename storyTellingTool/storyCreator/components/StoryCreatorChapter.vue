@@ -8,6 +8,7 @@ import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
+import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import {Toast} from "bootstrap";
 
 export default {
@@ -17,6 +18,7 @@ export default {
         AddElementDropdown,
         FlatButton,
         Multiselect,
+        StoryCreatorAddImageCard,
         StoryCreatorAddTextCard
     },
     props: {
@@ -125,6 +127,11 @@ export default {
             this.resetCurrentChapter();
             this.setCurrentView("story");
         },
+        /**
+         * Handles the triggered action and sets the corresponding component.
+         * @param {String} type The type of the action (e.g., "image").
+         * @returns {void}
+         */
         handleAction (type) {
             console.warn("Aktion im StoryCreator ausgelöst. Ausgewähltes Element:", type);
             this.addComponentToShow = type;
@@ -379,6 +386,11 @@ export default {
                 class="mt-2"
                 @click:close="addComponentToShow = ''"
             />
+            <StoryCreatorAddImageCard
+                v-else-if="addComponentToShow === 'image'"
+                class="mt-2"
+                @click:close="addComponentToShow = ''"
+            />
         </AccordionItem>
         <div class="d-flex flex-column align-items-center pt-3">
             <FlatButton
@@ -399,7 +411,6 @@ export default {
         </div>
     </div>
 </template>
-
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss" scoped>
