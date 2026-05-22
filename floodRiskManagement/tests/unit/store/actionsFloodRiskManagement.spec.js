@@ -1,4 +1,4 @@
-import testAction from "../../../../../devtools/tests/VueTestUtils.js";
+import {expect} from "chai";
 import actions from "../../../store/actionsFloodRiskManagement.js";
 import sinon from "sinon";
 
@@ -10,17 +10,21 @@ afterEach(() => {
 
 describe("addons/floodRiskManagement/store/actionsFloodRiskManagement", function () {
     describe("activatePrintStarted", function () {
-        it("should set activatePrintStarted to true", done => {
-            // action, payload, state, rootState, expectedMutationsAndActions, getters = {}, done, rootGetters
-            testAction(activatePrintStarted, undefined, {}, {}, [
-                {type: "setPrintStarted", payload: true, commit: true}
-            ], {}, done);
+        it("should set activatePrintStarted to true", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy();
+
+            activatePrintStarted({commit, dispatch}, undefined);
+
+            expect(commit.calledWith("setPrintStarted", true)).to.be.true;
         });
     });
 
     describe("createPrintJob", function () {
-        it("should create a printJob", done => {
-            const defaults = {
+        it("should create a printJob", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy(),
+                defaults = {
                     attributes: {title: "Mein Titel", map: {}, scale: "1:60000", showGfi: false, gfi: {}},
                     layout: "A4 Hochformat",
                     outputFilename: "Ausdruck",
@@ -45,16 +49,17 @@ describe("addons/floodRiskManagement/store/actionsFloodRiskManagement", function
                     currentFormat: "A4 Hochformat"
                 };
 
-            // action, payload, state, rootState, expectedMutationsAndActions, getters = {}, done, rootGetters
-            testAction(createPrintJob, payload, state, {}, [
-                {type: "waitForPrintJob", payload: data, dispatch: true}
-            ], {}, done);
+            await createPrintJob({commit, dispatch, state}, payload);
+
+            expect(dispatch.calledWith("waitForPrintJob", data)).to.be.true;
         });
     });
 
     describe("waitForPrintJob", function () {
-        it("should start another print request", done => {
-            const state = {
+        it("should start another print request", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy(),
+                state = {
                     serviceUrl: "https://geodienste.hamburg.de/mapfish_print_internet/print/",
                     printAppId: "master"
                 },
@@ -69,13 +74,14 @@ describe("addons/floodRiskManagement/store/actionsFloodRiskManagement", function
                     "onSuccess": "waitForPrintJobSuccess"
                 };
 
-            // action, payload, state, rootState, expectedMutationsAndActions, getters = {}, done, rootGetters
-            testAction(waitForPrintJob, response, state, {}, [
-                {type: "sendRequest", payload: serviceRequest, dispatch: true}
-            ], {}, done);
+            waitForPrintJob({commit, dispatch, state}, response);
+
+            expect(dispatch.calledWith("sendRequest", serviceRequest)).to.be.true;
         });
-        it("should start another print request with service url without /print/", done => {
-            const state = {
+        it("should start another print request with service url without /print/", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy(),
+                state = {
                     serviceUrl: "https://geodienste.hamburg.de/mapfish_print_internet/",
                     printAppId: "master",
                     printService: "mapfish"
@@ -91,10 +97,9 @@ describe("addons/floodRiskManagement/store/actionsFloodRiskManagement", function
                     "onSuccess": "waitForPrintJobSuccess"
                 };
 
-            // action, payload, state, rootState, expectedMutationsAndActions, getters = {}, done, rootGetters
-            testAction(waitForPrintJob, response, state, {}, [
-                {type: "sendRequest", payload: serviceRequest, dispatch: true}
-            ], {}, done);
+            waitForPrintJob({commit, dispatch, state}, response);
+
+            expect(dispatch.calledWith("sendRequest", serviceRequest)).to.be.true;
         });
     });
 
@@ -107,8 +112,10 @@ describe("addons/floodRiskManagement/store/actionsFloodRiskManagement", function
         afterAll(function () {
             clock.restore();
         });
-        it("is not done yet so it should start another print request", done => {
-            const state = {
+        it("is not done yet so it should start another print request", () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy(),
+                state = {
                     serviceUrl: "https://geodienste.hamburg.de/mapfish_print_internet/print/",
                     printAppId: "master"
                 },
@@ -127,11 +134,10 @@ describe("addons/floodRiskManagement/store/actionsFloodRiskManagement", function
                     onSuccess: "waitForPrintJobSuccess"
                 };
 
-            // action, payload, state, rootState, expectedMutationsAndActions, getters = {}, done, rootGetters
-            testAction(waitForPrintJobSuccess, response, state, {}, [
-                {type: "sendRequest", payload: serviceRequest, dispatch: true}
-            ], {}, done);
+            waitForPrintJobSuccess({commit, dispatch, state}, response);
             clock.tick(2001);
+
+            expect(dispatch.calledWith("sendRequest", serviceRequest)).to.be.true;
         });
     });
 });

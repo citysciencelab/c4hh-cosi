@@ -1,6 +1,7 @@
+import {expect} from "chai";
 import actions from "../../../store/actions.js";
 import stateSimulationTool from "../../../store/state.js";
-import testAction from "../../../../../devtools/tests/VueTestUtils.js";
+import sinon from "sinon";
 
 const {isFormatValid, parseScenarioFromImport} = actions;
 
@@ -11,70 +12,84 @@ beforeAll(() => {
     });
 });
 
+afterEach(() => {
+    sinon.restore();
+});
+
 describe("addons/SimulationTool/store/actions", () => {
     describe("isFormatValid", () => {
         let payload = "";
 
-        it("should call wrong format warning if the payload is not an object.", done => {
-            testAction(isFormatValid, payload, stateSimulationTool, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat")
-                },
-                dispatch: true
-            }], {}, done);
+        it("should call wrong format warning if the payload is not an object.", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy();
+
+            isFormatValid({commit, dispatch}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat")
+            })).to.be.true;
         });
 
-        it("should call wrong format warning if the payload has no id.", done => {
+        it("should call wrong format warning if the payload has no id.", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy();
+
             payload = {
                 name: "name",
                 inputs: {},
                 scenarioFeature: {}
             };
-            testAction(isFormatValid, payload, stateSimulationTool, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "id"})
-                },
-                dispatch: true
-            }], {}, done);
+
+            isFormatValid({commit, dispatch}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "id"})
+            })).to.be.true;
         });
 
-        it("should call wrong format warning if the payload has no name.", done => {
+        it("should call wrong format warning if the payload has no name.", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy();
+
             payload = {
                 id: "id",
                 inputs: {},
                 scenarioFeature: {}
             };
-            testAction(isFormatValid, payload, stateSimulationTool, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "name"})
-                },
-                dispatch: true
-            }], {}, done);
+
+            isFormatValid({commit, dispatch}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "name"})
+            })).to.be.true;
         });
 
-        it("should call wrong format warning if the payload has no inputs.", done => {
+        it("should call wrong format warning if the payload has no inputs.", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy();
+
             payload = {
                 id: "id",
                 name: "name",
                 scenarioFeature: {}
             };
-            testAction(isFormatValid, payload, stateSimulationTool, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "inputs"})
-                },
-                dispatch: true
-            }], {}, done);
+
+            isFormatValid({commit, dispatch}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "inputs"})
+            })).to.be.true;
         });
 
-        it("should call wrong format warning if the payload has no scenarioFeature.", done => {
+        it("should call wrong format warning if the payload has no scenarioFeature.", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy();
+
             payload = {
                 id: "id",
                 name: "name",
@@ -83,24 +98,26 @@ describe("addons/SimulationTool/store/actions", () => {
                     roads: {}
                 }
             };
-            testAction(isFormatValid, payload, stateSimulationTool, {}, [{
-                type: "Alerting/addSingleAlert",
-                payload: {
-                    category: "error",
-                    content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "scenarioFeature"})
-                },
-                dispatch: true
-            }], {}, done);
+
+            isFormatValid({commit, dispatch}, payload);
+
+            expect(dispatch.calledWith("Alerting/addSingleAlert", {
+                category: "error",
+                content: i18next.t("additional:modules.tools.simulationTool.planningScenarioWrongFormat") + "<br>" + i18next.t("additional:modules.tools.simulationTool.planningScenarioMissedKey", {key: "scenarioFeature"})
+            })).to.be.true;
         });
     });
 
     describe("parseScenarioFromImport", () => {
         let payload = "";
 
-        it("should not call anything when the payload is not in string format.", done => {
+        it("should not call anything when the payload is not in string format.", async () => {
+            const commit = sinon.spy(),
+                dispatch = sinon.spy();
+
             payload = null;
 
-            testAction(parseScenarioFromImport, payload, stateSimulationTool, {}, [], {}, done);
+            await parseScenarioFromImport({commit, dispatch, getters: stateSimulationTool}, payload);
         });
     });
 });

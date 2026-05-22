@@ -63,7 +63,7 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
     });
 
     describe("exportToDOC", () => {
-        it("exports data to DOC format", function (done) {
+        it("exports data to DOC format", async () => {
             const layerResults = [
                     {
                         layerName: "Layer 1",
@@ -83,30 +83,23 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
                     noData: "Keine Daten verfügbar"
                 };
 
-            try {
-                exportToDOC({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
+            exportToDOC({
+                layerResults,
+                fileName: "test-export",
+                setIsLoading: setIsLoadingSpy,
+                translations
+            });
 
-                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
-                expect(createElementStub.calledWith("a")).to.be.true;
-                expect(appendChildStub.called).to.be.true;
-                expect(clickStub.called).to.be.true;
-                expect(removeChildStub.called).to.be.true;
-                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
-                expect(global.URL.revokeObjectURL.called).to.be.true;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
+            expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
+            expect(createElementStub.calledWith("a")).to.be.true;
+            expect(appendChildStub.called).to.be.true;
+            expect(clickStub.called).to.be.true;
+            expect(removeChildStub.called).to.be.true;
+            expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
+            expect(global.URL.revokeObjectURL.called).to.be.true;
         });
 
-        it("handles empty rows gracefully", function (done) {
+        it("handles empty rows gracefully", async () => {
             const layerResults = [
                     {
                         layerName: "Layer 1",
@@ -123,27 +116,20 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
                     noData: "Keine Daten verfügbar"
                 };
 
-            try {
-                exportToDOC({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
+            exportToDOC({
+                layerResults,
+                fileName: "test-export",
+                setIsLoading: setIsLoadingSpy,
+                translations
+            });
 
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
-                expect(setIsLoadingSpy.calledWith(false)).to.be.true;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
+            expect(setIsLoadingSpy.calledWith(true)).to.be.true;
+            expect(setIsLoadingSpy.calledWith(false)).to.be.true;
         });
     });
 
     describe("exportToJSON", () => {
-        it("exports data to JSON format", function (done) {
+        it("exports data to JSON format", async () => {
             const layerResults = [
                     {
                         layerName: "Layer 1",
@@ -161,29 +147,22 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
                     defaultFileName: "Export-File"
                 };
 
-            try {
-                exportToJSON({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
+            exportToJSON({
+                layerResults,
+                fileName: "test-export",
+                setIsLoading: setIsLoadingSpy,
+                translations
+            });
 
-                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
-                expect(createElementStub.calledWith("a")).to.be.true;
-                expect(appendChildStub.called).to.be.true;
-                expect(clickStub.called).to.be.true;
-                expect(removeChildStub.called).to.be.true;
-                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
+            expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
+            expect(createElementStub.calledWith("a")).to.be.true;
+            expect(appendChildStub.called).to.be.true;
+            expect(clickStub.called).to.be.true;
+            expect(removeChildStub.called).to.be.true;
+            expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
         });
 
-        it("handles complex header structures", function (done) {
+        it("handles complex header structures", async () => {
             const layerResults = [
                     {
                         layerName: "Layer 1",
@@ -201,22 +180,15 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
                     defaultFileName: "Export-File"
                 };
 
-            try {
-                exportToJSON({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
+            exportToJSON({
+                layerResults,
+                fileName: "test-export",
+                setIsLoading: setIsLoadingSpy,
+                translations
+            });
 
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
-                expect(setIsLoadingSpy.calledWith(false)).to.be.true;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
+            expect(setIsLoadingSpy.calledWith(true)).to.be.true;
+            expect(setIsLoadingSpy.calledWith(false)).to.be.true;
         });
     });
 
@@ -246,7 +218,7 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
             delete global.window;
         });
 
-        it("exports data to PDF format", function (done) {
+        it("exports data to PDF format", async () => {
             const layerResults = [
                     {
                         layerName: "Layer 1",
@@ -265,30 +237,23 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
                     exportAsPdf: "Export as PDF"
                 };
 
-            try {
-                exportToPDF({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
+            exportToPDF({
+                layerResults,
+                fileName: "test-export",
+                setIsLoading: setIsLoadingSpy,
+                translations
+            });
 
-                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
-                expect(windowOpenStub.called).to.be.true;
-                expect(writeStub.called).to.be.true;
-                expect(closeStub.called).to.be.true;
-                expect(focusStub.called).to.be.true;
-                expect(printStub.called).to.be.true;
-                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
+            expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
+            expect(windowOpenStub.called).to.be.true;
+            expect(writeStub.called).to.be.true;
+            expect(closeStub.called).to.be.true;
+            expect(focusStub.called).to.be.true;
+            expect(printStub.called).to.be.true;
+            expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
         });
 
-        it("handles window.open failure gracefully", function (done) {
+        it("handles window.open failure gracefully", async () => {
             windowOpenStub.returns(null);
 
             const layerResults = [
@@ -304,29 +269,22 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
                     exportAsPdf: "Export as PDF"
                 };
 
-            try {
-                exportToPDF({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
+            exportToPDF({
+                layerResults,
+                fileName: "test-export",
+                setIsLoading: setIsLoadingSpy,
+                translations
+            });
 
-                expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
-                expect(windowOpenStub.called).to.be.true;
-                expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
-                expect(writeStub.called).to.be.false;
-                expect(focusStub.called).to.be.false;
-                expect(printStub.called).to.be.false;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
+            expect(setIsLoadingSpy.firstCall.args[0]).to.be.true;
+            expect(windowOpenStub.called).to.be.true;
+            expect(setIsLoadingSpy.lastCall.args[0]).to.be.false;
+            expect(writeStub.called).to.be.false;
+            expect(focusStub.called).to.be.false;
+            expect(printStub.called).to.be.false;
         });
 
-        it("handles layers with many columns", function (done) {
+        it("handles layers with many columns", async () => {
             const headers = [],
                 row = {},
                 layerResults = [
@@ -347,27 +305,20 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
                 row[`attr${i}`] = `value${i}`;
             }
 
-            try {
-                exportToPDF({
-                    layerResults,
-                    fileName: "test-export",
-                    setIsLoading: setIsLoadingSpy,
-                    translations
-                });
+            exportToPDF({
+                layerResults,
+                fileName: "test-export",
+                setIsLoading: setIsLoadingSpy,
+                translations
+            });
 
-                expect(setIsLoadingSpy.calledWith(true)).to.be.true;
-                expect(windowOpenStub.called).to.be.true;
-                expect(writeStub.called).to.be.true;
-                const htmlContent = writeStub.firstCall.args[0];
+            expect(setIsLoadingSpy.calledWith(true)).to.be.true;
+            expect(windowOpenStub.called).to.be.true;
+            expect(writeStub.called).to.be.true;
+            const htmlContent = writeStub.firstCall.args[0];
 
-                expect(htmlContent).to.include("many-columns");
-                expect(setIsLoadingSpy.calledWith(false)).to.be.true;
-
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
+            expect(htmlContent).to.include("many-columns");
+            expect(setIsLoadingSpy.calledWith(false)).to.be.true;
         });
     });
 });
