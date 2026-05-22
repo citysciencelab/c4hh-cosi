@@ -6,6 +6,7 @@ import ButtonGroup from "./shared/ButtonGroup.vue";
 import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import DrawEdit from "@shared/modules/draw/components/DrawEdit.vue";
+import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 
 import Polygon from "ol/geom/Polygon";
@@ -24,14 +25,15 @@ export default {
         SpinnerItem,
         DrawTypes,
         DrawEdit,
-        ButtonGroup
+        ButtonGroup,
+        SwitchInput
     },
     inject: {
         setCurrentTab: {from: TAB_SET_CURRENT, default: null}
     },
     data () {
         return {
-            activeContent: "searchOptionsList",
+            attributeSearchModeIsActive: false,
             selectedArchive: "",
             searchWithAttributeFormData: {},
             archives: {},
@@ -181,13 +183,6 @@ export default {
             "setLzsSelectedDrawType",
             "setLzsSelectedInteraction"
         ]),
-        /**
-         * Update the active content section to the given `contentId`.
-         * @param {string} contentId - The id of the content to activate.
-         */
-        changeSearchContent (contentId) {
-            this.activeContent = contentId;
-        },
         /**
          * Set the selected archive identifier.
          * @param {string} archive - The archive name to select.
@@ -520,16 +515,16 @@ export default {
                 });
         },
         /**
-         * Initiates the search based on the active content type.
+         * Initiates the search based on the active search mode.
          *
          * @returns {void}
          */
         startSearch () {
-            switch (this.activeContent) {
-                case "searchFormWithAttributes":
+            switch (this.attributeSearchModeIsActive) {
+                case true:
                     this.searchWithAttribute();
                     break;
-                case "searchFormWithGeometry":
+                case false:
                 default:
                     this.searchWithGeometry();
                     break;
@@ -559,346 +554,314 @@ export default {
 
 <template>
     <div id="TabSearch">
-        <ul
-            v-if="activeContent === 'searchOptionsList'"
-            id="searchOptionsList"
-            class="list-group"
-        >
-            <li
-                class="list-group-item d-flex justify-content-between align-items-center"
-                role="button"
-                tabindex="0"
-                @click="changeSearchContent('searchFormWithAttributes')"
-                @keydown.enter="changeSearchContent('searchFormWithAttributes')"
-            >
-                {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.searchWithAttributeHeading') }}
-
-                <i class="bi bi-arrow-right-circle" />
-            </li>
-
-            <li
-                class="list-group-item d-flex justify-content-between align-items-center"
-                role="button"
-                tabindex="0"
-                @click="changeSearchContent('searchFormWithGeometry')"
-                @keydown.enter="changeSearchContent('searchFormWithGeometry')"
-            >
-                {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.searchWithGeometryHeading") }}
-
-                <i class="bi bi-arrow-right-circle" />
-            </li>
-        </ul>
-
         <div
-            v-else
-            id="searchAttributes"
-            class="searchAttributes"
+            v-if="showSpinner"
+            class="loadingSpinner"
         >
-            <div
-                v-if="showSpinner"
-                class="loadingSpinner"
-            >
-                <SpinnerItem
-                    custom-class="spinner"
-                    class="ms-3"
+            <SpinnerItem
+                custom-class="spinner"
+                class="ms-3"
+            />
+        </div>
+
+        <div v-else>
+            <div class="switch-container">
+                <SwitchInput
+                    id="idSearchModeSwitch"
+                    :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
+                    :label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
+                    :checked="attributeSearchModeIsActive"
+                    :interaction="(evt) => attributeSearchModeIsActive = evt.target.checked"
                 />
             </div>
 
-            <div v-else>
-                <div
-                    v-if="activeContent === 'searchFormWithAttributes'"
-                    id="searchFormWithAttributes"
-                    class="searchFormWithAttributes"
-                >
-                    <label for="archiv">
-                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
-                    </label>
+            <div
+                v-if="attributeSearchModeIsActive"
+                id="searchFormWithAttributes"
+                class="searchFormWithAttributes"
+            >
+                <label for="archive">
+                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
+                </label>
 
-                    <select
-                        id="archive"
-                        class="form-select archive"
-                        :value="selectedArchive"
-                        @change="setSelectedArchive($event.target.value)"
+                <select
+                    id="archive"
+                    class="form-select archive"
+                    :value="selectedArchive"
+                    @change="setSelectedArchive($event.target.value)"
+                >
+                    <option
+                        v-for="(_, name) in searchWithAttributeFormData"
+                        :key="name"
+                        :value="name"
                     >
-                        <option
-                            v-for="(_, name) in searchWithAttributeFormData"
-                            :key="name"
-                            :value="name"
-                        >
-                            {{ name }}
-                        </option>
-                    </select>
+                        {{ name }}
+                    </option>
+                </select>
 
-                    <div class="searchWithAttributeForm">
-                        <InputText
-                            v-for="attribute in searchWithAttributeFormData[selectedArchive]"
-                            :id="attribute.name"
-                            :key="attribute.name"
-                            v-model="attribute.value"
-                            :class-obj="['form-control' + (attribute.errorMessage.length > 0 ? ' is-invalid': ' is-valid')]"
-                            :label="attribute.name"
-                            :placeholder="attribute.placeholder"
-                            :error-message="attribute.errorMessage"
-                            @input="validateSearchWithAttributeForm()"
-                        />
+                <div class="searchWithAttributeForm">
+                    <InputText
+                        v-for="attribute in searchWithAttributeFormData[selectedArchive]"
+                        :id="attribute.name"
+                        :key="attribute.name"
+                        v-model="attribute.value"
+                        :class-obj="['form-control' + (attribute.errorMessage.length > 0 ? ' is-invalid': ' is-valid')]"
+                        :label="attribute.name"
+                        :placeholder="attribute.placeholder"
+                        :error-message="attribute.errorMessage"
+                        @input="validateSearchWithAttributeForm()"
+                    />
+                </div>
+            </div>
+
+            <div
+                v-if="!attributeSearchModeIsActive"
+                id="searchFormWithGeometry"
+                class="searchFormWithGeometry"
+            >
+                <div class="archiveSelection">
+                    <span>
+                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel') }}
+                    </span>
+
+                    <div
+                        class="archiveSelectionList"
+                        role="group"
+                        aria-label="archives"
+                    >
+                        <div
+                            v-for="archive in archiveList"
+                            :key="archive.id"
+                            class="archiveCheckboxList"
+                        >
+                            <input
+                                :id="`archiveCheckbox-${archive.id}`"
+                                type="checkbox"
+                                :value="archive.id"
+                                :checked="selectedArchiveIds.includes(archive.id)"
+                                @change="onSelectedArchiveIdsChange(archive.id, $event)"
+                            >
+
+                            <label :for="`archiveCheckbox-${archive.id}`">
+                                {{ archive.name }}
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <div
-                    v-if="activeContent === 'searchFormWithGeometry'"
-                    id="searchFormWithGeometry"
-                    class="searchFormWithGeometry"
-                >
-                    <div class="archiveSelection">
-                        <span>
-                            {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel') }}
-                        </span>
+                <div class="yearsSelection">
+                    <span>
+                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectYearsLabel') }}
+                    </span>
 
+                    <div
+                        class="yearsSelectionList"
+                        role="group"
+                        aria-label="years"
+                    >
                         <div
-                            class="archiveSelectionList"
-                            role="group"
-                            aria-label="archives"
+                            v-for="yearObject in yearsList"
+                            :key="yearObject.year"
+                            class="yearCheckboxItem"
                         >
-                            <div
-                                v-for="archive in archiveList"
-                                :key="archive.id"
-                                class="archiveCheckboxList"
+                            <input
+                                :id="`yearCheckbox-${yearObject.year}`"
+                                type="checkbox"
+                                :value="yearObject.year"
+                                :checked="selectedYears.includes(yearObject.year)"
+                                @change="onSelectedYearsChange(yearObject.year, $event)"
                             >
-                                <input
-                                    :id="`archiveCheckbox-${archive.id}`"
-                                    type="checkbox"
-                                    :value="archive.id"
-                                    :checked="selectedArchiveIds.includes(archive.id)"
-                                    @change="onSelectedArchiveIdsChange(archive.id, $event)"
-                                >
 
-                                <label :for="`archiveCheckbox-${archive.id}`">
-                                    {{ archive.name }}
-                                </label>
-                            </div>
+                            <label :for="`yearCheckbox-${yearObject.year}`">
+                                <span>
+                                    {{ yearObject.year }}
+                                </span>
+                                <span>
+                                    ({{ yearObject.archiveNames.join(", ") }})
+                                </span>
+                            </label>
                         </div>
                     </div>
+                </div>
 
-                    <div class="yearsSelection">
-                        <span>
-                            {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectYearsLabel') }}
-                        </span>
+                <div class="spatialSelection">
+                    <p class="spatialSelectionLabel">
+                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionLabel") }}
+                    </p>
 
-                        <div
-                            class="yearsSelectionList"
-                            role="group"
-                            aria-label="years"
-                        >
-                            <div
-                                v-for="yearObject in yearsList"
-                                :key="yearObject.year"
-                                class="yearCheckboxItem"
-                            >
-                                <input
-                                    :id="`yearCheckbox-${yearObject.year}`"
-                                    type="checkbox"
-                                    :value="yearObject.year"
-                                    :checked="selectedYears.includes(yearObject.year)"
-                                    @change="onSelectedYearsChange(yearObject.year, $event)"
-                                >
+                    <ButtonGroup
+                        :buttons="buttonGroupLevels"
+                        :pre-checked-value="selectedButtonGroup"
+                        group="spatialSelectionGroups"
+                        class="level-switch"
+                        :selected-value="selectedSpatialButtonName"
+                        @set-selected-button="setSelectedButtonGroup"
+                    />
 
-                                <label :for="`yearCheckbox-${yearObject.year}`">
-                                    <span>
-                                        {{ yearObject.year }}
-                                    </span>
-                                    <span>
-                                        ({{ yearObject.archiveNames.join(", ") }})
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+                    <p
+                        v-if="selectedButtonGroup === 'extent' && scale > minScaleValue"
+                        class="extentWarning"
+                    >
+                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.extentWarningMessage", {scale: minScaleValue}) }}
+                    </p>
 
-                    <div class="spatialSelection">
-                        <p class="spatialSelectionLabel">
-                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionLabel") }}
-                        </p>
-
-                        <ButtonGroup
-                            :buttons="buttonGroupLevels"
-                            :pre-checked-value="selectedButtonGroup"
-                            group="spatialSelectionGroups"
-                            class="level-switch"
-                            :selected-value="selectedSpatialButtonName"
-                            @set-selected-button="setSelectedButtonGroup"
+                    <div
+                        v-if="selectedButtonGroup === 'geometry'"
+                        class="spatialSelectionButtons d-flex align-items-center"
+                    >
+                        <DrawTypes
+                            :source="lzsDrawLayerSource"
+                            :current-layout="lzsCurrentLayout"
+                            :draw-types="lzsDrawTypes"
+                            :draw-icons="lzsDrawIcons"
+                            :selected-draw-type="lzsSelectedDrawType"
+                            :selected-interaction="lzsSelectedInteraction"
+                            :set-selected-draw-type="setLzsSelectedDrawType"
+                            :set-selected-interaction="setLzsSelectedInteraction"
+                            :should-emit-events="true"
+                            @drawend="onDrawend"
                         />
 
-                        <p
-                            v-if="selectedButtonGroup === 'extent' && scale > minScaleValue"
-                            class="extentWarning"
-                        >
-                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.extentWarningMessage", {scale: minScaleValue}) }}
-                        </p>
-
-                        <div
-                            v-if="selectedButtonGroup === 'geometry'"
-                            class="spatialSelectionButtons d-flex align-items-center"
-                        >
-                            <DrawTypes
-                                :source="lzsDrawLayerSource"
-                                :current-layout="lzsCurrentLayout"
-                                :draw-types="lzsDrawTypes"
+                        <div class="deleteFeature">
+                            <DrawEdit
+                                :draw-edits="lzsDrawEdits"
                                 :draw-icons="lzsDrawIcons"
-                                :selected-draw-type="lzsSelectedDrawType"
+                                :layer="lzsDrawLayer"
                                 :selected-interaction="lzsSelectedInteraction"
-                                :set-selected-draw-type="setLzsSelectedDrawType"
                                 :set-selected-interaction="setLzsSelectedInteraction"
-                                :should-emit-events="true"
-                                @drawend="onDrawend"
                             />
-
-                            <div class="deleteFeature">
-                                <DrawEdit
-                                    :draw-edits="lzsDrawEdits"
-                                    :draw-icons="lzsDrawIcons"
-                                    :layer="lzsDrawLayer"
-                                    :selected-interaction="lzsSelectedInteraction"
-                                    :set-selected-interaction="setLzsSelectedInteraction"
-                                />
-                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="searchButtons">
-                    <FlatButton
-                        id="backButton"
-                        :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.backButtonLabel')"
-                        :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.backButtonLabel')"
-                        @click="changeSearchContent('searchOptionsList')"
-                    />
+            <div class="searchButtons">
+                <div class="spacer-div" />
+                <FlatButton
+                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
+                    :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
+                    :disabled="attributeSearchModeIsActive ? !isAttributeSearchFormValid : !isSpatialSearchFormValid"
+                    @click="startSearch()"
+                />
 
-                    <FlatButton
-                        :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
-                        :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
-                        :disabled="activeContent === 'searchFormWithGeometry' ? !isSpatialSearchFormValid : !isAttributeSearchFormValid"
-                        @click="startSearch()"
-                    />
-
-                    <FlatButton
-                        :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
-                        :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
-                        @click="resetForm()"
-                    />
-                </div>
+                <FlatButton
+                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
+                    :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
+                    @click="resetForm()"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-    //@import "~variables";
-
-
     #TabSearch {
         padding: 1rem 0.5rem;
         position: relative;
         height: 100%;
 
-    div.searchAttributes {
+        div.switch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: end;
+            margin-bottom: 0.5rem;
+        }
+
+        div.searchFormWithAttributes {
+            select.archive {
+                margin-bottom: 1rem;
+            }
+        }
+
+        div.loadingSpinner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.7);
+            z-index: 2;
 
-            div.searchFormWithAttributes {
-                select.archive {
-                    margin-bottom: 1rem;
-                }
+            div.spinner {
+                width: 4rem;
+                height: 4rem;
             }
 
-            div.loadingSpinner {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
+            p {
+                background-color: white;
+                white-space: pre-line;
+                padding: 1.5rem;
+            }
+        }
+
+        div.searchFormWithGeometry {
+            .archiveSelectionList {
+                max-height: 12.5rem;
+                overflow-y: auto;
+                border: 0.0625rem solid rgba(0,0,0,0.1);
+                padding: 0.5rem;
+                margin: 0.5rem 0 1rem 0;
+            }
+
+            .archiveCheckboxList {
                 display: flex;
-                flex-direction: column;
-                gap: 2rem;
                 align-items: center;
-                justify-content: center;
-                background: rgba(255,255,255,0.7);
-                z-index: 2;
-
-                div.spinner {
-                    width: 4rem;
-                    height: 4rem;
-                }
-
-                p {
-                    background-color: white;
-                    white-space: pre-line;
-                    padding: 1.5rem;
-                }
+                gap: 0.5rem;
+                white-space: nowrap;
             }
-
-            div.searchFormWithGeometry {
-                .archiveSelectionList {
-                    max-height: 12.5rem;
+            .yearsSelection {
+                .yearsSelectionList {
+                    height: 10rem;
                     overflow-y: auto;
                     border: 0.0625rem solid rgba(0,0,0,0.1);
                     padding: 0.5rem;
                     margin: 0.5rem 0 1rem 0;
                 }
 
-                .archiveCheckboxList {
+                .yearCheckboxItem {
                     display: flex;
                     align-items: center;
                     gap: 0.5rem;
                     white-space: nowrap;
                 }
-                .yearsSelection {
-                    .yearsSelectionList {
-                        height: 10rem;
-                        overflow-y: auto;
-                        border: 0.0625rem solid rgba(0,0,0,0.1);
-                        padding: 0.5rem;
-                        margin: 0.5rem 0 1rem 0;
-                    }
-
-                    .yearCheckboxItem {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                        white-space: nowrap;
-                    }
-                }
-                div.noCommonYearError {
-                    color: $light_red;
-                }
-
-                p.extentWarning {
-                    color: $light_red;
-                    font-size: 0.875rem;
-                    margin: 1rem;
-                }
-
-                div.spatialSelectionButtons {
-                    margin-top: 1.5rem;
-                    gap: 0.5rem;
-
-                   div.deleteFeature {
-                       height: 2.5rem;
-
-                       :deep(hr) {
-                           display: none;
-                       }
-                    }
-
-
-                }
             }
-            div.searchButtons {
-                display: flex;
-                gap: 0.5rem;
-                margin-top: 1rem;
+            div.noCommonYearError {
+                color: $light_red;
+            }
 
-                *:nth-child(2) {
-                    margin-left: auto;
+            p.extentWarning {
+                color: $light_red;
+                font-size: 0.875rem;
+                margin: 1rem;
+            }
+
+            div.spatialSelectionButtons {
+                margin-top: 1.5rem;
+                gap: 0.5rem;
+
+                div.deleteFeature {
+                    height: 2.5rem;
+
+                    :deep(hr) {
+                        display: none;
+                    }
                 }
+
+
+            }
+        }
+        div.searchButtons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+
+            *:nth-child(2) {
+                margin-left: auto;
             }
         }
     }

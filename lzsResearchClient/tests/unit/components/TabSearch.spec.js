@@ -163,7 +163,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                 mocks: {
                     $t: key => key
                 },
-                plugins: [store]
+                plugins: [store],
+                stubs: {
+                    SwitchInput: false
+                }
             }
         });
     });
@@ -174,61 +177,51 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         }
     });
 
+    /**
+     * Returns the switchInput.
+     * @return {Object}
+     */
+    function getSearchModeSwitch () {
+        return wrapper.find("input#idSearchModeSwitch");
+    }
+    /**
+     * Checks/Unchecks the switchInput.
+     * @param {Boolean} checked - Whether the switch is to be changed to checked or unchecked.
+     */
+    async function toggleSwitch (checked = true) {
+        await getSearchModeSwitch().setChecked(checked);
+    }
+
     it("should exist", () => {
         expect(wrapper.exists()).to.be.true;
     });
 
-    it("clicking first list item shows attribute form", async () => {
-        const searchOptionsList = wrapper.findAll("#searchOptionsList li");
+    it("the geometry search form is active by default", async () => {
+        const switchInput = getSearchModeSwitch();
 
-        expect(searchOptionsList.length).to.be.at.least(1);
-
-        await searchOptionsList[0].trigger("click");
-
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.activeContent).to.equal("searchFormWithAttributes");
-        expect(wrapper.find("#searchFormWithAttributes").exists()).to.be.true;
-    });
-
-    it("clicking second list item shows geometry form", async () => {
-        const searchOptionsList = wrapper.findAll("#searchOptionsList li");
-
-        expect(searchOptionsList.length).to.be.at.least(2);
-
-        await searchOptionsList[1].trigger("click");
-
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.activeContent).to.equal("searchFormWithGeometry");
+        expect(switchInput.element.checked).to.be.false;
+        expect(wrapper.vm.attributeSearchModeIsActive).to.be.false;
         expect(wrapper.find("#searchFormWithGeometry").exists()).to.be.true;
     });
 
-    it("back button returns to options list", async () => {
-        const searchOptionsList = wrapper.findAll("#searchOptionsList li");
+    it("clicking on the switch input switches to the other form", async () => {
+        const switchInput = getSearchModeSwitch();
 
-        await searchOptionsList[0].trigger("click");
+        await toggleSwitch();
 
-        await wrapper.vm.$nextTick();
+        expect(switchInput.element.checked).to.be.true;
+        expect(wrapper.vm.attributeSearchModeIsActive).to.be.true;
+        expect(wrapper.find("#searchFormWithAttributes").exists()).to.be.true;
 
-        const backButton = wrapper.find("#backButton");
+        await toggleSwitch(false);
 
-        expect(backButton.exists()).to.be.true;
-
-        await backButton.trigger("click");
-
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.activeContent).to.equal("searchOptionsList");
-        expect(wrapper.find("#searchOptionsList").exists()).to.be.true;
+        expect(switchInput.element.checked).to.be.false;
+        expect(wrapper.vm.attributeSearchModeIsActive).to.be.false;
+        expect(wrapper.find("#searchFormWithGeometry").exists()).to.be.true;
     });
 
     it("initializes searchWithAttributeFormData from dataClassList", async () => {
-        const items = wrapper.findAll("#searchOptionsList li");
-
-        await items[0].trigger("click");
-
-        await wrapper.vm.$nextTick();
+        await toggleSwitch();
 
         const searchAttributes = wrapper.vm.searchWithAttributeFormData,
             searchWithAttributeForm = searchAttributes["3D-Stadtmodell LoD1"];
@@ -245,11 +238,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     });
 
     it("updates attribute value when input changes", async () => {
-        const items = wrapper.findAll("#searchOptionsList li");
-
-        await items[0].trigger("click");
-
-        await wrapper.vm.$nextTick();
+        await toggleSwitch();
 
         const searchAttributes = wrapper.vm.searchWithAttributeFormData;
 
@@ -264,11 +253,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     });
 
     it("select shows correct archive options and selecting updates selectedArchiv", async () => {
-        const items = wrapper.findAll("#searchOptionsList li");
-
-        await items[0].trigger("click");
-
-        await wrapper.vm.$nextTick();
+        await toggleSwitch();
 
         const keys = Object.keys(wrapper.vm.searchWithAttributeFormData);
 
@@ -290,11 +275,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     });
 
     it("toggles archive checkbox updates selectedArchivIds", async () => {
-        const items = wrapper.findAll("#searchOptionsList li"),
-            archiveId = "DKL_3DSTADT_LOD2";
+        const archiveId = "DKL_3DSTADT_LOD2";
 
-        await items[1].trigger("click");
-        await wrapper.vm.$nextTick();
         await wrapper.vm.onSelectedArchiveIdsChange(archiveId, {target: {checked: true}});
 
         expect(wrapper.vm.selectedArchiveIds).to.include(archiveId);
@@ -305,11 +287,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     });
 
     it("toggles year checkbox updates selectedYears", async () => {
-        const items = wrapper.findAll("#searchOptionsList li"),
-            year = 2020;
+        const year = 2020;
 
-        await items[1].trigger("click");
-        await wrapper.vm.$nextTick();
         await wrapper.vm.onSelectedYearsChange(year, {target: {checked: true}});
 
         expect(wrapper.vm.selectedYears).to.include(year);
@@ -325,12 +304,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
             clear: sinon.stub(),
             addFeature: sinon.stub()
         };
-        const items = wrapper.findAll("#searchOptionsList li"),
-            archiveId = "DKL_3DSTADT_LOD2",
+        const archiveId = "DKL_3DSTADT_LOD2",
             year = 2020;
 
-        await items[0].trigger("click");
-        await wrapper.vm.$nextTick();
+        await toggleSwitch();
 
         const formData = wrapper.vm.searchWithAttributeFormData["3D-Stadtmodell LoD1"][0];
 
@@ -338,8 +315,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         wrapper.vm.setSelectedArchive("AFIS-Einzelnachweise");
 
         await wrapper.vm.$nextTick();
-        await items[1].trigger("click");
-        await wrapper.vm.$nextTick();
+        await toggleSwitch(false);
         await wrapper.vm.onSelectedArchiveIdsChange(archiveId, {target: {checked: true}});
         await wrapper.vm.onSelectedYearsChange(year, {target: {checked: true}});
         await wrapper.vm.setSearchGeometry(new Point([0, 0]));
@@ -363,13 +339,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     });
 
     it("set SearchGeometry correctly", async () => {
-        const items = wrapper.findAll("#searchOptionsList li"),
-            mockPoint = new Point([0, 0]),
+        const mockPoint = new Point([0, 0]),
             mockLineString = new LineString([[0, 0], [1, 1]]),
             mockPolygon = new Polygon([[[0, 0], [1, 1], [1, 0], [0, 0]]]);
 
-        await items[1].trigger("click");
-        await wrapper.vm.$nextTick();
         await wrapper.vm.setSearchGeometry(mockPoint);
 
         expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Point", coordinates: [0, 0]});
@@ -385,10 +358,6 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     });
 
     it("sets selected button group of spatial selection", async () => {
-        const items = wrapper.findAll("#searchOptionsList li");
-
-        await items[1].trigger("click");
-        await wrapper.vm.$nextTick();
         await wrapper.vm.setSelectedButtonGroup("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries");
 
         expect(wrapper.vm.selectedButtonGroup).to.equal("geometry");

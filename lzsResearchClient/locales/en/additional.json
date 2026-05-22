@@ -30,8 +30,6 @@
                     "backButtonLabel": "Back",
                     "searchButtonLabel": "Search",
                     "resetButtonLabel": "Reset",
-                    "searchWithAttributeHeading": "Search Data by Attributes",
-                    "searchWithGeometryHeading": "Search Data by Geometry",
                     "selectArchivLabel": "Archive",
                     "selectYearsLabel": "Years",
                     "jahrgang": "Year",
@@ -43,6 +41,7 @@
                         "extent": "Map Extent"
                     },
                     "spatialSelectionLabel": "Search in:",
+                    "searchModeSwitchLabel": "Expert search mode",
                     "extentWarningMessage": "The map scale is smaller than 1:{ scale }. Please zoom in to enable searching within the map extent."
                 },
                 "tabResult": {
