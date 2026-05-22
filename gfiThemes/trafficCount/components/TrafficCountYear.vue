@@ -149,7 +149,9 @@ export default {
             },
             yearInterval: "1-Woche",
             diagramYear: "diagramYear",
-            tableYear: "tableYear"
+            tableYear: "tableYear",
+            showMultiData: false,
+            meansOfTransportKey: [this.meansOfTransport]
         };
     },
     computed: {
@@ -296,6 +298,14 @@ export default {
             }
 
             return question.isSameOrBefore(startMoment) || question.isSameOrAfter(endDate);
+        },
+        /**
+         * Set the means of transport key for diagram and table
+         * @param {String[]} keys means of transport key.
+         * @returns {void}
+         */
+        setMeansOfTransportKey (keys) {
+            this.meansOfTransportKey = keys;
         }
     }
 };
@@ -320,7 +330,10 @@ export default {
             />
         </div>
         <TrafficCountCheckbox
+            :current-means-of-transport="meansOfTransport"
+            :last-means-of-transport-key="meansOfTransportKey"
             :table-diagram-id="diagramYear"
+            @setMeansOfTransportKey="setMeansOfTransportKey"
         />
         <div id="diagramYear">
             <TrafficCountCompDiagram
@@ -335,6 +348,7 @@ export default {
                 :render-point-size="renderPointSize"
                 :active-tab="activeTab"
                 :current-means-of-transport="meansOfTransport"
+                :means-of-transport-key="meansOfTransportKey"
             />
         </div>
         <TrafficCountCheckbox
@@ -349,6 +363,7 @@ export default {
                 :set-col-title="setColTitle"
                 :set-row-title="setRowTitle"
                 :set-field-value="setFieldValue"
+                :means-of-transport-key="meansOfTransportKey"
             />
         </div>
     </div>

@@ -149,7 +149,9 @@ export default {
             },
             weekInterval: "1-Tag",
             diagramWeek: "diagramWeek",
-            tableWeek: "tableWeek"
+            tableWeek: "tableWeek",
+            showMultiData: false,
+            meansOfTransportKey: [this.meansOfTransport]
         };
     },
     computed: {
@@ -317,6 +319,14 @@ export default {
             const months = this.$t("additional:modules.tools.gfi.themes.trafficCount.datepicker.monthsShort", {returnObjects: true});
 
             return `${months[momentDate.get("month")]} ${momentDate.format("YYYY")}`;
+        },
+        /**
+         * Set the means of transport key for diagram and table
+         * @param {String[]} keys means of transport key.
+         * @returns {void}
+         */
+        setMeansOfTransportKey (keys) {
+            this.meansOfTransportKey = keys;
         }
     }
 };
@@ -356,7 +366,10 @@ export default {
             </TrafficCountDatePicker>
         </div>
         <TrafficCountCheckbox
+            :current-means-of-transport="meansOfTransport"
+            :last-means-of-transport-key="meansOfTransportKey"
             :table-diagram-id="diagramWeek"
+            @setMeansOfTransportKey="setMeansOfTransportKey"
         />
         <div id="diagramWeek">
             <TrafficCountCompDiagram
@@ -371,6 +384,7 @@ export default {
                 :render-point-size="renderPointSize"
                 :active-tab="activeTab"
                 :current-means-of-transport="meansOfTransport"
+                :means-of-transport-key="meansOfTransportKey"
             />
         </div>
         <TrafficCountCheckbox
@@ -385,6 +399,7 @@ export default {
                 :set-col-title="setColTitle"
                 :set-row-title="setRowTitle"
                 :set-field-value="setFieldValue"
+                :means-of-transport-key="meansOfTransportKey"
             />
         </div>
     </div>

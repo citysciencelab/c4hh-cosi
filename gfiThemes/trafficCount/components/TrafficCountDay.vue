@@ -143,7 +143,8 @@ export default {
             },
             dayInterval: "15-Min",
             diagramDay: "diagramDay",
-            tableDay: "tableDay"
+            tableDay: "tableDay",
+            meansOfTransportKey: [this.meansOfTransport]
         };
     },
     computed: {
@@ -279,6 +280,15 @@ export default {
             startDate.subtract(1, "day");
 
             return question.isSameOrBefore(startDate) || question.isSameOrAfter(endDate);
+        },
+
+        /**
+         * Set the means of transport key for diagram and table
+         * @param {String[]} keys means of transport key.
+         * @returns {void}
+         */
+        setMeansOfTransportKey (keys) {
+            this.meansOfTransportKey = keys;
         }
     }
 };
@@ -304,7 +314,10 @@ export default {
             />
         </div>
         <TrafficCountCheckbox
+            :current-means-of-transport="meansOfTransport"
+            :last-means-of-transport-key="meansOfTransportKey"
             :table-diagram-id="diagramDay"
+            @set-means-of-transport-key="setMeansOfTransportKey"
         />
         <div id="diagramDay">
             <TrafficCountCompDiagram
@@ -320,6 +333,7 @@ export default {
                 :render-point-size="renderPointSize"
                 :active-tab="activeTab"
                 :current-means-of-transport="meansOfTransport"
+                :means-of-transport-key="meansOfTransportKey"
             />
         </div>
         <TrafficCountCheckbox
@@ -334,6 +348,7 @@ export default {
                 :set-col-title="setColTitle"
                 :set-row-title="setRowTitle"
                 :set-field-value="setFieldValue"
+                :means-of-transport-key="meansOfTransportKey"
             />
         </div>
     </div>

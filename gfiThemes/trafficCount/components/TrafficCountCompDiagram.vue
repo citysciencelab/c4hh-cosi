@@ -109,6 +109,13 @@ export default {
         renderPointSize: {
             type: Function,
             required: true
+        },
+        /**
+         * The keys of meansOfTransport
+         */
+        meansOfTransportKey: {
+            type: Array,
+            required: true
         }
     },
     data () {
@@ -152,6 +159,18 @@ export default {
                 else {
                     this.destroyChart();
                 }
+            },
+            deep: true
+        },
+        /**
+         * Generates the new chart when means of transport key changes.
+         * @returns {Void}  -
+         */
+        meansOfTransportKey: {
+            handler () {
+                this.destroyChart();
+                this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+                this.createChart(this.chartData, this.ctx);
             },
             deep: true
         },
@@ -214,21 +233,20 @@ export default {
                 return [];
             }
 
-            const meansOfTransportKey = Object.keys(apiData[0]),
-                labelsXAxis = [],
+            const labelsXAxis = [],
                 datasets = [],
-                keysOfFirstDataset = Object.keys(apiData[0][meansOfTransportKey[0]]);
+                keysOfFirstDataset = Object.keys(apiData[0][this.meansOfTransportKey[0]]);
 
             keysOfFirstDataset.forEach(datetime => {
                 labelsXAxis.push(datetime);
             });
 
             apiData.forEach((dataObj, idx) => {
-                if (!Object.prototype.hasOwnProperty.call(dataObj, meansOfTransportKey[0])) {
+                if (!Object.prototype.hasOwnProperty.call(dataObj, this.meansOfTransportKey[0])) {
                     return;
                 }
 
-                meansOfTransportKey.forEach((meansOfTransport) => {
+                this.meansOfTransportKey.forEach((meansOfTransport) => {
                     let postfix = "";
 
                     if (meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz") {

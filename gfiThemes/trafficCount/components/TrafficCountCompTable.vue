@@ -62,11 +62,48 @@ export default {
         currentTabId: {
             type: String,
             required: true
+        },
+        /**
+         * The keys of meansOfTransport
+         */
+        meansOfTransportKey: {
+            type: Array,
+            required: true
         }
+    },
+    data () {
+        return {
+            tableData: []
+        };
     },
     computed: {
         tableIndication: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.tableIndication");
+        }
+    },
+    watch: {
+        /**
+         * Generates the table data when api data changes.
+         * @param {Object[]} val the api data.
+         * @returns {Void}  -
+         */
+        apiData: {
+            handler (val) {
+                this.tableData = this.getFlatApiData(val);
+            },
+            deep: true,
+            immediate: true
+        },
+        /**
+         * Generates the new chart when means of transport key changes.
+         * @returns {Void}  -
+         */
+        meansOfTransportKey: {
+            handler () {
+                this.tableData = this.getFlatApiData(this.apiData);
+            },
+            deep: true,
+            immediate: true
         }
     },
     methods: {
@@ -117,15 +154,14 @@ export default {
             }
 
             const result = [];
-            let key = null;
 
             apiDataRef.forEach(dataObj => {
-                for (key in dataObj) {
+                this.meansOfTransportKey.forEach(key => {
                     result.push({
                         key,
                         dataset: dataObj[key]
                     });
-                }
+                });
             });
 
             return result;
@@ -177,13 +213,13 @@ export default {
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody v-if="tableData.length">
                 <tr
-                    v-for="(dataObjFlat, idx) in getFlatApiData(apiData)"
+                    v-for="(dataObjFlat, idx) in tableData"
                     :key="idx"
                 >
                     <td>
-                        {{ setRowTitle(dataObjFlat.key, getFirstKeyOfObject(dataObjFlat.dataset)) }} {{ setStarAtDay(Object.keys(dataObjFlat.dataset)) }}
+                        {{ setRowTitle(dataObjFlat?.key, getFirstKeyOfObject(dataObjFlat?.dataset)) }} {{ setStarAtDay(Object.keys(dataObjFlat?.dataset ? dataObjFlat?.dataset : {})) }}
                     </td>
                     <td
                         v-for="(value, datetime) of dataObjFlat.dataset"
