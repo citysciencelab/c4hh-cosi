@@ -76,11 +76,11 @@ describe("addons/vpiDashboard/components/Tabs/TabOrigins.vue", () => {
         expect(wrapper.find(".line").exists()).to.be.false;
 
         wrapper.vm.setChartType("line");
-        wrapper.vm.$nextTick(() => {
-            expect(wrapper.vm.chartType).to.equal("line");
-            expect(wrapper.find(".bar").exists()).to.be.false;
-            expect(wrapper.find(".line").exists()).to.be.true;
-        });
+        wrapper.vm.$nextTick();
+        expect(wrapper.vm.chartType).to.equal("line");
+
+        expect(wrapper.find(".bar").exists()).to.be.false;
+        expect(wrapper.find(".line").exists()).to.be.true;
     });
 
     it("fetches and updates chart data for monthlyoverview", () => {
