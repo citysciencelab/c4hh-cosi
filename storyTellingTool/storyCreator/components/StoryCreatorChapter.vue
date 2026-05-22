@@ -7,6 +7,7 @@ import Multiselect from "vue-multiselect";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
+import TipTapEditor from "../shared/modules/tipTapEditor/components/TipTapEditor.vue";
 
 export default {
     name: "StoryCreatorChapter",
@@ -14,7 +15,8 @@ export default {
         AccordionItem,
         AddElementDropdown,
         FlatButton,
-        Multiselect
+        Multiselect,
+        TipTapEditor
     },
     data () {
         return {
@@ -206,6 +208,7 @@ export default {
                 :interaction="() => setCurrentView('story')"
             />
         </div>
+        <TipTapEditor />
     </div>
 </template>
 
