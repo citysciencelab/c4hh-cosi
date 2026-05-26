@@ -64,13 +64,13 @@
 - Issue \#1592: FileImport/Draw: Fixed label text offset not being restored when importing a drawn GeoJSON file.
 - Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset.
 - Issue \#1606: proxyAgent: Restored proxy agent support in the Vite development server, so external web resources can be accessed again from localhost through a corporate proxy.
+- Issue \#1612: GetFeatureInfo: Fixed an issue where the map marker remained visible after closing GetFeatureInfo after entering a query in the main menu search.
 - WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 - Fix package-lock.json for node version 24.15.0.
 - Print: Fixed print mask disappearing after toggling a layer via LayerPills or switching the base layer via BaseLayerSwitcher.
 - WMS-Time: Activating time comparison placed the second WMS-Time layer at the top of the layerTree, causing it to cover other layers. The fix places the comparison layer directly above the original layer.
 - SelectFeatures: Fixed console error and missing results in the list for OAF layers.
 - i18next: Fix language-code-detection (e.g. "de-DE" -> "de").
-- GetFeatureInfo: Fixed an issue where the map marker remained visible after closing GetFeatureInfo after entering a query in the main menu search.
 
 ---
 
