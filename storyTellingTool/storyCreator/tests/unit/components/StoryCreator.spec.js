@@ -60,5 +60,10 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
 
             expect(descriptionInput.at(1).attributes("id")).to.equal("storyDescription");
         });
+        it("should render the Draggable component.", () => {
+            const draggableCard = wrapper.findComponent({name: "Draggable"});
+
+            expect(draggableCard.exists()).to.be.true;
+        });
     });
 });

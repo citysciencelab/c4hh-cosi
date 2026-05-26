@@ -1,5 +1,6 @@
 <script>
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
+import draggable from "vuedraggable";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
@@ -11,6 +12,7 @@ export default {
     name: "StoryCreator",
     components: {
         AddCardButton,
+        Draggable: draggable,
         FileUpload,
         FlatButton,
         InputText,
@@ -139,20 +141,25 @@ export default {
             <h5 class="py-3">
                 {{ $t('additional:modules.storyCreator.headlines.chapterList') }}
             </h5>
-            <div
-                v-for="(chapter, index) in chapterContent"
-                :key="index"
+            <Draggable
+                v-model="chapterContent"
+                class="dragArea no-list ps-0 ms-2"
+                item-key="name"
+                handle=".card"
+                :list="chapterContent"
             >
-                <StoryCreatorChapterCard
-                    :chapter-title="chapter.title"
-                    :chapter-text="chapter.text"
-                    :chapter-image="chapter.image"
-                    :photo-credit="chapter.photoCredit"
-                    :alt-text="chapter.altText"
-                    :chapter-items="chapter.chapterItems"
-                    @delete="() => ''"
-                />
-            </div>
+                <template #item="{ element }">
+                    <StoryCreatorChapterCard
+                        :chapter-title="element.title"
+                        :chapter-text="element.text"
+                        :chapter-image="element.image"
+                        :photo-credit="element.photoCredit"
+                        :alt-text="element.altText"
+                        :chapter-items="element.chapterItems"
+                        @delete="() => ''"
+                    />
+                </template>
+            </Draggable>
             <AddCardButton
                 :text="$t('additional:modules.storyCreator.addChapter')"
                 @click="addChapter"
