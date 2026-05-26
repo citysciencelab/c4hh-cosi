@@ -39,7 +39,8 @@
         "save": "Kapitel speichern",
         "cancel": "abbrechen",
         "successAlert": "Die Kartenposition wurde erfolgreich übernommen!",
-        "positionChangedHint": "Die Position entspricht nicht der aktuellen Ansicht der Karte."
+        "positionChangedHint": "Die Position entspricht nicht der aktuellen Ansicht der Karte.",
+        "addContent": "Inhalte hinzufügen"
       },
       "addElementDropdown": {
         "categories": {

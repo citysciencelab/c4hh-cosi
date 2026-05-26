@@ -192,8 +192,9 @@ export default {
             {{ $t("additional:modules.storyCreator.chapter.editChapter") }}
         </h5>
         <AccordionItem
-            id="edit-chapter"
+            id="edit-chapter-map"
             icon="bi-map"
+            :is-open="true"
             :title="$t('additional:modules.storyCreator.chapter.mapTool')"
         >
             <div class="map-position">
@@ -303,16 +304,23 @@ export default {
                 </Multiselect>
             </div>
         </AccordionItem>
-        <AddElementDropdown
-            v-if="addComponentToShow === ''"
-            :allowed-actions="['text', 'image']"
-            @action-triggered="handleAction"
-        />
-        <StoryCreatorAddTextCard
-            v-else-if="addComponentToShow === 'text'"
-            class="mt-2"
-            @click:close="addComponentToShow = ''"
-        />
+        <AccordionItem
+            id="edit-chapter-content"
+            icon="bi-list-ul"
+            :is-open="true"
+            :title="$t('additional:modules.storyCreator.chapter.addContent')"
+        >
+            <AddElementDropdown
+                v-if="addComponentToShow === ''"
+                :allowed-actions="['text', 'image']"
+                @action-triggered="handleAction"
+            />
+            <StoryCreatorAddTextCard
+                v-else-if="addComponentToShow === 'text'"
+                class="mt-2"
+                @click:close="addComponentToShow = ''"
+            />
+        </AccordionItem>
         <div class="d-flex flex-column align-items-center pt-3">
             <FlatButton
                 id="save"

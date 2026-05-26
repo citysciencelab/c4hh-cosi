@@ -68,6 +68,11 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             expect(wrapper.exists()).to.be.true;
         });
 
+        it("should find shared component Accordion", () => {
+            expect(wrapper.findComponent({name: "AccordionItem"}).exists()).to.be.true;
+            expect(wrapper.findAllComponents({name: "AccordionItem"})).to.be.lengthOf(2);
+        });
+
         it("should find shared component FlatButton", () => {
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
             expect(wrapper.findAllComponents({name: "FlatButton"})).to.be.lengthOf(3);
