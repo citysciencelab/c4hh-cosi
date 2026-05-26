@@ -120,11 +120,9 @@ export default {
         }
     },
     beforeUnmount: function () {
-        if (this.searchInput === "") {
-            this.removePointMarker();
-            this.removeHighlighting();
-            this.removePolygonMarker();
-        }
+        this.removePointMarker();
+        this.removeHighlighting();
+        this.removePolygonMarker();
     },
     methods: {
         ...mapMutations("Modules/GetFeatureInfo", ["setShowMarker"]),
