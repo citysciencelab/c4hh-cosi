@@ -25,7 +25,7 @@ export function initiateVueI18Next (app) {
 * @param {Object} config.languages the languages to be used as {krz: full} where krz is "en" and full is "english"
 * @param {String} config.fallbackLanguage the language to use on startup
 * @param {Array} config.changeLanguageOnStartWhen the incidents that changes the language on startup as Array where the order is important
-* @returns {void}
+* @returns {Promise<{basePath: string, portalId: string, portalLanguage: Object}>} A promise that is resolved when i18next language configuration has been completed (returned values are only used by the unit-tests)
 */
 export function initLanguage (portalLanguageConfig, portalLocales) {
     const portalId = window.location.pathname.split("/")[2] || window.location.hostname.split(".")[0],
@@ -152,6 +152,8 @@ export function initLanguage (portalLanguageConfig, portalLocales) {
                     true
                 )));
             }
+
+            return {basePath, portalId, portalLanguage};
         });
 }
 
