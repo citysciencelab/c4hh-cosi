@@ -6,13 +6,15 @@
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
  * @property {String} currentView - The current view tab.
+ * @property {Object} story - The story data.
  */
 const state = {
     id: "storyCreator",
     type: "storyCreator",
     name: "additional:modules.storyCreator.title",
     icon: "bi-file-plus",
-    currentView: "story"
+    currentView: "story",
+    story: {}
 };
 
 export default state;

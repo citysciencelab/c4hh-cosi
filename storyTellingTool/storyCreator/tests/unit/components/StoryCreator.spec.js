@@ -18,7 +18,8 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                         StoryCreator: {
                             namespaced: true,
                             getters: {
-                                currentView: (state) => state.currentView
+                                currentView: (state) => state.currentView,
+                                story: (state) => state.story
                             },
                             mutations: {
                                 setCurrentView (state, value) {
@@ -26,7 +27,8 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                                 }
                             },
                             state: {
-                                currentView: "story"
+                                currentView: "story",
+                                story: {}
                             }
                         }
                     }
@@ -64,6 +66,20 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
             const draggableCard = wrapper.findComponent({name: "Draggable"});
 
             expect(draggableCard.exists()).to.be.true;
+        });
+    });
+
+    describe("Component methods", () => {
+        describe("updateStory", () => {
+            it("should update the story content when updateStory is called", async () => {
+                await wrapper.setData({
+                    title: "Test Story",
+                    description: "This is a test story."
+                });
+                wrapper.vm.updateStory();
+                expect(wrapper.vm.story.title).to.equal("Test Story");
+                expect(wrapper.vm.story.description).to.equal("This is a test story.");
+            });
         });
     });
 });

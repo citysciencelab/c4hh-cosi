@@ -21,11 +21,11 @@ export default {
     },
     data () {
         return {
-            storyName: "Geschichten mit Karten erzählen",
-            storyDescription: "Lorem ipsum dolor sit amet...",
-            altText: "Blick über die Hamburger Elbphilharmonie",
-            imageSource: "Max Mustermann / Getty Images",
-            selectedFile: null,
+            title: "Geschichten mit Karten erzählen",
+            description: "Lorem ipsum dolor sit amet...",
+            imageAlt: "Blick über die Hamburger Elbphilharmonie",
+            imageCopyright: "Max Mustermann / Getty Images",
+            imageSrc: "./img.png",
             chapterContent: [
                 {title: "Dies ist ein Titel",
                     text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum",
@@ -46,8 +46,12 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/StoryCreator", [
-            "currentView"
+            "currentView",
+            "story"
         ])
+    },
+    mounted () {
+        this.updateStory();
     },
     methods: {
         ...mapMutations("Modules/StoryCreator", [
@@ -60,12 +64,44 @@ export default {
         addChapter () {
             this.setCurrentView("chapter");
         },
+
+        /**
+         * Downloads the story as a JSON file.
+         * @returns {void}
+         */
+        downloadStory () {
+            this.updateStory();
+            const filename = this.title + ".json",
+                jsonStr = JSON.stringify(this.story),
+                element = document.createElement("a");
+
+            element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(jsonStr));
+            element.setAttribute("download", filename);
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        },
+
         /**
          * Goes to home page of story creator.
          * @returns {void}
          */
         goToStory () {
             this.setCurrentView("story");
+        },
+
+        /**
+         * Updates the story in the store with the current data.
+         * @returns {void}
+         */
+        updateStory () {
+            this.story.title = this.title;
+            this.story.description = this.description;
+            this.story.imageSrc = this.imageSrc;
+            this.story.imageAlt = this.imageAlt;
+            this.story.imageCopyright = this.imageCopyright;
+            this.story.chapters = this.chapterContent;
         }
     }
 };
@@ -101,15 +137,15 @@ export default {
                 {{ $t("additional:modules.storyCreator.introText") }}
             </p>
             <InputText
-                id="storyName"
-                v-model="storyName"
-                :label="$t('additional:modules.storyCreator.labels.storyName')"
-                :placeholder="$t('additional:modules.storyCreator.labels.storyName')"
+                id="storyTitle"
+                v-model="title"
+                :label="$t('additional:modules.storyCreator.labels.storyTitle')"
+                :placeholder="$t('additional:modules.storyCreator.labels.storyTitle')"
                 class="mb-3"
             />
             <InputText
                 id="storyDescription"
-                v-model="storyDescription"
+                v-model="description"
                 :label="$t('additional:modules.storyCreator.labels.storyDescription')"
                 :placeholder="$t('additional:modules.storyCreator.labels.storyDescription')"
                 html-type="textarea"
@@ -125,14 +161,14 @@ export default {
             />
             <InputText
                 id="altText"
-                v-model="altText"
+                v-model="imageAlt"
                 :label="$t('additional:modules.storyCreator.labels.altText')"
                 :placeholder="$t('additional:modules.storyCreator.labels.altText')"
                 class="mb-3"
             />
             <InputText
-                id="imageSource"
-                v-model="imageSource"
+                id="imageCopyright"
+                v-model="imageCopyright"
                 :label="$t('additional:modules.storyCreator.labels.photoCredit')"
                 :placeholder="$t('additional:modules.storyCreator.labels.photoCredit')"
                 class="mb-3"
@@ -175,6 +211,7 @@ export default {
                     :icon="'bi-cloud-arrow-down'"
                     :aria-label="$t('additional:modules.storyCreator.downloadStory')"
                     :text="$t('additional:modules.storyCreator.downloadStory')"
+                    :interaction="() => downloadStory()"
                 />
                 <FlatButton
                     :icon="'bi-x-circle'"

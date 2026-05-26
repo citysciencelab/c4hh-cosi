@@ -11,7 +11,7 @@
       "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
       "noSettings": "Keine Fachdaten oder Ansichten festgelegt",
       "labels": {
-        "storyName": "Story-Namen eingeben",
+        "storyTitle": "Story-Namen eingeben",
         "storyDescription": "Beschreibung der Story",
         "fileDrop": "Datei hier ablegen",
         "fileSelect": "oder Datei auswählen",

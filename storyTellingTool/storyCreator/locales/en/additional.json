@@ -11,7 +11,7 @@
       "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
       "noSettings": "No technical data or map positions have been defined",
       "labels": {
-        "storyName": "Enter story name",
+        "storyTitle": "Enter story name",
         "storyDescription": "Story description",
         "fileDrop": "Drop file here",
         "fileSelect": "or select file",
