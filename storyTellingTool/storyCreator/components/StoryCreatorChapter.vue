@@ -7,7 +7,7 @@ import Multiselect from "vue-multiselect";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
-import TipTapEditor from "../shared/modules/tipTapEditor/components/TipTapEditor.vue";
+import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import {Toast} from "bootstrap";
 
 export default {
@@ -17,10 +17,11 @@ export default {
         AddElementDropdown,
         FlatButton,
         Multiselect,
-        TipTapEditor
+        StoryCreatorAddTextCard
     },
     data () {
         return {
+            addComponentToShow: "",
             coordinate: "",
             zoomlevel: "",
             confirmedCoordinate: "",
@@ -103,6 +104,7 @@ export default {
         ]),
         handleAction (type) {
             console.warn("Aktion im StoryCreator ausgelöst. Ausgewähltes Element:", type);
+            this.addComponentToShow = type;
         },
         /**
          * Returns a list of layer names.
@@ -302,8 +304,14 @@ export default {
             </div>
         </AccordionItem>
         <AddElementDropdown
+            v-if="addComponentToShow === ''"
             :allowed-actions="['text', 'image']"
             @action-triggered="handleAction"
+        />
+        <StoryCreatorAddTextCard
+            v-else-if="addComponentToShow === 'text'"
+            class="mt-2"
+            @click:close="addComponentToShow = ''"
         />
         <div class="d-flex flex-column align-items-center pt-3">
             <FlatButton
@@ -321,7 +329,6 @@ export default {
                 :interaction="() => setCurrentView('story')"
             />
         </div>
-        <TipTapEditor />
     </div>
 </template>
 

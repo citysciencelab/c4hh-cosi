@@ -10,16 +10,39 @@ export default {
         TipTapEditorControls
     },
 
+    props: {
+        modelValue: {
+            type: [String, Object],
+            default: () => ""
+        }
+    },
+
+    emits: ["update:modelValue"],
+
     data () {
         return {
             editor: null
         };
     },
 
+    watch: {
+        modelValue (value) {
+            const isSame = JSON.stringify(this.editor.getJSON()) === JSON.stringify(value);
+
+            if (isSame) {
+                return;
+            }
+            this.editor.commands.setContent(value);
+        }
+    },
+
     mounted () {
         this.editor = new Editor({
-            content: "<p>I'm running Tiptap with Vue.js. 🎉</p>",
-            extensions: [StarterKit]
+            content: this.modelValue,
+            extensions: [StarterKit],
+            onUpdate: ({editor}) => {
+                this.$emit("update:modelValue", editor.getJSON());
+            }
         });
     },
 

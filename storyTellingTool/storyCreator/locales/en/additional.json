@@ -20,10 +20,12 @@
         "deleteChapter": "Delete chapter "
       },
       "buttons": {
-          "add": "Hinzufügen"
+          "add": "Add",
+          "abort": "Abort"
       },
       "headlines": {
         "addImages": "Add new image",
+        "addTexts": "Add new text",
         "chapterList": "List of Chapters"
       },
       "chapter": {
