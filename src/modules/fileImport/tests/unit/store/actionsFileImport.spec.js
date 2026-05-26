@@ -6,6 +6,7 @@ import importedState from "@modules/fileImport/store/stateFileImport.js";
 import rawSources from "@modules/fileImport/tests/resources/rawSources.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import {reset as resetUniqueId} from "@shared/js/utils/uniqueId.js";
+import testAction from "@devtools/tests/VueTestUtils.js";
 import sinon from "sinon";
 import {expect} from "chai";
 import fs from "fs";
