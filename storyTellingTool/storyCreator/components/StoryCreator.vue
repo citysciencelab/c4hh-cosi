@@ -66,6 +66,19 @@ export default {
         },
 
         /**
+         * Discards the current story and resets all data to default values.
+         * @return {void}
+         */
+        discardStory () {
+            this.title = "";
+            this.description = "";
+            this.imageAlt = "";
+            this.imageCopyright = "";
+            this.imageSrc = "";
+            this.chapterContent = [];
+        },
+
+        /**
          * Downloads the story as a JSON file.
          * @returns {void}
          */
@@ -218,6 +231,7 @@ export default {
                     :secondary="true"
                     :aria-label="$t('additional:modules.storyCreator.discardStory')"
                     :text="$t('additional:modules.storyCreator.discardStory')"
+                    :interaction="() => discardStory()"
                 />
             </div>
         </div>

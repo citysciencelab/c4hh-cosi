@@ -77,8 +77,30 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                     description: "This is a test story."
                 });
                 wrapper.vm.updateStory();
+
                 expect(wrapper.vm.story.title).to.equal("Test Story");
                 expect(wrapper.vm.story.description).to.equal("This is a test story.");
+            });
+        });
+
+        describe("discardStory", () => {
+            it("should reset all story data to default values when discardStory is called", async () => {
+                await wrapper.setData({
+                    title: "Test Story",
+                    description: "This is a test story.",
+                    imageAlt: "Test Alt",
+                    imageCopyright: "Test Copyright",
+                    imageSrc: "Test Src",
+                    chapterContent: [{title: "Test Chapter", text: "Test Text"}]
+                });
+                wrapper.vm.discardStory();
+
+                expect(wrapper.vm.title).to.equal("");
+                expect(wrapper.vm.description).to.equal("");
+                expect(wrapper.vm.imageAlt).to.equal("");
+                expect(wrapper.vm.imageCopyright).to.equal("");
+                expect(wrapper.vm.imageSrc).to.equal("");
+                expect(wrapper.vm.chapterContent).to.deep.equal([]);
             });
         });
     });
