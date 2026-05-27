@@ -516,7 +516,7 @@ describe("addons/trafficCount/utils/trafficCountApi.js", () => {
                 },
                 api = new TrafficCountApi("https://www.example.com", "v1234", {}, dummySensorThingsHttp, dummySensorThingsMqtt, "noSingletonOpt"),
                 expectedTopic = "v1234/Datastreams(foo)/Observations",
-                expectedMqttOptions = {rh: 2};
+                expectedMqttOptions = {rh: 0};
 
             // hint: day === dayTodayOpt with "day" === "day"
             api.updateDay("thingId", "meansOfTransport", "2020-03-20", "onupdate", "onerror", "onstart", "oncomplete", "2020-03-20");
@@ -1411,7 +1411,7 @@ describe("addons/trafficCount/utils/trafficCountApi.js", () => {
             api.updateDataset("thingId", "meansOfTransport", timeSettings, "onupdate", "onerror", "onstart", "oncomplete", "2020-03-20");
 
             expect(lastTopic).to.equal("v1234/Datastreams(foo)/Observations");
-            expect(lastMqttOptions).to.deep.equal({rh: 2});
+            expect(lastMqttOptions).to.deep.equal({rh: 0});
         });
         it("should resend the result with new data to onupdate anytime a subscribed message was received", () => {
             let lastDataset = false;

@@ -286,7 +286,7 @@ export class TrafficCountApi {
                 topic = this.sensorThingsVersion + "/Datastreams(" + datastreamId + ")/Observations";
 
             // set retain handling rh to 2 to avoid getting the last message from the server, as this message is already included in the server call above (see doc\sensorThings_EN.md)
-            this.mqttSubscribe(topic, {rh: 2}, (payload, packet) => {
+            this.mqttSubscribe(topic, {rh: 0}, (payload, packet) => {
                 if (packet && packet?.retain && packet.retain === true) {
                     // this message is a retained message, so its content is already in sum
                     return;
@@ -361,7 +361,7 @@ export class TrafficCountApi {
                     topic = this.sensorThingsVersion + "/Datastreams(" + datastreamId + ")/Observations";
 
                 // set retain to 2 to avoid getting the last message from the server, as this message is already included in the server call above (see doc\sensorThings_EN.md)
-                this.mqttSubscribe(topic, {rh: 2}, (payload, packet) => {
+                this.mqttSubscribe(topic, {rh: 0}, (payload, packet) => {
                     if (packet && packet?.retain && packet.retain === true) {
                         // this message is a retained message, so its content is already in sum
                         return;
@@ -420,7 +420,7 @@ export class TrafficCountApi {
                     topic = this.sensorThingsVersion + "/Datastreams(" + datastreamId + ")/Observations";
 
                 // set retain to 2 to avoid getting the last message from the server, as this message is already included in the server call above (see doc\sensorThings_EN.md)
-                this.mqttSubscribe(topic, {rh: 2}, (payload, packet) => {
+                this.mqttSubscribe(topic, {rh: 0}, (payload, packet) => {
                     if (packet && packet?.retain && packet.retain === true) {
                         // this message is a retained message, so its content is already in sum
                         return;
@@ -674,7 +674,7 @@ export class TrafficCountApi {
                         topic = this.sensorThingsVersion + "/Datastreams(" + datastreamId + ")/Observations";
 
                     // set retain to 2 to avoid getting the last message from the server, as this message is already included in the server call above (see doc\sensorThings_EN.md)
-                    this.mqttSubscribe(topic, {rh: 2}, (payload, packet) => {
+                    this.mqttSubscribe(topic, {rh: 0}, (payload, packet) => {
                         if (packet && packet?.retain && packet.retain === true) {
                             // this message is a retained message, so its content is already in sum
                             return;
@@ -713,27 +713,45 @@ export class TrafficCountApi {
     subscribeLastUpdate (thingId, meansOfTransport, onupdate, onerror, onstart, oncomplete) {
         const url = this.baseUrlHttp + "/Things(" + thingId + ")?$expand=Datastreams($filter=properties/layerName eq '" + meansOfTransport + this.layerNameInfix + "_15-Min')";
 
-        // get the datastreamId via http to subscribe to with mqtt
+        // 1. Get the datastreamId via http to subscribe to with mqtt
         return this.http.get(url, (dataset) => {
             if (
                 Array.isArray(dataset) && dataset.length > 0 && dataset[0]?.Datastreams
                 && Array.isArray(dataset[0].Datastreams) && dataset[0].Datastreams.length > 0 && Object.prototype.hasOwnProperty.call(dataset[0].Datastreams[0], "@iot.id")
             ) {
-                // subscribe via mqtt
                 const datastreamId = dataset[0].Datastreams[0]["@iot.id"],
-                    topic = this.sensorThingsVersion + "/Datastreams(" + datastreamId + ")/Observations";
+                    topic = this.sensorThingsVersion + "/Datastreams(" + datastreamId + ")/Observations",
+                    // 2. HTTP fallback: fetch the latest observation initially
+                    fallbackUrl = this.baseUrlHttp + "/Datastreams(" + datastreamId + ")/Observations?$orderby=phenomenonTime desc&$top=1";
 
-                // set retain to 0 to get the last message from the server immediately (see doc\sensorThings_EN.md)
+                this.http.get(fallbackUrl, (obsDataset) => {
+                    if (Array.isArray(obsDataset) && obsDataset.length > 0) {
+                        const obs = obsDataset[0],
+                            timeToUse = obs?.resultTime || obs?.phenomenonTime;
+
+                        if (timeToUse && typeof onupdate === "function") {
+                            const parsedTime = this.parsePhenomenonTime(timeToUse),
+                                datetime = dayjs(parsedTime).format("YYYY-MM-DD HH:mm:ss");
+
+                            onupdate(datetime);
+                        }
+                    }
+                }, false, false, onerror);
+
+                // 3. MQTT subscription for future live updates
                 this.mqttSubscribe(topic, {rh: 0}, (payload) => {
-                    if (payload && payload?.resultTime) {
+                    const timeToUse = payload?.resultTime || payload?.phenomenonTime;
+
+                    if (payload && timeToUse) {
                         if (typeof onupdate === "function") {
-                            const datetime = dayjs(payload.resultTime).format("YYYY-MM-DD HH:mm:ss");
+                            const parsedTime = this.parsePhenomenonTime(timeToUse),
+                                datetime = dayjs(parsedTime).format("YYYY-MM-DD HH:mm:ss");
 
                             onupdate(datetime);
                         }
                     }
                     else {
-                        (onerror || this.defaultErrorHandler)("TrafficCountAPI.subscribeLastUpdate: the payload does not include a resultTime", payload);
+                        (onerror || this.defaultErrorHandler)("TrafficCountAPI.subscribeLastUpdate: the payload does not include a resultTime or phenomenonTime", payload);
                     }
                 });
             }

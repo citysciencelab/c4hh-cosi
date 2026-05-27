@@ -26,6 +26,7 @@
                         "tableTitleYear": "Year",
                         "notice": "Due to unavailable data, gaps in the chart and empty table cells may occur.",
                         "lastupdateLabel": "Last update:",
+                        "autoUpdateNote": "Data is not automatically updated.",
                         "diagramLabel": "Diagram",
                         "calendarweek": "CW",
                         "infraredsensor": "Infrared sensor",

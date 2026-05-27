@@ -33,6 +33,10 @@ export default {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.notice");
         },
 
+        autoUpdateNote: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.autoUpdateNote");
+        },
+
         tableIndication: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign");
         },
@@ -133,7 +137,7 @@ export default {
 <template>
     <div>
         <div
-            v-if="currentTabId !== 'info' && currentTabId !== 'downloads' "
+            v-if="currentTabId !== 'info' && currentTabId !== 'downloads'"
             class="tableIndication"
             :style="customStyle"
         >
@@ -154,42 +158,51 @@ export default {
             {{ indication }}
         </div>
         <div
-            v-if="currentTabId !== 'info' && currentTabId !== 'downloads'"
-            class="reset-container"
-        >
-            <button
-                type="button"
-                class="btn btn-primary"
-                @click="reset"
-            >
-                {{ $t("additional:modules.tools.gfi.themes.trafficCount.reset") }}
-            </button>
-        </div>
-        <div
             v-if="currentTabId !== 'downloads'"
-            class="update"
+            class="footer-main-content"
         >
-            <table
-                :class="tableClass"
+            <div class="action-row">
+                <div
+                    v-if="currentTabId !== 'info'"
+                    class="reset-container"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        @click="reset"
+                    >
+                        {{ $t("additional:modules.tools.gfi.themes.trafficCount.reset") }}
+                    </button>
+                </div>
+                <div
+                    class="update-table-container"
+                    :class="{'w-100': currentTabId === 'info'}"
+                >
+                    <table :class="tableClass">
+                        <tbody>
+                            <tr>
+                                <td class="bold">
+                                    {{ lastupdateLabel }}
+                                </td>
+                                <td class="text-right">
+                                    {{ lastUpdate }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div
+                class="indication last-line mt-2"
+                :style="customStyle"
             >
-                <tbody>
-                    <tr colspan="2">
-                        <td class="bold">
-                            {{ lastupdateLabel }}
-                        </td>
-                        <td class="text-right">
-                            {{ lastUpdate }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                {{ autoUpdateNote }}
+            </div>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-    ;
-
     .tableIndication, .trucksStatusIndication, .indication {
         font-size: 10px;
     }
@@ -202,11 +215,28 @@ export default {
         float: left;
         padding-top: 10px;
     }
+
     .reset-container {
         float: left;
         padding-top: 10px;
         margin-left: 10px;
     }
+
+    .footer-main-content {
+        width: 100%;
+    }
+
+    .action-row {
+        width: 100%;
+    }
+
+    .last-line {
+        clear: both;
+        display: block;
+        width: 100%;
+        padding-top: 10px;
+    }
+
     table {
         margin-bottom: 0;
         .text-right {

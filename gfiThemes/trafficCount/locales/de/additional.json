@@ -26,6 +26,7 @@
                         "tableTitleYear": "Jahr",
                         "notice": "Aufgrund nicht verfügbarer Daten können Lücken im Diagramm und leere Tabellenzellen auftreten.",
                         "lastupdateLabel": "Letzte Aktualisierung:",
+                        "autoUpdateNote": "Daten werden nicht automatisch aktualisiert.",
                         "diagramLabel": "Diagramm",
                         "calendarweek": "KW",
                         "infraredsensor": "Infrarotsensor",
