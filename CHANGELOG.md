@@ -60,6 +60,8 @@
         - replace-in-file: 8.3.0 to 8.4.0
         - sinon": 19.0.2 to 22.0.0
         - sinon-chai: ^4.0.0 to ^4.0.1
+        - vite: ^7.3.0 to ^8.0.14
+        - vite-plugin-node-polyfills: ^0.24.0 to ^0.28.0
 - Accordion: Extended component to support heading elements (`h1`–`h6`).
 - Contact: Replaced custom accordion button with accordion-component for dropdown.
 - CoordToolkit: Replaced custom accordion button with accordion-component for information-dropdown.

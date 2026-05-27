@@ -243,14 +243,6 @@ export default defineConfig(({mode}) => {
                 }
             }
         },
-
-        esbuild: {
-            exclude: [
-                ".git",
-                "addons/.git"
-            ]
-        },
-
         server: {
             port: 9001,
             https: FORCE_HTTPS || (httpsConfig.cert && httpsConfig.key) ? httpsConfig || true : false,
@@ -294,6 +286,7 @@ export default defineConfig(({mode}) => {
             assetsDir: "js",
             sourcemap: false,
             cssCodeSplit: true,
+            cssMinify: "esbuild",
             chunkSizeWarningLimit: 5000,
             rollupOptions: {
                 input: Object.fromEntries(portalEntries),
