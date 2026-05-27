@@ -184,6 +184,29 @@ export default {
             "setLzsSelectedInteraction"
         ]),
         /**
+         * Update the active search form.
+         * @param {Boolean} attributeSearchMode - Is false if the geometry search form is to be activated.
+         */
+        changeSearchMode (attributeSearchMode) {
+            this.attributeSearchModeIsActive = attributeSearchMode;
+            if (attributeSearchMode) {
+                this.removeSearchGeometry();
+            }
+        },
+        /**
+         * Sets `searchGeometry` to null and removes the map interaction.
+         */
+        removeSearchGeometry () {
+            this.searchGeometry = null;
+
+            if (this.currentModifyInteraction) {
+                this.removeInteraction(this.currentModifyInteraction);
+                this.currentModifyInteraction = null;
+
+                this.lzsDrawLayerSource.clear();
+            }
+        },
+        /**
          * Set the selected archive identifier.
          * @param {string} archive - The archive name to select.
          */
@@ -295,14 +318,7 @@ export default {
             this.initializeSearchForm();
             this.validateSearchWithAttributeForm();
             this.resetGeometricSearchForm();
-            this.searchGeometry = null;
-
-            if (this.currentModifyInteraction) {
-                this.removeInteraction(this.currentModifyInteraction);
-                this.currentModifyInteraction = null;
-
-                this.lzsDrawLayerSource.clear();
-            }
+            this.removeSearchGeometry();
         },
         /**
          * Reset the geometric search selection (archive ids).
@@ -571,7 +587,7 @@ export default {
                     :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
                     :label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
                     :checked="attributeSearchModeIsActive"
-                    :interaction="(evt) => attributeSearchModeIsActive = evt.target.checked"
+                    :interaction="(evt) => changeSearchMode(evt.target.checked)"
                 />
             </div>
 
