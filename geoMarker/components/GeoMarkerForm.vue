@@ -84,6 +84,8 @@ export default {
             "newGeoMarkerFeature",
             "geoMarkerFeatureList",
             "geoMarkerUpdateFeature",
+            "geoMarkerNonEditFeatureId",
+            "geoMarkerEditFeatureId",
             "isFilterApplied",
             "geoMarkerShortFeatureId",
             "geoMarkerState",
@@ -163,7 +165,6 @@ export default {
             }
 
             return {
-                id: this.selectedFeature.getId(),
                 kategorie: this.categories[this.selectedCategoryId]?.name,
                 anhang_name: this.attachment ? this.attachment.name : null,
                 anhang_base_64: this.attachment ? this.attachment.base64 : null,
@@ -662,7 +663,7 @@ export default {
                     category: "success"
                 });
 
-                await this.loadNewlyCreatedOrUpdatedGeoMarker(transactionResponse.featureIds[0]);
+                await this.loadNewlyCreatedOrUpdatedGeoMarker(this.geoMarkerShortFeatureId(transactionResponse.featureIds[0]));
             }
 
             this.resetForm();
@@ -677,7 +678,7 @@ export default {
                 this.refreshNewFeaturePointOnMap();
             }
 
-            this.moveUpdatedFeatureToTop(transactionResponse.featureIds[0]);
+            this.moveUpdatedFeatureToTop(this.geoMarkerShortFeatureId(transactionResponse.featureIds[0]));
         },
         /**
          * Updates an existing geomarker and saves changes to the database
@@ -711,9 +712,9 @@ export default {
 
                     await this.updateGeoMarkerFeatureListAfterEdit();
 
-                    await this.loadNewlyCreatedOrUpdatedGeoMarker(this.selectedFeature.getId());
+                    await this.loadNewlyCreatedOrUpdatedGeoMarker(this.geoMarkerShortFeatureId(this.selectedFeature.getId()));
 
-                    this.moveUpdatedFeatureToTop(this.selectedFeature.getId());
+                    this.moveUpdatedFeatureToTop(this.geoMarkerShortFeatureId(this.selectedFeature.getId()));
 
                     if (this.isFilterApplied) {
                         this.layerIdsForSelectedDepartments.forEach(async layerId => {
@@ -826,10 +827,12 @@ export default {
         },
         /**
          * Moves the updated feature to the top of the list
+         * @param {String} shortFeatureId - The short numeric id of the feature that shall be moved in the list
          * @returns {void}
          */
-        moveUpdatedFeatureToTop (featureId) {
-            const updatedList = [...this.geoMarkerFeatureList],
+        moveUpdatedFeatureToTop (shortFeatureId) {
+            const featureId = this.geoMarkerNonEditFeatureId(shortFeatureId),
+                  updatedList = [...this.geoMarkerFeatureList],
                   updatedFeatureIndex = updatedList.findIndex(
                       feature => feature.getId() === featureId
                   );
@@ -843,11 +846,12 @@ export default {
         },
         /**
          * Loads the newly created or updated GeoMarker and displays it in the list, makes relevant layer(s) visible or reload them, if necessary
-         * @param {String} featureId - The id of the feature that was just created / updated
+         * @param {String} shortFeatureId - The short numeric id of the feature that was just created / updated
          * @returns {Promise<void>}
          */
-        async loadNewlyCreatedOrUpdatedGeoMarker (featureId) {
-            const relevantLayerIds = [...new Set(this.layerIdsForSelectedDepartments.concat(this.layerIdsForChangedDepartments))],
+        async loadNewlyCreatedOrUpdatedGeoMarker (shortFeatureId) {
+            const featureId = this.geoMarkerNonEditFeatureId(shortFeatureId),
+                  relevantLayerIds = [...new Set(this.layerIdsForSelectedDepartments.concat(this.layerIdsForChangedDepartments))],
                   loadPromises = relevantLayerIds.map(layerId => {
                       return new Promise(resolve => {
                           const layer = layerCollection.getLayerById(layerId);
@@ -1619,6 +1623,8 @@ export default {
         </ModalItem>
     </div>
 </template>
+
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss" scoped>
 

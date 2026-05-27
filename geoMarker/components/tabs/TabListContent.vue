@@ -33,9 +33,9 @@ export default {
         ...mapGetters("Modules/GeoMarker", [
             "geoMarkerFeatureList",
             "geoMarkerShortFeatureId",
+            "geoMarkerNonEditFeatureId",
             "geoMarkerState",
             "geoMarkerFeatureSelected",
-            "geoMarkerWfsFeatureType",
             "categories",
             "departments",
             "geoMarkerUpdateFeature",
@@ -157,11 +157,13 @@ export default {
             "requestGFI"
         ]),
         setSelectedFeature (item) {
-            const selectedFeature = this.geoMarkerFeatureList.find(feature => feature.getId() === item.featureId);
+            if (item && item.featureId) {
+                const selectedFeature = this.geoMarkerFeatureList.find(feature => feature.getId() === item.featureId);
 
-            this.selectedFeatureIsGemisEditNotAllowed = this.isGemisFeature(selectedFeature);
-            this.setGeoMarkerFeatureSelected(selectedFeature);
-            this.selectedListItemId = item.id;
+                this.selectedFeatureIsGemisEditNotAllowed = this.isGemisFeature(selectedFeature);
+                this.setGeoMarkerFeatureSelected(selectedFeature);
+                this.selectedListItemId = item.id;
+            }
         },
         resetSelectedFeature () {
             this.setGeoMarkerFeatureSelected(null);
@@ -261,7 +263,7 @@ export default {
 
                     if (!this.originalCoordinates) {
                         this.originalCoordinates = this.geoMarkerFeatureList
-                            .find(feature => feature.getId() === this.geoMarkerFeatureSelected.getId())
+                            .find(feature => feature.getId() === this.geoMarkerNonEditFeatureId(this.geoMarkerFeatureSelected.getId()))
                             .getGeometry()
                             .getCoordinates();
                     }

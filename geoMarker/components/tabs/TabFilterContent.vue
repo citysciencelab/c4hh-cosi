@@ -367,8 +367,17 @@ export default {
                     const source = layer.getSource();
 
                     // Info: This workaround does not work, if a layer has no features at all.
+                    // Therefore a timeout is set as fallback
                     if (!source.getFeatures().length) {
-                        source.once("featuresloadend", resolve);
+                        // wait for featuresloadend or fallback to timeout
+                        const timeout = setTimeout(() => {
+                            resolve();
+                        }, 3000);
+
+                        source.once("featuresloadend", () => {
+                            clearTimeout(timeout);
+                            resolve();
+                        });
                     }
                     else {
                         resolve();
@@ -387,8 +396,17 @@ export default {
                         const source = this.map.getLayers().getArray().find(l => l.get("id") === layerId).getSource();
 
                         // Info: This workaround does not work, if a layer has no features at all.
+                        // Therefore a timeout is set as fallback
                         if (!source.getFeatures().length) {
-                            source.once("featuresloadend", resolve);
+                            // wait for featuresloadend or fallback to timeout
+                            const timeout = setTimeout(() => {
+                                resolve();
+                            }, 3000);
+
+                            source.once("featuresloadend", () => {
+                                clearTimeout(timeout);
+                                resolve();
+                            });
                         }
                         else {
                             resolve();
@@ -984,6 +1002,8 @@ export default {
         </div>
     </div>
 </template>
+
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss">
 div#geoMarkerFilterContent {

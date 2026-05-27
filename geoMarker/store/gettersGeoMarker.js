@@ -4,7 +4,31 @@ import stateGeoMarker from "./stateGeoMarker";
 const getters = {
     ...generateSimpleGetters(stateGeoMarker),
     geoMarkerShortFeatureId: (state) => (featureId) => {
-        return Number(featureId.replace(state.geoMarkerWfsFeatureIdPrefix, ""));
+        if (featureId.startsWith(state.geoMarkerWfsFeatureIdPrefix)) {
+            return Number(featureId.replace(state.geoMarkerWfsFeatureIdPrefix, ""));
+        }
+
+        return Number(featureId.replace(state.geoMarkerEditLayerFeatureIdPrefix, ""));
+    },
+    geoMarkerNonEditFeatureId: (state) => (featureId) => {
+        if (Number.isInteger(featureId)) {
+            return state.geoMarkerWfsFeatureIdPrefix + String(featureId);
+        }
+        else if (featureId.startsWith(state.geoMarkerWfsFeatureIdPrefix)) {
+            return featureId;
+        }
+
+        return featureId.replace(state.geoMarkerEditLayerFeatureIdPrefix, state.geoMarkerWfsFeatureIdPrefix);
+    },
+    geoMarkerEditFeatureId: (state) => (featureId) => {
+        if (Number.isInteger(featureId)) {
+            return state.geoMarkerEditLayerFeatureIdPrefix + String(featureId);
+        }
+        else if (!featureId.startsWith(state.geoMarkerWfsFeatureIdPrefix)) {
+            return featureId;
+        }
+
+        return featureId.replace(state.geoMarkerWfsFeatureIdPrefix, state.geoMarkerEditLayerFeatureIdPrefix);
     },
     geoMarkerState: (state) => (geoMarker) => {
         // Collect current status fields for all departments, excluding null values.
