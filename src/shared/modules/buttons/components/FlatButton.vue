@@ -129,5 +129,10 @@ export default {
     background-color: $light-blue;
     border-color: $light-blue;
     color: $black;
+    &:hover {
+        background-color: $dark-blue;
+        border-color: $dark-blue;
+        color: $white;
+    }
 }
 </style>
