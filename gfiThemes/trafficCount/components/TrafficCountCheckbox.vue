@@ -57,14 +57,14 @@ export default {
         toggledCar: function () {
             if (this.currentMeansOfTransport === "Anzahl_Kfz") {
                 return [
-                    {key: "Anzahl_Kfz", name: "KFZ"},
+                    {key: "Anzahl_Kfz", name: "Kfz"},
                     {key: "Anzahl_Schwerverkehr", name: "Schwerverkehr"}
                 ];
             }
             else if (this.currentMeansOfTransport === "Anzahl_Schwerverkehr") {
                 return [
                     {key: "Anzahl_Schwerverkehr", name: "Schwerverkehr"},
-                    {key: "Anzahl_Kfz", name: "KFZ"}
+                    {key: "Anzahl_Kfz", name: "Kfz"}
                 ];
             }
 

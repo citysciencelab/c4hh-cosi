@@ -30,7 +30,7 @@
                         "calendarweek": "KW",
                         "infraredsensor": "Infrarotsensor",
                         "inductionLoop": "Induktionsschleife",
-                        "carLabel": "KFZ",
+                        "carLabel": "Kfz",
                         "bicycleLabel": "Fahrrad",
                         "heavyTrafficLabel": "Schwerverkehr",
                         "idLabel": "ID:",
@@ -38,7 +38,7 @@
                         "meansOfTransportLabel": "Verkehrsmittel: ",
                         "directionLabel": "Richtung:",
                         "directionBoth": "beide",
-                        "carsHeaderSuffix": "Anzahl KFZ",
+                        "carsHeaderSuffix": "Anzahl Kfz",
                         "trucksHeaderSuffix": "Anzahl SV **",
                         "yAxisTextDay": "Anzahl / {{minutes}} Min.",
                         "yAxisTextWeek": "Anzahl / Tag",
@@ -66,7 +66,7 @@
                             "weekdaysShort": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
                         },
                         "heavyTraffic": "(Schwerverkehr)",
-                        "totalTraffic": "(KFZ gesamt)",
+                        "totalTraffic": "(Kfz gesamt)",
                         "isHeavyTrafficAvailableDesc": "Schwerverkehr vorhanden",
                         "available": "Ja",
                         "inavailable": "Nein"

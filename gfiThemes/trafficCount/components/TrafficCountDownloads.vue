@@ -329,7 +329,7 @@ export default {
             let countHeader = "Anzahl";
 
             if (meansOfTransport === "Anzahl_Kfz") {
-                countHeader = "Anzahl KFZ";
+                countHeader = "Anzahl Kfz";
             }
             else if (meansOfTransport === "Anzahl_Schwerverkehr") {
                 countHeader = "Anzahl SV";
