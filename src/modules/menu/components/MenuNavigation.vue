@@ -19,26 +19,60 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Menu", ["previousNavigationEntryText", "currentComponentName", "currentComponent", "showHeaderIcon"]),
+        ...mapGetters("Menu", ["previousNavigationEntryText", "currentComponent", "showHeaderIcon", "secondaryMenuEnabled"]),
         ...mapGetters(["isMobile"]),
+
+        currentMenuComponent () {
+            return this.currentComponent(this.side) || {};
+        },
 
         previousNavigation () {
             return this.previousNavigationEntryText(this.side);
         },
 
         currentTitle () {
-            const component = this.currentComponent(this.side),
+            const component = this.currentMenuComponent,
                 key = component?.props?.name || `common:modules.${component?.type}.name`;
 
             return this.$t(key);
         },
 
         currentIcon () {
-            return this.currentComponent(this.side).props?.icon;
+            return this.currentMenuComponent?.props?.icon;
         },
 
         showIcon () {
             return this.showHeaderIcon(this.side);
+        },
+
+        isSecondaryGfiWithoutMenu () {
+            return this.side === "secondaryMenu"
+                && !this.secondaryMenuEnabled
+                && this.currentMenuComponent.type === "getFeatureInfo";
+        },
+
+        /**
+         * Hides invalid back navigation in GFI if no secondary menu exists.
+         * @returns {Boolean} Whether the back navigation should be displayed.
+         */
+        showPreviousNavigation () {
+            if (!this.previousNavigation) {
+                return false;
+            }
+
+            const pointsToMenuRoot = this.previousNavigation === this.$t("common:modules.menu.name"),
+                hideSecondaryGfiBack = this.isSecondaryGfiWithoutMenu && pointsToMenuRoot;
+
+            return !hideSecondaryGfiBack;
+        },
+
+        /**
+         * Determines if the close button should be displayed.
+         * Always show for secondary menu GFI even without back navigation.
+         * @returns {Boolean} Whether the close button should be displayed.
+         */
+        showCloseButton () {
+            return !this.isMobile && (this.showPreviousNavigation || this.isSecondaryGfiWithoutMenu);
         }
     },
     methods: {
@@ -49,13 +83,14 @@ export default {
 
 <template>
     <div
-        v-if="previousNavigation"
+        v-if="showPreviousNavigation || showCloseButton"
         :id="'mp-menu-navigation-' + side"
     >
         <div
             class="mp-menu-navigation"
         >
             <a
+                v-if="showPreviousNavigation"
                 :id="'mp-navigation-' + side"
                 class="pt-2 mp-menu-navigation-link"
                 href="#"
@@ -65,10 +100,10 @@ export default {
                 <h6 class="mp-menu-navigation-link-text mb-1"><p class="bi-chevron-left me-2" />{{ previousNavigation }}</h6>
             </a>
             <button
-                v-if="!isMobile"
+                v-if="showCloseButton"
                 :id="'mp-menu-navigation-reset-button-' + side"
                 type="button"
-                class="btn-close mp-menu-navigation-reset-button"
+                class="btn-close mp-menu-navigation-reset-button ms-auto"
                 :aria-label="$t('common:modules.menu.ariaLabelClose')"
                 @click="resetMenu(side)"
             />

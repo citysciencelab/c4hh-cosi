@@ -25,6 +25,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1610: Menu/PortalFooter: Fixed navigation behavior for secondary GFI without a configured secondary menu and corrected footer layout offsets for small desktop breakpoints.
 - Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
 - Migrator: Fixed creation of index.html.
 - Gazetteer: Restored correct display of geographicalIdentifier as search result, if available.
