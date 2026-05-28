@@ -376,6 +376,13 @@ export default {
             :is-open="true"
             :title="$t('additional:modules.storyCreator.chapter.addContent')"
         >
+            <h5
+                class="chapter-title mt-4 mb-3"
+                contenteditable="plaintext-only"
+                @input="title = $event.target.innerHTML"
+            >
+                {{ $t('additional:modules.storyCreator.chapter.title') }}
+            </h5>
             <AddElementDropdown
                 v-if="addComponentToShow === ''"
                 :allowed-actions="['text', 'image']"
@@ -483,6 +490,15 @@ export default {
 .map-position {
     i.bi-geo-alt-fill {
         color: $secondary;
+    }
+}
+
+.chapter-title {
+    font-family: "MasterPortalFont Bold";
+    &:hover {
+        outline-color: #101010;
+        outline-width: 1px;
+        outline-style: solid;
     }
 }
 </style>

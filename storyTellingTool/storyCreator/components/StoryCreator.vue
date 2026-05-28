@@ -202,7 +202,6 @@ export default {
                 class="dragArea no-list ps-0 ms-2"
                 item-key="name"
                 handle=".card"
-                :list="story.chapters"
             >
                 <template #item="{ element, index }">
                     <StoryCreatorChapterCard

@@ -111,6 +111,11 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(2);
         });
 
+        it("should find title element", () => {
+            expect(wrapper.find(".chapter-title").exists()).to.be.true;
+            expect(wrapper.find(".chapter-title").text()).to.equal("additional:modules.storyCreator.chapter.title");
+        });
+
         it("shows the position hint if positionChanged is true", async () => {
             await wrapper.setData({
                 coordinate: "1,2",
