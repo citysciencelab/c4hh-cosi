@@ -64,7 +64,14 @@ export default {
         addChapter () {
             this.setCurrentView("chapter");
         },
-
+        /**
+         * Deletes a chapter from the index.
+         * @param {Number} index - the index of the chapter in chapter list.
+         * @return {void}
+         */
+        deleteChapter (index) {
+            this.story.chapters.splice(index, 1);
+        },
         /**
          * Discards the current story and resets all data to default values.
          * @return {void}
@@ -191,13 +198,13 @@ export default {
                 {{ $t('additional:modules.storyCreator.headlines.chapterList') }}
             </h5>
             <Draggable
-                v-model="chapterContent"
+                v-model="story.chapters"
                 class="dragArea no-list ps-0 ms-2"
                 item-key="name"
                 handle=".card"
-                :list="chapterContent"
+                :list="story.chapters"
             >
-                <template #item="{ element }">
+                <template #item="{ element, index }">
                     <StoryCreatorChapterCard
                         :chapter-title="element.title"
                         :chapter-text="element.text"
@@ -205,7 +212,7 @@ export default {
                         :photo-credit="element.photoCredit"
                         :alt-text="element.altText"
                         :chapter-items="element.chapterItems"
-                        @delete="() => ''"
+                        @delete="() => deleteChapter(index)"
                     />
                 </template>
             </Draggable>

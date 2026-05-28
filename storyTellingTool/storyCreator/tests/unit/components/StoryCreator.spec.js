@@ -28,7 +28,9 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                             },
                             state: {
                                 currentView: "story",
-                                story: {}
+                                story: {
+                                    chapters: []
+                                }
                             }
                         }
                     }
@@ -101,6 +103,23 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                 expect(wrapper.vm.imageCopyright).to.equal("");
                 expect(wrapper.vm.imageSrc).to.equal("");
                 expect(wrapper.vm.chapterContent).to.deep.equal([]);
+            });
+        });
+
+        describe("deleteChapter", () => {
+            it("should delete one chapter from the index", async () => {
+                await wrapper.setData({
+                    chapterContent: [
+                        {title: "Test Chapter 1", text: "Test Text 1"},
+                        {title: "Test Chapter 2", text: "Test Text 2"}
+                    ]
+                });
+
+                wrapper.vm.updateStory();
+                wrapper.vm.deleteChapter(0);
+
+                expect(wrapper.vm.story.chapters.length).to.equal(1);
+                expect(wrapper.vm.story.chapters).to.deep.equal([{title: "Test Chapter 2", text: "Test Text 2"}]);
             });
         });
     });

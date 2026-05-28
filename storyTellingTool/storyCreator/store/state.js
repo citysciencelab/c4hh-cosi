@@ -14,7 +14,9 @@ const state = {
     name: "additional:modules.storyCreator.title",
     icon: "bi-file-plus",
     currentView: "story",
-    story: {}
+    story: {
+        chapters: []
+    }
 };
 
 export default state;
