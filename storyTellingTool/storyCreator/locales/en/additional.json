@@ -40,7 +40,8 @@
         "cancel": "Cancel",
         "successAlert": "The map position has been successfully saved!",
         "positionChangedHint": "The location does not match the current view of the map.",
-        "addContent": "Add content"
+        "addContent": "Add content",
+        "title": "This is the chapter title"
       },
       "addElementDropdown": {
         "categories": {

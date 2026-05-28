@@ -3,7 +3,6 @@ import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import StoryCreatorChapter from "../../../components/StoryCreatorChapter.vue";
-import indexStoryCreatorChapter from "../../../store/index.js";
 import store from "@appstore/index.js";
 
 config.global.mocks.$t = key => key;
@@ -25,7 +24,36 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 Modules: {
                     namespaced: true,
                     modules: {
-                        StoryCreator: indexStoryCreatorChapter
+                        StoryCreator: {
+                            namespaced: true,
+                            getters: {
+                                currentChapter: (state) => state.currentChapter,
+                                story: (state) => state.story
+                            },
+                            mutations: {
+                                setCurrentChapter (state, value) {
+                                    state.currentChapter = value;
+                                },
+                                setCurrentView (state, value) {
+                                    state.currentView = value;
+                                }
+                            },
+                            state: {
+                                currentChapter: {
+                                    "title": "",
+                                    "content": [],
+                                    "map": {
+                                        "center": null,
+                                        "zoomLevel": null,
+                                        "layers": null,
+                                        "tool": null
+                                    }
+                                },
+                                story: {
+                                    chapters: []
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -200,6 +228,48 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     ];
 
                 expect(wrapper.vm.getToolList(toolList)).to.deep.equal(results);
+            });
+        });
+
+        describe("saveChapter", () => {
+            it("should set the attribute to current chapter", async () => {
+                await wrapper.setData({
+                    title: "title",
+                    confirmedCoordinate: "123, 456",
+                    confirmedZoomlevel: 2,
+                    selectedLayer: [{layerId: 1}, {layerId: 2}],
+                    selectedTool: {toolId: "tool"}
+                });
+
+                wrapper.vm.saveChapter();
+
+                expect(wrapper.vm.currentChapter).to.deep.equal({
+                    content: [],
+                    title: "title",
+                    map: {
+                        "center": "123, 456",
+                        "zoomLevel": 2,
+                        "layers": [1, 2],
+                        "tool": "tool"
+                    }
+                });
+
+                expect(wrapper.vm.story).to.deep.equal(
+                    {
+                        chapters: [
+                            {
+                                content: [],
+                                title: "title",
+                                map: {
+                                    "center": "123, 456",
+                                    "zoomLevel": 2,
+                                    "layers": [1, 2],
+                                    "tool": "tool"
+                                }
+                            }
+                        ]
+                    }
+                );
             });
         });
     });

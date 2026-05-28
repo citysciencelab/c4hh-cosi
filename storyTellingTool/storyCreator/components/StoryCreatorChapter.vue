@@ -19,6 +19,13 @@ export default {
         Multiselect,
         StoryCreatorAddTextCard
     },
+    props: {
+        editIndex: {
+            type: [Boolean, Number],
+            required: false,
+            default: false
+        }
+    },
     data () {
         return {
             addComponentToShow: "",
@@ -30,12 +37,16 @@ export default {
             toolList: [],
             selectedLayer: [],
             selectedTool: "",
-            showAlert: false
+            showAlert: false,
+            title: i18next.t("additional:modules.storyCreator.chapter.title")
         };
     },
     computed: {
         ...mapGetters(["configuredModules"]),
-
+        ...mapGetters("Modules/StoryCreator", [
+            "currentChapter",
+            "story"
+        ]),
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
          * @returns {Boolean} True if position or zoom has changed, otherwise false.
@@ -81,6 +92,9 @@ export default {
             }
         }
     },
+    created () {
+        this.resetCurrentChapter();
+    },
     mounted () {
         this.layerList = this.getLayerList(rawLayerList.getLayerList());
         this.toolList = this.getToolList(this.configuredModules);
@@ -100,8 +114,17 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/StoryCreator", [
+            "setCurrentChapter",
             "setCurrentView"
         ]),
+        /**
+         * Resets the current chapter and goes back to overview page.
+         * @returns {void}
+         */
+        cancelChapter () {
+            this.resetCurrentChapter();
+            this.setCurrentView("story");
+        },
         handleAction (type) {
             console.warn("Aktion im StoryCreator ausgelöst. Ausgewähltes Element:", type);
             this.addComponentToShow = type;
@@ -137,7 +160,6 @@ export default {
 
             this.confirmedCoordinate = this.coordinate;
             this.confirmedZoomlevel = this.zoomlevel;
-
             this.showAlert = true;
         },
 
@@ -162,7 +184,44 @@ export default {
             toolList = sort("", toolList, "label");
             return toolList;
         },
+        /**
+         * Resets the current chapter.
+         * @returns {void}
+         */
+        resetCurrentChapter () {
+            this.setCurrentChapter(
+                {
+                    "title": "",
+                    "content": [],
+                    "map": {
+                        "center": null,
+                        "zoomLevel": null,
+                        "layers": null,
+                        "tool": null
+                    }
+                }
+            );
+        },
+        /**
+         * Saves the chapter and goes back to the overview page.
+         * @returns {void}
+         */
+        saveChapter () {
+            this.currentChapter.title = this.title;
+            this.currentChapter.map.center = this.confirmedCoordinate;
+            this.currentChapter.map.zoomLevel = this.confirmedZoomlevel;
+            this.currentChapter.map.layers = this.selectedLayer.map(layer => layer.layerId);
+            this.currentChapter.map.tool = this.selectedTool.toolId;
 
+            if (typeof this.editIndex === "number") {
+                // todos: replace the chapter
+            }
+            else {
+                this.story?.chapters.push(this.currentChapter);
+            }
+
+            this.setCurrentView("story");
+        },
         /**
          * Updates the current zoom level and coordinate from the map view.
          * @returns {void}
@@ -327,6 +386,7 @@ export default {
                 :icon="'bi-save'"
                 :aria-label="$t('additional:modules.storyCreator.chapter.save')"
                 :text="$t('additional:modules.storyCreator.chapter.save')"
+                :interaction="() => saveChapter()"
             />
             <FlatButton
                 id="cancel"
@@ -334,7 +394,7 @@ export default {
                 :aria-label="$t('additional:modules.storyCreator.chapter.cancel')"
                 :text="$t('additional:modules.storyCreator.chapter.cancel')"
                 :secondary="true"
-                :interaction="() => setCurrentView('story')"
+                :interaction="() => cancelChapter()"
             />
         </div>
     </div>

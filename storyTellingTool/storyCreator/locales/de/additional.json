@@ -40,7 +40,8 @@
         "cancel": "abbrechen",
         "successAlert": "Die Kartenposition wurde erfolgreich übernommen!",
         "positionChangedHint": "Die Position entspricht nicht der aktuellen Ansicht der Karte.",
-        "addContent": "Inhalte hinzufügen"
+        "addContent": "Inhalte hinzufügen",
+        "title": "Dies ist die Kapitel-Überschrift"
       },
       "addElementDropdown": {
         "categories": {

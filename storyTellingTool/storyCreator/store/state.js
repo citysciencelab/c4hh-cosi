@@ -6,6 +6,7 @@
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
  * @property {String} currentView - The current view tab.
+ * @property {Object} currentChapter - The current chapter object.
  * @property {Object} story - The story data.
  */
 const state = {
@@ -16,6 +17,16 @@ const state = {
     currentView: "story",
     story: {
         chapters: []
+    },
+    currentChapter: {
+        "title": "",
+        "content": [],
+        "map": {
+            "center": null,
+            "zoomLevel": null,
+            "layers": null,
+            "tool": null
+        }
     }
 };
 
