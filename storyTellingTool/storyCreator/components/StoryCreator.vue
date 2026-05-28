@@ -48,6 +48,7 @@ export default {
     computed: {
         ...mapGetters("Modules/StoryCreator", [
             "currentView",
+            "objectURLById",
             "story"
         ])
     },
@@ -71,6 +72,16 @@ export default {
          * @return {void}
          */
         deleteChapter (index) {
+            const chapter = this.story.chapters[index];
+
+            if (chapter.content) {
+                chapter.content
+                    .filter(item => item.type === "image")
+                    .forEach(image => {
+                        URL.revokeObjectURL(this.objectURLById[image.id]);
+                        delete this.objectURLById[image.id];
+                    });
+            }
             this.story.chapters.splice(index, 1);
         },
         /**

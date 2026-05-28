@@ -7,6 +7,7 @@
  * @property {String} icon - Icon next to title.
  * @property {String} currentView - The current view tab.
  * @property {Object} currentChapter - The current chapter object.
+ * @property {Object} objectURLById - Object URLs for images, indexed by image ID.
  * @property {Object} story - The story data.
  */
 const state = {
@@ -15,6 +16,7 @@ const state = {
     name: "additional:modules.storyCreator.title",
     icon: "bi-file-plus",
     currentView: "story",
+    objectURLById: {},
     story: {
         chapters: []
     },

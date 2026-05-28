@@ -31,6 +31,7 @@ export default {
     data () {
         return {
             addComponentToShow: "",
+            content: [],
             coordinate: "",
             zoomlevel: "",
             confirmedCoordinate: "",
@@ -47,6 +48,7 @@ export default {
         ...mapGetters(["configuredModules"]),
         ...mapGetters("Modules/StoryCreator", [
             "currentChapter",
+            "objectURLById",
             "story"
         ]),
         /**
@@ -196,6 +198,12 @@ export default {
          * @returns {void}
          */
         resetCurrentChapter () {
+            this.currentChapter.content
+                .filter(item => item.type === "image")
+                .forEach(image => {
+                    URL.revokeObjectURL(this.objectURLById[image.id]);
+                    delete this.objectURLById[image.id];
+                });
             this.setCurrentChapter(
                 {
                     "title": "",
@@ -219,6 +227,7 @@ export default {
             this.currentChapter.map.zoomLevel = this.confirmedZoomlevel;
             this.currentChapter.map.layers = this.selectedLayer.map(layer => layer.layerId);
             this.currentChapter.map.tool = this.selectedTool.toolId;
+            this.currentChapter.content = this.content;
 
             if (typeof this.editIndex === "number") {
                 // todos: replace the chapter
@@ -229,6 +238,24 @@ export default {
 
             this.setCurrentView("story");
         },
+
+        /**
+         * Handles the addition of an image by adding it to the content array.
+         * @param {Object} image - The image object containing id, altText, photoCredit, and objectURL.
+         * @returns {void}
+         */
+        handleAddImage (image) {
+            this.addComponentToShow = "";
+            this.content.push({
+                type: "image",
+                id: image.id,
+                attrs: {
+                    alt: image.altText,
+                    copyright: image.photoCredit
+                }
+            });
+        },
+
         /**
          * Updates the current zoom level and coordinate from the map view.
          * @returns {void}
@@ -383,6 +410,18 @@ export default {
             >
                 {{ $t('additional:modules.storyCreator.chapter.title') }}
             </h5>
+            <template
+                v-for="item in content"
+                :key="item.id"
+            >
+                <div v-if="item.type === 'image'">
+                    <img
+                        :src="objectURLById[item.id]"
+                        :alt="item.attrs.alt"
+                        class="img-thumbnail d-block mx-auto mb-3 w-100"
+                    >
+                </div>
+            </template>
             <AddElementDropdown
                 v-if="addComponentToShow === ''"
                 :allowed-actions="['text', 'image']"
@@ -396,6 +435,7 @@ export default {
             <StoryCreatorAddImageCard
                 v-else-if="addComponentToShow === 'image'"
                 class="mt-2"
+                @addImage="handleAddImage"
                 @click:close="addComponentToShow = ''"
             />
         </AccordionItem>

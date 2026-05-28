@@ -2,6 +2,7 @@
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
+import {mapGetters} from "vuex";
 
 export default {
     name: "StoryCreatorAddImageCard",
@@ -10,7 +11,55 @@ export default {
         FileUpload,
         InputText
     },
-    emits: ["click:close"]
+    emits: ["addImage", "click:close"],
+    data () {
+        return {
+            image: {
+                altText: "",
+                photoCredit: ""
+            },
+            imageLoaded: false
+        };
+    },
+    computed: {
+        ...mapGetters("Modules/StoryCreator", [
+            "objectURLById"
+        ])
+    },
+
+    methods: {
+        /**
+         * Emits the "addImage" event with the image data and stores the object URL in the store.
+         */
+        addImage () {
+            this.objectURLById[this.image.id] = this.image.objectURL;
+            this.$emit("addImage", this.image);
+        },
+
+        /**
+         * Emits the "click:close" event and revokes the object URL.
+         */
+        discardImage () {
+            URL.revokeObjectURL(this.image.objectURL);
+            this.$emit("click:close");
+        },
+
+        /**
+         * Loads the image and creates an object URL for it.
+         * @param {Event} event
+         */
+        loadImage (event) {
+            const file = event?.dataTransfer?.files?.[0] ?? event?.target?.files?.[0];
+
+            if (!file) {
+                return;
+            }
+            this.imageLoaded = true;
+
+            this.image.objectURL = URL.createObjectURL(file);
+            this.image.id = crypto.randomUUID();
+        }
+    }
 };
 </script>
 <template lang="html">
@@ -20,38 +69,51 @@ export default {
                 type="button"
                 class="btn-close position-absolute top-0 end-0 m-2"
                 aria-label="Close"
-                @click="$emit('click:close')"
+                @click="discardImage"
             />
 
             <h5 class="card-title mb-3">
                 {{ $t('additional:modules.storyCreator.headlines.addImages') }}
             </h5>
-            <div>
+            <div v-if="!imageLoaded">
                 <FileUpload
                     :id="'Story-Creator-Image-Upload'"
-                    :change="() => undefined"
-                    :drop="() => undefined"
+                    :change="loadImage"
+                    :drop="loadImage"
+                    :multiple="false"
+                    accept="image/*"
                 />
+            </div>
+            <div v-else>
+                <img
+                    :src="image.objectURL"
+                    :alt="image.altText"
+                    class="img-thumbnail d-block mx-auto mb-3 w-25"
+                >
             </div>
             <InputText
                 id="image-name"
+                v-model="image.altText"
                 class="mt-2"
                 :label="$t('additional:modules.storyCreator.labels.altText')"
                 :placeholder="$t('additional:modules.storyCreator.labels.altText')"
             />
             <InputText
                 id="image-name"
+                v-model="image.photoCredit"
                 class="mt-2"
                 :label="$t('additional:modules.storyCreator.labels.photoCredit')"
                 :placeholder="$t('additional:modules.storyCreator.labels.photoCredit')"
             />
-
-            <div class="d-flex justify-content-center">
+            <div
+                v-if="imageLoaded"
+                class="d-flex justify-content-center"
+            >
                 <FlatButton
                     class="mt-2"
                     icon="bi bi-save"
                     :text="$t('additional:modules.storyCreator.buttons.add')"
-                    @click.native="$emit('click:close')"
+                    :interaction="() => addImage()"
                 />
             </div>
         </div>

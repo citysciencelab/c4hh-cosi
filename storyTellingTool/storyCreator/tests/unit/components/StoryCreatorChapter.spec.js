@@ -28,6 +28,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                             namespaced: true,
                             getters: {
                                 currentChapter: (state) => state.currentChapter,
+                                objectURLById: (state) => state.objectURLById,
                                 story: (state) => state.story
                             },
                             mutations: {
@@ -49,6 +50,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                         "tool": null
                                     }
                                 },
+                                objectURLById: {},
                                 story: {
                                     chapters: []
                                 }
@@ -275,6 +277,35 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         ]
                     }
                 );
+            });
+        });
+
+        describe("handleAddImage", () => {
+            it("should reset addComponentToShow and append an image content entry", async () => {
+                const image = {
+                    id: "img-1",
+                    altText: "A test alt text",
+                    photoCredit: "Photo credit"
+                };
+
+                await wrapper.setData({
+                    addComponentToShow: "image",
+                    content: []
+                });
+
+                await wrapper.vm.handleAddImage(image);
+
+                expect(wrapper.vm.addComponentToShow).to.equal("");
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "image",
+                        id: "img-1",
+                        attrs: {
+                            alt: "A test alt text",
+                            copyright: "Photo credit"
+                        }
+                    }
+                ]);
             });
         });
     });
