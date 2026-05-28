@@ -16,6 +16,14 @@ export default {
         drop: {
             type: Function,
             required: true
+        },
+        multiple: {
+            type: Boolean,
+            default: true
+        },
+        accept: {
+            type: String,
+            default: undefined
         }
     },
     data () {
@@ -81,7 +89,8 @@ export default {
                         ref="upload-input-file"
                         type="file"
                         name="image"
-                        multiple="multiple"
+                        :multiple="multiple"
+                        :accept="accept"
                         @change="change"
                     >
                 </button>
