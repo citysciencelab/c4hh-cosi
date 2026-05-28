@@ -9,6 +9,7 @@
  * @property {Object} currentChapter - The current chapter object.
  * @property {Object} objectURLById - Object URLs for images, indexed by image ID.
  * @property {Object} story - The story data.
+ * @property {Object} subjectLayerCategory - The subject layer category.
  */
 const state = {
     id: "storyCreator",
@@ -29,6 +30,11 @@ const state = {
             "layers": null,
             "tool": null
         }
+    },
+    subjectLayerCategory: {
+        "key": "kategorie_opendata",
+        "name": "common:modules.layerTree.categoryOpendata",
+        "active": true
     }
 };
 

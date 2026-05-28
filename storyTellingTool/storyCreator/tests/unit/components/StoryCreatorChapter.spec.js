@@ -29,7 +29,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                             getters: {
                                 currentChapter: (state) => state.currentChapter,
                                 objectURLById: (state) => state.objectURLById,
-                                story: (state) => state.story
+                                story: (state) => state.story,
+                                subjectLayerCategory: (state) => state.subjectLayerCategory
                             },
                             mutations: {
                                 setCurrentChapter (state, value) {
@@ -53,7 +54,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 objectURLById: {},
                                 story: {
                                     chapters: []
-                                }
+                                },
+                                subjectLayerCategory: {}
                             }
                         }
                     }
@@ -185,30 +187,83 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
     });
 
     describe("Methods", () => {
-        describe("getLayerList", () => {
+        describe("findAllObjectsByKeyValueDeep", () => {
             it("should return empty array", () => {
-                expect(wrapper.vm.getLayerList(null)).to.deep.equal([]);
-                expect(wrapper.vm.getLayerList(0)).to.deep.equal([]);
-                expect(wrapper.vm.getLayerList("")).to.deep.equal([]);
-                expect(wrapper.vm.getLayerList({})).to.deep.equal([]);
-                expect(wrapper.vm.getLayerList(false)).to.deep.equal([]);
-                expect(wrapper.vm.getLayerList(undefined)).to.deep.equal([]);
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep(null)).to.deep.equal([]);
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep(0)).to.deep.equal([]);
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep("")).to.deep.equal([]);
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep({})).to.deep.equal([]);
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep(false)).to.deep.equal([]);
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep(undefined)).to.deep.equal([]);
             });
 
-            it("should return sorted layer list in array", () => {
-                const layerList = [
-                        {id: 1, typ: "WMS", name: "B Layer"},
-                        {id: 2, typ: "WFS", name: "A Layer"},
-                        {id: 3, typ: "WMS", name: "A Layer"},
-                        {id: 4, typ: "WMS", name: "C Layer"}
-                    ],
-                    results = [
-                        {layerId: 3, label: "A Layer"},
-                        {layerId: 1, label: "B Layer"},
-                        {layerId: 4, label: "C Layer"}
-                    ];
+            it("should return an array with one element", () => {
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep({type: "layer"})).to.deep.equal([{type: "layer", level: 0, $isDisabled: false}]);
+            });
 
-                expect(wrapper.vm.getLayerList(layerList)).to.deep.equal(results);
+            it("should return an array with one element", () => {
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep({type: "folder"})).to.deep.equal([{type: "folder", level: 0, $isDisabled: true}]);
+            });
+
+            it("should return an array with more element", () => {
+                const data = [
+                    {
+                        type: "folder",
+                        elements: [
+                            {type: "layer"}
+                        ]
+                    }
+                ];
+
+                expect(wrapper.vm.findAllObjectsByKeyValueDeep(data)).to.deep.equal(
+                    [
+                        {
+                            type: "folder",
+                            elements: [
+                                {type: "layer", level: 1, $isDisabled: false}
+                            ],
+                            level: 0,
+                            $isDisabled: true
+                        },
+                        {type: "layer", level: 1, $isDisabled: false}
+                    ]
+                );
+            });
+        });
+
+        describe("getParsedLayerList", () => {
+            it("should return empty array", () => {
+                expect(wrapper.vm.getParsedLayerList(null)).to.deep.equal([]);
+                expect(wrapper.vm.getParsedLayerList(0)).to.deep.equal([]);
+                expect(wrapper.vm.getParsedLayerList("")).to.deep.equal([]);
+                expect(wrapper.vm.getParsedLayerList({})).to.deep.equal([]);
+                expect(wrapper.vm.getParsedLayerList(false)).to.deep.equal([]);
+                expect(wrapper.vm.getParsedLayerList(undefined)).to.deep.equal([]);
+                expect(wrapper.vm.getParsedLayerList([])).to.deep.equal([]);
+            });
+
+            it("should return an array with one element", () => {
+                expect(wrapper.vm.getParsedLayerList([{type: "layer", id: "1", name: "layer"}])).to.deep.equal([{layerId: "1", label: "layer", level: 0, $isDisabled: false}]);
+            });
+
+            it("should return an array with more element", () => {
+                const data = [
+                    {
+                        type: "folder",
+                        id: "1",
+                        name: "folder",
+                        elements: [
+                            {type: "layer", id: "2", name: "layer"}
+                        ]
+                    }
+                ];
+
+                expect(wrapper.vm.getParsedLayerList(data)).to.deep.equal(
+                    [
+                        {layerId: "1", label: "folder", level: 0, $isDisabled: true},
+                        {layerId: "2", label: "layer", level: 1, $isDisabled: false}
+                    ]
+                );
             });
         });
 

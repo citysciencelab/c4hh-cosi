@@ -1,10 +1,12 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AddElementDropdown from "../shared/modules/addElementDropdown/components/AddElementDropdown.vue";
+import buildTreeStructure from "@appstore/js/buildTreeStructure.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
+import isObject from "@shared/js/utils/isObject.js";
 import {mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
@@ -46,11 +48,12 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["configuredModules"]),
+        ...mapGetters(["configuredModules", "layerConfig"]),
         ...mapGetters("Modules/StoryCreator", [
             "currentChapter",
             "objectURLById",
-            "story"
+            "story",
+            "subjectLayerCategory"
         ]),
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
@@ -101,7 +104,7 @@ export default {
         this.resetCurrentChapter();
     },
     mounted () {
-        this.layerList = this.getLayerList(rawLayerList.getLayerList());
+        this.layerList = this.getLayerList();
         this.toolList = this.getToolList(this.configuredModules);
 
         const map = mapCollection.getMap("2D");
@@ -142,24 +145,17 @@ export default {
         },
         /**
          * Returns a list of layer names.
-         * @param {Object[]} layerList - list of layer objects
          * @returns {Object[]} A list of objects with following format: {layerId: x, label: y}
          */
-        getLayerList (layerList) {
-            let layerNames = [];
+        getLayerList () {
+            const rawLayers = getAndMergeAllRawLayers(),
+                layerConfig = {
+                    baselayer: {},
+                    subjectlayer: {}
+                },
+                layersStructured = buildTreeStructure.build(rawLayers, layerConfig, this.subjectLayerCategory, []);
 
-            if (!Array.isArray(layerList)) {
-                return [];
-            }
-
-            layerList.forEach(layer => {
-                if (typeof layer?.name !== "undefined" && layer?.typ === "WMS") {
-                    layerNames.push({layerId: layer.id, label: layer.name});
-                }
-            });
-
-            layerNames = sort("", layerNames, "label");
-            return layerNames;
+            return this.getParsedLayerList(layersStructured?.elements);
         },
 
         /**
@@ -172,6 +168,58 @@ export default {
             this.confirmedCoordinate = this.coordinate;
             this.confirmedZoomlevel = this.zoomlevel;
             this.showAlert = true;
+        },
+
+        /**
+         * Returns a list of layer names.
+         * @param {Object[]} list - list of layers object
+         * @returns {Object[]} A list of objects with following format: {layerId: x, label: y}
+         */
+        getParsedLayerList (list) {
+            if (!Array.isArray(list) || !list.length) {
+                return [];
+            }
+
+            const layerNames = [];
+
+            this.findAllObjectsByKeyValueDeep(list).forEach(layer => {
+                if (typeof layer?.name !== "undefined") {
+                    layerNames.push({layerId: layer.id, label: layer.name, level: layer.level, $isDisabled: layer.$isDisabled});
+                }
+            });
+
+            return layerNames;
+        },
+
+        /**
+         * Returns a list of layers objects.
+         * @param {Object[]|Object} data the data to be checked if it is a layer or folder.
+         * @param {Object[]} results the found results in array.
+         * @param {Number} index the index of each data.
+         * @returns {Object[]} A list of found results in array.
+         */
+        findAllObjectsByKeyValueDeep (data, results = [], index = 0) {
+            if (!Array.isArray(data) && !isObject(data)) {
+                return [];
+            }
+
+            if (Array.isArray(data)) {
+                data.forEach(element => this.findAllObjectsByKeyValueDeep(element, results, index));
+            }
+
+            if (data?.type === "folder") {
+                data.level = index;
+                data.$isDisabled = true;
+                results.push(data);
+                this.findAllObjectsByKeyValueDeep(data.elements, results, index + 1);
+            }
+            else if (data?.type === "layer") {
+                data.level = index;
+                data.$isDisabled = false;
+                results.push(data);
+            }
+
+            return results;
         },
 
         /**
@@ -373,6 +421,7 @@ export default {
                     :searchable="true"
                     :multiple="true"
                     :open="true"
+                    :option-disabled="'disabled'"
                 >
                     <template #tag="{ option, remove }">
                         <button
@@ -384,6 +433,17 @@ export default {
                             {{ option.label }}
                             <i class="bi bi-x" />
                         </button>
+                    </template>
+                    <template #option="{ option }">
+                        <div
+                            :style="{
+                                paddingLeft: `${option.level * 16}px`,
+                                color: option.$isDisabled ? '#3C5F94' : '',
+                                fontFamily: option.level === 0 ? 'MasterPortalFont Bold' : 'MasterPortalFont'
+                            }"
+                        >
+                            {{ option.label }}
+                        </div>
                     </template>
                 </Multiselect>
             </div>
