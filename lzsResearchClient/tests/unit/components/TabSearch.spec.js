@@ -97,6 +97,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                             getters: {
                                 dataClassList: () => mockDataClassList,
                                 archiveList: () => mockDataClassList.map(a => ({id: a.id, name: a.name})),
+                                archiveHasGeoref: () => (id) => {
+                                    return id === "DKL_AFIS_EINZEL";
+                                },
                                 yearsList: () => [2020],
                                 archiveYears: () => ({}),
                                 placeholderDataClassList: () => mockPlaceholdersJson,

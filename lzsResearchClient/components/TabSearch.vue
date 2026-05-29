@@ -59,6 +59,7 @@ export default {
             "placeholderDataClassList",
             "archiveYears",
             "archiveList",
+            "archiveHasGeoref",
             "lzsCurrentLayout",
             "lzsDrawTypes",
             "lzsDrawIcons",
@@ -76,6 +77,11 @@ export default {
         ...mapGetters("Menu", [
             "expanded"
         ]),
+        archiveWithGeorefList () {
+            return this.archiveList.filter((archive) => {
+                return this.archiveHasGeoref(archive.id);
+            });
+        },
         /**
          * Generates a sorted list of years grouping the selected archives.
          *
@@ -650,7 +656,7 @@ export default {
                         aria-label="archives"
                     >
                         <div
-                            v-for="archive in archiveList"
+                            v-for="archive in archiveWithGeorefList"
                             :key="archive.id"
                             class="archiveCheckboxList"
                         >
