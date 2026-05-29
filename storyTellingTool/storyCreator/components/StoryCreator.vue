@@ -23,6 +23,7 @@ export default {
         return {
             title: "Geschichten mit Karten erzählen",
             description: "Lorem ipsum dolor sit amet...",
+            author: "Max Mustermann",
             imageAlt: "Blick über die Hamburger Elbphilharmonie",
             imageCopyright: "Max Mustermann / Getty Images",
             imageSrc: "./img.png",
@@ -82,6 +83,7 @@ export default {
             this.imageAlt = "";
             this.imageCopyright = "";
             this.imageSrc = "";
+            this.author = "";
             this.chapterContent = [];
         },
 
@@ -118,6 +120,7 @@ export default {
         updateStory () {
             this.story.title = this.title;
             this.story.description = this.description;
+            this.story.author = this.author;
             this.story.imageSrc = this.imageSrc;
             this.story.imageAlt = this.imageAlt;
             this.story.imageCopyright = this.imageCopyright;
@@ -171,6 +174,13 @@ export default {
                 html-type="textarea"
                 class="mb-3"
             />
+            <InputText
+                id="storyAuthor"
+                v-model="author"
+                :label="$t('additional:modules.storyCreator.labels.storyAuthor')"
+                :placeholder="$t('additional:modules.storyCreator.labels.storyAuthor')"
+                class="mb-3"
+            />
             <FileUpload
                 id="Story-creator-file-upload"
                 :label="$t('additional:modules.storyCreator.labels.fileDrop')"
@@ -180,7 +190,7 @@ export default {
                 :drop="() => undefined"
             />
             <InputText
-                id="altText"
+                id="imageAlt"
                 v-model="imageAlt"
                 :label="$t('additional:modules.storyCreator.labels.altText')"
                 :placeholder="$t('additional:modules.storyCreator.labels.altText')"

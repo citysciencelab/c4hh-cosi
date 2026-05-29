@@ -54,15 +54,30 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
             expect(fileUpload.exists()).to.be.true;
             expect(fileUpload.attributes("id")).to.equal("Story-creator-file-upload");
         });
-        it("should render all required InputText fields", () => {
-            const allInputTexts = wrapper.findAllComponents({name: "InputText"});
+        it("should render the InputText component used for the story title", () => {
+            const authorInput = wrapper.findComponent("#storyTitle");
 
-            expect(allInputTexts.length).to.equal(4);
+            expect(authorInput.exists()).to.be.true;
         });
         it("should render the InputText component used for the story description", () => {
-            const descriptionInput = wrapper.findAllComponents({name: "InputText"});
+            const descriptionInput = wrapper.findComponent("#storyDescription");
 
-            expect(descriptionInput.at(1).attributes("id")).to.equal("storyDescription");
+            expect(descriptionInput.exists()).to.be.true;
+        });
+        it("should render the InputText component used for the story author", () => {
+            const authorInput = wrapper.findComponent("#storyAuthor");
+
+            expect(authorInput.exists()).to.be.true;
+        });
+        it("should render the InputText component used for the image alt text", () => {
+            const imageAltInput = wrapper.findComponent("#imageAlt");
+
+            expect(imageAltInput.exists()).to.be.true;
+        });
+        it("should render the InputText component used for the image copyright", () => {
+            const imageCopyrightInput = wrapper.findComponent("#imageCopyright");
+
+            expect(imageCopyrightInput.exists()).to.be.true;
         });
         it("should render the Draggable component.", () => {
             const draggableCard = wrapper.findComponent({name: "Draggable"});
