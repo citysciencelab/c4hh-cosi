@@ -474,42 +474,41 @@ async function getTitleFromHtml (sourceFolder, indexFile) {
  * @param {Object} indexFile the index.html file
  * @returns {void}
  */
-function migrateIndexHtml (sourceFolder, destFolder, indexFile) {
-    readFile(path.resolve(sourceFolder, indexFile), "utf8")
-        .then(data => {
-            let result,
-                // removes <div id="loader"... and load of special_loaders.js from index.html - loader is no longer provided.
-                regex = /<div id="loader" [\s\S]*loaders.js"><\/script>/g;
-            // removes the Cesium.js script-tag
-            const regexCesium = /<script [\s\S]*Cesium.js"><\/script>/g;
+async function migrateIndexHtml (sourceFolder, destFolder, indexFile) {
+    try {
+        const data = await readFile(path.resolve(sourceFolder, indexFile), "utf8");
+        let result,
+            regex = /<div id="loader" [\s\S]*loaders.js"><\/script>/g;
 
+        result = data.replace(regex, "");
+        if (result.length === data.length) {
+            regex = /<div id="loader" [\s\S]*.svg">[\s\S]*<\/div>[\s\S]*<\/div>/g;
             result = data.replace(regex, "");
             if (result.length === data.length) {
-                regex = /<div id="loader" [\s\S]*.svg">[\s\S]*<\/div>[\s\S]*<\/div>/g;
-                result = data.replace(regex, "");
-                if (result.length === data.length) {
-                    console.warn("ATTENTION --- Removing of loader and logo in index.html failed! Must be done by user.");
-                }
+                console.warn("ATTENTION --- Removing of loader and logo in index.html failed! Must be done by user.");
             }
-            if (result.includes("Cesium.js")) {
-                result = result.replace(regexCesium, "");
-            }
-            if (result.includes("<script type=\"text/javascript\" src=\"../../build/js/masterportal.js\"></script>")) {
-                result = result.replace("<script type=\"text/javascript\" src=\"../../build/js/masterportal.js\"></script>", "<script type=\"module\" src=\"/src/masterportal.js\"></script>");
-            }
-            if (result.includes("<link rel=\"stylesheet\" href=\"../../build/css/masterportal.css\">")) {
-                result = result.replace("<link rel=\"stylesheet\" href=\"../../build/css/masterportal.css\">", "");
-            }
-            if (result.indexOf("lgv-container") > -1 || result.indexOf("masterportal-container") > -1) {
-                console.warn("IS TOO OLD - NOT MIGRATED: ", indexFile);
-            }
+        }
+        if (result.includes("Cesium.js")) {
+            result = result.replace(/<script [\s\S]*Cesium.js"><\/script>/g, "");
+        }
+        if (result.includes("/css/fonts.css")) {
+            result = result.replace(/<link rel="stylesheet" href="[^"]*\/css\/fonts\.css">/g, "");
+        }
+        if (result.includes("<script type=\"text/javascript\" src=\"../../build/js/masterportal.js\"></script>")) {
+            result = result.replace("<script type=\"text/javascript\" src=\"../../build/js/masterportal.js\"></script>", "<script type=\"module\" src=\"/src/masterportal.js\"></script>");
+        }
+        if (result.includes("<link rel=\"stylesheet\" href=\"../../build/css/masterportal.css\">")) {
+            result = result.replace("<link rel=\"stylesheet\" href=\"../../build/css/masterportal.css\">", "");
+        }
+        if (result.indexOf("lgv-container") > -1 || result.indexOf("masterportal-container") > -1) {
+            console.warn("IS TOO OLD - NOT MIGRATED: ", indexFile);
+        }
 
-            writeFile(path.resolve(destFolder, indexFile), result, "utf8");
-
-        })
-        .catch(err => {
-            console.error("write index.html", err);
-        });
+        await writeFile(path.resolve(destFolder, indexFile), result, "utf8");
+    }
+    catch (err) {
+        console.error("write index.html", err);
+    }
 }
 
 /**
@@ -589,10 +588,10 @@ async function migrateFiles (sourcePath, destPath) {
                                         mkdir(destPath, {recursive: true})
                                             .then(() => {
                                                 writeFile(configJsonDestFile, JSON.stringify(migrated, null, 4), "utf8")
-                                                    .then(() => {
+                                                    .then(async () => {
                                                         replaceInFile(configJsonDestFile);
                                                         copyFile(configJsSrcFile, configJsDestFile);
-                                                        migrateIndexHtml(sourceFolder, destFolder, indexFile);
+                                                        await migrateIndexHtml(sourceFolder, destFolder, indexFile);
                                                         console.info("ATTENTION - TODO for User --- remove from config.js by yourself: ", toRemoveFromConfigJs.join(", ") + "\n");
                                                         console.info("SUCCESSFULLY MIGRATED: ", destFolder);
                                                         // eslint-disable-next-line n/no-process-exit
