@@ -113,7 +113,6 @@ describe.skip("addons/cosi/SaveSession/components/SaveSession.vue", () => {
 
     afterEach(() => {
         wrapper.destroy();
-        sinon.restore();
     });
 
     describe("Component DOM", () => {

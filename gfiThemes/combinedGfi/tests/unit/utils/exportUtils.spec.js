@@ -59,7 +59,6 @@ describe("addons/gfiThemes/combinedGfi/utils/exportUtils.js", () => {
         global.window = originalWindow;
         global.i18next = originalI18next;
 
-        sinon.restore();
     });
 
     describe("exportToDOC", () => {

@@ -56,9 +56,6 @@ describe.skip("addons/cosi/PolygonStyler/components/PolygonStylerSettings.vue", 
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

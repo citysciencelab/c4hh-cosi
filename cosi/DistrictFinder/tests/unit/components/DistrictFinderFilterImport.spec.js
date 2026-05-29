@@ -61,9 +61,6 @@ describe.skip("addons/cosi/DistrictFinder/components/DistrictFinderFilterImport.
             }
         };
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

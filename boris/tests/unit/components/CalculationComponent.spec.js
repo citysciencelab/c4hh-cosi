@@ -76,9 +76,6 @@ describe("ADDONS: addons/boris/components/CalculationComponent.vue", () => {
         };
 
     });
-    afterEach(function () {
-        sinon.restore();
-    });
 
     describe("Boris calculation component template", () => {
         it("renders Calculation Component", () => {

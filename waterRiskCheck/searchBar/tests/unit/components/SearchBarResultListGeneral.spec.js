@@ -81,9 +81,6 @@ describe("addons/waterRiskCheck/searchBar/components/SearchBarResultListGeneral.
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("test the rendering with different parameters", () => {
         it("renders the SearchBarResultListGeneral with 3 SearchBarResultListGeneralItem", async () => {

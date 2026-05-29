@@ -152,7 +152,6 @@ describe("addons/gfiThemes/combinedGfi/store/actionsCombinedGfi.js", () => {
         global.URL = originalURL;
         global.Blob = originalBlob;
 
-        sinon.restore();
         mockExecuteProcess.reset();
         mockPollJobResults.reset();
     });

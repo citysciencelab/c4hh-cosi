@@ -145,9 +145,6 @@ describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("render SearchBar", () => {
         it("should render the SearchBar with button and input and mounted values", async () => {

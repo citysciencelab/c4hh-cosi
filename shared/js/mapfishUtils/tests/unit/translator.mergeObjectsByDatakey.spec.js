@@ -9,9 +9,6 @@ describe("addons/shared/js/mapfishUtils/translator.mergeObjectsByDatakey.js", ()
         sinon.stub(console, "error").callsFake(error);
     });
 
-    afterEach(function () {
-        sinon.restore();
-    });
 
     describe("mergeObjectsByDatakey", () => {
         it("should return an empty array if the given parameter is undefined", () => {

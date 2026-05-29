@@ -15,7 +15,6 @@ describe.skip("AccessibiltyAnalysis/utils/styleIsochroneFeatures", () => {
 
     afterEach(function () {
         console.error.restore();
-        sinon.restore();
     });
 
     it("should call an error if the given parameter is an object", () => {

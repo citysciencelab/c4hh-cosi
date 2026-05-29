@@ -92,7 +92,6 @@ describe.skip("addons/cosi/Dashboard/components/TableCell.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
 
         if (wrapper) {
             wrapper.destroy();

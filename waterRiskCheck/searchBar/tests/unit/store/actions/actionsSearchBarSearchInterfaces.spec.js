@@ -9,9 +9,6 @@ const {
     search
 } = actions;
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/searchBar/store/actions/actionsSearchBarSearchInterfaces.js", () => {
     let commit,
@@ -26,9 +23,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchInterfaces.j
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("startSearch", () => {
         it("should start search to abc-straße", () => {

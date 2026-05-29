@@ -4,9 +4,6 @@ import store from "../../../../../../src/app-store/index.js";
 import SearchInterface from "../../../../../../src/modules/searchBar/searchInterfaces/searchInterface.js";
 import SearchInterfaceGfiOnAddressGaz from "../../../js/searchInterfaceGfiOnAddressGaz.js";
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("addons/searchInterfaces/exampleSearch/searchInterfaceGfiOnAddressGaz.js", () => {
     let searchInterface = null;

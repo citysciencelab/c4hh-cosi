@@ -127,9 +127,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
         sinon.stub(layerCollection, "getLayerById").returns(layer);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

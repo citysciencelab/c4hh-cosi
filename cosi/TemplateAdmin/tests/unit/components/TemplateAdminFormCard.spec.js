@@ -4,7 +4,6 @@ import {expect} from "chai";
 import Vuex from "vuex";
 // import TemplateAdminFormCard from "../../../components/TemplateAdminFormCard.vue";
 import indexTemplateAdmin from "../../../store/indexTemplateAdmin";
-import sinon from "sinon/pkg/sinon-esm";
 
 // const localVue = createLocalVue();
 
@@ -24,10 +23,6 @@ describe.skip("addons/cosi/TemplateAdmin/components/TemplateAdminFormCard.vue", 
             }
         }),
         TemplateAdminFormCard = undefined;
-
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should render card", () => {

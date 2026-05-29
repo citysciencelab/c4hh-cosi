@@ -421,9 +421,6 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
             getLayerWhereStub = sinon.stub(rawLayerList, "getLayerWhere");
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("returns layersToRequest when no bufferAttributes are defined", () => {
             const layersToRequest = [{id: "a"}, {id: "b"}],

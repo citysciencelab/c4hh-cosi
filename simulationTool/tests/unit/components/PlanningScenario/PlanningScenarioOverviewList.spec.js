@@ -7,9 +7,6 @@ import layerCollection from "../../../../../../src/core/layers/js/layerCollectio
 
 config.global.mocks.$t = key => key;
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioOverviewList.vue", () => {
     let store;

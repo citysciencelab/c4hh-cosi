@@ -107,7 +107,6 @@ describe("addons/dipasNavigator/components/DipaNavigatorTheme.vue", () => {
             wrapper.unmount();
         }
 
-        sinon.restore();
         sinon.resetHistory();
     });
 

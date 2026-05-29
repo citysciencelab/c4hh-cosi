@@ -124,9 +124,6 @@ describe("addons/tacticalMark/components/TacticalMark.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("wrapper should exist", () => {

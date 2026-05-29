@@ -61,9 +61,6 @@ describe("addons/waterRiskCheck/searchBar/components/ActionButton.vue", () => {
         callActionSpy = sinon.spy(ActionButton.methods, "callAction");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("render ActionButton", () => {
         it("should render button with 'setMarker' icon", async () => {

@@ -122,9 +122,6 @@ describe("ADDONS: addons/boris/store/actionsBoris.js", () => {
         axiosPostStub = sinon.stub(axios, "post").resolves({status: 200, data: {}});
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("initialize", () => {
         it("initializes the layerlist ", () => {

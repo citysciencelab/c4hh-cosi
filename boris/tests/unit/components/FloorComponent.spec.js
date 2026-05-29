@@ -71,9 +71,6 @@ describe("ADDONS: addons/boris/components/FloorComponent.vue", () => {
             propsData: propsData
         });
     });
-    afterEach(function () {
-        sinon.restore();
-    });
 
     describe("Boris floor component template", () => {
 

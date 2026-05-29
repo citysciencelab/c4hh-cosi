@@ -119,9 +119,6 @@ describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should exist", async () => {
         const wrapper = shallowMount(Component, {global: {plugins: [store]}});

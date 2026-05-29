@@ -22,9 +22,6 @@ describe("addons/shared/js/mapfishUtils/bufferGeometrie.js", () => {
         sinon.stub(console, "error").callsFake(sinon.spy());
     });
 
-    afterEach(function () {
-        sinon.restore();
-    });
 
     it("should return a different geometry", () => {
         const bufferedPolygon = bufferGeometry(polygon, 200, "EPSG:4326");

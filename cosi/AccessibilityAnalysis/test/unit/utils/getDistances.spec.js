@@ -9,7 +9,6 @@ describe.skip("AccessibiltyAnalysis/utils/getDistances", () => {
 
     afterEach(function () {
         console.error.restore();
-        sinon.restore();
     });
 
     describe("getDistances", () => {

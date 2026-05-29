@@ -82,7 +82,6 @@ describe.skip("addons/cosi/Dashboard/components/TableRowMenu.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
 
         if (wrapper) {
             wrapper.destroy();

@@ -1,5 +1,4 @@
 import {expect} from "chai";
-import sinon from "sinon";
 
 import createVectorLayer from "../../createVectorLayer.js";
 import store from "../../../../../../src/app-store/index.js";
@@ -12,9 +11,6 @@ describe("addons/shared/js/mapfishUtils/createVectorLayer.js", () => {
                 getCode: () => "EPSG:25832"
             }
         };
-    });
-    afterEach(() => {
-        sinon.restore();
     });
 
     describe("getPointStyle", () => {

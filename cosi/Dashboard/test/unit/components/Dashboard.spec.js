@@ -157,7 +157,6 @@ describe.skip("addons/cosi/Dashboard/components/Dashboard.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
 
         if (wrapper) {
             wrapper.destroy();

@@ -54,7 +54,6 @@ describe.skip("addons/DistrictSelector/utils/styleSelectedDistrictLevels.js", ()
 
         afterEach(function () {
             console.error.restore();
-            sinon.restore();
         });
 
         it("should return undefined if the given parameter is an object", () => {
@@ -291,7 +290,6 @@ describe.skip("addons/DistrictSelector/utils/styleSelectedDistrictLevels.js", ()
 
         afterEach(function () {
             console.error.restore();
-            sinon.restore();
         });
 
         it("should call an error if the given parameter is an object", () => {

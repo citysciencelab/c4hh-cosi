@@ -47,9 +47,6 @@ describe("addons/valuationPrint/js/unionFeatures.js", () => {
         sinon.stub(console, "error").callsFake(error);
     });
 
-    afterEach(function () {
-        sinon.restore();
-    });
 
     it("should only return one feature if more than one is passed", () => {
         const feature = unionFeatures([features[0], features[1], features[2]]);

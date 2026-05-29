@@ -5,9 +5,6 @@ import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import sinon from "sinon";
 
 describe("addons/shared/js/mapfishUtils/mapfishDialog.js", () => {
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should create an instance with expected propertys", () => {
         const mapfishDialogInstance = new MapfishDialog({}, {}, "defaultValue", "EPSG:1234", "layoutName", "outputFilename", false);

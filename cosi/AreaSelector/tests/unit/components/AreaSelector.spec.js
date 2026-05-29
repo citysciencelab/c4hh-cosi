@@ -123,9 +123,6 @@ describe.skip("addons/cosi/AreaSelector/components/AreaSelector.vue", () => {
             }
         });
     });
-    afterEach(function () {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

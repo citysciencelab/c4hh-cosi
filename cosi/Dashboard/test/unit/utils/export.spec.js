@@ -15,7 +15,6 @@ describe.skip("Dashboard/utils/export", () => {
 
     afterEach(function () {
         console.error.restore();
-        sinon.restore();
     });
 
     describe("prepareTableExport", () => {

@@ -4,7 +4,6 @@ import {expect} from "chai";
 import Vuex from "vuex";
 // import TemplateAdminForm from "../../../components/TemplateAdminForm.vue";
 import indexTemplateAdmin from "../../../store/indexTemplateAdmin";
-import sinon from "sinon/pkg/sinon-esm";
 
 // const localVue = createLocalVue();
 
@@ -35,9 +34,6 @@ describe.skip("addons/cosi/TemplateAdmin/components/TemplateAdminForm.vue", () =
         }),
         TemplateAdminForm = undefined;
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should render form", () => {

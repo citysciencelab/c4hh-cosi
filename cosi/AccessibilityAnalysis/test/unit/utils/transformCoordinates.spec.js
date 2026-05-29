@@ -12,7 +12,6 @@ describe.skip("Accessibility/utils/transformCoordinates", () => {
 
     afterEach(function () {
         console.error.restore();
-        sinon.restore();
     });
 
     describe("transformCoordinates", () => {

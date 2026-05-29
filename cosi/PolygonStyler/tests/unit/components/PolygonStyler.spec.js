@@ -75,9 +75,6 @@ describe.skip("addons/cosi/PolygonStyler/components/PolygonStyler.vue", () => {
         store.commit("Tools/PolygonStyler/setActive", true);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

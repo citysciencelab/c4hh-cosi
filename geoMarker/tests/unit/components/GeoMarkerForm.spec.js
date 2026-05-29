@@ -107,7 +107,6 @@ describe("addons/geoMarker/components/GeoMarkerForm.vue", () => {
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     it("should render and have the correct class", () => {

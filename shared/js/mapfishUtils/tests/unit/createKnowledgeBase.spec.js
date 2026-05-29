@@ -4,9 +4,6 @@ import Polygon from "ol/geom/Polygon.js";
 import sinon from "sinon";
 import {createAttributesByFeatures, addKnowledgeBaseError, createKnowledgeBase, sumNumbers} from "../../createKnowledgeBase.js";
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("addons/shared/js/mapfishUtils/createKnowledgeBase.js", () => {
     const features = [

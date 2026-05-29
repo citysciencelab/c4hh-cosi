@@ -6,9 +6,6 @@ import ThemeConfig from "../../../themeConfig.json";
 
 config.global.mocks.$t = key => key;
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {
     const properties = {

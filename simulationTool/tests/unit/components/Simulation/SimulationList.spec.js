@@ -51,9 +51,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationList.vue", () =>
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

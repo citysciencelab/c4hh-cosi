@@ -56,9 +56,6 @@ describe("addons/streetSmart/components/StreetSmart.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the StreetSmart", () => {
         wrapper = shallowMount(StreetSmartComponent, {

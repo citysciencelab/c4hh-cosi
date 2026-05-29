@@ -79,9 +79,6 @@ describe("ADDONS: addons/boris/components/InformationComponent.vue", () => {
             propsData: propsData
         });
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Boris Information Component template", () => {
         it("renders Information Component", () => {

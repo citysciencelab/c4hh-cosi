@@ -113,7 +113,6 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
         Boris.actions.sendWpsConvertRequest = originalSendWpsConvertRequest;
         Boris.actions.updateSelectedBrwFeature = originalUpdateSelectedBrwFeature;
 
-        sinon.restore();
     });
 
     describe("Boris template", () => {

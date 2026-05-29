@@ -107,9 +107,6 @@ describe("addons/waterRiskCheck/components/WaterRiskCheck.vue", () => {
         );
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

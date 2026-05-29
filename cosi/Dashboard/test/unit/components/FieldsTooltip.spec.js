@@ -57,7 +57,6 @@ describe.skip("addons/cosi/Dashboard/components/FieldsTooltip.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
 
         if (wrapper) {
             wrapper.destroy();

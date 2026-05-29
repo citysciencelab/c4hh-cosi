@@ -49,7 +49,6 @@ describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenTheme.vue
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     it("should exist", () => {
@@ -97,9 +96,6 @@ describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenTheme.vue
                 }
                 return null;
             });
-        });
-        afterEach(() => {
-            sinon.restore();
         });
         it("should have a fullscreenview-button", () => {
 

@@ -12,10 +12,6 @@ beforeAll(() => {
     });
 });
 
-afterEach(() => {
-    sinon.restore();
-});
-
 describe("addons/SimulationTool/store/actions", () => {
     describe("isFormatValid", () => {
         let payload = "";

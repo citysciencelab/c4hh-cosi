@@ -88,7 +88,6 @@ describe.skip("addons/cosi/Dashboard/components/StatsTrend.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
 
         if (wrapper) {
             wrapper.destroy();

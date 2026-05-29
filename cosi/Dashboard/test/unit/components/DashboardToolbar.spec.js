@@ -86,7 +86,6 @@ describe.skip("addons/cosi/Dashboard/components/DashboardToolbar.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
 
         if (wrapper) {
             wrapper.destroy();

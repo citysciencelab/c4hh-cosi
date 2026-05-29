@@ -15,7 +15,6 @@ describe("addons/gfiThemes/combinedGfi/utils/printService.js", () => {
     afterEach(() => {
         global.fetch = originalFetch;
         console.error = originalConsoleError;
-        sinon.restore();
     });
 
     it("should call onError when feature is missing", async () => {

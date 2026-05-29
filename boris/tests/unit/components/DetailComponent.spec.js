@@ -64,9 +64,6 @@ describe("ADDONS: addons/boris/components/DetailComponent.vue", () => {
         };
 
     });
-    afterEach(function () {
-        sinon.restore();
-    });
 
     describe("Boris Detail Component template", () => {
         const data = {

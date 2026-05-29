@@ -66,9 +66,6 @@ describe("addons/streetSmart/store/actionsStreetSmart", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("setPosition", () => {
         it("setPosition shall call commit and dispatch once, if StreetSmartApi.open result has one entry; 3D cursor and address visibility are toggled", async () => {

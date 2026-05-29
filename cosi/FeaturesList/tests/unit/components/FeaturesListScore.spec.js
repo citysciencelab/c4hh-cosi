@@ -97,9 +97,6 @@ describe.skip("addons/cosi/FeaturesList/components/FeaturesListScore.vue", () =>
         });
     });
 
-    afterEach(function () {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

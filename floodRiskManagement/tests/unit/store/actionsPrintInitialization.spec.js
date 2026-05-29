@@ -54,9 +54,6 @@ describe("addons/floodRiskManagement/store/actionsPrintInitialization.js", () =>
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
     describe("chooseCurrentLayout", () => {
         it("should choose the current Layout", async () => {
             const payload = [

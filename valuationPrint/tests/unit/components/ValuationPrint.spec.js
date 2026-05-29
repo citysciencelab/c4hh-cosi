@@ -158,9 +158,6 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
         sinon.stub(ValuationPrint.methods, "createParcelLayer");
     });
 
-    afterEach(function () {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {
@@ -444,9 +441,6 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
                 stubParcelSearchFeature = sinon.stub(ValuationPrint.methods, "handleParcelSearch");
             });
 
-            afterEach(function () {
-                sinon.restore();
-            });
 
             it("should call handleParcelSearch, if the parcel search delivers a result", () => {
                 const wrapper = factory.getShallowMount({});

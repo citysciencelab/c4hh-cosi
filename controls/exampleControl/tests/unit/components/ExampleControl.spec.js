@@ -34,9 +34,6 @@ describe("addons/controls/exampleControl/components/ExampleControl.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the button", () => {
         const wrapper = mount(ExampleControl, {

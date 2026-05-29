@@ -83,7 +83,6 @@ describe("addons/vcOblique/components/VcOblique.vue", () => {
         });
     });
     afterEach(function () {
-        sinon.restore();
         VcOblique.actions.obliqueView = obliqueViewOrig;
         VcOblique.actions.initObliqueView = initObliqueViewOrig;
         VcOblique.actions.resetObliqueViewer = initResetObliqueViewer;

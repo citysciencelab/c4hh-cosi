@@ -124,9 +124,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
         sinon.stub(console, "warn").callsFake(consoleWarnSpy);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

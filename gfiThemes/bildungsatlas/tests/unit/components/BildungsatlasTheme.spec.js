@@ -33,9 +33,6 @@ describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
             }
         });
     });
-    afterEach(() => {
-        sinon.restore();
-    });
     describe("created", () => {
         it("should set the internal value of subTheme to the value found in the feature", () => {
             expect(wrapper.vm.subTheme).to.equal("");

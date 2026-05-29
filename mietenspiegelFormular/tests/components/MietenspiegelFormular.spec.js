@@ -71,9 +71,6 @@ describe("addons/mietenspiegelFormular/components/MietenspiegelFormular.vue", ()
         </wfs:FeatureCollection>`);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

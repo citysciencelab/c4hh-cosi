@@ -59,9 +59,6 @@ describe("addons/waterRiskCheck/searchBar/components/SearchBarSuggestionListItem
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("test the result item", () => {
         it("shows toolTip if available", () => {

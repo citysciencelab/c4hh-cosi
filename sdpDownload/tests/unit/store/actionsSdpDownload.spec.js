@@ -21,11 +21,6 @@ describe("addons/sdpDownload/store/actionsSdpDownload", () => {
         getters = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
-
     it("toggleRasterLayer dispatch add layer, if active is true", () => {
         getters = {wmsRasterLayerId: importedState.wmsRasterLayerId, active: true};
 

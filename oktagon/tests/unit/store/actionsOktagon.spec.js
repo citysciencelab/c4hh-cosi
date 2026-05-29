@@ -18,9 +18,6 @@ describe("addons/oktagon/store/actionsOktagon", () => {
         sinon.stub(i18next, "t").callsFake(key => key);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("addCoordinatesToSubmitObject adds the coordinate parameters to the submit object", async () => {
         const commit = sinon.spy(),

@@ -1,7 +1,6 @@
 import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import sinon from "sinon";
 
 import SearchBarResultListGeneralItemComponent from "../../../components/SearchBarResultListGeneralItem.vue";
 
@@ -60,9 +59,6 @@ describe("addons/waterRiskCheck/searchBar/components/SearchBarResultListGeneralI
         store = createStore({});
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("test the result item", () => {
         it("shows toolTip if available and check actionButtons", () => {

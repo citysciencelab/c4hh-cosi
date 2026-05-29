@@ -60,9 +60,6 @@ describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
         createModifyInteractionStub = sinon.stub(modifyInteraction, "createModifyInteraction");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

@@ -68,7 +68,6 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
         };
     });
     afterEach(() => {
-        sinon.restore();
         global.document = originalDocument;
     });
 
@@ -239,9 +238,6 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
             };
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         describe("obliqueView", () => {
             it("should correctly detect vcm@4 and use its methods", async () => {

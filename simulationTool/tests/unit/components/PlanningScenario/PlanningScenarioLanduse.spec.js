@@ -251,9 +251,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
         sinon.stub(layerCollection, "getLayerById").returns(layer);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", async function () {

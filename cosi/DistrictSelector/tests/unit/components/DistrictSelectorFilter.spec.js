@@ -44,9 +44,6 @@ describe.skip("addons/cosi/DistrictSelector/components/DistrictSelectorFilter.vu
             }
         };
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

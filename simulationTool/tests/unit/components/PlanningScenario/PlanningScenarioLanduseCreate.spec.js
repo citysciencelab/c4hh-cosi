@@ -224,9 +224,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLand
             }
         });
     });
-    afterEach(() => {
-        sinon.restore();
-    });
     describe("Component DOM", () => {
         it("should exist", async function () {
             const wrapper = factory.getShallowMount();

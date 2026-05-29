@@ -91,10 +91,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     describe("Component DOM", () => {
         it("should exist", () => {
             expect(wrapper.exists()).to.be.true;

@@ -46,10 +46,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         sinon.stub(markerHelper, "extentIsValid").returns(true);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     describe("activateLayerInTopicTree", () => {
         it("should activate a layer in topic tree", () => {
             const layerId = "123",
@@ -641,11 +637,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
                 },
                 "Maps/mode": "3D"
             };
-        });
-
-
-        afterEach(() => {
-            sinon.restore();
         });
 
         it("should not perform any action if the mode is not 3D", async function () {

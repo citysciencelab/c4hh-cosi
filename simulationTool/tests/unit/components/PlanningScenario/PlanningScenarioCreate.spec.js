@@ -121,9 +121,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

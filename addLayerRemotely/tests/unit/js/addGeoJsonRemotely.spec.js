@@ -63,7 +63,6 @@ describe("ADDON: addGeoJsonRemotely - getFeatureIds", function () {
         });
 
     afterEach(function () {
-        sinon.restore();
         sinon.resetHistory();
     });
 

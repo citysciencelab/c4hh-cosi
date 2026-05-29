@@ -56,11 +56,6 @@ describe("addons/sdpDownload/components/SdpDownload.vue", () => {
         store.commit("Modules/SdpDownload/setActive", true);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
-
     it("should find form in component", () => {
         const wrapper = shallowMount(SDPComponent, {
             global: {

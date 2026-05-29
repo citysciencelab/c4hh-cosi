@@ -452,9 +452,6 @@ describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => 
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {

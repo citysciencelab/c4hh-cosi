@@ -38,9 +38,6 @@ describe("addons/controls/toggleMouseHover/components/ToggleMouseHover.vue", () 
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should render the button with mouse2 icon", async () => {
         gettterMouseHover = {};

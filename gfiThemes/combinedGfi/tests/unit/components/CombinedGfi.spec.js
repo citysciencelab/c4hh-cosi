@@ -162,7 +162,6 @@ describe("addons/gfiThemes/combinedGfi/components/CombinedGfi.vue", () => {
 
     afterEach(() => {
         global.mapCollection = originalMapCollection;
-        sinon.restore();
         wrapper.unmount();
     });
 

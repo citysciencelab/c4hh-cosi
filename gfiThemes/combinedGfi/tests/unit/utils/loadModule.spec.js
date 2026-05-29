@@ -9,9 +9,6 @@ describe("addons/gfiThemes/combinedGfi/utils/loadModule.js", () => {
         fetchStub = sinon.stub(global, "fetch");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("loads and interprets a JS module", async () => {
         fetchStub.resolves(new Response(

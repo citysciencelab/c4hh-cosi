@@ -33,9 +33,6 @@ describe("src/modules/wfst/store/actionsGeoMarker.js", () => {
         mapCollection.clear();
         mapCollection.addMap(map, "2D");
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("setMapInteraction", () => {
         beforeEach(() => {
@@ -53,9 +50,6 @@ describe("src/modules/wfst/store/actionsGeoMarker.js", () => {
             };
             sinon.stub(layerCollection, "getLayerById").returns(layer);
             rootGetters = {};
-        });
-        afterEach(() => {
-            sinon.restore();
         });
 
         it("should handle Point interaction", async () => {
@@ -118,9 +112,6 @@ describe("src/modules/wfst/store/actionsGeoMarker.js", () => {
             };
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should rollback geometry and refresh layers when rollbackGeoMarkerFeature and geoMarkerUpdateLayerIds are set", () => {
             actionsGeoMarker.rollbackGeoMarkerUpdateFeature({commit, getters});

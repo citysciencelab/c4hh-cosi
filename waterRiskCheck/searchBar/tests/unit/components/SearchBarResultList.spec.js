@@ -127,9 +127,6 @@ describe("addons/waterRiskCheck/searchBar/components/SearchBarResultList.vue", (
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("test the rendering with different parameters", () => {
         it("renders the SearchBarResultList", async () => {

@@ -1,9 +1,8 @@
 // import {config, shallowMount, createLocalVue} from "@vue/test-utils";
 import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-// import DistrictSelectorLevel from "../../../components/DistrictSelectorLevel.vue";
 // import Vuetify from "vuetify";
-import sinon from "sinon";
+// import DistrictSelectorLevel from "../../../components/DistrictSelectorLevel.vue";
 // import Vue from "vue";
 
 // config.mocks.$t = key => key;
@@ -33,9 +32,6 @@ describe.skip("addons/cosi/DistrictSelector/components/DistrictSelectorLevel.vue
             }
         };
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {
