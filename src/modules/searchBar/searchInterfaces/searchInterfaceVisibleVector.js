@@ -2,7 +2,6 @@ import layerCollection from "@core/layers/js/layerCollection.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
 import store from "@appstore/index.js";
 import SearchInterface from "./searchInterface.js";
-import wfs from "@masterportal/masterportalapi/src/layer/wfs.js";
 
 import Cluster from "ol/source/Cluster.js";
 import * as olExtent from "ol/extent.js";
@@ -73,10 +72,14 @@ SearchInterfaceVisibleVector.prototype.findMatchingFeatures = function (visibleV
         const layer = layerCollection.getLayerById(layerConfig.id),
             layerSource = layer.getLayerSource() instanceof Cluster ? layer.getLayerSource().getSource() : layer.getLayerSource(),
             searchFields = Array.isArray(layerConfig.searchField) ? layerConfig.searchField : [layerConfig.searchField],
-            features = layerSource.getFeatures(),
-            attributes = layer.attributes;
+            attributes = layer.attributes,
+            layerTyp = layerConfig.typ.toUpperCase();
 
-        wfs.loadFeaturesManually(attributes, layerSource);
+        if ((layerTyp === "WFS" || layerTyp === "OAF") && typeof layer.loadFeaturesManually === "function") {
+            layer.loadFeaturesManually(attributes);
+        }
+
+        const features = layerSource.getFeatures();
 
         searchFields.forEach(searchField => {
             features.forEach(feature => {

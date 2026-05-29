@@ -64,6 +64,7 @@
 - Issue \#1592: FileImport/Draw: Fixed label text offset not being restored when importing a drawn GeoJSON file.
 - Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset.
 - Issue \#1606: proxyAgent: Restored proxy agent support in the Vite development server, so external web resources can be accessed again from localhost through a corporate proxy.
+- Issue \#1611: searchInterfaceVisibleVector: Fixed bugs using GeoJSON layers with `searchField`.
 - Issue \#1612: GetFeatureInfo: Fixed an issue where the map marker remained visible after closing GetFeatureInfo after entering a query in the main menu search.
 - WMS-Time: The `dimensionName` attribute is now being processed correctly again, so queries for individual dimensions are working again.
 - Fix package-lock.json for node version 24.15.0.

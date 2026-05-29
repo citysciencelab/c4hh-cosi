@@ -8,7 +8,6 @@ import sinon from "sinon";
 import VectorSource from "ol/source/Vector.js";
 
 import layerCollection from "@core/layers/js/layerCollection.js";
-import wfs from "@masterportal/masterportalapi/src/layer/wfs.js";
 import SearchInterface from "@modules/searchBar/searchInterfaces/searchInterface.js";
 import SearchInterfaceVisibleVector from "@modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js";
 
@@ -28,7 +27,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js
     });
 
     beforeEach(() => {
-        sinon.stub(wfs, "loadFeaturesManually");
         coordinates = [[
             [10, 10, 0],
             [10, 20, 0],
@@ -77,6 +75,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js
                     };
                 }
             },
+            loadFeaturesManually: sinon.stub(),
             getLayerSource: () => {
                 return {
                     getFeatures: () => {
@@ -111,6 +110,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js
                         id: "123",
                         name: "The layer",
                         searchField: "name",
+                        typ: "WFS",
                         url: "https://example.com/wfs",
                         version: "1.1.0",
                         featureType: "exampleFeatureType",
@@ -183,6 +183,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js
                             };
                         }
                     },
+                    loadFeaturesManually: sinon.stub(),
                     getLayerSource: () => new Cluster({
                         distance: 100,
                         source: new VectorSource({
@@ -199,6 +200,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js
                         id: "789",
                         name: "The layer",
                         searchField: "name",
+                        typ: "WFS",
                         url: "https://example.com/wfs",
                         version: "1.1.0",
                         featureType: "exampleFeatureType",
