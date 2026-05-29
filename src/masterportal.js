@@ -17,7 +17,7 @@ let app;
 
 window.__appMounted = window.__appMounted || false;
 const isDev = import.meta.env.MODE === "development",
-    // GET parameters need to be there for a reason - do not drop them!
+    // URL parameters (window.location.search) appended to the masterportal request are also appended to the path to the Config.js, used by addons
     configPath = globalUrlParams.getConfigJsPath() === null ? window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1) + "config.js" + window.location.search : globalUrlParams.getConfigJsPath(),
     loadConfigJs = new Promise((resolve, reject) => {
         const script = document.createElement("script");

@@ -47,6 +47,7 @@ export default {
         if (state.configJs?.portalConf?.slice(-5) === format) {
             targetPath = state.configJs.portalConf;
         }
+        // URL parameters in the URL to config.json remain unchanged, used by addons
         else if (state.configJs?.portalConf?.slice(-5) !== format && state.configJs?.portalConf?.includes(format) && state.configJs?.portalConf?.includes("?")) {
             targetPath = state.configJs.portalConf;
         }

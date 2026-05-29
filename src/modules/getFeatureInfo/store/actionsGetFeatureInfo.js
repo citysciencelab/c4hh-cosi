@@ -100,6 +100,7 @@ export default {
             });
 
         if (!clickCoordinate) {
+            // happens on use of plugin remoteInterface to open GFI
             console.warn("No click coordinate set for GetFeatureInfo.");
             return null;
         }
