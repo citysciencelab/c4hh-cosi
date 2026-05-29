@@ -53,6 +53,7 @@
                       "closeAll": "Close all"
                     },
                     "groupByLabel": "Group by",
+                    "selectOptionLabel": "Select option",
                     "table": {
                       "showPositionInMap": "Show position of dataset in map",
                       "goToDetails": "Show details for this dataset",

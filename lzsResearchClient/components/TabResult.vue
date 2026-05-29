@@ -211,21 +211,35 @@ export default {
                             {{ $t("additional:modules.lzsResearchClient.tabs.tabResult.groupByLabel") }}
                         </label>
 
-                        <Multiselect
-                            :id="`group-by-select-${index}`"
-                            v-model="step.attributeToGroupBy"
-                            :options="getAttributesToGroupBy(step)"
-                            name="select-box"
-                            :multiple="false"
-                            :show-labels="true"
-                            open-direction="bottom"
-                            :hide-selected="false"
-                            :allow-empty="false"
-                            :close-on-select="true"
-                            :clear-on-select="false"
-                            :internal-search="false"
-                            @select="groupByReRenderKey++"
-                        />
+                        <div class="attribute-select">
+                            <Multiselect
+                                :id="`group-by-select-${index}`"
+                                v-model="step.attributeToGroupBy"
+                                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabResult.selectOptionLabel')"
+                                :options="getAttributesToGroupBy(step)"
+                                name="select-box"
+                                :multiple="false"
+                                :placeholder="step.attributeToGroupBy"
+                                :show-labels="false"
+                                open-direction="bottom"
+                                :hide-selected="false"
+                                :allow-empty="false"
+                                :close-on-select="true"
+                                :clear-on-select="false"
+                                :internal-search="false"
+                                @select="groupByReRenderKey++"
+                            >
+                                <template #singleLabel="props">
+                                    <span>{{ props.option }}</span>
+                                </template>
+                                <template #option="props">
+                                    <div class="attribute-option-wrapper">
+                                        <span :class="`attribute-check-icon ${props.option === step.attributeToGroupBy ? 'bi bi-check2' : ''}`" />
+                                        <span>{{ props.option }}</span>
+                                    </div>
+                                </template>
+                            </Multiselect>
+                        </div>
                     </div>
 
                     <AccordionItem
@@ -306,6 +320,21 @@ export default {
 
     div.groupBySelectContainer {
         display: flex;
+        flex-direction: column;
+
+        .attribute-select {
+            margin: 0.5rem 0;
+
+            .attribute-option-wrapper {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+
+                .attribute-check-icon {
+                    width: 16px;
+                }
+            }
+        }
     }
 
     :deep(div.archive-step) {
@@ -322,6 +351,32 @@ export default {
             padding: 0.5rem 1rem;
             font-size: 1rem;
             margin-top: 0.5rem;
+        }
+    }
+}
+</style>
+
+<style lang="scss">
+.attribute-select {
+    .multiselect,
+    .multiselect__input::placeholder,
+    .multiselect__option {
+        color: $black;
+        font-weight: normal;
+    }
+
+    .multiselect__option {
+        &:after,
+        &--selected,
+        &--selected:after {
+            color: black;
+            background: $light_grey_hover;
+        }
+
+        &--highlight,
+        &--highlight:after {
+            color: $white;
+            background: $secondary;
         }
     }
 }

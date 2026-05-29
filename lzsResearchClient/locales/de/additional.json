@@ -53,6 +53,7 @@
                       "closeAll": "Alles zuklappen"
                     },
                     "groupByLabel": "Gruppieren nach",
+                    "selectOptionLabel": "Option selektieren",
                     "table": {
                       "showPositionInMap": "Position des Datensatzes in der Karte anzeigen",
                       "goToDetails": "Details zum Datensatz anzeigen",
