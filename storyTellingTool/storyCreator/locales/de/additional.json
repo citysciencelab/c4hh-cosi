@@ -10,6 +10,8 @@
       "discardStory": "Story verwerfen",
       "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
       "noSettings": "Keine Fachdaten oder Ansichten festgelegt",
+      "numberOfChapters": "Kapitel",
+      "readOnly": "schreibgeschützt",
       "labels": {
         "storyTitle": "Story-Namen eingeben",
         "storyDescription": "Beschreibung der Story (optional)",

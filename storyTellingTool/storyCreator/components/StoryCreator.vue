@@ -7,7 +7,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapGetters, mapMutations} from "vuex";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
-import StoryCreatorChapterCard from "./StoryCreatorChapterCard.vue";
+import InfoCard from "../../shared/card/components/InfoCard.vue";
 
 export default {
     name: "StoryCreator",
@@ -18,7 +18,7 @@ export default {
         FlatButton,
         InputText,
         StoryCreatorChapter,
-        StoryCreatorChapterCard
+        InfoCard
     },
     data () {
         return {
@@ -44,6 +44,7 @@ export default {
                     chapterItems: {}
                 }
             ]
+
         };
     },
     computed: {
@@ -227,13 +228,14 @@ export default {
                 handle=".card"
             >
                 <template #item="{ element, index }">
-                    <StoryCreatorChapterCard
-                        :chapter-title="element.title"
-                        :chapter-text="element.text"
-                        :chapter-image="element.image"
+                    <InfoCard
+                        card-type="chapter"
+                        :card-title="element.title"
+                        :card-text="element.text"
+                        :card-image="element.image"
                         :photo-credit="element.photoCredit"
                         :alt-text="element.altText"
-                        :chapter-items="element.chapterItems"
+                        :card-items="element.chapterItems"
                         @delete="() => deleteChapter(index)"
                     />
                 </template>

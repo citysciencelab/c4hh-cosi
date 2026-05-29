@@ -10,6 +10,8 @@
       "discardStory": "Discard Story",
       "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
       "noSettings": "No technical data or map positions have been defined",
+      "numberOfChapters": "Chapter",
+      "readOnly": "Read-only",
       "labels": {
         "storyTitle": "Enter story name",
         "storyDescription": "Story description (optional)",
