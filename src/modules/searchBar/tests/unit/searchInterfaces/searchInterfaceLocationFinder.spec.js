@@ -46,7 +46,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceLocationFinder.j
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("prototype", () => {

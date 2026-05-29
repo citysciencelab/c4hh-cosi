@@ -76,7 +76,6 @@ describe("src/modules/menu/MenuContainerBodyRootItemElement.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

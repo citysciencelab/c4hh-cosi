@@ -127,9 +127,6 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should have a title", () => {
         const wrapper = mount(DetachedTemplate, {

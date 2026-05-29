@@ -20,9 +20,6 @@ describe("src/core/js/layers/layer3d.js", () => {
         mapCollection.addMap(map, "3D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLayer", () => {
         it("new Layer3d should create an layer with warning", () => {

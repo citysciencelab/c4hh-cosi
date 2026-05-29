@@ -10,9 +10,6 @@ import Point from "ol/geom/Point.js";
 import Polygon from "ol/geom/Polygon.js";
 import proj4 from "proj4";
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/draw/js/download/transform.js", () => {
     beforeEach(() => {

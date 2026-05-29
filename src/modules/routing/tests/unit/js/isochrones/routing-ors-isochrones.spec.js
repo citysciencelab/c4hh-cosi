@@ -25,7 +25,6 @@ describe("src/modules/routing/js/directions/routing-ors-directions.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         global.window = originWindow;
     });
 

@@ -47,9 +47,6 @@ const {memorize, forward, backward} = mutations,
         zoom: 1
     };
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/controls/backForward/store/mutationsBackForward.js", () => {
     describe("memorize", () => {

@@ -118,9 +118,6 @@ describe.skip("src/utils/createLayerAddToTree.js", () => {
             store.dispatch = sinon.spy();
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("test create new layer - layerId is null shall do nothing", async () => {
             const layerId = null,

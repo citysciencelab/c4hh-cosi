@@ -49,9 +49,6 @@ describe("src/modules/routing/js/geosearch/routing-komoot-geosearch.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("should fetchRoutingKomootGeosearch", () => {
         it("should process result correct", async () => {

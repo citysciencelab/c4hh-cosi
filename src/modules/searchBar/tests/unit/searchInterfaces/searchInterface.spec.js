@@ -12,7 +12,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterface.js", () => {
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("createPossibleActions", () => {

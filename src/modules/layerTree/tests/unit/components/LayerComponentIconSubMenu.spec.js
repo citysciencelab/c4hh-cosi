@@ -1,6 +1,5 @@
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import sinon from "sinon";
 
 import LayerComponentIconSubMenu from "@modules/layerTree/components/LayerComponentIconSubMenu.vue";
 
@@ -28,9 +27,6 @@ describe("src/modules/layerTree/components/LayerComponentIconSubMenu.vue", () =>
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the sub menu icon given as property to the component", () => {
         wrapper = shallowMount(LayerComponentIconSubMenu, {

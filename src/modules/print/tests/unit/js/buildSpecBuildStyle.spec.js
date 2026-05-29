@@ -77,7 +77,6 @@ describe("src/modules/print/utils/buildSpecbuildStyle", function () {
         buildSpec.getFeatureStyle = getFeatureStyle;
         buildSpec.getStyleAttributes = getStyleAttributes;
         buildSpec.buildPolygonStyle = buildPolygonStyle;
-        sinon.restore();
     });
 
     describe("buildStyle", function () {

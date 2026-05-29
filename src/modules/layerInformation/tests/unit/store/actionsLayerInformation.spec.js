@@ -25,9 +25,6 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
         commit = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("initialize the store", () => {
         let layerConf,

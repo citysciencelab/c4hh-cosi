@@ -16,9 +16,6 @@ describe("src/modules/compareFeatures/store/actionsCompareFeatures.js", () => {
         dispatch = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("isFeatureOnCompareList", () => {
         it("adds feature", () => {

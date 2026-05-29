@@ -264,7 +264,6 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

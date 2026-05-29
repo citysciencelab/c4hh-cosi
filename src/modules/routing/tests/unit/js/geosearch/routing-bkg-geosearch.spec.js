@@ -50,7 +50,6 @@ describe("src/modules/routing/js/geosearch/routing-bkg-geosearch.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         global.window = originWindow;
         store.getters = originStoreGetter;
         store.replaceState(originStoreState);

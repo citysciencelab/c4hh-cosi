@@ -52,9 +52,6 @@ describe("src/modules/bufferAnalysis/store/actionsBufferAnalysis.js", () => {
         state = Object.assign({}, defaultState);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("initJSTSParser", () => {
         it("initializes the JSTS parser by injecting open layer geometries ", () => {

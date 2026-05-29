@@ -4,9 +4,6 @@ import mutations from "@modules/wfsSearch/store/mutationsWfsSearch.js";
 
 describe("src/modules/wfsSearch/store/mutationsWfsSearch.js", () => {
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("addOptions", () => {
         const addedOptions = [

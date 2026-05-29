@@ -96,9 +96,6 @@ describe("src/modules/draw/components/DrawModule.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("DrawModule", () => {
         it("renders the draw module component", () => {

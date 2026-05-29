@@ -113,9 +113,6 @@ describe("src/app-store/js/buildTreeStructure.js", () => {
             }
         };
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("build", () => {
         it("should return the unchanged layerlist if no param is given", () => {

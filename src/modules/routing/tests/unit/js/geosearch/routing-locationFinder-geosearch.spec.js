@@ -22,9 +22,6 @@ describe("src/modules/routing/js/geosearch/routing-locationFinder-geosearch.js",
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("should fetchRoutingLocationFinderGeosearch", () => {
         it("should process result correct", async () => {

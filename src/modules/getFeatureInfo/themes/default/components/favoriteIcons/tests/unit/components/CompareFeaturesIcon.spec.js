@@ -30,9 +30,6 @@ describe("src/modules/getFeatureInfo/themes/default/components/favoriteIcons/com
                 }
             });
         });
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should draw a star if the compareFeatures is configured", () => {
             expect(wrapper.find("span > i").exists()).to.be.true;
@@ -69,9 +66,6 @@ describe("src/modules/getFeatureInfo/themes/default/components/favoriteIcons/com
                     compareFeaturesType: sinon.fake.returns("compareFeatures")
                 }
             });
-        });
-        afterEach(() => {
-            sinon.restore();
         });
 
         it("should render filled star button if feature is already on compare list", () => {

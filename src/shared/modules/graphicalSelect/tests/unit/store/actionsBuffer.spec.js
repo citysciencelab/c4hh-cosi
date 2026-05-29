@@ -16,9 +16,6 @@ describe("src/shared/modules/graphicalSelect/store/actionsBuffer.js", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createBufferFromLine", () => {
         it("should create a buffer polygon from a line geometry", () => {

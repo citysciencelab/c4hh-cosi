@@ -2,9 +2,6 @@ import {expect} from "chai";
 import sinon from "sinon";
 import drawCesiumMask from "@modules/print/js/drawCesiumMask.js";
 describe("drawCesiumMask", () => {
-    afterEach(() => {
-        sinon.restore();
-    });
     describe("autoDrawMask", () => {
         it("should call expected function", () => {
             const testStub = sinon.stub(),

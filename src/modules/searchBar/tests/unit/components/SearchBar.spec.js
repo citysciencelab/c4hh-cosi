@@ -141,9 +141,6 @@ describe("src/modules/searchBar/components/SearchBar.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("render SearchBar", () => {
         it("should render the SearchBar with button and input and mounted values", async () => {

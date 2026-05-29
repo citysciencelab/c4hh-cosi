@@ -213,9 +213,6 @@ describe("src/modules/layerPreview/components/LayerPreview.vue", () => {
         sinon.stub(axios, "get").returns(Promise.resolve({status: 200, data: []}));
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("do not render the LayerPreview for not supported layer-typ", async () => {
         const props = {

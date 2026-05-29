@@ -46,9 +46,6 @@ describe("src/modules/fileImport/components/FileImport.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the fileImport", () => {
         wrapper = shallowMount(FileImportComponent, {

@@ -50,7 +50,6 @@ describe("src/core/js/layers/layer2dVector.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         store.getters = origGetters;
     });
 

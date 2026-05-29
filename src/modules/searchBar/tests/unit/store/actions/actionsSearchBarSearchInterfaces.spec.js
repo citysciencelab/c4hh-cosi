@@ -10,9 +10,6 @@ const {
     search
 } = actions;
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/searchBar/store/actions/actionsSearchBarSearchInterfaces.js", () => {
     let commit,
@@ -27,9 +24,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchInterfaces.j
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("instantiateSearchInterfaces", () => {
         it("should instantiate the gazetteer search interface", () => {

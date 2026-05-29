@@ -12,9 +12,6 @@ describe("src/shared/modules/checkboxes/components/SwitchInput.vue", () => {
         interactionSpy = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should render an input field", () => {
         const id = "perfect-sitch",

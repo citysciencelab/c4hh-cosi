@@ -64,7 +64,6 @@ describe("src/core/js/layers/layerProcessor.js", () => {
 
     afterEach(() => {
         store.getters = origGetters;
-        sinon.restore();
     });
 
     describe("processLayerConfig", () => {

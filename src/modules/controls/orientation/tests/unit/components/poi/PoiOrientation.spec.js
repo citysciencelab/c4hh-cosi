@@ -90,7 +90,6 @@ describe("src/modules/controls/orientation/components/PoiOrientation.vue", () =>
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

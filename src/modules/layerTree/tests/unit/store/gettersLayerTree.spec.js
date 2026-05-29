@@ -26,9 +26,6 @@ describe("src/modules/layerTree/store/gettersLayerTree.js", () => {
         ];
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("layerTreeSortedLayerConfigs", () => {
         it("layerTreeSortedLayerConfigs sortLayerSequence is false", () => {

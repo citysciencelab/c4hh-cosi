@@ -12,9 +12,6 @@ describe("src/shared/js/api/wmsGetFeatureInfo.js", () => {
         sinon.stub(console, "warn").callsFake(warn);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("handleAxiosResponse", () => {
         const testFunctions = {

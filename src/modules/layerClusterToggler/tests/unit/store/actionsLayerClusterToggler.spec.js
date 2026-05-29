@@ -11,9 +11,6 @@ describe("src/modules/layerClusterToggler/store/actionsLayerClusterToggler.js", 
         dispatch = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("toggleLayerVisibility", () => {
         it("should toggle the visibility of the layers from layerIdList to true", () => {

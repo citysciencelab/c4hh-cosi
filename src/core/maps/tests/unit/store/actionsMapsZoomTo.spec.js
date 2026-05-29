@@ -39,9 +39,6 @@ describe("src/core/maps/store/actionsMapsZoomTo.js", () => {
         consoleErrorSpy = sinon.stub(console, "error");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should returns false if no config is given", async () => {
         rootGetters.zoomTo = null;

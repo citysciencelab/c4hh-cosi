@@ -20,7 +20,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceTopicTree.js", (
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("prototype", () => {

@@ -32,7 +32,6 @@ describe("src/core/maps/actionsMapsFeatureViaUrl", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         spy.resetHistory();
     });
 

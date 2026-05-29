@@ -82,7 +82,6 @@ describe("src/core/js/layers/layer2dVectorSensorThings.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         store.dispatch = origDispatch;
     });
 

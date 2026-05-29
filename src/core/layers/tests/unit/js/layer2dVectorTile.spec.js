@@ -85,9 +85,6 @@ describe("src/core/js/layers/layer2dVectorTile.js", () => {
         crs.registerProjections();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLayer", () => {
         it("new Layer2dVectorTile should create an layer with no one warning", () => {

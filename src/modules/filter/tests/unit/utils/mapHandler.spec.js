@@ -90,9 +90,6 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
             determineZIndex: () => 1
         };
     });
-    afterEach(() => {
-        sinon.restore();
-    });
     describe("constructor", () => {
         it("should pipe an error if function getLayerByLayerId is missing with the given handlers", () => {
             new MapHandler({}, onerror.call);

@@ -9,9 +9,6 @@ describe("src/modules/contact/js/httpClient", function () {
             sinon.stub(console, "error");
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("calls onSuccess parameter on success", async () => {
             sinon.stub(axios, "post").returns(

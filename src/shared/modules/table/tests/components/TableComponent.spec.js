@@ -70,7 +70,6 @@ describe("src/shared/modules/table/components/TableComponent.vue", () => {
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     describe("DOM", () => {
@@ -360,7 +359,6 @@ describe("src/shared/modules/table/components/TableComponent.vue", () => {
 
             await button.trigger("click");
             expect(resetAllSpy.calledOnce).to.be.true;
-            sinon.restore();
         });
     });
     describe("methods", () => {
@@ -929,7 +927,6 @@ describe("src/shared/modules/table/components/TableComponent.vue", () => {
                 sinon.stub(wrapper.vm, "moveColumnToPlace");
                 wrapper.vm.toggleColumnFix(column);
                 expect(wrapper.vm.fixedColumn).to.be.equal(column);
-                sinon.restore();
             });
         });
         describe("moveColumnToPlace", () => {
@@ -1497,9 +1494,6 @@ describe("src/shared/modules/table/components/TableComponent.vue", () => {
                     value: tableRowMock,
                     configurable: true
                 });
-            });
-            afterEach(() => {
-                sinon.restore();
             });
             it("should hide footer on switch to fullView", () => {
                 const fullViewSpy = sinon.spy(wrapper.vm, "fullView"),

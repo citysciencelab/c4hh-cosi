@@ -48,11 +48,6 @@ describe("src/modules/layerClusterToggler/components/LayerClusterToggler.vue", (
 
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
-
     it("should find the component LayerClusterToggler", () => {
         wrapper = shallowMount(LayerClusterTogglerComponent, {
             global: {

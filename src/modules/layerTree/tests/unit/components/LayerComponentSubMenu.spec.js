@@ -139,9 +139,6 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the sub menu given as property to the component without path if showFolderPath is false", () => {
         showFolderPath = false;

@@ -231,7 +231,6 @@ describe("Actions", () => {
     });
     afterEach(() => {
         entity = undefined;
-        sinon.restore();
         entities.values = [];
         vi.restoreAllMocks();
         store.state.Maps.mode = "2D";
@@ -975,9 +974,6 @@ describe("Actions", () => {
             global.Cesium.Matrix4.multiplyByPoint = sinon.stub().returns({x: 10, y: 20, z: 30});
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
         it("should commit setActiveShapePoints", () => {
             actions.rotateDrawnEntity({state, getters}, 10);
 
@@ -1066,7 +1062,6 @@ describe("Actions", () => {
             };
         });
         afterEach(() => {
-            sinon.restore();
             state.drawnModels = [];
         });
         it("should copy a polygon entity", () => {

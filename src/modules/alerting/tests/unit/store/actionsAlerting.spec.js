@@ -59,9 +59,6 @@ describe("src/modules/alerting/store/actionsAlerting.js", () => {
         dispatch = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("cleanup", () => {
         const state = {

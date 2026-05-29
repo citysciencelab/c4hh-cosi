@@ -34,9 +34,6 @@ describe("src/modules/routing/js/geosearch/routing-nominatim-geosearch.js", () =
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("should fetchRoutingNominatimGeosearch", () => {
         it("should process result correct", async () => {

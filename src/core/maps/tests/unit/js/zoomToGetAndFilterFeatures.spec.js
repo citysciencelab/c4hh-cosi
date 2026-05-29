@@ -21,9 +21,6 @@ describe("src/core/maps/js/zoomToGetAndFilterFeatures.js", () => {
         crs.registerProjections(namedProjections);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should return a rejecting Promise if the layer with the given id can not be found", () => {
         sinon.stub(rawLayerList, "getLayerWhere").returns(null);

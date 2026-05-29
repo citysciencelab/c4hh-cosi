@@ -35,9 +35,6 @@ describe("src/modules/wfst/store/actionsWfst.js", () => {
         mapCollection.clear();
         mapCollection.addMap(map, "2D");
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("reset", () => {
         const featurePropertiesSymbol = Symbol("featureProperties"),
@@ -113,9 +110,6 @@ describe("src/modules/wfst/store/actionsWfst.js", () => {
             sinon.stub(layerCollection, "getLayerById").returns(layerStub);
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should reset selected interaction and update, clear interactions, and set layer visibility when layerSelected is true", () => {
             actionsWfst.resetCommon({commit, dispatch, getters});
@@ -170,9 +164,6 @@ describe("src/modules/wfst/store/actionsWfst.js", () => {
             };
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should call wfs.sendTransaction with correct parameters", async () => {
             const response = await sendTransaction({dispatch, getters, rootGetters}, feature);
@@ -279,9 +270,6 @@ describe("src/modules/wfst/store/actionsWfst.js", () => {
             };
             sinon.stub(layerCollection, "getLayerById").returns(layer);
             rootGetters = {};
-        });
-        afterEach(() => {
-            sinon.restore();
         });
 
         it("should handle LineString interaction", async () => {

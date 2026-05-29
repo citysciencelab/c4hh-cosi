@@ -82,9 +82,6 @@ describe("src/modules/shadowTool/components/ShadowTool.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("shadow tool", () => {
         it("component has checkbox,date picker, time and date slider", () => {

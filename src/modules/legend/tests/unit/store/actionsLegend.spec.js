@@ -82,9 +82,6 @@ describe("src/modules/legend/store/actionsLegend.js", () => {
         );
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLegend", () => {
 

@@ -5,9 +5,6 @@ import StylePolygon from "@masterportal/masterportalapi/src/vectorStyle/styles/p
 
 describe("src/utils/svgFactory.js", () => {
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createCircle", () => {
         it("style properties directly", () => {

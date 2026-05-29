@@ -111,7 +111,6 @@ describe("src/modules/routing/components/Isochrones/IsochronesItem.vue", () => {
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     afterAll(() => {

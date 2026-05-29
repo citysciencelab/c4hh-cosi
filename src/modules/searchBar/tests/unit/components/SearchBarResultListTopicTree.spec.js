@@ -94,9 +94,6 @@ describe("src/modules/searchBar/components/SearchBarResultListTopicTree.vue", ()
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("test the rendering with different parameters", () => {
         it("renders the SearchBarResultListTopicTree with 3 SearchBarResultListTopicTreeItems", () => {

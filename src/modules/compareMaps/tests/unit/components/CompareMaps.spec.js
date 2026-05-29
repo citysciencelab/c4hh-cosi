@@ -89,9 +89,6 @@ describe("src/modules/compareMaps/components/CompareMaps.vue", () => {
         store.dispatch = rootDispatchSpy;
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the CompareMaps component", () => {
         wrapper = shallowMount(CompareMaps, {

@@ -174,7 +174,6 @@ afterEach(() => {
     if (wrapper) {
         wrapper.unmount();
     }
-    sinon.restore();
 });
 
 

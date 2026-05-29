@@ -13,9 +13,6 @@ describe("src/modules/tools/wfst/utils/handleMultipolygon.js", async () => {
         sinon.stub(store, "getters").returns(new Set());
         sinon.stub(store, "dispatch").returns(true);
     });
-    afterEach(() => {
-        sinon.restore();
-    });
     const feature1 = new Feature({
             geometry: new MultiPolygon([
                 [

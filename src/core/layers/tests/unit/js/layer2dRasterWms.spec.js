@@ -48,7 +48,6 @@ describe("src/core/js/layers/layer2dRasterWms.js", () => {
 
     afterEach(() => {
         delete Config.overwriteWmsLoadfunction;
-        sinon.restore();
         store.getters = origGetters;
     });
 

@@ -40,9 +40,6 @@ describe("src/modules/layerSelection/components/LayerSelectionTreeNode.vue", () 
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders a layer", () => {
         wrapper = shallowMount(LayerSelectionTreeNode, {

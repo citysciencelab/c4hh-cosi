@@ -43,9 +43,6 @@ describe("src/core/maps/store/actionsMapsMarker.js", () => {
         sinon.stub(mapMarker, "removeMapMarker");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("changeMarkerStyle", () => {
         it("change the styleId of the marker", () => {

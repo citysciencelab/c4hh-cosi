@@ -129,7 +129,6 @@ describe("src/modules/routing/components/RoutingTemplate.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
         }

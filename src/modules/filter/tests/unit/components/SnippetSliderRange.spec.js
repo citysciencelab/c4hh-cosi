@@ -8,9 +8,6 @@ config.global.mocks.$t = key => key;
 describe("src/modules/filter/components/SnippetSliderRange.vue", () => {
     let wrapper = null;
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("created", () => {
         it("should have correct default vars", () => {

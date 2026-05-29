@@ -64,9 +64,6 @@ describe("src/modules/selectFeatures/components/SelectFeatures.vue", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the SelectFeatures tool if mounted and active", () => {
         const wrapper = shallowMount(SelectFeaturesComponent, {

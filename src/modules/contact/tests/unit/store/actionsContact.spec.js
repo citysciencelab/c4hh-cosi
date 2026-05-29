@@ -20,9 +20,6 @@ describe("src/modules/contact/store/actionsContact.js", () => {
             };
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("calls all expected commits and dispatches when configured to do so", async () => {
             const commit = sinon.spy(),
@@ -119,9 +116,6 @@ describe("src/modules/contact/store/actionsContact.js", () => {
             };
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("creates httpClient call as expected", async () => {
             const httpClientStub = sinon.stub(httpClientModule, "httpClient");

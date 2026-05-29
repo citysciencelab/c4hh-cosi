@@ -23,9 +23,6 @@ describe("src/modules/mouseHover/store/actionsMouseHover", () => {
         mapCollection.clear();
         mapCollection.addMap(olMap, "2D");
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("initialize", () => {
         const fakeRendererFunction = sinon.spy();

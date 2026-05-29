@@ -194,7 +194,6 @@ describe("src/core/maps/js/highlightFeaturesByAttribute", () => {
         });
 
         afterEach(function () {
-            sinon.restore();
             sinon.stub().resetHistory();
         });
 
@@ -276,9 +275,6 @@ describe("src/core/maps/js/highlightFeaturesByAttribute", () => {
             sinon.stub(console, "error").callsFake(error);
         });
 
-        afterEach(function () {
-            sinon.restore();
-        });
 
         it("configHasErrors should return false", () => {
             expect(highlightFeaturesByAttribute.configHasErrors(layer, wfsId)).to.be.false;

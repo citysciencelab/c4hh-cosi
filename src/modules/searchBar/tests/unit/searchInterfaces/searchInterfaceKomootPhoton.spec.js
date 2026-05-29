@@ -72,7 +72,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceKomootPhoton.js"
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("prototype", () => {

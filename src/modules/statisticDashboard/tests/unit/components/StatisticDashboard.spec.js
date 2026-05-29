@@ -124,7 +124,6 @@ describe("src/modules/statisticDashboard/components/StatisticDashboard.vue", () 
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     describe("Component DOM", () => {

@@ -55,7 +55,6 @@ describe("src/modules/featureLister/components/FeatureLister.vue", () => {
         });
     });
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

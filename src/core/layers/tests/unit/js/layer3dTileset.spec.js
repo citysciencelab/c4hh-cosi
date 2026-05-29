@@ -49,7 +49,6 @@ describe("src/core/js/layers/layer3dTileset.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         global.Cesium = null;
         store.getters = origGetters;
         store.dispatch = origDispatch;

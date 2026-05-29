@@ -29,9 +29,6 @@ describe("src/modules/measure/store/actionsMeasure", function () {
         sinon.stub(source, "clear").callsFake(clear);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("deleteFeatures", function () {
         it("aborts drawing", function () {

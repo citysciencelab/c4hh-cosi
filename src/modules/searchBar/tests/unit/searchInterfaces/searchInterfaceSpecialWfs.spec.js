@@ -47,7 +47,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceSpecialWfs.js", 
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("prototype", () => {

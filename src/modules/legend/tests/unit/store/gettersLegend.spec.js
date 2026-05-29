@@ -1,12 +1,8 @@
 import {expect} from "chai";
 import getters from "@modules/legend/store/gettersLegend.js";
-import sinon from "sinon";
 
 describe("src/modules/legend/store/gettersLegend.js", () => {
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("isLayerInLegend", () => {
         const state = {

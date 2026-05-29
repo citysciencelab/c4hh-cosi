@@ -12,9 +12,6 @@ import Feature from "ol/Feature.js";
 
 config.global.mocks.$t = key => key;
 
-afterEach(() => {
-    sinon.restore();
-});
 
 let store, layersOnMap, layer, mockMapGetters, mockMapActions, mockAlertActions, map;
 

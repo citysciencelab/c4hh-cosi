@@ -45,9 +45,6 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLayer", () => {
         it("new Layer2dVectorGeojson should create an layer with no warning", () => {

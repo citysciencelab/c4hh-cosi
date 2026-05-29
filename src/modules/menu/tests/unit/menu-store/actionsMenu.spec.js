@@ -61,9 +61,6 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
         global.window.open = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("activateCurrentComponent", () => {
         it("should activate current component and expand the menu side", () => {

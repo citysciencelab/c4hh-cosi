@@ -13,9 +13,6 @@ describe("src/shared/js/api/utils/handleAxiosError.js", () => {
         sinon.stub(console, "warn").callsFake(warn);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should trigger a specific amount of errors and warnings if the given object is a common Error", () => {
         handleAxiosErrorModule.handleAxiosError(undefined, "functionName");

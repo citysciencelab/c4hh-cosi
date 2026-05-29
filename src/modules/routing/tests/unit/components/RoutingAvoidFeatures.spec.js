@@ -50,7 +50,6 @@ describe("src/modules/routing/components/RoutingAvoidFeatures.vue", () => {
 
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
         }

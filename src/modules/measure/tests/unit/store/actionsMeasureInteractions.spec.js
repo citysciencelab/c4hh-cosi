@@ -36,9 +36,6 @@ describe("src/modules/measure/store/actionsMeasureInteractions", function () {
         getters = {getFeatureById: sinon.stub()};
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("cleanupAllInteractions", function () {
         it("dispatches removeDrawInteraction when interaction is active", function () {

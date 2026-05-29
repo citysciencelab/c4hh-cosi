@@ -110,9 +110,6 @@ describe("src/modules/Print/components/PrintMap.vue", () => {
             }});
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("PrintMap.vue methods", () => {
         it("method layoutChanged sets other print layout", () => {

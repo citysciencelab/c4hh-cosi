@@ -80,9 +80,6 @@ describe("src/modules/layerTree/components/FolderCheckBox.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the folder checkbox given as property to the component", () => {
         wrapper = shallowMount(FolderCheckBox, {

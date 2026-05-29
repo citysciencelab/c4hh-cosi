@@ -37,9 +37,6 @@ describe("src/core/js/layers/layer3dEntities.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLayer", () => {
         let checkLayer;

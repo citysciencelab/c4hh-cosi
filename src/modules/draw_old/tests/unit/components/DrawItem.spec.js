@@ -103,7 +103,6 @@ describe("src/modules/draw/components/DrawItem.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

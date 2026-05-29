@@ -185,9 +185,6 @@ describe("src/modules/routing/store/directions/actionsDirections.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should findDirections", async () => {
         await actionsDirections.findDirections({state, getters, commit, dispatch, rootState});

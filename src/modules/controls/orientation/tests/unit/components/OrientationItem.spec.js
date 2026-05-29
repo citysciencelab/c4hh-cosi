@@ -54,9 +54,6 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the Orientation component", () => {
         const wrapper = mount(OrientationItemComponent, {

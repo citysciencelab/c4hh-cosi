@@ -29,9 +29,6 @@ describe("src/modules/legend/components/LegendSingleLayer.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("LegendSingleLayerComponent.vue rendering", () => {
         describe("renders legend with pdf", () => {

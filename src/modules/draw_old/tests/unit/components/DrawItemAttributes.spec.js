@@ -61,7 +61,6 @@ describe("src/modules/draw/components/DrawItemAttributes.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

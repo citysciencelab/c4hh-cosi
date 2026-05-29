@@ -58,7 +58,6 @@ describe("src/core/menu/navigation/components/MenuNavigation.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

@@ -36,9 +36,6 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("currentComponent", () => {
         beforeEach(() => {

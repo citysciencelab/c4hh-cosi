@@ -67,7 +67,6 @@ describe("src/modules/routing/js/geosearch/routing-gazeteer-geosearch.js", () =>
     });
     afterEach(() => {
         global.fetch = fetch;
-        sinon.restore();
     });
     describe("should fetchRoutingGazeteerGeosearch", () => {
         it("should process result correct", async () => {

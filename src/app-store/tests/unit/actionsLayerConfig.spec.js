@@ -243,9 +243,6 @@ describe("src/app-store/actionsLayerConfig.js", () => {
         sinon.stub(console, "warn").callsFake(sinon.spy());
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("addLayerToLayerConfig", () => {
         it("addLayerToLayerConfig no folders - add config to 'treeSubjectsKey'", () => {

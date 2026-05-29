@@ -55,9 +55,6 @@ describe("src/shared/modules/draw/components/DrawTypes.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the drawTypes", () => {
         wrapper = shallowMount(DrawTypesComponent, {

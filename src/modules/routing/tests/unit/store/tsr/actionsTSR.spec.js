@@ -152,9 +152,6 @@ describe("src/modules/routing/store/directions/actionsTSR.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should findTSR", async () => {
         const mock = document.createElement("div");

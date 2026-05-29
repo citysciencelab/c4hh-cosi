@@ -142,9 +142,6 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("test the rendering with different parameters", () => {
         it("renders the SearchBarSuggestionList", async () => {

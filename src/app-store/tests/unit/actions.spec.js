@@ -40,7 +40,6 @@ describe("src/app-store/actions.js", () => {
 
     afterEach(() => {
         global.fetch = fetch;
-        sinon.restore();
     });
 
     describe("app-store actions", () => {

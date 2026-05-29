@@ -41,9 +41,6 @@ describe("src/modules/openConfig/components/OpenConfig.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the openConfig", () => {
         wrapper = shallowMount(OpenConfigComponent, {

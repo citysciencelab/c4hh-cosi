@@ -92,7 +92,6 @@ describe("src/modules/wmsTime/components/WmsTime.vue", () => {
     afterEach(() => {
         winWidth = 1024;
         timeSliderActive = false;
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

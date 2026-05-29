@@ -37,9 +37,6 @@ describe("src/modules/layerPreview/store/actionsLayerPreview", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("initialize", () => {
         it("initializes with center given as array and getters and rootGetters return null", () => {

@@ -68,9 +68,6 @@ describe("src/modules/layerSlider/components/LayerSliderHandle.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the layerSliderHandle elements", () => {
         store.commit("Modules/LayerSlider/setLayerIds", layerIds);

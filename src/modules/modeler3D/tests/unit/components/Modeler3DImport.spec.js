@@ -129,7 +129,6 @@ describe("src/modules/modeler3D/components/Modeler3DImport.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

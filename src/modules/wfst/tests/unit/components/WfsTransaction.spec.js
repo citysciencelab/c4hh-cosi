@@ -124,9 +124,6 @@ describe("src/modules/modules/wfst/components/WfsTransaction.vue", () => {
             }
         });
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     // form -> form-Element mit input-Elementen und dazugehörigen label als auch div-Element mit 2 SimpleButton
     it("renders a container for the whole tool", () => {

@@ -85,7 +85,6 @@ describe("src/modules/menu/MenuContainer.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

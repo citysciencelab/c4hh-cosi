@@ -261,7 +261,6 @@ describe("src/modules/modeler3D/components/Modeler3DDraw.vue", () => {
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }
-        sinon.restore();
         global.URL = globalURL;
     });
 

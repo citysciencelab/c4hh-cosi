@@ -44,9 +44,6 @@ describe("src/modules/styleVT/components/StyleVT.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should render a paragraph informing the user that no styleable layers are available if none are", () => {
         wrapper = shallowMount(StyleVTComponent, {

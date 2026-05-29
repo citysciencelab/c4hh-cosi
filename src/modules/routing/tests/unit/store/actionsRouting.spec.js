@@ -31,9 +31,6 @@ describe("src/modules/routing/store/actionsRouting.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should throw error because of missing required config parameter", () => {
         try {

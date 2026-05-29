@@ -31,9 +31,6 @@ describe("src/modules/openConfig/store/actionsOpenConfig.js", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("processConfigJsonOnload", () => {
         it("should clear layerCollection, set portalConfig to the state and start extendLayers", () => {

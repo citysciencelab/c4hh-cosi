@@ -44,9 +44,6 @@ describe("src/modules/selectFeatures/store/actionsSelectFeatures.js", () => {
         );
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("highlightFeature", () => {
         it("highlightFeature treeHighlightedFeatures is active", () => {

@@ -4,9 +4,6 @@ import legendDraw from "@modules/legend/js/legendDraw.js";
 
 describe("src/modules/legend/js/legendDraw", function () {
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("drawIntervalStyle", function () {
         it("with scalingShape 'CIRCLE_BAR'", function () {

@@ -81,7 +81,6 @@ describe("src/modules/contact/components/ContactFormular.vue", () => {
     afterEach(() => {
         ContactModule.actions.send = originalSendAction;
         ContactModule.actions.onSendSuccess = originalOnSendSuccessAction;
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }
@@ -331,9 +330,6 @@ describe("src/modules/contact/components/ContactFormular.vue", () => {
             checkValidSpy = sinon.spy(wrapper.vm, "checkValid");
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
         describe("removeAttachment", () => {
             const target = {
                 name: "Attachment1.pdf",

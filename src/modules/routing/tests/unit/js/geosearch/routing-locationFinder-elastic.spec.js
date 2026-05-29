@@ -17,9 +17,6 @@ describe("src/modules/routing/js/geosearch/routing-locationFinder-elastic.js", (
         store.state.Modules.Routing.geosearch.epsg = "25832";
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("should fetchRoutingElasticGeosearch", () => {
         it("should process result correct", async () => {

@@ -46,9 +46,6 @@ describe("src/core/js/layers/Layer3dGroup.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLayer", () => {
         it("new Layer3dGroup without children shall call warn", () => {

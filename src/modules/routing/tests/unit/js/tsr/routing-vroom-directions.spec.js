@@ -14,9 +14,6 @@ describe("src/modules/routing/js/tsr/routing-vroom-directions.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("should fetchRoutingvroomDirections", () => {
         it("should process result correct", async () => {

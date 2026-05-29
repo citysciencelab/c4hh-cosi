@@ -85,7 +85,6 @@ describe("src/modules/tools/modeler3D/components/Modeler3DFilter.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

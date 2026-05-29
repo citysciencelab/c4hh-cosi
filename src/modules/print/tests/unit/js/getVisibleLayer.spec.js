@@ -61,7 +61,6 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
     });
 
     afterEach(() => {
-        sinon.restore();
         store.dispatch = origDispatch;
         store.commit = origCommit;
     });
@@ -212,9 +211,6 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
             groupedLayerStub = {getLayers: () => [layerStub]};
         });
 
-        afterEach(function () {
-            sinon.restore();
-        });
 
         it("should do nothing when there are no grouped layers", () => {
             layerProvider.revertLayerOpacity();

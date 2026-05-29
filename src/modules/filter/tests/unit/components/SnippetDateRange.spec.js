@@ -9,9 +9,6 @@ config.global.mocks.$t = key => key;
 describe("src/modules/filter/components/SnippetDateRange.vue", () => {
     let wrapper = null;
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("created", () => {
         it("should have correct default vars", () => {

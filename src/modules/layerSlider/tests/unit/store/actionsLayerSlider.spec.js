@@ -12,9 +12,6 @@ const {
 
 
 describe("src/modules/layerSlider/store/actionsLayerSlider.js", () => {
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("addInformationToLayerIds", () => {
         it("addInformationToLayerIds", async () => {

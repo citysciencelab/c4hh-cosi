@@ -42,7 +42,6 @@ describe("src/core/js/layers/layer2d.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         store.dispatch = origDispatch;
     });
 
@@ -136,9 +135,6 @@ describe("src/core/js/layers/layer2d.js", () => {
             });
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should start the function controlAutoRefresh and startAutoRefreshSpy when a layer is created", () => {
             expect(controlAutoRefreshSpy.calledOnce).to.be.true;
@@ -267,9 +263,6 @@ describe("src/core/js/layers/layer2d.js", () => {
             crsTransformStub = sinon.stub(crs, "transform").callsFake((sourceProjection, targetProjection, coords) => coords);
             layerNode = null;
         });
-        afterEach(function () {
-            sinon.restore();
-        });
         it("should extract and transform bounding box for WMS layer", () => {
             layer.set("typ", "WMS");
             layerNode = new DOMParser().parseFromString(`
@@ -336,9 +329,6 @@ describe("src/core/js/layers/layer2d.js", () => {
                 data: "<Capabilities><Layer><Name>TestLayer</Name></Layer></Capabilities>"
             });
             zoomToLayerExtentSpy = sinon.spy(layer, "zoomToLayerExtent");
-        });
-        afterEach(() => {
-            sinon.restore();
         });
         it("should call zoomToLayerExtent with the correct layer node if the specific layer is found", async () => {
             await layer.requestCapabilitiesToFitExtent();

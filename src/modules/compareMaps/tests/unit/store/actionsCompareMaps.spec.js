@@ -36,9 +36,6 @@ describe("modules/compareMaps/store/actionsCompareMaps", () => {
         sinon.stub(layerCollection, "getLayers").returns([layer1, layer2]);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should activate LayerSwiper", () => {
         actions.activateSwiper({state, commit, rootGetters});

@@ -18,9 +18,6 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
         sinon.stub(console, "warn").callsFake(warnSpy);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("getAndMergeRawLayer", () => {
         it("should return undefined if no param is given", () => {
@@ -1026,9 +1023,6 @@ describe("src/app-store/js/getAndMergeRawLayer.js", () => {
             ];
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should filter by typ, datasets and layerContainer", () => {
             sinon.stub(rawLayerList, "getLayerWhere").callsFake(function (searchAttributes) {

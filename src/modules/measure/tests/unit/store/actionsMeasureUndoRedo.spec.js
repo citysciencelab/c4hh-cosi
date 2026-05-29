@@ -42,9 +42,6 @@ describe("src/modules/measure/store/actionsMeasureUndoRedo", function () {
         getters = {getFeatureById: sinon.stub()};
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("regulateDeleteAll", function () {
         it("dispatches cleanupAllInteractions", function () {

@@ -45,9 +45,6 @@ describe("src/modules/getFeatureInfo/themes/senor/components/SensorThemeBarChart
             Chart.getChart(ctx).destroy();
         });
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
 
     it("should render a canvas if show is true", () => {

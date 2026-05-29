@@ -385,7 +385,6 @@ describe("addons/vueAddon/components/VueAddon.vue", () => {
   });
 
   afterEach(() => {
-    sinon.restore();
     showAlertSpy.resetHistory();
   });
 

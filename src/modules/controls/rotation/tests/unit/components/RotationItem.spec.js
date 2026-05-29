@@ -85,9 +85,6 @@ describe("src/modules/controls/rotation/components/RotationItem.vue", () => {
         store.commit("Controls/Rotation/setShowResetRotationAlways", false, {root: true});
         store.commit("Controls/Rotation/setRotationAngle", 45, {root: true});
     });
-    afterEach(() => {
-        sinon.restore();
-    });
     it("the reset rotation button renders if rotation is not 0, rotate buttons are rendered", async () => {
         store.commit("Controls/Rotation/setRotation", 0.1, {root: true});
         wrapper = mount(RotationItemComponent, {

@@ -49,7 +49,6 @@ describe("src/core/js/layers/layer3dTerrain.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         global.Cesium = null;
     });
 

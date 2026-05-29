@@ -11,9 +11,6 @@ import {nextTick} from "vue";
 
 config.global.mocks.$t = key => key;
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/filter/components/GeometryFilter.vue", () => {
     let wrapper = null,

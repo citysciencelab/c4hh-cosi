@@ -53,7 +53,6 @@ describe("src/core/js/layers/layer2dVectorOaf.js", () => {
 
 
     afterEach(() => {
-        sinon.restore();
         store.getters = origGetters;
     });
 

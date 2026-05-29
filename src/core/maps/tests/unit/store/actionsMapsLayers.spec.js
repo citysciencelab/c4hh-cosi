@@ -52,9 +52,6 @@ describe("src/core/maps/store/actionsMapsLayers.js", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("addLayer", () => {
         it("Should add three layers to the map", () => {
@@ -111,9 +108,6 @@ describe("src/core/maps/store/actionsMapsLayers.js", () => {
             isResolved = false;
         });
 
-        afterEach(()=> {
-            sinon.restore();
-        });
 
         it("Resolves immediately if layer is already fully loaded", () => {
             addLayer({}, layer1);

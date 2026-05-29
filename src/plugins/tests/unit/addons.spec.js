@@ -38,7 +38,6 @@ describe("src/plugins/addons.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         store.commit = origCommit;
         store.registerModule = origRegisterModule;
     });

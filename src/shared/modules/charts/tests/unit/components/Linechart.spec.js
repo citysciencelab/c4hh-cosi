@@ -7,9 +7,6 @@ import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 
 config.global.mocks.$t = key => key;
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/shared/modules/charts/components/LinechartItem.vue", () => {
     let wrapper;

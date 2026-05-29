@@ -68,7 +68,6 @@ describe("src/modules/routing/components/Isochrones/IsochronesHoverData.vue", ()
     });
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
         }

@@ -1,4 +1,3 @@
-import sinon from "sinon";
 import {config, mount} from "@vue/test-utils";
 import {expect} from "chai";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
@@ -7,9 +6,6 @@ config.global.mocks.$t = key => key;
 
 describe("src/shared/components/InputText.vue", () => {
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should render an input field", () => {
         const id = "input-awesome",

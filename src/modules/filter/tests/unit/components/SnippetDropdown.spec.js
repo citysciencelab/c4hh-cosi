@@ -425,9 +425,6 @@ describe("src/modules/filter/components/SnippetDropdown.vue", () => {
                 sinon.stub(getIconListFromLegend, "getStyleModel").returns({});
                 returnLegendByStyleIdSpy = sinon.spy(createStyle, "returnLegendByStyleId");
             });
-            afterEach(() => {
-                sinon.restore();
-            });
             it("initializeIcons with not visible WFS layer", async () => {
                 sinon.stub(layerCollection, "getLayerById").returns(null);
                 wrapper = shallowMount(SnippetDropdown,

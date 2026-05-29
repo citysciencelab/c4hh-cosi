@@ -124,9 +124,6 @@ describe("src/utils/multipleHighlighting.js", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should create a style when features are provided", () => {
         placingAdditionalPolygonMarker([feature], true);

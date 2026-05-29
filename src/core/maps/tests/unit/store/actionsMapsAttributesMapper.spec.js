@@ -108,7 +108,6 @@ describe("src/core/maps/store/actionsMapsAttributesMapper.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         mapDiv?.remove();
     });
 

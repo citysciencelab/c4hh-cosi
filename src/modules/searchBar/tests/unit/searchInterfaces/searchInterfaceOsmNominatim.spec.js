@@ -83,7 +83,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceOsmNominatim.js"
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("prototype", () => {

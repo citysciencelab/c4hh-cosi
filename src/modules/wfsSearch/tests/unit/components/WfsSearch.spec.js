@@ -111,7 +111,6 @@ describe("src/modules/wfsSearch/components/WfsSearch.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         wrapper.unmount();
         WfsSearchModule.actions.resetResult = resetResultOrig;
     });

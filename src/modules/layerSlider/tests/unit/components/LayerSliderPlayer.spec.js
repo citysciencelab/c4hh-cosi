@@ -29,9 +29,6 @@ describe("src/modules/layerSlider/components/LayerSliderPlayer.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the layerSliderPlayer elements", () => {
         wrapper = shallowMount(LayerSliderPlayerComponent, {

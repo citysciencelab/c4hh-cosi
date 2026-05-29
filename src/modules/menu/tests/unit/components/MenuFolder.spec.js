@@ -3,7 +3,6 @@ import {config, shallowMount} from "@vue/test-utils";
 import MenuFolder from "@modules/menu/components/MenuFolder.vue";
 import MenuContainerBodyRootItems from "@modules/menu/components/MenuContainerBodyRootItems.vue";
 import {expect} from "chai";
-import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
@@ -31,7 +30,6 @@ describe("src/modules/menu/MenuFolder.vue", () => {
 
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

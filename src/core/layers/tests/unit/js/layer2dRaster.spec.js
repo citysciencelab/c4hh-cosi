@@ -36,7 +36,6 @@ describe("src/core/js/layers/layer2dRaster.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         store.getters = origGetters;
     });
 

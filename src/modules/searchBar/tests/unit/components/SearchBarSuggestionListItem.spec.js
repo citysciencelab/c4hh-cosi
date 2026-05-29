@@ -59,9 +59,6 @@ describe("src/modules/searchBar/components/SearchBarSuggestionListItem.vue", () 
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("test the result item", () => {
         it("shows toolTip if available", () => {

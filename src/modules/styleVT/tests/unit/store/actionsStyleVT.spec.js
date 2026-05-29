@@ -25,9 +25,6 @@ describe("src/modules/styleVT/store/actionsStyleVT.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("refreshVectorTileLayerList", () => {
         beforeEach(() => {

@@ -14,9 +14,6 @@ describe("src/modules/controls/controls-store/actionsControls.js", () => {
         commit = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("mergeControlState", () => {
         it("should commit values to control state", () => {

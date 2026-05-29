@@ -151,7 +151,6 @@ describe("src/modules/LayerPills.vue", () => {
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     describe("functionality and lifecycle and resizeObserver", () => {

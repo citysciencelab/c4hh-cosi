@@ -246,7 +246,6 @@ describe("src/modules/layerSelection/components/LayerSelection.vue", () => {
     afterEach(() => {
         LayerSelection.actions = origActions;
         LayerSelection.state = origState;
-        sinon.restore();
     });
 
     it("do not render the LayerSelection if visible is false", () => {

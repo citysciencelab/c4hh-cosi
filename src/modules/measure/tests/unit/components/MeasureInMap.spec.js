@@ -91,7 +91,6 @@ describe("src/modules/measure/components/MeasureInMap.vue", () => {
     afterEach(() => {
         MeasureModule.actions.createDrawInteraction = origcreateDrawInteraction;
         MeasureModule.actions.deleteFeatures = origdeleteFeatures;
-        sinon.restore();
     });
 
 

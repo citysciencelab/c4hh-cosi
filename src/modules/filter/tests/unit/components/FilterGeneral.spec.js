@@ -48,9 +48,6 @@ describe("src/modules/filter/components/FilterGeneral.vue", () => {
         store.commit("Modules/Filter/setLayerGroups", groups);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("should exist", () => {
@@ -412,7 +409,6 @@ describe("src/modules/filter/components/FilterGeneral.vue", () => {
                 await wrapper.vm.$nextTick();
 
                 expect(wrapper.vm.layerRules).to.deep.equal([]);
-                sinon.restore();
             });
 
             it("should skip rules with empty appliedPassiveValues", async () => {
@@ -427,7 +423,6 @@ describe("src/modules/filter/components/FilterGeneral.vue", () => {
                 await wrapper.vm.$nextTick();
 
                 expect(wrapper.vm.layerRules).to.deep.equal([]);
-                sinon.restore();
             });
         });
         describe("getTagClass ", () => {

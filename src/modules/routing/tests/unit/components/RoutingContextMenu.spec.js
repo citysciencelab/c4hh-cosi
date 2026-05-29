@@ -124,7 +124,6 @@ describe("src/modules/routing/components/RoutingContextMenu.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
         }

@@ -122,7 +122,6 @@ describe("src/modules/routing/components/Isochrones/IsochronesLegend.vue", () =>
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     it("renders isochrones legend", () => {

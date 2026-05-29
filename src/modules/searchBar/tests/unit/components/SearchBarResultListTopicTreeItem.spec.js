@@ -117,9 +117,6 @@ describe("src/modules/searchBar/components/SearchBarResultListTopicTreeItem.vue"
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("render elements", () => {
         it("should render result list topic tree item and check actionButtons", () => {

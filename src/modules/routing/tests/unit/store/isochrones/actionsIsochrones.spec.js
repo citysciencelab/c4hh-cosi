@@ -117,9 +117,6 @@ describe("src/modules/routing/store/isochrones/actionsIsochrones.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should findIsochrones", async () => {
         await actionsIsochrones.findIsochrones({state, getters, commit, dispatch, rootState});

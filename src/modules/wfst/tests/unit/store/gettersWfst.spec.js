@@ -30,9 +30,6 @@ describe("src/modules/wfst/store/gettersWfst.js", () => {
             consoleSpy = sinon.spy();
             sinon.stub(console, "warn").callsFake(consoleSpy);
         });
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should return a parsed configuration if polygonButton are configured", () => {
             state.polygonButton = [basicGeometryConfig];

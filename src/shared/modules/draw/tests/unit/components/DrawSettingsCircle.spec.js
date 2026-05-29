@@ -21,9 +21,6 @@ describe("src/shared/modules/draw/components/DrawSettingsCircle.vue", () => {
         setCircleOptionsSpy = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("render", () => {
         it("renders the elements for drawtype === 'circle' and interactive === true", () => {

@@ -91,9 +91,6 @@ describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the footer", () => {
         const wrapper = shallowMount(PortalFooterComponent, {

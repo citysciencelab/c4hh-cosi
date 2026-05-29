@@ -40,7 +40,6 @@ describe("src/core/js/maps/maps.js", () => {
 
     afterEach(() => {
         store.getters = origGetters;
-        sinon.restore();
     });
 
     describe("initializeMaps", () => {

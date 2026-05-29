@@ -44,10 +44,6 @@ describe("src/modules/layerTree/components/LayerComponentIconCustom.vue", () => 
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     it("renders IconButton if customLayerIcon type is set", () => {
         wrapper = shallowMount(LayerComponentIconCustom, {
             global: {

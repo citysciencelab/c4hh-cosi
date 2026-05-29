@@ -63,9 +63,6 @@ describe("src/modules/featureLister/components/LayerListView.vue", () => {
             $t: msg => msg
         };
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders only supported vector layers", () => {
         const wrapper = shallowMount(LayerListView, {global: {plugins: [store], mocks}}),

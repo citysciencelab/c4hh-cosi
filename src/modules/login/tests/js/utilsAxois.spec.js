@@ -28,7 +28,6 @@ describe("src/modules/login/js/utilsAxois.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         Cookie.erase("token");
         mockCookieStore = {};
         global.document = originalGlobalDocument;

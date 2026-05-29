@@ -95,7 +95,6 @@ describe("src/modules/routing/components/TSR/TsrItem.vue", () => {
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     it("renders TSR", () => {

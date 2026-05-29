@@ -273,9 +273,6 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         ];
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("no layer button - renders the LayerTree without layers", () => {
         subjectDataLayers = [];

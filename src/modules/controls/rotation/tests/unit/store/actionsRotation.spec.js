@@ -22,9 +22,6 @@ describe("src/modules/controls/rotation/store/actionsRotation.js", () => {
         getters = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("actionsRotation", () => {
 

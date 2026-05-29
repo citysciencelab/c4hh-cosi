@@ -72,7 +72,6 @@ describe("src/modules/getFeatureInfo/store/actionsGetFeatureInfo.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         consoleWarnSpy.restore();
     });
 
@@ -299,9 +298,6 @@ describe("src/modules/getFeatureInfo/store/actionsGetFeatureInfo.js", () => {
             sinon.stub(layerCollection, "getLayerById");
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("commits menuExpandedBeforeGfi when features exist", async () => {
             gfiFeaturesAtPixelStub.returns([{getLayerId: () => "layer1"}]);

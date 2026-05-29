@@ -24,9 +24,6 @@ describe("src/shared/components/SliderDualRange.vue", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     /**
      * Creates a Vuex store instance for testing purposes.

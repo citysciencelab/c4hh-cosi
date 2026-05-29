@@ -22,9 +22,6 @@ beforeEach(() => {
     sinon.stub(getCswRecordById, "getRecordById").returns(cswReturn);
     sinon.stub(console, "error").callsFake(sinon.spy());
 });
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/print/store/actionsPrint", function () {
     describe("activatePrintStarted", function () {

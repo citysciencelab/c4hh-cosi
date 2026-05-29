@@ -20,9 +20,6 @@ describe("src/modules/routing/js/geosearch/routing-elastic-geosearch.js", () => 
                 url: "http://serviceId.url"
             }};
     });
-    afterEach(() => {
-        sinon.restore();
-    });
     describe("getRoutingElasticUrl", () => {
         it("test params", () => {
             const payload = {

@@ -216,9 +216,6 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("computed", () => {
         describe("sortedLayerConfig", () => {

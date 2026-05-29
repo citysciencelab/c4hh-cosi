@@ -70,9 +70,6 @@ describe("src/core/maps/js/highlightFeature", () => {
         sinon.stub(console, "warn").callsFake(consoleWarnSpy);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("highlightFeature", () => {
         describe("dispatch actions based on highlightObject type", () => {

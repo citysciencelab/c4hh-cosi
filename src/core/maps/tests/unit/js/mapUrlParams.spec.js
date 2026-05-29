@@ -48,7 +48,6 @@ describe("src/core/maps/js/mapUrlParams.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         store.getters = origGetters;
         store.dispatch = origDispatch;
     });
@@ -633,9 +632,6 @@ describe("src/core/maps/js/mapUrlParams.js", () => {
             };
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should return immediately if HIGHLIGHTED3D param is missing", () => {
             mapUrlParams.highlight3DFeatureUrlParam({});

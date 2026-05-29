@@ -10,9 +10,6 @@ describe("src/shared/js/utils/deepAssign.js", () => {
         sinon.stub(console, "error").callsFake(error);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("deepAssignIgnoreCase", () => {
         it("should alter the given target ignoring case and return it", () => {

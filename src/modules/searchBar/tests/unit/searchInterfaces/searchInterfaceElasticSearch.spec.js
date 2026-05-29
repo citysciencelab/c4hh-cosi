@@ -47,7 +47,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceElasticSearch.js
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("prototype", () => {

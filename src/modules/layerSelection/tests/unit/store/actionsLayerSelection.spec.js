@@ -45,9 +45,6 @@ describe("src/modules/layerSelection/store/actionsLayerSelection", () => {
         baselayerHandlerSpy = sinon.spy(baselayerHandler, "checkAndAdd");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("changeVisibility", () => {
         it("changeVisibility to true for one layers", () => {

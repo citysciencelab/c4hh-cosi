@@ -7,9 +7,6 @@ describe("src/app-store/js/getProxyUrl.js", () => {
     beforeEach(() => {
         sinon.stub(console, "warn");
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("getProxyUrl", () => {
         it("should generate key without hostname from url", function () {

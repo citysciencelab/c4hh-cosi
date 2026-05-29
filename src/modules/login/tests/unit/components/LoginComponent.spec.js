@@ -49,7 +49,6 @@ describe("src/modules/Modules/Login/components/LoginComponent.vue", () => {
         sinon.stub(LoginComponent.methods, "openLoginWindow");
     });
     afterEach(() => {
-        sinon.restore();
         sandbox.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();

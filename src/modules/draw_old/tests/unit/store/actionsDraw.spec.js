@@ -36,9 +36,6 @@ describe("src/modules/draw/store/actionsDraw.js", () => {
         };
 
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("addInteraction", () => {
         it("calls map's addInteraction function with a given interaction", () => {

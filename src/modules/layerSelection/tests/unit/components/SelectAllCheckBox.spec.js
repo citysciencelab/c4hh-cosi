@@ -69,9 +69,6 @@ describe("src/modules/layerTree/components/SelectAllCheckBox.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders a select all checkbox", () => {
         wrapper = shallowMount(SelectAllCheckBox, {

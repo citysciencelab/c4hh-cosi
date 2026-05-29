@@ -69,7 +69,6 @@ describe("src/modules/BaselayerSwitcher.vue", () => {
     afterEach(() => {
         BaselayerSwitcher.actions.updateLayerVisibilityAndZIndex = originalUpdateLayerVisibilityAndZIndex;
 
-        sinon.restore();
     });
 
     describe("baselayerSwitcher DOM elements", () => {

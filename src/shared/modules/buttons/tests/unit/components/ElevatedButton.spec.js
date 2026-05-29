@@ -15,9 +15,6 @@ describe("src/shared/components/ElevatedButton.vue", () => {
         }));
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should render a button with an icon and trigger the given interaction on click", async () => {
         const iconString = "bi-list",

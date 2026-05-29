@@ -11,9 +11,6 @@ describe("src/modules/wfsSearch/store/actionsWfsSearch.js", () => {
         dispatch = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("instanceChanged", () => {
         it("should update the currently set search instance", () => {

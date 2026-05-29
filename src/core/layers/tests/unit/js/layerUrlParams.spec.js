@@ -38,7 +38,6 @@ describe("src/core/layers/js/layerUrlParams.js", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         store.getters = origGetters;
         store.dispatch = origDispatch;
     });

@@ -26,9 +26,6 @@ describe("src/shared/components/SliderItem.vue", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     /**
      * Creates a Vuex store instance for testing purposes.

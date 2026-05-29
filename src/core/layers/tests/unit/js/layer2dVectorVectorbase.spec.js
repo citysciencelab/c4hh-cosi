@@ -44,11 +44,6 @@ describe("src/core/js/layers/layer2dVectorVectorbase.js", () => {
         sinon.stub(styleList, "returnStyleObject").returns(styleObj);
     });
 
-
-    afterEach(() => {
-        sinon.restore();
-    });
-
     describe("createLayer", () => {
         it("new Layer2dVectorVectorbase should create an layer with no warning", () => {
             const vectorbaseLayer = new Layer2dVectorVectorbase(attributes);

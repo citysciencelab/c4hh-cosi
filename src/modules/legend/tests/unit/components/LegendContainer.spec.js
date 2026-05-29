@@ -62,9 +62,6 @@ describe("src/modules/legend/components/LegendContainer.vue", () => {
         );
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("render LegendContainer", () => {
         it("renders the legend container without legends", () => {
@@ -283,9 +280,6 @@ describe("src/modules/legend/components/LegendContainer.vue", () => {
                     }
                 );
                 store.commit("Modules/Legend/setLegends", []);
-            });
-            afterEach(() => {
-                sinon.restore();
             });
 
             it("visibleLayerConfigs shall call toggleLayerInLegend with true", async () => {

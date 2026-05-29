@@ -63,9 +63,6 @@ describe("src/modules/controls/startModule/components/StartModule.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("render control", () => {
         it("should render the control", () => {

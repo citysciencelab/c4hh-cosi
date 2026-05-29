@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 import NewsViewComponent from "@modules/news/components/NewsView.vue";
 import News from "@modules/news/store/indexNewsView.js";
 import {expect} from "chai";
-import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
@@ -50,9 +49,6 @@ describe("src/modules/newsView/components/NewsView.vue", () => {
         store.commit("Modules/News/setNews", []);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the NewsView component", () => {
         wrapper = shallowMount(NewsViewComponent, {

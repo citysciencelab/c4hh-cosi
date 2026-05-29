@@ -1,5 +1,4 @@
 import {expect} from "chai";
-import sinon from "sinon";
 import {createStore} from "vuex";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
 import {mount, config} from "@vue/test-utils";
@@ -55,7 +54,6 @@ describe("src/modules/modeler3D/components/EntityList.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

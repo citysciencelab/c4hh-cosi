@@ -3,9 +3,6 @@ import Feature from "ol/Feature.js";
 import sinon from "sinon";
 import getters from "@modules/getFeatureInfo/store/gettersGetFeatureInfo.js";
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/getFeatureInfo/store/gettersGetFeatureInfo.js", () => {
 

@@ -25,9 +25,6 @@ describe("src/modules/draw/store/actions/withoutGUIDraw.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("cancelDrawWithoutGUI", () => {
         it("should dispatch as intended", () => {

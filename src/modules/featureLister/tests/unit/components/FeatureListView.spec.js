@@ -59,9 +59,6 @@ describe("src/modules/featureLister/components/FeatureListView.vue", () => {
             $t: msg => msg
         };
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the TableComponent with correct data", () => {
         const wrapper = shallowMount(FeatureListView, {global: {plugins: [store], mocks}}),

@@ -49,9 +49,6 @@ describe("src/shared/modules/draw/components/DrawEdit.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the drawEdits, if undoFeatures or redoFeatures length > 0", async () => {
         wrapper = shallowMount(DrawEditComponent, {

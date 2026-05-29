@@ -6,9 +6,6 @@ import VectorSource from "ol/source/Vector.js";
 import WFSLayer from "@core/layers/js/layer2dVectorWfs.js";
 import webgl from "@core/layers/js/webglRenderer.js";
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/core/js/layers/webglRenderer.js", () => {
     let attributes, olLayer, source, includes, removeLayerSpy, addLayerSpy;

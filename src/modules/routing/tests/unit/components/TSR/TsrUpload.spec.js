@@ -95,7 +95,6 @@ describe("src/modules/routing/components/TSR/TsrUpload.vue", () => {
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     it("renders TSRUpload", async () => {

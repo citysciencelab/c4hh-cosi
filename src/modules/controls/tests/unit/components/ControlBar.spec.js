@@ -59,9 +59,6 @@ describe("src/modules/controls/components/ControlBar.vue", () => {
             }
         });
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the buttons group", () => {
         const wrapper = mount(ControlBar, {

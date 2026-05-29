@@ -21,9 +21,6 @@ describe("src/shared/js/utils/handleAxiosResponse.js", () => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     Assertion.addMethod("getAxiosErrorResponse", function (errMessage, res) {
         new Assertion(this._obj).to.throw(errMessage);

@@ -94,7 +94,6 @@ describe("src/modules/routing/components/RoutingElevationProfileData.vue", () =>
     });
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
         }

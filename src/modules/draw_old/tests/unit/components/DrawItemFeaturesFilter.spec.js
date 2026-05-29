@@ -66,7 +66,6 @@ describe("src/modules/draw/components/DrawItemFeaturesFilter.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

@@ -51,9 +51,6 @@ describe("src/modules/routing/js/geosearch/routing-specialWfs-geosearch.js", () 
         store.state.Modules.Routing.geosearch.geometryName = "ms:msGeometry";
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("should fetchRoutingSpecialWfsGeosearch", () => {
         it("should process result correct", async () => {

@@ -57,7 +57,6 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

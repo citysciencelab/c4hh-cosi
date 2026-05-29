@@ -15,9 +15,6 @@ describe("src/modules/getFeatureInfo/js/getTheme.js", () => {
         sinon.stub(console, "warn").callsFake(warn);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("getTheme", () => {
         it("return the theme contained in addons", function () {

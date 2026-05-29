@@ -141,7 +141,6 @@ describe("src/modules/routing/components/Directions/DirectionsItem.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
         }

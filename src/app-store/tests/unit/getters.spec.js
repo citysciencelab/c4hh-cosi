@@ -13,9 +13,6 @@ describe("src/app-store/getters.js", () => {
         sinon.stub(console, "warn").callsFake(warn);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("allConfigsLoaded", () => {
         it("should return true, if all configs are loaded", () => {

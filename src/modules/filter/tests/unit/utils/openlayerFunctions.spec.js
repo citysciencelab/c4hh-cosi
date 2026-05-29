@@ -12,9 +12,6 @@ describe("src/modules/filter/utils/openlayerFunctions.js", () => {
             store.dispatch = stub;
         });
 
-        afterEach(() => {
-            sinon.restore();
-        });
 
         it("should do nothing if no layer with given id is found", () => {
 

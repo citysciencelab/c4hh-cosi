@@ -67,9 +67,6 @@ describe("src/modules/legend/js/layerCollector.js", function () {
             layers
         );
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("getLayerHolder", () => {
         it("returns empty array if no layers are in layerCollection", () => {

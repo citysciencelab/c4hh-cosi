@@ -3,7 +3,6 @@ import {expect} from "chai";
 import {createStore} from "vuex";
 import StatisticGridComponent from "@modules/statisticDashboard/components/StatisticGridComponent.vue";
 import indexStatisticDashboard from "@modules/statisticDashboard/store/indexStatisticDashboard.js";
-import sinon from "sinon";
 
 config.global.mocks.$t = key => key;
 
@@ -48,9 +47,6 @@ describe("src/modules/statiscticDashboard/components/StatisticGridComponent.vue"
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("Component DOM", () => {
         it("The component should exist", () => {

@@ -67,7 +67,6 @@ describe("src/modules/routing/components/Isochrones/IsochronesItemBatchProcessin
         if (wrapper) {
             wrapper.unmount();
         }
-        sinon.restore();
     });
 
     it("renders IsochronesBatchProcessingComponent", () => {

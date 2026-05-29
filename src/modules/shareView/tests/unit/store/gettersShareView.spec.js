@@ -38,9 +38,6 @@ describe("src/modules/shareView/store/gettersShareView.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should return a URL with MENU and LAYERS parameters, and remove filtered components", () => {
         const url = getters.url({}, {}, {}, rootGetters),

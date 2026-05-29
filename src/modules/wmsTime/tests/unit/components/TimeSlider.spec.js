@@ -103,7 +103,6 @@ describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
     afterEach(() => {
         winWidth = 1024;
         timeSliderActive = false;
-        sinon.restore();
     });
 
     it("renders the TimeSlider component without the possibility to activate the the LayerSwiper component if window.innerWidth is below 800", () => {

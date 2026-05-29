@@ -68,9 +68,6 @@ describe("src/modules/layerTree/components/LayerComponent.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the layer given as property to the component,  isLayerTree = true", () => {
         wrapper = shallowMount(LayerComponent, {

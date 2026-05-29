@@ -20,9 +20,6 @@ describe("src/shared/modules/draw/components/DrawLayout.vue", () => {
         setCurrentLayoutSpy = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("render", () => {
         it("renders the layout buttons for drawType - pen ", () => {

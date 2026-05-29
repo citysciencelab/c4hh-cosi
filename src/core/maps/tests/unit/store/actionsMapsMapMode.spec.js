@@ -51,9 +51,6 @@ describe("src/core/maps/store/actionsMapsMapMode.js", () => {
         mapCollection.addMap(map3d, "3D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("changeMapMode", () => {
         it("Should dispatch activateMap3d, if change from 2D to 3D map mode", () => {

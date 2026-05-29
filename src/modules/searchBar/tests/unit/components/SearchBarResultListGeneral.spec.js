@@ -1,7 +1,6 @@
 import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import sinon from "sinon";
 
 import SearchBarResultListGeneralComponent from "@modules/searchBar/components/SearchBarResultListGeneral.vue";
 
@@ -76,9 +75,6 @@ describe("src/modules/searchBar/components/SearchBarResultListGeneral.vue", () =
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("test the rendering with different parameters", () => {
         it("renders the SearchBarResultListGeneral with 3 SearchBarResultListGeneralItem", async () => {

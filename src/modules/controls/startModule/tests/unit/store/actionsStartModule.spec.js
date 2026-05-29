@@ -52,9 +52,6 @@ describe("src/modules/controls/startModule/store/actionsStartModule.js", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("setConfiguredModuleStates", () => {
         it("should set state of the configured modules", () => {

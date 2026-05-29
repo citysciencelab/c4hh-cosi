@@ -60,9 +60,6 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
     beforeEach(() => {
         receivePossiblePropertiesStub = sinon.stub(wfs, "receivePossibleProperties");
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should return an empty array if the parameter gfiAttributes is set to ignore", async () => {
         exampleLayerInformation.gfiAttributes = "ignore";

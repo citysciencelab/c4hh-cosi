@@ -1,7 +1,6 @@
 import {createStore} from "vuex";
 import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import sinon from "sinon";
 
 import LayerComponentIconFilter from "@modules/layerTree/components/LayerComponentIconFilter.vue";
 
@@ -45,9 +44,6 @@ describe("src/modules/layerTree/components/LayerComponentIconFilter.vue", () => 
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the filter icon given for layer with filterRefId", () => {
         layer.filterRefId = 1;

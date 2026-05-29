@@ -10,9 +10,6 @@ import SensorChartsBarChart from "@modules/getFeatureInfo/themes/sensor/componen
 
 config.global.mocks.$t = key => key;
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/getFeatureInfo/themes/senor/components/SensorTheme.vue", () => {
     let wrapper;

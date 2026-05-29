@@ -59,7 +59,6 @@ describe("actions", () => {
         global.window = originalWindow;
         global.KeyboardEvent = originalKeyboardEvent;
         global.PointerEvent = originalPointerEvent;
-        sinon.restore();
     });
 
     it("should calculate new position and commit changes on pointermove", () => {

@@ -45,9 +45,6 @@ describe("src/core/js/maps/mapMarker.js", () => {
         mapCollection.addMap(map2d, "2D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createMapMarker", () => {
         it("creates a point map marker", () => {

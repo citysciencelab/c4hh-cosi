@@ -15,9 +15,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarResultList.js", ()
         dispatch = sinon.spy();
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("activateActions", () => {
         const searchResult = {

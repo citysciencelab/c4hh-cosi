@@ -98,7 +98,6 @@ describe("src/modules/print/js/buildSpec", function () {
         buildSpec.getLabelAlign = originalGetLabelAlign;
         buildSpec.getImageName = originalGetImageName;
         style = originalStyle;
-        sinon.restore();
         global.window = localWindow;
     });
     afterAll(() => {
@@ -498,9 +497,6 @@ describe("src/modules/print/js/buildSpec", function () {
                 sinon.stub(buildSpec, "getMetaData").resolves();
             });
 
-            afterEach(() => {
-                sinon.restore();
-            });
 
             it("should generate legend object with unique images", async () => {
                 store.getters = mockStore.getters;

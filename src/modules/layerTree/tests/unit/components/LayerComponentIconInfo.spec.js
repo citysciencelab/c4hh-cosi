@@ -65,9 +65,6 @@ describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the info icon given as property to the component", () => {
         wrapper = shallowMount(LayerComponentIconInfo, {

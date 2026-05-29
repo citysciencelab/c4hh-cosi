@@ -41,9 +41,6 @@ describe("src/core/js/layers/layer2dVectorWfs.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLayer", () => {
         beforeEach(() => {

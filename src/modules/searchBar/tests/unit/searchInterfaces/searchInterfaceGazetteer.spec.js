@@ -4,9 +4,6 @@ import SearchInterface from "@modules/searchBar/searchInterfaces/searchInterface
 import SearchInterfaceGazetteer from "@modules/searchBar/searchInterfaces/searchInterfaceGazetteer.js";
 import store from "@appstore/index.js";
 
-afterEach(() => {
-    sinon.restore();
-});
 
 describe("src/modules/searchBar/searchInterfaces/searchInterfaceGazetteer.js", () => {
     let SearchInterface1 = null,
@@ -28,7 +25,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceGazetteer.js", (
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("prototype", () => {

@@ -57,9 +57,6 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
         sinon.stub(console, "warn").callsFake(warn);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("state defaults", () => {
         it("useDifferentLayers defaults to false", () => {

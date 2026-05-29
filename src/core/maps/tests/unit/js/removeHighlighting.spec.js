@@ -20,9 +20,6 @@ describe("src/core/maps/js/removeHighlightFeature", () => {
 
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should remove a single highlighted feature", async () => {
         state.highlightedFeatures = [feature];

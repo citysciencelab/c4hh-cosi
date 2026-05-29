@@ -152,9 +152,6 @@ describe("src/modules/copyrightConstraints/components/CopyrightConstraints.vue",
         axiosMock = sinon.stub(axios, "get").resolves({status: 200, statusText: "OK", request: {responseXML: new DOMParser().parseFromString("", "text/xml")}});
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the CopyrightConstraints component", () => {
         const wrapper = mount(CopyrightConstraints, {

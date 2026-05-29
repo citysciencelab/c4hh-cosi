@@ -69,9 +69,6 @@ describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("toggleSwiper", () => {
         beforeEach(() => {

@@ -36,9 +36,6 @@ describe("scaleOutOfRangeMixin", () => {
         sinon.stub(rawLayerList, "getLayerWhere");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("computed#rawLayers", () => {
         it("returns found raw layers", () => {

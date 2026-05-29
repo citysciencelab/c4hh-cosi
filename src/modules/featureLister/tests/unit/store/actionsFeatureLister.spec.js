@@ -60,9 +60,6 @@ describe("src/modules/featureLister/store/actionsFeatureLister", () => {
         );
         createLayerAddToTreeStub = sinon.stub(createLayerAddToTreeModule, "createLayerAddToTree");
     });
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("clickOnFeature", () => {
         it("handles the click event when clicking in a point-feature in the feature list view", () => {

@@ -28,9 +28,6 @@ describe("src/modules/filter/components/SnippetDownload.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("enableDownloadBtn", () => {
         beforeEach(() => {

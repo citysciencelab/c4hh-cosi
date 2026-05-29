@@ -69,7 +69,6 @@ describe("src/modules/routing/components/RoutingDownload.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
         }

@@ -15,9 +15,6 @@ describe("src/core/js/layers/layer.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLayer", () => {
         it("new Layer should create an layer with warning", () => {

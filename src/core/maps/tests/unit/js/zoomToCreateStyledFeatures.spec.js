@@ -28,9 +28,6 @@ describe("src/core/maps/js/zoomToCreateStyledFeatures.js", () => {
         sinon.stub(createStyle, "createStyle");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("should return an array of Features using a Point as its geometry and containing a style", () => {
         sinon.stub(styleList, "returnStyleObject").returns(styleObject);

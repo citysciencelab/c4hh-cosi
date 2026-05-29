@@ -2,9 +2,6 @@ import {expect} from "chai";
 import sinon from "sinon";
 import buildCesiumImageLayer from "@modules/print/js/buildCesiumImageLayer.js";
 describe("buildCesiumImageLayer", () => {
-    afterEach(() => {
-        sinon.restore();
-    });
     describe("takeOl3DScreenshot", () => {
         it("should return a rejected promise", async () => {
             const scene = {

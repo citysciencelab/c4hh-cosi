@@ -88,7 +88,6 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceVisibleVector.js
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
-        sinon.restore();
     });
 
     describe("prototype", () => {

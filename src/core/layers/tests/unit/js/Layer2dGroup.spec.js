@@ -58,9 +58,6 @@ describe("src/core/js/layers/Layer2dGroup.js", () => {
         };
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     describe("createLayer", () => {
         it("new Layer2dGroup without children shall call warn", () => {

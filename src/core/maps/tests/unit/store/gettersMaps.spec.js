@@ -8,9 +8,6 @@ import stateMap from "@core/maps/store/stateMaps.js";
 import actions from "@core/maps/store/actionsMapsLayers.js";
 import sinon from "sinon";
 
-afterEach(() => {
-    sinon.restore();
-});
 
 const {
     addLayer

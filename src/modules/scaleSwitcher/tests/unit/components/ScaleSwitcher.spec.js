@@ -71,9 +71,6 @@ describe("src/modules/scaleSwitcher/components/ScaleSwitcher.vue", () => {
         mapCollection.addMap(map, "2D");
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
 
     it("renders the scaleSwitcher", () => {
         wrapper = shallowMount(ScaleSwitcherComponent, {
