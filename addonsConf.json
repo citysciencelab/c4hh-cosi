@@ -251,5 +251,9 @@
   "storyCreator": {
     "path": "storyTellingTool/storyCreator",
     "type": "tool"
+  },
+    "storyManager": {
+    "path": "storyTellingTool/storyManager",
+    "type": "tool"
   }
 }

@@ -11,6 +11,11 @@ export default {
             type: String,
             default: "Inhalte hinzufügen",
             required: false
+        },
+        descr: {
+            type: String,
+            default: "",
+            required: false
         }
     },
     emits: ["click"]
@@ -24,23 +29,38 @@ export default {
             type="button"
             @click="$emit('click')"
         >
-            <i
-                :class="icon"
-                class="fs-5 me-3"
-            />
-            {{ text }}
+            <div
+                v-if="descr"
+                class="d-flex flex-column align-items-center text-center"
+            >
+                <div class="d-flex align-items-center">
+                    <i
+                        :class="icon"
+                        class="fs-5 me-2"
+                    />
+                    <span class="fw-bold">{{ text }}</span>
+                </div>
+                <span class="small mt-1">{{ descr }}</span>
+            </div>
+            <template v-else>
+                <i
+                    :class="icon"
+                    class="fs-5 me-3"
+                />
+                {{ text }}
+            </template>
         </button>
     </div>
 </template>
 
 <style lang="scss" scoped>
-    button {
+button {
+    border: 2px dashed $secondary;
+    color: $secondary;
+    &:hover {
+        background-color: $light_blue;
         border: 2px dashed $secondary;
         color: $secondary;
-        &:hover {
-            background-color: $light_blue;
-            border: 2px dashed $secondary;
-            color: $secondary;
-        }
     }
+}
 </style>
