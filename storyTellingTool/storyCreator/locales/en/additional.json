@@ -18,7 +18,9 @@
         "fileSelect": "or select file",
         "altText": "Accessibility text",
         "photoCredit": "Photo credit",
-        "deleteChapter": "Delete chapter "
+        "deleteChapter": "Delete chapter ",
+        "wrongFormat": "Only image files (e.g. JPG, PNG) are permitted.",
+        "wrongFormatTitle": "Invalid file format"
       },
       "buttons": {
           "add": "Add",

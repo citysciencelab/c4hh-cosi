@@ -18,7 +18,9 @@
         "fileSelect": "oder Datei auswählen",
         "altText": "Text für Barrierefreiheit",
         "photoCredit": "Fotograf / Bildquelle",
-        "deleteChapter": "Kapitel löschen"
+        "deleteChapter": "Kapitel löschen",
+        "wrongFormat": "Es sind nur Bilddateien (z. B. JPG, PNG) zulässig.",
+        "wrongFormatTitle": "Ungültiges Dateiformat"
       },
       "buttons": {
           "add": "Hinzufügen",

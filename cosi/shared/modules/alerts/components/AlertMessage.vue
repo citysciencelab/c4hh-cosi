@@ -11,6 +11,11 @@ export default {
             type: String,
             required: true
         },
+        title: {
+            type: String,
+            required: false,
+            default: undefined
+        },
         type: {
             type: String,
             required: true,
@@ -67,7 +72,7 @@ export default {
                 :class="iconMapping[type]"
             />
             <div class="me-4">
-                <span class=" title">{{ titleMapping[type] }}</span>
+                <span class=" title">{{ title || titleMapping[type] }}</span>
                 <br>
                 <span>{{ text }}</span>
             </div>

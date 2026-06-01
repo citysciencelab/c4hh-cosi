@@ -1,4 +1,5 @@
 <script>
+import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMessage.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
@@ -7,6 +8,7 @@ import {mapGetters} from "vuex";
 export default {
     name: "StoryCreatorAddImageCard",
     components: {
+        AlertMessage,
         FlatButton,
         FileUpload,
         InputText
@@ -18,7 +20,8 @@ export default {
                 altText: "",
                 photoCredit: ""
             },
-            imageLoaded: false
+            imageLoaded: false,
+            isValidated: true
         };
     },
     computed: {
@@ -51,13 +54,15 @@ export default {
         loadImage (event) {
             const file = event?.dataTransfer?.files?.[0] ?? event?.target?.files?.[0];
 
-            if (!file) {
+            if (!file || !file?.type.startsWith("image/")) {
+                this.isValidated = false;
                 return;
             }
-            this.imageLoaded = true;
 
+            this.imageLoaded = true;
             this.image.objectURL = URL.createObjectURL(file);
             this.image.id = crypto.randomUUID();
+            this.isValidated = true;
         }
     }
 };
@@ -104,6 +109,14 @@ export default {
                 class="mt-2"
                 :label="$t('additional:modules.storyCreator.labels.photoCredit')"
                 :placeholder="$t('additional:modules.storyCreator.labels.photoCredit')"
+            />
+            <AlertMessage
+                v-if="!isValidated"
+                :closeable="true"
+                :text="$t('additional:modules.storyCreator.labels.wrongFormat')"
+                :title="$t('additional:modules.storyCreator.labels.wrongFormatTitle')"
+                type="error"
+                @closed="isValidated = true"
             />
             <div
                 v-if="imageLoaded"

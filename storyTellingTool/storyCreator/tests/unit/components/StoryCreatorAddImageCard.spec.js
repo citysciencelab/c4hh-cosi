@@ -72,6 +72,16 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
 
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
         });
+
+        it("should not render AlertMessage components", () => {
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.false;
+        });
+
+        it("should render AlertMessage components", async () => {
+            await wrapper.setData({isValidated: false});
+
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
+        });
     });
     describe("Component Methods", () => {
         it("addImage should store objectURL by id and emit addImage", () => {
@@ -99,6 +109,19 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.emitted()).to.have.property("click:close");
         });
 
+        it("loadImage should set isValidated false", () => {
+            const file = new File(["file-content"], {type: "json"}),
+                event = {
+                    target: {
+                        files: [file]
+                    }
+                };
+
+            wrapper.vm.loadImage(event);
+
+            expect(wrapper.vm.isValidated).to.be.false;
+        });
+
         it("loadImage should set imageLoaded, image id and objectURL", () => {
             const createObjectURLSpy = sinon.stub(URL, "createObjectURL").returns("blob:test-created-url"),
                 randomUUIDSpy = sinon.stub(crypto, "randomUUID").returns("test-uuid"),
@@ -114,6 +137,7 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.vm.imageLoaded).to.be.true;
             expect(wrapper.vm.image.objectURL).to.equal("blob:test-created-url");
             expect(wrapper.vm.image.id).to.equal("test-uuid");
+            expect(wrapper.vm.isValidated).to.be.true;
             expect(createObjectURLSpy.calledOnceWithExactly(file)).to.be.true;
             expect(randomUUIDSpy.calledOnce).to.be.true;
         });
