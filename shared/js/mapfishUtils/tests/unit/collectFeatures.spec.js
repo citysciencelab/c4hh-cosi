@@ -91,6 +91,7 @@ describe("addons/shared/js/mapfishUtils/collectFeatures.js", () => {
             collectFeatures({}, {coordinate: [574729.649, 5927590.856]}, {mapProjection: "EPSG:25832", oafCRSURI: undefined}, undefined, onsuccess);
 
             expect(onsuccess.calledOnce).to.be.true;
+            sinon.restore();
         });
 
         it("should call onsuccess if a equalTo filter is given", () => {
@@ -99,6 +100,7 @@ describe("addons/shared/js/mapfishUtils/collectFeatures.js", () => {
             collectFeatures({}, {filter: "equalTo"}, {mapProjection: undefined, oafCRSURI: undefined}, undefined, onsuccess);
 
             expect(onsuccess.calledOnce).to.be.true;
+            sinon.restore();
         });
         it("should call not onsuccess with oaf if no array is given", () => {
             const onsuccess = sinon.spy(),
@@ -107,6 +109,7 @@ describe("addons/shared/js/mapfishUtils/collectFeatures.js", () => {
             collectFeatures({}, {}, {mapProjection: undefined, oafCRSURI: undefined}, {typ: "OAF"}, onsuccess);
             expect(onsuccess.calledOnce).to.be.false;
             expect(getOAFFeatureGetStub.calledOnce).to.be.true;
+            sinon.restore();
         });
         it("should call onsuccess with oaf if array is given", async () => {
             const onsuccess = sinon.stub(),
@@ -118,6 +121,7 @@ describe("addons/shared/js/mapfishUtils/collectFeatures.js", () => {
             expect(onsuccess.calledOnce).to.be.true;
             expect(getOAFFeatureGetStub.calledOnce).to.be.true;
             expect(readAllOAFToGeoJSONStub.called).to.be.true;
+            sinon.restore();
         });
     });
 
