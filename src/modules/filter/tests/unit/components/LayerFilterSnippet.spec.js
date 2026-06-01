@@ -354,6 +354,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                     wrapper.vm.setSnippetValueByState(true);
                     wrapper.vm.setSnippetValueByState({});
                     expect(wrapper.vm.snippets).to.deep.equal(snippets);
+                    sinon.restore();
                 });
                 it("should not set prechecked value if given structure is not a rule", async () => {
                     await wrapper.setData({
@@ -398,6 +399,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                 wrapper.vm.applyPassiveValuesToTags(rules);
                 expect(isRuleStub.calledOnce).to.be.true;
                 expect(wrapper.emitted().updateRules).to.be.undefined;
+                sinon.restore();
             });
 
             it("should not emit updateRules if appliedPassiveValues has same length as value", () => {
@@ -410,6 +412,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                 sinon.stub(wrapper.vm, "isRule").returns(true);
                 wrapper.vm.applyPassiveValuesToTags([rule]);
                 expect(wrapper.emitted().updateRules).to.be.undefined;
+                sinon.restore();
             });
 
             it("should set appliedPassiveValues and emit updateRules if lengths differ", async () => {
@@ -435,7 +438,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                     snippetId: 1,
                     rule
                 });
-
+                sinon.restore();
             });
 
             it("should skip rule if appliedPassiveValues is not an array", () => {
@@ -451,6 +454,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                 expect(rule.appliedPassiveValues).to.be.null;
                 expect(wrapper.emitted().updateRules).to.be.undefined;
             });
+            sinon.restore();
         });
 
         describe("hasThisSnippetTheExpectedType", () => {
@@ -578,6 +582,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                 wrapper.vm.changeRule(rule);
 
                 expect(rule.appliedPassiveValues).to.deep.equal(["a", "b"]);
+                sinon.restore();
             });
 
             it("should call deleteRulesOfChildren and deleteRulesOfParallelSnippets", async () => {
@@ -591,6 +596,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
 
                 expect(spyChildren.calledOnce).to.be.true;
                 expect(spyParallel.calledOnce).to.be.true;
+                sinon.restore();
             });
 
             it("should call handleActiveStrategy if ignoreStrategyCheck is true", async () => {
@@ -602,6 +608,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                 await wrapper.vm.$nextTick();
 
                 expect(spyHandle.calledOnce).to.be.true;
+                sinon.restore();
             });
 
             it("should call handleActiveStrategy if strategy is active", async () => {
@@ -614,6 +621,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                 await wrapper.vm.$nextTick();
 
                 expect(spyHandle.calledOnce).to.be.true;
+                sinon.restore();
             });
 
             it("should call handleActiveStrategy if parent snippet returns true", async () => {
@@ -626,6 +634,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                 await wrapper.vm.$nextTick();
 
                 expect(spyHandle.calledOnce).to.be.true;
+                sinon.restore();
             });
         });
 
@@ -890,6 +899,7 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
                 wrapper.vm.setSnippetValueByState(noRule);
                 expect(wrapper.vm.snippets).to.deep.equal(snippets);
                 expect(isRuleStub.called).to.be.true;
+                sinon.restore();
             });
             it("should set prechecked value if correct filter rule is given", async () => {
                 await wrapper.setData({
