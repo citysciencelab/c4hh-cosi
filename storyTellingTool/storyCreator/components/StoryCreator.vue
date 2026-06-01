@@ -1,5 +1,6 @@
 <script>
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
+import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
@@ -132,6 +133,7 @@ export default {
             this.story.title = this.title;
             this.story.description = this.description;
             this.story.author = this.author;
+            this.story.created = dayjs().format("DD.MM.YYYY");
             this.story.imageSrc = this.imageSrc;
             this.story.imageAlt = this.imageAlt;
             this.story.imageCopyright = this.imageCopyright;
