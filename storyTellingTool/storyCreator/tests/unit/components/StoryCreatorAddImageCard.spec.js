@@ -83,6 +83,24 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
         });
     });
+
+    describe("Computed Properties", () => {
+        it("should set computed 'enableAdd' to false", () => {
+            expect(wrapper.vm.enableAdd).to.be.false;
+        });
+
+        it("should set computed 'enableAdd' to true", async () => {
+            await wrapper.setData({
+                image: {
+                    altText: "altText",
+                    photoCredit: "photoCredit"
+                }
+            });
+
+            expect(wrapper.vm.enableAdd).to.be.true;
+        });
+    });
+
     describe("Component Methods", () => {
         it("addImage should store objectURL by id and emit addImage", () => {
             const image = {

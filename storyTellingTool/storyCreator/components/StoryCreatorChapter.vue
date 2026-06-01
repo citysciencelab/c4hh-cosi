@@ -494,6 +494,9 @@ export default {
                         :alt="item.attrs.alt"
                         class="img-thumbnail d-block mx-auto mb-3 w-100"
                     >
+                    <div class="text-end">
+                        © {{ item?.attrs?.copyright }}
+                    </div>
                 </div>
                 <div v-else-if="item.type === 'doc'">
                     <div v-html="tipTapJsonToHtml(item)" />

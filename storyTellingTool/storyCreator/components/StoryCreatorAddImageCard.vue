@@ -27,7 +27,18 @@ export default {
     computed: {
         ...mapGetters("Modules/StoryCreator", [
             "objectURLById"
-        ])
+        ]),
+        /**
+         * Returns true if the altText and photoCredit are not empty.
+         * @returns {Boolean} True if the altText and photoCredit are not empty.
+         */
+        enableAdd () {
+            if (this.image?.altText.trim() !== "" && this.image?.photoCredit.trim() !== "") {
+                return true;
+            }
+
+            return false;
+        }
     },
 
     methods: {
@@ -126,6 +137,7 @@ export default {
                     class="mt-2"
                     icon="bi bi-save"
                     :text="$t('additional:modules.storyCreator.buttons.add')"
+                    :disabled="!enableAdd"
                     :interaction="() => addImage()"
                 />
             </div>
