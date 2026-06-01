@@ -6,7 +6,6 @@ import importedState from "@modules/fileImport/store/stateFileImport.js";
 import rawSources from "@modules/fileImport/tests/resources/rawSources.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import {reset as resetUniqueId} from "@shared/js/utils/uniqueId.js";
-import testAction from "@devtools/tests/VueTestUtils.js";
 import sinon from "sinon";
 import {expect} from "chai";
 import fs from "fs";
@@ -502,54 +501,50 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
             })).to.be.true;
         });
 
-        it("useDifferentLayers true: dispatches with per-file layerId derived from filename", done => {
+        it("useDifferentLayers true: dispatches with per-file layerId derived from filename", async () => {
             const state = {
-                layerId: "importDrawLayer",
-                useDifferentLayers: true
-            };
+                    layerId: "importDrawLayer",
+                    useDifferentLayers: true
+                },
+                payload = "meine daten!.kml",
+                layerConfig = {
+                    id: "importDrawLayer_meine-daten-",
+                    name: "importDrawLayer (meine daten!)",
+                    showInLayerTree: true,
+                    typ: "VECTORBASE",
+                    type: "layer",
+                    visibility: true
+                };
 
-            testAction(addLayerConfig, "meine daten!.kml", state, {}, [
-                {
-                    type: "addLayerToLayerConfig",
-                    payload: {
-                        layerConfig: {
-                            id: "importDrawLayer_meine-daten-",
-                            name: "importDrawLayer (meine daten!)",
-                            showInLayerTree: true,
-                            typ: "VECTORBASE",
-                            type: "layer",
-                            visibility: true
-                        },
-                        parentKey: treeSubjectsKey
-                    },
-                    dispatch: true
-                }
-            ], {}, done);
+            await addLayerConfig({state, dispatch, commit, rootGetters: {}}, payload);
+
+            expect(dispatch.calledWith("addLayerToLayerConfig", {
+                layerConfig,
+                parentKey: treeSubjectsKey
+            })).to.be.true;
         });
 
-        it("useDifferentLayers true: plain filename without special chars", done => {
+        it("useDifferentLayers true: plain filename without special chars", async () => {
             const state = {
-                layerId: "importDrawLayer",
-                useDifferentLayers: true
-            };
+                    layerId: "importDrawLayer",
+                    useDifferentLayers: true
+                },
+                payload = "meine daten.kml",
+                layerConfig = {
+                    id: "importDrawLayer_meine-daten",
+                    name: "importDrawLayer (meine daten)",
+                    showInLayerTree: true,
+                    typ: "VECTORBASE",
+                    type: "layer",
+                    visibility: true
+                };
 
-            testAction(addLayerConfig, "meine-daten.kml", state, {}, [
-                {
-                    type: "addLayerToLayerConfig",
-                    payload: {
-                        layerConfig: {
-                            id: "importDrawLayer_meine-daten",
-                            name: "importDrawLayer (meine-daten)",
-                            showInLayerTree: true,
-                            typ: "VECTORBASE",
-                            type: "layer",
-                            visibility: true
-                        },
-                        parentKey: treeSubjectsKey
-                    },
-                    dispatch: true
-                }
-            ], {}, done);
+            await addLayerConfig({state, dispatch, commit, rootGetters: {}}, payload);
+
+            expect(dispatch.calledWith("addLayerToLayerConfig", {
+                layerConfig,
+                parentKey: treeSubjectsKey
+            })).to.be.true;
         });
     });
 
