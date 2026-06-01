@@ -238,6 +238,32 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
+        describe("handleAddContent", () => {
+            it("should close add component and append content with generated id", async () => {
+                const randomUuidStub = sinon.stub(crypto, "randomUUID").returns("uuid-1"),
+                    newContent = {
+                        type: "doc",
+                        content: [{type: "paragraph", content: [{type: "text", text: "Hello"}]}]
+                    };
+
+                await wrapper.setData({
+                    addComponentToShow: "text",
+                    content: []
+                });
+
+                wrapper.vm.handleAddContent(newContent);
+
+                expect(wrapper.vm.addComponentToShow).to.equal("");
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        ...newContent,
+                        id: "uuid-1"
+                    }
+                ]);
+                expect(randomUuidStub.calledOnce).to.be.true;
+            });
+        });
+
         describe("saveChapter", () => {
             it("should set the attribute to current chapter", async () => {
                 await wrapper.setData({

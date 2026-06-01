@@ -8,7 +8,7 @@ export default {
         FlatButton,
         TipTapEditor
     },
-    emits: ["click:close"],
+    emits: ["click:close", "addContent"],
     data () {
         return {
             content: ""
@@ -39,13 +39,14 @@ export default {
                     icon="bi bi-x-circle"
                     :secondary="true"
                     :text="$t('additional:modules.storyCreator.buttons.abort')"
-                    @click="$emit('click:close')"
+                    :interaction="() => $emit('click:close')"
                 />
                 <FlatButton
+                    v-if="content"
                     class="mt-2"
                     icon="bi bi-save"
                     :text="$t('additional:modules.storyCreator.buttons.add')"
-                    @click="() => ''"
+                    :interaction="() => $emit('addContent', content)"
                 />
             </div>
         </div>

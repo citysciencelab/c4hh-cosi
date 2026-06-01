@@ -9,6 +9,7 @@ import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
+import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
 import {Toast} from "bootstrap";
 
 export default {
@@ -121,6 +122,7 @@ export default {
             "setCurrentChapter",
             "setCurrentView"
         ]),
+        tipTapJsonToHtml,
         /**
          * Resets the current chapter and goes back to overview page.
          * @returns {void}
@@ -192,6 +194,18 @@ export default {
 
             toolList = sort("", toolList, "label");
             return toolList;
+        },
+        /**
+         * Adds the given tiptap content to the chapter content and closes the add component.
+         * @param {Object} content - the content to add, e.g., {type: "doc", content: {...}}
+         * @returns {void}
+         */
+        handleAddContent (content) {
+            this.addComponentToShow = "";
+            this.content.push({
+                ...content,
+                id: crypto.randomUUID()
+            });
         },
         /**
          * Resets the current chapter.
@@ -421,6 +435,9 @@ export default {
                         class="img-thumbnail d-block mx-auto mb-3 w-100"
                     >
                 </div>
+                <div v-else-if="item.type === 'doc'">
+                    <div v-html="tipTapJsonToHtml(item)" />
+                </div>
             </template>
             <AddElementDropdown
                 v-if="addComponentToShow === ''"
@@ -431,6 +448,7 @@ export default {
                 v-else-if="addComponentToShow === 'text'"
                 class="mt-2"
                 @click:close="addComponentToShow = ''"
+                @addContent="handleAddContent"
             />
             <StoryCreatorAddImageCard
                 v-else-if="addComponentToShow === 'image'"

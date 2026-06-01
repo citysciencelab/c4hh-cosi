@@ -1,7 +1,7 @@
 <script>
 import {Editor, EditorContent} from "@tiptap/vue-3";
-import StarterKit from "@tiptap/starter-kit";
 import TipTapEditorControls from "./TipTapEditorControls.vue";
+import extensions from "../js/tipTapExtensions";
 
 export default {
     name: "TipTapEditor",
@@ -39,7 +39,7 @@ export default {
     mounted () {
         this.editor = new Editor({
             content: this.modelValue,
-            extensions: [StarterKit],
+            extensions,
             onUpdate: ({editor}) => {
                 this.$emit("update:modelValue", editor.getJSON());
             }
