@@ -321,6 +321,83 @@ describe("src/modules/menu/MenuContainer.vue", () => {
             onResizeSpy.restore();
         });
     });
+
+    describe("onTransitionEnd", () => {
+        beforeEach(() => {
+            wrapper = shallowMount(MenuContainer, {
+                global: {
+                    plugins: [store]
+                },
+                propsData: {side: "mainMenu"}
+            });
+
+            sinon.stub(wrapper.vm, "setCurrentSecondaryMenuWidth");
+            sinon.stub(wrapper.vm, "setCurrentSecondaryMenuOffsetWidth");
+            sinon.stub(wrapper.vm, "setCurrentMainMenuWidth");
+            sinon.stub(wrapper.vm, "setCurrentMainMenuOffsetWidth");
+        });
+
+        it("should update secondary menu width data when secondary menu transition ends", () => {
+            wrapper.vm.onTransitionEnd({
+                propertyName: "width",
+                target: {
+                    id: "mp-menu-secondaryMenu",
+                    offsetWidth: 300
+                }
+            });
+
+            expect(wrapper.vm.setCurrentSecondaryMenuWidth.calledOnce).to.be.true;
+            expect(wrapper.vm.setCurrentSecondaryMenuOffsetWidth.calledOnceWith(300)).to.be.true;
+            expect(wrapper.vm.setCurrentMainMenuWidth.notCalled).to.be.true;
+            expect(wrapper.vm.setCurrentMainMenuOffsetWidth.notCalled).to.be.true;
+        });
+
+        it("should update main menu width data when main menu transition ends", () => {
+            wrapper.vm.onTransitionEnd({
+                propertyName: "width",
+                target: {
+                    id: "mp-menu-mainMenu",
+                    offsetWidth: 300
+                }
+            });
+
+            expect(wrapper.vm.setCurrentMainMenuWidth.calledOnce).to.be.true;
+            expect(wrapper.vm.setCurrentMainMenuOffsetWidth.calledOnceWith(300)).to.be.true;
+            expect(wrapper.vm.setCurrentSecondaryMenuWidth.notCalled).to.be.true;
+            expect(wrapper.vm.setCurrentSecondaryMenuOffsetWidth.notCalled).to.be.true;
+        });
+
+        it("should ignore width transitions from nested non-menu elements", () => {
+            wrapper.vm.onTransitionEnd({
+                propertyName: "width",
+                target: {
+                    id: "",
+                    offsetWidth: 300
+                }
+            });
+
+            expect(wrapper.vm.setCurrentSecondaryMenuWidth.notCalled).to.be.true;
+            expect(wrapper.vm.setCurrentSecondaryMenuOffsetWidth.notCalled).to.be.true;
+            expect(wrapper.vm.setCurrentMainMenuWidth.notCalled).to.be.true;
+            expect(wrapper.vm.setCurrentMainMenuOffsetWidth.notCalled).to.be.true;
+        });
+
+        it("should ignore non-width transition events", () => {
+            wrapper.vm.onTransitionEnd({
+                propertyName: "top",
+                target: {
+                    id: "mp-menu-mainMenu",
+                    offsetWidth: 300
+                }
+            });
+
+            expect(wrapper.vm.setCurrentSecondaryMenuWidth.notCalled).to.be.true;
+            expect(wrapper.vm.setCurrentSecondaryMenuOffsetWidth.notCalled).to.be.true;
+            expect(wrapper.vm.setCurrentMainMenuWidth.notCalled).to.be.true;
+            expect(wrapper.vm.setCurrentMainMenuOffsetWidth.notCalled).to.be.true;
+        });
+    });
+
     describe("hideElementsForBiggerMenu", () => {
         let layerPillsMock, footerMock;
 

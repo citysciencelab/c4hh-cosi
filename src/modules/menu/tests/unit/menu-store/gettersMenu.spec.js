@@ -549,6 +549,59 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
         });
     });
 
+    describe("zoomToExtentPadding", () => {
+        it("should return base padding if no menu is expanded", () => {
+            state = {
+                mainMenu: {
+                    expanded: false
+                },
+                secondaryMenu: {
+                    expanded: false
+                },
+                currentMainMenuOffsetWidth: 300,
+                currentSecondaryMenuOffsetWidth: 200
+            };
+
+            const result = gettersMenu.zoomToExtentPadding(state);
+
+            expect(result).to.deep.equal([20, 20, 20, 20]);
+        });
+
+        it("should include both menu widths if both menus are expanded", () => {
+            state = {
+                mainMenu: {
+                    expanded: true
+                },
+                secondaryMenu: {
+                    expanded: true
+                },
+                currentMainMenuOffsetWidth: 300,
+                currentSecondaryMenuOffsetWidth: 200
+            };
+
+            const result = gettersMenu.zoomToExtentPadding(state);
+
+            expect(result).to.deep.equal([20, 220, 20, 320]);
+        });
+
+        it("should include only the expanded menu width", () => {
+            state = {
+                mainMenu: {
+                    expanded: false
+                },
+                secondaryMenu: {
+                    expanded: true
+                },
+                currentMainMenuOffsetWidth: 300,
+                currentSecondaryMenuOffsetWidth: 200
+            };
+
+            const result = gettersMenu.zoomToExtentPadding(state);
+
+            expect(result).to.deep.equal([20, 220, 20, 20]);
+        });
+    });
+
     describe("secondaryMenuEnabled", () => {
         it("should return false if secondaryMenu.sections is undefined", () => {
             state = {

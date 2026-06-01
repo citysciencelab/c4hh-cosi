@@ -111,7 +111,9 @@ export default {
             "collapseMenues",
             "mergeMenuState",
             "setCurrentMenuWidth",
+            "setCurrentMainMenuOffsetWidth",
             "setCurrentSecondaryMenuWidth",
+            "setCurrentSecondaryMenuOffsetWidth",
             "setCurrentMainMenuWidth"
         ]),
         ...mapMutations("Modules/LayerPills", {setLayerPillsHidden: "setHidden"}),
@@ -136,10 +138,12 @@ export default {
 
             if (this.side === "mainMenu" && this.uiStyle === "DEFAULT") {
                 this.setCurrentMainMenuWidth(menuPercentWidth);
+                this.setCurrentMainMenuOffsetWidth(eventData.handleElement.offsetWidth);
             }
             if (this.side === "secondaryMenu" && this.uiStyle === "DEFAULT") {
                 this.hideElementsForBiggerMenu(menuPercentWidth);
                 this.setCurrentSecondaryMenuWidth(menuPercentWidth);
+                this.setCurrentSecondaryMenuOffsetWidth(eventData.handleElement.offsetWidth);
             }
         },
         /**
@@ -165,9 +169,11 @@ export default {
             if (event.propertyName === "width") {
                 if (event.target.id.includes("secondary")) {
                     this.setCurrentSecondaryMenuWidth(menuPercentWidth);
+                    this.setCurrentSecondaryMenuOffsetWidth(event.target.offsetWidth);
                 }
-                else {
+                else if (event.target.id.includes("main")) {
                     this.setCurrentMainMenuWidth(menuPercentWidth);
+                    this.setCurrentMainMenuOffsetWidth(event.target.offsetWidth);
                 }
             }
         }

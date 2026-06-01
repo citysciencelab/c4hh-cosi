@@ -291,6 +291,20 @@ const menuGetters = {
 
         return Array.isArray(sections) &&
             sections.some(section => Array.isArray(section) && section.length > 0);
+    },
+
+    /**
+     * Returns the padding for zooming to extent, depending on the menu state.
+     * The padding is calculated based on the current width of the main and secondary menu, if they are expanded, and an extra padding to ensure that the zoomed extent is not too close to the edge of the map.
+     * @param {MenuState} state Local vuex state.
+     * @returns {Array} The padding for zooming to extent.
+     */
+    zoomToExtentPadding: (state) => {
+        const mainOffset = state.mainMenu.expanded ? state.currentMainMenuOffsetWidth : 0,
+            secondaryOffset = state.secondaryMenu.expanded ? state.currentSecondaryMenuOffsetWidth : 0,
+            extraPadding = 20;
+
+        return [extraPadding, secondaryOffset + extraPadding, extraPadding, mainOffset + extraPadding];
     }
 };
 

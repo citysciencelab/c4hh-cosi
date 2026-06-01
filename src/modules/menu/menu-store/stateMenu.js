@@ -30,7 +30,9 @@ export default {
     defaultComponent: "getFeatureInfo",
     customMenuElementIcon: "bi-asterisk",
     currentSecondaryMenuWidth: 0,
+    currentSecondaryMenuOffsetWidth: 0,
     currentMainMenuWidth: 0,
+    currentMainMenuOffsetWidth: 0,
     mainMenu: {
         configPaths: ["portalConfig.mainMenu.sections"],
         expanded: false,
