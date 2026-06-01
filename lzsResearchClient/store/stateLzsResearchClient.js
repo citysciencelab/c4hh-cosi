@@ -1,3 +1,5 @@
+import stateSearchBar from "./searchBar/stateSearchBar.js";
+
 /**
  * Masterportal state
  * @typedef {Object} MapState
@@ -41,6 +43,7 @@
  */
 
 const state = {
+    ...stateSearchBar,
     // Masterportal state
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D", "3D"],

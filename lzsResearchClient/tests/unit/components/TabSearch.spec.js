@@ -120,7 +120,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                                 lzsSelectedDrawType: () => "",
                                 lzsSelectedInteraction: () => null,
                                 lzsDrawEdits: () => ["deleteAll"],
-                                minScaleValue: () => 5000
+                                minScaleValue: () => 5000,
+                                addressSearchCoordinates: () => [1, 2]
                             },
                             actions: {
                                 fetchDataClassList: () => Promise.resolve(),
@@ -131,7 +132,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                             mutations: {
                                 setYearsList: () => Promise.resolve(),
                                 setLzsSelectedDrawType: () => "box",
-                                setLzsSelectedInteraction: () => "draw"
+                                setLzsSelectedInteraction: () => "draw",
+                                setSearchInput: () => sinon.stub(),
+                                setAddressSearchCoordinates: () => sinon.stub()
                             }
                         }
                     }
@@ -144,7 +147,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                         }),
                         registerListener: () => sinon.stub(),
                         addInteraction: () => sinon.stub(),
-                        removeInteraction: () => sinon.stub()
+                        removeInteraction: () => sinon.stub(),
+                        removePointMarker: () => sinon.stub(),
+                        placingPointMarker: () => sinon.stub()
                     },
                     getters: {
                         projectionCode: () => "EPSG:25832",
@@ -368,5 +373,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         await wrapper.vm.setSelectedButtonGroup("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent");
 
         expect(wrapper.vm.selectedButtonGroup).to.equal("extent");
+
+        await wrapper.vm.setSelectedButtonGroup("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address");
+
+        expect(wrapper.vm.selectedButtonGroup).to.equal("address");
     });
 });

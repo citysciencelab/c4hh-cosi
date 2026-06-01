@@ -1,4 +1,5 @@
 import {generateSimpleMutations} from "@shared/js/utils/generators";
+import searchBarMutations from "./searchBar/mutationsSearchBar.js";
 import stateLzsResearchClient from "./stateLzsResearchClient.js";
 
 const mutations = {
@@ -9,6 +10,7 @@ const mutations = {
      * will be returned.
      */
     ...generateSimpleMutations(stateLzsResearchClient),
+    ...searchBarMutations,
     /**
      * Merges new archive year data into the existing archive years state.
      * @param {Object} state - The current state object.

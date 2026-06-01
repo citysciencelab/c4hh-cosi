@@ -8,6 +8,7 @@ import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import DrawEdit from "@shared/modules/draw/components/DrawEdit.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
+import LzsResearchClientSearchBar from "./searchBar/components/LzsResearchClientSearchBar.vue";
 
 import Polygon from "ol/geom/Polygon";
 import LineString from "ol/geom/LineString";
@@ -26,7 +27,8 @@ export default {
         DrawTypes,
         DrawEdit,
         ButtonGroup,
-        SwitchInput
+        SwitchInput,
+        LzsResearchClientSearchBar
     },
     inject: {
         setCurrentTab: {from: TAB_SET_CURRENT, default: null}
@@ -48,7 +50,8 @@ export default {
             searchGeometry: null,
             buttonGroupLevels: [
                 {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent")},
-                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries")}
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries")},
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address")}
             ],
             selectedButtonGroup: "extent"
         };
@@ -67,7 +70,8 @@ export default {
             "lzsSelectedDrawTypeMain",
             "lzsSelectedInteraction",
             "lzsDrawEdits",
-            "minScaleValue"
+            "minScaleValue",
+            "addressSearchCoordinates"
         ]),
         ...mapGetters("Maps", [
             "projectionCode",
@@ -117,16 +121,22 @@ export default {
             return Object.values(yearsList).sort((a, b) => a.year - b.year);
         },
         selectedSpatialButtonName () {
-            return this.selectedButtonGroup === "geometry"
-                ? this.buttonGroupLevels[1].name
-                : this.buttonGroupLevels[0].name;
+            switch (this.selectedButtonGroup) {
+                case "geometry":
+                    return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries");
+                case "address":
+                    return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address");
+                case "extent":
+                default:
+                    return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent");
+            }
         },
         isSpatialSearchFormValid () {
             if (this.selectedArchiveIds.length === 0) {
                 return false;
             }
 
-            if (!this.searchGeometry && this.selectedButtonGroup === "geometry") {
+            if (!this.searchGeometry && (this.selectedButtonGroup === "geometry" || this.selectedButtonGroup === "address")) {
                 return false;
             }
 
@@ -183,11 +193,16 @@ export default {
         ...mapActions("Maps", [
             "addNewLayerIfNotExists",
             "addInteraction",
-            "removeInteraction"
+            "removeInteraction",
+            "removePointMarker",
+            "placingPointMarker",
+            "zoomToExtent"
         ]),
         ...mapMutations("Modules/LzsResearchClient", [
             "setLzsSelectedDrawType",
             "setLzsSelectedInteraction",
+            "setSearchInput",
+            "setAddressSearchCoordinates",
             "setErrorMessage"
         ]),
         /**
@@ -198,6 +213,9 @@ export default {
             this.attributeSearchModeIsActive = attributeSearchMode;
             if (attributeSearchMode) {
                 this.removeSearchGeometry();
+                this.removePointMarker();
+                this.setSearchInput("");
+                this.setAddressSearchCoordinates(null);
             }
         },
         /**
@@ -206,11 +224,11 @@ export default {
         removeSearchGeometry () {
             this.searchGeometry = null;
 
+            this.lzsDrawLayerSource.clear();
+
             if (this.currentModifyInteraction) {
                 this.removeInteraction(this.currentModifyInteraction);
                 this.currentModifyInteraction = null;
-
-                this.lzsDrawLayerSource.clear();
             }
         },
         /**
@@ -334,6 +352,8 @@ export default {
             this.validateSearchWithAttributeForm();
             this.resetGeometricSearchForm();
             this.removeSearchGeometry();
+            this.setSearchInput("");
+            this.setAddressSearchCoordinates(null);
         },
         /**
          * Reset the geometric search selection (archive ids).
@@ -466,6 +486,16 @@ export default {
          * @return {void}
          */
         setSearchGeometry (geometry) {
+            const style = new Style({
+                fill: new Fill({
+                    color: this.lzsCurrentLayout.fillColor
+                }),
+                stroke: new Stroke({
+                    color: this.lzsCurrentLayout.strokeColor,
+                    width: this.lzsCurrentLayout.strokeWidth
+                })
+            });
+
             if (geometry instanceof LineString) {
                 const coordinates = geometry.getCoordinates(),
                     polygonCoordinates = [
@@ -478,16 +508,7 @@ export default {
                     coordinates: JSON.parse(JSON.stringify(polygonCoordinates))
                 };
 
-                const style = new Style({
-                        fill: new Fill({
-                            color: this.lzsCurrentLayout.fillColor
-                        }),
-                        stroke: new Stroke({
-                            color: this.lzsCurrentLayout.strokeColor,
-                            width: this.lzsCurrentLayout.strokeWidth
-                        })
-                    }),
-                    feature = new Feature(polygon);
+                const feature = new Feature(polygon);
 
                 feature.setStyle(style);
 
@@ -495,6 +516,21 @@ export default {
                 this.lzsDrawLayerSource.addFeature(feature);
             }
             else if (geometry instanceof Polygon) {
+                if (this.selectedButtonGroup === "address") {
+                    this.lzsDrawLayerSource.clear();
+
+                    const feature = new Feature(geometry);
+
+                    feature.setStyle(style);
+
+                    this.lzsDrawLayerSource.addFeature(feature);
+                    this.zoomToExtent({
+                        extent: geometry.getExtent(),
+                        options: {
+                            padding: this.mapZoomToExtentPadding()
+                        }
+                    });
+                }
                 this.searchGeometry = {
                     type: "Polygon",
                     coordinates: JSON.parse(JSON.stringify(geometry.getCoordinates()))
@@ -505,6 +541,10 @@ export default {
                     type: "Point",
                     coordinates: JSON.parse(JSON.stringify(geometry.getCoordinates()))
                 };
+            }
+            else {
+                this.searchGeometry = null;
+                this.lzsDrawLayerSource.clear();
             }
         },
         /**
@@ -525,7 +565,6 @@ export default {
             if (this.selectedButtonGroup === "extent") {
                 this.getCurrentVisibleMapExtent();
             }
-
 
             const payload = {
                 "dataclassIdsWithJahrgang": this.selectedYears.length ? [...this.selectedArchiveIds] : [],
@@ -576,13 +615,57 @@ export default {
             switch (group) {
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries"):
                     this.selectedButtonGroup = "geometry";
+                    this.searchGeometry = null;
+
+                    if (this.addressSearchCoordinates) {
+                        this.removePointMarker();
+                        this.lzsDrawLayerSource.clear();
+                        this.setSearchInput(null);
+                    }
+
+                    break;
+                case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address"):
+                    this.lzsDrawLayerSource.clear();
+                    this.searchGeometry = null;
+                    this.selectedButtonGroup = "address";
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent"):
                 default:
                     this.lzsDrawLayerSource.clear();
+
+                    if (this.addressSearchCoordinates) {
+                        this.removePointMarker();
+                        this.setSearchInput(null);
+                    }
+
                     this.selectedButtonGroup = "extent";
                     break;
             }
+        },
+        /**
+         * Checks if the menu sides are open or closed and
+         * calculates the padding for the zoomToExtent function, depending on the opening state
+         * @returns {Number[]} Padding values for an extent, fitting inbetween the menu sides.
+         */
+        mapZoomToExtentPadding () {
+            const
+                rightPadding = this.expanded("secondaryMenu")
+                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
+                    : 20,
+                leftPadding = this.expanded("mainMenu")
+                    ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
+                    : 20;
+
+            return [20, rightPadding, 20, leftPadding];
+        },
+        /**
+         * Deletes the current search geometry.
+         *
+         * @method deleteSearchGeometry
+         * @returns {void}
+         */
+        deleteSearchGeometry () {
+            this.searchGeometry = null;
         }
     }
 };
@@ -765,8 +848,18 @@ export default {
                                 :layer="lzsDrawLayer"
                                 :selected-interaction="lzsSelectedInteraction"
                                 :set-selected-interaction="setLzsSelectedInteraction"
+                                @click="deleteSearchGeometry"
                             />
                         </div>
+                    </div>
+
+                    <div
+                        v-if="selectedButtonGroup === 'address'"
+                        class="addressSearch"
+                    >
+                        <LzsResearchClientSearchBar
+                            @set-search-geometry="setSearchGeometry"
+                        />
                     </div>
                 </div>
             </div>
@@ -887,8 +980,25 @@ export default {
                         display: none;
                     }
                 }
+            }
 
+            div.spatialSelection {
+                .level-switch {
+                    :deep(.btn-group) {
+                        flex-wrap: wrap;
+                    }
 
+                    :deep(.btn-group .btn) {
+                        border-radius: 0;
+                        border-left: 1px solid rgba(255, 255, 255);
+                        border-right: 1px solid rgba(255, 255, 255);
+                    }
+                }
+            }
+
+            div.addressSearch {
+                margin-top: 1rem;
+                margin-left: 0.25rem;
             }
         }
         div.searchButtons {

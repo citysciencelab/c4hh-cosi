@@ -40,11 +40,13 @@
                     "patternErrorRange": "Please enter a numeric value with { minDigits } to { maxDigits } digits.",
                     "spatialSelectionGroup": {
                         "geometries": "Drawn Area",
-                        "extent": "Map Extent"
+                        "extent": "Map Extent",
+                        "address": "Address"
                     },
-                    "spatialSelectionLabel": "Search in:",
+                    "spatialSelectionLabel": "Search in / by:",
                     "searchModeSwitchLabel": "Expert search mode",
-                    "extentWarningMessage": "The map scale is smaller than 1:{ scale }. Please zoom in to enable searching within the map extent."
+                    "extentWarningMessage": "The map scale is smaller than 1:{ scale }. Please zoom in to enable searching within the map extent.",
+                    "addressSearchCancel": "Cancel address search"
                 },
                 "tabResult": {
                     "label": "Results",

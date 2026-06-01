@@ -1,9 +1,12 @@
+import searchBarActions from "./searchBar/actions/actionsSearchBar.js";
 import axios from "axios";
 import {buildEndpointUrl} from "../utils/buildEndpointUrl";
 import {saveAs, fetchWithProgress, setNested, buildFileInformationObject} from "../utils/zipHelpers";
 import {zip} from "fflate/browser";
 
 export default {
+    ...searchBarActions,
+
     /**
      * Fetch a new request token, store it, and set the refresh schedule.
      *
