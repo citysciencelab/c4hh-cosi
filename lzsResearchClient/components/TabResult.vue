@@ -1,5 +1,5 @@
 <script>
-import {mapGetters, mapMutations} from "vuex";
+import {mapGetters, mapMutations, mapActions} from "vuex";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import Multiselect from "vue-multiselect";
@@ -29,7 +29,8 @@ export default {
         ...mapGetters("Modules/LzsResearchClient", [
             "searchAttributeResponse",
             "nameForArchiveId",
-            "archiveHasGeoref"
+            "archiveHasGeoref",
+            "progressNow"
         ]),
         /**
          * Computes a list of unique archive IDs from the searchAttributeResponse and determines the attribute to group by for each archive.
@@ -73,6 +74,9 @@ export default {
     methods: {
         ...mapMutations("Modules/LzsResearchClient", [
             "setSelectedInstanceId"
+        ]),
+        ...mapActions("Modules/LzsResearchClient", [
+            "downloadSelectedFiles"
         ]),
         /**
          * Returns a sorted list of unique group values for a given archive.
@@ -216,6 +220,9 @@ export default {
                     }
                 });
             }
+        },
+        download () {
+            this.downloadSelectedFiles(this.searchAttributeResponse);
         }
     }
 };
@@ -329,6 +336,14 @@ export default {
             :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
             :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
             @click="returnToSearchTab()"
+        />
+
+        <FlatButton
+            v-if="numberOfResults > 0"
+            :disabled="progressNow >= 0"
+            :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
+            :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
+            @click="download()"
         />
     </div>
 </template>

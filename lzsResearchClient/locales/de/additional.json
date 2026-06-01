@@ -23,7 +23,8 @@
                     "numberOfResults": "Anzahl der gefundenen Datensätze:",
                     "backButtonLabel": "Zurück",
                     "loading": "Daten werden geladen...",
-                    "previewAltText": "Vorschaubild"
+                    "previewAltText": "Vorschaubild",
+                    "fileSizeMB": "GRÖßE (MB)"
                 },
                 "tabSearch": {
                     "label": "Suche",
@@ -68,6 +69,22 @@
                 "tabDownload": {
                     "label": "Download"
                 }
+            },
+            "zipAndDownload": {
+              "buttonText": "Download",
+              "buttonAriaLabel": "Download",
+              "progressAriaLabel": "Downloadfortschritt {{ percent }}%",
+              "withoutArchive": "unbekanntes Archiv",
+              "withoutYear": "ohne Jahrgang",
+              "progress": {
+                "start": "Beginne Daten zu sammeln und das ZIP zu erzeugen ...",
+                "fetchPrimaryData": "Hole Infos über Dateien zu {{ archiveName }} ...",
+                "downloading": "Dateien herunterladen ...",
+                "sumFileSizeError": "Die summierte Dateigröße ist größer als 500 MB (nämlich {{ sumFileSize }}MB). Das kann nicht auf einmal heruntergeladen werden.",
+                "downloadingFile": "Lade {{ fileName }}",
+                "zipping": "Erzeuge das ZIP ...",
+                "done": "Erledigt!"
+              }
             }
         }
     }

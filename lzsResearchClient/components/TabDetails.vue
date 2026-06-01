@@ -37,7 +37,8 @@ export default {
             "selectedInstanceId",
             "getDetailsForSelectedInstanceId",
             "nameForArchiveId",
-            "dataProtectionClassForArchiveId"
+            "dataProtectionClassForArchiveId",
+            "progressNow"
         ])
     },
     watch: {
@@ -66,7 +67,8 @@ export default {
         ...mapActions("Modules/LzsResearchClient", [
             "fetchPrimarydata",
             "downloadPreview",
-            "downloadDatafile"
+            "downloadDatafile",
+            "downloadSelectedFiles"
         ]),
         returnToResultTab () {
             this.setSelectedInstanceId(null);
@@ -85,6 +87,8 @@ export default {
             const headers = this.getDetailsForSelectedInstanceId?.primaryData ? this.getDetailsForSelectedInstanceId?.primaryData[0].primarydataAttributes.map(p => p.key) : [],
                 attributeNames = (this.getDetailsForSelectedInstanceId?.attributes || []).map(attr => attr.name),
                 filteredHeaders = headers.filter(header => !attributeNames.includes(header));
+
+            filteredHeaders.push(this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"));
 
             return filteredHeaders;
         },
@@ -110,6 +114,11 @@ export default {
                     }
                 });
 
+                attributes.push({
+                    name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
+                    value: (dataset.contentFileSize / 1000000).toFixed(2)
+                });
+
                 results.push(
                     {
                         attributes: attributes,
@@ -130,6 +139,11 @@ export default {
                                 value: attribute.value
                             });
                         }
+                    });
+
+                    worldFileAttributes.push({
+                        name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
+                        value: (dataset.georeferencePrimarydata.contentFileSize / 1000000).toFixed(2)
                     });
 
                     results.push(
@@ -169,6 +183,9 @@ export default {
             setTimeout(() => {
                 this.showSpinner = false;
             }, 4000);
+        },
+        download () {
+            this.downloadSelectedFiles(this.getDetailsForSelectedInstanceId);
         }
     }
 };
@@ -238,6 +255,14 @@ export default {
                 @download="downloadDataset"
             />
         </div>
+
+        <FlatButton
+            v-if="primaryDataCount > 0"
+            :disabled="progressNow >= 0"
+            :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
+            :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
+            @click="download()"
+        />
 
         <FlatButton
             id="backToListButton"

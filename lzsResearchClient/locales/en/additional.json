@@ -23,7 +23,8 @@
                     "numberOfResults": "Number of results:",
                     "backButtonLabel": "Back",
                     "loading": "Data is loading...",
-                    "previewAltText": "Preview"
+                    "previewAltText": "Preview",
+                    "fileSizeMB": "SIZE (MB)"
                 },
                 "tabSearch": {
                     "label": "Search",
@@ -68,6 +69,22 @@
                 "tabDownload": {
                     "label": "Download"
                 }
+            },
+            "zipAndDownload": {
+              "buttonText": "Download",
+              "buttonAriaLabel": "Download",
+              "progressAriaLabel": "Downloadprogress {{ percent }}%",
+              "withoutArchive": "unknown archive",
+              "withoutYear": "unknown year",
+              "progress": {
+                "start": "Start collecting data and creating zip ...",
+                "fetchPrimaryData": "Getting info on files for {{ archiveName }} ...",
+                "downloading": "Downloading files...",
+                "sumFileSizeError": "The total file size exceeds 500 MB (namely {{ sumFileSize }}MB). This cannot be downloaded at once.",
+                "downloadingFile": "Downloading {{ fileName }}",
+                "zipping": "Now building the zip...",
+                "done": "Done!"
+              }
             }
         }
     }

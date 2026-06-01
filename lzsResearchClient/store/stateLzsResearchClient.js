@@ -14,6 +14,8 @@
  * @property {String} apiBasePath - Base url for api requests to gis portal
  * @property {String} placeholderJsonPath - Path placeholder.json file in portalconfigs.
  * @property {Object} placeholderDataClassList - Placeholder data class list from placeholder.json
+ * @property {Number} minScaleValue - minimal scale value for search in map extent (e.g. 5000 for 1 : 5.000)
+ * @property {String} zipFileName - name part of the created zip file name, will be extended by '.zip'
 
  * Addon state
  * @property {Boolean} showLoadingSpinner - Show loading spinner or not
@@ -26,6 +28,11 @@
  * @property {Object} archiveYears - Map of archive IDs to year data { [archiveId]: { year: "2022", archiveName: ["xyz", "abc"] } }
  * @property {Object[]} searchAttributeResponse - List of dataclass objects from the search response
  * @property {String} selectedInstanceId - instance id of the selected primary object to watch details for
+ * @property {String} errorMessage - message text for errors from backend or while ziping download
+ * @property {String} currentProgressValue - message for current progress for ziping the files for download
+ * @property {Number} progressNow - percentage of progress in ziping and downloading files, -1 to hide progressbar
+ *
+ * Draw state
  * @property {Object} lzsCurrentLayout - Current layout settings for the drawn features in the draw component
  * @property {Object} lzsDrawIcons - Icons used in the draw component
  * @property {String[]} lzsDrawTypes - Draw types available in the draw component
@@ -45,6 +52,9 @@ const state = {
     deactivateGFI: true,
     standAlonePortal: false,
     hasMouseMapInteractions: true,
+    apiBasePath: "",
+    minScaleValue: 5000,
+    zipFileName: "GeoDataDepot-Download",
 
     // Addon state
     showLoadingSpinner: false,
@@ -53,13 +63,15 @@ const state = {
     requestToken: null,
     requestTokenExpireTime: null,
     dataClassList: [],
-    apiBasePath: "",
     searchAttributeResponse: [],
     placeholderDataClassList: {},
     placeholderJsonPath: "",
     archiveYears: {},
     archiveList: [],
     selectedInstanceId: null,
+    errorMessage: "",
+    currentProgressValue: "",
+    progressNow: -1,
 
     // Draw component
     lzsCurrentLayout: {
@@ -86,9 +98,7 @@ const state = {
         circleFillColor: [50, 168, 149, 0.5],
         circleStrokeColor: [50, 168, 149],
         circleRadius: 10
-    },
-    minScaleValue: 5000,
-    errorMessage: ""
+    }
 };
 
 export default state;

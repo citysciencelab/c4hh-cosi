@@ -27,8 +27,13 @@ export default {
             "showLoadingSpinner",
             "requestToken",
             "globalError",
-            "errorMessage"
+            "errorMessage",
+            "currentProgressValue",
+            "progressNow"
         ]),
+        progressBarWidthClass () {
+            return `width: ${this.progressNow}%;`;
+        },
         errorOccured () {
             return this.errorMessage !== "";
         },
@@ -104,6 +109,14 @@ export default {
                     tabContainerRef.$refs.tabResult[0].clearGeomAndGeomIndicators();
                 }
             });
+        },
+        progressNow (val) {
+            if (val === 100) {
+                setTimeout(() => {
+                    this.setProgressNow(-1);
+                    this.setCurrentProgressValue("");
+                }, 1000);
+            }
         }
     },
     /**
@@ -129,7 +142,9 @@ export default {
         ]),
         ...mapMutations("Modules/LzsResearchClient", [
             "setShowLoadingSpinner",
-            "setErrorMessage"
+            "setErrorMessage",
+            "setProgressNow",
+            "setCurrentProgressValue"
         ]),
         hideErrorMessage () {
             this.setErrorMessage("");
@@ -153,6 +168,25 @@ export default {
                 @click="hideErrorMessage"
             />
         </div>
+
+        <div
+            v-if="progressNow >= 0"
+            class="progress"
+            role="progressbar"
+            :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.progressAriaLabel', {percent: progressNow})"
+            :aria-valuenow="progressNow"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+            <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                :style="progressBarWidthClass"
+            />
+        </div>
+
+        <p id="result">
+            {{ currentProgressValue }}
+        </p>
 
         <div
             v-if="showLoadingSpinner"
@@ -188,10 +222,14 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    //@import "~variables";
+    @import "bootstrap/scss/progress";
 
     #lzsResearchClient{
         height: 100%;
+
+        div.progress-bar {
+            background-color: #3C5F94;
+        }
 
         div.alertError {
             color: #a94442;
