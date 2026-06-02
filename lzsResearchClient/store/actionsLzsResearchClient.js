@@ -81,7 +81,8 @@ export default {
                     });
                 });
 
-                commit("setSearchAttributeResponse", searchAttributeResponse);
+                commit("setSearchAttributeResponseWithUniqueInstanceIds", searchAttributeResponse);
+
             }).catch(function (error) {
                 dispatch("axiosErrorHandling", error);
             });
@@ -156,9 +157,10 @@ export default {
                     });
                 });
 
-                commit("setSearchAttributeResponse", searchAttributeResponse);
+                commit("setSearchAttributeResponseWithUniqueInstanceIds", searchAttributeResponse);
 
                 return response;
+
             }).catch(function (error) {
                 dispatch("axiosErrorHandling", error);
 

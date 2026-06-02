@@ -61,7 +61,8 @@ const getters = {
             return datasets.instanceId === state.selectedInstanceId;
         });
 
-        if (result && result.length === 1) {
+        if (result) {
+            // it should not be more than one result since we filter by instanceId in the search functions
             return result[0];
         }
 

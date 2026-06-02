@@ -204,7 +204,7 @@ export default {
         changeGroupBy (index) {
             this.groupByReRenderKey++;
 
-            if (this.geomIsShownBy.startsWith(`result-table-${index}`)) {
+            if (this.geomIsShownBy?.startsWith(`result-table-${index}`)) {
                 Object.keys(this.$refs).forEach((refTable) => {
                     if (
                         this.$refs[refTable] &&

@@ -33,9 +33,34 @@ const mutations = {
             return datasets.instanceId === primaryDataObj.instanceId;
         });
 
-        if (instanceDataset && instanceDataset.length === 1) {
-            instanceDataset[0].primaryData = primaryDataObj.primaryData;
+        if (instanceDataset && instanceDataset.length > 0) {
+            instanceDataset.forEach(dataset => {
+                dataset.primaryData = primaryDataObj.primaryData;
+            });
         }
+    },
+    /**
+     * Filter the given search response so only the first entry for each unique instanceId remains,
+     * preserve the original order, and store the result in state.searchAttributeResponse.
+     *
+     * @param {Object} state - Vuex state object.
+     * @param {Array<Object>} searchResponse - Array of result objects; each object must contain an instanceId property.
+     * @returns {void}
+     */
+    setSearchAttributeResponseWithUniqueInstanceIds (state, searchResponse) {
+        const uniqueInstanceSearchAttributeResponse = (() => {
+            const seen = new Set();
+
+            return searchResponse.filter(item => {
+                if (seen.has(item.instanceId)) {
+                    return false;
+                }
+                seen.add(item.instanceId);
+                return true;
+            });
+        })();
+
+        state.searchAttributeResponse = uniqueInstanceSearchAttributeResponse;
     }
 };
 
