@@ -1,13 +1,13 @@
 <script>
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
-import {createStoryZip} from "../shared/js/storyZipCreator.js";
+// import {createStoryZip} from "../shared/js/storyZipCreator.js";
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
 import StoryCreatorImportTest from "./StoryCreatorImportTest.vue";
 
@@ -55,15 +55,25 @@ export default {
             "currentView",
             "imageAssetsById",
             "story"
+        ]),
+        ...mapGetters("Modules/StoryManager", [
+            "storyList"
         ])
     },
     mounted () {
         this.updateStory();
     },
     methods: {
+        ...mapActions("Menu", ["changeCurrentComponent"]),
+        ...mapMutations("Menu", [
+            "setNavigationHistoryBySide"
+        ]),
         ...mapMutations("Modules/StoryCreator", [
             "removeImageAsset",
             "setCurrentView"
+        ]),
+        ...mapMutations("Modules/StoryManager", [
+            "setStoryList"
         ]),
         /**
          * Adds a new chapter.
@@ -104,10 +114,15 @@ export default {
         },
 
         /**
-         * Downloads the story as a zip file with JSON and images.
-         * @returns {Promise<void>}
+         * Saves the story into story list.
+         * @returns {void}
          */
-        async downloadStory () {
+        saveStory () {
+            this.updateStory();
+            this.setStoryList([...this.storyList, this.story]);
+            this.changeCurrentComponent({type: "storyManager", side: "secondaryMenu", props: {name: "additional:modules.storyManager.title"}});
+            this.setNavigationHistoryBySide({side: "secondaryMenu", newHistory: [{type: "root", props: []}]});
+            /*
             this.updateStory();
 
             const zipBlob = await createStoryZip(this.story, this.imageAssetsById),
@@ -122,6 +137,7 @@ export default {
             element.click();
             document.body.removeChild(element);
             URL.revokeObjectURL(objectURL);
+            */
         },
 
         /**
@@ -259,9 +275,9 @@ export default {
                 />
                 <FlatButton
                     :icon="'bi-cloud-arrow-down'"
-                    :aria-label="$t('additional:modules.storyCreator.downloadStory')"
-                    :text="$t('additional:modules.storyCreator.downloadStory')"
-                    :interaction="() => downloadStory()"
+                    :aria-label="$t('additional:modules.storyCreator.saveStory')"
+                    :text="$t('additional:modules.storyCreator.saveStory')"
+                    :interaction="() => saveStory()"
                 />
                 <FlatButton
                     :icon="'bi-x-circle'"

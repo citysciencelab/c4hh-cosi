@@ -1,14 +1,14 @@
 import {config, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import sinon from "sinon";
+import StoryCreator from "../../../components/StoryCreator.vue";
 import {vi} from "vitest";
 
 vi.mock("../../../shared/js/storyZipCreator.js", () => ({
     createStoryZip: vi.fn(),
     extractStoryZip: vi.fn()
 }));
-
-import StoryCreator from "../../../components/StoryCreator.vue";
 
 config.global.mocks.$t = key => key;
 
@@ -39,7 +39,30 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                                     chapters: []
                                 }
                             }
+                        },
+                        StoryManager: {
+                            namespaced: true,
+                            getters: {
+                                storyList: (state) => state.storyList
+                            },
+                            mutations: {
+                                setStoryList (state, value) {
+                                    state.storyList = value;
+                                }
+                            },
+                            state: {
+                                storyList: []
+                            }
                         }
+                    }
+                },
+                Menu: {
+                    namespaced: true,
+                    actions: {
+                        changeCurrentComponent: sinon.stub()
+                    },
+                    mutations: {
+                        setNavigationHistoryBySide: sinon.stub()
                     }
                 }
             }
@@ -49,6 +72,10 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                 plugins: [store]
             }
         });
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe("Component DOM", () => {
@@ -149,6 +176,34 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
 
                 expect(wrapper.vm.story.chapters.length).to.equal(1);
                 expect(wrapper.vm.story.chapters).to.deep.equal([{title: "Test Chapter 2", text: "Test Text 2"}]);
+            });
+        });
+
+        describe("saveStory", () => {
+            it("should call function updateStory", async () => {
+                const updateStorySpy = sinon.spy(wrapper.vm, "updateStory");
+
+                wrapper.vm.saveStory();
+
+                expect(updateStorySpy.calledOnce).to.be.true;
+            });
+
+            it("should call function changeCurrentComponent", async () => {
+                const changeCurrentComponentSpy = sinon.spy(wrapper.vm, "changeCurrentComponent");
+
+                wrapper.vm.saveStory();
+
+                expect(changeCurrentComponentSpy.calledOnce).to.be.true;
+                expect(changeCurrentComponentSpy.calledWith({type: "storyManager", side: "secondaryMenu", props: {name: "additional:modules.storyManager.title"}})).to.be.true;
+            });
+
+            it("should call function setNavigationHistoryBySide", async () => {
+                const setNavigationHistoryBySideSpy = sinon.spy(wrapper.vm, "setNavigationHistoryBySide");
+
+                wrapper.vm.saveStory();
+
+                expect(setNavigationHistoryBySideSpy.calledOnce).to.be.true;
+                expect(setNavigationHistoryBySideSpy.calledWith({side: "secondaryMenu", newHistory: [{type: "root", props: []}]})).to.be.true;
             });
         });
     });
