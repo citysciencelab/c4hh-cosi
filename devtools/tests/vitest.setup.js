@@ -1,5 +1,8 @@
 /* eslint-disable no-empty-function, n/no-process-env */
 import mapCollection from "../../src/core/maps/js/mapCollection.js";
+import proj4 from "proj4";
+import {unregister as unregisterProjections} from "ol/proj/proj4.js";
+import {reset as resetUniqueId} from "@shared/js/utils/uniqueId.js";
 import testConfig from "./testConfig.js";
 import i18next from "i18next";
 import sinon from "sinon";
@@ -385,10 +388,9 @@ globalThis.beforeAll(() => {
 
 globalThis.afterAll(() => {
     mapCollection.clear();
-
-    // hier auch folgendes zurücksetzen?
-    // - projections
-    // - vuex state, etc. --> es wird in vielen Tests der store importiert und manipuliert
+    proj4.defs([]);
+    unregisterProjections();
+    resetUniqueId();
 });
 
 globalThis.afterEach(() => {
