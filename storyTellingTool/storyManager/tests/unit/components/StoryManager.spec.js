@@ -14,7 +14,20 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                     namespaced: true,
                     modules: {
                         StoryManager: {
-                            namespaced: true
+                            namespaced: true,
+                            getters: {
+                                storyList: (state) => state.storyList
+                            },
+                            state: {
+                                storyList: [
+                                    {
+                                        title: "Story 1"
+                                    },
+                                    {
+                                        title: "Story 2"
+                                    }
+                                ]
+                            }
                         }
                     }
                 }
@@ -38,6 +51,30 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
 
         it("should find FlatButton component", () => {
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
+        });
+
+        it("should find InfoCard component", () => {
+            expect(wrapper.findComponent({name: "InfoCard"}).exists()).to.be.true;
+            expect(wrapper.findAllComponents({name: "InfoCard"}).length).to.equal(2);
+        });
+    });
+
+    describe("Methods", () => {
+        describe("getCardItems", () => {
+            it("should get the card items in object", async () => {
+                const story = {
+                        author: "test",
+                        created: "01.01.2026",
+                        chapters: [{}]
+                    },
+                    cardItems = {
+                        author: "test",
+                        creation: "01.01.2026",
+                        numberOfChapters: 1
+                    };
+
+                expect(wrapper.vm.getCardItems(story)).to.deep.equal(cardItems);
+            });
         });
     });
 });
