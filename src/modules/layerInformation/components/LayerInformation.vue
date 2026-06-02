@@ -479,7 +479,6 @@ export default {
                 />
             </ul>
         </nav>
-
         <div class="tab-content">
             <div
                 v-if="legendAvailable"
@@ -548,15 +547,14 @@ export default {
     </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .layer-info-text {
         word-break: break-word;
     }
 
-    #accordion-container-layer-info-contact {
+    :deep(#accordion-container-layer-info-contact) {
         .accordion-button {
             color: $link-color;
-
             transition: color 0.2s ease;
 
             &:hover {
@@ -572,42 +570,9 @@ export default {
     .abstract {
         max-height: 40vH;
         overflow-y: auto;
-    }
 
-    .abstract > p {
-        font-size: $font-size-base;
-    }
-
-    .layerInformation {
-        position: absolute;
-        overflow: unset;
-        top: 20px;
-        right: 60px;
-        max-width:600px;
-        width: 45vw;
-        margin: 0 10px 30px 10px;
-        z-index: 1010;
-        background-color: $white;
-        box-shadow: 8px 8px 12px rgba(0, 0, 0, 0.176);
-        border: 1px solid $light_grey;
-
-        @include media-breakpoint-down(sm) {
-            inset: 12px auto auto 0;
-            max-width:750px;
-            width: 95vw;
-            max-height: 80vh;
-        }
-    }
-
-    .header {
-        padding: 10px 10px 5px 10px;
-        border-bottom: 1px solid $light_grey;
-        cursor: move;
-    }
-    .bi-x-lg {
-        &:hover {
-            opacity: 0.7;
-            cursor: pointer;
+        :deep(>p) {
+            font-size: $font-size-base;
         }
     }
 
@@ -615,14 +580,12 @@ export default {
         border-bottom: 0;
         display: flex;
         flex-wrap: nowrap;
-        >li {
+
+        :deep(>li) {
             font-size: $font-size-base;
-            >a {
-                text-overflow: ellipsis;
-                overflow: hidden;
-            }
         }
     }
+
     .tab-content {
         .tab-pane {
             >ul {
@@ -637,6 +600,7 @@ export default {
                 }
             }
         }
+
         #layerinfo-legend {
             max-width: 95%;
             overflow: auto;
@@ -645,21 +609,6 @@ export default {
 
     .mb-2 {
         margin-bottom: 2rem;
-    }
-
-    .dropdown-toggle {
-        width: 100%;
-    }
-
-    .dropdown-menu {
-        width: 100%;
-        a.active {
-            background-color: $accent_active;
-            color: white;
-        }
-        a:hover {
-            background-color: $accent_hover;
-        }
     }
 
     .pt-5 {

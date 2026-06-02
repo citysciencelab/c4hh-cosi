@@ -367,6 +367,18 @@ export default [
                 {
                     selector: "VElement[name='input']:has(VAttribute[directive=false][key.name='type'][value.value='text'])",
                     message: "Native <input type=\"text\"> is not allowed. Use <InputText> instead."
+                },
+
+                // 3) Disallow native accordion buttons with static class="accordion-button".
+                {
+                    selector: "VElement[name='button']:has(VAttribute[directive=false][key.name='class'][value.value=/\\baccordion-button\\b/])",
+                    message: "Native <button class=\"accordion-button\"> is not allowed. Use <AccordionItem> instead."
+                },
+
+                // 4) Disallow accordion-button literals inside dynamic :class expressions.
+                {
+                    selector: "VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='accordion-button']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='accordion-button'])",
+                    message: "Native <button> with class \"accordion-button\" is not allowed. Use <AccordionItem> instead."
                 }
             ]
 
@@ -381,6 +393,12 @@ export default [
             "vue/no-deprecated-delete-set": "off",
             "vue/no-deprecated-model-definition": "off",
             "jsdoc/ts-no-empty-object-type": "off"
+        }
+    },
+    {
+        files: ["src/shared/modules/accordion/components/AccordionItem.vue"],
+        rules: {
+            "vue/no-restricted-syntax": "off"
         }
     },
     {

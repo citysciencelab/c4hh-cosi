@@ -50,6 +50,7 @@
 - LayerPills: The tooltip is always removed when a LayerPill is closed and no longer stays open on mouse click.
 - ButtonGroup: Fixed `precheckedIndex` not reflecting the initial `selectedValue` on component creation.
 - SearchBar: Fixed duplicated results with URL Parameter `QUERY`.
+- LayerInformation: Fixed CSS scope.
 
 ---
 

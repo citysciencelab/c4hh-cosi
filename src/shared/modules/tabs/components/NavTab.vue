@@ -99,23 +99,19 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
-    .nav-tabs {
+    .nav-link {
         border: none;
-        .nav-link.active {
-            border-top: none;
-            border-left: none;
-            border-right: none;
+        color: $black;
+
+        &.active {
+            border: none;
             border-bottom: 3px solid $dark_blue;
             font-family: $font_family_accent;
         }
-        .nav-link {
-            color: $black;
-            border: none;
-        }
-        .nav-link:hover {
-            border-radius: 0;
+
+        &:hover {
             background-color: $light_blue;
+            border-radius: 0;
         }
     }
 </style>
