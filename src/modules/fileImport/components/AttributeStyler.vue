@@ -19,13 +19,11 @@ export default {
     props: {
         features: {
             type: Array,
-            required: true,
-            default: undefined
+            required: true
         },
         attributes: {
             type: Array,
-            required: true,
-            default: undefined
+            required: true
         }
     },
     emits: ["setAttributeStyles"],

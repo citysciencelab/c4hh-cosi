@@ -125,7 +125,10 @@ export default [
             "no-unused-vars": ["error",
                 {"caughtErrors": "none"}
             ],
-            "global-require": "off",
+            // changes for eslint v10
+            "no-useless-assignment": "off",
+            "no-unassigned-vars": "off",
+            "preserve-caught-error": "off",
             // new rules in recommended
             "no-empty-static-block": "off",
             "no-new-native-nonconstructor": "off",
@@ -208,6 +211,7 @@ export default [
             // eslint-plugin-jsdoc
             "jsdoc/check-types": "off",
             "jsdoc/require-returns": "off",
+            "jsdoc/require-throws-type": "off",
             "jsdoc/check-tag-names": "off",
             "jsdoc/no-undefined-types": "off",
             "jsdoc/no-defaults": "off",
@@ -227,6 +231,9 @@ export default [
             "jsdoc/implements-on-classes": "off",
             "jsdoc/require-param-name": "off",
             "jsdoc/require-param-description": "off",
+            "jsdoc/reject-any-type": "off",
+            "jsdoc/reject-function-type": "off",
+            "jsdoc/escape-inline-tags": "off",
             "jsdoc/require-jsdoc": [
                 "error",
                 {
@@ -340,7 +347,10 @@ export default [
         files: ["addons/**/*.{js,vue}"],
         rules: {
             "no-restricted-syntax": "off",
-            "vue/no-restricted-syntax": "off"
+            "vue/no-restricted-syntax": "off",
+            "vue/no-deprecated-delete-set": "off",
+            "vue/no-deprecated-model-definition": "off",
+            "jsdoc/ts-no-empty-object-type": "off"
         }
     },
     {
