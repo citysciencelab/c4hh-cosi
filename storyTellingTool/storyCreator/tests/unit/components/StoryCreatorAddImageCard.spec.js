@@ -9,11 +9,9 @@ config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
     let wrapper,
-        objectURLById,
         localStore;
 
     beforeEach(() => {
-        objectURLById = {};
         localStore = createStore({
             namespaced: true,
             modules: {
@@ -22,8 +20,39 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
                     modules: {
                         StoryCreator: {
                             namespaced: true,
+                            state: {
+                                imageAssetsById: {}
+                            },
                             getters: {
-                                objectURLById: () => objectURLById
+                                imageAssetsById: (state) => state.imageAssetsById
+                            },
+                            mutations: {
+                                removeImageAsset (state, id) {
+                                    const objectURL = state.imageAssetsById[id]?.objectURL;
+
+                                    if (objectURL) {
+                                        URL.revokeObjectURL(objectURL);
+                                    }
+                                    delete state.imageAssetsById[id];
+                                }
+                            },
+                            actions: {
+                                addImageAsset ({state}, blob) {
+                                    const id = "test-uuid",
+                                        objectURL = "blob:test-created-url",
+                                        originalName = typeof blob?.name === "string" && blob.name.trim() !== "" ? blob.name : `${id}.bin`,
+                                        archivePath = `images/${id}__${originalName}`;
+
+                                    state.imageAssetsById[id] = {
+                                        blob,
+                                        objectURL,
+                                        mimeType: blob.type || "application/octet-stream",
+                                        originalName,
+                                        archivePath
+                                    };
+
+                                    return Promise.resolve(id);
+                                }
                             }
                         }
                     }
@@ -102,28 +131,15 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
     });
 
     describe("Component Methods", () => {
-        it("addImage should store objectURL by id and emit addImage", () => {
-            const image = {
-                id: "test-id",
-                objectURL: "blob:test-url",
-                altText: "alt",
-                photoCredit: "credit"
-            };
+        it("discardImage should revoke objectURL and emit click:close", async () => {
+            const revokeObjectURLSpy = sinon.spy(URL, "revokeObjectURL"),
+                file = new File(["test"], "test.png", {type: "image/png"}),
+                event = {target: {files: [file]}};
 
-            wrapper.vm.image = image;
-            wrapper.vm.addImage();
-
-            expect(objectURLById["test-id"]).to.equal("blob:test-url");
-            expect(wrapper.emitted("addImage")[0]).to.deep.equal([image]);
-        });
-
-        it("discardImage should revoke objectURL and emit click:close", () => {
-            const revokeObjectURLSpy = sinon.spy(URL, "revokeObjectURL");
-
-            wrapper.vm.image.objectURL = "blob:test-url";
+            await wrapper.vm.loadImage(event);
             wrapper.vm.discardImage();
 
-            expect(revokeObjectURLSpy.calledOnceWithExactly("blob:test-url")).to.be.true;
+            expect(revokeObjectURLSpy.calledWith("blob:test-created-url")).to.be.true;
             expect(wrapper.emitted()).to.have.property("click:close");
         });
 
@@ -140,24 +156,24 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.vm.isValidated).to.be.false;
         });
 
-        it("loadImage should set imageLoaded, image id and objectURL", () => {
-            const createObjectURLSpy = sinon.stub(URL, "createObjectURL").returns("blob:test-created-url"),
-                randomUUIDSpy = sinon.stub(crypto, "randomUUID").returns("test-uuid"),
-                file = new File(["file-content"], "test-image.png", {type: "image/png"}),
+        it("loadImage should set imageLoaded, image id and objectURL", async () => {
+            const file = new File(["file-content"], "test-image.png", {type: "image/png"}),
                 event = {
                     target: {
                         files: [file]
                     }
                 };
 
-            wrapper.vm.loadImage(event);
+            await wrapper.vm.loadImage(event);
 
             expect(wrapper.vm.imageLoaded).to.be.true;
-            expect(wrapper.vm.image.objectURL).to.equal("blob:test-created-url");
             expect(wrapper.vm.image.id).to.equal("test-uuid");
             expect(wrapper.vm.isValidated).to.be.true;
-            expect(createObjectURLSpy.calledOnceWithExactly(file)).to.be.true;
-            expect(randomUUIDSpy.calledOnce).to.be.true;
+            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].blob).to.equal(file);
+            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].objectURL).to.equal("blob:test-created-url");
+            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].mimeType).to.equal("image/png");
+            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].originalName).to.equal("test-image.png");
+            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].archivePath).to.equal("images/test-uuid__test-image.png");
         });
     });
 });

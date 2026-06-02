@@ -1,13 +1,15 @@
 <script>
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
+import {createStoryZip} from "../shared/js/storyZipCreator.js";
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapGetters, mapMutations} from "vuex";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
-import InfoCard from "../../shared/card/components/InfoCard.vue";
+import StoryCreatorImportTest from "./StoryCreatorImportTest.vue";
 
 export default {
     name: "StoryCreator",
@@ -16,9 +18,10 @@ export default {
         Draggable: draggable,
         FileUpload,
         FlatButton,
+        InfoCard,
         InputText,
         StoryCreatorChapter,
-        InfoCard
+        StoryCreatorImportTest
     },
     data () {
         return {
@@ -50,7 +53,7 @@ export default {
     computed: {
         ...mapGetters("Modules/StoryCreator", [
             "currentView",
-            "objectURLById",
+            "imageAssetsById",
             "story"
         ])
     },
@@ -59,6 +62,7 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/StoryCreator", [
+            "removeImageAsset",
             "setCurrentView"
         ]),
         /**
@@ -80,8 +84,7 @@ export default {
                 chapter.content
                     .filter(item => item.type === "image")
                     .forEach(image => {
-                        URL.revokeObjectURL(this.objectURLById[image.id]);
-                        delete this.objectURLById[image.id];
+                        this.removeImageAsset(image.id);
                     });
             }
             this.story.chapters.splice(index, 1);
@@ -101,21 +104,24 @@ export default {
         },
 
         /**
-         * Downloads the story as a JSON file.
-         * @returns {void}
+         * Downloads the story as a zip file with JSON and images.
+         * @returns {Promise<void>}
          */
-        downloadStory () {
+        async downloadStory () {
             this.updateStory();
-            const filename = this.title + ".json",
-                jsonStr = JSON.stringify(this.story),
+
+            const zipBlob = await createStoryZip(this.story, this.imageAssetsById),
+                filename = this.title + ".zip",
+                objectURL = URL.createObjectURL(zipBlob),
                 element = document.createElement("a");
 
-            element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(jsonStr));
+            element.setAttribute("href", objectURL);
             element.setAttribute("download", filename);
             element.style.display = "none";
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
+            URL.revokeObjectURL(objectURL);
         },
 
         /**
@@ -269,6 +275,7 @@ export default {
         <div v-else-if="currentView === 'chapter'">
             <StoryCreatorChapter />
         </div>
+        <StoryCreatorImportTest />
     </div>
 </template>
 

@@ -28,9 +28,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                             namespaced: true,
                             getters: {
                                 currentChapter: (state) => state.currentChapter,
-                                objectURLById: (state) => state.objectURLById,
                                 story: (state) => state.story,
-                                subjectLayerCategory: (state) => state.subjectLayerCategory
+                                subjectLayerCategory: (state) => state.subjectLayerCategory,
+                                imageAssetsById: (state) => state.imageAssetsById
                             },
                             mutations: {
                                 setCurrentChapter (state, value) {
@@ -51,7 +51,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                         "tool": null
                                     }
                                 },
-                                objectURLById: {},
+                                imageAssetsById: {},
                                 story: {
                                     chapters: []
                                 },

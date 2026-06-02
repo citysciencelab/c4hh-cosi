@@ -3,7 +3,7 @@ import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMe
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
-import {mapGetters} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 
 export default {
     name: "StoryCreatorAddImageCard",
@@ -26,7 +26,7 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/StoryCreator", [
-            "objectURLById"
+            "imageAssetsById"
         ]),
         /**
          * Returns true if the altText and photoCredit are not empty.
@@ -40,29 +40,27 @@ export default {
             return false;
         }
     },
-
     methods: {
-        /**
-         * Emits the "addImage" event with the image data and stores the object URL in the store.
-         */
-        addImage () {
-            this.objectURLById[this.image.id] = this.image.objectURL;
-            this.$emit("addImage", this.image);
-        },
+        ...mapActions("Modules/StoryCreator", [
+            "addImageAsset"
+        ]),
+        ...mapMutations("Modules/StoryCreator", [
+            "removeImageAsset"
+        ]),
 
         /**
-         * Emits the "click:close" event and revokes the object URL.
+         * Emits the "click:close" event and removes the stored image asset.
          */
         discardImage () {
-            URL.revokeObjectURL(this.image.objectURL);
+            this.removeImageAsset(this.image.id);
             this.$emit("click:close");
         },
 
         /**
-         * Loads the image and creates an object URL for it.
+         * Loads the image and stores it through the StoryCreator action.
          * @param {Event} event
          */
-        loadImage (event) {
+        async loadImage (event) {
             const file = event?.dataTransfer?.files?.[0] ?? event?.target?.files?.[0];
 
             if (!file || !file?.type.startsWith("image/")) {
@@ -71,9 +69,10 @@ export default {
             }
 
             this.imageLoaded = true;
-            this.image.objectURL = URL.createObjectURL(file);
-            this.image.id = crypto.randomUUID();
             this.isValidated = true;
+            const id = await this.addImageAsset(file);
+
+            this.image.id = id;
         }
     }
 };
@@ -102,7 +101,7 @@ export default {
             </div>
             <div v-else>
                 <img
-                    :src="image.objectURL"
+                    :src="imageAssetsById[image.id]?.objectURL"
                     :alt="image.altText"
                     class="img-thumbnail d-block mx-auto mb-3 w-25"
                 >
@@ -138,7 +137,7 @@ export default {
                     icon="bi bi-save"
                     :text="$t('additional:modules.storyCreator.buttons.add')"
                     :disabled="!enableAdd"
-                    :interaction="() => addImage()"
+                    :interaction="() => $emit('addImage', image)"
                 />
             </div>
         </div>

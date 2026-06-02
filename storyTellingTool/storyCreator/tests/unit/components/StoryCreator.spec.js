@@ -1,6 +1,13 @@
 import {config, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import {vi} from "vitest";
+
+vi.mock("../../../shared/js/storyZipCreator.js", () => ({
+    createStoryZip: vi.fn(),
+    extractStoryZip: vi.fn()
+}));
+
 import StoryCreator from "../../../components/StoryCreator.vue";
 
 config.global.mocks.$t = key => key;

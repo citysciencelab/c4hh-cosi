@@ -7,7 +7,7 @@
  * @property {String} icon - Icon next to title.
  * @property {String} currentView - The current view tab.
  * @property {Object} currentChapter - The current chapter object.
- * @property {Object} objectURLById - Object URLs for images, indexed by image ID.
+ * @property {Object} imageAssetsById - Image assets indexed by image ID. Each entry holds { blob, objectURL, mimeType, originalName, archivePath }.
  * @property {Object} story - The story data.
  * @property {Object} subjectLayerCategory - The subject layer category.
  */
@@ -17,7 +17,7 @@ const state = {
     name: "additional:modules.storyCreator.title",
     icon: "bi-file-plus",
     currentView: "story",
-    objectURLById: {},
+    imageAssetsById: {},
     story: {
         chapters: []
     },

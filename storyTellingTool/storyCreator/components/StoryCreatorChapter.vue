@@ -51,7 +51,7 @@ export default {
         ...mapGetters(["configuredModules", "layerConfig"]),
         ...mapGetters("Modules/StoryCreator", [
             "currentChapter",
-            "objectURLById",
+            "imageAssetsById",
             "story",
             "subjectLayerCategory"
         ]),
@@ -122,6 +122,7 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/StoryCreator", [
+            "removeImageAsset",
             "setCurrentChapter",
             "setCurrentView"
         ]),
@@ -263,8 +264,7 @@ export default {
             this.currentChapter.content
                 .filter(item => item.type === "image")
                 .forEach(image => {
-                    URL.revokeObjectURL(this.objectURLById[image.id]);
-                    delete this.objectURLById[image.id];
+                    this.removeImageAsset(image.id);
                 });
             this.setCurrentChapter(
                 {
@@ -490,7 +490,7 @@ export default {
             >
                 <div v-if="item.type === 'image'">
                     <img
-                        :src="objectURLById[item.id]"
+                        :src="imageAssetsById[item.id]?.objectURL"
                         :alt="item.attrs.alt"
                         class="img-thumbnail d-block mx-auto mb-3 w-100"
                     >
