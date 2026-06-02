@@ -1,33 +1,35 @@
 <script>
+import axios from "axios";
+import dayjs from "dayjs";
+import Feature from "ol/Feature.js";
 import {Fill, Stroke, Style} from "ol/style.js";
 import {getCenter as getCenterOfExtent} from "ol/extent.js";
-import getters from "../store/gettersValuationPrint.js";
-import Feature from "ol/Feature.js";
-import {mapActions, mapGetters, mapMutations} from "vuex";
-import mutations from "../store/mutationsValuationPrint.js";
 import {Select} from "ol/interaction.js";
 import {singleClick} from "ol/events/condition.js";
-import ModalItem from "../../../src/shared/modules/modals/components/ModalItem.vue";
-import {unionFeatures} from "../js/unionFeatures.js";
-import {createKnowledgeBase} from "../../shared/js/mapfishUtils/createKnowledgeBase.js";
-import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
-import axios from "axios";
-import isObject from "../../../src/shared/js/utils/isObject.js";
-import dayjs from "dayjs";
-import {upperFirst} from "../../../src/shared/js/utils/changeCase.js";
-import {collectFeaturesByCoordinates as collectFeatures} from "../../shared/js/mapfishUtils/collectFeatures.js";
+import {mapActions, mapGetters, mapMutations} from "vuex";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import layerFactory from "@core/layers/js/layerFactory.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
-import layerCollection from "../../../src/core/layers/js/layerCollection.js";
-import layerFactory from "../../../src/core/layers/js/layerFactory.js";
-import IconButton from "../../../src/shared/modules/buttons/components/IconButton.vue";
-import FlatButton from "../../../src/shared/modules/buttons/components/FlatButton.vue";
-import WfsSearch from "../../../src/modules/wfsSearch/components/WfsSearch.vue";
-import {uniqueId} from "../../../src/shared/js/utils/uniqueId.js";
+import {uniqueId} from "@shared/js/utils/uniqueId.js";
+import {upperFirst} from "@shared/js/utils/changeCase.js";
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import isObject from "@shared/js/utils/isObject.js";
+import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
+import WfsSearch from "@modules/wfsSearch/components/WfsSearch.vue";
+import {collectFeaturesByCoordinates as collectFeatures} from "../../shared/js/mapfishUtils/collectFeatures.js";
+import {createKnowledgeBase} from "../../shared/js/mapfishUtils/createKnowledgeBase.js";
 import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog.js";
+import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.js";
+import {unionFeatures} from "../js/unionFeatures.js";
+import getters from "../store/gettersValuationPrint.js";
+import mutations from "../store/mutationsValuationPrint.js";
 
 export default {
     name: "ValuationPrint",
     components: {
+        AccordionItem,
         ModalItem,
         IconButton,
         FlatButton,
@@ -953,40 +955,23 @@ export default {
                     </div>
                 </div>
             </div>
-            <div
+            <AccordionItem
                 v-else-if="messageList.length > 0 && showStatusLog"
-                class="accordion accordion-flush mt-3"
+                id="valuation-print-messages"
+                font-size="font-size-base"
+                heading-level="h6"
+                :is-open="true"
+                :title="$t('additional:modules.valuationPrint.messageListTitle')"
+                :use-indentation="true"
             >
-                <div class="accordion-item">
-                    <h6 class="accordion-header message-list">
-                        <button
-                            class="accordion-button"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseMessage"
-                            aria-expanded="true"
-                            aria-controls="collapseMessage"
-                        >
-                            {{ $t('additional:modules.valuationPrint.messageListTitle') }}
-                        </button>
-                    </h6>
-                    <div
-                        id="collapseMessage"
-                        class="accordion-collapse collapse show"
-                        data-bs-parent="#accordionMessage"
-                    >
-                        <div class="accordion-body">
-                            <div
-                                v-for="(messageObj, idx) in messageList"
-                                :key="idx + '_' + messageObj.message"
-                                :class="messageObj.isError ? 'messageListError' : 'messageListEntry'"
-                            >
-                                {{ messageObj.message }}
-                            </div>
-                        </div>
-                    </div>
+                <div
+                    v-for="(messageObj, idx) in messageList"
+                    :key="idx + '_' + messageObj.message"
+                    :class="messageObj.isError ? 'messageListError' : 'messageListEntry'"
+                >
+                    {{ messageObj.message }}
                 </div>
-            </div>
+            </AccordionItem>
             <hr v-if="selectedFeatures.length > 0">
             <div
                 v-if="showParcelSearch && urlList.length === 1"
@@ -1164,8 +1149,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+:deep(.accordion-button) {
+    font-family: "MasterPortalFont Bold";
+}
 
-.selected-parcels, .accordion-button {
+.selected-parcels {
     font-family: "MasterPortalFont Bold";
     font-size: 14px;
 }
