@@ -375,8 +375,8 @@ describe("addons/gfiThemes/combinedGfi/utils/gfiUtils.js", () => {
                             <app:x>5</app:x>
                         </app:TestFeature>
                     </gml:featureMember>
-                </wfs:FeatureCollection>`
-                , "application/xml");
+                </wfs:FeatureCollection>`,
+                "application/xml");
 
             const result = extractFeaturesFromWfsGml(mockXml, ["x"]);
 

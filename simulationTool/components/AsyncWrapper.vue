@@ -9,11 +9,7 @@ export default {
     props: {
         asyncState: {
             type: Object,
-            required: true,
-            default: () => ({
-                loading: false,
-                error: null
-            })
+            required: true
         }
     }
 };

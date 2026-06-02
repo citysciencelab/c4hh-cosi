@@ -19,8 +19,7 @@ export default {
         },
         dataSets: {
             type: Array,
-            required: true,
-            default: () => []
+            required: true
         },
         icon: {
             type: [Boolean, String],
