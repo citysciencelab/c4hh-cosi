@@ -477,13 +477,11 @@ async function getTitleFromHtml (sourceFolder, indexFile) {
 async function migrateIndexHtml (sourceFolder, destFolder, indexFile) {
     try {
         const data = await readFile(path.resolve(sourceFolder, indexFile), "utf8");
-        let result,
-            regex = /<div id="loader" [\s\S]*loaders.js"><\/script>/g;
 
-        result = data.replace(regex, "");
+        let result = data.replace(/<div id="loader" [\s\S]*loaders.js"><\/script>/g, "");
+
         if (result.length === data.length) {
-            regex = /<div id="loader" [\s\S]*.svg">[\s\S]*<\/div>[\s\S]*<\/div>/g;
-            result = data.replace(regex, "");
+            result = data.replace(/<div id="loader" [\s\S]*.svg">[\s\S]*<\/div>[\s\S]*<\/div>/g, "");
             if (result.length === data.length) {
                 console.warn("ATTENTION --- Removing of loader and logo in index.html failed! Must be done by user.");
             }
@@ -503,6 +501,7 @@ async function migrateIndexHtml (sourceFolder, destFolder, indexFile) {
         if (result.indexOf("lgv-container") > -1 || result.indexOf("masterportal-container") > -1) {
             console.warn("IS TOO OLD - NOT MIGRATED: ", indexFile);
         }
+        result = result.replace(/^\s*[\r\n]/gm, "");
 
         await writeFile(path.resolve(destFolder, indexFile), result, "utf8");
     }
