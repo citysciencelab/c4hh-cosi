@@ -12,6 +12,7 @@
       "noSettings": "Keine Fachdaten oder Ansichten festgelegt",
       "numberOfChapters": "Kapitel",
       "readOnly": "schreibgeschützt",
+      "previewNav": "Story-Vorschau",
       "labels": {
         "storyTitle": "Story-Namen eingeben",
         "storyDescription": "Beschreibung der Story (optional)",

@@ -10,6 +10,7 @@ import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
 import StoryCreatorImportTest from "./StoryCreatorImportTest.vue";
+import StoryPlayer from "../../storyPlayer/components/storyPlayer/StoryPlayer.vue";
 
 export default {
     name: "StoryCreator",
@@ -21,7 +22,8 @@ export default {
         InfoCard,
         InputText,
         StoryCreatorChapter,
-        StoryCreatorImportTest
+        StoryCreatorImportTest,
+        StoryPlayer
     },
     data () {
         return {
@@ -47,7 +49,6 @@ export default {
                     chapterItems: {}
                 }
             ]
-
         };
     },
     computed: {
@@ -161,6 +162,12 @@ export default {
             this.story.imageAlt = this.imageAlt;
             this.story.imageCopyright = this.imageCopyright;
             this.story.chapters = this.chapterContent;
+        },
+        /** Changes to preview mode.
+         *  @returns {void}
+         */
+        openPreview () {
+            this.setCurrentView("preview");
         }
     }
 };
@@ -169,7 +176,7 @@ export default {
 <template lang="html">
     <div id="story-creator">
         <nav
-            v-if="currentView === 'chapter'"
+            v-if="currentView === 'chapter' || currentView === 'preview'"
             aria-label="breadcrumb"
             class="mb-4"
         >
@@ -187,7 +194,9 @@ export default {
                     class="breadcrumb-item active"
                     aria-current="page"
                 >
-                    {{ $t("additional:modules.storyCreator.chapterNav") }}
+                    {{ currentView === 'chapter'
+                        ? $t("additional:modules.storyCreator.chapterNav")
+                        : $t("additional:modules.storyCreator.previewNav") }}
                 </li>
             </ol>
         </nav>
@@ -272,6 +281,7 @@ export default {
                     :icon="'bi-collection-play'"
                     :aria-label="$t('additional:modules.storyCreator.preview')"
                     :text="$t('additional:modules.storyCreator.preview')"
+                    :interaction="openPreview"
                 />
                 <FlatButton
                     :icon="'bi-cloud-arrow-down'"
@@ -290,6 +300,11 @@ export default {
         </div>
         <div v-else-if="currentView === 'chapter'">
             <StoryCreatorChapter />
+        </div>
+        <div
+            v-else-if="currentView === 'preview'"
+        >
+            <StoryPlayer />
         </div>
         <StoryCreatorImportTest />
     </div>

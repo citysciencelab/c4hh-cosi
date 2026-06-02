@@ -12,6 +12,7 @@
       "noSettings": "No technical data or map positions have been defined",
       "numberOfChapters": "Chapter",
       "readOnly": "Read-only",
+      "previewNav": "Story preview",
       "labels": {
         "storyTitle": "Enter story name",
         "storyDescription": "Story description (optional)",
