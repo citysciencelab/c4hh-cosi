@@ -1,22 +1,32 @@
 import path from "path";
-import { fileURLToPath } from "url";
-import { execSync } from "child_process";
+import {fileURLToPath} from "url";
+import {execSync} from "child_process";
 import dayjs from "dayjs";
 import getStableVersionNumber from "./getStableVersionNumber.mjs";
 
-function git(cmd, cwd) {
+/**
+ * Executes the given command and returns the result.
+ * @param {Object} cmd the command to execute
+ * @param {String} cwd the path
+ * @returns {String} the result
+ */
+function git (cmd, cwd) {
     try {
-        return execSync(cmd, { cwd, encoding: "utf8" }).trim();
-    } catch {
+        return execSync(cmd, {cwd, encoding: "utf8", stdio: ["pipe"]}).trim();
+    }
+    catch {
         return "";
     }
 }
 
-export default function getMastercodeVersionFolderName() {
+/**
+ * If version tag exists, it is returned. Else a string containing date and time and branch name is returned.
+ * @returns {String} the dedicated version or name of the folder to create
+ */
+export default function getMastercodeVersionFolderName () {
     const filename = fileURLToPath(import.meta.url);
     const dirname = path.dirname(filename);
     const repoRoot = path.resolve(dirname, "../../");
-
     const stableVersionNumber = getStableVersionNumber();
     let folderName = stableVersionNumber;
 
@@ -27,8 +37,10 @@ export default function getMastercodeVersionFolderName() {
     const long = git("git rev-parse --short HEAD", repoRoot);
     const normalizedBranch = branch === "HEAD" ? long : branch;
     const dateStr = git("git log -1 --format=%cd --date=format:'%Y-%m-%d__%H-%M-%S'", repoRoot).replace(/'/g, "");
+
     if (stableVersionNumber !== tag || !normalizedBranch.includes(long)) {
         const gitLastCommitDate = dateStr || dayjs().format("YYYY-MM-DD__HH-mm-ss");
+
         folderName += `_${normalizedBranch}_git_last_commit_at_${gitLastCommitDate}`;
     }
 
