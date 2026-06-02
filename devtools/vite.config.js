@@ -93,7 +93,6 @@ export default defineConfig(({mode}) => {
                 "@": path.resolve(rootPath, "src"),
                 "mixins": path.resolve(rootPath, "src/assets/css/mixins.scss"),
                 "variables": path.resolve(rootPath, "src/assets/css/variables.scss"),
-                "olcs": path.resolve(rootPath, "node_modules/olcs"),
                 "ol": path.resolve(rootPath, "node_modules/ol"),
                 "proj4": path.resolve(rootPath, "node_modules/proj4"),
                 "@appstore": path.resolve(rootPath, "src/app-store"),
@@ -108,7 +107,7 @@ export default defineConfig(({mode}) => {
                     }
                     : {}
             },
-            dedupe: ["jsts", "ol", "proj4", "olcs"]
+            dedupe: ["jsts", "ol", "proj4"]
         },
 
         plugins: [
