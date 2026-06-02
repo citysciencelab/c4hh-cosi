@@ -127,6 +127,54 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceGazetteer.js", (
                 }
             ]);
         });
+
+        it("should normalize an search result with geographicIdentifier", () => {
+            const searchResults = [
+                {
+                    name: "ABC-Straße",
+                    type: "street",
+                    properties: {
+                        geographicIdentifier: {
+                            $: {"xmlns:iso19112": "http://www.opengis.net/iso19112"},
+                            _: "ABC-Straße (OT 0108), Hamburg (20354)"
+                        }
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: [10, 20]
+                    }
+                }];
+
+            expect(SearchInterface1.normalizeResults(searchResults)).to.deep.equals([
+                {
+                    events: {
+                        onClick: {
+                            setMarker: {
+                                coordinates: [10, 20]
+                            },
+                            zoomToResult: {
+                                coordinates: [10, 20]
+                            }
+                        },
+                        onHover: {
+                            setMarker: {
+                                coordinates: [10, 20]
+                            }
+                        },
+                        buttons: {
+                            startRouting: {
+                                coordinates: [10, 20],
+                                name: searchResults[0].name
+                            }
+                        }
+                    },
+                    category: "modules.searchBar.type.street",
+                    id: "ABC-Straße_ABC-Straße(OT0108),Hamburg(20354)",
+                    icon: "bi-signpost-split",
+                    name: "ABC-Straße (OT 0108), Hamburg (20354)"
+                }
+            ]);
+        });
     });
 
     describe("getTranslationByType", () => {

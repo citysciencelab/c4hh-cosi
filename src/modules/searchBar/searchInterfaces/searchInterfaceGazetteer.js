@@ -115,7 +115,7 @@ SearchInterfaceGazetteer.prototype.normalizeResults = function (searchResults) {
 
     searchResults.forEach(searchResult => {
         const translatedType = this.getTranslationByType(searchResult.type),
-            displayName = searchResult.name,
+            displayName = searchResult.properties?.geographicIdentifier?._ || searchResult.name,
 
             uniqueIdParts = [
                 searchResult.name,
