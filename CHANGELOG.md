@@ -24,8 +24,14 @@
 - Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) besides Version **23** and npm fom **10.9.3** up to smaller than **12** are now supported.
 
 ### Fixed
-- vcOblique: Fixed an issue with VC Map 6 where markers and images appeared at the initial map position instead of the current view when opening vcOblique after panning.
 - Boris: Set state in urlParams to provide open boris by shareView without selection.
+
+---
+
+## 2026-05-06 v3.22.0
+
+### Fixed
+- vcOblique: Fixed an issue with VC Map 6 where markers and images appeared at the initial map position instead of the current view when opening vcOblique after panning.
 
 ---
 
