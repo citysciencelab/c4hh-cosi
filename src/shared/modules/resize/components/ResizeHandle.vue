@@ -96,6 +96,10 @@ export default {
     },
     emits: ["endResizing", "leftScreen", "resizing", "startResizing"],
     data: () => ({
+        boundOnMouseMove: null,
+        boundOnMouseUp: null,
+        boundOnWindowBlur: null,
+        boundOnVisibilityChange: null,
         deltaCursorPosition: {x: 0, y: 0}, // Cursor position difference during resizing, modified by rotation
         initialCursorPosition: {x: 0, y: 0},
         isResizing: false,
@@ -162,8 +166,8 @@ export default {
         },
         resizeEventNames () {
             return this.touchDevice
-                ? {move: "touchmove", end: "touchend"}
-                : {move: "mousemove", end: "mouseup"};
+                ? {move: "touchmove", end: "touchend", cancel: "touchcancel"}
+                : {move: "mousemove", end: "mouseup", cancel: null};
         }
     },
     watch: {
@@ -173,19 +177,29 @@ export default {
          * @returns {void}
          */
         isResizing (newValue) {
-            const {move, end} = this.resizeEventNames;
+            const {move, end, cancel} = this.resizeEventNames;
 
             if (newValue) {
                 this.handleElement.classList.add("resize-handle-is-resizing");
-                document.addEventListener(move, this.onMouseMove);
-                document.addEventListener(end, this.onMouseUp, {once: true});
+                document.addEventListener(move, this.boundOnMouseMove);
+                document.addEventListener(end, this.boundOnMouseUp);
+                if (cancel) {
+                    document.addEventListener(cancel, this.boundOnMouseUp);
+                }
+                window.addEventListener("blur", this.boundOnWindowBlur);
+                document.addEventListener("visibilitychange", this.boundOnVisibilityChange);
                 this.$emit("startResizing", this.eventData);
                 document.querySelector("body").classList.add("resize-handle-is-resizing");
                 return;
             }
             this.handleElement.classList.remove("resize-handle-is-resizing");
-            document.removeEventListener(move, this.onMouseMove);
-            document.removeEventListener(end, this.onMouseUp);
+            document.removeEventListener(move, this.boundOnMouseMove);
+            document.removeEventListener(end, this.boundOnMouseUp);
+            if (cancel) {
+                document.removeEventListener(cancel, this.boundOnMouseUp);
+            }
+            window.removeEventListener("blur", this.boundOnWindowBlur);
+            document.removeEventListener("visibilitychange", this.boundOnVisibilityChange);
             this.$emit("endResizing", this.eventData);
             document.querySelector("body").classList.remove("resize-handle-is-resizing");
         }
@@ -195,6 +209,21 @@ export default {
             this.saveInitialDimensions();
             this.setNewSize();
         }
+        this.boundOnMouseMove = this.onMouseMove.bind(this);
+        this.boundOnMouseUp = this.onMouseUp.bind(this);
+        this.boundOnWindowBlur = this.onWindowBlur.bind(this);
+        this.boundOnVisibilityChange = this.onVisibilityChange.bind(this);
+    },
+    beforeUnmount () {
+        const {move, end, cancel} = this.resizeEventNames;
+
+        document.removeEventListener(move, this.boundOnMouseMove);
+        document.removeEventListener(end, this.boundOnMouseUp);
+        if (cancel) {
+            document.removeEventListener(cancel, this.boundOnMouseUp);
+        }
+        window.removeEventListener("blur", this.boundOnWindowBlur);
+        document.removeEventListener("visibilitychange", this.boundOnVisibilityChange);
     },
     methods: {
         ...mapMutations("Modules/ResizeHandle", ["setMainMenuWidth", "setSecondaryMenuWidth"]),
@@ -223,6 +252,9 @@ export default {
             }
         },
         onMouseDown (event) {
+            if (event.button !== 0) {
+                return;
+            }
             if (this.touchStarted) {
                 return;
             }
@@ -243,6 +275,11 @@ export default {
                 clientY = event.touches ? event.touches[0].clientY : event.clientY,
                 deltaX = clientX - this.initialCursorPosition.x,
                 deltaY = clientY - this.initialCursorPosition.y;
+
+            if (!event.touches && event.buttons === 0) {
+                this.onMouseUp();
+                return;
+            }
 
             if (clientX < 0 || clientX > window.innerWidth || clientY < 0 || clientY > window.innerHeight) {
                 this.$emit("leftScreen", this.eventData);
@@ -265,6 +302,18 @@ export default {
         },
         onMouseUp () {
             this.isResizing = false;
+        },
+        onWindowBlur () {
+            if (!this.isResizing) {
+                return;
+            }
+            this.onMouseUp();
+        },
+        onVisibilityChange () {
+            if (!this.isResizing || document.visibilityState === "visible") {
+                return;
+            }
+            this.onMouseUp();
         },
         onTouchStart (event) {
             this.setTouchStarted();
