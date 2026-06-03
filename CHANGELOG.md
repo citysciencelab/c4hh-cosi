@@ -17,6 +17,8 @@
 
 ### Fixed
 - Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
+- Migrator: Fixed creation of index.html.
+- Gazetteer: Restored correct display of geographicalIdentifier as search result, if available.
 
 ---
 
@@ -90,8 +92,6 @@
 - LayerSlider: Fixed tab focus management — removed unnecessary focus attribute from the handle tab pane.
 - NavTab: Improved keyboard accessibility — added arrow key navigation support for switching between tabs.
 - Routing/RoutingCoordinateInput: Optimized button visibility — the delete waypoint, move up, and move down buttons are now only rendered when applicable based on waypoint state.
-- Migrator: Fixed creation of index.html.
-- Gazetteer: Restored correct display of geographicalIdentifier as search result, if available.
 
 ---
 
