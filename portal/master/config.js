@@ -50,6 +50,14 @@ const Config = {
         },
         fallbackLanguage: "de",
         changeLanguageOnStartWhen: ["querystring", "localStorage", "htmlTag"]
+    },
+    matomo: {
+        host: "https://matomo.be-on.de",
+        siteId: "237",
+        trackerScriptUrl: "https://matomo.be-on.de/matomo.js",
+        trackerUrl: "https://matomo.be-on.de/matomo.php",
+        requireConsent: false,
+        trackInitialView: true
     }
 };
 
