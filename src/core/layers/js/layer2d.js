@@ -51,63 +51,15 @@ Layer2d.prototype.controlAutoRefresh = function (attributes) {
 };
 
 /**
- * Adds a unique timestamp as a cache-busting query parameter to a given URL.
- * Uses the native URL API and falls back to string manipulation if the URL is invalid.
- * @param {String} url The original layer URL to be modified.
- * @param {Number} timestamp The current timestamp in milliseconds used as the cache-buster value.
- * @returns {String} The modified URL including the cache-busting parameter.
- */
-function addCacheBuster (url, timestamp) {
-    try {
-        const urlObj = new URL(url, window.location.href);
-
-        urlObj.searchParams.set("_refresh", timestamp);
-        return urlObj.href;
-    }
-    catch (e) {
-        const separator = url.includes("?") ? "&" : "?";
-
-        return `${url}${separator}_refresh=${timestamp}`;
-    }
-}
-
-/**
  * Creates and starts an interval to refresh the layer.
  * @param {Number} autoRefresh The interval in milliseconds.
  * @returns {void}
  */
 Layer2d.prototype.startAutoRefresh = function (autoRefresh) {
     this.setIntervalAutoRefresh(setInterval(() => {
-        const olSource = this.getLayer()?.getSource(),
-            layerSource = olSource instanceof Cluster ? olSource.getSource() : olSource,
-            timestamp = Date.now();
+        const layerSource = this.getLayerSource() instanceof Cluster ? this.getLayerSource()?.getSource() : this.getLayerSource();
 
-        if (!layerSource) {
-            return;
-        }
-
-        if (typeof layerSource.updateParams === "function" && typeof layerSource.getParams === "function") {
-            layerSource.updateParams({...layerSource.getParams(), CACHEID: timestamp});
-            return;
-        }
-
-        if (typeof layerSource.getUrls === "function" && typeof layerSource.setUrls === "function") {
-            this.autoRefreshBaseUrls = this.autoRefreshBaseUrls || layerSource.getUrls();
-            if (Array.isArray(this.autoRefreshBaseUrls)) {
-                layerSource.setUrls(this.autoRefreshBaseUrls.map(url => addCacheBuster(url, timestamp)));
-                return;
-            }
-        }
-
-        if (typeof layerSource.getUrl === "function" && typeof layerSource.setUrl === "function") {
-            this.autoRefreshBaseUrl = this.autoRefreshBaseUrl || layerSource.getUrl();
-            if (this.autoRefreshBaseUrl) {
-                layerSource.setUrl(addCacheBuster(this.autoRefreshBaseUrl, timestamp));
-                return;
-            }
-        }
-
-        layerSource.refresh();
+        layerSource?.refresh();
     }, autoRefresh));
 };
 
