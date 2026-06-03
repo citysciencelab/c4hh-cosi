@@ -4,9 +4,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-
-### __Breaking Changes__
+## 2026-06-03 v3.23.0
 
 ### Added
 - Added CONTRIBUTING.md file.
@@ -54,10 +52,6 @@
 - CompareMaps: The restriction of layer types is extended to all types without GROUP Layers.
 - LayerInformation: replaced "nav-item"-links with NavTab-component.
 - Tabs: extended NavTab-component with additional "value"-prop.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - Issue \#1591: Draw/FileImport: fixed KML export and KML import of symbols.
