@@ -6,7 +6,6 @@ import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import mapMarker from "@core/maps/js/mapMarker.js";
 import calculateScreenPosition from "../../js/calculateScreenPosition.js";
-import addInitialTilesLoadedListener from "../../js/addInitialTilesLoadedListener.js";
 import find3DPickedFeatureProvider from "@shared/js/utils/find3DPickedFeature.js";
 import get3DHighlightColor from "@shared/js/utils/get3DHighlightColor.js";
 import applyTileStyle from "@shared/js/utils/applyTileStyle.js";
@@ -393,8 +392,7 @@ export default {
 
         const scene = mapCollection.getMap("3D").getCesiumScene(),
             [longitude, latitude] = coordinates,
-            height = 0,
-            cartesian = Cesium.Cartesian3.fromDegrees(longitude, latitude, height),
+            cartesian = Cesium.Cartesian3.fromDegrees(longitude, latitude, 0),
             camera = scene.camera,
             cameraHeight = Cesium.Ellipsoid.WGS84.cartesianToCartographic(camera.position).height + 140;
 
@@ -436,32 +434,23 @@ export default {
                 }
             }
 
-            const screenPosition = calculateScreenPosition(scene, cartesian),
-                pickedFeatures = scene.drillPick(screenPosition);
+            const screenPosition = calculateScreenPosition(scene, cartesian);
 
             if (!screenPosition) {
                 console.warn("Unable to project the position into screen space.");
                 return;
             }
 
-            let pickedFeature;
-
-            if (pickedFeatures.length > 0) {
+            const pickedFeatures = scene.drillPick(screenPosition, undefined, 20, 20),
                 pickedFeature = pickedFeatures.find(feature => typeof feature._batchId !== "undefined");
-            }
-
-            if (!screenPosition) {
-                console.warn("Unable to project the position into screen space.");
-                return;
-            }
 
             if (pickedFeature) {
-                commit("setLastPickedFeatureId", pickedFeature?.getProperty("id"));
+                commit("setLastPickedFeatureId", pickedFeature.getProperty("id"));
 
                 dispatch("highlightPickedFeature", {pickedFeature});
             }
             else {
-                dispatch("handleLayerLoading", {scene, screenPosition});
+                dispatch("handleLayerLoading", {scene, cartesian});
             }
         }
         catch (error) {
@@ -470,51 +459,52 @@ export default {
     },
 
     /**
-     * Waits for 3D tiles to fully load, then attempts to pick and highlight a feature.
-     * If no feature is found initially, retries after a short delay.
+     * Listens to the Cesium postRender event and attempts to pick and highlight a 3D tile
+     * feature at the given position on each rendered frame, throttled to once per 300 ms.
+     * Stops after 15 s if no feature is found.
      *
      * @param {Object} context The Vuex context.
      * @param {Function} context.dispatch The Vuex dispatch function.
      * @param {Function} context.commit The Vuex commit function.
      * @param {Object} payload The payload.
      * @param {Cesium.Scene} payload.scene The Cesium scene object.
-     * @param {Cesium.Cartesian2} payload.screenPosition The screen-space position to pick from.
-     * @returns {Promise<void>}
+     * @param {Cesium.Cartesian3} payload.cartesian The world-space position of the feature.
+     * @returns {void}
      */
-    async handleLayerLoading ({dispatch, commit}, {scene, screenPosition}) {
-        try {
-            const {allLayersLoaded, cleanup} = await addInitialTilesLoadedListener(scene.camera);
+    handleLayerLoading ({dispatch, commit}, {scene, cartesian}) {
+        const startTime = Date.now(),
+            maxWaitTime = 15000;
+        let lastPickTime = startTime - 300;
 
-            if (!allLayersLoaded) {
-                throw new Error("Not all layers are loaded.");
+        const removeListener = scene.postRender.addEventListener(() => {
+            const now = Date.now();
+
+            if (now - startTime > maxWaitTime) {
+                removeListener();
+                dispatch("removeHighlight3DTile");
+                return;
             }
 
-            let pickedFeatures = scene.drillPick(screenPosition),
-                pickedFeature = pickedFeatures.find(feature => feature._batchId !== undefined);
+            if (now - lastPickTime < 300) {
+                return;
+            }
+            lastPickTime = now;
+
+            const screenPosition = calculateScreenPosition(scene, cartesian);
+
+            if (!screenPosition) {
+                return;
+            }
+
+            const pickedFeature = scene.drillPick(screenPosition, undefined, 20, 20)
+                .find(f => typeof f._batchId !== "undefined");
 
             if (pickedFeature) {
-                commit("setLastPickedFeatureId", pickedFeature?.getProperty("id"));
+                removeListener();
+                commit("setLastPickedFeatureId", pickedFeature.getProperty("id"));
                 dispatch("highlightPickedFeature", {pickedFeature});
             }
-            else {
-                setTimeout(() => {
-                    pickedFeatures = scene.drillPick(screenPosition);
-                    pickedFeature = pickedFeatures.find(feature => feature._batchId !== undefined);
-
-                    if (pickedFeature) {
-                        commit("setLastPickedFeatureId", pickedFeature?.getProperty("id"));
-                        dispatch("highlightPickedFeature", {pickedFeature});
-                    }
-                    else {
-                        dispatch("removeHighlight3DTile");
-                    }
-                }, 1000);
-            }
-            cleanup();
-        }
-        catch (error) {
-            console.error("Error waiting for layer loading:", error);
-        }
+        });
     },
 
     /**
@@ -534,8 +524,8 @@ export default {
         }
 
         const featureId = pickedFeature.getProperty("id"),
-            GetFeatureInfoMenSide = rootGetters["Modules/GetFeatureInfo/menuSide"],
-            currentComponentType = rootGetters["Menu/currentComponent"](GetFeatureInfoMenSide)?.type;
+            gfiMenuSide = rootGetters["Modules/GetFeatureInfo/menuSide"],
+            currentComponentType = rootGetters["Menu/currentComponent"](gfiMenuSide)?.type;
 
         if (!featureId) {
             console.warn("Picked feature has no ID:", pickedFeature);
@@ -546,8 +536,8 @@ export default {
         commit("Modules/GetFeatureInfo/setGfiFeatures", null, {root: true});
 
         if (currentComponentType === "getFeatureInfo") {
-            commit("Menu/switchToPreviousComponent", rootGetters["Modules/GetFeatureInfo/menuSide"], {root: true});
-            if (GetFeatureInfoMenSide === "secondaryMenu" && rootGetters["Menu/secondaryMenu"].currentComponent === "root") {
+            commit("Menu/switchToPreviousComponent", gfiMenuSide, {root: true});
+            if (gfiMenuSide === "secondaryMenu" && rootGetters["Menu/secondaryMenu"].currentComponent === "root") {
                 dispatch("Menu/closeMenu", "secondaryMenu", {root: true});
             }
         }

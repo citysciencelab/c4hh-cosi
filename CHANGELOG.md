@@ -19,6 +19,7 @@
 - Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
 - Migrator: Fixed creation of index.html.
 - Gazetteer: Restored correct display of geographicalIdentifier as search result, if available.
+- SearchBar: Fixed unstable highlighting of 3D tiles at address coordinates.
 
 ---
 

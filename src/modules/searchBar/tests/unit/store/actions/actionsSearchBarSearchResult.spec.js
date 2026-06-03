@@ -7,6 +7,7 @@ import actions from "@modules/searchBar/store/actions/actionsSearchBarSearchResu
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import mapMarker from "@core/maps/js/mapMarker.js";
 import markerHelper from "@modules/searchBar/js/marker.js";
+import find3DPickedFeatureProvider from "@shared/js/utils/find3DPickedFeature.js";
 
 describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.js", () => {
     let dispatch,
@@ -44,10 +45,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
             return {getExtent: sinon.stub()};
         }});
         sinon.stub(markerHelper, "extentIsValid").returns(true);
-    });
-
-    afterEach(() => {
-        sinon.restore();
     });
 
     describe("activateLayerInTopicTree", () => {
@@ -643,11 +640,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
             };
         });
 
-
-        afterEach(() => {
-            sinon.restore();
-        });
-
         it("should not perform any action if the mode is not 3D", async function () {
             mockGetters["Maps/mode"] = "2D";
 
@@ -658,6 +650,278 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
 
             expect(mockDispatch.notCalled).to.be.true;
             expect(mockCommit.notCalled).to.be.true;
+        });
+
+        describe("when in 3D mode", () => {
+            let mockScene, mockCartesian, map3d;
+
+            beforeEach(() => {
+                mockCartesian = {x: 1, y: 2, z: 3};
+                mockScene = {
+                    camera: {position: {}},
+                    drillPick: sinon.stub().returns([])
+                };
+                map3d = {
+                    id: "1",
+                    mode: "3D",
+                    getCesiumScene: () => mockScene
+                };
+                mapCollection.addMap(map3d, "3D");
+                global.Cesium = {
+                    Cartesian3: {
+                        fromDegrees: sinon.stub().returns(mockCartesian)
+                    },
+                    Ellipsoid: {
+                        WGS84: {
+                            cartesianToCartographic: sinon.stub().returns({height: 500})
+                        }
+                    }
+                };
+            });
+
+            afterEach(() => {
+                global.Cesium = null;
+            });
+
+            it("should dispatch Maps/setCamera with the correct camera position", () => {
+                const coordinates = [10.0, 53.5];
+
+                actions.highlight3DTileByCoordinates(
+                    {rootGetters: mockGetters, dispatch: mockDispatch},
+                    {coordinates}
+                );
+
+                expect(mockDispatch.calledWith("Maps/setCamera", {
+                    cameraPosition: [10.0, 53.5, 640],
+                    heading: 0,
+                    pitch: -90,
+                    roll: 0
+                }, {root: true})).to.be.true;
+            });
+
+            it("should dispatch detectAndHighlight3DTile with the scene and cartesian", () => {
+                const coordinates = [10.0, 53.5];
+
+                actions.highlight3DTileByCoordinates(
+                    {rootGetters: mockGetters, dispatch: mockDispatch},
+                    {coordinates}
+                );
+
+                const detectCall = mockDispatch.getCalls().find(c => c.args[0] === "detectAndHighlight3DTile");
+
+                expect(detectCall).to.not.be.undefined;
+                expect(detectCall.args[1]).to.deep.equal({scene: mockScene, cartesian: mockCartesian});
+            });
+        });
+    });
+
+    describe("detectAndHighlight3DTile", () => {
+        let mockScene, mockState, mockDispatch, mockCommit, mockCartesian, warnStub;
+
+        beforeEach(() => {
+            mockCartesian = {x: 1, y: 2, z: 3};
+            mockScene = {
+                drillPick: sinon.stub().returns([])
+            };
+            mockState = {lastPickedFeatureId: null};
+            mockDispatch = sinon.spy();
+            mockCommit = sinon.spy();
+            warnStub = sinon.stub(console, "warn");
+            global.Cesium = {
+                SceneTransforms: {
+                    worldToWindowCoordinates: sinon.stub().returns({x: 100, y: 200})
+                }
+            };
+        });
+
+        afterEach(() => {
+            warnStub.restore();
+            global.Cesium = null;
+        });
+
+        it("returns early without dispatching if screenPosition cannot be computed", async () => {
+            global.Cesium.SceneTransforms.worldToWindowCoordinates = sinon.stub().returns(null);
+
+            await actions.detectAndHighlight3DTile(
+                {state: mockState, dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+
+            expect(mockDispatch.notCalled).to.be.true;
+            expect(mockCommit.notCalled).to.be.true;
+        });
+
+        it("warns when screenPosition cannot be computed", async () => {
+            global.Cesium.SceneTransforms.worldToWindowCoordinates = sinon.stub().returns(null);
+
+            await actions.detectAndHighlight3DTile(
+                {state: mockState, dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+
+            expect(warnStub.calledTwice).to.be.true;
+            expect(warnStub.firstCall.args[0]).to.equals("Unable to project the position into screen space.");
+            expect(warnStub.secondCall.args[0]).to.equals("Unable to project the position into screen space.");
+        });
+
+        it("commits and highlights immediately when drillPick finds a feature with _batchId", async () => {
+            const mockFeature = {
+                _batchId: 42,
+                getProperty: sinon.stub().returns("feat-1")
+            };
+
+            mockScene.drillPick = sinon.stub().returns([mockFeature]);
+
+            await actions.detectAndHighlight3DTile(
+                {state: mockState, dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+
+            expect(mockCommit.calledWith("setLastPickedFeatureId", "feat-1")).to.be.true;
+            expect(mockDispatch.calledWith("highlightPickedFeature", {pickedFeature: mockFeature})).to.be.true;
+        });
+
+        it("dispatches handleLayerLoading if no feature with _batchId is found by drillPick", async () => {
+            const featureWithoutBatchId = {getProperty: sinon.stub()};
+
+            mockScene.drillPick = sinon.stub().returns([featureWithoutBatchId]);
+
+            await actions.detectAndHighlight3DTile(
+                {state: mockState, dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+
+            expect(mockDispatch.calledWith("handleLayerLoading", {scene: mockScene, cartesian: mockCartesian})).to.be.true;
+        });
+
+        it("re-highlights the previously picked feature when lastPickedFeatureId resolves", async () => {
+            const mockFeature = {_batchId: 1, getProperty: sinon.stub()};
+
+            mockState = {lastPickedFeatureId: "feat-prev"};
+            sinon.stub(find3DPickedFeatureProvider, "find3DPickedFeature").resolves(mockFeature);
+
+            await actions.detectAndHighlight3DTile(
+                {state: mockState, dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+
+            expect(mockDispatch.calledWith("highlightPickedFeature", {pickedFeature: mockFeature})).to.be.true;
+            expect(mockScene.drillPick.notCalled).to.be.true;
+        });
+
+        it("falls through to drillPick if find3DPickedFeature returns null for lastPickedFeatureId", async () => {
+            mockState = {lastPickedFeatureId: "feat-prev"};
+            sinon.stub(find3DPickedFeatureProvider, "find3DPickedFeature").resolves(null);
+
+            await actions.detectAndHighlight3DTile(
+                {state: mockState, dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+
+            expect(mockScene.drillPick.calledOnce).to.be.true;
+        });
+    });
+
+    describe("handleLayerLoading", () => {
+        let mockScene, mockDispatch, mockCommit, mockCartesian, clock, postRenderCallback, removeListenerSpy, warnStub;
+
+        beforeEach(() => {
+            clock = sinon.useFakeTimers();
+            mockCartesian = {x: 1, y: 2, z: 3};
+            postRenderCallback = null;
+            removeListenerSpy = sinon.spy();
+            mockScene = {
+                drillPick: sinon.stub().returns([]),
+                postRender: {
+                    addEventListener: sinon.stub().callsFake((cb) => {
+                        postRenderCallback = cb;
+                        return removeListenerSpy;
+                    })
+                }
+            };
+            mockDispatch = sinon.spy();
+            mockCommit = sinon.spy();
+            warnStub = sinon.stub(console, "warn");
+            global.Cesium = {
+                SceneTransforms: {
+                    worldToWindowCoordinates: sinon.stub().returns({x: 100, y: 200})
+                }
+            };
+        });
+
+        afterEach(() => {
+            warnStub.restore();
+            clock.restore();
+            global.Cesium = null;
+        });
+
+        it("commits and highlights the first feature with _batchId found by drillPick", () => {
+            const mockFeature = {
+                _batchId: 5,
+                getProperty: sinon.stub().returns("feat-42")
+            };
+
+            mockScene.drillPick = sinon.stub().returns([mockFeature]);
+
+            actions.handleLayerLoading(
+                {dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+            postRenderCallback();
+
+            expect(mockCommit.calledWith("setLastPickedFeatureId", "feat-42")).to.be.true;
+            expect(mockDispatch.calledWith("highlightPickedFeature", {pickedFeature: mockFeature})).to.be.true;
+        });
+
+        it("does not dispatch anything before the first frame fires", () => {
+            const mockFeature = {_batchId: 1, getProperty: sinon.stub().returns("feat-1")};
+
+            mockScene.drillPick = sinon.stub().returns([mockFeature]);
+
+            actions.handleLayerLoading(
+                {dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+
+            expect(mockDispatch.notCalled).to.be.true;
+            expect(mockCommit.notCalled).to.be.true;
+        });
+
+        it("dispatches removeHighlight3DTile after 15 s if no feature is found", () => {
+            actions.handleLayerLoading(
+                {dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+            clock.tick(15001);
+            postRenderCallback();
+
+            expect(mockDispatch.calledWith("removeHighlight3DTile")).to.be.true;
+            expect(mockCommit.notCalled).to.be.true;
+        });
+
+        it("skips drillPick when calculateScreenPosition returns null", () => {
+            global.Cesium.SceneTransforms.worldToWindowCoordinates = sinon.stub().returns(null);
+
+            actions.handleLayerLoading(
+                {dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+            postRenderCallback();
+
+            expect(mockScene.drillPick.notCalled).to.be.true;
+        });
+
+        it("warns when calculateScreenPosition returns null", () => {
+            global.Cesium.SceneTransforms.worldToWindowCoordinates = sinon.stub().returns(null);
+
+            actions.handleLayerLoading(
+                {dispatch: mockDispatch, commit: mockCommit},
+                {scene: mockScene, cartesian: mockCartesian}
+            );
+            postRenderCallback();
+
+            expect(warnStub.calledOnce).to.be.true;
+            expect(warnStub.firstCall.args[0]).to.equals("Unable to project the position into screen space.");
         });
     });
 });
