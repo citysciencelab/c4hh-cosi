@@ -3,17 +3,10 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
-
-### Added
+## 2026-06-03 v3.23.0
 
 ### Changed
 - Changed Node.js and npm support: Versions from Node.js **22.19.0** up to smaller than **25** (LTS 24.15.0) besides Version **23** and npm fom **10.9.3** up to smaller than **12** are now supported.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - vcOblique: Fixed an issue with VC Map 6 where markers and images appeared at the initial map position instead of the current view when opening vcOblique after panning.
