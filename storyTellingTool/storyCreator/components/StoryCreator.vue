@@ -3,11 +3,11 @@ import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCard
 // import {createStoryZip} from "../shared/js/storyZipCreator.js";
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
-import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
 import StoryCreatorImportTest from "./StoryCreatorImportTest.vue";
 import StoryPlayer from "../../storyPlayer/components/storyPlayer/StoryPlayer.vue";
@@ -17,10 +17,10 @@ export default {
     components: {
         AddCardButton,
         Draggable: draggable,
-        FileUpload,
         FlatButton,
         InfoCard,
         InputText,
+        StoryCreatorAddImageCard,
         StoryCreatorChapter,
         StoryCreatorImportTest,
         StoryPlayer
@@ -226,28 +226,10 @@ export default {
                 :placeholder="$t('additional:modules.storyCreator.labels.storyAuthor')"
                 class="mb-3"
             />
-            <FileUpload
-                id="Story-creator-file-upload"
-                :label="$t('additional:modules.storyCreator.labels.fileDrop')"
-                :sub-label="$t('additional:modules.storyCreator.labels.fileSelect')"
-                class="mb-3"
-                :change="() => undefined"
-                :drop="() => undefined"
+            <StoryCreatorAddImageCard
+                :closeable="false"
             />
-            <InputText
-                id="imageAlt"
-                v-model="imageAlt"
-                :label="$t('additional:modules.storyCreator.labels.altText')"
-                :placeholder="$t('additional:modules.storyCreator.labels.altText')"
-                class="mb-3"
-            />
-            <InputText
-                id="imageCopyright"
-                v-model="imageCopyright"
-                :label="$t('additional:modules.storyCreator.labels.photoCredit')"
-                :placeholder="$t('additional:modules.storyCreator.labels.photoCredit')"
-                class="mb-3"
-            />
+
             <hr>
             <h5 class="py-3">
                 {{ $t('additional:modules.storyCreator.headlines.chapterList') }}

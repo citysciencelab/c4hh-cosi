@@ -13,6 +13,13 @@ export default {
         FileUpload,
         InputText
     },
+    props: {
+        closeable: {
+            type: Boolean,
+            required: false,
+            default: true
+        }
+    },
     emits: ["addImage", "click:close"],
     data () {
         return {
@@ -52,8 +59,25 @@ export default {
          * Emits the "click:close" event and removes the stored image asset.
          */
         discardImage () {
-            this.removeImageAsset(this.image.id);
+            this.resetImage();
             this.$emit("click:close");
+        },
+
+        /**
+         * Resets the local image form state and removes a stored image asset if present.
+         * @returns {void}
+         */
+        resetImage () {
+            if (this.image.id) {
+                this.removeImageAsset(this.image.id);
+            }
+
+            this.image = {
+                altText: "",
+                photoCredit: ""
+            };
+            this.imageLoaded = false;
+            this.isValidated = true;
         },
 
         /**
@@ -81,6 +105,7 @@ export default {
     <div class="card border-0 rounded-3 bg-light">
         <div class="card-body p-4 position-relative">
             <button
+                v-if="closeable"
                 type="button"
                 class="btn-close position-absolute top-0 end-0 m-2"
                 aria-label="Close"
@@ -88,7 +113,9 @@ export default {
             />
 
             <h5 class="card-title mb-3">
-                {{ $t('additional:modules.storyCreator.headlines.addImages') }}
+                {{ closeable
+                    ? $t('additional:modules.storyCreator.headlines.addImages')
+                    : $t('additional:modules.storyCreator.headlines.addImageTitle') }}
             </h5>
             <div v-if="!imageLoaded">
                 <FileUpload
@@ -138,6 +165,13 @@ export default {
                     :text="$t('additional:modules.storyCreator.buttons.add')"
                     :disabled="!enableAdd"
                     :interaction="() => $emit('addImage', image)"
+                />
+                <FlatButton
+                    class="mt-2"
+                    icon="bi bi-x-circle"
+                    :secondary="true"
+                    :text="$t('additional:modules.storyCreator.buttons.abort')"
+                    :interaction="discardImage"
                 />
             </div>
         </div>

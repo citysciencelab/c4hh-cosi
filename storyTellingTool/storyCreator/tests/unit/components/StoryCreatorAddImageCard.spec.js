@@ -75,6 +75,23 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.exists()).to.be.true;
         });
 
+        it("should render close button if closeable is true", () => {
+            expect(wrapper.find(".btn-close").exists()).to.be.true;
+        });
+
+        it("should not render close button if closeable is false", () => {
+            const nonCloseableWrapper = shallowMount(StoryCreatorAddImageCard, {
+                props: {
+                    closeable: false
+                },
+                global: {
+                    plugins: [localStore]
+                }
+            });
+
+            expect(nonCloseableWrapper.find(".btn-close").exists()).to.be.false;
+        });
+
         it("should emit 'click:close' event when the close button is clicked", async () => {
             const closeBtn = wrapper.find(".btn-close");
 
@@ -82,8 +99,22 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
 
             expect(wrapper.emitted()).to.have.property("click:close");
         });
-        it("should render the headline", () => {
+
+        it("should render addImages headline if closeable is true", () => {
             expect(wrapper.find(".card-title").text()).to.include("additional:modules.storyCreator.headlines.addImages");
+        });
+
+        it("should render addImageTitle headline if closeable is false", () => {
+            const nonCloseableWrapper = shallowMount(StoryCreatorAddImageCard, {
+                props: {
+                    closeable: false
+                },
+                global: {
+                    plugins: [localStore]
+                }
+            });
+
+            expect(nonCloseableWrapper.find(".card-title").text()).to.include("additional:modules.storyCreator.headlines.addImageTitle");
         });
 
         it("should render the FileUpload component", () => {

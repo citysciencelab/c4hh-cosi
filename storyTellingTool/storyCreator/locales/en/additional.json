@@ -32,7 +32,8 @@
       "headlines": {
         "addImages": "Add new image",
         "addTexts": "Add new text",
-        "chapterList": "List of Chapters"
+        "chapterList": "List of Chapters",
+        "addImageTitle": "Add new title image"
       },
       "chapter": {
         "editChapter": "Edit chapter",

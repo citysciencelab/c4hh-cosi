@@ -32,7 +32,8 @@
       "headlines": {
         "addImages": "Neues Bild hinzufügen",
         "addTexts": "Neuen Text hinzufügen",
-        "chapterList": "Übersicht der Kapitel"
+        "chapterList": "Übersicht der Kapitel",
+        "addImageTitle": "Neues Titelbild hinzufügen"
       },
       "chapter": {
         "editChapter": "Kapitel bearbeiten",
