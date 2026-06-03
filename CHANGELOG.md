@@ -91,6 +91,7 @@
 - Tabs: extended NavTab-component with additional "value"-prop.
 
 ### Fixed
+- Issue \#1585: Fixed case where dragging for resizing menus continued after releasing mouse or touch outside browser window.
 - Issue \#1591: Draw/FileImport: fixed KML export and KML import of symbols.
 - Issue \#1592: FileImport/Draw: Fixed label text offset not being restored when importing a drawn GeoJSON file.
 - Issue \#1605: Fix ensures that STYLES parameter in GFI URL are correctly reset.
