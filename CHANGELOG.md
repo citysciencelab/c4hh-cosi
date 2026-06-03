@@ -16,6 +16,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
 
 ---
 

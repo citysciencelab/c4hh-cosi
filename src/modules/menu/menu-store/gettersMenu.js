@@ -187,6 +187,24 @@ const menuGetters = {
     },
 
     /**
+     * @param {MenuState} state Local vuex state.
+     * @param {String} side Side of the menu.
+     * @param {Number} sectionIndex Index inside sections.
+     * @returns {Boolean} Whether the section has at least one item.
+     */
+    sectionHasItems: state => (side, sectionIndex) => {
+        const section = state?.[side]?.sections?.[sectionIndex];
+
+        if (Array.isArray(section)) {
+            return section.length > 0;
+        }
+        if (section && Array.isArray(section.elements)) {
+            return section.elements.length > 0;
+        }
+        return false;
+    },
+
+    /**
      * @param {Object} state Local vuex state.
      * @param {String} side side of the menu.
      * @returns {Boolean} Whether show description for modules in the menu by side.
@@ -286,11 +304,18 @@ const menuGetters = {
      * @param {MenuState} state Local vuex state.
      * @returns {Boolean} Whether the secondary menu is enabled.
      */
-    secondaryMenuEnabled: (state) => {
+    secondaryMenuEnabled: (state, getters) => {
         const sections = state.secondaryMenu?.sections;
 
         return Array.isArray(sections) &&
-            sections.some(section => Array.isArray(section) && section.length > 0);
+            sections.some((section, index) => {
+                if (getters?.sectionHasItems) {
+                    return getters.sectionHasItems("secondaryMenu", index);
+                }
+
+                return (Array.isArray(section) && section.length > 0) ||
+                    (section && Array.isArray(section.elements) && section.elements.length > 0);
+            });
     },
 
     /**

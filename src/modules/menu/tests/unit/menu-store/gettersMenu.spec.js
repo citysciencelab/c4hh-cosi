@@ -449,6 +449,66 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
         });
     });
 
+    describe("sectionHasItems", () => {
+        it("should return false if section is missing", () => {
+            state = {
+                mainMenu: {
+                    sections: []
+                }
+            };
+
+            const result = gettersMenu.sectionHasItems(state)("mainMenu", 0);
+
+            expect(result).to.be.false;
+        });
+
+        it("should return true for array sections with items", () => {
+            state = {
+                mainMenu: {
+                    sections: [
+                        ["item"]
+                    ]
+                }
+            };
+
+            const result = gettersMenu.sectionHasItems(state)("mainMenu", 0);
+
+            expect(result).to.be.true;
+        });
+
+        it("should return true for object sections with elements", () => {
+            state = {
+                mainMenu: {
+                    sections: [
+                        {
+                            elements: ["item"]
+                        }
+                    ]
+                }
+            };
+
+            const result = gettersMenu.sectionHasItems(state)("mainMenu", 0);
+
+            expect(result).to.be.true;
+        });
+
+        it("should return false for object sections without elements", () => {
+            state = {
+                mainMenu: {
+                    sections: [
+                        {
+                            type: "section"
+                        }
+                    ]
+                }
+            };
+
+            const result = gettersMenu.sectionHasItems(state)("mainMenu", 0);
+
+            expect(result).to.be.false;
+        });
+    });
+
     describe("titleBySide", () => {
         const exampleTitle = {
             text: "Precise name",
@@ -603,12 +663,23 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
     });
 
     describe("secondaryMenuEnabled", () => {
+        let mockGetters;
+
+        beforeEach(() => {
+            mockGetters = {
+                sectionHasItems: gettersMenu.sectionHasItems(state)
+            };
+        });
+
         it("should return false if secondaryMenu.sections is undefined", () => {
             state = {
                 secondaryMenu: {}
             };
+            mockGetters = {
+                sectionHasItems: gettersMenu.sectionHasItems(state)
+            };
 
-            const result = gettersMenu.secondaryMenuEnabled(state);
+            const result = gettersMenu.secondaryMenuEnabled(state, mockGetters);
 
             expect(result).to.be.false;
         });
@@ -619,8 +690,11 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
                     sections: null
                 }
             };
+            mockGetters = {
+                sectionHasItems: gettersMenu.sectionHasItems(state)
+            };
 
-            const result = gettersMenu.secondaryMenuEnabled(state);
+            const result = gettersMenu.secondaryMenuEnabled(state, mockGetters);
 
             expect(result).to.be.false;
         });
@@ -631,8 +705,11 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
                     sections: []
                 }
             };
+            mockGetters = {
+                sectionHasItems: gettersMenu.sectionHasItems(state)
+            };
 
-            const result = gettersMenu.secondaryMenuEnabled(state);
+            const result = gettersMenu.secondaryMenuEnabled(state, mockGetters);
 
             expect(result).to.be.false;
         });
@@ -646,8 +723,11 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
                     ]
                 }
             };
+            mockGetters = {
+                sectionHasItems: gettersMenu.sectionHasItems(state)
+            };
 
-            const result = gettersMenu.secondaryMenuEnabled(state);
+            const result = gettersMenu.secondaryMenuEnabled(state, mockGetters);
 
             expect(result).to.be.false;
         });
@@ -662,8 +742,11 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
                     ]
                 }
             };
+            mockGetters = {
+                sectionHasItems: gettersMenu.sectionHasItems(state)
+            };
 
-            const result = gettersMenu.secondaryMenuEnabled(state);
+            const result = gettersMenu.secondaryMenuEnabled(state, mockGetters);
 
             expect(result).to.be.true;
         });
@@ -677,10 +760,35 @@ describe("src/modules/menu/menu-store/gettersMenu.js", () => {
                     ]
                 }
             };
+            mockGetters = {
+                sectionHasItems: gettersMenu.sectionHasItems(state)
+            };
 
-            const result = gettersMenu.secondaryMenuEnabled(state);
+            const result = gettersMenu.secondaryMenuEnabled(state, mockGetters);
 
             expect(result).to.be.false;
+        });
+
+        it("should return true if one section is an object with elements", () => {
+            state = {
+                secondaryMenu: {
+                    sections: [
+                        {
+                            type: "group"
+                        },
+                        {
+                            elements: ["item1"]
+                        }
+                    ]
+                }
+            };
+            mockGetters = {
+                sectionHasItems: gettersMenu.sectionHasItems(state)
+            };
+
+            const result = gettersMenu.secondaryMenuEnabled(state, getters);
+
+            expect(result).to.be.true;
         });
     });
 });

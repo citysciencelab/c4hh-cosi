@@ -20,23 +20,31 @@ describe("src/modules/menu/MenuContainerBodyRoot.vue", () => {
     beforeEach(() => {
         mainMenu = {
             sections: [
-                {
-                    type: "section1"
-                },
-                {
-                    type: "section1"
-                }
+                [
+                    {
+                        type: "section1"
+                    }
+                ],
+                [
+                    {
+                        type: "section1"
+                    }
+                ]
             ],
             searchBar: {}
         };
         secondaryMenu = {
             sections: [
-                {
-                    type: "section1"
-                },
-                {
-                    type: "section1"
-                }
+                [
+                    {
+                        type: "section1"
+                    }
+                ],
+                [
+                    {
+                        type: "section1"
+                    }
+                ]
             ]
         };
         mainMenuTitle = {
@@ -62,7 +70,18 @@ describe("src/modules/menu/MenuContainerBodyRoot.vue", () => {
                             return null;
                         },
                         mainMenu: () => mainMenu,
-                        secondaryMenu: () => secondaryMenu
+                        secondaryMenu: () => secondaryMenu,
+                        sectionHasItems: () => (side, sectionIndex) => {
+                            const section = (side === "mainMenu" ? mainMenu : secondaryMenu)?.sections?.[sectionIndex];
+
+                            if (Array.isArray(section)) {
+                                return section.length > 0;
+                            }
+                            if (section && Array.isArray(section.elements)) {
+                                return section.elements.length > 0;
+                            }
+                            return false;
+                        }
 
                     }
                 }

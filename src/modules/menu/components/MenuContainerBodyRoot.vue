@@ -26,6 +26,7 @@ export default {
         ...mapGetters("Menu", [
             "mainMenu",
             "secondaryMenu",
+            "sectionHasItems",
             "titleBySide"
         ]),
 
@@ -58,11 +59,14 @@ export default {
             v-for="(_, key) in menu.sections"
             :key="key"
         >
-            <MenuContainerBodyRootItems
-                :id-appendix="side"
-                :side="side"
-                :path="path(key)"
-            />
+            <template v-if="sectionHasItems(side, key)">
+                <MenuContainerBodyRootItems
+                    :id-appendix="side"
+                    :side="side"
+                    :path="path(key)"
+                />
+                <hr>
+            </template>
         </template>
     </div>
 </template>
