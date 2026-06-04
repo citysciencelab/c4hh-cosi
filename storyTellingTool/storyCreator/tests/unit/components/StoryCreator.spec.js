@@ -107,6 +107,19 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
 
             expect(draggableCard.exists()).to.be.true;
         });
+        it("should not render the InfoText component.", () => {
+            const InfoText = wrapper.findComponent({name: "InfoText"});
+
+            expect(InfoText.exists()).to.be.false;
+        });
+        it("should render the InfoText component.", async () => {
+            await wrapper.vm.discardStory();
+            await wrapper.vm.updateStory();
+
+            const InfoText = wrapper.findComponent({name: "InfoText"});
+
+            expect(InfoText.exists()).to.be.true;
+        });
     });
 
     describe("Component methods", () => {

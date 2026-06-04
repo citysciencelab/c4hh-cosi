@@ -10,7 +10,8 @@
       "selectStoryDescription": "Wählen Sie eine vorhandene Story aus der Liste unten aus, um diese anzusehen, zu bearbeiten oder importieren Sie ein bestehendes Projekt.",
       "importButton": "Importieren",
       "createdAt": "Erstellt am:",
-      "chapters": "Kapitel"
+      "chapters": "Kapitel",
+      "emptyStory": "Es sind noch keine Stories vorhanden."
     }
   }
 }

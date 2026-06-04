@@ -23,7 +23,8 @@
         "photoCredit": "Fotograf / Bildquelle",
         "deleteChapter": "Kapitel löschen",
         "wrongFormat": "Es sind nur Bilddateien (z. B. JPG, PNG) zulässig.",
-        "wrongFormatTitle": "Ungültiges Dateiformat"
+        "wrongFormatTitle": "Ungültiges Dateiformat",
+        "emptyChapter": "Es wurden noch keine Kapitel angelegt."
       },
       "buttons": {
           "add": "Hinzufügen",

@@ -10,7 +10,8 @@
       "selectStoryDescription": "Select an existing story from the list below to view or edit it, or import an existing project.",
       "importButton": "Import",
       "createdAt": "Created on:",
-      "chapters": "Chapters"
+      "chapters": "Chapters",
+      "emptyStory": "There are no stories yet."
     }
   }
 }

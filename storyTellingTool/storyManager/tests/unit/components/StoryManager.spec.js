@@ -70,6 +70,10 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
             expect(wrapper.findComponent({name: "InfoCard"}).exists()).to.be.true;
             expect(wrapper.findAllComponents({name: "InfoCard"}).length).to.equal(2);
         });
+
+        it("should not find InfoText component", () => {
+            expect(wrapper.findComponent({name: "InfoText"}).exists()).to.be.false;
+        });
     });
 
     describe("Methods", () => {

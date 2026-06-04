@@ -2,6 +2,7 @@
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
+import InfoText from "../../shared/card/components/InfoText.vue";
 import {mapGetters, mapActions} from "vuex";
 
 export default {
@@ -9,7 +10,8 @@ export default {
     components: {
         AddCardButton,
         FlatButton,
-        InfoCard
+        InfoCard,
+        InfoText
     },
     computed: {
         ...mapGetters("Modules/StoryManager", [
@@ -81,6 +83,11 @@ export default {
                 :text="$t('additional:modules.storyManager.importButton')"
             />
         </div>
+        <InfoText
+            v-if="!storyList.length"
+            class="mb-4"
+            :text="$t('additional:modules.storyManager.emptyStory')"
+        />
         <div class="story-list flex-grow-1 overflow-auto pb-2">
             <div
                 v-for="(story, index) in storyList"

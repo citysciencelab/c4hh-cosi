@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
+import InfoText from "../../shared/card/components/InfoText.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
@@ -19,6 +20,7 @@ export default {
         Draggable: draggable,
         FlatButton,
         InfoCard,
+        InfoText,
         InputText,
         StoryCreatorAddImageCard,
         StoryCreatorChapter,
@@ -253,11 +255,15 @@ export default {
                     />
                 </template>
             </Draggable>
+            <InfoText
+                v-if="!story?.chapters?.length"
+                class="mb-4"
+                :text="$t('additional:modules.storyCreator.labels.emptyChapter')"
+            />
             <AddCardButton
                 :text="$t('additional:modules.storyCreator.addChapter')"
                 @click="addChapter"
             />
-
             <div class="d-flex flex-column align-items-center pt-3">
                 <FlatButton
                     :icon="'bi-collection-play'"

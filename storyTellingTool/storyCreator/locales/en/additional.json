@@ -23,7 +23,8 @@
         "photoCredit": "Photo credit",
         "deleteChapter": "Delete chapter ",
         "wrongFormat": "Only image files (e.g. JPG, PNG) are permitted.",
-        "wrongFormatTitle": "Invalid file format"
+        "wrongFormatTitle": "Invalid file format",
+        "emptyChapter": "No chapters have been created yet."
       },
       "buttons": {
           "add": "Add",
