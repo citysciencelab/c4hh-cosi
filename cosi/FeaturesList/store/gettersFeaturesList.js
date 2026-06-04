@@ -101,6 +101,7 @@ export default {
 
         if (typeof style === "undefined" || style === null && layer) {
             style = layer.getStyleFunction()(feature);
+            style = Array.isArray(style) ? style[0] : style;
         }
 
         return ((typeof style?.getImage() !== "undefined" && style?.getImage() !== null) || (typeof style?.getStroke() !== "undefined" && style?.getStroke() !== null) || (typeof style?.getFill() !== "undefined" && style?.getFill() !== null)) && !isFeatureDisabled(feature);
