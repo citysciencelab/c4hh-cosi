@@ -2,14 +2,22 @@ import {createStore} from "vuex";
 import {expect} from "chai";
 import {shallowMount} from "@vue/test-utils";
 import StoryManager from "../../../components/StoryManager.vue";
+import sinon from "sinon";
 
 describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () => {
-    let store, wrapper;
+    let store, wrapper, changeCurrentComponentSpy;
 
     beforeEach(() => {
+        changeCurrentComponentSpy = sinon.spy();
+
         store = createStore({
-            namespaced: true,
             modules: {
+                Menu: {
+                    namespaced: true,
+                    actions: {
+                        changeCurrentComponent: changeCurrentComponentSpy
+                    }
+                },
                 Modules: {
                     namespaced: true,
                     modules: {
@@ -33,11 +41,16 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 }
             }
         });
+
         wrapper = shallowMount(StoryManager, {
             global: {
                 plugins: [store]
             }
         });
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe("Component DOM", () => {
@@ -75,6 +88,24 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
 
                 expect(wrapper.vm.getCardItems(story)).to.deep.equal(cardItems);
             });
+        });
+    });
+
+    describe("User Interaction", () => {
+        it("should call changeCurrentComponent when createNewStory is triggered", async () => {
+            const addCardBtn = wrapper.findComponent({name: "AddCardButton"}),
+                expectedPayload = {
+                    type: "storyCreator",
+                    side: "secondaryMenu",
+                    props: {
+                        name: "additional:modules.storyCreator.title"
+                    }
+                };
+
+            await addCardBtn.vm.$emit("click");
+
+            expect(changeCurrentComponentSpy.calledOnce).to.be.true;
+            expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal(expectedPayload);
         });
     });
 });

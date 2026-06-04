@@ -2,7 +2,7 @@
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
-import {mapGetters} from "vuex";
+import {mapGetters, mapActions} from "vuex";
 
 export default {
     name: "StoryManager",
@@ -11,50 +11,25 @@ export default {
         FlatButton,
         InfoCard
     },
-    data () {
-        return {
-            mockStories: [
-                {
-                    id: 1,
-                    title: "Story 1",
-                    description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat...",
-                    author: "LGV - Landesbetrieb Geoinformation und Vermessung",
-                    date: "12.04.2026",
-                    chapters: 10,
-                    image: "https://picsum.photos/id/1015/400/160",
-                    copyright: "© Getty Images"
-                },
-                {
-                    id: 12,
-                    title: "Story 12",
-                    description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat...",
-                    author: "",
-                    date: "12.04.2026",
-                    chapters: 5,
-                    image: "https://picsum.photos/id/1016/400/160",
-                    copyright: "© Getty Images"
-                },
-                {
-                    id: 123,
-                    title: "Story 123",
-                    description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat...",
-                    author: "",
-                    date: "12.04.2026",
-                    chapters: 3,
-                    image: "https://picsum.photos/id/1018/400/160",
-                    copyright: "© Getty Images"
-                }
-            ]
-        };
-    },
     computed: {
         ...mapGetters("Modules/StoryManager", [
             "storyList"
         ])
     },
     methods: {
+        ...mapActions("Menu", ["changeCurrentComponent"]),
+        /**
+         * Changes the current menu component to the Story Creator to start a new story.
+         * @returns {void}
+         */
         createNewStory () {
-            // todos
+            this.changeCurrentComponent({
+                type: "storyCreator",
+                side: "secondaryMenu",
+                props: {
+                    name: "additional:modules.storyCreator.title"
+                }
+            });
         },
         /**
          * Gets the card items in object from story.
