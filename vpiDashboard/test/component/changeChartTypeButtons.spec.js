@@ -19,22 +19,27 @@ describe("addons/vpiDashboard/test/ change chart type buttons component", () => 
         );
     });
 
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
+    });
+
     it("renders the component", () => {
         expect(wrapper.find(".chart-type-change-button-container").exists()).to.be.true;
     });
 
-    it("emits the correct value when clicked on button", () => {
+    it("emits the correct value when clicked on button", async () => {
         let chartButton = wrapper.find(".btn-line");
 
         chartButton.trigger("click");
-        wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted().updateChartType[0]).to.deep.equal(["line"]);
 
         chartButton = wrapper.find(".btn-bar");
 
         chartButton.trigger("click");
-        wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted().updateChartType[1]).to.deep.equal(["bar"]);
     });

@@ -13,11 +13,12 @@ config.global.mocks.$t = key => key;
  * Run only these tests via command:
  * npm run test:watch -- --grep="addons/vpiDashboard/test/ visitors tab component"
  */
-describe.skip("addons/vpiDashboard/test/ visitors tab component", () => {
-    let wrapper = null;
+describe("addons/vpiDashboard/test/ visitors tab component", () => {
+    let wrapper = null,
+        store = null;
 
     beforeAll(() => {
-        const store = new Vuex.Store({
+        store = new Vuex.Store({
             state: {},
             modules: {
                 "Modules/VpiDashboard": {
@@ -36,7 +37,7 @@ describe.skip("addons/vpiDashboard/test/ visitors tab component", () => {
                         yearList: () => [2024, 2025],
                         barChartMonthlyData: () => ({}),
                         lineChartMonthlyData: () => ({}),
-                        monthlyXLabels: () => ({}),
+                        monthlyXLabels: () => [],
                         sliderData: () => [],
                         currentLocale () {
                             return "de-DE";
@@ -74,14 +75,19 @@ describe.skip("addons/vpiDashboard/test/ visitors tab component", () => {
                 }
             }
         });
+    });
 
-        wrapper = shallowMount(
-            TabVisitorsComponent, {
-                global: {
-                    plugins: [store]
-                }
+    beforeEach(() => {
+        wrapper = shallowMount(TabVisitorsComponent, {
+            global: {
+                plugins: [store]
             }
-        );
+        });
+    });
+
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
     });
 
     it("renders the visitors component", () => {
@@ -101,8 +107,10 @@ describe.skip("addons/vpiDashboard/test/ visitors tab component", () => {
         expect(wrapper.vm.isVisitorsChartType).to.be.false;
     });
 
-    it("sets the correct charttype", () => {
+    it("sets the correct charttype", async () => {
+        wrapper.vm.showChart = true;
         wrapper.vm.setChartType("bar");
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.chartType).to.equal("bar");
     });

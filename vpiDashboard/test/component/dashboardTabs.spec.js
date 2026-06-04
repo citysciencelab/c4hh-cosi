@@ -104,6 +104,11 @@ describe("addons/vpiDashboard/test/ DashboardTabs", () => {
         );
     });
 
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
+    });
+
     it("renders the component", () => {
         expect(wrapper.exists()).to.equal(true);
     });

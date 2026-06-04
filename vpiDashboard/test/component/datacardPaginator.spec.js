@@ -15,6 +15,12 @@ describe("addons/vpiDashboard/test/ paginator component", () => {
             startIndex: 4
         }});
     });
+
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
+    });
+
     it("renders the paginator component", () => {
         expect(wrapper.find("#paginator").exists()).to.be.true;
     });

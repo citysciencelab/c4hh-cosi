@@ -59,6 +59,12 @@ describe("addons/vpiDashboard/test/ Tabs component", () => {
             }
         });
     });
+
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
+    });
+
     it("renders the tabs component", () => {
         expect(wrapper.find("#vpiDashboard-tabs").exists()).to.be.true;
     });

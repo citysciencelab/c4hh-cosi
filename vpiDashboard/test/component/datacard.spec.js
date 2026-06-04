@@ -15,7 +15,8 @@ describe("addons/vpiDashboard/test/ data card component", () => {
         store = null;
     const spyCurrentIndex = sinon.spy(),
         spyCurrentDayIndex = sinon.spy(),
-        spyCurrentMonthIndex = sinon.spy();
+        spyCurrentMonthIndex = sinon.spy(),
+        fixedStartYear = 2024;
 
     beforeEach(() => {
         spyCurrentIndex.resetHistory();
@@ -39,7 +40,7 @@ describe("addons/vpiDashboard/test/ data card component", () => {
                             const thisYear = new Date().getFullYear(),
                                 yearListReturnArray = [];
 
-                            let startYear = 2024;
+                            let startYear = fixedStartYear;
 
                             while (startYear <= thisYear) {
                                 yearListReturnArray.push(startYear);
@@ -88,6 +89,11 @@ describe("addons/vpiDashboard/test/ data card component", () => {
                 }
             }
         );
+    });
+
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
     });
 
     it("renders the data card component", () => {
@@ -165,7 +171,7 @@ describe("addons/vpiDashboard/test/ data card component", () => {
         expect(wrapper.emitted().indexChanged[0]).to.deep.equal([3]);
     });
 
-    it.skip("get list of years for paginator", () => {
+    it("get list of years for paginator", () => {
         const thisYear = new Date().getFullYear();
 
         wrapper = shallowMount(
@@ -183,7 +189,7 @@ describe("addons/vpiDashboard/test/ data card component", () => {
         );
 
         expect(wrapper.vm.paginatorData).to.be.an("array");
-        expect(wrapper.vm.paginatorData.length).to.equal(thisYear - 2025 + 1);
-        expect(wrapper.vm.paginatorData[1]).to.equal(2025);
+        expect(wrapper.vm.paginatorData.length).to.equal(thisYear - fixedStartYear + 1);
+        expect(wrapper.vm.paginatorData[0]).to.equal(fixedStartYear);
     });
 });

@@ -19,6 +19,12 @@ describe("addons/vpiDashboard/test/ loader component", () => {
             subtitle: "Test: Loader"
         }});
     });
+
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
+    });
+
     it("renders the loader component", ()=> {
         expect(wrapper.find("#vpiDashboardLoader").exists()).to.be.true;
     });

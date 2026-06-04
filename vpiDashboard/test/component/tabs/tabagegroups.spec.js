@@ -11,10 +11,11 @@ config.global.mocks.$t = key => key;
  * npm run test:watch -- --grep="addons/vpiDashboard/test/ age groups tab component"
  */
 describe("addons/vpiDashboard/test/ age groups tab component", () => {
-    let wrapper = null;
+    let wrapper = null,
+        store = null;
 
     beforeAll(() => {
-        const store = new Vuex.Store({
+        store = new Vuex.Store({
             state: {},
             modules: {
                 "Modules/VpiDashboard": {
@@ -76,32 +77,39 @@ describe("addons/vpiDashboard/test/ age groups tab component", () => {
                 }
             }
         });
+    });
 
-        wrapper = shallowMount(
-            TabAgeGroups, {
-                global: {
-                    plugins: [store]
-                }
+    beforeEach(() => {
+        wrapper = shallowMount(TabAgeGroups, {
+            global: {
+                plugins: [store]
             }
-        );
+        });
+    });
+
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
     });
 
     it("renders the age groups component", () => {
         expect(wrapper.find(".piechart").exists()).to.be.true;
     });
 
-    it("sets the correct charttype", () => {
+    it("sets the correct charttype", async () => {
+        wrapper.vm.showChart = true;
         wrapper.vm.setChartType("bar");
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.chartType).to.equal("bar");
         expect(wrapper.find(".bar").exists()).to.be.true;
         expect(wrapper.find(".line").exists()).to.be.false;
 
         wrapper.vm.setChartType("line");
-        wrapper.vm.$nextTick(() => {
-            expect(wrapper.vm.chartType).to.equal("line");
-            expect(wrapper.find(".bar").exists()).to.be.false;
-            expect(wrapper.find(".line").exists()).to.be.true;
-        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.chartType).to.equal("line");
+        expect(wrapper.find(".bar").exists()).to.be.false;
+        expect(wrapper.find(".line").exists()).to.be.true;
     });
 });

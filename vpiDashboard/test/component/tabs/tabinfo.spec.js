@@ -15,6 +15,12 @@ describe("addons/vpiDashboard/test/ loader component", () => {
     beforeEach(() => {
         wrapper = shallowMount(TabInfoComponent);
     });
+
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
+    });
+
     it("renders the info tab component", ()=> {
         expect(wrapper.find("#vpiDashboardTabInfo").exists()).to.be.true;
     });

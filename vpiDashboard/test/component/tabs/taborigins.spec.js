@@ -8,10 +8,11 @@ import Vuex from "vuex";
 config.global.mocks.$t = key => key;
 
 describe("addons/vpiDashboard/components/Tabs/TabOrigins.vue", () => {
-    let wrapper = null;
+    let wrapper = null,
+        store = null;
 
     beforeAll(() => {
-        const store = new Vuex.Store({
+        store = new Vuex.Store({
             state: {},
             modules: {
                 "Modules/VpiDashboard": {
@@ -48,11 +49,19 @@ describe("addons/vpiDashboard/components/Tabs/TabOrigins.vue", () => {
 
         sinon.stub(axios, "get").resolves({status: 200, data: {}});
         sinon.stub(axios, "post").resolves({status: 200, data: {}});
+    });
+
+    beforeEach(() => {
         wrapper = shallowMount(TabOriginsComponent, {
             global: {
                 plugins: [store]
             }
         });
+    });
+
+    afterEach(() => {
+        wrapper.unmount();
+        wrapper = null;
     });
 
     afterAll(() => {
@@ -68,17 +77,19 @@ describe("addons/vpiDashboard/components/Tabs/TabOrigins.vue", () => {
         expect(wrapper.find(".chartDataSelection").exists()).to.be.true;
 
     });
-    it.skip("sets the correct charttype", () => {
+    it("sets the correct charttype", async () => {
+        wrapper.vm.showChart = true;
         wrapper.vm.setChartType("bar");
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.chartType).to.equal("bar");
         expect(wrapper.find(".bar").exists()).to.be.true;
         expect(wrapper.find(".line").exists()).to.be.false;
 
         wrapper.vm.setChartType("line");
-        wrapper.vm.$nextTick();
-        expect(wrapper.vm.chartType).to.equal("line");
+        await wrapper.vm.$nextTick();
 
+        expect(wrapper.vm.chartType).to.equal("line");
         expect(wrapper.find(".bar").exists()).to.be.false;
         expect(wrapper.find(".line").exists()).to.be.true;
     });
