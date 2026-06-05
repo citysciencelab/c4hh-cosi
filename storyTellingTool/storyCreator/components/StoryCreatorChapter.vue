@@ -2,6 +2,7 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AddElementDropdown from "../shared/modules/addElementDropdown/components/AddElementDropdown.vue";
 import buildTreeStructure from "@appstore/js/buildTreeStructure.js";
+import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import isObject from "@shared/js/utils/isObject.js";
@@ -19,6 +20,7 @@ export default {
     components: {
         AccordionItem,
         AddElementDropdown,
+        Draggable: draggable,
         FlatButton,
         Multiselect,
         StoryCreatorAddImageCard,
@@ -484,24 +486,34 @@ export default {
             >
                 {{ $t('additional:modules.storyCreator.chapter.title') }}
             </h5>
-            <template
-                v-for="item in content"
-                :key="item.id"
+            <Draggable
+                v-model="content"
+                item-key="id"
+                class="no-list"
+                handle=".drag-handle"
             >
-                <div v-if="item.type === 'image'">
-                    <img
-                        :src="imageAssetsById[item.id]?.objectURL"
-                        :alt="item.attrs.alt"
-                        class="img-thumbnail d-block mx-auto mb-3 w-100"
-                    >
-                    <div class="text-end">
-                        © {{ item?.attrs?.copyright }}
+                <template #item="{ element }">
+                    <div class="chapter-content-item">
+                        <i
+                            class="bi bi-grip-vertical mt-1 drag-handle"
+                            aria-hidden="true"
+                        />
+                        <div v-if="element.type === 'image'">
+                            <img
+                                :src="imageAssetsById[element.id]?.objectURL"
+                                :alt="element.attrs.alt"
+                                class="img-thumbnail d-block mx-auto mb-3 w-100"
+                            >
+                            <div class="text-end">
+                                © {{ element?.attrs?.copyright }}
+                            </div>
+                        </div>
+                        <div v-else-if="element.type === 'doc'">
+                            <div v-html="tipTapJsonToHtml(element)" />
+                        </div>
                     </div>
-                </div>
-                <div v-else-if="item.type === 'doc'">
-                    <div v-html="tipTapJsonToHtml(item)" />
-                </div>
-            </template>
+                </template>
+            </Draggable>
             <AddElementDropdown
                 v-if="addComponentToShow === ''"
                 :allowed-actions="['text', 'image']"
@@ -553,6 +565,23 @@ export default {
 }
 .position-hint {
     color: $secondary;
+}
+
+.chapter-content-item {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.drag-handle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: grab;
+    color: #6c757d;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
 </style>
 

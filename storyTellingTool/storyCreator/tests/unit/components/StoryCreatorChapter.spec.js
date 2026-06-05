@@ -111,6 +111,24 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(2);
         });
 
+        it("should configure Draggable to use drag handle only", async () => {
+            const content = [
+                {
+                    id: "doc-1",
+                    type: "doc",
+                    content: []
+                }
+            ];
+
+            await wrapper.setData({content});
+
+            const draggableWrapper = wrapper.findComponent({name: "Draggable"});
+
+            expect(draggableWrapper.exists()).to.be.true;
+            expect(draggableWrapper.props("itemKey")).to.equal("id");
+            expect(draggableWrapper.props("modelValue")).to.deep.equal(content);
+        });
+
         it("should find title element", () => {
             expect(wrapper.find(".chapter-title").exists()).to.be.true;
             expect(wrapper.find(".chapter-title").text()).to.equal("additional:modules.storyCreator.chapter.title");
