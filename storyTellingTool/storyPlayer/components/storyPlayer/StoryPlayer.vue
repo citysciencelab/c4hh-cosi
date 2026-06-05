@@ -676,13 +676,14 @@ export default {
                     </div>
                 </div>
             </div>
-            <div />
         </div>
     </div>
 </template>
 
 <style lang="scss">
 #story-player {
+    background-color: #F5F5F5;
+
     .sticky-top {
         z-index: 1050;
     }
@@ -691,8 +692,9 @@ export default {
         font-family: $font_family_accent;
     }
     .number-of-chapters {
-    color: $dark_grey;
+        color: $dark_grey;
     }
+
     .story-player-content {
         overflow: auto;
 
@@ -706,16 +708,18 @@ export default {
             max-width: 100%;
         }
     }
+
     .cover-card {
-    min-height: 82vh;
-    height: 82vh;
-    max-height: 82vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    box-sizing: border-box;
-    overflow: hidden;
+        min-height: 82vh;
+        height: 82vh;
+        max-height: 82vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        overflow: hidden;
+
         .card-img-top {
             flex: 1 1 0;
             min-height: 150px;
@@ -731,6 +735,7 @@ export default {
         }
     }
 }
+
 .player {
     --h1Size: 1.875rem;
     --h2Size: 1.5rem;
@@ -753,12 +758,16 @@ export default {
 
     .stepper {
         min-height: 500px;
-        margin: 10px 0;
-        background-color: rgb(195, 195, 195) !important;
-        box-shadow: 0 4px 8px 0 rgb(0 0 0 / 50%);
-        opacity: 0.3;
+        margin: 20px 10px;
+        background-color: rgb(240, 240, 240);
+        opacity: 0.4;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
         position: relative;
         scroll-margin-top: 50px;
+        transition: all 0.3s ease-in-out;
 
         >figure {
             >img {
@@ -876,15 +885,16 @@ export default {
                 }
 
                 iframe {
-                    width: 100% !important;
-                    height: 100% !important;
+                    width: 100%;
+                    height: 100%;
                 }
             }
         }
 
         &.active {
-            background-color: white !important;
+            background-color: #ffffff;
             opacity: 1;
+            box-shadow: 0 8px 11px 2px rgba(0, 0, 0, 0.15);
         }
     }
 }
