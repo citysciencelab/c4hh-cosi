@@ -96,7 +96,7 @@ Layer2dVectorGeojson.prototype.createLegend = async function () {
         if (styleObject && legend === true) {
             const legendInfos = await createStyle.returnLegendByStyleId(styleObject.styleId);
 
-            legend = legendInfos.legendInformation;
+            legend = sortByStyleLabelOrder(legendInfos.legendInformation, styleObject);
 
         }
         else if (typeof legend === "string") {
@@ -116,3 +116,23 @@ Layer2dVectorGeojson.prototype.loadFeaturesManually = function (attributes) {
     geojson.loadFeaturesManually(this.getRawLayerAttributes(attributes), this.layer.getSource());
 };
 
+/**
+ * Sorts legend entries by the order of the style labels.
+ * @param {*} items
+ * @param {*} styleObject
+ */
+function sortByStyleLabelOrder (legendInformation, styleObject) {
+    const styleLabels = styleObject.rules.map(rule => rule.style.legendValue);
+
+    return legendInformation.map((entry, originalPosition) => {
+        const idx = styleLabels.indexOf(entry.label);
+
+        return {
+            entry,
+            originalPosition,
+            sortIdx: idx !== -1 ? idx : Number.POSITIVE_INFINITY
+        };
+    }).sort(
+        (a, b) => a.sortIdx - b.sortIdx || a.originalPosition - b.originalPosition
+    ).map(sortedItem => sortedItem.entry);
+}
