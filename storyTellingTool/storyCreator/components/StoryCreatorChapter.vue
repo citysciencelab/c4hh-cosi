@@ -335,11 +335,6 @@ export default {
          * @returns {void}
          */
         resetCurrentChapter () {
-            this.currentChapter.content
-                .filter(item => item.type === "image")
-                .forEach(image => {
-                    this.removeImageAsset(image.id);
-                });
             this.setCurrentChapter(
                 {
                     "title": "",

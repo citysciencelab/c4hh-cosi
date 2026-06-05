@@ -7,7 +7,9 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
+import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import store from "@appstore/index.js";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
 import StoryCreatorImportTest from "./StoryCreatorImportTest.vue";
@@ -36,20 +38,7 @@ export default {
             imageCopyright: "Max Mustermann / Getty Images",
             imageSrc: "./img.png",
             chapterContent: [
-                {title: "Dies ist ein Titel",
-                    text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum",
-                    image: "https://www.hamburg.de/resource/image/1173902/landscape_ratio16x9/1300/731/59436f59c7c0b46a07676bff0913e36d/D4C3C6D304E3E543EF78A67BE4C173EF/eine-visualisierung-eines-radrennens-in-der-hafen-city.png",
-                    photoCredit: "neuland concerts",
-                    altText: "Eine Visualisierung eines Radrennens in der Hafen City",
-                    chapterItems: {subject: "4 Fachdaten", map: "Position", tool: "Strecke/Fläche messen"}
-                },
-                {title: "Dies ist ein zweiter Titel",
-                    text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr",
-                    image: "",
-                    photoCredit: "",
-                    altText: "",
-                    chapterItems: {}
-                }
+
             ]
         };
     },
@@ -115,7 +104,85 @@ export default {
             this.author = "";
             this.chapterContent = [];
         },
+        /**
+         * Gets the deep value from attribute.
+         * @param {Object} obj - the content object.
+         * @param {String} attr - the searched attribute.
+         * @param {String[]} results - the searched results in array.
+         * @return {void}
+         */
+        getAllDeepValues (obj, attr, results = []) {
+            if (!Array.isArray(obj) && !isObject(obj)) {
+                return results;
+            }
 
+            if (attr in obj) {
+                results.push(obj[attr]);
+            }
+
+            for (const value of Object.values(obj)) {
+                this.getAllDeepValues(value, attr, results);
+            }
+
+            return results;
+        },
+        /**
+         * Gets the value from attribute of content.
+         * @param {Object} val - the object value.
+         * @param {String} attr - the searched attribute.
+         * @return {void}
+         */
+        getChapterOverviewAttr (val, attr) {
+            if (!isObject(val) || !Array.isArray(val?.content) || !val?.content.length) {
+                return "";
+            }
+
+            return this.getAllDeepValues(val.content, attr)[0];
+        },
+        /**
+         * Gets the chapter card items from content.
+         * @param {Object} val - the object value.
+         * @return {void}
+         */
+        getChapterOverviewCardItems (val) {
+            if (!isObject(val) || !isObject(val.map)) {
+                return {};
+            }
+
+            let toolName = "";
+
+            if (typeof val.map.tool === "string" && val.map.tool.length) {
+                const toolId = val.map.tool,
+                    capModuleName = toolId.charAt(0).toUpperCase() + toolId.slice(1),
+                    key = typeof store.getters["Modules/" + capModuleName + "/name"] !== "undefined" ? store.getters["Modules/" + capModuleName + "/name"] : capModuleName;
+
+                toolName = i18next.t(key);
+            }
+
+            return {
+                subject: val.map?.layers.length ? val.map.layers.length + " " + i18next.t("common:modules.layerSelection.datalayer") : "",
+                map: val.map?.center,
+                tool: toolName
+            };
+        },
+        /**
+         * Gets the chapter overview image.
+         * @param {Object} val - the object value.
+         * @return {String} the image source.
+         */
+        getChapterOverviewImg (val) {
+            if (!isObject(val) || !Array.isArray(val.content)) {
+                return "";
+            }
+
+            const imageId = val?.content.find(v => v.type === "image")?.id;
+
+            if (!imageId) {
+                return "";
+            }
+
+            return this.imageAssetsById[imageId]?.objectURL;
+        },
         /**
          * Saves the story into story list.
          * @returns {void}
@@ -245,12 +312,12 @@ export default {
                 <template #item="{ element, index }">
                     <InfoCard
                         card-type="chapter"
+                        :alt-text="getChapterOverviewAttr(element, 'alt')"
+                        :card-image="getChapterOverviewImg(element)"
+                        :card-items="getChapterOverviewCardItems(element)"
+                        :card-text="getChapterOverviewAttr(element, 'text')"
                         :card-title="element.title"
-                        :card-text="element.text"
-                        :card-image="element.image"
-                        :photo-credit="element.photoCredit"
-                        :alt-text="element.altText"
-                        :card-items="element.chapterItems"
+                        :photo-credit="getChapterOverviewAttr(element, 'copyright')"
                         @delete="() => deleteChapter(index)"
                     />
                 </template>

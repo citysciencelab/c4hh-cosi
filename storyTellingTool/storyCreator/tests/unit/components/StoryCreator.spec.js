@@ -26,6 +26,7 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                             namespaced: true,
                             getters: {
                                 currentView: (state) => state.currentView,
+                                imageAssetsById: (state) => state.imageAssetsById,
                                 story: (state) => state.story
                             },
                             mutations: {
@@ -35,6 +36,11 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                             },
                             state: {
                                 currentView: "story",
+                                imageAssetsById: {
+                                    "273a4c04-760f-4abe-8a37-e640fc10fefa": {
+                                        "objectURL": "test image"
+                                    }
+                                },
                                 story: {
                                     chapters: []
                                 }
@@ -107,15 +113,7 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
 
             expect(draggableCard.exists()).to.be.true;
         });
-        it("should not render the InfoText component.", () => {
-            const InfoText = wrapper.findComponent({name: "InfoText"});
-
-            expect(InfoText.exists()).to.be.false;
-        });
-        it("should render the InfoText component.", async () => {
-            await wrapper.vm.discardStory();
-            await wrapper.vm.updateStory();
-
+        it("should render the InfoText component.", () => {
             const InfoText = wrapper.findComponent({name: "InfoText"});
 
             expect(InfoText.exists()).to.be.true;
@@ -178,6 +176,166 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
 
                 expect(wrapper.vm.story.chapters.length).to.equal(1);
                 expect(wrapper.vm.story.chapters).to.deep.equal([{title: "Test Chapter 2", text: "Test Text 2"}]);
+            });
+        });
+
+        describe("getAllDeepValues", () => {
+            it("should return empty array", () => {
+                expect(wrapper.vm.getAllDeepValues(null, "", [])).to.deep.equal([]);
+                expect(wrapper.vm.getAllDeepValues(0, "", [])).to.deep.equal([]);
+                expect(wrapper.vm.getAllDeepValues("", "", [])).to.deep.equal([]);
+                expect(wrapper.vm.getAllDeepValues(false, "", [])).to.deep.equal([]);
+                expect(wrapper.vm.getAllDeepValues(undefined, "", [])).to.deep.equal([]);
+            });
+
+            it("should return the searched results", () => {
+                const val = [
+                        {
+                            "type": "doc",
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum."
+                                        }
+                                    ]
+                                }
+                            ],
+                            "id": "bfbdf9b8-a5f8-4844-8a22-29cfc9425cb7"
+                        },
+                        {
+                            "type": "image",
+                            "id": "273a4c04-760f-4abe-8a37-e640fc10fefa",
+                            "attrs": {
+                                "alt": "test",
+                                "copyright": "test"
+                            }
+                        }
+                    ],
+                    attr = "text",
+                    result = ["Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum."];
+
+
+                expect(wrapper.vm.getAllDeepValues(val, attr, [])).to.deep.equal(result);
+            });
+        });
+
+        describe("getChapterOverviewAttr", () => {
+            it("should return empty string", () => {
+                expect(wrapper.vm.getChapterOverviewAttr(null, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr(0, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr("", "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr(false, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr(undefined, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr([], "text")).to.equal("");
+
+                expect(wrapper.vm.getChapterOverviewAttr({}, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr({content: 0}, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr({content: ""}, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr({content: false}, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr({content: undefined}, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr({content: {}}, "text")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewAttr({content: []}, "text")).to.equal("");
+            });
+
+            it("should return text", () => {
+                const val = {
+                    content: [
+                        {
+                            "type": "doc",
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum."
+                                        }
+                                    ]
+                                }
+                            ],
+                            "id": "bfbdf9b8-a5f8-4844-8a22-29cfc9425cb7"
+                        },
+                        {
+                            "type": "image",
+                            "id": "273a4c04-760f-4abe-8a37-e640fc10fefa",
+                            "attrs": {
+                                "alt": "test",
+                                "copyright": "test"
+                            }
+                        }
+                    ]};
+
+                expect(wrapper.vm.getChapterOverviewAttr(val, "text")).to.equal("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.");
+            });
+        });
+
+        describe("getChapterOverviewCardItems", () => {
+            it("should return empty object", () => {
+                expect(wrapper.vm.getChapterOverviewCardItems(null)).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems(0)).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems("")).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems(false)).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems(undefined)).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems([])).to.deep.equal({});
+
+                expect(wrapper.vm.getChapterOverviewCardItems({})).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems({map: 0})).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems({map: ""})).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems({map: false})).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems({map: undefined})).to.deep.equal({});
+                expect(wrapper.vm.getChapterOverviewCardItems({map: []})).to.deep.equal({});
+            });
+
+            it("should return card items", () => {
+                const val = {
+                    map: {
+                        layers: ["1", "2"],
+                        center: "1, 2",
+                        tool: "tool"
+                    }
+                };
+
+                expect(wrapper.vm.getChapterOverviewCardItems(val).subject).to.equal("2 modules.layerSelection.datalayer");
+                expect(wrapper.vm.getChapterOverviewCardItems(val).map).to.equal("1, 2");
+                expect(wrapper.vm.getChapterOverviewCardItems(val).tool).to.equal("Tool");
+            });
+        });
+
+        describe("getChapterOverviewImg", () => {
+            it("should return empty string", () => {
+                expect(wrapper.vm.getChapterOverviewImg(null)).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg(0)).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg("")).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg(false)).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg(undefined)).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg([])).to.equal("");
+
+                expect(wrapper.vm.getChapterOverviewImg({})).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg({content: 0})).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg({content: ""})).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg({content: false})).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg({content: undefined})).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg({content: {}})).to.equal("");
+                expect(wrapper.vm.getChapterOverviewImg({content: []})).to.equal("");
+            });
+
+            it("should return image source", () => {
+                const val = {
+                    content: [
+                        {
+                            "type": "image",
+                            "id": "273a4c04-760f-4abe-8a37-e640fc10fefa",
+                            "attrs": {
+                                "alt": "test",
+                                "copyright": "test"
+                            }
+                        }
+                    ]};
+
+                expect(wrapper.vm.getChapterOverviewImg(val)).to.equal("test image");
             });
         });
 
