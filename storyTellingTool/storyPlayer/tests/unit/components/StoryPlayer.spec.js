@@ -204,6 +204,36 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
         expect(storyTitleElement.text()).to.equal("Geschichten mit Karten erzählen");
     });
 
+    it("should not render the sticky header when showStickyHeader is false", async () => {
+        wrapper.vm.showStickyHeader = false;
+        await wrapper.vm.$nextTick();
+        const stickyHeader = wrapper.find(".sticky-top");
+
+        expect(stickyHeader.exists()).to.be.false;
+    });
+
+    it("should render the sticky header when showStickyHeader is true", async () => {
+        wrapper.vm.showStickyHeader = true;
+        await wrapper.vm.$nextTick();
+        const stickyHeader = wrapper.find(".sticky-top");
+
+        expect(stickyHeader.exists()).to.be.true;
+    });
+
+    it("should display the correct chapter number in the sticky header", async () => {
+        wrapper.vm.showStickyHeader = true;
+        wrapper.vm.currentStepIndex = 1;
+        wrapper.vm.steps = [
+            {title: "Step 1"},
+            {title: "Step 2"},
+            {title: "Step 3"}
+        ];
+        await wrapper.vm.$nextTick();
+        const chapterText = wrapper.find(".number-of-chapters").text();
+
+        expect(chapterText).to.include("Kapitel 2 von 3");
+    });
+
     it("renders step titles in the DOM from mocked steps", () => {
         const stepElements = wrapper.findAll(".stepper");
 

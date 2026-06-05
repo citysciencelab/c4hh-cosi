@@ -29,7 +29,8 @@ export default {
             activeTools: [],
             interval: null,
             toolBodyScrollTop: 0,
-            scroller: null
+            scroller: null,
+            showStickyHeader: false
         };
     },
     computed: {
@@ -124,10 +125,19 @@ export default {
 
         this.scrollerSetup();
 
-        const toolBody = document.getElementById("mp-body-secondaryMenu");
+        const toolBody = document.getElementById("mp-body-secondaryMenu"),
+            coverCard = this.$el.querySelector(".cover-card");
 
         if (toolBody) {
             toolBody.addEventListener("scroll", this.handleToolBodyScroll);
+        }
+
+        if (coverCard) {
+            this.coverCardObserver = new IntersectionObserver(([entry]) => {
+                this.showStickyHeader = !entry.isIntersecting;
+            }, {threshold: 0}
+            );
+            this.coverCardObserver.observe(coverCard);
         }
     },
     activated () {
@@ -182,6 +192,9 @@ export default {
             if (isStepLayer && layer.attributes.isVisibleInMap) {
                 this.disableLayer(layer);
             }
+        }
+        if (this.coverCardObserver) {
+            this.coverCardObserver.disconnect();
         }
     },
     methods: {
@@ -559,6 +572,17 @@ export default {
         id="story-player"
     >
         <div
+            v-if="showStickyHeader"
+            class="sticky-top bg-white border-bottom shadow-sm py-3 px-3 d-flex flex-column gap-1"
+        >
+            <h4 class="sticky-title mb-0 flex-grow-1">
+                {{ storyConf.title }}
+            </h4>
+            <span class="number-of-chapters">
+                Kapitel {{ currentStepIndex + 1 }} von {{ steps.length }}
+            </span>
+        </div>
+        <div
             class="d-flex w-100 player"
         >
             <div
@@ -659,6 +683,16 @@ export default {
 
 <style lang="scss">
 #story-player {
+    .sticky-top {
+        z-index: 1050;
+    }
+    .sticky-title {
+        color: $secondary;
+        font-family: $font_family_accent;
+    }
+    .number-of-chapters {
+    color: $dark_grey;
+    }
     .story-player-content {
         overflow: auto;
 
@@ -672,8 +706,7 @@ export default {
             max-width: 100%;
         }
     }
-}
-.cover-card {
+    .cover-card {
     min-height: 82vh;
     height: 82vh;
     max-height: 82vh;
@@ -683,20 +716,19 @@ export default {
     justify-content: flex-start;
     box-sizing: border-box;
     overflow: hidden;
-
-    .card-img-top {
-        flex: 1 1 0;
-        min-height: 150px;
-        max-height: 60vh;
-        width: 100%;
-        object-fit: cover;
-        transition: max-height 0.3s;
-    }
-
-    .card-body {
-        flex: 0 0 auto;
-        overflow-y: auto;
-        min-height: 0;
+        .card-img-top {
+            flex: 1 1 0;
+            min-height: 150px;
+            max-height: 60vh;
+            width: 100%;
+            object-fit: cover;
+            transition: max-height 0.3s;
+        }
+        .card-body {
+            flex: 0 0 auto;
+            overflow-y: auto;
+            min-height: 0;
+        }
     }
 }
 .player {
