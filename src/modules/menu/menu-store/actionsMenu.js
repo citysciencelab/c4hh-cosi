@@ -60,9 +60,6 @@ export default {
         else if (props?.name !== currentProps?.name) {
             commit("setCurrentComponentProps", {side, props});
         }
-        if (type !== "getFeatureInfo" && type !== "searchBar" && type !== "layerSelection") {
-            window.trackMatomo?.("Menu", "Menuitem clicked", i18next.t(props.name));
-        }
     },
 
     /**

@@ -57,7 +57,16 @@ const Config = {
         trackerScriptUrl: "https://matomo.be-on.de/matomo.js",
         trackerUrl: "https://matomo.be-on.de/matomo.php",
         requireConsent: false,
-        trackInitialView: true
+        trackInitialView: true,
+        privacy: [
+            "noAbTesting",
+            "noCookies",
+            "noFormAnalytics",
+            "noHeatmap",
+            "noReferrerUrl",
+            "respectDoNotTrack"
+        ],
+        customDimension: ["spaSession"]
     }
 };
 

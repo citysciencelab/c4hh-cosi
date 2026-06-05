@@ -295,8 +295,6 @@ export default function getActionsLayerConfig () {
                 subjectDataLayerConfs: layersStructured.elements,
                 baselayerConfs: rootGetters.allLayerConfigsStructured(treeBaselayersKey)
             }, {root: true});
-
-            window.trackMatomo?.("Layer", "Layertree category switched", i18next.t(category.name));
         },
 
         /**

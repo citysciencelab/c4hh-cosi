@@ -105,12 +105,10 @@ export default {
                         content: i18next.t("common:modules.searchBar.layerResultNotShown")
                     }, {root: true});
                 }
-                window.trackMatomo?.("Layer", "Layer added via Search", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
             });
         }
         else {
             dispatch("activateLayerInTopicTree", {layerId, source});
-            window.trackMatomo?.("Layer", "Layer added via Search", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
         }
     },
 
