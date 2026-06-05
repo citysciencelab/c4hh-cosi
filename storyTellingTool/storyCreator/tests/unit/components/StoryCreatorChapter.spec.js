@@ -33,6 +33,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 imageAssetsById: (state) => state.imageAssetsById
                             },
                             mutations: {
+                                removeImageAsset (state, id) {
+                                    delete state.imageAssetsById[id];
+                                },
                                 setCurrentChapter (state, value) {
                                     state.currentChapter = value;
                                 },
@@ -307,29 +310,57 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
-        describe("handleAddContent", () => {
-            it("should close add component and append content with generated id", async () => {
-                const randomUuidStub = sinon.stub(crypto, "randomUUID").returns("uuid-1"),
-                    newContent = {
-                        type: "doc",
-                        content: [{type: "paragraph", content: [{type: "text", text: "Hello"}]}]
-                    };
+        describe("handleContent", () => {
+            it("should add content when editor index points to add position", async () => {
+                const newContent = {
+                    type: "doc",
+                    content: [{type: "paragraph", content: [{type: "text", text: "Hello"}]}]
+                };
 
                 await wrapper.setData({
-                    addComponentToShow: "text",
+                    openContentEditor: {
+                        type: "text",
+                        index: 0
+                    },
                     content: []
                 });
 
-                wrapper.vm.handleAddContent(newContent);
+                wrapper.vm.handleContent(newContent);
 
-                expect(wrapper.vm.addComponentToShow).to.equal("");
-                expect(wrapper.vm.content).to.deep.equal([
-                    {
-                        ...newContent,
-                        id: "uuid-1"
-                    }
-                ]);
-                expect(randomUuidStub.calledOnce).to.be.true;
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.have.lengthOf(1);
+                expect(wrapper.vm.content[0].type).to.equal("doc");
+                expect(wrapper.vm.content[0].content).to.deep.equal(newContent.content);
+            });
+
+            it("should edit existing content when editor index points to an existing item", async () => {
+                const existingContent = {
+                        type: "doc",
+                        content: [{type: "paragraph", content: [{type: "text", text: "Old"}]}]
+                    },
+                    updatedContent = {
+                        type: "doc",
+                        content: [{type: "paragraph", content: [{type: "text", text: "Updated"}]}]
+                    };
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "text",
+                        index: 0
+                    },
+                    content: [existingContent]
+                });
+
+                wrapper.vm.handleContent(updatedContent);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([updatedContent]);
             });
         });
 
@@ -375,8 +406,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
-        describe("handleAddImage", () => {
-            it("should reset addComponentToShow and append an image content entry", async () => {
+        describe("handleImage", () => {
+            it("should add an image when editor index points to add position", async () => {
                 const image = {
                     id: "img-1",
                     altText: "A test alt text",
@@ -384,13 +415,19 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 };
 
                 await wrapper.setData({
-                    addComponentToShow: "image",
+                    openContentEditor: {
+                        type: "image",
+                        index: 0
+                    },
                     content: []
                 });
 
-                await wrapper.vm.handleAddImage(image);
+                await wrapper.vm.handleImage(image);
 
-                expect(wrapper.vm.addComponentToShow).to.equal("");
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
                 expect(wrapper.vm.content).to.deep.equal([
                     {
                         type: "image",
@@ -399,6 +436,81 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                             alt: "A test alt text",
                             copyright: "Photo credit"
                         }
+                    }
+                ]);
+            });
+
+            it("should edit an existing image when editor index points to an existing item", async () => {
+                const image = {
+                    id: "img-1",
+                    altText: "Updated alt text",
+                    photoCredit: "Updated credit"
+                };
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "image",
+                        index: 0
+                    },
+                    content: [
+                        {
+                            type: "image",
+                            id: "img-1",
+                            attrs: {
+                                alt: "Old alt",
+                                copyright: "Old credit"
+                            }
+                        }
+                    ]
+                });
+
+                await wrapper.vm.handleImage(image);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "image",
+                        id: "img-1",
+                        attrs: {
+                            alt: "Updated alt text",
+                            copyright: "Updated credit"
+                        }
+                    }
+                ]);
+            });
+        });
+
+        describe("removeContentItem", () => {
+            it("should remove an image item and trigger image asset cleanup", async () => {
+                const removeImageAssetSpy = sinon.spy(wrapper.vm, "removeImageAsset");
+
+                await wrapper.setData({
+                    content: [
+                        {
+                            type: "image",
+                            id: "img-1",
+                            attrs: {
+                                alt: "Alt",
+                                copyright: "Credit"
+                            }
+                        },
+                        {
+                            type: "doc",
+                            content: [{type: "paragraph", content: [{type: "text", text: "Keep me"}]}]
+                        }
+                    ]
+                });
+
+                wrapper.vm.removeContentItem(0);
+
+                expect(removeImageAssetSpy.calledOnceWithExactly("img-1")).to.be.true;
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "doc",
+                        content: [{type: "paragraph", content: [{type: "text", text: "Keep me"}]}]
                     }
                 ]);
             });

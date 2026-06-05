@@ -30,14 +30,14 @@ describe("addons/storyCreator/components/StoryCreatorAddTextCard.vue", () => {
             expect(wrapper.findComponent({name: "TipTapEditor"}).exists()).to.be.true;
         });
 
-        it("should render one FlatButton first and two after content is set", async () => {
+        it("should render one IconButton first and two after content is set", async () => {
             const wrapper = shallowMount(StoryCreatorAddTextCard);
 
-            expect(wrapper.findAllComponents({name: "FlatButton"}).length).to.equal(1);
+            expect(wrapper.findAllComponents({name: "IconButton"}).length).to.equal(1);
 
             await wrapper.setData({content: {type: "doc", content: []}});
 
-            expect(wrapper.findAllComponents({name: "FlatButton"}).length).to.equal(2);
+            expect(wrapper.findAllComponents({name: "IconButton"}).length).to.equal(2);
         });
 
         it("should emit click:close event when close button is clicked", async () => {
@@ -49,7 +49,7 @@ describe("addons/storyCreator/components/StoryCreatorAddTextCard.vue", () => {
 
         it("should emit click:close event when abort button interaction is triggered", () => {
             const wrapper = shallowMount(StoryCreatorAddTextCard);
-            const buttons = wrapper.findAllComponents({name: "FlatButton"});
+            const buttons = wrapper.findAllComponents({name: "IconButton"});
             const abortButton = buttons[0];
 
             abortButton.props("interaction")();

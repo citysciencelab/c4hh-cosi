@@ -125,10 +125,19 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.findAllComponents({name: "InputText"}).length).to.equal(2);
         });
 
-        it("should render the FlatButton component only if imageLoaded is true", async () => {
+        it("should render the FlatButton component only if isImageLoaded is true", async () => {
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.false;
 
-            await wrapper.setData({imageLoaded: true});
+            localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"] = {
+                objectURL: "blob:test-created-url"
+            };
+            await wrapper.setData({
+                image: {
+                    id: "test-uuid",
+                    altText: "altText",
+                    photoCredit: "photoCredit"
+                }
+            });
 
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
         });
@@ -162,13 +171,13 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
     });
 
     describe("Component Methods", () => {
-        it("discardImage should revoke objectURL and emit click:close", async () => {
+        it("handleCloseButtonClick should revoke objectURL and emit click:close", async () => {
             const revokeObjectURLSpy = sinon.spy(URL, "revokeObjectURL"),
                 file = new File(["test"], "test.png", {type: "image/png"}),
                 event = {target: {files: [file]}};
 
             await wrapper.vm.loadImage(event);
-            wrapper.vm.discardImage();
+            wrapper.vm.handleCloseButtonClick();
 
             expect(revokeObjectURLSpy.calledWith("blob:test-created-url")).to.be.true;
             expect(wrapper.emitted()).to.have.property("click:close");
@@ -187,7 +196,7 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.vm.isValidated).to.be.false;
         });
 
-        it("loadImage should set imageLoaded, image id and objectURL", async () => {
+        it("loadImage should set isImageLoaded, image id and objectURL", async () => {
             const file = new File(["file-content"], "test-image.png", {type: "image/png"}),
                 event = {
                     target: {
@@ -197,7 +206,7 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
 
             await wrapper.vm.loadImage(event);
 
-            expect(wrapper.vm.imageLoaded).to.be.true;
+            expect(wrapper.vm.isImageLoaded).to.be.true;
             expect(wrapper.vm.image.id).to.equal("test-uuid");
             expect(wrapper.vm.isValidated).to.be.true;
             expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].blob).to.equal(file);

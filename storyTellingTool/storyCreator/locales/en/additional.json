@@ -27,7 +27,8 @@
         "emptyChapter": "No chapters have been created yet."
       },
       "buttons": {
-          "add": "Add",
+          "confirm": "Confirm",
+          "discardImage": "Discard image",
           "abort": "Abort"
       },
       "headlines": {

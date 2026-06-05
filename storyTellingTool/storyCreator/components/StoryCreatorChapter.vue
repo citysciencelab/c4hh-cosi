@@ -35,7 +35,10 @@ export default {
     },
     data () {
         return {
-            addComponentToShow: "",
+            openContentEditor: {
+                type: "",
+                index: null
+            },
             content: [],
             coordinate: "",
             zoomlevel: "",
@@ -78,6 +81,13 @@ export default {
                 return false;
             }
             return this.coordinate === this.confirmedCoordinate && this.zoomlevel === this.confirmedZoomlevel;
+        },
+        /**
+         * Returns true when an add/edit component is currently open.
+         * @returns {Boolean} True if a content editor is open, otherwise false.
+         */
+        isContentEditorOpen () {
+            return this.openContentEditor.type !== "";
         }
     },
     watch: {
@@ -138,13 +148,68 @@ export default {
             this.setCurrentView("story");
         },
         /**
-         * Handles the triggered action and sets the corresponding component.
-         * @param {String} type The type of the action (e.g., "image").
+         * Opens a content add/edit component and stores context of the open editor.
+         * @param {String} type - The editor type (e.g. "text" or "image").
          * @returns {void}
          */
-        handleAction (type) {
-            console.warn("Aktion im StoryCreator ausgelöst. Ausgewähltes Element:", type);
-            this.addComponentToShow = type;
+        openContentEditorForAdd (type) {
+            this.openContentEditor = {
+                type,
+                index: this.content.length
+            };
+        },
+        /**
+         * Closes the current content editor and unlocks content interactions.
+         * @returns {void}
+         */
+        closeContentEditor () {
+            this.openContentEditor = {
+                type: "",
+                index: null
+            };
+        },
+        /**
+         * Opens a content editor to edit an existing item.
+         * @param {Number} index - The index of the item to edit.
+         * @param {String} type - The editor type (e.g. "text").
+         * @returns {void}
+         */
+        openContentEditorForEdit (index, type) {
+            if (this.isContentEditorOpen) {
+                return;
+            }
+            this.openContentEditor = {
+                type,
+                index
+            };
+        },
+        /**
+         * Returns true if the given index is currently edited.
+         * @param {Number} index - The index of the content item.
+         * @returns {Boolean} True if the item is in edit mode.
+         */
+        isEditingContentItem (index) {
+            return this.isContentEditorOpen
+                && this.openContentEditor.index < this.content.length
+                && this.openContentEditor.index === index;
+        },
+        /**
+         * Returns true if the add editor for the given type is open.
+         * @param {String} type - The content type.
+         * @returns {Boolean} True if add editor is open for this type.
+         */
+        isAddingContentType (type) {
+            return this.isContentEditorOpen
+                && this.openContentEditor.type === type
+                && this.openContentEditor.index === this.content.length;
+        },
+        /**
+         * Returns true if the given content item should be non-interactive.
+         * @param {Number} index - The index of the content item.
+         * @returns {Boolean} True if the item should be locked, otherwise false.
+         */
+        isContentItemLocked (index) {
+            return this.isContentEditorOpen && this.openContentEditor.index !== index;
         },
         /**
          * Returns a list of layer names.
@@ -247,16 +312,23 @@ export default {
             return toolList;
         },
         /**
-         * Adds the given tiptap content to the chapter content and closes the add component.
-         * @param {Object} content - the content to add, e.g., {type: "doc", content: {...}}
+         * Handles content add/edit by writing it to the content array and closing the open editor.
+         * @param {Object} content - the content to add or update, e.g., {type: "doc", content: {...}}
          * @returns {void}
          */
-        handleAddContent (content) {
-            this.addComponentToShow = "";
-            this.content.push({
-                ...content,
-                id: crypto.randomUUID()
-            });
+        handleContent (content) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index,
+                    currentItem = this.content[editIndex];
+
+                if (currentItem) {
+                    this.content.splice(editIndex, 1, content);
+                }
+            }
+            else {
+                this.content.push(content);
+            }
+            this.closeContentEditor();
         },
         /**
          * Resets the current chapter.
@@ -304,20 +376,57 @@ export default {
         },
 
         /**
-         * Handles the addition of an image by adding it to the content array.
+         * Handles image add/edit by writing it to the content array and closing the open editor.
          * @param {Object} image - The image object containing id, altText, photoCredit, and objectURL.
          * @returns {void}
          */
-        handleAddImage (image) {
-            this.addComponentToShow = "";
-            this.content.push({
-                type: "image",
-                id: image.id,
-                attrs: {
-                    alt: image.altText,
-                    copyright: image.photoCredit
+        handleImage (image) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index,
+                    currentItem = this.content[editIndex];
+
+                if (currentItem?.type === "image" && currentItem.id !== image.id) {
+                    this.removeImageAsset(currentItem.id);
                 }
-            });
+
+                this.content.splice(editIndex, 1, {
+                    type: "image",
+                    id: image.id,
+                    attrs: {
+                        alt: image.altText,
+                        copyright: image.photoCredit
+                    }
+                });
+            }
+            else {
+                this.content.push({
+                    type: "image",
+                    id: image.id,
+                    attrs: {
+                        alt: image.altText,
+                        copyright: image.photoCredit
+                    }
+                });
+            }
+            this.closeContentEditor();
+        },
+        /**
+         * Removes a content item and cleans up related resources.
+         * @param {Number} index - The index of the content item to remove.
+         * @returns {void}
+         */
+        removeContentItem (index) {
+            const item = this.content[index];
+
+            if (!item) {
+                return;
+            }
+
+            if (item.type === "image") {
+                this.removeImageAsset(item.id);
+            }
+
+            this.content.splice(index, 1);
         },
 
         /**
@@ -491,48 +600,99 @@ export default {
                 item-key="id"
                 class="no-list"
                 handle=".drag-handle"
+                :disabled="isContentEditorOpen"
             >
-                <template #item="{ element }">
-                    <div class="chapter-content-item">
+                <template #item="{ element, index }">
+                    <div class="chapter-content-item mb-2">
                         <i
+                            v-if="!isContentEditorOpen"
                             class="bi bi-grip-vertical mt-1 drag-handle"
                             aria-hidden="true"
                         />
-                        <div v-if="element.type === 'image'">
-                            <img
-                                :src="imageAssetsById[element.id]?.objectURL"
-                                :alt="element.attrs.alt"
-                                class="img-thumbnail d-block mx-auto mb-3 w-100"
+                        <div
+                            v-if="element.type === 'image'"
+                            :class="{'chapter-content-item--locked': isContentItemLocked(index)}"
+                        >
+                            <StoryCreatorAddImageCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :initial-image="{id: element.id, altText: element.attrs.alt, photoCredit: element.attrs.copyright}"
+                                @addImage="handleImage"
+                                @click:close="closeContentEditor"
+                            />
+                            <div
+                                v-else
+                                class="card rounded-3 border-0 p-4 position-relative chapter-content-item__image-preview"
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'image')"
+                                @keydown.enter="openContentEditorForEdit(index, 'image')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'image')"
                             >
-                            <div class="text-end">
-                                © {{ element?.attrs?.copyright }}
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-1 chapter-content-item__image-close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <img
+                                    :src="imageAssetsById[element.id]?.objectURL"
+                                    :alt="element.attrs.alt"
+                                    class="rounded w-100 d-block"
+                                >
+                                <div class="text-end mt-1 small">
+                                    © {{ element?.attrs?.copyright }}
+                                </div>
                             </div>
                         </div>
-                        <div v-else-if="element.type === 'doc'">
-                            <div v-html="tipTapJsonToHtml(element)" />
+                        <div
+                            v-else-if="element.type === 'doc'"
+                        >
+                            <StoryCreatorAddTextCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :initial-content="element"
+                                @click:close="closeContentEditor"
+                                @addContent="handleContent"
+                            />
+                            <div
+                                v-else
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'text')"
+                                @keydown.enter="openContentEditorForEdit(index, 'text')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'text')"
+                            >
+                                <div v-html="tipTapJsonToHtml(element)" />
+                            </div>
                         </div>
                     </div>
                 </template>
             </Draggable>
             <AddElementDropdown
-                v-if="addComponentToShow === ''"
+                v-if="!isContentEditorOpen"
                 :allowed-actions="['text', 'image']"
-                @action-triggered="handleAction"
+                @action-triggered="openContentEditorForAdd"
             />
             <StoryCreatorAddTextCard
-                v-else-if="addComponentToShow === 'text'"
+                v-else-if="isAddingContentType('text')"
                 class="mt-2"
-                @click:close="addComponentToShow = ''"
-                @addContent="handleAddContent"
+                @click:close="closeContentEditor"
+                @addContent="handleContent"
             />
             <StoryCreatorAddImageCard
-                v-else-if="addComponentToShow === 'image'"
+                v-else-if="isAddingContentType('image')"
                 class="mt-2"
-                @addImage="handleAddImage"
-                @click:close="addComponentToShow = ''"
+                @addImage="handleImage"
+                @click:close="closeContentEditor"
             />
         </AccordionItem>
-        <div class="d-flex flex-column align-items-center pt-3">
+        <div
+            v-if="!isContentEditorOpen"
+            class="d-flex flex-column align-items-center pt-3"
+        >
             <FlatButton
                 id="save"
                 :icon="'bi-save'"
@@ -582,6 +742,38 @@ export default {
 
 .drag-handle:active {
     cursor: grabbing;
+}
+
+.chapter-content-item--locked {
+    pointer-events: none;
+    position: relative;
+    filter: blur(1px);
+}
+
+.chapter-content-item--locked::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.45);
+    z-index: 1;
+}
+
+.chapter-content-item--clickable {
+    cursor: pointer;
+
+    &:hover {
+        outline: 1px solid $light_grey;
+    }
+}
+
+.chapter-content-item__image-close {
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.chapter-content-item__image-preview:hover .chapter-content-item__image-close,
+.chapter-content-item__image-preview:focus-within .chapter-content-item__image-close {
+    opacity: 1;
 }
 </style>
 
@@ -646,7 +838,7 @@ export default {
 .chapter-title {
     font-family: "MasterPortalFont Bold";
     &:hover {
-        outline-color: #101010;
+        outline-color: $light_grey;
         outline-width: 1px;
         outline-style: solid;
     }

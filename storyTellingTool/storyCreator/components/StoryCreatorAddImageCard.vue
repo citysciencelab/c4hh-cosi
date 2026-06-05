@@ -18,6 +18,11 @@ export default {
             type: Boolean,
             required: false,
             default: true
+        },
+        initialImage: {
+            type: Object,
+            required: false,
+            default: null
         }
     },
     emits: ["addImage", "click:close"],
@@ -27,7 +32,6 @@ export default {
                 altText: "",
                 photoCredit: ""
             },
-            imageLoaded: false,
             isValidated: true
         };
     },
@@ -35,6 +39,20 @@ export default {
         ...mapGetters("Modules/StoryCreator", [
             "imageAssetsById"
         ]),
+        /**
+         * Returns true if the card is creating a new image.
+         * @returns {Boolean} True if no initial image data exists.
+         */
+        isNewImage () {
+            return !this.initialImage?.id;
+        },
+        /**
+         * Returns true if an image id exists and its object URL is available.
+         * @returns {Boolean} True if the image can be displayed.
+         */
+        isImageLoaded () {
+            return Boolean(this.image?.id && this.imageAssetsById[this.image.id]?.objectURL);
+        },
         /**
          * Returns true if the altText and photoCredit are not empty.
          * @returns {Boolean} True if the altText and photoCredit are not empty.
@@ -47,6 +65,11 @@ export default {
             return false;
         }
     },
+    created () {
+        if (this.initialImage?.id) {
+            this.image = JSON.parse(JSON.stringify(this.initialImage));
+        }
+    },
     methods: {
         ...mapActions("Modules/StoryCreator", [
             "addImageAsset"
@@ -56,19 +79,23 @@ export default {
         ]),
 
         /**
-         * Emits the "click:close" event and removes the stored image asset.
+         * Handles clicking the close button.
+         * @returns {void}
          */
-        discardImage () {
-            this.resetImage();
+        handleCloseButtonClick () {
+            if (this.isNewImage) {
+                this.removeImageAsset(this.image.id);
+            }
+
             this.$emit("click:close");
         },
 
         /**
-         * Resets the local image form state and removes a stored image asset if present.
+         * Handles clicking the discard button.
          * @returns {void}
          */
-        resetImage () {
-            if (this.image.id) {
+        handleDiscardButtonClick () {
+            if (this.isNewImage) {
                 this.removeImageAsset(this.image.id);
             }
 
@@ -76,7 +103,6 @@ export default {
                 altText: "",
                 photoCredit: ""
             };
-            this.imageLoaded = false;
             this.isValidated = true;
         },
 
@@ -92,7 +118,6 @@ export default {
                 return;
             }
 
-            this.imageLoaded = true;
             this.isValidated = true;
             const id = await this.addImageAsset(file);
 
@@ -109,7 +134,7 @@ export default {
                 type="button"
                 class="btn-close position-absolute top-0 end-0 m-2"
                 aria-label="Close"
-                @click="discardImage"
+                @click="handleCloseButtonClick"
             />
 
             <h5 class="card-title mb-3">
@@ -117,7 +142,7 @@ export default {
                     ? $t('additional:modules.storyCreator.headlines.addImages')
                     : $t('additional:modules.storyCreator.headlines.addImageTitle') }}
             </h5>
-            <div v-if="!imageLoaded">
+            <div v-if="!isImageLoaded">
                 <FileUpload
                     :id="'Story-Creator-Image-Upload'"
                     :change="loadImage"
@@ -156,13 +181,13 @@ export default {
                 @closed="isValidated = true"
             />
             <div
-                v-if="imageLoaded"
-                class="d-flex justify-content-center"
+                v-if="isImageLoaded"
+                class="d-flex justify-content-center gap-2"
             >
                 <FlatButton
                     class="mt-2"
                     icon="bi bi-save"
-                    :text="$t('additional:modules.storyCreator.buttons.add')"
+                    :text="$t('additional:modules.storyCreator.buttons.confirm')"
                     :disabled="!enableAdd"
                     :interaction="() => $emit('addImage', image)"
                 />
@@ -170,8 +195,8 @@ export default {
                     class="mt-2"
                     icon="bi bi-x-circle"
                     :secondary="true"
-                    :text="$t('additional:modules.storyCreator.buttons.abort')"
-                    :interaction="discardImage"
+                    :text="$t('additional:modules.storyCreator.buttons.discardImage')"
+                    :interaction="handleDiscardButtonClick"
                 />
             </div>
         </div>

@@ -1,17 +1,24 @@
 <script>
-import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import TipTapEditor from "../shared/modules/tipTapEditor/components/TipTapEditor.vue";
 
 export default {
     name: "StoryCreatorAddTextCard",
     components: {
-        FlatButton,
+        IconButton,
         TipTapEditor
+    },
+    props: {
+        initialContent: {
+            type: [Object, String],
+            required: false,
+            default: ""
+        }
     },
     emits: ["click:close", "addContent"],
     data () {
         return {
-            content: ""
+            content: JSON.parse(JSON.stringify(this.initialContent))
         };
     }
 };
@@ -34,19 +41,20 @@ export default {
                 <TipTapEditor v-model="content" />
             </div>
             <div class="d-flex justify-content-center gap-2">
-                <FlatButton
-                    class="mt-2"
-                    icon="bi bi-x-circle"
-                    :secondary="true"
-                    :text="$t('additional:modules.storyCreator.buttons.abort')"
-                    :interaction="() => $emit('click:close')"
-                />
-                <FlatButton
+                <IconButton
                     v-if="content"
                     class="mt-2"
-                    icon="bi bi-save"
-                    :text="$t('additional:modules.storyCreator.buttons.add')"
+                    icon="bi bi-check-lg"
+                    :aria="$t('additional:modules.storyCreator.buttons.confirm')"
+                    :class-array="['btn-secondary']"
                     :interaction="() => $emit('addContent', content)"
+                />
+                <IconButton
+                    class="mt-2"
+                    icon="bi bi-x-lg"
+                    :aria="$t('additional:modules.storyCreator.buttons.abort')"
+                    :class-array="['btn-primary']"
+                    :interaction="() => $emit('click:close')"
                 />
             </div>
         </div>

@@ -27,7 +27,8 @@
         "emptyChapter": "Es wurden noch keine Kapitel angelegt."
       },
       "buttons": {
-          "add": "Hinzufügen",
+          "confirm": "Übernehmen",
+          "discardImage": "Bild verwerfen",
           "abort": "Abbrechen"
       },
       "headlines": {
