@@ -118,6 +118,20 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
 
             expect(InfoText.exists()).to.be.true;
         });
+        it("should not render the loaded title image.", () => {
+            const titleImage = wrapper.find(".chapter-title-image-preview");
+
+            expect(titleImage.exists()).to.be.false;
+        });
+        it("should render the loaded title image.", async () => {
+            await wrapper.setData({
+                imageLoaded: true
+            });
+
+            const titleImage = wrapper.find(".chapter-title-image-preview");
+
+            expect(titleImage.exists()).to.be.true;
+        });
     });
 
     describe("Component methods", () => {

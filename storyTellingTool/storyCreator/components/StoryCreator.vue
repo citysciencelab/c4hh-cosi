@@ -31,15 +31,14 @@ export default {
     },
     data () {
         return {
-            title: "Geschichten mit Karten erzählen",
-            description: "Lorem ipsum dolor sit amet...",
-            author: "Max Mustermann",
-            imageAlt: "Blick über die Hamburger Elbphilharmonie",
-            imageCopyright: "Max Mustermann / Getty Images",
-            imageSrc: "./img.png",
-            chapterContent: [
-
-            ]
+            title: "",
+            description: "",
+            author: "",
+            imageAlt: "",
+            imageCopyright: "",
+            imageSrc: "",
+            chapterContent: [],
+            imageLoaded: false
         };
     },
     computed: {
@@ -54,6 +53,7 @@ export default {
     },
     mounted () {
         this.updateStory();
+        this.imageLoaded = typeof this.imageAssetsById?.[this.imageSrc]?.objectURL !== "undefined";
     },
     methods: {
         ...mapActions("Menu", ["changeCurrentComponent"]),
@@ -67,6 +67,7 @@ export default {
         ...mapMutations("Modules/StoryManager", [
             "setStoryList"
         ]),
+
         /**
          * Adds a new chapter.
          * @returns {void}
@@ -74,6 +75,19 @@ export default {
         addChapter () {
             this.setCurrentView("chapter");
         },
+
+        /**
+         * Adds the uploaded title image attributes.
+         * @param {Object} image - The image object containing id, altText, photoCredit, and objectURL.
+         * @returns {void}
+         */
+        addImage (image) {
+            this.imageSrc = image.id;
+            this.imageAlt = image.altText;
+            this.imageCopyright = image.photoCredit;
+            this.imageLoaded = true;
+        },
+
         /**
          * Deletes a chapter from the index.
          * @param {Number} index - the index of the chapter in chapter list.
@@ -91,6 +105,7 @@ export default {
             }
             this.story.chapters.splice(index, 1);
         },
+
         /**
          * Discards the current story and resets all data to default values.
          * @return {void}
@@ -104,6 +119,7 @@ export default {
             this.author = "";
             this.chapterContent = [];
         },
+
         /**
          * Gets the deep value from attribute.
          * @param {Object} obj - the content object.
@@ -126,6 +142,7 @@ export default {
 
             return results;
         },
+
         /**
          * Gets the value from attribute of content.
          * @param {Object} val - the object value.
@@ -139,6 +156,7 @@ export default {
 
             return this.getAllDeepValues(val.content, attr)[0];
         },
+
         /**
          * Gets the chapter card items from content.
          * @param {Object} val - the object value.
@@ -165,6 +183,7 @@ export default {
                 tool: toolName
             };
         },
+
         /**
          * Gets the chapter overview image.
          * @param {Object} val - the object value.
@@ -183,13 +202,14 @@ export default {
 
             return this.imageAssetsById[imageId]?.objectURL;
         },
+
         /**
          * Saves the story into story list.
          * @returns {void}
          */
         saveStory () {
             this.updateStory();
-            this.setStoryList([...this.storyList, this.story]);
+            this.setStoryList([...this.storyList, JSON.parse(JSON.stringify(this.story))]);
             this.changeCurrentComponent({type: "storyManager", side: "secondaryMenu", props: {name: "additional:modules.storyManager.title"}});
             this.setNavigationHistoryBySide({side: "secondaryMenu", newHistory: [{type: "root", props: []}]});
             /*
@@ -232,11 +252,24 @@ export default {
             this.story.imageCopyright = this.imageCopyright;
             this.story.chapters = this.chapterContent;
         },
-        /** Changes to preview mode.
+
+        /**
+         * Changes to preview mode.
          *  @returns {void}
          */
         openPreview () {
             this.setCurrentView("preview");
+        },
+
+        /**
+         * Removes the uploaded image and shows the upload area.
+         *  @returns {void}
+         */
+        removeImage () {
+            this.imageSrc = "";
+            this.imageAlt = "";
+            this.imageCopyright = "";
+            this.imageLoaded = false;
         }
     }
 };
@@ -296,9 +329,35 @@ export default {
                 class="mb-3"
             />
             <StoryCreatorAddImageCard
+                v-if="!imageLoaded"
                 :closeable="false"
+                :initial-image="{id: imageSrc, altText: imageAlt, photoCredit: imageCopyright}"
+                @addImage="addImage"
             />
-
+            <div
+                v-else
+                class="card rounded-3 border-0 p-4 position-relative chapter-title-image-preview"
+                role="button"
+                tabindex="0"
+                @click="imageLoaded = false"
+                @keydown.enter="imageLoaded = false"
+                @keydown.space.prevent="imageLoaded = false"
+            >
+                <button
+                    type="button"
+                    class="btn-close position-absolute top-0 end-0 m-1 chapter-title-image-close"
+                    :aria-label="$t('common:button.close')"
+                    @click.stop="removeImage()"
+                />
+                <img
+                    :src="imageAssetsById?.[imageSrc]?.objectURL"
+                    :alt="imageAlt"
+                    class="rounded w-100 d-block"
+                >
+                <div class="text-end mt-1 small">
+                    © {{ imageCopyright }}
+                </div>
+            </div>
             <hr>
             <h5 class="py-3">
                 {{ $t('additional:modules.storyCreator.headlines.chapterList') }}
@@ -373,6 +432,18 @@ export default {
 
         &:hover {
             text-decoration: underline;
+        }
+    }
+}
+.chapter-title-image-preview {
+    cursor: pointer;
+    .chapter-title-image-close {
+        display: none;
+    }
+    &:hover {
+        outline: 1px solid $light_grey;
+        .chapter-title-image-close {
+            display: block;
         }
     }
 }

@@ -36,6 +36,15 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                     }
                                 ]
                             }
+                        },
+                        StoryCreator: {
+                            namespaced: true,
+                            getters: {
+                                imageAssetsById: (state) => state.imageAssetsById
+                            },
+                            state: {
+                                imageAssetsById: {}
+                            }
                         }
                     }
                 }

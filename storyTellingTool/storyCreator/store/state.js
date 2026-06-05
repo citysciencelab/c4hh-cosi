@@ -16,11 +16,6 @@ const state = {
     type: "storyCreator",
     name: "additional:modules.storyCreator.title",
     icon: "bi-file-plus",
-    currentView: "story",
-    imageAssetsById: {},
-    story: {
-        chapters: []
-    },
     currentChapter: {
         "title": "",
         "content": [],
@@ -30,6 +25,11 @@ const state = {
             "layers": null,
             "tool": null
         }
+    },
+    currentView: "story",
+    imageAssetsById: {},
+    story: {
+        chapters: []
     },
     subjectLayerCategory: {
         "key": "kategorie_opendata",

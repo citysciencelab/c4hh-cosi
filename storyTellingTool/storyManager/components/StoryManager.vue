@@ -14,6 +14,9 @@ export default {
         InfoText
     },
     computed: {
+        ...mapGetters("Modules/StoryCreator", [
+            "imageAssetsById"
+        ]),
         ...mapGetters("Modules/StoryManager", [
             "storyList"
         ])
@@ -98,9 +101,9 @@ export default {
                     card-type="story"
                     :card-title="story?.title"
                     :card-text="story?.text"
-                    :card-image="story?.image"
-                    :photo-credit="story?.photoCredit"
-                    :alt-text="story?.altText"
+                    :card-image="imageAssetsById?.[story?.imageSrc]?.objectURL"
+                    :photo-credit="story?.imageCopyright"
+                    :alt-text="story?.imageAlt"
                     :card-items="getCardItems(story)"
                     :editable="true"
                     @edit="() => ''"
