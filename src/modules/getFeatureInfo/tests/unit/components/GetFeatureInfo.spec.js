@@ -462,6 +462,100 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfo.vue", () => {
             expect(mockMutations.setVisible.notCalled).to.be.true;
             expect(toggleMenuSpy.notCalled).to.be.true;
         });
+
+        it("should expand the menu for unchanged html gfi features after a new map click", () => {
+            menuExpanded = false;
+
+            const gfiFeaturesOld = [{
+                    getId: () => undefined,
+                    getAttributesToShow: () => sinon.stub(),
+                    getProperties: () => {
+                        return {};
+                    },
+                    getFeatures: sinon.stub(),
+                    getMimeType: () => "text/html"
+                }],
+                gfiFeaturesNew = [{
+                    getId: () => undefined,
+                    getAttributesToShow: () => sinon.stub(),
+                    getProperties: () => {
+                        return {};
+                    },
+                    getFeatures: sinon.stub(),
+                    getMimeType: () => "text/html"
+                }];
+
+            store = getGfiStore(false, undefined, gfiFeaturesNew, []);
+
+            wrapper = shallowMount(GfiComponent, {
+                components: {
+                    GetFeatureInfoDetached: {
+                        name: "GetFeatureInfoDetached",
+                        template: "<span />"
+                    },
+                    IconButton: {
+                        name: "IconButton",
+                        template: "<button>Hier</button>"
+                    }
+                },
+                global: {
+                    plugins: [store]
+                }
+            });
+
+            wrapper.vm.reopenMenuOnNextFeatureUpdate = true;
+            wrapper.vm.$options.watch.gfiFeatures.handler.call(wrapper.vm, gfiFeaturesNew, gfiFeaturesOld);
+
+            expect(mockMutations.setVisible.notCalled).to.be.true;
+            expect(toggleMenuSpy.calledOnce).to.be.true;
+        });
+
+        it("should not expand the menu for unchanged non-html gfi features after a new map click", () => {
+            menuExpanded = false;
+
+            const gfiFeaturesOld = [{
+                    getId: () => undefined,
+                    getAttributesToShow: () => sinon.stub(),
+                    getProperties: () => {
+                        return {};
+                    },
+                    getFeatures: sinon.stub(),
+                    getMimeType: () => "text/xml"
+                }],
+                gfiFeaturesNew = [{
+                    getId: () => undefined,
+                    getAttributesToShow: () => sinon.stub(),
+                    getProperties: () => {
+                        return {};
+                    },
+                    getFeatures: sinon.stub(),
+                    getMimeType: () => "text/xml"
+                }];
+
+            store = getGfiStore(false, undefined, gfiFeaturesNew, []);
+
+            wrapper = shallowMount(GfiComponent, {
+                components: {
+                    GetFeatureInfoDetached: {
+                        name: "GetFeatureInfoDetached",
+                        template: "<span />"
+                    },
+                    IconButton: {
+                        name: "IconButton",
+                        template: "<button>Hier</button>"
+                    }
+                },
+                global: {
+                    plugins: [store]
+                }
+            });
+
+            wrapper.vm.reopenMenuOnNextFeatureUpdate = true;
+            wrapper.vm.$options.watch.gfiFeatures.handler.call(wrapper.vm, gfiFeaturesNew, gfiFeaturesOld);
+
+            expect(mockMutations.setVisible.notCalled).to.be.true;
+            expect(toggleMenuSpy.notCalled).to.be.true;
+        });
     });
     describe("watcher visibleSubjectDataLayerConfigs", () => {
         it("visibleSubjectDataLayerConfigs changed, only one gfi visible", async () => {

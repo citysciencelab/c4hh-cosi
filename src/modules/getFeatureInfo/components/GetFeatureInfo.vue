@@ -167,6 +167,7 @@ export default {
             handler (value) {
                 if (this.currentMouseMapInteractionsComponent === this.type) {
                     this.pagerIndex = 0;
+                    this.reopenMenuOnNextFeatureUpdate = true;
                     this.setClickCoordinates(value);
                     this.collectGfiFeatures();
                 }
@@ -218,6 +219,8 @@ export default {
         gfiFeatures: {
             handler (newFeatures, oldFeatures) {
                 let featuresChanged = oldFeatures === null;
+                const menuCollapsed = !this.expanded(this.menuSide),
+                    hasIframeGfi = Array.isArray(newFeatures) && newFeatures.some(feature => feature?.getMimeType?.() === "text/html");
 
                 if (newFeatures?.length > 0) {
                     if (oldFeatures !== null) {
@@ -235,15 +238,16 @@ export default {
 
                     if (featuresChanged) {
                         this.setVisible(true);
-                        if (!this.expanded(this.menuSide)) {
-                            this.toggleMenu(this.menuSide);
-                        }
+                    }
+                    if (menuCollapsed && (featuresChanged || hasIframeGfi && this.reopenMenuOnNextFeatureUpdate === true)) {
+                        this.toggleMenu(this.menuSide);
                     }
                     this.setUpdatedFeature(true);
                 }
                 else if (newFeatures === null) {
                     this.setUpdatedFeature(false);
                 }
+                this.reopenMenuOnNextFeatureUpdate = false;
             },
             deep: true
         }
@@ -283,6 +287,7 @@ export default {
          */
         reset: function () {
             this.pagerIndex = 0;
+            this.reopenMenuOnNextFeatureUpdate = false;
             this.setGfiFeatures(null);
             if (this.mapMode === "3D") {
                 this.removeHighlightColor();

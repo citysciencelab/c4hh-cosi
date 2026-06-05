@@ -32,6 +32,7 @@
 - Issue \#1610: Menu/PortalFooter: Fixed navigation behavior for secondary GFI without a configured secondary menu and corrected footer layout offsets for small desktop breakpoints.
 - Issue \#1613: LayerSlider: Fixed layers not being hidden when moving the slider handle past them, causing previously active layers to remain visible. 
 - Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
+- Issue \#1619: GetFeatureInfo: Fixed case where GFI with iframe content did not reopen after being closed.
 - Issue \#1620: Adapted vite build to respect new created heads (clone with --branch).
 - Migrator: Fixed creation of index.html.
 - Gazetteer: Restored correct display of geographicalIdentifier as search result, if available.
