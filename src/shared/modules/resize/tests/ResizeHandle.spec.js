@@ -158,6 +158,20 @@ describe("src/shared/modules/resize/components/ResizeHandle.vue", () => {
         expect(wrapper.emitted("resizing")[0][0].deltaCursorPosition.y).to.equal(30);
     });
 
+    it("onMouseMove stops resizing when mouse buttons are no longer pressed", () => {
+        mountComponent();
+        const onMouseUpSpy = sinon.spy(wrapper.vm, "onMouseUp");
+
+        wrapper.vm.onMouseMove({
+            clientX: 23,
+            clientY: 27,
+            buttons: 0
+        });
+
+        expect(onMouseUpSpy.calledOnce).to.be.true;
+        expect(wrapper.emitted("resizing")).to.be.undefined;
+    });
+
     it("setNewSize commits main menu width to vuex", () => {
         mountComponent({side: "mainMenu", handlePosition: "right", minWidth: 0, maxWidth: 1});
         wrapper.vm.initialDimensions.width = 300;
@@ -180,5 +194,36 @@ describe("src/shared/modules/resize/components/ResizeHandle.vue", () => {
         wrapper.vm.onVisibilityChange();
 
         expect(onMouseUpSpy.calledOnce).to.be.true;
+    });
+
+    it("onWindowBlur stops resizing while resize is active", () => {
+        mountComponent();
+        const onMouseUpSpy = sinon.spy(wrapper.vm, "onMouseUp");
+
+        wrapper.vm.isResizing = true;
+        wrapper.vm.onWindowBlur();
+
+        expect(onMouseUpSpy.calledOnce).to.be.true;
+    });
+
+    it("uses touchcancel as cancel event while resizing on touch devices", async () => {
+        mountComponent();
+        const addEventListenerSpy = sinon.spy(document, "addEventListener"),
+            removeEventListenerSpy = sinon.spy(document, "removeEventListener");
+
+        wrapper.vm.touchDevice = true;
+        wrapper.vm.isResizing = true;
+        await wrapper.vm.$nextTick();
+
+        expect(addEventListenerSpy.calledWith("touchmove", wrapper.vm.boundOnMouseMove)).to.be.true;
+        expect(addEventListenerSpy.calledWith("touchend", wrapper.vm.boundOnMouseUp)).to.be.true;
+        expect(addEventListenerSpy.calledWith("touchcancel", wrapper.vm.boundOnMouseUp)).to.be.true;
+
+        wrapper.vm.isResizing = false;
+        await wrapper.vm.$nextTick();
+
+        expect(removeEventListenerSpy.calledWith("touchmove", wrapper.vm.boundOnMouseMove)).to.be.true;
+        expect(removeEventListenerSpy.calledWith("touchend", wrapper.vm.boundOnMouseUp)).to.be.true;
+        expect(removeEventListenerSpy.calledWith("touchcancel", wrapper.vm.boundOnMouseUp)).to.be.true;
     });
 });
