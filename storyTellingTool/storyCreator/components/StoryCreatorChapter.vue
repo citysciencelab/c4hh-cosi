@@ -589,7 +589,7 @@ export default {
             :title="$t('additional:modules.storyCreator.chapter.addContent')"
         >
             <h5
-                class="chapter-title mt-4 mb-3"
+                class="chapter-title mt-4 mb-3 p-2"
                 contenteditable="plaintext-only"
                 @input="title = $event.target.innerHTML"
             >
@@ -658,6 +658,7 @@ export default {
                             />
                             <div
                                 v-else
+                                class="p-4 rounded-3"
                                 :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
                                 role="button"
                                 tabindex="0"
@@ -778,6 +779,34 @@ export default {
 </style>
 
 <style lang="scss">
+
+.chapter-content-item {
+    strong, b {
+        font-family: $font_family_accent;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: $font_family_accent;
+        text-transform: unset;
+        border: 0;
+        color: $headings-color;
+        line-height: 1.1;
+        text-wrap: pretty;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+    }
+}
+
 .chapter .multiselect__strong {
     font-family: "MasterPortalFont Bold";
 }

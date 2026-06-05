@@ -25,18 +25,15 @@ export default {
 </script>
 <template lang="html">
     <div
-        class="card border-0 rounded-3 bg-light"
+        class="card rounded-3"
     >
-        <div class="card-body p-4 position-relative">
+        <div class="card-body p-3 position-relative">
             <button
                 type="button"
                 class="btn-close position-absolute top-0 end-0 m-2"
                 aria-label="Close"
                 @click="$emit('click:close')"
             />
-            <h5 class="card-title mb-3">
-                {{ $t('additional:modules.storyCreator.headlines.addTexts') }}
-            </h5>
             <div class="mt-2">
                 <TipTapEditor v-model="content" />
             </div>

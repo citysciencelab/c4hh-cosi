@@ -18,24 +18,22 @@ describe("addons/storyCreator/components/StoryCreatorAddTextCard.vue", () => {
             expect(wrapper.find(".card").exists()).to.be.true;
         });
 
-        it("should render the headline", () => {
-            const wrapper = shallowMount(StoryCreatorAddTextCard);
-
-            expect(wrapper.find(".card-title").text()).to.include("additional:modules.storyCreator.headlines.addTexts");
-        });
-
         it("should render the TipTapEditor component", () => {
             const wrapper = shallowMount(StoryCreatorAddTextCard);
 
             expect(wrapper.findComponent({name: "TipTapEditor"}).exists()).to.be.true;
         });
 
-        it("should render one IconButton first and two after content is set", async () => {
+        it("should render one IconButton", () => {
             const wrapper = shallowMount(StoryCreatorAddTextCard);
 
             expect(wrapper.findAllComponents({name: "IconButton"}).length).to.equal(1);
+        });
 
-            await wrapper.setData({content: {type: "doc", content: []}});
+        it("should render two IconButton", async () => {
+            const wrapper = shallowMount(StoryCreatorAddTextCard);
+
+            await wrapper.setData({content: "true"});
 
             expect(wrapper.findAllComponents({name: "IconButton"}).length).to.equal(2);
         });
