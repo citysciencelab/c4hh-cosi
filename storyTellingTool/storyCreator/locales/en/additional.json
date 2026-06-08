@@ -22,6 +22,8 @@
         "altText": "Accessibility text",
         "photoCredit": "Photo credit",
         "deleteChapter": "Delete chapter ",
+        "editStory": "Edit story",
+        "downloadStory": "Download story",
         "wrongFormat": "Only image files (e.g. JPG, PNG) are permitted.",
         "wrongFormatTitle": "Invalid file format",
         "emptyChapter": "No chapters have been created yet."

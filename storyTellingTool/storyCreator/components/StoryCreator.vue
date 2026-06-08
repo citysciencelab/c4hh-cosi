@@ -1,6 +1,5 @@
 <script>
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
-// import {createStoryZip} from "../shared/js/storyZipCreator.js";
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
@@ -12,7 +11,6 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import store from "@appstore/index.js";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
-import StoryCreatorImportTest from "./StoryCreatorImportTest.vue";
 import StoryPlayer from "../../storyPlayer/components/storyPlayer/StoryPlayer.vue";
 
 export default {
@@ -26,7 +24,6 @@ export default {
         InputText,
         StoryCreatorAddImageCard,
         StoryCreatorChapter,
-        StoryCreatorImportTest,
         StoryPlayer
     },
     data () {
@@ -209,25 +206,18 @@ export default {
          */
         saveStory () {
             this.updateStory();
-            this.setStoryList([...this.storyList, JSON.parse(JSON.stringify(this.story))]);
+            const storySnapshot = JSON.parse(JSON.stringify(this.story)),
+                imageAssetsSnapshot = {...this.imageAssetsById};
+
+            this.setStoryList([
+                ...this.storyList,
+                {
+                    story: storySnapshot,
+                    imageAssetsById: imageAssetsSnapshot
+                }
+            ]);
             this.changeCurrentComponent({type: "storyManager", side: "secondaryMenu", props: {name: "additional:modules.storyManager.title"}});
             this.setNavigationHistoryBySide({side: "secondaryMenu", newHistory: [{type: "root", props: []}]});
-            /*
-            this.updateStory();
-
-            const zipBlob = await createStoryZip(this.story, this.imageAssetsById),
-                filename = this.title + ".zip",
-                objectURL = URL.createObjectURL(zipBlob),
-                element = document.createElement("a");
-
-            element.setAttribute("href", objectURL);
-            element.setAttribute("download", filename);
-            element.style.display = "none";
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-            URL.revokeObjectURL(objectURL);
-            */
         },
 
         /**
@@ -420,7 +410,6 @@ export default {
         >
             <StoryPlayer />
         </div>
-        <StoryCreatorImportTest />
     </div>
 </template>
 

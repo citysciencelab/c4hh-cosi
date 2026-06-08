@@ -1,28 +1,83 @@
 <script>
+import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMessage.vue";
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
+import {createStoryZip, extractStoryZip} from "../shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
-import {mapGetters, mapActions} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 
 export default {
     name: "StoryManager",
     components: {
+        AlertMessage,
         AddCardButton,
         FlatButton,
         InfoCard,
         InfoText
     },
+    data () {
+        return {
+            showImportError: false
+        };
+    },
     computed: {
-        ...mapGetters("Modules/StoryCreator", [
-            "imageAssetsById"
-        ]),
         ...mapGetters("Modules/StoryManager", [
             "storyList"
         ])
     },
     methods: {
         ...mapActions("Menu", ["changeCurrentComponent"]),
+        ...mapMutations("Modules/StoryManager", ["setStoryList"]),
+        /**
+         * Sanitizes story titles for use as file names.
+         * @param {String} title - Raw story title.
+         * @returns {String} Safe filename base.
+         */
+        toSafeFileName (title) {
+            const fallbackName = "story";
+
+            if (!title || typeof title !== "string") {
+                return fallbackName;
+            }
+
+            const safeName = title
+                .trim()
+                .replace(/[\\/:*?"<>|]+/g, "-")
+                .replace(/\s+/g, " ")
+                .slice(0, 120);
+
+            return safeName || fallbackName;
+        },
+        /**
+         * Downloads one story as ZIP from its stored export payload.
+         * @param {Object} storyEntry - Story list entry.
+         * @returns {Promise<void>}
+         */
+        async downloadStory (storyEntry) {
+            const story = storyEntry?.story,
+                imageAssetsById = storyEntry?.imageAssetsById || {};
+
+            if (!story) {
+                return;
+            }
+
+            const zipBlob = await createStoryZip(
+                    story,
+                    imageAssetsById
+                ),
+                filename = `${this.toSafeFileName(story?.title)}.zip`,
+                objectURL = URL.createObjectURL(zipBlob),
+                element = document.createElement("a");
+
+            element.setAttribute("href", objectURL);
+            element.setAttribute("download", filename);
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            URL.revokeObjectURL(objectURL);
+        },
         /**
          * Changes the current menu component to the Story Creator to start a new story.
          * @returns {void}
@@ -47,6 +102,38 @@ export default {
                 creation: val?.created,
                 numberOfChapters: val?.chapters?.length || 0
             };
+        },
+        /**
+         * Handles selected import file.
+         * @param {Event} event - Input change event.
+         * @returns {Promise<void>}
+         */
+        async onStoryImportFileChange (event) {
+            const inputElement = event?.target,
+                selectedFile = inputElement?.files?.[0];
+
+            if (!selectedFile) {
+                return;
+            }
+
+            try {
+                const {storyJson, imageAssetsById} = await extractStoryZip(selectedFile);
+
+                this.setStoryList([
+                    {
+                        story: storyJson,
+                        imageAssetsById
+                    },
+                    ...this.storyList
+                ]);
+                this.showImportError = false;
+            }
+            catch (error) {
+                this.showImportError = true;
+            }
+            finally {
+                inputElement.value = "";
+            }
         }
     }
 };
@@ -84,6 +171,23 @@ export default {
                 :icon="'bi-box-arrow-in-down'"
                 :aria-label="$t('additional:modules.storyManager.importButton')"
                 :text="$t('additional:modules.storyManager.importButton')"
+                :interaction="() => $refs.storyImportInput?.click()"
+            />
+            <input
+                ref="storyImportInput"
+                type="file"
+                class="d-none"
+                accept=".zip,application/zip"
+                @change="onStoryImportFileChange"
+            >
+            <AlertMessage
+                v-if="showImportError"
+                class="mt-2"
+                :closeable="true"
+                :text="$t('additional:modules.storyManager.importErrorText')"
+                :title="$t('additional:modules.storyManager.importErrorTitle')"
+                type="error"
+                @closed="showImportError = false"
             />
         </div>
         <InfoText
@@ -93,21 +197,21 @@ export default {
         />
         <div class="story-list flex-grow-1 overflow-auto pb-2">
             <div
-                v-for="(story, index) in storyList"
+                v-for="(storyEntry, index) in storyList"
                 :key="index"
                 class="mb-4 w-100 mx-0"
             >
                 <InfoCard
                     card-type="story"
-                    :card-title="story?.title"
-                    :card-text="story?.text"
-                    :card-image="imageAssetsById?.[story?.imageSrc]?.objectURL"
-                    :photo-credit="story?.imageCopyright"
-                    :alt-text="story?.imageAlt"
-                    :card-items="getCardItems(story)"
+                    :card-title="storyEntry?.story?.title"
+                    :card-text="storyEntry?.story?.text"
+                    :card-image="storyEntry?.imageAssetsById?.[storyEntry?.story?.imageSrc]?.objectURL"
+                    :photo-credit="storyEntry?.story?.imageCopyright"
+                    :alt-text="storyEntry?.story?.imageAlt"
+                    :card-items="getCardItems(storyEntry?.story)"
                     :editable="true"
                     @edit="() => ''"
-                    @download="() => ''"
+                    @download="() => downloadStory(storyEntry)"
                 />
             </div>
         </div>

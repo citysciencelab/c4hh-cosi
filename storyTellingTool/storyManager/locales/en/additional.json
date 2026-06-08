@@ -9,6 +9,8 @@
       "selectStoryTitle": "Select story",
       "selectStoryDescription": "Select an existing story from the list below to view or edit it, or import an existing project.",
       "importButton": "Import",
+      "importErrorTitle": "Import failed",
+      "importErrorText": "Only ZIP files created with this application can be loaded.",
       "createdAt": "Created on:",
       "chapters": "Chapters",
       "emptyStory": "There are no stories yet."

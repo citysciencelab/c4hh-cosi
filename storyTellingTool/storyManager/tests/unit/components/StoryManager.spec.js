@@ -29,10 +29,26 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                             state: {
                                 storyList: [
                                     {
-                                        title: "Story 1"
+                                        story: {
+                                            title: "Story 1",
+                                            text: "",
+                                            imageSrc: "",
+                                            imageCopyright: "",
+                                            imageAlt: "",
+                                            chapters: []
+                                        },
+                                        imageAssetsById: {}
                                     },
                                     {
-                                        title: "Story 2"
+                                        story: {
+                                            title: "Story 2",
+                                            text: "",
+                                            imageSrc: "",
+                                            imageCopyright: "",
+                                            imageAlt: "",
+                                            chapters: []
+                                        },
+                                        imageAssetsById: {}
                                     }
                                 ]
                             }
@@ -100,6 +116,44 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                     };
 
                 expect(wrapper.vm.getCardItems(story)).to.deep.equal(cardItems);
+            });
+        });
+
+        describe("toSafeFileName", () => {
+            it("should sanitize invalid filename characters", () => {
+                const result = wrapper.vm.toSafeFileName("Story:/\\*?\"<>|Name");
+
+                expect(result).to.equal("Story-Name");
+            });
+        });
+
+        describe("downloadStory", () => {
+            it("should return early if story is missing", async () => {
+                const createObjectURLSpy = sinon.spy(URL, "createObjectURL");
+
+                await wrapper.vm.downloadStory({});
+
+                expect(createObjectURLSpy.called).to.be.false;
+            });
+        });
+
+        describe("onStoryImportFileChange", () => {
+            it("should return early when no file is selected", async () => {
+                const setStoryListSpy = sinon.spy(wrapper.vm, "setStoryList");
+
+                await wrapper.vm.onStoryImportFileChange({target: {files: []}});
+
+                expect(setStoryListSpy.called).to.be.false;
+            });
+
+            it("should show AlertMessage when zip import fails", async () => {
+                const invalidZipBlob = new Blob(["invalid zip content"], {type: "application/zip"});
+
+                await wrapper.vm.onStoryImportFileChange({target: {files: [invalidZipBlob], value: "dummy"}});
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.showImportError).to.be.true;
+                expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
             });
         });
     });

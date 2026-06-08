@@ -5,7 +5,6 @@
     "type": "module",
     "dependencies": {
         "@tiptap/starter-kit": "^2.27.1",
-        "@tiptap/vue-3": "^2.27.1",
-        "fflate": "^0.8.2"
+        "@tiptap/vue-3": "^2.27.1"
     }
 }

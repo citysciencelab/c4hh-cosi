@@ -5,7 +5,7 @@
  * @property {String} type - type of the component.
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
- * @property {Object[]} storyList the story object list in array.
+ * @property {Object[]} storyList List entries with story and image assets.
  */
 const state = {
     id: "storyManager",
