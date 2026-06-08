@@ -36,6 +36,7 @@
 
 ### Fixed
 - Issue \#1585: Fixed case where dragging for resizing menus continued after releasing mouse or touch outside browser window.
+- Issue \#1594: Sort legend in order of style config for Geojson Layer.
 - Issue \#1600: AddWMS: Fixed detection of crs, if using EPSG-Code 4326.
 - Issue \#1601: Improve attribute extraction in `getDescribeFeature` to handle mixed xml2json node shapes.
 - Issue \#1608: Fixed autoRefresh by reading source from OL Layer instead of cached layerSource to prevent stale source.
