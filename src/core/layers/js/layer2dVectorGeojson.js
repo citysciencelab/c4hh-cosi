@@ -118,19 +118,17 @@ Layer2dVectorGeojson.prototype.loadFeaturesManually = function (attributes) {
 
 /**
  * Sorts legend entries by the order of the style labels.
- * @param {*} items
- * @param {*} styleObject
+ * @param {*} legendInformation The legend information as returned from the returnLegendByStyleId function.
+ * @param {*} styleObject The style object containing the configured styling rules.
  */
 function sortByStyleLabelOrder (legendInformation, styleObject) {
     const styleLabels = styleObject.rules.map(rule => rule.style.legendValue);
 
     return legendInformation.map((entry, originalPosition) => {
-        const idx = styleLabels.indexOf(entry.label);
-
         return {
             entry,
             originalPosition,
-            sortIdx: idx !== -1 ? idx : Number.POSITIVE_INFINITY
+            sortIdx: styleLabels.indexOf(entry.label)
         };
     }).sort(
         (a, b) => a.sortIdx - b.sortIdx || a.originalPosition - b.originalPosition
