@@ -14,7 +14,7 @@ describe("src/shared/modules/resize/components/ResizeHandle.vue", () => {
         setSecondaryMenuWidthSpy;
 
     /**
-     *
+     * helper function to set the geometry of an element by defining its offsetWidth, offsetHeight, offsetLeft, and offsetTop properties
      */
     function setElementGeometry (element, {width = 300, height = 200, left = 10, top = 20} = {}) {
         Object.defineProperty(element, "offsetWidth", {configurable: true, value: width});
@@ -24,7 +24,7 @@ describe("src/shared/modules/resize/components/ResizeHandle.vue", () => {
     }
 
     /**
-     *
+     * create a test store with spies for the mutations that the component commits to update menu widths
      */
     function createTestStore () {
         return createStore({
@@ -46,7 +46,7 @@ describe("src/shared/modules/resize/components/ResizeHandle.vue", () => {
     }
 
     /**
-     *
+     * helper function to mount the component with default props and the test store, and reset the spies before each test
      */
     function mountComponent (props = {}) {
         const store = createTestStore();
@@ -81,7 +81,6 @@ describe("src/shared/modules/resize/components/ResizeHandle.vue", () => {
     });
 
     afterEach(() => {
-        sinon.restore();
         if (wrapper) {
             wrapper.unmount();
             wrapper = null;
