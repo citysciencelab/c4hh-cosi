@@ -221,14 +221,70 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
         it("createLegend with styleObject and legend true", async () => {
             attributes.legend = true;
             const layerWrapper = new Layer2dVectorGeojson(attributes),
-                legendInformation = {
-                    "the": "legend Information"
-                };
+                legendInformation = [
+                    {label: "legend Information", img: "legend.png"}
+                ];
 
             sinon.stub(createStyle, "returnLegendByStyleId").returns({legendInformation});
             sinon.stub(getGeometryTypeFromService, "getGeometryTypeFromWFS");
 
             expect(await layerWrapper.createLegend()).to.deep.equals(legendInformation);
+        });
+
+        it("createLegend should sort legend entries by style legendValue order", async () => {
+            const styleObj = {
+                styleId: "styleId",
+                rules: [
+                    {style: {legendValue: "Second"}},
+                    {style: {legendValue: "First"}},
+                    {style: {legendValue: "Third"}}
+                ]
+            };
+            const legendInformation = [
+                {label: "Third", img: "third.png"},
+                {label: "First", img: "first.png"},
+                {label: "Second", img: "second.png"}
+            ];
+
+            attributes.legend = true;
+            styleList.returnStyleObject.returns(styleObj);
+            sinon.stub(createStyle, "returnLegendByStyleId").resolves({legendInformation});
+            sinon.stub(getGeometryTypeFromService, "getGeometryTypeFromWFS");
+
+            const layerWrapper = new Layer2dVectorGeojson(attributes);
+
+            expect(await layerWrapper.createLegend()).to.deep.equals([
+                {label: "Second", img: "second.png"},
+                {label: "First", img: "first.png"},
+                {label: "Third", img: "third.png"}
+            ]);
+        });
+
+        it("createLegend should keep original order for same sort index", async () => {
+            const styleObj = {
+                styleId: "styleId",
+                rules: [
+                    {style: {legendValue: "Known"}}
+                ]
+            };
+            const legendInformation = [
+                {label: "Unknown A", img: "a.png"},
+                {label: "Known", img: "known.png"},
+                {label: "Unknown B", img: "b.png"}
+            ];
+
+            attributes.legend = true;
+            styleList.returnStyleObject.returns(styleObj);
+            sinon.stub(createStyle, "returnLegendByStyleId").resolves({legendInformation});
+            sinon.stub(getGeometryTypeFromService, "getGeometryTypeFromWFS");
+
+            const layerWrapper = new Layer2dVectorGeojson(attributes);
+
+            expect(await layerWrapper.createLegend()).to.deep.equals([
+                {label: "Unknown A", img: "a.png"},
+                {label: "Unknown B", img: "b.png"},
+                {label: "Known", img: "known.png"}
+            ]);
         });
     });
 });
