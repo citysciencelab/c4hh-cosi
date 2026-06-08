@@ -136,13 +136,25 @@ export default {
          * @return {void}
          */
         discardStory () {
+            const chapterCount = this.story.chapters.length;
+
+            for (let i = 0; i < chapterCount; i++) {
+                this.deleteChapter(0);
+            }
+
+            if (this.imageSrc) {
+                this.removeImageAsset(this.imageSrc);
+            }
+
             this.title = "";
             this.description = "";
+            this.author = "";
             this.imageAlt = "";
             this.imageCopyright = "";
             this.imageSrc = "";
-            this.author = "";
+            this.imageLoaded = false;
             this.chapterContent = [];
+            this.story.chapters = [];
         },
 
         /**
@@ -418,7 +430,7 @@ export default {
                 :text="$t('additional:modules.storyCreator.addChapter')"
                 @click="addChapter"
             />
-            <div class="d-flex flex-column align-items-center pt-3">
+            <div class="d-flex flex-column align-items-center pt-5">
                 <FlatButton
                     :icon="'bi-collection-play'"
                     :aria-label="$t('additional:modules.storyCreator.preview')"

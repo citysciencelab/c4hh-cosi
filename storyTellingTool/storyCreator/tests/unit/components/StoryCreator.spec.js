@@ -32,6 +32,9 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                             mutations: {
                                 setCurrentView (state, value) {
                                     state.currentView = value;
+                                },
+                                removeImageAsset (state, id) {
+                                    delete state.imageAssetsById[id];
                                 }
                             },
                             state: {
@@ -165,18 +168,22 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                 await wrapper.setData({
                     title: "Test Story",
                     description: "This is a test story.",
+                    author: "Test Author",
                     imageAlt: "Test Alt",
                     imageCopyright: "Test Copyright",
                     imageSrc: "Test Src",
+                    imageLoaded: true,
                     chapterContent: [{title: "Test Chapter", text: "Test Text"}]
                 });
                 wrapper.vm.discardStory();
 
                 expect(wrapper.vm.title).to.equal("");
                 expect(wrapper.vm.description).to.equal("");
+                expect(wrapper.vm.author).to.equal("");
                 expect(wrapper.vm.imageAlt).to.equal("");
                 expect(wrapper.vm.imageCopyright).to.equal("");
                 expect(wrapper.vm.imageSrc).to.equal("");
+                expect(wrapper.vm.imageLoaded).to.equal(false);
                 expect(wrapper.vm.chapterContent).to.deep.equal([]);
             });
         });
