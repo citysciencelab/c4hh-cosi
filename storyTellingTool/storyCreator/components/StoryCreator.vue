@@ -45,8 +45,34 @@ export default {
             "story"
         ]),
         ...mapGetters("Modules/StoryManager", [
+            "currentStoryIndex",
             "storyList"
         ])
+    },
+    watch: {
+        /**
+         * Loads the data from current story with index in story list.
+         * @param {Number} val - The current story index.
+         * @returns {void}
+         */
+        currentStoryIndex: {
+            handler (val) {
+                if (typeof val !== "number") {
+                    return;
+                }
+
+                this.title = this.storyList[val]?.story?.title;
+                this.description = this.storyList[val]?.story?.description;
+                this.imageAlt = this.storyList[val]?.story?.imageAlt;
+                this.imageCopyright = this.storyList[val]?.story?.imageCopyright;
+                this.imageSrc = this.storyList[val]?.story?.imageSrc;
+                this.author = this.storyList[val]?.story?.author;
+                this.chapterContent = this.storyList[val]?.story?.chapters;
+                this.setImageAssetsById(this.storyList[val]?.imageAssetsById);
+                this.updateStory();
+            },
+            immediate: true
+        }
     },
     mounted () {
         this.updateStory();
@@ -59,9 +85,11 @@ export default {
         ]),
         ...mapMutations("Modules/StoryCreator", [
             "removeImageAsset",
-            "setCurrentView"
+            "setCurrentView",
+            "setImageAssetsById"
         ]),
         ...mapMutations("Modules/StoryManager", [
+            "setCurrentStoryIndex",
             "setStoryList"
         ]),
 
@@ -209,15 +237,25 @@ export default {
             const storySnapshot = JSON.parse(JSON.stringify(this.story)),
                 imageAssetsSnapshot = {...this.imageAssetsById};
 
-            this.setStoryList([
-                ...this.storyList,
-                {
+            if (typeof this.currentStoryIndex !== "number") {
+                this.setStoryList([
+                    ...this.storyList,
+                    {
+                        story: storySnapshot,
+                        imageAssetsById: imageAssetsSnapshot
+                    }
+                ]);
+            }
+            else {
+                this.storyList[this.currentStoryIndex] = {
                     story: storySnapshot,
                     imageAssetsById: imageAssetsSnapshot
-                }
-            ]);
+                };
+            }
+
             this.changeCurrentComponent({type: "storyManager", side: "secondaryMenu", props: {name: "additional:modules.storyManager.title"}});
             this.setNavigationHistoryBySide({side: "secondaryMenu", newHistory: [{type: "root", props: []}]});
+            this.setCurrentStoryIndex(undefined);
         },
 
         /**

@@ -49,14 +49,19 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                         StoryManager: {
                             namespaced: true,
                             getters: {
+                                currentStoryIndex: (state) => state.currentStoryIndex,
                                 storyList: (state) => state.storyList
                             },
                             mutations: {
+                                setCurrentStoryIndex (state, value) {
+                                    state.currentStoryIndex = value;
+                                },
                                 setStoryList (state, value) {
                                     state.storyList = value;
                                 }
                             },
                             state: {
+                                currentStoryIndex: undefined,
                                 storyList: []
                             }
                         }
@@ -354,6 +359,19 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
         });
 
         describe("saveStory", () => {
+            it("should add a new story in story list", async () => {
+                wrapper.vm.saveStory();
+
+                expect(wrapper.vm.storyList.length).to.equal(1);
+            });
+
+            it("should update a story in story list", async () => {
+                wrapper.vm.setCurrentStoryIndex(0);
+                wrapper.vm.saveStory();
+
+                expect(wrapper.vm.storyList.length).to.equal(1);
+            });
+
             it("should call function updateStory", async () => {
                 const updateStorySpy = sinon.spy(wrapper.vm, "updateStory");
 

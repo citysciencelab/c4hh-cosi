@@ -24,9 +24,16 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                         StoryManager: {
                             namespaced: true,
                             getters: {
+                                currentStoryIndex: (state) => state.currentStoryIndex,
                                 storyList: (state) => state.storyList
                             },
+                            mutations: {
+                                setCurrentStoryIndex (state, value) {
+                                    state.storyList = value;
+                                }
+                            },
                             state: {
+                                currentStoryIndex: undefined,
                                 storyList: [
                                     {
                                         story: {
@@ -154,6 +161,23 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
 
                 expect(wrapper.vm.showImportError).to.be.true;
                 expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
+            });
+        });
+
+        describe("editStory", () => {
+            it("should call changeCurrentComponent when createNewStory is triggered", async () => {
+                const expectedPayload = {
+                    type: "storyCreator",
+                    side: "secondaryMenu",
+                    props: {
+                        name: "additional:modules.storyCreator.title"
+                    }
+                };
+
+                await wrapper.vm.editStory(1);
+
+                expect(changeCurrentComponentSpy.calledOnce).to.be.true;
+                expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal(expectedPayload);
             });
         });
     });

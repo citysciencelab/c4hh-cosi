@@ -28,26 +28,20 @@ export default {
     },
     methods: {
         ...mapActions("Menu", ["changeCurrentComponent"]),
-        ...mapMutations("Modules/StoryManager", ["setStoryList"]),
+        ...mapMutations("Modules/StoryManager", ["setCurrentStoryIndex", "setStoryList"]),
         /**
-         * Sanitizes story titles for use as file names.
-         * @param {String} title - Raw story title.
-         * @returns {String} Safe filename base.
+         * Changes the current menu component to the Story Creator to start a new story.
+         * @returns {void}
          */
-        toSafeFileName (title) {
-            const fallbackName = "story";
-
-            if (!title || typeof title !== "string") {
-                return fallbackName;
-            }
-
-            const safeName = title
-                .trim()
-                .replace(/[\\/:*?"<>|]+/g, "-")
-                .replace(/\s+/g, " ")
-                .slice(0, 120);
-
-            return safeName || fallbackName;
+        createNewStory () {
+            this.setCurrentStoryIndex(undefined);
+            this.changeCurrentComponent({
+                type: "storyCreator",
+                side: "secondaryMenu",
+                props: {
+                    name: "additional:modules.storyCreator.title"
+                }
+            });
         },
         /**
          * Downloads one story as ZIP from its stored export payload.
@@ -79,10 +73,12 @@ export default {
             URL.revokeObjectURL(objectURL);
         },
         /**
-         * Changes the current menu component to the Story Creator to start a new story.
+         * @param {Number} index - the index of the story in the list.
+         * Sets the current story index and opens story creator.
          * @returns {void}
          */
-        createNewStory () {
+        editStory (index) {
+            this.setCurrentStoryIndex(index);
             this.changeCurrentComponent({
                 type: "storyCreator",
                 side: "secondaryMenu",
@@ -134,6 +130,26 @@ export default {
             finally {
                 inputElement.value = "";
             }
+        },
+        /**
+         * Sanitizes story titles for use as file names.
+         * @param {String} title - Raw story title.
+         * @returns {String} Safe filename base.
+         */
+        toSafeFileName (title) {
+            const fallbackName = "story";
+
+            if (!title || typeof title !== "string") {
+                return fallbackName;
+            }
+
+            const safeName = title
+                .trim()
+                .replace(/[\\/:*?"<>|]+/g, "-")
+                .replace(/\s+/g, " ")
+                .slice(0, 120);
+
+            return safeName || fallbackName;
         }
     }
 };
@@ -191,7 +207,7 @@ export default {
             />
         </div>
         <InfoText
-            v-if="!storyList.length"
+            v-if="!storyList?.length"
             class="mb-4"
             :text="$t('additional:modules.storyManager.emptyStory')"
         />
@@ -210,7 +226,7 @@ export default {
                     :alt-text="storyEntry?.story?.imageAlt"
                     :card-items="getCardItems(storyEntry?.story)"
                     :editable="true"
-                    @edit="() => ''"
+                    @edit="() => editStory(index)"
                     @download="() => downloadStory(storyEntry)"
                 />
             </div>
