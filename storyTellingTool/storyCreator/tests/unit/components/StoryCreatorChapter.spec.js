@@ -139,9 +139,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
         it("shows the position hint if positionChanged is true", async () => {
             await wrapper.setData({
-                coordinate: "1,2",
+                coordinate: [1, 2],
                 zoomlevel: "5",
-                confirmedCoordinate: "3,4",
+                confirmedCoordinate: [3, 4],
                 confirmedZoomlevel: "5"
             });
             await wrapper.vm.$nextTick();
@@ -150,9 +150,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
         it("disables the FlatButton if isButtonDisabled is true", async () => {
             await wrapper.setData({
-                coordinate: "1,2",
+                coordinate: [1, 2],
                 zoomlevel: "5",
-                confirmedCoordinate: "1,2",
+                confirmedCoordinate: [1, 2],
                 confirmedZoomlevel: "5"
             });
             await wrapper.vm.$nextTick();
@@ -165,39 +165,39 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
     describe("Computed", () => {
         describe("positionChanged", () => {
             it("returns false if no confirmed values", () => {
-                wrapper.setData({coordinate: "", zoomlevel: "", confirmedCoordinate: "", confirmedZoomlevel: ""});
+                wrapper.setData({coordinate: [], zoomlevel: "", confirmedCoordinate: [], confirmedZoomlevel: ""});
                 expect(wrapper.vm.positionChanged).to.be.false;
             });
 
             it("returns true if coordinate or zoomlevel changed", () => {
-                wrapper.setData({coordinate: "1,2", zoomlevel: "5", confirmedCoordinate: "3,4", confirmedZoomlevel: "5"});
+                wrapper.setData({coordinate: [1, 2], zoomlevel: "5", confirmedCoordinate: [3, 4], confirmedZoomlevel: "5"});
                 expect(wrapper.vm.positionChanged).to.be.true;
             });
 
             it("returns false if coordinate and zoomlevel are unchanged", () => {
-                wrapper.setData({coordinate: "1,2", zoomlevel: "5", confirmedCoordinate: "1,2", confirmedZoomlevel: "5"});
+                wrapper.setData({coordinate: [1, 2], zoomlevel: "5", confirmedCoordinate: [1, 2], confirmedZoomlevel: "5"});
                 expect(wrapper.vm.positionChanged).to.be.false;
             });
 
             it("returns false if no confirmed values", () => {
-                wrapper.setData({coordinate: "", zoomlevel: "", confirmedCoordinate: "", confirmedZoomlevel: ""});
+                wrapper.setData({coordinate: [], zoomlevel: "", confirmedCoordinate: [], confirmedZoomlevel: ""});
                 expect(wrapper.vm.isButtonDisabled).to.be.false;
             });
         });
 
         describe("isButtonDisabled", () => {
             it("returns false if no confirmed values", () => {
-                wrapper.setData({coordinate: "", zoomlevel: "", confirmedCoordinate: "", confirmedZoomlevel: ""});
+                wrapper.setData({coordinate: [], zoomlevel: "", confirmedCoordinate: [], confirmedZoomlevel: ""});
                 expect(wrapper.vm.isButtonDisabled).to.be.false;
             });
 
             it("returns true if coordinate and zoomlevel are unchanged", () => {
-                wrapper.setData({coordinate: "1,2", zoomlevel: "5", confirmedCoordinate: "1,2", confirmedZoomlevel: "5"});
+                wrapper.setData({coordinate: [1, 2], zoomlevel: "5", confirmedCoordinate: [1, 2], confirmedZoomlevel: "5"});
                 expect(wrapper.vm.isButtonDisabled).to.be.true;
             });
 
             it("isButtonDisabled returns false if coordinate or zoomlevel changed", () => {
-                wrapper.setData({coordinate: "1,2", zoomlevel: "6", confirmedCoordinate: "1,2", confirmedZoomlevel: "5"});
+                wrapper.setData({coordinate: [1, 2], zoomlevel: "6", confirmedCoordinate: [1, 2], confirmedZoomlevel: "5"});
                 expect(wrapper.vm.isButtonDisabled).to.be.false;
             });
         });
@@ -368,7 +368,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             it("should set the attribute to current chapter", async () => {
                 await wrapper.setData({
                     title: "title",
-                    confirmedCoordinate: "123, 456",
+                    confirmedCoordinate: [123, 456],
                     confirmedZoomlevel: 2,
                     selectedLayer: [{layerId: 1}, {layerId: 2}],
                     selectedTool: {toolId: "tool"}
@@ -380,7 +380,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     content: [],
                     title: "title",
                     map: {
-                        "center": "123, 456",
+                        "center": [123, 456],
                         "zoomLevel": 2,
                         "layers": [1, 2],
                         "tool": "tool"
@@ -394,7 +394,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 content: [],
                                 title: "title",
                                 map: {
-                                    "center": "123, 456",
+                                    "center": [123, 456],
                                     "zoomLevel": 2,
                                     "layers": [1, 2],
                                     "tool": "tool"

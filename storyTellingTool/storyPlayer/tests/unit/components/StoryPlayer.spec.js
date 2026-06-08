@@ -3,16 +3,18 @@ import {expect} from "chai";
 import sinon from "sinon";
 import {createStore} from "vuex";
 
-import StoryPlayer from "../../../components/storyPlayer/StoryPlayer.vue";
+import StoryPlayer from "../../../components/StoryPlayer.vue";
 
 describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
     let wrapper,
         store,
-        originalXMLHttpRequest;
+        originalXMLHttpRequest,
+        originalIntersectionObserver;
 
     beforeEach(() => {
         // Save original XMLHttpRequest
         originalXMLHttpRequest = global.XMLHttpRequest;
+        originalIntersectionObserver = global.IntersectionObserver;
 
         // Mock XMLHttpRequest
         global.XMLHttpRequest = class {
@@ -72,21 +74,59 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             }
         };
 
+        // Mock IntersectionObserver for jsdom test environment
+        global.IntersectionObserver = class {
+            /**
+             * mock implementation to satisfy linter
+             */
+            constructor () {
+                return null;
+            }
+            /**
+             * mock implementation to satisfy linter
+             */
+            observe () {
+                return null;
+            }
+            /**
+             * mock implementation to satisfy linter
+             */
+            unobserve () {
+                return null;
+            }
+            /**
+             * mock implementation to satisfy linter
+             */
+            disconnect () {
+                return null;
+            }
+            /**
+             * mock implementation to satisfy linter
+             */
+            takeRecords () {
+                return [];
+            }
+        };
+
+        if (typeof window !== "undefined") {
+            window.IntersectionObserver = global.IntersectionObserver;
+        }
+
         store = createStore({
             modules: {
                 Modules: {
                     namespaced: true,
                     modules: {
-                        DataNarrator: {
+                        StoryPlayer: {
                             namespaced: true,
                             state: () => ({
                                 showLoadingSpinner: false,
                                 autoplay: true,
                                 storyConf: {
                                     title: "Geschichten mit Karten erzählen",
-                                    steps: [
-                                        {title: "Step 1", layers: [1]},
-                                        {title: "Step 2", layers: [2]}
+                                    chapters: [
+                                        {title: "Chapter 1", layers: [1], content: []},
+                                        {title: "Chapter 2", layers: [2], content: []}
                                     ],
                                     displayType: "dipas"
                                 },
@@ -99,7 +139,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                                 storyConf: state => state.storyConf,
                                 mode: state => state.mode,
                                 storyConfJson: state => state.storyConfJson,
-                                dataNarratorMenuSide: () => "secondaryMenu"
+                                storyPlayerMenuSide: () => "secondaryMenu"
                             },
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {
@@ -153,7 +193,18 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
 
         wrapper = shallowMount(StoryPlayer, {
             props: {
-                storyConfPath: null
+                storyConfProp: {
+                    title: "Geschichten mit Karten erzählen",
+                    chapters: [
+                        {title: "Chapter 1", layers: [1], content: []},
+                        {title: "Chapter 2", layers: [2], content: []}
+                    ],
+                    displayType: "dipas",
+                    author: "Test Author",
+                    created: "2026-06-08",
+                    description: "Test Description"
+                },
+                imageAssetsById: {}
             },
             global: {
                 mocks: {
@@ -191,6 +242,11 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
 
         // Restore original XMLHttpRequest
         global.XMLHttpRequest = originalXMLHttpRequest;
+        global.IntersectionObserver = originalIntersectionObserver;
+
+        if (typeof window !== "undefined") {
+            window.IntersectionObserver = originalIntersectionObserver;
+        }
     });
 
     it("StoryPlayer should exist", async () => {
@@ -222,34 +278,30 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
 
     it("should display the correct chapter number in the sticky header", async () => {
         wrapper.vm.showStickyHeader = true;
-        wrapper.vm.currentStepIndex = 1;
-        wrapper.vm.steps = [
-            {title: "Step 1"},
-            {title: "Step 2"},
-            {title: "Step 3"}
-        ];
+        wrapper.vm.currentChapterIndex = 1;
         await wrapper.vm.$nextTick();
         const chapterText = wrapper.find(".number-of-chapters").text();
 
-        expect(chapterText).to.include("Kapitel 2 von 3");
+        expect(chapterText).to.include("Kapitel 2 von 2");
     });
 
-    it("renders step titles in the DOM from mocked steps", () => {
+    it("renders step titles in the DOM from mocked chapters", () => {
         const stepElements = wrapper.findAll(".stepper");
 
-        wrapper.vm.steps.forEach(step => {
-            const el = stepElements.find(e => e.text().includes(step.title));
+        wrapper.vm.storyConf.chapters.forEach(chapter => {
+            const el = stepElements.find(e => e.text().includes(chapter.title));
 
             expect(el).to.exist;
         });
 
-        expect(stepElements.length).to.equal(wrapper.vm.steps.length);
+        expect(stepElements.length).to.equal(wrapper.vm.storyConf.chapters.length);
     });
 
     it("each .stepper has correct index and class for first/last step", () => {
         const stepElements = wrapper.findAll(".stepper");
+        const chaptersLength = wrapper.vm.storyConf.chapters.length;
 
-        expect(stepElements.length).to.equal(wrapper.vm.steps.length);
+        expect(stepElements.length).to.equal(chaptersLength);
 
         stepElements.forEach((el, idx) => {
             // Check firstStep class
@@ -261,7 +313,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             }
 
             // Check lastStep class
-            if (idx === wrapper.vm.steps.length - 1) {
+            if (idx === chaptersLength - 1) {
                 expect(el.classes()).to.include("lastStep");
             }
             else {
@@ -270,14 +322,14 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
         });
     });
 
-    it("should call loadStep when currentStepIndex changes", async () => {
-        const loadStepSpy = sinon.spy(wrapper.vm, "loadStep");
+    it("should call loadChapter when currentChapterIndex changes", async () => {
+        const loadChapterSpy = sinon.spy(wrapper.vm, "loadChapter");
 
-        wrapper.vm.currentStepIndex = 2;
+        wrapper.vm.currentChapterIndex = 1;
         await wrapper.vm.$nextTick();
 
-        expect(loadStepSpy.called).to.be.true;
-        loadStepSpy.restore();
+        expect(loadChapterSpy.called).to.be.true;
+        loadChapterSpy.restore();
     });
 
     it("should activate tool when activateTool is called", () => {
@@ -306,49 +358,8 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
         toggleLayerStub.restore();
     });
 
-    it("should createStepArray flatten steps", () => {
-        const steps = [
-            {title: "Step 1"},
-            {title: "Step 2",
-                steps: [
-                    {title: "Step 2.1"}
-                ]
-            },
-            {title: "Step 3"}
-        ];
-
-        wrapper.vm.steps = [];
-        wrapper.vm.createStepArray(steps);
-        expect(wrapper.vm.steps.length).to.equal(4);
-        expect(wrapper.vm.steps[0].title).to.equal("Step 1");
-        expect(wrapper.vm.steps[1].title).to.equal("Step 2");
-        expect(wrapper.vm.steps[2].title).to.equal("Step 2.1");
-        expect(wrapper.vm.steps[3].title).to.equal("Step 3");
-    });
-
-    it("should assignDepth add depth property", () => {
-        const arr = [
-            {title: "Step 1",
-                steps: [{title: "Step 1.1"}
-                ]},
-            {title: "Step 2"}
-        ];
-
-        wrapper.vm.assignDepth(arr);
-
-        expect(arr[0].depth).to.equal(0);
-        expect(arr[0].steps[0].depth).to.equal(1);
-        expect(arr[1].depth).to.equal(0);
-    });
-
-    it("should return storyConfURL from URL parameter if storyConfJson is set in config.json is not set", () => {
-        wrapper.vm.$store.state.storyConfJson = null;
-
-        // Stub the getConfPathfromUrl method to return the mocked URL parameter
-        const stub = sinon.stub(wrapper.vm, "getConfPathfromUrl").returns("mockConfigJsStoryConf.json");
-
+    it("should return storyConfPath from store when available", () => {
+        // storyConfJson is set in the store state
         expect(wrapper.vm.storyConfPath).to.equal("mockConfigJsStoryConf.json");
-
-        stub.restore();
     });
 });

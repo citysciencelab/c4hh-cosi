@@ -248,6 +248,10 @@
     "path": "storyTellingTool/storySelector",
     "type": "tool"
   },
+  "storyPlayer": {
+    "path": "storyTellingTool/storyPlayer",
+    "type": "tool"
+  },
   "storyCreator": {
     "path": "storyTellingTool/storyCreator",
     "type": "tool"

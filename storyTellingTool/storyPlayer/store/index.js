@@ -1,6 +1,6 @@
-import getters from "./gettersDataNarrator.js";
-import state from "./stateDataNarrator.js";
-import mutations from "./mutationsDataNarrator.js";
+import getters from "./getters.js";
+import state from "./state.js";
+import mutations from "./mutations.js";
 
 export default {
     namespaced: true,

@@ -1,16 +1,16 @@
 import {generateSimpleGetters} from "@shared/js/utils/generators.js";
-import state from "./stateDataNarrator.js";
+import state from "./state.js";
 
 const getters = {
     ...generateSimpleGetters(state),
     /**
-     * Determines on which menu side the dataNarrator is located.
-     * @param {Object} state - The local state of the dataNarrator module
-     * @param {Object} getters - The local getters of the dataNarrator module
+     * Determines on which menu side the storyPlayer is located.
+     * @param {Object} state - The local state of the storyPlayer module
+     * @param {Object} getters - The local getters of the storyPlayer module
      * @param {Object} rootState - The root state of the Vuex store
      * @returns {String} "mainMenu", "secondaryMenu" or "" depending on where the tool is located
      */
-    dataNarratorMenuSide (___, __, _, rootGetters) {
+    storyPlayerMenuSide (___, __, _, rootGetters) {
         let isInMainMenu = false,
             isInSecondaryMenu = false;
 

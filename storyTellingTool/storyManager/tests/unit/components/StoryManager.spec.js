@@ -29,6 +29,9 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                             },
                             mutations: {
                                 setCurrentStoryIndex (state, value) {
+                                    state.currentStoryIndex = value;
+                                },
+                                setStoryList (state, value) {
                                     state.storyList = value;
                                 }
                             },

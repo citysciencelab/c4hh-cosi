@@ -319,7 +319,7 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                 const val = {
                     map: {
                         layers: ["1", "2"],
-                        center: "1, 2",
+                        center: [1, 2],
                         tool: "tool"
                     }
                 };

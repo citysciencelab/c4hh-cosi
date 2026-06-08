@@ -11,7 +11,7 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import store from "@appstore/index.js";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
-import StoryPlayer from "../../storyPlayer/components/storyPlayer/StoryPlayer.vue";
+import StoryPlayer from "../../storyPlayer/components/StoryPlayer.vue";
 
 export default {
     name: "StoryCreator",
@@ -47,7 +47,23 @@ export default {
         ...mapGetters("Modules/StoryManager", [
             "currentStoryIndex",
             "storyList"
-        ])
+        ]),
+        /**
+         * Returns the story object for preview with the current data.
+         * @returns {Object} the story object for preview.
+         */
+        previewStory () {
+            return {
+                title: this.title,
+                description: this.description,
+                author: this.author,
+                created: dayjs().format("DD.MM.YYYY"),
+                imageSrc: this.imageSrc,
+                imageAlt: this.imageAlt,
+                imageCopyright: this.imageCopyright,
+                chapters: this.chapterContent
+            };
+        }
     },
     watch: {
         /**
@@ -218,7 +234,7 @@ export default {
 
             return {
                 subject: val.map?.layers.length ? val.map.layers.length + " " + i18next.t("common:modules.layerSelection.datalayer") : "",
-                map: val.map?.center,
+                map: val.map?.center?.join?.(", ") || "",
                 tool: toolName
             };
         },
@@ -438,6 +454,7 @@ export default {
                     :aria-label="$t('additional:modules.storyCreator.preview')"
                     :text="$t('additional:modules.storyCreator.preview')"
                     :interaction="openPreview"
+                    :disabled="!title || !chapterContent?.length"
                 />
                 <FlatButton
                     :icon="'bi-cloud-arrow-down'"
@@ -460,7 +477,10 @@ export default {
         <div
             v-else-if="currentView === 'preview'"
         >
-            <StoryPlayer />
+            <StoryPlayer
+                :story-conf-prop="previewStory"
+                :image-assets-by-id="imageAssetsById"
+            />
         </div>
     </div>
 </template>

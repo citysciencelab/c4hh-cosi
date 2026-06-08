@@ -1,6 +1,6 @@
 /**
  * Masterportal state
- * @typedef {Object} dataNarrator State
+ * @typedef {Object} storyPlayer State
  * @property {String[]} supportedDevices list of devices supported
  * @property {String[]} supportedMapModes list of map modes supported
  * @property {String} type type of the component
@@ -18,10 +18,10 @@ const state = {
     // Masterportal state
     supportedDevices: ["Desktop", "Mobile", "Table"],
     supportedMapModes: ["2D", "3D"],
-    type: "dataNarrator",
-    id: "dataNarrator",
-    name: "additional:modules.dataNarrator.name",
-    description: "additional:modules.dataNarrator.description",
+    type: "storyPlayer",
+    id: "storyPlayer",
+    name: "additional:modules.storyPlayer.name",
+    description: "additional:modules.storyPlayer.description",
     icon: "bi-book",
 
     // Addon state

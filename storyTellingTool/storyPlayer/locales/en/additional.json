@@ -1,6 +1,6 @@
 {
     "modules": {
-        "dataNarrator": {
+        "storyPlayer": {
             "name": "Story Player",
             "description": "Please insert a description.",
             "tableOfContents": "Table of Contents",

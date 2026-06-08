@@ -1,13 +1,14 @@
 <script>
-import axios from "axios";
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import fetchDataFromUrl from "../../utils/getStoryFromUrl";
-import getters from "../../store/gettersDataNarrator";
-import mutations from "../../store/mutationsDataNarrator";
+import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
 
 export default {
     name: "StoryPlayer",
     props: {
+        imageAssetsById: {
+            type: Object,
+            default: null
+        },
         isMobileDevice: {
             type: Boolean,
             default: false
@@ -15,18 +16,20 @@ export default {
         screenOrientationType: {
             type: String,
             default: screen.orientation?.type
+        },
+        storyConfProp: {
+            type: Object,
+            default: null
         }
     },
     data () {
         return {
             currentIndex: -1,
-            currentStepIndex: 0,
+            currentChapterIndex: 0,
             loadedContent: null,
             isHovering: null,
             isChangeFrom3D: false,
             showMode: "",
-            steps: [],
-            activeTools: [],
             interval: null,
             toolBodyScrollTop: 0,
             scroller: null,
@@ -34,7 +37,22 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/DataNarrator", Object.keys(getters)),
+        ...mapGetters("Modules/StoryPlayer", [
+            "supportedDevices",
+            "supportedMapModes",
+            "type",
+            "id",
+            "name",
+            "description",
+            "icon",
+            "storyConfJson",
+            "autoplay",
+            "mode",
+            "storyPlayerMenuSide"
+        ]),
+        ...mapGetters("Modules/StoryPlayer", {
+            storyConfStore: "storyConf"
+        }),
         ...mapGetters([
             "layerConfigsByAttributes",
             "allLayerConfigs",
@@ -54,25 +72,28 @@ export default {
             return this.storyConfJson ? this.storyConfJson : this.getConfPathfromUrl();
         },
         /**
-         * The current selected step of the story.
-         * @returns {number} current step index
+         * The current selected chapter of the story.
+         * @returns {Object} current chapter
          */
-        currentStep () {
-            const stepindex = this.autoplay && this.steps.length > 0
-                ? this.steps[this.currentStepIndex]
-                : this.storyConf.steps[this.currentStepIndex];
-
-            return this.currentStepIndex !== null
-                ? this.storyConf && stepindex
-                : null;
+        currentChapter () {
+            if (!this.storyConf || !Array.isArray(this.storyConf.chapters) || this.currentChapterIndex < 0) {
+                return null;
+            }
+            return this.storyConf.chapters[this.currentChapterIndex];
         },
         /**
-         * Creates a shallow copy of the provided steps array.
-         * This is done to avoid mutating the original steps array when adding depth information.
-         * @returns {Array} A new array containing the copied steps.
+         * The story configuration object, either from the prop or the store.
+         * @returns {Object} the story configuration
          */
-        stepsCopy () {
-            return JSON.parse(JSON.stringify(this.storyConf.steps));
+        storyConf () {
+            return this.storyConfProp || this.storyConfStore || {};
+        },
+        /**
+         * The URL of the cover image.
+         * @returns {String} the URL of the cover image
+         */
+        coverImagePath () {
+            return this.imageAssetsById[this.storyConf.imageSrc]?.objectURL || "";
         },
         isMobilePortrait () {
             return this.isMobileDevice && this.screenOrientationType.startsWith("portrait");
@@ -83,19 +104,11 @@ export default {
          * Handles step changes.
          * @returns {void}
          */
-        currentStepIndex () {
-            this.loadStep();
+        currentChapterIndex () {
+            this.loadChapter();
         }
     },
     created () {
-        this.steps.forEach((step) => {
-            this.loadStoryContents(step.htmlFile).then(data => {
-                step.loadedContent = data?.replace(/<a(?![^>]*\btarget=)([^>]*)>/gi, "<a$1 target=\"_blank\">");
-            }).catch(err => {
-                console.error(err);
-            });
-        });
-
         const breakpoint = "(max-width: 768px)",
             mediaQuery = window.matchMedia(breakpoint),
             isMobile = mediaQuery.matches,
@@ -105,28 +118,11 @@ export default {
             this.applyMobileLandscapeLayout();
         }
     },
-    async mounted () {
-        if (this.storyConfPath && this.storyConfPath !== "") {
-            await fetchDataFromUrl(this.storyConfPath).then(loadedStoryConf => {
-                this.setStoryConf(loadedStoryConf);
-
-                let count = 0;
-
-                this.stepsCopy.forEach(() => {
-                    this.assignDepth(this.stepsCopy, 0, count);
-                    count += 1;
-                });
-
-                this.showMode = this.storyConf?.displayType ? this.storyConf.displayType : "dipas";
-                this.createStepArray(this.stepsCopy);
-                this.loadStep();
-            });
-        }
-
+    mounted () {
         this.scrollerSetup();
 
         const toolBody = document.getElementById("mp-body-secondaryMenu"),
-            coverCard = this.$el.querySelector(".cover-card");
+            coverCard = this.$refs.coverCard;
 
         if (toolBody) {
             toolBody.addEventListener("scroll", this.handleToolBodyScroll);
@@ -198,42 +194,31 @@ export default {
         }
     },
     methods: {
-        ...mapMutations("Modules/DataNarrator", Object.keys(mutations)),
+        ...mapMutations("Modules/StoryPlayer", [
+            "setSupportedDevices",
+            "setSupportedMapModes",
+            "setType",
+            "setId",
+            "setName",
+            "setDescription",
+            "setIcon",
+            "setStoryConf",
+            "setStoryConfJson",
+            "setAutoplay",
+            "setMode"
+        ]),
         ...mapMutations("Menu", ["setExpandedBySide"]),
         ...mapActions("Maps", ["changeMapMode"]),
         ...mapActions(["replaceByIdInLayerConfig"]),
         ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
-        /**
-         * Updates the step html content
-         * @param {Object} htmlFile name of the html file to load
-         * @returns {void}
-         */
-        async loadStoryContents (htmlFile) {
-            if (this.storyConf.htmlFolder && htmlFile) {
-                const storybasepath = this.storyConfPath.endsWith("/") ? this.storyConfPath : this.storyConfPath + "/",
-                    response = await axios.get(storybasepath + this.storyConf.htmlFolder + "/" + htmlFile),
-                    data = await response.data;
 
-                return data;
-            }
-            else if (htmlFile) {
-                return axios.get("./assets/steps/" + htmlFile)
-                    .then(response => {
-                        if (!response || !response.data) {
-                            throw new Error(`No data received for file: ${htmlFile}`);
-                        }
-                        return response.data;
-                    });
-            }
-
-            return null;
-        },
+        tipTapJsonToHtml,
         handleToolBodyScroll (event) {
             this.toolBodyScrollTop = event.target.scrollTop;
         },
         /**
          * Activates a tool
-         * @param {Object} toolId the id of the tool to activate
+         * @param {String} toolId the id of the tool to activate
          * @returns {void}
          */
         activateTool (toolId) {
@@ -241,7 +226,7 @@ export default {
                 return;
             }
 
-            const toolMenuSide = this.dataNarratorMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu",
+            const toolMenuSide = this.storyPlayerMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu",
                 toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
                 module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
                 name = module && module.name ? module.name : toolKey;
@@ -250,11 +235,11 @@ export default {
             this.changeCurrentComponent({type: toolId, side: toolMenuSide, props: {name}});
         },
         /**
-         * Deactivates a tool on the opposite menu side of where the dataNarrator is located
+         * Deactivates a tool on the opposite menu side of where the storyPlayer is located
          * @returns {void}
          */
         deactivateTool () {
-            const toolMenuSide = this.dataNarratorMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu";
+            const toolMenuSide = this.storyPlayerMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu";
 
             this.setExpandedBySide({expanded: false, side: toolMenuSide});
 
@@ -294,37 +279,37 @@ export default {
             this.toggleLayer(layer, false);
         },
         /**
-         * Sets up the tool window and content for the selected step.
+         * Sets up the tool window and content for the selected chapter.
          * @returns {void}
          */
-        async loadStep () {
-            if (!this.currentStep) {
+        async loadChapter () {
+            if (!this.currentChapter) {
                 return;
             }
 
             // Updates the tool width
-            if (this.currentStep.stepWidth) {
-                this.setInitialWidth(this.currentStep.stepWidth);
+            if (this.currentChapter.stepWidth) {
+                this.setInitialWidth(this.currentChapter.stepWidth);
             }
 
             // Toggles 3D map mode
-            if (this.currentStep.is3D && this.mode === "2D") {
+            if (this.currentChapter.is3D && this.mode === "2D") {
                 this.changeMapMode("3D");
             }
-            else if (!this.currentStep.is3D && this.mode === "3D") {
+            else if (!this.currentChapter.is3D && this.mode === "3D") {
                 this.isChangeFrom3D = true;
                 this.changeMapMode("2D");
             }
 
             // Updates the map center and zoom level for 2D
-            if (this.currentStep.centerCoordinate && this.currentStep.centerCoordinate.length > 0) {
-                if (this.currentStep.is3D) {
+            if (this.currentChapter.map?.center && this.currentChapter.map.center.length > 0) {
+                if (this.currentChapter.is3D) {
                     console.warn("Don't use centerCoordinate for 3D navigation.");
                 }
                 else {
                     const map = mapCollection.getMap("2D"),
                         mapView = typeof map?.getView === "function" ? map.getView() : undefined,
-                        zoomLevel = this.isMobilePortrait ? this.currentStep.zoomLevel - 1 : this.currentStep.zoomLevel;
+                        zoomLevel = this.isMobilePortrait ? this.currentChapter.map.zoomLevel - 1 : this.currentChapter.map.zoomLevel;
 
                     if (mapView) {
                         setTimeout(() => {
@@ -345,10 +330,10 @@ export default {
             }
 
             // Updates the map center for 3D
-            if (this.currentStep.navigation3D
-                && Object.prototype.hasOwnProperty.call(this.currentStep.navigation3D, "cameraPosition")
-                && this.currentStep.navigation3D.cameraPosition[0] !== null) {
-                const position = this.currentStep.navigation3D.cameraPosition,
+            if (this.currentChapter.navigation3D
+                && Object.prototype.hasOwnProperty.call(this.currentChapter.navigation3D, "cameraPosition")
+                && this.currentChapter.navigation3D.cameraPosition[0] !== null) {
+                const position = this.currentChapter.navigation3D.cameraPosition,
                     map3d = mapCollection.getMap("3D"),
                     camera = map3d.getCesiumScene().camera,
                     destination = Cesium.Cartesian3.fromDegrees(position[0], position[1], position[2]);
@@ -356,8 +341,8 @@ export default {
                 camera.flyTo({
                     destination: destination,
                     orientation: {
-                        heading: this.currentStep.navigation3D.heading,
-                        pitch: this.currentStep.navigation3D.pitch
+                        heading: this.currentChapter.navigation3D.heading,
+                        pitch: this.currentChapter.navigation3D.pitch
                     },
                     easingFunction: Cesium.EasingFunction.QUADRATIC_OUT
                 });
@@ -367,9 +352,9 @@ export default {
 
             // Updates the map layers
             for (const layer of layerList) {
-                const isStepLayer = (this.currentStep.layers || []).includes(
+                const isStepLayer = (this.currentChapter.map.layers || []).includes(
                     layer.id
-                ) || this.currentStep.layers.some(l => {
+                ) || this.currentChapter.map.layers.some(l => {
                     return Array.isArray(l) ? l.includes(layer.id) : false;
                 });
 
@@ -381,46 +366,11 @@ export default {
                 }
             }
 
-            if (!this.currentStep.is3D) {
-                // Activates or deactivates tools
-                const interactionAddons = this.currentStep.interactionAddons || [];
-
-                this.activeTools = interactionAddons;
-
+            if (!this.currentChapter.is3D) {
                 this.deactivateTool();
-
-                // Activate all tools of the current step
-                interactionAddons.forEach(this.activateTool);
-            }
-        },
-        /*
-         * Fills the steps array transforming the nested structure of the steps into a flat structure
-         * @returns {void}
-         */
-        createStepArray (steps) {
-            steps.forEach(s => {
-                const step = JSON.parse(JSON.stringify(s));
-
-                delete step.steps;
-                this.steps.push(step);
-
-                if (s.steps) {
-                    this.createStepArray(s.steps);
+                if (this.currentChapter.map?.tool) {
+                    this.activateTool(this.currentChapter.map.tool);
                 }
-            });
-        },
-        /*
-         * Adds the depth level of a story step to a copy of the storyConf
-         * @returns {void}
-         */
-        assignDepth (arr, depth = 0, index = 0) {
-
-            if (index < arr.length) {
-                arr[index].depth = depth;
-                if (arr[index].steps && arr[index].steps.length) {
-                    this.assignDepth(arr[index].steps, depth + 1, 0);
-                }
-                this.assignDepth(arr, depth, index + 1);
             }
         },
         /**
@@ -436,10 +386,10 @@ export default {
                 projection = mapView?.getProjection();
 
             if (projection && projection.getUnits() === "degrees") {
-                return this.currentStep.centerCoordinate;
+                return this.currentChapter.map.center;
             }
 
-            const zoomLevel = this.isMobilePortrait ? this.currentStep.zoomLevel - 1 : this.currentStep.zoomLevel,
+            const zoomLevel = this.isMobilePortrait ? this.currentChapter.map.zoomLevel - 1 : this.currentChapter.map.zoomLevel,
                 targetResolution = mapView?.getResolutionForZoom(zoomLevel),
                 rightPadding = this.expanded("secondaryMenu")
                     ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
@@ -448,7 +398,7 @@ export default {
                     ? document.getElementById("mp-menu-mainMenu").offsetWidth
                     : 20,
                 offsetPixels = (rightPadding - leftPadding) / 2,
-                center = this.currentStep.centerCoordinate;
+                center = this.currentChapter.map.center;
 
             if (this.isMobilePortrait) {
                 const mapHeight = map.getTargetElement().getBoundingClientRect().top,
@@ -473,9 +423,10 @@ export default {
             return urlParams.get("story");
         },
         scrollerSetup () {
-            const stepElements = Array.isArray(this.$refs.stepper) ? this.$refs.stepper : [this.$refs.stepper];
+            const stepRefs = Array.isArray(this.$refs.stepper) ? this.$refs.stepper : [this.$refs.stepper],
+                stepElements = stepRefs.filter(step => step && step.classList);
 
-            if (!stepElements || stepElements.length === 0) {
+            if (stepElements.length === 0) {
                 return;
             }
 
@@ -508,7 +459,9 @@ export default {
                     entries.forEach(entry => {
                         const idx = stepElements.indexOf(entry.target);
 
-                        intersectionRatios[idx] = entry.isIntersecting ? entry.intersectionRatio : 0;
+                        if (idx !== -1) {
+                            intersectionRatios[idx] = entry.isIntersecting ? entry.intersectionRatio : 0;
+                        }
                     });
 
                     // Find the step with the highest intersection ratio
@@ -536,7 +489,7 @@ export default {
 
                         if (this.currentIndex !== activeIndex) {
                             this.currentIndex = activeIndex;
-                            this.currentStepIndex = activeIndex;
+                            this.currentChapterIndex = activeIndex;
 
                             // Handle iframe aspect ratio and progress
                             const iframeElement = step.querySelector("iframe"),
@@ -568,7 +521,7 @@ export default {
 
 <template lang="html">
     <div
-        v-if="storyConf !== undefined && storyConf.steps && currentStep"
+        v-if="storyConf !== undefined && storyConf.chapters"
         id="story-player"
     >
         <div
@@ -579,18 +532,19 @@ export default {
                 {{ storyConf.title }}
             </h4>
             <span class="number-of-chapters">
-                Kapitel {{ currentStepIndex + 1 }} von {{ steps.length }}
+                Kapitel {{ currentChapterIndex + 1 }} von {{ storyConf.chapters.length }}
             </span>
         </div>
         <div
             class="d-flex w-100 player"
         >
             <div
+                ref="coverCard"
                 class="card cover-card"
             >
                 <img
-                    v-if="storyConf.coverImagePath && storyConf.coverImagePath.length"
-                    :src="storyConf.coverImagePath"
+                    v-if="coverImagePath && coverImagePath.length"
+                    :src="coverImagePath"
                     class="card-img-top"
                     :alt="storyConf.coverImageAlt"
                 >
@@ -617,20 +571,20 @@ export default {
                             <small
                                 class="author-name"
                             >
-                                LGV - Landesbetrieb Geoinformation und Vermessung
+                                {{ storyConf.author }}
                             </small>
                             <small
                                 class="created text-muted small"
                             >
-                                Erstellt am: 11.03.2026
+                                Erstellt am: {{ storyConf.created }}
                             </small>
                         </div>
                     </div>
                     <p
-                        v-if="storyConf.coverImageCaption"
+                        v-if="storyConf.description"
                         class="card-text mt-3"
                     >
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                        {{ storyConf.description }}
                     </p>
                 </div>
             </div>
@@ -639,40 +593,38 @@ export default {
                 tabindex="0"
             >
                 <div
-                    v-for="(step, index) in steps"
+                    v-for="(chapter, index) in storyConf.chapters"
                     ref="stepper"
-                    :key="step.title"
+                    :key="chapter.title"
                     class="stepper"
-                    :class="{firstStep: index === 0, lastStep: index === steps.length - 1}"
+                    :class="{firstStep: index === 0, lastStep: index === storyConf.chapters.length - 1}"
                 >
-                    <h2 v-if="step.title">
-                        {{ step.title }}
+                    <h2 v-if="chapter.title">
+                        {{ chapter.title }}
                     </h2>
 
-                    <figure
-                        v-if="step.titleImage"
-                        :alt="step.titleImageAlt"
-                    >
-                        <img
-                            v-if="step.titleImage && step.titleImage.length"
-                            :alt="step.titleImageAlt"
-                            :src="step.titleImage"
-                        >
-
-                        <figcaption v-if="step.titleImageCaption">
-                            <span> {{ step.titleImageCaption }}</span>
-                        </figcaption>
-
-                        <figcaption v-if="step.titleImageCopyright">
-                            <span> ©  {{ step.titleImageCopyright }}</span>
-                        </figcaption>
-                    </figure>
                     <div
                         class="story-player-content"
                     >
                         <div
-                            v-html="step.loadedContent"
-                        />
+                            v-for="(item, itemIndex) in chapter.content"
+                            :key="'content-' + itemIndex"
+                        >
+                            <div v-if="item.type === 'image'">
+                                <img
+                                    :src="imageAssetsById?.[item.id]?.objectURL"
+                                    :alt="item.attrs?.alt"
+                                    class="rounded w-100 d-block mb-2"
+                                >
+                                <div class="text-end small text-muted">
+                                    <span v-if="item.attrs?.copyright">© {{ item.attrs.copyright }}</span>
+                                </div>
+                            </div>
+                            <div
+                                v-else-if="item.type === 'doc'"
+                                v-html="tipTapJsonToHtml(item)"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

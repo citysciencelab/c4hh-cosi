@@ -40,9 +40,9 @@ export default {
                 index: null
             },
             content: [],
-            coordinate: "",
+            coordinate: [],
             zoomlevel: "",
-            confirmedCoordinate: "",
+            confirmedCoordinate: [],
             confirmedZoomlevel: "",
             layerList: [],
             toolList: [],
@@ -65,11 +65,11 @@ export default {
          * @returns {Boolean} True if position or zoom has changed, otherwise false.
          */
         positionChanged () {
-            if (!this.confirmedCoordinate || !this.confirmedZoomlevel) {
+            if (!this.confirmedCoordinate.length || !this.confirmedZoomlevel) {
                 return false;
             }
             return (
-                this.coordinate !== this.confirmedCoordinate || this.zoomlevel !== this.confirmedZoomlevel
+                !this.areCoordinatesEqual(this.coordinate, this.confirmedCoordinate) || this.zoomlevel !== this.confirmedZoomlevel
             );
         },
         /**
@@ -77,10 +77,10 @@ export default {
          * @returns {Boolean} True if the button should be disabled, otherwise false.
          */
         isButtonDisabled () {
-            if (!this.confirmedCoordinate || !this.confirmedZoomlevel) {
+            if (!this.confirmedCoordinate.length || !this.confirmedZoomlevel) {
                 return false;
             }
-            return this.coordinate === this.confirmedCoordinate && this.zoomlevel === this.confirmedZoomlevel;
+            return this.areCoordinatesEqual(this.coordinate, this.confirmedCoordinate) && this.zoomlevel === this.confirmedZoomlevel;
         },
         /**
          * Returns true when an add/edit component is currently open.
@@ -233,9 +233,22 @@ export default {
         getMapPosition () {
             this.updatePositionFromMap();
 
-            this.confirmedCoordinate = this.coordinate;
+            this.confirmedCoordinate = [...this.coordinate];
             this.confirmedZoomlevel = this.zoomlevel;
             this.showAlert = true;
+        },
+
+        /**
+         * Returns true when two coordinates contain the same values.
+         * @param {Number[]|null} left - The first coordinate.
+         * @param {Number[]|null} right - The second coordinate.
+         * @returns {Boolean} True if both coordinates match.
+         */
+        areCoordinatesEqual (left, right) {
+            return Array.isArray(left)
+                && Array.isArray(right)
+                && left.length === right.length
+                && left.every((value, index) => value === right[index]);
         },
 
         /**
@@ -354,7 +367,7 @@ export default {
          */
         saveChapter () {
             this.currentChapter.title = this.title;
-            this.currentChapter.map.center = this.confirmedCoordinate;
+            this.currentChapter.map.center = [...this.confirmedCoordinate];
             this.currentChapter.map.zoomLevel = this.confirmedZoomlevel;
             this.currentChapter.map.layers = this.selectedLayer.map(layer => layer.layerId);
             this.currentChapter.map.tool = this.selectedTool.toolId;
@@ -440,7 +453,7 @@ export default {
             }
 
             this.zoomlevel = mapView.getZoom();
-            this.coordinate = mapView.getCenter().join(", ");
+            this.coordinate = [...mapView.getCenter()];
         }
 
     }
@@ -466,11 +479,11 @@ export default {
                     :disabled="isButtonDisabled"
                     @click.native="getMapPosition()"
                 />
-                <div v-if="confirmedCoordinate !== '' && confirmedZoomlevel !== ''">
+                <div v-if="confirmedCoordinate.length && confirmedZoomlevel !== ''">
                     {{ $t("additional:modules.storyCreator.chapter.currentPosition") }}
                 </div>
                 <div
-                    v-if="confirmedCoordinate !== '' && confirmedZoomlevel !== ''"
+                    v-if="confirmedCoordinate.length && confirmedZoomlevel !== ''"
                     class="p-2 d-flex flex-row align-center"
                 >
                     <div class="p-1 fs-3">
@@ -478,7 +491,7 @@ export default {
                     </div>
                     <div class="ps-4 py-1 flex-grow-1">
                         <div class="label">
-                            {{ confirmedCoordinate }}
+                            {{ Array.isArray(confirmedCoordinate) ? confirmedCoordinate.join(", ") : "" }}
                         </div>
                         <div class="text">
                             {{ $t("additional:modules.storyCreator.chapter.zoomLevel") }} {{ confirmedZoomlevel }}
