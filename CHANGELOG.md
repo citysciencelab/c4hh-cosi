@@ -28,6 +28,7 @@
 
 ### Fixed
 - Issue \#1585: Fixed case where dragging for resizing menus continued after releasing mouse or touch outside browser window.
+- Issue \#1601: Improve attribute extraction in `getDescribeFeature` to handle mixed xml2json node shapes.
 - Issue \#1608: Fixed autoRefresh by reading source from OL Layer instead of cached layerSource to prevent stale source.
 - Issue \#1610: Menu/PortalFooter: Fixed navigation behavior for secondary GFI without a configured secondary menu and corrected footer layout offsets for small desktop breakpoints.
 - Issue \#1613: LayerSlider: Fixed layers not being hidden when moving the slider handle past them, causing previously active layers to remain visible. 

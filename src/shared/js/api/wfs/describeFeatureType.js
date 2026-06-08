@@ -1,6 +1,24 @@
 import axios from "axios";
 import xml2json from "@shared/js/utils/xml2json.js";
 import handleAxiosErrorModule from "@shared/js/utils/handleAxiosError.js";
+import isObject from "@shared/js/utils/isObject.js";
+
+/**
+ * Returns attributes from xml2json node regardless of shape.
+ * @param {Object} node - xml2json node.
+ * @returns {Object|undefined} node attributes.
+ */
+function getNodeAttributes (node) {
+    if (!isObject(node)) {
+        return undefined;
+    }
+
+    if (typeof node.getAttributes === "function") {
+        return node.getAttributes();
+    }
+
+    return node.attributes;
+}
 
 /**
  * Handles the WFS DescribeFeatureType request and returns the response.
@@ -53,12 +71,20 @@ export function getFeatureDescription (json, featureTypeName) {
     const description = [],
         // path to the featureTypes
         featureType = Array.isArray(json?.schema?.element)
-            ? json?.schema?.element?.find(element => element.attributes?.name === featureTypeName)
+            ? json?.schema?.element?.find(element => getNodeAttributes(element)?.name === featureTypeName)
             : json?.schema?.element;
 
     if (typeof featureType === "undefined") {
         console.error(`getFeatureDescription: FeatureType "${featureType}" was not found`);
         return undefined;
+    }
+
+    if (typeof featureType.complexType === "undefined") {
+        const featureTypeType = getNodeAttributes(featureType)?.type?.split(":")[1];
+
+        featureType.complexType = Array.isArray(json?.schema?.complexType)
+            ? json?.schema?.complexType?.find(complexType => getNodeAttributes(complexType)?.name === featureTypeType)
+            : json?.schema?.complexType;
     }
 
     // path to the feature attributes
@@ -68,7 +94,11 @@ export function getFeatureDescription (json, featureTypeName) {
     }
 
     featureType.complexType.complexContent.extension.sequence.element.forEach(attribute => {
-        description.push(attribute.getAttributes());
+        const attributeDescription = getNodeAttributes(attribute);
+
+        if (typeof attributeDescription === "object" && attributeDescription !== null) {
+            description.push(attributeDescription);
+        }
     });
 
     return description;
