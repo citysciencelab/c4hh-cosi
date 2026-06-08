@@ -27,12 +27,14 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
                             }),
                             getters: {
                                 searchAttributeResponse: () => mockSearchAttributeResponse,
-                                nameForArchiveId: () => (id) => {
+                                getNameForArchiveId: () => (id) => {
                                     return id;
                                 },
                                 archiveHasGeoref: () => (id) => {
                                     return id === "test";
-                                }
+                                },
+                                progressNow: () => -1,
+                                currentProgressValue: () => ""
                             }
                         }
                     }

@@ -36,8 +36,8 @@ export default {
         ...mapGetters("Modules/LzsResearchClient", [
             "selectedInstanceId",
             "getDetailsForSelectedInstanceId",
-            "nameForArchiveId",
-            "dataProtectionClassForArchiveId",
+            "getNameForArchiveId",
+            "getDataProtectionClassForArchiveId",
             "progressNow"
         ])
     },
@@ -90,6 +90,14 @@ export default {
 
             filteredHeaders.push(this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"));
 
+            if (this.showTableButtons.preview) {
+                filteredHeaders.push(this.$t("additional:modules.lzsResearchClient.tabs.archiveList.table.headers.preview"));
+            }
+
+            if (this.showTableButtons.download) {
+                filteredHeaders.push(this.$t("additional:modules.lzsResearchClient.tabs.archiveList.table.headers.download"));
+            }
+
             return filteredHeaders;
         },
         /**
@@ -116,7 +124,7 @@ export default {
 
                 attributes.push({
                     name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
-                    value: (dataset.contentFileSize / 1000000).toFixed(2)
+                    value: (dataset.contentFileSize / 1000000).toFixed(2).replace(".", ",")
                 });
 
                 results.push(
@@ -143,7 +151,7 @@ export default {
 
                     worldFileAttributes.push({
                         name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
-                        value: (dataset.georeferencePrimarydata.contentFileSize / 1000000).toFixed(2)
+                        value: (dataset.georeferencePrimarydata.contentFileSize / 1000000).toFixed(2).replace(".", ",")
                     });
 
                     results.push(
@@ -203,13 +211,13 @@ export default {
                 <tr>
                     <td>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.datasetInfoTable.archive") }}</td>
 
-                    <td>{{ nameForArchiveId(getDetailsForSelectedInstanceId?.archiveId) }}</td>
+                    <td>{{ getNameForArchiveId(getDetailsForSelectedInstanceId?.archiveId) }}</td>
                 </tr>
 
                 <tr>
                     <td>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.datasetInfoTable.datasetProtectionClass") }}</td>
 
-                    <td>{{ dataProtectionClassForArchiveId(getDetailsForSelectedInstanceId?.archiveId)?.name }}</td>
+                    <td>{{ getDataProtectionClassForArchiveId(getDetailsForSelectedInstanceId?.archiveId)?.name }}</td>
                 </tr>
 
                 <tr

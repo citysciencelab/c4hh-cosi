@@ -8,32 +8,24 @@ const getters = {
      * @param {Object} state - The Vuex state object.
      * @returns {function(string): string} - A function that takes an archiveId and returns the corresponding name, or an empty string if not found.
      */
-    nameForArchiveId: state => archiveId => {
-        const result = state.dataClassList?.filter((dataClass) => {
+    getNameForArchiveId: state => archiveId => {
+        const result = state.dataClassList?.find((dataClass) => {
             return dataClass.id === archiveId;
         });
 
-        if (result && result.length === 1) {
-            return result[0].name;
-        }
-
-        return "";
+        return result?.name ?? "";
     },
     /**
      * Returns the dataclass protection class for a given archive ID from the state's dataClassList.
      * @param {Object} state - The Vuex state object.
      * @returns {function(string): string} - A function that takes an archiveId and returns the corresponding dataclass protection class, or an empty string if not found.
      */
-    dataProtectionClassForArchiveId: state => archiveId => {
-        const result = state.dataClassList?.filter((dataClass) => {
+    getDataProtectionClassForArchiveId: state => archiveId => {
+        const result = state.dataClassList?.find((dataClass) => {
             return dataClass.id === archiveId;
         });
 
-        if (result && result.length === 1) {
-            return result[0].highestActiveDataclassVersion.dataProtectionClass;
-        }
-
-        return "";
+        return result?.highestActiveDataclassVersion?.dataProtectionClass ?? "";
     },
     /**
      * Checks if the archive with the given ID has georeference information (EPSG code).
@@ -41,15 +33,11 @@ const getters = {
      * @returns {function(string): Boolean} - A function that takes an archiveId and returns true if the archive has an EPSG code, otherwise false.
      */
     archiveHasGeoref: state => archiveId => {
-        const result = state.dataClassList?.filter((dataClass) => {
+        const result = state.dataClassList?.find((dataClass) => {
             return dataClass.id === archiveId;
         });
 
-        if (result && result.length === 1) {
-            return result[0].highestActiveDataclassVersion.epsgcode !== null;
-        }
-
-        return false;
+        return result?.highestActiveDataclassVersion?.epsgcode !== null;
     },
     /**
      * Searches the object in the search result, according to the stored selectedInstanceId.
@@ -57,16 +45,35 @@ const getters = {
      * @returns {function(): Object | null} - A function that returns the data object for the stored selectedInstanceId, otherwise null.
      */
     getDetailsForSelectedInstanceId: state => {
-        const result = state.searchAttributeResponse?.filter((datasets) => {
+        const result = state.searchAttributeResponse?.find((datasets) => {
             return datasets.instanceId === state.selectedInstanceId;
         });
 
-        if (result) {
-            // it should not be more than one result since we filter by instanceId in the search functions
-            return result[0];
-        }
+        return result;
+    },
+    /**
+     * Returns the dossierIds for a given archive ID from the state's dataClassList.
+     * @param {Object} state - The Vuex state object.
+     * @returns {function(string): array} - A function that takes an archiveId and returns the corresponding dossierIds, or an empty array if not found.
+     */
+    getDossierIdsForArchiveId: state => archiveId => {
+        const result = state.dataClassList?.find((dataClass) => {
+            return dataClass.id === archiveId;
+        });
 
-        return null;
+        return result?.highestActiveDataclassVersion?.dossierIds ?? [];
+    },
+    /**
+     * Returns the dossierData for a given archive ID and dossier ID from the state's dataClassList.
+     * @param {Object} state - The Vuex state object.
+     * @returns {function(string, string): Object | false} - A function that takes an archiveId and a dossierId and returns the corresponding dossierData, or false if not found.
+     */
+    getDossierDataForArchiveId: state => (archiveId, dossierId) => {
+        const result = state.dataClassList?.find((dataClass) => {
+            return dataClass.id === archiveId;
+        });
+
+        return result?.highestActiveDataclassVersion?.dossierData?.[dossierId] ?? false;
     }
 };
 

@@ -65,14 +65,16 @@
                     "groupByLabel": "Group by",
                     "selectOptionLabel": "Select option",
                     "table": {
-                        "showPositionInMap": "Show / Hide position of dataset in map",
-                        "goToDetails": "Show details for this dataset",
-                        "showPreview": "Show preview",
-                        "download": "Download dataset",
-                        "headers": {
-                            "position": "Position",
-                            "details": "Details"
-                        }
+                      "showPositionInMap": "Show / Hide position of dataset in map",
+                      "goToDetails": "Show details for this dataset",
+                      "showPreview": "Show preview",
+                      "download": "Download dataset",
+                      "headers": {
+                        "position": "Position",
+                        "details": "Details",
+                        "download": "Download",
+                        "preview": "Preview"
+                      }
                     }
                 }
             },
@@ -82,6 +84,7 @@
               "progressAriaLabel": "Downloadprogress {{ percent }}%",
               "withoutArchive": "unknown archive",
               "withoutYear": "unknown year",
+              "metadataFolderName": "Metadata",
               "progress": {
                 "start": "Start collecting data and creating zip ...",
                 "fetchPrimaryData": "Getting info on files for {{ archiveName }} ...",

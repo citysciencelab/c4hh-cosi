@@ -1,3 +1,5 @@
+import {buildEndpointUrl} from "./buildEndpointUrl";
+
 const ALREADY_COMPRESSED = [
     "zip", "gz", "png", "jpg", "jpeg", "jp2", "pdf", "doc", "docx", "ppt", "pptx",
     "xls", "xlsx", "heic", "heif", "7z", "bz2", "rar", "gif", "webp", "webm",
@@ -78,12 +80,20 @@ async function fetchWithProgress (url, onProgress) {
 /**
  * Recursively set a value on a nested object using an array of path segments.
  *
+ * Creates intermediate plain objects as needed and assigns the provided value
+ * at the location described by parts. The final leaf is stored as an array
+ * [value, { level }] where level is determined from the file extension
+ * (non-compressed -> 6, already compressed -> 0).
+ *
+ * Keys that may lead to prototype pollution ("__proto__", "constructor", "prototype")
+ * or falsy/empty keys are ignored.
+ *
  * Example:
  *   setNested(obj, ['archiveName', 'jahrgang', 'file.txt'], Uint8Array)
  * results in:
- *   { archiveName: { jahrgang: { 'file.txt': Uint8Array } } }
+ *   { archiveName: { jahrgang: { 'file.txt': [Uint8Array, { level: 6 }] } } }
  *
- * @param {Object} obj - Root object to modify.
+ * @param {Object} obj - Root object to modify (mutated in place).
  * @param {string[]} parts - Array of path segments (folders and final filename).
  * @param {*} value - Value to assign at the nested location (e.g. Uint8Array).
  * @returns {void}
@@ -108,8 +118,38 @@ function setNested (obj, parts, value) {
     setNested(obj[head], rest, value);
 }
 
+/**
+ * Build a file information object used for archive creation and downloads.
+ *
+ * Creates a sanitized filename (replaces back/forward slashes), builds a download URL
+ * using buildEndpointUrl(filePath, { Token: token }), coerces fileSize to a Number,
+ * and returns an object containing pathParts, url, size and archiveId.
+ *
+ * @param {string} fileName - Original file name; falls back to "file" if falsy.
+ * @param {string} filePath - Server path or endpoint used to build the download URL.
+ * @param {string|number} fileSize - File size in bytes (string or number); will be coerced to Number.
+ * @param {string|number} archiveId - Identifier for the containing archive.
+ * @param {string} archiveName - Archive folder name to include as the first path part.
+ * @param {string|number} year - Year (or folder) to include as the second path part.
+ * @param {string} token - Access token appended to the built URL as the Token query parameter.
+ * @returns {{pathParts: string[], url: string, size: number, archiveId: (string|number)}} File info object.
+ */
+function buildFileInformationObject (fileName, filePath, fileSize, archiveId, archiveName, year, token) {
+    const safeFilename = (fileName || "file").replace(/[\\/]/g, "_"),
+        url = buildEndpointUrl(filePath, {Token: token}),
+        size = Number(fileSize) || 0;
+
+    return {
+        pathParts: [archiveName, year, safeFilename],
+        url: url,
+        size: size,
+        archiveId: archiveId
+    };
+}
+
 export {
     saveAs,
     fetchWithProgress,
-    setNested
+    setNested,
+    buildFileInformationObject
 };

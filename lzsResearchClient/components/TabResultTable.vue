@@ -434,9 +434,9 @@ export default {
                         }}
                     </td>
 
-                    <td>
+                    <td v-if="showButtons.georef">
                         <IconButton
-                            v-if="showButtons.georef && hasGeoRef"
+                            v-if="hasGeoRef"
                             :class-array="[
                                 'btn-light',
                                 'me-2',
@@ -452,9 +452,8 @@ export default {
                         />
                     </td>
 
-                    <td>
+                    <td v-if="showButtons.details">
                         <IconButton
-                            v-if="showButtons.details"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.goToDetails')"
                             icon="bi-arrow-right-circle"
@@ -462,9 +461,9 @@ export default {
                         />
                     </td>
 
-                    <td>
+                    <td v-if="showButtons.preview">
                         <IconButton
-                            v-if="showButtons.preview && dataset.hasPreview"
+                            v-if="dataset.hasPreview"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.showPreview')"
                             icon="bi-image"
@@ -472,9 +471,8 @@ export default {
                         />
                     </td>
 
-                    <td>
+                    <td v-if="showButtons.download">
                         <IconButton
-                            v-if="showButtons.download"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.download')"
                             icon="bi-file-earmark-arrow-down"

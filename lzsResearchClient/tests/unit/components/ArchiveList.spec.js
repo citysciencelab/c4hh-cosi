@@ -47,7 +47,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
                         LzsResearchClient: {
                             namespaced: true,
                             getters: {
-                                nameForArchiveId: () => (id) => {
+                                getNameForArchiveId: () => (id) => {
                                     return id;
                                 },
                                 archiveHasGeoref: () => (id) => {

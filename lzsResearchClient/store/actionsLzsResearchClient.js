@@ -1,6 +1,6 @@
 import axios from "axios";
 import {buildEndpointUrl} from "../utils/buildEndpointUrl";
-import {saveAs, fetchWithProgress, setNested} from "../utils/zipHelpers";
+import {saveAs, fetchWithProgress, setNested, buildFileInformationObject} from "../utils/zipHelpers";
 import {zip} from "fflate/browser";
 
 export default {
@@ -217,6 +217,33 @@ export default {
             });
     },
     /**
+     * Request metadata for a given dossier and add them to the store.
+     * @param {Object} context - Vuex action context (state, commit, dispatch).
+     * @param {Object} payload
+     * @param {String} payload.archiveId - Archive identifier to request dossier data for.
+     * @param {String} payload.dossierId - Dossier identifier to request metadata for.
+     */
+    async fetchDossierInformation ({state, commit, dispatch}, payload) {
+        const {archiveId, dossierId} = payload,
+            params = {
+                Token: state.requestToken,
+                f: "json",
+                preventCache: Date.now()
+            },
+            url = buildEndpointUrl(`${state.apiBasePath}/rest/dossier/${dossierId}`, params);
+
+        await axios.get(url)
+            .then(function (response) {
+                commit("addDossierDataToArchive", {
+                    archiveId: archiveId,
+                    dossierId: dossierId,
+                    dossierData: response?.data
+                });
+            }).catch(function (error) {
+                dispatch("axiosErrorHandling", error);
+            });
+    },
+    /**
      * Download the preview picture for a given primaryDataId and add it to the store.
      * Return already stored preview picture if available for the given primaryDataId
      * @param {Object} context - Vuex action context (state, dispatch).
@@ -372,7 +399,7 @@ export default {
         state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.start");
 
         for (const item of selectedFiles) {
-            const archiveName = getters.nameForArchiveId(item.archiveId) || i18next.t("additional:modules.lzsResearchClient.zipAndDownload.withoutArchive"),
+            const archiveName = getters.getNameForArchiveId(item.archiveId) || i18next.t("additional:modules.lzsResearchClient.zipAndDownload.withoutArchive"),
                 jahrgangAttr = item.attributes.find(a => a.id === "JAHRGANG"),
                 jahrgang = jahrgangAttr ? String(jahrgangAttr.value) : i18next.t("additional:modules.lzsResearchClient.zipAndDownload.withoutYear");
 
@@ -387,39 +414,70 @@ export default {
             }
 
             (item.primaryData || []).forEach(dataset => {
-                const safeFilename = (dataset.contentFilename || "file").replace(/[\\/]/g, "_"),
-                    url = buildEndpointUrl(
+                files.push(
+                    buildFileInformationObject(
+                        dataset.contentFilename || "file",
                         `${state.apiBasePath}/rest/primarydata/${item.archiveId}/${item.instanceId}/${dataset.primaryDataId}/content`,
-                        {Token: state.requestToken}
-                    ),
-                    size = Number(dataset.contentFileSize) || 0;
-
-                files.push({
-                    pathParts: [archiveName, jahrgang, safeFilename],
-                    url: url,
-                    size: size
-                });
+                        dataset.contentFileSize,
+                        item.archiveId,
+                        archiveName,
+                        jahrgang,
+                        state.requestToken
+                    )
+                );
 
                 if (dataset.georeferencePrimarydata) {
-                    const safeFilenameWorld = (dataset.georeferencePrimarydata.contentFilename || "file-world").replace(/[\\/]/g, "_"),
-                        urlWorld = buildEndpointUrl(
+                    files.push(
+                        buildFileInformationObject(
+                            dataset.georeferencePrimarydata.contentFilename || "file-world",
                             `${state.apiBasePath}/rest/primarydata/${item.archiveId}/${item.instanceId}/${dataset.georeferencePrimarydata.primaryDataId}/content`,
-                            {Token: state.requestToken}
-                        ),
-                        sizeWorld = Number(dataset.georeferencePrimarydata.contentFileSize) || 0;
-
-
-                    files.push({
-                        pathParts: [archiveName, jahrgang, safeFilenameWorld],
-                        url: urlWorld,
-                        size: sizeWorld
-                    });
+                            dataset.georeferencePrimarydata.contentFileSize,
+                            item.archiveId,
+                            archiveName,
+                            jahrgang,
+                            state.requestToken
+                        )
+                    );
                 }
             });
         }
 
-        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.downloading");
+        // add the metadata (in backend it is called 'dossier') to each archive, affected by the downloaded files
+        const archiveIdsInDownload = [...new Set(files.map(file => file.archiveId))];
 
+        for (const archiveId of archiveIdsInDownload) {
+            const dossierIds = getters.getDossierIdsForArchiveId(archiveId),
+                archiveName = getters.getNameForArchiveId(archiveId);
+
+            for (const dossierId of dossierIds) {
+                let dossierData = getters.getDossierDataForArchiveId(archiveId, dossierId);
+
+                if (!dossierData) {
+                    await dispatch("fetchDossierInformation", {
+                        archiveId: archiveId,
+                        dossierId: dossierId
+                    });
+
+                    dossierData = getters.getDossierDataForArchiveId(archiveId, dossierId);
+                }
+
+                if (dossierData) {
+                    files.push(
+                        buildFileInformationObject(
+                            dossierData.contentFilename || "metadata-file",
+                            `${state.apiBasePath}/rest/dossier/${dossierId}/content`,
+                            50000, // no content file size given for dossiers, use an estimated file size (50 kB)
+                            archiveId,
+                            archiveName,
+                            i18next.t("additional:modules.lzsResearchClient.zipAndDownload.metadataFolderName"),
+                            state.requestToken
+                        )
+                    );
+                }
+            }
+        }
+
+        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.downloading");
 
         // total known bytes from contentFileLength
         const knownTotalBytes = files.reduce((s, f) => s + (f.size || 0), 0);
@@ -484,7 +542,9 @@ export default {
             setNested(nested, item.pathParts, item.data);
         });
 
+        // eslint-disable-next-line require-atomic-updates
         state.progressNow = 85;
+        // eslint-disable-next-line require-atomic-updates
         state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.zipping");
 
         // create zip and trigger download

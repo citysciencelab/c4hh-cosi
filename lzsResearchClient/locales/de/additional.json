@@ -65,14 +65,16 @@
                     "groupByLabel": "Gruppieren nach",
                     "selectOptionLabel": "Option selektieren",
                     "table": {
-                        "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
-                        "goToDetails": "Details zum Datensatz anzeigen",
-                        "showPreview": "Vorschau anzeigen",
-                        "download": "Datensatz herunterladen",
-                        "headers": {
-                            "position": "Lage",
-                            "details": "Details"
-                        }
+                      "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
+                      "goToDetails": "Details zum Datensatz anzeigen",
+                      "showPreview": "Vorschau anzeigen",
+                      "download": "Datensatz herunterladen",
+                      "headers": {
+                        "position": "Lage",
+                        "details": "Details",
+                        "download": "Download",
+                        "preview": "Vorschau"
+                      }
                     }
                 }
             },
@@ -82,6 +84,7 @@
               "progressAriaLabel": "Downloadfortschritt {{ percent }}%",
               "withoutArchive": "unbekanntes Archiv",
               "withoutYear": "ohne Jahrgang",
+              "metadataFolderName": "Metadaten",
               "progress": {
                 "start": "Beginne Daten zu sammeln und das ZIP zu erzeugen ...",
                 "fetchPrimaryData": "Hole Infos über Dateien zu {{ archiveName }} ...",

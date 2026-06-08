@@ -24,7 +24,9 @@ describe("addons/lzsResearchClient/tests/unit/LzsResearchClient.spec.js", () => 
                                 showLoadingSpinner: state => state.showLoadingSpinner,
                                 errorMessage: () => "",
                                 globalError: state => state.globalError ?? null,
-                                requestToken: state => state.requestToken
+                                requestToken: state => state.requestToken,
+                                progressNow: () => -1,
+                                currentProgressValue: () => ""
                             },
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {

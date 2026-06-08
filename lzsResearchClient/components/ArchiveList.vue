@@ -56,7 +56,7 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
-            "nameForArchiveId",
+            "getNameForArchiveId",
             "archiveHasGeoref"
         ]),
         /**
@@ -374,7 +374,7 @@ export default {
                 <AccordionItem
                     :id="`${idPrefix}-item-${index}`"
                     class="archive-step"
-                    :title="nameForArchiveId(step.archiveId)"
+                    :title="getNameForArchiveId(step.archiveId)"
                     :is-open="openAllAccordions"
                     :coloured-header="true"
                 >

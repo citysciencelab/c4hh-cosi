@@ -40,6 +40,24 @@ const mutations = {
         }
     },
     /**
+     * Adds the fetched dossier data into the existing data class object.
+     * @param {Object} state - The current state object.
+     * @param {Object} dossierDataObj - The new data object to be added or updated.
+     */
+    addDossierDataToArchive (state, dossierDataObj) {
+        const archiveDataset = state.dataClassList?.find((dataset) => {
+            return dataset.id === dossierDataObj.archiveId;
+        });
+
+        if (archiveDataset) {
+            if (!archiveDataset.highestActiveDataclassVersion.dossierData) {
+                archiveDataset.highestActiveDataclassVersion.dossierData = {};
+            }
+
+            archiveDataset.highestActiveDataclassVersion.dossierData[dossierDataObj.dossierId] = dossierDataObj.dossierData;
+        }
+    },
+    /**
      * Filter the given search response so only the first entry for each unique instanceId remains,
      * preserve the original order, and store the result in state.searchAttributeResponse.
      *
