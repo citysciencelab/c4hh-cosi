@@ -187,7 +187,8 @@ export default {
         ]),
         ...mapMutations("Modules/LzsResearchClient", [
             "setLzsSelectedDrawType",
-            "setLzsSelectedInteraction"
+            "setLzsSelectedInteraction",
+            "setErrorMessage"
         ]),
         /**
          * Update the active search form.
@@ -292,11 +293,15 @@ export default {
 
             this.showSpinner = true;
 
-            await this.searchByAttribute(payload);
-
-            this.showSpinner = false;
-
-            this.setCurrentTab("tabResult");
+            this.searchByAttribute(payload)
+                .then((result) => {
+                    if (result) {
+                        this.setCurrentTab("tabResult");
+                    }
+                })
+                .finally(() => {
+                    this.showSpinner = false;
+                });
         },
         /**
          * Validate form fields against their patterns and set error messages accordingly.
@@ -533,8 +538,10 @@ export default {
             this.showSpinner = true;
 
             this.searchByGeometry(payload)
-                .then(() => {
-                    this.setCurrentTab("tabResult");
+                .then((result) => {
+                    if (result) {
+                        this.setCurrentTab("tabResult");
+                    }
                 })
                 .finally(() => {
                     this.showSpinner = false;
@@ -546,6 +553,9 @@ export default {
          * @returns {void}
          */
         startSearch () {
+            // clear all error messages on start of a search
+            this.setErrorMessage("");
+
             switch (this.attributeSearchModeIsActive) {
                 case true:
                     this.searchWithAttribute();

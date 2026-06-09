@@ -168,8 +168,8 @@ export default {
          * @returns {void}
          */
         openDetails (datasetInstanceId) {
-            this.setSelectedInstanceId(datasetInstanceId);
             this.setCurrentTab("tabDetails");
+            this.setSelectedInstanceId(datasetInstanceId);
         },
         returnToSearchTab () {
             this.setCurrentTab("tabSearch");

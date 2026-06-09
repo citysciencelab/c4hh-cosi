@@ -7,10 +7,10 @@ import querystring from "querystring";
  * @param {Object} queryParameters query string parameters
  * @return {string} Full url to endpoint
  */
-export function buildEndpointUrl (url, queryParameters) {
+export function buildEndpointUrl (url, queryParameters = null) {
     let endpointUrl = url;
 
-    if (Object.keys(queryParameters).length) {
+    if (queryParameters && typeof queryParameters === "object" && Object.keys(queryParameters).length) {
         // Split hash fragment if present
         const [baseUrl, hash] = endpointUrl.split("#", 2);
 

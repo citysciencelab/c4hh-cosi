@@ -108,6 +108,9 @@ export default {
                 if (newVal !== "tabResult") {
                     tabContainerRef.$refs.tabResult[0].clearGeomAndGeomIndicators();
                 }
+
+                // clear all error messages on tab change
+                this.setErrorMessage("");
             });
         },
         progressNow (val) {

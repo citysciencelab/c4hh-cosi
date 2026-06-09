@@ -31,7 +31,7 @@ export default {
      * Fetch the dataclass list from the API and store it in Vuex.
      * @param {object} context - Vuex action context (state, commit, dispatch).
      */
-    async fetchDataClassList ({state, commit, dispatch}) {
+    async fetchDataClassList ({state, commit}) {
         const params = {
                 Token: state.requestToken
             },
@@ -50,8 +50,11 @@ export default {
 
             commit("setArchiveList", archiveList);
             commit("setDataClassList", response.data);
-        }).catch(function (error) {
-            dispatch("axiosErrorHandling", error);
+        }).catch(function () {
+            commit("setGlobalError", {
+                type: "server",
+                message: "Failed to fetch data class list."
+            });
         });
     },
     /**
@@ -67,6 +70,7 @@ export default {
                 preventCache: Date.now()
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/dataclassinstance/search`, params);
+        let result = false;
 
         await axios.post(url, payload)
             .then(function (response) {
@@ -85,9 +89,15 @@ export default {
 
                 commit("setSearchAttributeResponseWithUniqueInstanceIds", searchAttributeResponse);
 
+                result = true;
+
             }).catch(function (error) {
                 dispatch("axiosErrorHandling", error);
+
+                result = false;
             });
+
+        return result;
     },
     /**
      * Load placeholder JSON file from portalconfigs and commit it to the store.
@@ -143,6 +153,7 @@ export default {
                 preventCache: Date.now()
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/searchfeatures`, params);
+        let result = false;
 
         await axios.post(url, payload)
             .then(function (response) {
@@ -161,13 +172,15 @@ export default {
 
                 commit("setSearchAttributeResponseWithUniqueInstanceIds", searchAttributeResponse);
 
-                return response;
+                result = true;
 
             }).catch(function (error) {
                 dispatch("axiosErrorHandling", error);
 
-                return null;
+                result = false;
             });
+
+        return result;
     },
     /**
      * Request primarydata for a given archive and instance and add them to the store.
