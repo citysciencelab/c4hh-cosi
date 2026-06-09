@@ -8,11 +8,11 @@
       "saveStory": "Story speichern",
       "preview": "Vorschau",
       "discardStory": "Story verwerfen",
-      "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
       "noSettings": "Keine Fachdaten oder Ansichten festgelegt",
       "numberOfChapters": "Kapitel",
       "readOnly": "schreibgeschützt",
       "previewNav": "Story-Vorschau",
+      "introText": "Dieses Werkzeug dient der Erstellung interaktiver, kartenbasierter Geschichten. Nach der Eingabe der allgemeinen Informationen, wie Name, Beschreibung, Autor und Titelbild, können darunter die einzelnen Kapitel flexibel hinzugefügt werden. Über die Schaltflächen am Seitenende lässt sich die Story in der Vorschau prüfen, speichern oder verwerfen.",
       "labels": {
         "storyTitle": "Story-Namen eingeben",
         "storyDescription": "Beschreibung der Story (optional)",
@@ -26,7 +26,8 @@
         "downloadStory": "Story herunterladen",
         "wrongFormat": "Es sind nur Bilddateien (z. B. JPG, PNG) zulässig.",
         "wrongFormatTitle": "Ungültiges Dateiformat",
-        "emptyChapter": "Es wurden noch keine Kapitel angelegt."
+        "emptyChapter": "Es wurden noch keine Kapitel angelegt.",
+        "mapPosition": "Kartenposition"
       },
       "buttons": {
           "confirm": "Übernehmen",
@@ -37,10 +38,12 @@
         "addImages": "Neues Bild hinzufügen",
         "addTexts": "Neuen Text hinzufügen",
         "chapterList": "Übersicht der Kapitel",
-        "addImageTitle": "Neues Titelbild hinzufügen"
+        "addImageTitle": "Neues Titelbild hinzufügen",
+        "coverOfStory": "Titelbild der Story"
       },
       "chapter": {
         "editChapter": "Kapitel bearbeiten",
+        "infoText": "Hier wird definiert, was in der fertigen Story zu sehen ist. Die Erstellung erfolgt in zwei Schritten: Zuerst werden Kartenausschnitt, Zoomstufe, Fachdaten und Werkzeuge festgelegt. Danach lassen sich im unteren Bereich die zugehörigen Texte und Medien einfügen.",
         "mapTool": "Karteneinstellungen und Werkzeuge",
         "mapPosition": "Kartenposition übernehmen",
         "currentPosition": "Aktuelle Position auf der Karte",
@@ -52,7 +55,10 @@
         "successAlert": "Die Kartenposition wurde erfolgreich übernommen!",
         "positionChangedHint": "Die Position entspricht nicht der aktuellen Ansicht der Karte.",
         "addContent": "Inhalte hinzufügen",
-        "title": "Dies ist die Kapitel-Überschrift"
+        "title": "Kapitelüberschrift eingeben",
+        "initialText": "Hier klicken, um eine Kapitelbeschreibung hinzuzufügen...",
+        "toolListPlaceholder": "Werkzeug auswählen...",
+        "layerListPlaceholder": "Layer auswählen..."
       },
       "addElementDropdown": {
         "categories": {

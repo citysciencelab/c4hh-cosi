@@ -7,7 +7,7 @@
       "createStoryTitle": "Neue Story erstellen",
       "createStoryDescription": "Eine neue interaktive Story erstellen und Karten, Texte sowie Medien miteinander verknüpfen.",
       "selectStoryTitle": "Story auswählen",
-      "selectStoryDescription": "Wählen Sie eine vorhandene Story aus der Liste unten aus, um diese anzusehen, zu bearbeiten oder importieren Sie ein bestehendes Projekt.",
+      "selectStoryDescription": "Zum Ansehen oder Bearbeiten eine Story aus der Liste auswählen. Zudem steht eine Importfunktion zur Verfügung.",
       "importButton": "Importieren",
       "importErrorTitle": "Import fehlgeschlagen",
       "importErrorText": "Es können nur ZIP-Dateien geladen werden, die mit dieser Anwendung erstellt wurden.",

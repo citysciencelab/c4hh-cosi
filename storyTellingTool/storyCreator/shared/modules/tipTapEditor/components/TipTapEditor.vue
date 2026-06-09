@@ -55,11 +55,11 @@ export default {
 <template>
     <div class="w-100">
         <TipTapEditorControls
-            :editor
+            :editor="editor"
         />
         <EditorContent
             class="h-25"
-            :editor
+            :editor="editor"
         />
     </div>
 </template>
@@ -77,13 +77,18 @@ export default {
         font-family: $font_family_accent;
     }
 
+    p {
+        font-size: $font-size-base;
+    }
+
     h1, h2, h3, h4, h5, h6 {
         font-family: $font_family_accent;
         text-transform: unset;
         border: 0;
-        color: $headings-color;
+        color: $dark_grey;
         line-height: 1.1;
-        text-wrap: pretty;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     h1 {

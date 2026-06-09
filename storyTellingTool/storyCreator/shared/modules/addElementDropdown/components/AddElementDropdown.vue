@@ -119,7 +119,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-/* Das Styling bleibt absolut identisch */
 .add-button {
     width: 44px;
     height: 44px;
@@ -173,7 +172,7 @@ export default {
         }
 
         &:hover, &:focus, &.active {
-            background-color: $secondary;
+            background-color: $light_blue;
             color: $black;
 
             i {

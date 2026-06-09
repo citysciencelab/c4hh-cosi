@@ -8,11 +8,11 @@
       "saveStory": "Save story",
       "preview": "Preview",
       "discardStory": "Discard Story",
-      "introText": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
       "noSettings": "No technical data or map positions have been defined",
       "numberOfChapters": "Chapter",
       "readOnly": "Read-only",
       "previewNav": "Story preview",
+      "introText": "This tool is designed for creating interactive, map-based stories. After entering general information such as the name, description, author, and cover image, you can flexibly add individual chapters below. Using the buttons at the bottom of the page, you can preview, save, or discard the story.",
       "labels": {
         "storyTitle": "Enter story name",
         "storyDescription": "Story description (optional)",
@@ -26,7 +26,8 @@
         "downloadStory": "Download story",
         "wrongFormat": "Only image files (e.g. JPG, PNG) are permitted.",
         "wrongFormatTitle": "Invalid file format",
-        "emptyChapter": "No chapters have been created yet."
+        "emptyChapter": "No chapters have been created yet.",
+        "mapPosition": "Map position"
       },
       "buttons": {
           "confirm": "Confirm",
@@ -37,10 +38,12 @@
         "addImages": "Add new image",
         "addTexts": "Add new text",
         "chapterList": "List of Chapters",
-        "addImageTitle": "Add new title image"
+        "addImageTitle": "Add new title image",
+        "coverOfStory": "Cover photo for the story"
       },
       "chapter": {
         "editChapter": "Edit chapter",
+        "infoText": "This is where you define what will appear in the final story. The process involves two steps: First, you specify the map section, zoom level, feature data, and tools. Then, in the lower section, you can insert the corresponding text and media.",
         "mapTool": "Map settings and tools",
         "mapPosition": "Apply map position",
         "currentPosition": "Current map position",
@@ -52,7 +55,10 @@
         "successAlert": "The map position has been successfully saved!",
         "positionChangedHint": "The location does not match the current view of the map.",
         "addContent": "Add content",
-        "title": "This is the chapter title"
+        "title": "Enter chapter title",
+        "initialText": "Click here to add a chapter description...",
+        "toolListPlaceholder": "Select tool...",
+        "layerListPlaceholder": "Select layers..."
       },
       "addElementDropdown": {
         "categories": {

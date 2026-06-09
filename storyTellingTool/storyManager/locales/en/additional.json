@@ -7,7 +7,7 @@
       "createStoryTitle": "Create new story",
       "createStoryDescription": "Create a new interactive story and link maps, texts, and media.",
       "selectStoryTitle": "Select story",
-      "selectStoryDescription": "Select an existing story from the list below to view or edit it, or import an existing project.",
+      "selectStoryDescription": "Select a story from the list to view or edit it. An import function is also available.",
       "importButton": "Import",
       "importErrorTitle": "Import failed",
       "importErrorText": "Only ZIP files created with this application can be loaded.",

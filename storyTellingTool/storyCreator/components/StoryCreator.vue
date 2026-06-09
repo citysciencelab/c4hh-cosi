@@ -234,7 +234,7 @@ export default {
 
             return {
                 subject: val.map?.layers.length ? val.map.layers.length + " " + i18next.t("common:modules.layerSelection.datalayer") : "",
-                map: val.map?.center?.join?.(", ") || "",
+                map: val.map?.center?.length ? i18next.t("additional:modules.storyCreator.labels.mapPosition") : "",
                 tool: toolName
             };
         },
@@ -401,6 +401,7 @@ export default {
                 @keydown.enter="imageLoaded = false"
                 @keydown.space.prevent="imageLoaded = false"
             >
+                <h5>  {{ $t('additional:modules.storyCreator.headlines.coverOfStory') }} </h5>
                 <button
                     type="button"
                     class="btn-close position-absolute top-0 end-0 m-1 chapter-title-image-close"
@@ -422,9 +423,9 @@ export default {
             </h5>
             <Draggable
                 v-model="story.chapters"
-                class="dragArea no-list ps-0 ms-2"
+                class="dragArea no-list chapter-list-item ps-0"
                 item-key="name"
-                handle=".card"
+                handle=".card-wrapper"
             >
                 <template #item="{ element, index }">
                     <InfoCard
@@ -445,10 +446,12 @@ export default {
                 :text="$t('additional:modules.storyCreator.labels.emptyChapter')"
             />
             <AddCardButton
+                class="py-5 chapter-list-item"
                 :text="$t('additional:modules.storyCreator.addChapter')"
                 @click="addChapter"
             />
-            <div class="d-flex flex-column align-items-center pt-5">
+            <hr class="w-100">
+            <div class="d-flex flex-column align-items-center p-2">
                 <FlatButton
                     :icon="'bi-collection-play'"
                     :aria-label="$t('additional:modules.storyCreator.preview')"
@@ -495,6 +498,9 @@ export default {
             text-decoration: underline;
         }
     }
+    .breadcrumb-item + .breadcrumb-item::before {
+    content: "|";
+}
 }
 .chapter-title-image-preview {
     cursor: pointer;
@@ -507,5 +513,13 @@ export default {
             display: block;
         }
     }
+    img {
+        max-height: 50vh;
+        object-fit: contain;
+    }
+}
+.chapter-list-item {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
 }
 </style>

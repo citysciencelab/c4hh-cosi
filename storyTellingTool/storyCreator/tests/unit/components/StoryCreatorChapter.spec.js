@@ -368,6 +368,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             it("should set the attribute to current chapter", async () => {
                 await wrapper.setData({
                     title: "title",
+                    content: [],
                     confirmedCoordinate: [123, 456],
                     confirmedZoomlevel: 2,
                     selectedLayer: [{layerId: 1}, {layerId: 2}],
@@ -403,6 +404,20 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         ]
                     }
                 );
+            });
+            it("should use default title when title is empty", async () => {
+                await wrapper.setData({
+                    title: "",
+                    content: [],
+                    confirmedCoordinate: [123, 456],
+                    confirmedZoomlevel: 2,
+                    selectedLayer: [],
+                    selectedTool: ""
+                });
+
+                wrapper.vm.saveChapter();
+
+                expect(wrapper.vm.currentChapter.title).to.equal("additional:modules.storyCreator.chapter.title");
             });
         });
 

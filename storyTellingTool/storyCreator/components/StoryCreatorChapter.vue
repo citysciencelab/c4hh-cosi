@@ -49,7 +49,8 @@ export default {
             selectedLayer: [],
             selectedTool: "",
             showAlert: false,
-            title: i18next.t("additional:modules.storyCreator.chapter.title")
+            title: "",
+            isPlaceholder: true
         };
     },
     computed: {
@@ -123,6 +124,28 @@ export default {
 
         if (map) {
             map.on("moveend", this.updatePositionFromMap);
+        }
+
+        if (this.$refs.chapterTitle) {
+            this.$refs.chapterTitle.textContent = this.$t("additional:modules.storyCreator.chapter.title");
+        }
+        if (this.editIndex === false) {
+            this.content = [
+                {
+                    type: "doc",
+                    content: [
+                        {
+                            type: "paragraph",
+                            content: [
+                                {
+                                    type: "text",
+                                    text: this.$t("additional:modules.storyCreator.chapter.initialText")
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ];
         }
     },
     beforeUnmount () {
@@ -344,6 +367,38 @@ export default {
             this.closeContentEditor();
         },
         /**
+         * Handles focus event on the title field. Clears placeholder text when focused.
+         * @param {Event} event - The focus event.
+         * @returns {void}
+         */
+        handleFocus (event) {
+            if (this.isPlaceholder) {
+                event.target.textContent = "";
+                this.isPlaceholder = false;
+            }
+        },
+        /**
+         * Handles blur event on the title field. Restores placeholder if input is empty.
+         * @param {Event} event - The blur event.
+         * @returns {void}
+         */
+        handleBlur (event) {
+            const text = event.target.textContent.trim();
+
+            if (text === "") {
+                this.isPlaceholder = true;
+                event.target.textContent = this.$t("additional:modules.storyCreator.chapter.title");
+            }
+        },
+        /**
+         * Handles input event on the title field. Updates the title with current content.
+         * @param {Event} event - The input event.
+         * @returns {void}
+         */
+        handleInput (event) {
+            this.title = event.target.textContent.trim();
+        },
+        /**
          * Resets the current chapter.
          * @returns {void}
          */
@@ -366,7 +421,7 @@ export default {
          * @returns {void}
          */
         saveChapter () {
-            this.currentChapter.title = this.title;
+            this.currentChapter.title = this.title.trim() !== "" ? this.title : this.$t("additional:modules.storyCreator.chapter.title");
             this.currentChapter.map.center = [...this.confirmedCoordinate];
             this.currentChapter.map.zoomLevel = this.confirmedZoomlevel;
             this.currentChapter.map.layers = this.selectedLayer.map(layer => layer.layerId);
@@ -465,6 +520,9 @@ export default {
         <h5>
             {{ $t("additional:modules.storyCreator.chapter.editChapter") }}
         </h5>
+        <p>
+            {{ $t('additional:modules.storyCreator.chapter.infoText') }}
+        </p>
         <AccordionItem
             id="edit-chapter-map"
             icon="bi-map"
@@ -525,10 +583,16 @@ export default {
                 </div>
             </div>
             <div class="row no-gutters mb-4 mt-4">
+                <label
+                    for="layer-list"
+                    class="form-label small text-muted"
+                >
+                    {{ $t('additional:modules.storyCreator.chapter.layerList') }}
+                </label>
                 <Multiselect
                     id="layer-list"
                     v-model="selectedLayer"
-                    :placeholder="$t('additional:modules.storyCreator.chapter.layerList')"
+                    :placeholder="$t('additional:modules.storyCreator.chapter.layerListPlaceholder')"
                     :aria-label="$t('additional:modules.storyCreator.chapter.layerList')"
                     label="label"
                     track-by="label"
@@ -567,12 +631,20 @@ export default {
                 </Multiselect>
             </div>
             <div class="row no-gutters mb-4">
+                <label
+                    for="tool-list"
+                    class="form-label small text-muted"
+                >
+                    {{ $t('additional:modules.storyCreator.chapter.toolList') }}
+                </label>
                 <Multiselect
+                    id="tool-list"
                     v-model="selectedTool"
+                    :aria-label="$t('additional:modules.storyCreator.chapter.toolList')"
                     :multiple="false"
                     :options="toolList"
                     :show-labels="false"
-                    :placeholder="$t('additional:modules.storyCreator.chapter.toolList')"
+                    :placeholder="$t('additional:modules.storyCreator.chapter.toolListPlaceholder')"
                     label="label"
                     track-by="label"
                 >
@@ -590,6 +662,7 @@ export default {
                 </Multiselect>
             </div>
         </AccordionItem>
+        <hr>
         <AccordionItem
             id="edit-chapter-content"
             icon="bi-list-ul"
@@ -597,9 +670,12 @@ export default {
             :title="$t('additional:modules.storyCreator.chapter.addContent')"
         >
             <h5
-                class="chapter-title mt-4 mb-3 p-2"
+                class="chapter-title mt-4 mb-3 p-2 ms-4 rounded"
+                :class="{ 'is-placeholder': isPlaceholder }"
                 contenteditable="plaintext-only"
-                @input="title = $event.target.innerHTML"
+                @focus="handleFocus"
+                @blur="handleBlur"
+                @input="handleInput"
             >
                 {{ $t('additional:modules.storyCreator.chapter.title') }}
             </h5>
@@ -611,16 +687,20 @@ export default {
                 :disabled="isContentEditorOpen"
             >
                 <template #item="{ element, index }">
-                    <div class="chapter-content-item mb-2">
-                        <i
-                            v-if="!isContentEditorOpen"
-                            class="bi bi-grip-vertical mt-1 drag-handle"
-                            aria-hidden="true"
-                        />
+                    <div
+                        class="chapter-content-item mb-2"
+                        :class="{ 'chapter-content-item--editing': isEditingContentItem(index) }"
+                    >
                         <div
                             v-if="element.type === 'image'"
+                            class="chapter-content-item__wrapper"
                             :class="{'chapter-content-item--locked': isContentItemLocked(index)}"
                         >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
                             <StoryCreatorAddImageCard
                                 v-if="isEditingContentItem(index)"
                                 class="mt-2"
@@ -656,7 +736,13 @@ export default {
                         </div>
                         <div
                             v-else-if="element.type === 'doc'"
+                            class="chapter-content-item__wrapper"
                         >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
                             <StoryCreatorAddTextCard
                                 v-if="isEditingContentItem(index)"
                                 class="mt-2"
@@ -688,6 +774,7 @@ export default {
             </Draggable>
             <AddElementDropdown
                 v-if="!isContentEditorOpen"
+                class="mt-5"
                 :allowed-actions="['text', 'image']"
                 @action-triggered="openContentEditorForAdd"
             />
@@ -708,17 +795,18 @@ export default {
             v-if="!isContentEditorOpen"
             class="d-flex flex-column align-items-center pt-3"
         >
+            <hr class="w-100">
             <FlatButton
                 id="save"
+                class="mb-4"
                 :icon="'bi-save'"
-                :aria-label="$t('additional:modules.storyCreator.chapter.save')"
                 :text="$t('additional:modules.storyCreator.chapter.save')"
+                :title="$t('additional:modules.storyCreator.chapter.save')"
                 :interaction="() => saveChapter()"
             />
             <FlatButton
                 id="cancel"
                 :icon="'bi-x-lg'"
-                :aria-label="$t('additional:modules.storyCreator.chapter.cancel')"
                 :text="$t('additional:modules.storyCreator.chapter.cancel')"
                 :secondary="true"
                 :interaction="() => cancelChapter()"
@@ -744,19 +832,39 @@ export default {
 
 .chapter-content-item {
     position: relative;
-    padding-left: 1.5rem;
+}
+
+.chapter-content-item__wrapper {
+    position: relative;
+    padding-left: 2rem;
 }
 
 .drag-handle {
     position: absolute;
-    top: 0;
+    top: 1rem;
     left: 0;
     cursor: grab;
     color: #6c757d;
+    font-size: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+    padding: 0.25rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+}
+
+.chapter-content-item__wrapper:hover .drag-handle {
+    opacity: 1;
 }
 
 .drag-handle:active {
     cursor: grabbing;
+    background-color: $primary;
+    color: $dark_blue;
 }
 
 .chapter-content-item--locked {
@@ -781,14 +889,26 @@ export default {
     }
 }
 
-.chapter-content-item__close {
-    opacity: 0;
-    transition: opacity 0.15s ease-in-out;
+.chapter-content-item__preview {
+    img {
+        max-height: 40vh;
+        object-fit: contain;
+    }
+}
+
+.chapter-content-item__preview {
+    .chapter-content-item__close {
+        font-size: 0.75rem;
+        width: 1rem;
+        height: 1rem;
+        opacity: 0;
+        transition: opacity 0.15s ease-in-out;
+    }
 }
 
 .chapter-content-item__preview:hover .chapter-content-item__close,
 .chapter-content-item__preview:focus-within .chapter-content-item__close {
-    opacity: 1;
+    opacity: 0.5;
 }
 </style>
 
@@ -799,13 +919,26 @@ export default {
         font-family: $font_family_accent;
     }
 
+    p {
+        font-size: $font-size-base;
+    }
+
+    p:empty {
+        min-height: 1em;
+    }
+
+    p:empty::before {
+        content: "\00a0";
+    }
+
     h1, h2, h3, h4, h5, h6 {
         font-family: $font_family_accent;
         text-transform: unset;
         border: 0;
-        color: $headings-color;
+        color: $dark_grey;
         line-height: 1.1;
-        text-wrap: pretty;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     h1 {
@@ -880,10 +1013,17 @@ export default {
 
 .chapter-title {
     font-family: $font_family_accent;
+    color: $dark_grey;
     &:hover {
         outline-color: $light_grey;
         outline-width: 1px;
         outline-style: solid;
+    }
+    &:focus {
+        outline: 1px solid $light_grey;
+    }
+    &.is-placeholder {
+        color: #8f8f8f;
     }
 }
 </style>
