@@ -49,8 +49,7 @@ export default {
             selectedLayer: [],
             selectedTool: "",
             showAlert: false,
-            title: "",
-            isPlaceholder: true
+            title: this.$t("additional:modules.storyCreator.chapter.title")
         };
     },
     computed: {
@@ -93,6 +92,16 @@ export default {
     },
     watch: {
         /**
+         * Watches for changes in currentChapter to load data automatically.
+         * @param {Object} newVal - The new chapter object.
+         * @returns {void}
+         */
+        currentChapter (newVal) {
+            if (newVal) {
+                this.loadChapterData();
+            }
+        },
+        /**
          * Initializes and displays the Bootstrap Toast. The toast will automatically hide after 4 seconds.
          * @param {Boolean} newVal - The new value of showAlert.
          */
@@ -113,12 +122,11 @@ export default {
             }
         }
     },
-    created () {
-        this.resetCurrentChapter();
-    },
     mounted () {
         this.layerList = this.getLayerList();
         this.toolList = this.getToolList(this.configuredModules);
+
+        this.loadChapterData();
 
         const map = mapCollection.getMap("2D");
 
@@ -126,9 +134,7 @@ export default {
             map.on("moveend", this.updatePositionFromMap);
         }
 
-        if (this.$refs.chapterTitle) {
-            this.$refs.chapterTitle.textContent = this.$t("additional:modules.storyCreator.chapter.title");
-        }
+        // Feature aus dem dev-Branch, um beim Hinzufügen (nicht Editieren) einen Dummy-Text zu setzen
         if (this.editIndex === false) {
             this.content = [
                 {
@@ -215,6 +221,33 @@ export default {
             return this.isContentEditorOpen
                 && this.openContentEditor.index < this.content.length
                 && this.openContentEditor.index === index;
+        },
+        /**
+         * Loads the chapter data from the store into the local component state.
+         * @returns {void}
+         */
+        loadChapterData () {
+            if (this.currentChapter) {
+                this.title = this.currentChapter.title || this.$t("additional:modules.storyCreator.chapter.title");
+                this.content = this.currentChapter.content ? JSON.parse(JSON.stringify(this.currentChapter.content)) : [];
+
+                if (this.currentChapter.map) {
+                    this.confirmedCoordinate = this.currentChapter.map.center ? [...this.currentChapter.map.center] : [];
+                    this.coordinate = this.currentChapter.map.center ? [...this.currentChapter.map.center] : [];
+                    this.confirmedZoomlevel = this.currentChapter.map.zoomLevel || "";
+                    this.zoomlevel = this.currentChapter.map.zoomLevel || "";
+
+                    if (Array.isArray(this.currentChapter.map.layers)) {
+                        this.selectedLayer = this.layerList.filter(layer => this.currentChapter.map.layers.includes(layer.layerId));
+                    }
+
+                    if (this.currentChapter.map.tool) {
+                        this.selectedTool = this.toolList.find(
+                            tool => tool.toolId === this.currentChapter.map.tool
+                        ) || "";
+                    }
+                }
+            }
         },
         /**
          * Returns true if the add editor for the given type is open.
@@ -367,38 +400,6 @@ export default {
             this.closeContentEditor();
         },
         /**
-         * Handles focus event on the title field. Clears placeholder text when focused.
-         * @param {Event} event - The focus event.
-         * @returns {void}
-         */
-        handleFocus (event) {
-            if (this.isPlaceholder) {
-                event.target.textContent = "";
-                this.isPlaceholder = false;
-            }
-        },
-        /**
-         * Handles blur event on the title field. Restores placeholder if input is empty.
-         * @param {Event} event - The blur event.
-         * @returns {void}
-         */
-        handleBlur (event) {
-            const text = event.target.textContent.trim();
-
-            if (text === "") {
-                this.isPlaceholder = true;
-                event.target.textContent = this.$t("additional:modules.storyCreator.chapter.title");
-            }
-        },
-        /**
-         * Handles input event on the title field. Updates the title with current content.
-         * @param {Event} event - The input event.
-         * @returns {void}
-         */
-        handleInput (event) {
-            this.title = event.target.textContent.trim();
-        },
-        /**
          * Resets the current chapter.
          * @returns {void}
          */
@@ -417,7 +418,7 @@ export default {
             );
         },
         /**
-         * Saves the chapter and goes back to the overview page.
+         * Saves the chapter and returns to the overview page.
          * @returns {void}
          */
         saveChapter () {
@@ -425,19 +426,18 @@ export default {
             this.currentChapter.map.center = [...this.confirmedCoordinate];
             this.currentChapter.map.zoomLevel = this.confirmedZoomlevel;
             this.currentChapter.map.layers = this.selectedLayer.map(layer => layer.layerId);
-            this.currentChapter.map.tool = this.selectedTool.toolId;
+            this.currentChapter.map.tool = this.selectedTool?.toolId || null;
             this.currentChapter.content = this.content;
 
-            if (typeof this.editIndex === "number") {
-                // todos: replace the chapter
+            if (this.editIndex !== false && typeof this.editIndex === "number") {
+                this.story.chapters.splice(this.editIndex, 1, JSON.parse(JSON.stringify(this.currentChapter)));
             }
             else {
-                this.story?.chapters.push(this.currentChapter);
+                this.story?.chapters.push(JSON.parse(JSON.stringify(this.currentChapter)));
             }
 
             this.setCurrentView("story");
         },
-
         /**
          * Handles image add/edit by writing it to the content array and closing the open editor.
          * @param {Object} image - The image object containing id, alt, copyright, and objectURL.
@@ -445,12 +445,7 @@ export default {
          */
         handleImage (image) {
             if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
-                const editIndex = this.openContentEditor.index,
-                    currentItem = this.content[editIndex];
-
-                if (currentItem?.type === "image" && currentItem.id !== image.id) {
-                    this.removeImageAsset(currentItem.id);
-                }
+                const editIndex = this.openContentEditor.index;
 
                 this.content.splice(editIndex, 1, {
                     type: "image",
@@ -483,10 +478,6 @@ export default {
 
             if (!item) {
                 return;
-            }
-
-            if (item.type === "image") {
-                this.removeImageAsset(item.id);
             }
 
             this.content.splice(index, 1);
@@ -669,16 +660,15 @@ export default {
             :is-open="true"
             :title="$t('additional:modules.storyCreator.chapter.addContent')"
         >
-            <h5
-                class="chapter-title mt-4 mb-3 p-2 ms-4 rounded"
-                :class="{ 'is-placeholder': isPlaceholder }"
-                contenteditable="plaintext-only"
-                @focus="handleFocus"
-                @blur="handleBlur"
-                @input="handleInput"
-            >
-                {{ $t('additional:modules.storyCreator.chapter.title') }}
-            </h5>
+            <div class="chapter-title mt-4 mb-3 p-2 h5">
+                <input
+                    v-model="title"
+                    class="w-100 bg-transparent border-0"
+                    style="outline: none;"
+                    :placeholder="$t('additional:modules.storyCreator.chapter.title')"
+                    :aria-label="$t('additional:modules.storyCreator.chapter.title')"
+                >
+            </div>
             <Draggable
                 v-model="content"
                 item-key="id"
@@ -806,6 +796,7 @@ export default {
             />
             <FlatButton
                 id="cancel"
+                class="mb-4"
                 :icon="'bi-x-lg'"
                 :text="$t('additional:modules.storyCreator.chapter.cancel')"
                 :secondary="true"
@@ -1021,9 +1012,6 @@ export default {
     }
     &:focus {
         outline: 1px solid $light_grey;
-    }
-    &.is-placeholder {
-        color: #8f8f8f;
     }
 }
 </style>

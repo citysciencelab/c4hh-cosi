@@ -35,7 +35,8 @@ export default {
             imageCopyright: "",
             imageSrc: "",
             chapterContent: [],
-            imageLoaded: false
+            imageLoaded: false,
+            editingChapterIndex: false
         };
     },
     computed: {
@@ -102,7 +103,8 @@ export default {
         ...mapMutations("Modules/StoryCreator", [
             "removeImageAsset",
             "setCurrentView",
-            "setImageAssetsById"
+            "setImageAssetsById",
+            "setCurrentChapter"
         ]),
         ...mapMutations("Modules/StoryManager", [
             "setCurrentStoryIndex",
@@ -114,9 +116,19 @@ export default {
          * @returns {void}
          */
         addChapter () {
+            this.setCurrentChapter({
+                title: "",
+                content: [],
+                map: {
+                    center: null,
+                    zoomLevel: null,
+                    layers: null,
+                    tool: null
+                }
+            });
+            this.editingChapterIndex = false;
             this.setCurrentView("chapter");
         },
-
         /**
          * Adds the uploaded title image attributes.
          * @param {Object} image - The image object containing id, alt, copyright, and objectURL.
@@ -127,6 +139,20 @@ export default {
             this.imageAlt = image.alt;
             this.imageCopyright = image.copyright;
             this.imageLoaded = true;
+        },
+
+        /**
+         * Loads the chapter data into the store for editing.
+         * @param {Number} index - The index of the chapter to edit.
+         * @returns {void}
+         */
+        editChapter (index) {
+            this.editingChapterIndex = index;
+
+            const chapterToEdit = JSON.parse(JSON.stringify(this.story.chapters[index]));
+
+            this.setCurrentChapter(chapterToEdit);
+            this.setCurrentView("chapter");
         },
 
         /**
@@ -436,6 +462,9 @@ export default {
                         :card-text="getChapterOverviewAttr(element, 'text')"
                         :card-title="element.title"
                         :copyright="getChapterOverviewAttr(element, 'copyright')"
+                        :photo-credit="getChapterOverviewAttr(element, 'copyright')"
+                        :editable="true"
+                        @edit="editChapter(index)"
                         @delete="() => deleteChapter(index)"
                     />
                 </template>
@@ -475,7 +504,9 @@ export default {
             </div>
         </div>
         <div v-else-if="currentView === 'chapter'">
-            <StoryCreatorChapter />
+            <StoryCreatorChapter
+                :edit-index="editingChapterIndex"
+            />
         </div>
         <div
             v-else-if="currentView === 'preview'"

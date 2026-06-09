@@ -47,7 +47,7 @@ export default {
             default: true
         }
     },
-    emits: ["delete", "edit", "download"],
+    emits: ["delete", "edit", "download", "click"],
     data () {
         return {
             chapterSettingIcons: [
@@ -58,12 +58,49 @@ export default {
         };
     },
     computed: {
-    /**
-     * Returns true if at least one cardItem has a non-empty value.
-     * @returns {Boolean} True if card items exist, otherwise false.
-     */
+        /**
+         * Returns true if at least one cardItem has a non-empty value.
+         * @returns {Boolean} True if card items exist, otherwise false.
+         */
         hasCardItems () {
             return Object.values(this.cardItems).some(value => value && value.length > 0);
+        }
+    },
+    methods: {
+        /**
+         * Handles the click event on the edit button and stops propagation.
+         * @param {Event} event The DOM event.
+         * @returns {void}
+         */
+        handleEditClick (event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            this.$emit("edit");
+        },
+
+        /**
+         * Handles the click event on the delete button and stops propagation.
+         * @param {Event} event The DOM event.
+         * @returns {void}
+         */
+        handleDeleteClick (event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            this.$emit("delete");
+        },
+
+        /**
+         * Handles the click event on the download button and stops propagation.
+         * @param {Event} event The DOM event.
+         * @returns {void}
+         */
+        handleDownloadClick (event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            this.$emit("download");
         }
     }
 };
@@ -81,7 +118,15 @@ export default {
         />
         <div
             class="card shadow rounded-3 mb-3"
-            :class="{'story-card': cardType === 'story'}"
+            :class="{
+                'story-card': cardType === 'story',
+                'is-editable': editable
+            }"
+            role="button"
+            tabindex="0"
+            @click="handleEditClick"
+            @keydown.enter="handleEditClick"
+            @keydown.space.prevent="handleEditClick"
         >
             <div
                 v-if="cardImage.length"
@@ -147,18 +192,18 @@ export default {
                         >
                             {{ $t('additional:modules.storyCreator.noSettings') }}
                         </small>
-                        <IconButton
-                            :aria="$t('additional:modules.storyCreator.labels.deleteChapter')"
-                            icon="bi bi-trash"
-                            :title="$t('additional:modules.storyCreator.labels.deleteChapter')"
-                            :interaction="() => $emit('delete')"
-                            :class-array="['btn-light']"
-                        />
+                        <div class="d-flex align-items-center gap-2">
+                            <IconButton
+                                :aria="$t('additional:modules.storyCreator.labels.deleteChapter')"
+                                icon="bi bi-trash"
+                                :title="$t('additional:modules.storyCreator.labels.deleteChapter')"
+                                :interaction="handleDeleteClick"
+                                :class-array="['btn-light']"
+                            />
+                        </div>
                     </div>
                 </div>
-                <div
-                    v-else
-                >
+                <div v-else>
                     <div
                         v-if="Object.keys(cardItems).length !== 0"
                         class="d-flex justify-content-between align-items-center gap-3 pt-2 px-2"
@@ -183,14 +228,14 @@ export default {
                                 :aria="$t('additional:modules.storyCreator.labels.editStory')"
                                 icon="bi bi-pencil"
                                 :title="$t('additional:modules.storyCreator.labels.editStory')"
-                                :interaction="() => $emit('edit')"
+                                :interaction="handleEditClick"
                                 :class-array="['btn-light']"
                             />
                             <IconButton
                                 :aria="$t('additional:modules.storyCreator.labels.downloadStory')"
                                 icon="bi bi-download"
                                 :title="$t('additional:modules.storyCreator.labels.downloadStory')"
-                                :interaction="() => $emit('download')"
+                                :interaction="handleDownloadClick"
                                 :class-array="['btn-light']"
                             />
                         </div>
@@ -200,6 +245,7 @@ export default {
         </div>
     </div>
 </template>
+
 <style lang="scss" scoped>
 .card-wrapper {
     position: relative;
@@ -213,10 +259,14 @@ export default {
     overflow: visible;
     border: 0.5px solid $light_grey;
     transition: box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    &:hover {
-        border-color: $secondary;
-        box-shadow: 0 0 0 3px rgba($secondary, 1) inset;
+
+    &.is-editable {
+        cursor: pointer;
+
+        &:hover {
+            border-color: $secondary;
+            box-shadow: 0 0 0 3px rgba($secondary, 1) inset;
+        }
     }
 }
 .drag-handle {
@@ -224,7 +274,7 @@ export default {
     left: 0;
     top: 0;
     cursor: grab;
-    color:  $secondary;;
+    color: $secondary;
     font-size: 1.75rem;
     opacity: 0;
     transition: opacity 0.15s ease-in-out;
@@ -235,7 +285,6 @@ export default {
     justify-content: center;
     width: 2.25rem;
     height: 2.25rem;
-    font-size: 1.75rem;
 
     &:active {
         cursor: grabbing;

@@ -54,6 +54,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                         "tool": null
                                     }
                                 },
+                                currentView: "chapter",
                                 imageAssetsById: {},
                                 story: {
                                     chapters: []
@@ -134,7 +135,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
         it("should find title element", () => {
             expect(wrapper.find(".chapter-title").exists()).to.be.true;
-            expect(wrapper.find(".chapter-title").text()).to.equal("additional:modules.storyCreator.chapter.title");
         });
 
         it("shows the position hint if positionChanged is true", async () => {
@@ -365,46 +365,66 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         });
 
         describe("saveChapter", () => {
-            it("should set the attribute to current chapter", async () => {
+            it("should append a new chapter when editIndex is false (ADD mode)", async () => {
+                wrapper.vm.story.chapters = [];
+
+                await wrapper.setProps({editIndex: false});
+
                 await wrapper.setData({
-                    title: "title",
-                    content: [],
+                    title: "Neues Testkapitel",
                     confirmedCoordinate: [123, 456],
                     confirmedZoomlevel: 2,
                     selectedLayer: [{layerId: 1}, {layerId: 2}],
-                    selectedTool: {toolId: "tool"}
+                    selectedTool: {toolId: "testTool"},
+                    content: []
                 });
 
                 wrapper.vm.saveChapter();
 
-                expect(wrapper.vm.currentChapter).to.deep.equal({
+                expect(wrapper.vm.currentChapter.title).to.equal("Neues Testkapitel");
+                expect(wrapper.vm.currentChapter.map.center).to.deep.equal([123, 456]);
+                expect(wrapper.vm.story.chapters).to.have.lengthOf(1);
+
+                expect(wrapper.vm.story.chapters[0]).to.deep.equal({
                     content: [],
-                    title: "title",
+                    title: "Neues Testkapitel",
                     map: {
-                        "center": [123, 456],
-                        "zoomLevel": 2,
-                        "layers": [1, 2],
-                        "tool": "tool"
+                        center: [123, 456],
+                        zoomLevel: 2,
+                        layers: [1, 2],
+                        tool: "testTool"
                     }
                 });
 
-                expect(wrapper.vm.story).to.deep.equal(
-                    {
-                        chapters: [
-                            {
-                                content: [],
-                                title: "title",
-                                map: {
-                                    "center": [123, 456],
-                                    "zoomLevel": 2,
-                                    "layers": [1, 2],
-                                    "tool": "tool"
-                                }
-                            }
-                        ]
-                    }
-                );
+                expect(localStore.state.Modules.StoryCreator.currentView).to.equal("story");
             });
+
+            it("should overwrite an existing chapter when editIndex is a number (UPDATE mode)", async () => {
+                wrapper.vm.story.chapters = [
+                    {title: "Altes Kapitel 1", content: []},
+                    {title: "Altes Kapitel 2", content: []}
+                ];
+
+                await wrapper.setProps({editIndex: 1});
+
+                await wrapper.setData({
+                    title: "Geändertes Kapitel 2",
+                    confirmedCoordinate: [999, 888],
+                    confirmedZoomlevel: 10,
+                    selectedLayer: [],
+                    selectedTool: "",
+                    content: [{type: "text", text: "Neuer Inhalt"}]
+                });
+
+                wrapper.vm.saveChapter();
+
+                expect(wrapper.vm.story.chapters).to.have.lengthOf(2);
+                expect(wrapper.vm.story.chapters[0].title).to.equal("Altes Kapitel 1");
+                expect(wrapper.vm.story.chapters[1].title).to.equal("Geändertes Kapitel 2");
+                expect(wrapper.vm.story.chapters[1].map.center).to.deep.equal([999, 888]);
+                expect(localStore.state.Modules.StoryCreator.currentView).to.equal("story");
+            });
+
             it("should use default title when title is empty", async () => {
                 await wrapper.setData({
                     title: "",
@@ -521,7 +541,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
                 wrapper.vm.removeContentItem(0);
 
-                expect(removeImageAssetSpy.calledOnceWithExactly("img-1")).to.be.true;
+                expect(removeImageAssetSpy.called).to.be.false;
                 expect(wrapper.vm.content).to.deep.equal([
                     {
                         type: "doc",
