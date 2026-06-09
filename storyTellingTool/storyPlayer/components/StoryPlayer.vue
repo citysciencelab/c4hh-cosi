@@ -422,6 +422,39 @@ export default {
 
             return urlParams.get("story");
         },
+        /**
+         * Navigates to the previous step
+         * @returns {void}
+         */
+        goToPreviousStep () {
+            if (this.currentChapterIndex > 0) {
+                this.currentChapterIndex -= 1;
+                this.scrollToActiveStep();
+            }
+        },
+        /**
+         * Navigates to the next step
+         * @returns {void}
+         */
+        goToNextStep () {
+            if (this.currentChapterIndex < this.storyConf.chapters.length - 1) {
+                this.currentChapterIndex += 1;
+                this.scrollToActiveStep();
+            }
+        },
+        /**
+         * Scrolls the step into view
+         * @returns {void}
+         */
+        scrollToActiveStep () {
+            this.$nextTick(() => {
+                const stepElements = Array.isArray(this.$refs.stepper) ? this.$refs.stepper : [this.$refs.stepper];
+
+                if (stepElements && stepElements[this.currentChapterIndex]) {
+                    stepElements[this.currentChapterIndex].scrollIntoView({behavior: "smooth", block: "center"});
+                }
+            });
+        },
         scrollerSetup () {
             const stepRefs = Array.isArray(this.$refs.stepper) ? this.$refs.stepper : [this.$refs.stepper],
                 stepElements = stepRefs.filter(step => step && step.classList);
@@ -451,7 +484,38 @@ export default {
             // Track intersection ratios for each step
             // intersectionRatios tell you how much of each observed element is currently visible,
             // so it can be decided which one is “active”.
-            const intersectionRatios = new Array(stepElements.length).fill(0);
+            const intersectionRatios = new Array(stepElements.length).fill(0),
+                minVisibleRatio = 0.15,
+                switchDelta = 0.12,
+                applyActiveStep = (activeIndex) => {
+                    const step = stepElements[activeIndex];
+
+                    if (!step || !step.classList) {
+                        return;
+                    }
+
+                    stepElements.forEach(s => s.classList.remove("active"));
+                    step.classList.add("active");
+
+                    if (this.currentIndex !== activeIndex) {
+                        this.currentIndex = activeIndex;
+                        this.currentChapterIndex = activeIndex;
+
+                        // Handle iframe aspect ratio and progress
+                        const iframeElement = step.querySelector("iframe"),
+                            iframeDiv = step.getElementsByClassName("field_video")[0];
+
+                        if (iframeElement && iframeDiv) {
+                            const ratioClass = this.getIframeAspectRatio(iframeElement);
+
+                            iframeDiv.classList.add("ratio", ratioClass);
+                        }
+                    }
+                };
+
+            if (this.currentChapterIndex >= 0 && this.currentChapterIndex < stepElements.length) {
+                applyActiveStep(this.currentChapterIndex);
+            }
 
             this._stepObserver = new IntersectionObserver(
                 (entries) => {
@@ -476,34 +540,19 @@ export default {
                         }
                     });
 
-                    // Remove all active classes first
-                    stepElements.forEach(step => step.classList.remove("active"));
-
-                    // Set only the most visible step as active if any
-                    if (activeIndex !== -1 && maxRatio > 0) {
-                        const step = stepElements[activeIndex];
-
-                        if (step && step.classList) {
-                            step.classList.add("active");
-                        }
-
-                        if (this.currentIndex !== activeIndex) {
-                            this.currentIndex = activeIndex;
-                            this.currentChapterIndex = activeIndex;
-
-                            // Handle iframe aspect ratio and progress
-                            const iframeElement = step.querySelector("iframe"),
-                                iframeDiv = step.getElementsByClassName("field_video")[0];
-
-                            if (iframeElement && iframeDiv) {
-                                const ratioClass = this.getIframeAspectRatio(iframeElement);
-
-                                iframeDiv.classList.add("ratio", ratioClass);
-                            }
-                        }
+                    if (activeIndex === -1 || maxRatio < minVisibleRatio) {
+                        return;
                     }
-                    else {
-                        this.currentIndex = -1;
+
+                    const currentRatio = this.currentIndex >= 0
+                            ? intersectionRatios[this.currentIndex]
+                            : 0,
+                        shouldSwitch = this.currentIndex === -1
+                            || activeIndex === this.currentIndex
+                            || maxRatio >= currentRatio + switchDelta;
+
+                    if (shouldSwitch) {
+                        applyActiveStep(activeIndex);
                     }
                 },
                 {
@@ -599,6 +648,18 @@ export default {
                     class="stepper"
                     :class="{firstStep: index === 0, lastStep: index === storyConf.chapters.length - 1}"
                 >
+                    <div
+                        v-if="index === currentChapterIndex && currentChapterIndex > 0"
+                        class="chevron-navigation chevron-up"
+                    >
+                        <button
+                            class="btn btn-chevron"
+                            :aria-label="`Zum vorherigen Schritt (${currentChapterIndex})`"
+                            @click="goToPreviousStep"
+                        >
+                            <i class="bi bi-arrow-up" />
+                        </button>
+                    </div>
                     <h2 v-if="chapter.title">
                         {{ chapter.title }}
                     </h2>
@@ -625,6 +686,18 @@ export default {
                                 v-html="tipTapJsonToHtml(item)"
                             />
                         </div>
+                    </div>
+                    <div
+                        v-if="index === currentChapterIndex && currentChapterIndex < storyConf.chapters.length - 1"
+                        class="chevron-navigation chevron-down"
+                    >
+                        <button
+                            class="btn btn-chevron"
+                            :aria-label="`Zum nächsten Schritt (${currentChapterIndex + 2})`"
+                            @click="goToNextStep"
+                        >
+                            <i class="bi bi-arrow-down" />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -721,6 +794,48 @@ export default {
         scroll-margin-top: 50px;
         transition: all 0.3s ease-in-out;
 
+        .chevron-navigation {
+            display: flex;
+            justify-content: center;
+            padding: 8px 0;
+
+            .btn-chevron {
+                background-color: #fff;
+                border: 1px solid #000;
+                border-radius: 50%;
+                color: #000;
+                cursor: pointer;
+                padding: 0;
+                width: 35px;
+                height: 35px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+
+                .bi {
+                    font-size: 20px;
+                    line-height: 1;
+                }
+
+                &:hover {
+                    background-color: #f5f5f5;
+                    transform: scale(1.08);
+                }
+
+                &:active {
+                    transform: scale(0.95);
+                }
+            }
+        }
+
+        .chevron-up {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .chevron-down {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
         >figure {
             >img {
                 width: 100%;
@@ -768,7 +883,6 @@ export default {
                     font-size: var(--pSize);
                     margin-right: 0;
                     line-height: 1.5rem;
-                    color: var(--DipasColorsFont, #212529);
                 }
 
                 figure {

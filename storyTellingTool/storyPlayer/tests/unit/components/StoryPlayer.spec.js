@@ -9,12 +9,18 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
     let wrapper,
         store,
         originalXMLHttpRequest,
-        originalIntersectionObserver;
+        originalIntersectionObserver,
+        originalScrollIntoView;
 
     beforeEach(() => {
         // Save original XMLHttpRequest
         originalXMLHttpRequest = global.XMLHttpRequest;
         originalIntersectionObserver = global.IntersectionObserver;
+        originalScrollIntoView = global.HTMLElement?.prototype?.scrollIntoView;
+
+        if (global.HTMLElement && global.HTMLElement.prototype) {
+            global.HTMLElement.prototype.scrollIntoView = sinon.stub();
+        }
 
         // Mock XMLHttpRequest
         global.XMLHttpRequest = class {
@@ -249,6 +255,10 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
         }
     });
 
+    if (global.HTMLElement && global.HTMLElement.prototype) {
+        global.HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
+    }
+
     it("StoryPlayer should exist", async () => {
         expect(wrapper.exists()).to.be.true;
     });
@@ -361,5 +371,74 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
     it("should return storyConfPath from store when available", () => {
         // storyConfJson is set in the store state
         expect(wrapper.vm.storyConfPath).to.equal("mockConfigJsStoryConf.json");
+    });
+
+    describe("Chevron Navigation Tests", () => {
+        beforeEach(() => {
+            wrapper.vm.storyConf.chapters = [
+                {title: "Step 1", content: []},
+                {title: "Step 2", content: []},
+                {title: "Step 3", content: []}
+            ];
+        });
+
+        it("should navigate to next and previous steps", async () => {
+            wrapper.vm.currentChapterIndex = 1;
+            wrapper.vm.goToNextStep();
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.currentChapterIndex).to.equal(2);
+
+            wrapper.vm.goToPreviousStep();
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.currentChapterIndex).to.equal(1);
+        });
+
+        it("should not exceed step boundaries", async () => {
+            wrapper.vm.currentChapterIndex = 0;
+            wrapper.vm.goToPreviousStep();
+            expect(wrapper.vm.currentChapterIndex).to.equal(0);
+
+            wrapper.vm.currentChapterIndex = wrapper.vm.storyConf.chapters.length - 1;
+            wrapper.vm.goToNextStep();
+            expect(wrapper.vm.currentChapterIndex).to.equal(wrapper.vm.storyConf.chapters.length - 1);
+        });
+
+        it("should render chevron navigation icons correctly", async () => {
+            wrapper.vm.currentChapterIndex = 1;
+            await wrapper.vm.$nextTick();
+
+            const chevronUp = wrapper.find(".chevron-up .bi-arrow-up");
+            const chevronDown = wrapper.find(".chevron-down .bi-arrow-down");
+
+            expect(chevronUp.exists()).to.be.true;
+            expect(chevronDown.exists()).to.be.true;
+        });
+
+        it("should hide chevrons at step boundaries", async () => {
+            wrapper.vm.currentChapterIndex = 0;
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find(".chevron-up").exists()).to.be.false;
+
+            wrapper.vm.currentChapterIndex = wrapper.vm.storyConf.chapters.length - 1;
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find(".chevron-down").exists()).to.be.false;
+        });
+
+        it("should call navigation methods when chevron buttons are clicked", async () => {
+            wrapper.vm.currentChapterIndex = 1;
+            await wrapper.vm.$nextTick();
+
+            const goNextSpy = sinon.spy(wrapper.vm, "goToNextStep");
+            const goPrevSpy = sinon.spy(wrapper.vm, "goToPreviousStep");
+
+            await wrapper.find(".chevron-down .btn-chevron").trigger("click");
+            expect(goNextSpy.called).to.be.true;
+
+            await wrapper.find(".chevron-up .btn-chevron").trigger("click");
+            expect(goPrevSpy.called).to.be.true;
+
+            goNextSpy.restore();
+            goPrevSpy.restore();
+        });
     });
 });
