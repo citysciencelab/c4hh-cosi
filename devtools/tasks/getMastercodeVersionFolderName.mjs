@@ -27,18 +27,21 @@ export default function getMastercodeVersionFolderName () {
     const filename = fileURLToPath(import.meta.url);
     const dirname = path.dirname(filename);
     const repoRoot = path.resolve(dirname, "../../");
-    const stableVersionNumber = getStableVersionNumber();
-    let folderName = stableVersionNumber;
 
-    //  gitRevSync
+    const stableVersionNumber = getStableVersionNumber();
+    let folderName = stableVersionNumber,
+        newCreatedHead = false;
     const tagRaw = git("git describe --tags --exact-match", repoRoot); // e.g. v3.13.0
     const tag = tagRaw ? tagRaw.replace(/^v/, "").replace(/\./g, "_") : "";
     const branch = git("git rev-parse --abbrev-ref HEAD", repoRoot);
     const long = git("git rev-parse --short HEAD", repoRoot);
-    const normalizedBranch = branch === "HEAD" ? long : branch;
+    const normalizedBranch = branch === "HEAD" ? long : branch.replace(/^heads\/v/, "");// if worked with git clone ... --branch (new created head), branchname is e.g.: heads/v3.13.0
     const dateStr = git("git log -1 --format=%cd --date=format:'%Y-%m-%d__%H-%M-%S'", repoRoot).replace(/'/g, "");
 
-    if (stableVersionNumber !== tag || !normalizedBranch.includes(long)) {
+    if (normalizedBranch.replaceAll(".", "_") === stableVersionNumber) {
+        newCreatedHead = true;
+    }
+    if (!newCreatedHead && (stableVersionNumber !== tag || !normalizedBranch.includes(long))) {
         const gitLastCommitDate = dateStr || dayjs().format("YYYY-MM-DD__HH-mm-ss");
 
         folderName += `_${normalizedBranch}_git_last_commit_at_${gitLastCommitDate}`;
