@@ -61,14 +61,14 @@ export default {
                     return;
                 }
 
-                this.title = this.storyList[val]?.story?.title;
-                this.description = this.storyList[val]?.story?.description;
-                this.imageAlt = this.storyList[val]?.story?.imageAlt;
-                this.imageCopyright = this.storyList[val]?.story?.imageCopyright;
-                this.imageSrc = this.storyList[val]?.story?.imageSrc;
-                this.author = this.storyList[val]?.story?.author;
-                this.chapterContent = this.storyList[val]?.story?.chapters;
-                this.setImageAssetsById(this.storyList[val]?.imageAssetsById);
+                this.title = JSON.parse(JSON.stringify(this.storyList[val]?.story?.title));
+                this.description = JSON.parse(JSON.stringify(this.storyList[val]?.story?.description));
+                this.imageAlt = JSON.parse(JSON.stringify(this.storyList[val]?.story?.imageAlt));
+                this.imageCopyright = JSON.parse(JSON.stringify(this.storyList[val]?.story?.imageCopyright));
+                this.imageSrc = JSON.parse(JSON.stringify(this.storyList[val]?.story?.imageSrc));
+                this.author = JSON.parse(JSON.stringify(this.storyList[val]?.story?.author));
+                this.chapterContent = JSON.parse(JSON.stringify(this.storyList[val]?.story?.chapters));
+                this.setImageAssetsById(JSON.parse(JSON.stringify(this.storyList[val]?.imageAssetsById)));
                 this.updateStory();
             },
             immediate: true
@@ -136,14 +136,16 @@ export default {
          * @return {void}
          */
         discardStory () {
-            const chapterCount = this.story.chapters.length;
+            if (typeof this.currentStoryIndex !== "number") {
+                const chapterCount = this.story.chapters.length;
 
-            for (let i = 0; i < chapterCount; i++) {
-                this.deleteChapter(0);
-            }
+                for (let i = 0; i < chapterCount; i++) {
+                    this.deleteChapter(0);
+                }
 
-            if (this.imageSrc) {
-                this.removeImageAsset(this.imageSrc);
+                if (this.imageSrc) {
+                    this.removeImageAsset(this.imageSrc);
+                }
             }
 
             this.title = "";
