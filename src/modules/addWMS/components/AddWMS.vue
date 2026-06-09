@@ -360,8 +360,8 @@ export default {
                 });
 
                 if (layerEPSG4326Projection && !firstLayerExtent.length && !secondLayerExtent.length) {
-                    firstLayerExtent = crs.transform(layer[0].crs, this.projection.getCode(), [layerEPSG4326Projection.extent[1], layerEPSG4326Projection.extent[0]]);
-                    secondLayerExtent = crs.transform(layer[0].crs, this.projection.getCode(), [layerEPSG4326Projection.extent[3], layerEPSG4326Projection.extent[2]]);
+                    firstLayerExtent = crs.transform("EPSG:4326", this.projection.getCode(), [layerEPSG4326Projection.extent[1], layerEPSG4326Projection.extent[0]]);
+                    secondLayerExtent = crs.transform("EPSG:4326", this.projection.getCode(), [layerEPSG4326Projection.extent[3], layerEPSG4326Projection.extent[2]]);
                 }
                 else if (!firstLayerExtent.length && !secondLayerExtent.length) {
                     firstLayerExtent = crs.transform(layer[0].crs, this.projection.getCode(), [layer[0].extent[0], layer[0].extent[1]]);

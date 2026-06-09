@@ -567,6 +567,63 @@ describe("src/modules/addWMS/components/AddWMS.vue", () => {
             ];
             expect(wrapper.vm.getIfInExtent(capability, currentExtent)).to.be.false;
         });
+
+
+        it("no matching extent in capability - use EPSG:4326", function () {
+            const capability2 = {
+                Capability: {
+                    Layer: {
+                        "BoundingBox": [
+                            {
+                                "crs": "CRS:84",
+                                "extent": [
+                                    10.683778216290383,
+                                    48.68676493667471,
+                                    10.85441066402193,
+                                    48.75169506087416
+                                ]
+                            },
+                            {
+                                "crs": "EPSG:3857",
+                                "extent": [
+                                    1189312.750785714,
+                                    6221878.126903715,
+                                    1208307.46798,
+                                    6232833.784925716
+                                ]
+                            },
+                            {
+                                "crs": "EPSG:4326",
+                                "extent": [
+                                    48.68676493667471,
+                                    10.683778216290383,
+                                    48.75169506087416,
+                                    10.85441066402193
+                                ]
+                            },
+                            {
+                                "crs": "EPSG:900913",
+                                "extent": [
+                                    1189312.750785714,
+                                    6221878.126903715,
+                                    1208307.46798,
+                                    6232833.784925716
+                                ]
+                            }
+                        ]
+                    }
+                }
+            };
+
+            currentExtent = [
+                205000,
+                5009000,
+                730000,
+                6075800
+            ];
+
+            expect(wrapper.vm.getIfInExtent(capability2, currentExtent)).to.be.true;
+        });
     });
 
     describe("getReversedData", () => {
