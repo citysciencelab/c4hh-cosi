@@ -42,10 +42,6 @@ describe("src/modules/controls/totalView/components/TotalView.vue", () => {
         });
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
     it("renders the totalView button", () => {
         const wrapper = mount(TotalView, {
             global: {

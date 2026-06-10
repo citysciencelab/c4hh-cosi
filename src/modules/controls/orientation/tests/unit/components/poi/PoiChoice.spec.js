@@ -47,11 +47,6 @@ describe("src/modules/controls/orientation/components/PoiChoice.vue", () => {
         });
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
-
     describe("Render Component", function () {
         it("renders the Poi choice component", () => {
             expect(wrapper.find(".poi-choice").exists()).to.be.true;

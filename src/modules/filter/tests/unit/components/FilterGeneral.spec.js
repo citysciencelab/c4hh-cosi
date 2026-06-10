@@ -409,7 +409,6 @@ describe("src/modules/filter/components/FilterGeneral.vue", () => {
                 await wrapper.vm.$nextTick();
 
                 expect(wrapper.vm.layerRules).to.deep.equal([]);
-                sinon.restore();
             });
 
             it("should skip rules with empty appliedPassiveValues", async () => {
@@ -424,7 +423,6 @@ describe("src/modules/filter/components/FilterGeneral.vue", () => {
                 await wrapper.vm.$nextTick();
 
                 expect(wrapper.vm.layerRules).to.deep.equal([]);
-                sinon.restore();
             });
         });
         describe("getTagClass ", () => {

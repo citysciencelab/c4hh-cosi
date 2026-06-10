@@ -35,10 +35,6 @@ describe("src/core/js/layers/layer2dRasterStaticImage.js", () => {
         };
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
     describe("createLayer", () => {
         it("new Layer2dRasterStaticImage should create an layer with no warning", () => {
             const staticImageLayer = new Layer2dRasterStaticImage({});

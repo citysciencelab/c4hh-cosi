@@ -14,8 +14,6 @@ describe("src/modules/layerTree/components/LayerComponentIconCustom.vue", () => 
         dispatchStub;
 
     beforeEach(() => {
-        sinon.restore();
-
         layerConf = {
             id: "layer-1",
             customLayerIcon: {

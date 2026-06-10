@@ -39,7 +39,6 @@ describe("src/core/js/layers/layer2dRasterGeoTiff.js", () => {
     afterAll(() => {
         global.fetch = fetch;
         styleListStub.restore();
-        sinon.restore();
     });
 
     beforeEach(() => {

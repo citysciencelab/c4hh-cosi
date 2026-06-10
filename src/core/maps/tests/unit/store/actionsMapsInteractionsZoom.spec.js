@@ -37,10 +37,6 @@ describe("src/core/maps/store/actionsMapsInteractionsZoom.js", () => {
         mapCollection.addMap(map2d, "2D");
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
     describe("decreaseZoom", () => {
         it("should decrease zoom level by one", () => {
             decreaseZoom({dispatch});

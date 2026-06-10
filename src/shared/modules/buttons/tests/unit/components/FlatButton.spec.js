@@ -61,6 +61,5 @@ describe("src/shared/components/FlatButton.vue", () => {
         await wrapper.trigger("click");
 
         expect(interactionSpy.calledOnce).to.be.true;
-        sinon.restore;
     });
 });

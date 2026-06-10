@@ -126,7 +126,6 @@ describe("src/modules/searchBar/js/searchBarUrlParams.js", () => {
 
 
     afterEach(() => {
-        sinon.restore();
         store.getters = origGetters;
     });
 

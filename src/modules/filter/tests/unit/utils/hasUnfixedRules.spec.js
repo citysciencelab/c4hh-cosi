@@ -44,6 +44,5 @@ describe("hasUnfixedRules", () => {
 
         sinon.stub(isRule);
         expect(hasUnfixedRules(rules)).to.be.true;
-        sinon.restore();
     });
 });

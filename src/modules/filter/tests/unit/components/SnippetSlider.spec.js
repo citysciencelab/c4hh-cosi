@@ -71,7 +71,6 @@ describe("src/modules/filter/components/SnippetSlider.vue", () => {
             await clock.tickAsync(1);
             expect(wrapper.find(".input-single").element.value).to.equal("50");
             expect(wrapper.find(".slider-single").element.value).to.equal("50");
-            sinon.restore();
         });
         it("should set input value by slider", async () => {
             const wrapper = shallowMount(SnippetSlider, {

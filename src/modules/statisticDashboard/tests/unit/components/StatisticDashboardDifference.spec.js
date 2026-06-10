@@ -112,8 +112,6 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
 
                 expect(setSelectedReferenceDataStub.calledWith(expected)).to.be.true;
                 expect(wrapper.vm.selectedRegion).to.be.an("string").that.is.empty;
-
-                sinon.restore();
             });
             it("should set the selectedReferenceData to undefined for date if no vale for selectedDate is set", () => {
                 const wrapper = shallowMount(StatisticDashboardDifference, {
@@ -129,8 +127,6 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
 
                 expect(setSelectedReferenceDataStub.calledWith(undefined)).to.be.true;
                 expect(wrapper.vm.selectedRegion).to.be.an("string").that.is.empty;
-
-                sinon.restore();
             });
             it("should set the selectedReferenceData to the emit object for region", () => {
                 const wrapper = shallowMount(StatisticDashboardDifference, {
@@ -150,8 +146,6 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
 
                 expect(setSelectedReferenceDataStub.calledWith(expected)).to.be.true;
                 expect(wrapper.vm.selectedDate).to.be.an("string").that.is.empty;
-
-                sinon.restore();
             });
             it("should set the selectedReferenceData to undefined for region", () => {
                 const wrapper = shallowMount(StatisticDashboardDifference, {
@@ -167,8 +161,6 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
 
                 expect(setSelectedReferenceDataStub.calledWith(undefined)).to.be.true;
                 expect(wrapper.vm.selectedDate).to.be.an("string").that.is.empty;
-
-                sinon.restore();
             });
             it("should set the selectedReferenceData", async () => {
                 const wrapper = shallowMount(StatisticDashboardDifference, {
@@ -182,8 +174,6 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
                 wrapper.vm.selectedRegion = "Hamburg";
                 wrapper.vm.updateSelectedReferenceData("region");
                 expect(setSelectedReferenceDataStub.called).to.be.true;
-
-                sinon.restore();
             });
         });
         describe("getRegionsOptionsForLastChild", () => {

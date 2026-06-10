@@ -83,7 +83,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 openlayerFunctions.getMapProjection = sinon.stub().returns("foo");
                 filterApi.setServiceByLayerModel(0, layerModel, false);
                 expect(filterApi.service).to.deep.equal(expected);
-                sinon.restore();
             });
             it("should set the version in the wfs service", () => {
                 const filterApi = new FilterApi(0),
@@ -110,7 +109,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 openlayerFunctions.getMapProjection = sinon.stub().returns("foo");
                 filterApi.setServiceByLayerModel(0, layerModel, false);
                 expect(filterApi.service).to.deep.equal(expected);
-                sinon.restore();
             });
             it("should set the service for oaf", () => {
                 const filterApi = new FilterApi(0),
@@ -270,7 +268,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getAttrTypes(result => {
                     expect(result).to.be.equal(expected);
                 });
-                sinon.restore();
             });
             it("should call error function with expected error if cache key not matches and no connector is given", () => {
                 const filterApi = new FilterApi(0),
@@ -283,7 +280,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getAttrTypes(undefined, error => {
                     expect(error).to.deep.equal(expected);
                 });
-                sinon.restore();
             });
             it("should call the onsuccess function with expected result if cache key exists but has no array", () => {
                 const filterApi = new FilterApi(0),
@@ -304,7 +300,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                         "fow.bar": "foo"
                     });
                 });
-                sinon.restore();
             });
             it("should push object with onsuccess and onerror if waitinglist with key is already an array", () => {
                 /**
@@ -335,7 +330,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 FilterApi.waitingList["fow.bar"] = [];
                 filterApi.getAttrTypes(onsuccess, onerror);
                 expect(FilterApi.waitingList["fow.bar"]).to.deep.equal([{onsuccess, onerror}]);
-                sinon.restore();
             });
         });
         describe("getMinMax", () => {
@@ -348,7 +342,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getMinMax("foo", undefined, error => {
                     expect(error).to.deep.equal(expected);
                 }, false, false, false, {});
-                sinon.restore();
             });
             it("should call onsucces function if cache key matches existing cache key", () => {
                 const filterApi = new FilterApi(0),
@@ -361,7 +354,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getMinMax("attr", result => {
                     expect(result).to.be.equal(expected);
                 }, undefined, false, false, false, {});
-                sinon.restore();
             });
             it("should call given error function with expected error, if connector is not an object", () => {
                 const filterApi = new FilterApi(0),
@@ -373,7 +365,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getMinMax("attr", undefined, error => {
                     expect(error).to.deep.equal(expected);
                 }, false, false, false, {});
-                sinon.restore();
             });
             it("should call given error function with expected error, if connector.getMinMax is not a function", () => {
                 const filterApi = new FilterApi(0),
@@ -385,7 +376,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getMinMax("attr", undefined, error => {
                     expect(error).to.deep.equal(expected);
                 }, false, false, false, {});
-                sinon.restore();
             });
             it("should call onsuccess function and return the expected value, if waitingList with key is not an array.", () => {
                 const filterApi = new FilterApi(0),
@@ -407,7 +397,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                         "fow.bar": "foo"
                     });
                 }, undefined, false, false, false, {});
-                sinon.restore();
             });
             it("should push object with onsuccess and onerror if waitinglist with key is already an array", () => {
                 /**
@@ -438,7 +427,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 FilterApi.waitingList["fow.bar"] = [];
                 filterApi.getMinMax("attr", onsuccess, onerror, false, false, false, {});
                 expect(FilterApi.waitingList["fow.bar"]).to.deep.equal([{onsuccess, onerror}]);
-                sinon.restore();
             });
         });
         describe("getUniqueValues", () => {
@@ -463,7 +451,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getUniqueValues("attr", result => {
                     expect(result).to.be.deep.equal(expected);
                 }, undefined, {});
-                sinon.restore();
             });
             it("should call given error function with expected error, if connector is not an object", () => {
                 const filterApi = new FilterApi(0),
@@ -475,7 +462,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getUniqueValues("attr", undefined, error => {
                     expect(error).to.deep.equal(expected);
                 }, false, false, false, {});
-                sinon.restore();
             });
             it("should call onsuccess function and return the expected value, if waitingList with key is not an array.", () => {
                 const filterApi = new FilterApi(0),
@@ -493,7 +479,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.getUniqueValues("attr", result => {
                     expect(result).to.be.deep.equal(expected);
                 }, undefined, {});
-                sinon.restore();
             });
             it("should call onsuccess function and return the expected value, if service is extern and searchInMapExtent is true.", async () => {
                 const filterApi = new FilterApi(0),
@@ -515,7 +500,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                         "fow.bar": "foo"
                     });
                 }, undefined, false, false, false, {commands: {searchInMapExtent: true}});
-                sinon.restore();
             });
             it("should push object with onsuccess and onerror if waitinglist with key is already an array", () => {
                 /**
@@ -546,7 +530,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 FilterApi.waitingList["fow.bar"] = [];
                 filterApi.getUniqueValues("attr", onsuccess, onerror, {});
                 expect(FilterApi.waitingList["fow.bar"]).to.deep.equal([{onsuccess, onerror}]);
-                sinon.restore();
             });
         });
         describe("filter", () => {
@@ -559,7 +542,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.filter({}, undefined, error => {
                     expect(error).to.deep.equal(expected);
                 });
-                sinon.restore();
             });
             it("should call onsuccess function and return the expected value, if connector is an object and connector.filter is a function", () => {
                 const filterApi = new FilterApi(0),
@@ -575,7 +557,6 @@ describe("src/modules/filter/interfaces/filter.api.js", () => {
                 filterApi.filter({}, result => {
                     expect(result).to.deep.equal(expected);
                 }, undefined);
-                sinon.restore();
             });
             it("should call onsuccess with expected dummy data if last param is set to true", () => {
                 const filterApi = new FilterApi(0),

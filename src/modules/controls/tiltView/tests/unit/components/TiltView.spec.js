@@ -65,10 +65,6 @@ describe("src/modules/controls/button3d/components/TiltView.vue", () => {
         });
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
     it("renders the TiltView button", () => {
         const wrapper = mount(TiltView, {
             global: {

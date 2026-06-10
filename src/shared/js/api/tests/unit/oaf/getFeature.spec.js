@@ -85,7 +85,6 @@ describe("src/shared/js/api/oaf", () => {
 
             await getOAFFeature.getOAFFeatureGet(param1, param2);
             expect(oafRecursionHelperStub.calledWith([], `${param1}/collections/${param2}/items?limit=${defaultLimit}`)).to.be.true;
-            sinon.restore();
         });
         it("should call oafRecursionHelper with correct params, if crs is undefined", async () => {
             const oafRecursionHelperStub = sinon.stub(getOAFFeature, "oafRecursionHelper"),
@@ -98,7 +97,6 @@ describe("src/shared/js/api/oaf", () => {
 
             await getOAFFeature.getOAFFeatureGet(param1, param2, {limit: param3, filter: param4, filterCrs: param5, crs: param6});
             expect(oafRecursionHelperStub.calledWith([], `${param1}/collections/${param2}/items?limit=${param3}&filter=${param4}&filter-crs=${param5}`)).to.be.true;
-            sinon.restore();
         });
         it("should call oafRecursionHelper with correct params, if crs is defined", async () => {
             const oafRecursionHelperStub = sinon.stub(getOAFFeature, "oafRecursionHelper"),
@@ -111,7 +109,6 @@ describe("src/shared/js/api/oaf", () => {
 
             await getOAFFeature.getOAFFeatureGet(param1, param2, {limit: param3, filter: param4, filterCrs: param5, crs: param6});
             expect(oafRecursionHelperStub.calledWith([], `${param1}/collections/${param2}/items?limit=${param3}&filter=${param4}&filter-crs=${param5}&crs=${param6}`)).to.be.true;
-            sinon.restore();
         });
     });
     describe("readAllOAFToGeoJSON", () => {
@@ -137,7 +134,6 @@ describe("src/shared/js/api/oaf", () => {
             });
             expect(errorToTest).to.not.be.null;
             expect(errorToTest).to.deep.equal(error);
-            sinon.restore();
         });
         it("should merge the new features with already existing one", async () => {
             let result = null;
@@ -146,7 +142,6 @@ describe("src/shared/js/api/oaf", () => {
             sinon.stub(axios, "get").resolves({data: {features: ["boo", "baz"]}});
             result = await getOAFFeature.oafRecursionHelper(existing);
             expect(result).to.deep.equal(["foo", "bar", "boo", "baz"]);
-            sinon.restore();
         });
     });
     describe("getNextLinkFromFeatureCollection", () => {
@@ -227,7 +222,6 @@ describe("src/shared/js/api/oaf", () => {
             } while (!done);
 
             expect(features.length).to.equal(2);
-            sinon.restore();
         });
 
         it("should request the nextUrl if present", async () => {
@@ -242,8 +236,6 @@ describe("src/shared/js/api/oaf", () => {
             }).onSecondCall().callsFake(() => {
                 expect(axiosGetStub.secondCall.args[0]).to.equal("http://next");
             });
-
-            sinon.restore();
         });
         it("should pass only defined/non-empty searchParams as axios params", async () => {
             const axiosGetStub = sinon.stub(axios, "get").resolves({
@@ -278,7 +270,6 @@ describe("src/shared/js/api/oaf", () => {
             const [, config] = axiosGetStub.firstCall.args;
 
             expect(config.params).to.deep.equal({a: 1, b: "x", f: 0, g: false});
-            sinon.restore();
         });
         it("should call axios.get with (url, signal) when there are no params", async () => {
             const signal = {foo: "bar"},
@@ -303,8 +294,6 @@ describe("src/shared/js/api/oaf", () => {
             expect(axiosGetStub.calledOnce).to.be.true;
             expect(axiosGetStub.firstCall.args[0]).to.equal("http://test");
             expect(axiosGetStub.firstCall.args[1]).to.equal(signal);
-
-            sinon.restore();
         });
         it("should emit progress events when getProgress=true (and include total from numberMatched)", async () => {
             sinon.stub(axios, "get").resolves({
@@ -344,8 +333,6 @@ describe("src/shared/js/api/oaf", () => {
             expect(events[1]).to.have.property("type", "feature");
             expect(events[1].feature).to.be.instanceOf(Feature);
             expect(events[2]).to.deep.equal({type: "progress", loaded: 2, total: 2});
-
-            sinon.restore();
         });
         it("should keep total as null when numberMatched is not finite", async () => {
             sinon.stub(axios, "get").resolves({
@@ -379,8 +366,6 @@ describe("src/shared/js/api/oaf", () => {
 
             expect(events).to.have.length(2);
             expect(events[1]).to.deep.equal({type: "progress", loaded: 1, total: null});
-
-            sinon.restore();
         });
         it("should throw an error when axios.get rejects", async () => {
             const err = new Error("network fail");
@@ -405,8 +390,6 @@ describe("src/shared/js/api/oaf", () => {
                 thrown = e;
             }
             expect(thrown).to.equal(err);
-
-            sinon.restore();
         });
     });
     describe("getUniqueValuesByScheme", () => {
@@ -441,13 +424,11 @@ describe("src/shared/js/api/oaf", () => {
             sinon.stub(axios, "get").resolves({status: 400});
             sinon.stub(getOAFFeature, "getUniqueValuesFromCollection").resolves({});
             expect(await getOAFFeature.getUniqueValuesByScheme("foo", "foo", [])).to.be.an("object").that.is.empty;
-            sinon.restore();
         });
         it("should return an empty object if request was successfull but without expected data", async () => {
             sinon.stub(axios, "get").resolves({data: "foo"});
             sinon.stub(getOAFFeature, "getUniqueValuesFromCollection").resolves({});
             expect(await getOAFFeature.getUniqueValuesByScheme("foo", "foo", [])).to.be.an("object").that.is.empty;
-            sinon.restore();
         });
         it("should return an object with all properties", async () => {
             const expected = {
@@ -470,7 +451,6 @@ describe("src/shared/js/api/oaf", () => {
                 }
             });
             expect(await getOAFFeature.getUniqueValuesByScheme("foo", "foo", [])).to.deep.equal(expected);
-            sinon.restore();
         });
         it("should return an object with only the expected properties", async () => {
             const expected = {
@@ -492,7 +472,6 @@ describe("src/shared/js/api/oaf", () => {
                 }
             });
             expect(await getOAFFeature.getUniqueValuesByScheme("foo", "foo", ["boo"])).to.deep.equal(expected);
-            sinon.restore();
         });
         it("should return an object with expected properties which weren't gathered through enums", async () => {
             const expected = {
@@ -511,7 +490,6 @@ describe("src/shared/js/api/oaf", () => {
                 }
             });
             expect(await getOAFFeature.getUniqueValuesByScheme("foo", "foo", ["boo"])).to.deep.equal(expected);
-            sinon.restore();
         });
     });
     describe("getOAFGeometryFilter", () => {
@@ -587,8 +565,6 @@ describe("src/shared/js/api/oaf", () => {
             sinon.stub(axios, "get").resolves({status: 400});
 
             expect(await getOAFFeature.getTemporalExtent()).to.be.undefined;
-
-            sinon.restore();
         });
 
         it("should return expected results", async () => {
@@ -607,8 +583,6 @@ describe("src/shared/js/api/oaf", () => {
 
             expect((await getOAFFeature.getTemporalExtent("", "")).map(i => i.map(d => d.getFullYear())))
                 .to.deep.equal([[2000, 2001], [2023, 2024]]);
-
-            sinon.restore();
         });
     });
     describe("getOafParamsSerialized", () => {

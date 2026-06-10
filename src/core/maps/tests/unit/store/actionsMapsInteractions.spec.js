@@ -36,10 +36,6 @@ describe("src/core/maps/store/actionsMapsInteractions.js", () => {
         mapCollection.addMap(olMap, "2D");
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
     describe("registerListener", () => {
         it("register pointermove listener to ol map and execute function", () => {
             const dispatch = sinon.spy(),

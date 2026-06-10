@@ -51,10 +51,6 @@ describe("src/modules/controls/zoom/components/ZoomInAndOut.vue", () => {
         });
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
     it("renders the ZoomInAndOut buttons", () => {
         const wrapper = mount(ZoomInAndOut, {
             global: {

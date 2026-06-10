@@ -59,7 +59,6 @@ describe("src/core/js/layers/layerFactory.js", () => {
 
     afterAll(() => {
         store.getters = origGetters;
-        sinon.restore();
     });
 
     describe("createLayer", () => {

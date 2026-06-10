@@ -359,7 +359,6 @@ describe("src/shared/modules/table/components/TableComponent.vue", () => {
 
             await button.trigger("click");
             expect(resetAllSpy.calledOnce).to.be.true;
-            sinon.restore();
         });
     });
     describe("methods", () => {
@@ -928,7 +927,6 @@ describe("src/shared/modules/table/components/TableComponent.vue", () => {
                 sinon.stub(wrapper.vm, "moveColumnToPlace");
                 wrapper.vm.toggleColumnFix(column);
                 expect(wrapper.vm.fixedColumn).to.be.equal(column);
-                sinon.restore();
             });
         });
         describe("moveColumnToPlace", () => {

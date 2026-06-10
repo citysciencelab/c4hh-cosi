@@ -27,7 +27,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
                 expect(error).to.deep.equal(expectedError);
                 expect(stubGetLayerByLayerId.called).to.be.true;
             });
-            sinon.restore();
         });
         it("should call the onsuccess function and return an empty list if no features in current extent", () => {
             sinon.stub(openlayerFunctions, "getLayerByLayerId").returns({
@@ -44,7 +43,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
             interfaceVectorTilesIntern.getAttrTypes({}, attrTypes => {
                 expect(attrTypes).to.deep.equal({});
             }, undefined);
-            sinon.restore();
         });
         it("should call the onsuccess function with expected result", () => {
             sinon.stub(openlayerFunctions, "getLayerByLayerId").returns({
@@ -73,7 +71,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
             interfaceVectorTilesIntern.getAttrTypes({}, attrTypes => {
                 expect(attrTypes).to.deep.equal(expected);
             }, undefined);
-            sinon.restore();
         });
     });
     describe("getMinMax", () => {
@@ -88,7 +85,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
                 expect(error).to.deep.equal(expectedError);
                 expect(stubGetLayerByLayerId.called).to.be.true;
             }, false, false);
-            sinon.restore();
         });
         it("should call the onsuccess function with {min: false, max:false} param, if no features exists in current extent.", () => {
             sinon.stub(layerCollection, "getLayerById").returns({
@@ -111,7 +107,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
             interfaceVectorTilesIntern.getMinMax(service, attrName, minMaxObj => {
                 expect(minMaxObj).to.deep.equal(expectedObj);
             }, onerror, false, false);
-            sinon.restore();
         });
         it("should call onsuccess with expected min max result", () => {
             sinon.stub(openlayerFunctions, "getLayerByLayerId").returns({
@@ -139,7 +134,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
             interfaceVectorTilesIntern.getMinMax(service, attrName, minMaxObj => {
                 expect(minMaxObj).to.deep.equal(expectedObj);
             }, onerror, true, true);
-            sinon.restore();
         });
     });
     describe("getUniqueValues", () => {
@@ -154,7 +148,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
                 expect(error).to.deep.equal(expectedError);
                 expect(stubGetLayerByLayerId.called).to.be.true;
             });
-            sinon.restore();
         });
         it("should call the onsuccess function, even if no features exists in current extent.", () => {
             sinon.stub(openlayerFunctions, "getLayerByLayerId").returns({
@@ -177,7 +170,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
             interfaceVectorTilesIntern.getUniqueValues(service, attrName, uniqueValues => {
                 expect(uniqueValues).to.deep.equal(expected);
             }, onerror);
-            sinon.restore();
         });
         it("should return unique values if features exists", () => {
             sinon.stub(openlayerFunctions, "getLayerByLayerId").returns({
@@ -203,7 +195,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
             interfaceVectorTilesIntern.getUniqueValues(service, attrName, uniqueValues => {
                 expect(uniqueValues).to.deep.equal(expected);
             }, onerror);
-            sinon.restore();
         });
     });
     describe("filterGivenFeatures", () => {
@@ -240,7 +231,6 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
                         items: [feature]
                     });
                 });
-            sinon.restore();
         });
     });
 });

@@ -68,7 +68,6 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
 
             urlHandler.readFromUrlParams(str);
             expect(transformOldUrlStub.called).to.be.true;
-            sinon.restore();
         });
     });
     describe("transformOldUrl", () => {
@@ -119,7 +118,6 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
             urlHandler.transformOldUrl([{"foooo": "fpp"}], {}, undefined, result => {
                 expect(result).to.deep.equal(expected);
             });
-            sinon.restore();
         });
         it("should return the template filled with data from the given param", () => {
             const matchingFilterStub = sinon.stub(urlHandler, "getMatchingFilterFromGroupsOrLayers"),
@@ -165,7 +163,6 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
 
 
             urlHandler.transformOldUrl([{rules: [{foo: "foo"}]}], {}, mapHandler, onsuccess);
-            sinon.restore();
         });
     });
     describe("setResultValues", () => {
@@ -307,7 +304,6 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
             });
             urlHandler.setResultValues(oldFilterObject, matchingFilter, attrTypes, result);
             expect(result).to.deep.equal(expected);
-            sinon.restore();
         });
     });
     describe("getMatchingFilterFromGroupsOrLayers", () => {

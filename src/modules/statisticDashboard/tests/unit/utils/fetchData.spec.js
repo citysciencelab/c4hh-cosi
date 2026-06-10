@@ -130,7 +130,6 @@ describe("src/modules/statisticDashboard/utils/fetchData.js", () => {
         it("should return an empty array if getLayerWhere returns null", async () => {
             sinon.stub(rawLayerList, "getLayerWhere").returns(null);
             expect(await fetchData.getUniqueValues(1234)).to.be.an("object").that.is.empty;
-            sinon.restore();
         });
         it("should call expected functions", async () => {
             const features = null,
@@ -143,7 +142,6 @@ describe("src/modules/statisticDashboard/utils/fetchData.js", () => {
 
             await fetchData.getUniqueValues("1234", ["foo"]);
             expect(fetchData.getUniqueValuesFromFeatures.calledWith([], attributesWithType)).to.be.true;
-            sinon.restore();
         });
     });
 });

@@ -52,7 +52,6 @@ describe("src/core/js/layers/layer2dRasterWmts.js", () => {
 
     afterAll(() => {
         global.fetch = fetch;
-        sinon.restore();
     });
 
     describe("createLayer", () => {

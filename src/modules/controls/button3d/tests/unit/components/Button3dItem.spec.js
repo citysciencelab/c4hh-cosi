@@ -47,10 +47,6 @@ describe("src/modules/controls/button3d/components/Button3dItem.vue", () => {
         });
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
     it("renders the button3d button", () => {
         const wrapper = mount(Button3dItem, {
             global: {
