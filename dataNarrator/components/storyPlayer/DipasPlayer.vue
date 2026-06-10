@@ -334,7 +334,7 @@ export default {
          */
         callClose () {
             if (this.storyConf.showHomeButton) {
-                this.changeCurrentComponent({type: "storySelector", side: "secondaryMenu", props: {name: "DipasStorySelector"}});
+                this.changeCurrentComponent({type: "dipasStorySelector", side: "secondaryMenu", props: {name: "DipasStorySelector"}});
             }
         },
         /**

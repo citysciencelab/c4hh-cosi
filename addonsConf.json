@@ -241,11 +241,7 @@
     "type": "tool"
   },
   "dataNarrator": {
-    "path": "storyTellingTool/dataNarrator",
-    "type": "tool"
-  },
-  "storySelector": {
-    "path": "storyTellingTool/storySelector",
+    "path": "dataNarrator",
     "type": "tool"
   },
   "storyPlayer": {
