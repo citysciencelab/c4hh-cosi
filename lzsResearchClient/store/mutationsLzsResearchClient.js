@@ -61,6 +61,45 @@ const mutations = {
         })();
 
         state.searchAttributeResponse = uniqueInstanceSearchAttributeResponse;
+    },
+    /**
+     * Updates the checked state on a dataset within searchAttributeResponse and attributesToDownload.
+     * Adds the dataset to attributesToDownload if it is not already present.
+     * @param {Object} state - The current state object.
+     * @param {String} instanceId - The instanceId of the dataset to update.
+     * @param {Boolean} checked - The new checked value.
+     * @returns {void}
+     */
+    setCheckedForInstanceId (state, {instanceId, checked}) {
+        const dataset = state.searchAttributeResponse?.find(d => d.instanceId === instanceId);
+
+        if (dataset) {
+            dataset.checked = checked;
+
+            const alreadyInDownload = state.attributesToDownload.find(d => d.instanceId === instanceId);
+
+            if (alreadyInDownload) {
+                alreadyInDownload.checked = checked;
+            }
+            else {
+                state.attributesToDownload.push(dataset);
+            }
+        }
+        else {
+            const datasetInDownload = state.attributesToDownload.find(d => d.instanceId === instanceId);
+
+            if (datasetInDownload) {
+                datasetInDownload.checked = checked;
+            }
+        }
+    },
+    /**
+     * Remove unchecked datasets from attributesToDownload to remove unnecessary datasets from the download list.
+     * @param {Object} state - The current state object.
+     * @returns {void}
+     * */
+    removeUncheckedFromAttributesToDownload (state) {
+        state.attributesToDownload = state.attributesToDownload.filter(d => d.checked);
     }
 };
 

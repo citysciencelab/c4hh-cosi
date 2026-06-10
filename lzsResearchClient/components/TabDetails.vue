@@ -251,6 +251,7 @@ export default {
                 :table-header="getTableHeaders()"
                 :table-datasets="getTableDatasets()"
                 :show-buttons="showTableButtons"
+                :show-checkboxes="false"
                 @showPreview="showPreview"
                 @download="downloadDataset"
             />

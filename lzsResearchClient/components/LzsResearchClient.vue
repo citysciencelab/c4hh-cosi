@@ -166,7 +166,7 @@ export default {
 
             <IconButton
                 :class-array="['btn-light', 'me-2', 'errorCloseButton']"
-                :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.goToDetails')"
+                :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.goToDetails')"
                 icon="bi-x"
                 @click="hideErrorMessage"
             />

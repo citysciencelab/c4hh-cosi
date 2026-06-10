@@ -17,8 +17,8 @@
                     "label": "Details",
                     "title": "Detailinformationen",
                     "datasetInfoTable": {
-                      "archive": "Archiv",
-                      "datasetProtectionClass": "Datenschutzklasse"
+                        "archive": "Archiv",
+                        "datasetProtectionClass": "Datenschutzklasse"
                     },
                     "numberOfResults": "Anzahl der gefundenen Datensätze:",
                     "backButtonLabel": "Zurück",
@@ -49,25 +49,31 @@
                 "tabResult": {
                     "label": "Ergebnisse",
                     "numberOfResults": "Anzahl der gefundenen Datensätze:",
+                    "toDownload": "Weiter zum Download"
+                },
+                "tabDownload": {
+                    "label": "Download",
+                    "numberOfResults": "Anzahl der vorselektierten Datensätze:",
+                    "downloadButtonLabel": "Downloaden"
+                },
+                "archiveList": {
                     "toggleAccordions": {
-                      "openAll": "Alles aufklappen",
-                      "closeAll": "Alles zuklappen"
+                        "openAll": "Alles aufklappen",
+                        "closeAll": "Alles zuklappen"
                     },
+                    "selectAll": "Alles selektieren",
                     "groupByLabel": "Gruppieren nach",
                     "selectOptionLabel": "Option selektieren",
                     "table": {
-                      "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
-                      "goToDetails": "Details zum Datensatz anzeigen",
-                      "showPreview": "Vorschau anzeigen",
-                      "download": "Datensatz herunterladen",
-                      "headers": {
-                        "position": "Lage",
-                        "details": "Details"
-                      }
+                        "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
+                        "goToDetails": "Details zum Datensatz anzeigen",
+                        "showPreview": "Vorschau anzeigen",
+                        "download": "Datensatz herunterladen",
+                        "headers": {
+                            "position": "Lage",
+                            "details": "Details"
+                        }
                     }
-                },
-                "tabDownload": {
-                    "label": "Download"
                 }
             },
             "zipAndDownload": {

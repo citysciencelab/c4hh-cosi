@@ -1,5 +1,5 @@
 <script>
-import {mapActions, mapGetters} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
@@ -29,6 +29,11 @@ export default {
             type: Boolean,
             required: false,
             default: false
+        },
+        showCheckboxes: {
+            type: Boolean,
+            required: false,
+            default: true
         },
         showButtons: {
             type: Object,
@@ -64,6 +69,10 @@ export default {
         sortableHeaderCount () {
             return this.tableDatasets[0]?.attributes.length || 0;
         },
+        headerChecked () {
+            return this.tableDatasets.length > 0
+                && this.tableDatasets.every(d => d.checked);
+        },
         cssVars () {
             return {
                 "--geomIndicatorFillColor": this.lzsGeomLayout.fillColor.join(","),
@@ -75,6 +84,31 @@ export default {
         ...mapActions("Modules/LzsResearchClient", [
             "fetchGeometryForInstanceId"
         ]),
+        ...mapMutations("Modules/LzsResearchClient", [
+            "setCheckedForInstanceId"
+        ]),
+        /**
+         * Pushes "checked" values back into searchAttributeResponse and attributesToDownload using instanceId.
+         * If a single dataset is provided, only that one is synced; otherwise all datasets in sortedData are synced.
+         * @param {Object} dataset - Optional single dataset to sync.
+         * @returns {void}
+         */
+        syncCheckedToStore (dataset) {
+            if (dataset) {
+                this.setCheckedForInstanceId({
+                    instanceId: dataset.instanceId,
+                    checked: Boolean(dataset.checked)
+                });
+                return;
+            }
+
+            this.sortedData.forEach((entry) => {
+                this.setCheckedForInstanceId({
+                    instanceId: entry.instanceId,
+                    checked: Boolean(entry.checked)
+                });
+            });
+        },
         /**
          * Toggles the dataset's geometry on the map and marks it as currently shown if it was not before.
          * Emits "showGeom" to notify parents.
@@ -303,6 +337,25 @@ export default {
             });
 
             return sortAsc ? sortedData : sortedData.reverse();
+        },
+        /** Toggles the checked state of all datasets in the table and syncs the changes to the store.
+         * @param {Boolean} changeTo - Is the new checked value for the table.
+         */
+        toggleAllRows (changeTo) {
+            this.sortedData.forEach(dataset => {
+                dataset.checked = changeTo;
+            });
+
+            this.syncCheckedToStore();
+        },
+        /** Toggles the checked state of a single dataset and syncs the change to the store.
+         * @param {Object} dataset - The dataset for which the checked state should be toggled.
+         * @param {Boolean} changeTo - Is the new checked value for the dataset.
+         */
+        toggleOneRow (dataset, changeTo) {
+            dataset.checked = changeTo;
+
+            this.syncCheckedToStore(dataset);
         }
     }
 };
@@ -316,6 +369,18 @@ export default {
         <table v-if="sortedData.length">
             <thead>
                 <tr>
+                    <th
+                        v-if="showCheckboxes"
+                        @click.stop="toggleAllRows(!headerChecked)"
+                        @keypress.stop="toggleAllRows(!headerChecked)"
+                    >
+                        <input
+                            id="header-checkbox"
+                            type="checkbox"
+                            :checked="headerChecked"
+                            @change="(evt) => toggleAllRows(evt.target.checked)"
+                        >
+                    </th>
                     <th
                         v-for="(attrName, attrIndex) in tableHeader"
                         :key="attrName"
@@ -346,9 +411,23 @@ export default {
                     :data-dataset-index="datasetIndex"
                 >
                     <td
+                        v-if="showCheckboxes"
+                        @click.stop="toggleOneRow(dataset, !dataset.checked)"
+                        @keypress.stop="toggleOneRow(dataset, !dataset.checked)"
+                    >
+                        <input
+                            :id="`checkbox-${datasetIndex}`"
+                            type="checkbox"
+                            :checked="dataset.checked"
+                            @change="(evt) => toggleOneRow(dataset, evt.target.checked)"
+                        >
+                    </td>
+                    <td
                         v-for="attrName in sortedData[0].attributes.map(a => a.id || a.name)"
                         :key="attrName"
                         :class="`td-item-${attrName}`"
+                        @click.stop="showCheckboxes ? toggleOneRow(dataset, !dataset.checked) : undefined"
+                        @keypress.stop="showCheckboxes ? toggleOneRow(dataset, !dataset.checked) : undefined"
                     >
                         {{
                             (dataset.attributes.find(a => (a.id || a.name) === attrName) || {}).value || ''
@@ -367,7 +446,7 @@ export default {
                                 dataset.instanceId === currentlyShownGeorefId ? 'isShownGeometry' : ''
                             ]"
                             :style="cssVars"
-                            :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.showPositionInMap')"
+                            :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.showPositionInMap')"
                             icon="bi-crosshair"
                             @click="toggleDatasetPositionInMap(dataset)"
                         />
@@ -377,7 +456,7 @@ export default {
                         <IconButton
                             v-if="showButtons.details"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
-                            :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.goToDetails')"
+                            :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.goToDetails')"
                             icon="bi-arrow-right-circle"
                             @click="$emit('openDetails', dataset.instanceId)"
                         />
@@ -387,7 +466,7 @@ export default {
                         <IconButton
                             v-if="showButtons.preview && dataset.hasPreview"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
-                            :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.showPreview')"
+                            :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.showPreview')"
                             icon="bi-image"
                             @click="$emit('showPreview', dataset.instanceId)"
                         />
@@ -397,7 +476,7 @@ export default {
                         <IconButton
                             v-if="showButtons.download"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
-                            :aria="$t('additional:modules.lzsResearchClient.tabs.tabResult.table.download')"
+                            :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.download')"
                             icon="bi-file-earmark-arrow-down"
                             @click="$emit('download', dataset.instanceId)"
                         />
@@ -415,6 +494,9 @@ export default {
         width: 100%;
 
         th {
+            &:first-child {
+                padding-left: 1rem;
+            }
             span.sortable-icon {
                 cursor: pointer;
                 margin: 0 0 0 0.5rem;

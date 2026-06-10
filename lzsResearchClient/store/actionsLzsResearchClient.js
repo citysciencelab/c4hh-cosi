@@ -59,6 +59,7 @@ export default {
     },
     /**
      * Search dataclass instances by attribute payload and commit results.
+     * If the dataset from the search response is already in attributesToDownload, the checked state from attributesToDownload will be used. Otherwise, it will be set to false.
      * @param {object} context - Vuex action context (state, commit, dispatch).
      * @param {object} payload - Search payload sent to the API.
      */
@@ -77,13 +78,16 @@ export default {
                 const searchAttributeResponse = [];
 
                 response.data.forEach(element => {
+                    const inDownload = state.attributesToDownload.find(d => d.instanceId === element.dataclassinstanceId);
+
                     searchAttributeResponse.push({
                         archiveId: element.dataclassId,
                         instanceId: element.dataclassinstanceId,
                         attributes: element.dataclassinstanceAttributeArr
                             .filter(attr => attr.type !== "P")
                             .map(attr => ({...attr, id: attr.name})),
-                        geom: null
+                        geom: null,
+                        checked: inDownload ? inDownload.checked : false
                     });
                 });
 
@@ -140,6 +144,7 @@ export default {
     },
     /**
      * Send a geometry-based search request.
+     * If the dataset from the search response is already in attributesToDownload, the checked state from attributesToDownload will be used. Otherwise, it will be set to false.
      * @param {object} context - Vuex action context (state).
      * @param {object} payload - Search payload including geometry and attributes.
      * @returns {Promise} Axios response from the search API.
@@ -160,13 +165,16 @@ export default {
                 const searchAttributeResponse = [];
 
                 response.data.foundItems.forEach(element => {
+                    const inDownload = state.attributesToDownload.find(d => d.instanceId === element.dklInstanceId);
+
                     searchAttributeResponse.push({
                         archiveId: element.dklId,
                         instanceId: element.dklInstanceId,
                         attributes: element.dklAttributeList
                             .filter(attr => attr.type !== "P")
                             .map(attr => ({...attr, name: attr.id})),
-                        geom: element.featuregeometrie?.features[0]?.geometry
+                        geom: element.featuregeometrie?.features[0]?.geometry,
+                        checked: inDownload ? inDownload.checked : false
                     });
                 });
 

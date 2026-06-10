@@ -17,8 +17,8 @@
                     "label": "Details",
                     "title": "Detailinformation",
                     "datasetInfoTable": {
-                      "archive": "Archive",
-                      "datasetProtectionClass": "Dataset protection class"
+                        "archive": "Archive",
+                        "datasetProtectionClass": "Dataset protection class"
                     },
                     "numberOfResults": "Number of results:",
                     "backButtonLabel": "Back",
@@ -49,25 +49,31 @@
                 "tabResult": {
                     "label": "Results",
                     "numberOfResults": "Number of results:",
+                    "toDownload": "Go to download"
+                },
+                "tabDownload": {
+                    "label": "Download",
+                    "numberOfResults": "Number of pre-selected results:",
+                    "downloadButtonLabel": "Download"
+                },
+                "archiveList": {
                     "toggleAccordions": {
-                      "openAll": "Open all",
-                      "closeAll": "Close all"
+                        "openAll": "Open all",
+                        "closeAll": "Close all"
                     },
+                    "selectAll": "Select all",
                     "groupByLabel": "Group by",
                     "selectOptionLabel": "Select option",
                     "table": {
-                      "showPositionInMap": "Show / Hide position of dataset in map",
-                      "goToDetails": "Show details for this dataset",
-                      "showPreview": "Show preview",
-                      "download": "Download dataset",
-                      "headers": {
-                        "position": "Position",
-                        "details": "Details"
-                      }
+                        "showPositionInMap": "Show / Hide position of dataset in map",
+                        "goToDetails": "Show details for this dataset",
+                        "showPreview": "Show preview",
+                        "download": "Download dataset",
+                        "headers": {
+                            "position": "Position",
+                            "details": "Details"
+                        }
                     }
-                },
-                "tabDownload": {
-                    "label": "Download"
                 }
             },
             "zipAndDownload": {

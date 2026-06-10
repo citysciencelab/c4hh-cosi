@@ -9,57 +9,6 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
     let wrapper,
         store;
 
-    const tableDatasets = [
-        {
-            instanceId: "dataset1",
-            attributes: [
-                {
-                    value: "2017",
-                    id: "JAHRGANG"
-                },
-                {
-                    value: "6",
-                    id: "KACHELNUMMER"
-                },
-                {
-                    value: "Z Item",
-                    id: "BESCHREIBUNG"
-                }
-            ],
-            geom: {
-                coordinates: [
-                    [0, 1],
-                    [1, 1],
-                    [1, 0],
-                    [0, 0],
-                    [0, 1]
-                ],
-                type: "Polygon"
-            }
-        },
-        {
-            instanceId: "dataset2",
-            attributes: [
-                {
-                    value: "2015",
-                    id: "JAHRGANG"
-                },
-                {
-                    value: "30",
-                    id: "KACHELNUMMER"
-                },
-                {
-                    value: "A Item",
-                    id: "BESCHREIBUNG"
-                }
-            ],
-            geom: {
-                coordinates: [0, 1],
-                type: "Point"
-            }
-        }
-    ];
-
     const tableHeader = ["JAHRGANG", "KACHELNUMMER", "BESCHREIBUNG"];
 
     const fakeLayer = {
@@ -79,6 +28,57 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         });
 
     beforeEach(() => {
+        const tableDatasets = [
+            {
+                instanceId: "dataset1",
+                attributes: [
+                    {
+                        value: "2017",
+                        id: "JAHRGANG"
+                    },
+                    {
+                        value: "6",
+                        id: "KACHELNUMMER"
+                    },
+                    {
+                        value: "Z Item",
+                        id: "BESCHREIBUNG"
+                    }
+                ],
+                geom: {
+                    coordinates: [
+                        [0, 1],
+                        [1, 1],
+                        [1, 0],
+                        [0, 0],
+                        [0, 1]
+                    ],
+                    type: "Polygon"
+                }
+            },
+            {
+                instanceId: "dataset2",
+                attributes: [
+                    {
+                        value: "2015",
+                        id: "JAHRGANG"
+                    },
+                    {
+                        value: "30",
+                        id: "KACHELNUMMER"
+                    },
+                    {
+                        value: "A Item",
+                        id: "BESCHREIBUNG"
+                    }
+                ],
+                geom: {
+                    coordinates: [0, 1],
+                    type: "Point"
+                }
+            }
+        ];
+
         store = createStore({
             modules: {
                 namespaced: true,
@@ -104,6 +104,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
                             },
                             actions: {
                                 fetchGeometryForInstanceId: () => Promise.resolve()
+                            },
+                            mutations: {
+                                setCheckedForInstanceId: () => sinon.stub()
                             }
                         }
                     }
@@ -247,5 +250,53 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         expect(brokenVectorFeature2).to.be.null;
         expect(brokenVectorFeature3).to.be.null;
         expect(brokenVectorFeature4).to.be.null;
+    });
+
+    it("checking both datasets changes the checked state of the header checkbox", async () => {
+        const headerCheckbox = wrapper.find("thead input[type='checkbox']"),
+            checkboxes = wrapper.findAll("tbody input[type='checkbox']");
+
+        expect(headerCheckbox.element.checked).to.be.false;
+        expect(checkboxes[0].element.checked).to.be.false;
+        expect(checkboxes[1].element.checked).to.be.false;
+
+        await checkboxes[0].setChecked();
+
+        expect(headerCheckbox.element.checked).to.be.false;
+        expect(checkboxes[0].element.checked).to.be.true;
+        expect(checkboxes[1].element.checked).to.be.false;
+
+        await checkboxes[1].setChecked();
+
+        expect(headerCheckbox.element.checked).to.be.true;
+        expect(checkboxes[0].element.checked).to.be.true;
+        expect(checkboxes[1].element.checked).to.be.true;
+
+        await checkboxes[0].setChecked(false);
+
+        expect(headerCheckbox.element.checked).to.be.false;
+        expect(checkboxes[0].element.checked).to.be.false;
+        expect(checkboxes[1].element.checked).to.be.true;
+    });
+
+    it("checking the header checkbox changes the checked state of all datasets", async () => {
+        const headerCheckbox = wrapper.find("thead input[type='checkbox']"),
+            checkboxes = wrapper.findAll("tbody input[type='checkbox']");
+
+        expect(headerCheckbox.element.checked).to.be.false;
+        expect(checkboxes[0].element.checked).to.be.false;
+        expect(checkboxes[1].element.checked).to.be.false;
+
+        await headerCheckbox.setChecked();
+
+        expect(headerCheckbox.element.checked).to.be.true;
+        expect(checkboxes[0].element.checked).to.be.true;
+        expect(checkboxes[1].element.checked).to.be.true;
+
+        await headerCheckbox.setChecked(false);
+
+        expect(headerCheckbox.element.checked).to.be.false;
+        expect(checkboxes[0].element.checked).to.be.false;
+        expect(checkboxes[1].element.checked).to.be.false;
     });
 });

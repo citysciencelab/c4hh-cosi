@@ -27,6 +27,7 @@
  * @property {Array} archiveList - List of archives to use in TabSearch
  * @property {Object} archiveYears - Map of archive IDs to year data { [archiveId]: { year: "2022", archiveName: ["xyz", "abc"] } }
  * @property {Object[]} searchAttributeResponse - List of dataclass objects from the search response
+ * @property {Object[]} attributesToDownload - List of dataclass objects to download from all search responses, used in TabDownload
  * @property {String} selectedInstanceId - instance id of the selected primary object to watch details for
  * @property {String} errorMessage - message text for errors from backend or while ziping download
  * @property {String} currentProgressValue - message for current progress for ziping the files for download
@@ -64,6 +65,7 @@ const state = {
     requestTokenExpireTime: null,
     dataClassList: [],
     searchAttributeResponse: [],
+    attributesToDownload: [],
     placeholderDataClassList: {},
     placeholderJsonPath: "",
     archiveYears: {},
