@@ -126,6 +126,7 @@ export default {
 
         if (toolBody) {
             toolBody.addEventListener("scroll", this.handleToolBodyScroll);
+            toolBody.scrollTop = this.toolBodyScrollTop;
         }
 
         if (coverCard) {
