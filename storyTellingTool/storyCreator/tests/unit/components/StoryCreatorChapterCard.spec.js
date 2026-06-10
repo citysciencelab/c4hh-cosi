@@ -50,22 +50,22 @@ describe("addons/storyCreator/components/StoryCreatorChapterCard.vue", () => {
 
             expect(wrapper.find("img.card-img-top").exists()).to.be.false;
         });
-        it("renders the photo credit if photoCredit is set", () => {
+        it("renders the copyright if copyright is set", () => {
             const wrapper = shallowMount(StoryCreatorChapterCard, {
                 props: {
                     chapterTitle: "Test",
-                    photoCredit: "Max Mustermann"
+                    copyright: "Max Mustermann"
                 }
             });
 
-            expect(wrapper.find(".photo-credit").text()).to.include("Max Mustermann");
+            expect(wrapper.find(".copyright").text()).to.include("Max Mustermann");
         });
-        it("does not render the photo credit if photoCredit is empty", () => {
+        it("does not render the copyright if copyright is empty", () => {
             const wrapper = shallowMount(StoryCreatorChapterCard, {
-                props: {chapterTitle: "Test", photoCredit: ""}
+                props: {chapterTitle: "Test", copyright: ""}
             });
 
-            expect(wrapper.find(".photo-credit").exists()).to.be.false;
+            expect(wrapper.find(".copyright").exists()).to.be.false;
         });
         it("renders the IconButton", () => {
             const wrapper = shallowMount(StoryCreatorChapterCard, {

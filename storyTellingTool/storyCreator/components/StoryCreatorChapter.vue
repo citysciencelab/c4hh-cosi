@@ -385,7 +385,7 @@ export default {
 
         /**
          * Handles image add/edit by writing it to the content array and closing the open editor.
-         * @param {Object} image - The image object containing id, altText, photoCredit, and objectURL.
+         * @param {Object} image - The image object containing id, alt, copyright, and objectURL.
          * @returns {void}
          */
         handleImage (image) {
@@ -401,8 +401,8 @@ export default {
                     type: "image",
                     id: image.id,
                     attrs: {
-                        alt: image.altText,
-                        copyright: image.photoCredit
+                        alt: image.alt,
+                        copyright: image.copyright
                     }
                 });
             }
@@ -411,8 +411,8 @@ export default {
                     type: "image",
                     id: image.id,
                     attrs: {
-                        alt: image.altText,
-                        copyright: image.photoCredit
+                        alt: image.alt,
+                        copyright: image.copyright
                     }
                 });
             }
@@ -624,7 +624,7 @@ export default {
                             <StoryCreatorAddImageCard
                                 v-if="isEditingContentItem(index)"
                                 class="mt-2"
-                                :initial-image="{id: element.id, altText: element.attrs.alt, photoCredit: element.attrs.copyright}"
+                                :initial-image="{id: element.id, alt: element.attrs.alt, copyright: element.attrs.copyright}"
                                 @addImage="handleImage"
                                 @click:close="closeContentEditor"
                             />

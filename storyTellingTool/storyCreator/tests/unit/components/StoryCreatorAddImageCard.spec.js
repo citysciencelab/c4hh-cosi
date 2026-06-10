@@ -134,8 +134,8 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             await wrapper.setData({
                 image: {
                     id: "test-uuid",
-                    altText: "altText",
-                    photoCredit: "photoCredit"
+                    alt: "alt",
+                    copyright: "copyright"
                 }
             });
 
@@ -161,8 +161,8 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
         it("should set computed 'enableAdd' to true", async () => {
             await wrapper.setData({
                 image: {
-                    altText: "altText",
-                    photoCredit: "photoCredit"
+                    alt: "alt",
+                    copyright: "copyright"
                 }
             });
 

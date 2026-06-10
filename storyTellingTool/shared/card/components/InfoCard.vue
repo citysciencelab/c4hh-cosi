@@ -26,12 +26,12 @@ export default {
             required: false,
             default: ""
         },
-        photoCredit: {
+        copyright: {
             type: String,
             required: false,
             default: ""
         },
-        altText: {
+        alt: {
             type: String,
             required: false,
             default: ""
@@ -73,15 +73,15 @@ export default {
             <img
                 :src="cardImage"
                 class="card-img-top w-100 h-100 object-fit-cover"
-                :alt="altText"
+                :alt="alt"
             >
         </div>
         <div class="text-end">
             <small
-                v-if="photoCredit"
-                class="text-muted photo-credit me-2 mt-1"
+                v-if="copyright"
+                class="text-muted copyright me-2 mt-1"
             >
-                &copy; {{ photoCredit }}
+                &copy; {{ copyright }}
             </small>
         </div>
         <div

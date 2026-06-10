@@ -410,8 +410,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             it("should add an image when editor index points to add position", async () => {
                 const image = {
                     id: "img-1",
-                    altText: "A test alt text",
-                    photoCredit: "Photo credit"
+                    alt: "A test alt text",
+                    copyright: "Photo credit"
                 };
 
                 await wrapper.setData({
@@ -443,8 +443,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             it("should edit an existing image when editor index points to an existing item", async () => {
                 const image = {
                     id: "img-1",
-                    altText: "Updated alt text",
-                    photoCredit: "Updated credit"
+                    alt: "Updated alt text",
+                    copyright: "Updated credit"
                 };
 
                 await wrapper.setData({

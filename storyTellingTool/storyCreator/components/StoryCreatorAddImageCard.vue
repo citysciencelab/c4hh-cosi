@@ -29,8 +29,8 @@ export default {
     data () {
         return {
             image: {
-                altText: "",
-                photoCredit: ""
+                alt: "",
+                copyright: ""
             },
             isValidated: true
         };
@@ -54,11 +54,11 @@ export default {
             return Boolean(this.image?.id && this.imageAssetsById[this.image.id]?.objectURL);
         },
         /**
-         * Returns true if the altText and photoCredit are not empty.
-         * @returns {Boolean} True if the altText and photoCredit are not empty.
+         * Returns true if the alt and copyright are not empty.
+         * @returns {Boolean} True if the alt and copyright are not empty.
          */
         enableAdd () {
-            if (this.image?.altText.trim() !== "" && this.image?.photoCredit.trim() !== "") {
+            if (this.image?.alt.trim() !== "" && this.image?.copyright.trim() !== "") {
                 return true;
             }
 
@@ -100,8 +100,8 @@ export default {
             }
 
             this.image = {
-                altText: "",
-                photoCredit: ""
+                alt: "",
+                copyright: ""
             };
             this.isValidated = true;
         },
@@ -154,23 +154,23 @@ export default {
             <div v-else>
                 <img
                     :src="imageAssetsById[image.id]?.objectURL"
-                    :alt="image.altText"
+                    :alt="image.alt"
                     class="img-thumbnail d-block mx-auto mb-3 w-25"
                 >
             </div>
             <InputText
                 id="image-name"
-                v-model="image.altText"
+                v-model="image.alt"
                 class="mt-2"
-                :label="$t('additional:modules.storyCreator.labels.altText')"
-                :placeholder="$t('additional:modules.storyCreator.labels.altText')"
+                :label="$t('additional:modules.storyCreator.labels.alt')"
+                :placeholder="$t('additional:modules.storyCreator.labels.alt')"
             />
             <InputText
                 id="image-name"
-                v-model="image.photoCredit"
+                v-model="image.copyright"
                 class="mt-2"
-                :label="$t('additional:modules.storyCreator.labels.photoCredit')"
-                :placeholder="$t('additional:modules.storyCreator.labels.photoCredit')"
+                :label="$t('additional:modules.storyCreator.labels.copyright')"
+                :placeholder="$t('additional:modules.storyCreator.labels.copyright')"
             />
             <AlertMessage
                 v-if="!isValidated"

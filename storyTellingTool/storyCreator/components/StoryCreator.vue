@@ -119,13 +119,13 @@ export default {
 
         /**
          * Adds the uploaded title image attributes.
-         * @param {Object} image - The image object containing id, altText, photoCredit, and objectURL.
+         * @param {Object} image - The image object containing id, alt, copyright, and objectURL.
          * @returns {void}
          */
         addImage (image) {
             this.imageSrc = image.id;
-            this.imageAlt = image.altText;
-            this.imageCopyright = image.photoCredit;
+            this.imageAlt = image.alt;
+            this.imageCopyright = image.copyright;
             this.imageLoaded = true;
         },
 
@@ -389,7 +389,7 @@ export default {
             <StoryCreatorAddImageCard
                 v-if="!imageLoaded"
                 :closeable="false"
-                :initial-image="{id: imageSrc, altText: imageAlt, photoCredit: imageCopyright}"
+                :initial-image="{id: imageSrc, alt: imageAlt, copyright: imageCopyright}"
                 @addImage="addImage"
             />
             <div
@@ -429,12 +429,12 @@ export default {
                 <template #item="{ element, index }">
                     <InfoCard
                         card-type="chapter"
-                        :alt-text="getChapterOverviewAttr(element, 'alt')"
+                        :alt="getChapterOverviewAttr(element, 'alt')"
                         :card-image="getChapterOverviewImg(element)"
                         :card-items="getChapterOverviewCardItems(element)"
                         :card-text="getChapterOverviewAttr(element, 'text')"
                         :card-title="element.title"
-                        :photo-credit="getChapterOverviewAttr(element, 'copyright')"
+                        :copyright="getChapterOverviewAttr(element, 'copyright')"
                         @delete="() => deleteChapter(index)"
                     />
                 </template>

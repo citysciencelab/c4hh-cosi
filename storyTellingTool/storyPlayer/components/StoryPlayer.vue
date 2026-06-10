@@ -600,7 +600,7 @@ export default {
                 <div class="text-end">
                     <small
                         v-if="storyConf.coverImageCopyright"
-                        class="text-muted photo-credit me-2 mt-1"
+                        class="text-muted copyright me-2 mt-1"
                     >
                         &copy; {{ storyConf.coverImageCopyright }}
                     </small>
