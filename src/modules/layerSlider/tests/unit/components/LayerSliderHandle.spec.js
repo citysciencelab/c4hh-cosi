@@ -173,7 +173,7 @@ describe("src/modules/layerSlider/components/LayerSliderHandle.vue", () => {
     });
 
     describe("showLayer", () => {
-        it("show layer with status true, if transparency is 100", async () => {
+        it("show layer with status false, if transparency is 100", async () => {
             wrapper = shallowMount(LayerSliderHandleComponent, {
                 global: {
                     plugins: [store]
@@ -196,7 +196,7 @@ describe("src/modules/layerSlider/components/LayerSliderHandle.vue", () => {
             expect(spySendModification.calledOnce).to.be.true;
             expect(spySendModification.args[0]).to.deep.includes({
                 layerId: "100",
-                visibility: true,
+                visibility: false,
                 transparency: 100
             });
         });

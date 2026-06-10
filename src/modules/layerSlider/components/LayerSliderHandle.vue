@@ -65,6 +65,16 @@ export default {
                 prevLayerTransparency = (index % 10) * 10,
                 nextLayerTransparency = 100 - prevLayerTransparency;
 
+            this.layerIds.forEach(layer => {
+                if (layer.layerId !== prevLayerId && layer.layerId !== nextLayerId) {
+                    this.sendModification({
+                        layerId: layer.layerId,
+                        visibility: false,
+                        transparency: 0
+                    });
+                }
+            });
+
             this.showLayer(prevLayerId, prevLayerTransparency, this.layerIds);
             this.showLayer(nextLayerId, nextLayerTransparency, this.layerIds);
         },
@@ -110,7 +120,7 @@ export default {
             if (layerIds.filter(layer => layer.layerId === layerId).length > 0) {
                 this.sendModification({
                     layerId: layerId,
-                    visibility: transparency >= 0 && transparency <= 100,
+                    visibility: transparency >= 0 && transparency < 100,
                     transparency: transparency
                 });
             }
