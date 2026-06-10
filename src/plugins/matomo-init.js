@@ -6,5 +6,5 @@ import VueMatomo from "vue-matomo";
  * @returns {void}
  */
 export function initiateMatomo (app) {
-    app.use(VueMatomo, Config.matomo);
+    app.use(VueMatomo.default || VueMatomo, Config.matomo);
 }
