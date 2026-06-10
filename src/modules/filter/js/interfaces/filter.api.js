@@ -79,7 +79,7 @@ export default class FilterApi {
         if (!isObject(layerModel)) {
             return;
         }
-        const type = layerModel.typ.toLowerCase(),
+        const type = layerModel.typ?.toLowerCase(),
             featureNS = layerModel.featureNS,
             url = layerModel.url,
             featureType = layerModel.featureType,

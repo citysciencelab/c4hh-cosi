@@ -48,7 +48,7 @@ SearchInterfaceVisibleVector.prototype.search = async function (searchInput) {
     this.searchState = "running";
     const vectorLayerTypes = layerFactory.getVectorLayerTypes(),
         visibleVectorLayerConfigs = store.getters.visibleLayerConfigs.filter(layerConfig => {
-            return vectorLayerTypes.includes(layerConfig.typ.toUpperCase()) && layerConfig.searchField && layerConfig.searchField !== "";
+            return vectorLayerTypes.includes(layerConfig.typ?.toUpperCase()) && layerConfig.searchField && layerConfig.searchField !== "";
         }),
         foundFeatures = this.findMatchingFeatures(visibleVectorLayerConfigs, searchInput);
 
@@ -73,7 +73,7 @@ SearchInterfaceVisibleVector.prototype.findMatchingFeatures = function (visibleV
             layerSource = layer.getLayerSource() instanceof Cluster ? layer.getLayerSource().getSource() : layer.getLayerSource(),
             searchFields = Array.isArray(layerConfig.searchField) ? layerConfig.searchField : [layerConfig.searchField],
             attributes = layer.attributes,
-            layerTyp = layerConfig.typ.toUpperCase();
+            layerTyp = layerConfig.typ?.toUpperCase();
 
         if ((layerTyp === "WFS" || layerTyp === "OAF") && typeof layer.loadFeaturesManually === "function") {
             layer.loadFeaturesManually(attributes);

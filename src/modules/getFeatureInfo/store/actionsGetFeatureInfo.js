@@ -270,7 +270,7 @@ export default {
      * @returns {void}
      */
     async handleRestore3D ({dispatch, commit, rootGetters}, {attributes, componentName, clickCoordinates}) {
-        const visibleTerrainLayers = rootGetters.visibleLayerConfigs.filter(c => c.typ.toUpperCase() === "TERRAIN3D");
+        const visibleTerrainLayers = rootGetters.visibleLayerConfigs.filter(c => c.typ?.toUpperCase() === "TERRAIN3D");
 
         if (visibleTerrainLayers.length === 0) {
             return;

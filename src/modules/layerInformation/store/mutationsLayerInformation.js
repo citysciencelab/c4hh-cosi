@@ -24,7 +24,7 @@ export default {
             attributes = layerConf?.datasets?.[0]?.attributes ?? null,
             showDocUrl = layerConf?.datasets?.[0]?.show_doc_url ?? null;
 
-        if (layerConf?.typ.startsWith("GROUP")) {
+        if (layerConf?.typ?.startsWith("GROUP")) {
             layerConf.children.forEach(child => {
                 const childUrl = child.url || child.capabilitiesUrl,
                     dataset = child.datasets?.[0] || {},

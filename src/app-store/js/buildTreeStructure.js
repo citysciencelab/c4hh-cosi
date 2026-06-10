@@ -178,7 +178,7 @@ function getId () {
  * @returns {Boolean} true, if all layers are 3D-layer.
  */
 function containsOnly3DLayer (layers) {
-    return get3DLayersWithGrouped(layers).every(conf => layerTypes.getLayerTypes3d().includes(rawLayerList.getLayerWhere({id: conf.id})?.typ.toUpperCase()));
+    return get3DLayersWithGrouped(layers).every(conf => layerTypes.getLayerTypes3d().includes(rawLayerList.getLayerWhere({id: conf.id})?.typ?.toUpperCase()));
 }
 /**
  * Returns all 3D-layers with typ contained in layerTypes.getLayerTypes3d().
@@ -186,7 +186,7 @@ function containsOnly3DLayer (layers) {
  * @returns {Array} all 3D-layers
  */
 function get3DLayers (layers) {
-    return get3DLayersWithGrouped(layers).filter(conf => layerTypes.getLayerTypes3d().includes(rawLayerList.getLayerWhere({id: conf.id})?.typ.toUpperCase()));
+    return get3DLayersWithGrouped(layers).filter(conf => layerTypes.getLayerTypes3d().includes(rawLayerList.getLayerWhere({id: conf.id})?.typ?.toUpperCase()));
 }
 
 /**

@@ -85,7 +85,7 @@ export default {
             return this.downloadLinks !== null;
         },
         showUrl () {
-            if (this.layerInfo.typ.startsWith("GROUP") && Array.isArray(this.layerInfo.layers)) {
+            if (this.layerInfo.typ?.startsWith("GROUP") && Array.isArray(this.layerInfo.layers)) {
                 const selectedLayer = this.layerInfo.layers[this.selectedOption];
 
                 return selectedLayer?.url && this.showUrlGlobal !== false && this.layerInfo.urlIsVisible !== false;
@@ -93,7 +93,7 @@ export default {
             return this.layerInfo.url && this.layerInfo.typ !== "SensorThings" && this.showUrlGlobal !== false && this.layerInfo.urlIsVisible !== false;
         },
         selectedMetaURLs () {
-            if (this.layerInfo.typ.startsWith("GROUP") && Array.isArray(this.layerInfo.layers)) {
+            if (this.layerInfo.typ?.startsWith("GROUP") && Array.isArray(this.layerInfo.layers)) {
                 const selectedLayer = this.layerInfo.layers[this.selectedOption],
                     metaID = selectedLayer?.metaID;
 
@@ -111,7 +111,7 @@ export default {
         layerUrl () {
             const layer = this.layerInfo;
 
-            if (layer.typ.startsWith("GROUP") && layer.layers) {
+            if (layer.typ?.startsWith("GROUP") && layer.layers) {
                 const selectedLayer = layer.layers[this.selectedOption];
 
                 return selectedLayer ? this.getLayerAddress(selectedLayer) : "";
@@ -122,7 +122,7 @@ export default {
             return this.layerInfo.legendURL;
         },
         layerTyp () {
-            if (!this.layerInfo.typ.startsWith("GROUP")) {
+            if (!this.layerInfo.typ?.startsWith("GROUP")) {
                 return `${this.layerInfo.typ}-${this.$t("common:modules.layerInformation.addressSuffix")}`;
             }
 
@@ -165,7 +165,7 @@ export default {
     created () {
         this.setConfigParams(this.configJs);
 
-        if (this.layerInfo.typ.startsWith("GROUP")) {
+        if (this.layerInfo.typ?.startsWith("GROUP")) {
             this.createDropdownOptions();
         }
     },
@@ -335,7 +335,7 @@ export default {
         id="modules-layer-information"
     >
         <div
-            v-if="layerInfo.typ.startsWith('GROUP')"
+            v-if="layerInfo.typ?.startsWith('GROUP')"
             class="form-floating mb-3"
         >
             <select
