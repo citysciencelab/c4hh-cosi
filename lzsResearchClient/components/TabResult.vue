@@ -4,7 +4,7 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import Multiselect from "vue-multiselect";
 import TabResultTable from "./TabResultTable.vue";
-import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
+import {TAB_SET_CURRENT} from "@shared/modules/tabs/components/TabContainer.vue";
 
 export default {
     name: "TabResult",

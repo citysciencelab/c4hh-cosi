@@ -2,7 +2,7 @@
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-import TabContainer from "./shared/TabContainer.vue";
+import TabContainer from "@shared/modules/tabs/components/TabContainer.vue";
 import TabDetails from "./TabDetails.vue";
 import TabResult from "./TabResult.vue";
 import TabSearch from "./TabSearch.vue";

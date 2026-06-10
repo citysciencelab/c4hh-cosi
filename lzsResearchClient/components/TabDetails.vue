@@ -1,6 +1,6 @@
 <script>
 import {mapGetters, mapMutations, mapActions} from "vuex";
-import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
+import {TAB_SET_CURRENT} from "@shared/modules/tabs/components/TabContainer.vue";
 import TabResultTable from "./TabResultTable.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";

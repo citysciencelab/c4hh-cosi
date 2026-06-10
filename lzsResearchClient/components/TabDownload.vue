@@ -1,5 +1,5 @@
 <script>
-import {TAB_SET_CURRENT} from "./shared/TabContainer.vue";
+import {TAB_SET_CURRENT} from "@shared/modules/tabs/components/TabContainer.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 
 export default {
