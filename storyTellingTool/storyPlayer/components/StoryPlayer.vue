@@ -625,7 +625,7 @@ export default {
                             <small
                                 class="created text-muted small"
                             >
-                                Erstellt am: {{ storyConf.created }}
+                                {{ storyConf.created }}
                             </small>
                         </div>
                     </div>
