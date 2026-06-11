@@ -44,7 +44,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@masterportal/masterportalapi": "^2.61.0",
+    "@masterportal/masterportalapi": "^2.62.0",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.16.0",
     "bootstrap": "^5.3.8",
@@ -92,8 +92,8 @@
     "eslint-plugin-vue": "10.9.1",
     "eslint-plugin-vuejs-accessibility": "2.5.0",
     "fs-extra": "^11.3.4",
-    "https-proxy-agent": "^9.0.0",
     "globals": "^17.6.0",
+    "https-proxy-agent": "^9.0.0",
     "husky": "^9.1.7",
     "jsdoc": "4.0.5",
     "jsdoc-vuejs": "^4.0.0",

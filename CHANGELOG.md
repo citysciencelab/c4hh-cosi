@@ -17,6 +17,8 @@
 
 ### Changed
 - The following packages have been updated:
+    - dependencies:
+        - @masterportal/masterportalapi: 2.61.0 to 2.62.0
     - devDependencies:
         - @eslint/js: 9.20.0 to 10.0.1
         - eslint-plugin-n: 17.24.0 to 18.0.1
