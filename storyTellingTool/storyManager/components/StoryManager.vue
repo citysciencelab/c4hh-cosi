@@ -6,6 +6,7 @@ import {createStoryZip, extractStoryZip} from "../shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
+import StoryPlayer from "../../storyPlayer/components/StoryPlayer.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 
 export default {
@@ -15,11 +16,13 @@ export default {
         AddCardButton,
         FlatButton,
         InfoCard,
-        InfoText
+        InfoText,
+        StoryPlayer
     },
     data () {
         return {
-            showImportError: false
+            showImportError: false,
+            playingStoryIndex: null
         };
     },
     computed: {
@@ -93,6 +96,14 @@ export default {
                     name: "additional:modules.storyCreator.title"
                 }
             });
+        },
+        /**
+         * Opens the selected story directly in the story player.
+         * @param {Number} index - the index of the story in the list.
+         * @returns {void}
+         */
+        playStory (index) {
+            this.playingStoryIndex = index;
         },
         /**
          * Gets the card items in object from story.
@@ -217,75 +228,85 @@ export default {
         id="story-manager"
         class="d-flex flex-column"
     >
-        <div class="mb-2">
-            <h6 class="fw-bold text-dark">
-                {{ $t('additional:modules.storyManager.mainTitle') }}
-            </h6>
-            <p class="text-muted small mb-0">
-                {{ $t('additional:modules.storyManager.mainDescription') }}
-            </p>
-        </div>
-        <AddCardButton
-            class="mt-3 mb-3 w-100 mx-0"
-            :text="$t('additional:modules.storyManager.createStoryTitle')"
-            :descr="$t('additional:modules.storyManager.createStoryDescription')"
-            @click="createNewStory"
-        />
-        <hr>
-        <div class="mt-2 mb-3">
-            <h6 class="fw-bold d-flex align-items-center mb-1 text-dark">
-                <i class="bi bi-play-btn me-2 fs-5" />
-                {{ $t('additional:modules.storyManager.selectStoryTitle') }}
-            </h6>
-            <p class="text-muted small mb-4">
-                {{ $t('additional:modules.storyManager.selectStoryDescription') }}
-            </p>
-            <FlatButton
-                :icon="'bi-box-arrow-in-down'"
-                :aria-label="$t('additional:modules.storyManager.importButton')"
-                :text="$t('additional:modules.storyManager.importButton')"
-                :interaction="() => $refs.storyImportInput?.click()"
-            />
-            <input
-                ref="storyImportInput"
-                type="file"
-                class="d-none"
-                accept=".zip,application/zip"
-                @change="onStoryImportFileChange"
-            >
-            <AlertMessage
-                v-if="showImportError"
-                class="mt-2"
-                :closeable="true"
-                :text="$t('additional:modules.storyManager.importErrorText')"
-                :title="$t('additional:modules.storyManager.importErrorTitle')"
-                type="error"
-                @closed="showImportError = false"
+        <div v-if="playingStoryIndex !== null">
+            <StoryPlayer
+                :story-conf-prop="storyList[playingStoryIndex]?.story"
+                :image-assets-by-id="storyList[playingStoryIndex]?.imageAssetsById"
             />
         </div>
-        <InfoText
-            v-if="!storyList?.length"
-            class="mb-4"
-            :text="$t('additional:modules.storyManager.emptyStory')"
-        />
-        <div class="story-list flex-grow-1 overflow-auto pb-2">
-            <div
-                v-for="(storyEntry, index) in storyList"
-                :key="index"
-                class="mb-4 w-100 mx-0"
-            >
-                <InfoCard
-                    card-type="story"
-                    :card-title="storyEntry?.story?.title"
-                    :card-text="storyEntry?.story?.text"
-                    :card-image="storyEntry?.imageAssetsById?.[storyEntry?.story?.imageSrc]?.objectURL"
-                    :copyright="storyEntry?.story?.imageCopyright"
-                    :alt="storyEntry?.story?.imageAlt"
-                    :card-items="getCardItems(storyEntry?.story)"
-                    :editable="storyEntry?.story?.editable"
-                    @edit="() => editStory(index)"
-                    @download="() => downloadStory(storyEntry)"
+        <div v-else>
+            <div class="mb-2">
+                <h6 class="fw-bold text-dark">
+                    {{ $t('additional:modules.storyManager.mainTitle') }}
+                </h6>
+                <p class="text-muted small mb-0">
+                    {{ $t('additional:modules.storyManager.mainDescription') }}
+                </p>
+            </div>
+            <AddCardButton
+                class="mt-3 mb-3 w-100 mx-0"
+                :text="$t('additional:modules.storyManager.createStoryTitle')"
+                :descr="$t('additional:modules.storyManager.createStoryDescription')"
+                @click="createNewStory"
+            />
+            <hr>
+            <div class="mt-2 mb-3">
+                <h6 class="fw-bold d-flex align-items-center mb-1 text-dark">
+                    <i class="bi bi-play-btn me-2 fs-5" />
+                    {{ $t('additional:modules.storyManager.selectStoryTitle') }}
+                </h6>
+                <p class="text-muted small mb-4">
+                    {{ $t('additional:modules.storyManager.selectStoryDescription') }}
+                </p>
+                <FlatButton
+                    :icon="'bi-box-arrow-in-down'"
+                    :aria-label="$t('additional:modules.storyManager.importButton')"
+                    :text="$t('additional:modules.storyManager.importButton')"
+                    :interaction="() => $refs.storyImportInput?.click()"
                 />
+                <input
+                    ref="storyImportInput"
+                    type="file"
+                    class="d-none"
+                    accept=".zip,application/zip"
+                    @change="onStoryImportFileChange"
+                >
+                <AlertMessage
+                    v-if="showImportError"
+                    class="mt-2"
+                    :closeable="true"
+                    :text="$t('additional:modules.storyManager.importErrorText')"
+                    :title="$t('additional:modules.storyManager.importErrorTitle')"
+                    type="error"
+                    @closed="showImportError = false"
+                />
+            </div>
+            <InfoText
+                v-if="!storyList?.length"
+                class="mb-4"
+                :text="$t('additional:modules.storyManager.emptyStory')"
+            />
+            <div class="story-list flex-grow-1 overflow-auto pb-2">
+                <div
+                    v-for="(storyEntry, index) in storyList"
+                    :key="index"
+                    class="mb-4 w-100 mx-0"
+                >
+                    <InfoCard
+                        card-type="story"
+                        :card-title="storyEntry?.story?.title"
+                        :card-text="storyEntry?.story?.text"
+                        :card-image="storyEntry?.imageAssetsById?.[storyEntry?.story?.imageSrc]?.objectURL"
+                        :copyright="storyEntry?.story?.imageCopyright"
+                        :alt="storyEntry?.story?.imageAlt"
+                        :card-items="getCardItems(storyEntry?.story)"
+                        :editable="storyEntry?.story?.editable"
+                        @click="() => playStory(index)"
+                        @play="() => playStory(index)"
+                        @edit="() => editStory(index)"
+                        @download="() => downloadStory(storyEntry)"
+                    />
+                </div>
             </div>
         </div>
     </div>

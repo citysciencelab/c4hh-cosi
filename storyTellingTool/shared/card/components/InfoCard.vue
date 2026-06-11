@@ -47,7 +47,7 @@ export default {
             default: true
         }
     },
-    emits: ["delete", "edit", "download", "click"],
+    emits: ["delete", "play", "edit", "download", "click"],
     data () {
         return {
             chapterSettingIcons: [
@@ -201,7 +201,6 @@ export default {
                             <IconButton
                                 :aria="$t('additional:modules.storyCreator.labels.deleteChapter')"
                                 icon="bi bi-trash"
-                                :title="$t('additional:modules.storyCreator.labels.deleteChapter')"
                                 :interaction="handleDeleteClick"
                                 :class-array="['btn-light']"
                             />
@@ -233,16 +232,20 @@ export default {
                             class="d-flex align-items-center gap-2"
                         >
                             <IconButton
+                                :aria="$t('additional:modules.storyCreator.labels.playStory')"
+                                icon="bi bi-collection-play"
+                                :interaction="() => $emit('play')"
+                                :class-array="['btn-light']"
+                            />
+                            <IconButton
                                 :aria="$t('additional:modules.storyCreator.labels.editStory')"
                                 icon="bi bi-pencil"
-                                :title="$t('additional:modules.storyCreator.labels.editStory')"
                                 :interaction="handleEditClick"
                                 :class-array="['btn-light']"
                             />
                             <IconButton
                                 :aria="$t('additional:modules.storyCreator.labels.downloadStory')"
                                 icon="bi bi-download"
-                                :title="$t('additional:modules.storyCreator.labels.downloadStory')"
                                 :interaction="handleDownloadClick"
                                 :class-array="['btn-light']"
                             />

@@ -77,16 +77,8 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                 fixedStoryFiles: [],
                                 fixedStoryLoaded: false
                             }
-                        },
-                        StoryCreator: {
-                            namespaced: true,
-                            getters: {
-                                imageAssetsById: (state) => state.imageAssetsById
-                            },
-                            state: {
-                                imageAssetsById: {}
-                            }
                         }
+
                     }
                 }
             }
@@ -236,6 +228,14 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal(expectedPayload);
             });
         });
+
+        describe("playStory", () => {
+            it("should set playingStoryIndex to the given index", async () => {
+                await wrapper.vm.playStory(1);
+
+                expect(wrapper.vm.playingStoryIndex).to.equal(1);
+            });
+        });
     });
 
     describe("User Interaction", () => {
@@ -253,6 +253,22 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
 
             expect(changeCurrentComponentSpy.calledOnce).to.be.true;
             expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal(expectedPayload);
+        });
+
+        it("should set playingStoryIndex when play event is emitted from story card", async () => {
+            const storyCards = wrapper.findAllComponents({name: "InfoCard"});
+
+            await storyCards[0].vm.$emit("play");
+
+            expect(wrapper.vm.playingStoryIndex).to.equal(0);
+        });
+
+        it("should set playingStoryIndex when story card is clicked", async () => {
+            const storyCards = wrapper.findAllComponents({name: "InfoCard"});
+
+            await storyCards[0].trigger("click");
+
+            expect(wrapper.vm.playingStoryIndex).to.equal(0);
         });
     });
 });
