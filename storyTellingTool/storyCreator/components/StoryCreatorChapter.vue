@@ -630,7 +630,7 @@ export default {
                             />
                             <div
                                 v-else
-                                class="card rounded-3 border-0 p-4 position-relative chapter-content-item__image-preview"
+                                class="card rounded-3 border-0 p-4 position-relative chapter-content-item__preview"
                                 :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
                                 role="button"
                                 tabindex="0"
@@ -640,7 +640,7 @@ export default {
                             >
                                 <button
                                     type="button"
-                                    class="btn-close position-absolute top-0 end-0 m-1 chapter-content-item__image-close"
+                                    class="btn-close position-absolute top-0 end-0 m-1 chapter-content-item__close"
                                     :aria-label="$t('common:button.close')"
                                     @click.stop="removeContentItem(index)"
                                 />
@@ -666,7 +666,7 @@ export default {
                             />
                             <div
                                 v-else
-                                class="p-4 rounded-3"
+                                class="p-4 rounded-3 chapter-content-item__preview"
                                 :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
                                 role="button"
                                 tabindex="0"
@@ -674,6 +674,12 @@ export default {
                                 @keydown.enter="openContentEditorForEdit(index, 'text')"
                                 @keydown.space.prevent="openContentEditorForEdit(index, 'text')"
                             >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-2 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
                                 <div v-html="tipTapJsonToHtml(element)" />
                             </div>
                         </div>
@@ -775,13 +781,13 @@ export default {
     }
 }
 
-.chapter-content-item__image-close {
+.chapter-content-item__close {
     opacity: 0;
     transition: opacity 0.15s ease-in-out;
 }
 
-.chapter-content-item__image-preview:hover .chapter-content-item__image-close,
-.chapter-content-item__image-preview:focus-within .chapter-content-item__image-close {
+.chapter-content-item__preview:hover .chapter-content-item__close,
+.chapter-content-item__preview:focus-within .chapter-content-item__close {
     opacity: 1;
 }
 </style>
@@ -816,7 +822,7 @@ export default {
 }
 
 .chapter .multiselect__strong {
-    font-family: "MasterPortalFont Bold";
+    font-family: $font_family_accent;
 }
 
 .chapter .multiselect__placeholder {
@@ -873,7 +879,7 @@ export default {
 }
 
 .chapter-title {
-    font-family: "MasterPortalFont Bold";
+    font-family: $font_family_accent;
     &:hover {
         outline-color: $light_grey;
         outline-width: 1px;
