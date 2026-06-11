@@ -1,6 +1,10 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import {setNested, buildFileInformationObject, saveAs, fetchWithProgress} from "../../../utils/zipHelpers";
+import {setNested,
+    buildFileInformationObject,
+    saveAs, fetchWithProgress,
+    getHumanReadableFileSize,
+    roundFileSizeToFixed} from "../../../utils/zipHelpers";
 
 /**
  * Run only utils tests via command:
@@ -416,6 +420,99 @@ describe("addons/lzsResearchClient/utils/zipHelpers", () => {
             catch (err) {
                 expect(err.message).to.equal("404 Not Found");
             }
+        });
+    });
+
+    describe("getHumanReadableFileSize", () => {
+        it("should return the correct human readable file size", () => {
+            const prevI18next = global.i18next;
+
+            expect(getHumanReadableFileSize(0)).to.equal("0 kB");
+            expect(getHumanReadableFileSize()).to.equal("0 kB");
+            expect(getHumanReadableFileSize("test")).to.equal("0 kB");
+            expect(getHumanReadableFileSize(null)).to.equal("0 kB");
+            expect(getHumanReadableFileSize({bla: "foo"})).to.equal("0 kB");
+            expect(getHumanReadableFileSize([1, 2])).to.equal("0 kB");
+            expect(getHumanReadableFileSize(true)).to.equal("0 kB");
+            expect(getHumanReadableFileSize(false)).to.equal("0 kB");
+            expect(getHumanReadableFileSize(undefined)).to.equal("0 kB");
+            expect(getHumanReadableFileSize(-209)).to.equal("0 kB");
+            expect(getHumanReadableFileSize("")).to.equal("0 kB");
+
+            global.i18next = {language: "de"};
+            expect(getHumanReadableFileSize(100)).to.equal("0,10 kB");
+            expect(getHumanReadableFileSize(213354841)).to.equal("213,35 MB");
+            expect(getHumanReadableFileSize(500000000)).to.equal("500 MB");
+            expect(getHumanReadableFileSize(2136548410)).to.equal("2,14 GB");
+            expect(getHumanReadableFileSize("2136548410")).to.equal("2,14 GB");
+            expect(getHumanReadableFileSize(50000000000)).to.equal("50 GB");
+
+            global.i18next = {language: "en"};
+            expect(getHumanReadableFileSize(100)).to.equal("0.10 kB");
+            expect(getHumanReadableFileSize(213354841)).to.equal("213.35 MB");
+            expect(getHumanReadableFileSize(500000000)).to.equal("500 MB");
+            expect(getHumanReadableFileSize(2136548410)).to.equal("2.14 GB");
+            expect(getHumanReadableFileSize("2136548410")).to.equal("2.14 GB");
+            expect(getHumanReadableFileSize(50000000000)).to.equal("50 GB");
+
+            global.i18next = prevI18next;
+        });
+    });
+
+    describe("roundFileSizeToFixed", () => {
+        it("should return the correct number with or without decimals", () => {
+            const prevI18next = global.i18next;
+
+            expect(roundFileSizeToFixed(0)).to.equal("0");
+            expect(roundFileSizeToFixed()).to.equal("0");
+            expect(roundFileSizeToFixed("test")).to.equal("0");
+            expect(roundFileSizeToFixed(null)).to.equal("0");
+            expect(roundFileSizeToFixed({bla: "foo"})).to.equal("0");
+            expect(roundFileSizeToFixed([1, 2])).to.equal("0");
+            expect(roundFileSizeToFixed(true)).to.equal("0");
+            expect(roundFileSizeToFixed(false)).to.equal("0");
+            expect(roundFileSizeToFixed(undefined)).to.equal("0");
+            expect(roundFileSizeToFixed("")).to.equal("0");
+
+            global.i18next = {language: "de"};
+            expect(roundFileSizeToFixed(-209)).to.equal("-209");
+            expect(roundFileSizeToFixed(100)).to.equal("100");
+            expect(roundFileSizeToFixed(21335.4841)).to.equal("21335,48");
+            expect(roundFileSizeToFixed(50.000)).to.equal("50");
+            expect(roundFileSizeToFixed("2136548.410")).to.equal("2136548,41");
+
+            global.i18next = {language: "en"};
+            expect(roundFileSizeToFixed(-209)).to.equal("-209");
+            expect(roundFileSizeToFixed(100)).to.equal("100");
+            expect(roundFileSizeToFixed(21335.4841)).to.equal("21335.48");
+            expect(roundFileSizeToFixed(50.000)).to.equal("50");
+            expect(roundFileSizeToFixed("2136548.410")).to.equal("2136548.41");
+
+            global.i18next = {language: "de"};
+            expect(roundFileSizeToFixed(0, true)).to.equal("0,00");
+            expect(roundFileSizeToFixed("test", true)).to.equal("0,00");
+            expect(roundFileSizeToFixed(null, true)).to.equal("0,00");
+            expect(roundFileSizeToFixed({bla: "foo"}, true)).to.equal("0,00");
+            expect(roundFileSizeToFixed([1, 2], true)).to.equal("0,00");
+            expect(roundFileSizeToFixed(true, true)).to.equal("0,00");
+            expect(roundFileSizeToFixed(false, true)).to.equal("0,00");
+            expect(roundFileSizeToFixed(undefined, true)).to.equal("0,00");
+            expect(roundFileSizeToFixed("", true)).to.equal("0,00");
+
+            expect(roundFileSizeToFixed(-209, true)).to.equal("-209,00");
+            expect(roundFileSizeToFixed(100, true)).to.equal("100,00");
+            expect(roundFileSizeToFixed(21335.4841, true)).to.equal("21335,48");
+            expect(roundFileSizeToFixed(50.000, true)).to.equal("50,00");
+            expect(roundFileSizeToFixed("2136548.410", true)).to.equal("2136548,41");
+
+            global.i18next = {language: "en"};
+            expect(roundFileSizeToFixed(-209, true)).to.equal("-209.00");
+            expect(roundFileSizeToFixed(100, true)).to.equal("100.00");
+            expect(roundFileSizeToFixed(21335.4841, true)).to.equal("21335.48");
+            expect(roundFileSizeToFixed(50.000, true)).to.equal("50.00");
+            expect(roundFileSizeToFixed("2136548.410", true)).to.equal("2136548.41");
+
+            global.i18next = prevI18next;
         });
     });
 });

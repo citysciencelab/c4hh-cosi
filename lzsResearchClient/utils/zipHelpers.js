@@ -147,9 +147,75 @@ function buildFileInformationObject (fileName, filePath, fileSize, archiveId, ar
     };
 }
 
+/**
+ * Convert a file size given in bytes to a compact human-readable string using
+ * kB, MB or GB.
+ *
+ * Selection rules:
+ * - Chooses the largest unit among kB, MB, GB that yields a value >= 1.
+ * - Outputs no decimals for integer values, otherwise exactly two decimals.
+ * - Uses a comma as decimal separator (e.g. "213,35 MB").
+ *
+ * @param {number|string} fileSizeByte - File size in bytes (number or numeric string).
+ * @returns {string} Formatted size with unit, e.g. "500 MB" or "213,35 MB".
+ */
+function getHumanReadableFileSize (fileSizeByte) {
+    const bytes = Number(fileSizeByte) || 0;
+
+    if (bytes <= 0) {
+        return "0 kB";
+    }
+
+    const kB = 1e3;
+    const MB = 1e6;
+    const GB = 1e9;
+
+    let value, unit;
+
+    if (bytes >= GB) {
+        value = bytes / GB;
+        unit = "GB";
+    }
+    else if (bytes >= MB) {
+        value = bytes / MB;
+        unit = "MB";
+    }
+    else {
+        value = bytes / kB;
+        unit = "kB";
+    }
+
+    return roundFileSizeToFixed(value) + " " + unit;
+}
+
+/**
+ * Format a numeric file-size value to a localized string with up to two decimals.
+ *
+ * - Coerces fileSize (number or numeric string) to Number; NaN -> 0.
+ * - Rounds the input to two decimal places.
+ * - If fixed2 is true, always returns two decimals (e.g. 2 -> "2.00" / "2,00").
+ * - If fixed2 is false, omits the decimal part for integer results (e.g. 2 -> "2").
+ * - Uses a comma as decimal separator for German locale (i18next.language === "de"),
+ *   otherwise uses a dot.
+ *
+ * @param {number|string} fileSize - File size (number or numeric string).
+ * @param {boolean} [fixed2=false] - When true, always format with two decimal places.
+ * @returns {string} Localized formatted number as a string (unit not included).
+ */
+function roundFileSizeToFixed (fileSize, fixed2 = false) {
+    const numericFileSize = typeof fileSize === "boolean" ? 0 : Number(fileSize) || 0,
+        rounded = Math.round(numericFileSize * 100) / 100,
+        str = fixed2 || rounded % 1 !== 0 ? rounded.toFixed(2) : String(rounded),
+        result = i18next.language === "de" ? str.replace(".", ",") : str;
+
+    return result;
+}
+
 export {
     saveAs,
     fetchWithProgress,
     setNested,
-    buildFileInformationObject
+    buildFileInformationObject,
+    getHumanReadableFileSize,
+    roundFileSizeToFixed
 };

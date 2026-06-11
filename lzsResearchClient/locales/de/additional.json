@@ -91,7 +91,7 @@
                 "start": "Beginne Daten zu sammeln und das ZIP zu erzeugen ...",
                 "fetchPrimaryData": "Hole Infos über Dateien zu {{ archiveName }} ...",
                 "downloading": "Dateien herunterladen ...",
-                "sumFileSizeError": "Die summierte Dateigröße ist größer als 500 MB (nämlich {{ sumFileSize }}MB). Das kann nicht auf einmal heruntergeladen werden.",
+                "sumFileSizeError": "Die summierte Dateigröße ist größer als {{ maxFileSize }} (nämlich {{ sumFileSize }}). Das kann nicht auf einmal heruntergeladen werden.",
                 "downloadingFile": "Lade {{ fileName }}",
                 "zipping": "Erzeuge das ZIP ...",
                 "done": "Erledigt!"

@@ -18,6 +18,7 @@ import stateSearchBar from "./searchBar/stateSearchBar.js";
  * @property {Object} placeholderDataClassList - Placeholder data class list from placeholder.json
  * @property {Number} minScaleValue - minimal scale value for search in map extent (e.g. 5000 for 1 : 5.000)
  * @property {String} zipFileName - name part of the created zip file name, will be extended by '.zip'
+ * @property {Number} maxDownloadMB - maximal allowed size of files to select for download in MB (default 500, set -1 to skip max size check)
 
  * Addon state
  * @property {Boolean} showLoadingSpinner - Show loading spinner or not
@@ -59,6 +60,7 @@ const state = {
     apiBasePath: "",
     minScaleValue: 5000,
     zipFileName: "GeoDataDepot-Download",
+    maxDownloadMB: 500,
 
     // Addon state
     showLoadingSpinner: false,

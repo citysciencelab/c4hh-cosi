@@ -1,7 +1,7 @@
 import searchBarActions from "./searchBar/actions/actionsSearchBar.js";
 import axios from "axios";
 import {buildEndpointUrl} from "../utils/buildEndpointUrl";
-import {saveAs, fetchWithProgress, setNested, buildFileInformationObject} from "../utils/zipHelpers";
+import {saveAs, fetchWithProgress, setNested, buildFileInformationObject, getHumanReadableFileSize} from "../utils/zipHelpers";
 import {zip} from "fflate/browser";
 
 export default {
@@ -485,8 +485,13 @@ export default {
         // total known bytes from contentFileLength
         const knownTotalBytes = files.reduce((s, f) => s + (f.size || 0), 0);
 
-        if (knownTotalBytes > 500000000) {
-            state.errorMessage = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.sumFileSizeError", {sumFileSize: (knownTotalBytes / 1000000).toFixed(2)});
+        if (state.maxDownloadMB > -1 && knownTotalBytes / 1e6 > state.maxDownloadMB) {
+            state.errorMessage = i18next.t(
+                "additional:modules.lzsResearchClient.zipAndDownload.progress.sumFileSizeError",
+                {
+                    maxFileSize: getHumanReadableFileSize(state.maxDownloadMB * 1e6),
+                    sumFileSize: getHumanReadableFileSize(knownTotalBytes)
+                });
             state.progressNow = 100;
             state.currentProgressValue = "";
             return;

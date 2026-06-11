@@ -5,6 +5,7 @@ import TabResultTable from "./TabResultTable.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
+import {roundFileSizeToFixed} from "../utils/zipHelpers";
 
 export default {
     name: "TabDetails",
@@ -124,7 +125,7 @@ export default {
 
                 attributes.push({
                     name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
-                    value: (dataset.contentFileSize / 1000000).toFixed(2).replace(".", ",")
+                    value: roundFileSizeToFixed(dataset.contentFileSize / 1e6, true)
                 });
 
                 results.push(
@@ -151,7 +152,7 @@ export default {
 
                     worldFileAttributes.push({
                         name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
-                        value: (dataset.georeferencePrimarydata.contentFileSize / 1000000).toFixed(2).replace(".", ",")
+                        value: roundFileSizeToFixed(dataset.georeferencePrimarydata.contentFileSize / 1e6, true)
                     });
 
                     results.push(
