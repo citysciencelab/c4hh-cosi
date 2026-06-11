@@ -84,7 +84,7 @@ export default {
                 this.imageSrc = JSON.parse(JSON.stringify(this.storyList[val]?.story?.imageSrc));
                 this.author = JSON.parse(JSON.stringify(this.storyList[val]?.story?.author));
                 this.chapterContent = JSON.parse(JSON.stringify(this.storyList[val]?.story?.chapters));
-                this.setImageAssetsById(JSON.parse(JSON.stringify(this.storyList[val]?.imageAssetsById)));
+                this.setImageAssetsById(Object.assign({}, this.storyList[val]?.imageAssetsById));
                 this.updateStory();
             },
             immediate: true
