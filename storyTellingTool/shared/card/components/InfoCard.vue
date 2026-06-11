@@ -70,9 +70,14 @@ export default {
         /**
          * Handles the click event on the edit button and stops propagation.
          * @param {Event} event The DOM event.
+         * @param {Boolean} ignore if to ignore the click event.
          * @returns {void}
          */
-        handleEditClick (event) {
+        handleEditClick (event, ignore = false) {
+            if (ignore) {
+                return;
+            }
+
             if (event) {
                 event.stopPropagation();
             }
@@ -124,9 +129,9 @@ export default {
             }"
             role="button"
             tabindex="0"
-            @click="handleEditClick"
-            @keydown.enter="handleEditClick"
-            @keydown.space.prevent="handleEditClick"
+            @click="handleEditClick($event, cardType === 'story')"
+            @keydown.enter="handleEditClick($event, cardType === 'story')"
+            @keydown.space.prevent="handleEditClick($event, cardType === 'story')"
         >
             <div
                 v-if="cardImage.length"
@@ -223,7 +228,10 @@ export default {
                             />
                             <span class="ms-1 small">{{ cardItems.numberOfChapters + " " + $t('additional:modules.storyCreator.numberOfChapters') }}</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
+                        <div
+                            v-if="editable"
+                            class="d-flex align-items-center gap-2"
+                        >
                             <IconButton
                                 :aria="$t('additional:modules.storyCreator.labels.editStory')"
                                 icon="bi bi-pencil"

@@ -122,5 +122,16 @@ describe("addons/shared/components/InfoCard.vue", () => {
             expect(wrapper.find(".badge").exists()).to.be.true;
             expect(wrapper.find(".badge").text()).to.equal("additional:modules.storyCreator.readOnly");
         });
+        it("renders no button for download and edit", () => {
+            const wrapper = shallowMount(InfoCard, {
+                props: {
+                    cardTitle: "Test",
+                    cardType: "story",
+                    editable: false
+                }
+            });
+
+            expect(wrapper.findComponent({name: "IconButton"}).exists()).to.be.false;
+        });
     });
 });

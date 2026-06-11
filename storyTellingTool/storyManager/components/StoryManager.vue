@@ -1,6 +1,7 @@
 <script>
 import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMessage.vue";
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
+import axios from "axios";
 import {createStoryZip, extractStoryZip} from "../shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
@@ -23,12 +24,18 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/StoryManager", [
+            "fixedStoryFiles",
+            "fixedStoryLoaded",
+            "fixedStoryPath",
             "storyList"
         ])
     },
+    mounted () {
+        this.getFixedStoryList(this.fixedStoryPath, this.fixedStoryFiles);
+    },
     methods: {
         ...mapActions("Menu", ["changeCurrentComponent"]),
-        ...mapMutations("Modules/StoryManager", ["setCurrentStoryIndex", "setStoryList"]),
+        ...mapMutations("Modules/StoryManager", ["setCurrentStoryIndex", "setFixedStoryLoaded", "setStoryList"]),
         /**
          * Changes the current menu component to the Story Creator to start a new story.
          * @returns {void}
@@ -98,6 +105,56 @@ export default {
                 creation: val?.created,
                 numberOfChapters: val?.chapters?.length || 0
             };
+        },
+        /**
+         * Returns the fixed story list.
+         * @param {String} storyPath - the relative path in portalconfigs to contain fixed stories.
+         * @param {String[]} files - the fixed story files name.
+         * @returns {Promise<void>}.
+         */
+        async getFixedStoryList (storyPath, files) {
+            if (this.fixedStoryLoaded || typeof storyPath !== "string" || !Array.isArray(files)) {
+                return;
+            }
+
+            const stories = await Promise.all(
+                files.map(async (filename) => {
+                    const file = `${storyPath}/${filename}.zip`;
+
+                    try {
+                        const response = await axios.get(file, {
+                            responseType: "blob"
+                        });
+
+                        try {
+                            const {storyJson, imageAssetsById} =
+                                await extractStoryZip(response.data);
+
+                            storyJson.editable = false;
+
+                            return {
+                                story: storyJson,
+                                imageAssetsById
+                            };
+                        }
+                        catch (error) {
+                            this.showImportError = true;
+                            return null;
+                        }
+                    }
+                    catch (e) {
+                        console.warn(
+                            `Zip files at ${storyPath} could not be loaded. Please check that it is a valid zip file.`
+                        );
+                        return null;
+                    }
+                })
+            );
+
+            this.setStoryList([
+                ...stories.filter(Boolean),
+                ...this.storyList
+            ]);
         },
         /**
          * Handles selected import file.
@@ -225,7 +282,7 @@ export default {
                     :copyright="storyEntry?.story?.imageCopyright"
                     :alt="storyEntry?.story?.imageAlt"
                     :card-items="getCardItems(storyEntry?.story)"
-                    :editable="true"
+                    :editable="storyEntry?.story?.editable"
                     @edit="() => editStory(index)"
                     @download="() => downloadStory(storyEntry)"
                 />

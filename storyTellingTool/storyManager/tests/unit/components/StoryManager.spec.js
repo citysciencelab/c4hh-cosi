@@ -25,11 +25,23 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                             namespaced: true,
                             getters: {
                                 currentStoryIndex: (state) => state.currentStoryIndex,
+                                fixedStoryPath: (state) => state.fixedStoryPath,
+                                fixedStoryFiles: (state) => state.fixedStoryFiles,
+                                fixedStoryLoaded: (state) => state.fixedStoryLoaded,
                                 storyList: (state) => state.storyList
                             },
                             mutations: {
                                 setCurrentStoryIndex (state, value) {
                                     state.currentStoryIndex = value;
+                                },
+                                setFixedStoryPath (state, value) {
+                                    state.fixedStoryPath = value;
+                                },
+                                setFixedStoryFiles (state, value) {
+                                    state.fixedStoryFiles = value;
+                                },
+                                setFixedStoryLoaded (state, value) {
+                                    state.fixedStoryLoaded = value;
                                 },
                                 setStoryList (state, value) {
                                     state.storyList = value;
@@ -60,7 +72,10 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                         },
                                         imageAssetsById: {}
                                     }
-                                ]
+                                ],
+                                fixedStoryPath: "./assets",
+                                fixedStoryFiles: [],
+                                fixedStoryLoaded: false
                             }
                         },
                         StoryCreator: {
@@ -126,6 +141,44 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                     };
 
                 expect(wrapper.vm.getCardItems(story)).to.deep.equal(cardItems);
+            });
+        });
+
+        describe("getFixedStoryList", () => {
+            it("should return not call setStoryList", async () => {
+                const setStoryListSpy = sinon.spy(wrapper.vm, "setStoryList");
+
+                await wrapper.vm.getFixedStoryList(null);
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList(0);
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList({});
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList(undefined);
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList(false);
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList([]);
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList("path", null);
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList("path", "");
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList("path", {});
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList("path", 0);
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList("path", false);
+                expect(setStoryListSpy.called).to.be.false;
+                await wrapper.vm.getFixedStoryList("path", undefined);
+                expect(setStoryListSpy.called).to.be.false;
+            });
+
+            it("should return call setStoryList", async () => {
+                const setStoryListSpy = sinon.spy(wrapper.vm, "setStoryList");
+
+                await wrapper.vm.getFixedStoryList("path", []);
+                expect(setStoryListSpy.called).to.be.true;
             });
         });
 
