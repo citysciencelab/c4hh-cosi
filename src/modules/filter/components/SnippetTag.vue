@@ -2,11 +2,11 @@
 
 /**
 * Snippet Tag
-* @module modules/SnippetTag
-* @vue-prop {Number} filterId - The filter ID.
+* @module modules/filter/components/SnippetTag
+* @vue-prop {number} filterId - The filter ID.
 * @vue-prop {Object} rule - Rule object containing snippetId and value.
-* @vue-event {Number, Number} deleteRule - Emits snippet and filter ID of rule to delete.
-* @vue-event {Number, Number, Number} deleteValue - Emits snippet and filter ID of value to delete.
+* @vue-event {Array<number>} deleteRule - Emits [snippetId, filterId] of rule to delete.
+* @vue-event {Array<(number|string)>} deleteValue - Emits [snippetId, filterId, value] of value to delete.
 */
 export default {
     name: "SnippetTag",
@@ -44,7 +44,7 @@ export default {
     methods: {
         /**
          * Triggers the functions to reset the snippet and change the rules.
-         * @param {String} value The value to be removed.
+         * @param {string} value The value to be removed.
          * @returns {void}
          */
         removeTag (value) {

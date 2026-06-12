@@ -8,10 +8,10 @@ import {
 /**
  * ExportButtonGeoJSON component: A component for handling, preparing and downloading Data in geojson format.
  * @module shared/modules/buttons/ExportButtonGeoJSON
- * @vue-prop {String} title is the label of the Button. An i18next-String can be used for internationalization.
- * @vue-prop {[Object, Boolean]} data is the geojson data to be downloaded, provided as either a String.
- * @vue-prop {String, Boolean} filename sets the prefix of the filename. Can be set to false to use "download".
- * @vue-prop {String} postfixFormat sets the dayjs format to be used as a postfix for filename. Only used if filename is not a boolean value.
+ * @vue-prop {string} title is the label of the Button. An i18next-String can be used for internationalization.
+ * @vue-prop {Array<(Object|boolean)>} data is the geojson data to be downloaded, provided as either a String.
+ * @vue-prop {(string|boolean)} filename sets the prefix of the filename. Can be set to false to use "download".
+ * @vue-prop {string} postfixFormat sets the dayjs format to be used as a postfix for filename. Only used if filename is not a boolean value.
  */
 export default {
     name: "ExportButtonGeoJSON",
@@ -72,7 +72,7 @@ export default {
         /**
          * handles the given error message according to portal standards
          * @post the error message is processed
-         * @param {String} msg the error message to use on the console (alert uses standard from translation)
+         * @param {string} msg the error message to use on the console (alert uses standard from translation)
          * @returns {void}
          */
         handleDownloadError (msg) {
@@ -103,7 +103,7 @@ export default {
         /**
          * Creates a file based on given blob.
          * @param {Blob} blob the blob to create the file on
-         * @param {String} fileName the file name
+         * @param {string} fileName the file name
          * @returns {void}
          */
         createFile (blob, fileName) {
@@ -117,9 +117,9 @@ export default {
         },
         /**
          * creates a filename using the given prefix and postfixFormat
-         * @param {String} prefix the prefix to begin the filename with
-         * @param {String} postfixFormat the format to hand over to dayjs to create the end of the filename with
-         * @returns {String} a concatination of prefix and postfixFormat
+         * @param {string} prefix the prefix to begin the filename with
+         * @param {string} postfixFormat the format to hand over to dayjs to create the end of the filename with
+         * @returns {string} a concatination of prefix and postfixFormat
          */
         createFilename (prefix, postfixFormat) {
             if (postfixFormat) {

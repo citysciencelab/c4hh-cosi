@@ -3,13 +3,13 @@
 /**
  * IconButton component: A component to display an icon button.
  * @vue-prop {Function} interaction provides the function to be called on click of the button.
- * @vue-prop {String} aria sets the tooltip of the button to be displayed on hover.
- * @vue-prop {String} icon sets the (bootstrap-)icon to be used by the button.
- * @vue-prop {[String]} iconArray : An iconArray can be provided as well, the first entry of the Array will be used as the icon.
- * @vue-prop {[String]} classArray can be used to set an Array of custom Classes to be applied to the button.
- * @vue-prop {String} id sets the html-id of the button.
- * @vue-prop {Boolean} disabled can be used to disable the button.
- * @vue-prop {String} label can be used to add a Label to the iconButton to be displayed beside it.
+ * @vue-prop {string} aria sets the tooltip of the button to be displayed on hover.
+ * @vue-prop {string} icon sets the (bootstrap-)icon to be used by the button.
+ * @vue-prop {string[]} iconArray : An iconArray can be provided as well, the first entry of the Array will be used as the icon.
+ * @vue-prop {string[]} classArray can be used to set an Array of custom Classes to be applied to the button.
+ * @vue-prop {string} id sets the html-id of the button.
+ * @vue-prop {boolean} disabled can be used to disable the button.
+ * @vue-prop {string} label can be used to add a Label to the iconButton to be displayed beside it.
  */
 export default {
     name: "IconButton",

@@ -10,15 +10,15 @@ const getters = {
      * {key: state => state[key]} will be returned.
      * This is useful to avoid writing basic operations.
      * @param {Object} state state to generate getters for
-     * @returns {object.<string, function>} object of getters
+     * @returns {Object.<string, Function>} object of getters
      */
     ...generateSimpleGetters(legendState),
 
     /**
     * Checks if given layerid is in the legend.
     * @param {Object} state state of the app-store.
-    * @param {String} layerId Id of layer.
-    * @returns {Boolean} - Flag if layer is in the legend
+    * @param {string} layerId Id of layer.
+    * @returns {boolean} - Flag if layer is in the legend
     */
     isLayerInLegend: state => (layerId) => {
         return state.legends.filter((legendObj) => {
@@ -30,7 +30,7 @@ const getters = {
      * Checks if the legend object of the layer has changed
      * @param {Object} state state of the app-store.
      * @param {Object} legendObj The legend object to be checked.
-     * @returns {Boolean} - Flag if the legendObject has changed
+     * @returns {boolean} - Flag if the legendObject has changed
      */
     isLegendChanged: state => (legendObj) => {
         let isLegendChanged = false;

@@ -8,9 +8,9 @@ import Feature from "ol/Feature.js";
 class RoutingWaypoint {
     /**
      * creates new RoutingWaypoint
-     * @param {Number} index of the waypoint in list of waypoints.
+     * @param {number} index of the waypoint in list of waypoints.
      * @param {ol/feature} feature of the waypoint as point in map.
-     * @param {String} displayName of the waypoint as text.
+     * @param {string} displayName of the waypoint as text.
      * @param {ol/source} source where to add the feature.
      */
     constructor ({index, feature, displayName, source}) {
@@ -39,14 +39,14 @@ class RoutingWaypoint {
 
     /**
      * Index of the waypoint in list of waypoints.
-     * @returns {Number} index of the waypoint in list of waypoints.
+     * @returns {number} index of the waypoint in list of waypoints.
      */
     getIndex () {
         return this.index;
     }
     /**
      * Index of the waypoint in list of waypoints
-     * @param {Number} index of the waypoint in list of waypoints
+     * @param {number} index of the waypoint in list of waypoints
      * @returns {void}
      */
     setIndex (index) {
@@ -56,14 +56,14 @@ class RoutingWaypoint {
 
     /**
      * Coordinates in local projection.
-     * @returns {Array<{Number, Number}>} coordinates in local projection.
+     * @returns {Array<number>} Array containing coordinate pair [lng, lat]
      */
     getCoordinates () {
         return this.coordinates;
     }
     /**
      * Coordinates in local projection
-     * @param {Array<{Number, Number}>} coordinates in local projection
+      * @param {Array<number>} coordinates - Array containing coordinate pair [lng, lat]
      * @returns {void}
      */
     setCoordinates (coordinates) {
@@ -85,7 +85,7 @@ class RoutingWaypoint {
 
     /**
      * DisplayName of the waypoint as text.
-     * @returns {String|null} displayName of the waypoint as text.
+     * @returns {string|null} displayName of the waypoint as text.
      */
     getDisplayName () {
         if (this.displayName) {
@@ -98,7 +98,7 @@ class RoutingWaypoint {
     }
     /**
      * DisplayName of the waypoint as text.
-     * @param {String} displayName of the waypoint as text
+     * @param {string} displayName of the waypoint as text
      * @returns {void}
      */
     setDisplayName (displayName) {
@@ -117,14 +117,14 @@ class RoutingWaypoint {
 
     /**
      * Index along linestring
-     * @returns {Number|null} index along linestring
+     * @returns {number|null} index along linestring
      */
     getIndexDirectionsLineString () {
         return this.indexDirectionsLineString;
     }
     /**
      * Index along linestring
-     * @param {Number} indexDirectionsLineString along linestring
+     * @param {number} indexDirectionsLineString along linestring
      * @returns {void}
      */
     setIndexDirectionsLineString (indexDirectionsLineString) {

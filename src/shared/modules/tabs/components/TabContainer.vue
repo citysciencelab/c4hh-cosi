@@ -16,7 +16,7 @@ export default {
     props: {
         /**
          * List of tab descriptors for navigation and content rendering.
-         * @type {Tab{}}
+         * @type {Object[]}
          * @example
          * {
          * id: "tabSearch", // Unique identifier for the tab (used as `key` and `aria-labelledby`).

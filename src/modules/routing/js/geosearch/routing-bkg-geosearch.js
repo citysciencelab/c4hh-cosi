@@ -4,7 +4,7 @@ import state from "../../store/stateRouting.js";
 import store from "@appstore/index.js";
 /**
  * Requests POIs from text from BKG
- * @param {String} search text to search with
+ * @param {string} search text to search with
  * @returns {RoutingGeosearchResult[]} routingGeosearchResults
  */
 async function fetchRoutingBkgGeosearch (search) {
@@ -22,8 +22,8 @@ async function fetchRoutingBkgGeosearch (search) {
 
 /**
  * Creates the url with the given params.
- * @param {String} search to search for
- * @returns {String} the url
+ * @param {string} search to search for
+ * @returns {string} the url
  */
 async function getRoutingBkgGeosearchUrl (search) {
     const serviceUrl = store.getters.restServiceById(state.geosearch.serviceId).url,
@@ -49,8 +49,8 @@ async function getRoutingBkgGeosearchUrl (search) {
 
 /**
  * Creates the url with the given params.
- * @param {Array<{Number, Number}>} coordinates to search at
- * @returns {String} the url
+ * @param {Array<number>} coordinates Array containing coordinate pair [lon, lat] in wgs84 projection
+ * @returns {string} the url
  */
 function getRoutingBkgGeosearchReverseUrl (coordinates) {
     const serviceUrl = store.getters.restServiceById(state.geosearchReverse.serviceId).url,
@@ -67,7 +67,7 @@ function getRoutingBkgGeosearchReverseUrl (coordinates) {
 
 /**
  * Requests POI at coordinate from BKG
- * @param {Array<{Number, Number}>} coordinates to search at
+ * @param {Array<number>} coordinates Array containing coordinate pair [lon, lat] in wgs84 projection
  * @returns {RoutingGeosearchResult} routingGeosearchResult
  */
 async function fetchRoutingBkgGeosearchReverse (coordinates) {
@@ -86,9 +86,9 @@ async function fetchRoutingBkgGeosearchReverse (coordinates) {
  * Parses Response from Bkg to RoutingGeosearchResult
  * @param {Object} geosearchResult from BKG
  * @param {Object} [geosearchResult.geometry] geosearchResult geometry
- * @param {Array<{Number, Number}>} [geosearchResult.geometry.coordinates] geosearchResult geometry coordinates
+ * @param {Array<number>} [geosearchResult.geometry.coordinates] Array containing coordinate pair [lon, lat] from geosearch geometry
  * @param {Object} [geosearchResult.properties] geosearchResult properties
- * @param {String} [geosearchResult.properties.text] geosearchResult properties text
+ * @param {string} [geosearchResult.properties.text] geosearchResult properties text
  * @returns {RoutingGeosearchResult} routingGeosearchResult
  */
 function parseRoutingBkgGeosearchResult (geosearchResult) {
@@ -100,7 +100,7 @@ function parseRoutingBkgGeosearchResult (geosearchResult) {
 
 /**
  * Checks if a bbox is configured with the current speed profile
- * @returns {Boolean|String} false or current speed profile
+ * @returns {boolean|string} false or current speed profile
  */
 function checkConfiguredBbox () {
     const currentSpeedProfile = state.directionsSettings.speedProfile;

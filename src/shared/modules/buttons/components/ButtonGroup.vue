@@ -5,13 +5,13 @@ import SpinnerItem from "../../../modules/spinner/components/SpinnerItem.vue";
 /**
  * Shared component to display an array of buttons.
  * @module shared/modules/buttons/ButtonGroup
- * @vue-prop {[Object]} buttons The buttons to display, in the format [{name: "button1", icon: "bi-icon"}].
- * @vue-prop {String} group The name of the button group, ensuring only one of the buttons may be active at a time.
- * @vue-prop {Boolean} isLoadSpinnerEnable Determines whether a loading spinner will be displayed.
- * @vue-prop {String} selectedValue The initially active button.
- * @vue-prop {[String]} subText An Array of optional Subtexts to be shown below each button.
- * @vue-prop {Boolean} isGroup is a display-Prop. When false, the buttons will be shown like a toggle between them, when false the buttons are separated more clearly.
- * @vue-prop {String} returnedButtonProperty overrides the button.name that is emitted on button selection, allowing for custom values.
+ * @vue-prop {Object[]} buttons The buttons to display, in the format [{name: "button1", icon: "bi-icon"}].
+ * @vue-prop {string} group The name of the button group, ensuring only one of the buttons may be active at a time.
+ * @vue-prop {boolean} isLoadSpinnerEnable Determines whether a loading spinner will be displayed.
+ * @vue-prop {string} selectedValue The initially active button.
+ * @vue-prop {string[]} subText An Array of optional Subtexts to be shown below each button.
+ * @vue-prop {boolean} isGroup is a display-Prop. When false, the buttons will be shown like a toggle between them, when false the buttons are separated more clearly.
+ * @vue-prop {string} returnedButtonProperty overrides the button.name that is emitted on button selection, allowing for custom values.
  */
 export default {
     name: "ButtonGroup",
@@ -82,8 +82,8 @@ export default {
         /**
          * Gets the prechecked index
          * @param {Object[]} buttons - the buttons object in array
-         * @param {String} precheckedValue - the prechecked value
-         * @returns {Number} the prechecked index
+         * @param {string} precheckedValue - the prechecked value
+         * @returns {number} the prechecked index
          */
         getPrecheckedIndex (buttons, precheckedValue) {
             if (!Array.isArray(buttons) || typeof precheckedValue !== "string") {

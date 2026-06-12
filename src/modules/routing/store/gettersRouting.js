@@ -16,15 +16,15 @@ const getters = {
      * {key: state => state[key]} will be returned.
      * This is useful to avoid writing basic operations.
      * @param {Object} state state to generate getters for
-     * @returns {object.<string, function>} object of getters
+     * @returns {Object.<string, Function>} object of getters
      */
     ...generateSimpleGetters(routingState),
 
     /**
      * Returns the configured tabs to be displayed.
      * @param {Object} state routing
-     * @param {String[]} [state.routingToolOptions] routingToolOptions in state
-     * @returns {String[]} routing tool options
+     * @param {string[]} [state.routingToolOptions] routingToolOptions in state
+     * @returns {string[]} routing tool options
      */
     filteredRoutingToolOptions ({routingToolOptions}) {
         const constantOptions = [
@@ -44,7 +44,7 @@ const getters = {
     /**
      * Returns url params for routing.
      * @param {Object} state routing store state
-     * @returns {String} The url params for routing-
+     * @returns {string} The url params for routing-
      */
     urlParams: state => {
         const params = {

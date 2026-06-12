@@ -4,40 +4,39 @@ import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 
 /**
  * A generic confirmation modal component asking for user confirmation.
- * @module shared/modules/buttons/ElevatedButton
+ * @module shared/modules/modals/ConfirmModal
  *
- * Example usage:
- *
+ * @example
  * <button @click="showConfirmModal = true">Open modal</button>
  *
  * <ConfirmModal
  *     :show-modal="showConfirmModal"
  *     modal-title="Update item?"
- *     modal-content="This can't be undone. Are you shure?"
+ *     modal-content="This can't be undone. Are you sure?"
  *     button-confirm-label="Update"
  *     button-cancel-label="Cancel"
  *     @clicked-confirm="showConfirmModal = false"
  *     @clicked-cancel="showConfirmModal = false"
  * />
  *
- * @vue-props {string} modalTitle - Modal title, overwrite with slot "title" if HTML is required.
- * @vue-props {string} modalContent - Modal content, overwrite with slot "default" if HTML is required.
- * @vue-props {string} buttonConfirmLabel - Label for the confirm button.
- * @vue-props {string|null} buttonConfirmIcon - Icon for the confirm button.
- * @vue-props {boolean} buttonConfirmHidden - Whether the confirm button is hidden.
- * @vue-props {string} buttonCancelLabel - Label for the cancel button.
- * @vue-props {string|null} buttonCancelIcon - Icon for the cancel button.
- * @vue-props {boolean} buttonCancelHidden - Whether the cancel button is hidden.
- * @vue-props {boolean} buttonCloseHidden - Whether the close (X) button is hidden.
- * @vue-props {string} modalClass - Additional CSS class for the modal.
- * @vue-props {string} modalStyle - Additional inline styles for the modal.
- * @vue-props {string} modalContentClass - Additional CSS class for the modal content.
- * @vue-props {string} modalContentStyle - Additional inline styles for the modal content.
- * @vue-props {boolean} showModal - Whether the modal is visible.
+ * @vue-prop {string} modalTitle - Modal title, overwrite with slot "title" if HTML is required.
+ * @vue-prop {string} modalContent - Modal content, overwrite with slot "default" if HTML is required.
+ * @vue-prop {string} buttonConfirmLabel - Label for the confirm button.
+ * @vue-prop {(string|null)} buttonConfirmIcon - Icon for the confirm button.
+ * @vue-prop {boolean} buttonConfirmHidden - Whether the confirm button is hidden.
+ * @vue-prop {string} buttonCancelLabel - Label for the cancel button.
+ * @vue-prop {(string|null)} buttonCancelIcon - Icon for the cancel button.
+ * @vue-prop {boolean} buttonCancelHidden - Whether the cancel button is hidden.
+ * @vue-prop {boolean} buttonCloseHidden - Whether the close (X) button is hidden.
+ * @vue-prop {string} modalClass - Additional CSS class for the modal.
+ * @vue-prop {string} modalStyle - Additional inline styles for the modal.
+ * @vue-prop {string} modalContentClass - Additional CSS class for the modal content.
+ * @vue-prop {string} modalContentStyle - Additional inline styles for the modal content.
+ * @vue-prop {boolean} showModal - Whether the modal is visible.
  *
- * @vue-emits confirmModalHidden - Emitted when the modal has been fully hidden.
- * @vue-emits clickedConfirm - Emitted when the confirm button is clicked.
- * @vue-emits clickedCancel - Emitted when the cancel button is clicked.
+ * @vue-event {void} confirmModalHidden - Emitted when the modal has been fully hidden.
+ * @vue-event {void} clickedConfirm - Emitted when the confirm button is clicked.
+ * @vue-event {void} clickedCancel - Emitted when the cancel button is clicked.
  */
 export default {
     name: "ConfirmModal",

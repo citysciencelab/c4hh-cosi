@@ -2,16 +2,16 @@
 /**
  * SliderDualRange: A component for handling a dual range input slider that allows the user to adjust two values (e.g., two time points).
  * @module shared/modules/slider/SliderDualRange
- * @vue-prop {String} aria - is used for accessibility, e.g. screenreaders take this string to describe the element to visually impaired users.
- * @vue-prop {String} id - can be used to give a distinct id to the slider-element.
- * @vue-prop {String} label - can be provided for a right-hand label to the slider
- * @vue-prop {String|Number} min - can be used to set a minimal value for the slider. If no value is given 0 is the minimum.
- * @vue-prop {String|Number} max - can be used to set a maximum value for the slider. If no value is given 100 is the maximum.
- * @vue-prop {String|Number} step - can be used to define steps by which the slider can be moved, i.e. "10" will let the slider only take values that are multiples of 10.
- * @vue-prop {String|Number} values - are the current two values of the slider.
- * @vue-prop {Boolean} disabled - can be used to disable any input to the slider.
+ * @vue-prop {string} aria - is used for accessibility, e.g. screenreaders take this string to describe the element to visually impaired users.
+ * @vue-prop {string} id - can be used to give a distinct id to the slider-element.
+ * @vue-prop {string} label - can be provided for a right-hand label to the slider
+ * @vue-prop {string|number} min - can be used to set a minimal value for the slider. If no value is given 0 is the minimum.
+ * @vue-prop {string|number} max - can be used to set a maximum value for the slider. If no value is given 100 is the maximum.
+ * @vue-prop {string|number} step - can be used to define steps by which the slider can be moved, i.e. "10" will let the slider only take values that are multiples of 10.
+ * @vue-prop {string|number} values - are the current two values of the slider.
+ * @vue-prop {boolean} disabled - can be used to disable any input to the slider.
  * @vue-prop {Function} interaction - can be used to define a function to be executed on each user interaction with the slider.
- * @vue-prop {[String]} classArray - is used to provide additional classes to the encapsulating div of the slider.
+ * @vue-prop {string[]} classArray - is used to provide additional classes to the encapsulating div of the slider.
  */
 
 export default {
@@ -85,7 +85,7 @@ export default {
         /**
          * Update the slider range layout.
          * @param {Event} event The input event.
-         * @param {String} slider The slider start or end.
+         * @param {string} slider The slider start or end.
          * @returns {void}
          */
         updateSliderRangeLayout (event, slider) {

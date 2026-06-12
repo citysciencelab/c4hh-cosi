@@ -14,14 +14,14 @@ const getters = {
      * {key: state => state[key]} will be returned.
      * This is useful to avoid writing basic operations.
      * @param {Object} state state to generate getters for
-     * @returns {object.<string, function>} object of getters
+     * @returns {Object.<string, Function>} object of getters
      */
     ...generateSimpleGetters(directionsState),
     /**
      * Gets all valid coordinates from the given waypoints.
      * @param {Object} params with waypoints
      * @param {RoutingWaypoint[]} [params.waypoints] waypoints from directionsState
-     * @returns {Array<{Number, Number}>} coordinate array
+     * @returns {Array<Array<number>>} Array of [lng, lat] coordinate pairs
      */
     directionsCoordinates ({waypoints}) {
         return waypoints
@@ -32,9 +32,9 @@ const getters = {
      * Gets the avoid speed profile options for the currently selected speed profile.
      * @param {Object} params from stateDirections
      * @param {Object} [params.settings] settings from stateDirections
-     * @param {String} [params.settings.speedProfile] selected SpeedProfile
-     * @param {String[]} [params.routingAvoidFeaturesOptions] selected avoid options
-     * @returns {String[]} avoid speed profile options
+     * @param {string} [params.settings.speedProfile] selected SpeedProfile
+     * @param {string[]} [params.routingAvoidFeaturesOptions] selected avoid options
+     * @returns {string[]} avoid speed profile options
      */
     selectedAvoidSpeedProfileOptions ({settings, routingAvoidFeaturesOptions}) {
         return constantsRouting.avoidSpeedProfileOptions.filter((option) => option.availableProfiles.includes(settings.speedProfile) && routingAvoidFeaturesOptions.includes(option.id));
@@ -42,8 +42,8 @@ const getters = {
     /**
      * Checks if input is disabled.
      * @param {Object} params from stateDirections
-     * @param {Boolean} [params.isLoadingDirections] if the directions are currently loaded
-     * @returns {Boolean} true if input is disabled
+     * @param {boolean} [params.isLoadingDirections] if the directions are currently loaded
+     * @returns {boolean} true if input is disabled
      */
     isInputDisabled ({isLoadingDirections}) {
         return isLoadingDirections;
@@ -51,7 +51,7 @@ const getters = {
     /**
      * Check if all HGV parameters are valid.
      * @param {Object} state state
-     * @returns {Boolean} true if all parameters are valid
+     * @returns {boolean} true if all parameters are valid
      */
     allHGVRestrictionsValid (state) {
         return Object.values(state.routingRestrictionIsValid).every(val => val);

@@ -17,13 +17,13 @@ export function initiateVueI18Next (app) {
 * initialization of the language with i18next
 * @pre i18next is not initialized
 * @post i18next is initialized
-* @param {String} portalId the unique identifier for each portal
+* @param {string} portalId the unique identifier for each portal
 * @param {Object} portalLanguageConfig the configuration red from config.js
 * @param {Object} portalLocales portal-specific locale overrides from config.js
-* @param {Boolean} config.enabled activates the GUI for language switching
-* @param {Boolean} config.debug if true i18next show debugging for developing
+* @param {boolean} config.enabled activates the GUI for language switching
+* @param {boolean} config.debug if true i18next show debugging for developing
 * @param {Object} config.languages the languages to be used as {krz: full} where krz is "en" and full is "english"
-* @param {String} config.fallbackLanguage the language to use on startup
+* @param {string} config.fallbackLanguage the language to use on startup
 * @param {Array} config.changeLanguageOnStartWhen the incidents that changes the language on startup as Array where the order is important
 * @returns {Promise<{basePath: string, portalId: string, portalLanguage: Object}>} A promise that is resolved when i18next language configuration has been completed (returned values are only used by the unit-tests)
 */
@@ -87,7 +87,7 @@ export function initLanguage (portalLanguageConfig, portalLocales) {
 
             /**
             * check wheather portalLanguage switcher is enabled or not
-            * @returns {Boolean}  true if switcher has to be shown
+            * @returns {boolean}  true if switcher has to be shown
             */
             isEnabled: function () {
                 return portalLanguage.enabled;
@@ -131,8 +131,8 @@ export function initLanguage (portalLanguageConfig, portalLocales) {
              * Custom handler for missing keys. Strips prefixes and corrects time format.
              * Removes unnecessary prefixes from translation keys and adjusts time formats
              * to use colons (`:`) where appropriate (e.g., replacing "HH.MM" with "HH:MM").
-             * @param {String} key - The missing key string to process.
-             * @returns {String} The cleaned key with time formats corrected if applicable.
+             * @param {string} key - The missing key string to process.
+             * @returns {string} The cleaned key with time formats corrected if applicable.
              */
             parseMissingKeyHandler: (key) => {
                 return key
@@ -163,7 +163,7 @@ export function initLanguage (portalLanguageConfig, portalLocales) {
  * supported languages, the fallback language is used instead.
  * Nothing is changed if the detected language code contains no region suffix.
  * @param {Object} portalLanguage - The portal language configuration.
- * @param {String} portalLanguage.fallbackLanguage - The language to fall back to if the base language is not supported.
+ * @param {string} portalLanguage.fallbackLanguage - The language to fall back to if the base language is not supported.
  * @param {Object} portalLanguage.languages - Supported languages as `{code: label}` pairs (e.g. `{en: "english"}`).
  * @returns {void}
  */

@@ -14,7 +14,7 @@ These two examples illustrate how to write JSDoc comment blocks.
 ```js
 /**
 * This function does some things that are explained right here.
-* @returns {Void}
+* @returns {void}
 */
 functionWithoutParamsAndNoReturn: function () {
     ...
@@ -24,8 +24,8 @@ functionWithoutParamsAndNoReturn: function () {
 ```js
 /**
 * This function does some things that are explained right here.
-* @param {String} param1 InputString.
-* @returns {String} ConcatenatedString
+* @param {string} param1 InputString.
+* @returns {string} ConcatenatedString
 */
 functionWithParamsAndReturn: function (param1) {
     return param1 + "foobar";

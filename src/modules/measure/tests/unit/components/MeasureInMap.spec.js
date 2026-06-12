@@ -29,8 +29,8 @@ describe("src/modules/measure/components/MeasureInMap.vue", () => {
     /**
      * Creates a Vuex store for testing with the given uiStyle value.
      * Must be called after the sinon spies have been set up in beforeEach.
-     * @param {String} [uiStyle=""] - The uiStyle value to use
-     * @returns {import('vuex').Store} The Vuex store instance
+     * @param {string} [uiStyle=""] - The uiStyle value to use
+     * @returns {Object} The Vuex store instance
      */
     function createTestStore (uiStyle = "") {
         return createStore({

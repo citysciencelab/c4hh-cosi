@@ -8,7 +8,7 @@ import Feature from "ol/Feature.js";
  */
 /**
  * @typedef {Object} SeparateMultiPolygonResult
- * @property {Map<string, FeatureMap>} featureMap - A map where keys are feature IDs and values are feature map items.
+ * @property {Map<string, Object>} featureMap - A map where keys are feature IDs and values are feature map items.
  * @property {boolean} isVoidFeature - Indicates if there is a void feature.
  */
 /**
@@ -80,7 +80,7 @@ async function separateMultipolygon (multiPolygonFeatures) {
 }
 /**
  * Sorts the feature map so that every inner Feature is placed behind its outer Feature.
- * @param {Map<string, FeatureMap>} featureMap - The feature map to be sorted.
+ * @param {Map<string, Object>} featureMap - The feature map to be sorted.
  * @returns {Array} - An array of sorted features.
  */
 function sortFeatureMap (featureMap) {

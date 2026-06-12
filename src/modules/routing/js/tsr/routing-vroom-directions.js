@@ -7,9 +7,9 @@ import {getLength} from "ol/sphere.js";
 
 /**
  * Translates the preference in the corresponding value for the service
- * @param {String} preference set by the user
- * @param {String} speedProfile set by the user
- * @returns {String} translated service value
+ * @param {string} preference set by the user
+ * @param {string} speedProfile set by the user
+ * @returns {string} translated service value
  */
 function routingOrsPreference (preference, speedProfile) {
     const preferenceConfigs = store.getters["Modules/Routing/tsrSettings"]?.customPreferences;
@@ -27,12 +27,12 @@ function routingOrsPreference (preference, speedProfile) {
 /**
  * Requests directions from ors service.
  * @param {Object} params parameter
- * @param {Array<{Number, Number}>} [params.coordinates] in wgs84 projection
- * @param {String} [params.language] to request the instructions in local language.
+ * @param {Array<Array<number>>} [params.coordinates] Array of [lng, lat] coordinate pairs in wgs84 projection
+ * @param {string} [params.language] to request the instructions in local language.
  * @param {Function} [params.transformCoordinatesToLocal] function to transform result coordinates to local projection.
- * @param {String} [params.speedProfile] to request the directions with
- * @param {String} [params.preference] to request the directions with
- * @param {Boolean} [params.instructions] if the instructions should be requested
+ * @param {string} [params.speedProfile] to request the directions with
+ * @param {string} [params.preference] to request the directions with
+ * @param {boolean} [params.instructions] if the instructions should be requested
  * @returns {RoutingTSRDirections} routingDirections
  */
 async function fetchTSRDirections ({
@@ -157,10 +157,10 @@ async function fetchTSRDirections ({
 
 /**
  * Sends request to VROOM service and returns its response
- * @param {String} url of VROOM request
- * @param {String} tsrSpeedProfile selected speed profile
- * @param {Array} start coordinates of start point
- * @param {Array<Number>} end coordinates of end point
+ * @param {string} url of VROOM request
+ * @param {string} tsrSpeedProfile selected speed profile
+ * @param {Array<number>} start Array containing coordinate pair [lng, lat] of start point
+ * @param {Array<number>} end Array containing coordinate pair [lng, lat] of end point
  * @param {Array<Object>} jobs jobs of tsr route
  * @returns {Object} VROOM resoponse
  */
@@ -189,8 +189,8 @@ async function sendRequestVROOM (url, tsrSpeedProfile, start, end, jobs) {
 
 /**
  * Sends request to ORS service and returns its response
- * @param {String} tsrSpeedProfile selected speed profile
- * @param {Array} coordinates of points
+ * @param {string} tsrSpeedProfile selected speed profile
+ * @param {Array<Array<number>>} coordinates Array of [lng, lat] coordinate pairs
  * @returns {Object} ORS response
  */
 async function sendRequestORS (tsrSpeedProfile, coordinates) {
@@ -227,7 +227,7 @@ async function sendRequestORS (tsrSpeedProfile, coordinates) {
 /**
  * Decode an x,y or x,y,z encoded polyline
  * @param {*} encodedPolyline binary encoded polyline
- * @param {Boolean} includeElevation - true for x,y,z polyline
+ * @param {boolean} includeElevation - true for x,y,z polyline
  * @returns {Array} of coordinates
  */
 function decodePolyline (encodedPolyline, includeElevation) {
@@ -293,7 +293,7 @@ function decodePolyline (encodedPolyline, includeElevation) {
 /**
  * Construct a valid GeoJSON from a vroom response
  * @param {*} vroomResponse - the vroom response
- * @param {Boolean} includeElevation - true for x,y,z polyline
+ * @param {boolean} includeElevation - true for x,y,z polyline
  * @returns {*} a valid GeoJSON as dictionary
  */
 function createGeoJSONFromVroomResponse (vroomResponse, includeElevation) {

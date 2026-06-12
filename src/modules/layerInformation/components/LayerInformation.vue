@@ -10,20 +10,20 @@ import LayerInfoContactButton from "../../layerTree/components/LayerInfoContactB
 /**
  * The Layer Information that gives the user information, links and the legend for a layer
  * @module modules/layerInformation/components/LayerInformation
- * @vue-data {String} activeTab - The active tab.
- * @vue-computed {Boolean} showAdditionalMetaData - Shows if additional meta data should be displayed.
- * @vue-computed {Boolean} showCustomMetaData - Shows if custom meta data should be displayed.
- * @vue-computed {Boolean} showPublication - Shows if publication should be displayed.
- * @vue-computed {Boolean} showRevision - Determines if the revision date should be displayed.
- * @vue-computed {Boolean} showPeriodicity - Shows if periodicity should be displayed.
- * @vue-computed {Boolean} showDownloadLinks - Shows if download lonks should be displayed.
- * @vue-computed {Boolean} showUrl - Shows if url should be displayed.
- * @vue-computed {Boolean} showAttachFile - Shows if file type needs to be attached for download.
- * @vue-computed {String} layerUrl - The layer URL.
- * @vue-computed {String} legendURL - The legend URL.
- * @vue-computed {String} contact - Contact information from pointOfContact if given otherwise from publisher from meta data information.
- * @vue-computed {Boolean} menuIndicator - Returns the menu the LayerInfo module is in.
- * @vue-computed {String} layerName - Name of the layer.
+ * @vue-data {string} activeTab - The active tab.
+ * @vue-computed {boolean} showAdditionalMetaData - Shows if additional meta data should be displayed.
+ * @vue-computed {boolean} showCustomMetaData - Shows if custom meta data should be displayed.
+ * @vue-computed {boolean} showPublication - Shows if publication should be displayed.
+ * @vue-computed {boolean} showRevision - Determines if the revision date should be displayed.
+ * @vue-computed {boolean} showPeriodicity - Shows if periodicity should be displayed.
+ * @vue-computed {boolean} showDownloadLinks - Shows if download lonks should be displayed.
+ * @vue-computed {boolean} showUrl - Shows if url should be displayed.
+ * @vue-computed {boolean} showAttachFile - Shows if file type needs to be attached for download.
+ * @vue-computed {string} layerUrl - The layer URL.
+ * @vue-computed {string} legendURL - The legend URL.
+ * @vue-computed {string} contact - Contact information from pointOfContact if given otherwise from publisher from meta data information.
+ * @vue-computed {boolean} menuIndicator - Returns the menu the LayerInfo module is in.
+ * @vue-computed {string} layerName - Name of the layer.
  */
 export default {
     name: "LayerInformation",
@@ -153,7 +153,7 @@ export default {
         /**
          * Watches changes to `selectedOption` and updates the layer's abstract information accordingly.
          *
-         * @param {Number} newIndex - The newly selected layer index.
+         * @param {number} newIndex - The newly selected layer index.
          */
         selectedOption (newIndex) {
             const metaInfo = this.getMetaInfoForLayer(newIndex);
@@ -231,8 +231,8 @@ export default {
          *
          * @param {number} index - Index of the layer to fetch metadata for.
          * @returns {Object} Metadata for the layer, including:
-         *   - {String} metaId - The metadata ID for the layer.
-         *   - {String} cswUrl - The CSW URL for the layer.
+         *   - {string} metaId - The metadata ID for the layer.
+         *   - {string} cswUrl - The CSW URL for the layer.
          *   - {Object} customMetadata - Additional custom metadata for the layer.
          *   - {Object} attributes - Attributes related to the layer.
          */
@@ -247,8 +247,8 @@ export default {
 
         /**
          * checks if the given tab name is currently active
-         * @param {String} tab the tab name
-         * @returns {true || null}  true if the given tab name is active
+         * @param {string} tab the tab name
+         * @returns {(boolean|null)}  true if the given tab name is active
          */
         isActiveTab (tab) {
             return this.activeTab === tab ? true : null;
@@ -275,16 +275,16 @@ export default {
 
         /**
          * returns the classnames for the tab
-         * @param {String} tab name of the tab depending on property activeTab
-         * @returns {String} classNames of the tab
+         * @param {string} tab name of the tab depending on property activeTab
+         * @returns {string} classNames of the tab
          */
         getTabPaneClasses (tab) {
             return {active: this.isActiveTab(tab), show: this.isActiveTab(tab), "tab-pane": true, fade: true};
         },
         /**
          * Removes slash or questionmark from the end of the url.
-         * @param {String} url the url to clean
-         * @returns {String} the cleaned URL
+         * @param {string} url the url to clean
+         * @returns {string} the cleaned URL
          */
         cleanUrl (url) {
             let baseUrl = url.split("?")[0];
@@ -299,9 +299,9 @@ export default {
          * Appends 'tileset.json' to TileSet3D layers url, if not exists.
          * Appends always 'layer.json' to Terrain3D layers url.
          * @param {Object} param payload
-         * @param {String} param.url service base URL
-         * @param {String} param.typ service type (e.g., WMS)
-         * @returns {String} the created URL
+         * @param {string} param.url service base URL
+         * @param {string} param.typ service type (e.g., WMS)
+         * @returns {string} the created URL
          */
         getLayerAddress (layerInfo) {
             const typ = layerInfo.typ ?? layerInfo.type,

@@ -13,15 +13,15 @@ const getters = {
      * For example, given a state object {key: value}, an object
      * {key: state => state[key]} will be returned.
      * This is useful to avoid writing basic operations.
-     * @param {object} state state to generate getters for
-     * @returns {object.<string, function>} object of getters
+     * @param {Object} state state to generate getters for
+     * @returns {Object.<string, Function>} object of getters
      */
     ...generateSimpleGetters(tsrState),
     /**
      * Gets all valid coordinates from the given waypoints.
      * @param {Object} params with waypoints
      * @param {RoutingWaypoint[]} [params.waypoints] waypoints from tsrState
-     * @returns {Array<{Number, Number}>} coordinate array
+     * @returns {Array<Array<number>>} Array of [lng, lat] coordinate pairs
      */
     tsrCoordinates ({waypoints}) {
         return waypoints
@@ -32,8 +32,8 @@ const getters = {
     /**
      * Checks if input is disabled.
      * @param {Object} params from stateDirections
-     * @param {Boolean} [params.isLoadingDirections] if the directions are currently loaded
-     * @returns {Boolean} true if input is disabled
+     * @param {boolean} [params.isLoadingDirections] if the directions are currently loaded
+     * @returns {boolean} true if input is disabled
      */
     isInputDisabled ({isLoadingDirections}) {
         return isLoadingDirections;
@@ -41,7 +41,7 @@ const getters = {
 
     /**
      * Returns available speed profiles for TSR
-     * @returns {String[]} displayed routing profiles
+     * @returns {string[]} displayed routing profiles
      */
     getTSRSpeedProfiles () {
         return constantsRouting.speedProfileOptions.filter(profile => !["WHEELCHAIR"].includes(profile));

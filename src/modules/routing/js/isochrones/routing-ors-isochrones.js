@@ -9,8 +9,8 @@ import stateIsochrones from "../../store/isochrones/stateIsochrones.js";
 
 /**
  * Translates the optimization in the corresponding value for the service
- * @param {String} optimization set by the user
- * @returns {String} translated service value
+ * @param {string} optimization set by the user
+ * @returns {string} translated service value
  */
 function routingOrsOptimization (optimization) {
     switch (optimization) {
@@ -22,8 +22,8 @@ function routingOrsOptimization (optimization) {
 
 /**
  * Translates the optimization in the corresponding multiplicator value for the service
- * @param {String} optimization set by the user
- * @returns {Number} multiplicator for the specified optimization
+ * @param {string} optimization set by the user
+ * @returns {number} multiplicator for the specified optimization
  */
 function routingOrsOptimizationMultiplicator (optimization) {
     switch (optimization) {
@@ -36,13 +36,13 @@ function routingOrsOptimizationMultiplicator (optimization) {
 /**
  * Requests isochrones from ors service.
  * @param {Object} params for the function
- * @param {Array<{Number, Number}>} [params.coordinates] coordinates in wgs84 projection
+ * @param {Array<number>} [params.coordinates] Array containing coordinate pair [lng, lat] in wgs84 projection
  * @param {Function} [params.transformCoordinatesToLocal] function to transform result coordinates to local projection.
- * @param {String} [params.speedProfile] which is used to request the isochrones for.
- * @param {String} [params.optimization] which optimization to request
- * @param {Array<{id: String}>} [params.avoidSpeedProfileOptions] which options to avoid
- * @param {Boolean} [params.transformCoordinates] if the coordinates should be transformed to local projection
- * @param {Boolean} [params.avoidBorders] if borders should be avoided
+ * @param {string} [params.speedProfile] which is used to request the isochrones for.
+ * @param {string} [params.optimization] which optimization to request
+ * @param {Array<{id: string}>} [params.avoidSpeedProfileOptions] which options to avoid
+ * @param {boolean} [params.transformCoordinates] if the coordinates should be transformed to local projection
+ * @param {boolean} [params.avoidBorders] if borders should be avoided
  * @returns {RoutingIsochrones} routingIsochrones
  */
 async function fetchRoutingOrsIsochrones ({
@@ -159,7 +159,7 @@ async function fetchRoutingOrsIsochrones ({
 
 /**
  * Creates the url with the given params.
- * @param {String} speedProfile current speedProfile
+ * @param {string} speedProfile current speedProfile
  * @returns {Object} the url
  */
 function getRoutingIsochronesSettingsUrl (speedProfile) {

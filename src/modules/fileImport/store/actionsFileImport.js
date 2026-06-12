@@ -49,8 +49,8 @@ const defaultFont = "16px Arial",
 /**
  * Strips the file extension and replaces non-alphanumeric characters (except hyphens) with hyphens.
  * Used to derive a stable layer ID from a filename.
- * @param {String} fileName - The original file name, e.g. "meine daten!.kml"
- * @returns {String} Sanitized string, e.g. "meine-daten-"
+ * @param {string} fileName - The original file name, e.g. "meine daten!.kml"
+ * @returns {string} Sanitized string, e.g. "meine-daten-"
  */
 function sanitizeFileName (fileName) {
     return fileName.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-]/g, "-");
@@ -59,13 +59,13 @@ function sanitizeFileName (fileName) {
 /**
  * Checks given file suffix for any defined Format. Default mappings are defined in state and may be
  * overridden in config.
- * @param {String} filename - Name of the given file.
- * @param {String} selectedFiletype - The name of type of file. This represents a key of supportedFiletypes
+ * @param {string} filename - Name of the given file.
+ * @param {string} selectedFiletype - The name of type of file. This represents a key of supportedFiletypes
  * and defines, how the format will be chosen. Either directly if it matches an available format and
  * supported file type. Or automatically, when set to "auto".
  * @param {Object} availableFormats - Object of available formats provided by Openlayers. These are hardcoded
  * in this file and this is only a param for the sake of avoiding global variables.
- * @returns {Object|Boolean} Returns the chosen openlayers format object or false on error.
+ * @returns {Object|boolean} Returns the chosen openlayers format object or false on error.
  */
 function getFormat (filename, selectedFiletype, availableFormats) {
     if (selectedFiletype !== "auto") {
@@ -98,8 +98,8 @@ function getFormat (filename, selectedFiletype, availableFormats) {
  *      - cascadingStyle
  * Removes attributes from Placemark-tag, e.g. 'id': if same id is in different imported files, the features are overwritten by ol format.
  * Replaces wrong urls to symbols.
- * @param {String} rawSource - KML source as string.
- * @returns {String} Returns raw string KML source without unsupported tags.
+ * @param {string} rawSource - KML source as string.
+ * @returns {string} Returns raw string KML source without unsupported tags.
  */
 function removeBadTags (rawSource) {
     let result = rawSource;
@@ -117,8 +117,8 @@ function removeBadTags (rawSource) {
 
 /**
  * Find all complete URLs with 'tools/draw/circle_' and check them. Incorrect urls are replaced by correct urls.
- * @param {String} rawSource - KML source as string.
- * @returns {String} KML source with correct urls to symnbols.
+ * @param {string} rawSource - KML source as string.
+ * @returns {string} KML source with correct urls to symnbols.
  */
 function checkAndReplaceSymbolUrls (rawSource) {
     let result = rawSource;
@@ -143,8 +143,8 @@ function checkAndReplaceSymbolUrls (rawSource) {
 
 /**
  * Reads the JSON and extracts the coordinate system.
- * @param {String} rawSource - KML source as string.
- * @returns {String} Returns CRS.Properties.Name - if not found it defaults to EPSG:4326
+ * @param {string} rawSource - KML source as string.
+ * @returns {string} Returns CRS.Properties.Name - if not found it defaults to EPSG:4326
  */
 function getCrsPropertyName (rawSource) {
     let result = "EPSG:4326";
@@ -220,7 +220,7 @@ export default {
      * @param {Object} param.state the state
      * @param {Object} param.commit the commit
      * @param {ol/Feature[]} payload.features the parsed features
-     * @param {String} payload.fileName the file name
+     * @param {string} payload.fileName the file name
      * @returns {void}
      */
     setFeatureExtents ({state, commit}, {features, fileName}) {
@@ -839,7 +839,7 @@ export default {
      * Adds the name of a successfully imported file to list of imported filenames
      * @param {Object} param.state the state
      * @param {Object} param.commit the commit
-     * @param {String} fileName name of the file
+     * @param {string} fileName name of the file
      * @returns {void}
      */
     addImportedFilename ({state, commit}, fileName) {
@@ -855,8 +855,8 @@ export default {
      * identified by a sanitized version of the fileName.
      * @param {Object} param.dispatch the dispatch
      * @param {Object} param.state the state
-     * @param {String|null} fileName - The name of the file being imported (used when useDifferentLayers is true).
-     * @returns {Promise<{layer: ol/layer, layerId: String}>} The created/existing layer and its ID.
+     * @param {string|null} fileName - The name of the file being imported (used when useDifferentLayers is true).
+     * @returns {Promise<{layer: module:ol/layer, layerId: string}>} The created/existing layer and its ID.
      */
     async addLayerConfig ({dispatch, state}, fileName) {
         let layerId = state.layerId,

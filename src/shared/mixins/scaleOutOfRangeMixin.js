@@ -5,7 +5,7 @@ import layerCollection from "@core/layers/js/layerCollection.js";
 
 /**
  * Mixin to provide scaleIsOutOfRange behaviour.
- * @param {String} containerName the name of the itm, that holds the layerId
+ * @param {string} containerName the name of the itm, that holds the layerId
  */
 export default (containerName) => ({
     computed: {
@@ -29,7 +29,7 @@ export default (containerName) => ({
         },
 
         /**
-         * @returns {[number, number]} [minScale, maxScale] across all layers
+         * @returns {Array<number>} [minScale, maxScale] across all layers
          */
         rawLayersScaleBoundaries () {
             return this.rawLayers.reduce(
@@ -58,7 +58,7 @@ export default (containerName) => ({
          * Returns a formatted scale range explanation.
          * If no scale limits exist, an empty string is returned.
          *
-         * @returns {String} The tooltip text for layers out of visible scale range.
+         * @returns {string} The tooltip text for layers out of visible scale range.
          */
         tooltipText () {
             const [fallbackMinScale, fallbackMaxScale] = this.rawLayersScaleBoundaries || [],
@@ -101,7 +101,7 @@ export default (containerName) => ({
         /**
          * Returns true, if this layer is not visible in the maps current scale.
          * In mode 3D the layer is set visible/invisible depending on scale restrictions.
-         * @returns {Boolean}  true, if this layer is not visible in the maps current scale
+         * @returns {boolean}  true, if this layer is not visible in the maps current scale
          */
         scaleIsOutOfRange () {
             const rawLayer = this.rawLayers.length > 0 ? this.rawLayers[0] : null,

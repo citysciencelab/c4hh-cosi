@@ -16,7 +16,7 @@ config.global.mocks.$t = key => key;
  * @property {Function} [toggleMenuSpy]
  *
  * @param {MenuStoreOptions} [options]
- * @returns {import("vuex").Store} Vuex store instance configured for Menu module tests
+ * @returns {Object} Vuex store instance configured for Menu module tests
  */
 function createMenuStore ({
     mainExpanded = false,

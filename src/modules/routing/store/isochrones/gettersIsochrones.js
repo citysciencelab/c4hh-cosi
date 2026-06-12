@@ -14,16 +14,16 @@ const getters = {
      * {key: state => state[key]} will be returned.
      * This is useful to avoid writing basic operations.
      * @param {Object} state state to generate getters for
-     * @returns {object.<string, function>} object of getters
+     * @returns {Object.<string, Function>} object of getters
      */
     ...generateSimpleGetters(stateIsochrones),
     /**
      * Gets the avoid speed profile options for the currently selected speed profile.
      * @param {Object} params with the configured settings
      * @param {Object} [params.settings] settings from stateIsochrones
-     * @param {String} [params.settings.speedProfile] selected speedProfile
-     * @param {String[]} [params.routingAvoidFeaturesOptions] selected avoid options
-     * @returns {String[]} avoid speed profile options
+     * @param {string} [params.settings.speedProfile] selected speedProfile
+     * @param {string[]} [params.routingAvoidFeaturesOptions] selected avoid options
+     * @returns {string[]} avoid speed profile options
      */
     selectedAvoidSpeedProfileOptions ({settings, routingAvoidFeaturesOptions}) {
         return constantsRouting.avoidSpeedProfileOptions.filter((option) => option.availableProfiles.includes(settings.speedProfile) && routingAvoidFeaturesOptions.includes(option.id));
@@ -31,8 +31,8 @@ const getters = {
     /**
      * Checks if input is disabled.
      * @param {Object} params from stateIsochrones
-     * @param {Boolean} [params.isLoadingDirections] if the directions are currently loaded
-     * @returns {Boolean} true if input is disabled
+     * @param {boolean} [params.isLoadingDirections] if the directions are currently loaded
+     * @returns {boolean} true if input is disabled
      */
     isInputDisabled ({isLoadingIsochrones}) {
         return isLoadingIsochrones;
@@ -40,7 +40,7 @@ const getters = {
     /**
      * Check if all HGV parameters are valid.
      * @param {Object} state state
-     * @returns {Boolean} true if all parameters are valid
+     * @returns {boolean} true if all parameters are valid
      */
     allHGVRestrictionsValid (state) {
         return Object.values(state.isochronesRestrictionIsValid).every(val => val);

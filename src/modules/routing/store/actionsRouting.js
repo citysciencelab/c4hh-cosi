@@ -30,7 +30,7 @@ export default {
      * @param {Object} context the vuex context
      * @param {Object} context.dispatch the dispatch
      * @param {Object} payload the vuex context
-     * @param {String} payload.displayName name to show at start routing input field
+     * @param {string} payload.displayName name to show at start routing input field
      * @param {Array} payload.coordinates coordinates of the routing start waypoint
      * @returns {void}
      */
@@ -69,7 +69,7 @@ export default {
     /**
      * Async fetch Coordinates by text.
      * @param {Object} context actions context object.
-     * @param {String} search searching text.
+     * @param {string} search searching text.
      * @returns {RoutingGeosearchResult[]} Returns parsed Array of RoutingGeosearchResults.
      */
     async fetchCoordinatesByText ({state, dispatch}, {search}) {
@@ -136,7 +136,7 @@ export default {
     /**
      * Async fetch Text by Coordinates.
      * @param {Object} context actions context object.
-     * @param {Array<{Number, Number}>} coordinates LonLat Coordinates.
+      * @param {Array<number>} coordinates Array containing coordinate pair [lon, lat] in wgs84 projection.
      * @returns {RoutingGeosearchResult} Returns parsed Array of RoutingGeosearchResults.
      */
     async fetchTextByCoordinates ({state, dispatch}, {coordinates}) {
@@ -193,8 +193,8 @@ export default {
     /**
      * Transforms the given coordinates from the local projection to the wgs84 projections
      * @param {Object} context actions context object.
-     * @param {Array<{Number, Number}>} coordinates to project
-     * @returns {Array<{Number, Number}>} projected wgs84 coordinates
+      * @param {(Array<number>|Array<Array<number>>)} coordinates Array containing coordinate pair [x, y] or Array of [x, y] coordinate pairs in local projection.
+      * @returns {(Array<number>|Array<Array<number>>)} Projected Array containing coordinate pair [lon, lat] or Array of [lon, lat] coordinate pairs in wgs84 projection.
      */
     transformCoordinatesLocalToWgs84Projection ({rootState}, coordinates) {
         return crs.transform(
@@ -206,8 +206,8 @@ export default {
     /**
      * Transforms the given coordinates from the wgs84 projection to the local projections
      * @param {Object} context actions context object.
-     * @param {Array<{Number, Number}>} coordinates to project
-     * @returns {Array<{Number, Number}>} projected local coordinates
+      * @param {(Array<number>|Array<Array<number>>)} coordinates Array containing coordinate pair [lon, lat] or Array of [lon, lat] coordinate pairs in wgs84 projection.
+      * @returns {(Array<number>|Array<Array<number>>)} Projected Array containing coordinate pair [x, y] or Array of [x, y] coordinate pairs in local projection.
      */
     transformCoordinatesWgs84ToLocalProjection ({rootState}, coordinates) {
         return crs.transform(
@@ -220,9 +220,9 @@ export default {
      * Transforms the given coordinates from the wgs84 projection to the local projections
      * @param {Object} context actions context object.
      * @param {Object} payload parameter object.
-     * @param {Array} payload.coordinates the coordinates to transform.
-     * @param {String} payload.epsg coordinate system.
-     * @returns {Array} projected local coordinates
+      * @param {(Array<number>|Array<Array<number>>)} payload.coordinates Array containing coordinate pair [x, y] or Array of [x, y] coordinate pairs in payload.epsg projection.
+     * @param {string} payload.epsg coordinate system.
+      * @returns {(Array<number>|Array<Array<number>>)} Projected Array containing coordinate pair [x, y] or Array of [x, y] coordinate pairs in local projection.
      */
     transformCoordinatesToLocalProjection ({rootState}, {coordinates, epsg}) {
         return crs.transform(

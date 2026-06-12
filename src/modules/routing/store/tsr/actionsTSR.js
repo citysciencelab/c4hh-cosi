@@ -134,9 +134,9 @@ export default {
      * Needs to be extended if new services should be configurable.
      * @param {Object} context actions context object.
      * @param {Object} parameter with wgs84Coords as input and instructions for the external service
-     * @param {Array<{Number, Number}>} [parameter.wgs84Coords] coordinates in wgs84 projection
-     * @param {Boolean} [parameter.instructions] should request with instructions
-     * @returns {tsrDirections} tsrDirections
+      * @param {Array<Array<number>>} [parameter.wgs84Coords] Array of [lng, lat] coordinate pairs in wgs84 projection
+     * @param {boolean} [parameter.instructions] should request with instructions
+      * @returns {RoutingTSRDirections} tsrDirections
      */
     async fetchTSR ({state, dispatch, rootState}, {wgs84Coords, instructions}) {
 
@@ -173,7 +173,7 @@ export default {
     /**
      * Retrieves the waypoint coordinates in wgs84 projection
      * @param {Object} context actions context object.
-     * @returns {Array<{Number, Number}>} wgs84 coordinates
+      * @returns {Array<Array<number>>} Array of [lng, lat] coordinate pairs in wgs84 projection
      */
     async getTSRCoordinatesWgs84 ({state, getters, dispatch}) {
         // if there is no last point, set coordinates from first point to initiate round trip
@@ -336,7 +336,7 @@ export default {
     /**
      * Define whether a startpoint, endpoint, or waypoint is to be added.
      * @param {Object} context actions context object.
-     * @param {Number} position new value of addStartEndPoint
+     * @param {number} position new value of addStartEndPoint
      * @returns {void}
      */
     isStartEndInput ({state}, position) {
@@ -359,9 +359,9 @@ export default {
      * Adds a new waypoint to the array.
      * @param {Object} context actions context object.
      * @param {Object} payload payload object.
-     * @param {Number} [payload.index] index for the waypoint to insert at
+     * @param {number} [payload.index] index for the waypoint to insert at
      * @param {ol.Feature} [payload.feature] optional feature to use in the waypoint or to extract coordinates from
-     * @param {String} [payload.displayName] optional displayName for the waypoint
+     * @param {string} [payload.displayName] optional displayName for the waypoint
      * @returns {RoutingWaypoint} added waypoint
      */
     addWaypoint ({state, dispatch}, {index, feature, displayName, coordinates, fromExtern}) {
@@ -479,8 +479,8 @@ export default {
      * Removes a waypoint at the given index and reloads the directions if reload = true
      * @param {Object} context actions context object.
      * @param {Object} params with a waypoint index and reload to control if the directions should be requested.
-     * @param {Number} [params.index] index to remove the waypoint at
-     * @param {Boolean} [params.reload = false] if the route should be reloaded
+     * @param {number} [params.index] index to remove the waypoint at
+     * @param {boolean} [params.reload = false] if the route should be reloaded
      * @returns {void}
      */
     removeWaypoint ({state, commit}, {index = false}) {
@@ -614,7 +614,7 @@ export default {
      * unfinished drawing, removing the interaction from the map, and
      * removing the interaction from the store.
      * @param {Object} context actions context object.
-     * @param {Boolean} removeWaypointsModifyInteraction decides whether or not tsrWaypointsModifyInteraction should be removed
+     * @param {boolean} removeWaypointsModifyInteraction decides whether or not tsrWaypointsModifyInteraction should be removed
      * @returns {void}
      */
     removeTSRWaypointsDrawInteraction ({state, dispatch}) {

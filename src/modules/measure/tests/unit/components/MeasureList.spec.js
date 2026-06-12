@@ -16,7 +16,7 @@ describe("src/modules/measure/components/MeasureList.vue", function () {
     /**
      * Mounts MeasureList with default props, overridable via propsData.
      * @param {Object} propsData - Props to merge into defaults
-     * @returns {import('@vue/test-utils').VueWrapper} mounted wrapper
+     * @returns {Object} mounted wrapper (VueWrapper)
      */
     function mountList (propsData = {}) {
         return shallowMount(MeasureList, {
@@ -30,7 +30,7 @@ describe("src/modules/measure/components/MeasureList.vue", function () {
     /**
      * Finds a stubbed IconButton by its id prop and returns its interaction function.
      * @param {Object} wrapper - VTU wrapper
-     * @param {String} id - the id prop on the IconButton
+     * @param {string} id - the id prop on the IconButton
      * @returns {Function} the interaction function
      */
     function getButtonInteraction (wrapper, id) {

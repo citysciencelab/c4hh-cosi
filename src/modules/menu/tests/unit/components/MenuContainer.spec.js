@@ -452,7 +452,7 @@ describe("src/modules/menu/MenuContainer.vue", () => {
          *
          * @param {Object} params
          * @param {boolean} [params.enabled=true] - Whether the secondary menu is enabled
-         * @returns {import("vuex").Store} Vuex store instance configured for MenuContainer tests
+         * @returns {Object} Vuex store instance configured for MenuContainer tests
          */
         function createSecondaryMenuEnabledStore (enabled = true) {
             return createStore({

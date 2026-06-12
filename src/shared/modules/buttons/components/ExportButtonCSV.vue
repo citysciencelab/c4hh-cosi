@@ -12,18 +12,18 @@ import {
 /**
  * ExportButtonCSV component: A component for handling, preparing and downloading Data in the csv format. The data to be downloaded can be specified in 3 different ways, either as a data-Object containing the raw data in either an Array or Object-Format
  * @module shared/modules/buttons/ExportButtonCSV
- * @vue-prop {String} title is the label of the Button. An i18next-String can be used for internationalization.
- * @vue-prop {[Object, Boolean]} data is the data to be downloaded, provided as either an Array or an Array of Objects. In the latter case, the keys of the objects are used as csv Headers, e.g. [{a: 1, b: 2}, {a: 3, b: 4}] to create a csv file "a,b\r\n1,2\r\n3,4"
- * @vue-prop {function, boolean} handler - a handler function can be passed to provide the downloadable data as well. the handler is called on export button click and onsuccess shall be called when the data with the available data as onsuccess(data)
+ * @vue-prop {string} title is the label of the Button. An i18next-String can be used for internationalization.
+ * @vue-prop {Array<(Object|boolean)>} data is the data to be downloaded, provided as either an Array or an Array of Objects. In the latter case, the keys of the objects are used as csv Headers, e.g. [{a: 1, b: 2}, {a: 3, b: 4}] to create a csv file "a,b\r\n1,2\r\n3,4"
+ * @vue-prop {(Function|boolean)} handler - a handler function can be passed to provide the downloadable data as well. the handler is called on export button click and onsuccess shall be called when the data with the available data as onsuccess(data)
          * e.g.: handler = onsuccess => {
          *   // do stuff and create the data here
          *   // than start download as csv file by handing over data to exportButton via onsuccess
          *   onsuccess(data);
          * }
- * @vue-prop {String, Boolean} url can used to provide the data through an url. This way filename can be used to rename the file to be downloaded. If  filename is set to false it triggers a direct download of the csv file.
- * @vue-prop {String, Boolean} filename sets the prefix of the filename. Can be set to false to use the filename of the url download or "download" in  other cases.
- * @vue-prop {String} postfixFormat sets the dayjs format to be used as a postfix for filename. Only used if filename is not a boolean value.
- * @vue-prop {Boolean} useSemicolon can be set to use a semicolon instead of a comma as delimiter.
+ * @vue-prop {(string|boolean)} url can used to provide the data through an url. This way filename can be used to rename the file to be downloaded. If  filename is set to false it triggers a direct download of the csv file.
+ * @vue-prop {(string|boolean)} filename sets the prefix of the filename. Can be set to false to use the filename of the url download or "download" in  other cases.
+ * @vue-prop {string} postfixFormat sets the dayjs format to be used as a postfix for filename. Only used if filename is not a boolean value.
+ * @vue-prop {boolean} useSemicolon can be set to use a semicolon instead of a comma as delimiter.
  */
 export default {
     name: "ExportButtonCSV",
@@ -99,7 +99,7 @@ export default {
         /**
          * handles the given error message according to portal standards
          * @post the error message is processed
-         * @param {String} msg the error message to use on the console (alert uses standard from translation)
+         * @param {string} msg the error message to use on the console (alert uses standard from translation)
          * @returns {void}
          */
         handleDownloadError (msg) {
@@ -140,7 +140,7 @@ export default {
         /**
          * "downloads" the given json data
          * @param {Object} data the json data to download
-         * @param {String} filename the filename to use
+         * @param {string} filename the filename to use
          * @returns {void}
          */
         downloadWithData (data, filename) {
@@ -156,7 +156,7 @@ export default {
         /**
          * "downloads" the data received by the given handler
          * @param {Function} handler the handler to use for receiving the data
-         * @param {String} filename the filename to use
+         * @param {string} filename the filename to use
          * @returns {void}
          */
         downloadWithHandler (handler, filename) {
@@ -166,8 +166,8 @@ export default {
         },
         /**
          * downloads data using the given url and starts the "download"
-         * @param {String} url the url to receive the data with
-         * @param {String} filename the filename to use
+         * @param {string} url the url to receive the data with
+         * @param {string} filename the filename to use
          * @returns {void}
          */
         downloadWithUrl (url, filename) {
@@ -184,10 +184,10 @@ export default {
         /**
          * "downloads" the given csvText using navigator or html5
          * @post the given csvText is getting "fake"-downloaded
-         * @param {String} csvText the text to download
-         * @param {String} filename the filename to name the file with
+         * @param {string} csvText the text to download
+         * @param {string} filename the filename to name the file with
          * @param {Function} onerror an error handler to call if something went wrong
-         * @returns {Boolean} true if the download was successfull, false if not - see onerror for details
+         * @returns {boolean} true if the download was successfull, false if not - see onerror for details
          */
         fakeDownloadCsvText (csvText, filename, onerror) {
             if (typeof csvText !== "string") {
@@ -211,7 +211,7 @@ export default {
         /**
          * uses axios to load data from the given url
          * @post onsuccess is called with the received data or onerror is called when an error occured
-         * @param {String} url the url to call
+         * @param {string} url the url to call
          * @param {Function} onsuccess the function to hand over the data to
          * @param {Function} onerror the handler to call on error
          * @returns {void}
@@ -233,9 +233,9 @@ export default {
         },
         /**
          * creates a filename using the given prefix and postfixFormat
-         * @param {String} prefix the prefix to begin the filename with
-         * @param {String} postfixFormat the format to hand over to dayjs to create the end of the filename with
-         * @returns {String} a concatination of prefix and postfixFormat extended with ".csv" extension
+         * @param {string} prefix the prefix to begin the filename with
+         * @param {string} postfixFormat the format to hand over to dayjs to create the end of the filename with
+         * @returns {string} a concatination of prefix and postfixFormat extended with ".csv" extension
          */
         createFilename (prefix, postfixFormat) {
             if (postfixFormat) {

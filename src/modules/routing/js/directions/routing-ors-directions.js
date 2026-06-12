@@ -12,9 +12,9 @@ import {getLength} from "ol/sphere.js";
 
 /**
  * Translates the Preference in the corresponding value for the service
- * @param {String} preference set by the user
- * @param {String} speedProfile set by the user
- * @returns {String} translated service value
+ * @param {string} preference set by the user
+ * @param {string} speedProfile set by the user
+ * @returns {string} translated service value
  */
 function routingOrsPreference (preference, speedProfile) {
     const preferenceConfigs = store.getters["Modules/Routing/directionsSettings"]?.customPreferences;
@@ -32,16 +32,16 @@ function routingOrsPreference (preference, speedProfile) {
 /**
  * Requests directions from ors service.
  * @param {Object} params parameter
- * @param {Array<{Number, Number}>} [params.coordinates] in wgs84 projection
- * @param {String} [params.language] to request the instructions in local language.
+ * @param {Array<Array<number>>} [params.coordinates] Array of [lng, lat] coordinate pairs in wgs84 projection
+ * @param {string} [params.language] to request the instructions in local language.
  * @param {Function} [params.transformCoordinatesToLocal] function to transform result coordinates to local projection.
- * @param {String} [params.speedProfile] to request the directions with
- * @param {Array<{id: String}>} [params.avoidSpeedProfileOptions] options to avoid
- * @param {String} [params.preference] to request the directions with
+ * @param {string} [params.speedProfile] to request the directions with
+ * @param {Array<{id: string}>} [params.avoidSpeedProfileOptions] options to avoid
+ * @param {string} [params.preference] to request the directions with
  * @param {Object} [params.avoidPolygons] areas to avoid when requesting directions
- * @param {Boolean} [params.instructions] if the instructions should be requested
- * @param {Boolean} [params.elevation] if elevation data should be considered
- * @param {Boolean} [params.avoidBorders] if borders should be avoided
+ * @param {boolean} [params.instructions] if the instructions should be requested
+ * @param {boolean} [params.elevation] if elevation data should be considered
+ * @param {boolean} [params.avoidBorders] if borders should be avoided
  * @returns {RoutingDirections} routingDirections
  */
 async function fetchRoutingOrsDirections ({
@@ -189,7 +189,7 @@ async function fetchRoutingOrsDirections ({
 
 /**
  * Creates the url with the given params.
- * @param {String} speedProfile current speedProfile
+ * @param {string} speedProfile current speedProfile
  * @returns {Object} the url
  */
 function getRoutingDirectionsSettingsUrl (speedProfile) {

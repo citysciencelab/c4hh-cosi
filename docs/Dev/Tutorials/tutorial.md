@@ -47,7 +47,7 @@ Open `modules/scaleSwitcher/components/ScaleSwitcher.vue` and create the Vue com
  * Module to switch the scale of the map. Listens to changes of the map's scale and sets the scale to this value.
  * @module modules/ScaleSwitcher
  * @vue-data {Array} scales - The available scales.
- * @vue-computed {Number} scale - The current scale that is set in the drop down.
+ * @vue-computed {number} scale - The current scale that is set in the drop down.
  */
 export default {
     name: "ScaleSwitcher"
@@ -94,13 +94,13 @@ All of these properties in the state are mandatory.
 /**
  * The ScaleSwitcher State
  * @module  modules/scaleSwitcher/store/stateScaleSwitcher
- * @property {String} [description="common:modules.scaleSwitcher.description"] The description that should be shown in the button in the menu.
- * @property {Boolean} [hasMouseMapInteractions=false] If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
- * @property {String} [icon="bi-arrows-angle-contract"] Icon next to title (config-param)
- * @property {String} [name="common:modules.scaleSwitcher.name"] Displayed as title (config-param)
- * @property {String[]} [supportedDevices=["Desktop", "Mobile", "Table"]] Devices on which the module is displayed.
- * @property {String[]} [supportedMapModes=["2D", "3D"]] Map mode in which this module can be used.
- * @property {String} [type= "scaleSwitcher"] The type of the module.
+ * @property {string} [description="common:modules.scaleSwitcher.description"] The description that should be shown in the button in the menu.
+ * @property {boolean} [hasMouseMapInteractions=false] If this attribute is true, then all other modules will be deactivated when this attribute is also true. Only one module with this attribute true may be open at the same time, since conflicts can arise in the card interactions.
+ * @property {string} [icon="bi-arrows-angle-contract"] Icon next to title (config-param)
+ * @property {string} [name="common:modules.scaleSwitcher.name"] Displayed as title (config-param)
+ * @property {string[]} [supportedDevices=["Desktop", "Mobile", "Table"]] Devices on which the module is displayed.
+ * @property {string[]} [supportedMapModes=["2D", "3D"]] Map mode in which this module can be used.
+ * @property {string} [type= "scaleSwitcher"] The type of the module.
  *
  */
 const state = {
@@ -346,7 +346,7 @@ import {mapGetters, mapActions, mapMutations} from "vuex";
         ...
         /**
          * Sets the choosen resolution to the map view.
-         * @param {Number} index The selection index.
+         * @param {number} index The selection index.
          * @returns {void}
          */
         setResolutionByIndex (index) {

@@ -8,22 +8,22 @@ import InputText from "@shared/modules/inputs/components/InputText.vue";
  * RoutingCoordinateInput
  * @module modules/routing/components/RoutingCoordinateInput
  * @vue-prop {Object} waypoint - The waypoints.
- * @vue-prop {Number} countWaypoints - The number of waypoints.
+ * @vue-prop {number} countWaypoints - The number of waypoints.
  *
- * @vue-data {String} search - The waypoints display name.
- * @vue-data {Boolean} awaitingSearch - Shows if search is awaited.
+ * @vue-data {string} search - The waypoints display name.
+ * @vue-data {boolean} awaitingSearch - Shows if search is awaited.
  * @vue-data {Array} searchResults - The list of search results.
- * @vue-data {Boolean} ignoreNextSearchChange - Shows if the next change of the search should be ignored.
- * @vue-data {Boolean} isFocused - Shows if input is focused.
- * @vue-data {Number} selectedIndex - index of selected search result.
+ * @vue-data {boolean} ignoreNextSearchChange - Shows if the next change of the search should be ignored.
+ * @vue-data {boolean} isFocused - Shows if input is focused.
+ * @vue-data {number} selectedIndex - index of selected search result.
  *
- * @vue-computed {String} waypointDisplayName - The waypoint display name.
+ * @vue-computed {string} waypointDisplayName - The waypoint display name.
  *
- * @vue-event {String} moveWaypointDown - Emits function to move waypoint down.
- * @vue-event {String} moveWaypointUp - Emits function to move waypoint up.
- * @vue-event {String} searchResultSelected - Emits function to select search result.
- * @vue-event {Boolean} removeWaypoint - Emits function to remove waypoint.
- * @vue-event {Boolean} addStartEnd - Emits function to add start or endpoint if input field is focused.
+ * @vue-event {string} moveWaypointDown - Emits function to move waypoint down.
+ * @vue-event {string} moveWaypointUp - Emits function to move waypoint up.
+ * @vue-event {string} searchResultSelected - Emits function to select search result.
+ * @vue-event {boolean} removeWaypoint - Emits function to remove waypoint.
+ * @vue-event {boolean} addStartEnd - Emits function to add start or endpoint if input field is focused.
  */
 export default {
     name: "RoutingCoordinateInput",
@@ -65,21 +65,21 @@ export default {
 
         /**
          * Computed value for the waypoint display name to watch for changes
-         * @returns {String} the display name for the waypoint
+         * @returns {string} the display name for the waypoint
          */
         waypointDisplayName () {
             return this.waypoint.getDisplayName();
         },
         /**
          * Computed value to determine whether the waypoint has valid coordinates set
-         * @returns {Boolean} true if waypoint contains exactly two coordinate values
+         * @returns {boolean} true if waypoint contains exactly two coordinate values
          */
         isWaypointSet () {
             return this.waypoint.coordinates.length === 2;
         },
         /**
          * Computed value to determine whether delete button should be shown for this waypoint
-         * @returns {Boolean} true if waypoint is set or if more than two waypoints exist and this one is empty
+         * @returns {boolean} true if waypoint is set or if more than two waypoints exist and this one is empty
          */
         showDeleteWaypoint () {
             return this.isWaypointSet
@@ -87,7 +87,7 @@ export default {
         },
         /**
          * Computed value to determine whether move-up button should be shown for this waypoint
-         * @returns {Boolean} true if waypoint is set, routing option is not TSR, and waypoint is not first
+         * @returns {boolean} true if waypoint is set, routing option is not TSR, and waypoint is not first
          */
         showMoveWaypointUp () {
             return this.isWaypointSet
@@ -96,7 +96,7 @@ export default {
         },
         /**
          * Computed value to determine whether move-down button should be shown for this waypoint
-         * @returns {Boolean} true if waypoint is set, routing option is not TSR, and waypoint is not last
+         * @returns {boolean} true if waypoint is set, routing option is not TSR, and waypoint is not last
          */
         showMoveWaypointDown () {
             return this.isWaypointSet
@@ -107,7 +107,7 @@ export default {
     watch: {
         /**
          * Resets the input text string and makes sure that no additional request is made if the waypoint display name changes
-         * @param {String} val new display name
+         * @param {string} val new display name
          * @return {void}
          */
         waypointDisplayName: function (val) {
@@ -214,7 +214,7 @@ export default {
         },
         /**
          * Passes the input wgs84 coordinate to the waypoint
-         * @param {Array<{Number, Number}>} wgs84Coordinate which was entered in the input text
+         * @param {Array<number>} wgs84Coordinate - Array containing coordinate pair [lat, lng] entered in the input text
          * @returns {void}
          */
         async selectWgs84Coordinate (wgs84Coordinate) {
@@ -243,7 +243,7 @@ export default {
         },
         /**
          * Checks if the current input text string is in the lat, lng format
-         * @returns {Boolean} true if current input text is in the lat, lng format in the wgs84 range
+         * @returns {boolean} true if current input text is in the lat, lng format in the wgs84 range
          */
         isInputtextWgs84Coordinate () {
             if (typeof this.search !== "string") {
@@ -269,7 +269,7 @@ export default {
         },
         /**
          * Creates placeholder text for the input field
-         * @returns {String} placeholder text
+         * @returns {string} placeholder text
          */
         getPlaceholder () {
             if (this.waypoint.index === 0) {

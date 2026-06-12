@@ -5,11 +5,11 @@
 class RoutingTSRDirections {
     /**
      * creates new RoutingDirections
-     * @param {Array<{Number, Number, Number, Number}>} bbox of the route.
-     * @param {Number} distance of the route in meter.
-     * @param {Number} duration of the route in seconds.
-     * @param {Array<{Number, Number}>} lineString of the route.
-     * @param {Array<Number>} lineStringWaypointIndex to find out where the waypoints on the linestring are.
+     * @param {Array<number>} bbox - Array of [minX, minY, maxX, maxY] bounding box coordinates
+     * @param {number} distance of the route in meter.
+     * @param {number} duration of the route in seconds.
+     * @param {Array<Array<number>>} lineString - Array of [lng, lat] coordinate pairs representing the route
+     * @param {Array<number>} lineStringWaypointIndex to find out where the waypoints on the linestring are.
      */
     constructor ({
         distance,
@@ -30,7 +30,7 @@ class RoutingTSRDirections {
 
     /**
      * Distance of the route in meter.
-     * @returns {Number} distance of the route in meter.
+     * @returns {number} distance of the route in meter.
      */
     getDistanceMeter () {
         return this.distance;
@@ -38,7 +38,7 @@ class RoutingTSRDirections {
 
     /**
      * Duration of the route in seconds.
-     * @returns {Number} duration of the route in seconds.
+     * @returns {number} duration of the route in seconds.
      */
     getDurationSeconds () {
         return this.duration;
@@ -46,7 +46,7 @@ class RoutingTSRDirections {
 
     /**
      * LineString of the route
-     * @returns {Array<{Number, Number}>} lineString of the route
+     * @returns {Array<Array<number>>} lineString - Array of [lng, lat] coordinate pairs representing the route
      */
     getLineString () {
         return this.lineString;

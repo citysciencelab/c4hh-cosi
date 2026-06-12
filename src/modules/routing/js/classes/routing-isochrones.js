@@ -5,7 +5,7 @@
 class RoutingIsochrones {
     /**
      * creates new RoutingIsochrones
-     * @param {Array<{Number, Number, Number, Number}>} bbox of isochrones.
+     * @param {Array<number>} bbox - Array of [minX, minY, maxX, maxY] bounding box coordinates
      */
     constructor (bbox) {
         this.bbox = bbox;
@@ -14,7 +14,7 @@ class RoutingIsochrones {
 
     /**
      * BBOX of all areas.
-     * @returns {Array<{Number, Number, Number, Number}>} bbox of all areas.
+     * @returns {Array<number>} Array of [minX, minY, maxX, maxY] bounding box coordinates
      */
     getBbox () {
         return this.bbox;
@@ -22,7 +22,7 @@ class RoutingIsochrones {
 
     /**
      * Get all areas of isochrones.
-     * @returns {RoutingIsochronesArea} areas of isochrones.
+     * @returns {Array<RoutingIsochronesArea>} areas of isochrones.
      */
     getAreas () {
         return this.areas;

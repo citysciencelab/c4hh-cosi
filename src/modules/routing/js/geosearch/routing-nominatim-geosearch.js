@@ -5,7 +5,7 @@ import store from "@appstore/index.js";
 
 /**
  * Requests POIs from text from Nominatim
- * @param {String} search text to search with
+ * @param {string} search text to search with
  * @returns {RoutingGeosearchResult[]} routingGeosearchResults
  */
 async function fetchRoutingNominatimGeosearch (search) {
@@ -23,8 +23,8 @@ async function fetchRoutingNominatimGeosearch (search) {
 
 /**
  * Creates the url with the given params.
- * @param {String} search to search for
- * @returns {String} the url
+ * @param {string} search to search for
+ * @returns {string} the url
  */
 function getRoutingNominatimGeosearchUrl (search) {
     const serviceUrl = store.getters.restServiceById(state.geosearch.serviceId).url,
@@ -40,7 +40,7 @@ function getRoutingNominatimGeosearchUrl (search) {
 
 /**
  * Requests POI at coordinate from Nominatim
- * @param {Array<{Number, Number}>} coordinates to search at
+ * @param {Array<number>} coordinates Array containing a coordinate pair [lon, lat] in wgs84 projection
  * @returns {RoutingGeosearchResult} routingGeosearchResult
  */
 async function fetchRoutingNominatimGeosearchReverse (coordinates) {
@@ -58,8 +58,8 @@ async function fetchRoutingNominatimGeosearchReverse (coordinates) {
 
 /**
  * Creates the url with the given params.
- * @param {Array} coordinates to add as params
- * @returns {String} the url
+ * @param {Array<number>} coordinates Array containing a coordinate pair [lon, lat] to add as URL params
+ * @returns {string} the url
  */
 function getRoutingNominatimGeosearchReverseUrl (coordinates) {
     const serviceUrl = store.getters.restServiceById(state.geosearchReverse.serviceId).url,
@@ -75,9 +75,9 @@ function getRoutingNominatimGeosearchReverseUrl (coordinates) {
 /**
  * Parses Response from Nominatim to RoutingGeosearchResult
  * @param {Object} geosearchResult from Nominatim
- * @param {Number} [geosearchResult.lat] geosearchResult latitude
- * @param {Number} [geosearchResult.lon] geosearchResult longitude
- * @param {String} [geosearchResult.properties.display_name] geosearchResult display_name
+ * @param {number} [geosearchResult.lat] geosearchResult latitude
+ * @param {number} [geosearchResult.lon] geosearchResult longitude
+ * @param {string} [geosearchResult.properties.display_name] geosearchResult display_name
  * @returns {RoutingGeosearchResult} routingGeosearchResult
  */
 function parseRoutingNominatimGeosearchResult (geosearchResult) {

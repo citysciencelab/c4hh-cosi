@@ -8,11 +8,11 @@ import layerTypes from "@core/layers/js/layerTypes.js";
  * @name SearchInterfaceTopicTree
  * @constructs
  * @extends SearchInterface
- * @param {String} [hitTemplate="default"] The template for rendering the hits.
+ * @param {string} [hitTemplate="default"] The template for rendering the hits.
  * @param {Object} [resultEvents] Actions that are executed when an interaction, such as hover or click, is performed with a result list item.
- * @param {String[]} [resultEvents.onClick=["activateLayerInTopicTree"]] Actions that are fired when clicking on a result list item.
- * @param {String} [searchInterfaceId="topicTree"] The id of the service interface.
- * @param {String} [searchType=""] Decides whether the metadata or the name of a layer should be searched. Possible value: "metadata". If empty, name will be searched.
+ * @param {string[]} [resultEvents.onClick=["activateLayerInTopicTree"]] Actions that are fired when clicking on a result list item.
+ * @param {string} [searchInterfaceId="topicTree"] The id of the service interface.
+ * @param {string} [searchType=""] Decides whether the metadata or the name of a layer should be searched. Possible value: "metadata". If empty, name will be searched.
  * @returns {void}
  */
 export default function SearchInterfaceTopicTree ({hitTemplate, resultEvents, searchInterfaceId, searchType, toolTip} = {}) {
@@ -40,7 +40,7 @@ SearchInterfaceTopicTree.prototype = Object.create(SearchInterface.prototype);
 /**
  * Search in topic tree search interface.
  * @override
- * @param {String} searchInput The search input.
+ * @param {string} searchInput The search input.
  * @returns {void}
  */
 SearchInterfaceTopicTree.prototype.search = async function (searchInput) {
@@ -57,8 +57,8 @@ SearchInterfaceTopicTree.prototype.search = async function (searchInput) {
 
 /**
  * Creates a regular Expression to handle special Characters like "(".
- * @param {String} searchInput The search input.
- * @return {String} The search input as regExp String.
+ * @param {string} searchInput The search input.
+ * @return {string} The search input as regExp String.
  */
 SearchInterfaceTopicTree.prototype.createRegExp = function (searchInput) {
     const searchInputRegExp = new RegExp(searchInput.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "i");
@@ -70,7 +70,7 @@ SearchInterfaceTopicTree.prototype.createRegExp = function (searchInput) {
  * Executes the search in the layer variable with search string and finds in the layer name and dataset name.
  * Note: 3D layers will not be found in 2D map mode.
  * @param {Object[]} layerConfigs The layerConfigs from topic tree.
- * @param {String} searchInputRegExp The search input as regExp String.
+ * @param {string} searchInputRegExp The search input as regExp String.
  * @returns {Object[]} The found layers.
  */
 SearchInterfaceTopicTree.prototype.searchInLayers = function (layerConfigs, searchInputRegExp) {
@@ -106,7 +106,7 @@ SearchInterfaceTopicTree.prototype.searchInLayers = function (layerConfigs, sear
 /**
  * creates the path in the layertree of the given layer/folder
  * @param {Object} layerOrFolder - given layer or leaf folder
- * @return {String} path - the path in the layertree
+ * @return {string} path - the path in the layertree
  */
 SearchInterfaceTopicTree.prototype.getPath = function (layerOrFolder) {
     let layerPath = [layerOrFolder.name];
@@ -118,7 +118,7 @@ SearchInterfaceTopicTree.prototype.getPath = function (layerOrFolder) {
 
 /**
  * Looks up for the names of all parent folders.
- * @param {String} parentId id of the parent folder
+ * @param {string} parentId id of the parent folder
  * @param {Array} names to store names
  * @returns {Array}  the names of all parent folders
  */
@@ -137,7 +137,7 @@ SearchInterfaceTopicTree.prototype.getNamesOfParentFolder = function (parentId, 
 /**
  * Normalizes the layer search results to display them in a SearchResult.
  * @param {Object} layer The search results layer.
- * @param {Boolean} datasetsExist Is true, if layer has datasets.
+ * @param {boolean} datasetsExist Is true, if layer has datasets.
  * @returns {Object} The normalized layer search result.
  */
 SearchInterfaceTopicTree.prototype.normalizeLayerResult = function (layer, datasetsExist) {
@@ -162,7 +162,7 @@ SearchInterfaceTopicTree.prototype.normalizeLayerResult = function (layer, datas
 /**
  * Executes the search in the folders.
  * @param {Object} layerConfig The layerConfig from topic tree.
- * @param {String} searchInputRegExp The search input as regExp String.
+ * @param {string} searchInputRegExp The search input as regExp String.
  * @returns {Object[]} The found folders.
  */
 SearchInterfaceTopicTree.prototype.searchInFolders = function (layerConfig, searchInputRegExp) {
@@ -219,8 +219,8 @@ SearchInterfaceTopicTree.prototype.normalizeFolderResult = function (folder) {
 /**
  * Creates the possible actions and fills them.
  * @override
- * Note: Folders do not have activateLayerInTopicTree action.
  * @param {Object} searchResult The search result of topic tree.
+ * Note: Folders do not have activateLayerInTopicTree action.
  * @returns {Object} The possible actions.
  */
 SearchInterfaceTopicTree.prototype.createPossibleActions = function (searchResult) {

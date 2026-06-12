@@ -8,17 +8,17 @@ import {convertColor} from "@shared/js/utils/convertColor.js";
 class RoutingIsochronesArea {
     /**
      * creates new RoutingIsochronesArea
-     * @param {Array<Array<{Number, Number}>>} coordinates of area as polygon.
-     * @param {Number} groupIndex of area.
-     * @param {Number} value of area.
-     * @param {Number} maximum value for interval.
-     * @param {Number} interval value parameter.
-     * @param {String} speedProfile parameter.
-     * @param {String} optimization parameter.
-     * @param {String[]} avoidSpeedProfileOptions parameter.
-     * @param {Number} displayValue of area for GUI
-     * @param {Number} population of area
-     * @param {Number} area of area
+     * @param {Array<Array<Array<number>>>} coordinates - Array of polygon coordinates (rings of [lng, lat] pairs)
+     * @param {number} groupIndex of area.
+     * @param {number} value of area.
+     * @param {number} maximum value for interval.
+     * @param {number} interval value parameter.
+     * @param {string} speedProfile parameter.
+     * @param {string} optimization parameter.
+     * @param {string[]} avoidSpeedProfileOptions parameter.
+     * @param {number} displayValue of area for GUI
+     * @param {number} population of area
+     * @param {number} area of area
      */
     constructor ({coordinates, groupIndex, value, maximum, interval, speedProfile, optimization, avoidSpeedProfileOptions, displayValue, population, area}) {
         this.coordinates = coordinates;
@@ -55,7 +55,7 @@ class RoutingIsochronesArea {
 
     /**
      * Polygon coordinates.
-     * @returns {Array<Array<{Number, Number}>>} coordinates of area as polygon.
+     * @returns {Array<Array<Array<number>>>} Array of polygon coordinates (rings of [lng, lat] pairs)
      */
     getCoordinates () {
         return this.coordinates;
@@ -63,7 +63,7 @@ class RoutingIsochronesArea {
 
     /**
      * Group index of area.
-     * @returns {Number} groupIndex of area.
+     * @returns {number} groupIndex of area.
      */
     getGroupIndex () {
         return this.groupIndex;
@@ -71,7 +71,7 @@ class RoutingIsochronesArea {
 
     /**
      * Value of area.
-     * @returns {Number} value of area.
+     * @returns {number} value of area.
      */
     getValue () {
         return this.value;
@@ -79,28 +79,28 @@ class RoutingIsochronesArea {
 
     /**
      * Maximum value of area.
-     * @returns {Number} maximum value of area.
+     * @returns {number} maximum value of area.
      */
     getMaximum () {
         return this.maximum;
     }
     /**
      * Interval value of area.
-     * @returns {Number} interval value of area.
+     * @returns {number} interval value of area.
      */
     getInterval () {
         return this.interval;
     }
     /**
      * SpeedProfile parameter used.
-     * @returns {String} speedProfile parameter used.
+     * @returns {string} speedProfile parameter used.
      */
     getSpeedProfile () {
         return this.speedProfile;
     }
     /**
      * Optimization parameter used.
-     * @returns {String} optimization parameter used.
+     * @returns {string} optimization parameter used.
      */
     getOptimization () {
         return this.optimization;
@@ -108,7 +108,7 @@ class RoutingIsochronesArea {
 
     /**
      * RGB color to display the area in.
-     * @returns {Array<{Number, Number, Number}>} rgb color to display the area in.
+     * @returns {Array<number>} Array of [red, green, blue] color values
      */
     getColor () {
         return this.color;
@@ -116,7 +116,7 @@ class RoutingIsochronesArea {
 
     /**
      * RGB color string to display the area in.
-     * @returns {Array<{Number, Number, Number}>} rgb color string to display the area in.
+     * @returns {string} RGB color string (e.g., "rgb(255, 0, 0)")
      */
     getColorRgbString () {
         return convertColor(this.color, "rgbString");
@@ -124,7 +124,7 @@ class RoutingIsochronesArea {
 
     /**
      * Avoided speed profile options.
-     * @returns {String[]} avoided speed profile options.
+     * @returns {string[]} avoided speed profile options.
      */
     getAvoidSpeedProfileOptions () {
         return this.avoidSpeedProfileOptions;
@@ -132,7 +132,7 @@ class RoutingIsochronesArea {
 
     /**
      * DisplayValue of area for GUI.
-     * @returns {Number} displayValue of area for GUI.
+     * @returns {number} displayValue of area for GUI.
      */
     getDisplayValue () {
         return this.displayValue;
@@ -168,7 +168,7 @@ class RoutingIsochronesArea {
 
     /**
      * Population of the area
-     * @returns {Number} population of the area
+     * @returns {number} population of the area
      */
     getPopulation () {
         return this.population;
@@ -176,7 +176,7 @@ class RoutingIsochronesArea {
 
     /**
      * Area of the isochrone
-     * @returns {Number} Area of the isochrone
+     * @returns {number} Area of the isochrone
      */
     getArea () {
         return this.area;
