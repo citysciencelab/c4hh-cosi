@@ -118,19 +118,51 @@ Layer2dVectorGeojson.prototype.loadFeaturesManually = function (attributes) {
 
 /**
  * Sorts legend entries by the order of the style labels.
+ * Falls back to conditions.properties when legendValue is not present.
  * @param {*} legendInformation The legend information as returned from the returnLegendByStyleId function.
  * @param {*} styleObject The style object containing the configured styling rules.
  */
 function sortByStyleLabelOrder (legendInformation, styleObject) {
-    const styleLabels = styleObject.rules.map(rule => rule.style.legendValue);
+    const orderedLegendKeys = styleObject.rules
+        .map(rule => getLegendKeyFromRule(rule))
+        .filter(key => key !== null);
 
-    return legendInformation.map((entry, originalPosition) => {
-        return {
-            entry,
-            originalPosition,
-            sortIdx: styleLabels.indexOf(entry.label)
-        };
-    }).sort(
-        (a, b) => a.sortIdx - b.sortIdx || a.originalPosition - b.originalPosition
-    ).map(sortedItem => sortedItem.entry);
+    return legendInformation
+        .map((entry, originalPosition) => {
+            const sortIdx = orderedLegendKeys.indexOf(entry.label);
+
+            return {
+                entry,
+                originalPosition,
+                sortIdx: sortIdx === -1 ? orderedLegendKeys.length + originalPosition : sortIdx
+            };
+        })
+        .sort((a, b) => a.sortIdx - b.sortIdx || a.originalPosition - b.originalPosition)
+        .map(sortedItem => sortedItem.entry);
+}
+
+/**
+ * Returns sortable legend key from style rule.
+ * Uses legendValue first, then first condition value as fallback.
+ * @param {Object} rule The style rule.
+ * @returns {String|null} The sortable key or null.
+ */
+function getLegendKeyFromRule (rule) {
+    if (rule?.style?.legendValue) {
+        return rule.style.legendValue;
+    }
+    const condProps = rule?.conditions?.properties;
+
+    if (!condProps) {
+        return null;
+    }
+
+    if (Array.isArray(condProps)) {
+        const firstValue = condProps[0]?.value;
+
+        return typeof firstValue === "undefined" ? null : String(firstValue);
+    }
+    const firstValue = Object.values(condProps)[0];
+
+    return typeof firstValue === "undefined" ? null : String(firstValue);
 }
