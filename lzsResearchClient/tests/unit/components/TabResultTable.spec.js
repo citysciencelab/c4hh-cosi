@@ -231,10 +231,13 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         expect(wrapper.vm.currentlyShownGeorefId).to.equal(null);
     });
 
-    it("create correct featues from geometry", async () => {
+    it("create correct features from geometry", async () => {
         const pointVectorFeature = wrapper.vm.createNewVectorFeature({type: "Point", coordinates: [0, 1]}),
             lineVectorFeature = wrapper.vm.createNewVectorFeature({type: "LineString", coordinates: [[0, 1], [1, 1], [1, 0]]}),
             polygonVectorFeature = wrapper.vm.createNewVectorFeature({type: "Polygon", coordinates: [[[0, 1], [1, 1], [1, 0], [0, 1]]]}),
+            multiPointVectorFeature = wrapper.vm.createNewVectorFeature({type: "MultiPoint", coordinates: [[0, 1], [2, 3]]}),
+            multiLineStringVectorFeature = wrapper.vm.createNewVectorFeature({type: "MultiLineString", coordinates: [[[0, 1], [1, 1], [1, 0]], [[2, 2], [3, 3]]]}),
+            geometryCollectionVectorFeature = wrapper.vm.createNewVectorFeature({type: "GeometryCollection", geometries: [{type: "Point", coordinates: [0, 1]}, {type: "LineString", coordinates: [[0, 1], [1, 1]]}]}),
             brokenVectorFeature1 = wrapper.vm.createNewVectorFeature({type: "broken", coordinates: [[[0, 1], [1, 1], [1, 0], [0, 1]]]}),
             brokenVectorFeature2 = wrapper.vm.createNewVectorFeature({coordinates: [[0, 1], [1, 1], [1, 0], [0, 1]]}),
             brokenVectorFeature3 = wrapper.vm.createNewVectorFeature({type: "broken"}),
@@ -245,11 +248,66 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         expect(lineVectorFeature).to.be.an("object");
         expect(lineVectorFeature.getGeometry().getCoordinates()).to.deep.equal([[0, 1], [1, 1], [1, 0]]);
         expect(polygonVectorFeature).to.be.an("object");
+        expect(multiPointVectorFeature).to.be.an("object");
+        expect(multiPointVectorFeature.getGeometry().getCoordinates()).to.deep.equal([[0, 1], [2, 3]]);
+        expect(multiLineStringVectorFeature).to.be.an("object");
+        expect(multiLineStringVectorFeature.getGeometry().getCoordinates()).to.deep.equal([[[0, 1], [1, 1], [1, 0]], [[2, 2], [3, 3]]]);
+        expect(geometryCollectionVectorFeature).to.be.an("object");
+        expect(geometryCollectionVectorFeature.getGeometry().getGeometries()).to.have.lengthOf(2);
+        expect(geometryCollectionVectorFeature.getGeometry().getGeometries()[0].getCoordinates()).to.deep.equal([0, 1]);
+        expect(geometryCollectionVectorFeature.getGeometry().getGeometries()[1].getCoordinates()).to.deep.equal([[0, 1], [1, 1]]);
         expect(polygonVectorFeature.getGeometry().getCoordinates()).to.deep.equal([[[0, 1], [1, 1], [1, 0], [0, 1]]]);
         expect(brokenVectorFeature1).to.be.null;
         expect(brokenVectorFeature2).to.be.null;
         expect(brokenVectorFeature3).to.be.null;
         expect(brokenVectorFeature4).to.be.null;
+    });
+
+    it("create correct OL geometries from geometry objects", () => {
+        const pointGeometry = wrapper.vm.createOlGeometry({type: "Point", coordinates: [0, 1]}),
+            lineGeometry = wrapper.vm.createOlGeometry({type: "LineString", coordinates: [[0, 1], [1, 1], [1, 0]]}),
+            polygonGeometry = wrapper.vm.createOlGeometry({type: "Polygon", coordinates: [[[0, 1], [1, 1], [1, 0], [0, 1]]]}),
+            multiPolygonGeometry = wrapper.vm.createOlGeometry({type: "MultiPolygon", coordinates: [[[[0, 1], [1, 1], [1, 0], [0, 1]]], [[[2, 2], [3, 3], [3, 2], [2, 2]]]]}),
+            multiPointGeometry = wrapper.vm.createOlGeometry({type: "MultiPoint", coordinates: [[0, 1], [2, 3]]}),
+            multiLineStringGeometry = wrapper.vm.createOlGeometry({type: "MultiLineString", coordinates: [[[0, 1], [1, 1], [1, 0]], [[2, 2], [3, 3]]]}),
+            geometryCollectionGeometry = wrapper.vm.createOlGeometry({type: "GeometryCollection", geometries: [{type: "Point", coordinates: [0, 1]}, {type: "LineString", coordinates: [[0, 1], [1, 1]]}]}),
+            geometryCollectionWithBrokenSubGeometry = wrapper.vm.createOlGeometry({type: "GeometryCollection", geometries: [{type: "Point", coordinates: [0, 1]}, {type: "broken", coordinates: [[0, 1], [1, 1]]}]}),
+            brokenGeometry1 = wrapper.vm.createOlGeometry({type: "broken", coordinates: [[[0, 1], [1, 1], [1, 0], [0, 1]]]}),
+            brokenGeometry2 = wrapper.vm.createOlGeometry({coordinates: [[0, 1], [1, 1], [1, 0], [0, 1]]}),
+            brokenGeometry3 = wrapper.vm.createOlGeometry({type: "broken"}),
+            brokenGeometry4 = wrapper.vm.createOlGeometry({});
+
+        expect(pointGeometry).to.be.an("object");
+        expect(pointGeometry.getCoordinates()).to.deep.equal([0, 1]);
+
+        expect(lineGeometry).to.be.an("object");
+        expect(lineGeometry.getCoordinates()).to.deep.equal([[0, 1], [1, 1], [1, 0]]);
+
+        expect(polygonGeometry).to.be.an("object");
+        expect(polygonGeometry.getCoordinates()).to.deep.equal([[[0, 1], [1, 1], [1, 0], [0, 1]]]);
+
+        expect(multiPolygonGeometry).to.be.an("object");
+        expect(multiPolygonGeometry.getCoordinates()).to.deep.equal([[[[0, 1], [1, 1], [1, 0], [0, 1]]], [[[2, 2], [3, 3], [3, 2], [2, 2]]]]);
+
+        expect(multiPointGeometry).to.be.an("object");
+        expect(multiPointGeometry.getCoordinates()).to.deep.equal([[0, 1], [2, 3]]);
+
+        expect(multiLineStringGeometry).to.be.an("object");
+        expect(multiLineStringGeometry.getCoordinates()).to.deep.equal([[[0, 1], [1, 1], [1, 0]], [[2, 2], [3, 3]]]);
+
+        expect(geometryCollectionGeometry).to.be.an("object");
+        expect(geometryCollectionGeometry.getGeometries()).to.have.lengthOf(2);
+        expect(geometryCollectionGeometry.getGeometries()[0].getCoordinates()).to.deep.equal([0, 1]);
+        expect(geometryCollectionGeometry.getGeometries()[1].getCoordinates()).to.deep.equal([[0, 1], [1, 1]]);
+
+        expect(geometryCollectionWithBrokenSubGeometry).to.be.an("object");
+        expect(geometryCollectionWithBrokenSubGeometry.getGeometries()).to.have.lengthOf(1);
+        expect(geometryCollectionWithBrokenSubGeometry.getGeometries()[0].getCoordinates()).to.deep.equal([0, 1]);
+
+        expect(brokenGeometry1).to.be.null;
+        expect(brokenGeometry2).to.be.null;
+        expect(brokenGeometry3).to.be.null;
+        expect(brokenGeometry4).to.be.null;
     });
 
     it("checking both datasets changes the checked state of the header checkbox", async () => {

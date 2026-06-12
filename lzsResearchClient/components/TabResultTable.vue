@@ -4,7 +4,7 @@ import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
 import {Style, Stroke, Fill, Circle} from "ol/style";
-import {MultiPolygon, Polygon, LineString, Point} from "ol/geom.js";
+import {MultiPolygon, MultiPoint, MultiLineString, Polygon, LineString, Point, GeometryCollection} from "ol/geom.js";
 import Feature from "ol/Feature.js";
 
 export default {
@@ -208,34 +208,39 @@ export default {
          * @returns {Feature|null} The created Feature or null if geometry type is unsupported.
          */
         createNewVectorFeature (geom) {
-            let newFeature = null;
+            const geometry = this.createOlGeometry(geom);
 
+            return geometry ? new Feature({geometry}) : null;
+        },
+        /**
+         * Creates an OpenLayers geometry from a GeoJSON-like geometry object.
+         * @param {Object} geom - Geometry object ({ type: string, coordinates: Array }).
+         * @returns {import("ol/geom").Geometry|null} The created OL geometry or null if unsupported.
+         */
+        createOlGeometry (geom) {
             switch (geom.type) {
                 case "Point":
-                    newFeature = new Feature({
-                        geometry: new Point(geom.coordinates)
-                    });
-                    break;
+                    return new Point(geom.coordinates);
                 case "LineString":
-                    newFeature = new Feature({
-                        geometry: new LineString(geom.coordinates)
-                    });
-                    break;
-                case "Polygon":
-                    newFeature = new Feature({
-                        geometry: new Polygon(geom.coordinates)
-                    });
-                    break;
-                case "MultiPolygon":
-                    newFeature = new Feature({
-                        geometry: new MultiPolygon(geom.coordinates)
-                    });
-                    break;
-                default:
-                    break;
-            }
+                    return new LineString(geom.coordinates);
 
-            return newFeature;
+                case "Polygon":
+                    return new Polygon(geom.coordinates);
+                case "MultiPolygon":
+                    return new MultiPolygon(geom.coordinates);
+                case "MultiPoint":
+                    return new MultiPoint(geom.coordinates);
+                case "MultiLineString":
+                    return new MultiLineString(geom.coordinates);
+                case "GeometryCollection":
+                    return new GeometryCollection(
+                        // if GeometryCollection contains an unsupported sub-geometry type
+                        //  filter(Boolean) removes all falsy values (null, undefined, false, 0, "")
+                        // leaving only valid geometry objects
+                        geom.geometries.map(this.createOlGeometry).filter(Boolean)
+                    );
+                default: return null;
+            }
         },
         /**
          * Clear the marker for which dataset is currently shown (does not remove vector from map).
