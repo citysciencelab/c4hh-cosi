@@ -117,10 +117,6 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     describe("Component DOM", () => {
         it("should render the story manager container and its content", () => {
             expect(wrapper.exists()).to.be.true;

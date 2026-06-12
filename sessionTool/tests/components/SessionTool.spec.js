@@ -60,7 +60,6 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
             });
             wrapper.find("#fileDownload").trigger("click");
             expect(stubDownloadFile.called).to.be.true;
-            sinon.restore();
         });
         it("should trigger upload if button is clicked", () => {
             const stubTriggerUpload = sinon.stub(SessionTool.methods, "triggerUpload");
@@ -72,7 +71,6 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
             });
             wrapper.find("#fileUpload").trigger("click");
             expect(stubTriggerUpload.called).to.be.true;
-            sinon.restore();
         });
     });
     describe("Methods", () => {
@@ -99,7 +97,6 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
                 expect(stubCreateFile.called).to.be.false;
                 wrapper.vm.downloadFile(false);
                 expect(stubCreateFile.called).to.be.false;
-                sinon.restore();
             });
             it("should call createFile function if given param is an array", () => {
                 const stubCreateFile = sinon.stub(SessionTool.methods, "createFile");
@@ -111,7 +108,6 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
                 });
                 wrapper.vm.downloadFile([]);
                 expect(stubCreateFile.called).to.be.true;
-                sinon.restore();
             });
             it("should call createFile function if given param is an array with object but has no getter function", () => {
                 const stubCreateFile = sinon.stub(SessionTool.methods, "createFile");
@@ -123,7 +119,6 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
                 });
                 wrapper.vm.downloadFile([{}]);
                 expect(stubCreateFile.called).to.be.true;
-                sinon.restore();
             });
             it("should call createFile function with expected blob if given param is an array and object has a getter function", () => {
                 const stubCreateFile = sinon.stub(SessionTool.methods, "createFile"),
@@ -146,14 +141,12 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
                 });
                 wrapper.vm.downloadFile(observer);
                 expect(stubCreateFile.calledWithExactly(expectedBlob, "session.masterportal"));
-                sinon.restore();
             });
         });
         describe("onFileLoad", () => {
             it("should throw an error if the given param is not an parsable object or array", () => {
                 wrapper.vm.onFileLoad(undefined);
                 expect(addSingleAlertStub.called).to.be.true;
-                sinon.restore();
             });
             it("should call the close function if given param is a parsable json string which also has a state property", () => {
                 const spySetObserver = sinon.spy(SessionTool.methods, "setObserver");
@@ -165,7 +158,6 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
                 });
                 wrapper.vm.onFileLoad(JSON.stringify({state: {}}));
                 expect(spySetObserver.called).to.be.true;
-                sinon.restore();
             });
             it("should handle 3d mode map differently", async () => {
                 let setObserverSpy = null;
@@ -176,7 +168,6 @@ describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
                 wrapper.vm.onFileLoad(JSON.stringify({state: {Maps: {mode: "3D"}, Modeler3D: "foo"}}));
                 await wrapper.vm.$nextTick();
                 expect(setObserverSpy.callCount).to.be.equal(2);
-                sinon.restore();
             });
         });
     });

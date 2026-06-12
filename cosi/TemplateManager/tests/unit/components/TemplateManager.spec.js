@@ -345,7 +345,6 @@ describe.skip("addons/cosi/TemplateManager/components/TemplateManager.vue", () =
                 });
                 wrapper.vm.createMappingByTemplates(wrapper.vm.templates, mapping);
                 expect(stubSetMapping.calledOnce).to.be.true;
-                sinon.restore();
                 wrapper.destroy();
             });
 
@@ -387,7 +386,6 @@ describe.skip("addons/cosi/TemplateManager/components/TemplateManager.vue", () =
                 });
                 wrapper.vm.createMappingByTemplates(wrapper.vm.templates, mapping);
                 expect(stubSetMapping.calledWith({}, expectedValues)).to.be.true;
-                sinon.restore();
                 wrapper.destroy();
             });
 
@@ -416,7 +414,6 @@ describe.skip("addons/cosi/TemplateManager/components/TemplateManager.vue", () =
                 newMapping = stubSetMapping.getCall(0).args[1];
                 mappingGroup = newMapping.every(mappingObject => mappingObject.group === "Keine Stats to filter");
                 expect(mappingGroup).to.be.true;
-                sinon.restore();
                 wrapper.destroy();
             });
 
@@ -477,7 +474,6 @@ describe.skip("addons/cosi/TemplateManager/components/TemplateManager.vue", () =
                 });
                 wrapper.vm.createMappingByTemplates(wrapper.vm.templates, mapping);
                 expect(stubSetMapping.calledWith({}, expectedValues)).to.be.true;
-                sinon.restore();
                 wrapper.destroy();
             });
 

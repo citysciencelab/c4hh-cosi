@@ -3,7 +3,7 @@ import {createStore} from "vuex";
 import {expect} from "chai";
 import StoryCreatorAddImageCard from "../../../components/StoryCreatorAddImageCard.vue";
 import sinon from "sinon";
-import {afterEach, beforeEach, describe} from "vitest";
+import {beforeEach, describe} from "vitest";
 
 config.global.mocks.$t = key => key;
 
@@ -68,10 +68,6 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
                 plugins: [localStore]
             }
         });
-    });
-
-    afterEach(() => {
-        sinon.restore();
     });
 
     describe("Component DOM", () => {

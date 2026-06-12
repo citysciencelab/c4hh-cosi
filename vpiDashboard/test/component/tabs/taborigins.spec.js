@@ -64,10 +64,6 @@ describe("addons/vpiDashboard/components/Tabs/TabOrigins.vue", () => {
         wrapper = null;
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
-
     it("renders the origins component", () => {
         /* vorübergebend wurden die Karten deaktiviert, da der Dienst nicht performant genug ist
         expect(wrapper.find(".cards").exists()).to.be.true;
