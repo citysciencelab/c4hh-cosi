@@ -1,9 +1,12 @@
-import source from "../js/measureSource.js";
+import {Collection} from "ol";
+import {Modify} from "ol/interaction.js";
+import {pointerMove} from "ol/events/condition.js";
 import {unByKey} from "ol/Observable.js";
+import source from "../js/measureSource.js";
 import selectInteraction from "@masterportal/masterportalapi/src/maps/interactions/selectInteraction.js";
+import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
 import getStyle from "../js/measureStyle.js";
-import {createSelectInteractions, createMeasureModifyInteraction} from "../js/measureInteractions.js";
-import {normalizeFeatureId} from "../js/measureUtils.js";
+import {deepCloneCoords, normalizeFeatureId} from "../js/measureUtils.js";
 
 export default {
     /**
@@ -62,20 +65,22 @@ export default {
      * @returns {void}
      */
     setupDeleteInteraction ({state, commit, dispatch}) {
-        const interactions = createSelectInteractions(state.layer),
-            selectInter = interactions[0],
-            removeHandler = selectInter.on("select", evt => {
-                if (evt.selected.length > 0) {
-                    const featureId = evt.selected[0].ol_uid;
+        const clickInteraction = selectInteraction.createSelectInteraction(state.layer);
+        const hoverInteraction = selectInteraction.createSelectInteraction(state.layer, pointerMove);
+        const interactions = [clickInteraction, hoverInteraction];
 
-                    dispatch("deleteSingleFeature", featureId);
-                    commit("removeFeatureHistory", normalizeFeatureId(featureId));
-                    dispatch("setInteractionMode", {mode: "DRAW"});
-                    unByKey(removeHandler);
-                }
-            });
+        const removeHandler = clickInteraction.on("select", evt => {
+            if (evt.selected.length > 0) {
+                const featureId = evt.selected[0].ol_uid;
 
-        selectInteraction.removeSelectedFeature(selectInter, source);
+                dispatch("deleteSingleFeature", featureId);
+                commit("removeFeatureHistory", normalizeFeatureId(featureId));
+                dispatch("setInteractionMode", {mode: "DRAW"});
+                unByKey(removeHandler);
+            }
+        });
+
+        selectInteraction.removeSelectedFeature(clickInteraction, source);
         commit("setCurrentSelectInteractions", interactions);
         interactions.forEach(inter => dispatch("Maps/addInteraction", inter, {root: true}));
     },
@@ -93,12 +98,59 @@ export default {
             commit("setCurrentModifyInteraction", null);
         }
 
-        const interaction = createMeasureModifyInteraction(
-            featureId,
-            getters.getFeatureById,
-            {
-                onModifyStart: feature => dispatch("capturePreModifyCoords", feature),
-                onModifyEnd: (feature, beforeCoords, afterCoords, geometryType) => {
+        let interaction;
+        const geometryChangeListeners = new Map();
+
+        if (featureId) {
+            const feature = getters.getFeatureById(featureId);
+
+            if (!feature) {
+                return;
+            }
+            interaction = new Modify({features: new Collection([feature])});
+        }
+        else {
+            interaction = modifyInteraction.createModifyInteraction(source);
+        }
+
+        interaction.on("modifystart", event => {
+            event.features.forEach(feature => {
+                dispatch("capturePreModifyCoords", feature);
+
+                const geometry = feature.getGeometry();
+                // eslint-disable-next-line func-style
+                const changeListener = () => {
+                    dispatch("updateTooltipPositionForFeature", feature);
+                    commit("incrementGeometryUpdateTrigger");
+                };
+
+                geometry.on("change", changeListener);
+                geometryChangeListeners.set(feature.ol_uid, {geometry, changeListener});
+            });
+        });
+
+        interaction.on("modifyend", event => {
+            event.features.forEach(feature => {
+                const listenerInfo = geometryChangeListeners.get(feature.ol_uid);
+
+                if (listenerInfo) {
+                    listenerInfo.geometry.un("change", listenerInfo.changeListener);
+                    geometryChangeListeners.delete(feature.ol_uid);
+                }
+
+                const geometry = feature.getGeometry(),
+                    geometryType = geometry.getType(),
+                    beforeCoords = feature.get("_beforeModifyCoords");
+                let afterCoords;
+
+                if (geometryType === "LineString") {
+                    afterCoords = geometry.getCoordinates();
+                }
+                else if (geometryType === "Polygon") {
+                    afterCoords = geometry.getCoordinates()[0];
+                }
+
+                if (beforeCoords && afterCoords) {
                     const normalizedId = normalizeFeatureId(feature.ol_uid);
 
                     commit("initFeatureHistory", normalizedId);
@@ -107,18 +159,21 @@ export default {
                         entry: {
                             mode: "modifyCoordinates",
                             timestamp: Date.now(),
-                            data: {previousCoordinates: beforeCoords, newCoordinates: afterCoords, geometryType}
+                            data: {previousCoordinates: beforeCoords, newCoordinates: deepCloneCoords(afterCoords), geometryType}
                         }
                     });
                     commit("clearRedoForFeature", normalizedId);
-                    commit("addFeature", feature);
                 }
-            }
-        );
 
-        if (!interaction) {
-            return;
-        }
+                commit("addFeature", feature);
+                feature.unset("_beforeModifyCoords");
+            });
+
+            if (event.mapBrowserEvent) {
+                event.mapBrowserEvent.stopPropagation();
+            }
+        });
+
         commit("setCurrentModifyInteraction", interaction);
         dispatch("Maps/addInteraction", interaction, {root: true});
     },

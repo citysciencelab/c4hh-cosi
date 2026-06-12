@@ -23,29 +23,33 @@ describe("src/modules/measure/js/measureCalculation", function () {
             });
             let result;
 
-            result = calculateLineLengths("EPSG:4326", {}, 6378137, "meter", "0", "LineString", ["m"]);
+            result = calculateLineLengths("EPSG:4326", {}, 6378137, "meter", "0", ["m"]);
             expect(result).to.deep.equal({});
 
-            result = calculateLineLengths("EPSG:4326", {a: feature}, 6378137, "meter", "0", "LineString", ["m"]);
+            result = calculateLineLengths("EPSG:4326", {a: feature}, 6378137, "meter", "0", ["m"]);
             expect(result).to.deep.equal({a: "157.426 m"});
 
-            result = calculateLineLengths("EPSG:4326", {a: feature}, 6378137, "decimeter", "0", "LineString", ["m"]);
+            result = calculateLineLengths("EPSG:4326", {a: feature}, 6378137, "decimeter", "0", ["m"]);
             expect(result).to.deep.equal({a: "157.425,5 m"});
 
-            result = calculateLineLengths("EPSG:4326", {a: feature, b: feature}, 6378137, "meter", "0", "LineString", ["km"]);
+            result = calculateLineLengths("EPSG:4326", {a: feature, b: feature}, 6378137, "meter", "0", ["km"]);
             expect(result).to.deep.equal({a: "157,4 km", b: "157,4 km"});
 
-            result = calculateLineLengths("EPSG:4326", {a: feature}, 6378137, "meter", "0", "LineString", ["nm"]);
+            result = calculateLineLengths("EPSG:4326", {a: feature}, 6378137, "meter", "0", ["nm"]);
             expect(result).to.deep.equal({a: "85 nm"});
         });
-        it("should not format measured linestrings", function () {
-            const feature = new Feature({
+
+        it("should still calculate line length even when polygon tool is currently selected (regression)", function () {
+            const lineFeature = new Feature({
                     geometry: new LineString([[0, 0], [1, 1]])
                 }),
-                result = calculateLineLengths("EPSG:4326", {a: feature}, 6378137, "meter", "0", "Polygon", ["m", "m²"]);
+                selectedGeometry = "Polygon",
+                result = calculateLineLengths("EPSG:4326", {line1: lineFeature}, 6378137, "meter", "0", ["m"]);
 
-            expect(result).to.deep.equal({});
+            expect(selectedGeometry).to.equal("Polygon");
+            expect(result).to.deep.equal({line1: "157.426 m"});
         });
+
     });
 
     describe("calculatePolygonAreas", function () {
@@ -55,30 +59,34 @@ describe("src/modules/measure/js/measureCalculation", function () {
             });
             let result;
 
-            result = calculatePolygonAreas("EPSG:4326", {}, 6378137, "meter", "0", "Polygon", ["m²"]);
+            result = calculatePolygonAreas("EPSG:4326", {}, 6378137, "meter", "0", ["m²"]);
             expect(result).to.deep.equal({});
 
-            result = calculatePolygonAreas("EPSG:4326", {a: feature}, 6378137, "meter", "0", "Polygon", ["m²"]);
+            result = calculatePolygonAreas("EPSG:4326", {a: feature}, 6378137, "meter", "0", ["m²"]);
             expect(result).to.deep.equal({a: "12.391.399.902 m²"});
 
-            result = calculatePolygonAreas("EPSG:4326", {a: feature}, 6378137, "decimeter", "0", "Polygon", ["m²"]);
+            result = calculatePolygonAreas("EPSG:4326", {a: feature}, 6378137, "decimeter", "0", ["m²"]);
             expect(result).to.deep.equal({a: "12.391.399.902,1 m²"});
 
-            result = calculatePolygonAreas("EPSG:4326", {a: feature, b: feature}, 6378137, "meter", "0", "Polygon", ["km²"]);
+            result = calculatePolygonAreas("EPSG:4326", {a: feature, b: feature}, 6378137, "meter", "0", ["km²"]);
             expect(result).to.deep.equal({a: "12.391,4 km²", b: "12.391,4 km²"});
 
-            result = calculatePolygonAreas("EPSG:4326", {a: feature}, 6378137, "decimeter", "0", "Polygon", ["ha"]);
+            result = calculatePolygonAreas("EPSG:4326", {a: feature}, 6378137, "decimeter", "0", ["ha"]);
             expect(result).to.deep.equal({a: "1.239.140,0 ha"});
         });
 
-        it("should not format measured polygons", function () {
-            const feature = new Feature({
+        it("should still calculate polygon area even when line tool is currently selected (regression)", function () {
+            const polygonFeature = new Feature({
                     geometry: new Polygon([[[0, 0], [0, 1], [1, 1], [1, 0]]])
                 }),
-                result = calculatePolygonAreas("EPSG:4326", {a: feature}, 6378137, "meter", "0", "LineString", ["m", "m²"]);
+                selectedGeometry = "LineString",
+                result = calculatePolygonAreas("EPSG:4326", {poly1: polygonFeature}, 6378137, "meter", "0", ["km²"]);
 
-            expect(result).to.deep.equal({});
+            expect(selectedGeometry).to.equal("LineString");
+            expect(result).to.deep.equal({poly1: "12.391,4 km²"});
         });
+
+
     });
 
     describe("formatLineLength", function () {

@@ -46,6 +46,7 @@
 - Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
 - Issue \#1619: GetFeatureInfo: Fixed case where GFI with iframe content did not reopen after being closed.
 - Issue \#1620: Adapted vite build to respect new created heads (clone with --branch).
+- Issue \#1621: Measure: Fixed recalculation of measurement values after geometry modification, regardless of the currently selected geometry type.
 - Migrator: Fixed creation of index.html.
 - Gazetteer: Restored correct display of geographicalIdentifier as search result, if available.
 - SearchBar: Fixed unstable highlighting of 3D tiles at address coordinates.
