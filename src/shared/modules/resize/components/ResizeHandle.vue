@@ -1,28 +1,19 @@
 <script>
 import {mapMutations} from "vuex";
+import {mainMenu, secondaryMenu} from "@shared/js/utils/constants.js";
+import {clampAndApplyHeight, clampAndApplyWidth, dimensionValidator} from "@shared/modules/resize/js/resizeHandleHelper.js";
 
-// Signs for calculating the position after resize
 const handleSigns = {
-    topLeft: [-1, -1],
-    top: [0, -1],
-    topRight: [1, -1],
-    right: [1, 0],
-    bottomRight: [1, 1],
-    bottom: [0, 1],
-    bottomLeft: [-1, 1],
-    left: [-1, 0]
-};
-
-/**
- * Checks whether the given values is a Number and is between 0 and 1.
- *
- * @param {*} val Value given for any of the dimension props.
- * @returns {Boolean} Whether the given value is between 0 and 1.
- */
-function dimensionValidator (val) {
-    return !isNaN(val) && typeof val === "number"
-        && val >= 0 && val <= 1;
-}
+        topLeft: [-1, -1],
+        top: [0, -1],
+        topRight: [1, -1],
+        right: [1, 0],
+        bottomRight: [1, 1],
+        bottom: [0, 1],
+        bottomLeft: [-1, 1],
+        left: [-1, 0]
+    },
+    minDistanceBetweenMenus = 300;
 
 export default {
     name: "ResizeHandle",
@@ -90,7 +81,7 @@ export default {
             type: String,
             required: true,
             validator (value) {
-                return value === "mainMenu" || value === "secondaryMenu";
+                return value === mainMenu || value === secondaryMenu;
             }
         }
     },
@@ -238,17 +229,13 @@ export default {
         },
         moveHandle (key) {
             if (key === "ArrowLeft" || key === "ArrowRight") {
-                const containerWidth = document.getElementById("masterportal-container").offsetWidth,
-                    disposition = key === "ArrowLeft" ? -5 : 5;
-                let newWidth = this.handleElement.offsetWidth + disposition;
+                const disposition = (key === "ArrowLeft" ? 1 : -1) * (this.side === mainMenu ? -1 : 1) * 10;
 
-                if (newWidth < containerWidth * this.minWidth) {
-                    newWidth = containerWidth * this.minWidth;
-                }
-                if (newWidth > containerWidth * this.maxWidth) {
-                    newWidth = containerWidth * this.maxWidth;
-                }
-                this.handleElement.style.width = Math.round(newWidth) + "px";
+                clampAndApplyWidth(
+                    this,
+                    this.handleElement.offsetWidth + disposition,
+                    minDistanceBetweenMenus
+                );
             }
         },
         onMouseDown (event) {
@@ -391,47 +378,20 @@ export default {
          * @returns {void}
          */
         setNewSize () {
-            const containerWidth = document.getElementById("masterportal-container").offsetWidth,
-                containerHeight = document.getElementById("masterportal-container").offsetHeight;
-
-            let newWidth, newHeight;
-
             if (this.handlePosition !== "top" && this.handlePosition !== "bottom") {
-                newWidth = this.initialDimensions.width + handleSigns[this.handlePosition][0] * this.deltaCursorPosition.x;
-
-                if (newWidth < containerWidth * this.minWidth) {
-                    newWidth = containerWidth * this.minWidth;
-                }
-                if (newWidth > containerWidth * this.maxWidth) {
-                    newWidth = containerWidth * this.maxWidth;
-                }
-                this.handleElement.style.width = Math.round(newWidth) + "px";
+                clampAndApplyWidth(
+                    this,
+                    this.initialDimensions.width + handleSigns[this.handlePosition][0] * this.deltaCursorPosition.x,
+                    minDistanceBetweenMenus
+                );
             }
+
             if (this.handlePosition !== "left" && this.handlePosition !== "right") {
-                newHeight = this.initialDimensions.height + handleSigns[this.handlePosition][1] * this.deltaCursorPosition.y;
-
-                if (newHeight < containerHeight * this.minHeight) {
-                    newHeight = containerHeight * this.minHeight;
-                }
-                if (newHeight > containerHeight * this.maxHeight) {
-                    newHeight = containerHeight * this.maxHeight;
-                }
-                this.handleElement.style.height = Math.round(newHeight) + "px";
+                clampAndApplyHeight(
+                    this,
+                    this.initialDimensions.height + handleSigns[this.handlePosition][1] * this.deltaCursorPosition.y
+                );
             }
-            if (this.handleElement.style.maxWidth !== "none") {
-                this.handleElement.style.maxWidth = "none";
-            }
-            if (this.handleElement.style.maxHeight !== "none") {
-                this.handleElement.style.maxHeight = "none";
-            }
-
-            if (this.side === "mainMenu") {
-                this.setMainMenuWidth(newWidth);
-            }
-            else if (this.side === "secondaryMenu") {
-                this.setSecondaryMenuWidth(newWidth);
-            }
-
         },
         /**
          * When using the mousedown event, a ghost click is triggered.
@@ -481,8 +441,6 @@ export default {
 </template>
 
 <style lang="scss">
-
-
 $handle_size: 6px;
 
 .resize-handle {
@@ -557,5 +515,4 @@ button:not(:disabled).resize-handle-cursor {
             cursor: ew-resize;
         }
 }
-
 </style>

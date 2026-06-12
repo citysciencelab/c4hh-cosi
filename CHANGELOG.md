@@ -35,6 +35,7 @@
     - @stylistic/eslint-plugin-js ^2.13.0
 
 ### Fixed
+- Issue \#1343: Fixed width-calculation for left and right menu.
 - Issue \#1585: Fixed case where dragging for resizing menus continued after releasing mouse or touch outside browser window.
 - Issue \#1594: Sort legend in order of style config for Geojson Layer.
 - Issue \#1600: AddWMS: Fixed detection of crs, if using EPSG-Code 4326.
