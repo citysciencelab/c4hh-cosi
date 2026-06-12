@@ -38,9 +38,6 @@ pipelines:
                         - pip install -r devtools/docsValidation/python-dependencies.txt
                         - mkdir -p docs/_snippets
                         - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
-                        - git add docs/_snippets/index_title.md
-                        - 'git commit -m "docs: update mkdocs title snippet for $BITBUCKET_TAG" || echo "No changes to commit"'
-                        - git push origin HEAD
                         - mike deploy $BITBUCKET_TAG
                         - mv $BITBUCKET_CLONE_DIR/site $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG
                         -   pipe: atlassian/ftp-deploy:0.7.1
@@ -142,7 +139,6 @@ pipelines:
                         - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
                         - git add docs/_snippets/index_title.md
                         - 'git commit -m "docs: update mkdocs title snippet for $BITBUCKET_TAG" || echo "No changes to commit"'
-                        - git push origin HEAD
                         - mike deploy $BITBUCKET_TAG
                         - mv $BITBUCKET_CLONE_DIR/site $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG
                         -   pipe: atlassian/ftp-deploy:0.7.1
@@ -172,7 +168,6 @@ pipelines:
                         - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
                         - git add docs/_snippets/index_title.md
                         - 'git commit -m "docs: update mkdocs title snippet for $BITBUCKET_TAG" || echo "No changes to commit"'
-                        - git push origin HEAD
                         - mike deploy $BITBUCKET_TAG
                         - mv $BITBUCKET_CLONE_DIR/site $BITBUCKET_CLONE_DIR/Latest
                         -   pipe: atlassian/ftp-deploy:0.7.1
@@ -213,7 +208,6 @@ pipelines:
                         - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
                         - git add docs/_snippets/index_title.md
                         - 'git commit -m "docs: update mkdocs title snippet for $BITBUCKET_TAG" || echo "No changes to commit"'
-                        - git push origin HEAD
                         - mike deploy $BITBUCKET_TAG
                         - zip -r masterportal_docs.zip /opt/atlassian/pipelines/agent/build/site
                         - curl -X POST --user "$bbapi_name:$bbapi_key" "https://api.bitbucket.org/2.0/repositories/geowerkstatt-hamburg/masterportal/downloads/" --form files=@"masterportal_docs.zip" --verbose;
