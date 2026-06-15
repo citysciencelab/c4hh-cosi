@@ -9,6 +9,7 @@
 ### Added
 - PlanParken: Added a new addon `planParken` to analyze parking spaces in an area.
 - GFI - `parking`: Added a new gfi to match the visual style of the `planParken` addon.
+- vcOblique: Added footer with image name, because footer of VCMap 6 does not react to image changes.
 
 ### Changed
 - Boris: Changed list structures to reflect accessibility rules

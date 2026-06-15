@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import actions from "../../../store/actionsVcOblique.js";
+import actions, {headingToCardinal} from "../../../store/actionsVcOblique.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 
 
@@ -201,6 +201,33 @@ describe("addons/vcOblique/store/actionsVcOblique", () => {
             expect(commit.calledOnce).to.be.true;
             expect(commit.firstCall.args[0]).to.equals("setObliqueViewerURL");
             expect(commit.firstCall.args[1]).to.equals("https:///examplePortal?groundPosition=9.99431966511419, 53.55201216725377");
+        });
+    });
+
+    describe("headingToCardinal", () => {
+        it("should return 'Nord' for 0°", () => {
+            expect(headingToCardinal(0)).to.equal("Nord");
+        });
+        it("should return 'Ost' for 90°", () => {
+            expect(headingToCardinal(90)).to.equal("Ost");
+        });
+        it("should return 'Süd' for 180°", () => {
+            expect(headingToCardinal(180)).to.equal("Süd");
+        });
+        it("should return 'West' for 270°", () => {
+            expect(headingToCardinal(270)).to.equal("West");
+        });
+        it("should return 'Ost' for 89°", () => {
+            expect(headingToCardinal(89)).to.equal("Ost");
+        });
+        it("should return 'Ost' for 91°", () => {
+            expect(headingToCardinal(91)).to.equal("Ost");
+        });
+        it("should return 'Süd' for -180°", () => {
+            expect(headingToCardinal(-180)).to.equal("Süd");
+        });
+        it("should return 'Ost' for -270°", () => {
+            expect(headingToCardinal(-270)).to.equal("Ost");
         });
     });
 

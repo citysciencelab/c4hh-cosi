@@ -96,4 +96,24 @@ describe("addons/vcOblique/components/VcOblique.vue", () => {
             expect(VcOblique.actions.obliqueView.calledOnce).to.be.true;
         });
     });
+
+    describe("VcOblique.vue footer", () => {
+        it("should not render #oblique-footer when currentImageName is empty", async () => {
+            store.commit("Modules/VcOblique/setCurrentImageName", "");
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find("#oblique-footer").exists()).to.be.false;
+        });
+
+        it("should render #oblique-footer when currentImageName is set", async () => {
+            store.commit("Modules/VcOblique/setCurrentImageName", "IMG001-Ost");
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find("#oblique-footer").exists()).to.be.true;
+        });
+
+        it("should display the currentImageName in #oblique-footer", async () => {
+            store.commit("Modules/VcOblique/setCurrentImageName", "IMG001-Ost");
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find("#oblique-footer").text()).to.equal("IMG001-Ost");
+        });
+    });
 });

@@ -157,6 +157,10 @@ const actions = {
                         if (!vp?.groundPosition) {
                             return;
                         }
+                        const imageName = map._obliqueProvider?.currentImage?.name,
+                            direction = headingToCardinal(vp.heading);
+
+                        commit("setCurrentImageName", imageName ? `${imageName}-${direction}` : "");
                         if (isFirstImageChange) {
                             isFirstImageChange = false;
                             dispatch("obliqueView", rootGetters["Maps/center"] || rootGetters["Maps/initialCenter"])
@@ -236,7 +240,8 @@ const actions = {
     * @param {Object} param.getters the getters
     * @returns {void}
     */
-    resetObliqueViewer ({dispatch, getters}) {
+    resetObliqueViewer ({commit, dispatch, getters}) {
+        commit("setCurrentImageName", "");
         const layer = mapMarker.getMapmarkerLayerById("marker_point_layer");
 
         if (layer) {
@@ -364,3 +369,4 @@ const actions = {
 };
 
 export default actions;
+export {headingToCardinal};

@@ -28,7 +28,8 @@ const state = {
     lastCoordinates: "",
     defaultMapMarkerStyleId: "",
     heading: 0,
-    serviceId: "oblique"
+    serviceId: "oblique",
+    currentImageName: ""
 };
 
 export default state;

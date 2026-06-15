@@ -21,6 +21,7 @@ export default {
     computed: {
         ...mapGetters("Modules/VcOblique", [
             "active",
+            "currentImageName",
             "defaultMapMarkerStyleId",
             "icon",
             "name",
@@ -81,12 +82,34 @@ export default {
             frameboarder="0"
             :src="obliqueViewerURL"
         />
+        <div
+            v-if="currentImageName"
+            id="oblique-footer"
+        >
+            {{ currentImageName }}
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 #obliqueViewer{
     height: 84vh;
+    container-type: inline-size;
+}
+
+#oblique-footer {
+    display: none;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    color: #333;
+    background: rgba(255, 255, 255, 0.85);
+    text-align: left;
+}
+
+@container (min-width: 605px) {
+    #oblique-footer {
+        display: block;
+    }
 }
 </style>
 
