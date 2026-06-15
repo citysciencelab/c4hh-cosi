@@ -25,7 +25,9 @@ export default {
     data () {
         return {
             customStyle: {},
-            lastUpdate: ""
+            lastUpdate: "",
+            isMqttLive: true,
+            statusHandler: null
         };
     },
     computed: {
@@ -54,6 +56,7 @@ export default {
         thingId: {
             handler (newVal, oldVal) {
                 if (oldVal) {
+                    this.isMqttLive = true;
                     this.setFooterLastUpdate(this.api, newVal, this.meansOfTransport);
                 }
             },
@@ -64,6 +67,7 @@ export default {
         meansOfTransport: {
             handler (newVal, oldVal) {
                 if (oldVal) {
+                    this.isMqttLive = true;
                     this.setFooterLastUpdate(this.api, this.thingId, newVal);
                 }
             },
@@ -77,8 +81,20 @@ export default {
         }
     },
     mounted: function () {
-        // set the date
         this.setFooterLastUpdate(this.api, this.thingId, this.meansOfTransport);
+
+        this.statusHandler = (status) => {
+            this.isMqttLive = status;
+        };
+
+        if (typeof this.api.api.onMqttStatusChange === "function") {
+            this.api.api.onMqttStatusChange(this.statusHandler);
+        }
+    },
+    beforeUnmount: function () {
+        if (typeof this.api.api.offMqttStatusChange === "function" && this.statusHandler) {
+            this.api.api.offMqttStatusChange(this.statusHandler);
+        }
     },
     methods: {
         /**
@@ -193,9 +209,11 @@ export default {
                 </div>
             </div>
             <div
-                class="indication last-line mt-2"
+                v-if="!isMqttLive"
+                class="indication last-line mt-2 mqtt-warning"
                 :style="customStyle"
             >
+                <i class="bi bi-exclamation-triangle-fill pe-1" />
                 {{ autoUpdateNote }}
             </div>
         </div>
@@ -203,8 +221,13 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+@import "/src/assets/css/variables";
     .tableIndication, .trucksStatusIndication, .indication {
         font-size: 10px;
+    }
+    .mqtt-warning {
+        color: $danger;
+        font-weight: bold;
     }
 
     .trucksStatusIndication {
