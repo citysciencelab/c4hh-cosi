@@ -36,8 +36,8 @@
                     "jahrgang": "Year",
                     "kachelnummer": "Tile Number",
                     "maxValueCount": "Max. Results",
-                    "patternError": "Please enter a numeric value with \"{ digitNumber }\" digits.",
-                    "patternErrorRange": "Please enter a numeric value with { minDigits } to { maxDigits } digits.",
+                    "patternError": "Please enter a numeric value with {{ digitNumber }} digits.",
+                    "patternErrorRange": "Please enter a numeric value with {{ minDigits }} to {{ maxDigits }} digits.",
                     "numberRangeError": "Please enter a numeric value between {{ minNum }} and {{ maxNum }}.",
                     "spatialSelectionGroup": {
                         "geometries": "Drawn Area",
@@ -46,7 +46,7 @@
                     },
                     "spatialSelectionLabel": "Search in / by:",
                     "searchModeSwitchLabel": "Expert search mode",
-                    "extentWarningMessage": "The map scale is smaller than 1:{ scale }. Please zoom in to enable searching within the map extent.",
+                    "extentWarningMessage": "The map scale is smaller than 1:{{ scale }}. Please zoom in to enable searching within the map extent.",
                     "addressSearchCancel": "Cancel address search"
                 },
                 "tabResult": {

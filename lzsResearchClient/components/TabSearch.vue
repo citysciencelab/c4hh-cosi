@@ -186,9 +186,8 @@ export default {
                 return;
             }
 
-            if (newValue !== oldValue) {
-                this.lzsDrawLayerSource.clear();
-                this.searchGeometry = null;
+            if (this.searchGeometry && newValue !== oldValue) {
+                this.removeSearchGeometry();
             }
         }
     },
@@ -240,6 +239,15 @@ export default {
             }
         },
         /**
+         * Activates or deactivates the modify interaction without destroying it,
+         * so it can be re-enabled when the user returns to this tab.
+         * @param {Boolean} active Whether the modify interaction should listen to map events.
+         * @returns {void}
+         */
+        setMapInteractionsActive (active) {
+            this.currentModifyInteraction?.setActive(active);
+        },
+        /**
          * Sets `searchGeometry` to null and removes the map interaction.
          */
         removeSearchGeometry () {
@@ -248,6 +256,7 @@ export default {
             this.lzsDrawLayerSource.clear();
 
             if (this.currentModifyInteraction) {
+                this.currentModifyInteraction.un("modifyend", this.onModifyEnd);
                 this.removeInteraction(this.currentModifyInteraction);
                 this.currentModifyInteraction = null;
             }
@@ -487,6 +496,19 @@ export default {
                 coordinates: JSON.parse(JSON.stringify(polygonCoordinates))
             };
         },
+        resetDrawingInteraction () {
+            this.drawEnd = true;
+
+            this.removeInteraction(this.lzsSelectedInteraction);
+            this.setLzsSelectedDrawType("");
+            this.setLzsSelectedInteraction("");
+        },
+        cancelIncompleteDrawing () {
+            if (this.currentModifyInteraction) {
+                return;
+            }
+            this.resetDrawingInteraction();
+        },
         /**
          * Event handler for the 'drawend' event.
          * Triggered when a drawing operation is completed.
@@ -494,15 +516,22 @@ export default {
          * @param {DrawEvent} event - The event object containing details about the completed drawing.
          * @returns {void}
          */
-        onDrawend (event) {
-            this.drawEnd = true;
-
+        onDrawEnd (event) {
             this.setSearchGeometry(event.feature.getGeometry());
-            this.removeInteraction(this.lzsSelectedInteraction);
-            this.setLzsSelectedDrawType("");
-            this.setLzsSelectedInteraction("");
+            this.resetDrawingInteraction();
             this.editFeature();
+        },
+        /**
+         * Event handler for the 'modifyend' event.
+         * Triggered when a modification operation on a feature is completed, updating the search geometry accordingly.
+         *
+         * @param {ModifyEvent} event - The event object containing details about the completed modification.
+         * @returns {void}
+         */
+        onModifyEnd (event) {
+            const feature = event.features.getArray()[0];
 
+            this.setSearchGeometry(feature.getGeometry());
         },
         /**
          * Sets the map interaction to modify a feature.
@@ -511,6 +540,7 @@ export default {
          */
         editFeature () {
             this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.lzsDrawLayerSource);
+            this.currentModifyInteraction.on("modifyend", this.onModifyEnd);
             this.addInteraction(this.currentModifyInteraction);
         },
         /**
@@ -547,7 +577,6 @@ export default {
 
                 feature.setStyle(style);
 
-                this.lzsDrawLayerSource.clear();
                 this.lzsDrawLayerSource.addFeature(feature);
             }
             else if (geometry instanceof Polygon) {
@@ -610,6 +639,7 @@ export default {
             };
 
             this.showSpinner = true;
+            this.setMapInteractionsActive(false);
 
             this.searchByGeometry(payload)
                 .then((result) => {
@@ -666,7 +696,7 @@ export default {
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent"):
                 default:
-                    this.lzsDrawLayerSource.clear();
+                    this.removeSearchGeometry();
 
                     if (this.addressSearchCoordinates) {
                         this.removePointMarker();
@@ -692,15 +722,6 @@ export default {
                     : 20;
 
             return [20, rightPadding, 20, leftPadding];
-        },
-        /**
-         * Deletes the current search geometry.
-         *
-         * @method deleteSearchGeometry
-         * @returns {void}
-         */
-        deleteSearchGeometry () {
-            this.searchGeometry = null;
         }
     }
 };
@@ -873,7 +894,7 @@ export default {
                             :set-selected-draw-type="setLzsSelectedDrawType"
                             :set-selected-interaction="setLzsSelectedInteraction"
                             :should-emit-events="true"
-                            @drawend="onDrawend"
+                            @drawend="onDrawEnd"
                         />
 
                         <div class="deleteFeature">
@@ -883,7 +904,7 @@ export default {
                                 :layer="lzsDrawLayer"
                                 :selected-interaction="lzsSelectedInteraction"
                                 :set-selected-interaction="setLzsSelectedInteraction"
-                                @click="deleteSearchGeometry"
+                                @click="removeSearchGeometry"
                             />
                         </div>
                     </div>

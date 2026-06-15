@@ -104,9 +104,19 @@ export default {
 
             const tabContainerRef = await waitForRef("tabContainer");
 
-            tabContainerRef?.$watch("activeTabIdLocal", (newVal) => {
+            tabContainerRef?.$watch("activeTabIdLocal", (newVal, oldVal) =>{
                 if (newVal !== "tabResult") {
                     tabContainerRef.$refs.tabResult[0].clearGeomAndGeomIndicators();
+                }
+
+                const tabSearch = tabContainerRef.$refs.tabSearch?.[0];
+
+                if (oldVal === "tabSearch" && newVal !== "tabSearch") {
+                    tabSearch?.setMapInteractionsActive(false);
+                    tabSearch?.cancelIncompleteDrawing();
+                }
+                else if (newVal === "tabSearch") {
+                    tabSearch?.setMapInteractionsActive(true);
                 }
 
                 // clear all error messages on tab change

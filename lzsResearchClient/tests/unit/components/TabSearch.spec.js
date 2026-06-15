@@ -2,6 +2,7 @@ import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import {createStore} from "vuex";
+import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 
 import Point from "ol/geom/Point";
 import LineString from "ol/geom/LineString";
@@ -11,7 +12,9 @@ import Component from "../../../components/TabSearch.vue";
 
 describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js", () => {
     let wrapper,
-        store;
+        store,
+        drawLayerSourceMock,
+        currentModifyInteractionMock;
     const mockMaxResultValueCount = 100;
 
     beforeEach(() => {
@@ -93,11 +96,20 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                         "ERROR_PARAMS": {"digitNumber": 9}
                     }
                 }
-            },
-            drawLayerSourceMock = {
-                clear: sinon.stub(),
-                addFeature: sinon.stub()
             };
+
+        drawLayerSourceMock = {
+            clear: sinon.stub(),
+            addFeature: sinon.stub(),
+            on: sinon.stub(),
+            un: sinon.stub(),
+            getFeatures: sinon.stub().returns([])
+        };
+
+        currentModifyInteractionMock = {
+            on: sinon.stub(),
+            un: sinon.stub()
+        };
 
         store = createStore({
             modules: {
@@ -196,12 +208,16 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                 }
             }
         });
+
+        wrapper.vm.currentModifyInteraction = currentModifyInteractionMock;
+        sinon.stub(modifyInteraction, "createModifyInteraction").returns(currentModifyInteractionMock);
     });
 
     afterEach(() => {
         if (wrapper) {
             wrapper.unmount();
         }
+        sinon.restore();
     });
 
     /**
@@ -330,11 +346,6 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     });
 
     it("resetForm restores attribute form and geometric selections", async () => {
-        // Ensure lzsDrawLayerSource is mocked before calling setSearchGeometry
-        wrapper.vm.lzsDrawLayerSource = {
-            clear: sinon.stub(),
-            addFeature: sinon.stub()
-        };
         const archiveId = "DKL_3DSTADT_LOD2",
             year = 2020;
 
@@ -464,5 +475,42 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         wrapper.vm.validateSearchWithAttributeForm();
         expect(wrapper.vm.isAttributeSearchFormValid).to.be.false;
         expect(searchWithAttributeForm[0].errorMessage).to.equal("additional:modules.lzsResearchClient.tabs.tabSearch.patternError:4");
+    });
+    it("onDrawEnd sets searchGeometry", async () => {
+        const mockPolygon = new Polygon([[[0, 0], [1, 1], [1, 0], [0, 0]]]);
+
+        await wrapper.vm.onDrawEnd({feature: {getGeometry: () => mockPolygon}});
+
+        expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Polygon", coordinates: [[[0, 0], [1, 1], [1, 0], [0, 0]]]});
+    });
+
+    it("onDrawEnd creates modify interaction and registers modifyend listener", async () => {
+        const mockPolygon = new Polygon([[[0, 0], [1, 1], [1, 0], [0, 0]]]);
+
+        await wrapper.vm.onDrawEnd({feature: {getGeometry: () => mockPolygon}});
+
+        expect(wrapper.vm.currentModifyInteraction).to.deep.equal(currentModifyInteractionMock);
+        expect(currentModifyInteractionMock.on.calledWith("modifyend", wrapper.vm.onModifyEnd)).to.be.true;
+    });
+
+    it("onModifyEnd updates searchGeometry", async () => {
+        const mockPolygon = new Polygon([[[0, 0], [1, 1], [1, 0], [0, 0]]]),
+            modifiedMockPolygon = new Polygon([[[0, 0], [1, 1], [1, 2], [1, 0], [0, 0]]]);
+
+        await wrapper.vm.onDrawEnd({feature: {getGeometry: () => mockPolygon}});
+        await wrapper.vm.onModifyEnd({features: {getArray: () => [{getGeometry: () => modifiedMockPolygon}]}});
+
+        expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Polygon", coordinates: [[[0, 0], [1, 1], [1, 2], [1, 0], [0, 0]]]});
+    });
+
+    it("removeSearchGeometry clears searchGeometry, currentModifyInteraction and unregisters modifyend listener", async () => {
+        const mockPolygon = new Polygon([[[0, 0], [1, 1], [1, 0], [0, 0]]]);
+
+        await wrapper.vm.onDrawEnd({feature: {getGeometry: () => mockPolygon}});
+        await wrapper.vm.removeSearchGeometry();
+
+        expect(wrapper.vm.searchGeometry).to.be.null;
+        expect(wrapper.vm.currentModifyInteraction).to.be.null;
+        expect(currentModifyInteractionMock.un.calledWith("modifyend", wrapper.vm.onModifyEnd)).to.be.true;
     });
 });
