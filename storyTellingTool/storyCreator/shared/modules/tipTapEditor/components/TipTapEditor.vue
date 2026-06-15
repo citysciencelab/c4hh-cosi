@@ -1,13 +1,15 @@
 <script>
 import {Editor, EditorContent} from "@tiptap/vue-3";
-import TipTapEditorControls from "./TipTapEditorControls.vue";
 import extensions from "../js/tipTapExtensions";
+import TipTapEditorBubbleMenu from "./TipTapEditorBubbleMenu.vue";
+import TipTapEditorFloatingMenu from "./TipTapEditorFloatingMenu.vue";
 
 export default {
     name: "TipTapEditor",
     components: {
         EditorContent,
-        TipTapEditorControls
+        TipTapEditorBubbleMenu,
+        TipTapEditorFloatingMenu
     },
 
     props: {
@@ -27,6 +29,10 @@ export default {
 
     watch: {
         modelValue (value) {
+            if (!this.editor) {
+                return;
+            }
+
             const isSame = JSON.stringify(this.editor.getJSON()) === JSON.stringify(value);
 
             if (isSame) {
@@ -42,23 +48,28 @@ export default {
             extensions,
             onUpdate: ({editor}) => {
                 this.$emit("update:modelValue", editor.getJSON());
-            }
+            },
+            autofocus: "end"
         });
     },
 
     beforeUnmount () {
-        this.editor.destroy();
+        this.editor?.destroy();
     }
 };
 </script>
 
 <template>
     <div class="w-100">
-        <TipTapEditorControls
+        <EditorContent
+            v-if="editor"
+            class="h-25"
             :editor="editor"
         />
-        <EditorContent
-            class="h-25"
+        <TipTapEditorBubbleMenu
+            :editor="editor"
+        />
+        <TipTapEditorFloatingMenu
             :editor="editor"
         />
     </div>
@@ -104,3 +115,4 @@ export default {
     }
 }
 </style>
+
