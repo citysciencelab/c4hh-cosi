@@ -118,7 +118,7 @@ export default {
             };
         },
         /**
-         * Returns the fixed story list.
+         * Sets the fixed story list.
          * @param {String} storyPath - the relative path in portalconfigs to contain fixed stories.
          * @param {String[]} files - the fixed story files name.
          * @returns {Promise<void>}.
@@ -143,6 +143,7 @@ export default {
 
                             storyJson.editable = false;
 
+                            this.setFixedStoryLoaded(true);
                             return {
                                 story: storyJson,
                                 imageAssetsById

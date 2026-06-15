@@ -11,7 +11,8 @@
  * @property {Boolean} isVisibleInMenu - if true, tool is selectable in menu (config-param)
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * Addon state
- * @property {Boolean} showLoadingSpinner - Show loading spinner or not
+ * @property {String} fixedStoryName the fixed story file name.
+ * @property {String} fixedStoryPath the relative path in portalconfigs to contain fixed stories.
  */
 
 const state = {
@@ -25,10 +26,12 @@ const state = {
     icon: "bi-book",
 
     // Addon state
-    storyConf: {},
-    storyConfJson: null,
     autoplay: false,
-    mode: null
+    fixedStoryName: null,
+    fixedStoryPath: null,
+    mode: null,
+    storyConf: {},
+    storyConfJson: null
 };
 
 export default state;

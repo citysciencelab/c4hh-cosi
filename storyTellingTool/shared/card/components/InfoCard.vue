@@ -228,7 +228,6 @@ export default {
                             <span class="ms-1 small">{{ cardItems.numberOfChapters + " " + $t('additional:modules.storyCreator.numberOfChapters') }}</span>
                         </div>
                         <div
-                            v-if="editable"
                             class="d-flex align-items-center gap-2"
                         >
                             <IconButton
@@ -238,12 +237,14 @@ export default {
                                 :class-array="['btn-light']"
                             />
                             <IconButton
+                                v-if="editable"
                                 :aria="$t('additional:modules.storyCreator.labels.editStory')"
                                 icon="bi bi-pencil"
                                 :interaction="handleEditClick"
                                 :class-array="['btn-light']"
                             />
                             <IconButton
+                                v-if="editable"
                                 :aria="$t('additional:modules.storyCreator.labels.downloadStory')"
                                 icon="bi bi-download"
                                 :interaction="handleDownloadClick"

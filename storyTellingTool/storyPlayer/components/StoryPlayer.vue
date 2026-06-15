@@ -1,4 +1,6 @@
 <script>
+import axios from "axios";
+import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
 
@@ -26,6 +28,7 @@ export default {
         return {
             currentIndex: -1,
             currentChapterIndex: 0,
+            fixedImageAssetsById: null,
             loadedContent: null,
             isHovering: null,
             isChangeFrom3D: false,
@@ -38,17 +41,19 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/StoryPlayer", [
-            "supportedDevices",
-            "supportedMapModes",
-            "type",
-            "id",
-            "name",
-            "description",
-            "icon",
-            "storyConfJson",
             "autoplay",
+            "description",
+            "fixedStoryName",
+            "fixedStoryPath",
+            "icon",
+            "id",
             "mode",
-            "storyPlayerMenuSide"
+            "name",
+            "storyConfJson",
+            "type",
+            "storyPlayerMenuSide",
+            "supportedDevices",
+            "supportedMapModes"
         ]),
         ...mapGetters("Modules/StoryPlayer", {
             storyConfStore: "storyConf"
@@ -89,11 +94,18 @@ export default {
             return this.storyConfProp || this.storyConfStore || {};
         },
         /**
+         * The image assets object.
+         * @returns {Object} the image assets object
+         */
+        finalImageAssetsById () {
+            return this.imageAssetsById || this.fixedImageAssetsById;
+        },
+        /**
          * The URL of the cover image.
          * @returns {String} the URL of the cover image
          */
         coverImagePath () {
-            return this.imageAssetsById[this.storyConf.imageSrc]?.objectURL || "";
+            return this.finalImageAssetsById?.[this.storyConf.imageSrc]?.objectURL || "";
         },
         isMobilePortrait () {
             return this.isMobileDevice && this.screenOrientationType.startsWith("portrait");
@@ -118,7 +130,11 @@ export default {
             this.applyMobileLandscapeLayout();
         }
     },
-    mounted () {
+    async mounted () {
+        if (!Object.keys(this.storyConf).length) {
+            await this.getFixedStoryList(this.fixedStoryPath, this.fixedStoryName);
+        }
+
         this.scrollerSetup();
 
         const toolBody = document.getElementById("mp-body-secondaryMenu"),
@@ -245,6 +261,40 @@ export default {
             this.setExpandedBySide({expanded: false, side: toolMenuSide});
 
             this.resetMenu(toolMenuSide);
+        },
+        /**
+         * Sets the fixed story list.
+         * @param {String} storyPath - the relative path in portalconfigs to contain fixed stories.
+         * @param {String} name - the fixed story file name.
+         * @returns {Promise<void>}.
+         */
+        async getFixedStoryList (storyPath, name) {
+            if (typeof storyPath !== "string" || typeof name !== "string") {
+                return;
+            }
+
+            try {
+                const response = await axios.get(`${storyPath}/${name}.zip`, {
+                    responseType: "blob"
+                });
+
+                try {
+                    const {storyJson, imageAssetsById} = await extractStoryZip(response.data);
+
+                    this.setStoryConf(storyJson);
+                    this.fixedImageAssetsById = imageAssetsById;
+                }
+                catch (error) {
+                    console.warn(
+                        `Zip file at ${storyPath} could not be loaded. Please check that it is a valid zip file.`
+                    );
+                }
+            }
+            catch (e) {
+                console.warn(
+                    `Zip file at ${storyPath} could not be loaded. Please check that it is a valid zip file.`
+                );
+            }
         },
         /**
          * Toggles a layer on the map
@@ -674,7 +724,7 @@ export default {
                         >
                             <div v-if="item.type === 'image'">
                                 <img
-                                    :src="imageAssetsById?.[item.id]?.objectURL"
+                                    :src="finalImageAssetsById?.[item.id]?.objectURL"
                                     :alt="item.attrs?.alt"
                                     class="rounded w-100 d-block mb-2"
                                 >

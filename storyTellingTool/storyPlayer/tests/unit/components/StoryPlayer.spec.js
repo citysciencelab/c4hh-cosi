@@ -128,6 +128,8 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                             state: () => ({
                                 showLoadingSpinner: false,
                                 autoplay: true,
+                                fixedStoryPath: "",
+                                fixedStoryName: "",
                                 storyConf: {
                                     title: "Geschichten mit Karten erzählen",
                                     chapters: [
@@ -142,6 +144,8 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                             getters: {
                                 showLoadingSpinner: state => state.showLoadingSpinner,
                                 autoplay: state => state.autoplay,
+                                fixedStoryPath: (state) => state.fixedStoryPath,
+                                fixedStoryName: (state) => state.fixedStoryName,
                                 storyConf: state => state.storyConf,
                                 mode: state => state.mode,
                                 storyConfJson: state => state.storyConfJson,
@@ -150,6 +154,9 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {
                                     state.showLoadingSpinner = payload;
+                                },
+                                setStoryConf (state, payload) {
+                                    state.setStoryConf = payload;
                                 },
                                 setMode: (state, payload) => {
                                     state.mode = payload;
@@ -253,192 +260,223 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
         if (typeof window !== "undefined") {
             window.IntersectionObserver = originalIntersectionObserver;
         }
+
+        sinon.restore();
     });
 
     if (global.HTMLElement && global.HTMLElement.prototype) {
         global.HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
     }
 
-    it("StoryPlayer should exist", async () => {
-        expect(wrapper.exists()).to.be.true;
-    });
-
-    it("renders the main story title from storyConf.title in the DOM", () => {
-        const storyTitleElement = wrapper.find(".story-title");
-
-        expect(storyTitleElement.exists()).to.be.true;
-        expect(storyTitleElement.text()).to.equal("Geschichten mit Karten erzählen");
-    });
-
-    it("should not render the sticky header when showStickyHeader is false", async () => {
-        wrapper.vm.showStickyHeader = false;
-        await wrapper.vm.$nextTick();
-        const stickyHeader = wrapper.find(".sticky-top");
-
-        expect(stickyHeader.exists()).to.be.false;
-    });
-
-    it("should render the sticky header when showStickyHeader is true", async () => {
-        wrapper.vm.showStickyHeader = true;
-        await wrapper.vm.$nextTick();
-        const stickyHeader = wrapper.find(".sticky-top");
-
-        expect(stickyHeader.exists()).to.be.true;
-    });
-
-    it("should display the correct chapter number in the sticky header", async () => {
-        wrapper.vm.showStickyHeader = true;
-        wrapper.vm.currentChapterIndex = 1;
-        await wrapper.vm.$nextTick();
-        const chapterText = wrapper.find(".number-of-chapters").text();
-
-        expect(chapterText).to.include("Kapitel 2 von 2");
-    });
-
-    it("renders step titles in the DOM from mocked chapters", () => {
-        const stepElements = wrapper.findAll(".stepper");
-
-        wrapper.vm.storyConf.chapters.forEach(chapter => {
-            const el = stepElements.find(e => e.text().includes(chapter.title));
-
-            expect(el).to.exist;
+    describe("Component DOM", () => {
+        it("StoryPlayer should exist", async () => {
+            expect(wrapper.exists()).to.be.true;
         });
 
-        expect(stepElements.length).to.equal(wrapper.vm.storyConf.chapters.length);
-    });
+        it("renders the main story title from storyConf.title in the DOM", () => {
+            const storyTitleElement = wrapper.find(".story-title");
 
-    it("each .stepper has correct index and class for first/last step", () => {
-        const stepElements = wrapper.findAll(".stepper");
-        const chaptersLength = wrapper.vm.storyConf.chapters.length;
-
-        expect(stepElements.length).to.equal(chaptersLength);
-
-        stepElements.forEach((el, idx) => {
-            // Check firstStep class
-            if (idx === 0) {
-                expect(el.classes()).to.include("firstStep");
-            }
-            else {
-                expect(el.classes()).to.not.include("firstStep");
-            }
-
-            // Check lastStep class
-            if (idx === chaptersLength - 1) {
-                expect(el.classes()).to.include("lastStep");
-            }
-            else {
-                expect(el.classes()).to.not.include("lastStep");
-            }
-        });
-    });
-
-    it("should call loadChapter when currentChapterIndex changes", async () => {
-        const loadChapterSpy = sinon.spy(wrapper.vm, "loadChapter");
-
-        wrapper.vm.currentChapterIndex = 1;
-        await wrapper.vm.$nextTick();
-
-        expect(loadChapterSpy.called).to.be.true;
-        loadChapterSpy.restore();
-    });
-
-    it("should activate tool when activateTool is called", () => {
-        const changeCurrentComponentStub = sinon.stub(wrapper.vm, "changeCurrentComponent");
-
-        wrapper.vm.activateTool("testTool");
-        expect(changeCurrentComponentStub.called).to.be.true;
-        changeCurrentComponentStub.restore();
-    });
-
-    it("should deactivate tool when deactivateTool is called", () => {
-        const resetMenuStub = sinon.stub(wrapper.vm, "resetMenu");
-
-        wrapper.vm.deactivateTool(["testTool"]);
-        expect(resetMenuStub.called).to.be.true;
-        resetMenuStub.restore();
-    });
-
-    it("should enableLayer and disableLayer call toggleLayer", () => {
-        const toggleLayerStub = sinon.stub(wrapper.vm, "toggleLayer");
-
-        wrapper.vm.enableLayer({id: 1});
-        expect(toggleLayerStub.calledWith({id: 1}, true)).to.be.true;
-        wrapper.vm.disableLayer({id: 2});
-        expect(toggleLayerStub.calledWith({id: 2}, false)).to.be.true;
-        toggleLayerStub.restore();
-    });
-
-    it("should return storyConfPath from store when available", () => {
-        // storyConfJson is set in the store state
-        expect(wrapper.vm.storyConfPath).to.equal("mockConfigJsStoryConf.json");
-    });
-
-    describe("Chevron Navigation Tests", () => {
-        beforeEach(() => {
-            wrapper.vm.storyConf.chapters = [
-                {title: "Step 1", content: []},
-                {title: "Step 2", content: []},
-                {title: "Step 3", content: []}
-            ];
+            expect(storyTitleElement.exists()).to.be.true;
+            expect(storyTitleElement.text()).to.equal("Geschichten mit Karten erzählen");
         });
 
-        it("should navigate to next and previous steps", async () => {
+        it("should not render the sticky header when showStickyHeader is false", async () => {
+            wrapper.vm.showStickyHeader = false;
+            await wrapper.vm.$nextTick();
+            const stickyHeader = wrapper.find(".sticky-top");
+
+            expect(stickyHeader.exists()).to.be.false;
+        });
+
+        it("should render the sticky header when showStickyHeader is true", async () => {
+            wrapper.vm.showStickyHeader = true;
+            await wrapper.vm.$nextTick();
+            const stickyHeader = wrapper.find(".sticky-top");
+
+            expect(stickyHeader.exists()).to.be.true;
+        });
+
+        it("should display the correct chapter number in the sticky header", async () => {
+            wrapper.vm.showStickyHeader = true;
             wrapper.vm.currentChapterIndex = 1;
-            wrapper.vm.goToNextStep();
             await wrapper.vm.$nextTick();
-            expect(wrapper.vm.currentChapterIndex).to.equal(2);
+            const chapterText = wrapper.find(".number-of-chapters").text();
 
-            wrapper.vm.goToPreviousStep();
-            await wrapper.vm.$nextTick();
-            expect(wrapper.vm.currentChapterIndex).to.equal(1);
+            expect(chapterText).to.include("Kapitel 2 von 2");
         });
 
-        it("should not exceed step boundaries", async () => {
-            wrapper.vm.currentChapterIndex = 0;
-            wrapper.vm.goToPreviousStep();
-            expect(wrapper.vm.currentChapterIndex).to.equal(0);
+        it("renders step titles in the DOM from mocked chapters", () => {
+            const stepElements = wrapper.findAll(".stepper");
 
-            wrapper.vm.currentChapterIndex = wrapper.vm.storyConf.chapters.length - 1;
-            wrapper.vm.goToNextStep();
-            expect(wrapper.vm.currentChapterIndex).to.equal(wrapper.vm.storyConf.chapters.length - 1);
+            wrapper.vm.storyConf.chapters.forEach(chapter => {
+                const el = stepElements.find(e => e.text().includes(chapter.title));
+
+                expect(el).to.exist;
+            });
+
+            expect(stepElements.length).to.equal(wrapper.vm.storyConf.chapters.length);
         });
 
-        it("should render chevron navigation icons correctly", async () => {
+        it("each .stepper has correct index and class for first/last step", () => {
+            const stepElements = wrapper.findAll(".stepper");
+            const chaptersLength = wrapper.vm.storyConf.chapters.length;
+
+            expect(stepElements.length).to.equal(chaptersLength);
+
+            stepElements.forEach((el, idx) => {
+                // Check firstStep class
+                if (idx === 0) {
+                    expect(el.classes()).to.include("firstStep");
+                }
+                else {
+                    expect(el.classes()).to.not.include("firstStep");
+                }
+
+                // Check lastStep class
+                if (idx === chaptersLength - 1) {
+                    expect(el.classes()).to.include("lastStep");
+                }
+                else {
+                    expect(el.classes()).to.not.include("lastStep");
+                }
+            });
+        });
+    });
+
+    describe("Methods", () => {
+        describe("getFixedStoryList", () => {
+            it("should not call getFixedStoryList", () => {
+                const getFixedStoryListSpy = sinon.spy(wrapper.vm, "getFixedStoryList");
+
+                expect(getFixedStoryListSpy.called).to.be.false;
+            });
+
+            it("should call getFixedStoryList", async () => {
+                const getFixedStoryListStub = sinon.stub(StoryPlayer.methods, "getFixedStoryList").resolves();
+
+                store.commit("Modules/StoryPlayer/setStoryConf", {});
+
+                wrapper = shallowMount(StoryPlayer, {props: {
+                    storyConfProp: {},
+                    imageAssetsById: {}
+                },
+                global: {plugins: [store]
+                }});
+
+                await wrapper.vm.$nextTick();
+
+                expect(getFixedStoryListStub.calledOnce).to.be.true;
+            });
+        });
+
+        it("should call loadChapter when currentChapterIndex changes", async () => {
+            const loadChapterSpy = sinon.spy(wrapper.vm, "loadChapter");
+
             wrapper.vm.currentChapterIndex = 1;
             await wrapper.vm.$nextTick();
 
-            const chevronUp = wrapper.find(".chevron-up .bi-arrow-up");
-            const chevronDown = wrapper.find(".chevron-down .bi-arrow-down");
-
-            expect(chevronUp.exists()).to.be.true;
-            expect(chevronDown.exists()).to.be.true;
+            expect(loadChapterSpy.called).to.be.true;
+            loadChapterSpy.restore();
         });
 
-        it("should hide chevrons at step boundaries", async () => {
-            wrapper.vm.currentChapterIndex = 0;
-            await wrapper.vm.$nextTick();
-            expect(wrapper.find(".chevron-up").exists()).to.be.false;
+        it("should activate tool when activateTool is called", () => {
+            const changeCurrentComponentStub = sinon.stub(wrapper.vm, "changeCurrentComponent");
 
-            wrapper.vm.currentChapterIndex = wrapper.vm.storyConf.chapters.length - 1;
-            await wrapper.vm.$nextTick();
-            expect(wrapper.find(".chevron-down").exists()).to.be.false;
+            wrapper.vm.activateTool("testTool");
+            expect(changeCurrentComponentStub.called).to.be.true;
+            changeCurrentComponentStub.restore();
         });
 
-        it("should call navigation methods when chevron buttons are clicked", async () => {
-            wrapper.vm.currentChapterIndex = 1;
-            await wrapper.vm.$nextTick();
+        it("should deactivate tool when deactivateTool is called", () => {
+            const resetMenuStub = sinon.stub(wrapper.vm, "resetMenu");
 
-            const goNextSpy = sinon.spy(wrapper.vm, "goToNextStep");
-            const goPrevSpy = sinon.spy(wrapper.vm, "goToPreviousStep");
+            wrapper.vm.deactivateTool(["testTool"]);
+            expect(resetMenuStub.called).to.be.true;
+            resetMenuStub.restore();
+        });
 
-            await wrapper.find(".chevron-down .btn-chevron").trigger("click");
-            expect(goNextSpy.called).to.be.true;
+        it("should enableLayer and disableLayer call toggleLayer", () => {
+            const toggleLayerStub = sinon.stub(wrapper.vm, "toggleLayer");
 
-            await wrapper.find(".chevron-up .btn-chevron").trigger("click");
-            expect(goPrevSpy.called).to.be.true;
+            wrapper.vm.enableLayer({id: 1});
+            expect(toggleLayerStub.calledWith({id: 1}, true)).to.be.true;
+            wrapper.vm.disableLayer({id: 2});
+            expect(toggleLayerStub.calledWith({id: 2}, false)).to.be.true;
+            toggleLayerStub.restore();
+        });
 
-            goNextSpy.restore();
-            goPrevSpy.restore();
+        it("should return storyConfPath from store when available", () => {
+            // storyConfJson is set in the store state
+            expect(wrapper.vm.storyConfPath).to.equal("mockConfigJsStoryConf.json");
+        });
+
+        describe("Chevron Navigation Tests", () => {
+            beforeEach(() => {
+                wrapper.vm.storyConf.chapters = [
+                    {title: "Step 1", content: []},
+                    {title: "Step 2", content: []},
+                    {title: "Step 3", content: []}
+                ];
+            });
+
+            it("should navigate to next and previous steps", async () => {
+                wrapper.vm.currentChapterIndex = 1;
+                wrapper.vm.goToNextStep();
+                await wrapper.vm.$nextTick();
+                expect(wrapper.vm.currentChapterIndex).to.equal(2);
+
+                wrapper.vm.goToPreviousStep();
+                await wrapper.vm.$nextTick();
+                expect(wrapper.vm.currentChapterIndex).to.equal(1);
+            });
+
+            it("should not exceed step boundaries", async () => {
+                wrapper.vm.currentChapterIndex = 0;
+                wrapper.vm.goToPreviousStep();
+                expect(wrapper.vm.currentChapterIndex).to.equal(0);
+
+                wrapper.vm.currentChapterIndex = wrapper.vm.storyConf.chapters.length - 1;
+                wrapper.vm.goToNextStep();
+                expect(wrapper.vm.currentChapterIndex).to.equal(wrapper.vm.storyConf.chapters.length - 1);
+            });
+
+            it("should render chevron navigation icons correctly", async () => {
+                wrapper.vm.currentChapterIndex = 1;
+                await wrapper.vm.$nextTick();
+
+                const chevronUp = wrapper.find(".chevron-up .bi-arrow-up");
+                const chevronDown = wrapper.find(".chevron-down .bi-arrow-down");
+
+                expect(chevronUp.exists()).to.be.true;
+                expect(chevronDown.exists()).to.be.true;
+            });
+
+            it("should hide chevrons at step boundaries", async () => {
+                wrapper.vm.currentChapterIndex = 0;
+                await wrapper.vm.$nextTick();
+                expect(wrapper.find(".chevron-up").exists()).to.be.false;
+
+                wrapper.vm.currentChapterIndex = wrapper.vm.storyConf.chapters.length - 1;
+                await wrapper.vm.$nextTick();
+                expect(wrapper.find(".chevron-down").exists()).to.be.false;
+            });
+
+            it("should call navigation methods when chevron buttons are clicked", async () => {
+                wrapper.vm.currentChapterIndex = 1;
+                await wrapper.vm.$nextTick();
+
+                const goNextSpy = sinon.spy(wrapper.vm, "goToNextStep");
+                const goPrevSpy = sinon.spy(wrapper.vm, "goToPreviousStep");
+
+                await wrapper.find(".chevron-down .btn-chevron").trigger("click");
+                expect(goNextSpy.called).to.be.true;
+
+                await wrapper.find(".chevron-up .btn-chevron").trigger("click");
+                expect(goPrevSpy.called).to.be.true;
+
+                goNextSpy.restore();
+                goPrevSpy.restore();
+            });
         });
     });
 });
