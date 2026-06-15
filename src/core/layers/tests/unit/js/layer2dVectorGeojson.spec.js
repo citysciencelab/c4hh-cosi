@@ -286,5 +286,44 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
                 {label: "Unknown B", img: "b.png"}
             ]);
         });
+
+        it("createLegend should match fallback labels with normalized whitespace", async () => {
+            const styleObj = {
+                styleId: "styleId",
+                rules: [
+                    {
+                        conditions: {
+                            properties: {
+                                schultyp: "Grundschule",
+                                schuljahr: "2024/25"
+                            }
+                        }
+                    },
+                    {
+                        conditions: {
+                            properties: {
+                                schultyp: "Integrierte Sekundarschule"
+                            }
+                        }
+                    }
+                ]
+            };
+            const legendInformation = [
+                {label: "Integrierte Sekundarschule", img: "iss.png"},
+                {label: "Grundschule, 2024/25", img: "grundschule.png"}
+            ];
+
+            attributes.legend = true;
+            styleList.returnStyleObject.returns(styleObj);
+            sinon.stub(createStyle, "returnLegendByStyleId").resolves({legendInformation});
+            sinon.stub(getGeometryTypeFromService, "getGeometryTypeFromWFS");
+
+            const layerWrapper = new Layer2dVectorGeojson(attributes);
+
+            expect(await layerWrapper.createLegend()).to.deep.equals([
+                {label: "Grundschule, 2024/25", img: "grundschule.png"},
+                {label: "Integrierte Sekundarschule", img: "iss.png"}
+            ]);
+        });
     });
 });

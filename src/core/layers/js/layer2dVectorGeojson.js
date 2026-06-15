@@ -163,11 +163,9 @@ function getLegendKeyFromRule (rule) {
     }
 
     if (Array.isArray(condProps)) {
-        const firstValue = condProps[0]?.value;
-
-        return typeof firstValue === "undefined" ? null : String(firstValue);
+        return condProps
+            .map(prop => String(prop?.value))
+            .join(", ");
     }
-    const firstValue = Object.values(condProps)[0];
-
-    return typeof firstValue === "undefined" ? null : String(firstValue);
+    return Object.values(condProps).map(value => String(value)).join(", ");
 }
