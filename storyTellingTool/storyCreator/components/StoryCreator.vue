@@ -7,7 +7,6 @@ import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import isObject from "@shared/js/utils/isObject.js";
-import {mapActions, mapGetters, mapMutations} from "vuex";
 import store from "@appstore/index.js";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
@@ -26,29 +25,44 @@ export default {
         StoryCreatorChapter,
         StoryPlayer
     },
+    props: {
+        /**
+         * Initial story data to edit. Creator maintains local copy.
+         * @type {Object}
+         */
+        story: {
+            type: Object,
+            required: true
+        },
+        /**
+         * Initial image assets. Creator maintains local copy during editing.
+         * @type {Object}
+         */
+        imageAssetsById: {
+            type: Object,
+            required: true
+        }
+    },
+    emits: [
+        "save-story",
+        "abort-editing"
+    ],
     data () {
         return {
-            title: "",
-            description: "",
-            author: "",
-            imageAlt: "",
-            imageCopyright: "",
-            imageSrc: "",
-            chapterContent: [],
+            currentView: "story",
+            title: this.story?.title || "",
+            description: this.story?.description || "",
+            author: this.story?.author || "",
+            imageAlt: this.story?.imageAlt || "",
+            imageCopyright: this.story?.imageCopyright || "",
+            imageSrc: this.story?.imageSrc || "",
+            chapterContent: JSON.parse(JSON.stringify(this.story?.chapters || [])),
             imageLoaded: false,
-            editingChapterIndex: false
+            editingChapterIndex: false,
+            workingImageAssetsById: Object.assign({}, this.imageAssetsById)
         };
     },
     computed: {
-        ...mapGetters("Modules/StoryCreator", [
-            "currentView",
-            "imageAssetsById",
-            "story"
-        ]),
-        ...mapGetters("Modules/StoryManager", [
-            "currentStoryIndex",
-            "storyList"
-        ]),
         /**
          * Returns the story object for preview with the current data.
          * @returns {Object} the story object for preview.
@@ -66,68 +80,90 @@ export default {
             };
         }
     },
-    watch: {
-        /**
-         * Loads the data from current story with index in story list.
-         * @param {Number} val - The current story index.
-         * @returns {void}
-         */
-        currentStoryIndex: {
-            handler (val) {
-                if (typeof val !== "number") {
-                    return;
-                }
-
-                this.title = JSON.parse(JSON.stringify(this.storyList[val]?.story?.title));
-                this.description = JSON.parse(JSON.stringify(this.storyList[val]?.story?.description));
-                this.imageAlt = JSON.parse(JSON.stringify(this.storyList[val]?.story?.imageAlt));
-                this.imageCopyright = JSON.parse(JSON.stringify(this.storyList[val]?.story?.imageCopyright));
-                this.imageSrc = JSON.parse(JSON.stringify(this.storyList[val]?.story?.imageSrc));
-                this.author = JSON.parse(JSON.stringify(this.storyList[val]?.story?.author));
-                this.chapterContent = JSON.parse(JSON.stringify(this.storyList[val]?.story?.chapters));
-                this.setImageAssetsById(Object.assign({}, this.storyList[val]?.imageAssetsById));
-                this.updateStory();
-            },
-            immediate: true
-        }
-    },
     mounted () {
-        this.updateStory();
-        this.imageLoaded = typeof this.imageAssetsById?.[this.imageSrc]?.objectURL !== "undefined";
+        this.imageLoaded = typeof this.workingImageAssetsById?.[this.imageSrc]?.objectURL !== "undefined";
     },
     methods: {
-        ...mapActions("Menu", ["changeCurrentComponent"]),
-        ...mapMutations("Menu", [
-            "setNavigationHistoryBySide"
-        ]),
-        ...mapMutations("Modules/StoryCreator", [
-            "removeImageAsset",
-            "setCurrentView",
-            "setImageAssetsById",
-            "setCurrentChapter"
-        ]),
-        ...mapMutations("Modules/StoryManager", [
-            "setCurrentStoryIndex",
-            "setStoryList"
-        ]),
+        /**
+         * Sanitizes a filename for safe ZIP entry paths.
+         * @param {String} originalName - The original filename.
+         * @returns {String} A sanitized filename.
+         */
+        sanitizeFileName (originalName) {
+            const fallback = "unnamed.bin";
+
+            if (typeof originalName !== "string") {
+                return fallback;
+            }
+
+            const sanitizedName = originalName
+                .replace(/[\\/:*?"<>|\u0000-\u001F]/g, "_")
+                .trim();
+
+            return sanitizedName || fallback;
+        },
+
+        /**
+         * Creates a new image id, generates its preview ObjectURL and returns full asset metadata.
+         * @param {Blob} blob - The image Blob.
+         * @returns {Object} Object with id and metadata {id, blob, objectURL, mimeType, originalName, archivePath}.
+         */
+        createImageAsset (blob) {
+            const id = crypto.randomUUID(),
+                objectURL = URL.createObjectURL(blob),
+                originalName = typeof blob?.name === "string" && blob.name.trim() !== "" ? blob.name : `${id}.bin`,
+                sanitizedOriginalName = this.sanitizeFileName(originalName),
+                archivePath = `images/${id}__${sanitizedOriginalName}`,
+                assetData = {
+                    id,
+                    blob,
+                    objectURL,
+                    mimeType: blob.type || "application/octet-stream",
+                    originalName,
+                    archivePath
+                };
+
+            this.workingImageAssetsById = {
+                ...this.workingImageAssetsById,
+                [id]: assetData
+            };
+
+            return assetData;
+        },
 
         /**
          * Adds a new chapter.
          * @returns {void}
          */
         addChapter () {
-            this.setCurrentChapter({
-                title: "",
-                content: [],
-                map: {
-                    center: null,
-                    zoomLevel: null,
-                    layers: null,
-                    tool: null
-                }
-            });
+            this.currentView = "chapter";
+        },
+
+        /**
+         * Handles save-chapter event from StoryCreatorChapter.
+         * Appends or replaces the chapter in chapterContent and returns to story view.
+
+         * @param {Object} chapter - The chapter data.
+         * @returns {void}
+         */
+        handleSaveChapter (chapter) {
+            if (this.editingChapterIndex !== false) {
+                this.chapterContent.splice(this.editingChapterIndex, 1, chapter);
+                this.editingChapterIndex = false;
+            }
+            else {
+                this.chapterContent = [...this.chapterContent, chapter];
+            }
+            this.currentView = "story";
+        },
+
+        /**
+         * Handles cancel-chapter event from StoryCreatorChapter.
+         * @returns {void}
+         */
+        handleCancelChapter () {
             this.editingChapterIndex = false;
-            this.setCurrentView("chapter");
+            this.currentView = "story";
         },
         /**
          * Adds the uploaded title image attributes.
@@ -149,47 +185,25 @@ export default {
         editChapter (index) {
             this.editingChapterIndex = index;
 
-            const chapterToEdit = JSON.parse(JSON.stringify(this.story.chapters[index]));
-
-            this.setCurrentChapter(chapterToEdit);
-            this.setCurrentView("chapter");
+            this.currentView = "chapter";
         },
 
         /**
          * Deletes a chapter from the index.
+         * Does not revoke ObjectURLs during editing - parent handles cleanup after save.
          * @param {Number} index - the index of the chapter in chapter list.
          * @return {void}
          */
         deleteChapter (index) {
-            const chapter = this.story.chapters[index];
-
-            if (chapter.content) {
-                chapter.content
-                    .filter(item => item.type === "image")
-                    .forEach(image => {
-                        this.removeImageAsset(image.id);
-                    });
-            }
-            this.story.chapters.splice(index, 1);
+            this.chapterContent.splice(index, 1);
+            this.editingChapterIndex = false;
         },
 
         /**
          * Discards the current story and resets all data to default values.
          * @return {void}
          */
-        discardStory () {
-            if (typeof this.currentStoryIndex !== "number") {
-                const chapterCount = this.story.chapters.length;
-
-                for (let i = 0; i < chapterCount; i++) {
-                    this.deleteChapter(0);
-                }
-
-                if (this.imageSrc) {
-                    this.removeImageAsset(this.imageSrc);
-                }
-            }
-
+        clearForm () {
             this.title = "";
             this.description = "";
             this.author = "";
@@ -198,7 +212,9 @@ export default {
             this.imageSrc = "";
             this.imageLoaded = false;
             this.chapterContent = [];
-            this.story.chapters = [];
+            this.currentView = "story";
+            this.workingImageAssetsById = {};
+            this.editingChapterIndex = false;
         },
 
         /**
@@ -281,37 +297,28 @@ export default {
                 return "";
             }
 
-            return this.imageAssetsById[imageId]?.objectURL;
+            return this.workingImageAssetsById[imageId]?.objectURL;
         },
 
         /**
-         * Saves the story into story list.
+         * Saves the story with current local data.
+         * Emits final snapshot to parent for persistence.
          * @returns {void}
          */
         saveStory () {
-            this.updateStory();
-            const storySnapshot = JSON.parse(JSON.stringify(this.story)),
-                imageAssetsSnapshot = {...this.imageAssetsById};
+            const storySnapshot = {
+                title: this.title,
+                description: this.description,
+                author: this.author,
+                created: dayjs().format("DD.MM.YYYY"),
+                imageSrc: this.imageSrc,
+                imageAlt: this.imageAlt,
+                imageCopyright: this.imageCopyright,
+                chapters: this.chapterContent
+            };
+            const imageAssetsSnapshot = {...this.workingImageAssetsById};
 
-            if (typeof this.currentStoryIndex !== "number") {
-                this.setStoryList([
-                    ...this.storyList,
-                    {
-                        story: storySnapshot,
-                        imageAssetsById: imageAssetsSnapshot
-                    }
-                ]);
-            }
-            else {
-                this.storyList[this.currentStoryIndex] = {
-                    story: storySnapshot,
-                    imageAssetsById: imageAssetsSnapshot
-                };
-            }
-
-            this.changeCurrentComponent({type: "storyManager", side: "secondaryMenu", props: {name: "additional:modules.storyManager.title"}});
-            this.setNavigationHistoryBySide({side: "secondaryMenu", newHistory: [{type: "root", props: []}]});
-            this.setCurrentStoryIndex(undefined);
+            this.$emit("save-story", storySnapshot, imageAssetsSnapshot);
         },
 
         /**
@@ -319,22 +326,7 @@ export default {
          * @returns {void}
          */
         goToStory () {
-            this.setCurrentView("story");
-        },
-
-        /**
-         * Updates the story in the store with the current data.
-         * @returns {void}
-         */
-        updateStory () {
-            this.story.title = this.title;
-            this.story.description = this.description;
-            this.story.author = this.author;
-            this.story.created = dayjs().format("DD.MM.YYYY");
-            this.story.imageSrc = this.imageSrc;
-            this.story.imageAlt = this.imageAlt;
-            this.story.imageCopyright = this.imageCopyright;
-            this.story.chapters = this.chapterContent;
+            this.currentView = "story";
         },
 
         /**
@@ -342,7 +334,7 @@ export default {
          *  @returns {void}
          */
         openPreview () {
-            this.setCurrentView("preview");
+            this.currentView = "preview";
         },
 
         /**
@@ -371,6 +363,7 @@ export default {
                     <a
                         href="#"
                         class="breadcrumb-link"
+                        :class="{'breadcrumb-link--disabled': currentView === 'chapter'}"
                         @click.prevent="goToStory"
                     >
                         {{ $t("additional:modules.storyCreator.storyNav") }}
@@ -415,6 +408,8 @@ export default {
             <StoryCreatorAddImageCard
                 v-if="!imageLoaded"
                 :closeable="false"
+                :create-image-asset="createImageAsset"
+                :image-assets-by-id="workingImageAssetsById"
                 :initial-image="{id: imageSrc, alt: imageAlt, copyright: imageCopyright}"
                 @addImage="addImage"
             />
@@ -435,7 +430,7 @@ export default {
                     @click.stop="removeImage()"
                 />
                 <img
-                    :src="imageAssetsById?.[imageSrc]?.objectURL"
+                    :src="workingImageAssetsById?.[imageSrc]?.objectURL"
                     :alt="imageAlt"
                     class="rounded w-100 d-block"
                 >
@@ -448,7 +443,7 @@ export default {
                 {{ $t('additional:modules.storyCreator.headlines.chapterList') }}
             </h5>
             <Draggable
-                v-model="story.chapters"
+                v-model="chapterContent"
                 class="dragArea no-list chapter-list-item ps-0"
                 item-key="name"
                 handle=".card-wrapper"
@@ -470,7 +465,7 @@ export default {
                 </template>
             </Draggable>
             <InfoText
-                v-if="!story?.chapters?.length"
+                v-if="!chapterContent?.length"
                 class="mb-4"
                 :text="$t('additional:modules.storyCreator.labels.emptyChapter')"
             />
@@ -497,15 +492,27 @@ export default {
                 <FlatButton
                     :icon="'bi-x-circle'"
                     :secondary="true"
-                    :aria-label="$t('additional:modules.storyCreator.discardStory')"
-                    :text="$t('additional:modules.storyCreator.discardStory')"
-                    :interaction="() => discardStory()"
+                    :aria-label="$t('additional:modules.storyCreator.clearForm')"
+                    :text="$t('additional:modules.storyCreator.clearForm')"
+                    :interaction="() => clearForm()"
+                />
+                <FlatButton
+                    :icon="'bi-arrow-left-circle'"
+                    :secondary="true"
+                    :aria-label="$t('additional:modules.storyCreator.buttons.abort')"
+                    :text="$t('additional:modules.storyCreator.buttons.abort')"
+                    :interaction="() => $emit('abort-editing')"
                 />
             </div>
         </div>
         <div v-else-if="currentView === 'chapter'">
             <StoryCreatorChapter
                 :edit-index="editingChapterIndex"
+                :create-image-asset="createImageAsset"
+                :image-assets-by-id="workingImageAssetsById"
+                :initial-chapter="editingChapterIndex !== false ? chapterContent[editingChapterIndex] : null"
+                @save-chapter="handleSaveChapter"
+                @cancel-chapter="handleCancelChapter"
             />
         </div>
         <div
@@ -513,7 +520,7 @@ export default {
         >
             <StoryPlayer
                 :story-conf-prop="previewStory"
-                :image-assets-by-id="imageAssetsById"
+                :image-assets-by-id="workingImageAssetsById"
             />
         </div>
     </div>
@@ -527,6 +534,15 @@ export default {
 
         &:hover {
             text-decoration: underline;
+        }
+    }
+    .breadcrumb-link--disabled {
+        pointer-events: none;
+        opacity: 0.5;
+        cursor: default;
+
+        &:hover {
+            text-decoration: none;
         }
     }
     .breadcrumb-item + .breadcrumb-item::before {

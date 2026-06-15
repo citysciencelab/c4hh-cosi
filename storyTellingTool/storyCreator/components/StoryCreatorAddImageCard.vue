@@ -3,7 +3,6 @@ import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMe
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
-import {mapActions, mapGetters, mapMutations} from "vuex";
 
 export default {
     name: "StoryCreatorAddImageCard",
@@ -19,6 +18,14 @@ export default {
             required: false,
             default: true
         },
+        createImageAsset: {
+            type: Function,
+            required: true
+        },
+        imageAssetsById: {
+            type: Object,
+            required: true
+        },
         initialImage: {
             type: Object,
             required: false,
@@ -32,26 +39,24 @@ export default {
                 alt: "",
                 copyright: ""
             },
+            uploadedAsset: null,
             isValidated: true
         };
     },
     computed: {
-        ...mapGetters("Modules/StoryCreator", [
-            "imageAssetsById"
-        ]),
         /**
-         * Returns true if the card is creating a new image.
-         * @returns {Boolean} True if no initial image data exists.
+         * Returns the current asset to display: uploaded first, initial as fallback.
+         * @returns {Object|null} The active image asset.
          */
-        isNewImage () {
-            return !this.initialImage?.id;
+        currentAsset () {
+            return this.uploadedAsset || this.imageAssetsById[this.initialImage?.id] || null;
         },
         /**
          * Returns true if an image id exists and its object URL is available.
          * @returns {Boolean} True if the image can be displayed.
          */
         isImageLoaded () {
-            return Boolean(this.image?.id && this.imageAssetsById[this.image.id]?.objectURL);
+            return Boolean(this.currentAsset?.id && this.currentAsset?.objectURL);
         },
         /**
          * Returns true if the alt and copyright are not empty.
@@ -71,22 +76,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Modules/StoryCreator", [
-            "addImageAsset"
-        ]),
-        ...mapMutations("Modules/StoryCreator", [
-            "removeImageAsset"
-        ]),
-
         /**
          * Handles clicking the close button.
          * @returns {void}
          */
         handleCloseButtonClick () {
-            if (this.isNewImage) {
-                this.removeImageAsset(this.image.id);
-            }
-
             this.$emit("click:close");
         },
 
@@ -95,19 +89,19 @@ export default {
          * @returns {void}
          */
         handleDiscardButtonClick () {
-            if (this.isNewImage) {
-                this.removeImageAsset(this.image.id);
-            }
-
             this.image = {
                 alt: "",
                 copyright: ""
+            };
+            this.uploadedAsset = {
+                id: null,
+                objectURL: null
             };
             this.isValidated = true;
         },
 
         /**
-         * Loads the image and stores it through the StoryCreator action.
+         * Loads the image and stores it both locally and as an asset for the parent.
          * @param {Event} event
          */
         async loadImage (event) {
@@ -119,9 +113,9 @@ export default {
             }
 
             this.isValidated = true;
-            const id = await this.addImageAsset(file);
+            this.uploadedAsset = await this.createImageAsset(file);
 
-            this.image.id = id;
+            this.image.id = this.uploadedAsset.id;
         }
     }
 };
@@ -153,7 +147,7 @@ export default {
             </div>
             <div v-else>
                 <img
-                    :src="imageAssetsById[image.id]?.objectURL"
+                    :src="currentAsset.objectURL"
                     :alt="image.alt"
                     class="img-thumbnail d-block mx-auto mb-3 w-25"
                 >

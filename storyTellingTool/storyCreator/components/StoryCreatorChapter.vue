@@ -6,7 +6,7 @@ import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import isObject from "@shared/js/utils/isObject.js";
-import {mapGetters, mapMutations} from "vuex";
+import {mapGetters} from "vuex";
 import Multiselect from "vue-multiselect";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
@@ -27,12 +27,41 @@ export default {
         StoryCreatorAddTextCard
     },
     props: {
+        /**
+         * Callback to create image asset metadata in StoryCreator.
+         * @type {Function}
+         */
+        createImageAsset: {
+            type: Function,
+            required: true
+        },
         editIndex: {
             type: [Boolean, Number],
             required: false,
             default: false
+        },
+        /**
+         * Image assets keyed by id, passed from parent.
+         * @type {Object}
+         */
+        imageAssetsById: {
+            type: Object,
+            required: true
+        },
+        /**
+         * Existing chapter to edit. If not provided, creates a new blank chapter.
+         * @type {Object}
+         */
+        initialChapter: {
+            type: Object,
+            required: false,
+            default: null
         }
     },
+    emits: [
+        "save-chapter",
+        "cancel-chapter"
+    ],
     data () {
         return {
             openContentEditor: {
@@ -54,12 +83,7 @@ export default {
     },
     computed: {
         ...mapGetters(["configuredModules", "layerConfig"]),
-        ...mapGetters("Modules/StoryCreator", [
-            "currentChapter",
-            "imageAssetsById",
-            "story",
-            "subjectLayerCategory"
-        ]),
+        ...mapGetters("Modules/StoryManager", ["subjectLayerCategory"]),
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
          * @returns {Boolean} True if position or zoom has changed, otherwise false.
@@ -91,16 +115,6 @@ export default {
         }
     },
     watch: {
-        /**
-         * Watches for changes in currentChapter to load data automatically.
-         * @param {Object} newVal - The new chapter object.
-         * @returns {void}
-         */
-        currentChapter (newVal) {
-            if (newVal) {
-                this.loadChapterData();
-            }
-        },
         /**
          * Initializes and displays the Bootstrap Toast. The toast will automatically hide after 4 seconds.
          * @param {Boolean} newVal - The new value of showAlert.
@@ -162,11 +176,6 @@ export default {
         }
     },
     methods: {
-        ...mapMutations("Modules/StoryCreator", [
-            "removeImageAsset",
-            "setCurrentChapter",
-            "setCurrentView"
-        ]),
         tipTapJsonToHtml,
         /**
          * Resets the current chapter and goes back to overview page.
@@ -174,7 +183,7 @@ export default {
          */
         cancelChapter () {
             this.resetCurrentChapter();
-            this.setCurrentView("story");
+            this.$emit("cancel-chapter");
         },
         /**
          * Opens a content add/edit component and stores context of the open editor.
@@ -223,31 +232,36 @@ export default {
                 && this.openContentEditor.index === index;
         },
         /**
-         * Loads the chapter data from the store into the local component state.
+         * Loads initial chapter data into local state.
          * @returns {void}
          */
         loadChapterData () {
-            if (this.currentChapter) {
-                this.title = this.currentChapter.title || this.$t("additional:modules.storyCreator.chapter.title");
-                this.content = this.currentChapter.content ? JSON.parse(JSON.stringify(this.currentChapter.content)) : [];
-
-                if (this.currentChapter.map) {
-                    this.confirmedCoordinate = this.currentChapter.map.center ? [...this.currentChapter.map.center] : [];
-                    this.coordinate = this.currentChapter.map.center ? [...this.currentChapter.map.center] : [];
-                    this.confirmedZoomlevel = this.currentChapter.map.zoomLevel || "";
-                    this.zoomlevel = this.currentChapter.map.zoomLevel || "";
-
-                    if (Array.isArray(this.currentChapter.map.layers)) {
-                        this.selectedLayer = this.layerList.filter(layer => this.currentChapter.map.layers.includes(layer.layerId));
-                    }
-
-                    if (this.currentChapter.map.tool) {
-                        this.selectedTool = this.toolList.find(
-                            tool => tool.toolId === this.currentChapter.map.tool
-                        ) || "";
-                    }
-                }
+            if (!this.initialChapter) {
+                return;
             }
+
+            const chapter = this.initialChapter;
+
+            this.title = chapter.title || this.$t("additional:modules.storyCreator.chapter.title");
+            this.content = Array.isArray(chapter.content)
+                ? JSON.parse(JSON.stringify(chapter.content))
+                : [];
+
+            if (!chapter.map) {
+                return;
+            }
+
+            this.confirmedCoordinate = chapter.map.center ? [...chapter.map.center] : [];
+            this.coordinate = chapter.map.center ? [...chapter.map.center] : [];
+            this.confirmedZoomlevel = chapter.map.zoomLevel || "";
+            this.zoomlevel = chapter.map.zoomLevel || "";
+
+            this.selectedLayer = Array.isArray(chapter.map.layers)
+                ? this.layerList.filter(layer => chapter.map.layers.includes(layer.layerId))
+                : [];
+            this.selectedTool = chapter.map.tool
+                ? this.toolList.find(tool => tool.toolId === chapter.map.tool) || ""
+                : "";
         },
         /**
          * Returns true if the add editor for the given type is open.
@@ -404,39 +418,33 @@ export default {
          * @returns {void}
          */
         resetCurrentChapter () {
-            this.setCurrentChapter(
-                {
-                    "title": "",
-                    "content": [],
-                    "map": {
-                        "center": null,
-                        "zoomLevel": null,
-                        "layers": null,
-                        "tool": null
-                    }
-                }
-            );
+            this.title = this.$t("additional:modules.storyCreator.chapter.title");
+            this.content = [];
+            this.coordinate = [];
+            this.zoomlevel = "";
+            this.confirmedCoordinate = [];
+            this.confirmedZoomlevel = "";
+            this.selectedLayer = [];
+            this.selectedTool = "";
+            this.closeContentEditor();
         },
         /**
          * Saves the chapter and returns to the overview page.
          * @returns {void}
          */
         saveChapter () {
-            this.currentChapter.title = this.title.trim() !== "" ? this.title : this.$t("additional:modules.storyCreator.chapter.title");
-            this.currentChapter.map.center = [...this.confirmedCoordinate];
-            this.currentChapter.map.zoomLevel = this.confirmedZoomlevel;
-            this.currentChapter.map.layers = this.selectedLayer.map(layer => layer.layerId);
-            this.currentChapter.map.tool = this.selectedTool?.toolId || null;
-            this.currentChapter.content = this.content;
+            const chapter = {
+                title: this.title.trim() !== "" ? this.title : this.$t("additional:modules.storyCreator.chapter.title"),
+                map: {
+                    center: [...this.confirmedCoordinate],
+                    zoomLevel: this.confirmedZoomlevel,
+                    layers: this.selectedLayer.map(layer => layer.layerId),
+                    tool: this.selectedTool.toolId
+                },
+                content: this.content
+            };
 
-            if (this.editIndex !== false && typeof this.editIndex === "number") {
-                this.story.chapters.splice(this.editIndex, 1, JSON.parse(JSON.stringify(this.currentChapter)));
-            }
-            else {
-                this.story?.chapters.push(JSON.parse(JSON.stringify(this.currentChapter)));
-            }
-
-            this.setCurrentView("story");
+            this.$emit("save-chapter", chapter);
         },
         /**
          * Handles image add/edit by writing it to the content array and closing the open editor.
@@ -694,6 +702,8 @@ export default {
                             <StoryCreatorAddImageCard
                                 v-if="isEditingContentItem(index)"
                                 class="mt-2"
+                                :create-image-asset="createImageAsset"
+                                :image-assets-by-id="imageAssetsById"
                                 :initial-image="{id: element.id, alt: element.attrs.alt, copyright: element.attrs.copyright}"
                                 @addImage="handleImage"
                                 @click:close="closeContentEditor"
@@ -777,6 +787,8 @@ export default {
             <StoryCreatorAddImageCard
                 v-else-if="isAddingContentType('image')"
                 class="mt-2"
+                :create-image-asset="createImageAsset"
+                :image-assets-by-id="imageAssetsById"
                 @addImage="handleImage"
                 @click:close="closeContentEditor"
             />

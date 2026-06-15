@@ -22,66 +22,46 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                 Modules: {
                     namespaced: true,
                     modules: {
-                        StoryCreator: {
-                            namespaced: true,
-                            getters: {
-                                currentView: (state) => state.currentView,
-                                imageAssetsById: (state) => state.imageAssetsById,
-                                story: (state) => state.story
-                            },
-                            mutations: {
-                                setCurrentView (state, value) {
-                                    state.currentView = value;
-                                },
-                                removeImageAsset (state, id) {
-                                    delete state.imageAssetsById[id];
-                                }
-                            },
-                            state: {
-                                currentView: "story",
-                                imageAssetsById: {
-                                    "273a4c04-760f-4abe-8a37-e640fc10fefa": {
-                                        "objectURL": "test image"
-                                    }
-                                },
-                                story: {
-                                    chapters: []
-                                }
-                            }
-                        },
                         StoryManager: {
                             namespaced: true,
-                            getters: {
-                                currentStoryIndex: (state) => state.currentStoryIndex,
-                                storyList: (state) => state.storyList
+                            actions: {
+                                addImageAsset: sinon.stub().resolves({
+                                    id: "test-asset-id",
+                                    blob: new Blob(),
+                                    objectURL: "blob:test-url",
+                                    mimeType: "image/png",
+                                    originalName: "test.png",
+                                    archivePath: "images/test.png"
+                                })
                             },
-                            mutations: {
-                                setCurrentStoryIndex (state, value) {
-                                    state.currentStoryIndex = value;
-                                },
-                                setStoryList (state, value) {
-                                    state.storyList = value;
-                                }
-                            },
-                            state: {
-                                currentStoryIndex: undefined,
-                                storyList: []
-                            }
+                            state: {}
                         }
-                    }
-                },
-                Menu: {
-                    namespaced: true,
-                    actions: {
-                        changeCurrentComponent: sinon.stub()
-                    },
-                    mutations: {
-                        setNavigationHistoryBySide: sinon.stub()
                     }
                 }
             }
         });
         wrapper = shallowMount(StoryCreator, {
+            props: {
+                story: {
+                    title: "Test Story",
+                    description: "Test Description",
+                    author: "Test Author",
+                    imageAlt: "Test Alt",
+                    imageCopyright: "Test Copyright",
+                    imageSrc: "test-image-id",
+                    chapters: []
+                },
+                imageAssetsById: {
+                    "test-image-id": {
+                        id: "test-image-id",
+                        blob: new Blob(),
+                        objectURL: "blob:test-url",
+                        mimeType: "image/png",
+                        originalName: "test.png"
+                    }
+                },
+                currentStoryIndex: undefined
+            },
             global: {
                 plugins: [store]
             }
@@ -95,11 +75,6 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
     describe("Component DOM", () => {
         it("should exist", () => {
             expect(wrapper.exists()).to.be.true;
-        });
-        it("should render exactly one FileUpload component", () => {
-            const addImageCard = wrapper.findComponent({name: "StoryCreatorAddImageCard"});
-
-            expect(addImageCard.exists()).to.be.true;
         });
         it("should render the InputText component used for the story title", () => {
             const authorInput = wrapper.findComponent("#storyTitle");
@@ -126,7 +101,11 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
 
             expect(InfoText.exists()).to.be.true;
         });
-        it("should not render the loaded title image.", () => {
+        it("should not render the loaded title image.", async () => {
+            await wrapper.setData({
+                imageLoaded: false
+            });
+
             const titleImage = wrapper.find(".chapter-title-image-preview");
 
             expect(titleImage.exists()).to.be.false;
@@ -143,51 +122,6 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
     });
 
     describe("Component methods", () => {
-        describe("updateStory", () => {
-            it("should update the story content when updateStory is called", async () => {
-                const currentDate = new Date().toLocaleDateString("de-DE", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric"
-                });
-
-                await wrapper.setData({
-                    title: "Test Story",
-                    description: "This is a test story."
-                });
-                wrapper.vm.updateStory();
-
-                expect(wrapper.vm.story.title).to.equal("Test Story");
-                expect(wrapper.vm.story.description).to.equal("This is a test story.");
-                expect(wrapper.vm.story.created).to.equal(currentDate);
-            });
-        });
-
-        describe("discardStory", () => {
-            it("should reset all story data to default values when discardStory is called", async () => {
-                await wrapper.setData({
-                    title: "Test Story",
-                    description: "This is a test story.",
-                    author: "Test Author",
-                    imageAlt: "Test Alt",
-                    imageCopyright: "Test Copyright",
-                    imageSrc: "Test Src",
-                    imageLoaded: true,
-                    chapterContent: [{title: "Test Chapter", text: "Test Text"}]
-                });
-                wrapper.vm.discardStory();
-
-                expect(wrapper.vm.title).to.equal("");
-                expect(wrapper.vm.description).to.equal("");
-                expect(wrapper.vm.author).to.equal("");
-                expect(wrapper.vm.imageAlt).to.equal("");
-                expect(wrapper.vm.imageCopyright).to.equal("");
-                expect(wrapper.vm.imageSrc).to.equal("");
-                expect(wrapper.vm.imageLoaded).to.equal(false);
-                expect(wrapper.vm.chapterContent).to.deep.equal([]);
-            });
-        });
-
         describe("deleteChapter", () => {
             it("should delete one chapter from the index", async () => {
                 await wrapper.setData({
@@ -197,11 +131,10 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                     ]
                 });
 
-                wrapper.vm.updateStory();
                 wrapper.vm.deleteChapter(0);
 
-                expect(wrapper.vm.story.chapters.length).to.equal(1);
-                expect(wrapper.vm.story.chapters).to.deep.equal([{title: "Test Chapter 2", text: "Test Text 2"}]);
+                expect(wrapper.vm.chapterContent.length).to.equal(1);
+                expect(wrapper.vm.chapterContent).to.deep.equal([{title: "Test Chapter 2", text: "Test Text 2"}]);
             });
         });
 
@@ -353,7 +286,7 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                     content: [
                         {
                             "type": "image",
-                            "id": "273a4c04-760f-4abe-8a37-e640fc10fefa",
+                            "id": "test-image-id",
                             "attrs": {
                                 "alt": "test",
                                 "copyright": "test"
@@ -361,49 +294,132 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                         }
                     ]};
 
-                expect(wrapper.vm.getChapterOverviewImg(val)).to.equal("test image");
+                expect(wrapper.vm.getChapterOverviewImg(val)).to.equal("blob:test-url");
             });
         });
 
         describe("saveStory", () => {
-            it("should add a new story in story list", async () => {
-                wrapper.vm.saveStory();
-
-                expect(wrapper.vm.storyList.length).to.equal(1);
-            });
-
-            it("should update a story in story list", async () => {
-                wrapper.vm.setCurrentStoryIndex(0);
-                wrapper.vm.saveStory();
-
-                expect(wrapper.vm.storyList.length).to.equal(1);
-            });
-
-            it("should call function updateStory", async () => {
-                const updateStorySpy = sinon.spy(wrapper.vm, "updateStory");
-
-                wrapper.vm.saveStory();
-
-                expect(updateStorySpy.calledOnce).to.be.true;
-            });
-
-            it("should call function changeCurrentComponent", async () => {
-                const changeCurrentComponentSpy = sinon.spy(wrapper.vm, "changeCurrentComponent");
+            it("should emit save-story event with story snapshot and image assets snapshot", async () => {
+                await wrapper.setData({
+                    title: "Test Story",
+                    description: "Test Description",
+                    author: "Test Author",
+                    imageSrc: "test-image-id",
+                    imageAlt: "Test Alt",
+                    imageCopyright: "Test Copyright",
+                    chapterContent: [{title: "Chapter 1"}],
+                    workingImageAssetsById: {
+                        "test-image-id": {
+                            id: "test-image-id",
+                            objectURL: "blob:test"
+                        }
+                    }
+                });
 
                 wrapper.vm.saveStory();
 
-                expect(changeCurrentComponentSpy.calledOnce).to.be.true;
-                expect(changeCurrentComponentSpy.calledWith({type: "storyManager", side: "secondaryMenu", props: {name: "additional:modules.storyManager.title"}})).to.be.true;
+                const emitted = wrapper.emitted("save-story");
+
+                expect(emitted).to.have.lengthOf(1);
+                expect(emitted[0][0]).to.include({
+                    title: "Test Story",
+                    description: "Test Description",
+                    author: "Test Author",
+                    imageSrc: "test-image-id",
+                    imageAlt: "Test Alt",
+                    imageCopyright: "Test Copyright"
+                });
+                expect(emitted[0][1]).to.have.property("test-image-id");
+                expect(emitted[0][1]["test-image-id"]).to.include({
+                    id: "test-image-id",
+                    objectURL: "blob:test"
+                });
+            });
+        });
+    });
+
+    describe("Image and Asset Management", () => {
+        describe("addImage", () => {
+            it("should set image metadata and mark image as loaded", () => {
+                wrapper.vm.addImage({
+                    id: "new-img-id",
+                    alt: "New Alt",
+                    copyright: "New Copyright"
+                });
+
+                expect(wrapper.vm.imageSrc).to.equal("new-img-id");
+                expect(wrapper.vm.imageAlt).to.equal("New Alt");
+                expect(wrapper.vm.imageCopyright).to.equal("New Copyright");
+                expect(wrapper.vm.imageLoaded).to.be.true;
+            });
+        });
+
+        describe("handleSaveChapter", () => {
+            it("should append chapter to content and return to story view", () => {
+                const chapter = {
+                    title: "New Chapter",
+                    content: [],
+                    map: {center: null, zoomLevel: null, layers: null, tool: null}
+                };
+
+                wrapper.vm.currentView = "chapter";
+                wrapper.vm.handleSaveChapter(chapter);
+
+                expect(wrapper.vm.chapterContent).to.include(chapter);
+                expect(wrapper.vm.currentView).to.equal("story");
+            });
+        });
+    });
+
+    describe("Props and Initialization", () => {
+        it("should initialize data from props correctly", () => {
+            const newWrapper = shallowMount(StoryCreator, {
+                props: {
+                    story: {
+                        title: "Initial Story",
+                        description: "Initial Desc",
+                        author: "Initial Author",
+                        imageAlt: "Initial Alt",
+                        imageCopyright: "Initial Copyright",
+                        imageSrc: "test-image-id",
+                        chapters: [{title: "Ch1"}]
+                    },
+                    imageAssetsById: {
+                        "test-image-id": {
+                            id: "test-image-id",
+                            objectURL: "blob:test"
+                        }
+                    }
+                },
+                global: {
+                    plugins: [store]
+                }
             });
 
-            it("should call function setNavigationHistoryBySide", async () => {
-                const setNavigationHistoryBySideSpy = sinon.spy(wrapper.vm, "setNavigationHistoryBySide");
+            expect(newWrapper.vm.title).to.equal("Initial Story");
+            expect(newWrapper.vm.description).to.equal("Initial Desc");
+            expect(newWrapper.vm.author).to.equal("Initial Author");
+            expect(newWrapper.vm.imageAlt).to.equal("Initial Alt");
+            expect(newWrapper.vm.imageCopyright).to.equal("Initial Copyright");
+            expect(newWrapper.vm.imageSrc).to.equal("test-image-id");
+            expect(newWrapper.vm.chapterContent).to.deep.equal([{title: "Ch1"}]);
+        });
 
-                wrapper.vm.saveStory();
-
-                expect(setNavigationHistoryBySideSpy.calledOnce).to.be.true;
-                expect(setNavigationHistoryBySideSpy.calledWith({side: "secondaryMenu", newHistory: [{type: "root", props: []}]})).to.be.true;
+        it("should initialize with empty values for missing props", () => {
+            const newWrapper = shallowMount(StoryCreator, {
+                props: {
+                    story: {},
+                    imageAssetsById: {}
+                },
+                global: {
+                    plugins: [store]
+                }
             });
+
+            expect(newWrapper.vm.title).to.equal("");
+            expect(newWrapper.vm.description).to.equal("");
+            expect(newWrapper.vm.author).to.equal("");
+            expect(newWrapper.vm.chapterContent).to.deep.equal([]);
         });
     });
 });

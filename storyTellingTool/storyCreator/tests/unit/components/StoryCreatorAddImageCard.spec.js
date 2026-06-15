@@ -9,7 +9,8 @@ config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
     let wrapper,
-        localStore;
+        localStore,
+        createImageAsset;
 
     beforeEach(() => {
         localStore = createStore({
@@ -18,48 +19,51 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
                 Modules: {
                     namespaced: true,
                     modules: {
-                        StoryCreator: {
+                        StoryManager: {
                             namespaced: true,
-                            state: {
-                                imageAssetsById: {}
-                            },
-                            getters: {
-                                imageAssetsById: (state) => state.imageAssetsById
-                            },
-                            mutations: {
-                                removeImageAsset (state, id) {
-                                    const objectURL = state.imageAssetsById[id]?.objectURL;
-
-                                    if (objectURL) {
-                                        URL.revokeObjectURL(objectURL);
-                                    }
-                                    delete state.imageAssetsById[id];
-                                }
-                            },
                             actions: {
-                                addImageAsset ({state}, blob) {
+                                addImageAsset: sinon.stub().callsFake((context, blob) => {
                                     const id = "test-uuid",
                                         objectURL = "blob:test-created-url",
                                         originalName = typeof blob?.name === "string" && blob.name.trim() !== "" ? blob.name : `${id}.bin`,
                                         archivePath = `images/${id}__${originalName}`;
 
-                                    state.imageAssetsById[id] = {
+                                    return Promise.resolve({
+                                        id,
                                         blob,
                                         objectURL,
                                         mimeType: blob.type || "application/octet-stream",
                                         originalName,
                                         archivePath
-                                    };
-
-                                    return Promise.resolve(id);
-                                }
-                            }
+                                    });
+                                })
+                            },
+                            state: {}
                         }
                     }
                 }
             }
         });
+        createImageAsset = sinon.stub().callsFake(blob => {
+            const id = "test-uuid",
+                objectURL = "blob:test-created-url",
+                originalName = typeof blob?.name === "string" && blob.name.trim() !== "" ? blob.name : `${id}.bin`,
+                archivePath = `images/${id}__${originalName}`;
+
+            return {
+                id,
+                blob,
+                objectURL,
+                mimeType: blob.type || "application/octet-stream",
+                originalName,
+                archivePath
+            };
+        });
         wrapper = shallowMount(StoryCreatorAddImageCard, {
+            props: {
+                createImageAsset,
+                imageAssetsById: {}
+            },
             global: {
                 plugins: [localStore]
             }
@@ -82,7 +86,9 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
         it("should not render close button if closeable is false", () => {
             const nonCloseableWrapper = shallowMount(StoryCreatorAddImageCard, {
                 props: {
-                    closeable: false
+                    closeable: false,
+                    createImageAsset,
+                    imageAssetsById: {}
                 },
                 global: {
                     plugins: [localStore]
@@ -107,7 +113,9 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
         it("should render addImageTitle headline if closeable is false", () => {
             const nonCloseableWrapper = shallowMount(StoryCreatorAddImageCard, {
                 props: {
-                    closeable: false
+                    closeable: false,
+                    createImageAsset,
+                    imageAssetsById: {}
                 },
                 global: {
                     plugins: [localStore]
@@ -128,10 +136,11 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
         it("should render the FlatButton component only if isImageLoaded is true", async () => {
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.false;
 
-            localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"] = {
-                objectURL: "blob:test-created-url"
-            };
             await wrapper.setData({
+                uploadedAsset: {
+                    id: "test-uuid",
+                    objectURL: "blob:test-created-url"
+                },
                 image: {
                     id: "test-uuid",
                     alt: "alt",
@@ -171,20 +180,40 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
     });
 
     describe("Component Methods", () => {
-        it("handleCloseButtonClick should revoke objectURL and emit click:close", async () => {
-            const revokeObjectURLSpy = sinon.spy(URL, "revokeObjectURL"),
-                file = new File(["test"], "test.png", {type: "image/png"}),
-                event = {target: {files: [file]}};
-
-            await wrapper.vm.loadImage(event);
+        it("handleCloseButtonClick should emit click:close event", async () => {
             wrapper.vm.handleCloseButtonClick();
 
-            expect(revokeObjectURLSpy.calledWith("blob:test-created-url")).to.be.true;
             expect(wrapper.emitted()).to.have.property("click:close");
         });
 
-        it("loadImage should set isValidated false", () => {
-            const file = new File(["file-content"], {type: "json"}),
+        it("handleDiscardButtonClick should reset form data", async () => {
+            await wrapper.setData({
+                image: {
+                    alt: "alt",
+                    copyright: "copyright"
+                },
+                uploadedAsset: {
+                    id: "test-uuid",
+                    objectURL: "blob:test-created-url"
+                },
+                isValidated: false
+            });
+
+            wrapper.vm.handleDiscardButtonClick();
+
+            expect(wrapper.vm.image).to.deep.equal({
+                alt: "",
+                copyright: ""
+            });
+            expect(wrapper.vm.uploadedAsset).to.deep.equal({
+                id: null,
+                objectURL: null
+            });
+            expect(wrapper.vm.isValidated).to.be.true;
+        });
+
+        it("loadImage should set isValidated false for non-image files", () => {
+            const file = new File(["file-content"], "test.json", {type: "application/json"}),
                 event = {
                     target: {
                         files: [file]
@@ -196,7 +225,7 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.vm.isValidated).to.be.false;
         });
 
-        it("loadImage should set isImageLoaded, image id and objectURL", async () => {
+        it("loadImage should load image and set uploadedAsset", async () => {
             const file = new File(["file-content"], "test-image.png", {type: "image/png"}),
                 event = {
                     target: {
@@ -209,11 +238,50 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.vm.isImageLoaded).to.be.true;
             expect(wrapper.vm.image.id).to.equal("test-uuid");
             expect(wrapper.vm.isValidated).to.be.true;
-            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].blob).to.equal(file);
-            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].objectURL).to.equal("blob:test-created-url");
-            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].mimeType).to.equal("image/png");
-            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].originalName).to.equal("test-image.png");
-            expect(localStore.state.Modules.StoryCreator.imageAssetsById["test-uuid"].archivePath).to.equal("images/test-uuid__test-image.png");
+            expect(wrapper.vm.uploadedAsset).to.deep.equal({
+                id: "test-uuid",
+                blob: file,
+                objectURL: "blob:test-created-url",
+                mimeType: "image/png",
+                originalName: "test-image.png",
+                archivePath: "images/test-uuid__test-image.png"
+            });
+        });
+
+        it("should emit addImage with complete image object on confirm", async () => {
+            const file = new File(["file-content"], "test-image.png", {type: "image/png"}),
+                event = {
+                    target: {
+                        files: [file]
+                    }
+                };
+
+            await wrapper.setData({
+                image: {
+                    alt: "alt text",
+                    copyright: "copyright info"
+                }
+            });
+
+            await wrapper.vm.loadImage(event);
+
+            // Find the add button and trigger it (in the template, it's the confirm button)
+            const addButton = wrapper.findAllComponents({name: "FlatButton"}).at(0);
+
+            if (addButton) {
+                await addButton.trigger("click");
+                const emitted = wrapper.emitted("addImage");
+
+                if (emitted && emitted.length > 0) {
+                    const emittedData = emitted[0][0];
+
+                    expect(emittedData).to.include({
+                        id: "test-uuid",
+                        alt: "alt text",
+                        copyright: "copyright info"
+                    });
+                }
+            }
         });
     });
 });

@@ -5,19 +5,11 @@ import StoryManager from "../../../components/StoryManager.vue";
 import sinon from "sinon";
 
 describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () => {
-    let store, wrapper, changeCurrentComponentSpy;
+    let store, wrapper;
 
     beforeEach(() => {
-        changeCurrentComponentSpy = sinon.spy();
-
         store = createStore({
             modules: {
-                Menu: {
-                    namespaced: true,
-                    actions: {
-                        changeCurrentComponent: changeCurrentComponentSpy
-                    }
-                },
                 Modules: {
                     namespaced: true,
                     modules: {
@@ -28,7 +20,8 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                 fixedStoryPath: (state) => state.fixedStoryPath,
                                 fixedStoryFiles: (state) => state.fixedStoryFiles,
                                 fixedStoryLoaded: (state) => state.fixedStoryLoaded,
-                                storyList: (state) => state.storyList
+                                storyList: (state) => state.storyList,
+                                subjectLayerCategory: (state) => state.subjectLayerCategory
                             },
                             mutations: {
                                 setCurrentStoryIndex (state, value) {
@@ -53,18 +46,25 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                     {
                                         story: {
                                             title: "Story 1",
-                                            text: "",
-                                            imageSrc: "",
+                                            description: "",
+                                            author: "",
+                                            imageSrc: "img-1",
                                             imageCopyright: "",
                                             imageAlt: "",
                                             chapters: []
                                         },
-                                        imageAssetsById: {}
+                                        imageAssetsById: {
+                                            "img-1": {
+                                                id: "img-1",
+                                                objectURL: "blob:url-1"
+                                            }
+                                        }
                                     },
                                     {
                                         story: {
                                             title: "Story 2",
-                                            text: "",
+                                            description: "",
+                                            author: "",
                                             imageSrc: "",
                                             imageCopyright: "",
                                             imageAlt: "",
@@ -119,6 +119,98 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
     });
 
     describe("Methods", () => {
+        describe("createNewStory", () => {
+            it("should set currentStoryIndex to undefined and switch to creator view", () => {
+                wrapper.vm.createNewStory();
+
+                expect(wrapper.vm.currentView).to.equal("creator");
+                expect(store.state.Modules.StoryManager.currentStoryIndex).to.be.undefined;
+            });
+        });
+
+        describe("editStory", () => {
+            it("should set currentStoryIndex and switch to creator view", () => {
+                wrapper.vm.editStory(0);
+
+                expect(wrapper.vm.currentView).to.equal("creator");
+                expect(store.state.Modules.StoryManager.currentStoryIndex).to.equal(0);
+            });
+        });
+
+        describe("onSaveStory", () => {
+            it("should add a new story when creating", () => {
+                const storySnapshot = {
+                        title: "New Story",
+                        description: "Test",
+                        author: "Me",
+                        imageSrc: "img-new",
+                        imageAlt: "",
+                        imageCopyright: "",
+                        chapters: []
+                    },
+                    imageAssetsSnapshot = {
+                        "img-new": {id: "img-new", objectURL: "blob:new"}
+                    };
+
+                wrapper.vm.onSaveStory(storySnapshot, imageAssetsSnapshot);
+
+                expect(store.state.Modules.StoryManager.storyList.length).to.equal(3);
+                expect(store.state.Modules.StoryManager.storyList[2]).to.deep.equal({
+                    story: storySnapshot,
+                    imageAssetsById: imageAssetsSnapshot
+                });
+                expect(wrapper.vm.currentView).to.equal("manager");
+            });
+
+            it("should update an existing story", () => {
+                const storySnapshot = {
+                        title: "Updated Story",
+                        description: "Updated",
+                        author: "Updated",
+                        imageSrc: "",
+                        imageAlt: "",
+                        imageCopyright: "",
+                        chapters: []
+                    },
+                    imageAssetsSnapshot = {};
+
+                store.state.Modules.StoryManager.currentStoryIndex = 0;
+                wrapper.vm.onSaveStory(storySnapshot, imageAssetsSnapshot);
+
+                expect(store.state.Modules.StoryManager.storyList[0].story.title).to.equal("Updated Story");
+                expect(wrapper.vm.currentView).to.equal("manager");
+            });
+
+            it("should revoke orphaned ObjectURLs when updating", () => {
+                const revokeObjectURLSpy = sinon.spy(URL, "revokeObjectURL"),
+                    storySnapshot = {
+                        title: "Story 1",
+                        description: "",
+                        author: "",
+                        imageSrc: "",
+                        imageAlt: "",
+                        imageCopyright: "",
+                        chapters: []
+                    },
+                    imageAssetsSnapshot = {}; // No images, so img-1 is orphaned
+
+                store.state.Modules.StoryManager.currentStoryIndex = 0;
+                wrapper.vm.onSaveStory(storySnapshot, imageAssetsSnapshot);
+
+                expect(revokeObjectURLSpy.calledWith("blob:url-1")).to.be.true;
+            });
+        });
+
+        describe("onAbortEditing", () => {
+            it("should clear currentStoryIndex and switch to manager view", () => {
+                store.state.Modules.StoryManager.currentStoryIndex = 0;
+                wrapper.vm.onAbortEditing();
+
+                expect(store.state.Modules.StoryManager.currentStoryIndex).to.be.undefined;
+                expect(wrapper.vm.currentView).to.equal("manager");
+            });
+        });
+
         describe("getCardItems", () => {
             it("should get the card items in object", async () => {
                 const story = {
@@ -212,23 +304,6 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
             });
         });
 
-        describe("editStory", () => {
-            it("should call changeCurrentComponent when createNewStory is triggered", async () => {
-                const expectedPayload = {
-                    type: "storyCreator",
-                    side: "secondaryMenu",
-                    props: {
-                        name: "additional:modules.storyCreator.title"
-                    }
-                };
-
-                await wrapper.vm.editStory(1);
-
-                expect(changeCurrentComponentSpy.calledOnce).to.be.true;
-                expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal(expectedPayload);
-            });
-        });
-
         describe("playStory", () => {
             it("should set playingStoryIndex to the given index", async () => {
                 await wrapper.vm.playStory(1);
@@ -239,20 +314,77 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
     });
 
     describe("User Interaction", () => {
-        it("should call changeCurrentComponent when createNewStory is triggered", async () => {
-            const addCardBtn = wrapper.findComponent({name: "AddCardButton"}),
-                expectedPayload = {
-                    type: "storyCreator",
-                    side: "secondaryMenu",
-                    props: {
-                        name: "additional:modules.storyCreator.title"
-                    }
-                };
+        it("should create new story when AddCardButton is clicked", async () => {
+            const addCardBtn = wrapper.findComponent({name: "AddCardButton"});
 
             await addCardBtn.vm.$emit("click");
 
-            expect(changeCurrentComponentSpy.calledOnce).to.be.true;
-            expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal(expectedPayload);
+            expect(wrapper.vm.currentView).to.equal("creator");
+            expect(store.state.Modules.StoryManager.currentStoryIndex).to.be.undefined;
+        });
+    });
+
+    describe("Asset Cleanup and Child Component Interaction", () => {
+        it("should keep image assets that are still referenced", () => {
+            const revokeObjectURLSpy = sinon.spy(URL, "revokeObjectURL"),
+                storySnapshot = {
+                    title: "Story 1",
+                    description: "",
+                    author: "",
+                    imageSrc: "img-1",
+                    imageAlt: "",
+                    imageCopyright: "",
+                    chapters: []
+                },
+                imageAssetsSnapshot = {
+                    "img-1": {id: "img-1", objectURL: "blob:url-1"}
+                };
+
+            store.state.Modules.StoryManager.currentStoryIndex = 0;
+            wrapper.vm.onSaveStory(storySnapshot, imageAssetsSnapshot);
+
+            expect(revokeObjectURLSpy.called).to.be.false;
+        });
+
+        it("should handle multiple orphaned assets correctly", () => {
+            const revokeObjectURLSpy = sinon.spy(URL, "revokeObjectURL");
+
+            store.state.Modules.StoryManager.storyList[1].imageAssetsById = {
+                "img-a": {id: "img-a", objectURL: "blob:url-a"},
+                "img-b": {id: "img-b", objectURL: "blob:url-b"},
+                "img-c": {id: "img-c", objectURL: "blob:url-c"}
+            };
+
+            store.state.Modules.StoryManager.currentStoryIndex = 1;
+            wrapper.vm.onSaveStory({
+                title: "Story 2",
+                description: "",
+                author: "",
+                imageSrc: "",
+                imageAlt: "",
+                imageCopyright: "",
+                chapters: []
+            }, {
+                "img-b": {id: "img-b", objectURL: "blob:url-b"}
+            });
+
+            expect(revokeObjectURLSpy.calledWith("blob:url-a")).to.be.true;
+            expect(revokeObjectURLSpy.calledWith("blob:url-c")).to.be.true;
+            expect(revokeObjectURLSpy.calledWith("blob:url-b")).to.be.false;
+        });
+
+        it("should pass correct props to StoryCreator child component", async () => {
+            store.state.Modules.StoryManager.currentStoryIndex = 0;
+            wrapper.vm.currentView = "creator";
+            await wrapper.vm.$nextTick();
+
+            const storyCreatorComponent = wrapper.findComponent({name: "StoryCreator"});
+
+            expect(storyCreatorComponent.exists()).to.be.true;
+            if (storyCreatorComponent.exists()) {
+                expect(storyCreatorComponent.props("story")).to.be.an("object");
+                expect(storyCreatorComponent.props("imageAssetsById")).to.be.an("object");
+            }
         });
 
         it("should set playingStoryIndex when play event is emitted from story card", async () => {

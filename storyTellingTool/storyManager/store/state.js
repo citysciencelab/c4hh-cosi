@@ -10,6 +10,7 @@
  * @property {String[]} fixedStoryFiles the fixed story files name.
  * @property {Boolean} fixedStoryLoaded check if fixed story is load.
  * @property {Object[]} storyList List entries with story and image assets.
+ * @property {Object} subjectLayerCategory - The subject layer category for layer selection.
  */
 const state = {
     id: "storyManager",
@@ -20,7 +21,12 @@ const state = {
     fixedStoryPath: "./assets",
     fixedStoryFiles: [],
     fixedStoryLoaded: false,
-    storyList: []
+    storyList: [],
+    subjectLayerCategory: {
+        "key": "kategorie_opendata",
+        "name": "common:modules.layerTree.categoryOpendata",
+        "active": true
+    }
 };
 
 export default state;

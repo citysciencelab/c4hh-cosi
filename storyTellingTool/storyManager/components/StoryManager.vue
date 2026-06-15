@@ -7,7 +7,8 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
 import StoryPlayer from "../../storyPlayer/components/StoryPlayer.vue";
-import {mapGetters, mapActions, mapMutations} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
+import StoryCreator from "../../storyCreator/components/StoryCreator.vue";
 
 export default {
     name: "StoryManager",
@@ -17,12 +18,14 @@ export default {
         FlatButton,
         InfoCard,
         InfoText,
+        StoryCreator,
         StoryPlayer
     },
     data () {
         return {
-            showImportError: false,
-            playingStoryIndex: null
+            currentView: "manager",
+            playingStoryIndex: null,
+            showImportError: false
         };
     },
     computed: {
@@ -30,28 +33,89 @@ export default {
             "fixedStoryFiles",
             "fixedStoryLoaded",
             "fixedStoryPath",
+            "currentStoryIndex",
             "storyList"
-        ])
+        ]),
+        /**
+         * Returns the story object to pass to StoryCreator.
+         * Empty object for new stories, existing entry for edits.
+         * @returns {Object} The story object.
+         */
+        editingStory () {
+            if (typeof this.currentStoryIndex === "number") {
+                return JSON.parse(JSON.stringify(this.storyList[this.currentStoryIndex]?.story || {}));
+            }
+            return {title: "", description: "", author: "", imageSrc: "", imageAlt: "", imageCopyright: "", chapters: []};
+        },
+        /**
+         * Returns the image assets to pass to StoryCreator.
+         * @returns {Object} The image assets object.
+         */
+        editingImageAssetsById () {
+            if (typeof this.currentStoryIndex === "number") {
+                return Object.assign({}, this.storyList[this.currentStoryIndex]?.imageAssetsById);
+            }
+            return {};
+        }
+    },
+    activated () {
+        // Hook required by masterportal for keep-alive support
+    },
+    deactivated () {
+        // Hook required by masterportal for keep-alive support
     },
     mounted () {
         this.getFixedStoryList(this.fixedStoryPath, this.fixedStoryFiles);
     },
     methods: {
-        ...mapActions("Menu", ["changeCurrentComponent"]),
         ...mapMutations("Modules/StoryManager", ["setCurrentStoryIndex", "setFixedStoryLoaded", "setStoryList"]),
         /**
-         * Changes the current menu component to the Story Creator to start a new story.
+         * Opens the creator for a new story.
          * @returns {void}
          */
         createNewStory () {
             this.setCurrentStoryIndex(undefined);
-            this.changeCurrentComponent({
-                type: "storyCreator",
-                side: "secondaryMenu",
-                props: {
-                    name: "additional:modules.storyCreator.title"
-                }
-            });
+            this.currentView = "creator";
+        },
+        /**
+         * Handles save-story event from StoryCreator.
+         * Persists the story snapshot, revoking any orphaned ObjectURLs.
+         * @param {Object} storySnapshot - Final story data.
+         * @param {Object} imageAssetsSnapshot - Final image assets.
+         * @returns {void}
+         */
+        onSaveStory (storySnapshot, imageAssetsSnapshot) {
+            if (typeof this.currentStoryIndex === "number") {
+                const oldAssets = this.storyList[this.currentStoryIndex]?.imageAssetsById || {};
+
+                Object.keys(oldAssets).forEach(id => {
+                    if (!imageAssetsSnapshot[id]) {
+                        URL.revokeObjectURL(oldAssets[id].objectURL);
+                    }
+                });
+            }
+
+            const entry = {story: storySnapshot, imageAssetsById: imageAssetsSnapshot};
+
+            if (typeof this.currentStoryIndex === "number") {
+                const updatedList = [...this.storyList];
+
+                updatedList[this.currentStoryIndex] = entry;
+                this.setStoryList(updatedList);
+            }
+            else {
+                this.setStoryList([...this.storyList, entry]);
+            }
+            this.setCurrentStoryIndex(undefined);
+            this.currentView = "manager";
+        },
+        /**
+         * Handles abort-editing event from StoryCreator.
+         * @returns {void}
+         */
+        onAbortEditing () {
+            this.setCurrentStoryIndex(undefined);
+            this.currentView = "manager";
         },
         /**
          * Downloads one story as ZIP from its stored export payload.
@@ -89,13 +153,7 @@ export default {
          */
         editStory (index) {
             this.setCurrentStoryIndex(index);
-            this.changeCurrentComponent({
-                type: "storyCreator",
-                side: "secondaryMenu",
-                props: {
-                    name: "additional:modules.storyCreator.title"
-                }
-            });
+            this.currentView = "creator";
         },
         /**
          * Opens the selected story directly in the story player.
@@ -235,7 +293,14 @@ export default {
                 :image-assets-by-id="storyList[playingStoryIndex]?.imageAssetsById"
             />
         </div>
-        <div v-else>
+        <StoryCreator
+            v-else-if="currentView === 'creator'"
+            :story="editingStory"
+            :image-assets-by-id="editingImageAssetsById"
+            @save-story="onSaveStory"
+            @abort-editing="onAbortEditing"
+        />
+        <template v-else-if="currentView === 'manager'">
             <div class="mb-2">
                 <h6 class="fw-bold text-dark">
                     {{ $t('additional:modules.storyManager.mainTitle') }}
@@ -309,7 +374,7 @@ export default {
                     />
                 </div>
             </div>
-        </div>
+        </template>
     </div>
 </template>
 

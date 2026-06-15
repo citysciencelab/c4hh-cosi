@@ -24,7 +24,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 Modules: {
                     namespaced: true,
                     modules: {
-                        StoryCreator: {
+                        StoryManager: {
                             namespaced: true,
                             getters: {
                                 currentChapter: (state) => state.currentChapter,
@@ -66,10 +66,24 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 }
             },
             getters: {
-                configuredModules: () => sinon.stub()
+                configuredModules: () => sinon.stub(),
+                layerConfig: () => ({})
             }
         });
         wrapper = shallowMount(StoryCreatorChapter, {
+            props: {
+                editIndex: false,
+                chapters: [],
+                imageAssetsById: {},
+                createImageAsset: sinon.stub().callsFake(blob => ({
+                    id: "test-uuid",
+                    blob,
+                    objectURL: "blob:test-created-url",
+                    mimeType: blob?.type || "application/octet-stream",
+                    originalName: "test.png",
+                    archivePath: "images/test-uuid__test.png"
+                }))
+            },
             global: {
                 plugins: [localStore]
             }
@@ -365,11 +379,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         });
 
         describe("saveChapter", () => {
-            it("should append a new chapter when editIndex is false (ADD mode)", async () => {
-                wrapper.vm.story.chapters = [];
-
-                await wrapper.setProps({editIndex: false});
-
+            it("should emit chapter payload when saving in add mode", async () => {
                 await wrapper.setData({
                     title: "Neues Testkapitel",
                     confirmedCoordinate: [123, 456],
@@ -381,11 +391,10 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
                 wrapper.vm.saveChapter();
 
-                expect(wrapper.vm.currentChapter.title).to.equal("Neues Testkapitel");
-                expect(wrapper.vm.currentChapter.map.center).to.deep.equal([123, 456]);
-                expect(wrapper.vm.story.chapters).to.have.lengthOf(1);
+                const emitted = wrapper.emitted("save-chapter");
 
-                expect(wrapper.vm.story.chapters[0]).to.deep.equal({
+                expect(emitted).to.have.lengthOf(1);
+                expect(emitted[0][0]).to.deep.equal({
                     content: [],
                     title: "Neues Testkapitel",
                     map: {
@@ -395,16 +404,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         tool: "testTool"
                     }
                 });
-
-                expect(localStore.state.Modules.StoryCreator.currentView).to.equal("story");
             });
 
-            it("should overwrite an existing chapter when editIndex is a number (UPDATE mode)", async () => {
-                wrapper.vm.story.chapters = [
-                    {title: "Altes Kapitel 1", content: []},
-                    {title: "Altes Kapitel 2", content: []}
-                ];
-
+            it("should emit chapter payload when saving in update mode", async () => {
                 await wrapper.setProps({editIndex: 1});
 
                 await wrapper.setData({
@@ -418,11 +420,19 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
                 wrapper.vm.saveChapter();
 
-                expect(wrapper.vm.story.chapters).to.have.lengthOf(2);
-                expect(wrapper.vm.story.chapters[0].title).to.equal("Altes Kapitel 1");
-                expect(wrapper.vm.story.chapters[1].title).to.equal("Geändertes Kapitel 2");
-                expect(wrapper.vm.story.chapters[1].map.center).to.deep.equal([999, 888]);
-                expect(localStore.state.Modules.StoryCreator.currentView).to.equal("story");
+                const emitted = wrapper.emitted("save-chapter");
+
+                expect(emitted).to.have.lengthOf(1);
+                expect(emitted[0][0]).to.deep.equal({
+                    title: "Geändertes Kapitel 2",
+                    map: {
+                        center: [999, 888],
+                        zoomLevel: 10,
+                        layers: [],
+                        tool: undefined
+                    },
+                    content: [{type: "text", text: "Neuer Inhalt"}]
+                });
             });
 
             it("should use default title when title is empty", async () => {
@@ -437,7 +447,10 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
                 wrapper.vm.saveChapter();
 
-                expect(wrapper.vm.currentChapter.title).to.equal("additional:modules.storyCreator.chapter.title");
+                const emitted = wrapper.emitted("save-chapter");
+
+                expect(emitted).to.have.lengthOf(1);
+                expect(emitted[0][0].title).to.equal("additional:modules.storyCreator.chapter.title");
             });
         });
 
@@ -519,9 +532,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         });
 
         describe("removeContentItem", () => {
-            it("should remove an image item and trigger image asset cleanup", async () => {
-                const removeImageAssetSpy = sinon.spy(wrapper.vm, "removeImageAsset");
-
+            it("should remove an image item from content", async () => {
                 await wrapper.setData({
                     content: [
                         {
@@ -541,7 +552,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
                 wrapper.vm.removeContentItem(0);
 
-                expect(removeImageAssetSpy.called).to.be.false;
                 expect(wrapper.vm.content).to.deep.equal([
                     {
                         type: "doc",
