@@ -127,18 +127,23 @@ function sortByStyleLabelOrder (legendInformation, styleObject) {
         .map(rule => getLegendKeyFromRule(rule))
         .filter(key => key !== null);
 
-    return legendInformation
-        .map((entry, originalPosition) => {
-            const sortIdx = orderedLegendKeys.indexOf(entry.label);
+    const result = [...legendInformation];
+    const knownPositions = result.reduce((acc, entry, idx) => {
+        if (orderedLegendKeys.includes(entry.label)) {
+            acc.push(idx);
+        }
+        return acc;
+    }, []);
 
-            return {
-                entry,
-                originalPosition,
-                sortIdx: sortIdx === -1 ? orderedLegendKeys.length + originalPosition : sortIdx
-            };
-        })
-        .sort((a, b) => a.sortIdx - b.sortIdx || a.originalPosition - b.originalPosition)
-        .map(sortedItem => sortedItem.entry);
+    const sortedKnownEntries = knownPositions
+        .map(idx => result[idx])
+        .sort((a, b) => orderedLegendKeys.indexOf(a.label) - orderedLegendKeys.indexOf(b.label));
+
+    knownPositions.forEach((idx, i) => {
+        result[idx] = sortedKnownEntries[i];
+    });
+
+    return result;
 }
 
 /**

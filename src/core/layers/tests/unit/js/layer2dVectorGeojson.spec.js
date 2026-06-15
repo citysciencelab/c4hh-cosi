@@ -260,7 +260,7 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
             ]);
         });
 
-        it("createLegend should keep original order for same sort index", async () => {
+        it("createLegend should keep unknown entries in their original positions", async () => {
             const styleObj = {
                 styleId: "styleId",
                 rules: [
@@ -282,8 +282,8 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
 
             expect(await layerWrapper.createLegend()).to.deep.equals([
                 {label: "Unknown A", img: "a.png"},
-                {label: "Unknown B", img: "b.png"},
-                {label: "Known", img: "known.png"}
+                {label: "Known", img: "known.png"},
+                {label: "Unknown B", img: "b.png"}
             ]);
         });
     });
