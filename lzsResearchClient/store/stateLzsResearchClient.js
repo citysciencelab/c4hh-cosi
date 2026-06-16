@@ -60,6 +60,7 @@ const state = {
     hasMouseMapInteractions: true,
     apiBasePath: "",
     minScaleValue: 5000,
+    maxGeometryArea: 4000000,
     zipFileName: "GeoDataDepot-Download",
     maxDownloadMB: 500,
     maxResultValueCount: 25,

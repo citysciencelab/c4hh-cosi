@@ -9,12 +9,14 @@ import DrawEdit from "@shared/modules/draw/components/DrawEdit.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import LzsResearchClientSearchBar from "./searchBar/components/LzsResearchClientSearchBar.vue";
+import {roundFileSizeToFixed} from "../utils/zipHelpers";
 
 import Polygon from "ol/geom/Polygon";
 import LineString from "ol/geom/LineString";
 import Point from "ol/geom/Point";
 import Feature from "ol/Feature.js";
 import {Fill, Stroke, Style} from "ol/style";
+import {getArea} from "ol/sphere";
 
 import {mapGetters, mapActions, mapMutations} from "vuex";
 
@@ -53,7 +55,9 @@ export default {
                 {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries")},
                 {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address")}
             ],
-            selectedButtonGroup: "extent"
+            selectedButtonGroup: "extent",
+            showMaxAreaWarning: false,
+            searchGeometryArea: null
         };
     },
     computed: {
@@ -72,7 +76,8 @@ export default {
             "lzsDrawEdits",
             "minScaleValue",
             "maxResultValueCount",
-            "addressSearchCoordinates"
+            "addressSearchCoordinates",
+            "maxGeometryArea"
         ]),
         ...mapGetters("Maps", [
             "projectionCode",
@@ -166,6 +171,18 @@ export default {
             }
 
             return "1";
+        },
+        spatialAreaWarning () {
+            const areaInSquareKilometers = roundFileSizeToFixed(this.searchGeometryArea / 1e6),
+                maxAreaInSquareKilometers = roundFileSizeToFixed(this.maxGeometryArea / 1e6);
+
+            if (this.selectedButtonGroup === "extent" && this.scale > this.minScaleValue) {
+                return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.extentWarningMessage", {scale: this.minScaleValue});
+            }
+            if (this.selectedButtonGroup === "geometry" && this.showMaxAreaWarning) {
+                return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.geometryAreaWarningMessage", {maxArea: maxAreaInSquareKilometers, area: areaInSquareKilometers});
+            }
+            return null;
         }
     },
     watch: {
@@ -186,8 +203,9 @@ export default {
                 return;
             }
 
-            if (this.searchGeometry && newValue !== oldValue) {
+            if (newValue !== oldValue) {
                 this.removeSearchGeometry();
+                this.showMaxAreaWarning = false;
             }
         }
     },
@@ -257,8 +275,13 @@ export default {
 
             if (this.currentModifyInteraction) {
                 this.currentModifyInteraction.un("modifyend", this.onModifyEnd);
+                this.currentModifyInteraction?.un("modifystart", this.onModifyStart);
                 this.removeInteraction(this.currentModifyInteraction);
                 this.currentModifyInteraction = null;
+            }
+
+            if (this.showMaxAreaWarning) {
+                this.showMaxAreaWarning = false;
             }
         },
         /**
@@ -534,6 +557,15 @@ export default {
             this.setSearchGeometry(feature.getGeometry());
         },
         /**
+         * Handles the start of a draw modification event.
+         * Triggered when a modify interaction begins on a feature.
+         *
+         * @returns {void}
+         */
+        onModifyStart () {
+            this.showMaxAreaWarning = false;
+        },
+        /**
          * Sets the map interaction to modify a feature.
          *
          * @returns {void}
@@ -541,6 +573,7 @@ export default {
         editFeature () {
             this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.lzsDrawLayerSource);
             this.currentModifyInteraction.on("modifyend", this.onModifyEnd);
+            this.currentModifyInteraction?.on("modifystart", this.onModifyStart);
             this.addInteraction(this.currentModifyInteraction);
         },
         /**
@@ -578,6 +611,14 @@ export default {
                 feature.setStyle(style);
 
                 this.lzsDrawLayerSource.addFeature(feature);
+
+                if (this.checkSearchGeometryArea(polygon)) {
+
+                    this.searchGeometry = {
+                        type: "Polygon",
+                        coordinates: JSON.parse(JSON.stringify(polygonCoordinates))
+                    };
+                }
             }
             else if (geometry instanceof Polygon) {
                 if (this.selectedButtonGroup === "address") {
@@ -588,6 +629,7 @@ export default {
                     feature.setStyle(style);
 
                     this.lzsDrawLayerSource.addFeature(feature);
+
                     this.zoomToExtent({
                         extent: geometry.getExtent(),
                         options: {
@@ -595,10 +637,13 @@ export default {
                         }
                     });
                 }
-                this.searchGeometry = {
-                    type: "Polygon",
-                    coordinates: JSON.parse(JSON.stringify(geometry.getCoordinates()))
-                };
+
+                if (this.checkSearchGeometryArea(geometry)) {
+                    this.searchGeometry = {
+                        type: "Polygon",
+                        coordinates: JSON.parse(JSON.stringify(geometry.getCoordinates()))
+                    };
+                }
             }
             else if (geometry instanceof Point) {
                 this.searchGeometry = {
@@ -610,6 +655,25 @@ export default {
                 this.searchGeometry = null;
                 this.lzsDrawLayerSource.clear();
             }
+        },
+        /**
+         * Checks whether the provided geometry area is within acceptable bounds for performing a search operation.
+         *
+         * @param {Object} geometry - The geometry object whose area needs to be validated.
+         * @param {number} [maxArea] - The maximum allowed area for the search geometry.
+         * @returns {boolean} Returns `true` if the geometry area is valid, `false` otherwise.
+         */
+        checkSearchGeometryArea (geometry) {
+            this.searchGeometryArea = getArea(geometry, {projection: this.projectionCode});
+
+            if (this.searchGeometryArea > this.maxGeometryArea) {
+                this.showMaxAreaWarning = true;
+                this.searchGeometry = null;
+
+                return false;
+            }
+
+            return true;
         },
         /**
          * Build a search payload from the selected geometry, archive IDs and years and perform the search.
@@ -680,18 +744,16 @@ export default {
             switch (group) {
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries"):
                     this.selectedButtonGroup = "geometry";
-                    this.searchGeometry = null;
+                    this.removeSearchGeometry();
 
                     if (this.addressSearchCoordinates) {
                         this.removePointMarker();
-                        this.lzsDrawLayerSource.clear();
                         this.setSearchInput(null);
                     }
 
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address"):
-                    this.lzsDrawLayerSource.clear();
-                    this.searchGeometry = null;
+                    this.removeSearchGeometry();
                     this.selectedButtonGroup = "address";
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent"):
@@ -873,13 +935,6 @@ export default {
                         @set-selected-button="setSelectedButtonGroup"
                     />
 
-                    <p
-                        v-if="selectedButtonGroup === 'extent' && scale > minScaleValue"
-                        class="extentWarning"
-                    >
-                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.extentWarningMessage", {scale: minScaleValue}) }}
-                    </p>
-
                     <div
                         v-if="selectedButtonGroup === 'geometry'"
                         class="spatialSelectionButtons d-flex align-items-center"
@@ -917,6 +972,13 @@ export default {
                             @set-search-geometry="setSearchGeometry"
                         />
                     </div>
+
+                    <p
+                        v-if="spatialAreaWarning"
+                        class="spatialAreaWarning"
+                    >
+                        {{ spatialAreaWarning }}
+                    </p>
                 </div>
             </div>
 
@@ -1019,7 +1081,7 @@ export default {
                 color: $light_red;
             }
 
-            p.extentWarning {
+            p.spatialAreaWarning {
                 color: $light_red;
                 font-size: 0.875rem;
                 margin: 1rem;

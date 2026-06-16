@@ -147,6 +147,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                                 lzsDrawEdits: () => ["deleteAll"],
                                 minScaleValue: () => 5000,
                                 maxResultValueCount: () => mockMaxResultValueCount,
+                                maxGeometryArea: () => 4000000,
                                 addressSearchCoordinates: () => [1, 2]
                             },
                             actions: {
@@ -177,10 +178,21 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                         removePointMarker: () => sinon.stub(),
                         placingPointMarker: () => sinon.stub()
                     },
+                    state: () => ({
+                        scale: 5000
+                    }),
                     getters: {
-                        projectionCode: () => "EPSG:25832",
-                        scale: () => 5000,
+                        // FIX: EPSG:3857 is registered in OL by default (with EPSG:4326 transform),
+                        // so getArea() can call geometry.transform() without returning null.
+                        projectionCode: () => "EPSG:3857",
+                        scale: state => state.scale,
                         extent: () => [0, 0, 100, 100]
+                    },
+                    mutations: {
+                        // Mirror the real mutation signature
+                        setScale: (state, value) => {
+                            state.scale = value;
+                        }
                     }
                 },
                 Menu: {
@@ -382,7 +394,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
 
     it("set SearchGeometry correctly", async () => {
         const mockPoint = new Point([0, 0]),
-            mockLineString = new LineString([[0, 0], [1, 1]]),
+            mockLineString = new LineString([[0, 0], [1, 0], [0, 1]]),
             mockPolygon = new Polygon([[[0, 0], [1, 1], [1, 0], [0, 0]]]);
 
         await wrapper.vm.setSearchGeometry(mockPoint);
@@ -392,7 +404,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         await wrapper.vm.setSearchGeometry(mockLineString);
 
         // Lines should be converted to polygons
-        expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Polygon", coordinates: [[[0, 0], [1, 1], [0, 0]]]});
+        expect(wrapper.vm.searchGeometry).to.deep.equal({type: "Polygon", coordinates: [[[0, 0], [1, 0], [0, 1], [0, 0]]]});
 
         await wrapper.vm.setSearchGeometry(mockPolygon);
 
@@ -512,5 +524,92 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         expect(wrapper.vm.searchGeometry).to.be.null;
         expect(wrapper.vm.currentModifyInteraction).to.be.null;
         expect(currentModifyInteractionMock.un.calledWith("modifyend", wrapper.vm.onModifyEnd)).to.be.true;
+    });
+
+    it("spatialAreaWarning computed returns null when no warning conditions are met (default state)", () => {
+        expect(wrapper.vm.spatialAreaWarning).to.be.null;
+    });
+
+    it("spatialAreaWarning computed returns null when extent mode is active but scale equals minScaleValue", () => {
+        wrapper.vm.selectedButtonGroup = "extent";
+
+        expect(wrapper.vm.spatialAreaWarning).to.be.null;
+    });
+
+    it("spatialAreaWarning computed returns the extent warning when scale exceeds minScaleValue", async () => {
+        store.commit("Maps/setScale", 10000);
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.selectedButtonGroup).to.equal("extent");
+        expect(wrapper.vm.spatialAreaWarning).to.equal(
+            "additional:modules.lzsResearchClient.tabs.tabSearch.extentWarningMessage:5000"
+        );
+    });
+
+    it("spatialAreaWarning computed returns the geometry area warning translation key when geometry mode is active and showMaxAreaWarning is true", async () => {
+        wrapper.vm.selectedButtonGroup = "geometry";
+        wrapper.vm.showMaxAreaWarning = true;
+        wrapper.vm.searchGeometryArea = 1500000000; // 1500 km²
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.spatialAreaWarning).to.equal(
+            "additional:modules.lzsResearchClient.tabs.tabSearch.geometryAreaWarningMessage:4,1500"
+        );
+    });
+
+    it("spatialAreaWarning computed returns null when geometry mode is active but showMaxAreaWarning is false", async () => {
+        wrapper.vm.selectedButtonGroup = "geometry";
+        wrapper.vm.showMaxAreaWarning = false;
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.spatialAreaWarning).to.be.null;
+    });
+
+    describe("checkSearchGeometryArea", () => {
+        // A ~1 km² polygon in EPSG:3857 (well within limit)
+        const smallPolygon = new Polygon([[[0, 0], [1000, 0], [1000, 1000], [0, 1000], [0, 0]]]),
+            // A ~9 km² polygon in EPSG:3857 (exceeds limit)
+            largePolygon = new Polygon([[[0, 0], [3000, 0], [3000, 3000], [0, 3000], [0, 0]]]);
+
+        it("returns true when area is within the allowed limit", () => {
+            const result = wrapper.vm.checkSearchGeometryArea(smallPolygon);
+
+            expect(result).to.be.true;
+        });
+
+        it("does not set showMaxAreaWarning when area is within the allowed limit", () => {
+            wrapper.vm.checkSearchGeometryArea(smallPolygon);
+
+            expect(wrapper.vm.showMaxAreaWarning).to.be.false;
+        });
+
+        it("sets searchGeometryArea to the calculated numeric value", () => {
+            wrapper.vm.checkSearchGeometryArea(smallPolygon);
+
+            expect(wrapper.vm.searchGeometryArea).to.be.a("number").and.to.be.above(0);
+        });
+
+        it("returns false when area exceeds the allowed limit", () => {
+            const result = wrapper.vm.checkSearchGeometryArea(largePolygon);
+
+            expect(result).to.be.false;
+        });
+
+        it("sets showMaxAreaWarning to true when area exceeds the allowed limit", () => {
+            wrapper.vm.checkSearchGeometryArea(largePolygon);
+
+            expect(wrapper.vm.showMaxAreaWarning).to.be.true;
+        });
+
+        it("sets searchGeometry to null when area exceeds the allowed limit", () => {
+            wrapper.vm.searchGeometry = {type: "Point", coordinates: [0, 0]};
+
+            wrapper.vm.checkSearchGeometryArea(largePolygon);
+
+            expect(wrapper.vm.searchGeometry).to.be.null;
+        });
     });
 });

@@ -47,7 +47,8 @@
                     "spatialSelectionLabel": "Suche im / nach:",
                     "searchModeSwitchLabel": "Experten-Suchmodus",
                     "extentWarningMessage": "Der Maßstab der Karte ist kleiner als 1:{{ scale }}. Bitte zoomen Sie näher heran, um die Suche im Kartenausschnitt zu aktivieren.",
-                    "addressSearchCancel": "Adresssuche abbrechen"
+                    "addressSearchCancel": "Adresssuche abbrechen",
+                    "geometryAreaWarningMessage": "Die Fläche der eingezeichneten Geometrie beträgt {{ area }} km². Dies überschreitet die maximal erlaubte Fläche von {{ maxArea }} km². Bitte zeichnen Sie eine kleinere Fläche, um die Suche zu aktivieren."
                 },
                 "tabResult": {
                     "label": "Ergebnisse",
