@@ -28,9 +28,10 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                             namespaced: true,
                             getters: {
                                 currentChapter: (state) => state.currentChapter,
+                                imageAssetsById: (state) => state.imageAssetsById,
+                                originalLayerConfig: (state) => state.originalLayerConfig,
                                 story: (state) => state.story,
-                                subjectLayerCategory: (state) => state.subjectLayerCategory,
-                                imageAssetsById: (state) => state.imageAssetsById
+                                subjectLayerCategory: (state) => state.subjectLayerCategory
                             },
                             mutations: {
                                 removeImageAsset (state, id) {
@@ -41,6 +42,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 },
                                 setCurrentView (state, value) {
                                     state.currentView = value;
+                                },
+                                setOriginalLayerConfig (state, value) {
+                                    state.originalLayerConfig = value;
                                 }
                             },
                             state: {
@@ -56,6 +60,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 },
                                 currentView: "chapter",
                                 imageAssetsById: {},
+                                originalLayerConfig: undefined,
                                 story: {
                                     chapters: []
                                 },
@@ -66,8 +71,12 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 }
             },
             getters: {
+                allLayerConfigs: () => [],
                 configuredModules: () => sinon.stub(),
-                layerConfig: () => ({})
+                layerConfigById: () => sinon.stub()
+            },
+            actions: {
+                addOrReplaceLayer: () => sinon.stub()
             }
         });
         wrapper = shallowMount(StoryCreatorChapter, {
@@ -99,6 +108,13 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             mode: "2D",
             on: sinon.stub(),
             un: sinon.stub(),
+            getLayers: () => {
+                return {
+                    getArray: () => {
+                        return [];
+                    }
+                };
+            },
             getView: () => {
                 return {
                     getZoom: () => sinon.stub(),
@@ -217,6 +233,34 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         });
     });
 
+    describe("Watch", () => {
+        describe("selectedLayer", () => {
+            it("returns not call function deactivateSubjectLayer", async () => {
+                await wrapper.setData({
+                    selectedLayer: undefined
+                });
+
+                const spyDeactivateSubjectLayer = sinon.spy(wrapper.vm, "deactivateSubjectLayer"),
+                    spyAddOrReplaceLayer = sinon.spy(wrapper.vm, "addOrReplaceLayer");
+
+                expect(spyDeactivateSubjectLayer.called).to.be.false;
+                expect(spyAddOrReplaceLayer.called).to.be.false;
+            });
+
+            it("returns call function deactivateSubjectLayer", async () => {
+                const spyDeactivateSubjectLayer = sinon.spy(wrapper.vm, "deactivateSubjectLayer"),
+                    spyAddOrReplaceLayer = sinon.spy(wrapper.vm, "addOrReplaceLayer");
+
+                await wrapper.setData({
+                    selectedLayer: [{layerId: 1}]
+                });
+
+                expect(spyDeactivateSubjectLayer.called).to.be.true;
+                expect(spyAddOrReplaceLayer.called).to.be.true;
+            });
+        });
+    });
+
     describe("Methods", () => {
         describe("findAllObjectsByKeyValueDeep", () => {
             it("should return empty array", () => {
@@ -321,6 +365,39 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     ];
 
                 expect(wrapper.vm.getToolList(toolList)).to.deep.equal(results);
+            });
+        });
+
+        describe("getVisibleLayerList ", () => {
+            it("should return empty array", () => {
+                expect(wrapper.vm.getVisibleLayerList(undefined)).to.deep.equal([]);
+                expect(wrapper.vm.getVisibleLayerList(0)).to.deep.equal([]);
+                expect(wrapper.vm.getVisibleLayerList("")).to.deep.equal([]);
+                expect(wrapper.vm.getVisibleLayerList(true)).to.deep.equal([]);
+                expect(wrapper.vm.getVisibleLayerList({})).to.deep.equal([]);
+                expect(wrapper.vm.getVisibleLayerList(null)).to.deep.equal([]);
+                expect(wrapper.vm.getVisibleLayerList([])).to.deep.equal([]);
+            });
+
+            it("should return visible layers", () => {
+                const layers = {
+                    getArray: () => [
+                        {
+                            id: 1,
+                            getVisible: () => true,
+                            get: sinon.stub()
+                        },
+                        {
+                            id: 2,
+                            getVisible: () => false,
+                            get: sinon.stub()
+                        }
+                    ]
+
+                };
+
+                expect(wrapper.vm.getVisibleLayerList(layers).length).to.be.equal(1);
+                expect(wrapper.vm.getVisibleLayerList(layers)[0].id).to.be.equal(1);
             });
         });
 
@@ -558,6 +635,36 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         content: [{type: "paragraph", content: [{type: "text", text: "Keep me"}]}]
                     }
                 ]);
+            });
+        });
+
+        describe("resetLayerConfig ", () => {
+            it("should not set the selectedLayer", async () => {
+                await wrapper.setData({
+                    selectedLayer: [{layerId: 1}]
+                });
+
+                await wrapper.vm.resetLayerConfig(null);
+                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
+                await wrapper.vm.resetLayerConfig(0);
+                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
+                await wrapper.vm.resetLayerConfig(false);
+                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
+                await wrapper.vm.resetLayerConfig(undefined);
+                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
+                await wrapper.vm.resetLayerConfig({});
+                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
+                await wrapper.vm.resetLayerConfig([]);
+                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
+            });
+
+            it("should set the selectedLayer to be empty array", async () => {
+                await wrapper.setData({
+                    selectedLayer: [{layerId: 1}]
+                });
+
+                await wrapper.vm.resetLayerConfig([{layerId: 1}]);
+                expect(wrapper.vm.selectedLayer.length).to.be.equal(0);
             });
         });
     });

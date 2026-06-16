@@ -6,7 +6,7 @@ import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import isObject from "@shared/js/utils/isObject.js";
-import {mapGetters} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
@@ -82,8 +82,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["configuredModules", "layerConfig"]),
-        ...mapGetters("Modules/StoryManager", ["subjectLayerCategory"]),
+        ...mapGetters(["allLayerConfigs", "configuredModules", "layerConfigById"]),
+        ...mapGetters("Modules/StoryManager", ["originalLayerConfig", "subjectLayerCategory"]),
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
          * @returns {Boolean} True if position or zoom has changed, otherwise false.
@@ -116,6 +116,34 @@ export default {
     },
     watch: {
         /**
+         * Watches for the selected layers.
+         * @param {Object[]} layers - The selected layer objects object in array.
+         * @returns {void}
+         */
+        selectedLayer: {
+            handler (val) {
+                if (!Array.isArray(val)) {
+                    return;
+                }
+
+                const layers = mapCollection.getMap("2D")?.getLayers();
+
+                this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
+
+                val.forEach(layer => {
+                    if (!layer?.layerId) {
+                        return;
+                    }
+
+                    this.addOrReplaceLayer({
+                        layerId: layer.layerId,
+                        visibility: true
+                    });
+                });
+            },
+            deep: true
+        },
+        /**
          * Initializes and displays the Bootstrap Toast. The toast will automatically hide after 4 seconds.
          * @param {Boolean} newVal - The new value of showAlert.
          */
@@ -134,6 +162,11 @@ export default {
                     }
                 });
             }
+        }
+    },
+    created () {
+        if (typeof this.originalLayerConfig === "undefined") {
+            this.setOriginalLayerConfig(JSON.parse(JSON.stringify(this.allLayerConfigs)));
         }
     },
     mounted () {
@@ -174,8 +207,15 @@ export default {
         if (map) {
             map.un("moveend", this.updatePositionFromMap);
         }
+
+        this.resetLayerConfig(this.selectedLayer);
     },
     methods: {
+        ...mapActions(["addOrReplaceLayer"]),
+        ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
+        ...mapActions("Modules/LayerTree", ["removeLayer"]),
+        ...mapMutations("Modules/StoryManager", ["setOriginalLayerConfig"]),
+
         tipTapJsonToHtml,
         /**
          * Resets the current chapter and goes back to overview page.
@@ -184,6 +224,39 @@ export default {
         cancelChapter () {
             this.resetCurrentChapter();
             this.$emit("cancel-chapter");
+        },
+        /**
+         * Deactivates current subject layers from tree and map.
+         * @param {ol/layer[]} layers - The current visible layers.
+         * @returns {void}
+         */
+        deactivateSubjectLayer (layers) {
+            if (!Array.isArray(layers) || !layers.length) {
+                return;
+            }
+
+            layers.forEach(layer => {
+                const layerConf = this.layerConfigById(layer.get("id"));
+
+                if (layerConf && !layerConf?.baselayer && !this.selectedLayer.some(sl => sl.layerId === layer.get("id"))) {
+                    this.addOrReplaceLayer({
+                        layerId: layer.get("id"),
+                        visibility: false
+                    });
+                }
+            });
+        },
+        /**
+         * Gets visible layer list.
+         * @param {ol/layer[]} layers - The layers.
+         * @returns {Object} {visibleLayerList} The list of visible layers from the "2D" map.
+         */
+        getVisibleLayerList (layers) {
+            const visibleLayerList = typeof layers?.getArray !== "function" ? [] : layers.getArray().filter(layer => {
+                return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon";
+            });
+
+            return visibleLayerList;
         },
         /**
          * Opens a content add/edit component and stores context of the open editor.
@@ -424,7 +497,6 @@ export default {
             this.zoomlevel = "";
             this.confirmedCoordinate = [];
             this.confirmedZoomlevel = "";
-            this.selectedLayer = [];
             this.selectedTool = "";
             this.closeContentEditor();
         },
@@ -490,7 +562,36 @@ export default {
 
             this.content.splice(index, 1);
         },
+        /**
+         * Resets the layer config.
+         * @param {Object[]} val - The selected layer.
+         * @returns {void}
+         */
+        resetLayerConfig (val) {
+            if (!Array.isArray(val) || !val.length) {
+                return;
+            }
 
+            val.forEach(layer => {
+                const layerConf = this.layerConfigById(layer.layerId);
+
+                if (layerConf) {
+                    this.addOrReplaceLayer({
+                        layerId: layer.layerId,
+                        visibility: this.originalLayerConfig.some(oriLayer => oriLayer.id === layer.layerId && layerConf?.baselayer && oriLayer.visibility),
+                        showInLayerTree: this.originalLayerConfig.some(oriLayer => oriLayer.id === layer.layerId)
+                    });
+                }
+            });
+
+            this.allLayerConfigs.forEach(each => {
+                if (!this.originalLayerConfig.some(oriLayer => oriLayer.id === each.id)) {
+                    this.removeLayer(each);
+                }
+            });
+
+            this.selectedLayer = [];
+        },
         /**
          * Updates the current zoom level and coordinate from the map view.
          * @returns {void}
