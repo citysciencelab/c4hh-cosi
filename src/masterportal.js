@@ -11,8 +11,6 @@ import bsTooltipDirective from "./directives/bs-tooltip.js";
 import store from "./app-store/index.js";
 import remoteInterface from "./plugins/remoteInterface.js";
 import utilsLogin from "../src/modules/login/js/utilsLogin.js";
-
-import {createMatomoQueueAndAddInitialSettings, createMatomoVuexPlugin} from "./plugins/matomo-tracking.js";
 import {instantiateVuetify} from "./plugins/vuetify.js";
 
 let app;
@@ -58,19 +56,6 @@ loadConfigJs.then(() => {
     app.use(pinia);
     app.use(store);
     store.$app = app;
-
-    if (Config.matomo) {
-        createMatomoQueueAndAddInitialSettings(Config.matomo);
-        createMatomoVuexPlugin(store);
-
-        import("./plugins/matomo-init.js")
-            .then(module => {
-                module.initiateMatomo(app);
-            })
-            .catch(() => {
-                console.warn("Matomo blocked. Events will not be send.");
-            });
-    }
 
     if (Config.vuetifyFolder) {
         instantiateVuetify().then(vuetify => {
