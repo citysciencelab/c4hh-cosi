@@ -256,5 +256,8 @@
     "storyManager": {
     "path": "storyTellingTool/storyManager",
     "type": "tool"
+  },
+    "userTracking": {
+    "type": "javascript"
   }
 }
