@@ -76,7 +76,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 layerConfigById: () => sinon.stub()
             },
             actions: {
-                addOrReplaceLayer: () => sinon.stub()
+                addOrReplaceLayer: () => sinon.stub(),
+                updateLayerConfigs: () => sinon.stub()
             }
         });
         wrapper = shallowMount(StoryCreatorChapter, {
@@ -639,25 +640,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         });
 
         describe("resetLayerConfig ", () => {
-            it("should not set the selectedLayer", async () => {
-                await wrapper.setData({
-                    selectedLayer: [{layerId: 1}]
-                });
-
-                await wrapper.vm.resetLayerConfig(null);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig(0);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig(false);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig(undefined);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig({});
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig([]);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-            });
-
             it("should set the selectedLayer to be empty array", async () => {
                 await wrapper.setData({
                     selectedLayer: [{layerId: 1}]

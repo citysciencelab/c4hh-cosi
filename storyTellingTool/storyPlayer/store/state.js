@@ -14,6 +14,7 @@
  * @property {Number} duration Duration used for StoryPlayer animations.
  * @property {String} fixedStoryName the fixed story file name.
  * @property {String} fixedStoryPath the relative path in portalconfigs to contain fixed stories.
+ * @property {ol/layer[]} originalLayerConfig the original layer configs.
  */
 
 const state = {
@@ -33,6 +34,7 @@ const state = {
     fixedStoryPath: null,
     imageAssetsById: {},
     mode: null,
+    originalLayerConfig: undefined,
     storyConf: {}
 };
 
