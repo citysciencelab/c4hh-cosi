@@ -68,7 +68,10 @@
                     "selectParcelDistrictLabel": "Gemarkung",
                     "parcelNumberLabel": "Flurstücksnummer",
                     "parcelSearchNoResults": "Es wurden keine Flurstücksgeometrien für die eingegebene Gemarkung und Flurstücksnummer gefunden.",
-                    "layerConfigNotFound": "Layer-Konfiguration für die Layer-ID {{ layerId }} konnte nicht gefunden werden."
+                    "layerConfigNotFound": "Layer-Konfiguration für die Layer-ID {{ layerId }} konnte nicht gefunden werden.",
+                    "selectAll": "Alles auswählen",
+                    "yearsLoadError": "Es konnten keine Jahrgänge für die ausgewählten Archive geladen werden. Bitte versuchen Sie es erneut.",
+                    "singleYearLoadError": "Es konnten keine Jahrgänge für das Archiv {{ archiveName }} geladen werden. Bitte versuchen Sie es erneut."
                 },
                 "tabResult": {
                     "label": "Ergebnisse",
@@ -85,7 +88,7 @@
                         "openAll": "Alles aufklappen",
                         "closeAll": "Alles zuklappen"
                     },
-                    "selectAll": "Alles selektieren",
+                    "selectAll": "Alles auswählen",
                     "groupByLabel": "Gruppieren nach",
                     "selectOptionLabel": "Option selektieren",
                     "table": {

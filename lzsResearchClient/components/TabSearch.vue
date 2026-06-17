@@ -61,7 +61,9 @@ export default {
             searchGeometryArea: null,
             selectedParcelDistrict: null,
             parcelNumberInputValue: "",
-            archiveLayerOriginalState: {}
+            archiveLayerOriginalState: {},
+            bulkYearsLoading: false,
+            selectAllCancelled: false
         };
     },
     computed: {
@@ -155,7 +157,7 @@ export default {
             }
         },
         isSpatialSearchFormValid () {
-            if (this.selectedArchiveIds.length === 0) {
+            if (this.selectedArchiveIds.length === 0 || this.selectedYears.length === 0) {
                 return false;
             }
 
@@ -204,6 +206,24 @@ export default {
 
             }
             return null;
+        },
+        pointSelected () {
+            return this.searchGeometry?.type === "Point";
+        },
+        selectAllChecked () {
+            const archiveIdsAreChecked =
+                this.archiveWithGeorefList.length > 0 &&
+                this.archiveWithGeorefList.every(a => this.selectedArchiveIds.includes(a.id));
+
+            const yearsAreChecked =
+                this.yearsList.length > 0 &&
+                this.yearsList.every(y => this.selectedYears.includes(y.year));
+
+            if ((this.bulkYearsLoading && !this.selectAllCancelled) || (archiveIdsAreChecked && yearsAreChecked)) {
+                return true;
+            }
+
+            return false;
         }
     },
     watch: {
@@ -234,6 +254,11 @@ export default {
                 if (!this.parcelSourceData) {
                     await this.retrieveParcelSourceData();
                 }
+            }
+        },
+        pointSelected (newValue) {
+            if (!newValue) {
+                this.toggleAllArchiveIds(false);
             }
         }
     },
@@ -479,11 +504,70 @@ export default {
             // For later implementation, please do not reset archiveYears and dont use it directly so that you need to reset it sometime.
         },
         /**
+         * Fills or clears `selectedArchiveIds`. If filling, also fetch years for all archive ids and adds them to `selectedYears`.
+         * @param {Boolean} checked - Whether to check or uncheck all archive ids and years.
+         */
+        async toggleAllArchiveIds (checked) {
+            this.setErrorMessage("");
+            if (checked) {
+                this.selectAllCancelled = false;
+                if (this.bulkYearsLoading) {
+                    return;
+                }
+
+                const allArchiveIds = this.archiveWithGeorefList.map(archive => archive.id);
+                const allYearsCached = allArchiveIds.every(id => this.archiveYears[id]);
+
+                if (allYearsCached) {
+                    this.selectedArchiveIds = allArchiveIds;
+                    this.selectedYears = this.yearsList.map(y => y.year);
+                    return;
+                }
+
+                try {
+                    this.bulkYearsLoading = true;
+
+                    const results = await Promise.allSettled(allArchiveIds.map(async archiveId => {
+                        await this.fetchYears(archiveId);
+                        if (!this.archiveYears[archiveId]) {
+                            throw new Error();
+                        }
+                    }));
+
+                    if (!this.selectAllCancelled) {
+                        const anyFailed = results.some(r => r.status === "rejected");
+
+                        if (anyFailed) {
+                            this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.yearsLoadError"));
+                        }
+                        else {
+                            this.setErrorMessage("");
+                            this.selectedArchiveIds = allArchiveIds;
+                            this.selectedYears = this.yearsList.map(y => y.year);
+                        }
+                    }
+                }
+                finally {
+                    this.bulkYearsLoading = false;
+                    this.selectAllCancelled = false;
+                }
+            }
+            else {
+                this.selectedArchiveIds = [];
+                this.selectedYears = [];
+
+                if (this.bulkYearsLoading) {
+                    this.selectAllCancelled = true;
+                }
+            }
+        },
+        /**
          * Toggle an archive id in `selectedArchiveIds` and fetch years if needed.
          * @param {string} archiveId - Archive identifier to toggle.
          * @param {Event} event - The change event from the checkbox.
          */
         async onSelectedArchiveIdsChange (archiveId, event) {
+            this.setErrorMessage("");
             const checked = event.target.checked,
                 layerConfig = this.placeholderDataClassList[archiveId]?.LAYERCONFIG;
 
@@ -494,10 +578,18 @@ export default {
 
                 if (!this.archiveYears[archiveId]) {
                     await this.fetchYears(archiveId);
+
+                    if (!this.archiveYears[archiveId]) {
+                        this.selectedArchiveIds = this.selectedArchiveIds.filter(id => id !== archiveId);
+
+                        const archiveName = this.archiveList.find(archive => archive.id === archiveId)?.name || archiveId;
+
+                        this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.singleYearLoadError", {archiveName}));
+                    }
                 }
 
                 if (layerConfig && layerConfig.id) {
-                        this.displayLayerInMap(layerConfig.id);
+                    this.displayLayerInMap(layerConfig.id);
                 }
 
             }
@@ -715,8 +807,7 @@ export default {
                 };
             }
             else {
-                this.searchGeometry = null;
-                this.lzsDrawLayerSource.clear();
+                this.removeSearchGeometry();
             }
         },
         /**
@@ -807,7 +898,6 @@ export default {
             switch (group) {
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries"):
                     this.selectedButtonGroup = "geometry";
-                    this.removeSearchGeometry();
 
                     if (this.addressSearchCoordinates) {
                         this.removePointMarker();
@@ -818,20 +908,31 @@ export default {
 
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address"):
-                    this.removeSearchGeometry();
                     this.selectedButtonGroup = "address";
+
+                    if (this.searchGeometry) {
+                        this.removeSearchGeometry();
+                    }
 
                     this.clearParcelSearch(true);
 
 
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel"):
-                    this.removeSearchGeometry();
                     this.selectedButtonGroup = "parcel";
+
+                    if (this.searchGeometry) {
+                        this.removeSearchGeometry();
+                    }
+
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent"):
                 default:
-                    this.removeSearchGeometry();
+                    this.selectedButtonGroup = "extent";
+
+                    if (this.searchGeometry) {
+                        this.removeSearchGeometry();
+                    }
 
                     if (this.addressSearchCoordinates) {
                         this.removePointMarker();
@@ -839,8 +940,6 @@ export default {
                     }
 
                     this.clearParcelSearch(true);
-
-                    this.selectedButtonGroup = "extent";
                     break;
             }
         },
@@ -1011,10 +1110,10 @@ export default {
                 }
             }
             else if (!configJsonLayer.visibility) {
-                 this.archiveLayerOriginalState[layerId] = {
-                        visibility: false,
-                        showInLayerTree: configJsonLayer.showInLayerTree
-                    };
+                this.archiveLayerOriginalState[layerId] = {
+                    visibility: false,
+                    showInLayerTree: configJsonLayer.showInLayerTree
+                };
 
                 this.replaceByIdInLayerConfig({
                     layerConfigs: [{
@@ -1139,68 +1238,82 @@ export default {
                 id="searchFormWithGeometry"
                 class="searchFormWithGeometry"
             >
-                <div class="archiveSelection">
-                    <span>
-                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel') }}
-                    </span>
+                <div class="archiveYearsSelection">
+                    <div class="archiveSelection">
+                        <span>
+                            {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel') }}
+                        </span>
 
-                    <div
-                        class="archiveSelectionList"
-                        role="group"
-                        aria-label="archives"
-                    >
                         <div
-                            v-for="archive in archiveWithGeorefList"
-                            :key="archive.id"
-                            class="archiveCheckboxList"
+                            class="archiveSelectionList"
+                            role="group"
+                            aria-label="archives"
                         >
-                            <input
-                                :id="`archiveCheckbox-${archive.id}`"
-                                type="checkbox"
-                                :value="archive.id"
-                                :checked="selectedArchiveIds.includes(archive.id)"
-                                @change="onSelectedArchiveIdsChange(archive.id, $event)"
+                            <div
+                                v-for="archive in archiveWithGeorefList"
+                                :key="archive.id"
+                                class="archiveCheckboxList"
                             >
+                                <input
+                                    :id="`archiveCheckbox-${archive.id}`"
+                                    type="checkbox"
+                                    :value="archive.id"
+                                    :checked="selectedArchiveIds.includes(archive.id)"
+                                    :disabled="bulkYearsLoading && !selectAllCancelled"
+                                    @change="onSelectedArchiveIdsChange(archive.id, $event)"
+                                >
 
-                            <label :for="`archiveCheckbox-${archive.id}`">
-                                {{ archive.name }}
-                            </label>
+                                <label :for="`archiveCheckbox-${archive.id}`">
+                                    {{ archive.name }}
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="yearsSelection">
-                    <span>
-                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectYearsLabel') }}
-                    </span>
+                    <div class="yearsSelection">
+                        <span>
+                            {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectYearsLabel') }}
+                        </span>
+
+                        <div
+                            class="yearsSelectionList"
+                            role="group"
+                            aria-label="years"
+                        >
+                            <div
+                                v-for="yearObject in yearsList"
+                                :key="yearObject.year"
+                                class="yearCheckboxItem"
+                            >
+                                <input
+                                    :id="`yearCheckbox-${yearObject.year}`"
+                                    type="checkbox"
+                                    :value="yearObject.year"
+                                    :checked="selectedYears.includes(yearObject.year)"
+                                    :disabled="bulkYearsLoading && !selectAllCancelled"
+                                    @change="onSelectedYearsChange(yearObject.year, $event)"
+                                >
+
+                                <label :for="`yearCheckbox-${yearObject.year}`">
+                                    <span>
+                                        {{ yearObject.year }}
+                                    </span>
+                                    <span>
+                                        ({{ yearObject.archiveNames.join(", ") }})
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
                     <div
-                        class="yearsSelectionList"
-                        role="group"
-                        aria-label="years"
+                        v-if="bulkYearsLoading && !selectAllCancelled"
+                        class="loadingSpinner bulkLoadingSpinner"
                     >
-                        <div
-                            v-for="yearObject in yearsList"
-                            :key="yearObject.year"
-                            class="yearCheckboxItem"
-                        >
-                            <input
-                                :id="`yearCheckbox-${yearObject.year}`"
-                                type="checkbox"
-                                :value="yearObject.year"
-                                :checked="selectedYears.includes(yearObject.year)"
-                                @change="onSelectedYearsChange(yearObject.year, $event)"
-                            >
-
-                            <label :for="`yearCheckbox-${yearObject.year}`">
-                                <span>
-                                    {{ yearObject.year }}
-                                </span>
-                                <span>
-                                    ({{ yearObject.archiveNames.join(", ") }})
-                                </span>
-                            </label>
-                        </div>
+                        <SpinnerItem
+                            custom-class="spinner"
+                            class="ms-3"
+                        />
                     </div>
                 </div>
 
@@ -1330,7 +1443,19 @@ export default {
             </div>
 
             <div class="searchButtons">
-                <div class="spacer-div" />
+                <SwitchInput
+                    v-if="pointSelected"
+                    id="idSelectAllForPoint"
+                    name="selectAllForPoint"
+                    :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectAll')"
+                    :label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectAll')"
+                    :checked="selectAllChecked"
+                    :interaction="(evt) => toggleAllArchiveIds(evt.target.checked)"
+                />
+                <div
+                    v-else
+                    class="spacer-div"
+                />
                 <FlatButton
                     :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
                     :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
@@ -1511,12 +1636,28 @@ export default {
                 margin-top: 1rem;
                 margin-left: 0.25rem;
             }
+
+            div.archiveYearsSelection {
+                position: relative;
+
+                div.bulkLoadingSpinner {
+                    div.spinner {
+                        width: 2.5rem;
+                        height: 2.5rem;
+                    }
+                }
+            }
         }
 
         div.searchButtons {
             display: flex;
             gap: 0.5rem;
-            margin-top: 1rem;
+            margin: 1rem 0;
+            align-items: center;
+
+            button {
+                margin-bottom: 0;
+            }
 
             *:nth-child(2) {
                 margin-left: auto;

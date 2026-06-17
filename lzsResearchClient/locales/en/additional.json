@@ -68,7 +68,10 @@
                     "selectParcelDistrictLabel": "Parcel district",
                     "parcelNumberLabel": "Parcel number",
                     "parcelSearchNoResults": "No parcel geometries were found for the entered parcel district and parcel number.",
-                    "layerConfigNotFound": "Layer configuration for the specified layer ID {{ layerId }} could not be found."
+                    "layerConfigNotFound": "Layer configuration for the specified layer ID {{ layerId }} could not be found.",
+                    "selectAll": "Select all",
+                    "yearsLoadError": "Could not load years for the selected archives. Please try again.",
+                    "singleYearLoadError": "Could not load years for archive {{ archiveName }}. Please try again."
                 },
                 "tabResult": {
                     "label": "Results",

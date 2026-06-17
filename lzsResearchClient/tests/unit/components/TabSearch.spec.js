@@ -127,7 +127,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         addOrReplaceLayerStub = sinon.stub().resolves();
 
         store = createStore({
-             getters: {
+            getters: {
                 layerConfigById: () => layerConfigByIdStub
             },
             actions: {
@@ -152,8 +152,11 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                                 archiveHasGeoref: () => (id) => {
                                     return id === "DKL_AFIS_EINZEL";
                                 },
-                                yearsList: () => [2020],
-                                archiveYears: () => ({}),
+                                archiveYears: () => ({
+                                    "DKL_3DSTADT_LOD1": {years: [2020], archiveName: "3D-Stadtmodell LoD1"},
+                                    "DKL_3DSTADT_LOD2": {years: [2020], archiveName: "3D-Stadtmodell LoD2"},
+                                    "DKL_AFIS_EINZEL": {years: [2020], archiveName: "AFIS-Einzelnachweise"}
+                                }),
                                 placeholderDataClassList: () => mockPlaceholdersJson,
                                 lzsCurrentLayout: () => ({
                                     fillColor: [148, 10, 65, 0.5],
@@ -192,7 +195,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                                 setLzsSelectedDrawType: () => "box",
                                 setLzsSelectedInteraction: () => "draw",
                                 setSearchInput: () => sinon.stub(),
-                                setAddressSearchCoordinates: () => sinon.stub()
+                                setAddressSearchCoordinates: () => sinon.stub(),
+                                setErrorMessage: () => sinon.stub()
                             }
                         }
                     }
@@ -387,6 +391,20 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         await wrapper.vm.onSelectedYearsChange(year, {target: {checked: false}});
 
         expect(wrapper.vm.selectedYears).to.not.include(year);
+    });
+
+    it("toggling one year checkbox sets selectAllChecked to true or false", async () => {
+        const year = 2020;
+
+        await wrapper.vm.toggleAllArchiveIds(true);
+
+        await wrapper.vm.onSelectedYearsChange(year, {target: {checked: false}});
+
+        expect(wrapper.vm.selectAllChecked).to.be.false;
+
+        await wrapper.vm.onSelectedYearsChange(year, {target: {checked: true}});
+
+        expect(wrapper.vm.selectAllChecked).to.be.true;
     });
 
     it("resetForm restores attribute form and geometric selections", async () => {
@@ -814,6 +832,32 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
 
             expect(layerConfig).to.include({id: "test-layer", url: "https://example.com", showInLayerTree: true, visibility: true, type: "layer"});
             expect(parentKey).to.equal(treeSubjectsKey);
+        });
+    });
+
+    describe("toggleAllArchiveIds", () => {
+        it("checks or unchecks all archive ids", async () => {
+            expect(wrapper.vm.selectedArchiveIds).to.be.an("array").that.is.empty;
+
+            await wrapper.vm.toggleAllArchiveIds(true);
+
+            expect(wrapper.vm.selectedArchiveIds).to.have.members(["DKL_AFIS_EINZEL"]);
+
+            await wrapper.vm.toggleAllArchiveIds(false);
+
+            expect(wrapper.vm.selectedArchiveIds).to.be.an("array").that.is.empty;
+        });
+
+        it("checks or unchecks all years", async () => {
+            expect(wrapper.vm.selectedYears).to.be.an("array").that.is.empty;
+
+            await wrapper.vm.toggleAllArchiveIds(true);
+
+            expect(wrapper.vm.selectedYears).to.have.members(wrapper.vm.yearsList.map(y => y.year));
+
+            await wrapper.vm.toggleAllArchiveIds(false);
+
+            expect(wrapper.vm.selectedYears).to.be.an("array").that.is.empty;
         });
     });
 });

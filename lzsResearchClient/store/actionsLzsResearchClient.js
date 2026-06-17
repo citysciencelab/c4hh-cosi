@@ -125,7 +125,7 @@ export default {
      * @param {object} context - Vuex action context (state, commit, dispatch).
      * @param {string} archiveId - Archive identifier to request years for.
      */
-    async fetchYears ({state, commit, dispatch}, archiveId) {
+    async fetchYears ({state, commit}, archiveId) {
         const params = {
                 Token: state.requestToken,
                 f: "json",
@@ -142,7 +142,7 @@ export default {
                     }
                 });
             }).catch(function (error) {
-                dispatch("axiosErrorHandling", error);
+                console.error("fetchYears failed:", error);
             });
     },
     /**
