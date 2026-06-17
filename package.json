@@ -73,7 +73,7 @@
     "@geoblocks/print": "^0.7.9",
     "@masterportal/mpconfigparser": "^2.0.0",
     "@sinonjs/fake-timers": "^14.0.0",
-    "@stylistic/eslint-plugin-js": "^4.4.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vitest/eslint-plugin": "^1.6.16",
     "@vitest/ui": "^4.0.16",

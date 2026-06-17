@@ -4,7 +4,7 @@ import pluginVue from "eslint-plugin-vue";
 import pluginJsdoc from "eslint-plugin-jsdoc";
 import vitest from "@vitest/eslint-plugin";
 import globals from "globals";
-import stylisticJs from "@stylistic/eslint-plugin-js";
+import stylistic from "@stylistic/eslint-plugin";
 import nodePlugin from "eslint-plugin-n";
 
 export default [
@@ -33,7 +33,7 @@ export default [
         },
         plugins: {
             "vuejs-accessibility": pluginVuejsAccessibility,
-            "@stylistic/js": stylisticJs
+            "@stylistic": stylistic
         },
         rules: {
             // Possible Problems - These rules relate to possible logic errors in code:
@@ -141,35 +141,34 @@ export default [
             // end of changes for eslint v9
             // Layout & Formatting - These rules care about how the code looks rather than how it executes:
             // Deprecated - The old rules have been deprecated (in ESLint v8.53.0) in accordance with the deprecation policy, and replaced by those newer rules:
-            "@stylistic/js/array-bracket-spacing": "error",
-            "@stylistic/js/block-spacing": "error",
-            "@stylistic/js/brace-style": ["error", "stroustrup"],
-            "@stylistic/js/comma-dangle": "error",
-            "@stylistic/js/comma-spacing": "error",
-            "@stylistic/js/comma-style": "error",
-            "@stylistic/js/computed-property-spacing": "error",
-            "@stylistic/js/eol-last": ["error", "always"],
-            "@stylistic/js/func-call-spacing": ["error", "never"],
-            "@stylistic/js/implicit-arrow-linebreak": "error",
-            "@stylistic/js/indent": ["error", 4, {"SwitchCase": 1}],
-            "@stylistic/js/jsx-quotes": "error",
-            "@stylistic/js/key-spacing": "error",
-            "@stylistic/js/keyword-spacing": "error",
-            "@stylistic/js/max-statements-per-line": "error",
-            "@stylistic/js/new-parens": "error",
-            "@stylistic/js/no-multi-spaces": "error",
-            "@stylistic/js/no-extra-parens": [
+            "@stylistic/array-bracket-spacing": "error",
+            "@stylistic/block-spacing": "error",
+            "@stylistic/brace-style": ["error", "stroustrup"],
+            "@stylistic/comma-dangle": "error",
+            "@stylistic/comma-spacing": "error",
+            "@stylistic/comma-style": "error",
+            "@stylistic/computed-property-spacing": "error",
+            "@stylistic/eol-last": ["error", "always"],
+            "@stylistic/function-call-spacing": ["error", "never"],
+            "@stylistic/implicit-arrow-linebreak": "error",
+            "@stylistic/jsx-quotes": "error",
+            "@stylistic/key-spacing": "error",
+            "@stylistic/keyword-spacing": "error",
+            "@stylistic/max-statements-per-line": "error",
+            "@stylistic/new-parens": "error",
+            "@stylistic/no-multi-spaces": "error",
+            "@stylistic/no-extra-parens": [
                 "error",
                 "all",
                 {"nestedBinaryExpressions": false}
             ],
-            "@stylistic/js/no-multiple-empty-lines": ["error", {"max": 2, "maxBOF": 1}],
-            "@stylistic/js/no-tabs": "error",
-            "@stylistic/js/no-trailing-spaces": "error",
-            "@stylistic/js/no-whitespace-before-property": "error",
-            "@stylistic/js/object-curly-spacing": "error",
-            "@stylistic/js/object-property-newline": "off",
-            "@stylistic/js/padding-line-between-statements": [
+            "@stylistic/no-multiple-empty-lines": ["error", {"max": 2, "maxBOF": 1}],
+            "@stylistic/no-tabs": "error",
+            "@stylistic/no-trailing-spaces": "error",
+            "@stylistic/no-whitespace-before-property": "error",
+            "@stylistic/object-curly-spacing": "error",
+            "@stylistic/object-property-newline": "off",
+            "@stylistic/padding-line-between-statements": [
                 "error",
                 {
                     "blankLine": "always",
@@ -182,17 +181,17 @@ export default [
                     "next": ["const", "let", "var"]
                 }
             ],
-            "@stylistic/js/quotes": "error",
-            "@stylistic/js/semi": "error",
-            "@stylistic/js/semi-spacing": "error",
-            "@stylistic/js/semi-style": "error",
-            "@stylistic/js/space-before-blocks": "error",
-            "@stylistic/js/space-before-function-paren": "error",
-            "@stylistic/js/space-in-parens": "error",
-            "@stylistic/js/space-infix-ops": "error",
-            "@stylistic/js/space-unary-ops": "error",
-            "@stylistic/js/switch-colon-spacing": "error",
-            "@stylistic/js/wrap-regex": "error",
+            "@stylistic/quotes": "error",
+            "@stylistic/semi": "error",
+            "@stylistic/semi-spacing": "error",
+            "@stylistic/semi-style": "error",
+            "@stylistic/space-before-blocks": "error",
+            "@stylistic/space-before-function-paren": "error",
+            "@stylistic/space-in-parens": "error",
+            "@stylistic/space-infix-ops": "error",
+            "@stylistic/space-unary-ops": "error",
+            "@stylistic/switch-colon-spacing": "error",
+            "@stylistic/wrap-regex": "error",
             // Deprecated - The old rules have been deprecated (in ESLint v7.0.0) in accordance with the deprecation policy, and replaced by those newer rules:
             "n/callback-return": "error",
             "n/handle-callback-err": "error",
@@ -264,6 +263,37 @@ export default [
             "vue/no-v-for-template-key-on-child": ["off"],
             "vue/no-deprecated-v-bind-sync": ["off"],
             "vue/html-indent": ["error", 4],
+            "vue/html-closing-bracket-newline": [
+                "error",
+                {
+                    "singleline": "never",
+                    "multiline": "always"
+                }
+            ],
+            "vue/html-closing-bracket-spacing": [
+                "error",
+                {
+                    "startTag": "never",
+                    "endTag": "never",
+                    "selfClosingTag": "always"
+                }
+            ],
+            "vue/html-end-tags": "error",
+            "vue/html-quotes": ["error", "double"],
+            "vue/max-attributes-per-line": [
+                "error",
+                {
+                    "singleline": {
+                        "max": 1
+                    },
+                    "multiline": {
+                        "max": 1
+                    }
+                }
+            ],
+            "vue/no-multi-spaces": "error",
+            "vue/no-spaces-around-equal-signs-in-attribute": "error",
+            "vue/no-template-shadow": "error",
             "vue/no-v-html": ["off"],
             "vue/match-component-file-name": [
                 "error",

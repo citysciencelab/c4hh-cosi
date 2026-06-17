@@ -11,12 +11,14 @@
 - Vue-directive: Added a vue-directive "bs-tooltip.js" to handle Bootstrap-Tooltips.
 - TabContainer: Added new shared component `TabContainer` for reusable, state-independent tab navigation.
 - WMS-Time: Added Parameters `displayFormat` and `displayTimezone` to format the timestamp label in the TimeSlider.
+- The following packages have been added:
+    - dependencies:
+        -     @stylistic/eslint-plugin: ^5.10.0
 
 ### Changed
 - The following packages have been updated:
     - devDependencies:
         - @eslint/js: 9.20.0 to 10.0.1
-        - @stylistic/eslint-plugin-js: ^2.13.0 to ^4.4.1
         - eslint-plugin-n: 17.24.0 to 18.0.1
         - eslint-plugin-jsdoc": 50.6.3 to 63.0.1
         - eslint-plugin-vue": 9.32.0 to 10.9.1
@@ -26,6 +28,9 @@
 ### Deprecated
 
 ### Removed
+- The following packages have been removed:
+  - devDependencies:
+    - @stylistic/eslint-plugin-js ^2.13.0
 
 ### Fixed
 - Issue \#1585: Fixed case where dragging for resizing menus continued after releasing mouse or touch outside browser window.
