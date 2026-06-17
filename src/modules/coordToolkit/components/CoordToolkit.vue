@@ -655,12 +655,14 @@ export default {
                         <p class="mb-2">
                             {{ coordInfo?.title + ":" }}
                         </p>
-                        <li
-                            v-for="explanation in coordInfo?.explanations"
-                            :key="explanation"
-                        >
-                            {{ explanation }}
-                        </li>
+                        <ul class="explanation-list">
+                            <li
+                                v-for="explanation in coordInfo?.explanations"
+                                :key="explanation"
+                            >
+                                {{ explanation }}
+                            </li>
+                        </ul>
                         <br>
                     </div>
                 </AccordionItem>
@@ -744,6 +746,9 @@ export default {
     }
     .fade-enter, .fade-leave-to {
         opacity: 0;
+    }
+    .explanation-list {
+        margin-left: - 13px;
     }
 </style>
 

@@ -155,30 +155,32 @@ export default {
                     />
                 </button>
             </li>
-            <button
-                v-if="topBaselayer === null"
-                id="bs-placeholder"
-                class="btn btn-light preview top placeholder-button"
-                @click="setActivatedExpandable(!activatedExpandable)"
-            >
-                <i class="bi-map" />
-            </button>
-            <button
-                v-else
-                id="bs-topBaselayer"
-                class="btn btn-light preview top"
-                @click="setActivatedExpandable(!activatedExpandable)"
-            >
-                <LayerPreview
-                    :id="'layer-tree-layer-preview-' + topBaselayer.id"
-                    :layer-id="topBaselayer.id"
-                    :center="topBaselayer.preview?.center"
-                    :zoom-level="topBaselayer.preview?.zoomLevel"
-                    :radius="topBaselayer.preview?.radius"
-                    :checkable="topBaselayer.preview?.checkable"
-                    :custom-class="topBaselayer.preview?.customClass"
-                />
-            </button>
+            <li>
+                <button
+                    v-if="topBaselayer === null"
+                    id="bs-placeholder"
+                    class="btn btn-light preview top placeholder-button"
+                    @click="setActivatedExpandable(!activatedExpandable)"
+                >
+                    <i class="bi-map" />
+                </button>
+                <button
+                    v-else
+                    id="bs-topBaselayer"
+                    class="btn btn-light preview top"
+                    @click="setActivatedExpandable(!activatedExpandable)"
+                >
+                    <LayerPreview
+                        :id="'layer-tree-layer-preview-' + topBaselayer.id"
+                        :layer-id="topBaselayer.id"
+                        :center="topBaselayer.preview?.center"
+                        :zoom-level="topBaselayer.preview?.zoomLevel"
+                        :radius="topBaselayer.preview?.radius"
+                        :checkable="topBaselayer.preview?.checkable"
+                        :custom-class="topBaselayer.preview?.customClass"
+                    />
+                </button>
+            </li>
         </ul>
     </div>
 </template>
