@@ -326,7 +326,7 @@ export default [
 
                 // 1) Relative imports ("./" or "../") must end with .js or .vue
                 {
-                    selector: "ImportDeclaration[source.value=/^\\./]:not([source.value=/\\.(?:js|vue|json|css|scss|sass)$/])",
+                    selector: "ImportDeclaration[source.value=/^\\./]:not([source.value=/\\.(?:js|mjs|vue|json|css|scss|sass)$/])",
                     message: "Relative imports must include a valid extension (.js, .vue, .json, .css, .scss, or .sass)."
                 },
 
@@ -344,7 +344,7 @@ export default [
 
                 // 4) (optional) Dynamic relative imports must include .js or .vue
                 {
-                    selector: "CallExpression[callee.type='Import'] > Literal[value=/^\\./]:not([value=/\\.(?:js|vue|json|css|scss|sass)$/])",
+                    selector: "CallExpression[callee.type='Import'] > Literal[value=/^\\./]:not([value=/\\.(?:js|mjs|vue|json|css|scss|sass)$/])",
                     message: "Dynamic relative imports must include .js, .vue, .json, .css, .scss, or .sass."
                 },
 
@@ -392,7 +392,7 @@ export default [
         }
     },
     {
-        files: ["addons/**/*.{js,vue}"],
+        files: ["addons/**/*.{js,mjs,vue}"],
         rules: {
             "no-restricted-syntax": "off",
             "vue/no-restricted-syntax": "off",
@@ -420,6 +420,14 @@ export default [
         },
         rules: {
             "vitest/no-focused-tests": "error"
+        }
+    },
+    {
+        files: ["devtools/**/*.mjs"],
+        rules: {
+            "func-style": "off",
+            "no-console": "off",
+            "n/no-process-exit": "off"
         }
     },
     {

@@ -15,7 +15,7 @@ import addonModules from "./tasks/addon-modules-plugin.js";
 import emptyAddonModulesPlugin from "./tasks/empty-addon-modules-plugin.js";
 // import { analyzer } from "vite-bundle-analyzer";// Do not delete, comment in for analyzing bundle content and before install: npm install vite-bundle-analyzer --save-dev
 import vmShimPlugin from "./tasks/vm-shim-plugin.js";
-// eslint-disable-next-line no-restricted-syntax
+
 import getMastercodeVersionFolderName from "./tasks/getMastercodeVersionFolderName.mjs";
 import zipPack from "vite-plugin-zip-pack";
 import {HttpsProxyAgent} from "https-proxy-agent";

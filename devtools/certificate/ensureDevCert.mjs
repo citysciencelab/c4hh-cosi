@@ -6,7 +6,7 @@ import path from "node:path";
 import {fileURLToPath} from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 // This script lives in devtools/certificate → use this folder directly.
 const certDir = __dirname;
@@ -66,12 +66,18 @@ if (!sh(["version"], "ignore")) {
 
 // 4) Generate key → csr → cert
 console.log("[dev-cert] generating localhost.key …");
-if (!sh(["genrsa", "-out", KEY, "2048"])) process.exit(1);
+if (!sh(["genrsa", "-out", KEY, "2048"])) {
+ process.exit(1);
+}
 
 console.log("[dev-cert] generating localhost.csr …");
-if (!sh(["req", "-new", "-key", KEY, "-out", CSR, "-config", CNF])) process.exit(1);
+if (!sh(["req", "-new", "-key", KEY, "-out", CSR, "-config", CNF])) {
+ process.exit(1);
+}
 
 console.log("[dev-cert] generating localhost.pem …");
-if (!sh(["x509", "-req", "-days", "3650", "-in", CSR, "-signkey", KEY, "-out", PEM, "-extensions", "v3_req", "-extfile", CNF])) process.exit(1);
+if (!sh(["x509", "-req", "-days", "3650", "-in", CSR, "-signkey", KEY, "-out", PEM, "-extensions", "v3_req", "-extfile", CNF])) {
+ process.exit(1);
+}
 
 console.log("[dev-cert] ✅ certificates ready:", KEY, PEM);
