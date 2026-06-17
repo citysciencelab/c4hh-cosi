@@ -67,7 +67,7 @@ export default [
             "no-alert": "error",
             "no-array-constructor": "error",
             "no-caller": "error",
-            "no-console": ["error", { "allow": ["warn", "error"] }],
+            "no-console": ["error", {"allow": ["warn", "error"]}],
             "no-empty-function": "error",
             "no-div-regex": "error",
             "no-else-return": "error",
@@ -123,7 +123,7 @@ export default [
             // changes for eslint v9
             "no-undef": "error",
             "no-unused-vars": ["error",
-                { "caughtErrors": "none" }
+                {"caughtErrors": "none"}
             ],
             // changes for eslint v10
             "no-useless-assignment": "off",
@@ -160,7 +160,7 @@ export default [
             "@stylistic/no-extra-parens": [
                 "error",
                 "all",
-                { "nestedBinaryExpressions": false }
+                {"nestedBinaryExpressions": false}
             ],
             "@stylistic/no-multiple-empty-lines": ["error", {"max": 2, "maxBOF": 1}],
             "@stylistic/no-tabs": "error",
@@ -409,7 +409,7 @@ export default [
     },
     {
         files: ["**/*.spec.js"],
-        plugins: { vitest },
+        plugins: {vitest},
         languageOptions: {
             globals: {
                 ...vitest.environments.env.globals,
