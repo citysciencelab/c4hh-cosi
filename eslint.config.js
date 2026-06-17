@@ -67,7 +67,7 @@ export default [
             "no-alert": "error",
             "no-array-constructor": "error",
             "no-caller": "error",
-            "no-console": ["error", {"allow": ["warn", "error"]}],
+            "no-console": ["error", { "allow": ["warn", "error"] }],
             "no-empty-function": "error",
             "no-div-regex": "error",
             "no-else-return": "error",
@@ -123,7 +123,7 @@ export default [
             // changes for eslint v9
             "no-undef": "error",
             "no-unused-vars": ["error",
-                {"caughtErrors": "none"}
+                { "caughtErrors": "none" }
             ],
             // changes for eslint v10
             "no-useless-assignment": "off",
@@ -160,7 +160,7 @@ export default [
             "@stylistic/no-extra-parens": [
                 "error",
                 "all",
-                {"nestedBinaryExpressions": false}
+                { "nestedBinaryExpressions": false }
             ],
             "@stylistic/no-multiple-empty-lines": ["error", {"max": 2, "maxBOF": 1}],
             "@stylistic/no-tabs": "error",
@@ -379,6 +379,12 @@ export default [
                 {
                     selector: "VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='accordion-button']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='accordion-button'])",
                     message: "Native <button> with class \"accordion-button\" is not allowed. Use <AccordionItem> instead."
+                },
+
+                // 3) Disallow <li> without proper parent (ol, ul, menu, or template)
+                {
+                    selector: "VElement[name='li']:not([parent.name='ol']):not([parent.name='ul']):not([parent.name='menu']):not([parent.name='template']):not([parent.name='transitiongroup'])",
+                    message: "<li> must be a direct child of <ol>, <ul>, <menu>, or <template>. Using other parents violates accessibility standards. Vue's <TransitionGroup> is allowed when it renders as a list container (<ul> or <ol>)."
                 }
             ]
 
@@ -403,7 +409,7 @@ export default [
     },
     {
         files: ["**/*.spec.js"],
-        plugins: {vitest},
+        plugins: { vitest },
         languageOptions: {
             globals: {
                 ...vitest.environments.env.globals,
