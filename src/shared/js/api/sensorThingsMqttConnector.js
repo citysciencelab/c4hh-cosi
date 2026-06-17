@@ -225,6 +225,11 @@ export class SensorThingsMqttConnector {
 
         await new Promise(resolve => {
             this.mqttClient.subscribe(topic, subscriptionOptions, (err, granted) => {
+
+                if (err) {
+                    console.warn(`MQTT: Server rejected subscription for [${topic}]! Error:`, err);
+                }
+
                 resolve();
                 if (err) {
                     if (typeof onerror === "function") {
