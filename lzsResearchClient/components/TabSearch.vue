@@ -71,6 +71,7 @@ export default {
             "lzsSelectedInteraction",
             "lzsDrawEdits",
             "minScaleValue",
+            "maxResultValueCount",
             "addressSearchCoordinates"
         ]),
         ...mapGetters("Maps", [
@@ -145,6 +146,26 @@ export default {
             }
 
             return true;
+        },
+        maxValueCountPlaceholder () {
+            if (this.maxResultValueCount >= 10) {
+                return "10";
+            }
+            else if (this.maxResultValueCount >= 5) {
+                return "5";
+            }
+
+            return String(this.maxResultValueCount);
+        },
+        maxValueCountDefaultValue () {
+            if (this.maxResultValueCount >= 25) {
+                return "25";
+            }
+            else if (this.maxResultValueCount >= 10) {
+                return "10";
+            }
+
+            return "1";
         }
     },
     watch: {
@@ -255,6 +276,7 @@ export default {
                             placeholder: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.PLACEHOLDER || "",
                             label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`),
                             pattern: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.PATTERN || "",
+                            testNumberRange: null,
                             errorKey: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.ERROR_KEY,
                             errorParams: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.ERROR_PARAMS || {},
                             errorMessage: ""
@@ -264,12 +286,13 @@ export default {
                     ...attributes,
                     {
                         name: "maxValueCount",
-                        value: "",
+                        value: this.maxValueCountDefaultValue,
                         label: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount"),
-                        pattern: "[0-9]{1,4}",
-                        placeholder: "10",
-                        errorKey: "patternError",
-                        errorParams: {digitNumber: 4},
+                        pattern: "[0-9]*",
+                        testNumberRange: [1, this.maxResultValueCount],
+                        placeholder: this.maxValueCountPlaceholder,
+                        errorKey: "numberRangeError",
+                        errorParams: {minNum: 1, maxNum: this.maxResultValueCount},
                         errorMessage: ""
                     }
                 ];
@@ -336,6 +359,18 @@ export default {
                     const regex = new RegExp(`^${attribute.pattern}$`);
 
                     if (!regex.test(String(attribute.value))) {
+                        attribute.errorMessage = this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.errorKey}`,
+                            attribute.errorParams
+                        );
+                        this.isAttributeSearchFormValid = false;
+                    }
+                }
+
+                if (attribute.testNumberRange && attribute.value !== null && Number(attribute.value) !== "") {
+                    if (
+                        Number(attribute.value) < attribute.testNumberRange[0] ||
+                        Number(attribute.value) > attribute.testNumberRange[1]
+                    ) {
                         attribute.errorMessage = this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.errorKey}`,
                             attribute.errorParams
                         );
@@ -725,7 +760,7 @@ export default {
                         :key="attribute.name"
                         v-model="attribute.value"
                         :class-obj="['form-control' + (attribute.errorMessage.length > 0 ? ' is-invalid': ' is-valid')]"
-                        :label="attribute.name"
+                        :label="attribute.label"
                         :placeholder="attribute.placeholder"
                         :error-message="attribute.errorMessage"
                         @input="validateSearchWithAttributeForm()"

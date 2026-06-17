@@ -38,6 +38,7 @@
                     "maxValueCount": "Max. Trefferanzahl",
                     "patternError": "Bitte eine Zahl mit {{ digitNumber }} Ziffern eingeben.",
                     "patternErrorRange": "Bitte eine Zahl mit {{ minDigits }} bis {{ maxDigits }} Ziffern eingeben.",
+                    "numberRangeError": "Bitte eine Zahl zwischen {{ minNum }} und {{ maxNum }} eingeben.",
                     "spatialSelectionGroup": {
                         "geometries": "eingezeichneten Gebiet",
                         "extent": "Kartenausschnitt",

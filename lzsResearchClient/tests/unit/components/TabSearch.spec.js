@@ -12,6 +12,7 @@ import Component from "../../../components/TabSearch.vue";
 describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js", () => {
     let wrapper,
         store;
+    const mockMaxResultValueCount = 100;
 
     beforeEach(() => {
         const mockDataClassList = [
@@ -53,31 +54,43 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                 "3D-Stadtmodell LoD1": {
                     "JAHRGANG": {
                         "PLACEHOLDER": "2023",
-                        "PATTERN": "[0-9*]{4}"
+                        "PATTERN": "[0-9*]{4}",
+                        "ERROR_KEY": "patternError",
+                        "ERROR_PARAMS": {"digitNumber": 4}
                     },
                     "KACHELNUMMER": {
                         "PLACEHOLDER": "6628",
-                        "PATTERN": "[0-9*]{4}"
+                        "PATTERN": "[0-9*]{4}",
+                        "ERROR_KEY": "patternError",
+                        "ERROR_PARAMS": {"digitNumber": 4}
                     }
                 },
                 "3D-Stadtmodell LoD2": {
                     "JAHRGANG": {
                         "PLACEHOLDER": "2023",
-                        "PATTERN": "[0-9*]{4}"
+                        "PATTERN": "[0-9*]{4}",
+                        "ERROR_KEY": "patternError",
+                        "ERROR_PARAMS": {"digitNumber": 4}
                     },
                     "KACHELNUMMER": {
                         "PLACEHOLDER": "6628",
-                        "PATTERN": "[0-9*]{4}"
+                        "PATTERN": "[0-9*]{4}",
+                        "ERROR_KEY": "patternError",
+                        "ERROR_PARAMS": {"digitNumber": 4}
                     }
                 },
                 "AFIS-Einzelnachweise": {
                     "JAHRGANG": {
                         "PLACEHOLDER": "2023",
-                        "PATTERN": "[0-9*]{4}"
+                        "PATTERN": "[0-9*]{4}",
+                        "ERROR_KEY": "patternError",
+                        "ERROR_PARAMS": {"digitNumber": 4}
                     },
                     "PUNKTKENNUNG": {
                         "PLACEHOLDER": "232590148",
-                        "PATTERN": "[0-9*]{9}"
+                        "PATTERN": "[0-9*]{9}",
+                        "ERROR_KEY": "patternError",
+                        "ERROR_PARAMS": {"digitNumber": 9}
                     }
                 }
             },
@@ -121,6 +134,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                                 lzsSelectedInteraction: () => null,
                                 lzsDrawEdits: () => ["deleteAll"],
                                 minScaleValue: () => 5000,
+                                maxResultValueCount: () => mockMaxResultValueCount,
                                 addressSearchCoordinates: () => [1, 2]
                             },
                             actions: {
@@ -169,7 +183,12 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         wrapper = shallowMount(Component, {
             global: {
                 mocks: {
-                    $t: key => key
+                    $t: (key, pattern) => {
+                        if (pattern) {
+                            return key + ":" + Object.values(pattern).join(",");
+                        }
+                        return key;
+                    }
                 },
                 plugins: [store],
                 stubs: {
@@ -243,6 +262,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         expect(searchWithAttributeForm).to.be.an("array");
         expect(searchWithAttributeForm.length).to.equal(3);
         expect(searchWithAttributeForm[0].value).to.equal("");
+        expect(searchWithAttributeForm[2].name).to.equal("maxValueCount");
+        expect(searchWithAttributeForm[2].value).to.equal("25");
+        expect(searchWithAttributeForm[2].placeholder).to.equal("10");
+        expect(searchWithAttributeForm[2].testNumberRange).to.deep.equal([1, mockMaxResultValueCount]);
     });
 
     it("updates attribute value when input changes", async () => {
@@ -377,5 +400,69 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         await wrapper.vm.setSelectedButtonGroup("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address");
 
         expect(wrapper.vm.selectedButtonGroup).to.equal("address");
+    });
+
+    it("validating the attribute search form input", async () => {
+        await toggleSwitch();
+
+        const searchAttributes = wrapper.vm.searchWithAttributeFormData,
+            searchWithAttributeForm = searchAttributes["3D-Stadtmodell LoD1"];
+
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.true;
+        expect(searchWithAttributeForm[2].errorMessage).to.equal("");
+
+        // maxValueCount
+        searchWithAttributeForm[2].value = "1000";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.false;
+        expect(searchWithAttributeForm[2].errorMessage).to.equal("additional:modules.lzsResearchClient.tabs.tabSearch.numberRangeError:1," + mockMaxResultValueCount);
+
+        searchWithAttributeForm[2].value = "-1";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.false;
+        expect(searchWithAttributeForm[2].errorMessage).to.equal("additional:modules.lzsResearchClient.tabs.tabSearch.numberRangeError:1," + mockMaxResultValueCount);
+
+        searchWithAttributeForm[2].value = "abc";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.false;
+        expect(searchWithAttributeForm[2].errorMessage).to.equal("additional:modules.lzsResearchClient.tabs.tabSearch.numberRangeError:1," + mockMaxResultValueCount);
+
+        searchWithAttributeForm[2].value = "";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.false;
+        expect(searchWithAttributeForm[2].errorMessage).to.equal("additional:modules.lzsResearchClient.tabs.tabSearch.numberRangeError:1," + mockMaxResultValueCount);
+
+        // other patterns from placeholder.json
+        searchWithAttributeForm[0].value = "2026";
+        searchWithAttributeForm[2].value = "20";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.true;
+        expect(searchWithAttributeForm[0].errorMessage).to.equal("");
+
+        searchWithAttributeForm[0].value = "20*6";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.true;
+        expect(searchWithAttributeForm[0].errorMessage).to.equal("");
+
+        searchWithAttributeForm[0].value = "";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.true;
+        expect(searchWithAttributeForm[0].errorMessage).to.equal("");
+
+        searchWithAttributeForm[0].value = "100";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.false;
+        expect(searchWithAttributeForm[0].errorMessage).to.equal("additional:modules.lzsResearchClient.tabs.tabSearch.patternError:4");
+
+        searchWithAttributeForm[0].value = "abc";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.false;
+        expect(searchWithAttributeForm[0].errorMessage).to.equal("additional:modules.lzsResearchClient.tabs.tabSearch.patternError:4");
+
+        searchWithAttributeForm[0].value = "1a0";
+        wrapper.vm.validateSearchWithAttributeForm();
+        expect(wrapper.vm.isAttributeSearchFormValid).to.be.false;
+        expect(searchWithAttributeForm[0].errorMessage).to.equal("additional:modules.lzsResearchClient.tabs.tabSearch.patternError:4");
     });
 });

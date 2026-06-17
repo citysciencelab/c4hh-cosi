@@ -36,8 +36,9 @@
                     "jahrgang": "Year",
                     "kachelnummer": "Tile Number",
                     "maxValueCount": "Max. Results",
-                    "patternError": "Please enter a numeric value with \"{ digitNumber }\" digit.",
+                    "patternError": "Please enter a numeric value with \"{ digitNumber }\" digits.",
                     "patternErrorRange": "Please enter a numeric value with { minDigits } to { maxDigits } digits.",
+                    "numberRangeError": "Please enter a numeric value between {{ minNum }} and {{ maxNum }}.",
                     "spatialSelectionGroup": {
                         "geometries": "Drawn Area",
                         "extent": "Map Extent",
