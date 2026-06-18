@@ -1,6 +1,4 @@
 <script>
-import dayjs from "dayjs";
-
 export default {
     name: "TrafficCountFooter",
     props: {
@@ -10,22 +8,21 @@ export default {
         },
         api: {
             type: Object,
-            required: true
+            default: null
         },
         thingId: {
-            type: [Number, String],
-            required: true
+            type: [String, Number],
+            default: ""
         },
         meansOfTransport: {
             type: String,
-            required: true
+            default: ""
         }
     },
     emits: ["resetTab"],
     data () {
         return {
             customStyle: {},
-            lastUpdate: "",
             isMqttLive: true,
             statusHandler: null
         };
@@ -41,23 +38,14 @@ export default {
 
         tableIndication: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign");
-        },
-
-        lastupdateLabel: function () {
-            return this.$t("additional:modules.tools.gfi.themes.trafficCount.lastupdateLabel");
-        },
-
-        tableClass: function () {
-            return this.currentTabId + " table table-hover table-striped";
         }
     },
     watch: {
-        // When the gfi window switched with arrow, the new data will be fetched from api
+        // When the gfi window switched with arrow, reset the live status
         thingId: {
             handler (newVal, oldVal) {
                 if (oldVal) {
                     this.isMqttLive = true;
-                    this.setFooterLastUpdate(this.api, newVal, this.meansOfTransport);
                 }
             },
             immediate: true,
@@ -68,7 +56,6 @@ export default {
             handler (newVal, oldVal) {
                 if (oldVal) {
                     this.isMqttLive = true;
-                    this.setFooterLastUpdate(this.api, this.thingId, newVal);
                 }
             },
             immediate: true
@@ -81,18 +68,16 @@ export default {
         }
     },
     mounted: function () {
-        this.setFooterLastUpdate(this.api, this.thingId, this.meansOfTransport);
-
         this.statusHandler = (status) => {
             this.isMqttLive = status;
         };
 
-        if (typeof this.api.api.onMqttStatusChange === "function") {
+        if (typeof this.api?.api?.onMqttStatusChange === "function") {
             this.api.api.onMqttStatusChange(this.statusHandler);
         }
     },
     beforeUnmount: function () {
-        if (typeof this.api.api.offMqttStatusChange === "function" && this.statusHandler) {
+        if (typeof this.api?.api?.offMqttStatusChange === "function" && this.statusHandler) {
             this.api.api.offMqttStatusChange(this.statusHandler);
         }
     },
@@ -119,32 +104,6 @@ export default {
          */
         reset: function () {
             this.$emit("resetTab");
-        },
-
-        /**
-         * setup of the last update date
-         * @param {Object} api instance of TrafficCountApi
-         * @param {String} thingId the thingId to be send to any api call
-         * @param {String} meansOfTransport the meansOfTransport to be send with any api call
-         * @returns {void}
-         */
-        setFooterLastUpdate: function (api, thingId, meansOfTransport) {
-            api.subscribeLastUpdate(thingId, meansOfTransport, datetime => {
-                this.setLastUpdate(dayjs(datetime, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY, HH:mm:ss"));
-            }, errormsg => {
-                this.setLastUpdate("(aktuell keine Zeitangabe)");
-                console.warn("The last update received is incomplete:", errormsg);
-                this.$store.dispatch("Alerting/addSingleAlert", i18next.t("additional:modules.tools.gfi.themes.trafficCount.error.subscribeLastUpdate"));
-            });
-        },
-
-        /**
-         * setter for lastUpdate
-         * @param {String} value the datetime of the last update to be shown in the template
-         * @returns {void}
-         */
-        setLastUpdate: function (value) {
-            this.lastUpdate = value;
         }
     }
 };
@@ -160,7 +119,7 @@ export default {
             * {{ tableIndication }}
         </div>
         <div
-            v-if="currentTabId !== 'info' && currentTabId !== 'downloads' && meansOfTransport === 'Anzahl_Kfz'"
+            v-if="currentTabId !== 'info' && currentTabId !== 'downloads'"
             class="trucksStatusIndication"
             :style="customStyle"
         >
@@ -177,11 +136,11 @@ export default {
             v-if="currentTabId !== 'downloads'"
             class="footer-main-content"
         >
-            <div class="action-row">
-                <div
-                    v-if="currentTabId !== 'info'"
-                    class="reset-container"
-                >
+            <div
+                v-if="currentTabId !== 'info'"
+                class="action-row"
+            >
+                <div class="reset-container">
                     <button
                         type="button"
                         class="btn btn-primary"
@@ -189,23 +148,6 @@ export default {
                     >
                         {{ $t("additional:modules.tools.gfi.themes.trafficCount.reset") }}
                     </button>
-                </div>
-                <div
-                    class="update-table-container"
-                    :class="{'w-100': currentTabId === 'info'}"
-                >
-                    <table :class="tableClass">
-                        <tbody>
-                            <tr>
-                                <td class="bold">
-                                    {{ lastupdateLabel }}
-                                </td>
-                                <td class="text-right">
-                                    {{ lastUpdate }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
             <div

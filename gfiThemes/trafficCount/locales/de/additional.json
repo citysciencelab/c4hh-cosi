@@ -4,7 +4,7 @@
             "gfi": {
                 "themes":{
                     "trafficCount": {
-                        "infoLabel": "Info",
+                        "infoLabel": "Übersicht",
                         "dayLabel": "Tag",
                         "weekLabel": "Woche",
                         "yearLabel": "Jahr",
@@ -70,7 +70,13 @@
                         "totalTraffic": "(Kfz gesamt)",
                         "isHeavyTrafficAvailableDesc": "Schwerverkehr vorhanden",
                         "available": "Ja",
-                        "inavailable": "Nein"
+                        "inavailable": "Nein",
+                        "indicator": "Kennzahl",
+                        "totalNumbers": "Gesamtzahlen",
+                        "shortTermDevelopment": "Kurzfristige Entwicklung",
+                        "peakValues": "Höchstwerte nach Zeitraum",
+                        "previousDay": "Vortag",
+                        "workingDayAverageShort": "mittlerer Werktag"
                     }
                 }
             }

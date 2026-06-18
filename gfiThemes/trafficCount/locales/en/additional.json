@@ -70,7 +70,13 @@
                         "totalTraffic": "(total motor vehicles)",
                         "isHeavyTrafficAvailableDesc": "Heavy traffic available",
                         "available": "Yes",
-                        "inavailable": "No"
+                        "inavailable": "No",
+                        "indicator": "Indicator",
+                        "totalNumbers": "Total numbers",
+                        "shortTermDevelopment": "Short-term development",
+                        "peakValues": "Peak values by period",
+                        "previousDay": "Previous day",
+                        "workingDayAverageShort": "Average working day"
                     }
                 }
             }

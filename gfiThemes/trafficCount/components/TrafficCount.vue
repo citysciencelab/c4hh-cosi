@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 import {mapGetters} from "vuex";
 import axios from "axios";
+import dayjs from "dayjs";
 import {TrafficCountCache} from "../utils/trafficCountCache.js";
 import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi.js";
 import TrafficCountInfo from "./TrafficCountInfo.vue";
@@ -64,7 +65,8 @@ export default {
                 "secondDayOfChristmas",
                 "newYearsEve"
             ],
-            checkGurlittInsel: false
+            checkGurlittInsel: false,
+            lastUpdate: ""
         };
     },
     computed: {
@@ -87,6 +89,10 @@ export default {
 
         downloadsLabel: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.downloads");
+        },
+
+        lastupdateLabel: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.lastupdateLabel");
         },
 
         typeAssoc: function () {
@@ -309,6 +315,21 @@ export default {
         },
 
         /**
+         * setup of the last update date for the header
+         * @param {Object} api instance of TrafficCountApi
+         * @param {String} thingId the thingId to be send to any api call
+         * @param {String} meansOfTransport the meansOfTransport to be send with any api call
+         * @returns {void}
+         */
+        updateLastUpdate: function (api, thingId, meansOfTransport) {
+            api.subscribeLastUpdate(thingId, meansOfTransport, datetime => {
+                this.lastUpdate = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY HH:mm [Uhr]");
+            }, () => {
+                this.lastUpdate = "";
+            });
+        },
+
+        /**
          * set the header of gfi theme
          * @param {Object} api the api from library
          * @param {String} thingId the current thing Id
@@ -360,6 +381,9 @@ export default {
                     category: "Info"
                 });
             });
+
+            // last update for header
+            this.updateLastUpdate(api, thingId, meansOfTransport);
         },
 
         /**
@@ -435,6 +459,16 @@ export default {
             {{ meansOfTransportLabel }} <span class="meansOfTransport">{{ meansOfTransport }}</span><br>
             {{ $t("additional:modules.tools.gfi.themes.trafficCount.directionLabel") }} <span class="direction">{{ direction }}</span>
         </div>
+        <div
+            v-if="lastUpdate"
+            class="last-update-bar"
+        >
+            <i
+                class="bi bi-arrow-clockwise"
+                aria-hidden="true"
+            />
+            {{ lastupdateLabel }} {{ lastUpdate }}
+        </div>
         <div>
             <ul
                 id="traffic-count-tabs"
@@ -447,6 +481,7 @@ export default {
                     :active="true"
                     :target="'#info'"
                     :label="infoLabel"
+                    :icon="'bi-info-circle'"
                     :interaction="() => setCurrentTabId('info')"
                 />
                 <NavTab
@@ -454,6 +489,7 @@ export default {
                     :active="false"
                     :target="'#day'"
                     :label="dayLabel"
+                    :icon="'bi-calendar-day'"
                     :interaction="() => setCurrentTabId('day')"
                 />
                 <NavTab
@@ -461,6 +497,7 @@ export default {
                     :active="false"
                     :target="'#week'"
                     :label="weekLabel"
+                    :icon="'bi-calendar-week'"
                     :interaction="() => setCurrentTabId('week')"
                 />
                 <NavTab
@@ -468,6 +505,7 @@ export default {
                     :active="false"
                     :target="'#year'"
                     :label="yearLabel"
+                    :icon="'bi-calendar3'"
                     :interaction="() => setCurrentTabId('year')"
                 />
                 <NavTab
@@ -475,6 +513,7 @@ export default {
                     :active="false"
                     :target="'#downloads'"
                     :label="downloadsLabel"
+                    :icon="'bi-download'"
                     :interaction="() => setCurrentTabId('downloads')"
                 />
             </ul>
@@ -563,6 +602,22 @@ export default {
         div.graph {
             width: inherit;
             height: inherit;
+        }
+    }
+
+    .last-update-bar {
+        font-size: 12px;
+        color: #555;
+        padding: 4px 8px 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    #traffic-count-tabs {
+        :deep(.nav-link.active) {
+            color: #3C5F94;
+            border-bottom-color: #3C5F94;
         }
     }
 
