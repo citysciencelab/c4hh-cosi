@@ -23,7 +23,9 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                 fixedStoryLoaded: (state) => state.fixedStoryLoaded,
                                 menuSide: () => "secondaryMenu",
                                 storyList: (state) => state.storyList,
-                                subjectLayerCategory: (state) => state.subjectLayerCategory
+                                subjectLayerCategory: (state) => state.subjectLayerCategory,
+                                enableCreator: (state) => state.enableCreator,
+                                enableImport: (state) => state.enableImport
                             },
                             mutations: {
                                 setCurrentStoryIndex (state, value) {
@@ -44,6 +46,8 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                             },
                             state: {
                                 currentStoryIndex: undefined,
+                                enableCreator: true,
+                                enableImport: true,
                                 storyList: [
                                     {
                                         story: {
@@ -152,6 +156,8 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
 
         describe("editStory", () => {
             it("should set currentStoryIndex and switch to creator view", () => {
+                store.state.Modules.StoryManager.enableCreator = true;
+
                 wrapper.vm.editStory(0);
 
                 expect(wrapper.vm.currentView).to.equal("creator");
@@ -412,6 +418,22 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 expect(storyCreatorComponent.props("story")).to.be.an("object");
                 expect(storyCreatorComponent.props("imageAssetsById")).to.be.an("object");
             }
+        });
+    });
+    describe("Configuration Limits (enableCreator & enableImport)", () => {
+        it("should not render AddCardButton and block editStory if enableCreator is false", async () => {
+            store.state.Modules.StoryManager.enableCreator = false;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findComponent({name: "AddCardButton"}).exists()).to.be.false;
+        });
+
+        it("should not render import buttons and block onStoryImportFileChange if enableImport is false", async () => {
+            store.state.Modules.StoryManager.enableImport = false;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.false;
+            expect(wrapper.find("input[type='file']").exists()).to.be.false;
         });
     });
 });

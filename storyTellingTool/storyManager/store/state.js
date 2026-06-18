@@ -5,6 +5,8 @@
  * @property {String} type - type of the component.
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
+ * @property {Boolean} [enableCreator=true] - If false, the creation, editing, and downloading of stories is disabled.
+ * @property {Boolean} [enableImport=true] - Defines if importing stories from ZIP files is allowed.
  * @property {Number} currentStoryIndex - The current stroy index in the story list.
  * @property {String} fixedStoryPath the relative path in portalconfigs to contain fixed stories.
  * @property {String[]} fixedStoryFiles the fixed story files name.
@@ -18,6 +20,8 @@ const state = {
     type: "storyManager",
     name: "additional:modules.storyManager.title",
     icon: "bi-file-plus",
+    enableCreator: true,
+    enableImport: true,
     currentStoryIndex: undefined,
     fixedStoryPath: "./assets",
     fixedStoryFiles: [],

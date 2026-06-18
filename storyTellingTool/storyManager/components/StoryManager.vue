@@ -32,7 +32,9 @@ export default {
             "fixedStoryPath",
             "currentStoryIndex",
             "storyList",
-            "menuSide"
+            "menuSide",
+            "enableCreator",
+            "enableImport"
         ]),
         /**
          * Returns the story object to pass to StoryCreator.
@@ -69,6 +71,7 @@ export default {
         ...mapMutations("Modules/StoryManager", ["setCurrentStoryIndex", "setFixedStoryLoaded", "setStoryList"]),
         ...mapMutations("Modules/StoryPlayer", ["setImageAssetsById", "setStoryConf"]),
         ...mapActions("Menu", ["changeCurrentComponent"]),
+
         /**
          * Opens the creator for a new story.
          * @returns {void}
@@ -152,6 +155,9 @@ export default {
          * @returns {void}
          */
         editStory (index) {
+            if (!this.enableCreator) {
+                return;
+            }
             this.setCurrentStoryIndex(index);
             this.currentView = "creator";
         },
@@ -310,6 +316,7 @@ export default {
                 </p>
             </div>
             <AddCardButton
+                v-if="enableCreator"
                 class="mt-3 mb-3 w-100 mx-0"
                 :text="$t('additional:modules.storyManager.createStoryTitle')"
                 :descr="$t('additional:modules.storyManager.createStoryDescription')"
@@ -325,12 +332,14 @@ export default {
                     {{ $t('additional:modules.storyManager.selectStoryDescription') }}
                 </p>
                 <FlatButton
+                    v-if="enableImport"
                     :icon="'bi-box-arrow-in-down'"
                     :aria-label="$t('additional:modules.storyManager.importButton')"
                     :text="$t('additional:modules.storyManager.importButton')"
                     :interaction="() => $refs.storyImportInput?.click()"
                 />
                 <input
+                    v-if="enableImport"
                     ref="storyImportInput"
                     type="file"
                     class="d-none"
@@ -366,7 +375,7 @@ export default {
                         :copyright="storyEntry?.story?.imageCopyright"
                         :alt="storyEntry?.story?.imageAlt"
                         :card-items="getCardItems(storyEntry?.story)"
-                        :editable="storyEntry?.story?.editable"
+                        :editable="storyEntry?.story?.editable && enableCreator"
                         @click="() => playStory(index)"
                         @play="() => playStory(index)"
                         @edit="() => editStory(index)"
