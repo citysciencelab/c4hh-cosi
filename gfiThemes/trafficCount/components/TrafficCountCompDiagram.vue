@@ -1,7 +1,7 @@
 <script>
 import ChartJs from "chart.js/auto";
 import {mapGetters} from "vuex";
-import {shallowRef} from "vue";
+import {markRaw} from "vue";
 
 export default {
     name: "TrafficCountCompDiagram",
@@ -150,11 +150,18 @@ export default {
                 if (!oldValue.length) {
                     this.destroyChart();
                     this.chartData = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-                    this.createChart(this.chartData, this.ctx);
+                    this.createChart(this.chartData);
                 }
                 else if (Array.isArray(newData) && newData.length) {
-                    this.chart.data = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-                    this.chart.update(this.updateAnimation);
+                    this.chartData = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+
+                    if (this.chart) {
+                        this.chart.data = this.chartData;
+                        this.chart.update(this.updateAnimation);
+                    }
+                    else {
+                        this.createChart(this.chartData);
+                    }
                 }
                 else {
                     this.destroyChart();
@@ -170,19 +177,20 @@ export default {
             handler () {
                 this.destroyChart();
                 this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-                this.createChart(this.chartData, this.ctx);
+                this.createChart(this.chartData);
             },
             deep: true
-        },
-        activeTabId () {
-            this.destroyChart();
         }
     },
     mounted () {
         this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-        this.ctx = this.$refs[`trafficCountChart_${this.activeTabId}`];
-
-        this.createChart(this.chartData, this.ctx);
+        this.$nextTick(() => {
+            this.ctx = this.$refs.trafficCountChart;
+            this.createChart(this.chartData, this.ctx);
+        });
+    },
+    beforeUnmount () {
+        this.destroyChart();
     },
     methods: {
         /**
@@ -191,8 +199,32 @@ export default {
          * @param {html} ctx the canvas container for diagram
          * @returns {Void} -
          */
-        createChart (data, ctx) {
-            this.chart = shallowRef(new ChartJs(ctx, this.getChartJsConfig(data, {
+        createChart (data, ctx = this.$refs.trafficCountChart) {
+            if (!ctx || typeof ctx.getContext !== "function") {
+                this.$nextTick(() => {
+                    if (!this.chart) {
+                        this.createChart(data);
+                    }
+                });
+
+                return;
+            }
+
+            const existingChart = typeof ChartJs.getChart === "function" ? ChartJs.getChart(ctx) : null;
+
+            if (existingChart) {
+                existingChart.destroy();
+
+                if (this.chart === existingChart) {
+                    this.chart = null;
+                }
+            }
+
+            if (this.chart) {
+                this.destroyChart();
+            }
+
+            this.chart = markRaw(new ChartJs(ctx, this.getChartJsConfig(data, {
                 titleColor: this.colorTooltipFont,
                 backgroundColor: this.colorTooltipBack,
                 setTooltipValue: this.setTooltipValue,
@@ -475,10 +507,7 @@ export default {
 
 <template>
     <div class="graph">
-        <canvas
-            :id="`trafficCountChart_${activeTabId}`"
-            :ref="`trafficCountChart_${activeTabId}`"
-        />
+        <canvas ref="trafficCountChart" />
     </div>
 </template>
 

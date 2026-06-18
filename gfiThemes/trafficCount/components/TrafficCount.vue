@@ -13,10 +13,12 @@ import TrafficCountFooter from "./TrafficCountFooter.vue";
 import TrafficCountDownloads from "./TrafficCountDownloads.vue";
 import convertHttpLinkToSSL from "../../../../src/shared/js/utils/convertHttpLinkToSSL.js";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 
 export default {
     name: "TrafficCount",
     components: {
+        FlatButton,
         TrafficCountInfo,
         TrafficCountDay,
         TrafficCountWeek,
@@ -36,6 +38,7 @@ export default {
             api: null,
             propThingId: 0,
             propMeansOfTransport: "",
+            selectedTimeView: "day",
             title: "",
             type: "",
             meansOfTransport: "",
@@ -300,9 +303,6 @@ export default {
         setActiveDefaultTab: function () {
             this.$el.querySelector("#info-tab").click();
         },
-        isActiveTab (tabId) {
-            return this.currentTabId === tabId;
-        },
         /**
          * set the current tab id after clicking.
          * @param {String} id the id of current tab
@@ -437,13 +437,13 @@ export default {
          * @returns {void} -
          */
         resetTab: function () {
-            if (this.currentTabId === "day") {
+            if (this.selectedTimeView === "day") {
                 this.dayCheckReset = !this.dayCheckReset;
             }
-            else if (this.currentTabId === "week") {
+            else if (this.selectedTimeView === "week") {
                 this.weekCheckReset = !this.weekCheckReset;
             }
-            else if (this.currentTabId === "year") {
+            else if (this.selectedTimeView === "year") {
                 this.yearCheckReset = !this.yearCheckReset;
             }
         }
@@ -485,28 +485,12 @@ export default {
                     :interaction="() => setCurrentTabId('info')"
                 />
                 <NavTab
-                    :id="'day-tab'"
+                    :id="'analysis-tab'"
                     :active="false"
-                    :target="'#day'"
-                    :label="dayLabel"
-                    :icon="'bi-calendar-day'"
-                    :interaction="() => setCurrentTabId('day')"
-                />
-                <NavTab
-                    :id="'week-tab'"
-                    :active="false"
-                    :target="'#week'"
-                    :label="weekLabel"
-                    :icon="'bi-calendar-week'"
-                    :interaction="() => setCurrentTabId('week')"
-                />
-                <NavTab
-                    :id="'year-tab'"
-                    :active="false"
-                    :target="'#year'"
-                    :label="yearLabel"
-                    :icon="'bi-calendar3'"
-                    :interaction="() => setCurrentTabId('year')"
+                    :target="'#analysis'"
+                    :label="'Analyse'"
+                    :icon="'bi-bar-chart'"
+                    :interaction="() => setCurrentTabId('analysis')"
                 />
                 <NavTab
                     :id="'downloads-tab'"
@@ -528,41 +512,68 @@ export default {
                     :means-of-transport="propMeansOfTransport"
                     :active-tab="currentTabId === 'info'"
                 />
-                <TrafficCountDay
-                    id="day"
-                    :key="keyDay"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'day' }"
-                    :api="api"
-                    :thing-id="propThingId"
-                    :means-of-transport="propMeansOfTransport"
-                    :reset="dayCheckReset"
-                    :holidays="holidays"
-                    :check-gurlitt-insel="checkGurlittInsel"
-                    :active-tab="currentTabId === 'day'"
-                />
-                <TrafficCountWeek
-                    id="week"
-                    :key="keyWeek"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'week' }"
-                    :api="api"
-                    :thing-id="propThingId"
-                    :means-of-transport="propMeansOfTransport"
-                    :reset="weekCheckReset"
-                    :holidays="holidays"
-                    :active-tab="currentTabId === 'week'"
-                />
-                <TrafficCountYear
-                    id="year"
-                    :key="keyYear"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'year' }"
-                    :api="api"
-                    :thing-id="propThingId"
-                    :means-of-transport="propMeansOfTransport"
-                    :reset="yearCheckReset"
-                    :holidays="holidays"
-                    :check-gurlitt-insel="checkGurlittInsel"
-                    :active-tab="currentTabId === 'year'"
-                />
+                <div
+                    id="analysis"
+                    :class="{ 'tab-pane': true, 'active': currentTabId === 'analysis' }"
+                    :active-tab="currentTabId === 'analysis'"
+                >
+                    <div class="mt-2 ms-2 small text-secondary">
+                        {{ $t("additional:modules.tools.gfi.themes.trafficCount.period") }}
+                    </div>
+                    <div
+                        class="d-flex gap-2 flex-wrap m-2"
+                        role="group"
+                        :aria-label="$t('additional:modules.tools.gfi.themes.trafficCount.timeViewLabel')"
+                    >
+                        <FlatButton
+                            :secondary="selectedTimeView !== 'day'"
+                            :text="dayLabel"
+                            :interaction="() => selectedTimeView = 'day'"
+                            :aria-pressed="selectedTimeView === 'day'"
+                        />
+                        <FlatButton
+                            :secondary="selectedTimeView !== 'week'"
+                            :text="weekLabel"
+                            :interaction="() => selectedTimeView = 'week'"
+                            :aria-pressed="selectedTimeView === 'week'"
+                        />
+                        <FlatButton
+                            :secondary="selectedTimeView !== 'year'"
+                            :text="yearLabel"
+                            :interaction="() => selectedTimeView = 'year'"
+                            :aria-pressed="selectedTimeView === 'year'"
+                        />
+                    </div>
+                    <TrafficCountDay
+                        v-if="selectedTimeView === 'day'"
+                        :key="keyDay"
+                        :api="api"
+                        :thing-id="propThingId"
+                        :means-of-transport="propMeansOfTransport"
+                        :reset="dayCheckReset"
+                        :holidays="holidays"
+                        :check-gurlitt-insel="checkGurlittInsel"
+                    />
+                    <TrafficCountWeek
+                        v-if="selectedTimeView === 'week'"
+                        :key="keyWeek"
+                        :api="api"
+                        :thing-id="propThingId"
+                        :means-of-transport="propMeansOfTransport"
+                        :reset="weekCheckReset"
+                        :holidays="holidays"
+                    />
+                    <TrafficCountYear
+                        v-if="selectedTimeView === 'year'"
+                        :key="keyYear"
+                        :api="api"
+                        :thing-id="propThingId"
+                        :means-of-transport="propMeansOfTransport"
+                        :reset="yearCheckReset"
+                        :holidays="holidays"
+                        :check-gurlitt-insel="checkGurlittInsel"
+                    />
+                </div>
                 <TrafficCountDownloads
                     id="downloads"
                     :key="keyDownloads"

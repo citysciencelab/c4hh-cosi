@@ -4,7 +4,8 @@
             "gfi": {
                 "themes": {
                     "trafficCount": {
-                        "infoLabel": "Info",
+                        "infoLabel": "Overview",
+                        "timeViewLabel": "Choose time view",
                         "dayLabel": "Day",
                         "weekLabel": "Week",
                         "yearLabel": "Year",

@@ -11,7 +11,6 @@ import "vue-datepicker-next/index.css";
 import {addMissingDataDay} from "../utils/addMissingData.js";
 import {getPublicHoliday} from "../../../../src/shared/js/utils/calendar.js";
 import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi.js";
-import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -46,10 +45,6 @@ export default {
             required: true
         },
         checkGurlittInsel: {
-            type: Boolean,
-            required: true
-        },
-        activeTab: {
             type: Boolean,
             required: true
         }
@@ -147,11 +142,6 @@ export default {
             meansOfTransportKey: [this.meansOfTransport]
         };
     },
-    computed: {
-        ...mapGetters("Modules/TrafficCount", [
-            "activeTabId"
-        ])
-    },
     watch: {
         reset () {
             this.initializeDates();
@@ -161,20 +151,12 @@ export default {
                 this.dayDatepickerValueChanged(value);
             },
             deep: true
-        },
-        activeTab () {
-            if (this.activeTab && this.activeTabId !== "day") {
-                this.setActiveTabId("day");
-            }
         }
     },
     mounted () {
         this.initializeDates();
     },
     methods: {
-        ...mapMutations("Modules/TrafficCount", [
-            "setActiveTabId"
-        ]),
         /**
          * Initializes the calendar / resets the date.
          * @returns {void}
@@ -295,7 +277,7 @@ export default {
 </script>
 
 <template>
-    <div v-if="activeTab">
+    <div>
         <div
             id="dayDateSelector"
             class="dateSelector"
@@ -331,7 +313,6 @@ export default {
                 :render-label-legend="renderLabelLegend"
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
-                :active-tab="activeTab"
                 :current-means-of-transport="meansOfTransport"
                 :means-of-transport-key="meansOfTransportKey"
             />

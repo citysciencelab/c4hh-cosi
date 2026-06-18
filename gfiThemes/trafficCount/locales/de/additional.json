@@ -5,6 +5,7 @@
                 "themes":{
                     "trafficCount": {
                         "infoLabel": "Übersicht",
+                        "timeViewLabel": "Zeitansicht wählen",
                         "dayLabel": "Tag",
                         "weekLabel": "Woche",
                         "yearLabel": "Jahr",

@@ -11,7 +11,6 @@ import DatePicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 import {addMissingDataYear} from "../utils/addMissingData.js";
 import {hasHolidayInWeek} from "../../../../src/shared/js/utils/calendar.js";
-import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(advancedFormat);
 dayjs.extend(isSameOrAfter);
@@ -47,10 +46,6 @@ export default {
             required: true
         },
         checkGurlittInsel: {
-            type: Boolean,
-            required: true
-        },
-        activeTab: {
             type: Boolean,
             required: true
         }
@@ -154,11 +149,6 @@ export default {
             meansOfTransportKey: [this.meansOfTransport]
         };
     },
-    computed: {
-        ...mapGetters("Modules/TrafficCount", [
-            "activeTabId"
-        ])
-    },
     watch: {
         reset () {
             this.initializeDates();
@@ -168,20 +158,12 @@ export default {
                 this.yearDatepickerValueChanged(value);
             },
             deep: true
-        },
-        activeTab () {
-            if (this.activeTab && this.activeTabId !== "year") {
-                this.setActiveTabId("year");
-            }
         }
     },
     mounted () {
         this.initializeDates();
     },
     methods: {
-        ...mapMutations("Modules/TrafficCount", [
-            "setActiveTabId"
-        ]),
         /**
          * Initializes the calendar / resets the date.
          * @returns {void}
@@ -312,7 +294,7 @@ export default {
 </script>
 
 <template>
-    <div v-if="activeTab">
+    <div>
         <div
             id="yearDateSelector"
             class="dateSelector"
@@ -346,7 +328,6 @@ export default {
                 :render-label-legend="renderLabelLegend"
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
-                :active-tab="activeTab"
                 :current-means-of-transport="meansOfTransport"
                 :means-of-transport-key="meansOfTransportKey"
             />

@@ -11,7 +11,6 @@ import {addMissingDataWeek} from "../utils/addMissingData.js";
 import {getPublicHoliday} from "../../../../src/shared/js/utils/calendar.js";
 import TrafficCountDatePicker from "./TrafficCountDatePicker.vue";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
-import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -44,10 +43,6 @@ export default {
         },
         holidays: {
             type: Array,
-            required: true
-        },
-        activeTab: {
-            type: Boolean,
             required: true
         }
     },
@@ -155,9 +150,6 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/TrafficCount", [
-            "activeTabId"
-        ]),
         calendarweek: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.calendarweek");
         }
@@ -174,11 +166,6 @@ export default {
                 }
             },
             deep: true
-        },
-        activeTab () {
-            if (this.activeTab && this.activeTabId !== "week") {
-                this.setActiveTabId("week");
-            }
         }
     },
     created () {
@@ -188,9 +175,6 @@ export default {
         this.minDate = dayjs().subtract(1, "year").startOf("year").format("YYYY-MM-DD");
     },
     methods: {
-        ...mapMutations("Modules/TrafficCount", [
-            "setActiveTabId"
-        ]),
         /**
          * Initializes the calendar / resets the date.
          * @returns {void}
@@ -333,7 +317,7 @@ export default {
 </script>
 
 <template>
-    <div v-if="activeTab">
+    <div>
         <div
             id="weekDateSelector"
             class="dateSelector"
@@ -382,7 +366,6 @@ export default {
                 :render-label-legend="renderLabelLegend"
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
-                :active-tab="activeTab"
                 :current-means-of-transport="meansOfTransport"
                 :means-of-transport-key="meansOfTransportKey"
             />
