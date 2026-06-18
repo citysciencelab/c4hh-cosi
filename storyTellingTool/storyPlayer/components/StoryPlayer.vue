@@ -34,6 +34,7 @@ export default {
         ...mapGetters("Modules/StoryPlayer", [
             "autoplay",
             "description",
+            "duration",
             "fixedStoryName",
             "fixedStoryPath",
             "icon",
@@ -337,7 +338,7 @@ export default {
                             mapView.animate({
                                 center: adjustedCenter,
                                 zoom: zoomLevel,
-                                duration: 1000,
+                                duration: this.duration,
                                 rotation: 0
                             });
 

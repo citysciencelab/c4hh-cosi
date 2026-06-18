@@ -11,6 +11,7 @@
  * @property {Boolean} isVisibleInMenu - if true, tool is selectable in menu (config-param)
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * Addon state
+ * @property {Number} duration Duration used for StoryPlayer animations.
  * @property {String} fixedStoryName the fixed story file name.
  * @property {String} fixedStoryPath the relative path in portalconfigs to contain fixed stories.
  */
@@ -27,6 +28,7 @@ const state = {
 
     // Addon state
     autoplay: false,
+    duration: 1000,
     fixedStoryName: null,
     fixedStoryPath: null,
     imageAssetsById: {},
