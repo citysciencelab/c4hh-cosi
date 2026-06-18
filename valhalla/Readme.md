@@ -99,7 +99,7 @@ endpoint supports contours by **`time`** (minutes) **and** by **`distance`**
   minutes for Valhalla).
 - **Distance-based** isochrones are therefore **available for free** on the same
   service if we decide we want them — that decision belongs to the §3 code change
-  (and is tracked as an open question in BACKLOG §8); no change is needed here.
+  (and is tracked as an open question in BACKLOG §9); no change is needed here.
 
 ## Deploying on the CSL server
 

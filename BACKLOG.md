@@ -111,7 +111,7 @@ Replace ORS with our own Valhalla, runnable locally **and** auto-deployable on t
 - [x] Isochrone capabilities decided (see `valhalla/Readme.md`): **time-based** is the
       requirement and is what AccessibilityAnalysis uses; Valhalla `/isochrone` also supports
       **distance-based** contours on the same service for free — usage decision deferred to
-      the §3 code change (open question in §8). No service-side change needed.
+      the §3 code change (open question in §9). No service-side change needed.
 
 ---
 
@@ -225,7 +225,53 @@ the layers/services we actually keep.
 
 ---
 
-## 8. Open questions / decisions
+## 8. Dockerize & orchestrate the full COSI deployment
+
+The biggest deployment gap: §2 containerizes **only Valhalla**. The actual COSI
+portal (Masterportal framework + COSI addon, built into a static SPA) and the
+self-hosted config registries (§6) have no container story, and nothing ties the
+pieces together. We want a reproducible, one-command full-stack deploy that runs
+the same locally and on the CSL server.
+
+Target topology (single `docker compose up` at the repo root):
+- **`portal`** — multi-stage image: build stage runs the Masterportal/COSI
+  production build; runtime stage is nginx serving the static `dist/`.
+- **`valhalla`** — the routing service from §2 (fold its compose into the root
+  orchestration via `include:` / `extends`, keeping `valhalla/` self-contained).
+- nginx also serves our self-hosted `services.json` / `rest-services.json` /
+  `style.json` (§6) and **reverse-proxies `/valhalla/` → `valhalla:8002`** so the
+  portal calls routing same-origin (avoids CORS + mixed-content; gives a stable
+  URL independent of where Valhalla runs).
+- WPS / statistical WFS stay **external** (Hamburg) for now (§7) — not containerized.
+
+Tasks:
+- [ ] Add a **`.dockerignore`** and a multi-stage **`Dockerfile`** for the portal.
+      Build stage: Node `24.15.0`, reproduce the **layered install + broken-addons
+      `postinstall` workaround** from §1 (`npm install` in `masterportal/`, then
+      `addons/ npm install --ignore-scripts`, then `cosi/ npm install`), then
+      `npm run build` of the `portal/cosi` portal (§4). Runtime stage: nginx
+      serving `dist/`. **Depends on §4** (no COSI portalconfig exists yet) — until
+      then the image can only build the stock example portal as a smoke test.
+- [ ] **Runtime config injection:** keep `config.js` (`layerConf`/`restConf`/
+      `styleConf`, Valhalla URL) overridable at container start (entrypoint that
+      templates from env, or a mounted config) so one image works local vs CSL
+      without a rebuild. Decide build-time vs runtime config (lean runtime).
+- [ ] Author the **nginx config**: serve the SPA (history fallback), serve the
+      §6 registries, gzip/cache static assets, and reverse-proxy `/valhalla/`.
+- [ ] Create the **root `docker-compose.yml`** orchestrating `portal` + `valhalla`
+      (via `include:`), shared network, healthchecks, `restart: unless-stopped`.
+- [ ] Keep a clear **dev vs prod** split: dev stays on Vite (`npm start`, §1);
+      prod/staging uses the built image. Document both in the root `Readme.md`.
+- [ ] **Image build/publish:** decide registry + tagging (e.g. GHCR, tag by
+      Masterportal+COSI version), and whether CI builds the image. Note the build
+      is heavy (full npm install + Vite build).
+- [ ] **CSL server bootstrap:** one script/compose bringing up the whole stack
+      (portal + valhalla), TLS termination (reverse proxy / Let's Encrypt) for a
+      public hostname, and resource notes (Valhalla build dominates — see §2).
+
+---
+
+## 9. Open questions / decisions
 
 - [?] Where do the statistical data ultimately live long-term — keep consuming Hamburg's
       public WFS/OGC API, or import into our own store/service?
