@@ -56,6 +56,7 @@
 - ButtonGroup: Fixed `precheckedIndex` not reflecting the initial `selectedValue` on component creation.
 - SearchBar: Fixed duplicated results with URL Parameter `QUERY`.
 - LayerInformation: Fixed CSS scope.
+- GetFeatureInfo: Fixed the display of the table view.
 
 ---
 
