@@ -144,7 +144,6 @@ export default {
 
 <style lang="scss" scoped>
     .table-wrapper {
-        overflow-x: auto;
         max-width: 100%;
     }
     .table > :not(:first-child) {
