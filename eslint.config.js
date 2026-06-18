@@ -386,12 +386,6 @@ export default [
                     selector: "VElement[name='li']:not([parent.name='ol']):not([parent.name='ul']):not([parent.name='menu']):not([parent.name='template']):not([parent.name='transitiongroup'])",
                     message: "<li> must be a direct child of <ol>, <ul>, <menu>, or <template>. Using other parents violates accessibility standards. Vue's <TransitionGroup> is allowed when it renders as a list container (<ul> or <ol>)."
                 },
-
-                // 5) Disallow <li> without proper parent (ol, ul, menu, or template)
-                {
-                    selector: "VElement[name='li']:not([parent.name='ol']):not([parent.name='ul']):not([parent.name='menu']):not([parent.name='template']):not([parent.name='transitiongroup'])",
-                    message: "<li> must be a direct child of <ol>, <ul>, <menu>, or <template>. Using other parents violates accessibility standards. Vue's <TransitionGroup> is allowed when it renders as a list container (<ul> or <ol>)."
-                }
             ]
 
 
