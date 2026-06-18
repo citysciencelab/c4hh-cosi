@@ -78,9 +78,11 @@ time. `node_modules` are not installed anywhere yet.
 - [x] Install in the correct order:
       1. `cd masterportal && npm install` (839 pkgs, clean).
       2. `cd masterportal/addons && npm install` — **addons are at `addons/`, not `addons/addons/`.**
-         Its `postinstall` is **broken in this checkout** (does `cd shared/js/mapfishUtils`, which
-         is missing, and aborts before reaching `cosi`). Workaround: `npm install --ignore-scripts`
-         then `cd cosi && npm install` (~200 pkgs). cosi v1.2.0 installs clean.
+         Its `postinstall` aborted at `cd shared/js/mapfishUtils` because this partial checkout
+         had flattened that dir to `mapfishUtils/` — **now fixed in the addons fork** (§2.5:
+         restored to `shared/js/mapfishUtils/`, matching upstream + all the imports that use it).
+         We still install with the lighter `npm install --ignore-scripts` then `cd cosi &&
+         npm install` (~200 pkgs) to skip building addons we don't use. cosi v1.2.0 installs clean.
 - [x] Sanity boot the stock example portal: `cd masterportal && npm start`
       (runs `vite`; `prestart` generates a dev cert). **Verified:** serves on
       `https://localhost:9001/` (HTTP 200), Vite logs the COSI tools in `provided addons:`.
@@ -115,9 +117,49 @@ Replace ORS with our own Valhalla, runnable locally **and** auto-deployable on t
 
 ---
 
+## 2.5 Track the agency's COSI as a fork (foundation for §3/§8)
+
+We will keep developing on top of COSI while the agency keeps shipping new versions. To pull
+their updates **without redoing our changes** (Valhalla migration etc.), our edits must live as a
+small, additive, *tracked* diff on top of a pinned upstream base — so an upstream bump is a
+`rebase`, not a rewrite. Before this, `masterportal/addons/` was an untracked, gitignored partial
+checkout with no git association at all, which made automated updates impossible.
+
+- [x] Make `masterportal/addons/` its **own standalone git repo** (a fork). It stays invisible to
+      both parents (`masterportal/.gitignore` ignores `addons/*`; root ignores `/masterportal/`),
+      so it carries its own history without interfering. `upstream` remote =
+      `bitbucket.org/geowerkstatt-hamburg/addons.git`; our branch = **`cosi-selfhost`**.
+- [x] **Pin the base:** `cosi-selfhost` is rooted at upstream `dev` commit **`f148b81e`**
+      (2026-06-16; = v3.23.0 + unreleased work incl. `planParken`), tagged **`upstream-base`**.
+      All upstream tags fetched (through `v3.23.0`).
+- [x] **Corrected one partial-checkout artifact** so the base is pristine: `mapfishUtils/` was
+      flattened locally; restored to upstream's `shared/js/mapfishUtils/` (the path used by
+      `cosi/ReportingTool`, `valuationPrint`, `waterRiskCheck` imports and the addons
+      `postinstall`). Working tree now matches `f148b81e` byte-for-byte → zero standing diff,
+      so future rebases only touch lines we actually change. This also resolved the §1 breakage.
+- [ ] **Create our hosted fork** (`origin`): make a fork on GitHub/Bitbucket, then
+      `git remote add origin <url> && git push -u origin cosi-selfhost --tags`. (Outward-facing —
+      do when ready to publish/back up.)
+- [ ] **Automate the update** (the "update without redoing Valhalla" goal): a scheduled job that
+      `git fetch upstream --tags`, attempts the rebase onto the newest tag, runs the
+      AccessibilityAnalysis tests, and opens a PR if it applies cleanly (flags us only when our
+      seam genuinely collides). See update procedure in the root `Readme.md`.
+- [ ] **Consider upstreaming** the config-selectable Valhalla backend to the agency — if accepted,
+      zero maintenance for us. Raise alongside the portalconfig request.
+
+Update procedure (manual, today): `cd masterportal/addons && git fetch upstream --tags &&
+git rebase <new-tag>`, resolve only true collisions, then refresh deps.
+
+---
+
 ## 3. Adapt AccessibilityAnalysis to Valhalla (code change)
 
 This is a real rewrite, not a URL swap — ORS and Valhalla isochrone APIs differ.
+**Do this on the `cosi-selfhost` branch as additive, isolated changes (§2.5):** the import chain
+is `actionsAccessibilityAnalysis.js → createIsochrones.js → requestIsochrones.js` (single default
+export — the one chokepoint). Add a new Valhalla request module + a thin config-driven dispatcher
+in `requestIsochrones.js`; normalize Valhalla's response inside it so `createIsochrones.js`,
+`styleIsochroneFeatures.js`, and the `.vue` stay untouched. That keeps upstream rebases clean.
 
 Files:
 - `cosi/AccessibilityAnalysis/utils/requestIsochrones.js` — builds/sends the request.

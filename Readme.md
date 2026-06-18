@@ -12,7 +12,8 @@ cosi/
 ├─ .nvmrc                     # Node version pin (24.15.0)
 └─ masterportal/              # upstream Masterportal v3.23.0 (own git checkout, on `dev`)
    ├─ .nvmrc                  # Node version pin (24.15.0)
-   ├─ addons/                 # LGV addons; COSI lives in addons/cosi (v1.2.0)
+   ├─ addons/                 # standalone fork of the agency addons repo (own git history,
+   │                          #   branch cosi-selfhost); COSI lives in addons/cosi (v1.2.0)
    └─ portal/{master,auto,basic}/   # stock example portals (no COSI portal yet — see BACKLOG §4)
 ```
 
@@ -44,12 +45,10 @@ npm -v        # 11.12.1  (bundled with Node 24.15.0)
 cd masterportal
 npm install
 
-# b) Addons (incl. COSI). The addons package has a recursive `postinstall` that assumes the
-#    full upstream addons layout and is currently broken in this checkout — it references a
-#    missing `shared/js/mapfishUtils` dir and aborts the chain before reaching cosi. So install
-#    the addons we use directly instead:
+# b) Addons (incl. COSI). We install only the addons we actually use, skipping the recursive
+#    `postinstall` (it tries to build every addon's sub-deps; we don't need most of them):
 cd addons
-npm install --ignore-scripts        # top-level addon deps, skip the broken postinstall
+npm install --ignore-scripts        # top-level addon deps, skip the heavy recursive postinstall
 cd cosi && npm install && cd ..     # the COSI addon (~200 packages) — the one we need
 
 # Other addons used by the stock examples can be installed the same way if needed, e.g.:
@@ -74,6 +73,44 @@ list that already includes the COSI tools (`districtSelector`, `accessibilityAna
 
 > Note: the stock portals do **not** load any COSI tool yet — there is no COSI portalconfig in
 > this repo. Authoring `portal/cosi/` is tracked in BACKLOG §4.
+
+## Addons fork & upstream updates
+
+`masterportal/addons/` is its **own standalone git repository** — a fork of the agency's addons
+repo. It is intentionally invisible to both parent repos (`masterportal/.gitignore` ignores
+`addons/*`; the project root ignores `/masterportal/`), so it keeps its own history without
+interfering with them.
+
+This is what lets us pull future COSI releases from the agency **without redoing** our own
+changes (notably the Valhalla routing migration, BACKLOG §3): our work lives as commits on the
+`cosi-selfhost` branch on top of a pinned upstream base, so a new upstream version is a
+`rebase`, not a rewrite.
+
+| | |
+|---|---|
+| Remote `upstream` | `https://bitbucket.org/geowerkstatt-hamburg/addons.git` |
+| Our branch | `cosi-selfhost` |
+| Pinned base | `f148b81e` (tag `upstream-base`) — `dev` @ 2026-06-16, = v3.23.0 + unreleased work |
+| `origin` (our hosted fork) | **not set yet** — create a fork, then `git remote add origin <url> && git push -u origin cosi-selfhost` |
+
+> One local correction is baked into the base: this checkout had `mapfishUtils/` flattened (a
+> partial-checkout artifact that broke the addons `postinstall` and the `shared/js/mapfishUtils`
+> imports used by `cosi/ReportingTool`, `valuationPrint`, `waterRiskCheck`). It is restored to
+> the upstream path `shared/js/mapfishUtils/`, so the working tree matches `f148b81e` exactly.
+
+### Pull in a new upstream COSI version
+
+```bash
+cd masterportal/addons
+git fetch upstream --tags
+git rebase <new-tag-or-commit>      # e.g. a future v3.24.0 — replays our cosi-selfhost commits
+# resolve conflicts only where upstream touched the same lines we did, then refresh deps:
+npm install --ignore-scripts && (cd cosi && npm install)
+```
+
+Keeping our changes **additive and isolated** (new files + minimal dispatch seams) is what keeps
+these rebases conflict-free — see BACKLOG §3 for the AccessibilityAnalysis/Valhalla approach and
+§10 for the full update strategy.
 
 ## Verified working versions
 
