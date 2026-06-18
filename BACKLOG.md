@@ -187,14 +187,25 @@ API differences to handle:
   (`value`/`contour` metadata). Normalize so downstream
   (`styleIsochroneFeatures.js`, feature `value`/`mode`/`unit` props, the 3-step
   `range/3, range*2/3, range` rendering) keeps working.
-- [ ] Decide implementation shape: a Valhalla-specific request module selected by service
-      type, vs. rewriting `requestIsochrones.js` in place. Prefer keeping it swappable
-      (service-type aware) so ORS can remain a fallback.
-- [ ] Update unit tests under `AccessibilityAnalysis/test/unit/service/` and
-      `.../utils/` (`requestIsochrones.spec.js`, `createIsochrones.spec.js`,
-      `styleIsochroneFeatures.spec.js`, fixtures `isochronesPoint.json`/`isochronesRegion.json`).
-- [ ] Update `state` `serviceId`/`fallbackServiceId` (or service-type flag) to point at the
-      new Valhalla rest-service id.
+- [x] **Implementation shape decided & built** (commit `758aa3ce` on `cosi-selfhost`):
+      service-type-aware, ORS stays the default/fallback. New `utils/requestIsochronesValhalla.js`
+      (single-origin requests, profile→costing map, s/m→min/km contours, response normalized to
+      the ORS feature shape `{group_index, value, center}` ascending by value); a 3-line dispatch
+      guard at the top of `requestIsochrones.js` (`serviceType === "valhalla"`, ORS body untouched);
+      `serviceType` threaded through `createIsochrones.js` + the `methodsAnalysis` call; the `.vue`
+      builds a backend-aware `baseUrl` (Valhalla `<url>/isochrone`, ORS `<url>/v2/isochrones`).
+- [x] **Switch via config:** new `state.isochroneBackend` (default `"ors"`). To use Valhalla, set
+      `isochroneBackend: "valhalla"` in the COSI `config.json` and point `serviceId` at the Valhalla
+      rest-service id. ORS remains the fallback. (No hardcoded change to `serviceId` itself.)
+- [x] **Unit tests:** new `test/unit/service/requestIsochronesValhalla.spec.js` (7 tests, vitest)
+      covers conversions, request shape, response normalization/ordering, multi-origin grouping,
+      and error handling. (The pre-existing `requestIsochrones`/`createIsochrones` specs are all
+      `it.skip` — they hit live services — so nothing to update there.)
+- [ ] **Integration-test against a live local Valhalla** once tiles are built (§2) — verify the
+      real response shape matches the fixtures and the units/profile mapping are correct.
+- [ ] **Refine `wheelchair`**: currently mapped to `pedestrian`; add Valhalla
+      `costing_options.pedestrian` tuning if needed (no first-class wheelchair costing in Valhalla).
+- [ ] Add the **`valhalla` rest-service entry** that `serviceId` points at — see §6.
 
 ---
 
