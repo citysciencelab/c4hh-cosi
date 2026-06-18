@@ -93,18 +93,25 @@ time. `node_modules` are not installed anywhere yet.
 Replace ORS with our own Valhalla, runnable locally **and** auto-deployable on the CSL server
 (docker-compose + scripts, automatic OSM download + tile building).
 
-- [ ] Create `valhalla/` (or `infra/valhalla/`) with `docker-compose.yml` using the
-      community Valhalla image (e.g. `ghcr.io/gis-ops/docker-valhalla/valhalla`).
-- [ ] Configure automatic OSM extract download (Hamburg, possibly Schleswig-Holstein/
-      Niedersachsen buffer for edge isochrones) from Geofabrik, and **automatic tile building**
-      on first run / when the extract changes. Persist tiles in a named volume so rebuilds are
-      skipped on restart.
-- [ ] Expose Valhalla on a stable URL (local: `http://localhost:8002`). Health-check `/status`.
-- [ ] Provide a one-command bootstrap script (download + build + serve) for the CSL server,
-      plus notes on resource needs (tile build is RAM/CPU/disk heavy) and how to refresh data.
-- [ ] Decide isochrone capabilities needed: **time-based** for sure; confirm whether
-      **distance-based** isochrones are required (Valhalla `/isochrone` supports `contours` by
-      `time` in minutes or `distance` in km).
+- [x] Create `valhalla/` with `docker-compose.yml` using the community Valhalla image
+      (`ghcr.io/gis-ops/docker-valhalla/valhalla`, overridable via `VALHALLA_IMAGE`).
+      Config is `.env`-driven (`valhalla/.env.example`); `docker compose config` validates.
+- [x] Configure automatic OSM extract download (Germany) from Geofabrik (`OSM_EXTRACT_URL`,
+      Hamburg extract documented as the lighter local option) and **automatic tile building**
+      on first `up`. Tiles persist in the named volume `valhalla_tiles` (restarts skip the
+      build); `scripts/refresh.sh` forces a rebuild when the extract/GTFS changes.
+- [x] Download HVV GTFS data and build the public-transport mode: `scripts/fetch-gtfs.sh`
+      pulls + unzips the HVV feed (`HVV_GTFS_URL`, latest from the Hamburg Transparenzportal)
+      into `gtfs_feeds/hvv/`; compose builds it with `build_transit`/`build_admins`/`build_time_zones`.
+- [x] Expose Valhalla on a stable URL (local: `http://localhost:8002`, `VALHALLA_PORT`).
+      Compose healthcheck polls `/status` (generous `start_period` covers the long initial build).
+- [x] One-command bootstrap: `valhalla/bootstrap.sh` (creates `.env`, fetches GTFS, pulls,
+      starts, waits for `/status`). `valhalla/Readme.md` documents resource needs (RAM/CPU/disk
+      table: Hamburg vs Germany), refresh flow, and CSL-server deployment.
+- [x] Isochrone capabilities decided (see `valhalla/Readme.md`): **time-based** is the
+      requirement and is what AccessibilityAnalysis uses; Valhalla `/isochrone` also supports
+      **distance-based** contours on the same service for free — usage decision deferred to
+      the §3 code change (open question in §8). No service-side change needed.
 
 ---
 

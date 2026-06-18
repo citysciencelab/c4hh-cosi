@@ -1,0 +1,57 @@
+# Self-hosted Valhalla routing service for COSI (replaces OpenRouteService).
+#
+# Values are read from a sibling `.env` file (copy `.env.example` → `.env`).
+# Docker Compose substitutes ${VARS} below from that file automatically.
+#
+# First `docker compose up` downloads the OSM extract and BUILDS the routing
+# tiles — this is RAM/CPU/disk heavy and can take a long time for Germany (see
+# Readme.md). Tiles are persisted in the named volume `valhalla_tiles`, so
+# restarts reuse them and skip the build. To force a rebuild (e.g. after a new
+# OSM extract or GTFS feed) set FORCE_REBUILD=True for one run, or run
+# `./scripts/refresh.sh`.
+
+name: cosi-valhalla
+
+services:
+  valhalla:
+    image: ${VALHALLA_IMAGE:-ghcr.io/gis-ops/docker-valhalla/valhalla:latest}
+    container_name: cosi-valhalla
+    ports:
+      # AccessibilityAnalysis talks to this on http://localhost:8002 (see §3).
+      - "${VALHALLA_PORT:-8002}:8002"
+    volumes:
+      # Named volume = persisted graph tiles, config, admin/timezone DBs.
+      - valhalla_tiles:/custom_files
+      # Bind mount = unzipped GTFS feeds (populated by scripts/fetch-gtfs.sh).
+      - ./gtfs_feeds:/gtfs_feeds
+    environment:
+      # OSM extract(s) to build from — space-separated URLs. Default: Germany.
+      - tile_urls=${OSM_EXTRACT_URL:-https://download.geofabrik.de/europe/germany-latest.osm.pbf}
+      - server_threads=${SERVER_THREADS:-4}
+      - serve_tiles=True
+      # Build a tar of the tiles for fast loading; reuse it on restart.
+      - build_tar=True
+      - use_tiles_ignore_pbf=True
+      # Set True (one run) to discard tiles and rebuild from the PBF/GTFS.
+      - force_rebuild=${FORCE_REBUILD:-False}
+      - update_existing_config=True
+      # Elevation adds cycling/walking grade awareness (extra download + disk).
+      - build_elevation=${BUILD_ELEVATION:-False}
+      # Admin + timezone DBs are required for correct time-dependent and
+      # public-transport (GTFS) routing — keep them on when transit is built.
+      - build_admins=${BUILD_ADMINS:-True}
+      - build_time_zones=${BUILD_TIME_ZONES:-True}
+      # Build the public-transport graph from the GTFS feeds in /gtfs_feeds.
+      - build_transit=${BUILD_TRANSIT:-True}
+    healthcheck:
+      # /status returns JSON once the service is up and tiles are loaded.
+      # Stays "unhealthy" during the (long) initial tile build — see start_period.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8002/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: ${HEALTHCHECK_START_PERIOD:-3600s}
+    restart: unless-stopped
+
+volumes:
+  valhalla_tiles:

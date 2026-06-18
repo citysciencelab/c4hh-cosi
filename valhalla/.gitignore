@@ -1,0 +1,11 @@
+# Local config (copied from .env.example)
+.env
+
+# Downloaded / built data — never commit these (large, regenerable)
+gtfs_feeds/*
+!gtfs_feeds/.gitkeep
+custom_files/
+*.pbf
+*.zip
+*.ZIP
+*.tar
