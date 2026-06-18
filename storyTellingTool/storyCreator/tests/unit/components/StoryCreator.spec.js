@@ -35,6 +35,12 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                                 })
                             },
                             state: {}
+                        },
+                        Menu: {
+                            namespaced: true,
+                            actions: {
+                                changeCurrentComponent: sinon.spy()
+                            }
                         }
                     }
                 }

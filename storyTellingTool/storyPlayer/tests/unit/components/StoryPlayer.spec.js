@@ -126,6 +126,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                         StoryPlayer: {
                             namespaced: true,
                             state: () => ({
+                                imageAssetsById: {},
                                 showLoadingSpinner: false,
                                 autoplay: true,
                                 fixedStoryPath: "",
@@ -138,10 +139,10 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                                     ],
                                     displayType: "dipas"
                                 },
-                                mode: "2D",
-                                storyConfJson: "mockConfigJsStoryConf.json"
+                                mode: "2D"
                             }),
                             getters: {
+                                imageAssetsById: state => state.imageAssetsById,
                                 showLoadingSpinner: state => state.showLoadingSpinner,
                                 autoplay: state => state.autoplay,
                                 fixedStoryPath: (state) => state.fixedStoryPath,
@@ -156,7 +157,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                                     state.showLoadingSpinner = payload;
                                 },
                                 setStoryConf (state, payload) {
-                                    state.setStoryConf = payload;
+                                    state.storyConf = payload;
                                 },
                                 setMode: (state, payload) => {
                                     state.mode = payload;
@@ -403,11 +404,6 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             wrapper.vm.disableLayer({id: 2});
             expect(toggleLayerStub.calledWith({id: 2}, false)).to.be.true;
             toggleLayerStub.restore();
-        });
-
-        it("should return storyConfPath from store when available", () => {
-            // storyConfJson is set in the store state
-            expect(wrapper.vm.storyConfPath).to.equal("mockConfigJsStoryConf.json");
         });
 
         describe("Chevron Navigation Tests", () => {

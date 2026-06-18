@@ -7,10 +7,6 @@ import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/
 export default {
     name: "StoryPlayer",
     props: {
-        imageAssetsById: {
-            type: Object,
-            default: null
-        },
         isMobileDevice: {
             type: Boolean,
             default: false
@@ -18,17 +14,12 @@ export default {
         screenOrientationType: {
             type: String,
             default: screen.orientation?.type
-        },
-        storyConfProp: {
-            type: Object,
-            default: null
         }
     },
     data () {
         return {
             currentIndex: -1,
             currentChapterIndex: 0,
-            fixedImageAssetsById: null,
             loadedContent: null,
             isHovering: null,
             isChangeFrom3D: false,
@@ -47,17 +38,15 @@ export default {
             "fixedStoryPath",
             "icon",
             "id",
+            "imageAssetsById",
             "mode",
             "name",
-            "storyConfJson",
             "type",
             "storyPlayerMenuSide",
+            "storyConf",
             "supportedDevices",
             "supportedMapModes"
         ]),
-        ...mapGetters("Modules/StoryPlayer", {
-            storyConfStore: "storyConf"
-        }),
         ...mapGetters([
             "layerConfigsByAttributes",
             "allLayerConfigs",
@@ -70,13 +59,6 @@ export default {
             "expanded"
         ]),
         /**
-         * The path to the story configuration json.
-         * @returns {String} the path to the story configuration json
-         */
-        storyConfPath () {
-            return this.storyConfJson ? this.storyConfJson : this.getConfPathfromUrl();
-        },
-        /**
          * The current selected chapter of the story.
          * @returns {Object} current chapter
          */
@@ -87,25 +69,11 @@ export default {
             return this.storyConf.chapters[this.currentChapterIndex];
         },
         /**
-         * The story configuration object, either from the prop or the store.
-         * @returns {Object} the story configuration
-         */
-        storyConf () {
-            return this.storyConfProp || this.storyConfStore || {};
-        },
-        /**
-         * The image assets object.
-         * @returns {Object} the image assets object
-         */
-        finalImageAssetsById () {
-            return this.imageAssetsById || this.fixedImageAssetsById;
-        },
-        /**
          * The URL of the cover image.
          * @returns {String} the URL of the cover image
          */
         coverImagePath () {
-            return this.finalImageAssetsById?.[this.storyConf.imageSrc]?.objectURL || "";
+            return this.imageAssetsById?.[this.storyConf.imageSrc]?.objectURL || "";
         },
         isMobilePortrait () {
             return this.isMobileDevice && this.screenOrientationType.startsWith("portrait");
@@ -212,6 +180,7 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/StoryPlayer", [
+            "setImageAssetsById",
             "setSupportedDevices",
             "setSupportedMapModes",
             "setType",
@@ -220,7 +189,6 @@ export default {
             "setDescription",
             "setIcon",
             "setStoryConf",
-            "setStoryConfJson",
             "setAutoplay",
             "setMode"
         ]),
@@ -282,7 +250,7 @@ export default {
                     const {storyJson, imageAssetsById} = await extractStoryZip(response.data);
 
                     this.setStoryConf(storyJson);
-                    this.fixedImageAssetsById = imageAssetsById;
+                    this.setImageAssetsById(imageAssetsById);
                 }
                 catch (error) {
                     console.warn(
@@ -724,7 +692,7 @@ export default {
                         >
                             <div v-if="item.type === 'image'">
                                 <img
-                                    :src="finalImageAssetsById?.[item.id]?.objectURL"
+                                    :src="imageAssetsById?.[item.id]?.objectURL"
                                     :alt="item.attrs?.alt"
                                     class="rounded w-100 d-block mb-2"
                                 >

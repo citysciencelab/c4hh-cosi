@@ -29,9 +29,9 @@ const state = {
     autoplay: false,
     fixedStoryName: null,
     fixedStoryPath: null,
+    imageAssetsById: {},
     mode: null,
-    storyConf: {},
-    storyConfJson: null
+    storyConf: {}
 };
 
 export default state;

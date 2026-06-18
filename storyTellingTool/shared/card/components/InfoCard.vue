@@ -65,48 +65,6 @@ export default {
         hasCardItems () {
             return Object.values(this.cardItems).some(value => value && value.length > 0);
         }
-    },
-    methods: {
-        /**
-         * Handles the click event on the edit button and stops propagation.
-         * @param {Event} event The DOM event.
-         * @param {Boolean} ignore if to ignore the click event.
-         * @returns {void}
-         */
-        handleEditClick (event, ignore = false) {
-            if (ignore) {
-                return;
-            }
-
-            if (event) {
-                event.stopPropagation();
-            }
-            this.$emit("edit");
-        },
-
-        /**
-         * Handles the click event on the delete button and stops propagation.
-         * @param {Event} event The DOM event.
-         * @returns {void}
-         */
-        handleDeleteClick (event) {
-            if (event) {
-                event.stopPropagation();
-            }
-            this.$emit("delete");
-        },
-
-        /**
-         * Handles the click event on the download button and stops propagation.
-         * @param {Event} event The DOM event.
-         * @returns {void}
-         */
-        handleDownloadClick (event) {
-            if (event) {
-                event.stopPropagation();
-            }
-            this.$emit("download");
-        }
     }
 };
 </script>
@@ -129,9 +87,9 @@ export default {
             }"
             role="button"
             tabindex="0"
-            @click="handleEditClick($event, cardType === 'story')"
-            @keydown.enter="handleEditClick($event, cardType === 'story')"
-            @keydown.space.prevent="handleEditClick($event, cardType === 'story')"
+            @click="$emit('click')"
+            @keydown.enter="$emit('click')"
+            @keydown.space.prevent="$emit('click')"
         >
             <div
                 v-if="cardImage.length"
@@ -201,8 +159,8 @@ export default {
                             <IconButton
                                 :aria="$t('additional:modules.storyCreator.labels.deleteChapter')"
                                 icon="bi bi-trash"
-                                :interaction="handleDeleteClick"
                                 :class-array="['btn-light']"
+                                @click.stop="$emit('delete')"
                             />
                         </div>
                     </div>
@@ -233,22 +191,22 @@ export default {
                             <IconButton
                                 :aria="$t('additional:modules.storyCreator.labels.playStory')"
                                 icon="bi bi-collection-play"
-                                :interaction="() => $emit('play')"
                                 :class-array="['btn-light']"
+                                @click.stop="$emit('play')"
                             />
                             <IconButton
                                 v-if="editable"
                                 :aria="$t('additional:modules.storyCreator.labels.editStory')"
                                 icon="bi bi-pencil"
-                                :interaction="handleEditClick"
                                 :class-array="['btn-light']"
+                                @click.stop="$emit('edit')"
                             />
                             <IconButton
                                 v-if="editable"
                                 :aria="$t('additional:modules.storyCreator.labels.downloadStory')"
                                 icon="bi bi-download"
-                                :interaction="handleDownloadClick"
                                 :class-array="['btn-light']"
+                                @click.stop="$emit('download')"
                             />
                         </div>
                     </div>
@@ -335,6 +293,7 @@ export default {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     white-space: normal;
 }

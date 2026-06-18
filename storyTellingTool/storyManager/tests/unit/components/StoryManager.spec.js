@@ -5,9 +5,10 @@ import StoryManager from "../../../components/StoryManager.vue";
 import sinon from "sinon";
 
 describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () => {
-    let store, wrapper;
+    let store, wrapper, changeCurrentComponentSpy;
 
     beforeEach(() => {
+        changeCurrentComponentSpy = sinon.spy();
         store = createStore({
             modules: {
                 Modules: {
@@ -20,6 +21,7 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                 fixedStoryPath: (state) => state.fixedStoryPath,
                                 fixedStoryFiles: (state) => state.fixedStoryFiles,
                                 fixedStoryLoaded: (state) => state.fixedStoryLoaded,
+                                menuSide: () => "secondaryMenu",
                                 storyList: (state) => state.storyList,
                                 subjectLayerCategory: (state) => state.subjectLayerCategory
                             },
@@ -77,8 +79,28 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                 fixedStoryFiles: [],
                                 fixedStoryLoaded: false
                             }
+                        },
+                        StoryPlayer: {
+                            namespaced: true,
+                            state: () => ({
+                                imageAssetsById: {},
+                                storyConf: {}
+                            }),
+                            mutations: {
+                                setImageAssetsById (state, value) {
+                                    state.imageAssetsById = value;
+                                },
+                                setStoryConf (state, value) {
+                                    state.storyConf = value;
+                                }
+                            }
                         }
-
+                    }
+                },
+                Menu: {
+                    namespaced: true,
+                    actions: {
+                        changeCurrentComponent: changeCurrentComponentSpy
                     }
                 }
             }
@@ -305,10 +327,15 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
         });
 
         describe("playStory", () => {
-            it("should set playingStoryIndex to the given index", async () => {
+            it("should call changeCurrentComponent with storyPlayer config", async () => {
                 await wrapper.vm.playStory(1);
 
-                expect(wrapper.vm.playingStoryIndex).to.equal(1);
+                expect(changeCurrentComponentSpy.calledOnce).to.be.true;
+                expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal({
+                    type: "storyPlayer",
+                    side: "secondaryMenu",
+                    props: {name: "additional:modules.storyPlayer.name"}
+                });
             });
         });
     });
@@ -385,22 +412,6 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 expect(storyCreatorComponent.props("story")).to.be.an("object");
                 expect(storyCreatorComponent.props("imageAssetsById")).to.be.an("object");
             }
-        });
-
-        it("should set playingStoryIndex when play event is emitted from story card", async () => {
-            const storyCards = wrapper.findAllComponents({name: "InfoCard"});
-
-            await storyCards[0].vm.$emit("play");
-
-            expect(wrapper.vm.playingStoryIndex).to.equal(0);
-        });
-
-        it("should set playingStoryIndex when story card is clicked", async () => {
-            const storyCards = wrapper.findAllComponents({name: "InfoCard"});
-
-            await storyCards[0].trigger("click");
-
-            expect(wrapper.vm.playingStoryIndex).to.equal(0);
         });
     });
 });

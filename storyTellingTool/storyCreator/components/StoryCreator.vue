@@ -7,10 +7,10 @@ import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import isObject from "@shared/js/utils/isObject.js";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import store from "@appstore/index.js";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
-import StoryPlayer from "../../storyPlayer/components/StoryPlayer.vue";
 
 export default {
     name: "StoryCreator",
@@ -22,8 +22,7 @@ export default {
         InfoText,
         InputText,
         StoryCreatorAddImageCard,
-        StoryCreatorChapter,
-        StoryPlayer
+        StoryCreatorChapter
     },
     props: {
         /**
@@ -63,6 +62,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("Modules/StoryManager", ["menuSide"]),
         /**
          * Returns the story object for preview with the current data.
          * @returns {Object} the story object for preview.
@@ -84,6 +84,8 @@ export default {
         this.imageLoaded = typeof this.workingImageAssetsById?.[this.imageSrc]?.objectURL !== "undefined";
     },
     methods: {
+        ...mapMutations("Modules/StoryPlayer", ["setImageAssetsById", "setStoryConf"]),
+        ...mapActions("Menu", ["changeCurrentComponent"]),
         /**
          * Sanitizes a filename for safe ZIP entry paths.
          * @param {String} originalName - The original filename.
@@ -334,7 +336,13 @@ export default {
          *  @returns {void}
          */
         openPreview () {
-            this.currentView = "preview";
+            this.setStoryConf(this.previewStory);
+            this.setImageAssetsById(this.workingImageAssetsById);
+            this.changeCurrentComponent({
+                type: "storyPlayer",
+                side: this.menuSide,
+                props: {name: this.$t("additional:modules.storyPlayer.name")}
+            });
         },
 
         /**
@@ -353,33 +361,10 @@ export default {
 
 <template lang="html">
     <div id="story-creator">
-        <nav
-            v-if="currentView === 'chapter' || currentView === 'preview'"
-            aria-label="breadcrumb"
-            class="mb-4"
-        >
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item">
-                    <a
-                        href="#"
-                        class="breadcrumb-link"
-                        :class="{'breadcrumb-link--disabled': currentView === 'chapter'}"
-                        @click.prevent="goToStory"
-                    >
-                        {{ $t("additional:modules.storyCreator.storyNav") }}
-                    </a>
-                </li>
-                <li
-                    class="breadcrumb-item active"
-                    aria-current="page"
-                >
-                    {{ currentView === 'chapter'
-                        ? $t("additional:modules.storyCreator.chapterNav")
-                        : $t("additional:modules.storyCreator.previewNav") }}
-                </li>
-            </ol>
-        </nav>
         <div v-if="currentView === 'story'">
+            <h5 class="mb-4">
+                {{ $t("additional:modules.storyCreator.labels.editStory") }}
+            </h5>
             <p class="mb-4">
                 {{ $t("additional:modules.storyCreator.introText") }}
             </p>
@@ -460,6 +445,7 @@ export default {
                         :photo-credit="getChapterOverviewAttr(element, 'copyright')"
                         :editable="true"
                         @edit="editChapter(index)"
+                        @click="editChapter(index)"
                         @delete="() => deleteChapter(index)"
                     />
                 </template>
@@ -515,40 +501,10 @@ export default {
                 @cancel-chapter="handleCancelChapter"
             />
         </div>
-        <div
-            v-else-if="currentView === 'preview'"
-        >
-            <StoryPlayer
-                :story-conf-prop="previewStory"
-                :image-assets-by-id="workingImageAssetsById"
-            />
-        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.breadcrumb {
-    .breadcrumb-link {
-        color: $secondary;
-        text-decoration: none;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-    .breadcrumb-link--disabled {
-        pointer-events: none;
-        opacity: 0.5;
-        cursor: default;
-
-        &:hover {
-            text-decoration: none;
-        }
-    }
-    .breadcrumb-item + .breadcrumb-item::before {
-    content: "|";
-}
-}
 .chapter-title-image-preview {
     cursor: pointer;
     .chapter-title-image-close {

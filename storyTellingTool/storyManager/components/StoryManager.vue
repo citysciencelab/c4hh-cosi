@@ -6,8 +6,7 @@ import {createStoryZip, extractStoryZip} from "../shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
-import StoryPlayer from "../../storyPlayer/components/StoryPlayer.vue";
-import {mapGetters, mapMutations} from "vuex";
+import {mapGetters, mapMutations, mapActions} from "vuex";
 import StoryCreator from "../../storyCreator/components/StoryCreator.vue";
 
 export default {
@@ -18,13 +17,11 @@ export default {
         FlatButton,
         InfoCard,
         InfoText,
-        StoryCreator,
-        StoryPlayer
+        StoryCreator
     },
     data () {
         return {
             currentView: "manager",
-            playingStoryIndex: null,
             showImportError: false
         };
     },
@@ -34,7 +31,8 @@ export default {
             "fixedStoryLoaded",
             "fixedStoryPath",
             "currentStoryIndex",
-            "storyList"
+            "storyList",
+            "menuSide"
         ]),
         /**
          * Returns the story object to pass to StoryCreator.
@@ -69,6 +67,8 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/StoryManager", ["setCurrentStoryIndex", "setFixedStoryLoaded", "setStoryList"]),
+        ...mapMutations("Modules/StoryPlayer", ["setImageAssetsById", "setStoryConf"]),
+        ...mapActions("Menu", ["changeCurrentComponent"]),
         /**
          * Opens the creator for a new story.
          * @returns {void}
@@ -161,7 +161,13 @@ export default {
          * @returns {void}
          */
         playStory (index) {
-            this.playingStoryIndex = index;
+            this.setStoryConf(this.storyList[index].story);
+            this.setImageAssetsById(this.storyList[index].imageAssetsById);
+            this.changeCurrentComponent({
+                type: "storyPlayer",
+                side: this.menuSide,
+                props: {name: this.$t("additional:modules.storyPlayer.name")}
+            });
         },
         /**
          * Gets the card items in object from story.
@@ -287,14 +293,8 @@ export default {
         id="story-manager"
         class="d-flex flex-column"
     >
-        <div v-if="playingStoryIndex !== null">
-            <StoryPlayer
-                :story-conf-prop="storyList[playingStoryIndex]?.story"
-                :image-assets-by-id="storyList[playingStoryIndex]?.imageAssetsById"
-            />
-        </div>
         <StoryCreator
-            v-else-if="currentView === 'creator'"
+            v-if="currentView === 'creator'"
             :story="editingStory"
             :image-assets-by-id="editingImageAssetsById"
             @save-story="onSaveStory"
