@@ -1,0 +1,6 @@
+# Upstream Masterportal checkout — has its own git history (cloned from
+# bitbucket.org/geowerkstatt-hamburg/masterportal, currently on `dev`) and contains
+# installed node_modules. It is set up per Readme.md, not vendored into this repo.
+# Our own COSI artifacts (portal/cosi config, services.json, valhalla/, etc.) will be
+# tracked here at the repo root as the project grows — see BACKLOG.md.
+/masterportal/
