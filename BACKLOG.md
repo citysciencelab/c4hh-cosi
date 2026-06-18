@@ -70,15 +70,21 @@ Current local: `node v24.11.0`, `npm 11.6.1` — **both already satisfy the rang
 earlier "node versions not correct" pain was probably a different/older Node selected at the
 time. `node_modules` are not installed anywhere yet.
 
-- [ ] Add a Node pin so the env is reproducible: create `.nvmrc` (value `24.15.0`, matching CI)
-      at `masterportal/` (and optionally repo root). Document `nvm use` in the README.
-- [ ] Install in the correct order:
-      1. `cd masterportal && npm install`
-      2. `cd masterportal/addons/addons && npm install`
-         (its `postinstall` recursively installs each addon, incl. `cosi`).
-- [ ] Sanity boot the stock example portal: `cd masterportal && npm start`
-      (runs `vite`; `prestart` generates a dev cert). Confirm it serves before touching COSI.
-- [ ] Document the exact working Node/npm versions and steps in the root `Readme.md`.
+- [x] Add a Node pin so the env is reproducible: created `.nvmrc` (value `24.15.0`, matching CI)
+      at `masterportal/` **and** repo root; `nvm use` documented in `Readme.md`.
+      **Correction:** local v24.11.0/npm 11.6.1 do *not* satisfy — under `engine-strict` the
+      transitive dep `@masterportal/masterportalapi@2.62.0` needs `node ^24.11.1`/`npm ^11.6.2`,
+      so install fails `EBADENGINE` until on 24.15.0 (npm 11.12.1). This was the real "node" pain.
+- [x] Install in the correct order:
+      1. `cd masterportal && npm install` (839 pkgs, clean).
+      2. `cd masterportal/addons && npm install` — **addons are at `addons/`, not `addons/addons/`.**
+         Its `postinstall` is **broken in this checkout** (does `cd shared/js/mapfishUtils`, which
+         is missing, and aborts before reaching `cosi`). Workaround: `npm install --ignore-scripts`
+         then `cd cosi && npm install` (~200 pkgs). cosi v1.2.0 installs clean.
+- [x] Sanity boot the stock example portal: `cd masterportal && npm start`
+      (runs `vite`; `prestart` generates a dev cert). **Verified:** serves on
+      `https://localhost:9001/` (HTTP 200), Vite logs the COSI tools in `provided addons:`.
+- [x] Document the exact working Node/npm versions and steps in the root `Readme.md`. **Done.**
 
 ---
 
