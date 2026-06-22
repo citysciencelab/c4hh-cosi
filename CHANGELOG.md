@@ -27,7 +27,7 @@
         - eslint-plugin-vue": 9.32.0 to 10.9.1
 - Replaced native text input elements with the custom `InputText` component in selected modules without changing the user-facing behavior.
 - GraphicalSelect: Implemented debounce of the slider input to increase reliability of presented data and decrease the amount of requests.
-- Accessibility: Changed lists of CoordToolkit and BaselayerSwitcher to make it more readable for screen readers and added an eslint rule to enforce the right list implementations
+- Accessibility: Changed lists of CoordToolkit and BaselayerSwitcher to make it more readable for screen readers and added an eslint rule to enforce the right list implementations.
 
 ### Deprecated
 
