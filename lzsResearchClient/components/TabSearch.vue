@@ -10,10 +10,12 @@ import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import LzsResearchClientSearchBar from "./searchBar/components/LzsResearchClientSearchBar.vue";
 import {roundFileSizeToFixed} from "../utils/zipHelpers";
+import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
 
 import Polygon from "ol/geom/Polygon";
 import LineString from "ol/geom/LineString";
 import Point from "ol/geom/Point";
+import MultiPolygon from "ol/geom/MultiPolygon.js";
 import Feature from "ol/Feature.js";
 import {Fill, Stroke, Style} from "ol/style";
 import {getArea} from "ol/sphere";
@@ -53,11 +55,14 @@ export default {
             buttonGroupLevels: [
                 {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent")},
                 {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries")},
-                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address")}
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address")},
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel")}
             ],
             selectedButtonGroup: "extent",
-            showMaxAreaWarning: false,
-            searchGeometryArea: null
+            showAreaWarning: false,
+            searchGeometryArea: null,
+            selectedParcelDistrict: null,
+            parcelNumberInputValue: ""
         };
     },
     computed: {
@@ -77,7 +82,9 @@ export default {
             "minScaleValue",
             "maxResultValueCount",
             "addressSearchCoordinates",
-            "maxGeometryArea"
+            "maxGeometryArea",
+            "parcelSourceData",
+            "alkisBaseUrl"
         ]),
         ...mapGetters("Maps", [
             "projectionCode",
@@ -132,6 +139,8 @@ export default {
                     return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries");
                 case "address":
                     return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address");
+                case "parcel":
+                    return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel");
                 case "extent":
                 default:
                     return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent");
@@ -142,7 +151,7 @@ export default {
                 return false;
             }
 
-            if (!this.searchGeometry && (this.selectedButtonGroup === "geometry" || this.selectedButtonGroup === "address")) {
+            if (!this.searchGeometry && ["geometry", "address", "parcel"].includes(this.selectedButtonGroup)) {
                 return false;
             }
 
@@ -179,8 +188,12 @@ export default {
             if (this.selectedButtonGroup === "extent" && this.scale > this.minScaleValue) {
                 return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.extentWarningMessage", {scale: this.minScaleValue});
             }
-            if (this.selectedButtonGroup === "geometry" && this.showMaxAreaWarning) {
+            if (this.selectedButtonGroup === "geometry" && this.showAreaWarning) {
                 return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.geometryAreaWarningMessage", {maxArea: maxAreaInSquareKilometers, area: areaInSquareKilometers});
+            }
+            if (this.selectedButtonGroup === "parcel" && this.showAreaWarning) {
+                return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearchNoResults");
+
             }
             return null;
         }
@@ -205,7 +218,14 @@ export default {
 
             if (newValue !== oldValue) {
                 this.removeSearchGeometry();
-                this.showMaxAreaWarning = false;
+                this.showAreaWarning = false;
+            }
+        },
+        async selectedButtonGroup (newValue, oldValue) {
+            if (newValue === "parcel" && oldValue !== "parcel") {
+                if (!this.parcelSourceData) {
+                    await this.retrieveParcelSourceData();
+                }
             }
         }
     },
@@ -226,7 +246,8 @@ export default {
             "searchByAttribute",
             "fetchPlaceholders",
             "fetchYears",
-            "searchByGeometry"
+            "searchByGeometry",
+            "retrieveParcelSourceData"
         ]),
         ...mapActions("Maps", [
             "addNewLayerIfNotExists",
@@ -254,6 +275,10 @@ export default {
                 this.removePointMarker();
                 this.setSearchInput("");
                 this.setAddressSearchCoordinates(null);
+
+                if (this.parcelSourceData) {
+                    this.clearParcelSearch(true);
+                }
             }
         },
         /**
@@ -280,8 +305,8 @@ export default {
                 this.currentModifyInteraction = null;
             }
 
-            if (this.showMaxAreaWarning) {
-                this.showMaxAreaWarning = false;
+            if (this.showAreaWarning) {
+                this.showAreaWarning = false;
             }
         },
         /**
@@ -290,6 +315,13 @@ export default {
          */
         setSelectedArchive (archiv) {
             this.selectedArchive = archiv;
+        },
+        /**
+         * Set the selected parcel area identifier.
+         * @param {string} parcelDistrict - The parcel district name to select.
+         */
+        setSelectedParcelDistrict (parcelDistrict) {
+            this.selectedParcelDistrict = parcelDistrict;
         },
         /**
          * Initialize archive and form data structures from `dataClassList`.
@@ -422,6 +454,7 @@ export default {
             this.removeSearchGeometry();
             this.setSearchInput("");
             this.setAddressSearchCoordinates(null);
+            this.clearParcelSearch(true);
         },
         /**
          * Reset the geometric search selection (archive ids).
@@ -564,7 +597,7 @@ export default {
          * @returns {void}
          */
         onModifyStart () {
-            this.showMaxAreaWarning = false;
+            this.showAreaWarning = false;
         },
         /**
          * Sets the map interaction to modify a feature.
@@ -622,7 +655,7 @@ export default {
                 }
             }
             else if (geometry instanceof Polygon) {
-                if (this.selectedButtonGroup === "address") {
+                if (this.selectedButtonGroup === "address" || this.selectedButtonGroup === "parcel") {
                     this.lzsDrawLayerSource.clear();
 
                     const feature = new Feature(geometry);
@@ -668,7 +701,7 @@ export default {
             this.searchGeometryArea = getArea(geometry, {projection: this.projectionCode});
 
             if (this.searchGeometryArea > this.maxGeometryArea) {
-                this.showMaxAreaWarning = true;
+                this.showAreaWarning = true;
                 this.searchGeometry = null;
 
                 return false;
@@ -752,10 +785,20 @@ export default {
                         this.setSearchInput(null);
                     }
 
+                    this.clearParcelSearch(true);
+
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address"):
                     this.removeSearchGeometry();
                     this.selectedButtonGroup = "address";
+
+                    this.clearParcelSearch(true);
+
+
+                    break;
+                case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel"):
+                    this.removeSearchGeometry();
+                    this.selectedButtonGroup = "parcel";
                     break;
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent"):
                 default:
@@ -765,6 +808,8 @@ export default {
                         this.removePointMarker();
                         this.setSearchInput(null);
                     }
+
+                    this.clearParcelSearch(true);
 
                     this.selectedButtonGroup = "extent";
                     break;
@@ -785,6 +830,98 @@ export default {
                     : 20;
 
             return [20, rightPadding, 20, leftPadding];
+        },
+        /**
+         * Clears the parcel search input and resets the selected parcel district and search geometry.
+         * @param {boolean} clearDistrict - Whether to also clear the selected parcel district.
+         */
+        clearParcelSearch (clearDistrict = false) {
+            this.parcelNumberInputValue = "";
+            this.showAreaWarning = false;
+
+            if (clearDistrict) {
+                this.setSelectedParcelDistrict(null);
+            }
+
+            if (this.searchGeometry) {
+                this.removeSearchGeometry();
+            }
+        },
+        /**
+         * Fetches parcel search results from the OAF feature service.
+         * @async
+         * @returns {Promise<Object|null>} GeoJSON parcel data or null if an error occurs.
+         */
+        async fetchParcelSearchResults () {
+            try {
+                this.showSpinner = true;
+
+                const parcelGeoJson = await getOAFFeature.getOAFFeatureGet(this.alkisBaseUrl, "Flurstueck", {
+                    limit: 100,
+                    filterCrs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    crs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    filter: true,
+                    literalFilters: {gemaschl: "02" + this.selectedParcelDistrict, flstnrzae: this.parcelNumberInputValue}
+                });
+
+                this.showSpinner = false;
+
+                return parcelGeoJson;
+            }
+            catch (error) {
+                console.warn("An error has occurred when requesting the parcel features", error);
+                return null;
+            }
+        },
+        /**
+         * Handles the parcel search submission by fetching parcel search results and zooming to the parcel geometry.
+         * @returns {void}
+         */
+        handleParcelSearchSubmit () {
+            this.setSearchGeometry(null);
+            this.showAreaWarning = false;
+
+            this.fetchParcelSearchResults()
+                .then((parcelGeoJson) => {
+                    if (parcelGeoJson && parcelGeoJson[0]?.geometry) {
+                        const parcelGeometry = new MultiPolygon([]),
+                            parcel = parcelGeoJson[0];
+
+                        let searchGeometry;
+
+                        parcelGeometry.setCoordinates(parcel.geometry.coordinates);
+
+                        if (parcelGeometry.getPolygons().length === 1) {
+                            searchGeometry = parcelGeometry.getPolygons()[0];
+                        }
+                        else {
+                            searchGeometry = parcelGeometry.getPolygons().reduce((largest, polygon) => {
+                                if (!largest || polygon.getArea() > largest.getArea()) {
+                                    return polygon;
+                                }
+                                return largest;
+                            }, null);
+                        }
+
+                        if (!searchGeometry) {
+                            console.warn("No valid parcel geometry found.");
+                            return;
+                        }
+
+                        this.setSearchGeometry(searchGeometry);
+                        this.zoomToExtent({
+                            extent: searchGeometry.getExtent(),
+                            options: {
+                                padding: this.mapZoomToExtentPadding()
+                            }
+                        });
+                    }
+                    else {
+
+                        this.showAreaWarning = true;
+                        console.warn("No parcel geometry found in the search results.");
+                    }
+                });
         }
     }
 };
@@ -974,6 +1111,70 @@ export default {
                         />
                     </div>
 
+                    <div
+                        v-if="selectedButtonGroup === 'parcel'"
+                        class="spatialSelectionButtons parcelSearch d-flex flex-column"
+                    >
+                        <div>
+                            <label for="parcelSearchSelect">
+                                {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel") }}
+                            </label>
+
+                            <select
+                                id="parcelSearchSelect"
+                                class="form-select archive"
+                                :value="selectedParcelDistrict"
+                                @change="setSelectedParcelDistrict($event.target.value)"
+                            >
+                                <option
+                                    v-for="(_, name) in parcelSourceData"
+                                    :key="name"
+                                    :value="parcelSourceData[name].id"
+                                >
+                                    {{ name + " (" + parcelSourceData[name].id + ")" }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <label for="parcelNumber">
+                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel") }}
+                        </label>
+
+                        <div class="input-group">
+                            <input
+                                id="parcelNumber"
+                                ref="parcelNumberInput"
+                                v-model="parcelNumberInputValue"
+                                type="search"
+                                class="form-control"
+                                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel')"
+                            >
+                            <button
+                                v-if="parcelNumberInputValue"
+                                class="btn-icon input-icon reset-button"
+                                type="button"
+                                aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearchCancel.clearParcelSearch')"
+                                @click="clearParcelSearch(false)"
+                            >
+                                <i class="bi-x-lg fs-6" />
+                            </button>
+                            <button
+                                id="lzs-research-client-parcel-search-button"
+                                class="btn btn-primary"
+                                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel')"
+                                type="button"
+                                :disabled="!parcelNumberInputValue || !selectedParcelDistrict"
+                                @click="handleParcelSearchSubmit"
+                                @keydown.enter="handleParcelSearchSubmit"
+                            >
+                                <i
+                                    class="bi-search"
+                                    role="img"
+                                />
+                            </button>
+                        </div>
+                    </div>
+
                     <p
                         v-if="spatialAreaWarning"
                         class="spatialAreaWarning"
@@ -1099,6 +1300,52 @@ export default {
                         display: none;
                     }
                 }
+
+                &.parcelSearch {
+                    div.input-group {
+                        position: relative;
+
+                        #lzs-research-client-parcel-search-button {
+                            border-top-right-radius: 5px;
+                            border-bottom-right-radius: 5px;
+                            position: relative;
+
+                        }
+
+                        .input-label {
+                            color: $placeholder-color;
+                        }
+
+                        input[type="search"] {
+                            -webkit-appearance: none;
+                            appearance: none;
+
+                            &::-webkit-search-cancel-button {
+                                display: none;
+                            }
+                        }
+
+                        .btn-icon {
+                            position: absolute;
+                            right: 40px;
+                            top: 40%;
+                            transform: translateY(-50%);
+                            background-color: rgba(0, 0, 0, 0);
+                            border: none;
+                            padding: 5px 0 0 10px;
+                            z-index: 5;
+                        }
+
+                        .input-icon {
+                            margin-left: -37px;
+                        }
+
+                        .reset-button {
+                            cursor: pointer;
+                        }
+                    }
+
+                }
             }
 
             div.spatialSelection {
@@ -1120,6 +1367,7 @@ export default {
                 margin-left: 0.25rem;
             }
         }
+
         div.searchButtons {
             display: flex;
             gap: 0.5rem;

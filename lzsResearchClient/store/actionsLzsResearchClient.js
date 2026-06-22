@@ -358,6 +358,21 @@ export default {
         }
     },
     /**
+     * Retrieves the parcel source data from the configured URL and commits it to the store.
+     * This data is used for the parcel search functionality.
+     *
+     * @returns {void}
+     */
+    retrieveParcelSourceData ({commit, getters, dispatch}) {
+        const {parcelSearchSelectSource} = getters;
+
+        axios.get(encodeURI(parcelSearchSelectSource))
+            .then(response => {
+                commit("setParcelSourceData", response.data);
+            })
+            .catch(error => dispatch("axiosErrorHandling", error));
+    },
+    /**
      * Download selected primary data files (single item or array of items), show download
      * and zip progress in the Vuex state, build a nested folder structure and create a ZIP
      * using fflate, then trigger a browser save dialog.

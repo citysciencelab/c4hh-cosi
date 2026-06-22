@@ -36,6 +36,8 @@ import stateSearchBar from "./searchBar/stateSearchBar.js";
  * @property {String} errorMessage - message text for errors from backend or while ziping download
  * @property {String} currentProgressValue - message for current progress for ziping the files for download
  * @property {Number} progressNow - percentage of progress in ziping and downloading files, -1 to hide progressbar
+ * @property {Object|null} parcelSourceData - JSON data for the parcel search, containing the parcel districts and their respective names and ids
+ * @property {String|null} parcelSearchSelectSource - URL to fetch the list of parcel districts for the parcel search
  *
  * Draw state
  * @property {Object} lzsCurrentLayout - Current layout settings for the drawn features in the draw component
@@ -82,6 +84,8 @@ const state = {
     errorMessage: "",
     currentProgressValue: "",
     progressNow: -1,
+    parcelSourceData: null,
+    parcelSearchSelectSource: null,
 
     // Draw component
     lzsCurrentLayout: {

@@ -3,6 +3,7 @@ import {expect} from "chai";
 import sinon from "sinon";
 import {createStore} from "vuex";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
+import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
 
 import Point from "ol/geom/Point";
 import LineString from "ol/geom/LineString";
@@ -148,7 +149,11 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                                 minScaleValue: () => 5000,
                                 maxResultValueCount: () => mockMaxResultValueCount,
                                 maxGeometryArea: () => 4000000,
-                                addressSearchCoordinates: () => [1, 2]
+                                addressSearchCoordinates: () => [1, 2],
+                                alkisBaseUrl: () => "https://alkis_vereinfacht",
+                                parcelSearchSelectSource: () => "https://test/gemarkungen_hh.json",
+                                parcelSourceData: () => null
+
                             },
                             actions: {
                                 fetchDataClassList: () => Promise.resolve(),
@@ -176,7 +181,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                         addInteraction: () => sinon.stub(),
                         removeInteraction: () => sinon.stub(),
                         removePointMarker: () => sinon.stub(),
-                        placingPointMarker: () => sinon.stub()
+                        placingPointMarker: () => sinon.stub(),
+                        zoomToExtent: () => sinon.stub()
                     },
                     state: () => ({
                         scale: 5000
@@ -547,9 +553,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         );
     });
 
-    it("spatialAreaWarning computed returns the geometry area warning translation key when geometry mode is active and showMaxAreaWarning is true", async () => {
+    it("spatialAreaWarning computed returns the geometry area warning translation key when geometry mode is active and showAreaWarning is true", async () => {
         wrapper.vm.selectedButtonGroup = "geometry";
-        wrapper.vm.showMaxAreaWarning = true;
+        wrapper.vm.showAreaWarning = true;
         wrapper.vm.searchGeometryArea = 1500000000; // 1500 km²
 
         await wrapper.vm.$nextTick();
@@ -559,9 +565,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
         );
     });
 
-    it("spatialAreaWarning computed returns null when geometry mode is active but showMaxAreaWarning is false", async () => {
+    it("spatialAreaWarning computed returns null when geometry mode is active but showAreaWarning is false", async () => {
         wrapper.vm.selectedButtonGroup = "geometry";
-        wrapper.vm.showMaxAreaWarning = false;
+        wrapper.vm.showAreaWarning = false;
 
         await wrapper.vm.$nextTick();
 
@@ -580,10 +586,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
             expect(result).to.be.true;
         });
 
-        it("does not set showMaxAreaWarning when area is within the allowed limit", () => {
+        it("does not set showAreaWarning when area is within the allowed limit", () => {
             wrapper.vm.checkSearchGeometryArea(smallPolygon);
 
-            expect(wrapper.vm.showMaxAreaWarning).to.be.false;
+            expect(wrapper.vm.showAreaWarning).to.be.false;
         });
 
         it("sets searchGeometryArea to the calculated numeric value", () => {
@@ -598,10 +604,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
             expect(result).to.be.false;
         });
 
-        it("sets showMaxAreaWarning to true when area exceeds the allowed limit", () => {
+        it("sets showAreaWarning to true when area exceeds the allowed limit", () => {
             wrapper.vm.checkSearchGeometryArea(largePolygon);
 
-            expect(wrapper.vm.showMaxAreaWarning).to.be.true;
+            expect(wrapper.vm.showAreaWarning).to.be.true;
         });
 
         it("sets searchGeometry to null when area exceeds the allowed limit", () => {
@@ -610,6 +616,147 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
             wrapper.vm.checkSearchGeometryArea(largePolygon);
 
             expect(wrapper.vm.searchGeometry).to.be.null;
+        });
+    });
+
+    describe("clearParcelSearch", () => {
+        it("resets parcelNumberInputValue to an empty string", () => {
+            wrapper.vm.parcelNumberInputValue = "12345";
+
+            wrapper.vm.clearParcelSearch();
+
+            expect(wrapper.vm.parcelNumberInputValue).to.equal("");
+        });
+
+        it("does not change selectedParcelDistrict when clearDistrict is false", () => {
+            wrapper.vm.selectedParcelDistrict = "SomeDistrict";
+
+            wrapper.vm.clearParcelSearch();
+
+            expect(wrapper.vm.selectedParcelDistrict).to.equal("SomeDistrict");
+        });
+
+        it("does change selectedParcelDistrict when clearDistrict is true", () => {
+            wrapper.vm.selectedParcelDistrict = "SomeDistrict";
+
+            wrapper.vm.clearParcelSearch(true);
+
+            expect(wrapper.vm.selectedParcelDistrict).to.be.null;
+        });
+
+        it("does not clear the draw layer source when searchGeometry is null", () => {
+            wrapper.vm.searchGeometry = null;
+
+            wrapper.vm.clearParcelSearch();
+
+            expect(drawLayerSourceMock.clear.called).to.be.false;
+        });
+
+        it("sets searchGeometry to null when it was set", () => {
+            wrapper.vm.searchGeometry = {type: "Point", coordinates: [0, 0]};
+
+            wrapper.vm.clearParcelSearch();
+
+            expect(wrapper.vm.searchGeometry).to.be.null;
+        });
+
+        it("clears the draw layer source when searchGeometry was set", () => {
+            wrapper.vm.searchGeometry = {type: "Point", coordinates: [0, 0]};
+
+            wrapper.vm.clearParcelSearch();
+
+            expect(drawLayerSourceMock.clear.called).to.be.true;
+        });
+    });
+
+    describe("fetchParcelSearchResults", () => {
+        it("returns the GeoJSON array returned by getOAFFeatureGet on success", async () => {
+            const mockResult = [{geometry: {type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]}}];
+
+            sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves(mockResult);
+
+            const result = await wrapper.vm.fetchParcelSearchResults();
+
+            expect(result).to.deep.equal(mockResult);
+        });
+
+        it("returns null when getOAFFeatureGet rejects", async () => {
+            sinon.stub(console, "warn");
+            sinon.stub(getOAFFeature, "getOAFFeatureGet").rejects(new Error("Network error"));
+
+            const result = await wrapper.vm.fetchParcelSearchResults();
+
+            expect(result).to.be.null;
+        });
+
+        it("calls getOAFFeatureGet for the Flurstueck collection with the correct literal filters", async () => {
+            const stub = sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves([]);
+
+            wrapper.vm.selectedParcelDistrict = "123";
+            wrapper.vm.parcelNumberInputValue = "789";
+
+            await wrapper.vm.fetchParcelSearchResults();
+
+            expect(stub.calledOnce).to.be.true;
+            expect(stub.firstCall.args[1]).to.equal("Flurstueck");
+            expect(stub.firstCall.args[2].literalFilters).to.deep.equal({
+                gemaschl: "02123",
+                flstnrzae: "789"
+            });
+        });
+    });
+
+    describe("handleParcelSearchSubmit", () => {
+        // MultiPolygon coordinates: array of polygon arrays, each polygon = [outerRing, ...innerRings]
+        const smallRing = [[0, 0], [100, 0], [100, 100], [0, 100], [0, 0]],
+            largeRing = [[0, 0], [500, 0], [500, 500], [0, 500], [0, 0]],
+            singlePolygonGeoCoords = [[smallRing]],
+            twoPolygonGeoCoords = [[smallRing], [largeRing]];
+
+        it("does not set searchGeometry when parcelGeoJson is null", async () => {
+            sinon.stub(console, "warn");
+            sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves(null);
+
+            wrapper.vm.handleParcelSearchSubmit();
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(wrapper.vm.searchGeometry).to.be.null;
+        });
+
+        it("does not set searchGeometry when the first feature has no geometry", async () => {
+            sinon.stub(console, "warn");
+            sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves([{type: "Feature"}]);
+
+            wrapper.vm.handleParcelSearchSubmit();
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(wrapper.vm.searchGeometry).to.be.null;
+        });
+
+        it("sets searchGeometry when the parcel contains a single polygon", async () => {
+            sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves([{
+                geometry: {coordinates: singlePolygonGeoCoords}
+            }]);
+
+            wrapper.vm.handleParcelSearchSubmit();
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(wrapper.vm.searchGeometry).to.not.be.null;
+            expect(wrapper.vm.searchGeometry.type).to.equal("Polygon");
+            expect(wrapper.vm.searchGeometry.coordinates).to.deep.equal([smallRing]);
+        });
+
+        it("selects the largest polygon when the parcel contains multiple polygons", async () => {
+            sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves([{
+                geometry: {coordinates: twoPolygonGeoCoords}
+            }]);
+
+            wrapper.vm.handleParcelSearchSubmit();
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(wrapper.vm.searchGeometry).to.not.be.null;
+            expect(wrapper.vm.searchGeometry.type).to.equal("Polygon");
+            expect(wrapper.vm.searchGeometry.coordinates).to.deep.equal([largeRing]);
         });
     });
 });
