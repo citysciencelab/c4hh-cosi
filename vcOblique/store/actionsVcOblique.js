@@ -121,9 +121,7 @@ const actions = {
                                     return;
                                 }
                                 const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), currentVp.groundPosition),
-                                    isLargePositionChange = transformedCoordinates.some((coordinate, index) =>
-                                        Math.abs(coordinate - getters.lastCoordinates[index]) > 50
-                                    );
+                                    isLargePositionChange = transformedCoordinates.some((coordinate, index) => Math.abs(coordinate - getters.lastCoordinates[index]) > 50);
 
                                 // A heading change with a small position delta is a rotation-induced pan — skip.
                                 // A heading change with a large position delta is a position jump (e.g. "Zur Startansicht") — fall through.
@@ -160,9 +158,7 @@ const actions = {
                                             return;
                                         }
                                         const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), currentVp.groundPosition),
-                                            isLargePositionChange = transformedCoordinates.some((coordinate, index) =>
-                                                Math.abs(coordinate - getters.lastCoordinates[index]) > 50
-                                            );
+                                            isLargePositionChange = transformedCoordinates.some((coordinate, index) => Math.abs(coordinate - getters.lastCoordinates[index]) > 50);
 
                                         if (headingToCardinal(currentVp.heading) !== headingToCardinal(getters.heading) && !isLargePositionChange) {
                                             return;
