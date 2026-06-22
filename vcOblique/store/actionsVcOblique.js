@@ -105,7 +105,8 @@ const actions = {
                         const heading = vp.heading,
                             coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
 
-                        if (heading !== getters.heading) {
+                        if (headingToCardinal(heading) !== headingToCardinal(getters.heading)) {
+                            commit("setLastCoordinates", crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), vp.groundPosition));
                             dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
                         }
                         commit("setHeading", heading);
@@ -114,8 +115,21 @@ const actions = {
                     dispatch("obliqueView", rootGetters["Maps/center"] || rootGetters["Maps/initialCenter"])
                         .then(() => {
                             map.olMap.on("moveend", () => {
-                                const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
+                                const currentVp = getViewpointSync(map);
 
+                                if (!currentVp?.groundPosition) {
+                                    return;
+                                }
+                                const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), currentVp.groundPosition),
+                                    isLargePositionChange = transformedCoordinates.some((coordinate, index) =>
+                                        Math.abs(coordinate - getters.lastCoordinates[index]) > 50
+                                    );
+
+                                // A heading change with a small position delta is a rotation-induced pan — skip.
+                                // A heading change with a large position delta is a position jump (e.g. "Zur Startansicht") — fall through.
+                                if (headingToCardinal(currentVp.heading) !== headingToCardinal(getters.heading) && !isLargePositionChange) {
+                                    return;
+                                }
                                 transformedCoordinates.every((coordinate, index) => {
                                     if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
                                         dispatch("obliqueView", transformedCoordinates);
@@ -140,8 +154,19 @@ const actions = {
                             dispatch("obliqueView", rootGetters["Maps/center"] || rootGetters["Maps/initialCenter"])
                                 .then(() => {
                                     map.olMap.on("moveend", () => {
-                                        const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
+                                        const currentVp = getViewpointSync(map);
 
+                                        if (!currentVp?.groundPosition) {
+                                            return;
+                                        }
+                                        const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), currentVp.groundPosition),
+                                            isLargePositionChange = transformedCoordinates.some((coordinate, index) =>
+                                                Math.abs(coordinate - getters.lastCoordinates[index]) > 50
+                                            );
+
+                                        if (headingToCardinal(currentVp.heading) !== headingToCardinal(getters.heading) && !isLargePositionChange) {
+                                            return;
+                                        }
                                         transformedCoordinates.every((coordinate, index) => {
                                             if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
                                                 dispatch("obliqueView", transformedCoordinates);
@@ -156,7 +181,11 @@ const actions = {
                         const heading = vp.heading,
                             coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
 
-                        if (heading !== getters.heading) {
+                        if (headingToCardinal(heading) !== headingToCardinal(getters.heading)) {
+                            // True rotation (N/E/S/W direction change).
+                            // Update lastCoordinates to the new image center so that the subsequent
+                            // moveend sees a delta of ~0 and does not call obliqueView.
+                            commit("setLastCoordinates", crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), vp.groundPosition));
                             dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
                         }
                         commit("setHeading", heading);
