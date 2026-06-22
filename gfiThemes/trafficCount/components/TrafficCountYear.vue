@@ -1,7 +1,7 @@
 <script>
 import TrafficCountCompDiagram from "./TrafficCountCompDiagram.vue";
 import TrafficCountCompTable from "./TrafficCountCompTable.vue";
-import TrafficCountCheckbox from "./TrafficCountCheckbox.vue";
+import TrafficCountSwitch from "./TrafficCountSwitch.vue";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
@@ -21,7 +21,7 @@ export default {
     components: {
         TrafficCountCompDiagram,
         TrafficCountCompTable,
-        TrafficCountCheckbox,
+        TrafficCountSwitch,
         DatePicker
     },
     props: {
@@ -308,7 +308,7 @@ export default {
                 :lang="$t('common:libraries.vue-datepicker-next.lang', {returnObjects: true})"
             />
         </div>
-        <TrafficCountCheckbox
+        <TrafficCountSwitch
             :current-means-of-transport="meansOfTransport"
             :last-means-of-transport-key="meansOfTransportKey"
             :table-diagram-id="diagramYear"
@@ -329,7 +329,7 @@ export default {
                 :means-of-transport-key="meansOfTransportKey"
             />
         </div>
-        <TrafficCountCheckbox
+        <TrafficCountSwitch
             :table-diagram-id="tableYear"
         />
         <div id="tableYear">

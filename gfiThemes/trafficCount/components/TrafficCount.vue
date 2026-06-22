@@ -567,35 +567,37 @@ export default {
                             :aria-pressed="selectedTimeView === 'year'"
                         />
                     </div>
-                    <TrafficCountDay
-                        v-if="selectedTimeView === 'day'"
-                        :key="keyDay"
-                        :api="api"
-                        :thing-id="propThingId"
-                        :means-of-transport="propMeansOfTransport"
-                        :reset="dayCheckReset"
-                        :holidays="holidays"
-                        :check-gurlitt-insel="checkGurlittInsel"
-                    />
-                    <TrafficCountWeek
-                        v-if="selectedTimeView === 'week'"
-                        :key="keyWeek"
-                        :api="api"
-                        :thing-id="propThingId"
-                        :means-of-transport="propMeansOfTransport"
-                        :reset="weekCheckReset"
-                        :holidays="holidays"
-                    />
-                    <TrafficCountYear
-                        v-if="selectedTimeView === 'year'"
-                        :key="keyYear"
-                        :api="api"
-                        :thing-id="propThingId"
-                        :means-of-transport="propMeansOfTransport"
-                        :reset="yearCheckReset"
-                        :holidays="holidays"
-                        :check-gurlitt-insel="checkGurlittInsel"
-                    />
+                    <keep-alive>
+                        <TrafficCountDay
+                            v-if="selectedTimeView === 'day'"
+                            :key="keyDay"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="dayCheckReset"
+                            :holidays="holidays"
+                            :check-gurlitt-insel="checkGurlittInsel"
+                        />
+                        <TrafficCountWeek
+                            v-else-if="selectedTimeView === 'week'"
+                            :key="keyWeek"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="weekCheckReset"
+                            :holidays="holidays"
+                        />
+                        <TrafficCountYear
+                            v-else-if="selectedTimeView === 'year'"
+                            :key="keyYear"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="yearCheckReset"
+                            :holidays="holidays"
+                            :check-gurlitt-insel="checkGurlittInsel"
+                        />
+                    </keep-alive>
                 </div>
                 <TrafficCountDownloads
                     id="downloads"

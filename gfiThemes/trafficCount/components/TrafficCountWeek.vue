@@ -1,7 +1,7 @@
 <script>
 import TrafficCountCompDiagram from "./TrafficCountCompDiagram.vue";
 import TrafficCountCompTable from "./TrafficCountCompTable.vue";
-import TrafficCountCheckbox from "./TrafficCountCheckbox.vue";
+import TrafficCountSwitch from "./TrafficCountSwitch.vue";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import dayjs from "dayjs";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -21,7 +21,7 @@ export default {
     components: {
         TrafficCountCompDiagram,
         TrafficCountCompTable,
-        TrafficCountCheckbox,
+        TrafficCountSwitch,
         TrafficCountDatePicker
     },
     props: {
@@ -346,7 +346,7 @@ export default {
                 </template>
             </TrafficCountDatePicker>
         </div>
-        <TrafficCountCheckbox
+        <TrafficCountSwitch
             :current-means-of-transport="meansOfTransport"
             :last-means-of-transport-key="meansOfTransportKey"
             :table-diagram-id="diagramWeek"
@@ -367,7 +367,7 @@ export default {
                 :means-of-transport-key="meansOfTransportKey"
             />
         </div>
-        <TrafficCountCheckbox
+        <TrafficCountSwitch
             :table-diagram-id="tableWeek"
         />
         <div id="tableWeek">
