@@ -300,17 +300,18 @@ export default {
 
             this.dataClassList?.forEach(element => {
                 const archiveName = element.name,
+                    archiveId = element.id,
                     attributes = element.highestActiveDataclassVersion.dataclassAttributs
                         .filter(attribute => attribute.usage === "I")
                         .map(attribute => ({
                             ...attribute,
                             value: "",
-                            placeholder: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.PLACEHOLDER || "",
+                            placeholder: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PLACEHOLDER || "",
                             label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`),
-                            pattern: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.PATTERN || "",
+                            pattern: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PATTERN || "",
                             testNumberRange: null,
-                            errorKey: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.ERROR_KEY,
-                            errorParams: this.placeholderDataClassList?.[archiveName]?.[attribute.name]?.ERROR_PARAMS || {},
+                            errorKey: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_KEY,
+                            errorParams: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_PARAMS || {},
                             errorMessage: ""
                         }));
 

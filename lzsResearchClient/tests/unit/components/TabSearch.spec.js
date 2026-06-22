@@ -54,7 +54,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                 }
             ],
             mockPlaceholdersJson = {
-                "3D-Stadtmodell LoD1": {
+                "DKL_3DSTADT_LOD1": {
                     "JAHRGANG": {
                         "PLACEHOLDER": "2023",
                         "PATTERN": "[0-9*]{4}",
@@ -68,7 +68,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                         "ERROR_PARAMS": {"digitNumber": 4}
                     }
                 },
-                "3D-Stadtmodell LoD2": {
+                "DKL_3DSTADT_LOD2": {
                     "JAHRGANG": {
                         "PLACEHOLDER": "2023",
                         "PATTERN": "[0-9*]{4}",
@@ -82,7 +82,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
                         "ERROR_PARAMS": {"digitNumber": 4}
                     }
                 },
-                "AFIS-Einzelnachweise": {
+                "DKL_AFIS_EINZEL": {
                     "JAHRGANG": {
                         "PLACEHOLDER": "2023",
                         "PATTERN": "[0-9*]{4}",

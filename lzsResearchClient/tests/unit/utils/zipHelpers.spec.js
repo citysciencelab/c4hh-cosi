@@ -304,7 +304,9 @@ describe("addons/lzsResearchClient/utils/zipHelpers", () => {
 
             const originalCreate = document.createElement;
             const anchor = originalCreate.call(document, "a");
-            const clickSpy = sinon.spy(anchor, "click");
+            const clickStub = sinon.stub(anchor, "click").callsFake(() => {
+                return null;
+            });
 
             sinon.stub(document, "createElement").callsFake((tag) => tag === "a" ? anchor : originalCreate.call(document, tag));
             const appendSpy = sinon.spy(document.body, "appendChild");
@@ -315,7 +317,7 @@ describe("addons/lzsResearchClient/utils/zipHelpers", () => {
 
             sinon.assert.calledOnce(createStub);
             sinon.assert.calledWith(appendSpy, anchor);
-            sinon.assert.calledOnce(clickSpy);
+            sinon.assert.calledOnce(clickStub);
             sinon.assert.calledWith(removeSpy, anchor);
 
             // revoke is scheduled after 1000ms
@@ -330,6 +332,9 @@ describe("addons/lzsResearchClient/utils/zipHelpers", () => {
 
             const originalCreate = document.createElement;
             const anchor = originalCreate.call(document, "a");
+            const clickStub = sinon.stub(anchor, "click").callsFake(() => {
+                return null;
+            });
 
             sinon.stub(document, "createElement").callsFake((tag) => tag === "a" ? anchor : originalCreate.call(document, tag));
             const appendSpy = sinon.spy(document.body, "appendChild");
@@ -342,6 +347,7 @@ describe("addons/lzsResearchClient/utils/zipHelpers", () => {
             sinon.assert.notCalled(createStub);
             sinon.assert.notCalled(revokeStub);
             sinon.assert.calledOnce(appendSpy);
+            sinon.assert.calledOnce(clickStub);
 
             // anchor should have used the provided url
             expect(anchor.href).to.equal(testUrl);
@@ -357,7 +363,9 @@ describe("addons/lzsResearchClient/utils/zipHelpers", () => {
 
             const originalCreate = document.createElement;
             const anchor = originalCreate.call(document, "a");
-            const clickSpy = sinon.spy(anchor, "click");
+            const clickStub = sinon.stub(anchor, "click").callsFake(() => {
+                return null;
+            });
 
             sinon.stub(document, "createElement").callsFake((tag) => tag === "a" ? anchor : originalCreate.call(document, tag));
             const appendSpy = sinon.spy(document.body, "appendChild");
@@ -370,7 +378,7 @@ describe("addons/lzsResearchClient/utils/zipHelpers", () => {
 
             sinon.assert.calledOnce(createStub);
             sinon.assert.calledWith(appendSpy, anchor);
-            sinon.assert.calledOnce(clickSpy);
+            sinon.assert.calledOnce(clickStub);
             sinon.assert.calledWith(removeSpy, anchor);
 
             expect(anchor.href).to.equal(objUrl);
