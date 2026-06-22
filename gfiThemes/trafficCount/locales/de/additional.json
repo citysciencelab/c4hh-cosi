@@ -77,7 +77,9 @@
                         "shortTermDevelopment": "Entwicklung",
                         "peakValues": "Höchstwerte",
                         "previousDay": "Vortag",
-                        "workingDayAverageShort": "mittlerer Werktag"
+                        "workingDayAverageShort": "mittlerer Werktag",
+                        "isHeavyTrafficAvailable": "Schwerverkehr ist vorhanden",
+                        "isHeavyTrafficNotAvailable": "Schwerverkehr ist nicht vorhanden"
                     }
                 }
             }

@@ -77,7 +77,9 @@
                         "shortTermDevelopment": "Development",
                         "peakValues": "Peak values",
                         "previousDay": "Previous day",
-                        "workingDayAverageShort": "Average working day"
+                        "workingDayAverageShort": "Average working day",
+                        "isHeavyTrafficAvailable": "Heavy traffic is available",
+                        "isHeavyTrafficNotAvailable": "Heavy traffic is not available"
                     }
                 }
             }
