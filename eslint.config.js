@@ -7,6 +7,14 @@ import globals from "globals";
 import stylistic from "@stylistic/eslint-plugin";
 import nodePlugin from "eslint-plugin-n";
 
+const navTabLegacyExcludedFiles = [
+    "src/shared/modules/tabs/components/NavTab.vue",
+    "src/modules/featureLister/components/LayerListView.vue",
+    "src/modules/controls/orientation/components/poi/PoiOrientation.vue",
+    "src/modules/layerPills/components/LayerPills.vue",
+    "src/modules/getFeatureInfo/themes/sensor/components/SensorTheme.vue"
+];
+
 export default [
     js.configs.recommended,
     ...pluginVue.configs["flat/recommended"],
@@ -369,19 +377,37 @@ export default [
                     message: "Native <input type=\"text\"> is not allowed. Use <InputText> instead."
                 },
 
-                // 3) Disallow native accordion buttons with static class="accordion-button".
+                // 3) Disallow native nav links and enforce NavTab usage.
+                {
+                    selector: "VElement[name='a']:has(VAttribute[directive=false][key.name='class'][value.value=/\\bnav-link\\b/]), VElement[name='button']:has(VAttribute[directive=false][key.name='class'][value.value=/\\bnav-link\\b/])",
+                    message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
+                },
+
+                // 4) Disallow dynamic class bindings that include nav-link.
+                {
+                    selector: "VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'][value.value=/\\bnav-link\\b/]), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'][value.value=/\\bnav-link\\b/])",
+                    message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
+                },
+
+                // 5) Disallow nav-link literals inside dynamic :class expressions.
+                {
+                    selector: "VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='nav-link']), VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='nav-link']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='nav-link']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='nav-link'])",
+                    message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
+                },
+
+                // 6) Disallow native accordion buttons with static class="accordion-button".
                 {
                     selector: "VElement[name='button']:has(VAttribute[directive=false][key.name='class'][value.value=/\\baccordion-button\\b/])",
                     message: "Native <button class=\"accordion-button\"> is not allowed. Use <AccordionItem> instead."
                 },
 
-                // 4) Disallow accordion-button literals inside dynamic :class expressions.
+                // 7) Disallow accordion-button literals inside dynamic :class expressions.
                 {
                     selector: "VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='accordion-button']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='accordion-button'])",
                     message: "Native <button> with class \"accordion-button\" is not allowed. Use <AccordionItem> instead."
                 },
 
-                // 5) Disallow <li> without proper parent (ol, ul, menu, or template)
+                // 8) Disallow <li> without proper parent (ol, ul, menu, or template)
                 {
                     selector: "VElement[name='li']:not([parent.name='ol']):not([parent.name='ul']):not([parent.name='menu']):not([parent.name='template']):not([parent.name='transitiongroup'])",
                     message: "<li> must be a direct child of <ol>, <ul>, <menu>, or <template>. Using other parents violates accessibility standards. Vue's <TransitionGroup> is allowed when it renders as a list container (<ul> or <ol>)."
@@ -399,6 +425,18 @@ export default [
             "vue/no-deprecated-delete-set": "off",
             "vue/no-deprecated-model-definition": "off",
             "jsdoc/ts-no-empty-object-type": "off"
+        }
+    },
+    {
+        files: navTabLegacyExcludedFiles,
+        rules: {
+            "vue/no-restricted-syntax": "off"
+        }
+    },
+    {
+        files: navTabLegacyExcludedFiles,
+        rules: {
+            "vue/no-restricted-syntax": "off"
         }
     },
     {

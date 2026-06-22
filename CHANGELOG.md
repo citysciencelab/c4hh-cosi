@@ -10,6 +10,7 @@
 ### Added
 
 ### Changed
+- FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.
 
 ### Deprecated
 
@@ -17,6 +18,7 @@
 
 ### Fixed
 -Issue \#1630: Fixed parseMissingKeyHandler misinterpreting decimal numbers as time values (e.g. "0.58 m" became "0:58 m"). The time format replacement now requires two-digit hours only.
+- FeatureLister/NavTab: Disabled tabs are now non-interactive, and native nav-link tab markup is prevented by lint rules in favor of the shared NavTab component.
 
 ---
 

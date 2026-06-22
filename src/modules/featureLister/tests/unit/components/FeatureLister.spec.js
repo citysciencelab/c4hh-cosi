@@ -8,7 +8,8 @@ config.global.mocks.$t = key => key;
 
 describe("src/modules/featureLister/components/FeatureLister.vue", () => {
     let wrapper, actions, mutations, getters, store,
-        removeHighlightFeatureStub, removePointMarkerStub, removePolygonMarkerStub;
+        removeHighlightFeatureStub, removePointMarkerStub, removePolygonMarkerStub,
+        mountOptions;
 
     beforeEach(() => {
         removeHighlightFeatureStub = sinon.stub();
@@ -53,6 +54,14 @@ describe("src/modules/featureLister/components/FeatureLister.vue", () => {
                 }
             }
         });
+        mountOptions = {
+            global: {
+                plugins: [store],
+                stubs: {
+                    NavTab: false
+                }
+            }
+        };
     });
     afterEach(() => {
         if (typeof wrapper !== "undefined") {
@@ -62,7 +71,7 @@ describe("src/modules/featureLister/components/FeatureLister.vue", () => {
 
     it("renders list of visible vector layers", () => {
         store.commit("Modules/FeatureLister/setLayerListView", true);
-        wrapper = shallowMount(FeatureListerComponent, {global: {plugins: [store]}});
+        wrapper = shallowMount(FeatureListerComponent, mountOptions);
 
         expect(wrapper.find("#module-feature-lister-themeChooser").exists()).to.be.true;
         expect(wrapper.find("#module-feature-lister-list").exists()).to.be.true;
@@ -70,30 +79,28 @@ describe("src/modules/featureLister/components/FeatureLister.vue", () => {
     });
 
     it("calls switchToThemes if Theme-Tab was clicked", async () => {
-        wrapper = shallowMount(FeatureListerComponent, {global: {plugins: [store]}});
+        wrapper = shallowMount(FeatureListerComponent, mountOptions);
 
-        await wrapper.find("#module-feature-lister-themeChooser a").trigger("click");
+        await wrapper.find("#module-feature-lister-themeChooser").trigger("click");
         expect(actions.switchToThemes.called).to.be.true;
     });
 
     it("calls switchBackToList if List-Tab was clicked", async () => {
-        wrapper = shallowMount(FeatureListerComponent, {global: {plugins: [store]}});
+        wrapper = shallowMount(FeatureListerComponent, mountOptions);
 
-        await wrapper.find("#module-feature-lister-list a").trigger("click");
+        await wrapper.find("#module-feature-lister-list").trigger("click");
         expect(actions.switchBackToList.called).to.be.true;
     });
 
     it("calls switchToDetails if Details-Tab was clicked", async () => {
-        wrapper = shallowMount(FeatureListerComponent, {global: {plugins: [store]}});
+        wrapper = shallowMount(FeatureListerComponent, mountOptions);
 
-        await wrapper.find("#module-feature-lister-details a").trigger("click");
+        await wrapper.find("#module-feature-lister-details").trigger("click");
         expect(actions.switchToDetails.called).to.be.true;
     });
 
     it("calls cleanup methods on unmount", () => {
-        wrapper = shallowMount(FeatureListerComponent, {
-            global: {plugins: [store]}
-        });
+        wrapper = shallowMount(FeatureListerComponent, mountOptions);
 
         wrapper.unmount();
         expect(mutations.resetToThemeChooser.called).to.be.true;

@@ -4,6 +4,7 @@ import tabStatus from "../constantsTabStatus.js";
 import FeatureDetailView from "./FeatureDetailView.vue";
 import FeatureListView from "./FeatureListView.vue";
 import LayerListView from "./LayerListView.vue";
+import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 
 /**
  * Feature Lister
@@ -17,13 +18,11 @@ export default {
     components: {
         LayerListView,
         FeatureListView,
-        FeatureDetailView
+        FeatureDetailView,
+        NavTab
     },
     data () {
         return {
-            enabledTabClass: "",
-            activeTabClass: "active",
-            disabledTabClass: "disabled",
             tabStatus: tabStatus
         };
     },
@@ -33,10 +32,7 @@ export default {
             "layerListView",
             "featureListView",
             "featureDetailView"
-        ]),
-        themeTabClasses: function () {
-            return this.layerListView ? this.activeTabClass : this.defaultTabClass;
-        }
+        ])
     },
     unmounted () {
         this.resetToThemeChooser();
@@ -53,67 +49,43 @@ export default {
         ...mapActions("Maps", ["removeHighlightFeature", "removePointMarker", "removePolygonMarker"]),
         ...mapMutations("Modules/FeatureLister", [
             "resetToThemeChooser"
-        ]),
-        /**
-         * Returns the CSS classes for the tab based on its status.
-         * @param {String} view - The current view status of the tab.
-         * @returns {String} - The CSS class for the tab.
-         */
-        tabClasses: function (view) {
-            switch (view) {
-                case tabStatus.ACTIVE:
-                    return this.activeTabClass;
-                case tabStatus.ENABLED:
-                    return this.enabledTabClass;
-                case tabStatus.DISABLED:
-                    return this.disabledTabClass;
-                default:
-                    return this.disabledTabClass;
-            }
-        }
+        ])
     }
 };
 </script>
 
 <template lang="html">
-    <div id="feature-lister">
-        <ul class="nav nav-tabs">
-            <li
+    <div
+        id="feature-lister"
+    >
+        <ul
+            class="nav nav-tabs"
+            role="tablist"
+        >
+            <NavTab
                 id="module-feature-lister-themeChooser"
-                role="presentation"
-                class="nav-item"
-            >
-                <a
-                    href="#"
-                    class="nav-link"
-                    :class="tabClasses(layerListView)"
-                    @click.prevent="switchToThemes()"
-                >{{ $t("common:modules.featureLister.chooseTheme") }}</a>
-            </li>
-            <li
+                label="common:modules.featureLister.chooseTheme"
+                :active="layerListView === tabStatus.ACTIVE"
+                :enabled="layerListView !== tabStatus.DISABLED"
+                target="#feature-lister-themes"
+                :interaction="switchToThemes"
+            />
+            <NavTab
                 id="module-feature-lister-list"
-                role="presentation"
-                class="nav-item"
-            >
-                <a
-                    href="#"
-                    class="nav-link"
-                    :class="tabClasses(featureListView)"
-                    @click.prevent="switchBackToList()"
-                >{{ $t("common:modules.featureLister.list") }}</a>
-            </li>
-            <li
+                label="common:modules.featureLister.list"
+                :active="featureListView === tabStatus.ACTIVE"
+                :enabled="featureListView !== tabStatus.DISABLED"
+                target="#feature-lister-list"
+                :interaction="switchBackToList"
+            />
+            <NavTab
                 id="module-feature-lister-details"
-                role="presentation"
-                class="nav-item"
-            >
-                <a
-                    href="#"
-                    class="nav-link"
-                    :class="tabClasses(featureDetailView)"
-                    @click.prevent="switchToDetails()"
-                >{{ $t("common:modules.featureLister.details") }}</a>
-            </li>
+                label="common:modules.featureLister.details"
+                :active="featureDetailView === tabStatus.ACTIVE"
+                :enabled="featureDetailView !== tabStatus.DISABLED"
+                target="#feature-lister-details"
+                :interaction="switchToDetails"
+            />
         </ul>
         <template
             v-if="layerListView === tabStatus.ACTIVE"

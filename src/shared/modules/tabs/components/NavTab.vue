@@ -7,6 +7,7 @@
  * @vue-prop {String} label - the label used on the navTab-button.
  * @vue-prop {String} icon - optional bootstrap icon class suffix (e.g. 'bi-geo-alt') shown before the label.
  * @vue-prop {Boolean} active - whether the tab is currently active.
+ * @vue-prop {Boolean} enabled - whether the tab is interactive.
  * @vue-prop {String} target - used to specify the id of the element shown by the navTab button (i.e. '#section-1').
  * @vue-prop {String} value - optional value attribute for the list element (e.g. <li value="my-value">)
  * @vue-prop {Function} interaction - can be used to bind a function to an interaction with the navTab-button, to be executed on click.
@@ -31,6 +32,11 @@ export default {
             type: Boolean,
             required: true
         },
+        enabled: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
         target: {
             type: String,
             required: true
@@ -49,14 +55,28 @@ export default {
         }
     },
     methods: {
+        onclick (event) {
+            if (!this.enabled) {
+                return;
+            }
+            this.interaction(event);
+        },
         onkeydown (event) {
+            if (!this.enabled) {
+                return;
+            }
             const step = {ArrowLeft: -1, ArrowRight: 1}[event.key];
 
             if (step === undefined) {
                 return;
             }
+            const tablist = event.currentTarget.closest("[role=tablist]");
+
+            if (!tablist) {
+                return;
+            }
             event.preventDefault();
-            const tabs = [...event.currentTarget.closest("[role=tablist]").querySelectorAll("[role=tab]")],
+            const tabs = [...tablist.querySelectorAll("[role=tab]")],
                 next = tabs[(tabs.indexOf(event.currentTarget) + step + tabs.length) % tabs.length];
 
             next?.focus();
@@ -75,16 +95,18 @@ export default {
         <button
             :id="id"
             class="nav-link"
-            :class="active ? 'active' : ''"
+            :class="{active, disabled: !enabled}"
             data-bs-toggle="tab"
             :data-bs-target="target"
             type="button"
             role="tab"
-            :tabindex="active ? 0 : -1"
+            :disabled="!enabled"
+            :tabindex="active && enabled ? 0 : -1"
             :aria-controls="target"
             :aria-selected="active"
+            :aria-disabled="!enabled"
             :aria-label="label"
-            @click="interaction"
+            @click="onclick"
             @keydown="onkeydown"
         >
             <i
