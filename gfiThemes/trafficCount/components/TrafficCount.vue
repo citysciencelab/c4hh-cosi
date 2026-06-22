@@ -12,7 +12,6 @@ import TrafficCountHeader from "./TrafficCountHeader.vue";
 import TrafficCountWeek from "./TrafficCountWeek.vue";
 import TrafficCountYear from "./TrafficCountYear.vue";
 import TrafficCountFooter from "./TrafficCountFooter.vue";
-import TrafficCountDownloads from "./TrafficCountDownloads.vue";
 import convertHttpLinkToSSL from "../../../../src/shared/js/utils/convertHttpLinkToSSL.js";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
@@ -27,8 +26,7 @@ export default {
         TrafficCountHeader,
         TrafficCountWeek,
         TrafficCountYear,
-        TrafficCountFooter,
-        TrafficCountDownloads
+        TrafficCountFooter
     },
     props: {
         feature: {
@@ -51,7 +49,6 @@ export default {
             keyDay: "day",
             keyWeek: "week",
             keyYear: "year",
-            keyDownloads: "downloads",
             dayCheckReset: false,
             weekCheckReset: false,
             yearCheckReset: false,
@@ -94,10 +91,6 @@ export default {
 
         yearLabel: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.yearLabel");
-        },
-
-        downloadsLabel: function () {
-            return this.$t("additional:modules.tools.gfi.themes.trafficCount.downloads");
         },
 
         lastupdateLabel: function () {
@@ -460,7 +453,6 @@ export default {
             this.keyDay = value + "day";
             this.keyWeek = value + "week";
             this.keyYear = value + "year";
-            this.keyDownloads = value + "downloads";
         },
 
         /**
@@ -487,6 +479,11 @@ export default {
             :title="title"
             :type="type"
             :direction="direction"
+            :api="api"
+            :thing-id="propThingId"
+            :holidays="holidays"
+            :download-url="downloadUrl"
+            :download-filename="downloadFilename"
             :means-of-transport="propMeansOfTransport"
             :is-mqtt-live="isMqttLive"
             :is-heavy-traffic-available="isHeavyTrafficAvailable"
@@ -514,14 +511,6 @@ export default {
                     :label="'Analyse'"
                     :icon="'bi-bar-chart'"
                     :interaction="() => setCurrentTabId('analysis')"
-                />
-                <NavTab
-                    :id="'downloads-tab'"
-                    :active="false"
-                    :target="'#downloads'"
-                    :label="downloadsLabel"
-                    :icon="'bi-download'"
-                    :interaction="() => setCurrentTabId('downloads')"
                 />
             </ul>
             <div class="tab-content">
@@ -599,18 +588,6 @@ export default {
                         />
                     </keep-alive>
                 </div>
-                <TrafficCountDownloads
-                    id="downloads"
-                    :key="keyDownloads"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'downloads' }"
-                    :api="api"
-                    :holidays="holidays"
-                    :thing-id="propThingId"
-                    :means-of-transport="propMeansOfTransport"
-                    :download-url="downloadUrl"
-                    :download-filename="downloadFilename"
-                    :active-tab="currentTabId === 'downloads'"
-                />
             </div>
         </div>
         <TrafficCountFooter
