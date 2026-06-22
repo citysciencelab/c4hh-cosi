@@ -468,7 +468,8 @@ export default {
                         showInLayerTree: true,
                         typ: "VECTORBASE",
                         type: "layer",
-                        visibility: true
+                        visibility: true,
+                        isDynamic: true
                     },
                     parentKey: treeSubjectsKey
                 }, {root: true});
