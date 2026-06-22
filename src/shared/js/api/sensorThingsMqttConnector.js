@@ -35,6 +35,7 @@ export class SensorThingsMqttConnector {
 
         this.mqttLibObject = null;
         this.mqttClient = null;
+        this.lastWarnTime = 0;
         this.httpClient = null;
         this.handlers = {};
     }
@@ -47,6 +48,8 @@ export class SensorThingsMqttConnector {
      */
     connect () {
         const actualMqttLib = this.mqttLibObject?.default || this.mqttLibObject;
+
+        this.lastWarnTime = 0;
 
         if (typeof actualMqttLib?.connect === "function") {
             this.mqttClient = actualMqttLib.connect(this.options);
@@ -227,7 +230,12 @@ export class SensorThingsMqttConnector {
             this.mqttClient.subscribe(topic, subscriptionOptions, (err, granted) => {
 
                 if (err) {
-                    console.warn(`MQTT: Server rejected subscription for [${topic}]! Error:`, err);
+                    const now = Date.now();
+
+                    if (!this.lastWarnTime || now - this.lastWarnTime > 10000) {
+                        console.warn(`MQTT: Server rejected subscription for [${topic}] (further warnings suppressed for 10s)! Error:`, err);
+                        this.lastWarnTime = now;
+                    }
                 }
 
                 resolve();
