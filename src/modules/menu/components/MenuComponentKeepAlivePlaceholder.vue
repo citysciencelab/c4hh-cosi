@@ -8,6 +8,7 @@
  *
  * To avoid the "Component is missing template or render function" error, we implement the
  * Vue render method and return null.
+ * @module modules/menu/components/MenuComponentKeepAlivePlaceholder
  */
 export default {
     name: "MenuComponentKeepAlivePlaceholder",

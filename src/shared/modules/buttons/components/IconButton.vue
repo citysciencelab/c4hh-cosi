@@ -2,6 +2,7 @@
 
 /**
  * IconButton component: A component to display an icon button.
+ * @module shared/modules/buttons/components/IconButton
  * @vue-prop {Function} interaction provides the function to be called on click of the button (deprecated, use @click instead).
  * @vue-prop {string} aria sets the tooltip of the button to be displayed on hover.
  * @vue-prop {string} icon sets the (bootstrap-)icon to be used by the button.
