@@ -219,11 +219,13 @@ export default {
      * @returns {void}
      */
     switchToDetails ({state, commit}) {
-        if (state.selectedRow !== null) {
-            commit("setLayerListView", tabStatus.ENABLED);
-            commit("setFeatureListView", tabStatus.ENABLED);
-            commit("setFeatureDetailView", tabStatus.ACTIVE);
+        if (!state.layer) {
+            return;
         }
+
+        commit("setLayerListView", tabStatus.ENABLED);
+        commit("setFeatureListView", tabStatus.ENABLED);
+        commit("setFeatureDetailView", tabStatus.ACTIVE);
     },
     /**
      * Switches to the themes list of all visible layers and resets the featureList and the selectedFeature.

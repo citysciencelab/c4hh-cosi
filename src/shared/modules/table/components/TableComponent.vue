@@ -1420,7 +1420,10 @@ export default {
                 <tr
                     v-for="(item, idx) in editedTable.items"
                     :key="idx"
+                    tabindex="0"
                     @click="selectRow(item)"
+                    @keydown.enter.prevent="selectRow(item)"
+                    @keydown.space.prevent="selectRow(item)"
                     @mouseenter="selectOnHover(item)"
                     @focus="selectOnHover(item)"
                 >

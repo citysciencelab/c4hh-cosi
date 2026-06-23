@@ -128,6 +128,12 @@ describe("src/modules/featureLister/store/gettersFeatureLister", () => {
 
     describe("featureDetails", () => {
 
+        it("returns an empty object without a selected row", () => {
+            state.selectedRow = null;
+
+            expect(featureDetails(state, {}, {}, {ignoredKeys: []})).to.deep.equal({});
+        });
+
         it("returns the exactly the attribute titles and values that are to show", () => {
             state.selectedRow = {
                 id: "2",

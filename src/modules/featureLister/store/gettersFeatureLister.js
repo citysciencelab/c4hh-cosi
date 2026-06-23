@@ -69,6 +69,10 @@ const simpleGetters = {
      * @returns {Object} the details of the selected feature.
      */
     featureDetails (state, getters, rootState, rootGetters) {
+        if (!state.selectedRow) {
+            return {};
+        }
+
         const feature = state.gfiFeaturesOfLayer.find(f => f.id === state.selectedRow.id),
             ignoredKeys = [...rootGetters.ignoredKeys, "ID"],
             valuesToFilter = ["", null, undefined];
