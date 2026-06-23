@@ -48,7 +48,9 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
                             state: {
                                 selectedSourceLayer: null,
                                 selectedTargetLayer: null,
-                                selectOptions: []
+                                selectOptions: [],
+                                bufferRadius: 0,
+                                savedUrl: null
                             },
                             actions: {
                                 checkIntersection: checkIntersectionSpy,
@@ -70,7 +72,9 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
                                 }
                             },
                             getters: {
-                                selectOptions: (state) => state.selectOptions
+                                selectOptions: (state) => state.selectOptions,
+                                bufferRadius: (state) => state.bufferRadius,
+                                savedUrl: (state) => state.savedUrl
                             }
                         }
                     }
