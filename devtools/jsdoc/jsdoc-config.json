@@ -6,7 +6,7 @@
     "source": {
         "include": ["./src", "./addons"],
         "includePattern": "\\.(vue|js)$",
-        "excludePattern": "(node_modules\\/)|(addons|node_modules\\/)|(addons(\\/|\\\\).*(\\/|\\\\)node_modules(\\/|\\\\))|((^|\\/|\\\\)__)"
+        "excludePattern": "(node_modules\\/)|(addons|node_modules\\/)|(addons(\\/|\\\\).*(\\/|\\\\)node_modules(\\/|\\\\))|((^|\\/|\\\\)__)|(.spec.js)"
     },
     "tags": {
         "allowUnknownTags": true,
