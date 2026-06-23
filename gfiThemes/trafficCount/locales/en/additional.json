@@ -74,8 +74,8 @@
                         "inavailable": "No",
                         "indicator": "Indicator",
                         "totalNumbers": "Total numbers",
-                        "shortTermDevelopment": "Short-term development",
-                        "peakValues": "Peak values by period",
+                        "shortTermDevelopment": "Development",
+                        "peakValues": "Peak values",
                         "previousDay": "Previous day",
                         "workingDayAverageShort": "Average working day"
                     }

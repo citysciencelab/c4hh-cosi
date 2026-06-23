@@ -74,8 +74,8 @@
                         "inavailable": "Nein",
                         "indicator": "Kennzahl",
                         "totalNumbers": "Gesamtzahlen",
-                        "shortTermDevelopment": "Kurzfristige Entwicklung",
-                        "peakValues": "Höchstwerte nach Zeitraum",
+                        "shortTermDevelopment": "Entwicklung",
+                        "peakValues": "Höchstwerte",
                         "previousDay": "Vortag",
                         "workingDayAverageShort": "mittlerer Werktag"
                     }
