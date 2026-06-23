@@ -18,6 +18,7 @@
 ### Removed
 
 ### Fixed
+- vcOblique: Fixed a bug where rotating oblique images caused the geomarker to sometimes jump to another position.
 
 ---
 

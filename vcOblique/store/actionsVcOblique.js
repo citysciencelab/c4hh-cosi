@@ -62,6 +62,18 @@ function getIsVc4 () {
     return iframe?.contentWindow?.vcs?.vcm;
 }
 
+/**
+ * Converts a heading in degrees to a German cardinal direction.
+ * @param {Number} heading Heading in degrees (0 = North)
+ * @returns {String} Cardinal direction in German (Nord, Ost, Süd, West)
+ */
+function headingToCardinal (heading) {
+    const directions = ["Nord", "Ost", "Süd", "West"],
+        index = Math.round(((heading % 360) + 360) % 360 / 90) % 4;
+
+    return directions[index];
+}
+
 const actions = {
     /**
     * InitObliqueView creates a click listener at the map. Creates a listener at the olMap in the oblique application when the oblique aerial images have been moved in the sidebar.
@@ -178,9 +190,6 @@ const actions = {
                             coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
 
                         if (headingToCardinal(heading) !== headingToCardinal(getters.heading)) {
-                            // True rotation (N/E/S/W direction change).
-                            // Update lastCoordinates to the new image center so that the subsequent
-                            // moveend sees a delta of ~0 and does not call obliqueView.
                             commit("setLastCoordinates", crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), vp.groundPosition));
                             dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
                         }
