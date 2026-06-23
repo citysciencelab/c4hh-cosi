@@ -96,11 +96,8 @@ export default {
                     if (hasHolidayInWeek(datetime[i], this.holidays, format)) {
                         pointStyle.push("star");
                     }
-                    else if (meansOfTransports === "Anzahl_Schwerverkehr") {
-                        pointStyle.push("triangle");
-                    }
                     else {
-                        pointStyle.push("circle");
+                        pointStyle.push(false);
                     }
                 }
 
