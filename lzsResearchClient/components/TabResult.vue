@@ -128,5 +128,29 @@ export default {
             margin-left: auto;
         }
     }
+
+    :deep(.attribute-select) {
+        .multiselect,
+        .multiselect__input::placeholder,
+        .multiselect__option {
+            color: $black;
+            font-weight: normal;
+        }
+
+        .multiselect__option {
+            &:after,
+            &--selected,
+            &--selected:after {
+                color: black;
+                background: $light_grey_hover;
+            }
+
+            &--highlight,
+            &--highlight:after {
+                color: $white;
+                background: $secondary;
+            }
+        }
+    }
 }
 </style>

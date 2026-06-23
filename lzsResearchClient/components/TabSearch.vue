@@ -11,6 +11,7 @@ import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactio
 import LzsResearchClientSearchBar from "./searchBar/components/LzsResearchClientSearchBar.vue";
 import {roundFileSizeToFixed} from "../utils/zipHelpers";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
+import {getTranslationForAttribute} from "../utils/translationHelpers";
 
 import Polygon from "ol/geom/Polygon";
 import LineString from "ol/geom/LineString";
@@ -52,12 +53,6 @@ export default {
             currentModifyInteraction: null,
             drawEnd: false,
             searchGeometry: null,
-            buttonGroupLevels: [
-                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent")},
-                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries")},
-                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address")},
-                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel")}
-            ],
             selectedButtonGroup: "extent",
             showAreaWarning: false,
             searchGeometryArea: null,
@@ -132,6 +127,14 @@ export default {
             });
 
             return Object.values(yearsList).sort((a, b) => a.year - b.year);
+        },
+        buttonGroupLevels () {
+            return [
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent")},
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries")},
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address")},
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel")}
+            ];
         },
         selectedSpatialButtonName () {
             switch (this.selectedButtonGroup) {
@@ -339,7 +342,7 @@ export default {
                             ...attribute,
                             value: "",
                             placeholder: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PLACEHOLDER || "",
-                            label: this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`),
+                            labelKey: `additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`,
                             pattern: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PATTERN || "",
                             testNumberRange: null,
                             errorKey: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_KEY,
@@ -352,7 +355,7 @@ export default {
                     {
                         name: "maxValueCount",
                         value: this.maxValueCountDefaultValue,
-                        label: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount"),
+                        labelKey: "additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount",
                         pattern: "[0-9]*",
                         testNumberRange: [1, this.maxResultValueCount],
                         placeholder: this.maxValueCountPlaceholder,
@@ -922,6 +925,15 @@ export default {
                         console.warn("No parcel geometry found in the search results.");
                     }
                 });
+        },
+        /**
+         * Returns the translated label for an attribute key, falling back to the raw attribute name if no translation exists.
+         * @param {String} key - The attribute key to translate.
+         * @param {String} fallback - The raw attribute name to use if no translation is found.
+         * @returns {String} The translated label or the fallback value.
+         */
+        getTranslationForAttributeWrapper (key, fallback) {
+            return getTranslationForAttribute(key, fallback);
         }
     }
 };
@@ -981,7 +993,7 @@ export default {
                         :key="attribute.name"
                         v-model="attribute.value"
                         :class-obj="['form-control' + (attribute.errorMessage.length > 0 ? ' is-invalid': ' is-valid')]"
-                        :label="attribute.label"
+                        :label="getTranslationForAttributeWrapper(attribute.labelKey, attribute.name)"
                         :placeholder="attribute.placeholder"
                         :error-message="attribute.errorMessage"
                         @input="validateSearchWithAttributeForm()"

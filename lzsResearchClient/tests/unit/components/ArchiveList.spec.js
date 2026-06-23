@@ -68,7 +68,10 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
             },
             global: {
                 mocks: {
-                    $t: key => key
+                    $t: key => key,
+                    $i18next: {
+                        exists: () => false // always fall back to the attribute name
+                    }
                 },
                 plugins: [store],
                 stubs: {

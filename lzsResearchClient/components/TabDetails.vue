@@ -6,6 +6,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
 import {roundFileSizeToFixed} from "../utils/zipHelpers";
+import {getTranslationForAttribute} from "../utils/translationHelpers";
 
 export default {
     name: "TabDetails",
@@ -87,7 +88,11 @@ export default {
         getTableHeaders () {
             const headers = this.getDetailsForSelectedInstanceId?.primaryData ? this.getDetailsForSelectedInstanceId?.primaryData[0].primarydataAttributes.map(p => p.key) : [],
                 attributeNames = (this.getDetailsForSelectedInstanceId?.attributes || []).map(attr => attr.name),
-                filteredHeaders = headers.filter(header => !attributeNames.includes(header));
+                filteredHeaders = headers
+                    .filter(header => !attributeNames.includes(header))
+                    .map((header) => {
+                        return getTranslationForAttribute(`additional:modules.lzsResearchClient.tabs.tabDetails.${header.toLowerCase()}`, header);
+                    });
 
             filteredHeaders.push(this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"));
 
@@ -195,6 +200,15 @@ export default {
         },
         download () {
             this.downloadSelectedFiles(this.getDetailsForSelectedInstanceId);
+        },
+        /**
+         * Returns the translated label for an attribute key, falling back to the raw attribute name if no translation exists.
+         * @param {String} key - The attribute key to translate.
+         * @param {String} fallback - The raw attribute name to use if no translation is found.
+         * @returns {String} The translated label or the fallback value.
+         */
+        getTranslationForAttributeWrapper (key, fallback) {
+            return getTranslationForAttribute(key, fallback);
         }
     }
 };
@@ -226,7 +240,7 @@ export default {
                     :id="`detail-tablerow-${index}`"
                     :key="index"
                 >
-                    <td>{{ attribute.name }}</td>
+                    <td>{{ getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`, attribute.name) }}</td>
 
                     <td>{{ attribute.value }}</td>
                 </tr>

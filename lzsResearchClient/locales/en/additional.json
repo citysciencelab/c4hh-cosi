@@ -15,7 +15,7 @@
                 "backToSearchButtonLabel": "Back to search",
                 "tabDetails": {
                     "label": "Details",
-                    "title": "Detailinformation",
+                    "title": "Detail information",
                     "datasetInfoTable": {
                         "archive": "Archive",
                         "datasetProtectionClass": "Dataset protection class"
@@ -24,7 +24,8 @@
                     "backButtonLabel": "Back",
                     "loading": "Data is loading...",
                     "previewAltText": "Preview",
-                    "fileSizeMB": "SIZE (MB)"
+                    "fileSizeMB": "SIZE (MB)",
+                    "dateityp": "File type"
                 },
                 "tabSearch": {
                     "label": "Search",

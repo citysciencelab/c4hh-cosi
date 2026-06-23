@@ -24,7 +24,8 @@
                     "backButtonLabel": "Zurück",
                     "loading": "Daten werden geladen...",
                     "previewAltText": "Vorschaubild",
-                    "fileSizeMB": "GRÖßE (MB)"
+                    "fileSizeMB": "GRÖßE (MB)",
+                    "dateityp": "Dateityp"
                 },
                 "tabSearch": {
                     "label": "Suche",

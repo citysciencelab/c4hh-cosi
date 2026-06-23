@@ -5,6 +5,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import Multiselect from "vue-multiselect";
 import TabResultTable from "./TabResultTable.vue";
+import {getTranslationForAttribute} from "../utils/translationHelpers";
 
 export default {
     name: "ArchiveList",
@@ -203,7 +204,7 @@ export default {
          * @returns {String[]} - Array of strings to be used as table headers.
          */
         getTableHeaders (step, groupValue = null) {
-            let headers = this.resultsForGroupsForArchive(step, groupValue)[0].attributes.map(a => a.name || a.id);
+            let headers = this.resultsForGroupsForArchive(step, groupValue)[0].attributes.map(a => getTranslationForAttribute(`additional:modules.lzsResearchClient.tabs.tabSearch.${a.name.toLowerCase()}`, a.id));
 
             if (groupValue) {
                 headers = headers.filter(a => a !== step.attributeToGroupBy);
@@ -399,7 +400,7 @@ export default {
                                     :options="getAttributesToGroupBy(step)"
                                     name="select-box"
                                     :multiple="false"
-                                    :placeholder="step.attributeToGroupBy"
+                                    :placeholder="$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${step.attributeToGroupBy.toLowerCase()}`)"
                                     :show-labels="false"
                                     open-direction="bottom"
                                     :hide-selected="false"
@@ -410,12 +411,12 @@ export default {
                                     @select="changeGroupBy(index)"
                                 >
                                     <template #singleLabel="props">
-                                        <span>{{ props.option }}</span>
+                                        <span>{{ $t(`additional:modules.lzsResearchClient.tabs.tabSearch.${props.option.toLowerCase()}`) }}</span>
                                     </template>
                                     <template #option="props">
                                         <div class="attribute-option-wrapper">
                                             <span :class="`attribute-check-icon ${props.option === step.attributeToGroupBy ? 'bi bi-check2' : ''}`" />
-                                            <span>{{ props.option }}</span>
+                                            <span>{{ $t(`additional:modules.lzsResearchClient.tabs.tabSearch.${props.option.toLowerCase()}`) }}</span>
                                         </div>
                                     </template>
                                 </Multiselect>
@@ -427,7 +428,7 @@ export default {
                             :id="`${idPrefix}-group-item-${index}-${groupIndex}`"
                             :key="groupIndex + groupByReRenderKey"
                             class="group-step"
-                            :title="step.attributeToGroupBy + ' ' + groupValue"
+                            :title="$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${step.attributeToGroupBy.toLowerCase()}`) + ' ' + groupValue"
                             :is-open="openAllAccordions"
                             :coloured-header="true"
                         >
@@ -556,28 +557,3 @@ export default {
 }
 </style>
 
-<style lang="scss">
-.attribute-select {
-    .multiselect,
-    .multiselect__input::placeholder,
-    .multiselect__option {
-        color: $black;
-        font-weight: normal;
-    }
-
-    .multiselect__option {
-        &:after,
-        &--selected,
-        &--selected:after {
-            color: black;
-            background: $light_grey_hover;
-        }
-
-        &--highlight,
-        &--highlight:after {
-            color: $white;
-            background: $secondary;
-        }
-    }
-}
-</style>
