@@ -52,6 +52,7 @@
                     "patternError": "Please enter a numeric value with {{ digitNumber }} digits.",
                     "patternErrorRange": "Please enter a numeric value with {{ minDigits }} to {{ maxDigits }} digits.",
                     "numberRangeError": "Please enter a numeric value between {{ minNum }} and {{ maxNum }}.",
+                    "characterError": "Please only use alphabetic characters.",
                     "spatialSelectionGroup": {
                         "geometries": "Drawn Area",
                         "extent": "Map Extent",
