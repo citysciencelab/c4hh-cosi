@@ -7,28 +7,19 @@ import {expect} from "chai";
 config.global.mocks.$t = key => key;
 
 describe("src/modules/featureLister/components/FeatureLister.vue", () => {
-    let wrapper, actions, mutations, getters, store,
-        removeHighlightFeatureStub, removePointMarkerStub, removePolygonMarkerStub,
+    let wrapper, actions, getters, store,
         mountOptions;
 
     beforeEach(() => {
-        removeHighlightFeatureStub = sinon.stub();
-        removePointMarkerStub = sinon.stub();
-        removePolygonMarkerStub = sinon.stub();
         actions = {
             switchBackToList: sinon.stub(),
             switchToThemes: sinon.stub(),
             switchToDetails: sinon.stub()
         };
-        mutations = {
-            resetToThemeChooser: sinon.stub(),
-            setLayerListView: sinon.stub()
-        };
         getters = {
             layer: () => ({name: "Layer 1"}),
-            layerListView: () => "ACTIVE",
-            featureListView: () => "ENABLED",
-            featureDetailView: () => "DISABLED"
+            activeTab: () => "themes",
+            selectedRow: () => ({id: "1"})
         };
         store = createStore({
             modules: {
@@ -38,18 +29,9 @@ describe("src/modules/featureLister/components/FeatureLister.vue", () => {
                         FeatureLister: {
                             namespaced: true,
                             actions,
-                            mutations,
                             getters,
                             state: {}
                         }
-                    }
-                },
-                Maps: {
-                    namespaced: true,
-                    actions: {
-                        removeHighlightFeature: removeHighlightFeatureStub,
-                        removePointMarker: removePointMarkerStub,
-                        removePolygonMarker: removePolygonMarkerStub
                     }
                 }
             }
@@ -70,7 +52,6 @@ describe("src/modules/featureLister/components/FeatureLister.vue", () => {
     });
 
     it("renders list of visible vector layers", () => {
-        store.commit("Modules/FeatureLister/setLayerListView", true);
         wrapper = shallowMount(FeatureListerComponent, mountOptions);
 
         expect(wrapper.find("#module-feature-lister-themeChooser").exists()).to.be.true;
@@ -99,13 +80,10 @@ describe("src/modules/featureLister/components/FeatureLister.vue", () => {
         expect(actions.switchToDetails.called).to.be.true;
     });
 
-    it("calls cleanup methods on unmount", () => {
+    it("calls switchToThemes on unmount", () => {
         wrapper = shallowMount(FeatureListerComponent, mountOptions);
 
         wrapper.unmount();
-        expect(mutations.resetToThemeChooser.called).to.be.true;
-        expect(removeHighlightFeatureStub.called).to.be.true;
-        expect(removePointMarkerStub.called).to.be.true;
-        expect(removePolygonMarkerStub.called).to.be.true;
+        expect(actions.switchToThemes.called).to.be.true;
     });
 });

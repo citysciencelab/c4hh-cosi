@@ -2,7 +2,6 @@ import {generateSimpleMutations} from "@shared/js/utils/generators.js";
 import stateFeatureLister from "./stateFeatureLister.js";
 import getGfiFeatureModule from "@shared/js/utils/getGfiFeaturesByTileFeature.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
-import tabStatus from "../constantsTabStatus.js";
 
 const mutations = {
     /**
@@ -61,9 +60,7 @@ const mutations = {
      */
     resetToThemeChooser: (state) => {
         state.selectedRow = null;
-        state.layerListView = tabStatus.ACTIVE;
-        state.featureListView = tabStatus.DISABLED;
-        state.featureDetailView = tabStatus.DISABLED;
+        state.activeTab = "themes";
         state.selectedArea = null;
         state.layer = null;
         state.headers = [];

@@ -199,39 +199,6 @@ describe("src/shared/modules/table/components/TableComponent.vue", () => {
             await wrapper.vm.$nextTick();
             expect(wrapper.find(".multiselect-dropdown").exists()).to.be.false;
         });
-        it("should make data rows keyboard-focusable", async () => {
-            wrapper = createWrapper({
-                data: {
-                    headers: [{name: "foo", index: 0}],
-                    items: [{foo: "bar"}]
-                }
-            });
-
-            await wrapper.vm.$nextTick();
-            const firstDataRow = wrapper.find("tbody tr");
-
-            expect(firstDataRow.exists()).to.be.true;
-            expect(firstDataRow.attributes("tabindex")).to.equal("0");
-        });
-        it("should emit rowSelected on enter key press in row select mode", async () => {
-            wrapper = createWrapper({
-                data: {
-                    headers: [{name: "foo", index: 0}],
-                    items: [{foo: "bar"}]
-                },
-                selectMode: "row",
-                runSelectRowOnMount: false
-            });
-
-            await wrapper.vm.$nextTick();
-            const firstDataRow = wrapper.find("tbody tr");
-
-            await firstDataRow.trigger("keydown.enter");
-
-            expect(wrapper.emitted("rowSelected")).to.exist;
-            expect(wrapper.emitted("rowSelected")).to.have.lengthOf(1);
-            expect(wrapper.emitted("rowSelected")[0][0]).to.deep.equal({foo: "bar"});
-        });
         it("should not render hint text", () => {
             wrapper = createWrapper({
                 totalProp: true

@@ -1,6 +1,5 @@
 <script>
-import {mapGetters, mapActions, mapMutations} from "vuex";
-import tabStatus from "../constantsTabStatus.js";
+import {mapGetters, mapActions} from "vuex";
 import FeatureDetailView from "./FeatureDetailView.vue";
 import FeatureListView from "./FeatureListView.vue";
 import LayerListView from "./LayerListView.vue";
@@ -9,9 +8,6 @@ import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 /**
  * Feature Lister
  * @module modules/FeatureLister
- * @vue-data {String} enabledTabClass - The CSS-Class for the enabled tab.
- * @vue-data {String} activeTabClass - The CSS-Class "active" tab.
- * @vue-computed {String} themeTabClasses - The class for the current theme-tab.
  */
 export default {
     name: "FeatureLister",
@@ -21,34 +17,21 @@ export default {
         FeatureDetailView,
         NavTab
     },
-    data () {
-        return {
-            tabStatus: tabStatus
-        };
-    },
     computed: {
         ...mapGetters("Modules/FeatureLister", [
             "layer",
-            "layerListView",
-            "featureListView",
-            "featureDetailView"
+            "activeTab",
+            "selectedRow"
         ])
     },
     unmounted () {
-        this.resetToThemeChooser();
-        this.removeHighlightFeature();
-        this.removePointMarker();
-        this.removePolygonMarker();
+        this.switchToThemes();
     },
     methods: {
         ...mapActions("Modules/FeatureLister", [
             "switchBackToList",
             "switchToThemes",
             "switchToDetails"
-        ]),
-        ...mapActions("Maps", ["removeHighlightFeature", "removePointMarker", "removePolygonMarker"]),
-        ...mapMutations("Modules/FeatureLister", [
-            "resetToThemeChooser"
         ])
     }
 };
@@ -65,30 +48,29 @@ export default {
             <NavTab
                 id="module-feature-lister-themeChooser"
                 label="common:modules.featureLister.chooseTheme"
-                :active="layerListView === tabStatus.ACTIVE"
-                :enabled="layerListView !== tabStatus.DISABLED"
+                :active="activeTab === 'themes'"
                 target="#feature-lister-themes"
                 :interaction="switchToThemes"
             />
             <NavTab
                 id="module-feature-lister-list"
                 label="common:modules.featureLister.list"
-                :active="featureListView === tabStatus.ACTIVE"
-                :enabled="featureListView !== tabStatus.DISABLED"
+                :active="activeTab === 'list'"
+                :disabled="!layer"
                 target="#feature-lister-list"
                 :interaction="switchBackToList"
             />
             <NavTab
                 id="module-feature-lister-details"
                 label="common:modules.featureLister.details"
-                :active="featureDetailView === tabStatus.ACTIVE"
-                :enabled="featureDetailView !== tabStatus.DISABLED"
+                :active="activeTab === 'details'"
+                :disabled="!selectedRow"
                 target="#feature-lister-details"
                 :interaction="switchToDetails"
             />
         </ul>
         <template
-            v-if="layerListView === tabStatus.ACTIVE"
+            v-if="activeTab === 'themes'"
         >
             <div
                 id="feature-lister-themes"
@@ -103,7 +85,7 @@ export default {
                 <LayerListView />
             </div>
         </template>
-        <template v-if="featureListView === tabStatus.ACTIVE">
+        <template v-if="activeTab === 'list'">
             <div
                 id="feature-lister-list-header"
                 class="panel-heading"
@@ -117,7 +99,7 @@ export default {
                 <FeatureListView />
             </div>
         </template>
-        <template v-if="featureDetailView === tabStatus.ACTIVE">
+        <template v-if="activeTab === 'details'">
             <div
                 id="feature-lister-details-header"
                 class="panel-heading"

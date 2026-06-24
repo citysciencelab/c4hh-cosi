@@ -7,7 +7,7 @@
  * @vue-prop {String} label - the label used on the navTab-button.
  * @vue-prop {String} icon - optional bootstrap icon class suffix (e.g. 'bi-geo-alt') shown before the label.
  * @vue-prop {Boolean} active - whether the tab is currently active.
- * @vue-prop {Boolean} enabled - whether the tab is interactive.
+ * @vue-prop {Boolean} disabled - whether the tab is non-interactive.
  * @vue-prop {String} target - used to specify the id of the element shown by the navTab button (i.e. '#section-1').
  * @vue-prop {String} value - optional value attribute for the list element (e.g. <li value="my-value">)
  * @vue-prop {Function} interaction - can be used to bind a function to an interaction with the navTab-button, to be executed on click.
@@ -32,10 +32,10 @@ export default {
             type: Boolean,
             required: true
         },
-        enabled: {
+        disabled: {
             type: Boolean,
             required: false,
-            default: true
+            default: false
         },
         target: {
             type: String,
@@ -56,15 +56,12 @@ export default {
     },
     methods: {
         onclick (event) {
-            if (!this.enabled) {
+            if (this.disabled) {
                 return;
             }
             this.interaction(event);
         },
         onkeydown (event) {
-            if (!this.enabled) {
-                return;
-            }
             const step = {ArrowLeft: -1, ArrowRight: 1}[event.key];
 
             if (step === undefined) {
@@ -76,8 +73,12 @@ export default {
                 return;
             }
             event.preventDefault();
-            const tabs = [...tablist.querySelectorAll("[role=tab]")],
-                next = tabs[(tabs.indexOf(event.currentTarget) + step + tabs.length) % tabs.length];
+            event.stopPropagation();
+            const tabs = [...tablist.querySelectorAll("[role=tab]:not([disabled])")],
+                currentIndex = tabs.indexOf(event.currentTarget),
+                next = currentIndex >= 0
+                    ? tabs[(currentIndex + step + tabs.length) % tabs.length]
+                    : null;
 
             next?.focus();
             next?.click();
@@ -95,16 +96,16 @@ export default {
         <button
             :id="id"
             class="nav-link"
-            :class="{active, disabled: !enabled}"
+            :class="{active}"
             data-bs-toggle="tab"
             :data-bs-target="target"
             type="button"
             role="tab"
-            :disabled="!enabled"
-            :tabindex="active && enabled ? 0 : -1"
+            :disabled="disabled"
+            :tabindex="active ? 0 : -1"
             :aria-controls="target"
             :aria-selected="active"
-            :aria-disabled="!enabled"
+            :aria-disabled="disabled"
             :aria-label="label"
             @click="onclick"
             @keydown="onkeydown"

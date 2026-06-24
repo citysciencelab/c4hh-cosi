@@ -1,5 +1,3 @@
-import tabStatus from "../constantsTabStatus.js";
-
 /**
  * featureLister tool state definition.
  * @typedef {Object} FeatureListerState
@@ -10,13 +8,11 @@ import tabStatus from "../constantsTabStatus.js";
  * @property {String} icon icon next to title (config-param)
  * @property {Number} maxFeatures default value for maxFeatures that can be overwritten in config
  * @property {Object} layer layer object of the selected layer
- * @property {String} layerListView current status of layer list view tab (enabled/active/disabled)
+ * @property {String} activeTab currently active tab identifier ('themes' | 'list' | 'details')
  * @property {Array} gfiFeaturesOfLayer array of the gfiFeatures of the selected layer
  * @property {String} featureCount number of total features of the selected layer
  * @property {String} shownFeatures currently count of features displayed in featureListView table
- * @property {String} featureListView current status of feature list view tab (enabled/active/disabled)
  * @property {Boolean} nestedFeatures some features have features themself, if true they get recognized
- * @property {String} featureDetailView current status of feature detail view tab (enabled/active/disabled)
  * @property {Array} headers list of headings in list
  * @property {Object} selectedRow the selected row of the table of gfiFeatures
  * @property {Object} highlightVectorRulesPolygon default style for highlighting polygons
@@ -36,13 +32,11 @@ const state = {
     icon: "bi-list",
     maxFeatures: 20,
     layer: null,
-    layerListView: tabStatus.ACTIVE,
+    activeTab: "themes",
     gfiFeaturesOfLayer: [],
     featureCount: "",
     shownFeatures: "",
-    featureListView: tabStatus.DISABLED,
     nestedFeatures: false,
-    featureDetailView: tabStatus.DISABLED,
     headers: [],
     selectedRow: null,
     highlightVectorRulesPolygon: {
