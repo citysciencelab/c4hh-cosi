@@ -7,7 +7,8 @@ import Component from "../../../components/TabResultTable.vue";
 
 describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spec.js", () => {
     let wrapper,
-        store;
+        store,
+        setVisibleFake;
 
     const tableHeader = ["JAHRGANG", "KACHELNUMMER", "BESCHREIBUNG"];
 
@@ -130,6 +131,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
                 plugins: [store]
             }
         });
+
+        setVisibleFake = sinon.fake();
     });
 
     afterEach(() => {
@@ -140,6 +143,19 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         sinon.restore();
         sinon.resetHistory();
     });
+
+    /**
+     * Stubs the mapCollection.getMap function to return a map with the specified layers.
+     * @param {Array} layers - The layers to be returned by the stubbed map.
+     */
+    function stubMapWithLayers (layers) {
+        mapCollection.getMap.callsFake(() => ({
+            getLayers: () => ({getArray: () => layers}),
+            removeLayer: sinon.fake.returns(null),
+            addLayer: sinon.fake.returns(null),
+            getView: fakeFunctionGetView
+        }));
+    }
 
     it("should exist", () => {
         expect(wrapper.exists()).to.be.true;
@@ -227,7 +243,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         expect(wrapper.vm.currentlyShownGeorefId).to.equal("dataset2");
         expect(iconButtons[0].vm.classArray).to.include("isShownGeometry");
 
-        wrapper.vm.clearGeomIndicators();
+        wrapper.vm.clearGeomIndicator();
         expect(wrapper.vm.currentlyShownGeorefId).to.equal(null);
     });
 
@@ -356,5 +372,89 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         expect(headerCheckbox.element.checked).to.be.false;
         expect(checkboxes[0].element.checked).to.be.false;
         expect(checkboxes[1].element.checked).to.be.false;
+    });
+
+    describe("hideGeom", () => {
+        it("hides the geom layer", () => {
+            const layerWithVisibility = {
+                get: () => "lzsGeorefLayer",
+                setVisible: setVisibleFake,
+                getVisible: () => true
+            };
+
+            stubMapWithLayers([layerWithVisibility]);
+            wrapper.vm.geoRefShown = true;
+
+            wrapper.vm.hideGeom();
+
+            expect(setVisibleFake.calledOnceWith(false)).to.be.true;
+            expect(wrapper.vm.geoRefShown).to.be.false;
+        });
+
+        it("does nothing when no geom layer exists on the map", () => {
+            const unrelatedLayer = {
+                // not "lzsGeorefLayer" -> not recognized as geom layer
+                get: () => "someOtherLayerId",
+                setVisible: setVisibleFake
+            };
+
+            stubMapWithLayers([unrelatedLayer]);
+
+            expect(() => wrapper.vm.hideGeom()).to.not.throw();
+            expect(setVisibleFake.called).to.be.false;
+        });
+    });
+
+    describe("showGeomAgain", () => {
+        it("makes a hidden geom layer visible again", () => {
+            const hiddenLayer = {
+                get: () => "lzsGeorefLayer",
+                setVisible: setVisibleFake,
+                getVisible: () => false
+            };
+
+            stubMapWithLayers([hiddenLayer]);
+
+            wrapper.vm.geoRefShown = false;
+
+            wrapper.vm.showGeomAgain();
+
+            expect(setVisibleFake.calledOnceWith(true)).to.be.true;
+            expect(wrapper.vm.geoRefShown).to.be.true;
+        });
+
+        it("does nothing when no geom layer exists on the map", () => {
+            const unrelatedLayer = {
+                // not "lzsGeorefLayer" -> not recognized as geom layer
+                get: () => "someOtherLayerId",
+                setVisible: setVisibleFake,
+                getVisible: () => false
+            };
+
+            stubMapWithLayers([unrelatedLayer]);
+
+            wrapper.vm.geoRefShown = false;
+
+            expect(() => wrapper.vm.showGeomAgain()).to.not.throw();
+            expect(setVisibleFake.called).to.be.false;
+            expect(wrapper.vm.geoRefShown).to.be.false;
+        });
+
+        it("does nothing when the layer is already visible", () => {
+            const visibleLayer = {
+                get: () => "lzsGeorefLayer",
+                setVisible: setVisibleFake,
+                getVisible: () => true
+            };
+
+            stubMapWithLayers([visibleLayer]);
+
+            wrapper.vm.geoRefShown = true;
+
+            wrapper.vm.showGeomAgain();
+
+            expect(setVisibleFake.called).to.be.false;
+            expect(wrapper.vm.geoRefShown).to.be.true;
+        });
     });
 });

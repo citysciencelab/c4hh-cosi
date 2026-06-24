@@ -68,8 +68,17 @@ export default {
         toDownload () {
             this.setCurrentTab("tabDownload");
         },
-        clearGeomAndGeomIndicators () {
-            this.$refs.archiveList?.clearGeomAndGeomIndicators();
+        clearGeomAndGeomIndicator (newGeomIsShownBy = null) {
+            this.$refs.archiveList?.clearGeomAndGeomIndicator(newGeomIsShownBy);
+        },
+        hideGeom () {
+            this.$refs.archiveList?.hideGeom();
+        },
+        showGeomAgain () {
+            this.$refs.archiveList?.showGeomAgain();
+        },
+        syncGeomToInstance (datasetInstanceId) {
+            this.$refs.archiveList?.syncGeomToInstance(datasetInstanceId);
         },
         download () {
             this.downloadSelectedFiles(this.searchAttributeResponse);

@@ -48,7 +48,7 @@ export default {
             }
         }
     },
-    emits: ["openDetails", "showPreview", "download", "clearOtherGeom"],
+    emits: ["openDetails", "showPreview", "download", "clearOtherGeom", "showGeomAgain"],
     data () {
         return {
             currentSorting: {
@@ -56,7 +56,8 @@ export default {
                 asc: true
             },
             geomLayerId: "lzsGeorefLayer",
-            currentlyShownGeorefId: null
+            currentlyShownGeorefId: null,
+            geoRefShown: false
         };
     },
     computed: {
@@ -117,14 +118,14 @@ export default {
          * @returns {void}
          */
         toggleDatasetPositionInMap (dataset) {
-            if (this.currentlyShownGeorefId === dataset.instanceId) {
-                this.clearGeomIndicators();
+            if (this.geoRefShown && this.currentlyShownGeorefId === dataset.instanceId) {
+                this.clearGeomIndicator();
                 this.clearGeom();
                 return;
             }
 
             this.currentlyShownGeorefId = dataset.instanceId;
-            this.$emit("clearOtherGeom");
+            this.$emit("clearOtherGeom", this.tableIndex);
 
             if (dataset.geom) {
                 this.showGeomOnLayer(dataset.geom);
@@ -188,6 +189,7 @@ export default {
                     extent = newFeature.getGeometry().getExtent();
 
                 map.addLayer(vectorLayer);
+                this.geoRefShown = true;
 
                 if (extent.some(coord => isNaN(coord))) {
                     console.error("Invalid extent:", extent);
@@ -246,7 +248,7 @@ export default {
          * Clear the marker for which dataset is currently shown (does not remove vector from map).
          * @returns {void}
          */
-        clearGeomIndicators () {
+        clearGeomIndicator () {
             this.currentlyShownGeorefId = null;
         },
         /**
@@ -254,12 +256,46 @@ export default {
          * @returns {void}
          */
         clearGeom () {
-            const map = mapCollection.getMap("2D"),
-                existingLayer = map.getLayers().getArray().find(layer => layer.get("id") === this.geomLayerId);
+            const map = mapCollection.getMap("2D");
+            const layerWithGeom = this.getLayerWithGeom();
 
-            if (existingLayer) {
-                map.removeLayer(existingLayer);
+            if (layerWithGeom) {
+                map.removeLayer(layerWithGeom);
             }
+            this.geoRefShown = false;
+        },
+        /**
+         * Hide the geometry layer on the map if present (does not remove it).
+         * @returns {void}
+         */
+        hideGeom () {
+            const layerWithGeom = this.getLayerWithGeom();
+
+            if (layerWithGeom) {
+                layerWithGeom.setVisible(false);
+            }
+            this.geoRefShown = false;
+        },
+        /**
+         * Show the geometry layer on the map again if it was previously hidden.
+         * @returns {void}
+         */
+        showGeomAgain () {
+            const layerWithGeom = this.getLayerWithGeom();
+
+            if (layerWithGeom && !layerWithGeom.getVisible()) {
+                layerWithGeom.setVisible(true);
+                this.geoRefShown = true;
+            }
+        },
+        /**
+         * Get the vector layer that contains the geometry for the currently shown dataset.
+         * @returns {VectorLayer|null} The vector layer or null if not found.
+         */
+        getLayerWithGeom () {
+            const map = mapCollection.getMap("2D");
+
+            return map.getLayers().getArray().find(layer => layer.get("id") === this.geomLayerId);
         },
         /**
          * Gets a specific icon class for the sorting of the given column index.

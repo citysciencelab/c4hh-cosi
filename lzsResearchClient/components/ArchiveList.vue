@@ -48,7 +48,7 @@ export default {
     emits: ["openDetails"],
     data () {
         return {
-            groupByReRenderKey: 0,
+            groupByRenderKeys: {},
             openAllAccordions: true,
             geomIsShownBy: null,
             groupedResultsForAllSteps: {},
@@ -79,7 +79,6 @@ export default {
                     };
                 });
 
-            this.groupResultsForAllSteps(result);
             return result;
         },
         /**
@@ -115,6 +114,14 @@ export default {
          */
         selectAllIsChecked () {
             return this.checkedArchives.length > 0 && this.checkedArchives.every(Boolean);
+        }
+    },
+    watch: {
+        datasets: {
+            handler () {
+                this.groupResultsForAllSteps();
+            },
+            immediate: true
         }
     },
     methods: {
@@ -173,20 +180,24 @@ export default {
          * Groups the results for all steps by the specified attribute and stores them in groupedResultsForAllSteps.
          * The grouped results are stored in an object where each key is the index of the archive and the value is either an object of groups or an array of datasets.
          * @param {Array} [archives=this.archives] - The archives to group.
+         * @param {Number|null} [onlyIndex=null] - If provided, only group the results for the archive at this index.
          * @returns {void}
          */
-        groupResultsForAllSteps (archives = this.archives) {
-            const results = {};
+        groupResultsForAllSteps (archives = this.archives, onlyIndex = null) {
+            const results = {...this.groupedResultsForAllSteps};
 
             archives.forEach((step, index) => {
-                results[index] = {};
+                if (onlyIndex !== null && index !== onlyIndex) {
+                    return;
+                }
 
                 if (step.attributeCount > 1) {
-                    const groups = this.groupsForArchive(step);
+                    const groupedStep = {};
 
-                    groups.forEach((group) => {
-                        results[index][group] = this.resultsForGroupsForArchive(step, group);
+                    this.groupsForArchive(step).forEach((group) => {
+                        groupedStep[group] = this.resultsForGroupsForArchive(step, group);
                     });
+                    results[index] = groupedStep;
                 }
                 else {
                     results[index] = this.resultsForGroupsForArchive(step);
@@ -242,32 +253,57 @@ export default {
                 : `${this.idPrefix}-table-${index}-${groupIndex}`;
         },
         /**
-         * Hides geometry indicators on all result tables except an optional table to skip,
-         * and optionally remove the geometry layer from the map for all tables.
-         *
-         * Iterates over child refs that start with "result-table-" and calls clearGeomIndicators()
-         * on each table component except the one specified by tableToSkip. If tableToSkip is null,
-         * also calls clearGeom() on each table to remove the geometry layer from the map.
-         *
-         * @param {String|null} tableToSkip - Ref name of the table to skip (e.g. "result-table-0-1"), or null to affect all tables.
+         * Clears the geometry indicator on the result table that previously showed the geometry,
+         * and, if newGeomIsShownBy is null, removes the geometry layer from the map.
+         * @param {String|null} newGeomIsShownBy - Ref name of the new geometry table (e.g. "result-table-0-1"), or null to affect the current table.
          * @returns {void}
          */
-        clearGeomAndGeomIndicators (tableToSkip = null) {
-            this.geomIsShownBy = tableToSkip;
+        clearGeomAndGeomIndicator (newGeomIsShownBy = null) {
+            const previousGeomIsShownBy = this.geomIsShownBy;
 
-            const tableRefPrefix = `${this.idPrefix}-table-`;
+            this.geomIsShownBy = newGeomIsShownBy;
 
-            Object.keys(this.$refs).forEach((refTable) => {
-                if (this.$refs[refTable] && typeof this.$refs[refTable] === "object") {
-                    if (refTable.startsWith(tableRefPrefix) && refTable !== tableToSkip) {
-                        this.$refs[refTable][0]?.clearGeomIndicators();
-                    }
+            if (previousGeomIsShownBy !== newGeomIsShownBy) {
+                this.$refs[previousGeomIsShownBy]?.[0]?.clearGeomIndicator();
+            }
 
-                    if (tableToSkip === null) {
-                        this.$refs[refTable][0]?.clearGeom();
-                    }
-                }
-            });
+            if (newGeomIsShownBy === null) {
+                this.$refs[previousGeomIsShownBy]?.[0]?.clearGeom();
+            }
+        },
+        /**
+         * Hides the geometry layer of the table that currently shows the geometry,
+         * without clearing the indicator or the stored `geomIsShownBy` reference,
+         * so it can be restored later via `showGeomAgain()`.
+         * @returns {void}
+         */
+        hideGeom () {
+            this.$refs[this.geomIsShownBy]?.[0]?.hideGeom();
+        },
+        /**
+         * Shows the geometry layer on the map again for the table that previously showed it.
++         * @returns {void}
+         */
+        showGeomAgain () {
+            const geomTableName = this.geomIsShownBy;
+            const geomRef = this.$refs[geomTableName];
+
+            geomRef?.[0]?.showGeomAgain();
+        },
+        /**
+         * Hides the geometry layer if it does not belong to the given dataset. Used when arriving at the details tab.
+         * @param {String} datasetInstanceId - The instance id of the dataset whose details are being shown.
+         * @returns {void}
+         */
+        syncGeomToInstance (datasetInstanceId) {
+            const geomTable = this.$refs[this.geomIsShownBy]?.[0];
+
+            if (!geomTable) {
+                return;
+            }
+            if (geomTable.currentlyShownGeorefId !== datasetInstanceId) {
+                geomTable.hideGeom();
+            }
         },
         /** Toggles the checked state of all datasets in all tables.
          * @param {Boolean} changeTo - Is the new checked value for the SelectAll-Switch.
@@ -302,7 +338,10 @@ export default {
          */
         changeGroupBy (index) {
             this.groupBySelections[this.archives[index].archiveId] = this.archives[index].attributeToGroupBy;
-            this.groupByReRenderKey++;
+            this.groupByRenderKeys = {
+                ...this.groupByRenderKeys,
+                [index]: (this.groupByRenderKeys[index] || 0) + 1
+            };
 
             const tableRefPrefix = `${this.idPrefix}-table-${index}`;
 
@@ -313,12 +352,12 @@ export default {
                         typeof this.$refs[refTable] === "object" &&
                         refTable.startsWith(tableRefPrefix)
                     ) {
-                        this.$refs[refTable][0]?.clearGeomIndicators();
+                        this.$refs[refTable][0]?.clearGeomIndicator();
                         this.$refs[refTable][0]?.clearGeom();
                     }
                 });
             }
-            this.groupResultsForAllSteps();
+            this.groupResultsForAllSteps(this.archives, index);
         },
         /**
          * Passes the openDetails event from the TabResultTable up to the parent.
@@ -426,7 +465,7 @@ export default {
                         <AccordionItem
                             v-for="(groupValue, groupIndex) in groupsForArchive(step)"
                             :id="`${idPrefix}-group-item-${index}-${groupIndex}`"
-                            :key="groupIndex + groupByReRenderKey"
+                            :key="`${groupIndex}-${groupByRenderKeys[index] || 0}`"
                             class="group-step"
                             :title="$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${step.attributeToGroupBy.toLowerCase()}`) + ' ' + groupValue"
                             :is-open="openAllAccordions"
@@ -436,11 +475,12 @@ export default {
                                 :ref="tableRefName(index, groupIndex)"
                                 :table-index="tableRefName(index, groupIndex)"
                                 :table-header="getTableHeaders(step, groupValue)"
-                                :table-datasets="groupedResultsForAllSteps[index][groupValue] || []"
+                                :table-datasets="groupedResultsForAllSteps[index]?.[groupValue] || []"
                                 :has-geo-ref="archiveHasGeoref(step.archiveId)"
                                 :show-buttons="showTableButtons"
                                 @openDetails="onOpenDetails"
-                                @clearOtherGeom="clearGeomAndGeomIndicators(tableRefName(index, groupIndex))"
+                                @clearOtherGeom="clearGeomAndGeomIndicator"
+                                @showGeomAgain="showGeomAgain"
                             />
                         </AccordionItem>
                     </div>
@@ -454,7 +494,8 @@ export default {
                             :has-geo-ref="archiveHasGeoref(step.archiveId)"
                             :show-buttons="showTableButtons"
                             @openDetails="onOpenDetails"
-                            @clearOtherGeom="clearGeomAndGeomIndicators(tableRefName(index))"
+                            @clearOtherGeom="clearGeomAndGeomIndicator"
+                            @showGeomAgain="showGeomAgain"
                         />
                     </div>
                 </AccordionItem>

@@ -19,17 +19,23 @@ export default {
     },
     data () {
         return {
-            modalDismissed: false
+            modalDismissed: false,
+            newSearchPerformed: false,
+            tabWatcherAttached: false,
+            unwatchTabContainer: null
         };
     },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
             "showLoadingSpinner",
             "requestToken",
+            "requestTokenExpireTime",
             "globalError",
             "errorMessage",
             "currentProgressValue",
-            "progressNow"
+            "progressNow",
+            "searchAttributeResponse",
+            "selectedInstanceId"
         ]),
         progressBarWidthClass () {
             return `width: ${this.progressNow}%;`;
@@ -82,46 +88,8 @@ export default {
         }
     },
     watch: {
-        /**
-         * This watcher is neccessary to wait for the rendering of the TabContainer component
-         * activates a watcher on the activeTabIdLocal of the TabContainer to react on tab change
-         * @param {String} val - request token for requests to the backend
-         */
-        async requestToken (val) {
-            if (!val) {
-                return;
-            }
-
-            // wait until the rendering of tabContainer is finished to access the $ref
-            const waitForRef = async (name, timeout = 1000, interval = 50) => {
-                const start = Date.now();
-
-                while (!this.$refs[name] && Date.now() - start < timeout) {
-                    await new Promise(r => setTimeout(r, interval));
-                }
-                return this.$refs[name];
-            };
-
-            const tabContainerRef = await waitForRef("tabContainer");
-
-            tabContainerRef?.$watch("activeTabIdLocal", (newVal, oldVal) =>{
-                if (newVal !== "tabResult") {
-                    tabContainerRef.$refs.tabResult[0].clearGeomAndGeomIndicators();
-                }
-
-                const tabSearch = tabContainerRef.$refs.tabSearch?.[0];
-
-                if (oldVal === "tabSearch" && newVal !== "tabSearch") {
-                    tabSearch?.setMapInteractionsActive(false);
-                    tabSearch?.cancelIncompleteDrawing();
-                }
-                else if (newVal === "tabSearch") {
-                    tabSearch?.setMapInteractionsActive(true);
-                }
-
-                // clear all error messages on tab change
-                this.setErrorMessage("");
-            });
+        searchAttributeResponse () {
+            this.newSearchPerformed = true;
         },
         progressNow (val) {
             if (val === 100) {
@@ -138,16 +106,59 @@ export default {
      * The mounted hook is only called once, when the component is created the first time.
      * The activated and deactivated hooks are called, when the component is
      * shown or closed via "menu" link.
+     * The component is not destroyed when closed, but kept in memory so that previous state is preserved when reopened.
      */
     async activated () {
-        this.setShowLoadingSpinner(true);
+        const hadToken = Boolean(this.requestToken);
 
-        await this.fetchRequestToken();
+        if (!hadToken) {
+            this.setShowLoadingSpinner(true);
+        }
 
-        this.setShowLoadingSpinner(false);
+        if (!hadToken || this.isTokenExpired()) {
+            await this.fetchRequestToken();
+        }
+
+        if (!hadToken) {
+            this.setShowLoadingSpinner(false);
+        }
+
+        if (this.requestToken) {
+            await this.attachTabWatcher();
+        }
+
+        await this.$nextTick();
+        const tabContainerRef = this.$refs.tabContainer;
+
+        if (!tabContainerRef) {
+            return;
+        }
+
+        // Call handleTabChange to ensure the correct state is set for the active tab when the component is activated.
+        this.handleTabChange(tabContainerRef, tabContainerRef.activeTabIdLocal, "tabSearch");
     },
+    /**
+     * Triggered if component is deactivated.
+     * Removes the watcher on the TabContainer and hides the geometry in the TabResult.
+     */
     deactivated () {
-        // Handle KeepAlive visibility. Triggered if component is deactivated
+        if (this.unwatchTabContainer) {
+            this.unwatchTabContainer();
+            this.unwatchTabContainer = null;
+        }
+        this.tabWatcherAttached = false;
+
+        const tabContainerRef = this.$refs.tabContainer;
+
+        if (!tabContainerRef) {
+            return;
+        }
+
+        const tabResult = tabContainerRef.$refs.tabResult?.[0];
+
+        if (tabResult) {
+            tabResult.hideGeom();
+        }
     },
     methods: {
         ...mapActions("Modules/LzsResearchClient", [
@@ -161,6 +172,82 @@ export default {
         ]),
         hideErrorMessage () {
             this.setErrorMessage("");
+        },
+        /**
+         * Handle tab changes in the TabContainer.
+         * @param {Object} tabContainerRef - Reference to the TabContainer component.
+         * @param {string} newTabId - Id of the newly activated tab.
+         * @param {string} oldTabId - Id of the previously active tab.
+         */
+        handleTabChange (tabContainerRef, newTabId, oldTabId) {
+            const tabResult = tabContainerRef.$refs.tabResult?.[0];
+            const tabSearch = tabContainerRef.$refs.tabSearch?.[0];
+
+            if (newTabId === "tabSearch") {
+                tabResult?.hideGeom();
+            }
+            else if (oldTabId === "tabSearch") {
+                if (newTabId === "tabResult" && this.newSearchPerformed) {
+                    tabResult?.clearGeomAndGeomIndicator();
+                    this.newSearchPerformed = false;
+                }
+                else {
+                    tabResult?.showGeomAgain();
+                }
+            }
+            else if (oldTabId === "tabDetails") {
+                tabResult?.showGeomAgain();
+            }
+
+            if (newTabId === "tabDetails") {
+                tabResult?.syncGeomToInstance(this.selectedInstanceId);
+            }
+
+            if (newTabId === "tabSearch") {
+                tabSearch?.setMapInteractionsActive(true);
+            }
+            else if (oldTabId === "tabSearch") {
+                tabSearch?.setMapInteractionsActive(false);
+                tabSearch?.cancelIncompleteDrawing();
+            }
+
+            this.setErrorMessage("");
+        },
+        /**
+         * Activates a watcher on the activeTabIdLocal of the TabContainer to react to tab changes.
+         * Calls handleTabChange when the active tab changes.
+         */
+        async attachTabWatcher () {
+            if (this.tabWatcherAttached) {
+                return;
+            }
+            await this.$nextTick();
+
+            const tabContainerRef = this.$refs.tabContainer;
+
+            if (!tabContainerRef) {
+                return;
+            }
+            this.tabWatcherAttached = true;
+
+            this.unwatchTabContainer = tabContainerRef.$watch("activeTabIdLocal", (newTabId, oldTabId) => {
+                this.handleTabChange(tabContainerRef, newTabId, oldTabId);
+            });
+        },
+        /**
+         * Checks if the request token is expired or about to expire.
+         * @returns {boolean} - True if the token is expired or about to expire, false otherwise.
+         */
+        isTokenExpired () {
+            const expireTimeInMs = this.requestTokenExpireTime;
+
+            if (!expireTimeInMs) {
+                return true;
+            }
+
+            const safetyMs = 3e4;
+
+            return Date.now() >= expireTimeInMs - safetyMs;
         }
     }
 };

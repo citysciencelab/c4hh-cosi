@@ -2,6 +2,7 @@ import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import {reactive} from "vue";
+import sinon from "sinon";
 
 import Component from "../../../components/ArchiveList.vue";
 
@@ -22,6 +23,11 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
             name: "TabResultTable",
             props: ["tableIndex", "tableHeader", "tableDatasets", "hasGeoRef", "showCheckboxes", "showButtons"],
             template: "<div class='table-stub' />",
+            data () {
+                return {
+                    currentlyShownGeorefId: null
+                };
+            },
             created () {
                 tableStubInstances.push(this);
             },
@@ -34,6 +40,9 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
                             d.checked = changeTo;
                         }
                     });
+                },
+                hideGeom () {
+                    // overridden per test
                 }
             }
         };
@@ -85,6 +94,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
         if (wrapper) {
             wrapper.unmount();
         }
+        sinon.restore();
     });
 
     it("should exist", () => {
@@ -121,5 +131,43 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
         await wrapper.vm.toggleAllTablesInArchive(1, true);
 
         expect(wrapper.vm.selectAllIsChecked).to.be.true;
+    });
+
+    describe("syncGeomToInstance", async () => {
+        it("calls hideGeom() on the active table when currentlyShownGeorefId does not match datasetInstanceId", async () => {
+            const refName = "test-table-0-0";
+            const tableInstance = wrapper.vm.$refs[refName]?.[0];
+
+            expect(tableInstance).to.exist;
+
+            tableInstance.currentlyShownGeorefId = "id2";
+            const hideGeomFake = sinon.fake();
+
+            tableInstance.hideGeom = hideGeomFake;
+
+            wrapper.vm.geomIsShownBy = refName;
+
+            wrapper.vm.syncGeomToInstance("id1");
+
+            expect(hideGeomFake.calledOnce).to.be.true;
+        });
+
+        it("does nothing when currentlyShownGeorefId already matches the given instanceId", async () => {
+            const refName = "test-table-0-0";
+            const tableInstance = wrapper.vm.$refs[refName]?.[0];
+
+            expect(tableInstance).to.exist;
+
+            tableInstance.currentlyShownGeorefId = "id1";
+            const hideGeomFake = sinon.fake();
+
+            tableInstance.hideGeom = hideGeomFake;
+
+            wrapper.vm.geomIsShownBy = refName;
+
+            wrapper.vm.syncGeomToInstance("id1");
+
+            expect(hideGeomFake.called).to.be.false;
+        });
     });
 });
