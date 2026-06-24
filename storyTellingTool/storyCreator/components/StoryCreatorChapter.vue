@@ -126,10 +126,6 @@ export default {
                     return;
                 }
 
-                const layers = mapCollection.getMap("2D")?.getLayers();
-
-                this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
-
                 val.forEach(layer => {
                     if (!layer?.layerId) {
                         return;
@@ -170,6 +166,10 @@ export default {
         }
     },
     mounted () {
+        const layers = mapCollection.getMap("2D")?.getLayers();
+
+        this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
+
         this.layerList = this.getLayerList();
         this.toolList = this.getToolList(this.configuredModules);
 

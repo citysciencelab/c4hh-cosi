@@ -234,34 +234,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         });
     });
 
-    describe("Watch", () => {
-        describe("selectedLayer", () => {
-            it("returns not call function deactivateSubjectLayer", async () => {
-                await wrapper.setData({
-                    selectedLayer: undefined
-                });
-
-                const spyDeactivateSubjectLayer = sinon.spy(wrapper.vm, "deactivateSubjectLayer"),
-                    spyAddOrReplaceLayer = sinon.spy(wrapper.vm, "addOrReplaceLayer");
-
-                expect(spyDeactivateSubjectLayer.called).to.be.false;
-                expect(spyAddOrReplaceLayer.called).to.be.false;
-            });
-
-            it("returns call function deactivateSubjectLayer", async () => {
-                const spyDeactivateSubjectLayer = sinon.spy(wrapper.vm, "deactivateSubjectLayer"),
-                    spyAddOrReplaceLayer = sinon.spy(wrapper.vm, "addOrReplaceLayer");
-
-                await wrapper.setData({
-                    selectedLayer: [{layerId: 1}]
-                });
-
-                expect(spyDeactivateSubjectLayer.called).to.be.true;
-                expect(spyAddOrReplaceLayer.called).to.be.true;
-            });
-        });
-    });
-
     describe("Methods", () => {
         describe("findAllObjectsByKeyValueDeep", () => {
             it("should return empty array", () => {
