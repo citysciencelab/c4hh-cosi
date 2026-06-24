@@ -76,7 +76,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 layerConfigById: () => sinon.stub()
             },
             actions: {
-                addOrReplaceLayer: () => sinon.stub()
+                addOrReplaceLayer: () => sinon.stub(),
+                updateLayerConfigs: () => sinon.stub()
             }
         });
         wrapper = shallowMount(StoryCreatorChapter, {
@@ -229,34 +230,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             it("isButtonDisabled returns false if coordinate or zoomlevel changed", () => {
                 wrapper.setData({coordinate: [1, 2], zoomlevel: "6", confirmedCoordinate: [1, 2], confirmedZoomlevel: "5"});
                 expect(wrapper.vm.isButtonDisabled).to.be.false;
-            });
-        });
-    });
-
-    describe("Watch", () => {
-        describe("selectedLayer", () => {
-            it("returns not call function deactivateSubjectLayer", async () => {
-                await wrapper.setData({
-                    selectedLayer: undefined
-                });
-
-                const spyDeactivateSubjectLayer = sinon.spy(wrapper.vm, "deactivateSubjectLayer"),
-                    spyAddOrReplaceLayer = sinon.spy(wrapper.vm, "addOrReplaceLayer");
-
-                expect(spyDeactivateSubjectLayer.called).to.be.false;
-                expect(spyAddOrReplaceLayer.called).to.be.false;
-            });
-
-            it("returns call function deactivateSubjectLayer", async () => {
-                const spyDeactivateSubjectLayer = sinon.spy(wrapper.vm, "deactivateSubjectLayer"),
-                    spyAddOrReplaceLayer = sinon.spy(wrapper.vm, "addOrReplaceLayer");
-
-                await wrapper.setData({
-                    selectedLayer: [{layerId: 1}]
-                });
-
-                expect(spyDeactivateSubjectLayer.called).to.be.true;
-                expect(spyAddOrReplaceLayer.called).to.be.true;
             });
         });
     });
@@ -639,25 +612,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         });
 
         describe("resetLayerConfig ", () => {
-            it("should not set the selectedLayer", async () => {
-                await wrapper.setData({
-                    selectedLayer: [{layerId: 1}]
-                });
-
-                await wrapper.vm.resetLayerConfig(null);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig(0);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig(false);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig(undefined);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig({});
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-                await wrapper.vm.resetLayerConfig([]);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(1);
-            });
-
             it("should set the selectedLayer to be empty array", async () => {
                 await wrapper.setData({
                     selectedLayer: [{layerId: 1}]

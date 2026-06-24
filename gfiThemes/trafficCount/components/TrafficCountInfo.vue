@@ -296,7 +296,6 @@ export default {
                 if (oldVal) {
                     this.setupTabInfo(this.api, this.thingId, newVal);
                 }
-
                 this.isHeavyTrafficAvailable = newVal === "Anzahl_Kfz" || newVal === "Anzahl_Schwerverkehr";
             },
             immediate: true

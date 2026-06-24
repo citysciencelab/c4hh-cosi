@@ -126,10 +126,6 @@ export default {
                     return;
                 }
 
-                const layers = mapCollection.getMap("2D")?.getLayers();
-
-                this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
-
                 val.forEach(layer => {
                     if (!layer?.layerId) {
                         return;
@@ -170,6 +166,10 @@ export default {
         }
     },
     mounted () {
+        const layers = mapCollection.getMap("2D")?.getLayers();
+
+        this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
+
         this.layerList = this.getLayerList();
         this.toolList = this.getToolList(this.configuredModules);
 
@@ -211,7 +211,7 @@ export default {
         this.resetLayerConfig(this.selectedLayer);
     },
     methods: {
-        ...mapActions(["addOrReplaceLayer"]),
+        ...mapActions(["addOrReplaceLayer", "updateLayerConfigs"]),
         ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Modules/StoryManager", ["setOriginalLayerConfig"]),
@@ -564,33 +564,11 @@ export default {
         },
         /**
          * Resets the layer config.
-         * @param {Object[]} val - The selected layer.
          * @returns {void}
          */
-        resetLayerConfig (val) {
-            if (!Array.isArray(val) || !val.length) {
-                return;
-            }
-
-            val.forEach(layer => {
-                const layerConf = this.layerConfigById(layer.layerId);
-
-                if (layerConf) {
-                    this.addOrReplaceLayer({
-                        layerId: layer.layerId,
-                        visibility: this.originalLayerConfig.some(oriLayer => oriLayer.id === layer.layerId && layerConf?.baselayer && oriLayer.visibility),
-                        showInLayerTree: this.originalLayerConfig.some(oriLayer => oriLayer.id === layer.layerId)
-                    });
-                }
-            });
-
-            this.allLayerConfigs.forEach(each => {
-                if (!this.originalLayerConfig.some(oriLayer => oriLayer.id === each.id)) {
-                    this.removeLayer(each);
-                }
-            });
-
+        resetLayerConfig () {
             this.selectedLayer = [];
+            this.updateLayerConfigs(this.originalLayerConfig);
         },
         /**
          * Updates the current zoom level and coordinate from the map view.

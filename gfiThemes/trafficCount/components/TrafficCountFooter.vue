@@ -19,7 +19,6 @@ export default {
             default: ""
         }
     },
-    emits: ["resetTab"],
     data () {
         return {
             customStyle: {},
@@ -30,10 +29,6 @@ export default {
     computed: {
         indication: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.notice");
-        },
-
-        autoUpdateNote: function () {
-            return this.$t("additional:modules.tools.gfi.themes.trafficCount.autoUpdateNote");
         },
 
         tableIndication: function () {
@@ -96,14 +91,6 @@ export default {
                     };
                 });
             }
-        },
-
-        /**
-         * trigger the function of resetting tab
-         * @returns {void}
-         */
-        reset: function () {
-            this.$emit("resetTab");
         }
     }
 };
@@ -117,13 +104,6 @@ export default {
             :style="customStyle"
         >
             * {{ tableIndication }}
-        </div>
-        <div
-            v-if="currentTabId !== 'info' && currentTabId !== 'downloads'"
-            class="trucksStatusIndication"
-            :style="customStyle"
-        >
-            {{ $t("additional:modules.tools.gfi.themes.trafficCount.trucksStatus") }}
         </div>
         <div
             v-if="currentTabId !== 'info' && currentTabId !== 'downloads'"
@@ -174,54 +154,5 @@ export default {
 
     .trucksStatusIndication {
         display: none;
-    }
-
-    .download-container {
-        float: left;
-        padding-top: 10px;
-    }
-
-    .reset-container {
-        float: left;
-        padding-top: 10px;
-        margin-left: 10px;
-    }
-
-    .footer-main-content {
-        width: 100%;
-    }
-
-    .action-row {
-        width: 100%;
-    }
-
-    .last-line {
-        clear: both;
-        display: block;
-        width: 100%;
-        padding-top: 10px;
-    }
-
-    table {
-        margin-bottom: 0;
-        .text-right {
-            text-align: right;
-        }
-        &:not(.info) {
-            min-width: 280px;
-            width: 50%;
-            float: right;
-            margin-top: 10px;
-            tbody {
-                tr {
-                    &:nth-of-type(odd){
-                        background-color: $white;
-                    }
-                    td {
-                        border-top: none;
-                    }
-                }
-            }
-        }
     }
 </style>

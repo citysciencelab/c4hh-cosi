@@ -1,10 +1,12 @@
 <script>
-import ChartJs from "chart.js/auto";
+import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 import {mapGetters} from "vuex";
-import {markRaw} from "vue";
 
 export default {
     name: "TrafficCountCompDiagram",
+    components: {
+        LinechartItem
+    },
     props: {
         /**
          * the data from the api (without gaps and in order)
@@ -121,110 +123,25 @@ export default {
     data () {
         return {
             chartData: {},
-            ctx: "",
-            colors: ["#337ab7", "#d73027", "#fc8d59", "#91bfdb", "#542788"],
+            colors: ["#36A2EB", "#FF6384", "#4BC0C0", "#FF9F40", "#9966FF", "#FFCD56", "#C9CBCF"],
             fontColorGraph: "black",
             fontColorLegend: "#555555",
             fontSizeGraph: 10,
             fontSizeLegend: 12,
-            gridLinesColor: "black",
             colorTooltipFont: "#555555",
-            colorTooltipBack: "#f0f0f0",
-            /**
-             * the animation to use on diagram update
-             * @see update https://www.chartjs.org/docs/latest/developers/api.html?h=update(config)
-             */
-            updateAnimation: {},
-
-            chart: null
+            colorTooltipBack: "#f0f0f0"
         };
     },
     computed: {
         ...mapGetters("Modules/TrafficCount", [
             "activeTabId"
-        ])
-    },
-    watch: {
-        apiData: {
-            handler (newData, oldValue) {
-                if (!oldValue.length) {
-                    this.destroyChart();
-                    this.chartData = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-                    this.createChart(this.chartData);
-                }
-                else if (Array.isArray(newData) && newData.length) {
-                    this.chartData = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-
-                    if (this.chart) {
-                        this.chart.data = this.chartData;
-                        this.chart.update(this.updateAnimation);
-                    }
-                    else {
-                        this.createChart(this.chartData);
-                    }
-                }
-                else {
-                    this.destroyChart();
-                }
-            },
-            deep: true
-        },
+        ]),
         /**
-         * Generates the new chart when means of transport key changes.
-         * @returns {Void}  -
+         * returns the config for chart js
+         * @returns {Object}  an object to use as config for chartjs
          */
-        meansOfTransportKey: {
-            handler () {
-                this.destroyChart();
-                this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-                this.createChart(this.chartData);
-            },
-            deep: true
-        }
-    },
-    mounted () {
-        this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
-        this.$nextTick(() => {
-            this.ctx = this.$refs.trafficCountChart;
-            this.createChart(this.chartData, this.ctx);
-        });
-    },
-    beforeUnmount () {
-        this.destroyChart();
-    },
-    methods: {
-        /**
-         * Creating the diagram from chart js
-         * @param {Object[]} data parsed for chartjs format
-         * @param {html} ctx the canvas container for diagram
-         * @returns {Void} -
-         */
-        createChart (data, ctx = this.$refs.trafficCountChart) {
-            if (!ctx || typeof ctx.getContext !== "function") {
-                this.$nextTick(() => {
-                    if (!this.chart) {
-                        this.createChart(data);
-                    }
-                });
-
-                return;
-            }
-
-            const existingChart = typeof ChartJs.getChart === "function" ? ChartJs.getChart(ctx) : null;
-
-            if (existingChart) {
-                existingChart.destroy();
-
-                if (this.chart === existingChart) {
-                    this.chart = null;
-                }
-            }
-
-            if (this.chart) {
-                this.destroyChart();
-            }
-
-            this.chart = markRaw(new ChartJs(ctx, this.getChartJsConfig(data, {
+        chartConfig () {
+            return this.getChartJsConfig(this.chartData, {
                 titleColor: this.colorTooltipFont,
                 backgroundColor: this.colorTooltipBack,
                 setTooltipValue: this.setTooltipValue,
@@ -232,25 +149,46 @@ export default {
                 fontSizeLegend: this.fontSizeLegend,
                 fontColorGraph: this.fontColorGraph,
                 fontColorLegend: this.fontColorLegend,
-                gridLinesColor: this.gridLinesColor,
                 xAxisTicks: this.xAxisTicks,
                 yAxisTicks: this.yAxisTicks,
                 renderLabelXAxis: this.renderLabelXAxis,
                 renderLabelYAxis: this.renderLabelYAxis,
                 descriptionXAxis: this.descriptionXAxis,
                 descriptionYAxis: this.descriptionYAxis
-            })));
+            });
+        }
+    },
+    watch: {
+        apiData: {
+            handler (newData) {
+                if (Array.isArray(newData) && newData.length) {
+                    this.chartData = this.createDataForDiagram(newData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+                }
+                else {
+                    this.chartData = {};
+                }
+            },
+            deep: true
         },
         /**
-         * Destroys the current chart if exists.
-         * @returns {void}
+         * Updates the chart data when means of transport key changes.
+         * @returns {Void}  -
          */
-        destroyChart () {
-            if (this.chart instanceof ChartJs) {
-                this.chart.destroy();
-                this.chart = null;
-            }
-        },
+        meansOfTransportKey: {
+            handler () {
+                if (Array.isArray(this.apiData) && this.apiData.length) {
+                    this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+                }
+            },
+            deep: true
+        }
+    },
+    mounted () {
+        if (Array.isArray(this.apiData) && this.apiData.length) {
+            this.chartData = this.createDataForDiagram(this.apiData, this.colors, this.renderLabelLegend, this.renderPointStyle, this.renderPointSize);
+        }
+    },
+    methods: {
         /**
          * creates the datasets for chartjs
          * @param {Object[]} apiData the apiData as received by parent
@@ -288,12 +226,15 @@ export default {
                         postfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
                     }
                     const datetimes = typeof dataObj[meansOfTransport] !== "undefined" ? Object.keys(dataObj[meansOfTransport]) : [],
+                        isComplementaryDataset = meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz"
+                            || meansOfTransport === "Anzahl_Kfz" && this.currentMeansOfTransport === "Anzahl_Schwerverkehr",
+                        color = Array.isArray(colors) ? colors[idx % colors.length] : "",
                         holidayData = {
-                            borderColor: Array.isArray(colors) ? colors[idx] : "",
+                            borderColor: color,
                             fill: false,
                             label: this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign") + postfix,
-                            pointBorderColor: Array.isArray(colors) ? colors[idx] : "",
-                            pointBackgroundColor: Array.isArray(colors) ? colors[idx] : "",
+                            pointBorderColor: color,
+                            pointBackgroundColor: color,
                             pointRadius: 3,
                             pointStyleLegend: "star"
                         };
@@ -301,27 +242,79 @@ export default {
                     datasets.push({
                         label: datetimes.length > 0 && typeof callbackRenderLabelLegend === "function" ? callbackRenderLabelLegend(datetimes[0]) + postfix : "",
                         data: typeof dataObj[meansOfTransport] !== "undefined" ? Object.values(dataObj[meansOfTransport]) : [],
-                        backgroundColor: Array.isArray(colors) ? colors[idx] : "",
-                        borderColor: Array.isArray(colors) ? colors[idx] : "",
+                        backgroundColor: color,
+                        borderColor: color,
                         spanGaps: false,
                         fill: false,
-                        borderWidth: 1,
+                        borderWidth: 2,
+                        borderDash: isComplementaryDataset ? [2, 2] : [],
                         pointRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
                         pointHoverRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
                         pointStyle: datetimes.length > 0 && typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(meansOfTransport, datetimes) : "",
-                        pointStyleLegend: typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(meansOfTransport, [], true) : "",
+                        pointStyleLegend: this.createCanvasPointStyleLegend(color, isComplementaryDataset),
                         datetimes,
                         isSVAvailable: meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz",
                         isKFZAvailable: meansOfTransport === "Anzahl_Kfz" && this.currentMeansOfTransport === "Anzahl_Schwerverkehr"
                     });
 
-                    if (datetimes.length > 0 && typeof callbackRenderPointStyle === "function" && callbackRenderPointStyle(meansOfTransport, datetimes).includes("star")) {
+                    if (datetimes.length > 0 && typeof callbackRenderPointStyle === "function" && callbackRenderPointStyle(meansOfTransport, datetimes)?.includes?.("star")) {
                         datasets.push(holidayData);
                     }
                 });
             });
 
             return {labels: labelsXAxis, datasets};
+        },
+        /**
+         * creates a canvas with the given color and shape for the legend
+         * @param {String} color the color of the point style
+         * @param {Boolean} dashed if true, the point style will be dashed (only for rectangles)
+         * @returns {HTMLCanvasElement}  a canvas element to use as point style in legend
+         */
+        createCanvasPointStyleLegend (color, dashed = false) {
+          const canvas = document.createElement("canvas");
+
+          canvas.width = 25;
+          canvas.height = 15;
+
+          const ctx = canvas.getContext("2d");
+          const x = 4;
+          const y = 4;
+          const width = 17;
+          const height = 7;
+          const borderRadius = 2;
+
+          if (dashed) {
+            const patternCanvas = document.createElement("canvas");
+
+            patternCanvas.width = 4;
+            patternCanvas.height = height;
+            const patternCtx = patternCanvas.getContext("2d");
+
+            patternCtx.fillStyle = color;
+            patternCtx.fillRect(0, 0, 2, height);
+            const pattern = ctx.createPattern(patternCanvas, "repeat");
+
+            ctx.fillStyle = pattern;
+          }
+        else {
+            ctx.fillStyle = color;
+          }
+
+          ctx.beginPath();
+          ctx.moveTo(x + borderRadius, y);
+          ctx.lineTo(x + width - borderRadius, y);
+          ctx.arcTo(x + width, y, x + width, y + borderRadius, borderRadius);
+          ctx.lineTo(x + width, y + height - borderRadius);
+          ctx.arcTo(x + width, y + height, x + width - borderRadius, y + height, borderRadius);
+          ctx.lineTo(x + borderRadius, y + height);
+          ctx.arcTo(x, y + height, x, y + height - borderRadius, borderRadius);
+          ctx.lineTo(x, y + borderRadius);
+          ctx.arcTo(x, y, x + borderRadius, y, borderRadius);
+          ctx.closePath();
+          ctx.fill();
+
+          return canvas;
         },
         /**
          * returns the config for chart js
@@ -340,7 +333,6 @@ export default {
                 fontSizeLegend: 12,
                 fontColorGraph: "black",
                 fontColorLegend: "#555555",
-                gridLinesColor: "black",
                 xAxisTicks: 0,
                 yAxisTicks: 0,
                 renderLabelXAxis: datetime => datetime,
@@ -353,9 +345,10 @@ export default {
                 type: "line",
                 data,
                 options: {
+                    maintainAspectRatio: false,
                     elements: {
                         line: {
-                            tension: 0
+                            tension: 0.35
                         }
                     },
                     plugins: {
@@ -364,11 +357,6 @@ export default {
                         },
                         legend: {
                             display: true,
-                            onClick: (e, legendItem, legend) => {
-                                if (Object.keys(this.apiData[0]).includes("Anzahl_Kfz") && Object.keys(this.apiData[0]).includes("Anzahl_Schwerverkehr")) {
-                                    ChartJs.defaults.plugins.legend.onClick(e, legendItem, legend);
-                                }
-                            },
                             labels: {
                                 usePointStyle: true,
                                 generateLabels: chart => {
@@ -395,6 +383,7 @@ export default {
                                 fontSize: options.fontSizeLegend,
                                 fontColorLegend: options.fontColorLegend
                             },
+                            position: "bottom",
                             align: "start"
                         },
                         tooltip: {
@@ -457,13 +446,11 @@ export default {
                                 fontSize: options.fontSizeGraph,
                                 fontColor: options.fontColorGraph,
                                 autoSkip: true,
-                                maxTicksLimit: options.xAxisTicks,
                                 callback: (xValue) => {
                                     return options.renderLabelXAxis(data.labels[xValue]);
                                 }
                             },
                             grid: {
-                                color: options.gridLinesColor,
                                 display: true,
                                 border: {
                                     display: true
@@ -487,10 +474,9 @@ export default {
                                 }
                             },
                             grid: {
-                                color: options.gridLinesColor,
                                 display: true,
                                 drawBorder: true,
-                                drawOnChartArea: false
+                                drawOnChartArea: true
                             },
                             title: {
                                 display: Boolean(options.descriptionYAxis),
@@ -506,21 +492,22 @@ export default {
 </script>
 
 <template>
-    <div class="graph">
-        <canvas ref="trafficCountChart" />
+    <div class="charts">
+        <LinechartItem
+            :data="chartConfig.data"
+            :given-options="chartConfig.options"
+        />
     </div>
 </template>
 
 <style lang="scss" scoped>
-    div.graph {
-        width: 580px;
-        min-height: 285px;
-        padding-bottom: 15px;
-    }
-
-    @media (max-width: 580px) {
-        div.graph {
-            width: inherit;
+    .charts {
+        position: relative;
+        min-width: 0;
+        display: block;
+        canvas {
+            width: 100%;
+            height: auto;
         }
     }
 </style>

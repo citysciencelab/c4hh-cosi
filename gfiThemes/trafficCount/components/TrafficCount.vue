@@ -1,31 +1,34 @@
 <script>
 /* eslint-disable no-undef */
-import {mapGetters} from "vuex";
 import axios from "axios";
 import dayjs from "dayjs";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {mapGetters} from "vuex";
 import {TrafficCountCache} from "../utils/trafficCountCache.js";
 import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi.js";
 import TrafficCountInfo from "./TrafficCountInfo.vue";
 import TrafficCountDay from "./TrafficCountDay.vue";
+import TrafficCountHeader from "./TrafficCountHeader.vue";
 import TrafficCountWeek from "./TrafficCountWeek.vue";
 import TrafficCountYear from "./TrafficCountYear.vue";
 import TrafficCountFooter from "./TrafficCountFooter.vue";
 import TrafficCountDownloads from "./TrafficCountDownloads.vue";
 import convertHttpLinkToSSL from "../../../../src/shared/js/utils/convertHttpLinkToSSL.js";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
-import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 
 export default {
     name: "TrafficCount",
     components: {
         FlatButton,
+        NavTab,
         TrafficCountInfo,
         TrafficCountDay,
+        TrafficCountHeader,
         TrafficCountWeek,
         TrafficCountYear,
         TrafficCountFooter,
-        TrafficCountDownloads,
-        NavTab
+        TrafficCountDownloads
     },
     props: {
         feature: {
@@ -69,7 +72,10 @@ export default {
                 "newYearsEve"
             ],
             checkGurlittInsel: false,
-            lastUpdate: ""
+            lastDayValueSecond: undefined,
+            lastUpdate: "",
+            isMqttLive: true,
+            statusHandler: null
         };
     },
     computed: {
@@ -144,6 +150,14 @@ export default {
             }
 
             return this.propMeansOfTransport + "_" + this.propThingId + "_" + this.direction;
+        },
+
+        /**
+         * Gets if the information about heavy traffic is available, currently only for "Anzahl_Kfz" and only if the last day value of "Anzahl_Schwerverkehr" is available
+         * @return {Boolean} True if the information about heavy traffic is available, false otherwise.
+         */
+        isHeavyTrafficAvailable () {
+            return typeof this.lastDayValueSecond !== "undefined";
         }
     },
     watch: {
@@ -163,6 +177,7 @@ export default {
                         }, null);
                         this.checkGurlittInsel = false;
                     }
+                    this.isMqttLive = true;
                     this.setHeader(this.api, this.propThingId, this.propMeansOfTransport);
                     this.setComponentKey(this.propThingId + this.propMeansOfTransport);
                     this.setActiveDefaultTab();
@@ -179,6 +194,16 @@ export default {
                 this.setComponentKey(newVal);
                 this.setActiveDefaultTab();
             }
+        },
+
+        propThingId: {
+            handler (newVal, oldVal) {
+                if (oldVal) {
+                    this.isMqttLive = true;
+                }
+            },
+            immediate: true,
+            deep: true
         }
     },
     created: function () {
@@ -196,10 +221,20 @@ export default {
         }
     },
     mounted: function () {
+        this.statusHandler = (status) => {
+            this.isMqttLive = status;
+        };
+
+        if (typeof this.api?.api?.onMqttStatusChange === "function") {
+            this.api.api.onMqttStatusChange(this.statusHandler);
+        }
         this.setHeader(this.api, this.propThingId, this.propMeansOfTransport);
         this.setHolidays(this.feature);
     },
     beforeUnmount: function () {
+        if (typeof this.api?.api?.offMqttStatusChange === "function" && this.statusHandler) {
+            this.api.api.offMqttStatusChange(this.statusHandler);
+        }
         this.api.unsubscribeEverything();
     },
     methods: {
@@ -382,6 +417,17 @@ export default {
                 });
             });
 
+            if (meansOfTransport === "Anzahl_Kfz" || meansOfTransport === "Anzahl_Schwerverkehr") {
+                const meansOfTransportSecond = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "Anzahl_Kfz";
+
+                api.updateDay(thingId, meansOfTransportSecond, dayjs().subtract(1, "day").format("YYYY-MM-DD"), (_, secondValue) => {
+                    this.lastDayValueSecond = thousandsSeparator(secondValue);
+                }, errormsg => {
+                    this.lastDayValueSecond = undefined;
+                    console.warn("The last update last day of traffic is incomplete:", errormsg);
+                });
+            }
+
             // last update for header
             this.updateLastUpdate(api, thingId, meansOfTransport);
         },
@@ -430,22 +476,6 @@ export default {
             if (Array.isArray(holidays) && holidays.length) {
                 this.holidays = holidays;
             }
-        },
-
-        /**
-         * changing resetting check status for the active tab
-         * @returns {void} -
-         */
-        resetTab: function () {
-            if (this.selectedTimeView === "day") {
-                this.dayCheckReset = !this.dayCheckReset;
-            }
-            else if (this.selectedTimeView === "week") {
-                this.weekCheckReset = !this.weekCheckReset;
-            }
-            else if (this.selectedTimeView === "year") {
-                this.yearCheckReset = !this.yearCheckReset;
-            }
         }
     }
 };
@@ -453,22 +483,15 @@ export default {
 
 <template>
     <div class="trafficCount-gfi">
-        <div class="header">
-            <span class="title">{{ idLabel }} {{ title }}</span><br>
-            {{ typeLabel }} <span class="type">{{ type }}</span><br>
-            {{ meansOfTransportLabel }} <span class="meansOfTransport">{{ meansOfTransport }}</span><br>
-            {{ $t("additional:modules.tools.gfi.themes.trafficCount.directionLabel") }} <span class="direction">{{ direction }}</span>
-        </div>
-        <div
-            v-if="lastUpdate"
-            class="last-update-bar"
-        >
-            <i
-                class="bi bi-arrow-clockwise"
-                aria-hidden="true"
-            />
-            {{ lastupdateLabel }} {{ lastUpdate }}
-        </div>
+        <TrafficCountHeader
+            :title="title"
+            :type="type"
+            :direction="direction"
+            :means-of-transport="propMeansOfTransport"
+            :is-mqtt-live="isMqttLive"
+            :is-heavy-traffic-available="isHeavyTrafficAvailable"
+            :last-update="lastUpdate"
+        />
         <div>
             <ul
                 id="traffic-count-tabs"
@@ -544,35 +567,37 @@ export default {
                             :aria-pressed="selectedTimeView === 'year'"
                         />
                     </div>
-                    <TrafficCountDay
-                        v-if="selectedTimeView === 'day'"
-                        :key="keyDay"
-                        :api="api"
-                        :thing-id="propThingId"
-                        :means-of-transport="propMeansOfTransport"
-                        :reset="dayCheckReset"
-                        :holidays="holidays"
-                        :check-gurlitt-insel="checkGurlittInsel"
-                    />
-                    <TrafficCountWeek
-                        v-if="selectedTimeView === 'week'"
-                        :key="keyWeek"
-                        :api="api"
-                        :thing-id="propThingId"
-                        :means-of-transport="propMeansOfTransport"
-                        :reset="weekCheckReset"
-                        :holidays="holidays"
-                    />
-                    <TrafficCountYear
-                        v-if="selectedTimeView === 'year'"
-                        :key="keyYear"
-                        :api="api"
-                        :thing-id="propThingId"
-                        :means-of-transport="propMeansOfTransport"
-                        :reset="yearCheckReset"
-                        :holidays="holidays"
-                        :check-gurlitt-insel="checkGurlittInsel"
-                    />
+                    <keep-alive>
+                        <TrafficCountDay
+                            v-if="selectedTimeView === 'day'"
+                            :key="keyDay"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="dayCheckReset"
+                            :holidays="holidays"
+                            :check-gurlitt-insel="checkGurlittInsel"
+                        />
+                        <TrafficCountWeek
+                            v-else-if="selectedTimeView === 'week'"
+                            :key="keyWeek"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="weekCheckReset"
+                            :holidays="holidays"
+                        />
+                        <TrafficCountYear
+                            v-else-if="selectedTimeView === 'year'"
+                            :key="keyYear"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="yearCheckReset"
+                            :holidays="holidays"
+                            :check-gurlitt-insel="checkGurlittInsel"
+                        />
+                    </keep-alive>
                 </div>
                 <TrafficCountDownloads
                     id="downloads"
@@ -591,10 +616,6 @@ export default {
         <TrafficCountFooter
             class="footer"
             :current-tab-id="currentTabId"
-            :api="api"
-            :thing-id="propThingId"
-            :means-of-transport="propMeansOfTransport"
-            @reset-tab="resetTab"
         />
     </div>
 </template>
@@ -639,13 +660,6 @@ export default {
         }
     }
 
-    .header {
-        min-width: 280px;
-        max-width: 320px;
-        margin: 0 auto 10px;
-        padding: 0 40px;
-        text-align: left;
-    }
     .footer {
         position: relative;
         display: inline-block;

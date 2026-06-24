@@ -22,9 +22,9 @@
                         "dateLabel": "Date",
                         "clockLabel": "",
                         "tableLabel": "Table",
-                        "tableTitleDay": "Date",
-                        "tableTitleWeek": "Week",
-                        "tableTitleYear": "Year",
+                        "tableTitleDay": "Time",
+                        "tableTitleWeek": "Day of the Week",
+                        "tableTitleYear": "Calendar Week",
                         "notice": "Due to unavailable data, gaps in the chart and empty table cells may occur.",
                         "lastupdateLabel": "Last update:",
                         "autoUpdateNote": "Data is not automatically updated.",
@@ -68,6 +68,9 @@
                             "weekdaysShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
                         },
                         "heavyTraffic": "(heavy traffic)",
+                        "showHeavyTraffic": "Show heavy traffic",
+                        "showCarTraffic": "Show cars",
+                        "showTable": "Show table",
                         "totalTraffic": "(total motor vehicles)",
                         "isHeavyTrafficAvailableDesc": "Heavy traffic available",
                         "available": "Yes",
@@ -77,7 +80,9 @@
                         "shortTermDevelopment": "Development",
                         "peakValues": "Peak values",
                         "previousDay": "Previous day",
-                        "workingDayAverageShort": "Average working day"
+                        "workingDayAverageShort": "Average working day",
+                        "isHeavyTrafficAvailable": "Heavy traffic is available",
+                        "isHeavyTrafficNotAvailable": "Heavy traffic is not available"
                     }
                 }
             }

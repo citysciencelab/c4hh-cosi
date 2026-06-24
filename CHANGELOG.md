@@ -11,12 +11,14 @@
 - GFI - `parking`: Added a new gfi to match the visual style of the `planParken` addon.
 
 ### Changed
+- Boris: Changed list structures to reflect accessibility rules
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+- vcOblique: Fixed a bug where rotating oblique images caused the geomarker to sometimes jump to another position.
 
 ---
 

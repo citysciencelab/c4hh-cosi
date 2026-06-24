@@ -1,6 +1,7 @@
 <script>
 import axios from "axios";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
+import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
 
@@ -42,6 +43,7 @@ export default {
             "imageAssetsById",
             "mode",
             "name",
+            "originalLayerConfig",
             "type",
             "storyPlayerMenuSide",
             "storyConf",
@@ -86,6 +88,7 @@ export default {
          * @returns {void}
          */
         currentChapterIndex () {
+            this.deactivateSubjectLayer();
             this.loadChapter();
         }
     },
@@ -97,6 +100,10 @@ export default {
 
         if (isMobile && orientationCheck) {
             this.applyMobileLandscapeLayout();
+        }
+
+        if (typeof this.originalLayerConfig === "undefined") {
+            this.setOriginalLayerConfig(JSON.parse(JSON.stringify(this.allLayerConfigs)));
         }
     },
     async mounted () {
@@ -152,29 +159,12 @@ export default {
         // remove the close button if GFI is opened
         document.getElementById("mp-menu-header-close-button-secondaryMenu")?.setAttribute("style", "display: none;");
         document.getElementById("mp-menu-navigation-reset-button-secondaryMenu")?.setAttribute("style", "display: none;");
+
+        this.deactivateSubjectLayer();
+        this.updateLayerConfigs(this.originalLayerConfig);
+        this.deactivateTool();
     },
     beforeUnmount () {
-        // Hides all story layers
-        const layerList = typeof this.layerConfigsByAttributes === "function"
-            ? this.layerConfigsByAttributes({showInLayerTree: true})
-            : [];
-
-        for (const layer of layerList) {
-            if (!layer || !layer.id || !layer.attributes) {
-                continue;
-            }
-
-            const isStepLayer = (
-                (this.currentStep && this.currentStep.layers) ||
-                []
-            ).includes(layer.id) || (this.currentStep && this.currentStep.layers && this.currentStep.layers.some(l => {
-                return Array.isArray(l) ? l.includes(layer.id) : false;
-            }));
-
-            if (isStepLayer && layer.attributes.isVisibleInMap) {
-                this.disableLayer(layer);
-            }
-        }
         if (this.coverCardObserver) {
             this.coverCardObserver.disconnect();
         }
@@ -189,13 +179,15 @@ export default {
             "setName",
             "setDescription",
             "setIcon",
+            "setOriginalLayerConfig",
             "setStoryConf",
             "setAutoplay",
             "setMode"
         ]),
+        ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Menu", ["setExpandedBySide"]),
         ...mapActions("Maps", ["changeMapMode"]),
-        ...mapActions(["replaceByIdInLayerConfig"]),
+        ...mapActions(["addLayerToLayerConfig", "addOrReplaceLayer", "replaceByIdInLayerConfig", "updateLayerConfigs"]),
         ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
 
         tipTapJsonToHtml,
@@ -219,6 +211,34 @@ export default {
 
             this.setExpandedBySide({expanded: true, side: toolMenuSide});
             this.changeCurrentComponent({type: toolId, side: toolMenuSide, props: {name}});
+        },
+        /**
+         * Deactivates current subject layers from tree and map.
+         * @returns {void}
+         */
+        deactivateSubjectLayer () {
+            const layers = mapCollection.getMap("2D")?.getLayers(),
+                visibleLayerList = typeof layers?.getArray !== "function" ? [] : layers.getArray().filter(layer => {
+                    return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon";
+                });
+
+            visibleLayerList.forEach(layer => {
+                this.addOrReplaceLayer({
+                    layerId: layer.get("id"),
+                    visibility: false
+                });
+            });
+
+            this.allLayerConfigs.forEach(each => {
+                if (!this.originalLayerConfig.some(oriLayer => oriLayer.id === each.id)) {
+                    this.replaceByIdInLayerConfig({
+                        layerId: each.id,
+                        visibility: false,
+                        showInLayerTree: false
+                    });
+                    this.removeLayer(each);
+                }
+            });
         },
         /**
          * Deactivates a tool on the opposite menu side of where the storyPlayer is located
@@ -266,37 +286,23 @@ export default {
             }
         },
         /**
-         * Toggles a layer on the map
-         * @param {Object} layer the layer to enable
-         * @param {Boolean} enabled enables the layer if `true`, disables the layer if `false`
-         * @returns {void}
-         */
-        toggleLayer (layer, enabled) {
-            this.replaceByIdInLayerConfig({
-                layerConfigs: [{
-                    id: layer.id,
-                    layer: {
-                        visibility: enabled,
-                        showInLayerTree: true
-                    }
-                }]
-            });
-        },
-        /**
          * Enables a layer on the map
-         * @param {Object} layer the layer to enable
+         * @param {String} layerId the layer id to enable
          * @returns {void}
          */
-        enableLayer (layer) {
-            this.toggleLayer(layer, true);
-        },
-        /**
-         * Disables a layer on the map
-         * @param {Object} layer the layer to disable
-         * @returns {void}
-         */
-        disableLayer (layer) {
-            this.toggleLayer(layer, false);
+        async enableLayer (layerId) {
+            let layerConf = this.layerConfigById(layerId);
+
+            if (!layerConf) {
+                layerConf = getAndMergeAllRawLayers().find(layer => layer.id === layerId);
+                await this.addLayerToLayerConfig({layerConfig: layerConf});
+            }
+
+            this.addOrReplaceLayer({
+                layerId: layerId,
+                visibility: true,
+                showInLayerTree: true
+            });
         },
         /**
          * Sets up the tool window and content for the selected chapter.
@@ -368,23 +374,8 @@ export default {
                 });
             }
 
-            const layerList = Array.isArray(this.allLayerConfigs) ? this.allLayerConfigs : [];
-
             // Updates the map layers
-            for (const layer of layerList) {
-                const isStepLayer = (this.currentChapter.map.layers || []).includes(
-                    layer.id
-                ) || this.currentChapter.map.layers.some(l => {
-                    return Array.isArray(l) ? l.includes(layer.id) : false;
-                });
-
-                if (isStepLayer) {
-                    this.enableLayer(layer);
-                }
-                else if (!isStepLayer) {
-                    this.disableLayer(layer);
-                }
-            }
+            this.currentChapter?.map?.layers.forEach(layer => this.enableLayer(layer));
 
             if (!this.currentChapter.is3D) {
                 this.deactivateTool();

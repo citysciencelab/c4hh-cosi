@@ -131,6 +131,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                                 autoplay: true,
                                 fixedStoryPath: "",
                                 fixedStoryName: "",
+                                originalLayerConfig: undefined,
                                 storyConf: {
                                     title: "Geschichten mit Karten erzählen",
                                     chapters: [
@@ -147,12 +148,16 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                                 autoplay: state => state.autoplay,
                                 fixedStoryPath: (state) => state.fixedStoryPath,
                                 fixedStoryName: (state) => state.fixedStoryName,
+                                originalLayerConfig: (state) => state.originalLayerConfig,
                                 storyConf: state => state.storyConf,
                                 mode: state => state.mode,
                                 storyConfJson: state => state.storyConfJson,
                                 storyPlayerMenuSide: () => "secondaryMenu"
                             },
                             mutations: {
+                                setOriginalLayerConfig (state, payload) {
+                                    state.originalLayerConfig = payload;
+                                },
                                 setShowLoadingSpinner (state, payload) {
                                     state.showLoadingSpinner = payload;
                                 },
@@ -201,7 +206,12 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             getters: {
                 configJs: state => state.configJs,
                 allLayerConfigs: () => [],
-                layerConfigsByAttributes: () => []
+                layerConfigsByAttributes: () => [],
+                layerConfigById: () => sinon.stub()
+            },
+            actions: {
+                addLayerToLayerConfig: () => sinon.stub(),
+                addOrReplaceLayer: () => sinon.stub()
             }
         });
 
@@ -396,14 +406,15 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             resetMenuStub.restore();
         });
 
-        it("should enableLayer and disableLayer call toggleLayer", () => {
-            const toggleLayerStub = sinon.stub(wrapper.vm, "toggleLayer");
+        it("should in enableLayer to call addLayerToLayerConfig and addOrReplaceLayer", async () => {
+            const addOrReplaceLayerStub = sinon.stub(wrapper.vm, "addOrReplaceLayer"),
+                addLayerToLayerConfigStub = sinon.stub(wrapper.vm, "addLayerToLayerConfig");
 
-            wrapper.vm.enableLayer({id: 1});
-            expect(toggleLayerStub.calledWith({id: 1}, true)).to.be.true;
-            wrapper.vm.disableLayer({id: 2});
-            expect(toggleLayerStub.calledWith({id: 2}, false)).to.be.true;
-            toggleLayerStub.restore();
+            await wrapper.vm.enableLayer("1");
+            expect(addLayerToLayerConfigStub.called).to.be.true;
+            expect(addOrReplaceLayerStub.called).to.be.true;
+            addOrReplaceLayerStub.restore();
+            addLayerToLayerConfigStub.restore();
         });
 
         describe("Chevron Navigation Tests", () => {
@@ -413,6 +424,16 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                     {title: "Step 2", content: []},
                     {title: "Step 3", content: []}
                 ];
+            });
+
+            it("should call function deactivateSubjectLayer", async () => {
+                const deactivateSubjectLayerStub = sinon.stub(wrapper.vm, "deactivateSubjectLayer");
+
+                wrapper.vm.currentChapterIndex = 1;
+                wrapper.vm.goToNextStep();
+                await wrapper.vm.$nextTick();
+                expect(deactivateSubjectLayerStub.called).to.be.true;
+                deactivateSubjectLayerStub.restore();
             });
 
             it("should navigate to next and previous steps", async () => {
