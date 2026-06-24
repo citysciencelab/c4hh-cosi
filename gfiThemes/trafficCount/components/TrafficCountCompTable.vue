@@ -78,7 +78,7 @@ export default {
     },
     computed: {
         tableIndication: function () {
-            return this.$t("additional:modules.tools.gfi.themes.trafficCount.tableIndication");
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign");
         }
     },
     watch: {
@@ -198,7 +198,13 @@ export default {
 </script>
 
 <template>
-    <div class="table-wrapper pt-4">
+    <div class="table-wrapper">
+        <div
+            v-if="currentTabId !== 'info'"
+            class="holiday-indication"
+        >
+            * {{ tableIndication }}
+        </div>
         <div class="table-container">
             <table class="table table-bordered">
                 <thead>
@@ -238,9 +244,14 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+@import "/src/assets/css/variables";
 .table-wrapper {
     margin-top: 5px;
     margin-bottom: 10px;
+
+    .holiday-indication {
+        font-size: 10px;
+    }
 }
 
 .table-container {

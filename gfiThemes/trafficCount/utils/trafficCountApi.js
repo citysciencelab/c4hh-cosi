@@ -69,7 +69,7 @@ export class TrafficCountApi {
         /** @private */
         this.watchdogTimer = null;
         /** @private */
-        this.watchdogTimeout = 35 * 60 * 1000;
+        this.watchdogTimeout = 18 * 60 * 1000;
         /** @private */
         this.statusCallbacks = [];
 

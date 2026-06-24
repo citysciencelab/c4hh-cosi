@@ -11,7 +11,6 @@ import TrafficCountDay from "./TrafficCountDay.vue";
 import TrafficCountHeader from "./TrafficCountHeader.vue";
 import TrafficCountWeek from "./TrafficCountWeek.vue";
 import TrafficCountYear from "./TrafficCountYear.vue";
-import TrafficCountFooter from "./TrafficCountFooter.vue";
 import convertHttpLinkToSSL from "../../../../src/shared/js/utils/convertHttpLinkToSSL.js";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
@@ -25,8 +24,7 @@ export default {
         TrafficCountDay,
         TrafficCountHeader,
         TrafficCountWeek,
-        TrafficCountYear,
-        TrafficCountFooter
+        TrafficCountYear
     },
     props: {
         feature: {
@@ -179,24 +177,29 @@ export default {
             },
             immediate: true
         },
-
-        // When language is switched, the header will be rerendered
-        currentLocale: function (newVal, oldVal) {
-            if (oldVal) {
-                this.setHeader(this.api, this.propThingId, this.propMeansOfTransport);
-                this.setComponentKey(newVal);
-                this.setActiveDefaultTab();
-            }
-        },
-
         propThingId: {
-            handler (newVal, oldVal) {
+            handler (_newVal, oldVal) {
                 if (oldVal) {
                     this.isMqttLive = true;
                 }
             },
             immediate: true,
             deep: true
+        },
+        propMeansOfTransport: {
+            handler (_newVal, oldVal) {
+                if (oldVal) {
+                    this.isMqttLive = true;
+                }
+            },
+            immediate: true
+        },
+        // When language is switched, the header will be rerendered
+        currentLocale: function (newVal, oldVal) {
+            if (oldVal) {
+                this.setHeader(this.api, this.propThingId, this.propMeansOfTransport);
+                this.setComponentKey(newVal);
+            }
         }
     },
     created: function () {
@@ -590,15 +593,16 @@ export default {
                 </div>
             </div>
         </div>
-        <TrafficCountFooter
-            class="footer"
-            :current-tab-id="currentTabId"
-        />
+        <div
+            v-if="currentTabId !== 'info'"
+            class="indication"
+        >
+            {{ $t("additional:modules.tools.gfi.themes.trafficCount.notice") }}
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .trafficCount-gfi {
     padding: 10px 5px 0;
 
@@ -637,7 +641,8 @@ export default {
         }
     }
 
-    .footer {
+    .indication {
+        font-size: 10px;
         position: relative;
         display: inline-block;
         width: 100%;

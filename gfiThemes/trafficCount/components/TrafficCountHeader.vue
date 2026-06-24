@@ -529,9 +529,9 @@ export default {
             return objArr;
         }
     }
-
 };
 </script>
+
 <template>
     <div class="mb-3">
         <div class="d-flex flex-row align-items-center p-3 rounded-3 background-color">
@@ -614,15 +614,22 @@ export default {
                 <span>{{ $t("additional:modules.tools.gfi.themes.trafficCount.lastupdateLabel") }} {{ lastUpdate }}</span>
                 <br>
             </div>
-            <div v-if="!isMqttLive">
-                <small>{{ $t("additional:modules.tools.gfi.themes.trafficCount.autoUpdateNote") }}</small>
+            <div
+                v-if="!isMqttLive"
+                class="indication"
+            >
+                <i class="bi bi-exclamation-triangle-fill pe-1 text-danger" />
+                {{ $t("additional:modules.tools.gfi.themes.trafficCount.autoUpdateNote") }}
             </div>
         </div>
     </div>
 </template>
 
-
 <style lang="scss" scoped>
+    .indication {
+        font-size: $font-size-sm;
+    }
+
     .background-color {
         background-color: rgba($light_grey, 0.5);
     }
