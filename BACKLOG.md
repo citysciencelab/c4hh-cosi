@@ -236,9 +236,15 @@ present (`accessibilityAnalysis`, `districtSelector`, `dashboard`, `reportingToo
       baseline to diff every self-hosting edit against. Unlike addons there is **no upstream git
       repo** (the agency handed us files, not a repo), so there is no fork/rebase story here — the
       tag is purely a pristine-snapshot anchor; future edits land as commits on `cosi-selfhost`.
-- [ ] **2. Boot as-is** (`cd masterportal && npm start`, open the `portal/cosi/` portal).
-      Expect: framework + COSI tool panels render (confirms addon wiring + config blocks parse),
-      but **layers/routing/WPS/stats fail** because the fhhnet registries 404. Baseline only.
+- [x] **2. Boot as-is** — Done 2026-06-25. `npm start` (Vite v8, `https://localhost:9001`) serves
+      the portal at `https://localhost:9001/portal/cosi/`. Baseline confirmed at HTTP level:
+      `index.html` / `config.js` / `config.json` (240 KB) / `assets/mapping.json` all **200**
+      (config parses, addon wiring resolves), and Vite's "provided addons" log lists every COSI
+      addon. The two fhhnet registries 404 as expected (`services-fhhnet.json`,
+      `rest-services-fhhnet.json`), while `style_v3.json` **200** and both `-internet.json`
+      variants **200** (so step 3's flip is viable). Also confirms **step 5**: all 21 `config.js`
+      `addons[]` keys resolve in `addons/addonsConf.json`. *Visual render of the Vue tool panels
+      not yet eyeballed in a browser (no headless browser installed) — open the URL to confirm.*
 - [ ] **3. Flip the registries to the public variants** in `config.js`
       (`services-fhhnet.json` → `services-internet.json`, `rest-services-fhhnet.json` →
       `rest-services-internet.json`) and boot again. **This is the real "what works today" map** —
@@ -246,8 +252,9 @@ present (`accessibilityAnalysis`, `districtSelector`, `dashboard`, `reportingToo
 - [ ] **4. Catalogue what loads vs. 404s** from step 3. This gap list directly drives:
       §6 (self-host the registries we must replace), §5 (district geometry/stats layers),
       §7 (verify WPS `1001` + statistical WFS reachability).
-- [ ] **5. Verify addon discovery** for this portal — that the build resolves the `addons/`
-      path and the `config.js` `addons: [...]` keys match `addons/addonsConf.json`.
+- [x] **5. Verify addon discovery** — Done 2026-06-25 (alongside step 2). Vite resolves the
+      `addons/` path (startup "provided addons" log) and all 21 `config.js` `addons[]` keys match
+      entries in `addons/addonsConf.json`.
 - [ ] **Later (after baseline):** wire our Valhalla backend (§3) into this config's
       `accessibilityAnalysis` block — add `isochroneBackend: "valhalla"` and point `serviceId`
       at the Valhalla rest-service (needs the §6 rest-service entry + a live local Valhalla, §2).
