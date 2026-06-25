@@ -283,17 +283,32 @@ Fully config-driven via DistrictSelector `districtLevels[]`
 (see `cosi/DistrictSelector/doc/config.json.md`). We lose access to Statistische Gebiete data,
 so configure only Stadtteile and Bezirke.
 
-- [ ] In the COSI `config.json`, define `districtSelector.districtLevels` with **Stadtteile**
-      and **Bezirke** entries only; omit the Statistische Gebiete entry entirely.
-- [ ] For each level set: `layerId` (geometry WFS layer), `label`, `keyOfAttrName`,
+- [x] In the COSI `config.json`, define `districtSelector.districtLevels` with **Stadtteile**
+      and **Bezirke** entries only; omit the Statistische Gebiete entry entirely. Done 2026-06-25:
+      the as-received config had **four** levels (Statistische Gebiete `27773`, Stadtteile `28201`,
+      Bezirke `28028`, Hamburg/FHH `28150`). Removed **Statistische Gebiete** (not public —
+      §4 catalogue) **and Hamburg/FHH** (to honour "Stadtteile + Bezirke **only**"). Also fixed the
+      now-dangling `districtFinder.selectedLevelId` (`27773` → `28201`/Stadtteile) and removed the
+      two orphaned geometry layers (`27773`, `28150`) from `Themenconfig`. JSON re-validates; no
+      leftover refs to the dropped IDs. **DECISION FLAG:** dropping the whole-city **Hamburg/FHH**
+      aggregate level is a one-line revert if we want it back (its stats layers `31270`/`34898`
+      public-reachability was never exercised — cf. §7).
+- [x] For each level set: `layerId` (geometry WFS layer), `label`, `keyOfAttrName`,
       and `stats.{layerIds, keyOfAttrName, metadataUrls}` (statistical-data layers + the
       attribute-name keys). Add `duplicateDistrictNames` where a name exists at two levels
       (e.g. *Eimsbüttel* is both a Stadtteil and a Bezirk — name given at the higher level).
-- [ ] **Name mapping** (user-confirmed this is needed): set `districtNamesMap` /
+      Already fully configured in the as-received config and retained unchanged: Stadtteile
+      (`keyOfAttrName: stadtteil_name`, 7 stats layers) and Bezirke (`bezirk_name`, 7 stats
+      layers, `duplicateDistrictNames: [Eimsbüttel, Wandsbek, Bergedorf, Harburg]`).
+- [x] **Name mapping** (user-confirmed this is needed): set `districtNamesMap` /
       `stats.keyOfAttrName` so geometry district names match the statistical-data attribute
-      names (cf. the doc's `Steinwerder`→`Steinwerder/Kl. Grasbrook` examples).
-- [ ] Confirm the geometry layer IDs (Stadtteile, Bezirke) and statistical-data layer IDs in
-      our own `services.json`.
+      names (cf. the doc's `Steinwerder`→`Steinwerder/Kl. Grasbrook` examples). Already present
+      on the retained Stadtteile level (`Steinwerder`, `Waltershof`, `St.Pauli`, `Moorburg`,
+      `Neuland`, … maps) — retained unchanged.
+- [ ] Confirm the geometry layer IDs (Stadtteile `28201`, Bezirke `28028`) and statistical-data
+      layer IDs (Stadtteile `31240`/`34505`/`34896`/`34503`/`35041`/`35046`/`35047`; Bezirke
+      `31271`/`34504`/`34897`/`34502`/`35050`/`35051`/`35042`) in our own `services.json`.
+      **Blocked on §6** (our curated `services.json` doesn't exist yet) — verify when authoring it.
 
 ---
 
