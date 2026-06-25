@@ -5,9 +5,10 @@ replaces the Hamburg/BKG **OpenRouteService** (ORS) used by COSI's
 `AccessibilityAnalysis` tool for isochrones. Runs locally via Docker Compose and
 deploys the same way on the CSL server.
 
-> The COSI **code** still has to be adapted from the ORS isochrone API to
-> Valhalla's — that is BACKLOG §3, a separate task. This directory only stands up
-> the service.
+> The COSI code is adapted to Valhalla's isochrone API (BACKLOG §3, done):
+> `AccessibilityAnalysis` dispatches to Valhalla when `isochroneBackend: "valhalla"`
+> is set in the portal config. The car/bike/foot profiles plus a **public-transport**
+> profile (Valhalla `multimodal`, built from the HVV GTFS feed below) are wired in.
 
 ## Quick start
 
@@ -50,7 +51,7 @@ All settings live in `.env` (see `.env.example` for the full list and comments):
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `OSM_EXTRACT_URL` | Germany (Geofabrik) | OSM extract to build from |
-| `HVV_GTFS_URL` | HVV GTFS (May–Dec 2025) | Public-transport feed |
+| `HVV_GTFS_URL` | HVV GTFS (Apr–Dec 2026) | Public-transport feed |
 | `BUILD_TRANSIT` | `True` | Build the GTFS transit graph |
 | `VALHALLA_PORT` | `8002` | Host port |
 | `SERVER_THREADS` | `4` | Request worker threads |

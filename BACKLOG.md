@@ -105,6 +105,23 @@ Replace ORS with our own Valhalla, runnable locally **and** auto-deployable on t
 - [x] Download HVV GTFS data and build the public-transport mode: `scripts/fetch-gtfs.sh`
       pulls + unzips the HVV feed (`HVV_GTFS_URL`, latest from the Hamburg Transparenzportal)
       into `gtfs_feeds/hvv/`; compose builds it with `build_transit`/`build_admins`/`build_time_zones`.
+- [~] **Public-transport (multimodal) tiles — code done, local tile build BLOCKED (2026-06-26).**
+      Updated `HVV_GTFS_URL` to the current **Apr–Dec 2026** feed (the old `.env.example` URL was a
+      May 2025 feed whose service calendar has expired → would route no transit today). Verified the
+      feed downloads (40 MB, 17,603 stops, service window covers today). Two build obstacles hit:
+      1. **OOM** — `valhalla_ingest_transit` was killed because Docker Desktop's VM defaulted to
+         **3.9 GB**. Raised to **8 GB** (`MemoryMiB: 8192` in `~/.docker/desktop/settings-store.json`;
+         host has 15 GB). Ingest then passed. **CSL note: the transit build needs ≥~5 GB RAM.**
+      2. **Upstream Valhalla bug (still blocking):** `valhalla_build_tiles -s enhance` aborts with
+         `std::bad_array_new_length` **only when transit is included** (the car/bike/foot build
+         enhances fine). Memory was low (354 MB) at the abort, so it is *not* OOM — it is a known,
+         version-dependent fragility in Valhalla's GTFS+enhance path (see valhalla issues
+         #4745/#4777/#4844/#5276). Suspect trigger: the HVV feed ships `frequencies.txt`
+         (frequency-based trips), a known Valhalla GTFS pain point. **Local service restored to
+         car/bike/foot** (rebuilt with `BUILD_TRANSIT=False`) so routing works meanwhile.
+         **Options to unblock:** (a) pin a different Valhalla image/version known good for transit;
+         (b) strip/expand `frequencies.txt` before the build; (c) build transit tiles as a separate
+         overlay step instead of the single-pass enhance. **Needs a decision.**
 - [x] Expose Valhalla on a stable URL (local: `http://localhost:8002`, `VALHALLA_PORT`).
       Compose healthcheck polls `/status` (generous `start_period` covers the long initial build).
 - [x] One-command bootstrap: `valhalla/bootstrap.sh` (creates `.env`, fetches GTFS, pulls,
