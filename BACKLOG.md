@@ -316,26 +316,52 @@ so configure only Stadtteile and Bezirke.
 Stop depending on `geodienste.hamburg.de` config endpoints; host our own, referencing only
 the layers/services we actually keep.
 
-- [ ] Create our own `services.json` (layer definitions) containing: Stadtteile + Bezirke
-      geometry, the statistical-data WFS layers we retain, and any base/background layers.
+> **Reality check (§7 probe, 2026-06-25):** the public registry's data layers are **all `typ: OAF`
+> (OGC API Features)** served from `https://api.hamburg.de/datasets/v1/…` — *not* WFS. So our
+> curated `services.json` entries are OAF (`typ`/`url`/`collection`/`gfiAttributes`), copied
+> verbatim from `services-internet.json`. The data endpoints stay external (api.hamburg.de); we
+> only self-host the *registry JSON* so we control the layer list and registry URLs.
+
+- [ ] Create our own `services.json` (layer definitions) containing: Stadtteile + Bezirke +
+      Hamburg geometry (`28201`/`28028`/`28150`), the 16 retained **OAF** statistical-data layers
+      (§5/§7 list), and any base/background layers — **omitting** the FHHNET-only catalog layers
+      catalogued in §4 step 4 (`1170`/`1171`/`8133`/`34444`/`34667`/`34668`/`8`/`22993`). Note the
+      dataset↔layer mapping is **not 1:1** (§7 caveat) — copy each layer's own `collection`, don't
+      assume one collection per dataset URL.
 - [ ] Create our own `rest-services.json` adding a **`valhalla`** entry (id used by
-      AccessibilityAnalysis) and the **WPS** entry (id `1001` / `einwohner_ermitteln`) if kept.
+      AccessibilityAnalysis) and the **WPS** entry (id `1001` / `einwohner_ermitteln` — confirmed
+      public & kept, §7).
 - [ ] Point `config.js` `layerConf`/`restConf` at our hosted copies.
-- [ ] **OGC API Features migration (forward-looking):** Hamburg UDP is replacing WFS with
-      OGC API Features. Track whether Masterportal/masterportalapi supports OGC API Features
-      layer types; plan a follow-up to migrate layer definitions when WFS is retired.
+- [x] ~~**OGC API Features migration (forward-looking):**~~ **Resolved 2026-06-25 — already done on
+      Hamburg's side.** The public registry is 100 % OAF; Masterportal/COSI already supports the
+      `OAF` layer type natively (the entries we boot against use it). No WFS layers remain to
+      migrate; nothing to track.
 
 ---
 
 ## 7. Verify retained Hamburg dependencies
 
-- [?] Confirm the **WPS** `einwohner_ermitteln.fmw` (id `1001`) is genuinely public and stays
-      reachable without LGV/fhhnet access. If not: disable/stub the residents-in-isochrone
-      feature (low priority).
-- [?] Confirm **statistical-data WFS** layers (population etc. for Stadtteile/Bezirke) remain
-      accessible to us, and capture the exact layer IDs + attribute keys + name mappings.
+- [x] Confirm the **WPS** `einwohner_ermitteln.fmw` (id `1001`) is genuinely public and stays
+      reachable without LGV/fhhnet access. **PUBLIC — verified 2026-06-25.** `GetCapabilities` on
+      `https://geodienste.hamburg.de/HH_WPS` returns HTTP 200 and lists `einwohner_ermitteln.fmw`
+      as a published process (alongside `ReverseGeocoder.fmw`, `schulwegrouting_wps.fmw`, …). No
+      need to stub the residents-in-isochrone feature; keep WPS `1001` in the §6 rest-services.
+- [x] Confirm **statistical-data** layers (population etc. for Stadtteile/Bezirke) remain
+      accessible to us. **ALL PUBLIC — verified 2026-06-25.** All 16 retained stats layers return
+      HTTP 200 with real GeoJSON via the public registry. **KEY FINDING: the public registry is now
+      100 % OGC API Features (OAF), not WFS** — the migration §6 called "forward-looking" has
+      *already happened*. Every layer is `typ: OAF`, addressed as
+      `https://api.hamburg.de/datasets/v1/{dataset}/collections/{collection}/items` (Accept:
+      `application/geo+json`). Counts sanity-check out: Stadtteile geom 104, Bezirke 7,
+      Landesgrenze 1; regionalstatistik Stadtteile 1188 rows / Bezirke 84 / HH-gesamt 12.
+      **Caveat for §6: dataset↔layer is NOT 1:1** — some endpoints serve multiple collections
+      (e.g. `kind_nicht_deutscher_fam_sprache` → both `_stadtteile` and `_bezirke`;
+      `regionalstatistische_daten_bezirke` → both `_bezirke` and `_hh_gesamt`;
+      `bevoelkerungsprognosen` → 3 collections). Attribute keys + name mappings already captured
+      in the retained `districtSelector` config (§5). Full per-layer (id → url/collection) table
+      dumped during the probe.
 - [ ] Snapshot/export the statistical data we need now, as a hedge against access ending
-      before self-hosting is ready.
+      before self-hosting is ready. *(Optional — all sources confirmed live & public above.)*
 
 ---
 
@@ -409,12 +435,15 @@ the COSI portal **boots and renders against public Hamburg infra** (registries f
 Remaining for a complete self-host:
 1. ~~§4 steps 1–5: track pristine config, boot baseline, flip registries, catalogue gaps, verify
    addons.~~ **All done 2026-06-25** (see §4).
-2. **§5 — District levels:** configure `districtSelector.districtLevels` for **Stadtteile +
-   Bezirke only** (drop Statistische Gebiete — confirmed not public). The natural next step.
-3. **§6 — Self-host registries:** curate our own `services.json`/`rest-services.json` keeping only
-   the layers we retain (omit the FHHNET-only catalog layers catalogued in §4 step 4), add the
-   `valhalla` rest-service + WPS `1001`.
-4. **§7 — Verify retained Hamburg deps:** exercise the WPS `1001` residents service + statistical
-   WFS (not yet hit by any tool run in the §4 baseline).
+2. ~~**§5 — District levels:** Stadtteile + Bezirke (+ Hamburg, user-requested).~~ **Done
+   2026-06-25** — dropped Statistische Gebiete only.
+3. ~~**§7 — Verify retained Hamburg deps.**~~ **Done 2026-06-25** — WPS `1001` + all 16 stats
+   layers + geometry confirmed **public**. Big finding: public registry is **100 % OAF**, WFS is
+   gone (so §6 curates OAF entries; the WFS→OAF migration task is moot). Optional data-snapshot
+   hedge left open.
+4. **§6 — Self-host registries (THE NATURAL NEXT STEP):** curate our own `services.json`/
+   `rest-services.json` keeping only the layers we retain as **OAF** entries (omit the FHHNET-only
+   catalog layers from §4 step 4), add the `valhalla` rest-service + WPS `1001`, then repoint
+   `config.js` `layerConf`/`restConf`. Closes the §5 leftover verify checkbox too.
 5. **§4 "Later":** stand up local Valhalla (§2) + wire `isochroneBackend: "valhalla"` (§3) into the
    `accessibilityAnalysis` block (needs the §6 rest-service entry).
