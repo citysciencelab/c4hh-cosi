@@ -289,23 +289,6 @@ export default {
             });
     },
     /**
-     * Download the dataset for a given primaryDataId and open the 'save' dialog.
-     * @param {Object} context - Vuex action context (state).
-     * @param {Object} payload
-     * @param {String} payload.archiveId - Archive identifier to download the dataset for.
-     * @param {String} payload.instanceId - Instance identifier to download the dataset for.
-     * @param {String} payload.primaryDataId - Primary data identifier to download the dataset for.
-     */
-    downloadDatafile ({state}, payload) {
-        const {archiveId, instanceId, primaryDataId} = payload,
-            params = {
-                Token: state.requestToken
-            },
-            url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}/${primaryDataId}/content`, params);
-
-        saveAs(null, url, "");
-    },
-    /**
      *
      * @param {Object} context - Vuex action context (state).
      * @param {Object} payload

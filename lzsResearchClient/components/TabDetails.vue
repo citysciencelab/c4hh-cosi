@@ -40,7 +40,8 @@ export default {
             "getDetailsForSelectedInstanceId",
             "getNameForArchiveId",
             "getDataProtectionClassForArchiveId",
-            "progressNow"
+            "progressNow",
+            "placeholderDataClassList"
         ])
     },
     watch: {
@@ -69,7 +70,6 @@ export default {
         ...mapActions("Modules/LzsResearchClient", [
             "fetchPrimarydata",
             "downloadPreview",
-            "downloadDatafile",
             "downloadSelectedFiles"
         ]),
         returnToResultTab () {
@@ -140,34 +140,6 @@ export default {
                         hasPreview: ["TIFF", "JP2"].includes(dataset.geoFileFormat) // are there other formats, that allow a preview?
                     }
                 );
-
-                // This part is currently included as long as we cannot download several files as zip compressed folder
-                // later the world file and the dossiers / metadata shall be downloaded automatically when downloading a dataset
-                if (dataset.georeferencePrimarydata) {
-                    const worldFileAttributes = [];
-
-                    dataset.georeferencePrimarydata.primarydataAttributes?.forEach(attribute => {
-                        if (!instanceAttributeNames.includes(attribute.key)) {
-                            worldFileAttributes.push({
-                                name: attribute.key,
-                                value: attribute.value
-                            });
-                        }
-                    });
-
-                    worldFileAttributes.push({
-                        name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
-                        value: roundFileSizeToFixed(dataset.georeferencePrimarydata.contentFileSize / 1e6, true)
-                    });
-
-                    results.push(
-                        {
-                            attributes: worldFileAttributes,
-                            instanceId: dataset.georeferencePrimarydata.primaryDataId,
-                            hasPreview: dataset.georeferencePrimarydata.geoFileFormat === "TIFF" // are there other formats, that allow a preview?
-                        }
-                    );
-                }
             });
 
             return results;
@@ -191,7 +163,16 @@ export default {
          */
         downloadDataset (primaryDatasetId) {
             this.showSpinner = true;
-            this.downloadDatafile({archiveId: this.getDetailsForSelectedInstanceId?.archiveId, instanceId: this.selectedInstanceId, primaryDataId: primaryDatasetId});
+
+            const onlySelectedPrimaryData = JSON.parse(JSON.stringify(this.getDetailsForSelectedInstanceId || {})),
+                filenamesToAddToDownload = this.placeholderDataClassList?.[onlySelectedPrimaryData?.archiveId]?.FILES_TO_ADD_TO_SINGLE_DOWNLOAD;
+
+            onlySelectedPrimaryData.primaryData = (onlySelectedPrimaryData.primaryData || []).filter(
+                p => p.primaryDataId === primaryDatasetId ||
+                (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename))
+            );
+
+            this.downloadSelectedFiles(onlySelectedPrimaryData);
 
             // Hide spinner with timeout because the download is made with a fake link. There is no possibility to 'wait' for it.
             setTimeout(() => {
