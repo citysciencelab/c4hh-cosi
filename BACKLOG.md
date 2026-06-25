@@ -209,24 +209,44 @@ API differences to handle:
 
 ---
 
-## 4. Author the COSI portalconfig (the core missing piece)
+## 4. COSI portalconfig — OBTAINED (now: get it running)
 
-Create our own portal that actually loads COSI, since none exists in-repo.
+**We have the real portalconfig** (received 2026-06-25, lives at `masterportal/portal/cosi/`):
+`config.js` (2.3 KB), `config.json` (240 KB — full menu + per-tool config blocks), plus
+`assets/mapping.json`, `assets/templates/`, `resources/`, `index.html`/`index.php`/`urm.php`.
+It lists all 21 COSI addons we have (`config.js` `addons: [...]`), and the tool blocks are
+present (`accessibilityAnalysis`, `districtSelector`, `dashboard`, `reportingTool`, …).
 
-- [ ] Create `masterportal/portal/cosi/` with:
-  - `config.js` — `addons` array listing the COSI sub-tools (matching keys in
-    `addons/addons/addonsConf.json`: `districtSelector`, `districtFinder`,
-    `accessibilityAnalysis`, `dashboard`, `colorCodeMap`, `featuresList`,
-    `distanceScoreService`, `polygonStyler`, `areaSelector`, `templateAdmin`,
-    `templateManager`, `saveSession`, `calculateRatio`, `dipasProjects`, `reportingTool`,
-    `cosiFileImport`, `cosiPrintLayoutSelection`, ...). Plus `layerConf`/`restConf`/`styleConf`.
-  - `config.json` — menu + per-tool config blocks. This is where each COSI tool is wired in.
-- [ ] Reference the original COSI portalconfig for the correct tool config blocks and menu
-      structure. **Action: obtain it before it's lost** — ask the agency / check the
-      `portalconfigs` repo / pull from the live staging/production instance config while we
-      still have access. This is the single most valuable artifact to grab now.
-- [ ] Verify how addons are discovered by the build (`addonsConf` path + Vite config in
-      `masterportal/devtools/`) and that the nested `addons/addons` path resolves.
+**Key finding — this is the INTERNAL (fhhnet) config, not the public one:**
+- `config.js` points the registries at Hamburg's **internal admin network**:
+  `layerConf = …/services-fhhnet.json`, `restConf = …/lgv-config/rest-services-fhhnet.json`
+  (`styleConf = …/style_v3.json`). The two `*-fhhnet.json` URLs **return 404 from the public
+  internet** (verified 2026-06-25); the public `*-internet.json` equivalents return **200**.
+- Routing still uses `bkg_ors` (×3); no `valhalla`/`isochroneBackend` yet (that's our §3 add).
+- It is currently **untracked** (masterportal ignores `portal/*`; root ignores `/masterportal/`) —
+  same situation the addons were in before §2.5.
+
+### Recommended next-session sequence (do in order)
+
+- [ ] **1. Track the pristine config first, before editing anything.** It's the most valuable
+      artifact and is untracked — we want the untouched original to diff against. Mirror the
+      §2.5 addons approach (small standalone tracking for `portal/cosi/`, or vendor it into the
+      project repo). Keep a pristine snapshot/tag of the as-received fhhnet version.
+- [ ] **2. Boot as-is** (`cd masterportal && npm start`, open the `portal/cosi/` portal).
+      Expect: framework + COSI tool panels render (confirms addon wiring + config blocks parse),
+      but **layers/routing/WPS/stats fail** because the fhhnet registries 404. Baseline only.
+- [ ] **3. Flip the registries to the public variants** in `config.js`
+      (`services-fhhnet.json` → `services-internet.json`, `rest-services-fhhnet.json` →
+      `rest-services-internet.json`) and boot again. **This is the real "what works today" map** —
+      how much of COSI runs against public Hamburg infra. (One-line-ish change; keep ORS for now.)
+- [ ] **4. Catalogue what loads vs. 404s** from step 3. This gap list directly drives:
+      §6 (self-host the registries we must replace), §5 (district geometry/stats layers),
+      §7 (verify WPS `1001` + statistical WFS reachability).
+- [ ] **5. Verify addon discovery** for this portal — that the build resolves the `addons/`
+      path and the `config.js` `addons: [...]` keys match `addons/addonsConf.json`.
+- [ ] **Later (after baseline):** wire our Valhalla backend (§3) into this config's
+      `accessibilityAnalysis` block — add `isochroneBackend: "valhalla"` and point `serviceId`
+      at the Valhalla rest-service (needs the §6 rest-service entry + a live local Valhalla, §2).
 
 ---
 
@@ -331,13 +351,22 @@ Tasks:
 - [?] Distance-based isochrones needed, or time-based only? (affects §2/§3).
 - [?] Target CSL server specs for Valhalla tile building (RAM/disk) and deployment method
       (plain docker-compose vs. orchestrated).
-- [?] How much of the original portalconfig can we recover before access ends? (see §4).
+- [x] How much of the original portalconfig can we recover? **Recovered the full internal
+      (fhhnet) portalconfig on 2026-06-25** (see §4). Open follow-up: get a public-reachable
+      build by repointing registries to `-internet.json` and self-hosting the rest (§6).
 
 ---
 
 ## Next session — suggested first steps
-1. **Grab the original COSI portalconfig** from the live instance / agency while access lasts
-   (§4) — highest-value, time-sensitive.
-2. Pin Node + run the layered install + boot the stock portal (§1).
-3. Stand up Valhalla locally via docker-compose (§2) and rewrite `requestIsochrones.js` (§3).
-4. Author `portal/cosi/` config with Stadtteile + Bezirke only (§4/§5).
+
+Done so far: §1 (env), §2 (Valhalla service), §2.5 (addons fork/tracking), §3 (Valhalla
+isochrone backend), and the **portalconfig is now in hand** (§4 — but it's the internal/fhhnet
+variant). So the next session is about **getting the real COSI portal running**:
+
+1. **Track the pristine `portal/cosi/` config** before editing it (§4 step 1) — it's untracked.
+2. **Boot it as-is** for a baseline (§4 step 2) — expect mostly-404 services (fhhnet registries).
+3. **Flip registries to the `-internet.json` public variants** and boot again (§4 step 3) —
+   this is the real "what works today" map.
+4. **Catalogue the gaps** (§4 step 4) → drives §6 (self-host registries), §5 (district layers),
+   §7 (verify WPS/stats).
+5. Later: stand up local Valhalla (§2) + wire `isochroneBackend: "valhalla"` into the config (§3).
