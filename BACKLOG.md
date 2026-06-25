@@ -245,13 +245,29 @@ present (`accessibilityAnalysis`, `districtSelector`, `dashboard`, `reportingToo
       variants **200** (so step 3's flip is viable). Also confirms **step 5**: all 21 `config.js`
       `addons[]` keys resolve in `addons/addonsConf.json`. *Visual render of the Vue tool panels
       not yet eyeballed in a browser (no headless browser installed) — open the URL to confirm.*
-- [ ] **3. Flip the registries to the public variants** in `config.js`
-      (`services-fhhnet.json` → `services-internet.json`, `rest-services-fhhnet.json` →
-      `rest-services-internet.json`) and boot again. **This is the real "what works today" map** —
-      how much of COSI runs against public Hamburg infra. (One-line-ish change; keep ORS for now.)
-- [ ] **4. Catalogue what loads vs. 404s** from step 3. This gap list directly drives:
-      §6 (self-host the registries we must replace), §5 (district geometry/stats layers),
-      §7 (verify WPS `1001` + statistical WFS reachability).
+- [x] **3. Flip the registries to the public variants** — Done 2026-06-25 (config.js commit
+      `ec2f52e` on `cosi-selfhost`). `services-fhhnet.json` → `services-internet.json`,
+      `rest-services-fhhnet.json` → `rest-services-internet.json` (styleConf already public; ORS
+      kept). **The portal now bootstraps and renders** — the white screen is gone. Note: the
+      fhhnet 404s weren't just empty layers, they were **fatal to app bootstrap** (404 HTML broke
+      `JSON.parse`, blank screen), so this flip is what makes the portal render at all, not polish.
+- [x] **4. Catalogue what loads vs. fails** — Done 2026-06-25. Verified live in-browser against the
+      public registries. **What works:** app shell + COSI tools render, public `services-internet.json`
+      (6553 layers) / `rest-services-internet.json` (47 entries) / `style_v3.json` all load. Gaps:
+      - **Basemap CORS (FIXED here):** the visible Geobasiskarten WMS (`33780`, present in the public
+        registry) failed with a credentialed-CORS block + tile-load storm + one `AxiosError 400`,
+        because `overwriteWmsLoadfunction:true` loads tiles via a credentialed fetch while geodienste
+        returns `ACAO:*`. **Set `overwriteWmsLoadfunction:false`** (commit `82080e2`) → basemap renders,
+        CORS/400 gone. *Forward-looking:* §8's nginx same-origin setup makes this moot in prod.
+      - **FHHNET-only catalog/background layers missing** (harmless "not found" warnings, just absent
+        from the catalog): subject layers `1170`/`1171` (Potenzialflächendatenbank PAUL–FHHNET),
+        `8133`/`34444`/`34667`/`34668` (Orthophotos Straße–FHHNET), background candidates `8`, `22993`.
+        → **§6**: omit these from our curated `services.json`. (Not core COSI machinery.)
+      - **Statistische Gebiete** geometry/stats not public (user-confirmed) → **§5**: drop that level
+        entirely, keep only Stadtteile + Bezirke.
+      - Cosmetic only: a `legendURL` deprecation warning and empty-`StyleId` warnings — defer.
+      - **WPS `1001` + statistical WFS** reachability not yet exercised (no tool run that hits them) →
+        **§7** still open.
 - [x] **5. Verify addon discovery** — Done 2026-06-25 (alongside step 2). Vite resolves the
       `addons/` path (startup "provided addons" log) and all 21 `config.js` `addons[]` keys match
       entries in `addons/addonsConf.json`.
@@ -371,15 +387,20 @@ Tasks:
 ## Next session — suggested first steps
 
 Done so far: §1 (env), §2 (Valhalla service), §2.5 (addons fork/tracking), §3 (Valhalla
-isochrone backend), and the **portalconfig is now in hand** (§4 — but it's the internal/fhhnet
-variant). So the next session is about **getting the real COSI portal running**:
+isochrone backend), the **portalconfig is in hand** (§4), and **§4 is now running publicly**:
+the COSI portal **boots and renders against public Hamburg infra** (registries flipped to
+`-internet.json`, basemap fixed via `overwriteWmsLoadfunction:false`). Tracked on the
+`cosi-selfhost` repo as 2 small diffs on top of the `fhhnet-original` baseline.
 
-1. ~~**Track the pristine `portal/cosi/` config** before editing it (§4 step 1).~~ **Done
-   2026-06-25:** standalone repo at `masterportal/portal/cosi/`, branch `cosi-selfhost`, pristine
-   tagged `fhhnet-original`. Next up is step 2.
-2. **Boot it as-is** for a baseline (§4 step 2) — expect mostly-404 services (fhhnet registries).
-3. **Flip registries to the `-internet.json` public variants** and boot again (§4 step 3) —
-   this is the real "what works today" map.
-4. **Catalogue the gaps** (§4 step 4) → drives §6 (self-host registries), §5 (district layers),
-   §7 (verify WPS/stats).
-5. Later: stand up local Valhalla (§2) + wire `isochroneBackend: "valhalla"` into the config (§3).
+Remaining for a complete self-host:
+1. ~~§4 steps 1–5: track pristine config, boot baseline, flip registries, catalogue gaps, verify
+   addons.~~ **All done 2026-06-25** (see §4).
+2. **§5 — District levels:** configure `districtSelector.districtLevels` for **Stadtteile +
+   Bezirke only** (drop Statistische Gebiete — confirmed not public). The natural next step.
+3. **§6 — Self-host registries:** curate our own `services.json`/`rest-services.json` keeping only
+   the layers we retain (omit the FHHNET-only catalog layers catalogued in §4 step 4), add the
+   `valhalla` rest-service + WPS `1001`.
+4. **§7 — Verify retained Hamburg deps:** exercise the WPS `1001` residents service + statistical
+   WFS (not yet hit by any tool run in the §4 baseline).
+5. **§4 "Later":** stand up local Valhalla (§2) + wire `isochroneBackend: "valhalla"` (§3) into the
+   `accessibilityAnalysis` block (needs the §6 rest-service entry).
