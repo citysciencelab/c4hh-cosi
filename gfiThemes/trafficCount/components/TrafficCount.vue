@@ -605,6 +605,8 @@ export default {
 <style lang="scss" scoped>
 .trafficCount-gfi {
     padding: 10px 5px 0;
+    container-type: inline-size;
+    container-name: trafficCountGfi;
 
     @media (max-width: 600px) {
         width: inherit;
@@ -647,6 +649,34 @@ export default {
         display: inline-block;
         width: 100%;
         padding-bottom: 5px;
+    }
+
+    // Shared styling for the date selectors of the day, week and year tabs (all use class "dateSelector").
+    :deep(.dateSelector) {
+        .mx-datepicker {
+            width: 100%;
+        }
+        .mx-input {
+            border-radius: var(--bs-border-radius);
+        }
+        .wrap-input {
+            height: auto;
+            min-height: calc(1.5em + 0.75rem + 2px);
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            cursor: pointer;
+        }
+        .wrap-input-placeholder {
+            color: $dark_grey;
+        }
+        .mx-icon-calendar,
+        .mx-icon-clear {
+            .bi {
+                font-size: 16px;
+                color: rgba($black, 0.5);
+            }
+        }
     }
 }
 </style>

@@ -384,11 +384,3 @@ export default {
         </div>
     </div>
 </template>
-
-<style lang="scss">
-#weekDateSelector {
-    .mx-input {
-        border-radius: 0px;
-    }
-}
-</style>

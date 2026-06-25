@@ -290,7 +290,30 @@ export default {
                 :disabled-date="isDateDisabled"
                 title-format="DD.MM.YYYY"
                 :lang="$t('common:libraries.vue-datepicker-next.lang', {returnObjects: true})"
-            />
+            >
+                <template #input="inputProps">
+                    <div
+                        :class="inputProps.class"
+                        class="mx-input wrap-input"
+                    >
+                        <template v-if="inputProps.value">
+                            {{ inputProps.value }}
+                        </template>
+                        <span
+                            v-else
+                            class="wrap-input-placeholder"
+                        >
+                            {{ inputProps.placeholder }}
+                        </span>
+                    </div>
+                </template>
+                <template #icon-calendar>
+                    <i class="bi bi-calendar4" />
+                </template>
+                <template #icon-clear>
+                    <i class="bi bi-x" />
+                </template>
+            </DatePicker>
         </div>
         <TrafficCountSwitch
             :current-means-of-transport="meansOfTransport"
@@ -332,10 +355,3 @@ export default {
     </div>
 </template>
 
-<style lang="scss">
-#dayDateSelector {
-    .mx-input {
-        border-radius: 0px;
-    }
-}
-</style>

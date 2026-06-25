@@ -534,7 +534,7 @@ export default {
 
 <template>
     <div class="mb-3">
-        <div class="d-flex flex-row align-items-center p-3 rounded-3 background-color">
+        <div class="d-flex flex-row align-items-center p-3 rounded-3 background-color header-row">
             <div class="fs-1 p-2">
                 <i :class="['bi', meansOfTransportIcon]" />
             </div>
@@ -550,7 +550,7 @@ export default {
                 <br>
                 <span class="header-color"> {{ heavyTrafficIndication }} </span>
             </div>
-            <div class="ms-auto">
+            <div class="ms-auto download-wrapper">
                 <div class="dropdown">
                     <FlatButton
                         :icon="'bi-cloud-arrow-down'"
@@ -632,6 +632,20 @@ export default {
 
     .background-color {
         background-color: rgba($light_grey, 0.5);
+    }
+
+    @container trafficCountGfi (max-width: 360px) {
+        .header-row {
+            flex-wrap: wrap;
+        }
+
+        .download-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-left: 0 !important;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
     }
 
     .header-color {

@@ -323,7 +323,7 @@ export default {
 
         tbody tr {
             &:nth-child(odd) td {
-                background-color: mix($white, $light_blue, 60%);
+                background-color: $light_blue;
             }
 
             &:nth-child(even) td {
