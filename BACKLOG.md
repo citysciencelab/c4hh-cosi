@@ -201,8 +201,16 @@ API differences to handle:
       covers conversions, request shape, response normalization/ordering, multi-origin grouping,
       and error handling. (The pre-existing `requestIsochrones`/`createIsochrones` specs are all
       `it.skip` — they hit live services — so nothing to update there.)
-- [ ] **Integration-test against a live local Valhalla** once tiles are built (§2) — verify the
+- [x] **Integration-test against a live local Valhalla** once tiles are built (§2) — verify the
       real response shape matches the fixtures and the units/profile mapping are correct.
+      **Done 2026-06-25** against a live local Valhalla (Hamburg extract, `gis-ops` image
+      v3.5.1, tiles built, `BUILD_TRANSIT=False`). Sent the exact body the code builds to
+      `POST http://localhost:8002/isochrone` for every profile mapping: `pedestrian`
+      (foot-walking/wheelchair), `auto` (driving-car), `bicycle` (cycling-regular) — all HTTP 200.
+      Response contract matches `normalizeCollection` exactly: `FeatureCollection` of `Polygon`
+      features each carrying `properties.contour` in **minutes** (e.g. 15/10/5 → `fromContour` →
+      900/600/300 s, sorted ascending). Distance contours echo **km** (2/1 → 2000/1000 m). The 7
+      `requestIsochronesValhalla` unit tests still pass (`npm test`, via `devtools/vitest.config.js`).
 - [ ] **Refine `wheelchair`**: currently mapped to `pedestrian`; add Valhalla
       `costing_options.pedestrian` tuning if needed (no first-class wheelchair costing in Valhalla).
 - [ ] Add the **`valhalla` rest-service entry** that `serviceId` points at — see §6.
@@ -271,9 +279,15 @@ present (`accessibilityAnalysis`, `districtSelector`, `dashboard`, `reportingToo
 - [x] **5. Verify addon discovery** — Done 2026-06-25 (alongside step 2). Vite resolves the
       `addons/` path (startup "provided addons" log) and all 21 `config.js` `addons[]` keys match
       entries in `addons/addonsConf.json`.
-- [ ] **Later (after baseline):** wire our Valhalla backend (§3) into this config's
+- [x] **Later (after baseline):** wire our Valhalla backend (§3) into this config's
       `accessibilityAnalysis` block — add `isochroneBackend: "valhalla"` and point `serviceId`
       at the Valhalla rest-service (needs the §6 rest-service entry + a live local Valhalla, §2).
+      **Done 2026-06-25** (`cosi-selfhost` config repo). The COSI `accessibilityAnalysis` tool block
+      now sets `"isochroneBackend": "valhalla"` + `"serviceId": "valhalla"` (the §6 rest-service id).
+      The separate stock Masterportal `routing` addon block is **left on `bkg_ors`** — different
+      addon, outside §3 scope. Verified live end-to-end (see §3 integration-test entry). Local
+      Valhalla stood up via `valhalla/bootstrap.sh` (Docker Desktop daemon started first; `.env`
+      set to the Hamburg extract + `BUILD_TRANSIT=False` for a fast local build).
 
 ---
 
@@ -462,6 +476,13 @@ Remaining for a complete self-host:
    to `./services.json` / `./rest-services.json`; portal boots against them. §5 verify checkbox
    closed. *Leftover:* prune the 64 FHHNET-only ids from `config.json`'s layer tree (generator lists
    them); optionally self-host `style_v3.json` too.
-5. **§4 "Later" / §3 wiring (NEXT):** stand up local Valhalla (§2) and flip `accessibilityAnalysis`
-   to it — set `isochroneBackend: "valhalla"` + `serviceId: "valhalla"` in `config.json` (the
-   `valhalla` rest-service now exists, §6). Then §8 (Dockerize the whole stack).
+5. ~~**§4 "Later" / §3 wiring:** stand up local Valhalla (§2) and flip `accessibilityAnalysis` to
+   it — set `isochroneBackend: "valhalla"` + `serviceId: "valhalla"` in `config.json`.~~ **Done
+   2026-06-25.** Local Valhalla up (Hamburg tiles, `gis-ops` image), config flipped on
+   `cosi-selfhost`, integration-tested live across all profiles + the 7 unit tests. ORS stays the
+   fallback (`fallbackServiceId: "csl_ors"`).
+6. **§8 — Dockerize the whole stack (NEXT):** multi-stage portal image (Node `24.15.0` build →
+   nginx runtime), fold `valhalla/` compose in via `include:`, nginx serves the §6 registries and
+   reverse-proxies `/valhalla/` → `valhalla:8002` (same-origin routing). Root `docker-compose.yml`
+   for one-command `portal + valhalla`. Leftover from §6: prune the 64 FHHNET-only ids from
+   `config.json`'s layer tree; optionally self-host `style_v3.json`.
