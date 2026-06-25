@@ -6,6 +6,7 @@ import GetFeatureInfo from "../../getFeatureInfo/components/GetFeatureInfo.vue";
 import MenuComponentKeepAlivePlaceholder from "./MenuComponentKeepAlivePlaceholder.vue";
 
 /**
+ * The MenuContainerBody component is responsible for rendering the body of the menu, which includes the navigation, the currently visible component, and any feature information. It manages the state of the menu, including which component is currently displayed and which components should be cached using Vue's keep-alive feature. The component also initializes modules based on the menu configuration.
  * @module modules/MenuContainerBody
  * @vue-prop {String} side - The side in which the menu component is being rendered.
  * @vue-computed {Object} menu - The menu configuration for the given menu.

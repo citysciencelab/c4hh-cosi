@@ -6,6 +6,7 @@ import MenuContainerBodyRootLogo from "./MenuContainerBodyRootLogo.vue";
 import SearchBar from "../../searchBar/components/SearchBar.vue";
 
 /**
+ * The MenuContainer component is responsible for rendering the menu and its content. It handles the menu's state, including its width, expansion, and the currently displayed component. The component also manages the resizing of the menu and adjusts the visibility of certain elements based on the menu's width.
  * @module modules/MenuContainer
  * @vue-prop {String} side - The side in which the menu component is being rendered.
  * @vue-computed {String} handlePosition - Defines whether the ResizeHandle should be displayed on the right or left side.

@@ -4,6 +4,8 @@ import MenuContainerBodyRootItems from "./MenuContainerBodyRootItems.vue";
 import {mapGetters} from "vuex";
 
 /**
+ * Renders the root/home view of the menu, displaying the layer tree (for mainMenu) and menu sections.
+ * Serves as the default view displayed by MenuContainerBody when no active tool or module is selected.
  * @module modules/MenuContainerBodyRoot
  * @vue-prop {String} side - The side in which the menu component is being rendered.
  * @vue-computed {Object} menu - The menu configuration for the given menu.

@@ -465,11 +465,17 @@ export default [
         }
     },
     {
+        files: ["devtools/jsdoc/js/*.js"],
+        rules: {
+            "jsdoc/require-jsdoc": "off"
+        }
+    },
+    {
         ignores: [
             "**/node_modules/",
             "**/dist/",
             "**/portalconfigs/",
-            "**/jsdoc/",
+            "jsdoc/**",
             "**/docHtml/",
             "**/.git/",
             "**/html/",

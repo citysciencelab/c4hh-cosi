@@ -9,6 +9,10 @@
 
 ### Added
 - package.json: Added `npm run buildJsDoc` to script `prePushHook`.
+- JSDoc: Added a theme for jsdoc to make it more usable. Features include: better design, a searchbar, dark mode, a logo, links to bitbucket.
+- The following packages have been added:
+    - devDependencies:
+        - "docdash": "^2.0.2"
 
 ### Changed
 - FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.
