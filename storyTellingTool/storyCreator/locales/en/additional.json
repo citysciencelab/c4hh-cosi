@@ -59,7 +59,10 @@
         "title": "Enter chapter title",
         "initialText": "Click here to add a chapter description...",
         "toolListPlaceholder": "Select tool...",
-        "layerListPlaceholder": "Select layers..."
+        "layerListPlaceholder": "Select layers...",
+        "noFeatureLinked": "No feature linked",
+        "noSubjectLayerHint": "Please select layers to be able to link a feature.",
+        "addFeatureDescription": "By clicking on a feature in the map, it will be linked to the current chapter. You can add additional information and define which attributes will later be visible in the info popup."
       },
       "addElementDropdown": {
         "categories": {
@@ -68,6 +71,7 @@
         },
         "items": {
           "text": "Text",
+          "feature": "Link feature",
           "separator": "Separator",
           "image": "Image",
           "video": "Video"

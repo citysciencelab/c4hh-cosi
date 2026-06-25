@@ -10,6 +10,7 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
+import StoryCreatorAddFeatureCard from "./StoryCreatorAddFeatureCard.vue";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
@@ -23,6 +24,7 @@ export default {
         Draggable: draggable,
         FlatButton,
         Multiselect,
+        StoryCreatorAddFeatureCard,
         StoryCreatorAddImageCard,
         StoryCreatorAddTextCard
     },
@@ -854,7 +856,7 @@ export default {
             <AddElementDropdown
                 v-if="!isContentEditorOpen"
                 class="mt-5"
-                :allowed-actions="['text', 'image']"
+                :allowed-actions="['text', 'image', 'feature']"
                 @action-triggered="openContentEditorForAdd"
             />
             <StoryCreatorAddTextCard
@@ -869,6 +871,11 @@ export default {
                 :create-image-asset="createImageAsset"
                 :image-assets-by-id="imageAssetsById"
                 @addImage="handleImage"
+                @click:close="closeContentEditor"
+            />
+            <StoryCreatorAddFeatureCard
+                v-else-if="isAddingContentType('feature')"
+                class="mt-2"
                 @click:close="closeContentEditor"
             />
         </AccordionItem>

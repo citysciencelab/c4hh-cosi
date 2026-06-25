@@ -20,6 +20,8 @@ const state = {
     type: "storyManager",
     name: "additional:modules.storyManager.title",
     icon: "bi-file-plus",
+    hasMouseMapInteractions: true,
+
     enableCreator: true,
     enableImport: true,
     currentStoryIndex: undefined,

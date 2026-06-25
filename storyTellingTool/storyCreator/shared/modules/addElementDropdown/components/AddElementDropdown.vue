@@ -13,6 +13,7 @@ export default {
             default: () => []
         }
     },
+    emits: ["action-triggered"],
     data () {
         return {
             /**
@@ -20,6 +21,7 @@ export default {
              */
             defaultItems: [
                 {category: "elements", name: "text", icon: "bi-type", action: "text"},
+                {category: "elements", name: "feature", icon: "bi-geo-alt-fill", action: "feature"},
                 {category: "elements", name: "separator", icon: "bi-dash-lg", action: "divider"},
                 {category: "media", name: "image", icon: "bi-image", action: "image"},
                 {category: "media", name: "video", icon: "bi-play-btn", action: "video"}

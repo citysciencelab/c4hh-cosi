@@ -59,7 +59,10 @@
         "title": "Kapitelüberschrift eingeben",
         "initialText": "Hier klicken, um eine Kapitelbeschreibung hinzuzufügen...",
         "toolListPlaceholder": "Werkzeug auswählen...",
-        "layerListPlaceholder": "Layer auswählen..."
+        "layerListPlaceholder": "Layer auswählen...",
+        "noFeatureLinked": "Kein Feature verknüpft",
+        "noSubjectLayerHint": "Bitte Fachdaten auswählen um ein Feature verknüpfen zu können.",
+        "addFeatureDescription": "Durch Klicken auf ein Feature in der Karte wird dieses mit dem aktuellen Kapitel verbunden. Es lassen sich zusätzliche Informationen hinzufügen und festlegen, welche Attribute später im Info-Popup sichtbar sind."
       },
       "addElementDropdown": {
         "categories": {
@@ -68,6 +71,7 @@
         },
         "items": {
           "text": "Text",
+          "feature": "Feature verknüpfen",
           "separator": "Trennlinie",
           "image": "Bild",
           "video": "Video"
