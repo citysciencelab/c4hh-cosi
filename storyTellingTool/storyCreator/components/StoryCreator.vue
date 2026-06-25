@@ -49,7 +49,7 @@ export default {
     data () {
         return {
             currentView: "story",
-            title: this.story?.title || "",
+            title: this.story?.title || this.$t("additional:modules.storyCreator.labels.storyname"),
             description: this.story?.description || "",
             author: this.story?.author || "",
             imageAlt: this.story?.imageAlt || "",
@@ -78,6 +78,15 @@ export default {
                 imageCopyright: this.imageCopyright,
                 chapters: this.chapterContent
             };
+        }
+    },
+    watch: {
+        title (newVal) {
+            if (newVal && newVal.length > 200) {
+                this.$nextTick(() => {
+                    this.title = newVal.substring(0, 200);
+                });
+            }
         }
     },
     mounted () {
@@ -206,7 +215,7 @@ export default {
          * @return {void}
          */
         clearForm () {
-            this.title = "";
+            this.title = this.$t("additional:modules.storyCreator.labels.storyname");
             this.description = "";
             this.author = "";
             this.imageAlt = "";
@@ -309,7 +318,7 @@ export default {
          */
         saveStory () {
             const storySnapshot = {
-                title: this.title,
+                title: this.title.trim() || this.$t("additional:modules.storyCreator.labels.storyname"),
                 description: this.description,
                 author: this.author,
                 created: dayjs().format("DD.MM.YYYY"),
@@ -474,6 +483,7 @@ export default {
                     :aria-label="$t('additional:modules.storyCreator.saveStory')"
                     :text="$t('additional:modules.storyCreator.saveStory')"
                     :interaction="() => saveStory()"
+                    :disabled="!title.trim()"
                 />
                 <FlatButton
                     :icon="'bi-x-circle'"

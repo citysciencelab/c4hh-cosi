@@ -15,6 +15,7 @@
       "introText": "This tool is designed for creating interactive, map-based stories. After entering general information such as the name, description, author, and cover image, you can flexibly add individual chapters below. Using the buttons at the bottom of the page, you can preview, save, or discard the story.",
       "labels": {
         "storyTitle": "Enter story name",
+        "storyname": "Story name",
         "storyDescription": "Story description (optional)",
         "storyAuthor": "Author of the story (optional)",
         "fileDrop": "Drop file here",

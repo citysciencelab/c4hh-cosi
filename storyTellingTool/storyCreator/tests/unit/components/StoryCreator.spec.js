@@ -418,7 +418,7 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                 }
             });
 
-            expect(newWrapper.vm.title).to.equal("");
+            expect(newWrapper.vm.title).to.equal("additional:modules.storyCreator.labels.storyname");
             expect(newWrapper.vm.description).to.equal("");
             expect(newWrapper.vm.author).to.equal("");
             expect(newWrapper.vm.chapterContent).to.deep.equal([]);
