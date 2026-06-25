@@ -12,6 +12,9 @@ import LzsResearchClientSearchBar from "./searchBar/components/LzsResearchClient
 import {roundFileSizeToFixed} from "../utils/zipHelpers";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
 import {getTranslationForAttribute} from "../utils/translationHelpers";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
+import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 import Polygon from "ol/geom/Polygon";
 import LineString from "ol/geom/LineString";
@@ -57,7 +60,8 @@ export default {
             showAreaWarning: false,
             searchGeometryArea: null,
             selectedParcelDistrict: null,
-            parcelNumberInputValue: ""
+            parcelNumberInputValue: "",
+            archiveLayerOriginalState: {}
         };
     },
     computed: {
@@ -86,6 +90,7 @@ export default {
             "scale",
             "extent"
         ]),
+        ...mapGetters(["layerConfigById"]),
         ...mapGetters("Menu", [
             "expanded"
         ]),
@@ -260,6 +265,8 @@ export default {
             "placingPointMarker",
             "zoomToExtent"
         ]),
+        ...mapActions(["addLayerToLayerConfig", "replaceByIdInLayerConfig", "addOrReplaceLayer"]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
         ...mapMutations("Modules/LzsResearchClient", [
             "setLzsSelectedDrawType",
             "setLzsSelectedInteraction",
@@ -451,6 +458,7 @@ export default {
          * Reset the attribute form and related validation to initial state.
          */
         resetForm () {
+            this.removeArchiveLayers();
             this.initializeSearchForm();
             this.validateSearchWithAttributeForm();
             this.resetGeometricSearchForm();
@@ -476,7 +484,8 @@ export default {
          * @param {Event} event - The change event from the checkbox.
          */
         async onSelectedArchiveIdsChange (archiveId, event) {
-            const checked = event.target.checked;
+            const checked = event.target.checked,
+                layerConfig = this.placeholderDataClassList[archiveId]?.LAYERCONFIG;
 
             if (checked) {
                 if (!this.selectedArchiveIds.includes(archiveId)) {
@@ -486,9 +495,26 @@ export default {
                 if (!this.archiveYears[archiveId]) {
                     await this.fetchYears(archiveId);
                 }
+
+                if (layerConfig && layerConfig.id) {
+                        this.displayLayerInMap(layerConfig.id);
+                }
+
             }
             else {
                 this.selectedArchiveIds = this.selectedArchiveIds.filter(id => id !== archiveId);
+
+                if (layerConfig && layerConfig.id) {
+                    this.replaceByIdInLayerConfig({
+                        layerConfigs: [{
+                            id: layerConfig.id,
+                            layer: {
+                                visibility: this.archiveLayerOriginalState[layerConfig.id]?.visibility ?? false,
+                                showInLayerTree: this.archiveLayerOriginalState[layerConfig.id]?.showInLayerTree ?? false
+                            }
+                        }]
+                    });
+                }
             }
         },
         /**
@@ -934,6 +960,113 @@ export default {
          */
         getTranslationForAttributeWrapper (key, fallback) {
             return getTranslationForAttribute(key, fallback);
+        },
+        /**
+         * Displays a layer in the map by adding it or making it visible.
+         * If the layer doesn't exist in the layer tree, it adds it from config.json or services.json.
+         * If it exists but is hidden, it makes it visible and shows it in the layer tree.
+         * @param {String} layerId - The ID of the layer to display.
+         */
+        displayLayerInMap (layerId) {
+            const existingLayer = layerCollection.getLayerById(layerId),
+                configJsonLayer = this.layerConfigById(layerId),
+                servicesJsonLayer = rawLayerList.getLayerWhere({id: layerId});
+
+            if (!configJsonLayer && !servicesJsonLayer) {
+                this.addSingleAlert({
+                    content: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.layerConfigNotFound", {layerId}),
+                    category: "warn",
+                    once: true
+                });
+
+                return;
+            }
+
+            if (!existingLayer) {
+                if (configJsonLayer) {
+                    this.archiveLayerOriginalState[layerId] = {
+                        visibility: false,
+                        showInLayerTree: configJsonLayer.showInLayerTree
+                    };
+
+                    this.addOrReplaceLayer({layerId});
+                }
+                else if (servicesJsonLayer) {
+                    this.archiveLayerOriginalState[layerId] = {
+                        visibility: false,
+                        showInLayerTree: false
+                    };
+
+                    this.addLayerToLayerConfig({
+                        layerConfig:
+                        {...servicesJsonLayer,
+                            ...{
+                                showInLayerTree: true,
+                                visibility: true,
+                                type: "layer"
+                            }
+                        },
+                        parentKey: treeSubjectsKey
+                    });
+                }
+            }
+            else if (!configJsonLayer.visibility) {
+                 this.archiveLayerOriginalState[layerId] = {
+                        visibility: false,
+                        showInLayerTree: configJsonLayer.showInLayerTree
+                    };
+
+                this.replaceByIdInLayerConfig({
+                    layerConfigs: [{
+                        id: layerId,
+                        layer: {
+                            visibility: true,
+                            showInLayerTree: true
+                        }
+                    }]
+                });
+
+            }
+            else {
+                this.archiveLayerOriginalState[layerId] = {
+                    visibility: true,
+                    showInLayerTree: true
+                };
+
+                this.replaceByIdInLayerConfig({
+                    layerConfigs: [{
+                        id: layerId,
+                        layer: {
+                            visibility: true,
+                            showInLayerTree: true
+                        }
+                    }]
+                });
+            }
+        },
+
+        /**
+         * Remove archive layers for all selected archives.
+         * Iterates through selected archive IDs, retrieves their layer configurations,
+         * and sets visibility and layer tree display to false.
+         * @returns {void}
+         */
+        removeArchiveLayers () {
+            this.selectedArchiveIds.forEach(archiveId => {
+                const layerConfig = this.placeholderDataClassList[archiveId].LAYERCONFIG;
+
+                if (layerConfig && layerConfig.id) {
+                    this.replaceByIdInLayerConfig({
+                        layerConfigs: [{
+                            id: layerConfig.id,
+                            layer: {
+                                visibility: this.archiveLayerOriginalState[layerConfig.id]?.visibility ?? false,
+                                showInLayerTree: this.archiveLayerOriginalState[layerConfig.id]?.showInLayerTree ?? false
+                            }
+                        }]
+                    });
+                }
+            });
         }
     }
 };

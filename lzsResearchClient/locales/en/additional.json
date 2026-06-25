@@ -67,7 +67,8 @@
                     "geometryAreaWarningMessage": "The area of the drawn geometry is {{ area }} km². This exceeds the maximum allowed area of {{ maxArea }} km². Please draw a smaller area to enable searching.",
                     "selectParcelDistrictLabel": "Parcel district",
                     "parcelNumberLabel": "Parcel number",
-                    "parcelSearchNoResults": "No parcel geometries were found for the entered parcel district and parcel number."
+                    "parcelSearchNoResults": "No parcel geometries were found for the entered parcel district and parcel number.",
+                    "layerConfigNotFound": "Layer configuration for the specified layer ID {{ layerId }} could not be found."
                 },
                 "tabResult": {
                     "label": "Results",

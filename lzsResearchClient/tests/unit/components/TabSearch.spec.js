@@ -4,6 +4,9 @@ import sinon from "sinon";
 import {createStore} from "vuex";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
+import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 import Point from "ol/geom/Point";
 import LineString from "ol/geom/LineString";
@@ -15,7 +18,12 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
     let wrapper,
         store,
         drawLayerSourceMock,
-        currentModifyInteractionMock;
+        currentModifyInteractionMock,
+        layerConfigByIdStub,
+        addSingleAlertStub,
+        addLayerToLayerConfigStub,
+        replaceByIdInLayerConfigStub,
+        addOrReplaceLayerStub;
     const mockMaxResultValueCount = 100;
 
     beforeEach(() => {
@@ -112,8 +120,26 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
             un: sinon.stub()
         };
 
+        layerConfigByIdStub = sinon.stub().returns(null);
+        addSingleAlertStub = sinon.stub().resolves();
+        addLayerToLayerConfigStub = sinon.stub().resolves();
+        replaceByIdInLayerConfigStub = sinon.stub().resolves();
+        addOrReplaceLayerStub = sinon.stub().resolves();
+
         store = createStore({
+             getters: {
+                layerConfigById: () => layerConfigByIdStub
+            },
+            actions: {
+                addLayerToLayerConfig: addLayerToLayerConfigStub,
+                replaceByIdInLayerConfig: replaceByIdInLayerConfigStub,
+                addOrReplaceLayer: addOrReplaceLayerStub
+            },
             modules: {
+                Alerting: {
+                    namespaced: true,
+                    actions: {addSingleAlert: addSingleAlertStub}
+                },
                 Modules: {
                     namespaced: true,
                     modules: {
@@ -757,6 +783,37 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
             expect(wrapper.vm.searchGeometry).to.not.be.null;
             expect(wrapper.vm.searchGeometry.type).to.equal("Polygon");
             expect(wrapper.vm.searchGeometry.coordinates).to.deep.equal([largeRing]);
+        });
+    });
+
+    describe("displayLayerInMap", () => {
+        beforeEach(() => {
+            sinon.stub(layerCollection, "getLayerById").returns(null);
+            sinon.stub(rawLayerList, "getLayerWhere").returns(null);
+        });
+
+        it("calls addSingleAlert and returns early when layer is in neither configJson nor servicesJson", () => {
+            // both stubs return null by default
+            wrapper.vm.displayLayerInMap("unknown-layer-id");
+
+            expect(addSingleAlertStub.calledOnce).to.be.true;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+        });
+
+        it("passes the servicesJson layer merged with showInLayerTree, visibility and type to addLayerToLayerConfig", () => {
+            const servicesLayer = {id: "test-layer", url: "https://example.com", typ: "WMS"};
+
+            rawLayerList.getLayerWhere.returns(servicesLayer);
+
+            wrapper.vm.displayLayerInMap("test-layer");
+
+            expect(addLayerToLayerConfigStub.calledOnce).to.be.true;
+
+            const {layerConfig, parentKey} = addLayerToLayerConfigStub.firstCall.args[1];
+
+            expect(layerConfig).to.include({id: "test-layer", url: "https://example.com", showInLayerTree: true, visibility: true, type: "layer"});
+            expect(parentKey).to.equal(treeSubjectsKey);
         });
     });
 });
