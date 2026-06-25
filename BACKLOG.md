@@ -286,13 +286,12 @@ so configure only Stadtteile and Bezirke.
 - [x] In the COSI `config.json`, define `districtSelector.districtLevels` with **Stadtteile**
       and **Bezirke** entries only; omit the Statistische Gebiete entry entirely. Done 2026-06-25:
       the as-received config had **four** levels (Statistische Gebiete `27773`, Stadtteile `28201`,
-      Bezirke `28028`, Hamburg/FHH `28150`). Removed **Statistische Gebiete** (not public —
-      §4 catalogue) **and Hamburg/FHH** (to honour "Stadtteile + Bezirke **only**"). Also fixed the
-      now-dangling `districtFinder.selectedLevelId` (`27773` → `28201`/Stadtteile) and removed the
-      two orphaned geometry layers (`27773`, `28150`) from `Themenconfig`. JSON re-validates; no
-      leftover refs to the dropped IDs. **DECISION FLAG:** dropping the whole-city **Hamburg/FHH**
-      aggregate level is a one-line revert if we want it back (its stats layers `31270`/`34898`
-      public-reachability was never exercised — cf. §7).
+      Bezirke `28028`, Hamburg/FHH `28150`). Removed **Statistische Gebiete** only (not public —
+      §4 catalogue). Also fixed the now-dangling `districtFinder.selectedLevelId`
+      (`27773` → `28201`/Stadtteile) and removed the orphaned `27773` geometry layer from
+      `Themenconfig`. JSON re-validates; no leftover refs to `27773`. **Hamburg/FHH (`28150`) is
+      KEPT** (user wants the whole-city aggregate) — note its stats layers `31270`/`34898`
+      public-reachability is still unverified (cf. §7).
 - [x] For each level set: `layerId` (geometry WFS layer), `label`, `keyOfAttrName`,
       and `stats.{layerIds, keyOfAttrName, metadataUrls}` (statistical-data layers + the
       attribute-name keys). Add `duplicateDistrictNames` where a name exists at two levels
