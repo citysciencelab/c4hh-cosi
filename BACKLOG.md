@@ -228,10 +228,14 @@ present (`accessibilityAnalysis`, `districtSelector`, `dashboard`, `reportingToo
 
 ### Recommended next-session sequence (do in order)
 
-- [ ] **1. Track the pristine config first, before editing anything.** It's the most valuable
-      artifact and is untracked — we want the untouched original to diff against. Mirror the
-      §2.5 addons approach (small standalone tracking for `portal/cosi/`, or vendor it into the
-      project repo). Keep a pristine snapshot/tag of the as-received fhhnet version.
+- [x] **1. Track the pristine config first, before editing anything.** Done 2026-06-25:
+      `masterportal/portal/cosi/` is now its own **standalone git repo** (mirrors the §2.5 addons
+      approach), invisible to both parents (`masterportal/.gitignore` ignores `portal/cosi`; root
+      ignores `/masterportal/`). The as-received config is committed **byte-for-byte** (13 files,
+      no edits) on branch **`cosi-selfhost`** and tagged **`fhhnet-original`** — the untouched
+      baseline to diff every self-hosting edit against. Unlike addons there is **no upstream git
+      repo** (the agency handed us files, not a repo), so there is no fork/rebase story here — the
+      tag is purely a pristine-snapshot anchor; future edits land as commits on `cosi-selfhost`.
 - [ ] **2. Boot as-is** (`cd masterportal && npm start`, open the `portal/cosi/` portal).
       Expect: framework + COSI tool panels render (confirms addon wiring + config blocks parse),
       but **layers/routing/WPS/stats fail** because the fhhnet registries 404. Baseline only.
@@ -363,7 +367,9 @@ Done so far: §1 (env), §2 (Valhalla service), §2.5 (addons fork/tracking), §
 isochrone backend), and the **portalconfig is now in hand** (§4 — but it's the internal/fhhnet
 variant). So the next session is about **getting the real COSI portal running**:
 
-1. **Track the pristine `portal/cosi/` config** before editing it (§4 step 1) — it's untracked.
+1. ~~**Track the pristine `portal/cosi/` config** before editing it (§4 step 1).~~ **Done
+   2026-06-25:** standalone repo at `masterportal/portal/cosi/`, branch `cosi-selfhost`, pristine
+   tagged `fhhnet-original`. Next up is step 2.
 2. **Boot it as-is** for a baseline (§4 step 2) — expect mostly-404 services (fhhnet registries).
 3. **Flip registries to the `-internet.json` public variants** and boot again (§4 step 3) —
    this is the real "what works today" map.
