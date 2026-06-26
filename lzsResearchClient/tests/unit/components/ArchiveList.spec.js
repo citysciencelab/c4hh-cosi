@@ -6,7 +6,7 @@ import sinon from "sinon";
 
 import Component from "../../../components/ArchiveList.vue";
 
-describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js", () => {
+describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", () => {
     let wrapper,
         store;
 
@@ -14,7 +14,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
         const mockDatasets = reactive([
             {"archiveId": "DKL_3DSTADT_LOD1", "instanceId": "id1", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "6232", "type": "I"}]},
             {"archiveId": "DKL_3DSTADT_LOD1", "instanceId": "id2", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "4835", "type": "I"}]},
-            {"archiveId": "test", "instanceId": "id3", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "1000", "type": "I"}]}
+            {"archiveId": "test", "instanceId": "id3", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "1000", "type": "I"}]},
+            {"archiveId": "testOneColumn", "instanceId": "id4", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}]}
         ]);
 
         const tableStubInstances = [];
@@ -73,7 +74,11 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
             props: {
                 datasets: mockDatasets,
                 idPrefix: "test",
-                showTableButtons: {georef: true, details: true, preview: false, download: false}
+                showTableButtons: {georef: true, details: true, preview: false, download: false},
+                additionalHeaders: [
+                    "additional:modules.lzsResearchClient.tabs.archiveList.table.headers.position",
+                    "additional:modules.lzsResearchClient.tabs.archiveList.table.headers.details"
+                ]
             },
             global: {
                 mocks: {
@@ -129,8 +134,38 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResult.spec.js"
         expect(wrapper.vm.selectAllIsChecked).to.be.false;
 
         await wrapper.vm.toggleAllTablesInArchive(1, true);
+        await wrapper.vm.toggleAllTablesInArchive(2, true);
 
         expect(wrapper.vm.selectAllIsChecked).to.be.true;
+    });
+
+    it("should include position column header only for archives with georef", async () => {
+        const archives = wrapper.vm.archives;
+
+        expect(archives).to.have.lengthOf(3);
+        expect(archives[0].archiveId).to.equal("DKL_3DSTADT_LOD1");
+        expect(archives[1].archiveId).to.equal("test");
+        expect(archives[2].archiveId).to.equal("testOneColumn");
+        // archive DKL_3DSTADT_LOD1 has no georef in this test, should therefore not have column "position"
+        expect(wrapper.vm.getTableHeaders(archives[0])).to.have.lengthOf(3);
+        expect(wrapper.vm.getTableButtons(archives[0]).georef).to.be.false;
+        // archive test has  georef in this test, should therefore have column "position"
+        expect(wrapper.vm.getTableHeaders(archives[1])).to.have.lengthOf(4);
+        expect(wrapper.vm.getTableButtons(archives[1]).georef).to.be.true;
+        // archive testOneColumn has no georef in this test, should therefore not have column "position"
+        expect(wrapper.vm.getTableHeaders(archives[2])).to.have.lengthOf(2);
+        expect(wrapper.vm.getTableButtons(archives[2]).georef).to.be.false;
+    });
+
+    it("should find the correct number of attributes to group by for the archives", async () => {
+        const archives = wrapper.vm.archives;
+
+        // archive DKL_3DSTADT_LOD1 has 2 instance-specific columns in this test
+        expect(wrapper.vm.getAttributesToGroupBy(archives[0])).to.have.lengthOf(2);
+        // archive test has 2 instance-specific columns in this test
+        expect(wrapper.vm.getAttributesToGroupBy(archives[1])).to.have.lengthOf(2);
+        // archive testOneColumn has only 1 instance-specific column in this test, therefore nothing to "group by"
+        expect(wrapper.vm.getAttributesToGroupBy(archives[2])).to.have.lengthOf(0);
     });
 
     describe("syncGeomToInstance", async () => {

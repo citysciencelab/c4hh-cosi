@@ -222,10 +222,23 @@ export default {
             }
 
             this.additionalHeaders.forEach((header) => {
+                if (!this.archiveHasGeoref(step.archiveId) && header === this.$t("additional:modules.lzsResearchClient.tabs.archiveList.table.headers.position")) {
+                    return;
+                }
+
                 headers.push(header);
             });
 
             return headers;
+        },
+        getTableButtons (step) {
+            const localTableButtons = JSON.parse(JSON.stringify(this.showTableButtons));
+
+            if (!this.archiveHasGeoref(step.archiveId)) {
+                localTableButtons.georef = false;
+            }
+
+            return localTableButtons;
         },
         /**
          * Returns all attributes available in this archive to be shown in the "group by" dropdown.
@@ -477,7 +490,7 @@ export default {
                                 :table-header="getTableHeaders(step, groupValue)"
                                 :table-datasets="groupedResultsForAllSteps[index]?.[groupValue] || []"
                                 :has-geo-ref="archiveHasGeoref(step.archiveId)"
-                                :show-buttons="showTableButtons"
+                                :show-buttons="getTableButtons(step)"
                                 @openDetails="onOpenDetails"
                                 @clearOtherGeom="clearGeomAndGeomIndicator"
                                 @showGeomAgain="showGeomAgain"
@@ -492,7 +505,7 @@ export default {
                             :table-header="getTableHeaders(step)"
                             :table-datasets="groupedResultsForAllSteps[index] || []"
                             :has-geo-ref="archiveHasGeoref(step.archiveId)"
-                            :show-buttons="showTableButtons"
+                            :show-buttons="getTableButtons(step)"
                             @openDetails="onOpenDetails"
                             @clearOtherGeom="clearGeomAndGeomIndicator"
                             @showGeomAgain="showGeomAgain"

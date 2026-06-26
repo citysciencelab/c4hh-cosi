@@ -23,12 +23,6 @@ export default {
     data () {
         return {
             primaryDataCount: this.getDetailsForSelectedInstanceId?.primaryData?.length ?? 0,
-            showTableButtons: {
-                georef: false,
-                details: false,
-                preview: true,
-                download: true
-            },
             showSpinner: false,
             showPreviewModal: false,
             previewImage: null
@@ -42,7 +36,15 @@ export default {
             "getDataProtectionClassForArchiveId",
             "progressNow",
             "placeholderDataClassList"
-        ])
+        ]),
+        showTableButtons () {
+            return {
+                georef: false,
+                details: false,
+                preview: this.getTableDatasets().some(d => d.hasPreview),
+                download: true
+            };
+        }
     },
     watch: {
         selectedInstanceId (newValue) {
