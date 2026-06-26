@@ -261,20 +261,39 @@ API differences to handle:
       features each carrying `properties.contour` in **minutes** (e.g. 15/10/5 → `fromContour` →
       900/600/300 s, sorted ascending). Distance contours echo **km** (2/1 → 2000/1000 m). The 7
       `requestIsochronesValhalla` unit tests still pass (`npm test`, via `devtools/vitest.config.js`).
-- [ ] **Refine `wheelchair`**: currently mapped to `pedestrian`; add Valhalla
-      `costing_options.pedestrian` tuning if needed (no first-class wheelchair costing in Valhalla).
-- [ ] Add the **`valhalla` rest-service entry** that `serviceId` points at — see §6.
-- [ ] **WANTED (user, 2026-06-26): more detailed / higher-resolution isochrones.** Levers, all in
-      the Valhalla request built by `utils/requestIsochronesValhalla.js` / `createIsochrones.js`:
-      - **`generalize`** (metres): Valhalla simplifies the contour with Douglas–Peucker; we send none
-        (defaults ~ tile-resolution). Add a small explicit value (e.g. 50–100 m) for smoother, more
-        detailed outlines, or 0 for maximum fidelity (bigger payloads).
-      - **`denoise`** (0–1): currently hard-coded **1** (drops all disconnected islands). Lower it
-        (e.g. 0.1–0.5) to keep smaller reachable pockets — more realistic, busier shapes.
-      - **Contour bands:** `createIsochrones.js` renders a fixed **3** bands (`range/3, range·2/3,
-        range`). More/finer bands = more gradient detail (mind the per-request cost; Valhalla isochrone
-        is single-origin so each extra origin/band adds calls).
-      - Consider exposing these as `accessibilityAnalysis` config so they're tunable without a rebuild.
+- [x] **Refine `wheelchair`**: was mapped to bare `pedestrian`; now also sends
+      `costing_options: {pedestrian: {type: "wheelchair"}}` (Valhalla's pedestrian costing exposes a
+      `type:"wheelchair"` that avoids steps + honours `wheelchair=*` access tags — the closest thing to
+      first-class wheelchair costing Valhalla has). **Done 2026-06-26**: new `toValhallaCostingOptions()`
+      in `utils/requestIsochronesValhalla.js`, only emitted for the `wheelchair` profile (others get
+      Valhalla defaults). Covered by 2 new unit tests.
+- [x] Add the **`valhalla` rest-service entry** that `serviceId` points at — **already done in §6**
+      (`portal/cosi/rest-services.json`: `{id:"valhalla", url:"http://localhost:8002", typ:"Valhalla"}`,
+      → `/valhalla` in the §8 nginx deploy). Verified present 2026-06-26; nothing more to do.
+- [x] **WANTED (user, 2026-06-26): more detailed / higher-resolution isochrones.** **Done 2026-06-26.**
+      Implemented the two resolution levers as `accessibilityAnalysis` config (no rebuild needed); the
+      band-count lever was deliberately deferred (see below). All in the Valhalla request built by
+      `utils/requestIsochronesValhalla.js` / `createIsochrones.js`:
+      - **`generalize`** (metres) — **DONE**: now sent from config (`null`/omitted = Valhalla default;
+        `0` = max fidelity). Threaded through a new `isochroneOptions` arg
+        (`methodsAnalysis` → `getIsochrones` action → `createIsochrones` → `requestIsochrones` →
+        `requestIsochronesValhalla`). Deployed config sets **`generalize: 30`** for smoother/finer outlines.
+      - **`denoise`** (0–1) — **DONE**: no longer hard-coded `1`; defaults to `1` in code (keeps backward
+        compat) but is config-overridable. Deployed config sets **`denoise: 0.3`** to keep small reachable
+        pockets (more realistic, busier shapes).
+      - Config shape: `accessibilityAnalysis.valhallaIsochroneOptions = {generalize, denoise}` (state default
+        `{generalize: null, denoise: 1}` = no behaviour change; the COSI `config.json` block sets `{30, 0.3}`).
+        Valhalla-only — the ORS path ignores `isochroneOptions`. Covered by 3 new unit tests (defaults,
+        explicit values, `generalize: 0` vs `null`).
+      - **Contour bands — DEFERRED (not done), on purpose.** The fixed **3** bands are *structurally* baked
+        in, not just a literal: `styleIsochroneFeatures.js` uses `% 3`/`% 4` modular arithmetic (the `%4`
+        path detects the travel-time-index "traffic flow" 4th band), `getDistances`/`getSteps` build exactly
+        3 (+1) steps, and `steps.length` drives feature grouping in both `createIsochrones.js` and
+        `AccessibilityAnalysis.vue` plus the legend + `isochroneColors`. Making band count configurable means
+        rewriting all of that coherently — a much bigger, riskier change than the outline levers, and the
+        per-request cost is real (Valhalla isochrone is single-origin, so each extra band × each origin = one
+        more call). Left as a standalone follow-up; the two levers above already deliver the "more detailed /
+        higher-resolution" outlines the user asked for.
       - **CORS note (done 2026-06-26):** isochrone POSTs now use `Content-Type: text/plain` to skip the
         browser preflight (Valhalla returns 405 on `OPTIONS`); the §8 nginx same-origin `/valhalla`
         proxy removes the cross-origin question entirely.
