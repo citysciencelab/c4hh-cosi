@@ -37,7 +37,7 @@ pipelines:
                         - apt-get update && apt-get install zip && apt-get install -y curl wput jq  && apt-get install zip
                         - pip install -r devtools/docsValidation/python-dependencies.txt
                         - mkdir -p docs/_snippets
-                        - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
+                        - RELEASE_VERSION="${BITBUCKET_TAG#v}" && if grep -q "^## .* v${RELEASE_VERSION}.*LTS.*$" CHANGELOG.md 2>/dev/null; then printf '# Welcome to the Masterportal Documentation (%s (lts))\n' "$RELEASE_VERSION" > docs/_snippets/index_title.md; else printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md; fi
                         - mike deploy $BITBUCKET_TAG
                         - mv $BITBUCKET_CLONE_DIR/site $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG
                         -   pipe: atlassian/ftp-deploy:0.7.1
@@ -49,6 +49,15 @@ pipelines:
                                 LOCAL_PATH: $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG
                                 DEBUG: 'true'
                                 DELETE_FLAG: 'false'
+                        - RELEASE_VERSION="${BITBUCKET_TAG#v}"
+                        - CHANGELOG_RELEASE_HEADER="$(grep -m1 -E "^## .* v${RELEASE_VERSION}( \(LTS\))?$" CHANGELOG.md || true)"
+                        - if [ -z "$CHANGELOG_RELEASE_HEADER" ]; then echo "Could not find release headline for $BITBUCKET_TAG in CHANGELOG.md." && exit 1; fi
+                        - IS_RELEASE_LTS="false"
+                        - if echo "$CHANGELOG_RELEASE_HEADER" | grep -q ' (LTS)$'; then IS_RELEASE_LTS="true"; fi
+                        - RELEASE_PATCH="${RELEASE_VERSION##*.}"
+                        - IS_LTS_HOTFIX="false"
+                        - if [ "$IS_RELEASE_LTS" = "true" ] && [ "$RELEASE_PATCH" != "0" ]; then IS_LTS_HOTFIX="true"; fi
+                        - if [ "$IS_LTS_HOTFIX" = "true" ]; then echo "LTS hotfix detected for $BITBUCKET_TAG - skip Latest docs upload." && exit 0; fi
                         - mv $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG $BITBUCKET_CLONE_DIR/Latest
                         -   pipe: atlassian/ftp-deploy:0.7.1
                             variables:
