@@ -13,6 +13,9 @@
               "screenToSmallMessage": "DIPAS_stories ist für diese Bildschirmgröße noch nicht optimiert. Bitte nach Möglichkeit einen größeren Bildschirm nutzen!",
                "mobilePortraitMessage": "Nutzung im Querformat empfohlen."
             },
+            "floatingButton": {
+                "scrollToTop": "Nach oben scrollen"
+            },
            "noPlayerAvailable": "Es ist kein vorhandener Story Player in displayType konfiguriert. Bitte füge einen gültigen Story Player hinzu, um die Story Widergabe zu nutzen."
         }
     }

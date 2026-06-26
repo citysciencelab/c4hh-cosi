@@ -2,11 +2,15 @@
 import axios from "axios";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
 
 export default {
     name: "StoryPlayer",
+    components: {
+        IconButton
+    },
     props: {
         isMobileDevice: {
             type: Boolean,
@@ -574,6 +578,18 @@ export default {
 
             // Observe each step element
             stepElements.forEach(step => this._stepObserver.observe(step));
+        },
+
+        /**
+         * Scrolls the secondary menu to the top.
+         * @returns {void}
+         */
+        scrollToTop () {
+            const secondaryMenu = document.getElementById("mp-body-secondaryMenu");
+
+            if (secondaryMenu) {
+                secondaryMenu.scrollTo({top: 0, behavior: "smooth"});
+            }
         }
     }
 };
@@ -713,6 +729,14 @@ export default {
                 </div>
             </div>
         </div>
+        <IconButton
+            v-if="showStickyHeader"
+            class="position-fixed bottom-0 end-0 mb-5 me-5"
+            :aria="$t('additional:modules.storyPlayer.floatingButton.scrollToTop')"
+            :class-array="['btn-secondary']"
+            :icon-array="['bi-arrow-up fs-3']"
+            @click="scrollToTop"
+        />
     </div>
 </template>
 

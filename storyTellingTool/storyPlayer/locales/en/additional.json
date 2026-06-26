@@ -13,6 +13,9 @@
               "screenToSmallMessage": "DIPAS_stories has not been optimized for this screen size yet. Please use a bigger screen if possible!",
               "mobilePortraitMessage": "Usage in landscape mode recommended."
             },
+            "floatingButton": {
+                "scrollToTop": "Scroll to top"
+            },
             "noPlayerAvailable": "No existing story player is configured for displayType. Please add a story player to use the story narration."
         }
     }

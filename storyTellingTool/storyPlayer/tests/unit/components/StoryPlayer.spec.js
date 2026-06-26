@@ -352,6 +352,14 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 }
             });
         });
+
+        it("should render floating-button", async () => {
+            wrapper.vm.showStickyHeader = true;
+            await wrapper.vm.$nextTick();
+            const floatingButton = wrapper.findComponent({name: "IconButton"});
+
+            expect(floatingButton.exists()).to.be.true;
+        });
     });
 
     describe("Methods", () => {
