@@ -62,6 +62,47 @@
 
 ---
 
+## 2026-06-24 v3.15.3 (LTS)
+
+### Added
+ - Security: Added SECURITY.md file.
+ - Added CONTRIBUTING.md file.
+ - Architectural Decision Record **[ADR](./docs/Dev/Architecture_Decision_Record.md)**: Added documentation file for architectural decisions in the project.
+ - UrlParams:
+    - ZOOMTOGEOMETRY: Added GeoJSON layer support for ZOOMTOGEOMETRY.
+    - ZOOMTOFEATUREID:
+        - An attribute `centerOfExtent` has been added to control whether a point geometry is set to the extent of the respective feature or whether the feature itself is displayed in its geometry.
+        - WFS versions 1.0.0, 1.1.0, and 2.0.0 are now compatible.
+
+### Changed
+- The following packages have been updated:
+    - dependencies:
+        - @masterportal/masterportalapi: 2.51.0 to 2.51.1
+
+### Fixed
+- Issue \#1472: Improve error handling and robustness of `addInterceptor`.
+- Issue \#1489: Print - fix rotated print masks and add missing rotation for MapFish. Add information regarding missing support of *High Resolution PlotService* to docs.
+- Issue \#1515: Filter: saveTo: `url` was fixed. Now reads URL params properly and sets them.
+- Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
+- Issue \#1577: PortalFooter: Fixed About-Module detection to search in all menu sections instead of only the first one.
+- Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
+- VectorStyle: Fixed styling of polygons: `"zig-line-horizontal"` and `"diagonal-right"` are rotated by 90Â°.
+- sortObjects: Ensure stable sortByLayerSequence order in Chrome/Firefox.
+- BufferAnalysis: Fixed applying values from URL. New and legacy format are now correctly parsed and applied.
+- UrlParams:
+  - Fixed an issue where old links with non-existent layers would fail to load by adding a fail-safe mechanism.
+  - Fixed WMS-Time layers not working with legacy URL parameters.
+  - ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
+  - Links to other config files have been corrected in the `urlParameter` documentation.
+- GFI: In the gfiTheme `Default`, line breaks have been optimised and the size of the content changes when the sidebar is resized.  
+- Print: Fixed print layer sorting for grouped layers without zIndex.
+- SearchBar: 
+    - Added a checkbox to select all subcategories when opening a folder.
+    - Fixed duplicated results with URL Parameter `QUERY`.
+- WMS-Time: Activating time comparison placed the second WMS-Time layer at the top of the layerTree, causing it to cover other layers. The fix places the comparison layer directly above the original layer.
+
+---
+
 ## 2026-06-03 v3.23.0
 
 ### Added
