@@ -45,4 +45,33 @@ if [ ! -f "$DEST/stops.txt" ]; then
   exit 1
 fi
 
+# ── Prepare the feed for Valhalla (see scripts/trim-gtfs.py / filter-gtfs-poly.py) ──
+# Two reasons the raw HVV feed must be reduced before Valhalla can build it:
+#  1. It spans ~9 months of service (2.5M stop_times); the transit+enhance step
+#     balloons and is very slow. We clip the calendar to a short current window.
+#  2. It covers the whole metropolitan region, but our OSM extract is Hamburg
+#     only; stops outside the road graph make Valhalla ABORT the build
+#     (std::bad_array_new_length / "Could not find connection point"). We drop
+#     stops outside the extract's polygon.
+
+# 1. Clip the service calendar to [today, today+GTFS_TRIM_DAYS] (0 disables).
+TRIM_DAYS="${GTFS_TRIM_DAYS:-14}"
+if [ "$TRIM_DAYS" != "0" ]; then
+  START="$(date +%Y%m%d)"
+  END="$(date -d "+${TRIM_DAYS} days" +%Y%m%d)"
+  python3 "$SCRIPT_DIR/trim-gtfs.py" "$DEST" "$START" "$END"
+fi
+
+# 2. Spatially filter stops to the OSM extract boundary polygon (empty disables).
+POLY="${GTFS_BOUNDARY_POLY:-hamburg.poly}"
+if [ -n "$POLY" ]; then
+  case "$POLY" in /*) POLY_PATH="$POLY";; *) POLY_PATH="$VALHALLA_DIR/$POLY";; esac
+  if [ ! -f "$POLY_PATH" ]; then
+    echo "✗ Boundary polygon '$POLY_PATH' not found. Set GTFS_BOUNDARY_POLY= to skip" >&2
+    echo "  spatial filtering, or provide the .poly matching your OSM extract." >&2
+    exit 1
+  fi
+  python3 "$SCRIPT_DIR/filter-gtfs-poly.py" "$DEST" "$POLY_PATH"
+fi
+
 echo "✓ GTFS feed ready in ${DEST}/ ($(find "$DEST" -name '*.txt' | wc -l | tr -d ' ') text files)"

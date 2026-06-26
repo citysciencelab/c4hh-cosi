@@ -105,23 +105,35 @@ Replace ORS with our own Valhalla, runnable locally **and** auto-deployable on t
 - [x] Download HVV GTFS data and build the public-transport mode: `scripts/fetch-gtfs.sh`
       pulls + unzips the HVV feed (`HVV_GTFS_URL`, latest from the Hamburg Transparenzportal)
       into `gtfs_feeds/hvv/`; compose builds it with `build_transit`/`build_admins`/`build_time_zones`.
-- [~] **Public-transport (multimodal) tiles — code done, local tile build BLOCKED (2026-06-26).**
-      Updated `HVV_GTFS_URL` to the current **Apr–Dec 2026** feed (the old `.env.example` URL was a
-      May 2025 feed whose service calendar has expired → would route no transit today). Verified the
-      feed downloads (40 MB, 17,603 stops, service window covers today). Two build obstacles hit:
-      1. **OOM** — `valhalla_ingest_transit` was killed because Docker Desktop's VM defaulted to
-         **3.9 GB**. Raised to **8 GB** (`MemoryMiB: 8192` in `~/.docker/desktop/settings-store.json`;
-         host has 15 GB). Ingest then passed. **CSL note: the transit build needs ≥~5 GB RAM.**
-      2. **Upstream Valhalla bug (still blocking):** `valhalla_build_tiles -s enhance` aborts with
-         `std::bad_array_new_length` **only when transit is included** (the car/bike/foot build
-         enhances fine). Memory was low (354 MB) at the abort, so it is *not* OOM — it is a known,
-         version-dependent fragility in Valhalla's GTFS+enhance path (see valhalla issues
-         #4745/#4777/#4844/#5276). Suspect trigger: the HVV feed ships `frequencies.txt`
-         (frequency-based trips), a known Valhalla GTFS pain point. **Local service restored to
-         car/bike/foot** (rebuilt with `BUILD_TRANSIT=False`) so routing works meanwhile.
-         **Options to unblock:** (a) pin a different Valhalla image/version known good for transit;
-         (b) strip/expand `frequencies.txt` before the build; (c) build transit tiles as a separate
-         overlay step instead of the single-pass enhance. **Needs a decision.**
+- [x] **Public-transport (multimodal) tiles — WORKING (2026-06-26).** `BUILD_TRANSIT=True`
+      builds an HVV transit graph and multimodal isochrones are live: a 45-min multimodal
+      isochrone from Hauptbahnhof covers **13.6×** the walking area, `transit_available` is true,
+      `version` 3.5.1. Getting there took unwinding three separate problems — recorded so we don't
+      re-derive them:
+      1. **Stale feed.** Updated `HVV_GTFS_URL` to the current **Apr–Dec 2026** feed (the old
+         `.env.example` URL was a May 2025 feed whose service calendar has expired → no transit today).
+      2. **OOM in `valhalla_ingest_transit`.** Docker Desktop's VM defaulted to **3.9 GB**; raised to
+         **8 GB** (`MemoryMiB: 8192` in `~/.docker/desktop/settings-store.json`). **CSL note: transit
+         build needs ≥~6 GB RAM.**
+      3. **The real blocker — `std::bad_array_new_length` in `valhalla_build_tiles -s enhance`,
+         "Adding N transit tiles to the local graph".** *Not* a Valhalla version bug (reproduces
+         identically on 3.4.0/3.5.0/3.5.1) and *not* OOM. Root cause: the HVV GTFS covers the whole
+         metropolitan region (stops at lat 51.5–54.9), but our OSM extract is **Hamburg-city only**, so
+         ~60 % of stops have **no road to connect to** → `"Could not find connection point for
+         in/egress"` → abort. Fix = make the feed fit the extract, via two reproducible preprocessing
+         steps now wired into `scripts/fetch-gtfs.sh`:
+         - **`scripts/trim-gtfs.py`** clips the service calendar to a current window (`GTFS_TRIM_DAYS`,
+           default 14) — ~18× fewer departures → build is fast and small (the 9-month feed is also why
+           it was slow/heavy).
+         - **`scripts/filter-gtfs-poly.py`** filters stops to the OSM extract's exact Geofabrik
+           **`hamburg.poly`** boundary (`GTFS_BOUNDARY_POLY`) — point-in-polygon, so every kept stop is
+           inside the road graph (a rectangular bbox can't match the irregular extract; that was
+           whack-a-mole). Result: 17,603 → ~5,100 stops, all connectable.
+         The build then completes on the default **3.5.1** image; the finalized tile tar (105 MB incl.
+         transit) is reused on restart. **Coverage note:** transit is **Hamburg-city only** (suburban
+         S-Bahn to Pinneberg/Norderstedt/Stade etc. is dropped with the out-of-extract stops). For full
+         HVV coverage, use a regional/Germany OSM extract and set `GTFS_BOUNDARY_POLY=` (empty) — heavier
+         build (see §8/CSL).
 - [x] Expose Valhalla on a stable URL (local: `http://localhost:8002`, `VALHALLA_PORT`).
       Compose healthcheck polls `/status` (generous `start_period` covers the long initial build).
 - [x] One-command bootstrap: `valhalla/bootstrap.sh` (creates `.env`, fetches GTFS, pulls,

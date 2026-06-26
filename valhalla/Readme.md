@@ -34,15 +34,25 @@ Then point COSI's `rest-services.json` `valhalla` entry at
 ## What gets built
 
 - **Driving / cycling / walking** graph from an OSM extract (Geofabrik). Default
-  is **all of Germany**; for local dev you can switch `OSM_EXTRACT_URL` in `.env`
-  to the much lighter **Hamburg** extract.
+  is the light **Hamburg** extract; switch `OSM_EXTRACT_URL` in `.env` to a
+  regional/Germany extract for full coverage (heavier — see the resource table).
 - **Public transport** graph from the **HVV GTFS** feed (`build_transit=True`),
-  enabling multimodal routing. `scripts/fetch-gtfs.sh` downloads and unzips the
-  feed into `gtfs_feeds/hvv/`. Admin and timezone databases are built too
-  (`build_admins`/`build_time_zones`), which transit/time-dependent routing needs.
+  enabling multimodal routing. `scripts/fetch-gtfs.sh` downloads, unzips, and
+  **prepares** the feed (admin/timezone DBs are built too, which transit needs).
 
-Set `BUILD_TRANSIT=False` in `.env` for a car/bike/foot-only graph (much faster,
-no GTFS download).
+  The raw HVV feed can't be built as-is, so `fetch-gtfs.sh` runs two steps:
+  - `scripts/trim-gtfs.py` clips the ~9-month service calendar to a current
+    window (`GTFS_TRIM_DAYS`, default 14) — the full span makes the build huge.
+  - `scripts/filter-gtfs-poly.py` drops stops outside the OSM extract's polygon
+    (`GTFS_BOUNDARY_POLY=hamburg.poly`). The HVV feed spans the whole region; a
+    stop with no road in the extract makes Valhalla **abort** the build
+    (`std::bad_array_new_length` / "Could not find connection point for in/egress").
+    Point-in-polygon filtering against the extract's Geofabrik `.poly` guarantees
+    every kept stop connects. **Coverage is therefore Hamburg-city only** — for
+    suburban/regional transit, use a bigger extract and set `GTFS_BOUNDARY_POLY=`.
+
+Set `BUILD_TRANSIT=False` in `.env` for a car/bike/foot-only graph (faster, no
+GTFS download/prep).
 
 ## Configuration
 

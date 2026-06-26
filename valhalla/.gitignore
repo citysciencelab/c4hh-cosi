@@ -9,3 +9,7 @@ custom_files/
 *.zip
 *.ZIP
 *.tar
+
+# Python bytecode
+scripts/__pycache__/
+__pycache__/
