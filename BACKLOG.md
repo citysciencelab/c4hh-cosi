@@ -133,7 +133,22 @@ Replace ORS with our own Valhalla, runnable locally **and** auto-deployable on t
          transit) is reused on restart. **Coverage note:** transit is **Hamburg-city only** (suburban
          S-Bahn to Pinneberg/Norderstedt/Stade etc. is dropped with the out-of-extract stops). For full
          HVV coverage, use a regional/Germany OSM extract and set `GTFS_BOUNDARY_POLY=` (empty) — heavier
-         build (see §8/CSL).
+         build (see §8/CSL). → see the next item, which is the wanted target.
+- [ ] **WANTED (user, 2026-06-26): full HVV transit coverage — do NOT crop to the Hamburg boundary.**
+      Hamburg is a metropolitan area tightly interconnected with its hinterland, so the public-transport
+      mode should include **all HVV stations**, not just the city. Concretely:
+      - **Extend the OSM extract** to cover the whole HVV catchment. User-requested states (all Geofabrik
+        `europe/germany/<state>-latest.osm.pbf`, space-separated in `OSM_EXTRACT_URL` → multi-`tile_urls`):
+        **Hamburg, Schleswig-Holstein, Mecklenburg-Vorpommern, Niedersachsen, Brandenburg, Sachsen-Anhalt,
+        Berlin, Bremen, Hessen.** (That's most of N+central Germany — compare against just using
+        `germany-latest.osm.pbf`, which may be simpler and similar in cost.)
+      - **Set `GTFS_BOUNDARY_POLY=`** (empty) so `fetch-gtfs.sh` keeps all ~17.6k stops (the poly filter
+        was only needed because the extract was Hamburg-only). Keep `GTFS_TRIM_DAYS` (calendar trim is
+        independent and keeps the build tractable — even more important at this scale).
+      - **Resource reality:** this is a **server-side (CSL) build**, not the laptop — multi-state OSM +
+        full transit graph needs a lot of RAM/disk/time (Valhalla enhance can be memory-heavy; the laptop
+        only has an 8 GB Docker VM / ~21 GB free disk). Size it as part of §8/§9 (CSL specs) before
+        building. No code change — purely `.env` (`OSM_EXTRACT_URL` + empty `GTFS_BOUNDARY_POLY`) + compute.
 - [x] Expose Valhalla on a stable URL (local: `http://localhost:8002`, `VALHALLA_PORT`).
       Compose healthcheck polls `/status` (generous `start_period` covers the long initial build).
 - [x] One-command bootstrap: `valhalla/bootstrap.sh` (creates `.env`, fetches GTFS, pulls,
@@ -243,6 +258,20 @@ API differences to handle:
 - [ ] **Refine `wheelchair`**: currently mapped to `pedestrian`; add Valhalla
       `costing_options.pedestrian` tuning if needed (no first-class wheelchair costing in Valhalla).
 - [ ] Add the **`valhalla` rest-service entry** that `serviceId` points at — see §6.
+- [ ] **WANTED (user, 2026-06-26): more detailed / higher-resolution isochrones.** Levers, all in
+      the Valhalla request built by `utils/requestIsochronesValhalla.js` / `createIsochrones.js`:
+      - **`generalize`** (metres): Valhalla simplifies the contour with Douglas–Peucker; we send none
+        (defaults ~ tile-resolution). Add a small explicit value (e.g. 50–100 m) for smoother, more
+        detailed outlines, or 0 for maximum fidelity (bigger payloads).
+      - **`denoise`** (0–1): currently hard-coded **1** (drops all disconnected islands). Lower it
+        (e.g. 0.1–0.5) to keep smaller reachable pockets — more realistic, busier shapes.
+      - **Contour bands:** `createIsochrones.js` renders a fixed **3** bands (`range/3, range·2/3,
+        range`). More/finer bands = more gradient detail (mind the per-request cost; Valhalla isochrone
+        is single-origin so each extra origin/band adds calls).
+      - Consider exposing these as `accessibilityAnalysis` config so they're tunable without a rebuild.
+      - **CORS note (done 2026-06-26):** isochrone POSTs now use `Content-Type: text/plain` to skip the
+        browser preflight (Valhalla returns 405 on `OPTIONS`); the §8 nginx same-origin `/valhalla`
+        proxy removes the cross-origin question entirely.
 
 ---
 
