@@ -109,6 +109,22 @@ export default {
          */
         normalizedMeansOfTransport () {
             return this.meansOfTransport !== "Anzahl_Fahrraeder" ? "Anzahl_Kfz" : this.meansOfTransport;
+        },
+
+        /**
+         * Gets the indication whether the sensor type is an induction loop.
+         * @return {Boolean} True if the sensor type is an induction loop.
+         */
+        isInductionLoop () {
+            return this.type === this.$t("additional:modules.tools.gfi.themes.trafficCount.inductionLoop");
+        },
+
+        /**
+         * Gets the interval download options that should be visible, none for an induction loop.
+         * @return {Object[]} The visible download options.
+         */
+        visibleDownloadOptions () {
+            return this.isInductionLoop ? [] : this.downloadOptions;
         }
     },
     watch: {
@@ -196,7 +212,7 @@ export default {
          * @returns {void}
          */
         startDownload (interval) {
-            if (this.isDownloading) {
+            if (this.isDownloading || this.isInductionLoop) {
                 return;
             }
 
@@ -215,6 +231,69 @@ export default {
             handler(jsonData => {
                 this.downloadCsv(jsonData, this.downloadFilename ? this.downloadFilename + " " + interval : interval);
             });
+        },
+
+        /**
+         * Triggers the data export for all available intervals at once, combining them into a single csv file.
+         * @returns {void}
+         */
+        startDownloadAll () {
+            if (this.isDownloading || !this.isInductionLoop) {
+                return;
+            }
+
+            if (typeof this.downloadUrl === "string") {
+                window.location = this.downloadUrl;
+                return;
+            }
+
+            const options = this.downloadOptions,
+                results = [];
+            let remaining = options.length;
+
+            this.isDownloading = true;
+
+            options.forEach((option, index) => {
+                const handler = this.getDownloadHandler(option.interval, this.meansOfTransport);
+
+                if (typeof handler !== "function") {
+                    results[index] = [];
+                    remaining -= 1;
+                    if (remaining <= 0) {
+                        this.finishDownloadAll(options, results);
+                    }
+                    return;
+                }
+
+                handler(jsonData => {
+                    results[index] = Array.isArray(jsonData) ? jsonData : [];
+                    remaining -= 1;
+                    if (remaining <= 0) {
+                        this.finishDownloadAll(options, results);
+                    }
+                });
+            });
+        },
+
+        /**
+         * Combines the data of all intervals into a single array and triggers the csv file download.
+         * @param {Object[]} options the download options in the order their data should appear
+         * @param {Object[][]} results the prepared data per interval, indexed like options
+         * @returns {void}
+         */
+        finishDownloadAll (options, results) {
+            const jsonData = [],
+                intervalHeader = this.$t("additional:modules.tools.gfi.themes.trafficCount.downloadIntervalColumn");
+
+            options.forEach((option, index) => {
+                const intervalLabel = this.$t("additional:modules.tools.gfi.themes.trafficCount." + option.intervalLabel);
+
+                (results[index] || []).forEach(row => {
+                    jsonData.push({[intervalHeader]: intervalLabel, ...row});
+                });
+            });
+
+            this.downloadCsv(jsonData, this.downloadFilename ? this.downloadFilename + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.downloadAllFilename") : this.$t("additional:modules.tools.gfi.themes.trafficCount.downloadAllFilename"));
         },
 
         /**
@@ -490,7 +569,7 @@ export default {
                         </li>
                         <li><hr class="dropdown-divider m-0"></li>
                         <li
-                            v-for="option in downloadOptions"
+                            v-for="option in visibleDownloadOptions"
                             :key="option.interval"
                         >
                             <button
@@ -503,6 +582,23 @@ export default {
                                 </span>
                                 <span class="download-menu-item-period">
                                     {{ getPeriodLabel(option.interval) }}
+                                </span>
+                            </button>
+                        </li>
+                        <li v-if="isInductionLoop">
+                            <hr class="dropdown-divider m-0">
+                        </li>
+                        <li v-if="isInductionLoop">
+                            <button
+                                type="button"
+                                class="dropdown-item download-menu-item"
+                                @click="startDownloadAll"
+                            >
+                                <span class="download-menu-item-title">
+                                    {{ $t("additional:modules.tools.gfi.themes.trafficCount.downloadAll") }}
+                                </span>
+                                <span class="download-menu-item-period">
+                                    {{ $t("additional:modules.tools.gfi.themes.trafficCount.downloadAllDescription") }}
                                 </span>
                             </button>
                         </li>
@@ -556,6 +652,8 @@ export default {
         padding: 0.6rem 1rem;
         white-space: normal;
 
+        &:hover,
+        &:focus,
         &:active {
             color: inherit;
             background-color: rgba($light_grey, 0.5);

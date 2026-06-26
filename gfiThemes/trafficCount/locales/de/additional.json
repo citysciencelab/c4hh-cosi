@@ -57,6 +57,10 @@
                         "downloadPeriod": "Zeitraum: {{from}} – {{until}}",
                         "downloadPeriodSince": "Zeitraum: seit {{year}}",
                         "downloadPeriodAll": "Zeitraum: gesamter Zeitraum",
+                        "downloadAll": "Alles herunterladen",
+                        "downloadAllDescription": "Alle Intervalle in einer CSV",
+                        "downloadAllFilename": "gesamt",
+                        "downloadIntervalColumn": "Intervall",
                         "error": {
                             "dataNotAvailableA": "(nicht",
                             "dataNotAvailableB": "empfangen)",
