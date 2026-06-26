@@ -71,9 +71,11 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 }
             },
             getters: {
+                allBaselayerConfigs: () => [],
                 allLayerConfigs: () => [],
                 configuredModules: () => sinon.stub(),
-                layerConfigById: () => sinon.stub()
+                layerConfigById: () => sinon.stub(),
+                visibleBaselayerConfigs: () => []
             },
             actions: {
                 addOrReplaceLayer: () => sinon.stub(),
@@ -143,7 +145,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
         it("should find vue multiselect component", () => {
             expect(wrapper.findComponent({name: "Multiselect"}).exists()).to.be.true;
-            expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(2);
+            expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(3);
         });
 
         it("should configure Draggable to use drag handle only", async () => {

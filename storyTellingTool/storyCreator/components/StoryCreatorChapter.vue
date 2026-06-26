@@ -84,7 +84,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["allLayerConfigs", "configuredModules", "layerConfigById"]),
+        ...mapGetters(["allLayerConfigs", "allBaselayerConfigs", "visibleBaselayerConfigs", "configuredModules", "layerConfigById"]),
         ...mapGetters("Modules/StoryManager", ["originalLayerConfig", "subjectLayerCategory"]),
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
@@ -114,6 +114,41 @@ export default {
          */
         isContentEditorOpen () {
             return this.openContentEditor.type !== "";
+        },
+        /**
+         * Returns the currently visible baselayer with the highest zIndex.
+         * @returns {Object|null} The active baselayer configuration or null.
+         */
+        activeVisibleBaselayer () {
+            if (!Array.isArray(this.visibleBaselayerConfigs) || this.visibleBaselayerConfigs.length === 0) {
+                return null;
+            }
+
+            let activeLayer = this.visibleBaselayerConfigs[0];
+
+            for (const layer of this.visibleBaselayerConfigs) {
+                if (layer.zIndex > activeLayer.zIndex) {
+                    activeLayer = layer;
+                }
+            }
+
+            return activeLayer;
+        },
+        /**
+         * Reflects the currently active baselayer and activates a newly selected one.
+         * @returns {Object|String} The active baselayer or an empty value.
+         */
+        selectedBaseLayer: {
+            get () {
+                return this.activeVisibleBaselayer || "";
+            },
+            set (layer) {
+                if (!layer) {
+                    return;
+                }
+
+                this.applyLayerVisibility(layer);
+            }
         }
     },
     watch: {
@@ -334,6 +369,13 @@ export default {
             this.selectedLayer = Array.isArray(chapter.map.layers)
                 ? this.layerList.filter(layer => chapter.map.layers.includes(layer.layerId))
                 : [];
+
+            if (Array.isArray(chapter.map.layers)) {
+                chapter.map.layers.forEach(layerId => {
+                    this.applyLayerVisibility({id: layerId});
+                });
+            }
+
             this.selectedTool = chapter.map.tool
                 ? this.toolList.find(tool => tool.toolId === chapter.map.tool) || ""
                 : "";
@@ -382,6 +424,23 @@ export default {
             this.confirmedZoomlevel = this.zoomlevel;
             this.showAlert = true;
         },
+        /**
+         * Activates the selected layer by updating layer config visibility.
+         * @param {Object} layer - The selected layer option.
+         * @returns {void}
+         */
+        applyLayerVisibility (layer) {
+            const layerId = layer?.id || layer?.layerId;
+
+            if (!layerId) {
+                return;
+            }
+
+            this.changeVisibility({
+                layerId,
+                value: true
+            });
+        },
 
         /**
          * Returns true when two coordinates contain the same values.
@@ -409,7 +468,9 @@ export default {
             const layerNames = [];
 
             this.findAllObjectsByKeyValueDeep(list).forEach(layer => {
-                if (typeof layer?.name !== "undefined") {
+                const layerConf = this.layerConfigById(layer?.id);
+
+                if (typeof layer?.name !== "undefined" && !layerConf?.baselayer) {
                     layerNames.push({layerId: layer.id, label: layer.name, level: layer.level, $isDisabled: layer.$isDisabled});
                 }
             });
@@ -507,12 +568,16 @@ export default {
          * @returns {void}
          */
         saveChapter () {
+            const baseLayerId = this.selectedBaseLayer?.id,
+                subjectLayerIds = this.selectedLayer.map(layer => layer.layerId),
+                layers = baseLayerId ? [baseLayerId, ...subjectLayerIds] : subjectLayerIds;
+
             const chapter = {
                 title: this.title.trim() !== "" ? this.title : this.$t("additional:modules.storyCreator.chapter.title"),
                 map: {
                     center: [...this.confirmedCoordinate],
                     zoomLevel: this.confirmedZoomlevel,
-                    layers: this.selectedLayer.map(layer => layer.layerId),
+                    layers,
                     tool: this.selectedTool.toolId
                 },
                 content: this.content
@@ -661,6 +726,26 @@ export default {
                         {{ $t('additional:modules.storyCreator.chapter.successAlert') }}
                     </div>
                 </div>
+            </div>
+            <div class="row no-gutters mb-4">
+                <label
+                    for="base-layer-list"
+                    class="form-label small text-muted"
+                >
+                    {{ $t('additional:modules.storyCreator.chapter.baseLayerList') }}
+                </label>
+                <Multiselect
+                    id="base-layer-list"
+                    v-model="selectedBaseLayer"
+                    :aria-label="$t('additional:modules.storyCreator.chapter.baseLayerList')"
+                    :multiple="false"
+                    :options="allBaselayerConfigs"
+                    :show-labels="false"
+                    :placeholder="$t('additional:modules.storyCreator.chapter.baseLayerListPlaceholder')"
+                    label="name"
+                    track-by="id"
+                    @select="applyLayerVisibility"
+                />
             </div>
             <div class="row no-gutters mb-4 mt-4">
                 <label
