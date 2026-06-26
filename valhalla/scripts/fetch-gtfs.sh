@@ -63,7 +63,10 @@ if [ "$TRIM_DAYS" != "0" ]; then
 fi
 
 # 2. Spatially filter stops to the OSM extract boundary polygon (empty disables).
-POLY="${GTFS_BOUNDARY_POLY:-hamburg.poly}"
+# Use `-` (not `:-`) so an *explicitly empty* GTFS_BOUNDARY_POLY= disables the
+# filter (full-coverage extract, all HVV stops kept); only an *unset* var falls
+# back to hamburg.poly.
+POLY="${GTFS_BOUNDARY_POLY-hamburg.poly}"
 if [ -n "$POLY" ]; then
   case "$POLY" in /*) POLY_PATH="$POLY";; *) POLY_PATH="$VALHALLA_DIR/$POLY";; esac
   if [ ! -f "$POLY_PATH" ]; then

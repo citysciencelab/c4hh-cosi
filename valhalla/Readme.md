@@ -48,8 +48,28 @@ Then point COSI's `rest-services.json` `valhalla` entry at
     stop with no road in the extract makes Valhalla **abort** the build
     (`std::bad_array_new_length` / "Could not find connection point for in/egress").
     Point-in-polygon filtering against the extract's Geofabrik `.poly` guarantees
-    every kept stop connects. **Coverage is therefore Hamburg-city only** — for
-    suburban/regional transit, use a bigger extract and set `GTFS_BOUNDARY_POLY=`.
+    every kept stop connects. **With the Hamburg extract, coverage is therefore
+    Hamburg-city only.**
+
+### Full HVV coverage (no Hamburg cropping)
+
+Hamburg is a metropolitan area tightly interconnected with its hinterland, so for
+the **complete HVV network** (suburban S-Bahn / regional rail to Pinneberg,
+Norderstedt, Stade, Lübeck, …) the graph must span the whole catchment, not just
+the city. In `.env`, do **both** (one without the other won't work):
+
+1. Extend `OSM_EXTRACT_URL` to the catchment — either the requested states
+   (Hamburg, Schleswig-Holstein, Mecklenburg-Vorpommern, Niedersachsen,
+   Brandenburg, Sachsen-Anhalt, Berlin, Bremen, Hessen — space-separated Geofabrik
+   URLs, merged into one graph) or simply `germany-latest.osm.pbf`. Both are
+   spelled out in `.env.example`.
+2. Set `GTFS_BOUNDARY_POLY=` (empty) so **no** stops are clipped — every HVV stop
+   (~17.6k) now has a road to connect to. `GTFS_TRIM_DAYS` still applies (the
+   calendar trim is independent and keeps the build tractable — more important at
+   this scale, not less).
+
+This is a **heavy, server-side build** (many GB download + lots of RAM/disk/time —
+see the resource table). Run it on the CSL server, not a laptop.
 
 Set `BUILD_TRANSIT=False` in `.env` for a car/bike/foot-only graph (faster, no
 GTFS download/prep).
@@ -87,12 +107,15 @@ guidance for the CSL server / a capable dev machine:
 | Extract | Download | Peak RAM | Disk (tiles) | Build time* |
 |---------|----------|----------|--------------|-------------|
 | Hamburg | ~70 MB   | ~2–4 GB  | ~1–2 GB      | a few min   |
-| Germany | ~4 GB    | ~16+ GB  | ~30–40 GB    | ~30–90 min  |
+| HVV catchment states / Germany | ~4 GB | ~16+ GB | ~30–40 GB | ~30–90 min |
 
-\* Very hardware-dependent. Transit + elevation add download, time and disk on
-top. Give Docker enough memory/disk headroom before a Germany build; the build
-runs **inside** the container, so the container — not just the host — must have
-access to that RAM.
+\* Very hardware-dependent. **Transit makes this heavier**: the full HVV feed
+(~17.6k stops, no polygon clipping) needs noticeably more RAM than the
+Hamburg-only build (the laptop's 8 GB Docker VM was already tight for
+Hamburg-city transit — full coverage needs the server). Elevation adds download,
+time and disk too. Give Docker enough memory/disk headroom before a multi-state /
+Germany build; the build runs **inside** the container, so the container — not
+just the host — must have access to that RAM.
 
 The build happens on first `up` (or after `FORCE_REBUILD`); the service serves
 tiles afterwards. During the build, `/status` is unavailable and the container's

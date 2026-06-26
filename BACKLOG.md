@@ -134,21 +134,27 @@ Replace ORS with our own Valhalla, runnable locally **and** auto-deployable on t
          S-Bahn to Pinneberg/Norderstedt/Stade etc. is dropped with the out-of-extract stops). For full
          HVV coverage, use a regional/Germany OSM extract and set `GTFS_BOUNDARY_POLY=` (empty) — heavier
          build (see §8/CSL). → see the next item, which is the wanted target.
-- [ ] **WANTED (user, 2026-06-26): full HVV transit coverage — do NOT crop to the Hamburg boundary.**
-      Hamburg is a metropolitan area tightly interconnected with its hinterland, so the public-transport
-      mode should include **all HVV stations**, not just the city. Concretely:
-      - **Extend the OSM extract** to cover the whole HVV catchment. User-requested states (all Geofabrik
-        `europe/germany/<state>-latest.osm.pbf`, space-separated in `OSM_EXTRACT_URL` → multi-`tile_urls`):
-        **Hamburg, Schleswig-Holstein, Mecklenburg-Vorpommern, Niedersachsen, Brandenburg, Sachsen-Anhalt,
-        Berlin, Bremen, Hessen.** (That's most of N+central Germany — compare against just using
-        `germany-latest.osm.pbf`, which may be simpler and similar in cost.)
-      - **Set `GTFS_BOUNDARY_POLY=`** (empty) so `fetch-gtfs.sh` keeps all ~17.6k stops (the poly filter
-        was only needed because the extract was Hamburg-only). Keep `GTFS_TRIM_DAYS` (calendar trim is
-        independent and keeps the build tractable — even more important at this scale).
+- [x] **WANTED (user, 2026-06-26): full HVV transit coverage — do NOT crop to the Hamburg boundary.**
+      **Configured 2026-06-26.** Hamburg is a metropolitan area tightly interconnected with its
+      hinterland, so the public-transport mode should include **all HVV stations**, not just the city.
+      The full-coverage path is now wired and documented; the actual heavy build is server-side (below).
+      - **OSM extract** — `.env.example` now carries the full HVV-coverage block as a ready-to-uncomment
+        option: (a) the user-requested states (all Geofabrik `europe/germany/<state>-latest.osm.pbf`,
+        space-separated in `OSM_EXTRACT_URL` → multi-`tile_urls`): **Hamburg, Schleswig-Holstein,
+        Mecklenburg-Vorpommern, Niedersachsen, Brandenburg, Sachsen-Anhalt, Berlin, Bremen, Hessen**,
+        or (b) `germany-latest.osm.pbf` (simpler, similar cost). Default stays Hamburg for local dev.
+      - **`GTFS_BOUNDARY_POLY=`** (empty) keeps all ~17.6k stops. **Bug found + fixed:** `fetch-gtfs.sh`
+        used `${GTFS_BOUNDARY_POLY:-hamburg.poly}` (`:-`), so an *explicitly empty* value silently fell
+        back to `hamburg.poly` and would have cropped to Hamburg anyway — defeating this whole task.
+        Changed to `${GTFS_BOUNDARY_POLY-hamburg.poly}` (`-`): empty now genuinely disables the filter,
+        unset still defaults to Hamburg. So the backlog's earlier "no code change" note was wrong — a
+        one-char script fix was needed. `GTFS_TRIM_DAYS` still applies (independent; kept).
       - **Resource reality:** this is a **server-side (CSL) build**, not the laptop — multi-state OSM +
         full transit graph needs a lot of RAM/disk/time (Valhalla enhance can be memory-heavy; the laptop
-        only has an 8 GB Docker VM / ~21 GB free disk). Size it as part of §8/§9 (CSL specs) before
-        building. No code change — purely `.env` (`OSM_EXTRACT_URL` + empty `GTFS_BOUNDARY_POLY`) + compute.
+        only has an 8 GB Docker VM / ~21 GB free disk, already tight for Hamburg-city transit). Readme
+        resource table + "Full HVV coverage" section updated. **Not built here** — size and run it as part
+        of §8/§9 (CSL specs). Committed changes are purely config/docs/script (`.env.example`, Readme,
+        `scripts/fetch-gtfs.sh`); `.env` is gitignored so the operator opts in on the server.
 - [x] Expose Valhalla on a stable URL (local: `http://localhost:8002`, `VALHALLA_PORT`).
       Compose healthcheck polls `/status` (generous `start_period` covers the long initial build).
 - [x] One-command bootstrap: `valhalla/bootstrap.sh` (creates `.env`, fetches GTFS, pulls,
