@@ -1,0 +1,429 @@
+From 758aa3ce5291bfebddadeb942350773b6be7be01 Mon Sep 17 00:00:00 2001
+From: paulhh <p.linnow@dp-planung.de>
+Date: Thu, 18 Jun 2026 11:55:02 +0200
+Subject: [PATCH 1/4] =?UTF-8?q?AccessibilityAnalysis:=20add=20self-hosted?=
+ =?UTF-8?q?=20Valhalla=20isochrone=20backend=20(BACKLOG=20=C2=A73)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add a config-selectable routing backend so isochrones can come from a
+self-hosted Valhalla instead of OpenRouteService, while keeping ORS as the
+default/fallback. Designed as an additive change so it rebases cleanly onto
+future upstream COSI releases (BACKLOG §2.5):
+
+- New utils/requestIsochronesValhalla.js: one request per coordinate (Valhalla
+  isochrones are single-origin), profile->costing mapping (driving-car->auto,
+  cycling-regular->bicycle, foot-walking/wheelchair->pedestrian), s/m->min/km
+  contour conversion, and response normalization back to the ORS feature shape
+  ({group_index, value, center}, value in seconds/meters, ascending by value).
+- utils/requestIsochrones.js: thin dispatch guard (serviceType === "valhalla")
+  at the top; ORS body untouched.
+- Thread serviceType through createIsochrones.js and the methodsAnalysis call.
+- AccessibilityAnalysis.vue: backend-aware baseUrl (Valhalla <url>/isochrone,
+  ORS <url>/v2/isochrones).
+- state: new isochroneBackend flag (default "ors"; set "valhalla" in config.json
+  and point serviceId at the Valhalla rest-service to switch).
+- New unit spec covering conversions, request shape, normalization/ordering,
+  multi-origin grouping, and error handling (7 tests, vitest).
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+---
+ .../components/AccessibilityAnalysis.vue      |   6 +-
+ .../components/methodsAnalysis.js             |   3 +-
+ .../store/stateAccessibilityAnalysis.js       |   3 +
+ .../service/requestIsochronesValhalla.spec.js | 118 ++++++++++++++++
+ .../utils/createIsochrones.js                 |  14 +-
+ .../utils/requestIsochrones.js                |   9 +-
+ .../utils/requestIsochronesValhalla.js        | 129 ++++++++++++++++++
+ 7 files changed, 273 insertions(+), 9 deletions(-)
+ create mode 100644 cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
+ create mode 100644 cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+
+diff --git a/cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue b/cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue
+index 63235c94..1bceef4e 100644
+--- a/cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue
++++ b/cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue
+@@ -406,7 +406,11 @@ export default {
+     * @returns {void}
+    */
+     mounted () {
+-        this.baseUrl = this.restServiceById(this.serviceId || this.fallbackServiceId).url + "/v2/";
++        const isochroneService = this.restServiceById(this.serviceId || this.fallbackServiceId);
++
++        // ORS isochrones live under <url>/v2/isochrones; self-hosted Valhalla under <url>/isochrone
++        // (the path suffix is appended in requestIsochrones / requestIsochronesValhalla).
++        this.baseUrl = this.isochroneBackend === "valhalla" ? isochroneService.url : isochroneService.url + "/v2/";
+         this.getLayerById("accessibility-analysis").getLayer().setVisible(true);
+         this.getLayerById("accessibility-analysis").getLayer().setZIndex(10);
+ 
+diff --git a/cosi/AccessibilityAnalysis/components/methodsAnalysis.js b/cosi/AccessibilityAnalysis/components/methodsAnalysis.js
+index 62c271e5..47579186 100644
+--- a/cosi/AccessibilityAnalysis/components/methodsAnalysis.js
++++ b/cosi/AccessibilityAnalysis/components/methodsAnalysis.js
+@@ -77,7 +77,8 @@ export default {
+                 distance,
+                 maxDistance,
+                 mergePolygons: this.mergePolygons,
+-                baseUrl: this.baseUrl
++                baseUrl: this.baseUrl,
++                serviceType: this.isochroneBackend
+             });
+ 
+             this.setSteps(steps);
+diff --git a/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js b/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
+index b3ba42d6..a817420d 100644
+--- a/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
++++ b/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
+@@ -57,6 +57,9 @@ const state = {
+     batchSize: 50,
+     serviceId: "bkg_ors",
+     fallbackServiceId: "csl_ors",
++    // isochrone routing backend: "ors" (OpenRouteService, default) or "valhalla" (self-hosted).
++    // For Valhalla, set this to "valhalla" in config.json and point serviceId at the Valhalla rest-service.
++    isochroneBackend: "ors",
+     wpsServiceId: "1001",
+     wpsProcess: "einwohner_ermitteln.fmw",
+     cardCounter: 0
+diff --git a/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js b/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
+new file mode 100644
+index 00000000..69dfa2d3
+--- /dev/null
++++ b/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
+@@ -0,0 +1,118 @@
++import {expect} from "chai";
++import axios from "axios";
++import requestIsochronesValhalla, {toValhallaCosting, toContour, fromContour} from "../../../utils/requestIsochronesValhalla";
++
++/**
++ * Builds a fake Valhalla isochrone FeatureCollection.
++ * @param {Number[]} contours contour values (minutes or km) as Valhalla echoes them.
++ * @param {String} metric "time" or "distance".
++ * @returns {Object} a GeoJSON FeatureCollection like Valhalla returns.
++ */
++function valhallaResponse (contours, metric) {
++    return {
++        type: "FeatureCollection",
++        features: contours.map((contour, i) => ({
++            type: "Feature",
++            // Valhalla decorates features with styling props we must ignore
++            properties: {contour, metric, color: "ff0000", opacity: 0.33, fill: "ff0000"},
++            geometry: {
++                type: "Polygon",
++                coordinates: [[[i, i], [i + 1, i], [i + 1, i + 1], [i, i + 1], [i, i]]]
++            }
++        }))
++    };
++}
++
++describe("requestIsochronesValhalla", () => {
++    afterEach(() => {
++        vi.restoreAllMocks();
++    });
++
++    describe("unit conversions", () => {
++        it("maps ORS profiles to Valhalla costing models (wheelchair -> pedestrian)", () => {
++            expect(toValhallaCosting("driving-car")).to.equal("auto");
++            expect(toValhallaCosting("cycling-regular")).to.equal("bicycle");
++            expect(toValhallaCosting("foot-walking")).to.equal("pedestrian");
++            expect(toValhallaCosting("wheelchair")).to.equal("pedestrian");
++            expect(toValhallaCosting("unknown")).to.equal("auto");
++        });
++        it("converts ORS range units (s / m) to Valhalla contours (min / km)", () => {
++            expect(toContour(600, "time")).to.eql({time: 10});
++            expect(toContour(1000, "distance")).to.eql({distance: 1});
++        });
++        it("converts Valhalla contours (min / km) back to ORS range units (s / m)", () => {
++            expect(fromContour(10, "time")).to.equal(600);
++            expect(fromContour(1, "distance")).to.equal(1000);
++        });
++    });
++
++    it("sends one POST per coordinate to <baseUrl>/isochrone with mapped costing and converted contours", async () => {
++        const post = vi.spyOn(axios, "post").mockResolvedValue({data: valhallaResponse([3.3, 6.7, 10], "time")});
++
++        await requestIsochronesValhalla(
++            "cycling-regular",
++            [[10.0, 53.5], [10.1, 53.6]],
++            "time",
++            [198, 402, 600],
++            null,
++            "http://localhost:8002/"
++        );
++
++        expect(post.mock.calls.length).to.equal(2);
++
++        const [url, body] = post.mock.calls[0],
++            payload = JSON.parse(body);
++
++        expect(url).to.equal("http://localhost:8002/isochrone");
++        expect(payload.costing).to.equal("bicycle");
++        expect(payload.polygons).to.equal(true);
++        expect(payload.locations).to.eql([{lon: 10.0, lat: 53.5}]);
++        expect(payload.contours).to.eql([{time: 3.3}, {time: 6.7}, {time: 10}]);
++    });
++
++    it("normalizes to ORS-shaped features (value in seconds, group_index, center) sorted ascending by value", async () => {
++        // Valhalla may return contours largest-first; the output must be ascending by value
++        vi.spyOn(axios, "post").mockResolvedValue({data: valhallaResponse([10, 6.7, 3.3], "time")});
++
++        const features = await requestIsochronesValhalla(
++            "driving-car",
++            [[10.0, 53.5]],
++            "time",
++            [198, 402, 600],
++            null,
++            "http://localhost:8002"
++        );
++
++        expect(features).to.have.length(3);
++        expect(features.map(feature => feature.get("value"))).to.eql([198, 402, 600]);
++        features.forEach(feature => {
++            expect(feature.get("group_index")).to.equal(0);
++            expect(feature.get("center")).to.eql([10.0, 53.5]);
++            expect(feature.getGeometry().getType()).to.equal("Polygon");
++        });
++    });
++
++    it("groups features per coordinate via group_index and converts distance contours to meters", async () => {
++        vi.spyOn(axios, "post").mockResolvedValue({data: valhallaResponse([1, 2], "distance")});
++
++        const features = await requestIsochronesValhalla(
++            "foot-walking",
++            [[10.0, 53.5], [10.1, 53.6]],
++            "distance",
++            [1000, 2000],
++            null,
++            "http://localhost:8002"
++        );
++
++        expect(features.map(feature => feature.get("value"))).to.eql([1000, 2000, 1000, 2000]);
++        expect(features.map(feature => feature.get("group_index"))).to.eql([0, 0, 1, 1]);
++    });
++
++    it("swallows per-coordinate request errors and returns an empty list", async () => {
++        vi.spyOn(axios, "post").mockRejectedValue(new Error("network"));
++
++        const features = await requestIsochronesValhalla("driving-car", [[10, 53.5]], "time", [600], null, "http://localhost:8002");
++
++        expect(features).to.eql([]);
++    });
++});
+diff --git a/cosi/AccessibilityAnalysis/utils/createIsochrones.js b/cosi/AccessibilityAnalysis/utils/createIsochrones.js
+index b5e879b8..738321e4 100644
+--- a/cosi/AccessibilityAnalysis/utils/createIsochrones.js
++++ b/cosi/AccessibilityAnalysis/utils/createIsochrones.js
+@@ -14,14 +14,14 @@ let abortController;
+  * @param {*} {transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl} parameters
+  * @return {*} features
+  */
+-export async function createIsochrones ({transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl, projectionCode, mergePolygons}) {
++export async function createIsochrones ({transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl, projectionCode, mergePolygons, serviceType}) {
+     let ret;
+ 
+     if (coordinates.length === 1) {
+-        ret = await createIsochronesPoint(transportType, coordinates[0], scaleUnit, distance, maxDistance, baseUrl, projectionCode);
++        ret = await createIsochronesPoint(transportType, coordinates[0], scaleUnit, distance, maxDistance, baseUrl, projectionCode, serviceType);
+         return ret;
+     }
+-    return createIsochronesPoints({transportType, coordinates, scaleUnit, distance, maxDistance, selectedFacilityNames: null, batchSize: batchSize || 200, baseUrl, projectionCode, mergePolygons});
++    return createIsochronesPoints({transportType, coordinates, scaleUnit, distance, maxDistance, selectedFacilityNames: null, batchSize: batchSize || 200, baseUrl, projectionCode, mergePolygons, serviceType});
+ }
+ 
+ /**
+@@ -35,7 +35,7 @@ export async function createIsochrones ({transportType, coordinates, scaleUnit,
+  * @param {*} projectionCode projectionCode
+  * @return {*} steps and features
+  */
+-async function createIsochronesPoint (transportType, coordinate, scaleUnit, distance, maxDistance, baseUrl, projectionCode) {
++async function createIsochronesPoint (transportType, coordinate, scaleUnit, distance, maxDistance, baseUrl, projectionCode, serviceType) {
+     if (abortController) {
+         abortController.cancel();
+     }
+@@ -51,7 +51,8 @@ async function createIsochronesPoint (transportType, coordinate, scaleUnit, dist
+             scaleUnit,
+             maxDistance ? [...rangeArray, maxRange] : rangeArray,
+             abortController,
+-            baseUrl
++            baseUrl,
++            serviceType
+         ),
+ 
+         // reverse JSON object sequence to render the isochrones in the correct order
+@@ -122,7 +123,8 @@ async function createIsochronesPoints (args) {
+                     args.scaleUnit,
+                     rangeArray,
+                     abortController,
+-                    args.baseUrl
++                    args.baseUrl,
++                    args.serviceType
+                 ),
+                 // reverse JSON object sequence to render the isochrones in the correct order
+                 // this reversion is intended for centrifugal isochrones (when range.length is larger than 1)
+diff --git a/cosi/AccessibilityAnalysis/utils/requestIsochrones.js b/cosi/AccessibilityAnalysis/utils/requestIsochrones.js
+index c8b0aa41..d7b2e9ef 100644
+--- a/cosi/AccessibilityAnalysis/utils/requestIsochrones.js
++++ b/cosi/AccessibilityAnalysis/utils/requestIsochrones.js
+@@ -1,6 +1,7 @@
+ import axios from "axios";
+ import GeoJSON from "ol/format/GeoJSON";
+ import splitIntoChunks from "../../utils/array/splitIntoChunks";
++import requestIsochronesValhalla from "./requestIsochronesValhalla";
+ 
+ /**
+  * send request to get Isochrone geoJSON
+@@ -10,9 +11,15 @@ import splitIntoChunks from "../../utils/array/splitIntoChunks";
+  * @param {Array} rangeArray array of time range values
+  * @param {object} abort abort
+  * @param {String} baseUrl url
++ * @param {String} [serviceType] routing backend ("valhalla" routes to the self-hosted service; otherwise ORS)
+  * @returns {void}
+  */
+-async function requestIsochrones (pathType, coordinates, rangeType, rangeArray, abort, baseUrl) {
++async function requestIsochrones (pathType, coordinates, rangeType, rangeArray, abort, baseUrl, serviceType) {
++    // Self-hosted Valhalla has a different isochrone API; delegate and normalize there (BACKLOG §3).
++    if (serviceType === "valhalla") {
++        return requestIsochronesValhalla(pathType, coordinates, rangeType, rangeArray, abort, baseUrl);
++    }
++
+     const promises = [],
+         format = new GeoJSON(),
+         // locations are limited to 5 in the bkg service
+diff --git a/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js b/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+new file mode 100644
+index 00000000..2be8d726
+--- /dev/null
++++ b/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+@@ -0,0 +1,129 @@
++import axios from "axios";
++import GeoJSON from "ol/format/GeoJSON";
++
++/**
++ * Maps an ORS transport profile to a Valhalla costing model.
++ * Wheelchair has no dedicated Valhalla costing, so it falls back to pedestrian.
++ * @param {String} pathType ORS profile name.
++ * @returns {String} Valhalla costing model.
++ */
++function toValhallaCosting (pathType) {
++    switch (String(pathType).trim()) {
++        case "driving-car": return "auto";
++        case "cycling-regular": return "bicycle";
++        case "foot-walking":
++        case "wheelchair": return "pedestrian";
++        default: return "auto";
++    }
++}
++
++/**
++ * Converts an ORS-style range value to a Valhalla contour entry.
++ * COSI/ORS ranges are in seconds (time) or meters (distance);
++ * Valhalla expects minutes (time) or kilometers (distance).
++ * @param {Number} range range value (seconds or meters).
++ * @param {String} rangeType "time" or "distance".
++ * @returns {Object} a Valhalla contour entry.
++ */
++function toContour (range, rangeType) {
++    return rangeType === "distance"
++        ? {distance: range / 1000}
++        : {time: range / 60};
++}
++
++/**
++ * Converts a Valhalla contour value back to the ORS-style range unit
++ * (seconds for time, meters for distance) so downstream code is unchanged.
++ * @param {Number} contour Valhalla contour value (minutes or km).
++ * @param {String} rangeType "time" or "distance".
++ * @returns {Number} the value in seconds or meters.
++ */
++function fromContour (contour, rangeType) {
++    return rangeType === "distance"
++        ? Math.round(contour * 1000)
++        : Math.round(contour * 60);
++}
++
++/**
++ * Normalizes a Valhalla isochrone FeatureCollection into ORS-compatible ol
++ * features ({group_index, value, center}), sorted by ascending value, so the
++ * downstream code in createIsochrones.js stays untouched.
++ * @param {Object} collection Valhalla GeoJSON FeatureCollection.
++ * @param {Number} groupIndex index of the origin coordinate (ORS "group_index").
++ * @param {Array} coordinate origin coordinate as [lon, lat].
++ * @param {String} rangeType "time" or "distance".
++ * @param {module:ol/format/GeoJSON} format ol GeoJSON format instance.
++ * @returns {module:ol/Feature[]} normalized features for this origin.
++ */
++function normalizeCollection (collection, groupIndex, coordinate, rangeType, format) {
++    if (!collection || !Array.isArray(collection.features)) {
++        return [];
++    }
++
++    const normalized = {
++        type: "FeatureCollection",
++        features: collection.features
++            .filter(feature => feature.geometry && String(feature.geometry.type).includes("Polygon"))
++            .map(feature => ({
++                type: "Feature",
++                geometry: feature.geometry,
++                properties: {
++                    "group_index": groupIndex,
++                    "value": fromContour(feature.properties.contour, rangeType),
++                    "center": coordinate
++                }
++            }))
++            .sort((featureA, featureB) => featureA.properties.value - featureB.properties.value)
++    };
++
++    return format.readFeatures(normalized);
++}
++
++/**
++ * Requests isochrones from a self-hosted Valhalla service and returns them in
++ * the same shape COSI expects from OpenRouteService: a flat array of ol polygon
++ * features carrying {group_index, value, center}, ordered by ascending value
++ * and grouped per origin coordinate.
++ *
++ * Unlike ORS (up to 5 locations per call), Valhalla's /isochrone endpoint takes
++ * a single location per request, so one request is sent per coordinate.
++ *
++ * @param {String} pathType ORS transport profile (mapped to a Valhalla costing).
++ * @param {Array} coordinates origin coordinates as [lon, lat] in EPSG:4326.
++ * @param {String} rangeType "time" or "distance".
++ * @param {Array} rangeArray range values (seconds for time, meters for distance).
++ * @param {Object} [abort] axios CancelToken source.
++ * @param {String} baseUrl Valhalla base URL (without a trailing "/isochrone").
++ * @returns {Promise<module:ol/Feature[]>} normalized isochrone features.
++ */
++async function requestIsochronesValhalla (pathType, coordinates, rangeType, rangeArray, abort, baseUrl) {
++    const format = new GeoJSON(),
++        costing = toValhallaCosting(pathType),
++        contours = rangeArray.map(range => toContour(range, rangeType)),
++        url = baseUrl.replace(/\/+$/u, "") + "/isochrone",
++        // one request per coordinate — Valhalla isochrones are single-origin
++        requests = coordinates.map((coordinate, groupIndex) => {
++            const body = {
++                "locations": [{"lon": coordinate[0], "lat": coordinate[1]}],
++                "costing": costing,
++                "contours": contours,
++                // return polygons (not linestrings) so the downstream turf union works
++                "polygons": true,
++                "denoise": 1
++            };
++
++            return axios.post(url, JSON.stringify(body), {
++                headers: {"Content-Type": "application/json"},
++                cancelToken: abort && abort.token
++            }).then(response => normalizeCollection(response.data, groupIndex, coordinate, rangeType, format))
++                .catch(error => {
++                    console.error("Error: ", error);
++                    return [];
++                });
++        });
++
++    return Promise.all(requests).then(grouped => grouped.flat());
++}
++
++export default requestIsochronesValhalla;
++export {toValhallaCosting, toContour, fromContour};
+-- 
+2.43.0
+

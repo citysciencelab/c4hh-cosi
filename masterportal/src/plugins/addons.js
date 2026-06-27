@@ -1,0 +1,174 @@
+/* eslint-disable no-undef */
+import store from "@appstore/index.js";
+import {defineComponent} from "vue";
+import {upperFirst} from "@shared/js/utils/changeCase.js";
+import addonModules from "virtual:addon-modules";
+
+const allAddons = typeof VUE_ADDONS !== "undefined" ? VUE_ADDONS : {};
+
+export default {
+/**
+ * Adds all addons based on config.js and addonsConf.json to the Vue Instance and store
+ * @param {Object} app The app.
+ * @param {String[]} config The array of addonKeys specified in config.js
+ * @returns {void}
+ */
+    loadAddons: async function (app, config) {
+        app.config.globalProperties.$gfiThemeAddons = [];
+        app.config.globalProperties.$searchInterfaceAddons = [];
+
+        if (config) {
+            const addons = config.map(async addonKey => {
+                try {
+                    const addonConf = allAddons[addonKey];
+
+                    if (addonConf && Object.prototype.hasOwnProperty.call(addonConf, "type")) {
+                        if (addonConf.type === "control") {
+                            await this.loadControls(addonKey);
+                        }
+                        else if (addonConf.type === "gfiTheme") {
+                            await this.loadGfiThemes(addonKey, app);
+                        }
+                        else if (addonConf.type === "searchInterface") {
+                            await this.loadSearchInterfaces(addonKey, app);
+                        }
+                        else if (addonConf.type === "tool") {
+                            await this.loadToolAddons(addonKey);
+                        }
+                        else if (addonConf.type === "javascript") {
+                            await this.loadJavascriptAddons(addonKey);
+                        }
+                        else if (addonConf.type === "vueComponent") {
+                            await this.loadVueComponentAddons(addonKey, app);
+                        }
+                        else if (addonConf.type === "filterSnippet") {
+                            await this.loadFilterSnippetAddons(addonKey, app);
+                        }
+                    }
+                }
+                catch (e) {
+                    console.warn(e);
+                    console.warn(`The module ${addonKey} does not include a Vue-component and/or vuex-store-module. Please make sure the folder contains a ${addonKey}.vue and ${addonKey}.js file.`, e);
+                }
+            });
+
+            await Promise.all(addons);
+        }
+    },
+
+    /**
+     * Load javascript addons and register store when it exists.
+     * @param {String} addonKey specified in config.js
+     * @returns {void}
+     */
+    loadJavascriptAddons: async function (addonKey) {
+        const addon = await this.loadAddon(addonKey);
+
+        if (addon.store) {
+            store.registerModule([upperFirst(addonKey)], addon.store);
+        }
+    },
+
+    /**
+     * Loads the vue component addon and creates the Vue component and adds it to Vue instance globally
+     * @param {String} addonKey specified in config.js
+     * @param {Object} app The app.
+     * @returns {void}
+     */
+    loadVueComponentAddons: async function (addonKey, app) {
+        const addon = await this.loadAddon(addonKey);
+
+        app.component(addon.component.name, addon.component);
+        if (addon.store) {
+            store.registerModule(["Modules", addon.component.name], addon.store);
+        }
+    },
+    /**
+ * Loads the control and creates the Vue component and adds it to Vue instance globally
+ * @param {String} addonKey specified in config.js
+ * @returns {void}
+ */
+    loadControls: async function (addonKey) {
+        const addon = await this.loadAddon(addonKey),
+            name = addon.component.name.charAt(0).toLowerCase() + addon.component.name.slice(1);
+
+        defineComponent(addon.component.name, addon.component);
+        if (addon.store) {
+            store.registerModule(["Controls", addon.component.name], addon.store);
+        }
+        store.commit("Controls/registerControl", {name: name, control: addon.component});
+    },
+
+    /**
+ * Loads the gfi themes and creates the Vue component and adds it to Vue instance globally
+ * @param {String} addonKey specified in config.js
+ * @param {Object} app The app.
+ * @returns {void}
+ */
+    loadGfiThemes: async function (addonKey, app) {
+        const addon = await this.loadAddon(addonKey),
+            addonName = addon.component.name.charAt(0).toLowerCase() + addon.component.name.slice(1);
+
+        app.component(addon.component.name, addon.component);
+
+        app.config.globalProperties.$gfiThemeAddons.push(addon.component.name);
+        if (addon.store) {
+            store.registerModule(["Modules", addon.component.name], addon.store);
+            moduleCollection[addonName] = addon.component;
+        }
+    },
+
+    /**
+ * Load searchInterface and register store when it exists.
+ * @param {String} addonKey specified in config.js
+ * @param {Object} app The app.
+ * @returns {void}
+ */
+    loadSearchInterfaces: async function (addonKey, app) {
+        const addon = await this.loadAddon(addonKey);
+
+        app.config.globalProperties.$searchInterfaceAddons.push(addon);
+    },
+
+    /**
+ * Creates the Vue component and adds it to Vue instance globally.
+ * Registers the store at "Modules" and adds the local-files.
+ * @param {String} addonKey specified in config.js
+ * @returns {void}
+ */
+    loadToolAddons: async function (addonKey) {
+        const addon = await this.loadAddon(addonKey),
+            addonName = addon.component.name.charAt(0).toLowerCase() + addon.component.name.slice(1);
+
+        store.registerModule(["Modules", addon.component.name], addon.store);
+        moduleCollection[addonName] = addon.component;
+    },
+
+    loadFilterSnippetAddons: async function (addonKey, app) {
+        const addon = await this.loadAddon(addonKey),
+            addonName = addon.component.name.charAt(0).toLowerCase() + addon.component.name.slice(1);
+
+        app.component(addon.component.name, addon.component);
+        if (addon.store) {
+            store.registerModule(["Modules", addon.component.name], addon.store);
+            moduleCollection[addonName] = addon.component;
+        }
+    },
+
+    /**
+ * Loads the addon with locales.
+ * @param {String} addonKey specified in config.js
+ * @returns {Object} The addon.
+ */
+    loadAddon: async function (addonKey) {
+        // Load the pre-built addon bundle instead of source files
+        const addonModule = await addonModules[addonKey](),
+            addon = addonModule.default;
+
+        for (const localeKey in addon.locales) {
+            i18next.addResourceBundle(localeKey, "additional", addon.locales[localeKey], true);
+        }
+        return addon;
+    }
+};
+

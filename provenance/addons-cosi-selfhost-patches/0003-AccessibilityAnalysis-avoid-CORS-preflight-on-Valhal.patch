@@ -1,0 +1,45 @@
+From 0f0cec026edeefac1e6d56f05a2ef21a0be6e493 Mon Sep 17 00:00:00 2001
+From: paulhh <p.linnow@dp-planung.de>
+Date: Fri, 26 Jun 2026 19:39:27 +0200
+Subject: [PATCH 3/4] AccessibilityAnalysis: avoid CORS preflight on Valhalla
+ isochrone requests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The browser sends a CORS preflight OPTIONS for application/json cross-origin
+POSTs; Valhalla answers OPTIONS with 405, so the isochrone request was blocked
+before being sent ("Erreichbarkeit konnte nicht berechnet werden") when the
+portal (https://localhost:9001) calls Valhalla (http://localhost:8002).
+
+Send the body as text/plain instead — a CORS simple request, no preflight.
+Valhalla parses the JSON body regardless of Content-Type, and its actual
+responses already carry Access-Control-Allow-Origin: *. Same-origin deploys
+(nginx /valhalla proxy, §8) are unaffected.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+---
+ .../utils/requestIsochronesValhalla.js                      | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js b/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+index 3e52fa8d..c069831a 100644
+--- a/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
++++ b/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+@@ -146,8 +146,12 @@ async function requestIsochronesValhalla (pathType, coordinates, rangeType, rang
+                 body.date_time = toValhallaDateTime(new Date());
+             }
+ 
++            // Content-Type "text/plain" keeps this a CORS "simple request" so the
++            // browser skips the preflight OPTIONS — Valhalla returns 405 for OPTIONS
++            // (it parses the JSON body regardless of Content-Type). Same-origin
++            // deploys (nginx /valhalla proxy, §8) are unaffected.
+             return axios.post(url, JSON.stringify(body), {
+-                headers: {"Content-Type": "application/json"},
++                headers: {"Content-Type": "text/plain"},
+                 cancelToken: abort && abort.token
+             }).then(response => normalizeCollection(response.data, groupIndex, coordinate, rangeType, format))
+                 .catch(error => {
+-- 
+2.43.0
+

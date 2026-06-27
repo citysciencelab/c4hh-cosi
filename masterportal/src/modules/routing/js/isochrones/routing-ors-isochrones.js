@@ -1,0 +1,185 @@
+import axios from "axios";
+import routingOrsAvoidOption from "../avoidoptions/routing-ors-avoidoptions.js";
+import {RoutingIsochrones} from "../classes/routing-isochrones.js";
+import {RoutingIsochronesArea} from "../classes/routing-isochrones-area.js";
+import routingOrsSpeedProfile from "../speedprofiles/routing-ors-speedprofiles.js";
+import state from "../../store/stateRouting.js";
+import store from "@appstore/index.js";
+import stateIsochrones from "../../store/isochrones/stateIsochrones.js";
+
+/**
+ * Translates the optimization in the corresponding value for the service
+ * @param {string} optimization set by the user
+ * @returns {string} translated service value
+ */
+function routingOrsOptimization (optimization) {
+    switch (optimization) {
+        case "TIME": return "time";
+        case "DISTANCE": return "distance";
+        default: throw new Error("Missing rangeType translation");
+    }
+}
+
+/**
+ * Translates the optimization in the corresponding multiplicator value for the service
+ * @param {string} optimization set by the user
+ * @returns {number} multiplicator for the specified optimization
+ */
+function routingOrsOptimizationMultiplicator (optimization) {
+    switch (optimization) {
+        case "TIME": return 60;
+        case "DISTANCE": return 1000;
+        default: throw new Error("Missing optimization to multiplicator translation");
+    }
+}
+
+/**
+ * Requests isochrones from ors service.
+ * @param {Object} params for the function
+ * @param {Array<number>} [params.coordinates] Array containing coordinate pair [lng, lat] in wgs84 projection
+ * @param {Function} [params.transformCoordinatesToLocal] function to transform result coordinates to local projection.
+ * @param {string} [params.speedProfile] which is used to request the isochrones for.
+ * @param {string} [params.optimization] which optimization to request
+ * @param {Array<{id: string}>} [params.avoidSpeedProfileOptions] which options to avoid
+ * @param {boolean} [params.transformCoordinates] if the coordinates should be transformed to local projection
+ * @param {boolean} [params.avoidBorders] if borders should be avoided
+ * @returns {RoutingIsochrones} routingIsochrones
+ */
+async function fetchRoutingOrsIsochrones ({
+    coordinates,
+    transformCoordinatesToLocal,
+    speedProfile,
+    optimization,
+    avoidSpeedProfileOptions,
+    transformCoordinates,
+    avoidBorders
+}) {
+    const url = getRoutingIsochronesSettingsUrl(speedProfile),
+        rangeValue = optimization === "TIME" ? state.isochronesSettings.timeValue : state.isochronesSettings.distanceValue,
+        optimizationMultiplicator = routingOrsOptimizationMultiplicator(optimization),
+        range = rangeValue * optimizationMultiplicator,
+        intervalDefault = state.isochronesSettings.intervalValue * optimizationMultiplicator,
+        intervalCount = state.isochronesSettings.intervalValue,
+        attributes = state.isochronesSettings.attributes;
+    let result = null,
+        first = null,
+        second = null,
+        isochrones = null,
+        response = null;
+
+    try {
+        const postParams = {
+            // 15 Min * 60 Sek || 15km * 1000m // interval steps
+            interval: state.isochronesSettings.intervalOption === "count" ? range / intervalCount : intervalDefault,
+            locations: [coordinates],
+            // start || destination
+            location_type: "start",
+            range_type: routingOrsOptimization(optimization),
+            // 30Min * 60 Sek || 30km * 1000m // maximum distance
+            range: [range],
+            options: {
+                ...avoidSpeedProfileOptions.length > 0 && {avoid_features: avoidSpeedProfileOptions.map(o => routingOrsAvoidOption(o.id))},
+                ...avoidBorders && {avoid_borders: "all"}
+            },
+            ...attributes.length > 0 && {attributes: attributes},
+            area_units: state.isochronesSettings.areaUnit
+        };
+
+        if (speedProfile === "HGV") {
+            postParams.options.profile_params = {};
+            postParams.options.profile_params.restrictions = {
+                length: stateIsochrones.isochronesRestrictionsInputData.length,
+                width: stateIsochrones.isochronesRestrictionsInputData.width,
+                height: stateIsochrones.isochronesRestrictionsInputData.height,
+                weight: stateIsochrones.isochronesRestrictionsInputData.weight,
+                axleload: stateIsochrones.isochronesRestrictionsInputData.axleload,
+                hazmat: stateIsochrones.isochronesRestrictionsInputData.hazmat
+            };
+        }
+
+        response = await axios.post(url, postParams);
+    }
+    catch (error) {
+        const message = error.response?.data?.error?.message ? error.response?.data?.error?.message : i18next.t("common:modules.routing.errors.errorIsochronesFetch");
+
+        throw new Error(message);
+    }
+
+
+    result = response.data;
+    if (transformCoordinates) {
+        first = await transformCoordinatesToLocal([
+            result.bbox[0],
+            result.bbox[1]
+        ]);
+        second = await transformCoordinatesToLocal([
+            result.bbox[2],
+            result.bbox[3]
+        ]);
+    }
+    else {
+        first = [
+            result.bbox[0],
+            result.bbox[1]
+        ];
+        second = [
+            result.bbox[2],
+            result.bbox[3]
+        ];
+    }
+
+    isochrones = new RoutingIsochrones([first[0], first[1], second[0], second[1]]);
+    for (let i = result.features.length - 1; i >= 0; i--) {
+        const feature = result.features[i],
+            localCoordinates = transformCoordinates ? [] : feature.geometry.coordinates[0];
+
+        if (transformCoordinates) {
+            for (const coordinate of feature.geometry.coordinates[0]) {
+                localCoordinates.push(await transformCoordinatesToLocal(coordinate));
+            }
+        }
+        isochrones.addArea(
+            new RoutingIsochronesArea({
+                coordinates: [localCoordinates],
+                groupIndex: feature.properties.group_index,
+                value: feature.properties.value,
+                maximum: range,
+                interval: state.isochronesSettings.intervalOption === "count" ? intervalCount : intervalDefault,
+                speedProfile: speedProfile,
+                optimization: optimization,
+                avoidSpeedProfileOptions: avoidSpeedProfileOptions.map(option => option.id),
+                displayValue: feature.properties.value / optimizationMultiplicator,
+                population: feature.properties.total_pop,
+                area: feature.properties.area
+            })
+        );
+    }
+    return isochrones;
+}
+
+/**
+ * Creates the url with the given params.
+ * @param {string} speedProfile current speedProfile
+ * @returns {Object} the url
+ */
+function getRoutingIsochronesSettingsUrl (speedProfile) {
+    const path = `v2/isochrones/${routingOrsSpeedProfile(speedProfile)}/geojson`;
+    let serviceUrl = store.getters.restServiceById(state.isochronesSettings.serviceId).url,
+        url;
+
+    if (serviceUrl.endsWith("/")) {
+        serviceUrl += path;
+    }
+    else {
+        serviceUrl = serviceUrl + "/" + path;
+    }
+    if (serviceUrl.startsWith("/")) {
+        url = new URL(serviceUrl, window.location.origin);
+    }
+    else {
+        url = new URL(serviceUrl);
+    }
+    return url;
+}
+
+export {fetchRoutingOrsIsochrones, getRoutingIsochronesSettingsUrl};

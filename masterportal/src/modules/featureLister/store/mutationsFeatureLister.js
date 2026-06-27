@@ -1,0 +1,74 @@
+import {generateSimpleMutations} from "@shared/js/utils/generators.js";
+import stateFeatureLister from "./stateFeatureLister.js";
+import getGfiFeatureModule from "@shared/js/utils/getGfiFeaturesByTileFeature.js";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import tabStatus from "../constantsTabStatus.js";
+
+const mutations = {
+    /**
+     * Creates from every state-key a setter.
+     * For example, given a state object {key: value}, an object
+     * {setKey:   (state, payload) => *   state[key] = payload * }
+     * will be returned.
+     */
+    ...generateSimpleMutations(stateFeatureLister),
+    /**
+     * Sets the GFI features for the selected layer from payload or by extracting features from the layer source
+     * and converts them to the needed format. Handles nested features if present.
+     * @param {Object} state - The Vuex state object
+     * @param {Array<ol.Feature>} [payload] - Optional array of features. If not provided, features will be retrieved from the layer source
+     * @returns {void}
+     */
+    setGfiFeaturesOfLayer: (state, payload) => {
+        const layerFromCollection = layerCollection.getLayerById(state.layer.id),
+            features = payload ?? layerFromCollection.getLayerSource().getFeatures();
+
+        if (features) {
+            const gfiFeatures = [],
+                olLayer = layerFromCollection.getLayer();
+
+            features.forEach(feature => {
+                if (feature.values_ && Object.prototype.hasOwnProperty.call(feature.values_, "features")) {
+                    feature.values_.features.forEach(nestedFeature => {
+                        const gfiFeature = getGfiFeatureModule.getGfiFeature(olLayer.values_, nestedFeature.values_);
+
+                        gfiFeature.id = nestedFeature.getId();
+                        gfiFeature.geom = nestedFeature.getGeometry();
+                        gfiFeature.olFeature = nestedFeature;
+                        gfiFeatures.push(gfiFeature);
+                    });
+                    state.nestedFeatures = true;
+                }
+                else {
+                    const gfiFeature = getGfiFeatureModule.getGfiFeature(olLayer.values_, feature.values_);
+
+                    gfiFeature.id = feature.getId();
+                    gfiFeature.geom = feature.getGeometry();
+                    gfiFeature.olFeature = feature;
+                    gfiFeatures.push(gfiFeature);
+                    state.nestedFeatures = false;
+                }
+            });
+            state.gfiFeaturesOfLayer = gfiFeatures;
+        }
+    },
+    /**
+     * Resets the featureLister to the themeChooser tab by setting the
+     * selected layer and feature to null, making their respective tabs
+     * disabled.
+     * @param {Object} state context object.
+     * @returns {void}
+     */
+    resetToThemeChooser: (state) => {
+        state.selectedRow = null;
+        state.layerListView = tabStatus.ACTIVE;
+        state.featureListView = tabStatus.DISABLED;
+        state.featureDetailView = tabStatus.DISABLED;
+        state.selectedArea = null;
+        state.layer = null;
+        state.headers = [];
+        state.gfiFeaturesOfLayer = [];
+    }
+};
+
+export default mutations;

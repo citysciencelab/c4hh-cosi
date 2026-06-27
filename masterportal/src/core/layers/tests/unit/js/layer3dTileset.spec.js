@@ -1,0 +1,547 @@
+import {expect} from "chai";
+import sinon from "sinon";
+import Layer3dTileset from "@core/layers/js/layer3dTileset.js";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import store from "@appstore/index.js";
+import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
+import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
+
+describe("src/core/js/layers/layer3dTileset.js", () => {
+    let attributes,
+        fromUrlSpy,
+        warn,
+        origGetters,
+        origDispatch,
+        style;
+
+    beforeAll(() => {
+        origGetters = store.getters;
+        origDispatch = store.dispatch;
+    });
+
+    beforeEach(() => {
+        warn = sinon.spy();
+        sinon.stub(console, "warn").callsFake(warn);
+        style = {};
+        attributes = {
+            id: "id",
+            name: "tilesetLayer",
+            url: "the_url",
+            typ: "TileSet3D",
+            cesium3DTilesetOptions: {
+                maximumScreenSpaceError: 6
+            }
+        };
+
+        mapCollection.clear();
+
+        global.Cesium = {};
+        global.Cesium.Cesium3DTileset = () => { /* no content*/ };
+        global.Cesium.Cesium3DTileset.fromUrl = () => sinon.stub();
+        global.Cesium.Cesium3DTileset.tileset = Promise.resolve({
+            style: "Styling",
+            readyPromise: Promise.resolve(true)
+        });
+        style = [["true", "color"]];
+        global.Cesium.Cesium3DTileStyle = sinon.stub().returns(style);
+
+        fromUrlSpy = sinon.spy(global.Cesium.Cesium3DTileset, "fromUrl");
+    });
+
+    afterEach(() => {
+        global.Cesium = null;
+        store.getters = origGetters;
+        store.dispatch = origDispatch;
+    });
+
+    describe("createLayer", () => {
+        let checkLayer;
+
+        beforeAll(() => {
+            /**
+             * Checks the layer for attributes content.
+             * @param {Object} layer the layer
+             * @param {Object} terrainLayer the terrainLayer
+             * @param {Object} attrs the attributes
+             * @returns {Promise} resolves after all assertions
+             */
+            checkLayer = async (layer, terrainLayer, attrs) => {
+                expect(layer).not.to.be.undefined;
+                expect(terrainLayer.get("name")).to.be.equals(attrs.name);
+                expect(terrainLayer.get("id")).to.be.equals(attrs.id);
+                expect(terrainLayer.get("typ")).to.be.equals(attrs.typ);
+                const tileset = await layer.tileset;
+
+                expect(tileset.layerReferenceId).to.be.equals(attrs.id);
+            };
+        });
+
+        it("new Layer3dTileset should create an layer with warning", () => {
+            const layer3dTileset = new Layer3dTileset(attributes);
+
+            expect(layer3dTileset).not.to.be.undefined;
+            expect(warn.notCalled).to.be.true;
+        });
+
+        it("createLayer shall create a tileset layer", async function () {
+            const layer3dTileset = new Layer3dTileset(attributes),
+                layer = layer3dTileset.getLayer();
+
+            expect(fromUrlSpy.calledOnce).to.equal(true);
+            await checkLayer(layer, layer3dTileset, attributes);
+        });
+
+        it("createLayer shall create a visible tileset layer", async function () {
+            Object.assign(attributes, {visibility: true});
+
+            const layer3dTileset = new Layer3dTileset(attributes),
+                layer = layer3dTileset.getLayer();
+
+            expect(layer3dTileset.get("visibility")).to.equal(true);
+            expect(fromUrlSpy.calledOnce).to.equal(true);
+            expect(fromUrlSpy.calledWithMatch("the_url/tileset.json", {maximumScreenSpaceError: 6})).to.equal(true);
+            await checkLayer(layer, layer3dTileset, attributes);
+        });
+        it("createLayer shall add hidden features at visible layer", async function () {
+            attributes.hiddenFeatures = [
+                "DEHHALKAJ00011uJ",
+                "DEHHALKAJ0000yd2"
+            ];
+            attributes.visibility = true;
+            const addToHiddenObjectsSpy = sinon.spy(Layer3dTileset.prototype, "addToHiddenObjects"),
+                layer3dTileset = new Layer3dTileset(attributes),
+                layer = layer3dTileset.getLayer();
+
+            expect(fromUrlSpy.calledOnce).to.equal(true);
+            await checkLayer(layer, layer3dTileset, attributes);
+            expect(addToHiddenObjectsSpy.calledOnce).to.be.true;
+            expect(addToHiddenObjectsSpy.firstCall.args[0]).to.be.deep.equals(attributes.hiddenFeatures);
+        });
+    });
+    describe("style funtions", () => {
+        it("initStyle shall be called on creation and call createStyle if styleListLoaded=true", function () {
+            const createStyleSpy = sinon.spy(Layer3dTileset.prototype, "createStyle");
+
+            global.Cesium;
+            store.getters = {
+                styleListLoaded: true
+            };
+            attributes.styleId = "styleId";
+            new Layer3dTileset(attributes);
+
+            expect(createStyleSpy.calledOnce).to.be.true;
+        });
+
+        it("initStyle shall be called on creation and not call createStyle if styleListLoaded=false", function () {
+            const createStyleSpy = sinon.spy(Layer3dTileset.prototype, "createStyle");
+
+            store.getters = {
+                styleListLoaded: false
+            };
+            attributes.styleId = "styleId";
+            new Layer3dTileset(attributes);
+
+            expect(createStyleSpy.notCalled).to.be.true;
+        });
+
+        it("createStyle shall set the style at attributes nd at tileset", async function () {
+            style = [["true", "color"]];
+            global.Cesium.Cesium3DTileStyle = sinon.stub().returns(style);
+            sinon.stub(createStyle, "createStyle").returns(style);
+            sinon.stub(styleList, "returnStyleObject").returns({});
+            let layer3d = null,
+                layerStyle = null,
+                tileset = null;
+
+            attributes.styleId = "styleId";
+            layer3d = new Layer3dTileset(attributes);
+            layer3d.createStyle(attributes);
+            layerStyle = layer3d.get("style");
+            tileset = await layer3d.layer.tileset;
+            expect(tileset.style).to.be.deep.equals([["true", "color"]]);
+            expect(layerStyle).to.be.deep.equals([["true", "color"]]);
+        });
+    });
+    describe("setVisible", function () {
+        let createLegendSpy, showObjectsSpy, setVisibleSpy, map;
+
+        beforeEach(() => {
+            createLegendSpy = sinon.spy(Layer3dTileset.prototype, "createLegend");
+            showObjectsSpy = sinon.spy(Layer3dTileset.prototype, "showObjects");
+            setVisibleSpy = sinon.spy();
+            map = {
+                id: "map"
+            };
+        });
+
+        it("setVisible with visibility true and hiddenFeatures", function () {
+            attributes.hiddenFeatures = [
+                "DEHHALKAJ00011uJ",
+                "DEHHALKAJ0000yd2"
+            ];
+
+            const tilesetLayer = new Layer3dTileset(attributes);
+
+            tilesetLayer.getLayer().setVisible = setVisibleSpy;
+
+            tilesetLayer.setVisible(true, map);
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.true;
+            expect(setVisibleSpy.firstCall.args[1]).to.be.deep.equals(map);
+            expect(createLegendSpy.calledOnce).to.be.true;
+            expect(showObjectsSpy.notCalled).to.be.true;
+        });
+        it("setVisible with visibility false and hiddenFeatures", function () {
+            attributes.hiddenFeatures = [
+                "DEHHALKAJ00011uJ",
+                "DEHHALKAJ0000yd2"
+            ];
+
+            const tilesetLayer = new Layer3dTileset(attributes);
+
+            tilesetLayer.getLayer().setVisible = setVisibleSpy;
+
+            tilesetLayer.setVisible(false, map);
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.false;
+            expect(setVisibleSpy.firstCall.args[1]).to.be.deep.equals(map);
+            expect(createLegendSpy.notCalled).to.be.true;
+            expect(showObjectsSpy.calledOnce).to.be.true;
+            expect(showObjectsSpy.firstCall.args[0]).to.be.deep.equals(attributes.hiddenFeatures);
+        });
+        it("setVisible with visibility true and no hiddenFeatures", function () {
+            const tilesetLayer = new Layer3dTileset(attributes);
+
+            tilesetLayer.getLayer().setVisible = setVisibleSpy;
+
+            tilesetLayer.setVisible(true, map);
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.true;
+            expect(setVisibleSpy.firstCall.args[1]).to.be.deep.equals(map);
+            expect(createLegendSpy.calledOnce).to.be.true;
+            expect(showObjectsSpy.notCalled).to.be.true;
+        });
+        it("setVisible with visibility false and no hiddenFeatures", function () {
+            const tilesetLayer = new Layer3dTileset(attributes);
+
+            tilesetLayer.getLayer().setVisible = setVisibleSpy;
+
+            tilesetLayer.setVisible(false, map);
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.false;
+            expect(setVisibleSpy.firstCall.args[1]).to.be.deep.equals(map);
+            expect(createLegendSpy.notCalled).to.be.true;
+            expect(showObjectsSpy.notCalled).to.be.true;
+        });
+    });
+    describe("updateLayerValues", function () {
+        it("updateLayerValues shall call setVisible and setOpacity if visibility changed", function () {
+            attributes.visibility = true;
+            const tilesetLayer = new Layer3dTileset(attributes),
+                setVisibleSpy = sinon.spy(Layer3dTileset.prototype, "setVisible"),
+                setOpacitySpy = sinon.spy(Layer3dTileset.prototype, "setOpacity");
+
+            tilesetLayer.updateLayerValues({visibility: false, transparency: 1});
+            expect(setVisibleSpy.calledOnce).to.be.true;
+            expect(setVisibleSpy.firstCall.args[0]).to.be.false;
+            expect(setOpacitySpy.calledOnce).to.be.true;
+            expect(setOpacitySpy.firstCall.args[0]).to.be.equals(1);
+        });
+        it("updateLayerValues shall call setOpacity if visibility not changed", function () {
+            attributes.visibility = true;
+            const tilesetLayer = new Layer3dTileset(attributes),
+                setVisibleSpy = sinon.spy(Layer3dTileset.prototype, "setVisible"),
+                setOpacitySpy = sinon.spy(Layer3dTileset.prototype, "setOpacity");
+
+            tilesetLayer.updateLayerValues({visibility: true, transparency: 1});
+            expect(setVisibleSpy.notCalled).to.be.true;
+            expect(setOpacitySpy.calledOnce).to.be.true;
+            expect(setOpacitySpy.firstCall.args[0]).to.be.equals(1);
+        });
+    });
+    describe("setOpacity", function () {
+        it("setOpacity 100 shall call setOpacity at layer", function () {
+            attributes.visibility = true;
+            const tilesetLayer = new Layer3dTileset(attributes),
+                setOpacitySpy = sinon.spy();
+
+            tilesetLayer.getLayer().setOpacity = setOpacitySpy;
+
+            tilesetLayer.setOpacity(100);
+            expect(setOpacitySpy.calledOnce).to.be.true;
+            expect(setOpacitySpy.firstCall.args[0]).to.be.equals(0);
+        });
+        it("setOpacity 0 shall call setOpacity at layer", function () {
+            attributes.visibility = true;
+            const tilesetLayer = new Layer3dTileset(attributes),
+                setOpacitySpy = sinon.spy();
+
+            tilesetLayer.getLayer().setOpacity = setOpacitySpy;
+
+            tilesetLayer.setOpacity(0);
+            expect(setOpacitySpy.calledOnce).to.be.true;
+            expect(setOpacitySpy.firstCall.args[0]).to.be.equals(1);
+        });
+    });
+    describe("setCesiumSceneOptions", function () {
+        it("setCesiumSceneOptions updates the scene option depthTestAgainstTerrain of the cesium map to true", function () {
+            attributes.visibility = true;
+            const tilesetLayer = new Layer3dTileset(attributes),
+                dispatchCalls = {},
+                sceneOptions = {
+                    globe: {
+                        depthTestAgainstTerrain: false
+                    }
+                },
+                map = {
+                    getCesiumScene: () => {
+                        return {
+                            globe: {
+                                depthTestAgainstTerrain: true
+                            }
+                        };
+                    }
+                },
+                replaceByIdInLayerConfig = {
+                    layerConfigs: [{
+                        id: attributes.id,
+                        layer: {
+                            id: attributes.id,
+                            defaultDepthTestAgainstTerrain: {
+                                globe: {
+                                    depthTestAgainstTerrain: true
+                                }
+                            }
+                        }
+                    }]
+                };
+
+            store.dispatch = (action, payload) => {
+                dispatchCalls[action] = payload;
+            };
+            tilesetLayer.setCesiumSceneOptions(sceneOptions, map);
+            expect(dispatchCalls.replaceByIdInLayerConfig).to.deep.equal(replaceByIdInLayerConfig);
+        });
+        it("setCesiumSceneOptions updates the scene option depthTestAgainstTerrain of the cesium map to false and resets the defaultDepthTestAgainstTerrrain to undefined", function () {
+            attributes.visibility = true;
+            attributes.defaultDepthTestAgainstTerrain = {
+                globe: {
+                    depthTestAgainstTerrain: true
+                }
+            };
+            const tilesetLayer = new Layer3dTileset(attributes),
+                dispatchCalls = {},
+                sceneOptions = {
+                    globe: {
+                        depthTestAgainstTerrain: false
+                    }
+                },
+                map = {
+                    getCesiumScene: () => {
+                        return {
+                            globe: {
+                                depthTestAgainstTerrain: false
+                            }
+                        };
+                    }
+                },
+                replaceByIdInLayerConfig = {
+                    layerConfigs: [{
+                        id: attributes.id,
+                        layer: {
+                            id: attributes.id,
+                            defaultDepthTestAgainstTerrain: undefined
+                        }
+                    }]
+                };
+
+            store.dispatch = (action, payload) => {
+                dispatchCalls[action] = payload;
+            };
+            tilesetLayer.setCesiumSceneOptions(sceneOptions, map);
+            expect(dispatchCalls.replaceByIdInLayerConfig).to.deep.equal(replaceByIdInLayerConfig);
+        });
+        it("setCesiumSceneOptions doesn't update the scene options depthTestAgainstTerrain of the cesium map if defaultDepthTestAgainstTerrrain is undefined", function () {
+            attributes.visibility = true;
+            const tilesetLayer = new Layer3dTileset(attributes),
+                dispatchCalls = {},
+                sceneOptions = {
+                    globe: {
+                        depthTestAgainstTerrain: false
+                    }
+                },
+                map = {
+                    getCesiumScene: () => {
+                        return {
+                            globe: {
+                                depthTestAgainstTerrain: false
+                            }
+                        };
+                    }
+                };
+
+            store.dispatch = (action, payload) => {
+                dispatchCalls[action] = payload;
+            };
+            tilesetLayer.setCesiumSceneOptions(sceneOptions, map);
+            expect(Object.keys(dispatchCalls).length).to.be.equals(0);
+        });
+    });
+    describe("featureExists", function () {
+        it("featureExists shall return true", function () {
+            attributes.visibility = true;
+            const tilesetLayer = new Layer3dTileset(attributes),
+                feature = {
+                    content: {
+                        isDestroyed: () => false,
+                        batchTable: {
+                            isDestroyed: () => false
+                        }
+                    }
+
+                },
+                result = tilesetLayer.featureExists(feature);
+
+            expect(result).to.be.true;
+        });
+        it("featureExists shall return false", function () {
+            attributes.visibility = true;
+            const tilesetLayer = new Layer3dTileset(attributes),
+                feature = {
+                    content: {
+                        isDestroyed: () => true,
+                        batchTable: {
+                            isDestroyed: () => false
+                        }
+                    }
+
+                },
+                result = tilesetLayer.featureExists(feature);
+
+            expect(result).to.be.false;
+        });
+    });
+    describe("styleContent", function () {
+        it("should set lastUpdatedSymbol on the content on first call", function () {
+            attributes.hiddenFeatures = [
+                "DEHHALKAJ00011uJ",
+                "DEHHALKAJ0000yd2"
+            ];
+            const updateHiddenFeatureListSpy = sinon.spy(Layer3dTileset.prototype, "updateHiddenFeatureList"),
+                tilesetLayer = new Layer3dTileset(attributes),
+                content = sinon.spy();
+
+            expect(content[tilesetLayer.lastUpdatedSymbol]).to.be.undefined;
+            tilesetLayer.styleContent(content);
+            expect(content[tilesetLayer.lastUpdatedSymbol]).to.not.be.undefined;
+            expect(updateHiddenFeatureListSpy.calledOnce).to.be.true;
+        });
+    });
+    describe("addToHiddenObjects", function () {
+        it("add the id to the hiddenObjects and create an empty Set", function () {
+            const setFeatureVisibilityLastUpdatedSpy = sinon.spy(Layer3dTileset.prototype, "setFeatureVisibilityLastUpdated"),
+                tilesetLayer = new Layer3dTileset(attributes);
+
+            tilesetLayer.addToHiddenObjects(["id"]);
+            expect(tilesetLayer.hiddenObjects.id).to.be.an.instanceOf(Set);
+            // once called at creation of layer
+            expect(setFeatureVisibilityLastUpdatedSpy.calledTwice).to.be.true;
+        });
+    });
+    describe("showObjects", function () {
+        it("should remove the id from the hiddenObjects List", function () {
+            const tilesetLayer = new Layer3dTileset(attributes);
+
+            tilesetLayer.addToHiddenObjects(["id"]);
+            expect(tilesetLayer.hiddenObjects.id).to.be.an.instanceOf(Set);
+            tilesetLayer.showObjects(["id"]);
+            expect(tilesetLayer.hiddenObjects.id).to.be.undefined;
+        });
+    });
+    describe("createLegend", function () {
+        it("createLegend shall create a legend", async function () {
+            attributes.legendURL = "https://legendUrl";
+            const tilesetLayer = new Layer3dTileset(attributes),
+                legend = await tilesetLayer.createLegend();
+
+            expect(legend).to.be.deep.equals([attributes.legendURL]);
+        });
+    });
+    describe("updateHiddenFeatureList", function () {
+        it("updateHiddenFeatureList", async function () {
+            let tilesetLayer = null;
+            const addToHiddenObjectsSpy = sinon.spy(),
+                hiddenFeatures1 = [
+                    "DEHHALKAJ00011uJ",
+                    "DEHHALKAJ0000yd2"
+                ],
+                hiddenFeatures3 = [
+                    "DEHHALKAJ0001abc"
+                ];
+
+            sinon.stub(layerCollection, "getLayers").returns(
+                [
+                    {
+                        id: "1",
+                        addToHiddenObjects: addToHiddenObjectsSpy,
+                        get: (key) =>{
+                            if (key === "hiddenFeatures") {
+                                return hiddenFeatures1;
+                            }
+                            if (key === "typ") {
+                                return "TileSet3D";
+                            }
+                            return null;
+                        }
+                    },
+                    {
+                        id: "2",
+                        addToHiddenObjects: addToHiddenObjectsSpy,
+                        get: (key) =>{
+                            if (key === "hiddenFeatures") {
+                                return [];
+                            }
+                            if (key === "typ") {
+                                return "TileSet3D";
+                            }
+                            return null;
+                        }
+                    },
+                    {
+                        id: "3",
+                        addToHiddenObjects: addToHiddenObjectsSpy,
+                        get: (key) =>{
+                            if (key === "hiddenFeatures") {
+                                return hiddenFeatures3;
+                            }
+                            if (key === "typ") {
+                                return "TileSet3D";
+                            }
+                            return null;
+                        }
+                    },
+                    {
+                        id: "4",
+                        addToHiddenObjects: addToHiddenObjectsSpy,
+                        get: (key) =>{
+                            if (key === "typ") {
+                                return "WMS";
+                            }
+                            return null;
+                        }
+                    }
+                ]
+            );
+            tilesetLayer = new Layer3dTileset(attributes);
+            tilesetLayer.updateHiddenFeatureList();
+
+            expect(addToHiddenObjectsSpy.calledThrice).to.be.true;
+            expect(addToHiddenObjectsSpy.firstCall.args[0]).to.be.deep.equals(hiddenFeatures1.concat(hiddenFeatures3));
+            expect(addToHiddenObjectsSpy.firstCall.args[1]).to.be.true;
+            expect(addToHiddenObjectsSpy.secondCall.args[0]).to.be.deep.equals(hiddenFeatures1.concat(hiddenFeatures3));
+            expect(addToHiddenObjectsSpy.secondCall.args[1]).to.be.true;
+            expect(addToHiddenObjectsSpy.thirdCall.args[0]).to.be.deep.equals(hiddenFeatures1.concat(hiddenFeatures3));
+            expect(addToHiddenObjectsSpy.thirdCall.args[1]).to.be.true;
+        });
+    });
+});

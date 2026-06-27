@@ -1,0 +1,130 @@
+import {markRaw} from "vue";
+import api from "@masterportal/masterportalapi/src/maps/api.js";
+import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
+import load3DScript from "@masterportal/masterportalapi/src/lib/load3DScript.js";
+
+import {setResolutions, setValues} from "./setValuesToMapView.js";
+import store from "@appstore/index.js";
+import mapMarker from "./mapMarker.js";
+
+/**
+ * Create the map in different modes and update the map attributes.
+ * @param {Object} mapViewSettings The map view settings.
+ * @param {Object} configJs The config.js.
+ * @returns {void}
+ */
+function initializeMaps (mapViewSettings, configJs) {
+    create2DMap(mapViewSettings, configJs);
+    store.dispatch("Maps/setMapAttributes");
+    watchPortalConfig();
+    if (store.getters.controlsConfig?.button3d || store.getters.controlsConfig?.expandable?.button3d) {
+        load3DMap();
+    }
+    mapMarker.initializeMapMarkers(store.getters.mapMarker);
+}
+
+/**
+ * Create the 2D map with mapview.
+ * @param {Object} mapViewSettings The mapViewSettings of config.json file.
+ * @param {Object} configJs The config.js.
+ * @returns {void}
+ */
+function create2DMap (mapViewSettings, configJs) {
+    const map2d = api.map.createMap({
+        ...configJs,
+        ...mapViewSettings,
+        layerConf: rawLayerList.getLayerList()
+    }, "2D", {});
+
+    markRaw(map2d);
+
+    mapCollection.addMap(map2d, "2D");
+}
+
+/**
+ * Watches the mapViewSettings
+ * Sets the changed attributes.
+ * @returns {void}
+ */
+function watchPortalConfig () {
+    store.watch((state, getters) => getters.mapViewSettings, mapViewSettings => {
+        const view = mapCollection.getMapView("2D"),
+            resolutions = mapViewSettings?.options?.map(entry => entry.resolution);
+
+        setResolutions(view, resolutions);
+        setValues(view, mapViewSettings);
+    });
+}
+
+/**
+ * Loads Cesium and the start creating the 3D map.
+ * @returns {void}
+ */
+function load3DMap () {
+    load3DScript.load3DScript(store.getters.cesiumLibrary, () => {
+        create3DMap();
+        store.dispatch("Maps/registerCesiumListener");
+
+        if (store.getters.startingMapMode === "3D") {
+            store.dispatch("Maps/activateMap3d");
+        }
+    });
+}
+
+/**
+ * Create the 3D map.
+ * @returns {void}
+ */
+function create3DMap () {
+    const map3dParameter = store.getters.map3dParameter,
+        shadowTimeFromConfig = map3dParameter?.shadowTime,
+        map3d = api.map.createMap({
+            cesiumParameter: map3dParameter,
+            map2D: mapCollection.getMap("2D"),
+            shadowTime: function () {
+                if (this.time) {
+                    return this.time;
+                }
+
+                if (shadowTimeFromConfig) {
+                    return Cesium.JulianDate.fromIso8601(shadowTimeFromConfig);
+                }
+
+                return Cesium.JulianDate.fromDate(new Date());
+            }
+        }, "3D"),
+        view = mapCollection.getMapView("2D"),
+        urlParamsMaps = store.state.urlParams?.MAPS ? Object.fromEntries(Object.entries(JSON.parse(store.state.urlParams?.MAPS)).map(([key, value]) => [key.toUpperCase(), value])).CENTER : undefined,
+        urlParamCenter = store.state.urlParams.CENTER || store.state.urlParams["MAP/CENTER"] || urlParamsMaps;
+
+    markRaw(map3d);
+
+    mapCollection.addMap(map3d, "3D");
+    if (store.state.urlParams.QUERY) {
+        store.dispatch("Modules/SearchBar/startSearch", store.state.urlParams.QUERY);
+    }
+    else if (!urlParamCenter && map3dParameter.camera && store.getters["Maps/mode"] === "2D") {
+        view.setZoom(store.getters["Maps/initialZoom"]);
+        view.setCenter(store.getters["Maps/initialCenter"]);
+    }
+    else if (urlParamCenter && map3dParameter.camera && store.getters["Maps/mode"] === "2D") {
+        let center;
+
+        if (Array.isArray(urlParamCenter)) {
+            center = urlParamCenter;
+        }
+        else if (urlParamCenter?.includes("[")) {
+            center = JSON.parse(urlParamCenter);
+        }
+        else {
+            center = urlParamCenter?.split(",");
+        }
+        view.setCenter(center);
+    }
+}
+
+export default {
+    create3DMap,
+    initializeMaps,
+    load3DMap
+};

@@ -1,0 +1,364 @@
+<script>
+import {mapActions, mapGetters, mapMutations} from "vuex";
+import MenuContainerBody from "./MenuContainerBody.vue";
+import ResizeHandle from "@shared/modules/resize/components/ResizeHandle.vue";
+import MenuContainerBodyRootLogo from "./MenuContainerBodyRootLogo.vue";
+import SearchBar from "../../searchBar/components/SearchBar.vue";
+
+/**
+ * @module modules/MenuContainer
+ * @vue-prop {String} side - The side in which the menu component is being rendered.
+ * @vue-computed {String} handlePosition - Defines whether the ResizeHandle should be displayed on the right or left side.
+ * @vue-computed {Boolean} expanded - Shows if the menu is expanded.
+ */
+export default {
+    name: "MenuContainer",
+    components: {
+        MenuContainerBody,
+        MenuContainerBodyRootLogo,
+        ResizeHandle,
+        SearchBar
+    },
+    props: {
+        /** Defines in which menu the component is being rendered */
+        side: {
+            type: String,
+            default: "mainMenu",
+            validator: value => value === "mainMenu" || value === "secondaryMenu"
+        }
+    },
+    computed: {
+        ...mapGetters([
+            "menuFromConfig",
+            "isMobile",
+            "uiStyle"
+        ]),
+        ...mapGetters("Modules", ["componentMap"]),
+        ...mapGetters("Menu", [
+            "mainMenu",
+            "secondaryMenu",
+            "currentMenuWidth",
+            "mainExpanded",
+            "secondaryExpanded",
+            "titleBySide",
+            "currentComponent",
+            "defaultComponent",
+            "secondaryMenuEnabled"
+        ]),
+        /**
+         * @returns {Object} Menu configuration for the given menu.
+         */
+        menu () {
+            return this.side === "mainMenu" ? this.mainMenu : this.secondaryMenu;
+        },
+
+        /**
+         * @returns {Object} Returns the currently visible Component.
+         */
+        currentComponent () {
+            let current = this.menu?.navigation?.currentComponent?.type;
+
+            if (current !== "root" && current !== this.defaultComponent) {
+                current = this.componentMap[current];
+            }
+
+            return current;
+        },
+        /**
+         * @returns {String} Defines whether the ResizeHandle should be displayed on the right or left side depending on the menu this component is rendered in.
+         */
+        handlePosition () {
+            return this.side === "mainMenu" ? "right" : "left";
+        },
+
+        expanded () {
+            return this.side === "mainMenu" ? this.mainExpanded : this.secondaryExpanded;
+        },
+
+        menuInlineStyles () {
+            return {
+                width: this.expanded ? this.currentMenuWidth(this.side) : "0",
+                top: this.isMobile ? this[this.side]?.expandedTop : "0%"
+            };
+        }
+    },
+    watch: {
+        mainMenu (mainMenu) {
+            this.mergeMenuState({menu: mainMenu, side: "mainMenu"});
+        },
+        secondaryMenu (secondaryMenu) {
+            this.mergeMenuState({menu: secondaryMenu, side: "secondaryMenu"});
+        },
+        isMobile (isMobile) {
+            if (isMobile) {
+                this.collapseMenues();
+                this.setCurrentMenuWidth({side: this.side, width: "100%"});
+            }
+            else {
+                this.setCurrentMenuWidth({side: this.side, width: "25%"});
+            }
+        }
+    },
+    created () {
+        this.mergeMenuState({menu: this.menuFromConfig(this.side), side: this.side});
+        if (this.isMobile) {
+            this.collapseMenues();
+            this.setCurrentMenuWidth({side: this.side, width: "100%"});
+        }
+    },
+    methods: {
+        ...mapMutations("Menu", [
+            "collapseMenues",
+            "mergeMenuState",
+            "setCurrentMenuWidth",
+            "setCurrentMainMenuOffsetWidth",
+            "setCurrentSecondaryMenuWidth",
+            "setCurrentSecondaryMenuOffsetWidth",
+            "setCurrentMainMenuWidth"
+        ]),
+        ...mapMutations("Modules/LayerPills", {setLayerPillsHidden: "setHidden"}),
+        ...mapActions("Menu", ["clickedMenuElement", "toggleMenu", "closeMenu"]),
+        /**
+         * Opens the searchbar module.
+         * @returns {void}
+         */
+        openSearchBar () {
+            this.clickedMenuElement({
+                name: "common:modules.searchBar.searchResultList",
+                side: this.side,
+                type: "searchBar"
+            });
+        },
+        /**
+         * Keeps track of current menu sizes and triggers function to hide layerPills and Footer with a sufficiently big secondary menu.
+         * @param {object} eventData emitted Data from ResizeHandle Event
+         */
+        onResize (eventData) {
+            const menuPercentWidth = eventData.handleElement.offsetWidth / document.documentElement.clientWidth;
+
+            if (this.side === "mainMenu" && this.uiStyle === "DEFAULT") {
+                this.setCurrentMainMenuWidth(menuPercentWidth);
+                this.setCurrentMainMenuOffsetWidth(eventData.handleElement.offsetWidth);
+            }
+            if (this.side === "secondaryMenu" && this.uiStyle === "DEFAULT") {
+                this.hideElementsForBiggerMenu(menuPercentWidth);
+                this.setCurrentSecondaryMenuWidth(menuPercentWidth);
+                this.setCurrentSecondaryMenuOffsetWidth(eventData.handleElement.offsetWidth);
+            }
+        },
+        /**
+         * Hides or displays layerPills and Footer depending on width of secondary Menu.
+         * @param {number} menuPercentWidth the width of the secondary Menu in percent of the viewport.
+         */
+        hideElementsForBiggerMenu (menuPercentWidth) {
+            const hideElementBreakPoint = document.documentElement.clientWidth > 1000 ? 0.7 : 0.5,
+                footer = document.getElementById("module-portal-footer");
+
+            this.setLayerPillsHidden(menuPercentWidth >= hideElementBreakPoint);
+            if (footer) {
+                footer.style.display = menuPercentWidth > hideElementBreakPoint ? "none" : "";
+            }
+        },
+        /**
+         * Triggers when css transition of menu ends to propagate new menu width to the state
+         * @param {object} event data-object from the css-transition element
+         */
+        onTransitionEnd (event) {
+            const menuPercentWidth = event.target.offsetWidth / document.documentElement.clientWidth;
+
+            if (event.propertyName === "width") {
+                if (event.target.id.includes("secondary")) {
+                    this.setCurrentSecondaryMenuWidth(menuPercentWidth);
+                    this.setCurrentSecondaryMenuOffsetWidth(event.target.offsetWidth);
+                }
+                else if (event.target.id.includes("main")) {
+                    this.setCurrentMainMenuWidth(menuPercentWidth);
+                    this.setCurrentMainMenuOffsetWidth(event.target.offsetWidth);
+                }
+            }
+        }
+    }
+};
+</script>
+
+<template>
+    <div
+        :id="'mp-menu-' + side"
+        class="mp-menu shadow d-flex"
+        :class="[
+            'mp-' + side,
+            {
+                'mp-menu-table': uiStyle === 'TABLE',
+                'mp-secondaryMenu-expanded': secondaryExpanded && side === 'secondaryMenu',
+                hidden: !secondaryMenuEnabled && side === 'secondaryMenu'
+            }
+        ]"
+        tabindex="-1"
+        :style="menuInlineStyles"
+        :aria-label="titleBySide(side) ? titleBySide(side).text : null"
+        @transitionend="onTransitionEnd"
+    >
+        <div
+            :id="'mp-header-' + side"
+            class="mp-menu-header"
+            :class="
+                {'mp-menu-header-collapsed': !mainExpanded && side === 'mainMenu' || !secondaryExpanded && side === 'secondaryMenu'}
+            "
+        >
+            <button
+                :id="'mp-menu-header-close-button-' + side"
+                type="button"
+                class="btn-close p-2 mp-menu-header-close-button"
+                :aria-label="$t('common:modules.menu.ariaLabelClose')"
+                @click="closeMenu(side)"
+            />
+            <div
+                v-if="(currentComponent ==='root') && titleBySide(side)"
+                :id="'mp-subHeader-' + side"
+                class="mp-menu-subHeader"
+                :class="
+                    {'mp-menu-subHeader-collapsed': !mainExpanded && side === 'mainMenu' || !secondaryExpanded && side === 'secondaryMenu'}
+                "
+            >
+                <MenuContainerBodyRootLogo
+                    class="mb-5 mt-4"
+                    v-bind="titleBySide(side)"
+                />
+                <SearchBar
+                    :click-action="openSearchBar"
+                />
+            </div>
+        </div>
+        <MenuContainerBody
+            :side="side"
+        />
+        <ResizeHandle
+            v-if="!isMobile"
+            :id="'mp-resize-handle-' + side"
+            class="mp-menu-container-handle"
+            :handle-position="handlePosition"
+            :mutation="setCurrentMenuWidth"
+            :min-width="0"
+            :max-width="0.95"
+            :min-height="1"
+            :side="side"
+            @resizing="eventData => onResize(eventData)"
+        >
+            &#8942;
+        </ResizeHandle>
+    </div>
+</template>
+
+<style lang="scss">
+
+.mp-menu {
+    height: 100%;
+    position: fixed;
+    background-color: $menu-background-color;
+    transition: width 0.3s ease;
+    z-index: 4;
+    flex-direction: column;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+.mp-mainMenu {
+    left: 0px;
+}
+
+.mp-secondaryMenu {
+    border-radius: 15px 15px 0 0;
+    height: 0;
+    position: absolute;
+    top: 100%;
+    transition: top 0.3s ease;
+    &-expanded {
+        height: 100%;
+    }
+}
+
+
+.mp-menu-header{
+    display: flex;
+    &-collapsed {
+        padding: 0;
+        display: none;
+    }
+
+    .mp-menu-subHeader{
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        font-size: $font-size-base;
+        padding: $padding $padding 0 $padding;
+        width:100%;
+
+        &-collapsed {
+            padding: 0;
+            display: none;
+        }
+    }
+}
+
+.mp-menu-header-close-button {
+    display: block;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+
+@include media-breakpoint-up(sm)  {
+    .mp-menu {
+        top: 0px;
+        min-width: 0%;
+        flex-grow: 0;
+        flex-shrink: 0;
+        position: absolute;
+    }
+
+    .mp-mainMenu {
+        left: 0;
+        overflow-x: hidden;
+    }
+
+    .mp-secondaryMenu {
+       border-radius: 0;
+       right:0;
+       width: unset;
+       transition: width 0.3s ease;
+    }
+
+    .mp-menu-container-handle {
+        display: flex;
+        width: 9px;
+        align-items: center;
+        justify-content: center;
+        top: 0rem;
+        font-size: 2rem;
+
+        &:hover {
+            background-color: $light_grey_active;
+        }
+    }
+}
+
+@include media-breakpoint-up(md) {
+    .mp-menu {
+        position: relative;
+    }
+
+    .mp-menu-header-close-button {
+        display: none;
+    }
+}
+
+.mp-menu-table {
+    height: 200px;
+    position: fixed;
+    left: calc(50% - 200px);
+    top: calc(100% - 250px);
+}
+</style>

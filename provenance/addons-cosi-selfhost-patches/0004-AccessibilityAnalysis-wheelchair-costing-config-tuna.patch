@@ -1,0 +1,295 @@
+From 8938fa154888bf760be747b7450c5c82f399a6b7 Mon Sep 17 00:00:00 2001
+From: paulhh <p.linnow@dp-planung.de>
+Date: Fri, 26 Jun 2026 22:17:04 +0200
+Subject: [PATCH 4/4] AccessibilityAnalysis: wheelchair costing +
+ config-tunable Valhalla isochrone detail
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Picks up BACKLOG §3 follow-ups.
+
+- Wheelchair: Valhalla has no first-class wheelchair costing, so the profile
+  was mapped to bare `pedestrian`. Now also send
+  `costing_options: {pedestrian: {type: "wheelchair"}}` (avoids steps, honours
+  `wheelchair=*` access tags) via new `toValhallaCostingOptions()`, emitted only
+  for the wheelchair profile.
+
+- Detail levers (more detailed / higher-resolution isochrones): `generalize`
+  (Douglas-Peucker tolerance, metres; null/omitted = Valhalla default, 0 = max
+  fidelity) and `denoise` (0..1; keep small reachable pockets) are now driven by
+  a new `valhallaIsochroneOptions` state field, threaded through a new
+  `isochroneOptions` arg (methodsAnalysis -> getIsochrones action ->
+  createIsochrones -> requestIsochrones -> requestIsochronesValhalla).
+  Defaults stay backward-compatible (generalize null, denoise 1); Valhalla-only,
+  the ORS path ignores it.
+
+- Contour-band count left at 3 (deferred): structurally baked into
+  styleIsochroneFeatures %3/%4 math, getDistances/getSteps, and steps.length
+  grouping; a much larger change with real per-request cost.
+
+5 new unit tests (wheelchair options, default body, explicit levers,
+generalize 0 vs null); all 13 pass, eslint clean.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+---
+ .../components/methodsAnalysis.js             |  3 +-
+ .../store/stateAccessibilityAnalysis.js       |  8 ++++
+ .../service/requestIsochronesValhalla.spec.js | 45 ++++++++++++++++++-
+ .../utils/createIsochrones.js                 | 14 +++---
+ .../utils/requestIsochrones.js                |  5 ++-
+ .../utils/requestIsochronesValhalla.js        | 39 ++++++++++++++--
+ 6 files changed, 101 insertions(+), 13 deletions(-)
+
+diff --git a/cosi/AccessibilityAnalysis/components/methodsAnalysis.js b/cosi/AccessibilityAnalysis/components/methodsAnalysis.js
+index 47579186..5eb325fc 100644
+--- a/cosi/AccessibilityAnalysis/components/methodsAnalysis.js
++++ b/cosi/AccessibilityAnalysis/components/methodsAnalysis.js
+@@ -78,7 +78,8 @@ export default {
+                 maxDistance,
+                 mergePolygons: this.mergePolygons,
+                 baseUrl: this.baseUrl,
+-                serviceType: this.isochroneBackend
++                serviceType: this.isochroneBackend,
++                isochroneOptions: this.valhallaIsochroneOptions
+             });
+ 
+             this.setSteps(steps);
+diff --git a/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js b/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
+index 0ed4538e..1d16cec7 100644
+--- a/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
++++ b/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
+@@ -61,6 +61,14 @@ const state = {
+     // isochrone routing backend: "ors" (OpenRouteService, default) or "valhalla" (self-hosted).
+     // For Valhalla, set this to "valhalla" in config.json and point serviceId at the Valhalla rest-service.
+     isochroneBackend: "ors",
++    // Valhalla-only isochrone detail tuning (BACKLOG §3); ignored when isochroneBackend !== "valhalla".
++    // Overridable wholesale via the config.json accessibilityAnalysis block.
++    //   generalize: Douglas–Peucker tolerance in metres; null → omit (Valhalla default). 0 = max fidelity.
++    //   denoise: 0..1; 1 drops disconnected islands, lower (e.g. 0.3) keeps small reachable pockets.
++    valhallaIsochroneOptions: {
++        generalize: null,
++        denoise: 1
++    },
+     wpsServiceId: "1001",
+     wpsProcess: "einwohner_ermitteln.fmw",
+     cardCounter: 0
+diff --git a/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js b/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
+index 7a8509eb..79f8aa62 100644
+--- a/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
++++ b/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
+@@ -1,6 +1,6 @@
+ import {expect} from "chai";
+ import axios from "axios";
+-import requestIsochronesValhalla, {toValhallaCosting, toContour, fromContour, toValhallaDateTime} from "../../../utils/requestIsochronesValhalla";
++import requestIsochronesValhalla, {toValhallaCosting, toValhallaCostingOptions, toContour, fromContour, toValhallaDateTime} from "../../../utils/requestIsochronesValhalla";
+ 
+ /**
+  * Builds a fake Valhalla isochrone FeatureCollection.
+@@ -37,6 +37,11 @@ describe("requestIsochronesValhalla", () => {
+             expect(toValhallaCosting("public-transport")).to.equal("multimodal");
+             expect(toValhallaCosting("unknown")).to.equal("auto");
+         });
++        it("builds wheelchair costing_options (pedestrian type) only for the wheelchair profile", () => {
++            expect(toValhallaCostingOptions("wheelchair")).to.eql({pedestrian: {type: "wheelchair"}});
++            expect(toValhallaCostingOptions("foot-walking")).to.equal(null);
++            expect(toValhallaCostingOptions("driving-car")).to.equal(null);
++        });
+         it("formats a Valhalla date_time as a local 'depart at' (type 1) wall-clock value", () => {
+             // local components (no timezone suffix) so transit departs at Hamburg local time
+             expect(toValhallaDateTime(new Date(2026, 5, 25, 8, 5))).to.eql({type: 1, value: "2026-06-25T08:05"});
+@@ -73,6 +78,44 @@ describe("requestIsochronesValhalla", () => {
+         expect(payload.polygons).to.equal(true);
+         expect(payload.locations).to.eql([{lon: 10.0, lat: 53.5}]);
+         expect(payload.contours).to.eql([{time: 3.3}, {time: 6.7}, {time: 10}]);
++        // detail defaults: keep islands (denoise 1), no generalization, no costing_options
++        expect(payload.denoise).to.equal(1);
++        expect(payload).to.not.have.property("generalize");
++        expect(payload).to.not.have.property("costing_options");
++    });
++
++    it("sends wheelchair as pedestrian costing with a wheelchair costing_options block", async () => {
++        const post = vi.spyOn(axios, "post").mockResolvedValue({data: valhallaResponse([10], "time")});
++
++        await requestIsochronesValhalla("wheelchair", [[10.0, 53.5]], "time", [600], null, "http://localhost:8002");
++        const payload = JSON.parse(post.mock.calls[0][1]);
++
++        expect(payload.costing).to.equal("pedestrian");
++        expect(payload.costing_options).to.eql({pedestrian: {type: "wheelchair"}});
++    });
++
++    it("applies the detail levers (generalize + denoise) from isochroneOptions to the request body", async () => {
++        const post = vi.spyOn(axios, "post").mockResolvedValue({data: valhallaResponse([10], "time")});
++
++        await requestIsochronesValhalla(
++            "foot-walking", [[10.0, 53.5]], "time", [600], null, "http://localhost:8002",
++            {generalize: 30, denoise: 0.3}
++        );
++        const payload = JSON.parse(post.mock.calls[0][1]);
++
++        expect(payload.generalize).to.equal(30);
++        expect(payload.denoise).to.equal(0.3);
++    });
++
++    it("treats generalize 0 as max fidelity (sent) and omits generalize when not a number", async () => {
++        const post = vi.spyOn(axios, "post").mockResolvedValue({data: valhallaResponse([10], "time")});
++
++        await requestIsochronesValhalla("foot-walking", [[10.0, 53.5]], "time", [600], null, "http://localhost:8002", {generalize: 0});
++        expect(JSON.parse(post.mock.calls[0][1]).generalize).to.equal(0);
++
++        post.mockClear();
++        await requestIsochronesValhalla("foot-walking", [[10.0, 53.5]], "time", [600], null, "http://localhost:8002", {generalize: null});
++        expect(JSON.parse(post.mock.calls[0][1])).to.not.have.property("generalize");
+     });
+ 
+     it("normalizes to ORS-shaped features (value in seconds, group_index, center) sorted ascending by value", async () => {
+diff --git a/cosi/AccessibilityAnalysis/utils/createIsochrones.js b/cosi/AccessibilityAnalysis/utils/createIsochrones.js
+index 738321e4..065d76d6 100644
+--- a/cosi/AccessibilityAnalysis/utils/createIsochrones.js
++++ b/cosi/AccessibilityAnalysis/utils/createIsochrones.js
+@@ -14,14 +14,14 @@ let abortController;
+  * @param {*} {transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl} parameters
+  * @return {*} features
+  */
+-export async function createIsochrones ({transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl, projectionCode, mergePolygons, serviceType}) {
++export async function createIsochrones ({transportType, coordinates, scaleUnit, distance, maxDistance, batchSize, baseUrl, projectionCode, mergePolygons, serviceType, isochroneOptions}) {
+     let ret;
+ 
+     if (coordinates.length === 1) {
+-        ret = await createIsochronesPoint(transportType, coordinates[0], scaleUnit, distance, maxDistance, baseUrl, projectionCode, serviceType);
++        ret = await createIsochronesPoint(transportType, coordinates[0], scaleUnit, distance, maxDistance, baseUrl, projectionCode, serviceType, isochroneOptions);
+         return ret;
+     }
+-    return createIsochronesPoints({transportType, coordinates, scaleUnit, distance, maxDistance, selectedFacilityNames: null, batchSize: batchSize || 200, baseUrl, projectionCode, mergePolygons, serviceType});
++    return createIsochronesPoints({transportType, coordinates, scaleUnit, distance, maxDistance, selectedFacilityNames: null, batchSize: batchSize || 200, baseUrl, projectionCode, mergePolygons, serviceType, isochroneOptions});
+ }
+ 
+ /**
+@@ -35,7 +35,7 @@ export async function createIsochrones ({transportType, coordinates, scaleUnit,
+  * @param {*} projectionCode projectionCode
+  * @return {*} steps and features
+  */
+-async function createIsochronesPoint (transportType, coordinate, scaleUnit, distance, maxDistance, baseUrl, projectionCode, serviceType) {
++async function createIsochronesPoint (transportType, coordinate, scaleUnit, distance, maxDistance, baseUrl, projectionCode, serviceType, isochroneOptions) {
+     if (abortController) {
+         abortController.cancel();
+     }
+@@ -52,7 +52,8 @@ async function createIsochronesPoint (transportType, coordinate, scaleUnit, dist
+             maxDistance ? [...rangeArray, maxRange] : rangeArray,
+             abortController,
+             baseUrl,
+-            serviceType
++            serviceType,
++            isochroneOptions
+         ),
+ 
+         // reverse JSON object sequence to render the isochrones in the correct order
+@@ -124,7 +125,8 @@ async function createIsochronesPoints (args) {
+                     rangeArray,
+                     abortController,
+                     args.baseUrl,
+-                    args.serviceType
++                    args.serviceType,
++                    args.isochroneOptions
+                 ),
+                 // reverse JSON object sequence to render the isochrones in the correct order
+                 // this reversion is intended for centrifugal isochrones (when range.length is larger than 1)
+diff --git a/cosi/AccessibilityAnalysis/utils/requestIsochrones.js b/cosi/AccessibilityAnalysis/utils/requestIsochrones.js
+index d7b2e9ef..07b77aea 100644
+--- a/cosi/AccessibilityAnalysis/utils/requestIsochrones.js
++++ b/cosi/AccessibilityAnalysis/utils/requestIsochrones.js
+@@ -12,12 +12,13 @@ import requestIsochronesValhalla from "./requestIsochronesValhalla";
+  * @param {object} abort abort
+  * @param {String} baseUrl url
+  * @param {String} [serviceType] routing backend ("valhalla" routes to the self-hosted service; otherwise ORS)
++ * @param {Object} [isochroneOptions] Valhalla-only detail tuning ({generalize, denoise}); ignored for ORS (BACKLOG §3)
+  * @returns {void}
+  */
+-async function requestIsochrones (pathType, coordinates, rangeType, rangeArray, abort, baseUrl, serviceType) {
++async function requestIsochrones (pathType, coordinates, rangeType, rangeArray, abort, baseUrl, serviceType, isochroneOptions) {
+     // Self-hosted Valhalla has a different isochrone API; delegate and normalize there (BACKLOG §3).
+     if (serviceType === "valhalla") {
+-        return requestIsochronesValhalla(pathType, coordinates, rangeType, rangeArray, abort, baseUrl);
++        return requestIsochronesValhalla(pathType, coordinates, rangeType, rangeArray, abort, baseUrl, isochroneOptions);
+     }
+ 
+     const promises = [],
+diff --git a/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js b/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+index c069831a..e9efa107 100644
+--- a/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
++++ b/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+@@ -20,6 +20,22 @@ function toValhallaCosting (pathType) {
+     }
+ }
+ 
++/**
++ * Builds the Valhalla costing_options for a profile, if any apply.
++ * Valhalla has no dedicated wheelchair costing model, but its pedestrian costing
++ * exposes a `type: "wheelchair"` that avoids steps and honours wheelchair=* access
++ * tags — the closest first-class accessibility tuning Valhalla offers. All other
++ * profiles use Valhalla's defaults (return null → no costing_options sent).
++ * @param {String} pathType ORS transport profile name.
++ * @returns {Object|null} a Valhalla costing_options object, or null if none apply.
++ */
++function toValhallaCostingOptions (pathType) {
++    if (String(pathType).trim() === "wheelchair") {
++        return {pedestrian: {type: "wheelchair"}};
++    }
++    return null;
++}
++
+ /**
+  * Builds a Valhalla date_time for multimodal (transit) requests. Transit routing
+  * is time-dependent, so Valhalla needs a departure time within the GTFS feed's
+@@ -123,13 +139,20 @@ function normalizeCollection (collection, groupIndex, coordinate, rangeType, for
+  * @param {Array} rangeArray range values (seconds for time, meters for distance).
+  * @param {Object} [abort] axios CancelToken source.
+  * @param {String} baseUrl Valhalla base URL (without a trailing "/isochrone").
++ * @param {Object} [isochroneOptions] detail tuning (BACKLOG §3); ignored fields fall back to Valhalla defaults.
++ * @param {Number} [isochroneOptions.generalize] Douglas–Peucker tolerance in metres; omitted if not a number. 0 = max fidelity.
++ * @param {Number} [isochroneOptions.denoise] 0..1; 1 (default) drops disconnected islands, lower keeps small reachable pockets.
+  * @returns {Promise<module:ol/Feature[]>} normalized isochrone features.
+  */
+-async function requestIsochronesValhalla (pathType, coordinates, rangeType, rangeArray, abort, baseUrl) {
++async function requestIsochronesValhalla (pathType, coordinates, rangeType, rangeArray, abort, baseUrl, isochroneOptions = {}) {
+     const format = new GeoJSON(),
+         costing = toValhallaCosting(pathType),
++        costingOptions = toValhallaCostingOptions(pathType),
+         contours = rangeArray.map(range => toContour(range, rangeType)),
+         url = baseUrl.replace(/\/+$/u, "") + "/isochrone",
++        // detail levers: keep islands by default (denoise 1), no extra simplification unless asked.
++        denoise = typeof isochroneOptions.denoise === "number" ? isochroneOptions.denoise : 1,
++        generalize = isochroneOptions.generalize,
+         // one request per coordinate — Valhalla isochrones are single-origin
+         requests = coordinates.map((coordinate, groupIndex) => {
+             const body = {
+@@ -138,9 +161,19 @@ async function requestIsochronesValhalla (pathType, coordinates, rangeType, rang
+                 "contours": contours,
+                 // return polygons (not linestrings) so the downstream turf union works
+                 "polygons": true,
+-                "denoise": 1
++                "denoise": denoise
+             };
+ 
++            // wheelchair → pedestrian costing with type "wheelchair" (no first-class costing).
++            if (costingOptions) {
++                body.costing_options = costingOptions;
++            }
++
++            // Douglas–Peucker generalization (metres) for smoother/finer outlines; 0 is valid (max fidelity).
++            if (typeof generalize === "number") {
++                body.generalize = generalize;
++            }
++
+             // multimodal/transit isochrones are time-dependent and require a date_time.
+             if (costing === "multimodal") {
+                 body.date_time = toValhallaDateTime(new Date());
+@@ -164,4 +197,4 @@ async function requestIsochronesValhalla (pathType, coordinates, rangeType, rang
+ }
+ 
+ export default requestIsochronesValhalla;
+-export {toValhallaCosting, toContour, fromContour, toValhallaDateTime};
++export {toValhallaCosting, toValhallaCostingOptions, toContour, fromContour, toValhallaDateTime};
+-- 
+2.43.0
+

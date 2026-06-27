@@ -13,14 +13,20 @@ cosi/
 ├─ docker-compose.yml         # full-stack deploy: portal + valhalla (BACKLOG §8)
 ├─ deploy/                    # portal Dockerfile, nginx, entrypoint, CSL bootstrap
 ├─ valhalla/                  # self-hosted routing service (Docker; BACKLOG §2)
-└─ masterportal/              # upstream Masterportal v3.23.0 (own git checkout, on `dev`)
+├─ provenance/                # git-history backups of the vendored trees (see its README)
+└─ masterportal/              # VENDORED Masterportal v3.23.0 — plain tracked files, self-contained
    ├─ .nvmrc                  # Node version pin (24.15.0)
-   ├─ addons/                 # standalone fork of the agency addons repo (own git history,
-   │                          #   branch cosi-selfhost); COSI lives in addons/cosi (v1.2.0)
+   ├─ addons/                 # agency addons (incl. our COSI addon, addons/cosi v1.2.0)
    └─ portal/
-      ├─ cosi/                # the COSI portalconfig (own git repo, branch cosi-selfhost)
+      ├─ cosi/                # the COSI portalconfig
       └─ {master,auto,basic}/ # stock example portals
 ```
+
+> **Self-contained.** `masterportal/` is vendored directly into this repo (no nested git
+> checkouts, no submodules): one clone has everything needed to build and run. `node_modules`
+> is **not** tracked — run the install steps below after cloning. The upstream sources we
+> vendored from, and how to pull newer versions, are documented under
+> [Upstream updates](#addons-fork--upstream-updates) and [`provenance/README.md`](./provenance/README.md).
 
 ## Local environment setup
 
@@ -109,41 +115,44 @@ injection, image publishing and TLS: [`deploy/Readme.md`](./deploy/Readme.md).
 
 ## Addons fork & upstream updates
 
-`masterportal/addons/` is its **own standalone git repository** — a fork of the agency's addons
-repo. It is intentionally invisible to both parent repos (`masterportal/.gitignore` ignores
-`addons/*`; the project root ignores `/masterportal/`), so it keeps its own history without
-interfering with them.
+`masterportal/` is **vendored** — plain tracked files, no nested git repos. What we vendored,
+pinned to which upstream commits, is in [`provenance/README.md`](./provenance/README.md):
 
-This is what lets us pull future COSI releases from the agency **without redoing** our own
-changes (notably the Valhalla routing migration, BACKLOG §3): our work lives as commits on the
-`cosi-selfhost` branch on top of a pinned upstream base, so a new upstream version is a
-`rebase`, not a rewrite.
+| Tree | Upstream | Pinned at |
+|------|----------|-----------|
+| `masterportal/` core | `bitbucket.org/geowerkstatt-hamburg/masterportal` `dev` | `205a13ac0e` (v3.23.0 + 51) |
+| `masterportal/addons/` | `bitbucket.org/geowerkstatt-hamburg/addons` | `f148b81e` base + our 4 `cosi-selfhost` commits |
+| `masterportal/portal/cosi/` | authored here | — |
 
-| | |
-|---|---|
-| Remote `upstream` | `https://bitbucket.org/geowerkstatt-hamburg/addons.git` |
-| Our branch | `cosi-selfhost` |
-| Pinned base | `f148b81e` (tag `upstream-base`) — `dev` @ 2026-06-16, = v3.23.0 + unreleased work |
-| `origin` (our hosted fork) | **not set yet** — create a fork, then `git remote add origin <url> && git push -u origin cosi-selfhost` |
+Our COSI changes are deliberately **additive and isolated** (the COSI addon lives in
+`addons/cosi`; the portalconfig in `portal/cosi`; the only edit to core is `.nvmrc`). That
+isolation is what keeps upstream syncs cheap — see BACKLOG §3/§10.
 
-> One local correction is baked into the base: this checkout had `mapfishUtils/` flattened (a
-> partial-checkout artifact that broke the addons `postinstall` and the `shared/js/mapfishUtils`
-> imports used by `cosi/ReportingTool`, `valuationPrint`, `waterRiskCheck`). It is restored to
-> the upstream path `shared/js/mapfishUtils/`, so the working tree matches `f148b81e` exactly.
+### Updating upstream
 
-### Pull in a new upstream COSI version
+Vendoring means upstream is pulled in a **side checkout**, tested locally, then the verified
+files are folded back into this repo (test-gated — never sync untested upstream straight in):
 
 ```bash
-cd masterportal/addons
-git fetch upstream --tags
-git rebase <new-tag-or-commit>      # e.g. a future v3.24.0 — replays our cosi-selfhost commits
-# resolve conflicts only where upstream touched the same lines we did, then refresh deps:
-npm install --ignore-scripts && (cd cosi && npm install)
+# 1. Side checkout — get the new upstream and replay our isolated changes onto it.
+git clone https://bitbucket.org/geowerkstatt-hamburg/masterportal.git /tmp/mp-next
+cd /tmp/mp-next && git checkout <new-tag-or-commit>   # e.g. a future v3.24.0
+git clone https://bitbucket.org/geowerkstatt-hamburg/addons.git addons
+cd addons && git checkout <new-addons-base>
+git am "$OLDPWD"/../<this-repo>/provenance/addons-cosi-selfhost-patches/*.patch   # our 4 commits
+cd .. && cp -r <this-repo>/masterportal/portal/cosi portal/cosi                   # our portalconfig
+
+# 2. Build + run + TEST in the side checkout (see "Local environment setup" above).
+npm install && (cd addons && npm install --ignore-scripts) && (cd addons/cosi && npm install)
+npm start    # verify the COSI portal still works against the new upstream
+
+# 3. Only once verified: fold the source back into THIS repo (node_modules/.git excluded),
+#    then commit and refresh provenance (new pinned SHAs + regenerated patches).
+rsync -a --delete --exclude node_modules --exclude .git /tmp/mp-next/ <this-repo>/masterportal/
 ```
 
-Keeping our changes **additive and isolated** (new files + minimal dispatch seams) is what keeps
-these rebases conflict-free — see BACKLOG §3 for the AccessibilityAnalysis/Valhalla approach and
-§10 for the full update strategy.
+If our addon commits needed conflict resolution during `git am`, regenerate the provenance
+patches/bundle from the side checkout so they stay in sync — see `provenance/README.md`.
 
 ## Verified working versions
 

@@ -1,0 +1,12 @@
+import {generateSimpleGetters} from "@shared/js/utils/generators.js";
+import stateResizeHandle from "./stateResizeHandle.js";
+const getters = {
+    /**
+     * Creates from every state-key a getter.
+     * * @param {Object} state The local Vuex state.
+     * @returns {Object} An object with getters corresponding to each state property.
+     */
+    ...generateSimpleGetters(stateResizeHandle)
+};
+
+export default getters;

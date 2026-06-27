@@ -1,0 +1,215 @@
+import axios from "axios";
+import state from "../../store/stateRouting.js";
+import stateDirections from "../../store/directions/stateDirections.js";
+import store from "@appstore/index.js";
+import {RoutingDirections} from "../classes/routing-directions.js";
+import {RoutingDirectionsStep} from "../classes/routing-directions-step.js";
+import {RoutingDirectionsSegment} from "../classes/routing-directions-segment.js";
+import routingOrsSpeedProfile from "../speedprofiles/routing-ors-speedprofiles.js";
+import routingOrsAvoidOption from "../avoidoptions/routing-ors-avoidoptions.js";
+import LineString from "ol/geom/LineString.js";
+import {getLength} from "ol/sphere.js";
+
+/**
+ * Translates the Preference in the corresponding value for the service
+ * @param {string} preference set by the user
+ * @param {string} speedProfile set by the user
+ * @returns {string} translated service value
+ */
+function routingOrsPreference (preference, speedProfile) {
+    const preferenceConfigs = store.getters["Modules/Routing/directionsSettings"]?.customPreferences;
+
+    if (preferenceConfigs && preferenceConfigs[speedProfile]?.includes(preference)) {
+        return preference.toLowerCase();
+    }
+    switch (preference) {
+        case "RECOMMENDED": return "recommended";
+        case "SHORTEST": return "shortest";
+        default: throw new Error("Fehlende Preference Übersetzung");
+    }
+}
+
+/**
+ * Requests directions from ors service.
+ * @param {Object} params parameter
+ * @param {Array<Array<number>>} [params.coordinates] Array of [lng, lat] coordinate pairs in wgs84 projection
+ * @param {string} [params.language] to request the instructions in local language.
+ * @param {Function} [params.transformCoordinatesToLocal] function to transform result coordinates to local projection.
+ * @param {string} [params.speedProfile] to request the directions with
+ * @param {Array<{id: string}>} [params.avoidSpeedProfileOptions] options to avoid
+ * @param {string} [params.preference] to request the directions with
+ * @param {Object} [params.avoidPolygons] areas to avoid when requesting directions
+ * @param {boolean} [params.instructions] if the instructions should be requested
+ * @param {boolean} [params.elevation] if elevation data should be considered
+ * @param {boolean} [params.avoidBorders] if borders should be avoided
+ * @returns {RoutingDirections} routingDirections
+ */
+async function fetchRoutingOrsDirections ({
+    coordinates,
+    language,
+    transformCoordinatesToLocal,
+    speedProfile,
+    avoidSpeedProfileOptions,
+    preference,
+    avoidPolygons,
+    instructions,
+    elevation,
+    avoidBorders
+}) {
+    const url = getRoutingDirectionsSettingsUrl(speedProfile);
+    let result = null,
+        feature = null,
+        first = null,
+        second = null,
+        localCoordinates = null,
+        elevationProfile = null,
+        currentDistance = null,
+        direction = null,
+        response = null;
+
+    try {
+
+        const postParams = {
+            coordinates: coordinates,
+            language: language,
+            options: {
+                ...avoidSpeedProfileOptions.length > 0 && {avoid_features: avoidSpeedProfileOptions.map(o => routingOrsAvoidOption(o.id, speedProfile))},
+                avoid_polygons: avoidPolygons,
+                ...avoidBorders && {avoid_borders: "all"}
+            },
+            preference: routingOrsPreference(preference, speedProfile),
+            units: "m",
+            geometry: true,
+            instructions: instructions,
+            elevation: elevation
+        };
+
+        if (speedProfile === "HGV") {
+            postParams.options.profile_params = {};
+            postParams.options.profile_params.restrictions = {
+                length: stateDirections.routingRestrictionsInputData.length,
+                width: stateDirections.routingRestrictionsInputData.width,
+                height: stateDirections.routingRestrictionsInputData.height,
+                weight: stateDirections.routingRestrictionsInputData.weight,
+                axleload: stateDirections.routingRestrictionsInputData.axleload,
+                hazmat: stateDirections.routingRestrictionsInputData.hazmat
+            };
+        }
+
+        response = await axios.post(url, postParams);
+    }
+    catch (e) {
+        if (e.response?.status === 404) {
+            throw new Error(i18next.t("common:modules.routing.errors.noRouteFound"));
+        }
+        if (e.response?.data?.error) {
+            if (e.response.data.error.code === 2003) {
+                throw new Error(i18next.t("common:modules.routing.errors.avoidAreaBig"));
+            }
+        }
+        throw new Error(i18next.t("common:modules.routing.errors.errorRouteFetch"));
+    }
+
+    result = response.data;
+    feature = result.features[0];
+    first = await transformCoordinatesToLocal([
+        feature.bbox[0],
+        feature.bbox[1]
+    ]);
+    second = await transformCoordinatesToLocal([
+        feature.bbox[2],
+        feature.bbox[3]
+    ]);
+    localCoordinates = [];
+
+    for (const coords of feature.geometry.coordinates) {
+        localCoordinates.push(await transformCoordinatesToLocal(coords));
+    }
+
+    if (elevation) {
+        elevationProfile = {
+            data: [],
+            ascent: feature.properties.ascent,
+            descent: feature.properties.descent
+        };
+        currentDistance = 0;
+        localCoordinates.forEach((coord, i) => {
+
+            // elevation profile of starting point(at distance 0 m)
+            if (i === 0) {
+                elevationProfile.data.push([currentDistance, coord[2]]);
+            }
+            // elevation for the remaining points
+            else {
+                const previousCoord = [localCoordinates[i - 1][0], localCoordinates[i - 1][1]],
+                    currentCoord = [localCoordinates[i][0], localCoordinates[i][1]];
+
+                // get distance between previous and current point
+                currentDistance = currentDistance + getLength(new LineString([previousCoord, currentCoord]));
+                elevationProfile.data.push([currentDistance, coord[2]]);
+            }
+        });
+    }
+
+    direction = new RoutingDirections({
+        bbox: [first[0], first[1], second[0], second[1]],
+        lineString: localCoordinates,
+        distance: feature.properties.summary.distance,
+        duration: feature.properties.summary.duration,
+        lineStringWaypointIndex: feature.properties.way_points,
+        elevationProfile: elevationProfile
+    });
+
+    if (feature.properties.segments) {
+        // One Segment represents directions from one waypoint to another
+        for (const segment of feature.properties.segments) {
+            const directionSegment = new RoutingDirectionsSegment({
+                distance: segment.distance,
+                duration: segment.duration,
+                steps: []
+            });
+
+            for (const step of segment.steps) {
+                directionSegment.steps.push(
+                    new RoutingDirectionsStep({
+                        distance: step.distance,
+                        duration: step.duration,
+                        instruction: step.instruction,
+                        name: step.name,
+                        type: step.type,
+                        waypoints: step.way_points
+                    })
+                );
+            }
+            direction.segments.push(directionSegment);
+        }
+    }
+    return direction;
+}
+
+/**
+ * Creates the url with the given params.
+ * @param {string} speedProfile current speedProfile
+ * @returns {Object} the url
+ */
+function getRoutingDirectionsSettingsUrl (speedProfile) {
+    const path = `v2/directions/${routingOrsSpeedProfile(speedProfile)}/geojson`;
+    let serviceUrl = store.getters.restServiceById(state.directionsSettings.serviceId).url,
+        url;
+
+    if (serviceUrl.endsWith("/")) {
+        serviceUrl += path;
+    }
+    else {
+        serviceUrl = serviceUrl + "/" + path;
+    }
+    if (serviceUrl.startsWith("/")) {
+        url = new URL(serviceUrl, window.location.origin);
+    }
+    else {
+        url = new URL(serviceUrl);
+    }
+    return url;
+}
+
+export {fetchRoutingOrsDirections, getRoutingDirectionsSettingsUrl, routingOrsPreference};

@@ -1,0 +1,203 @@
+<script>
+import {mapGetters} from "vuex";
+
+/**
+ * Legend Single Layer
+ * @module modules/LegendSingleLayer
+ * @vue-prop {Object} legendObj - The Legend.
+ */
+
+export default {
+    name: "LegendSingleLayer",
+    props: {
+        legendObj: {
+            type: Object && undefined,
+            required: true
+        },
+        selectedLayer: {
+            type: Number,
+            required: false,
+            default: null
+        }
+    },
+    computed: {
+        ...mapGetters("Modules/Legend", ["sldVersion"]),
+
+        /**
+         * Filters the legend object to return the appropriate legend entries based on the selected layer.
+         * If no legend object is available, an empty array is returned.
+         *
+         * @returns {Array} The filtered legend entries:
+         *   - Returns all legends grouped by layers if no layer is selected (`selectedLayer` is null or undefined).
+         *   - Returns the legend entries for the selected layer group if a valid `selectedLayer` index is specified.
+         *   - Returns an empty array if the `selectedLayer` index is out of bounds or no legend exists.
+         */
+        filteredLegend () {
+            if (!this.legendObj || !this.legendObj.legend || !Array.isArray(this.legendObj.legend)) {
+                return [];
+            }
+
+            const isGrouped = Array.isArray(this.legendObj.legend[0]);
+
+            if (!isGrouped) {
+                if (this.selectedLayer === null || this.selectedLayer === undefined) {
+                    return this.legendObj.legend;
+                }
+
+                if (this.selectedLayer >= 0 && this.selectedLayer < this.legendObj.legend.length) {
+                    return [this.legendObj.legend[this.selectedLayer]];
+                }
+
+                return [];
+            }
+
+            if (this.selectedLayer === null || this.selectedLayer === undefined) {
+                return this.legendObj.legend.flat();
+            }
+
+            if (this.selectedLayer >= 0 && this.selectedLayer < this.legendObj.legend.length) {
+                return this.legendObj.legend[this.selectedLayer];
+            }
+
+            return [];
+        }
+    },
+    methods: {
+        scaleImg (evt, legendPart) {
+            if (legendPart.imageScale !== null && legendPart.imageScale !== undefined) {
+                evt.target.width = legendPart.imageScale * evt.target.naturalWidth;
+            }
+        }
+    }
+};
+</script>
+
+<template>
+    <div
+        class="layer-legend show"
+    >
+        <template
+            v-if="legendObj && Object.keys(legendObj).length > 0"
+        >
+            <div
+                v-for="(legendPart, index) in filteredLegend"
+                :key="index"
+                class="mt-2 layer-legend-container"
+            >
+                <!-- String -->
+                <template
+                    v-if="typeof legendPart === 'string'"
+                >
+                    <!--Legend as Image-->
+                    <img
+                        v-if="!legendPart.endsWith('.pdf') && !legendPart.endsWith('</svg>')"
+                        :alt="legendPart.name ? legendPart.name : legendObj.name"
+                        :src="legendPart + (legendPart.toUpperCase().includes('GETLEGENDGRAPHIC') && sldVersion ? '&sld_version=' + sldVersion : '')"
+                    >
+                    <!--Legend as SVG-->
+                    <div
+                        v-if="legendPart.endsWith('</svg>')"
+                    >
+                        {{ legendPart }}
+                    </div>
+                    <!--Legend PDF as Link-->
+                    <a
+                        v-if="legendPart.endsWith('.pdf')"
+                        :href="legendPart"
+                        target="_blank"
+                        :title="legendPart"
+                    >
+                        {{ $t("common:modules.legend.linkToPdf") }}
+                    </a>
+                </template>
+
+                <!-- Object -->
+                <template
+                    v-if="typeof legendPart === 'object'"
+                >
+                    <div
+                        v-if="Array.isArray(legendPart.graphic)"
+                        class="images-row"
+                    >
+                        <!--Legend as Image or SVG -->
+                        <img
+                            :alt="legendPart.name ? legendPart.name : legendObj.name"
+                            :src="legendPart.graphic[1]"
+                            :style="{
+                                width: legendPart.iconSize[0] + 'px',
+                                height: legendPart.iconSize[1] + 'px',
+                                margin: legendPart.iconSizeDifferenz + 'px'
+                            }"
+                            class="first-image"
+                            @load="(evt) => scaleImg(evt, legendPart)"
+                        >
+                        <img
+                            :alt="legendPart.name ? legendPart.name : legendObj.name"
+                            :src="Array.isArray(legendPart.graphic) ? legendPart.graphic[0] : legendPart.graphic"
+                            class="second-image"
+                            @load="(evt) => scaleImg(evt, legendPart)"
+                        >
+                        <span
+                            class="ms-4 image-name"
+                        >
+                            {{ $t(legendPart.name) }}
+                        </span>
+                    </div>
+                    <div v-else>
+                        <!--Legend as Image or SVG -->
+                        <img
+                            v-if="!legendPart.graphic.endsWith('.pdf')"
+                            :alt="legendPart.name ? legendPart.name : legendObj.name"
+                            :src="legendPart.graphic"
+                            class="left"
+                            @load="(evt) => scaleImg(evt, legendPart)"
+                        >
+                        <!--Legend PDF as Link-->
+                        <a
+                            v-if="legendPart.graphic.endsWith('.pdf')"
+                            :href="legendPart.graphic"
+                            target="_blank"
+                            :title="legendPart.graphic"
+                        >
+                            {{ $t("common:modules.legend.linkToPdf") }}
+                        </a>
+                        <span
+                            class="ms-4"
+                        >
+                            {{ $t(legendPart.name) }}
+                        </span>
+                    </div>
+                </template>
+            </div>
+        </template>
+        <template
+            v-else
+        >
+            <p class="mt-3">
+                {{ $t("common:modules.legend.noLegendForLayerInfo") }}
+            </p>
+        </template>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+
+    .first-image {
+        grid-column: 1;
+        grid-row: 1;
+        z-index: 1;
+    }
+    .second-image {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .image-name {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        align-items: center;
+    }
+    .images-row{
+        display: inline-grid;
+    }
+</style>

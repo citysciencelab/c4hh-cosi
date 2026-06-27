@@ -1,0 +1,76 @@
+import {createStore} from "vuex";
+import {expect} from "chai";
+import {config, shallowMount} from "@vue/test-utils";
+import RoutingDistanceDisplayComponent from "@modules/routing/components/RoutingDistanceDisplay.vue";
+import mutations from "@modules/routing/store/mutationsRouting.js";
+import actions from "@modules/routing/store/actionsRouting.js";
+import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
+
+config.global.mocks.$t = key => key;
+
+describe("src/modules/routing/components/RoutingDistanceDisplay.vue", () => {
+    let store,
+        wrapper,
+        props;
+
+    beforeEach(() => {
+        store = createStore({
+            namespaced: true,
+            modules: {
+                Modules: {
+                    namespaced: true,
+                    modules: {
+                        Routing: {
+                            namespaced: true,
+                            mutations: mutations,
+                            actions: actions
+                        }
+                    }
+                }
+            }
+        });
+
+        props = {
+            distance: 1
+        };
+    });
+    afterEach(() => {
+        if (wrapper) {
+            wrapper.unmount();
+        }
+    });
+
+    it("renders RoutingDistanceDisplayComponent", () => {
+        wrapper = shallowMount(RoutingDistanceDisplayComponent, {
+            global: {
+                plugins: [store]
+            },
+            props: props
+        });
+        expect(wrapper.find("span").exists()).to.be.true;
+    });
+
+    it("renders distance in m", () => {
+        props.distance = 999;
+        wrapper = shallowMount(RoutingDistanceDisplayComponent, {
+            global: {
+                plugins: [store]
+            },
+            props: props
+        });
+        expect(wrapper.find("span").text()).equal("999 m");
+    });
+
+    it("renders distance in km", () => {
+        props.distance = 1234;
+        wrapper = shallowMount(RoutingDistanceDisplayComponent, {
+            global: {
+                plugins: [store]
+            },
+            props: props
+        });
+        const expectedResult = thousandsSeparator(1.2);
+
+        expect(wrapper.find("span").text()).equal(`${expectedResult} km`);
+    });
+});

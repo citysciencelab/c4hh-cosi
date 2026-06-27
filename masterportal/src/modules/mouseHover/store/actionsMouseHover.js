@@ -1,0 +1,183 @@
+import {buffer} from "ol/extent.js";
+import Point from "ol/geom/Point.js";
+import {createGfiFeature} from "@shared/js/utils/getWmsFeaturesByMimeType.js";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
+import store from "@appstore/index.js";
+import {getWebglFeaturesFromLayers} from "@shared/js/utils/getWebglFeaturesFromLayers.js";
+
+export default {
+    /**
+     * Sets the config-params of this MouseHover into state.
+     * Adds the overlay and eventListener for the map.
+     * @param {Object} param.commit the commit
+     * @param {Object} param.dispatch the dispatch
+     * @param {Object} param.state the state
+     * @returns {void}
+     */
+    initialize ({commit, dispatch, state}) {
+        const {numFeaturesToShow, infoText, highlightOnHover} = state,
+            map = mapCollection.getMap("2D");
+        let featuresAtPixel = [];
+
+        dispatch("setMouseHoverLayers");
+        commit("setMouseHoverInfos");
+        map.addOverlay(state.overlay);
+
+        if (numFeaturesToShow) {
+            commit("setNumFeaturesToShow", numFeaturesToShow);
+        }
+        if (infoText) {
+            commit("setInfoText", infoText);
+        }
+        map.on("pointermove", (evt) => {
+            if (!store.getters.mouseHover || evt.originalEvent.pointerType === "touch") {
+                return;
+            }
+            featuresAtPixel = [];
+            commit("setHoverPosition", evt.coordinate);
+
+            if (highlightOnHover) {
+                dispatch("Maps/removeHighlightFeature", "decrease", {root: true});
+            }
+
+            // works for WebGL layers that are point layers
+            map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
+                if (
+                    !layer?.getVisible() ||
+                    (layer.get("renderer") === "webgl" && !layer.get("isPointLayer"))
+                ) {
+                    return;
+                }
+
+                if (highlightOnHover) {
+                    dispatch("highlightFeature", {feature, layer});
+                }
+
+                if (feature.getProperties().features) {
+                    feature.get("features").forEach(clusteredFeature => {
+                        featuresAtPixel.push(createGfiFeature(
+                            layer,
+                            "",
+                            clusteredFeature
+                        ));
+                    });
+                }
+                else {
+                    featuresAtPixel.push(createGfiFeature(
+                        layer,
+                        "",
+                        feature
+                    ));
+                }
+            });
+            /** check WebGL Layers
+            * use buffered coord instead of pixel for hitTolerance
+            * only necessary for WebGL polygon and line layers
+            */
+            const resolution = mapCollection.getMapView("2D").getResolution();
+            const webglLayers = map.getLayers().getArray()
+                .filter(layer => layer.get("renderer") === "webgl" && !layer.get("isPointLayer"));
+
+            const webglFeatures = getWebglFeaturesFromLayers(
+                map,
+                webglLayers,
+                layer => buffer(
+                    new Point(evt.coordinate).getExtent(),
+                    (layer.get("hitTolerance") || 1) * Math.sqrt(resolution)
+                )
+            );
+
+            featuresAtPixel.push(...webglFeatures);
+            state.overlay.setPosition(evt.coordinate);
+            state.overlay.setElement(document.querySelector("#mousehover-overlay"));
+            commit("setInfoBox", null);
+
+            if (featuresAtPixel.length > 0) {
+                dispatch("filterInfos", featuresAtPixel);
+            }
+        });
+    },
+
+    /**
+     * Sets the layers with a mouseHoverField to the state
+     * @param {Object} param.commit the commit
+     * @param {Object} param.rootGetters the rootGetters
+     * @returns {void}
+     */
+    setMouseHoverLayers ({commit, rootGetters}) {
+        commit("setMouseHoverLayers", rootGetters.allLayerConfigs.filter(layer => {
+            return layer?.mouseHoverField && layer.mouseHoverField !== "";
+        }));
+    },
+    highlightFeature ({dispatch, state}, {feature, layer}) {
+        const {highlightVectorRulesPointLine, highlightVectorRulesPolygon} = state,
+            layerId = layer.get("id"),
+            featureGeometryType = feature.getGeometry().getType(),
+            featureId = feature.getId(),
+            styleObj = featureGeometryType.toLowerCase().indexOf("polygon") > -1 ?
+                highlightVectorRulesPolygon ?? state.highlightVectorRulesPolygon :
+                highlightVectorRulesPointLine ?? state.highlightVectorRulesPointLine,
+            highlightObject = {
+                type: featureGeometryType === "Point" || featureGeometryType === "MultiPoint" ? "increase" : "highlightPolygon",
+                id: featureId,
+                layer: layer,
+                feature: feature,
+                scale: styleObj.image?.scale
+            },
+            rawLayer = rawLayerList.getLayerWhere({id: layerId});
+
+        if (featureGeometryType === "LineString" || featureGeometryType === "MultiLineString") {
+            highlightObject.type = "highlightLine";
+        }
+        layer.id = layerId;
+        highlightObject.zoomLevel = styleObj.zoomLevel;
+        if (rawLayer && rawLayer.styleId) {
+            highlightObject.styleId = rawLayer.styleId;
+        }
+        else if (layer && layer.styleId) {
+            highlightObject.styleId = layer.styleId;
+        }
+
+        highlightObject.highlightStyle = {
+            fill: styleObj.fill,
+            stroke: styleObj.stroke,
+            image: styleObj.image
+        };
+
+        dispatch("Maps/highlightFeature", highlightObject, {root: true});
+    },
+    /**
+     * Filters the infos from each feature that should be displayed.
+     * @param {Object} param.commit the commit
+     * @param {Object} param.state the state
+     * @param {Array} features array of hovered Features
+     * @returns {void}
+     */
+    filterInfos ({commit, state}, features) {
+        const infoBox = [];
+
+        if (features.length > 0) {
+            features.forEach(feature => {
+                const configInfosForFeature = state.mouseHoverInfos.find(info => info.id === feature.getLayerId());
+
+                if (configInfosForFeature) {
+                    const featureProperties = feature.getProperties(),
+                        featureInfos = typeof configInfosForFeature.mouseHoverField === "string" ? configInfosForFeature.mouseHoverField : configInfosForFeature.mouseHoverField.filter(key => Object.keys(featureProperties).includes(key)),
+                        featureDetails = [];
+
+                    if (Array.isArray(featureInfos)) {
+                        featureInfos.forEach(info => {
+                            featureDetails.push(featureProperties[info]);
+                        });
+                    }
+                    else {
+                        featureDetails.push(featureProperties[featureInfos]);
+                    }
+                    infoBox.push(featureDetails);
+                    commit("setPleaseZoom", features.length > state.numFeaturesToShow);
+                    commit("setInfoBox", infoBox.slice(0, state.numFeaturesToShow));
+                }
+            });
+        }
+    }
+};

@@ -1,0 +1,335 @@
+<script>
+import {mapActions, mapGetters, mapMutations} from "vuex";
+import mutations from "../store/mutationsCompareMaps.js";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
+
+export default {
+    name: "CompareMaps",
+    components: SpinnerItem,
+    data () {
+        return {
+            splitDirection: "vertical",
+            selectedLayer1Config: null,
+            selectedLayer2Config: null,
+            visibleLayers: []
+        };
+    },
+    computed: {
+        ...mapGetters(["visibleLayerConfigs"]),
+        ...mapGetters("Modules/CompareMaps", [
+            "selectedLayer1Id",
+            "selectedLayer2Id"
+        ]),
+        selectionLayers () {
+            return this.visibleLayers.filter(layer => layer.id !== this.selectedLayer1Id);
+        }
+    },
+    watch: {
+        /**
+        /**
+         * Watcher for the visible layers.
+         * @param {Object} newValue - The new value of the visible layers.
+         * @returns {void}
+         */
+        visibleLayerConfigs: {
+            handler (newValue) {
+                if (newValue) {
+                    this.updateVisibleLayers(newValue);
+
+                    if (!this.areSelectedLayersValid(newValue)) {
+                        this.resetSelection();
+                    }
+                }
+            },
+            deep: true
+        },
+        /**
+         * Watcher for the first selected layer.
+         * @param {Object} newValue - The new value of the selected layer.
+         * @param {Object} oldValue - The old value of the selected layer.
+         * @returns {void}
+         */
+        selectedLayer1Config (newValue, oldValue) {
+            if (newValue) {
+                this.setSelectedLayer1Id(newValue.id);
+                if (this.selectedLayer2Config) {
+                    this.updateCompareMaps();
+                }
+            }
+            if (oldValue) {
+                this.resetLayer(oldValue.id);
+            }
+        },
+        /**
+         * Watcher for the second selected layer.
+         * @param {Object} newValue - The new value of the selected layer.
+         * @param {Object} oldValue - The old value of the selected layer.
+         * @returns {void}
+         */
+        selectedLayer2Config (newValue, oldValue) {
+            if (newValue) {
+                this.setSelectedLayer2Id(newValue.id);
+                this.updateCompareMaps();
+            }
+            if (oldValue) {
+
+                this.resetLayer(oldValue.id);
+            }
+        },
+        /**
+         * Watcher for the split direction.
+         * @param {String} newValue - The new value of the split direction.
+         * @returns {void}
+         */
+        splitDirection (newValue) {
+            if (newValue) {
+                this.setLayerSwiperSplitDirection(newValue);
+                this.updateMap();
+            }
+        }
+    },
+    mounted () {
+        this.setActive(true);
+        this.updateVisibleLayers(this.visibleLayerConfigs);
+        this.setLayerSwiperSplitDirection(this.splitDirection);
+
+        mapCollection.getMap("2D").on("moveend", this.handleMapMove);
+    },
+    unmounted () {
+        mapCollection.getMap("2D").un("moveend", this.handleMapMove);
+        this.resetSelection();
+        this.setActive(false);
+    },
+    methods: {
+        ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
+        ...mapMutations("Modules/LayerSwiper", {
+            setLayerSwiperActive: "setActive",
+            setLayerSwiperSplitDirection: "setSplitDirection",
+            setLayerSwiperValueY: "setLayerSwiperValueY",
+            setLayerSwiperValueX: "setLayerSwiperValueX"
+        }),
+        ...mapActions("Modules/LayerSwiper", ["updateMap"]),
+        ...mapMutations("Modules/CompareMaps", Object.keys(mutations)),
+        ...mapActions("Modules/CompareMaps", ["initialize", "activateSwiper", "deactivateSwiper", "resetLayer"]),
+
+        /**
+         * Updates the visible layers based on the provided configurations.
+         * @param {Array} layerConfigs - The layer configurations to filter and map.
+         * @returns {void}
+         */
+        updateVisibleLayers (layerConfigs) {
+            const visibleLayers = layerConfigs.filter(layerConfig => layerConfig.typ !== "GROUP");
+
+            this.visibleLayers = visibleLayers.map(layerConfig => ({name: layerConfig.name, id: layerConfig.id}));
+        },
+
+        /**
+         * Checks if selected layers are still visible in the layer configs.
+         * @param {Array} layerConfigs - The layer configurations to check against.
+         * @returns {boolean} True if all selected layers are valid, false otherwise.
+         */
+        areSelectedLayersValid (layerConfigs) {
+            const visibleIds = new Set(layerConfigs.map(l => l.id));
+            const selectedIds = [this.selectedLayer1Id, this.selectedLayer2Id];
+
+            return selectedIds.every(id => !id || visibleIds.has(id));
+        },
+
+        /**
+         * Resets the layer selection and deactivates the swiper.
+         * @returns {void}
+         */
+        resetSelection () {
+            this.deactivateSwiper();
+            this.selectedLayer1Config = null;
+            this.selectedLayer2Config = null;
+            this.setSelectedLayer1Id("");
+            this.setSelectedLayer2Id("");
+            this.setLayerSwiperValueX(null);
+            this.setLayerSwiperValueY(null);
+
+            this.updateMap();
+        },
+        /**
+         * Handle map move event to trigger spinner and layer updates
+         * @returns {void}
+         */
+        handleMapMove () {
+            if (this.selectedLayer2Config) {
+                this.setLayerSwiperActive(false);
+                this.updateCompareMaps();
+            }
+        },
+        /**
+         * Activate the swiper and update the map.
+         * @returns {void}
+         */
+        updateCompareMaps () {
+            if (this.selectedLayer1Id === this.selectedLayer2Id) {
+                this.deactivateSwiper();
+                this.updateMap();
+                this.setSelectedLayer2Id("");
+                this.selectedLayer2Config = null;
+                return;
+            }
+            this.activateSwiper();
+            this.updateMap();
+        }
+    }
+};
+</script>
+
+<template>
+    <div
+        id="compare-maps"
+        class="p-3"
+    >
+        <div>
+            <div class="toggle-buttons mb-4">
+                <span class="me-2">{{ $t("common:modules.compareMaps.splitDirection") }}</span>
+                <div class="form-check form-check-inline">
+                    <input
+                        id="module-compareMaps-vertical"
+                        v-model="splitDirection"
+                        type="radio"
+                        value="vertical"
+                        class="form-check-input"
+                    >
+                    <label
+                        class="form-check-label"
+                        for="vertical"
+                    >{{ $t("common:modules.compareMaps.vertical") }}</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input
+                        id="module-compareMaps-horizontal"
+                        v-model="splitDirection"
+                        type="radio"
+                        value="horizontal"
+                        class="form-check-input"
+                    >
+                    <label
+                        class="form-check-label"
+                        for="horizontal"
+                    >{{ $t("common:modules.compareMaps.horizontal") }}</label>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="layer-selectors mb-4">
+                <div class="form-floating mb-3">
+                    <select
+                        id="module-compareMaps-select-layer1"
+                        v-model="selectedLayer1Config"
+                        class="form-select"
+                    >
+                        <option
+                            v-for="layer in visibleLayers"
+                            :key="layer.name"
+                            :value="layer"
+                        >
+                            {{ $t(layer.name) }}
+                        </option>
+                    </select>
+                    <label
+                        id="module-compareMaps-select-label"
+                        for="module-compareMaps-select-layer1"
+                    >
+                        {{ splitDirection === "vertical" ? $t("common:modules.compareMaps.leftLayer") : $t("common:modules.compareMaps.upperLayer") }}
+                    </label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select
+                        id="module-compareMaps-select-layer2"
+                        v-model="selectedLayer2Config"
+                        class="form-select"
+                        :disabled="!selectedLayer1Config"
+                    >
+                        <option
+                            v-for="layer in selectionLayers"
+                            :key="layer.name"
+                            :value="layer"
+                        >
+                            {{ $t(layer.name) }}
+                        </option>
+                    </select>
+                    <label
+                        id="module-compareMaps-select-label"
+                        for="module-compareMaps-select-layer2"
+                    >
+                        {{ !selectedLayer1Config ? (splitDirection === "vertical" ? $t("common:modules.compareMaps.selectLeftLayerFirst") : $t("common:modules.compareMaps.selectUpperLayerFirst")) : (splitDirection === "vertical" ? $t("common:modules.compareMaps.rightLayer") : $t("common:modules.compareMaps.lowerLayer")) }}
+                    </label>
+                </div>
+            </div>
+
+            <hr>
+
+            <button
+                type="button"
+                class="btn btn-primary w-100"
+                @click="resetSelection"
+            >
+                {{ $t("common:modules.compareMaps.reset") }}
+            </button>
+        </div>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+
+#compare-maps {
+    position: relative;
+    padding: 1rem;
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(0.5px);
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .blurred {
+        filter: blur(0.5px);
+    }
+
+    .toggle-buttons {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        .form-check {
+            margin-right: 1rem;
+        }
+    }
+
+    .layer-selectors {
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    .spinner-border {
+        width: 25px;
+        height: 25px;
+        border: 4px solid #D6E3FF;
+        border-top: 4px solid #151C27;
+        border-radius: 50%;
+        aspect-ratio: 1 / 1;
+    }
+
+    .loading-text {
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+}
+</style>

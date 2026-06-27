@@ -1,0 +1,273 @@
+From b167444c0cec6ee027a613e7f8723404a0ae84a4 Mon Sep 17 00:00:00 2001
+From: paulhh <p.linnow@dp-planung.de>
+Date: Fri, 26 Jun 2026 00:48:55 +0200
+Subject: [PATCH 2/4] AccessibilityAnalysis: add public-transport (Valhalla
+ multimodal) isochrones
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adds an ÖPNV / public-transport profile mapped to Valhalla's multimodal
+costing (walk + HVV GTFS transit). Multimodal is time-dependent, so the
+request now attaches a date_time (local "depart at"). The UI button is
+gated to the Valhalla backend (ORS has no transit) and restricted to the
+time scale unit. i18n (de/en) + rangeSettings entry added.
+
+Unit tests cover the costing map and the date_time present/absent paths
+(9/9 pass, lint clean). Request shape matches a known-working Valhalla
+multimodal isochrone example. Live end-to-end verification is pending a
+transit-enabled Valhalla tileset (blocked on an upstream enhance-stage
+bug, see BACKLOG §2).
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+---
+ .../components/AccessibilityAnalysis.vue      | 37 ++++++++++++++++++-
+ .../locales/de/additional.json                |  3 +-
+ .../locales/en/additional.json                |  3 +-
+ .../store/stateAccessibilityAnalysis.js       |  1 +
+ .../service/requestIsochronesValhalla.spec.js | 24 +++++++++++-
+ .../utils/requestIsochronesValhalla.js        | 36 +++++++++++++++++-
+ 6 files changed, 97 insertions(+), 7 deletions(-)
+
+diff --git a/cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue b/cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue
+index 1bceef4e..04bfb411 100644
+--- a/cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue
++++ b/cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue
+@@ -128,6 +128,12 @@ export default {
+                     type: "driving-car",
+                     name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.driving-car"),
+                     icon: "bi bi-car-front"
++                },
++                {
++                    // Valhalla multimodal (walk + HVV GTFS transit); only offered on the Valhalla backend.
++                    type: "public-transport",
++                    name: this.$t("additional:modules.tools.cosi.accessibilityAnalysis.transportTypes.public-transport"),
++                    icon: "bi bi-bus-front"
+                 }
+             ],
+             scaleUnits: [
+@@ -170,6 +176,29 @@ export default {
+         ...mapGetters("Modules/Routing/Directions", ["directionsRouteSource", "directionsRouteLayer", "routingDirections", "settings"]),
+         // ...mapGetters("Modules/FeaturesList", ["activeVectorLayerList", "isFeatureActive", "layerMapById"]),
+ 
++        /**
++         * Transport types offered in the UI. Public transport (Valhalla multimodal)
++         * is only available on the self-hosted Valhalla backend, so it is hidden
++         * when the ORS backend is active.
++         * @returns {Object[]} the selectable transport types.
++         */
++        displayedTransportTypes () {
++            return this.transportTypes.filter(
++                type => type.type !== "public-transport" || this.isochroneBackend === "valhalla"
++            );
++        },
++
++        /**
++         * Scale units offered for the current transport type. Public-transport
++         * isochrones are time-dependent, so only the time unit is meaningful.
++         * @returns {Object[]} the selectable scale units.
++         */
++        displayedScaleUnits () {
++            return this.transportType === "public-transport"
++                ? this.scaleUnits.filter(unit => unit.type === "time")
++                : this.scaleUnits;
++        },
++
+         /**
+          * Gets the datasets for card in shared component resultManagement.
+          * @returns {Object[]} the datasets for card.
+@@ -1098,6 +1127,10 @@ export default {
+                 this.removeDataOnMap();
+             }
+             this.setTransportType(val);
++            // public-transport (multimodal) isochrones are time-based only
++            if (val === "public-transport" && this.scaleUnit !== "time") {
++                this.setScaleUnit("time");
++            }
+             this.showErrorAlert = false;
+         },
+ 
+@@ -1620,7 +1653,7 @@ export default {
+                 class="d-flex flex-row mb-4"
+             >
+                 <IconButton
+-                    v-for="type in transportTypes"
++                    v-for="type in displayedTransportTypes"
+                     :key="type.type"
+                     class="me-5"
+                     :aria="type.name"
+@@ -1638,7 +1671,7 @@ export default {
+         <ButtonGroup
+             v-if="activeMode.type !== 'path'"
+             class="mb-3"
+-            :buttons="scaleUnits.map(card => ({name: card.name, value: card.type}))"
++            :buttons="displayedScaleUnits.map(card => ({name: card.name, value: card.type}))"
+             :pre-checked-value="scaleUnit"
+             group="scaleUnits"
+             @show-view="updateCalculationMethod"
+diff --git a/cosi/AccessibilityAnalysis/locales/de/additional.json b/cosi/AccessibilityAnalysis/locales/de/additional.json
+index 393a9607..26a6849e 100644
+--- a/cosi/AccessibilityAnalysis/locales/de/additional.json
++++ b/cosi/AccessibilityAnalysis/locales/de/additional.json
+@@ -42,7 +42,8 @@
+                         "cycling-regular": "Rad",
+                         "cycling-electric": "Rad (elektrisch)",
+                         "foot-walking": "Gehen",
+-                        "wheelchair": "Rollstuhl"
++                        "wheelchair": "Rollstuhl",
++                        "public-transport": "ÖPNV"
+                     },
+                     "scaleUnit": "Maßeinheit der Entfernung",
+                     "scaleUnits": {
+diff --git a/cosi/AccessibilityAnalysis/locales/en/additional.json b/cosi/AccessibilityAnalysis/locales/en/additional.json
+index 54c5bcf1..1b1aaaf2 100644
+--- a/cosi/AccessibilityAnalysis/locales/en/additional.json
++++ b/cosi/AccessibilityAnalysis/locales/en/additional.json
+@@ -42,7 +42,8 @@
+                         "cycling-regular": "Bicycle",
+                         "cycling-electric": "Bicycle (electric)",
+                         "foot-walking": "Walking",
+-                        "wheelchair": "Wheelchair"
++                        "wheelchair": "Wheelchair",
++                        "public-transport": "Public transport"
+                     },
+                     "scaleUnit": "Unit of distance",
+                     "scaleUnits": {
+diff --git a/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js b/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
+index a817420d..0ed4538e 100644
+--- a/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
++++ b/cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js
+@@ -29,6 +29,7 @@ const state = {
+         "cycling-regular": {},
+         "foot-walking": {},
+         "wheelchair": {},
++        "public-transport": {},
+         "default": {
+             time: {
+                 value: 10,
+diff --git a/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js b/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
+index 69dfa2d3..7a8509eb 100644
+--- a/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
++++ b/cosi/AccessibilityAnalysis/test/unit/service/requestIsochronesValhalla.spec.js
+@@ -1,6 +1,6 @@
+ import {expect} from "chai";
+ import axios from "axios";
+-import requestIsochronesValhalla, {toValhallaCosting, toContour, fromContour} from "../../../utils/requestIsochronesValhalla";
++import requestIsochronesValhalla, {toValhallaCosting, toContour, fromContour, toValhallaDateTime} from "../../../utils/requestIsochronesValhalla";
+ 
+ /**
+  * Builds a fake Valhalla isochrone FeatureCollection.
+@@ -29,13 +29,18 @@ describe("requestIsochronesValhalla", () => {
+     });
+ 
+     describe("unit conversions", () => {
+-        it("maps ORS profiles to Valhalla costing models (wheelchair -> pedestrian)", () => {
++        it("maps ORS profiles to Valhalla costing models (wheelchair -> pedestrian, public-transport -> multimodal)", () => {
+             expect(toValhallaCosting("driving-car")).to.equal("auto");
+             expect(toValhallaCosting("cycling-regular")).to.equal("bicycle");
+             expect(toValhallaCosting("foot-walking")).to.equal("pedestrian");
+             expect(toValhallaCosting("wheelchair")).to.equal("pedestrian");
++            expect(toValhallaCosting("public-transport")).to.equal("multimodal");
+             expect(toValhallaCosting("unknown")).to.equal("auto");
+         });
++        it("formats a Valhalla date_time as a local 'depart at' (type 1) wall-clock value", () => {
++            // local components (no timezone suffix) so transit departs at Hamburg local time
++            expect(toValhallaDateTime(new Date(2026, 5, 25, 8, 5))).to.eql({type: 1, value: "2026-06-25T08:05"});
++        });
+         it("converts ORS range units (s / m) to Valhalla contours (min / km)", () => {
+             expect(toContour(600, "time")).to.eql({time: 10});
+             expect(toContour(1000, "distance")).to.eql({distance: 1});
+@@ -108,6 +113,21 @@ describe("requestIsochronesValhalla", () => {
+         expect(features.map(feature => feature.get("group_index"))).to.eql([0, 0, 1, 1]);
+     });
+ 
++    it("adds a date_time to multimodal (public-transport) requests, but not to other costings", async () => {
++        const post = vi.spyOn(axios, "post").mockResolvedValue({data: valhallaResponse([10], "time")});
++
++        await requestIsochronesValhalla("public-transport", [[10.0, 53.5]], "time", [600], null, "http://localhost:8002");
++        const transitPayload = JSON.parse(post.mock.calls[0][1]);
++
++        expect(transitPayload.costing).to.equal("multimodal");
++        expect(transitPayload.date_time.type).to.equal(1);
++        expect(transitPayload.date_time.value).to.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/u);
++
++        post.mockClear();
++        await requestIsochronesValhalla("foot-walking", [[10.0, 53.5]], "time", [600], null, "http://localhost:8002");
++        expect(JSON.parse(post.mock.calls[0][1])).to.not.have.property("date_time");
++    });
++
+     it("swallows per-coordinate request errors and returns an empty list", async () => {
+         vi.spyOn(axios, "post").mockRejectedValue(new Error("network"));
+ 
+diff --git a/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js b/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+index 2be8d726..3e52fa8d 100644
+--- a/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
++++ b/cosi/AccessibilityAnalysis/utils/requestIsochronesValhalla.js
+@@ -4,6 +4,8 @@ import GeoJSON from "ol/format/GeoJSON";
+ /**
+  * Maps an ORS transport profile to a Valhalla costing model.
+  * Wheelchair has no dedicated Valhalla costing, so it falls back to pedestrian.
++ * "public-transport" uses Valhalla's multimodal costing (walk + GTFS transit),
++ * which additionally requires a date_time on the request (see toValhallaDateTime).
+  * @param {String} pathType ORS profile name.
+  * @returns {String} Valhalla costing model.
+  */
+@@ -13,10 +15,37 @@ function toValhallaCosting (pathType) {
+         case "cycling-regular": return "bicycle";
+         case "foot-walking":
+         case "wheelchair": return "pedestrian";
++        case "public-transport": return "multimodal";
+         default: return "auto";
+     }
+ }
+ 
++/**
++ * Builds a Valhalla date_time for multimodal (transit) requests. Transit routing
++ * is time-dependent, so Valhalla needs a departure time within the GTFS feed's
++ * service window. We send the caller's local wall-clock time (Hamburg) as a
++ * "depart at" (type 1) value so the result is independent of the container's
++ * timezone.
++ * @param {Date} date the departure moment (defaults to now in the caller).
++ * @returns {Object} a Valhalla date_time object {type, value}.
++ */
++function toValhallaDateTime (date) {
++    /**
++     * Zero-pads a number to two digits.
++     * @param {Number} number the value to pad.
++     * @returns {String} the two-digit string.
++     */
++    function pad (number) {
++        return String(number).padStart(2, "0");
++    }
++
++    const value = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
++        `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
++
++    // type 1 = "depart at" the given local time.
++    return {"type": 1, "value": value};
++}
++
+ /**
+  * Converts an ORS-style range value to a Valhalla contour entry.
+  * COSI/ORS ranges are in seconds (time) or meters (distance);
+@@ -112,6 +141,11 @@ async function requestIsochronesValhalla (pathType, coordinates, rangeType, rang
+                 "denoise": 1
+             };
+ 
++            // multimodal/transit isochrones are time-dependent and require a date_time.
++            if (costing === "multimodal") {
++                body.date_time = toValhallaDateTime(new Date());
++            }
++
+             return axios.post(url, JSON.stringify(body), {
+                 headers: {"Content-Type": "application/json"},
+                 cancelToken: abort && abort.token
+@@ -126,4 +160,4 @@ async function requestIsochronesValhalla (pathType, coordinates, rangeType, rang
+ }
+ 
+ export default requestIsochronesValhalla;
+-export {toValhallaCosting, toContour, fromContour};
++export {toValhallaCosting, toContour, fromContour, toValhallaDateTime};
+-- 
+2.43.0
+

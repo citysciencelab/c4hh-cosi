@@ -1,0 +1,28 @@
+import {config, shallowMount} from "@vue/test-utils";
+import {expect} from "chai";
+import ExportButtonCSV from "@shared/modules/buttons/components/ExportButtonCSV.vue";
+
+config.global.mocks.$t = key => key;
+
+describe("src/shared/modules/buttons/components/ExportButtonCSV.vue", () => {
+    beforeAll(() => {
+        i18next.init({
+            lng: "cimode",
+            debug: false
+        });
+    });
+    it("createFilename", () => {
+        const wrapper = shallowMount(ExportButtonCSV, {
+            propsData: {}
+        });
+
+        expect(wrapper.vm.createFilename("prefix", "YYYY")).to.equal("prefix" + String(new Date().getFullYear()) + ".csv");
+    });
+    it("template", () => {
+        const wrapper = shallowMount(ExportButtonCSV, {
+            propsData: {}
+        });
+
+        expect(wrapper.find("button").exists()).to.be.true;
+    });
+});

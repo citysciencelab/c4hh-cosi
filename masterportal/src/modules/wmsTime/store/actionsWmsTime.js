@@ -1,0 +1,196 @@
+import layerCollection from "@core/layers/js/layerCollection.js";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
+import {treeSubjectsKey} from "@shared/js/utils/constants.js";
+import store from "@appstore/index.js";
+import {resetRenderListeners} from "@shared/js/utils/resetRenderListeners.js";
+
+export default {
+    windowWidthChanged ({commit, dispatch, state, getters, rootGetters}) {
+        if (getters.windowWidth !== window.innerWidth) {
+            commit("setWindowWidth");
+
+            if (!getters.minWidth && rootGetters["Modules/LayerSwiper/active"]) {
+                dispatch("toggleSwiper", state.timeSlider.currentLayerId + state.layerAppendix);
+            }
+        }
+    },
+    /**
+     * Watch the visible layers in layerConfig.
+     * Starts and ends wmsTime when time layer is activated/deactivated
+     * @param {Object} context the vuex context
+     * @param {Object} context.commit the commit
+     * @param {Object} context.state the state
+     * @param {Object} context.rootGetters the rootGetters
+     * @returns {void}
+     */
+    watchVisibleLayerConfig ({commit, state, rootGetters}) {
+        rootGetters.visibleLayerConfigs.forEach(visLayer => {
+            if (visLayer.typ === "WMS" && visLayer.time) {
+                commit("setTimeSliderActive", {
+                    active: true,
+                    currentLayerId: visLayer.id,
+                    playbackDelay: visLayer.time?.playbackDelay || 1
+                });
+                commit("setVisibility", true);
+            }
+        });
+        store.watch((_, getters) => getters.visibleLayerConfigs, layerConfig => {
+            if (!state.timeSlider.active) {
+                layerConfig.forEach(element => {
+                    if (element.typ === "WMS" && element.time && !rootGetters["Modules/CompareMaps/active"]) {
+                        commit("setTimeSliderActive", {
+                            active: true,
+                            currentLayerId: element.id,
+                            playbackDelay: element.time?.playbackDelay || 1
+                        });
+                        commit("setVisibility", true);
+                    }
+                });
+            }
+            else if (state.timeSlider.active) {
+                let currentLayerConf = rootGetters.layerConfigById(state.timeSlider.currentLayerId),
+                    visLayerConf = layerConfig.find(layerConf => layerConf.id === currentLayerConf.id);
+
+                if (rootGetters["Modules/LayerSwiper/targetLayer"]) {
+                    currentLayerConf = rootGetters.layerConfigById(rootGetters["Modules/LayerSwiper/targetLayer"].get("id"));
+                    visLayerConf = layerConfig.find(layerConf => layerConf.id === currentLayerConf.id);
+                }
+                if (!visLayerConf) {
+                    commit("setTimeSliderActive", {
+                        active: false,
+                        currentLayerId: "",
+                        objects: [],
+                        playbackDelay: 1,
+                        playing: false
+                    });
+                    commit("setVisibility", false);
+                }
+            }
+        }, {deep: true});
+    },
+    /**
+     * Toggles the LayerSwiper.
+     * If the LayerSwiper is deactivated, the second layer is deactivated and removed from the ModelList.
+     * @param {Object} context the vuex context
+     * @param {Object} context.commit the commit
+     * @param {Object} context.state the state
+     * @param {Object} context.getters the getters
+     * @param {Object} context.dispatch the dispatch
+     * @param {String} id Id of the Layer that should be toggled.
+     * @returns {void}
+     */
+    async toggleSwiper ({commit, state, getters, dispatch, rootGetters}, id) {
+        commit("Modules/LayerSwiper/setActive", !rootGetters["Modules/LayerSwiper/active"], {root: true});
+
+        const secondId = id.endsWith(state.layerAppendix) ? id : id + state.layerAppendix,
+            layerId = rootGetters["Modules/LayerSwiper/active"] ? id : secondId,
+            layer = layerCollection.getLayerById(layerId);
+
+        if (rootGetters["Modules/LayerSwiper/active"]) {
+            const {name, time, url, level, layers, version, parentId, gfiAttributes, featureCount} = layer.attributes,
+                originalZIndex = layer.attributes.zIndex,
+                secondLayerZIndex = typeof originalZIndex === "number" ? originalZIndex + 1 : undefined;
+
+            if (typeof secondLayerZIndex === "number") {
+                const allLayerConfigs = rootGetters.allLayerConfigs.filter(config => zIndexManager.hasNumericZIndex(config));
+
+                dispatch("updateLayerConfigZIndex", {
+                    layerContainer: allLayerConfigs,
+                    maxZIndex: originalZIndex
+                }, {root: true});
+            }
+
+            commit("Modules/LayerSwiper/setSourceLayerId", id, {root: true});
+            commit("Modules/LayerSwiper/setTargetLayerId", secondId, {root: true});
+
+            if (!layerCollection.getLayerById(secondId)) {
+                await dispatch("addLayerToLayerConfig", {
+                    layerConfig: {
+                        id: secondId,
+                        name: name + "_second",
+                        showInLayerTree: true,
+                        typ: "WMS",
+                        type: "layer",
+                        visibility: true,
+                        time,
+                        url,
+                        level,
+                        layers,
+                        version,
+                        parentId,
+                        legendURL: "ignore",
+                        gfiAttributes: gfiAttributes,
+                        featureCount: featureCount,
+                        zIndex: secondLayerZIndex
+                    },
+                    parentKey: treeSubjectsKey
+                }, {root: true});
+                if (typeof secondLayerZIndex === "number") {
+                    dispatch("replaceByIdInLayerConfig", {
+                        layerConfigs: [{
+                            id: secondId,
+                            layer: {
+                                id: secondId,
+                                zIndex: secondLayerZIndex
+                            }
+                        }]
+                    }, {root: true});
+                }
+            }
+            else {
+                dispatch("replaceByIdInLayerConfig", {
+                    layerConfigs: [{
+                        id: secondId,
+                        layer: {
+                            id: secondId,
+                            visibility: true,
+                            showInLayerTree: true,
+                            zIndex: secondLayerZIndex
+                        }
+                    }]
+                }, {root: true});
+            }
+        }
+        else {
+            const targetLayer = layerCollection.getLayerById(secondId),
+                sourceLayer = layerCollection.getLayerById(id);
+
+            resetRenderListeners(targetLayer);
+            resetRenderListeners(sourceLayer);
+
+            // If the button of the "original" window is clicked, it is assumed, that the time value selected in the added window is desired to be further displayed.
+            if (!id.endsWith(state.layerAppendix)) {
+                const dimensionValue = layer.getLayerSource().getParams()[getters.defaultDimensionName],
+                    {transparency} = layer.attributes,
+                    origLayer = layerCollection.getLayerById(id);
+
+                origLayer.updateTime(id, getters.defaultDimensionName, dimensionValue);
+
+                dispatch("replaceByIdInLayerConfig", {
+                    layerConfigs: [{
+                        id: id,
+                        layer: {
+                            id: id,
+                            transparency: transparency
+                        }
+                    }]
+                }, {root: true});
+                commit("setTimeSliderDefaultValue", dimensionValue);
+            }
+            dispatch("replaceByIdInLayerConfig", {
+                layerConfigs: [{
+                    id: secondId,
+                    layer: {
+                        id: secondId,
+                        visibility: false,
+                        showInLayerTree: false,
+                        zIndex: layer?.attributes?.zIndex
+                    }
+                }]
+            }, {root: true});
+
+            commit("Modules/LayerSwiper/setSourceLayerId", null, {root: true});
+            commit("Modules/LayerSwiper/setTargetLayerId", null, {root: true});
+        }
+    }
+};

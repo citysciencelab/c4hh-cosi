@@ -1,0 +1,229 @@
+import {expect} from "chai";
+import sinon from "sinon";
+import addons from "@plugins/addons";
+import store from "@appstore/index.js";
+
+
+describe("src/plugins/addons.js", () => {
+    let warnSpy,
+        loadAddonStub,
+        origCommit,
+        origRegisterModule,
+        gfiThemeAddons,
+        loadAddonRet,
+        searchInterfaceAddons,
+        mockApp;
+
+    beforeEach(() => {
+        gfiThemeAddons = [];
+        searchInterfaceAddons = [];
+        global.moduleCollection = {};
+        mockApp = {
+            config: {
+                globalProperties: {
+                    $gfiThemeAddons: gfiThemeAddons,
+                    $searchInterfaceAddons: searchInterfaceAddons
+                }
+            },
+            component: sinon.stub()
+        };
+        loadAddonRet = {name: "name", component: {name: "Component"}, store};
+        loadAddonStub = sinon.stub(addons, "loadAddon").resolves(new Promise(resolve => resolve(loadAddonRet)));
+        warnSpy = sinon.spy();
+        sinon.stub(console, "warn").callsFake(warnSpy);
+        origCommit = store.commit;
+        origRegisterModule = store.registerModule;
+        store.commit = sinon.spy();
+        store.registerModule = sinon.spy();
+    });
+
+    afterEach(() => {
+        store.commit = origCommit;
+        store.registerModule = origRegisterModule;
+    });
+
+    describe("loadAddons", () => {
+        let stubLoadControls,
+            stubLoadGfiThemes,
+            stubLoadSearchInterfaces,
+            stubLoadToolAddons,
+            stubLoadVueComponentAddons,
+            stubLoadJavascriptAddons;
+
+        beforeEach(async () => {
+            stubLoadControls = await sinon.stub(addons, "loadControls");
+            stubLoadGfiThemes = await sinon.stub(addons, "loadGfiThemes");
+            stubLoadSearchInterfaces = await sinon.stub(addons, "loadSearchInterfaces");
+            stubLoadToolAddons = await sinon.stub(addons, "loadToolAddons");
+            stubLoadVueComponentAddons = await sinon.stub(addons, "loadVueComponentAddons");
+            stubLoadJavascriptAddons = await sinon.stub(addons, "loadJavascriptAddons");
+        });
+
+        it("if config is undefined nothing happens", async () => {
+            await addons.loadAddons(mockApp, [undefined]);
+            expect(await stubLoadControls.notCalled).to.be.true;
+            expect(await stubLoadGfiThemes.notCalled).to.be.true;
+            expect(await stubLoadSearchInterfaces.notCalled).to.be.true;
+            expect(await stubLoadToolAddons.notCalled).to.be.true;
+            expect(await stubLoadVueComponentAddons.notCalled).to.be.true;
+            expect(await stubLoadJavascriptAddons.notCalled).to.be.true;
+        });
+        it("load addon control", async () => {
+            const config = ["exampleControl"];
+
+            await addons.loadAddons(mockApp, config);
+
+            expect(stubLoadControls.calledOnce).to.be.true;
+            expect(stubLoadControls.firstCall.args[0]).to.be.equals("exampleControl");
+            expect(stubLoadGfiThemes.notCalled).to.be.true;
+            expect(stubLoadSearchInterfaces.notCalled).to.be.true;
+            expect(stubLoadToolAddons.notCalled).to.be.true;
+            expect(stubLoadVueComponentAddons.notCalled).to.be.true;
+            expect(stubLoadJavascriptAddons.notCalled).to.be.true;
+        });
+        it("load addon gfiTheme", async () => {
+            const config = ["dataTable"];
+
+            await addons.loadAddons(mockApp, config);
+            expect(stubLoadGfiThemes.calledOnce).to.be.true;
+            expect(stubLoadGfiThemes.firstCall.args[0]).to.be.equals("dataTable");
+            expect(stubLoadControls.notCalled).to.be.true;
+            expect(stubLoadSearchInterfaces.notCalled).to.be.true;
+            expect(stubLoadToolAddons.notCalled).to.be.true;
+            expect(stubLoadJavascriptAddons.notCalled).to.be.true;
+        });
+        it("load addon searchInterface", async () => {
+            const config = ["exampleSearch"];
+
+            await addons.loadAddons(mockApp, config);
+            expect(stubLoadSearchInterfaces.calledOnce).to.be.true;
+            expect(stubLoadSearchInterfaces.firstCall.args[0]).to.be.equals("exampleSearch");
+            expect(stubLoadControls.notCalled).to.be.true;
+            expect(stubLoadGfiThemes.notCalled).to.be.true;
+            expect(stubLoadToolAddons.notCalled).to.be.true;
+            expect(stubLoadJavascriptAddons.notCalled).to.be.true;
+        });
+
+        it("load addon tool", async () => {
+            const config = ["populationRequest"];
+
+            await addons.loadAddons(mockApp, config);
+            expect(stubLoadToolAddons.calledOnce).to.be.true;
+            expect(stubLoadToolAddons.firstCall.args[0]).to.be.equals("populationRequest");
+            expect(stubLoadControls.notCalled).to.be.true;
+            expect(stubLoadGfiThemes.notCalled).to.be.true;
+            expect(stubLoadSearchInterfaces.notCalled).to.be.true;
+            expect(stubLoadJavascriptAddons.notCalled).to.be.true;
+        });
+
+        it("load addon javascript", async () => {
+            const config = ["cesium3dTilesInspector"];
+
+            await addons.loadAddons(mockApp, config);
+            expect(stubLoadJavascriptAddons.calledOnce).to.be.true;
+            expect(stubLoadJavascriptAddons.firstCall.args[0]).to.be.equals("cesium3dTilesInspector");
+            expect(stubLoadControls.notCalled).to.be.true;
+            expect(stubLoadGfiThemes.notCalled).to.be.true;
+            expect(stubLoadSearchInterfaces.notCalled).to.be.true;
+            expect(stubLoadToolAddons.notCalled).to.be.true;
+        });
+
+        it("load addon vueComponent", async () => {
+            const config = ["exampleVueComponent"];
+
+            await addons.loadAddons(mockApp, config);
+            expect(stubLoadVueComponentAddons.calledOnce).to.be.true;
+            expect(stubLoadVueComponentAddons.firstCall.args[0]).to.be.equals("exampleVueComponent");
+            expect(stubLoadControls.notCalled).to.be.true;
+            expect(stubLoadGfiThemes.notCalled).to.be.true;
+            expect(stubLoadSearchInterfaces.notCalled).to.be.true;
+            expect(stubLoadToolAddons.notCalled).to.be.true;
+            expect(stubLoadJavascriptAddons.notCalled).to.be.true;
+        });
+    });
+    describe("loadControls", () => {
+        it("load addon type control", async () => {
+            await addons.loadControls("exampleControl");
+
+            expect(loadAddonStub.calledOnce).to.be.true;
+            expect(loadAddonStub.firstCall.args[0]).to.be.equals("exampleControl");
+            expect(store.registerModule.calledOnce).to.be.true;
+            expect(store.registerModule.firstCall.args[0]).to.be.deep.equals(["Controls", "Component"]);
+            expect(store.registerModule.firstCall.args[1]).to.be.deep.equals(store);
+            expect(store.commit.calledOnce).to.be.true;
+            expect(store.commit.firstCall.args[0]).to.be.equals("Controls/registerControl");
+            expect(store.commit.firstCall.args[1]).to.be.deep.equals({name: "component", control: {name: "Component"}});
+        });
+    });
+
+    describe("loadGfiThemes", () => {
+        it("load addon type gfiTheme", async () => {
+            await addons.loadGfiThemes("AddonGFITheme", mockApp);
+
+            expect(loadAddonStub.calledOnce).to.be.true;
+            expect(loadAddonStub.firstCall.args[0]).to.be.equals("AddonGFITheme");
+            expect(store.registerModule.calledOnce).to.be.true;
+            expect(store.registerModule.firstCall.args[0]).to.be.deep.equals(["Modules", "Component"]);
+            expect(store.registerModule.firstCall.args[1]).to.be.deep.equals(store);
+            expect(store.commit.notCalled).to.be.true;
+            expect(gfiThemeAddons.length).to.be.equals(1);
+            expect(gfiThemeAddons[0]).to.be.equals("Component");
+            expect(Object.keys(moduleCollection).length).to.be.equals(1);
+            expect(moduleCollection.component).to.be.deep.equals(loadAddonRet.component);
+        });
+    });
+
+    describe("loadSearchInterfaces", () => {
+        it("load addon type searchInterface", async () => {
+            await addons.loadSearchInterfaces("SearchAddon", mockApp);
+
+            expect(loadAddonStub.calledOnce).to.be.true;
+            expect(loadAddonStub.firstCall.args[0]).to.be.equals("SearchAddon");
+            expect(store.commit.notCalled).to.be.true;
+            expect(searchInterfaceAddons.length).to.be.equals(1);
+            expect(searchInterfaceAddons[0]).to.be.deep.equals(loadAddonRet);
+        });
+    });
+
+    describe("loadToolAddons", () => {
+        it("load addon type tool", async () => {
+            await addons.loadToolAddons("ToolAddon");
+
+            expect(loadAddonStub.calledOnce).to.be.true;
+            expect(loadAddonStub.firstCall.args[0]).to.be.equals("ToolAddon");
+            expect(store.commit.notCalled).to.be.true;
+            expect(store.registerModule.calledOnce).to.be.true;
+            expect(store.registerModule.firstCall.args[0]).to.be.deep.equals(["Modules", "Component"]);
+            expect(store.registerModule.firstCall.args[1]).to.be.deep.equals(store);
+            expect(Object.keys(moduleCollection).length).to.be.equals(1);
+            expect(moduleCollection.component).to.be.deep.equals(loadAddonRet.component);
+        });
+    });
+
+    describe("loadJavascriptAddons", () => {
+        it("load addon type javascript", async () => {
+            await addons.loadToolAddons("JavaScriptAddon");
+
+            expect(loadAddonStub.calledOnce).to.be.true;
+            expect(loadAddonStub.firstCall.args[0]).to.be.equals("JavaScriptAddon");
+            expect(store.commit.notCalled).to.be.true;
+            expect(store.registerModule.calledOnce).to.be.true;
+            expect(store.registerModule.firstCall.args[0]).to.be.deep.equals(["Modules", "Component"]);
+            expect(store.registerModule.firstCall.args[1]).to.be.deep.equals(store);
+        });
+    });
+
+    describe("loadVueComponentAddons", () => {
+        it("load addon type vueComponent", async () => {
+            await addons.loadVueComponentAddons("VueComponentAddon", mockApp);
+
+            expect(loadAddonStub.calledOnce).to.be.true;
+            expect(loadAddonStub.firstCall.args[0]).to.be.equals("VueComponentAddon");
+            expect(store.commit.notCalled).to.be.true;
+            expect(store.registerModule.calledOnce).to.be.true;
+            expect(store.registerModule.firstCall.args[0]).to.be.deep.equals(["Modules", "Component"]);
+            expect(store.registerModule.firstCall.args[1]).to.be.deep.equals(store);
+        });
+    });
+
+});

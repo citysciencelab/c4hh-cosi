@@ -1,0 +1,12 @@
+#!/bin/sh
+
+FILE="CHANGELOG.md"
+
+if [ -f "$FILE" ]; then
+  sed -i 's/Issue #/Issue \\#/g' "$FILE"
+  git add "$FILE"
+else
+  echo "[pre-commit] changelog not found"
+fi
+
+echo "[pre-commit] fixed Changelog"

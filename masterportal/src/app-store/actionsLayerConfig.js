@@ -1,0 +1,329 @@
+import buildTreeStructure from "./js/buildTreeStructure.js";
+import getNestedValues from "@shared/js/utils/getNestedValues.js";
+import replacer from "@shared/js/utils/replaceInNestedValues.js";
+import {getAndMergeAllRawLayers, getAndMergeRawLayer} from "./js/getAndMergeRawLayer.js";
+import {treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
+import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
+
+/**
+ * The root actions for layer configurations.
+ * @module app-store/actionsLayerConfig
+ */
+export default function getActionsLayerConfig () {
+    /**
+     * Adds one layer to states layerConfig under the given parentKey, if not already contained.
+     * @param {Object} context the vue context
+     * @param {Object} context.dispatch the dispatch
+     * @param {Object} context.state the state
+     * @param {Object} payload the payload
+     * @param {Object[]} payload.layerConfig layer to add to the layerConfigs
+     * @param {String} payload.parentKey the name of the parent object or the id of the parentFolder
+     * @returns {Boolean} true, if layer was added and false, if layer was contained in layerConfig
+     */
+    return {
+        addLayerToLayerConfig ({dispatch, getters, state}, {layerConfig, parentKey}) {
+            const layerContainer = getters.allLayerConfigs.filter(zIndexManager.hasNumericZIndex),
+                matchingLayer = layerContainer.find(layer =>layer.id === layerConfig.id),
+                maxZIndex = zIndexManager.getMaxZIndexForParentKey(state, getters, parentKey);
+
+            dispatch("updateLayerConfigZIndex", {layerContainer, maxZIndex});
+
+            if (matchingLayer === undefined) {
+                layerConfig.zIndex = maxZIndex + 1;
+                if (state.layerConfig[parentKey]) {
+                    state.layerConfig[parentKey].elements.push(layerConfig);
+                }
+                else {
+                    const folder = getters.folderById(parentKey);
+
+                    if (folder && folder.elements.find(config => config.id === layerConfig.id) === undefined) {
+                        folder.elements.push(layerConfig);
+                    }
+                }
+                dispatch("addBaselayerAttribute");
+
+                return true;
+            }
+
+            return false;
+        },
+
+        /**
+     * Replaces the layer with the id of the layer toReplace in state's layerConfig.
+     * Calls 'visibilityChanged' at layer.
+     * @param {Object} context the vue context
+     * @param {Object} context.dispatch the dispatch
+     * @param {Object} context.getters the getters
+     * @param {Object} context.state the state
+     * @param {Object} [payload={}] the payload
+     * @param {Object[]} [payload.layerConfigs=[]] Array of configs of layers to replace, and the id to match in state.layerConfigs
+     * @param {Object} payload.layerConfigs.layer layerConfig
+     * @param {String} payload.layerConfigs.id the id to match in state.layerConfigs
+     * @param {Boolean} [payload.trigger=true] if true then getters are triggered
+     * @returns {void}
+     */
+        replaceByIdInLayerConfig ({dispatch, getters, state}, {layerConfigs = [], trigger = true} = {}) {
+            layerConfigs.forEach(config => {
+                const replacement = config.layer,
+                    id = config.id,
+                    existingLayer = getters.layerConfigById(id),
+                    lastVisibility = existingLayer?.visibility;
+                let assigned = [];
+
+                if (existingLayer?.zIndex === undefined && config.layer.zIndex === undefined && replacement.visibility) {
+                    replacement.zIndex = getters.determineZIndex(id);
+                }
+                assigned = replacer.replaceInNestedValues(state.layerConfig, "elements", replacement, {key: "id", value: id});
+
+                if (assigned.length > 1) {
+                    console.warn(`Replaced ${assigned.length} layers in state.layerConfig with id: ${id}. Layer was found ${assigned.length} times. You have to correct your config!`);
+                }
+
+                // necessary to trigger the getters
+                if (trigger) {
+                    state.layerConfig = {...state.layerConfig};
+                }
+
+                if (typeof replacement.visibility === "boolean" && typeof lastVisibility === "boolean" && lastVisibility !== replacement.visibility) {
+                    layerCollection.getLayerById(id)?.visibilityChanged(replacement.visibility);
+                }
+
+                if (!trigger && (getters["Maps/mode"] === "2D" && !config.layer.is3DLayer || getters["Maps/mode"] === "3D")) {
+                    dispatch("showLayerAttributions", config.layer);
+                }
+            });
+        },
+
+        /**
+     * Adds the layer to layerConfig, if not contained and sets visibility.
+     * If layer is already in layertree, it stays there.
+     * @param {String} layerId id of the layer
+     * @param {Boolean} [visibility = true] value for visibility
+     * @param {Number|String} [transparency = 0] value for transparency
+     * @param {Boolean} [showInLayerTree = true] value for showInLayerTree
+     * @param {Boolean} [isBaseLayer = false] value for isBaseLayer
+     * @param {Number} zIndex new zIndex of the layer in the tree
+     * @param {Number} [payload.time] time information for time-dependent layers e.g. timestamp
+     * @returns {Boolean} true, if layer exists an was added or replaced
+     */
+        addOrReplaceLayer: function ({dispatch, getters}, {layerId, visibility = true, transparency = 0, showInLayerTree = true, isBaseLayer = false, zIndex, time}) {
+            const layer = getters.layerConfigById(layerId);
+            let newZIndex = zIndex;
+
+            if (!layer) {
+                const config = rawLayerList.getLayerWhere({id: layerId}),
+                    parentKey = isBaseLayer ? treeBaselayersKey : treeSubjectsKey;
+
+                if (config) {
+                    config.type = "layer";
+                    config.visibility = visibility;
+                    config.transparency = transparency;
+                    config.showInLayerTree = showInLayerTree;
+                    config.zIndex = newZIndex ?? getters.determineZIndex(layerId);
+                    if (time) {
+                        config.time = time;
+                    }
+
+                    if (config.styleId && typeof styleList.returnStyleObject(config.styleId) === "undefined") {
+                        styleList.initStyleAndAddToList(getters.configJs, config.styleId).then(() => {
+                            dispatch("addLayerToLayerConfig", {layerConfig: config, parentKey});
+                        });
+                    }
+                    else {
+                        dispatch("addLayerToLayerConfig", {layerConfig: config, parentKey});
+                    }
+                }
+                else {
+                    console.warn("addOrReplaceLayer- layer with id: " + layerId + " not added, because it was not found in services.json.");
+                    return false;
+                }
+            }
+            else {
+                if (newZIndex === null || newZIndex === undefined) {
+                    newZIndex = layer.zIndex ?? newZIndex;
+                }
+
+                if ((layer.zIndex === null || layer.zIndex === null) && !layer.showInLayerTree && visibility) {
+                    newZIndex = newZIndex ?? getters.determineZIndex(layerId);
+                }
+
+                dispatch("replaceByIdInLayerConfig", {layerConfigs: [{
+                    id: layerId,
+                    layer: {
+                        visibility: visibility,
+                        transparency: transparency,
+                        showInLayerTree: showInLayerTree,
+                        zIndex: newZIndex,
+                        time: time
+                    }
+                }]});
+            }
+            return true;
+        },
+
+
+        /**
+     * Show an alert that contains the layerAttributions, if these exist.
+     * @param {Object} context the vue context
+     * @param {Object} context.dispatch the dispatch
+     * @param {Object} layerAttributes The layer attributes
+     * @returns {void}
+     */
+        showLayerAttributions ({dispatch}, layerAttributes) {
+            const layerAttribution = layerAttributes?.layerAttribution;
+
+            if (layerAttributes?.visibility && typeof layerAttribution !== "undefined" && layerAttribution !== "nicht vorhanden") {
+                dispatch("Alerting/addSingleAlert", {
+                    content: layerAttribution,
+                    category: "info",
+                    title: layerAttributes?.name,
+                    onceInSession: true
+                }, {root: true});
+            }
+        },
+
+        updateLayerConfigZIndex: zIndexManager.updateLayerConfigZIndex,
+
+        updateAllZIndexes: zIndexManager.updateAllZIndexes,
+
+        /**
+     * Extends all layers of config.json with the attributes of the layer in services.json.
+     * If portalConfig.tree contains parameter 'layerIDsToIgnore', 'metaIDsToIgnore', 'metaIDsToMerge' or 'layerIDsToStyle' the raw layerlist is filtered and merged.
+     * Config entry portalConfig.tree.validLayerTypesAutoTree is respected.
+     * If tree type is 'auto' , folder structure is build from layer's metadata contents for the active or first category configured in config.json unter 'tree'.
+     * Replaces the extended layer in state.layerConf. Sets ids at folders and parentIds at folders and layers.
+     * @param {Object} context the vue context
+     * @param {Object} context.dispatch the dispatch
+     * @param {Object} context.getters the getters
+     * @param {Object} context.state the state
+     * @returns {void}
+     */
+        extendLayers ({dispatch, getters, state}) {
+            let layerContainer = [];
+
+            dispatch("addBaselayerAttribute");
+            if (state.portalConfig?.tree?.type === "auto") {
+                layerContainer = getNestedValues(state.layerConfig, "elements", true).flat(Infinity);
+                dispatch("processTreeTypeAuto", layerContainer);
+                dispatch("updateLayerConfigs", layerContainer);
+            }
+            else {
+                getters.allLayerConfigsByParentKey(treeSubjectsKey).map(attributes => {
+                    const rawLayers = getAndMergeRawLayer(attributes, !getters.showLayerAddButton, state.portalConfig?.tree?.layerIDsToStyle);
+
+                    if (rawLayers.length > 1) {
+                    // this is the case if config parameter tree.layerIDsToStyle results in more than on new created layers
+                    // --> replaces the originally config in config.json with the new created and styled configs
+                        replacer.replaceInNestedValues(state.layerConfig, "elements", rawLayers, {key: "id", value: attributes.id, replaceObject: attributes.id});
+                    }
+                    return Object.assign(attributes, rawLayers[0]);
+                });
+                const allLayerConfigsStructured = getters.allLayerConfigsStructured(),
+                    folders = allLayerConfigsStructured.filter(conf => conf.type === "folder");
+
+                if (allLayerConfigsStructured.find(conf => conf.legendURL !== undefined)) {
+                    console.warn("legendURL ist deprecated in one of the next versions. Please use attribute \"legend\" as boolean or string with path to legend image or pdf.");
+                }
+
+                buildTreeStructure.setIdsAtFolders(folders);
+                // fill layerContainer after state.layerConfig changed
+                layerContainer = getNestedValues(state.layerConfig, "elements", true).flat(Infinity);
+                if (getters.showLayerAddButton) {
+                    dispatch("updateLayerConfigs", layerContainer.filter(conf => conf.baselayer === true || conf.visibility === true || conf.showInLayerTree));
+                }
+                else {
+                    dispatch("updateLayerConfigs", layerContainer);
+                }
+            }
+        },
+
+        /**
+     * Adds the attribute baselayer to layers configured as baselayers.
+     * @param {Object} context the vue context
+     * @param {Object} context.getters the getters
+     * @returns {void}
+     */
+        addBaselayerAttribute ({getters}) {
+            getters.allLayerConfigsByParentKey(treeBaselayersKey).map(attributes => {
+                return Object.assign(attributes, {baselayer: true});
+            });
+        },
+
+        /**
+     * Processes the tree structure with raw layers of the tree type 'auto'.
+     * @param {Object} context the vue context
+     * @param {Object} context.commit the commit
+     * @param {Object} context.getters the getters
+     * @param {Object} context.state the state
+     * @param {Object[]} layerContainer The layer configs.
+     * @returns {void}
+     */
+        processTreeTypeAuto ({commit, getters, state}, layerContainer) {
+            const rawlayers = getAndMergeAllRawLayers(state.portalConfig?.tree, getters.showLayerAddButton),
+                layersStructured = buildTreeStructure.build(rawlayers, state.layerConfig, getters.activeOrFirstCategory, layerContainer);
+
+            if (rawlayers.find(conf => conf.legendURL !== undefined)) {
+                console.warn("legendURL ist deprecated in one of the next versions. Please use attribute \"legend\" as boolean or string with path to legend image or pdf.");
+            }
+
+            commit("setLayerConfigByParentKey", {layerConfigs: layersStructured, parentKey: treeSubjectsKey});
+        },
+
+        /**
+     * Changes the sorting of layerConfigs to the given category and displays them in layerSelection.
+     * @param {Object} context the vue context
+     * @param {Object} context.commit the commit
+     * @param {Object} context.dispatch the dispatch
+     * @param {Object} context.getters the getters
+     * @param {Object} context.rootGetters the rootGetters
+     * @param {Object} context.state the state
+     * @param {Object} category the category to change to
+     * @returns {void}
+     */
+        async changeCategory ({commit, dispatch, getters, rootGetters, state}, category) {
+            const layerContainer = getNestedValues(state.layerConfig, "elements", true).flat(Infinity),
+                rawlayers = getAndMergeAllRawLayers(state.portalConfig?.tree, getters.showLayerAddButton),
+                layersStructured = buildTreeStructure.build(rawlayers, state.layerConfig, category, layerContainer, true);
+
+            commit("setLayerConfigByParentKey", {layerConfigs: layersStructured, parentKey: treeSubjectsKey});
+            commit("Modules/LayerSelection/clearLayerSelection", {root: true});
+            dispatch("Modules/LayerSelection/navigateForward", {
+                lastFolderName: "root",
+                subjectDataLayerConfs: layersStructured.elements,
+                baselayerConfs: rootGetters.allLayerConfigsStructured(treeBaselayersKey)
+            }, {root: true});
+
+            window.trackMatomo?.("Layer", "Layertree category switched", i18next.t(category.name));
+        },
+
+        /**
+     * Updates the layer configs with raw layer attributes.
+     * If new layers are created during merge the original layer is replaced by them.
+     * @param {Object} context the vue context
+     * @param {Object} context.dispatch the dispatch
+     * @param {Object} context.getters the getters
+     * @param {Object[]} layerContainer The layer configs.
+     * @returns {void}
+     */
+        updateLayerConfigs ({dispatch, getters, state}, layerContainer) {
+            layerContainer.forEach(layerConf => {
+                const rawLayers = getAndMergeRawLayer(layerConf, !getters.showLayerAddButton, state.portalConfig?.tree?.layerIDsToStyle);
+
+                if (rawLayers.length > 1) {
+                    // this is the case if config parameter tree.layerIDsToStyle results in more than on new created layers
+                    // --> replaces the originally config in config.json with the new created and styled configs
+                    replacer.replaceInNestedValues(state.layerConfig, "elements", rawLayers, {key: "id", value: layerConf.id, replaceObject: layerConf.id});
+                }
+
+                rawLayers.forEach(mergedRawLayer => {
+                    if (mergedRawLayer) {
+                        dispatch("replaceByIdInLayerConfig", {layerConfigs: [{layer: mergedRawLayer, id: mergedRawLayer.id}]});
+                    }
+                });
+            });
+        }
+    };
+}

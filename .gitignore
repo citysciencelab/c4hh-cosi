@@ -1,6 +1,21 @@
-# Upstream Masterportal checkout — has its own git history (cloned from
-# bitbucket.org/geowerkstatt-hamburg/masterportal, currently on `dev`) and contains
-# installed node_modules. It is set up per Readme.md, not vendored into this repo.
-# Our own COSI artifacts (portal/cosi config, services.json, valhalla/, etc.) will be
-# tracked here at the repo root as the project grows — see BACKLOG.md.
-/masterportal/
+# Masterportal is now VENDORED into this repo (self-contained), not a separate
+# checkout. Its source is tracked under masterportal/; generated dirs are ignored
+# by the nested .gitignore files there (node_modules, build, dist, coverage,
+# portal/cosi/tools/.cache). The belt-and-suspenders rules below cover the rest.
+# Upstream provenance + sync procedure: provenance/README.md and Readme.md.
+
+# Dependencies / build output (safety net — also covered by masterportal/.gitignore)
+node_modules/
+dist/
+build/
+coverage/
+
+# Editor / OS cruft
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Local env overrides (committed examples: .env.example, valhalla/.env.example)
+.env
+valhalla/.env
