@@ -48,3 +48,31 @@ services:
       valhalla:
         condition: service_started
     restart: unless-stopped
+    networks:
+      # `default` = this stack's internal network: nginx proxies /valhalla/ →
+      # http://valhalla:8002 by Docker DNS, so portal MUST stay on it.
+      # `dokploy-network` = Dokploy's shared Traefik network. Dokploy's Domains
+      # UI injects the router/host/TLS labels for `portal`, but for a Compose
+      # app it does NOT attach the container to Traefik's network — without this
+      # Traefik has the route but no reachable backend → "404 page not found"
+      # and no cert (Dokploy issue #3200). Joining both networks fixes it.
+      - default
+      - dokploy-network
+    labels:
+      # Container is on two networks now; tell Traefik which one to dial.
+      - traefik.docker.network=dokploy-network
+
+networks:
+  # The stack's own internal network (portal ↔ valhalla). Declared explicitly so
+  # `portal` can list it alongside dokploy-network above (naming any network on a
+  # service opts out of the implicit default attachment, so it must be named).
+  default: {}
+  # Dokploy/Traefik's shared proxy network — created and owned by Dokploy, so we
+  # attach to the EXISTING one (external) rather than create our own.
+  #
+  # OUTSIDE Dokploy (plain `docker compose up`, bootstrap-csl.sh) this network
+  # won't exist and compose will refuse to start. Create it once — idempotent,
+  # harmless, and it just sits empty if you're not running Traefik:
+  #     docker network create dokploy-network
+  dokploy-network:
+    external: true

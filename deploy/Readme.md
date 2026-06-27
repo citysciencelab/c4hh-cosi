@@ -40,8 +40,13 @@ regardless of where Valhalla actually runs.
 ```bash
 # from the repo root
 cp .env.example .env                       # optional: set PORTAL_PORT, routing knobs
+docker network create dokploy-network      # once (see note); bootstrap-csl.sh does it for you
 docker compose up -d --build               # or: ./deploy/bootstrap-csl.sh
 ```
+
+> The `portal` service joins the external `dokploy-network` (so Dokploy's Traefik
+> can reach it). On Dokploy that network already exists; **off** Dokploy create it
+> once — it's idempotent and sits empty harmlessly if you're not running Traefik.
 
 Then open **http://localhost:8080/cosi/**. The **first** start also builds the
 Valhalla tiles (slow, resource-heavy — see `../valhalla/Readme.md`); the portal
@@ -66,7 +71,17 @@ that (self-contained, no host-side pre-steps):
    `BUILD_TRANSIT` here if you don't want the Hamburg+transit defaults.
 3. **Deploy.** First build: the portal image (`npm` install + Vite build, heavy —
    see *Resource needs*) and Valhalla's first tile build run once.
-4. Add a domain in Dokploy pointing at the `portal` service (port 80) for TLS.
+4. **Domains** → add a domain → service `portal`, container port `80`, HTTPS on.
+   The compose already attaches `portal` to `dokploy-network` and sets
+   `traefik.docker.network=dokploy-network`, so Traefik can reach it. (Without
+   that, a Compose app gets the route labels but no network → `404 page not
+   found` and a self-signed cert — Dokploy issue #3200.) **Redeploy** after
+   adding/changing a domain — labels only apply on redeploy.
+
+> **Don't publish host port 8080 on Dokploy.** Dokploy's own Traefik already
+> binds 8080; set `PORTAL_PORT` to a free port in the Environment tab (or rely on
+> the domain and ignore the host publish) or the deploy fails with
+> `Bind for 0.0.0.0:8080 failed: port is already allocated`.
 
 Persistence: Valhalla tiles live in the named volume `valhalla_tiles`, so they
 survive redeploys (no rebuild). `gtfs_feeds/` is re-fetched on a clean redeploy

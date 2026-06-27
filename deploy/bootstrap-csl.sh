@@ -49,6 +49,11 @@ PORTAL_PORT="$(grep -E '^PORTAL_PORT=' "$ROOT/.env" | cut -d= -f2 || true)"
 PORTAL_PORT="${PORTAL_PORT:-8080}"
 
 # --- 3. build + start ------------------------------------------------------
+# The portal joins `dokploy-network` (external) so Dokploy's Traefik can route to
+# it. Off Dokploy that network doesn't exist and compose would refuse to start —
+# create it (idempotent; sits empty harmlessly if you're not running Traefik).
+docker network create dokploy-network >/dev/null 2>&1 || true
+
 echo "==> Building and starting the stack (first run builds Valhalla tiles — slow)"
 docker compose up -d --build
 

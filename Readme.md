@@ -101,9 +101,15 @@ self-hosted Valhalla routing service, one command — BACKLOG §8):
 ```bash
 cp .env.example .env                      # optional: PORTAL_PORT, etc.
 cp valhalla/.env.example valhalla/.env    # optional: tune routing (BACKLOG §2)
-docker compose up -d --build              # or: ./deploy/bootstrap-csl.sh
+docker network create dokploy-network     # once; harmless off-Dokploy (see note)
+docker compose up -d --build              # or: ./deploy/bootstrap-csl.sh (does this for you)
 # → http://localhost:8080/cosi/
 ```
+
+> The portal attaches to `dokploy-network` so Dokploy's Traefik can route the
+> public domain to it. That network is created by Dokploy; outside Dokploy it
+> doesn't exist, so create it once (idempotent — it just sits empty if you're not
+> running Traefik). `deploy/bootstrap-csl.sh` does this automatically.
 
 The portal image is a multi-stage build (Node 24.15.0 build → nginx runtime) that
 reproduces the layered install below and runs the Vite production build. nginx
