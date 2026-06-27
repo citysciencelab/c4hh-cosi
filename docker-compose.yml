@@ -51,39 +51,49 @@ services:
     networks:
       # `default` = this stack's internal network: nginx proxies /valhalla/ →
       # http://valhalla:8002 by Docker DNS, so portal MUST stay on it.
-      # `dokploy-network` = Dokploy's shared Traefik network. Dokploy's Domains
-      # UI injects the router/host/TLS labels for `portal`, but for a Compose
-      # app it does NOT attach the container to Traefik's network — without this
-      # Traefik has the route but no reachable backend → "404 page not found"
-      # and no cert (Dokploy issue #3200). Joining both networks fixes it.
+      # `dokploy-network` = Dokploy's shared Traefik network — Traefik only routes
+      # to containers attached to it. (Dokploy is supposed to attach compose
+      # services automatically but frequently doesn't; without this every request
+      # 404s even though nginx is healthy. Same fix as the c4hh-mpaddon deploy.)
       - default
       - dokploy-network
     labels:
-      # ── Traefik routing (Dokploy's reverse proxy) ─────────────────────────
-      # Dokploy's Compose deploys do NOT get Traefik router labels auto-injected
-      # — its Domains UI is unreliable for compose (a flat "404 page not found"
-      # from Traefik = no router matched the host, vs a 502 which would mean the
-      # router exists but the backend is unreachable). So declare the router HERE.
-      # Set PORTAL_DOMAIN in the Dokploy Environment tab (e.g. cosi.care4.hamburg);
-      # leave it unset for local `docker compose up` — with no Traefik around these
-      # labels are inert.
-      - traefik.enable=true
-      # HTTPS router + automatic Let's Encrypt cert (Dokploy's resolver is named
-      # "letsencrypt"; its entrypoints are "web" :80 and "websecure" :443).
-      - "traefik.http.routers.cosi-portal-websecure.rule=Host(`${PORTAL_DOMAIN:-localhost}`)"
-      - traefik.http.routers.cosi-portal-websecure.entrypoints=websecure
-      - traefik.http.routers.cosi-portal-websecure.tls=true
-      - traefik.http.routers.cosi-portal-websecure.tls.certresolver=letsencrypt
-      - traefik.http.routers.cosi-portal-websecure.service=cosi-portal
-      # HTTP router → redirect everything to HTTPS.
-      - "traefik.http.routers.cosi-portal-web.rule=Host(`${PORTAL_DOMAIN:-localhost}`)"
-      - traefik.http.routers.cosi-portal-web.entrypoints=web
-      - traefik.http.routers.cosi-portal-web.middlewares=cosi-portal-https
-      - traefik.http.middlewares.cosi-portal-https.redirectscheme.scheme=https
-      # Backend: the portal's nginx listens on 80 inside the container.
-      - traefik.http.services.cosi-portal.loadbalancer.server.port=80
-      # Container is on two networks now; tell Traefik which one to dial.
+      # Domain + TLS are configured in the Dokploy UI → Domains tab (Service:
+      # portal, Container Port: 80, HTTPS on); Dokploy injects the Traefik
+      # router/host/cert labels for you — this is how the working c4hh-mpaddon
+      # (mp.care4.hamburg) is deployed on the same host. The one label below is
+      # still needed because `portal` is on TWO networks: it tells Traefik to
+      # reach the container via dokploy-network. See "Method 2" below to wire the
+      # domain by hand (no UI) instead.
       - traefik.docker.network=dokploy-network
+    healthcheck:
+      # Traefik will NOT create a route for a service whose healthcheck is
+      # FAILING, so this must pass for the domain to work. /cosi/config.js is the
+      # runtime-injected config the SPA loads first (also bootstrap-csl.sh's
+      # readiness probe), so it's a good "portal is really serving" signal.
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1/cosi/config.js || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+    # --- Method 2 (advanced): wire Traefik by hand instead of via the UI --------
+    # Prefer the Dokploy Domains UI (above). If you'd rather not use it, set
+    # PORTAL_DOMAIN in the Environment tab and REPLACE the `labels:` block above
+    # with this one:
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.docker.network=dokploy-network
+    #   - "traefik.http.routers.cosi-portal-websecure.rule=Host(`${PORTAL_DOMAIN}`)"
+    #   - traefik.http.routers.cosi-portal-websecure.entrypoints=websecure
+    #   - traefik.http.routers.cosi-portal-websecure.tls=true
+    #   - traefik.http.routers.cosi-portal-websecure.tls.certresolver=letsencrypt
+    #   - traefik.http.routers.cosi-portal-websecure.service=cosi-portal
+    #   - "traefik.http.routers.cosi-portal-web.rule=Host(`${PORTAL_DOMAIN}`)"
+    #   - traefik.http.routers.cosi-portal-web.entrypoints=web
+    #   - traefik.http.routers.cosi-portal-web.middlewares=cosi-portal-https
+    #   - traefik.http.middlewares.cosi-portal-https.redirectscheme.scheme=https
+    #   - traefik.http.services.cosi-portal.loadbalancer.server.port=80
 
 networks:
   # The stack's own internal network (portal ↔ valhalla). Declared explicitly so

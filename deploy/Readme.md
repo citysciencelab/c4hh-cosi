@@ -67,29 +67,27 @@ that (self-contained, no host-side pre-steps):
 1. **New → Compose**, point it at this repo, compose path `docker-compose.yml`.
 2. **Environment** tab: paste the vars you want to override from `.env.example`
    (Dokploy writes them as the root `.env`, which also feeds the Valhalla
-   service). At minimum set:
-   - **`PORTAL_DOMAIN`** = your public hostname (e.g. `cosi.care4.hamburg`) — this
-     is what wires up Traefik routing + the TLS cert (see below).
-   - **`PORTAL_PORT`** = a free host port (Dokploy's Traefik already binds 8080).
-   - Optionally `OSM_EXTRACT_URL` / `BUILD_TRANSIT` if you don't want the
-     Hamburg+transit defaults.
-3. Point `PORTAL_DOMAIN`'s DNS **A record at the Dokploy server** (Let's Encrypt
+   service). At minimum set **`PORTAL_PORT`** = a free host port (Dokploy's Traefik
+   already binds 8080). Optionally `OSM_EXTRACT_URL` / `BUILD_TRANSIT` if you don't
+   want the Hamburg+transit defaults. (`PORTAL_DOMAIN` is NOT needed — the domain
+   is set in the Domains tab, step 4.)
+3. Point your hostname's DNS **A record at the Dokploy server** (Let's Encrypt
    needs it to resolve before it can issue the cert).
-4. **Deploy.** First build: the portal image (`npm` install + Vite build, heavy —
-   see *Resource needs*) and Valhalla's first tile build run once.
+4. **Domains** tab → add your domain → **Service: `portal`, Container Port: `80`,
+   HTTPS on**. Dokploy injects the Traefik router/host/cert labels; the compose
+   already attaches `portal` to `dokploy-network` and sets
+   `traefik.docker.network=dokploy-network` so Traefik can reach it. (This is how
+   the working `mp.care4.hamburg` deploy is wired.)
+5. **Deploy.** First build: the portal image (`npm` install + Vite build, heavy —
+   see *Resource needs*) and Valhalla's first tile build run once. **Redeploy**
+   after adding/changing the domain — Traefik labels only apply on redeploy.
 
-**Routing/TLS is handled by Traefik labels in `docker-compose.yml`, not the
-Domains tab.** Dokploy's Domains UI does *not* reliably inject Traefik labels for
-Compose services (you get a flat `404 page not found` and a self-signed cert —
-Dokploy issues [#3222], [#3435], [#3161]). So the compose declares the router
-itself and attaches `portal` to `dokploy-network`; you just supply `PORTAL_DOMAIN`.
-**Leave the Domains tab empty** (a UI domain on the same host would create a
-duplicate/conflicting router). After changing `PORTAL_DOMAIN`, **redeploy** —
-labels only apply on redeploy.
-
-[#3222]: https://github.com/Dokploy/dokploy/issues/3222
-[#3435]: https://github.com/Dokploy/dokploy/issues/3435
-[#3161]: https://github.com/Dokploy/dokploy/issues/3161
+> **404 page not found / self-signed cert after deploy?** That's Traefik with no
+> working route. Checklist: (a) the domain is in the **Domains** tab with Service
+> `portal`, port `80`; (b) you **redeployed** after adding it; (c) the portal
+> container shows **healthy** (Traefik won't route an unhealthy backend); (d) DNS
+> resolves to the server. If you'd rather not use the UI, switch to the "Method 2"
+> hand-wired labels in `docker-compose.yml` and set `PORTAL_DOMAIN`.
 
 > **Don't publish host port 8080 on Dokploy.** Dokploy's own Traefik already
 > binds 8080; set `PORTAL_PORT` to a free port in the Environment tab or the
