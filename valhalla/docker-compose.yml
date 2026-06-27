@@ -24,9 +24,18 @@ services:
       - valhalla_tiles:/custom_files
       # Bind mount = unzipped GTFS feeds (populated by scripts/fetch-gtfs.sh).
       - ./gtfs_feeds:/gtfs_feeds
+    depends_on:
+      # Fetch the HVV GTFS feed (if BUILD_TRANSIT) BEFORE the tile build starts.
+      # The init container always exits 0 (degrades to no-transit on failure), so
+      # it can never block the stack from coming up — see its definition below.
+      gtfs-fetch:
+        condition: service_completed_successfully
     environment:
-      # OSM extract(s) to build from — space-separated URLs. Default: Germany.
-      - tile_urls=${OSM_EXTRACT_URL:-https://download.geofabrik.de/europe/germany-latest.osm.pbf}
+      # OSM extract(s) to build from — space-separated URLs. Default: Hamburg
+      # city-state (the validated COSI default — matches the GTFS poly filter).
+      # For full HVV coverage set OSM_EXTRACT_URL to a wider extract AND
+      # GTFS_BOUNDARY_POLY= (empty); see .env.example.
+      - tile_urls=${OSM_EXTRACT_URL:-https://download.geofabrik.de/europe/germany/hamburg-latest.osm.pbf}
       - server_threads=${SERVER_THREADS:-4}
       - serve_tiles=True
       # Build a tar of the tiles for fast loading; reuse it on restart.
@@ -52,6 +61,52 @@ services:
       retries: 5
       start_period: ${HEALTHCHECK_START_PERIOD:-3600s}
     restart: unless-stopped
+
+  # ── GTFS auto-fetch (init) ───────────────────────────────────────────────
+  # Runs once before `valhalla` and downloads + prepares the HVV feed into
+  # ./gtfs_feeds so transit routing works on a hands-off deploy (no host-side
+  # `bootstrap.sh` step needed). It is deliberately fail-soft: if BUILD_TRANSIT
+  # is off, the feed is already present, or the download fails (the HVV URL
+  # expires each schedule period), it exits 0 so the stack still comes up —
+  # car/bike/foot routing always works; transit needs a current HVV_GTFS_URL.
+  gtfs-fetch:
+    image: python:3.12-slim-bookworm
+    container_name: cosi-gtfs-fetch
+    working_dir: /work
+    volumes:
+      # Whole valhalla/ dir → scripts/, hamburg.poly, and the gtfs_feeds output
+      # (same host dir the valhalla service bind-mounts) are all visible.
+      - ./:/work
+    environment:
+      - BUILD_TRANSIT=${BUILD_TRANSIT:-True}
+      - HVV_GTFS_URL=${HVV_GTFS_URL:-https://daten.transparenz.hamburg.de/Dataport.HmbTG.ZS.Webservice.GetRessource100/GetRessource100.svc/f0073555-962c-4d55-870e-b94bb676ad9d/Upload__hvv_Rohdaten_GTFS_Fpl_20260408.ZIP}
+      - GTFS_TRIM_DAYS=${GTFS_TRIM_DAYS:-14}
+      # `-` (not `:-`): an explicitly empty value disables poly filtering (full
+      # HVV coverage); unset falls back to hamburg.poly. Mirrors fetch-gtfs.sh.
+      - GTFS_BOUNDARY_POLY=${GTFS_BOUNDARY_POLY-hamburg.poly}
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -u
+        if [ "${BUILD_TRANSIT:-True}" != "True" ]; then
+          echo "gtfs-fetch: BUILD_TRANSIT != True — skipping GTFS download."; exit 0
+        fi
+        if [ -f gtfs_feeds/hvv/stops.txt ]; then
+          echo "gtfs-fetch: gtfs_feeds/hvv already present — reusing it."; exit 0
+        fi
+        echo "gtfs-fetch: installing curl + unzip …"
+        apt-get update -qq && apt-get install -y -qq --no-install-recommends curl unzip ca-certificates >/dev/null
+        if bash scripts/fetch-gtfs.sh; then
+          echo "gtfs-fetch: HVV feed ready."
+        else
+          echo "gtfs-fetch: WARNING — GTFS fetch failed; bringing the stack up WITHOUT transit." >&2
+          echo "gtfs-fetch: HVV feeds expire each schedule period — update HVV_GTFS_URL" >&2
+          echo "gtfs-fetch: (https://suche.transparenz.hamburg.de/?q=hvv+fahrplandaten+gtfs)," >&2
+          echo "gtfs-fetch: then redeploy. To suppress this, set BUILD_TRANSIT=False." >&2
+          rm -rf gtfs_feeds/hvv
+        fi
+    restart: "no"
 
 volumes:
   valhalla_tiles:

@@ -9,18 +9,21 @@
 #
 # Valhalla is pulled in from its self-contained compose via `include`, so it stays
 # usable on its own (cd valhalla && docker compose up) AND as part of this stack.
-# Its build/data tuning still lives in valhalla/.env (create it from
-# valhalla/.env.example, or run valhalla/bootstrap.sh once).
+# Its build/data tuning comes from valhalla/.env when present, else from ROOT env
+# vars / built-in defaults — see the `include` note and .env.example below.
 
 name: cosi
 
 include:
+  # The included Valhalla service interpolates its ${VARS} against THIS stack's
+  # ROOT environment (root .env / Dokploy env vars) plus its own built-in
+  # `${VAR:-default}`s — so a fresh clone with no valhalla/.env deploys straight
+  # away. Set the routing knobs (OSM_EXTRACT_URL, BUILD_TRANSIT, HVV_GTFS_URL, …)
+  # as ROOT env vars — see .env.example "Valhalla routing".
+  # NB: valhalla/.env is intentionally NOT loaded here (an `include` env_file is
+  # required-if-listed, which would break the no-.env case). It still applies to
+  # the STANDALONE service (`cd valhalla && docker compose up`).
   - path: valhalla/docker-compose.yml
-    # Keep Valhalla's own .env in effect when included (Compose would otherwise
-    # interpolate the included file against the ROOT env only). Create it first:
-    # `cp valhalla/.env.example valhalla/.env` (or run valhalla/bootstrap.sh once).
-    env_file:
-      - valhalla/.env
 
 services:
   portal:
