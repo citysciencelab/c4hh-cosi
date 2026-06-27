@@ -1,0 +1,47 @@
+# Full-stack COSI deployment (BACKLOG §8): portal + routing, one command.
+#
+#   docker compose up -d        # build + run portal and Valhalla together
+#   docker compose logs -f      # watch (Valhalla's first run builds tiles — slow)
+#
+# The portal is a multi-stage build (Node build → nginx runtime, deploy/Dockerfile)
+# serving the static COSI SPA and our self-hosted registries, and reverse-proxying
+# /valhalla/ → the Valhalla service so routing is same-origin (no CORS).
+#
+# Valhalla is pulled in from its self-contained compose via `include`, so it stays
+# usable on its own (cd valhalla && docker compose up) AND as part of this stack.
+# Its build/data tuning still lives in valhalla/.env (create it from
+# valhalla/.env.example, or run valhalla/bootstrap.sh once).
+
+name: cosi
+
+include:
+  - path: valhalla/docker-compose.yml
+    # Keep Valhalla's own .env in effect when included (Compose would otherwise
+    # interpolate the included file against the ROOT env only). Create it first:
+    # `cp valhalla/.env.example valhalla/.env` (or run valhalla/bootstrap.sh once).
+    env_file:
+      - valhalla/.env
+
+services:
+  portal:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    image: cosi-portal:latest
+    container_name: cosi-portal
+    ports:
+      - "${PORTAL_PORT:-8080}:80"
+    environment:
+      # Same-origin routing through this stack's nginx (see deploy/nginx.conf).
+      - VALHALLA_URL=${VALHALLA_URL:-/valhalla}
+      # Optional registry/style overrides (blank = keep the built-in values).
+      - LAYER_CONF=${LAYER_CONF:-}
+      - REST_CONF=${REST_CONF:-}
+      - STYLE_CONF=${STYLE_CONF:-}
+    depends_on:
+      # Start Valhalla first, but DON'T wait for healthy — its first-run tile
+      # build can take a long time; the portal serves immediately, routing
+      # starts working once Valhalla is up.
+      valhalla:
+        condition: service_started
+    restart: unless-stopped

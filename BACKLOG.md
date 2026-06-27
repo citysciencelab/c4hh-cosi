@@ -496,30 +496,71 @@ Target topology (single `docker compose up` at the repo root):
   URL independent of where Valhalla runs).
 - WPS / statistical WFS stay **external** (Hamburg) for now (§7) — not containerized.
 
+**Done 2026-06-26.** Full stack lives at the repo root: `docker-compose.yml`
+(portal + valhalla via `include`), `.dockerignore`, `.env.example`, and `deploy/`
+(`Dockerfile`, `nginx.conf`, `docker-entrypoint.d/40-cosi-runtime-config.sh`,
+`bootstrap-csl.sh`, `Readme.md`). All built + tested end-to-end with a live local
+Valhalla (see per-task notes). Tested: `docker compose config` merges cleanly
+(portal+valhalla on one network, `depends_on` service_started); portal image
+builds (115 MB nginx runtime); portal serves `/cosi/{index.html,config.js,
+config.json,services.json,rest-services.json}` + version-pinned `/mastercode/`;
+runtime injection sets the served valhalla url; the same-origin `/valhalla/` proxy
+returns real Valhalla `/status` **and** a real `POST /valhalla/isochrone` (200,
+3-contour FeatureCollection) — the exact call AccessibilityAnalysis makes.
+
 Tasks:
-- [ ] Add a **`.dockerignore`** and a multi-stage **`Dockerfile`** for the portal.
-      Build stage: Node `24.15.0`, reproduce the **layered install + broken-addons
-      `postinstall` workaround** from §1 (`npm install` in `masterportal/`, then
-      `addons/ npm install --ignore-scripts`, then `cosi/ npm install`), then
-      `npm run build` of the `portal/cosi` portal (§4). Runtime stage: nginx
-      serving `dist/`. **Depends on §4** (no COSI portalconfig exists yet) — until
-      then the image can only build the stock example portal as a smoke test.
-- [ ] **Runtime config injection:** keep `config.js` (`layerConf`/`restConf`/
-      `styleConf`, Valhalla URL) overridable at container start (entrypoint that
-      templates from env, or a mounted config) so one image works local vs CSL
-      without a rebuild. Decide build-time vs runtime config (lean runtime).
-- [ ] Author the **nginx config**: serve the SPA (history fallback), serve the
-      §6 registries, gzip/cache static assets, and reverse-proxy `/valhalla/`.
-- [ ] Create the **root `docker-compose.yml`** orchestrating `portal` + `valhalla`
-      (via `include:`), shared network, healthchecks, `restart: unless-stopped`.
-- [ ] Keep a clear **dev vs prod** split: dev stays on Vite (`npm start`, §1);
-      prod/staging uses the built image. Document both in the root `Readme.md`.
-- [ ] **Image build/publish:** decide registry + tagging (e.g. GHCR, tag by
-      Masterportal+COSI version), and whether CI builds the image. Note the build
-      is heavy (full npm install + Vite build).
-- [ ] **CSL server bootstrap:** one script/compose bringing up the whole stack
-      (portal + valhalla), TLS termination (reverse proxy / Let's Encrypt) for a
-      public hostname, and resource notes (Valhalla build dominates — see §2).
+- [x] Add a **`.dockerignore`** and a multi-stage **`Dockerfile`** for the portal.
+      Build stage: Node `24.15.0`, reproduces the layered install from §1. **Key
+      correction to the planned recipe:** `addons/ npm install --ignore-scripts`
+      then `cosi/ npm install` is **not enough** — the Vite production build bundles
+      **every** addon in `addonsConf.json`, so each addon with its own
+      `node_modules` imports must be installed (e.g. `vpiDashboard` →
+      `vue-slider-component`, else `UNRESOLVED_IMPORT`). The Dockerfile installs the
+      full addon-deps list from the addons `postinstall` (sdpDownload, vcOblique,
+      valuationPrint, waterRiskCheck, simulationTool, shared/js/mapfishUtils,
+      vpiDashboard, gfiThemes/combinedGfi, cosi, storyTellingTool/story{Creator,
+      Manager}) as individual `npm install`s — skipping the root postinstall/prepare
+      (its `husky install` needs a `.git`, absent in the build context). Build runs
+      `vite build --mode production` + `rm -rf dist/portal`. Runtime stage: nginx
+      serving `dist/` (portal at `/cosi/`, assets at `/mastercode/<ver>/`).
+      `ARG MASTERCODE_VERSION_FOLDER=3_23_0` pins the asset folder so the build is
+      deterministic without git. **No longer depends on §4** — the real `portal/cosi`
+      portalconfig is in hand.
+- [x] **Runtime config injection:** `deploy/docker-entrypoint.d/40-cosi-runtime-config.sh`
+      runs on container start (nginx:alpine runs `/docker-entrypoint.d/*.sh`),
+      patching the **served** config from env: `VALHALLA_URL` (default `/valhalla`)
+      → `rest-services.json` valhalla entry (via `jq`); `LAYER_CONF`/`REST_CONF`/
+      `STYLE_CONF` → `config.js` (via `sed`). All optional/defaulted → no-rebuild
+      reconfig, lean-runtime. (Bug found+fixed in test: `jq`'s `mktemp` output was
+      `0600`/root → nginx 403; the script now `chmod 644`s it.)
+- [x] Author the **nginx config** (`deploy/nginx.conf`): serves the SPA
+      (`try_files` fallback; Masterportal uses query-string state, not path
+      routing), serves the §6 registries (`no-store` so injection always takes),
+      gzip + `immutable` 30-day cache on `/mastercode/`, `/` → `/cosi/`, and
+      reverse-proxies `/valhalla/<p>` → `valhalla:8002/<p>`. Uses Docker's embedded
+      resolver (`127.0.0.11`) + a variable upstream so nginx **starts even if
+      Valhalla is down** (routing 502s until it's up). Validated with `nginx -t`.
+- [x] Create the **root `docker-compose.yml`** orchestrating `portal` + `valhalla`
+      via `include` (Valhalla stays self-contained; its `valhalla/.env` is kept in
+      effect via include `env_file`). Shared default network, portal healthcheck,
+      `restart: unless-stopped`, `depends_on: valhalla (service_started)` — NOT
+      `healthy`, so the portal serves immediately while Valhalla's first-run tile
+      build (long) proceeds. *Note:* the stack uses its own `cosi_valhalla_tiles`
+      volume, separate from a standalone `cd valhalla` run's volume (and both name
+      the container `cosi-valhalla`, so run one or the other).
+- [x] Keep a clear **dev vs prod** split: dev = Vite (`npm start`), prod = built
+      image. Documented in the root `Readme.md` (new "Deployment (Docker)" section)
+      and in full in `deploy/Readme.md` (dev/prod table).
+- [x] **Image build/publish:** documented in `deploy/Readme.md` — build context is
+      the repo root, tag by Masterportal+COSI version
+      (`cosi-portal:mp3.23.0-cosi1.2.0` + `:latest`), publish to GHCR from CI once
+      the hosted fork (§2.5) exists so servers pull instead of building. Build is
+      heavy (full layered npm install + Vite build) — flagged.
+- [x] **CSL server bootstrap:** `deploy/bootstrap-csl.sh` — one command: checks
+      Docker/Compose, seeds `.env` + `valhalla/.env` from examples, `docker compose
+      up -d --build`, waits for the portal. TLS termination (Caddy/Traefik/nginx +
+      Let's Encrypt in front, kept outside the app compose) + resource notes
+      (Valhalla build dominates — links §2 table) documented in `deploy/Readme.md`.
 
 ---
 
@@ -564,8 +605,17 @@ Remaining for a complete self-host:
    2026-06-25.** Local Valhalla up (Hamburg tiles, `gis-ops` image), config flipped on
    `cosi-selfhost`, integration-tested live across all profiles + the 7 unit tests. ORS stays the
    fallback (`fallbackServiceId: "csl_ors"`).
-6. **§8 — Dockerize the whole stack (NEXT):** multi-stage portal image (Node `24.15.0` build →
-   nginx runtime), fold `valhalla/` compose in via `include:`, nginx serves the §6 registries and
-   reverse-proxies `/valhalla/` → `valhalla:8002` (same-origin routing). Root `docker-compose.yml`
-   for one-command `portal + valhalla`. Leftover from §6: prune the 64 FHHNET-only ids from
-   `config.json`'s layer tree; optionally self-host `style_v3.json`.
+6. ~~**§8 — Dockerize the whole stack.**~~ **Done 2026-06-26.** Root `docker-compose.yml`
+   (portal + valhalla via `include`) + `deploy/` (multi-stage Dockerfile Node 24.15.0 build →
+   nginx runtime, nginx serving §6 registries + same-origin `/valhalla/` proxy, runtime config
+   injection, CSL bootstrap script). Built + tested end-to-end against a live local Valhalla
+   (portal serves, injection works, isochrone POST proxied 200). See §8.
+
+Remaining (smaller follow-ups, none blocking a working self-host):
+- §2.5: create the hosted fork (`origin`) + automate the upstream-rebase PR job.
+- §6 leftover: prune the 64 FHHNET-only ids from `config.json`'s layer tree (generator lists
+  them); optionally self-host `style_v3.json`.
+- §7: optional statistical-data snapshot hedge.
+- §3: contour-band-count lever (deferred — structural change; see §3).
+- §8 ops: actually run the full multi-state/Germany Valhalla build on the CSL server (§2 path
+  is wired) and stand up TLS for a public hostname.

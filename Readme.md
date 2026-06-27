@@ -10,11 +10,16 @@ Repo layout:
 cosi/
 ├─ BACKLOG.md                 # working plan / task backlog
 ├─ .nvmrc                     # Node version pin (24.15.0)
+├─ docker-compose.yml         # full-stack deploy: portal + valhalla (BACKLOG §8)
+├─ deploy/                    # portal Dockerfile, nginx, entrypoint, CSL bootstrap
+├─ valhalla/                  # self-hosted routing service (Docker; BACKLOG §2)
 └─ masterportal/              # upstream Masterportal v3.23.0 (own git checkout, on `dev`)
    ├─ .nvmrc                  # Node version pin (24.15.0)
    ├─ addons/                 # standalone fork of the agency addons repo (own git history,
    │                          #   branch cosi-selfhost); COSI lives in addons/cosi (v1.2.0)
-   └─ portal/{master,auto,basic}/   # stock example portals (no COSI portal yet — see BACKLOG §4)
+   └─ portal/
+      ├─ cosi/                # the COSI portalconfig (own git repo, branch cosi-selfhost)
+      └─ {master,auto,basic}/ # stock example portals
 ```
 
 ## Local environment setup
@@ -73,6 +78,34 @@ list that already includes the COSI tools (`districtSelector`, `accessibilityAna
 
 > Note: the stock portals do **not** load any COSI tool yet — there is no COSI portalconfig in
 > this repo. Authoring `portal/cosi/` is tracked in BACKLOG §4.
+
+## Deployment (Docker) — dev vs prod
+
+Two ways to run the portal; pick by what you're doing.
+
+**Dev — Vite dev server** (fast hot-reload, for working on the code/config):
+
+```bash
+cd masterportal && npm start          # https://localhost:9001/portal/cosi/
+```
+
+**Prod / staging — full stack in Docker** (the built SPA behind nginx + the
+self-hosted Valhalla routing service, one command — BACKLOG §8):
+
+```bash
+cp .env.example .env                      # optional: PORTAL_PORT, etc.
+cp valhalla/.env.example valhalla/.env    # optional: tune routing (BACKLOG §2)
+docker compose up -d --build              # or: ./deploy/bootstrap-csl.sh
+# → http://localhost:8080/cosi/
+```
+
+The portal image is a multi-stage build (Node 24.15.0 build → nginx runtime) that
+reproduces the layered install below and runs the Vite production build. nginx
+serves the SPA + our self-hosted registries (BACKLOG §6) and reverse-proxies
+`/valhalla/` to the routing container, so the portal calls routing **same-origin**.
+The **first** start also builds Valhalla's tiles (slow, resource-heavy — see
+[`valhalla/Readme.md`](./valhalla/Readme.md)). Full details, runtime config
+injection, image publishing and TLS: [`deploy/Readme.md`](./deploy/Readme.md).
 
 ## Addons fork & upstream updates
 

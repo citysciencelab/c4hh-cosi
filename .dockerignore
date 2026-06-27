@@ -1,0 +1,23 @@
+# Docker build context excludes (context = repo root; see deploy/Dockerfile).
+# Keep the context small: the portal build only needs the masterportal SOURCE
+# tree — never the installed node_modules, the prior dist/, or any .git history.
+
+**/node_modules
+**/.git
+**/dist
+
+# Heavy / irrelevant-to-the-portal-build trees.
+valhalla/gtfs_feeds
+valhalla/*.poly
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dev cert + assorted local artifacts.
+masterportal/devtools/certificate/*.key
+masterportal/devtools/certificate/*.pem
+masterportal/devtools/certificate/*.csr
+**/*.log
+**/.DS_Store
+**/coverage
+**/site
