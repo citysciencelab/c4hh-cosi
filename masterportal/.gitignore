@@ -55,6 +55,10 @@ npm-debug.log
 !/portal/master
 !/portal/auto
 !/portal/layer
+# …and the COSI portalconfig, which is VENDORED here so the Docker/Dokploy build
+# is self-contained (it produces dist/cosi/). Source of truth + history:
+# provenance/portal-cosi.bundle. Without this the build has no /cosi/ → 404.
+!/portal/cosi
 
 
 # Ignore mkdocs build dir

@@ -1,0 +1,2313 @@
+[
+  {
+    "category": "bev_insgesamt",
+    "value": "Bevölkerung insgesamt",
+    "group": "Bevölkerung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_weiblich",
+    "value": "Bevölkerung weiblich",
+    "group": "Bevölkerung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_maennlich",
+    "value": "Bevölkerung männlich",
+    "group": "Bevölkerung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_ab56",
+    "value": "Bevölkerung 56 Jahre und älter",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_ab56_proz",
+    "value": "Anteil der Bevölkerung 56 Jahre und älter an der Bevölkerung insgesamt",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "bev_ab60",
+    "value": "Bevölkerung 60 Jahre und älter",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_ab65",
+    "value": "Bevölkerung 65 Jahre und älter",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_ab65_proz",
+    "value": "Anteil Bevölkerung 65 Jahre und älter an der Bevölkerung insgesamt",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Bevölkerung 65 Jahre und älter",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "bev_65_bis_u80",
+    "value": "Bevölkerung 65 bis unter 80 Jahre",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_ab80",
+    "value": "Bevölkerung 80 Jahre und älter",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_65_bis_u75",
+    "value": "Bevölkerung 65 bis unter 75 Jahre",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_75_bis_u85",
+    "value": "Bevölkerung 75 bis unter 85 Jahre",
+    "group": "Bevölkerung ab 56 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u1",
+    "value": "Bevölkerung unter 1 Jahr",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u3",
+    "value": "Bevölkerung unter 3 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u4",
+    "value": "Bevölkerung unter 4 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u6",
+    "value": "Bevölkerung unter 6 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u15",
+    "value": "Bevölkerung unter 15 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u18",
+    "value": "Bevölkerung unter 18 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u18_proz",
+    "value": "Anteil Bevölkerung unter 18 Jahre an der Bevölkerung insgesamt",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Bevölkerung unter 18 Jahre",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "bev_u21",
+    "value": "Bevölkerung unter 21 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u21_proz",
+    "value": "Anteil der Bevölkerung unter 21 Jahre an der Bevölkerung insgesamt",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "bev_6_bis_9",
+    "value": "Bevölkerung 6 bis unter 10 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_10_bis_14",
+    "value": "Bevölkerung 10 bis unter 15 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_15_bis_20",
+    "value": "Bevölkerung 15 bis unter 21 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_3_bis_u6",
+    "value": "Bevölkerung 3 bis unter 6 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_4_bis_u7",
+    "value": "Bevölkerung 4 bis unter 7 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_6_bis_u12",
+    "value": "Bevölkerung von 6 bis unter 12 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_6_bis_u18",
+    "value": "Bevölkerung 6 bis unter 18 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_7_bis_u13",
+    "value": "Bevölkerung 7 bis unter 13 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_10_bis_u14",
+    "value": "Bevölkerung 10 bis unter 14 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_13_bis_u16",
+    "value": "Bevölkerung 13 bis unter 16 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_12_bis_u18",
+    "value": "Bevölkerung 12 bis unter 18 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_14_bis_u18",
+    "value": "Bevölkerung 14 bis unter 18 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_15_bis_u25",
+    "value": "Bevölkerung 15 bis unter 25 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_16_bis_u26",
+    "value": "Bevölkerung 16 bis unter 26 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_18_bis_u25",
+    "value": "Bevölkerung 18 bis unter 25 Jahre",
+    "group": "Bevölkerung bis unter 26 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u65",
+    "value": "Bevölkerung unter 65 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_15_bis_64",
+    "value": "Bevölkerung 15 bis unter 65 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_21_bis_44",
+    "value": "Bevölkerung 21 bis unter 45 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_45_bis_64",
+    "value": "Bevölkerung 45 bis unter 65 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "summable": true,
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_18_bis_u30",
+    "value": "Bevölkerung 18 bis unter 30 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_18_bis_u30_proz",
+    "value": "Anteil der Bevölkerung 18 bis unter 30 Jahre an der Bevölkerung insgesamt",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "bev_18_bis_u65",
+    "value": "Bevölkerung 18 bis unter 65 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_18_bis_u65_proz",
+    "value": "Anteil der Bevölkerung 18 bis unter 65 Jahre an der Bevölkerung insgesamt",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "bev_25_bis_u55",
+    "value": "Bevölkerung 25 bis unter 55 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_25_bis_u65",
+    "value": "Bevölkerung 25 bis unter 65 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_26_bis_u66",
+    "value": "Bevölkerung 26 bis unter 66 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_30_bis_u56",
+    "value": "Bevölkerung von 30 bis unter 56 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_30_bis_u56_proz",
+    "value": "Anteil der Bevölkerung 30 bis unter 56 Jahren an der Bevölkerung insgesamt",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "bev_55_bis_u65",
+    "value": "Bevölkerung 55 bis unter 65 Jahre",
+    "group": "Bevölkerung bis unter 66 Jahre",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gesamt_unter_6",
+    "value": "Prognose - Bevölkerung gesamt unter 6 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "weiblich_unter_6",
+    "value": "Prognose - Bevölkerung weiblich unter 6 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "maennlich_unter_6",
+    "value": "Prognose - Bevölkerung männlich unter 6 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gesamt_6_17",
+    "value": "Prognose - Bevölkerung gesamt 6 bis unter 18 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "weiblich_6_17",
+    "value": "Prognose - Bevölkerung weiblich 6 bis unter 18 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "maennlich_6_17",
+    "value": "Prognose - Bevölkerung männlich 6 bis unter 18 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gesamt_18_64",
+    "value": "Prognose - Bevölkerung gesamt 18 bis unter 65 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "weiblich_18_64",
+    "value": "Prognose - Bevölkerung weiblich 18 bis unter 65 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "maennlich_18_64",
+    "value": "Prognose - Bevölkerung männlich 18 bis unter 65 Jahre",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gesamt_ab_65",
+    "value": "Prognose - Bevölkerung gesamt 65 Jahre und älter",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "weiblich_ab_65",
+    "value": "Prognose - Bevölkerung weiblich 65 Jahre und älter",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "maennlich_ab_65",
+    "value": "Prognose - Bevölkerung männlich 65 Jahre und älter",
+    "group": "Bevölkerung Prognose",
+    "ltf": true,
+    "stadtteil": "29287",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_auslaender_anz",
+    "value": "Ausländische Bevölkerung",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_auslaender_proz",
+    "value": "Anteil ausländische Bevölkerung an der Bevölkerung insgesamt",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Ausländische Bevölkerung",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "bev_migrationshintergrund_anz",
+    "value": "Bevölkerung mit Migrationshintergrund",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_migrationshintergrund_proz",
+    "value": "Anteil Bevölkerung mit Migrationshintergrund an der Bevölkerung insgesamt",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Bevölkerung mit Migrationshintergrund",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "bev_u18_migrationshintergrund_anz",
+    "value": "Bevölkerung unter 18 Jahre mit Migrationshintergrund",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_u18_migrationshintergrund_proz",
+    "value": "Anteil Bevölkerung unter 18 Jahre mit Migrationshintergrund an der Bevölkerung unter 18 Jahre",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Bevölkerung unter 18 Jahre mit Migrationshintergrund",
+      "category_B": "Bevölkerung unter 18 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "bev_18_bis_u65_migrationshintergrund",
+    "value": "Bevölkerung mit Migrationshintergrund 18 bis unter 65 Jahre",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_18_bis_u65_migrationshintergrund_ant_an_altersgrp_proz",
+    "value": "Anteil der Bevölkerung mit Migrationshintergrund 18 bis unter 65 Jahre an der Bevölkerung 18 bis unter 65 Jahre",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "bev_ab65_migrationshintergrund_anz",
+    "value": "Bevölkerung mit Migrationshintergrund 65 Jahre und älter",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_ab65_migrationshintergrund_proz",
+    "value": "Anteil der Bevölkerung mit Migrationshintergrund 65 Jahre und älter an der Bevölkerung 65 Jahre und älter",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Bevölkerung mit Migrationshintergrund 65 Jahre und älter",
+      "category_B": "Bevölkerung 65 Jahre und älter",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "bev_65_bis_u80_migrationshintergrund",
+    "value": "Bevölkerung mit Migrationshintergrund 65 bis unter 80 Jahre",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_65_bis_u80_migrationshintergrund_ant_an_altersgrp_proz",
+    "value": "Anteil der Bevölkerung mit Migrationshintergrund 65 bis unter 80 Jahre an der Bevölkerung 65 bis unter 80 Jahre",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "bev_ab80_migrationshintergrund",
+    "value": "Bevölkerung mit Migrationshintergrund 80 Jahre und älter",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bev_ab80_migrationshintergrund_ant_an_altersgrp_proz",
+    "value": "Anteil der Bevölkerung mit Migrationshintergrund 80 Jahre und älter an der Bevölkerung 80 Jahre und älter",
+    "group": "Bevölkerung Migrationshintergrund",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "flaeche_brutto_ha",
+    "value": "Bruttofläche in ha",
+    "group": "Fläche",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "flaeche_einw_pro_ha",
+    "value": "Einwohner-/innen je ha",
+    "group": "Fläche",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Bevölkerung insgesamt",
+      "category_B": "Bruttofläche in ha"
+    }
+  },
+  {
+    "category": "hau_privathaushalte_anz",
+    "value": "Privathaushalte",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_haushaltgroesse_avg",
+    "value": "Durchschnittliche Haushaltsgröße",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Bevölkerung insgesamt",
+      "category_B": "Privathaushalte",
+      "modifier": 1
+    }
+  },
+  {
+    "category": "hau_einpersonenhaushalte_anz",
+    "value": "Einpersonenhaushalte",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_einpersonenhaushalte_proz",
+    "value": "Anteil der Einpersonenhaushalte an allen Haushalten",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Einpersonenhaushalte",
+      "category_B": "Privathaushalte",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "hau_haushalte_mit_kindern_anz",
+    "value": "Haushalte mit Kindern",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_haushalte_mit_kindern_proz",
+    "value": "Anteil der Haushalte mit Kindern an allen Haushalten",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Haushalte mit Kindern",
+      "category_B": "Privathaushalte",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "hau_alleinerziehende_anz",
+    "value": "Alleinerziehende",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_alleinerziehende_proz",
+    "value": "Anteil Alleinerziehender an allen Haushalten mit Kindern",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Alleinerziehende",
+      "category_B": "Haushalte mit Kindern",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "hau_alleinerziehende_u18",
+    "value": "Alleinerziehende unter 18 Jahren",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_alleinerziehende_u18_proz",
+    "value": "Anteil der Alleinerziehenden unter 18 Jahren an den Alleinerziehenden insgesamt",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "hau_einpersonenhaushalte_ab65",
+    "value": "Einpersonenhaushalte der 65-Jährigen und Älteren",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_einpersonenhaushalte_ab65_proz",
+    "value": "Anteil der Einpersonenhaushalte der 65-Jährigen und Älteren an allen Haushalten",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "hau_1_kind",
+    "value": "Haushalte mit 1 Kind",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_1_kind_proz",
+    "value": "Anteil der Haushalte mit 1 Kind an allen Haushalten mit Kindern",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "hau_2_kinder",
+    "value": "Haushalte mit 2 Kindern",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_2_kinder_proz",
+    "value": "Anteil der Haushalte mit 2 Kindern an allen Haushalten mit Kindern",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "hau_3_kinder",
+    "value": "Haushalte mit 3 Kindern",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "hau_3_kinder_proz",
+    "value": "Anteil der Haushalte mit 3 Kindern an allen Haushalten mit Kindern",
+    "group": "Haushalte",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "soz_sozverpflichtig_beschaeftigte_ins_anz",
+    "value": "Sozialversicherungspflichtig Beschäftigte",
+    "group": "Sozialversicherungspflichtige",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "soz_sozverpflichtig_beschaeftigte_15_bis_64_ant",
+    "value": "Anteil sozialversicherungspflichtig Beschäftigter an der Bevölkerung im Alter 15 bis unter 65 Jahre",
+    "group": "Sozialversicherungspflichtige",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+	  "calculation": {
+      "operation": "divide",
+      "category_A": "Sozialversicherungspflichtig Beschäftigte",
+      "category_B": "Bevölkerung 15 bis unter 65 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "soz_sozverpflichtig_beschaeftigte_maenner",
+    "value": "Sozialversicherungspflichtig beschäftigte Männer",
+    "group": "Sozialversicherungspflichtige",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "soz_sozverpflichtig_beschaeftigte_maenner_15_bis_64_ant",
+    "value": "Anteil sozialversicherungspflichtig beschäftigter Männer an Männern im Alter 15 bis unter 65 Jahre",
+    "group": "Sozialversicherungspflichtige",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "soz_sozverpflichtig_beschaeftigte_frauen",
+    "value": "Sozialversicherungspflichtig beschäftigte Frauen",
+    "group": "Sozialversicherungspflichtige",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "soz_sozverpflichtig_beschaeftigte_frauen_15_bis_64_ant",
+    "value": "Anteil sozialversicherungspflichtig beschäftigter Frauen an Frauen im Alter 15 bis unter 65 Jahre",
+    "group": "Sozialversicherungspflichtige",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "arb_arbeitslose_ingesamt_anz",
+    "value": "Arbeitslose (SGB III + SGB II)",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "arb_arbeitslose_ingesamt_proz",
+    "value": "Anteil Arbeitslose (SGB III + SGB II) an der Bevölkerung insgesamt",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Arbeitslose (SGB III + SGB II)",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "arb_arbeitslose_15_bis_64_proz",
+    "value": "Anteil Arbeitslose (SGB III + SGB II) an der Bevölkerung im Alter 15 bis unter 65 Jahre",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+	  "calculation": {
+      "operation": "divide",
+      "category_A": "Arbeitslose (SGB III + SGB II)",
+      "category_B": "Bevölkerung 15 bis unter 65 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "arb_arbeitslose_15_bis_24_anz",
+    "value": "Jüngere Arbeitslose im Alter 15 bis unter 25 Jahre",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "arb_arbeitslose_15_bis_24_ant_an_altersgrp_proz",
+    "value": "Anteil jüngerer Arbeitsloser (15 bis unter 25-Jährige) an der Bevölkerung im Alter 15 bis unter 25-Jahre",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Jüngere Arbeitslose im Alter 15 bis unter 25 Jahre",
+      "category_B": "Bevölkerung 15 bis unter 25 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "arb_arbeitslose_55_bis_64_anz",
+    "value": "Ältere Arbeitslose im Alter 55 bis unter 65 Jahre",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "arb_arbeitslose_55_bis_64_ant_an_altersgrp_proz",
+    "value": "Anteil älterer Arbeitsloser (55 bis unter 65-Jährige) an der Bevölkerung im Alter 55 bis unter 65-Jahre",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "arb_alg_empfaenger_insgesamt_anz",
+    "value": "Arbeitslose im Rechtskreis SGB III",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "arb_alg_empfaenger_insgesamt_proz",
+    "value": "Anteil Arbeitslose im Rechtskreis SGB III an der Bevölkerung insgesamt",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Arbeitslose im Rechtskreis SGB III",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "arb_alg_empfaenger_15_bis_64_proz",
+    "value": "Anteil Arbeitslose im Rechtskreis SGB III an der Bevölkerung im Alter 15 bis unter 65 Jahre",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+	"calculation": {
+      "operation": "divide",
+      "category_A": "Arbeitslose im Rechtskreis SGB III",
+      "category_B": "Bevölkerung 15 bis unter 65 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "arb_alg2_empfaenger_insgesamt_anz",
+    "value": "Arbeitslose im Rechtskreis SGB II",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "arb_alg2_empfaenger_insgesamt_proz",
+    "value": "Anteil Arbeitslose im Rechtskreis SGB II an der Bevölkerung insgesamt",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Arbeitslose im Rechtskreis SGB II",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "arb_alg2_empfaenger_15_bis_64_proz",
+    "value": "Anteil Arbeitslose im Rechtskreis SGB II an der Bevölkerung im Alter 15 bis unter 65 Jahre",
+    "group": "Arbeitslose",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+	  "calculation": {
+      "operation": "divide",
+      "category_A": "Arbeitslose im Rechtskreis SGB II",
+      "category_B": "Bevölkerung 15 bis unter 65 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "sgb_bedarfsgemeinschaften_anz",
+    "value": "Bedarfsgemeinschaften nach SGB II",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sgb_leistungsempfaenger_anz",
+    "value": "Leistungsempfänger/-innen nach SGB II",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sgb_anteil_lst_an_der_bevoelkerung_ins_proz",
+    "value": "Anteil Leistungsempfänger/-innen nach SGB II an der Bevölkerung insgesamt",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Leistungsempfänger/-innen nach SGB II",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "sgb_erwerbsfaehige_lstempfaenger_anz",
+    "value": "Erwerbsfähige Leistungsempfänger/-innen nach SGB II",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sgb_anteil_erw_lst_an_der_bev_15_bis_64_proz",
+    "value": "Anteil erwerbsfähige Leistungsempfänger/-innen nach SGB II an der Bevölkerung im Alter 15 bis unter 65 Jahre",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+	"calculation": {
+      "operation": "divide",
+      "category_A": "Erwerbsfähige Leistungsempfänger/-innen nach SGB II",
+      "category_B": "Bevölkerung 15 bis unter 65 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "sgb_ausl_erw_leistungsempfaenger_anz",
+    "value": "Ausländische erwerbsfähige Leistungsempfänger/-innen nach SGB II",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sgb_anteil_ausl_erw_lst_an_der_ausl_bev_15_bis_64_proz",
+    "value": "Anteil ausländische erwerbsfähige Leistungsempfänger/-innen nach SGB II an der ausländischen Bevölkerung im Alter 15 bis unter 65 Jahre",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "sgb_jugendl_lst_15_bis_24_anz",
+    "value": "Leistungsempfänger/-innen nach SGB II im Alter von 15 bis unter 25 Jahre",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sgb_jugendl_lst_anteil_an_bev_15_bis_24_proz",
+    "value": "Anteil Leistungsempfänger/-innen nach SGB II im Alter von 15 bis unter 25 Jahre an der Bevölkerung im Alter 15 bis unter 25 Jahre",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Leistungsempfänger/-innen nach SGB II im Alter von 15 bis unter 25 Jahre",
+      "category_B": "Bevölkerung 15 bis unter 25 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "sgb_nicht_erw_lstempfaenger_u15_anz",
+    "value": "Nicht erwerbsfähige Leistungsempfänger/-innen nach SGB II (überwiegend Kinder unter 15 Jahre)",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sgb_anteil_nicht_erw_lst_an_bev_u15_proz",
+    "value": "Anteil nicht erwerbsfähige Leistungsempfänger/-innen nach SGB II (überwiegend Kinder unter 15 Jahre) an der Bevölkerung unter 15 Jahre",
+    "group": "SGB II Leistungen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+	  "calculation": {
+      "operation": "divide",
+      "category_A": "Nicht erwerbsfähige Leistungsempfänger/-innen nach SGB II (überwiegend Kinder unter 15 Jahre)",
+      "category_B": "Bevölkerung unter 15 Jahre",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "gsa_empf_grundsicherung_ab65_anz",
+    "value": "Empfänger/-innen von Grundsicherung im Alter 65 Jahre und älter",
+    "group": "Grundsicherung im Alter",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gsa_anteil_empf_grundsicherung_bev_ab65_proz",
+    "value": "Anteil Empfänger/-innen von Grundsicherung im Alter 65 Jahre und älter an der Bevölkerung 65 Jahre und älter",
+    "group": "Grundsicherung im Alter",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Empfänger/-innen von Grundsicherung im Alter 65 Jahre und älter",
+      "category_B": "Bevölkerung 65 Jahre und älter",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "wohn_mit_bindungsauslauf_in_5_jahren_anz",
+    "value": "Sozialwohnungen mit Bindungsauslauf in fünf Jahren",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_sozialwohnungen_anz",
+    "value": "Sozialwohnungen",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_wohngebaeude_anz",
+    "value": "Wohngebäude",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_wohnungen_in_wohn_und_nichtwohngebauede_anz",
+    "value": "Wohnungen in Wohn- und Nichtwohngebäuden",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_bezugsfertige_wohnungen_anz",
+    "value": "Bezugsfertig gewordene Wohnungen",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_wohnungen_in_1_und_2_fam_haeusern_anz",
+    "value": "Wohnungen in Ein- und Zweifamilienhäusern",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_wohnungen_in_1_und_2_fam_haeusern_proz",
+    "value": "Anteil der Wohnungen in Ein- und Zweifamilienhäusern an allen Wohnungen",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "wohn_avg_wohnungsgroesse_in_qm",
+    "value": "Durchschnittliche Wohnungsgröße in m²",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_avg_wohnflaeche_in_qm_pro_einw",
+    "value": "Durchschnittliche Wohnfläche je Einwohner/-in in m²",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_ant_sozialwohnungen_an_allen_wohnungen",
+    "value": "Anteil der Sozialwohnungen an allen Wohnungen",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "wohn_ant_sozwohn_mit_bindungauslauf_an_allen_sozwohn",
+    "value": "Anteil der Sozialwohnungen mit Bindungsauslauf in fünf Jahren an allen Sozialwohnungen",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "wohn_avg_immobiliengrundstueckspreis_euro_pro_qm",
+    "value": "Durchschnittlicher Immobilienpreis für ein Grundstück in EUR/m²",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_avg_immobilienpreis_1_2_fam_haus_euro_pro_qm",
+    "value": "Durchschnittlicher Immobilienpreis für ein Ein- bzw Zweifamilienhaus in EUR/m²",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohn_avg_immobilienpreis_eigt_wohnung_euro_pro_qm",
+    "value": "Durchschnittlicher Immobilienpreis für eine Eigentumswohnung in EUR/m²",
+    "group": "Wohnen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wahlbeteiligung_buergerschaftswahl_proz",
+    "value": "Wahlbeteiligung Bürgerschaftswahl",
+    "group": "Wahlbeteiligung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "ver_pkw_bestand_ins_anz",
+    "value": "PKW-Bestand",
+    "group": "Verkehr",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "ver_private_pkw_anz",
+    "value": "Private PKW",
+    "group": "Verkehr",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "ver_private_pkw_je_1000_ew_anz",
+    "value": "Private PKW je 1000 Einwohner",
+    "group": "Verkehr",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Private PKW",
+      "category_B": "Bevölkerung insgesamt",
+      "modifier": 1000
+    }
+  },
+  {
+    "category": "ver_gewerbl_pkw_anz",
+    "value": "Gewerbliche PKW",
+    "group": "Verkehr",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "ver_anteil_pkw_schadstoffkl_4_bis_6_gruene_plakette_proz",
+    "value": "Anteil PKW mit Schadstoffklasse 4 bis 6 (Grüne Plakette) an PKW-Bestand",
+    "group": "Verkehr",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "ver_elektro_pkw_anz",
+    "value": "Elektro-PKW",
+    "group": "Verkehr",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "inf_kita_vorschulklassen_kinder_ab3_bis_schuleintritt_anz",
+    "value": "Kindergärten und Vorschulklassen für Kinder im Alter von 3 Jahren bis Schuleintritt",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "inf_grundschulen_anz",
+    "value": "Grundschulen",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "inf_schueler_sekundarstufe_1_anz",
+    "value": "Schüler:innen der Sekundarstufe I (nach Wohnort)",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "inf_schueler_in_stadtteilsch_an_allen_sekundarstufe_1_proz",
+    "value": "Anteil der Schüler:innen in Stadtteilschulen an allen Schüler:innen der Sekundarstufe I (nach Wohnort)",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "inf_schueler_in_gymn_an_allen_sekundarstufe_1_proz",
+    "value": "Anteil der Schüler:innen in Gymnasien an allen Schüler:innen der Sekundarstufe I (nach Wohnort)",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "inf_niedergelassene_aerzte_anz",
+    "value": "Niedergelassene Ärzte:innen",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "inf_allgemeinaerzte_anz",
+    "value": "Allgemeinärzte:innen",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "inf_zahnaerzte_anz",
+    "value": "Zahnärzte:innen",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "inf_apotheken_anz",
+    "value": "Apotheken",
+    "group": "Infrastruktur",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "betr_quote_2_proz",
+    "value": "Regionale Betreuungsquote der 2-Jährigen (in %)",
+    "group": "Betreuungsquote Kindertagesbetreuung ",
+    "stadtteil": "34503",
+    "bezirk": "34502",
+    "valueType": "relative"
+  },
+  {
+    "category": "betr_quote_unter3_proz",
+    "value": "Regionale Betreuungsquote der unter 3-Jährigen (in %)",
+    "group": "Betreuungsquote Kindertagesbetreuung ",
+    "stadtteil": "34503",
+    "bezirk": "34502",
+    "valueType": "relative"
+  },
+  {
+    "category": "betr_quote_4_proz",
+    "value": "Regionale Betreuungsquote der 4-Jährigen (in %)",
+    "group": "Betreuungsquote Kindertagesbetreuung ",
+    "stadtteil": "34503",
+    "bezirk": "34502",
+    "valueType": "relative"
+  },
+  {
+    "category": "betr_quote_3_schuleintritt_proz",
+    "value": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)",
+    "group": "Betreuungsquote Kindertagesbetreuung ",
+    "stadtteil": "34503",
+    "bezirk": "34502",
+    "valueType": "relative"
+  },
+  {
+    "category": "anteil_unter3_fam_proz",
+    "value": "unter 3-Jährige in %",
+    "group": "Anteile Kinder mit nicht-deutscher Familiensprache in Kitas ",
+    "stadtteil": "34505",
+    "bezirk": "34504",
+    "valueType": "relative"
+  },
+  {
+    "category": "anteil_3_schuleintritt_fam_proz",
+    "value": "3-Jährige bis unter 6,5-Jährige in %",
+    "group": "Anteile Kinder mit nicht-deutscher Familiensprache in Kitas ",
+    "stadtteil": "34505",
+    "bezirk": "34504",
+    "valueType": "relative"
+  },
+  {
+    "category": "bevb_geburten_anz",
+    "value": "Lebendgeborene",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_sterbefaelle_anz",
+    "value": "Sterbefälle",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_zuzuege_ueber_stadtteilgrenze_anz",
+    "value": "Zuzüge über die Stadtteilgrenze",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_fortzuege_ueber_stadtteilgrenze_anz",
+    "value": "Fortzüge über die Stadtteilgrenze",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_diff_zuzuege_fortzuege_anz",
+    "value": "Wanderungssaldo über die Stadtteilgrenze",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_zuzuege_u6_anz",
+    "value": "Zuzüge unter 6 Jahre",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_zuzuege_u18_anz",
+    "value": "Zuzüge unter 18 Jahre",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_zuzuege_18_bis_u65_anz",
+    "value": "Zuzüge 18 bis unter 65 Jahre",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_zuzuege_ab65_anz",
+    "value": "Zuzüge 65 Jahre und älter",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_fortzuege_u6_anz",
+    "value": "Fortzüge unter 6 Jahre",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_fortzuege_u18_anz",
+    "value": "Fortzüge unter 18 Jahre",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_fortzuege_18_bis_u65_anz",
+    "value": "Fortzüge 18 bis unter 65 Jahre",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bevb_fortzuege_ab65_anz",
+    "value": "Fortzüge 65 Jahre und älter",
+    "group": "Bevölkerungsbewegung",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "insgesamt",
+    "value": "Gebäude insgesamt",
+    "group": "Zensus - Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31225",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gl_1_wohnung",
+    "value": "Gebäude mit 1 Wohnung",
+    "group": "Zensus - Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31225",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gl_2_wohnungen",
+    "value": "Gebäude mit 2 Wohnungen",
+    "group": "Zensus - Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31225",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_3_6_wohnungen",
+    "value": "Gebäude mit 3 - 6 Wohnungen",
+    "group": "Zensus - Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31225",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_7_12_wohnungen",
+    "value": "Gebäude mit 7 - 12 Wohnungen",
+    "group": "Zensus - Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31225",
+    "valueType": "absolute"
+  },
+  {
+    "category": "ab_13_und_mehr_wohnungen",
+    "value": "Gebäude mit 13 und mehr Wohnungen",
+    "group": "Zensus - Anzahl der Wohnungen im Gebäude",
+    "stat_gebiet": "31225",
+    "valueType": "absolute"
+  },
+  {
+    "category": "insgesamt",
+    "value": "Wohnungen insgesamt",
+    "group": "Zensus - Art der Wohnungsnutzung",
+    "stat_gebiet": "31226",
+    "valueType": "absolute"
+  },
+  {
+    "category": "von_eigentuemer_bewohnt",
+    "value": "Wohnungen - von Eigentümer/-in bewohnt",
+    "group": "Zensus - Art der Wohnungsnutzung",
+    "stat_gebiet": "31226",
+    "valueType": "absolute"
+  },
+  {
+    "category": "von_eigentuemer_bewohnt",
+    "value": "Anteil der von Eigentümer/-in bewohnten Wohnungen an allen Wohnungen",
+    "group": "Zensus - Art der Wohnungsnutzung",
+    "stat_gebiet": "31226",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Wohnungen - von Eigentümer/-in bewohnt",
+      "category_B": "Wohnungen insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "zu_wohnzwecken_vermietet",
+    "value": "Wohnungen - zu Wohnzwecken vermietet (auch mietfrei)",
+    "group": "Zensus - Art der Wohnungsnutzung",
+    "stat_gebiet": "31226",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zu_wohnzwecken_vermietet",
+    "value": "Anteil der zu Wohnzwecken vermieteten Wohnungen an allen Wohnungen",
+    "group": "Zensus - Art der Wohnungsnutzung",
+    "stat_gebiet": "31226",
+    "valueType": "relative",
+    "calculation": {
+      "operation": "divide",
+      "category_A": "Wohnungen - zu Wohnzwecken vermietet (auch mietfrei)",
+      "category_B": "Wohnungen insgesamt",
+      "modifier": 100
+    }
+  },
+  {
+    "category": "insgesamt",
+    "value": "Gebäude insgesamt",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "vor_1919",
+    "value": "Gebäude vor 1919",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1919_1948",
+    "value": "Gebäude 1919 - 1948",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1949_1978",
+    "value": "Gebäude 1949 - 1978",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1979_1986",
+    "value": "Gebäude 1979 - 1986",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1987_1990",
+    "value": "Gebäude 1987 - 1990",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1991_1995",
+    "value": "Gebäude 1991 - 1995",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_1996_2000",
+    "value": "Gebäude 1996 - 2000",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_2001_2004",
+    "value": "Gebäude 2001 - 2004",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zw_2005_2008",
+    "value": "Gebäude 2005 - 2008",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "ab_2009_und_spaeter",
+    "value": "Gebäude 2009 und später",
+    "group": "Zensus - Baujahr der Gebäude",
+    "stat_gebiet": "31227",
+    "valueType": "absolute"
+  },
+  {
+    "category": "gemeinschaft_von_wohnungseigentuemern",
+    "value": "Gebäude - Gemeinschaft von Wohnungseigentümern/innen",
+    "group": "Zensus - Eigentumsform der Gebäude",
+    "stat_gebiet": "31228",
+    "valueType": "absolute"
+  },
+  {
+    "category": "privatpersonen",
+    "value": "Gebäude - Privatperson/en",
+    "group": "Zensus - Eigentumsform der Gebäude",
+    "stat_gebiet": "31228",
+    "valueType": "absolute"
+  },
+  {
+    "category": "wohnungsgenossenschaft",
+    "value": "Gebäude - Wohnungsgenossenschaft",
+    "group": "Zensus - Eigentumsform der Gebäude",
+    "stat_gebiet": "31228",
+    "valueType": "absolute"
+  },
+  {
+    "category": "kommune_kommunales_wohnungsunternehmen",
+    "value": "Gebäude - Kommune oder kommunales Wohnungsunternehmen",
+    "group": "Zensus - Eigentumsform der Gebäude",
+    "stat_gebiet": "31228",
+    "valueType": "absolute"
+  },
+  {
+    "category": "privatwirtschaftl_wohnungsunternehmen",
+    "value": "Gebäude - Privatwirtschaftliches Wohnungsunternehmen",
+    "group": "Zensus - Eigentumsform der Gebäude",
+    "stat_gebiet": "31228",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anderes_privatwirtschaftl_unternehmen",
+    "value": "Gebäude - Anderes privatwirtschaftliches Unternehmen",
+    "group": "Zensus - Eigentumsform der Gebäude",
+    "stat_gebiet": "31228",
+    "valueType": "absolute"
+  },
+  {
+    "category": "bund_oder_land",
+    "value": "Gebäude - Bund oder Land",
+    "group": "Zensus - Eigentumsform der Gebäude",
+    "stat_gebiet": "31228",
+    "valueType": "absolute"
+  },
+  {
+    "category": "organisation_ohne_erwerbszweck",
+    "value": "Gebäude - Organisation ohne Erwerbszweck (z.B. Kirche)",
+    "group": "Zensus - Eigentumsform der Gebäude",
+    "stat_gebiet": "31228",
+    "valueType": "absolute"
+  },
+  {
+    "category": "fernheizung",
+    "value": "Gebäude - Fernheizung (Fernwärme)",
+    "group": "Zensus - Heizungsart der Gebäude",
+    "stat_gebiet": "31229",
+    "valueType": "absolute"
+  },
+  {
+    "category": "etagenheizung",
+    "value": "Gebäude - Etagenheizung",
+    "group": "Zensus - Heizungsart der Gebäude",
+    "stat_gebiet": "31229",
+    "valueType": "absolute"
+  },
+  {
+    "category": "blockheizung",
+    "value": "Gebäude - Blockheizung",
+    "group": "Zensus - Heizungsart der Gebäude",
+    "stat_gebiet": "31229",
+    "valueType": "absolute"
+  },
+  {
+    "category": "zentralheizung",
+    "value": "Gebäude - Zentralheizung",
+    "group": "Zensus - Heizungsart der Gebäude",
+    "stat_gebiet": "31229",
+    "valueType": "absolute"
+  },
+  {
+    "category": "einzel_und_mehrraumoefen",
+    "value": "Gebäude - Einzel-/Mehrraumöfen (auch Nachtspeicherheizung)",
+    "group": "Zensus - Heizungsart der Gebäude",
+    "stat_gebiet": "31229",
+    "valueType": "absolute"
+  },
+  {
+    "category": "keine_heizung_in_wohnung",
+    "value": "Gebäude - Keine Heizung im Gebäude oder in den Wohnungen",
+    "group": "Zensus - Heizungsart der Gebäude",
+    "stat_gebiet": "31229",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anzahl_u3",
+    "value": "Anzahl Kinder/Jugendliche unter 3-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anteil_u3",
+    "value": "Anteil Kinder/Jugendliche unter 3-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anzahl_3_5",
+    "value": "Anzahl Kinder/Jugendliche 3 bis 5-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anteil_3_5",
+    "value": "Anteil Kinder/Jugendliche 3 bis 5-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anzahl_6_9",
+    "value": "Anzahl Kinder/Jugendliche 6 bis 9-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anteil_6_9",
+    "value": "Anteil Kinder/Jugendliche 6 bis 9-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anzahl_10_15",
+    "value": "Anzahl Kinder/Jugendliche 10 bis 15-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anteil_10_15",
+    "value": "Anteil Kinder/Jugendliche 10 bis 15-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anzahl_u18",
+    "value": "Anzahl Kinder/Jugendliche unter 18-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anteil_u18",
+    "value": "Anteil Kinder/Jugendliche unter 18-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "wanderungssaldo_u6",
+    "value": "Zu/Abwanderungen Familien",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "migrhintergrund_u3",
+    "value": "Kinder mit Migrationshintergund unter 3-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "migrhintergrund_3_5",
+    "value": "Kinder mit Migrationshintergund 3 bis 5-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "migrhintergrund_6_9",
+    "value": "Kinder mit Migrationshintergund 6 bis 9-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "migrhintergrund_10_15",
+    "value": "Kinder mit Migrationshintergund 10 bis 15-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "migrhintergrund_u18",
+    "value": "Kinder mit Migrationshintergund unter 18-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "nicht_dt_spr_kl1",
+    "value": "Schulanfänger mit nicht-deutscher Familiensprache",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "alleinerz_u6",
+    "value": "Kinder Alleinerziehender unter 6-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "alleinerz_u10",
+    "value": "Kinder Alleinerziehender unter 10-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "alleinerz_u16",
+    "value": "Kinder Alleinerziehender unter 16-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "alleinerz_u18",
+    "value": "Kinder Alleinerziehender unter 18-Jährige",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anzahl_abschluss_bezug_osa",
+    "value": "Anzahl ohne Schulabschluss je 1000 unter 18-Jährigen",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anzahl_abschluss_bezug_esa",
+    "value": "Anzahl mit erstem allgemeinbildenden Schulabschluss je 1000 unter 18-Jährigen",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anzahl_abschluss_bezug_msa",
+    "value": "Anzahl mit mittlerem Schulabschluss je 1000 unter 18-Jährigen",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anzahl_abschluss_bezug_abi",
+    "value": "Anzahl mit Abitur/Fachhochschulreife je 1000 unter 18-Jährigen",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anzahl_abschluss_bezug_gesamt",
+    "value": "Anzahl verschiedener Abschlüsse je 1000 unter 18-Jährigen",
+    "group": "Schulkennzahlen",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anzahl_sus_primarstufe",
+    "value": "Anzahl der Schülerinnen und Schüler an Grundschulen",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anzahl_sus_sekundarstufe",
+    "value": "Anzahl der Schülerinnen und Schüler in der Sekundarstufe I",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "absolute"
+  },
+  {
+    "category": "anteil_sus_stadtteilschulen",
+    "value": "Anteil der Schülerinnen und Schüler in Stadtteilschulen in der Sekundarstufe I",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anteil_sus_gymnasien",
+    "value": "Anteil der Schülerinnen und Schüler in Gymnasien in der Sekundarstufe I",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anteil_sus_sonderschulen",
+    "value": "Anteil der Schülerinnen und Schüler in Sonderschulen in der Sekundarstufe I",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anteil_sus_ohneabschluss",
+    "value": "Anteil der Schüler und Schülerinnen ohne ersten allgemeinbildenden Schulabschluss",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anteil_sus_esa",
+    "value": "Anteil der Schüler und Schülerinnen mit ersten allgemeinbildenden Schulabschluss",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anteil_sus_msa",
+    "value": "Anteil der Schüler und Schülerinnen mit mittlerem Schulabschluss",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  },
+  {
+    "category": "anteil_sus_abi",
+    "value": "Anteil der Schüler und Schülerinnen mit Abitur/Fachhochschulreife",
+    "group": "Kennzahlen zur Schullandschaft",
+    "stat_gebiet": "31232",
+    "stadtteil": "31240",
+    "bezirk": "31271",
+    "valueType": "relative"
+  }
+]
